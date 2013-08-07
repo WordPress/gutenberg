@@ -14,7 +14,6 @@ module.exports = function(grunt) {
 				cwd: BUILD_DIR,
 				src: []
 			},
-			svn: [SOURCE_DIR]
 		},
 		copy: {
 			all: {
@@ -44,12 +43,6 @@ module.exports = function(grunt) {
 					// Exceptions
 					'!wp-admin/css/farbtastic.css'
 				]
-			}
-		},
-		svn: {
-			core: {
-				repository: 'https://core.svn.wordpress.org/trunk/',
-				dest: SOURCE_DIR
 			}
 		},
 		uglify: {
@@ -116,25 +109,6 @@ module.exports = function(grunt) {
 	// Register tasks.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core',
 		'uglify:core', 'uglify:tinymce']);
-
-
-	// Add a temporary setup task for preparing the directory using existing repositories.
-	grunt.registerTask('setup', ['clean:all', 'svn']);
-
-	// Add an svn task for checking out repositories.
-	grunt.registerMultiTask('svn', 'Check out a Subversion repository.', function() {
-		var done = this.async();
-		var args = ['checkout', '--ignore-externals', this.data.repository];
-		if (this.data.dest) {
-			args.push(this.data.dest);
-		}
-
-		grunt.util.spawn({
-			cmd: 'svn',
-			args: args,
-			opts: {stdio: 'inherit'}
-		}, done);
-	});
 
 	// Default task.
 	grunt.registerTask('default', ['build']);
