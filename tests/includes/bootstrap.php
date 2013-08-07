@@ -7,6 +7,10 @@
 require_once 'PHPUnit/Autoload.php';
 
 $config_file_path = dirname( __FILE__ ) . '/../wp-tests-config.php';
+if ( ! file_exists( $config_file_path ) ) {
+	// Support having the config file one level up.
+	$config_file_path = dirname( __FILE__ ) . '/../../wp-tests-config.php';
+}
 
 /*
  * Globalize some WordPress variables, because PHPUnit loads this file inside a function
