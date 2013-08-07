@@ -1,0 +1,7 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Windows 3.11\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "moon"
+msgstr "yuhu"

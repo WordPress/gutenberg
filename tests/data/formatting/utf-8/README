@@ -1,0 +1,15 @@
+The Python scripts are for generating test data, because Python's Unicode
+support is much, much, much, much better than PHP's.
+
+ * `utf-8/urlencode.py`, `utf-8/u-urlencode.py` and `utf-8/entitize.py` process UTF-8
+   into a few different formats (%-encoding, %u-encoding, &#decimal;)
+   and are used like normal UNIXy pipes.
+
+   Try:
+
+   `python urlencode.py < utf-8.txt > urlencoded.txt`
+   `python u-urlencode.py < utf-8.txt > u-urlencoded.txt`
+   `python entitize.py < utf-8.txt > entitized.txt`
+
+  * `windows-1252.py` converts Windows-only smart-quotes and things
+    into their unicode &#decimal reference; equivalents.

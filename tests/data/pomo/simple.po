@@ -1,0 +1,54 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress 2.6-bleeding\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "moon"
+msgstr ""
+
+msgctxt "brum"
+msgid "strut"
+msgid_plural "struts"
+msgstr[0] "ztrut0"
+msgstr[1] "ztrut1"
+msgstr[2] "ztrut2"
+
+msgid ""
+"The first thing you need to do is tell Blogger to let WordPress access your "
+"account. You will be sent back here after providing authorization."
+msgstr "baba\n"
+"dyado"
+"gugu"
+
+msgctxt ""
+"con"
+"text"
+msgid ""
+"sing"
+"ular"
+msgid_plural ""
+"plu"
+"ral"
+msgstr[0] ""
+"trans"
+"lation0"
+msgstr[1] ""
+"trans"
+"lation1"
+msgstr[2] ""
+"translation2"
+
+
+
+# baba
+#: wp-admin/x.php:111 baba:333
+#. translators: buuu
+#       brubru
+#, fuzzy
+#: baba
+msgid "a"
+msgstr ""
+
+msgid "a\""
+msgstr ""
+

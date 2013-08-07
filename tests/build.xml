@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="WordPress Unit Tests" default="build" basedir=".">
+    <target name="clean">
+        <delete dir="build" />
+    </target>
+    <target name="prepare">
+        <mkdir dir="build/logs" />
+        <mkdir dir="build/phpunitreport" />
+    </target>
+    <target name="phpunit">
+        <exec command="phpunit" passthru="true"></exec>
+        <phpunitreport infile="build/logs/junit.xml" format="frames" todir="build/phpunitreport" usesorttable="true" />
+    </target>
+    <target name="build" depends="clean,prepare,phpunit" />
+</project>
