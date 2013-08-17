@@ -259,4 +259,15 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * Test HTTP Cookie handling
+	 *
+	 * @ticket 21182
+	 */
+	function test_cookie_handling() {
+		$url = 'http://api.wordpress.org/core/tests/1.0/redirection.php?cookie-test=1';
+
+		$res = wp_remote_get( $url );
+		$this->assertEquals( 'PASS', wp_remote_retrieve_body( $res ) );
+	}
 }

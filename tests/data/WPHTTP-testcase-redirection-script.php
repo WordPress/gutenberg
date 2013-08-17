@@ -96,6 +96,33 @@ if ( isset( $_GET['multiple-location-headers'] ) ) {
 	exit;
 }
 
+if ( isset( $_GET['cookie-test'] ) ) {
+	if ( 'test-cookie' != $_GET['cookie-test'] ) {
+		setcookie( 'api_test_cookie', 'value', time() + 365*24*60*60, '/core/tests/1.0/', 'api.wordpress.org' );
+		setcookie( 'api_test_cookie_minimal', 'value'  );
+		setcookie( 'api_test_cookie_wrong_host', 'value', time() + 365*24*60*60, '/', 'example.com' );
+		setcookie( 'api_test_wildcard_domain', 'value', time() + 365*24*60*60, '/', '.wordpress.org' );
+		setcookie( 'api_test_cookie_expired', 'value', time() - 365*24*60*60, '/', '.wordpress.org' );
+		header( "Location: $url?cookie-test=test-cookie" );
+		exit;
+	}
+
+	if ( empty( $_COOKIE['api_test_cookie'] ) || 'value' != $_COOKIE['api_test_cookie'] )
+		die( 'FAIL_NO_COOKIE' );
+	if ( empty( $_COOKIE['api_test_cookie_minimal'] ) )
+		die( 'FAIL_NO_MINIMAL' );
+	if ( isset( $_COOKIE['api_test_cookie_wrong_host'] ) )
+		die( 'FAIL_WRONG_HOST' );
+	if ( empty( $_COOKIE['api_test_wildcard_domain'] ) )
+		die( 'FAIL_NO_WILDCARD' );
+	if ( isset( $_COOKIE['api_test_cookie_expired'] ) )
+		die( 'FAIL_EXPIRED_COOKIE' );
+
+	echo 'PASS';
+	exit;
+}
+
+
 $rt = isset($_GET['rt']) ? $_GET['rt'] : 5;
 $r = isset($_GET['r']) ? $_GET['r'] : 0;
 
