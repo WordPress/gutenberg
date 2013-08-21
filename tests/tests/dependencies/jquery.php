@@ -7,19 +7,17 @@
 class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 
 	function test_location_of_jquery() {
-		if ( SCRIPT_DEBUG ) {
-			$jquery_scripts = array(
-				'jquery-core'    => '/wp-includes/js/jquery/jquery.js',
-				'jquery-migrate' => '/wp-includes/js/jquery/jquery-migrate.min.js'
-			);
-		} else {
-			$jquery_scripts = array(
-				'jquery-core'    => '/wp-includes/js/jquery/jquery.js',
-				'jquery-migrate' => '/wp-includes/js/jquery/jquery-migrate.js'
-			);
-		}
 		$scripts = new WP_Scripts;
 		wp_default_scripts( $scripts );
+
+		$jquery_scripts = array(
+			'jquery-core' => '/wp-includes/js/jquery/jquery.js',
+		);
+		if ( SCRIPT_DEBUG )
+			$jquery_scripts['jquery-migrate'] = '/wp-includes/js/jquery/jquery-migrate.js';
+		else
+			$jquery_scripts['jquery-migrate'] = '/wp-includes/js/jquery/jquery-migrate.min.js';
+
 		$object = $scripts->query( 'jquery', 'registered' );
 		$this->assertInstanceOf( '_WP_Dependency', $object );
         $this->assertEqualSets( $object->deps, array_keys( $jquery_scripts ) );
@@ -58,5 +56,13 @@ class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 			$this->assertTrue( wp_script_is( $library, 'registered' ) );
 		}
 		set_current_screen( 'front' );
+	}
+
+	/**
+	 * @ticket 24994
+	 */
+	function test_exclusion_of_sourcemaps() {
+		$contents = trim( file_get_contents( ABSPATH . WPINC . '/js/jquery/jquery.js' ) );
+		$this->assertFalse( strpos( $contents, 'sourceMappingURL' ), 'Presence of sourceMappingURL' );
 	}
 }
