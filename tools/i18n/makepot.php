@@ -59,7 +59,7 @@ class MakePOT {
 	var $meta = array(
 		'default' => array(
 			'from-code' => 'utf-8',
-			'msgid-bugs-address' => 'http://wppolyglots.wordpress.com',
+			'msgid-bugs-address' => 'http://make.wordpress.org/polyglots',
 			'language' => 'php',
 			'add-comments' => 'translators',
 			'comments' => "Copyright (C) {year} {package-name}\nThis file is distributed under the same license as the {package-name} package.",
