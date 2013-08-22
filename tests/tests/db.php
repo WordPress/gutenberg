@@ -79,7 +79,8 @@ class Tests_DB extends WP_UnitTestCase {
 		foreach ( $current_locales as $locale_setting ) {
 			if ( false !== strpos( $locale_setting, '=' ) ) {
 				list( $category, $locale ) = explode( '=', $locale_setting );
-				setlocale( constant( $category ), $locale );
+				if ( defined( $category ) )
+					setlocale( constant( $category ), $locale );
 			} else {
 				setlocale( LC_ALL, $locale_setting );
 			}
