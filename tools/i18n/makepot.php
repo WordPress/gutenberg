@@ -108,14 +108,14 @@ class MakePOT {
 		),
 		'wp-plugin' => array(
 			'description' => 'Translation of the WordPress plugin {name} {version} by {author}',
-			'msgid-bugs-address' => 'http://wordpress.org/tag/{slug}',
+			'msgid-bugs-address' => 'http://wordpress.org/support/plugin/{slug}',
 			'copyright-holder' => '{author}',
 			'package-name' => '{name}',
 			'package-version' => '{version}',
 		),
 		'wp-theme' => array(
 			'description' => 'Translation of the WordPress theme {name} {version} by {author}',
-			'msgid-bugs-address' => 'http://wordpress.org/tags/{slug}',
+			'msgid-bugs-address' => 'http://wordpress.org/support/theme/{slug}',
 			'copyright-holder' => '{author}',
 			'package-name' => '{name}',
 			'package-version' => '{version}',
