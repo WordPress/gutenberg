@@ -289,7 +289,7 @@ class Tests_MS extends WP_UnitTestCase {
 	 * @ticket 18119
 	 */
 	function test_upload_is_user_over_quota() {
-		$default_space_allowed = 50;
+		$default_space_allowed = 100;
 		$echo = false;
 
 		$this->assertFalse( upload_is_user_over_quota( $echo ) );
