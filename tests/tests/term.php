@@ -373,8 +373,17 @@ class Tests_Term extends WP_UnitTestCase {
 		$e = wp_insert_term( 'child-neighbor', $this->taxonomy, array( 'parent' => $c['term_id'] ) );
 		$this->assertEquals( 'child-neighbor-2', wp_unique_term_slug( 'child', $d_term ) );
 
+		$f = wp_insert_term( 'foo', $this->taxonomy );
+		$this->assertInternalType( 'array', $f );
+		$f_term = get_term( $f['term_id'], $this->taxonomy );
+		$this->assertEquals( 'foo', $f_term->slug );
+		$this->assertEquals( 'foo', wp_unique_term_slug(  'foo', $f_term ) );
+
+		$g = wp_insert_term( 'foo',  $this->taxonomy );
+		$this->assertInstanceOf( 'WP_Error', $g );
+
 		// clean up
-		foreach ( array( $a, $b, $c, $d, $e ) as $t )
+		foreach ( array( $a, $b, $c, $d, $e, $f ) as $t )
 			$this->assertTrue( wp_delete_term( $t['term_id'], $this->taxonomy ) );
 	}
 
