@@ -6,7 +6,7 @@ The short version:
 
 3. $ svn up
 
-4. Run the tests from the "trunk" directory:
+4. Run the tests from the "trunk/tests" directory:
    To execute a particular test:
       $ phpunit tests/test_case.php
    To execute all tests:
