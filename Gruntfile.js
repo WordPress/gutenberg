@@ -63,7 +63,8 @@ module.exports = function(grunt) {
 					'!wp-admin/js/iris.min.js',
 					'!wp-includes/js/backbone.min.js',
 					'!wp-includes/js/swfobject.js',
-					'!wp-includes/js/underscore.min.js'
+					'!wp-includes/js/underscore.min.js',
+					'!wp-includes/js/zxcvbn.min.js'
 				]
 			},
 			tinymce: {
