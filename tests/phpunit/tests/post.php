@@ -19,19 +19,19 @@ class Tests_Post extends WP_UnitTestCase {
 		wp_set_current_user( $this->old_current_user );
 		parent::tearDown();
 	}
-	
+
 	// helper function: return the timestamp(s) of cron jobs for the specified hook and post
 	function _next_schedule_for_post($hook, $id) {
 		return wp_next_scheduled('publish_future_post', array(0=>intval($id)));
 	}
-	
+
 	// helper function, unsets current user globally
 	function _unset_current_user() {
 		global $current_user, $user_ID;
-		
+
 		$current_user = $user_ID = null;
 	}
-	
+
 	// test simple valid behavior: insert and get a post
 	function test_vb_insert_get_delete() {
 		register_post_type( 'cpt', array( 'taxonomies' => array( 'post_tag', 'ctax' ) ) );
@@ -707,9 +707,9 @@ class Tests_Post extends WP_UnitTestCase {
 	 */
 	function test_insert_programmatic_sanitized() {
 		$this->_unset_current_user();
-		
+
 		register_taxonomy( 'test_tax', 'post' );
-		
+
 		$title = rand_str();
 		$post_data = array(
 			'post_author' => $this->author_id,
@@ -722,7 +722,7 @@ class Tests_Post extends WP_UnitTestCase {
 		);
 		$insert_post_id = wp_insert_post( $post_data, true, true );
 		$this->assertTrue( ( is_int($insert_post_id) && $insert_post_id > 0 ) );
-		
+
 		$post = get_post( $insert_post_id );
 		$this->assertEquals( $post->post_author, $this->author_id );
 		$this->assertEquals( $post->post_title, $title );
@@ -733,9 +733,9 @@ class Tests_Post extends WP_UnitTestCase {
 	 */
 	function test_insert_programmatic_without_current_user_success() {
 		$this->_unset_current_user();
-		
+
 		register_taxonomy( 'test_tax', 'post' );
-		
+
 		$title = rand_str();
 		$post_data = array(
 			'post_author' => $this->author_id,
@@ -748,11 +748,11 @@ class Tests_Post extends WP_UnitTestCase {
 		);
 		// with sanitize set to false
 		$insert_post_id = wp_insert_post( $post_data, true, false );
-		
+
 		$post = get_post( $insert_post_id );
 		$this->assertEquals( $post->post_author, $this->author_id );
 		$this->assertEquals( $post->post_title, $title );
-		
+
 		$terms = wp_get_object_terms( $insert_post_id, 'test_tax' );
 		$this->assertTrue( ( is_array( $terms ) && count( $terms ) == 3 ) );
 	}
@@ -762,9 +762,9 @@ class Tests_Post extends WP_UnitTestCase {
 	 */
 	function test_insert_programmatic_without_current_user_fail() {
 		$this->_unset_current_user();
-		
+
 		register_taxonomy( 'test_tax', 'post' );
-		
+
 		$title = rand_str();
 		$post_data = array(
 			// post_author not set
@@ -797,5 +797,30 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( 1, $count->publish );
 		_unregister_post_type( $post_type );
 		$this->assertEquals( new stdClass, wp_count_posts( $post_type, 'readable' ) );
+	}
+
+	/**
+	 * @ticket 22074
+	 */
+	function test_get_pages_include_exclude() {
+		$page_ids = array();
+
+		foreach ( range( 1, 20 ) as $i )
+			$page_ids[] = $this->factory->post->create( array( 'post_type' => 'page' ) );
+
+		$inc = array_slice( $page_ids, 0, 10 );
+		sort( $inc );
+		$exc = array_slice( $page_ids, 10 );
+		sort( $exc );
+
+		$include = get_pages( array( 'include' => $inc ) );
+		$inc_result = wp_list_pluck( $include, 'ID' );
+		sort( $inc_result );
+		$this->assertEquals( $inc, $inc_result );
+
+		$exclude = get_pages( array( 'exclude' => $exc ) );
+		$exc_result = wp_list_pluck( $exclude, 'ID' );
+		sort( $exc_result );
+		$this->assertEquals( $inc, $exc_result );
 	}
 }
