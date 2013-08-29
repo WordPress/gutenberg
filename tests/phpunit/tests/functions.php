@@ -336,4 +336,23 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		update_option( 'blog_charset', $orig_blog_charset );
 	}
+
+	/**
+	 * @dataProvider data_wp_parse_id_list
+	 */
+	function test_wp_parse_id_list( $expected, $actual ) {
+		$this->assertSame( $expected, array_values( wp_parse_id_list( $actual ) ) );
+	}
+
+	function data_wp_parse_id_list() {
+		return array(
+			array( array( 1, 2, 3, 4 ), '1,2,3,4' ),
+			array( array( 1, 2, 3, 4 ), '1, 2,,3,4' ),
+			array( array( 1, 2, 3, 4 ), '1,2,2,3,4' ),
+			array( array( 1, 2, 3, 4 ), array( '1', '2', '3', '4', '3' ) ),
+			array( array( 1, 2, 3, 4 ), array( 1, '2', 3, '4' ) ),
+			array( array( 1, 2, 3, 4 ), '-1,2,-3,4' ),
+			array( array( 1, 2, 3, 4 ), array( -1, 2, '-3', '4' ) ),
+		);
+	}
 }
