@@ -17,11 +17,19 @@ module.exports = function(grunt) {
 		},
 		copy: {
 			all: {
-				dot: true,
-				expand: true,
-				cwd: SOURCE_DIR,
-				src: ['**','!**/.{svn,git}/**'], // Ignore version control directories.
-				dest: BUILD_DIR
+				files: [
+					{
+						dot: true,
+						expand: true,
+						cwd: SOURCE_DIR,
+						src: ['**','!**/.{svn,git}/**'], // Ignore version control directories.
+						dest: BUILD_DIR
+					},
+					{
+						src: 'wp-config-sample.php',
+						dest: BUILD_DIR
+					}
+				]
 			},
 			dynamic: {
 				dot: true,

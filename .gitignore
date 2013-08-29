@@ -12,6 +12,8 @@ logs
 results
 
 wp-config.php
+wp-tests-config.php
+phpunit.xml
 
 node_modules
 npm-debug.log
