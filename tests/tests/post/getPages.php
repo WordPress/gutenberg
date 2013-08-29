@@ -117,4 +117,15 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 
 		$this->assertEquals( 5, count( $matches[0] ) );
 	}
+
+	/**
+	 * @ticket 22208
+	 */
+	function test_get_chidren_fields_ids() {
+		$post_id = $this->factory->post->create();
+		$child_ids = $this->factory->post->create_many( 5, array( 'post_parent' => $post_id ) );
+
+		$post_ids = get_children( array( 'fields' => 'ids', 'post_parent' => $post_id ) );
+		$this->assertEqualSets( $child_ids, $post_ids );
+	}
 }
