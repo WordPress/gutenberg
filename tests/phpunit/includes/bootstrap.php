@@ -4,21 +4,18 @@
  */
 
 
-$config_file_path = dirname( __FILE__ ) . '/../wp-tests-config.php';
-if ( ! file_exists( $config_file_path ) ) {
-	// Support having the config file one level up.
-	$config_file_path = dirname( __FILE__ ) . '/../../wp-tests-config.php';
+$config_file_path = dirname( dirname( __FILE__ ) );
+if ( ! file_exists( $config_file_path . '/wp-tests-config.php' ) ) {
+	// Support the config file from the root of the develop repository.
+	if ( basename( $config_file_path ) === 'phpunit' && basename( dirname( $config_file_path ) ) === 'tests' )
+		$config_file_path = dirname( dirname( $config_file_path ) );
 }
+$config_file_path .= '/wp-tests-config.php';
 
 /*
  * Globalize some WordPress variables, because PHPUnit loads this file inside a function
  * See: https://github.com/sebastianbergmann/phpunit/issues/325
- *
- * These are not needed for WordPress 3.3+, only for older versions
-*/
-global $table_prefix, $wp_embed, $wp_locale, $_wp_deprecated_widgets_callbacks, $wp_widget_factory;
-
-// These are still needed
+ */
 global $wpdb, $current_site, $current_blog, $wp_rewrite, $shortcode_tags, $wp, $phpmailer;
 
 if ( !is_readable( $config_file_path ) ) {
