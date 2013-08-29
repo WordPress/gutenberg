@@ -139,4 +139,15 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		) );
 		$this->assertEquals( array(), wp_list_pluck( $exc_terms, 'term_id' ) );
 	}
+
+	/**
+	 * @ticket 13992
+	 */
+	function test_get_terms_search() {
+		$term_id1 = $this->factory->tag->create( array( 'slug' => 'burrito' ) );
+		$term_id2 = $this->factory->tag->create( array( 'name' => 'Wilbur' ) );
+
+		$terms = get_terms( 'post_tag', array( 'hide_empty' => false, 'search' => 'bur', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms );
+	}
 }
