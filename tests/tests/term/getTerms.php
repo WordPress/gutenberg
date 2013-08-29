@@ -87,4 +87,36 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$terms = get_terms( array( '111' => 'post_tag' ), array( 'hide_empty' => false ) );
 		$this->assertEquals( $term_id, $terms[0]->term_id );
 	}
+
+	/**
+	 * @ticket 13661
+	 */
+	function test_get_terms_fields() {
+		$term_id1 = $this->factory->tag->create( array( 'slug' => 'woo', 'name' => 'WOO!' ) );
+		$term_id2 = $this->factory->tag->create( array( 'slug' => 'hoo', 'name' => 'HOO!', 'parent' => $term_id1 ) );
+
+		$terms_id_parent = get_terms( 'post_tag', array( 'hide_empty' => false, 'fields' => 'id=>parent' ) );
+		$this->assertEquals( array(
+			$term_id1 => 0,
+			$term_id2 => $term_id1
+		), $terms_id_parent );
+
+		$terms_ids = get_terms( 'post_tag', array( 'hide_empty' => false, 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms_ids );
+
+		$terms_name = get_terms( 'post_tag', array( 'hide_empty' => false, 'fields' => 'names' ) );
+		$this->assertEqualSets( array( 'WOO!', 'HOO!' ), $terms_name );
+
+		$terms_id_name = get_terms( 'post_tag', array( 'hide_empty' => false, 'fields' => 'id=>name' ) );
+		$this->assertEquals( array(
+			$term_id1 => 'WOO!',
+			$term_id2 => 'HOO!',
+		), $terms_id_name );
+
+		$terms_id_slug = get_terms( 'post_tag', array( 'hide_empty' => false, 'fields' => 'id=>slug' ) );
+		$this->assertEquals( array(
+			$term_id1 => 'woo',
+			$term_id2 => 'hoo'
+		), $terms_id_slug );
+	}
 }
