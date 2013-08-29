@@ -119,4 +119,24 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 			$term_id2 => 'hoo'
 		), $terms_id_slug );
 	}
+
+ 	/**
+	 * @ti
+	 * cket 11823
+ 	 */
+	function test_get_terms_include_exclude() {
+		$term_id1 = $this->factory->tag->create();
+		$term_id2 = $this->factory->tag->create();
+		$inc_terms = get_terms( 'post_tag', array(
+			'include' => array( $term_id1, $term_id2 ),
+			'hide_empty' => false
+		) );
+		$this->assertEquals( array( $term_id1, $term_id2 ), wp_list_pluck( $inc_terms, 'term_id' ) );
+
+		$exc_terms = get_terms( 'post_tag', array(
+			'exclude' => array( $term_id1, $term_id2 ),
+			'hide_empty' => false
+		) );
+		$this->assertEquals( array(), wp_list_pluck( $exc_terms, 'term_id' ) );
+	}
 }
