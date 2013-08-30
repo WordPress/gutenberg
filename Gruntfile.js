@@ -53,6 +53,9 @@ module.exports = function(grunt) {
 				]
 			}
 		},
+		qunit: {
+			files: ['tests/qunit/**/*.html']
+		},
 		uglify: {
 			core: {
 				expand: true,
@@ -104,6 +107,10 @@ module.exports = function(grunt) {
 					spawn: false,
 					interval: 2000
 				}
+			},
+			test: {
+				files: ['tests/qunit/**'],
+				tasks: ['qunit']
 			}
 		}
 	});
@@ -112,12 +119,16 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-qunit');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Register tasks.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core',
 		'uglify:core', 'uglify:tinymce']);
+
+	// Testing task.
+	grunt.registerTask('test', ['qunit']);
 
 	// Default task.
 	grunt.registerTask('default', ['build']);
