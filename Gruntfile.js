@@ -109,7 +109,6 @@ module.exports = function(grunt) {
 			tinymce: {
 				options: {
 					separator: '\n',
-					banner: '// Created: <%= grunt.template.today("UTC:yyyy-mm-dd HH:MM:ss Z") %>\n',
 					process: function( src, filepath ) {
 						return '// Source: ' + filepath.replace( BUILD_DIR, '' ) + '\n' + src;
 					}
