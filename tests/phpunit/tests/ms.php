@@ -827,7 +827,7 @@ class Tests_MS extends WP_UnitTestCase {
 	/**
 	 * @ticket 21570
 	 */
-	function test_is_email_address_unsafe() {
+	function test_aggressiveness_of_is_email_address_unsafe() {
 		update_site_option( 'banned_email_domains', array( 'bar.com', 'foo.co' ) );
 
 		foreach ( array( 'test@bar.com', 'test@foo.bar.com', 'test@foo.co', 'test@subdomain.foo.co' ) as $email_address ) {
@@ -839,6 +839,21 @@ class Tests_MS extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 25046
+	 */
+	function test_case_sensitivity_of_is_email_address_unsafe() {
+		update_site_option( 'banned_email_domains', array( 'baR.com', 'Foo.co', 'barfoo.COM', 'BAZ.com' ) );
+
+		foreach ( array( 'test@Bar.com', 'tEst@bar.com', 'test@barFoo.com', 'tEst@foo.bar.com', 'test@baz.Com' ) as $email_address ) {
+			$this->assertTrue( is_email_address_unsafe( $email_address ), "$email_address should be UNSAFE" );
+		}
+
+		foreach ( array( 'test@Foobar.com', 'test@Foo-bar.com', 'tEst@foobar.com', 'test@Subdomain.Foo.com', 'test@fooBAz.com' ) as $email_address ) {
+			$this->assertFalse( is_email_address_unsafe( $email_address ), "$email_address should be SAFE" );
+		}
+
+	}
 	/**
 	 * @ticket 21552
 	 * @ticket 23418
