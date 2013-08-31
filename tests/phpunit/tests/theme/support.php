@@ -78,6 +78,47 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 24932
+	 */
+	function test_supports_html5() {
+		remove_theme_support( 'html5' );
+		$this->assertFalse( current_theme_supports( 'html5' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertFalse( add_theme_support( 'html5' ) );
+		$this->assertFalse( current_theme_supports( 'html5' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
+	}
+
+	/**
+	 * @ticket 24932
+	 */
+	function test_supports_html5_subset() {
+		remove_theme_support( 'html5' );
+		$this->assertFalse( current_theme_supports( 'html5' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertFalse( add_theme_support( 'html5', 'comment-form' ) );
+		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comment-form' ) ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
+
+		// This will return true, which might help a plugin author decide what markup to serve,
+		// but core should never check for it.
+		$this->assertTrue( current_theme_supports( 'html5' ) );
+
+		// It appends, rather than replaces.
+		$this->assertFalse( current_theme_supports( 'html5', 'comments-list' ) );
+		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comments-list' ) ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comments-list' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'search-form' ) );
+
+		// Removal is all or nothing.
+		$this->assertTrue( remove_theme_support( 'html5' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comments-list' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comments-form' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'search-form' ) );
+	}
+
 	function supports_foobar( $yesno, $args, $feature ) {
 		if ( $args[0] == $feature[0] )
 			return true;
