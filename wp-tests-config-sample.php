@@ -21,7 +21,7 @@ define( 'ABSPATH', dirname( __FILE__ ) . '/src/' );
 // These tests will DROP ALL TABLES in the database with the prefix named below.
 // DO NOT use a production database or one that is shared with something else.
 
-define( 'DB_NAME', 'yourdbnamehere' );
+define( 'DB_NAME', 'youremptytestdbnamehere' );
 define( 'DB_USER', 'yourusernamehere' );
 define( 'DB_PASSWORD', 'yourpasswordhere' );
 define( 'DB_HOST', 'localhost' );
