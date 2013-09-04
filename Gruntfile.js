@@ -4,6 +4,9 @@ module.exports = function(grunt) {
 	var SOURCE_DIR = 'src/';
 	var BUILD_DIR = 'build/';
 
+	// Load tasks. 
+	require('matchdep').filterDev('grunt-*').forEach( grunt.loadNpmTasks );
+
 	// Project configuration.
 	grunt.initConfig({
 		clean: {
@@ -153,16 +156,6 @@ module.exports = function(grunt) {
 			}
 		}
 	});
-
-	// Load tasks.
-	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	grunt.loadNpmTasks('grunt-contrib-qunit');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-compress');
-	grunt.loadNpmTasks('grunt-contrib-concat');
 
 	// Register tasks.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'uglify:core',
