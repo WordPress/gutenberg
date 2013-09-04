@@ -823,4 +823,29 @@ class Tests_Post extends WP_UnitTestCase {
 		sort( $exc_result );
 		$this->assertEquals( $inc, $exc_result );
 	}
+
+	function test_get_pages_parent() {
+		$page_id1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_id2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+		$page_id3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id2 ) );
+		$page_id4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+
+		$pages = get_pages( array( 'parent' => 0, 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id1 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => $page_id1, 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id2, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => array( $page_id1, $page_id2 ), 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id2, $page_id3, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => 0 ) );
+		$this->assertEqualSets( array( $page_id1 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => $page_id1 ) );
+		$this->assertEqualSets( array( $page_id2, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => array( $page_id1, $page_id2 ) ) );
+		$this->assertEqualSets( array( $page_id2, $page_id3, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+	}
 }
