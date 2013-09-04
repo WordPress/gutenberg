@@ -88,4 +88,15 @@ EOF;
 EOF;
 		$this->assertEquals($expected, mask_input_value($in));
 	}
+
+	function test_setting_nonexistent_arrays() {
+		$page = 1;
+		$field = 'settings';
+
+		error_reporting( -1 );
+
+		$empty_array[$page][$field] = 'foo';
+
+		unset( $empty_array[$page]['bar']['baz'] );
+	}
 }
