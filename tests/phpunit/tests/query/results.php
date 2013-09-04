@@ -369,4 +369,23 @@ class Tests_Query_Results extends WP_UnitTestCase {
 			'child-two',
 		), wp_list_pluck( $posts, 'post_title' ) );
 	}
+
+	function test_exlude_from_search_empty() {
+		global $wp_post_types;
+		foreach ( array_keys( $wp_post_types ) as $slug )
+			$wp_post_types[$slug]->exclude_from_search = true;
+
+		$posts = $this->q->query( array( 'post_type' => 'any' ) );
+
+		$this->assertEmpty( $posts );
+		$this->assertRegExp( '#AND 1=0#', $this->q->request );
+
+		foreach ( array_keys( $wp_post_types ) as $slug )
+			$wp_post_types[$slug]->exclude_from_search = false;
+
+		$posts2 = $this->q->query( array( 'post_type' => 'any' ) );
+
+		$this->assertNotEmpty( $posts2 );
+		$this->assertNotRegExp( '#AND 1=0#', $this->q->request );
+	}
 }
