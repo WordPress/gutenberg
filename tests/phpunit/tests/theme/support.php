@@ -85,9 +85,12 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		remove_theme_support( 'html5' );
 		$this->assertFalse( current_theme_supports( 'html5' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
-		$this->assertFalse( add_theme_support( 'html5' ) );
-		$this->assertFalse( current_theme_supports( 'html5' ) );
-		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertNotSame( false, add_theme_support( 'html5' ) );
+		$this->assertTrue( current_theme_supports( 'html5' ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comment-list' ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'search-form' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'something-else' ) );
 	}
 
 	/**
@@ -106,17 +109,27 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		$this->assertTrue( current_theme_supports( 'html5' ) );
 
 		// It appends, rather than replaces.
-		$this->assertFalse( current_theme_supports( 'html5', 'comments-list' ) );
-		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comments-list' ) ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-list' ) );
+		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comment-list' ) ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
-		$this->assertTrue( current_theme_supports( 'html5', 'comments-list' ) );
+		$this->assertTrue( current_theme_supports( 'html5', 'comment-list' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'search-form' ) );
 
 		// Removal is all or nothing.
 		$this->assertTrue( remove_theme_support( 'html5' ) );
-		$this->assertFalse( current_theme_supports( 'html5', 'comments-list' ) );
-		$this->assertFalse( current_theme_supports( 'html5', 'comments-form' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-list' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'search-form' ) );
+	}
+
+	/**
+	 * @ticket 24932
+	 */
+	function test_supports_html5_invalid() {
+		remove_theme_support( 'html5' );
+		$this->assertFalse( add_theme_support( 'html5', 'comment-form' ) );
+		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
+		$this->assertFalse( current_theme_supports( 'html5' ) );
 	}
 
 	function supports_foobar( $yesno, $args, $feature ) {
