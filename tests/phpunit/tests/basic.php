@@ -93,8 +93,6 @@ EOF;
 		$page = 1;
 		$field = 'settings';
 
-		error_reporting( -1 );
-
 		$empty_array[$page][$field] = 'foo';
 
 		unset( $empty_array[$page]['bar']['baz'] );
