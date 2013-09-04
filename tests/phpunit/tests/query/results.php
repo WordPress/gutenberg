@@ -388,4 +388,102 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertNotEmpty( $posts2 );
 		$this->assertNotRegExp( '#AND 1=0#', $this->q->request );
 	}
+
+	function test_query_author_vars() {
+		$author_1 = $this->factory->user->create( array( 'user_login' => 'admin1', 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_1 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_1, 'post_date' => '2007-01-01 00:00:00' ) );
+
+		$author_2 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_2 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_2, 'post_date' => '2007-01-01 00:00:00' ) );
+
+		$author_3 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_3 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_3, 'post_date' => '2007-01-01 00:00:00' ) );
+
+		$author_4 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_4 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_4, 'post_date' => '2007-01-01 00:00:00' ) );
+
+		$posts = $this->q->query( array(
+			'author' => '',
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_2, $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => 0,
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_2, $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => '0',
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_2, $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => $author_1,
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => "$author_1",
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => "{$author_1},{$author_2}",
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_2 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => "-{$author_1},{$author_2}",
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_2, $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => "{$author_1},-{$author_2}",
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author' => "-{$author_1},-{$author_2}",
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author__in' => array( $author_1, $author_2 ),
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1, $author_2 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author__not_in' => array( $author_1, $author_2 ),
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_3, $author_4 ), $author_ids );
+
+		$posts = $this->q->query( array(
+			'author_name' => 'admin1',
+			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
+		) );
+		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
+		$this->assertEqualSets( array( $author_1 ), $author_ids );
+	}
 }
