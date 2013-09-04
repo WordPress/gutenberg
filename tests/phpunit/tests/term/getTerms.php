@@ -150,4 +150,33 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$terms = get_terms( 'post_tag', array( 'hide_empty' => false, 'search' => 'bur', 'fields' => 'ids' ) );
 		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms );
 	}
+
+	function test_get_terms_like() {
+		$term_id1 = $this->factory->tag->create( array( 'name' => 'burrito', 'description' => 'This is a burrito.' ) );
+		$term_id2 = $this->factory->tag->create( array( 'name' => 'taco', 'description' => 'Burning man.' ) );
+
+		$terms = get_terms( 'post_tag', array( 'hide_empty' => false, 'name__like' => 'bur', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1 ), $terms );
+
+		$terms2 = get_terms( 'post_tag', array( 'hide_empty' => false, 'description__like' => 'bur', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms2 );
+
+		$terms3 = get_terms( 'post_tag', array( 'hide_empty' => false, 'name__like' => 'Bur', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1 ), $terms3 );
+
+		$terms4 = get_terms( 'post_tag', array( 'hide_empty' => false, 'description__like' => 'Bur', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms4 );
+
+		$terms5 = get_terms( 'post_tag', array( 'hide_empty' => false, 'name__like' => 'ENCHILADA', 'fields' => 'ids' ) );
+		$this->assertEmpty( $terms5 );
+
+		$terms6 = get_terms( 'post_tag', array( 'hide_empty' => false, 'description__like' => 'ENCHILADA', 'fields' => 'ids' ) );
+		$this->assertEmpty( $terms6 );
+
+		$terms7 = get_terms( 'post_tag', array( 'hide_empty' => false, 'name__like' => 'o', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms7 );
+
+		$terms8 = get_terms( 'post_tag', array( 'hide_empty' => false, 'description__like' => '.', 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms8 );
+	}
 }
