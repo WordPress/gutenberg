@@ -466,4 +466,37 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( $tag_id, $terms[0]->term_id );
 		$this->assertEquals( 'This description is even more amazing!', $terms[0]->description );
 	}
+
+	function test_wp_set_post_categories() {
+		$post_id = $this->factory->post->create();
+		$post = get_post( $post_id );
+
+		$this->assertInternalType( 'array', $post->post_category );
+		$this->assertEquals( 1, count( $post->post_category ) );
+		$this->assertEquals( get_option( 'default_category' ), $post->post_category[0] );
+		$term1 = wp_insert_term( 'Foo', 'category' );
+		$term2 = wp_insert_term( 'Bar', 'category' );
+		$term3 = wp_insert_term( 'Baz', 'category' );
+		wp_set_post_categories( $post_id, array( $term1['term_id'], $term2['term_id'] ) );
+		$this->assertEquals( 2, count( $post->post_category ) );
+		$this->assertEquals( array( $term2['term_id'], $term1['term_id'] ) , $post->post_category );
+
+		wp_set_post_categories( $post_id, $term3['term_id'], true );
+		$this->assertEquals( array( $term2['term_id'], $term3['term_id'], $term1['term_id'] ) , $post->post_category );
+
+		$term4 = wp_insert_term( 'Burrito', 'category' );
+		wp_set_post_categories( $post_id, $term4['term_id'] );
+		$this->assertEquals( array( $term4['term_id'] ), $post->post_category );
+
+		wp_set_post_categories( $post_id, array( $term1['term_id'], $term2['term_id'] ), true );
+		$this->assertEquals( array( $term2['term_id'], $term4['term_id'],$term1['term_id'] ), $post->post_category );
+
+		wp_set_post_categories( $post_id, array(), true );
+		$this->assertEquals( 1, count( $post->post_category ) );
+		$this->assertEquals( get_option( 'default_category' ), $post->post_category[0] );
+
+		wp_set_post_categories( $post_id, array() );
+		$this->assertEquals( 1, count( $post->post_category ) );
+		$this->assertEquals( get_option( 'default_category' ), $post->post_category[0] );
+	}
 }
