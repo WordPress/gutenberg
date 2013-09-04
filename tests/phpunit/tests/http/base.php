@@ -270,4 +270,20 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$res = wp_remote_get( $url );
 		$this->assertEquals( 'PASS', wp_remote_retrieve_body( $res ) );
 	}
+
+	/**
+	 * Test if HTTPS support works
+	 *
+	 * @group ssl
+	 * @ticket 25007
+	 */
+	function test_ssl() {
+		if ( ! wp_http_supports( array( 'ssl' ) ) )
+			$this->markTestSkipped( 'This install of PHP does not support SSL' );
+
+		$res = wp_remote_get( 'https://wordpress.org/' );
+		$this->assertTrue( ! is_wp_error( $res ), print_r( $res, true ) );
+	}
+	
+	
 }
