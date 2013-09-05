@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * A set of unit tests for functions in wp-includes/rewrite.php
+ *
+ * @group rewrite
+ */
+class Tests_Rewrite extends WP_UnitTestCase {
+
+	function setUp() {
+		parent::setUp();
+
+		// Need rewrite rules in place to use url_to_postid
+		global $wp_rewrite;
+		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+		create_initial_taxonomies();
+		$GLOBALS['wp_rewrite']->init();
+		flush_rewrite_rules();
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		$GLOBALS['wp_rewrite']->init();
+	}
+
+	function test_url_to_postid() {
+
+		$id = $this->factory->post->create();
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
+
+		$id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
+	}
+
+	function test_url_to_postid_hierarchical() {
+
+		$parent_id = $this->factory->post->create( array( 'post_title' => 'Parent', 'post_type' => 'page' ) );
+		$child_id = $this->factory->post->create( array( 'post_title' => 'Child', 'post_type' => 'page', 'post_parent' => $parent_id ) );
+
+		$this->assertEquals( $parent_id, url_to_postid( get_permalink( $parent_id ) ) );
+		$this->assertEquals( $child_id, url_to_postid( get_permalink( $child_id ) ) );
+	}
+
+	function test_url_to_postid_home_has_path() {
+
+		update_option( 'home', home_url( '/example/' ) );
+
+		$id = $this->factory->post->create( array( 'post_title' => 'Hi', 'post_type' => 'page', 'post_name' => 'examp' ) );
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
+		$this->assertEquals( $id, url_to_postid( site_url('/example/examp' ) ) );
+		$this->assertEquals( $id, url_to_postid( '/example/examp/' ) );
+		$this->assertEquals( $id, url_to_postid( '/example/examp' ) );
+
+		$this->assertEquals( 0, url_to_postid( site_url( '/example/ex' ) ) );
+		$this->assertEquals( 0, url_to_postid( '/example/ex' ) );
+		$this->assertEquals( 0, url_to_postid( '/example/ex/' ) );
+		$this->assertEquals( 0, url_to_postid( '/example-page/example/' ) );
+		$this->assertEquals( 0, url_to_postid( '/example-page/ex/' ) );
+	}
+
+	function test_url_to_postid_dupe_path() {
+		update_option( 'home', home_url('/example/') );
+
+		$id = $this->factory->post->create( array( 'post_title' => 'Hi', 'post_type' => 'page', 'post_name' => 'example' ) );
+
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
+		$this->assertEquals( $id, url_to_postid( site_url( '/example/example/' ) ) );
+		$this->assertEquals( $id, url_to_postid( '/example/example/' ) );
+		$this->assertEquals( $id, url_to_postid( '/example/example' ) );
+	}
+
+	/**
+	 * Reveals bug introduced in WP 3.0
+	 */
+	function test_url_to_postid_home_url_collision() {
+		update_option( 'home', home_url( '/example' ) );
+
+		$this->factory->post->create( array( 'post_title' => 'Collision', 'post_type' => 'page', 'post_name' => 'collision' ) );
+
+		// This url should NOT return a post ID
+		$badurl = site_url( '/example-collision' );
+		$this->assertEquals( 0, url_to_postid( $badurl ) );
+	}
+
+	/**
+	 * Reveals bug introduced in WP 3.0
+	 *
+	 * Run tests using multisite `phpunit -c multisite`
+	 */
+	function test_url_to_postid_ms_home_url_collision() {
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'test_url_to_postid_ms_home_url_collision requires multisite' );
+			return false;
+		}
+
+		$blog_id = $this->factory->blog->create( array( 'path' => '/example' ) );
+		switch_to_blog( $blog_id );
+
+		$this->factory->post->create( array( 'post_title' => 'Collision ', 'post_type' => 'page' ) );
+
+		// This url should NOT return a post ID
+		$badurl = network_home_url( '/example-collision' );
+		$this->assertEquals( 0, url_to_postid( $badurl ) );
+
+		restore_current_blog();
+	}
+}
