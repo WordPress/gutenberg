@@ -19,7 +19,7 @@ class Tests_Meta extends WP_UnitTestCase {
 		$meta = sanitize_meta( 'some_meta', 'unsanitized', 'post' );
 		$this->assertEquals( 'unsanitized', $meta );
 
-		register_meta( 'post', 'some_meta', array( &$this, '_meta_sanitize_cb' ) );
+		register_meta( 'post', 'some_meta', array( $this, '_meta_sanitize_cb' ) );
 		$meta = sanitize_meta( 'some_meta', 'unsanitized', 'post' );
 		$this->assertEquals( 'sanitized', $meta );
 	}

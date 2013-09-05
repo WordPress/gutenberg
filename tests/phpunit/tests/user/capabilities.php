@@ -508,7 +508,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertFalse( $admin->has_cap('add_post_meta', $post, '_protected') );
 			$this->assertFalse( $admin->has_cap('delete_post_meta', $post, '_protected') );
 
-			register_meta( 'post', '_protected', array( &$this, '_meta_filter' ), array( &$this, '_meta_yes_you_can' ) );
+			register_meta( 'post', '_protected', array( $this, '_meta_filter' ), array( $this, '_meta_yes_you_can' ) );
 			$this->assertTrue( $admin->has_cap('edit_post_meta',  $post, '_protected') );
 			$this->assertTrue( $admin->has_cap('add_post_meta',  $post, '_protected') );
 			$this->assertTrue( $admin->has_cap('delete_post_meta',  $post, '_protected') );
@@ -517,7 +517,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertTrue( $admin->has_cap('add_post_meta', $post, 'not_protected') );
 			$this->assertTrue( $admin->has_cap('delete_post_meta', $post, 'not_protected') );
 
-			register_meta( 'post', 'not_protected', array( &$this, '_meta_filter' ), array( &$this, '_meta_no_you_cant' ) );
+			register_meta( 'post', 'not_protected', array( $this, '_meta_filter' ), array( $this, '_meta_no_you_cant' ) );
 			$this->assertFalse( $admin->has_cap('edit_post_meta',  $post, 'not_protected') );
 			$this->assertFalse( $admin->has_cap('add_post_meta',  $post, 'not_protected') );
 			$this->assertFalse( $admin->has_cap('delete_post_meta',  $post, 'not_protected') );

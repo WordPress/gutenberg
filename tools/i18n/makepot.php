@@ -237,7 +237,7 @@ class MakePOT {
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-core', 'output' => $output,
 			'extract_not_gettexted' => true,
-                        'not_gettexted_files_filter' => array( &$this, 'is_not_ms_file' ),
+                        'not_gettexted_files_filter' => array( $this, 'is_not_ms_file' ),
 		) );
 	}
 
@@ -340,7 +340,7 @@ class MakePOT {
 			'includes' => $this->ms_files, 'excludes' => array(),
 			'default_output' => 'wordpress-ms.pot',
 			'extract_not_gettexted' => true,
-			'not_gettexted_files_filter' => array( &$this, 'is_ms_file' ),
+			'not_gettexted_files_filter' => array( $this, 'is_ms_file' ),
 		) );
 		if ( !$ms_result ) {
 			return false;
@@ -557,7 +557,7 @@ $included_files = get_included_files();
 if ($included_files[0] == __FILE__) {
 	$makepot = new MakePOT;
 	if ((3 == count($argv) || 4 == count($argv)) && in_array($method = str_replace('-', '_', $argv[1]), get_class_methods($makepot))) {
-		$res = call_user_func(array(&$makepot, $method), realpath($argv[2]), isset($argv[3])? $argv[3] : null);
+		$res = call_user_func(array($makepot, $method), realpath($argv[2]), isset($argv[3])? $argv[3] : null);
 		if (false === $res) {
 			fwrite(STDERR, "Couldn't generate POT file!\n");
 		}

@@ -32,7 +32,7 @@ class WPProfiler {
 
 		if (!$this->stack) {
 			// log all actions and filters
-			add_filter('all', array(&$this, 'log_filter'));
+			add_filter('all', array($this, 'log_filter'));
 		}
 
 		// reset the wpdb queries log, storing it on the profile stack if necessary
@@ -101,7 +101,7 @@ class WPProfiler {
 		}
 
 		if (!$this->stack) {
-			remove_filter('all', array(&$this, 'log_filter'));
+			remove_filter('all', array($this, 'log_filter'));
 		}
 	}
 

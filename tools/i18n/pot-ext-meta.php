@@ -51,7 +51,7 @@ class PotExtMeta {
 		if ( $headers )
 			$this->headers = (array) $headers;
 		if ( is_dir( $ext_filename ) ) {
-			$pot = implode('', array_map(array(&$this, 'load_from_file'), glob("$ext_filename/*.php")));
+			$pot = implode('', array_map(array($this, 'load_from_file'), glob("$ext_filename/*.php")));
 		} else {
 			$pot = $this->load_from_file($ext_filename);
 		}

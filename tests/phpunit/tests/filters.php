@@ -12,7 +12,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$tag = rand_str();
 		$val = rand_str();
 
-		add_filter($tag, array(&$a, 'filter'));
+		add_filter($tag, array($a, 'filter'));
 		$this->assertEquals($val, apply_filters($tag, $val));
 
 		// only one event occurred for the hook, with empty args
@@ -29,7 +29,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$tag = rand_str();
 		$val = rand_str();
 
-		add_filter($tag, array(&$a, 'filter'));
+		add_filter($tag, array($a, 'filter'));
 		$this->assertEquals($val, apply_filters($tag, $val));
 
 		// make sure our hook was called correctly
@@ -37,7 +37,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$this->assertEquals(array($tag), $a->get_tags());
 
 		// now remove the filter, do it again, and make sure it's not called this time
-		remove_filter($tag, array(&$a, 'filter'));
+		remove_filter($tag, array($a, 'filter'));
 		$this->assertEquals($val, apply_filters($tag, $val));
 		$this->assertEquals(1, $a->get_call_count());
 		$this->assertEquals(array($tag), $a->get_tags());
@@ -66,8 +66,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$val = rand_str();
 
 		// add both filters to the hook
-		add_filter($tag, array(&$a1, 'filter'));
-		add_filter($tag, array(&$a2, 'filter'));
+		add_filter($tag, array($a1, 'filter'));
+		add_filter($tag, array($a2, 'filter'));
 
 		$this->assertEquals($val, apply_filters($tag, $val));
 
@@ -82,7 +82,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$val = rand_str();
 		$arg1 = rand_str();
 
-		add_filter($tag, array(&$a, 'filter'), 10, 2);
+		add_filter($tag, array($a, 'filter'), 10, 2);
 		// call the filter with a single argument
 		$this->assertEquals($val, apply_filters($tag, $val, $arg1));
 
@@ -99,8 +99,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$arg2 = rand_str();
 
 		// a1 accepts two arguments, a2 doesn't
-		add_filter($tag, array(&$a1, 'filter'), 10, 3);
-		add_filter($tag, array(&$a2, 'filter'));
+		add_filter($tag, array($a1, 'filter'), 10, 3);
+		add_filter($tag, array($a2, 'filter'));
 		// call the filter with two arguments
 		$this->assertEquals($val, apply_filters($tag, $val, $arg1, $arg2));
 
@@ -119,8 +119,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$val = rand_str();
 
 		// make two filters with different priorities
-		add_filter($tag, array(&$a, 'filter'), 10);
-		add_filter($tag, array(&$a, 'filter2'), 9);
+		add_filter($tag, array($a, 'filter'), 10);
+		add_filter($tag, array($a, 'filter2'), 9);
 		$this->assertEquals($val, apply_filters($tag, $val));
 
 		// there should be two events, one per filter
@@ -151,7 +151,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$val = rand_str();
 
 		// add an 'all' filter
-		add_filter('all', array(&$a, 'filterall'));
+		add_filter('all', array($a, 'filterall'));
 		// do some filters
 		$this->assertEquals($val, apply_filters($tag1, $val));
 		$this->assertEquals($val, apply_filters($tag2, $val));
@@ -163,8 +163,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		// the right hooks should have been called in order
 		$this->assertEquals(array($tag1, $tag2, $tag1, $tag1), $a->get_tags());
 
-		remove_filter('all', array(&$a, 'filterall'));
-		$this->assertFalse( has_filter('all', array(&$a, 'filterall')) );
+		remove_filter('all', array($a, 'filterall'));
+		$this->assertFalse( has_filter('all', array($a, 'filterall')) );
 
 	}
 
@@ -173,9 +173,9 @@ class Tests_Filters extends WP_UnitTestCase {
 		$tag = rand_str();
 		$val = rand_str();
 
-		add_filter('all', array(&$a, 'filterall'));
+		add_filter('all', array($a, 'filterall'));
 		$this->assertTrue( has_filter('all') );
-		$this->assertEquals( 10, has_filter('all', array(&$a, 'filterall')) );
+		$this->assertEquals( 10, has_filter('all', array($a, 'filterall')) );
 		$this->assertEquals($val, apply_filters($tag, $val));
 
 		// make sure our hook was called correctly
@@ -183,8 +183,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$this->assertEquals(array($tag), $a->get_tags());
 
 		// now remove the filter, do it again, and make sure it's not called this time
-		remove_filter('all', array(&$a, 'filterall'));
-		$this->assertFalse( has_filter('all', array(&$a, 'filterall')) );
+		remove_filter('all', array($a, 'filterall'));
+		$this->assertFalse( has_filter('all', array($a, 'filterall')) );
 		$this->assertFalse( has_filter('all') );
 		$this->assertEquals($val, apply_filters($tag, $val));
 		// call cound should remain at 1
@@ -200,7 +200,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$a = new MockAction();
 		$tag = rand_str();
 
-		add_action($tag, array(&$a, 'filter'));
+		add_action($tag, array($a, 'filter'));
 
 		apply_filters_ref_array($tag, array(&$obj));
 
@@ -220,8 +220,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$b = new MockAction();
 		$tag = rand_str();
 
-		add_action($tag, array(&$a, 'filter_append'), 10, 2);
-		add_action($tag, array(&$b, 'filter_append'), 10, 2);
+		add_action($tag, array($a, 'filter_append'), 10, 2);
+		add_action($tag, array($b, 'filter_append'), 10, 2);
 
 		$result = apply_filters_ref_array($tag, array('string', &$obj));
 
@@ -242,7 +242,7 @@ class Tests_Filters extends WP_UnitTestCase {
 	}
 
 	function _self_removal($tag) {
-		remove_action( $tag, array(&$this, '_self_removal'), 10, 1 );
+		remove_action( $tag, array($this, '_self_removal'), 10, 1 );
 		return $tag;
 	}
 
@@ -254,9 +254,9 @@ class Tests_Filters extends WP_UnitTestCase {
 		$a = new MockAction();
 		$b = new MockAction();
 
-		add_action( $tag, array(&$a, 'filter_append'), 11, 1 );
-		add_action( $tag, array(&$b, 'filter_append'), 12, 1 );
-		add_action( $tag, array(&$this, '_self_removal'), 10, 1 );
+		add_action( $tag, array($a, 'filter_append'), 11, 1 );
+		add_action( $tag, array($b, 'filter_append'), 12, 1 );
+		add_action( $tag, array($this, '_self_removal'), 10, 1 );
 
 		$result = apply_filters($tag, $tag);
 		$this->assertEquals( 1, $a->get_call_count(), 'priority 11 filters should run after priority 10 empties itself' );

@@ -59,7 +59,7 @@ class NotGettexted {
 			if ('.' == $item || '..' == $item)
 				continue;
 			if ('.php' == substr($item, -4))
-				$files[] = $full_item; 
+				$files[] = $full_item;
 			if (is_dir($full_item))
 				$files += array_merge($files, NotGettexted::list_php_files($full_item, $files));
 		}
@@ -99,7 +99,7 @@ class NotGettexted {
 						continue;
 					}
 					if ($this->STAGE_START_COMMENT <= $stage && $stage <= $this->STAGE_WHITESPACE_AFTER && '/'.$current_comment_id == $matches[1]) {
-						$stage = $this->STAGE_END_COMMENT; 
+						$stage = $this->STAGE_END_COMMENT;
 						$this->logmsg('end comment', $current_comment_id);
 						$result .= call_user_func($other_action, $token);
 						if (!is_null($register_action)) call_user_func($register_action, $current_string, $current_comment_id, $current_string_line);
@@ -152,7 +152,7 @@ class NotGettexted {
 		foreach($filenames as $filename) {
 			$tokens = token_get_all(file_get_contents($filename));
 			$aggregator = $this->make_string_aggregator($global_name, $filename);
-			$this->walk_tokens($tokens, array(&$this, 'ignore_token'), array(&$this, 'ignore_token'), $aggregator);
+			$this->walk_tokens($tokens, array($this, 'ignore_token'), array($this, 'ignore_token'), $aggregator);
 		}
 
 		$potf = '-' == $pot_filename? STDOUT : @fopen($pot_filename, 'a');
@@ -196,7 +196,7 @@ class NotGettexted {
 			$source = file_get_contents($filename);
 			if ( strlen($source) > 150000 ) continue;
 			$tokens = token_get_all($source);
-			$new_file = $this->walk_tokens($tokens, $replacer, array(&$this, 'unchanged_token'));
+			$new_file = $this->walk_tokens($tokens, $replacer, array($this, 'unchanged_token'));
 			$f = fopen($filename, 'w');
 			fwrite($f, $new_file);
 			fclose($f);
@@ -218,7 +218,7 @@ class NotGettexted {
 			$this->usage();
 			exit(1);
 		}
-		call_user_func_array(array(&$this, $this->commands[$argv[1]]), array_slice($argv, 2));
+		call_user_func_array(array($this, $this->commands[$argv[1]]), array_slice($argv, 2));
 	}
 }
 
