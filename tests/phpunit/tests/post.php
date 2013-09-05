@@ -604,6 +604,15 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 24491
+	 */
+	function test_get_page_uri_with_nonexistent_post() {
+		global $wpdb;
+		$post_id = $wpdb->get_var( "SELECT MAX(ID) FROM $wpdb->posts" ) + 1;
+		$this->assertFalse( get_page_uri( $post_id ) );
+	}
+
+	/**
 	 * @ticket 23708
 	 */
 	function test_get_post_ancestors_within_loop() {
