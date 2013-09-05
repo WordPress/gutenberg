@@ -127,18 +127,12 @@ Content-Transfer-Encoding: 8bit
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
 		// Earlier versions of PHPMailer were not touchy about the formatting of these arguments.
-		if ( version_compare( $GLOBALS['wp_version'], '3.1.9', '>' ) ) {
-			$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-			$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
-			$this->assertEquals('cc@cc.com', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][0]);
-			$this->assertEquals('The Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][1]);
-			$this->assertEquals('bcc@bcc.com', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][0]);
-			$this->assertEquals('The Blind Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][1]);
-		} else {
-			$this->assertEquals($to, $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-			$this->assertEquals($cc, $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][0]);
-			$this->assertEquals($bcc, $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][0]);
-		}
+		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
+		$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
+		$this->assertEquals('cc@cc.com', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][0]);
+		$this->assertEquals('The Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][1]);
+		$this->assertEquals('bcc@bcc.com', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][0]);
+		$this->assertEquals('The Blind Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][1]);
 
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
 		unset( $_SERVER['SERVER_NAME'] );
@@ -159,15 +153,10 @@ Content-Transfer-Encoding: 8bit
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
 		// Earlier versions of PHPMailer were not touchy about the formatting of these arguments.
-		if ( version_compare( $GLOBALS['wp_version'], '3.1.9', '>' ) ) {
-			$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-			$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
-			$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
-			$this->assertEquals('Another Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][1]);
-		} else {
-			$this->assertEquals('Name <address@tld.com>', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-			$this->assertEquals('Another Name <another_address@different-tld.com>', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
-		}
+		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
+		$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
+		$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
+		$this->assertEquals('Another Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][1]);
 
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
 		unset( $_SERVER['SERVER_NAME'] );
@@ -201,11 +190,8 @@ Content-Transfer-Encoding: 8bit
 		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $message );
 
-		// Old PHPMailer blindly accepts the address, the new one santizes it
-		if ( version_compare( $GLOBALS['wp_version'], '3.1.9', '>' ) )
-			$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-		else
-			$this->assertEquals('<address@tld.com>', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
+		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
+
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
 		unset( $_SERVER['SERVER_NAME'] );
 	}

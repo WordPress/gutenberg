@@ -174,14 +174,14 @@ class Tests_Theme extends WP_UnitTestCase {
 	function test_switch_theme() {
 		$themes = get_themes();
 
-		$switch_theme_one_argument = version_compare( $GLOBALS['wp_version'], '3.5-alpha-21103', '>=' );
+		// Switch to each theme in sequence.
+		// Do it twice to make sure we switch to the first theme, even if it's our starting theme.
+		// Do it a third time to ensure switch_theme() works with one argument.
 
-		// switch to each theme in sequence
-		// do it twice to make sure we switch to the first theme, even if it's our starting theme
 		for ( $i = 0; $i < 3; $i++ ) {
 			foreach ($themes as $name=>$theme) {
 				// switch to this theme
-				if ( $i === 2 || $switch_theme_one_argument )
+				if ( $i === 2 )
 					switch_theme( $theme['Template'], $theme['Stylesheet'] );
 				else
 					switch_theme( $theme['Stylesheet'] );

@@ -316,16 +316,12 @@ class Tests_Formatting_MakeClickable extends WP_UnitTestCase {
 	}
 
 	/**
-	 * ticket 16892
+	 * @ticket 16892
 	 */
 	function test_no_segfault() {
-		if ( version_compare( $GLOBALS['wp_version'], '3.1.1', '<' ) )
-			$this->markTestSkipped();
-
 		$in = str_repeat( 'http://example.com/2011/03/18/post-title/', 256 );
 		$out = make_clickable( $in );
-		if ( version_compare( $GLOBALS['wp_version'], '3.4-alpha', '>=' ) )
-			$this->assertEquals( $in, $out );
+		$this->assertEquals( $in, $out );
 	}
 
 	/**
