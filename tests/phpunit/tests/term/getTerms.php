@@ -121,10 +121,11 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
  	/**
-	 * @ti
-	 * cket 11823
+	 * @ticket 11823
  	 */
 	function test_get_terms_include_exclude() {
+		global $wpdb;
+
 		$term_id1 = $this->factory->tag->create();
 		$term_id2 = $this->factory->tag->create();
 		$inc_terms = get_terms( 'post_tag', array(
@@ -138,6 +139,16 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 			'hide_empty' => false
 		) );
 		$this->assertEquals( array(), wp_list_pluck( $exc_terms, 'term_id' ) );
+
+		// These should not generate query errors.
+		get_terms( 'post_tag', array( 'exclude' => array( 0 ), 'hide_empty' => false ) );
+		$this->assertEmpty( $wpdb->last_error );
+
+		get_terms( 'post_tag', array( 'exclude' => array( 'unexpected-string' ), 'hide_empty' => false ) );
+		$this->assertEmpty( $wpdb->last_error );
+
+		get_terms( 'post_tag', array( 'include' => array( 'unexpected-string' ), 'hide_empty' => false ) );
+		$this->assertEmpty( $wpdb->last_error );
 	}
 
 	/**
