@@ -37,4 +37,29 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 
 		$this->assertEmpty( $posts2 );
 	}
+
+	function test_taxonomy_with_attachments() {
+		register_taxonomy_for_object_type( 'post_tag', 'attachment:image' );
+		$tag_id = $this->factory->term->create( array( 'slug' => rand_str(), 'name' => rand_str() ) );
+		$image_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment'
+		) );
+		wp_set_object_terms( $image_id, $tag_id, 'post_tag' );
+
+		$posts = $this->q->query( array(
+			'fields' => 'ids',
+			'post_type' => 'attachment',
+			'post_status' => 'inherit',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'post_tag',
+					'field' => 'term_id',
+					'terms' => array( $tag_id )
+				)
+			)
+		) );
+
+		$this->assertEquals( array( $image_id ), $posts );
+	}
 }
