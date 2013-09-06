@@ -428,9 +428,20 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'tag/(.+?)/?$' => 'index.php?tag=$matches[1]',
 	function test_tag() {
-		$this->factory->term->create( array( 'name' => 'tag-a', 'taxonomy' => 'post_tag' ) );
+		$term_id = $this->factory->term->create( array( 'name' => 'Tag Named A', 'slug' => 'tag-a', 'taxonomy' => 'post_tag' ) );
 		$this->go_to('/tag/tag-a/');
 		$this->assertQueryTrue('is_archive', 'is_tag');
+
+		$tag = get_term( $term_id, 'post_tag' );
+
+		$this->assertTrue( is_tag() );
+		$this->assertTrue( is_tag( $tag->name ) );
+		$this->assertTrue( is_tag( $tag->slug ) );
+		$this->assertTrue( is_tag( $tag->term_id ) );
+		$this->assertTrue( is_tag( array() ) );
+		$this->assertTrue( is_tag( array( $tag->name ) ) );
+		$this->assertTrue( is_tag( array( $tag->slug ) ) );
+		$this->assertTrue( is_tag( array( $tag->term_id ) ) );
 	}
 
 	// 'author/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?author_name=$matches[1]&feed=$matches[2]',
