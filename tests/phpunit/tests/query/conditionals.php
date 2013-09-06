@@ -683,4 +683,37 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 			array( 'taxonomy' => 'post_tag', 'field' => 'term_id', 'terms' => $term->term_id )
 		) );
 	}
+
+	function test_post_type_array() {
+		delete_option( 'rewrite_rules' );
+
+		$cpt_name = 'thearray';
+		register_post_type( $cpt_name, array(
+			'taxonomies' => array( 'post_tag', 'category' ),
+			'rewrite' => true,
+			'has_archive' => true,
+			'public' => true
+		) );
+		$this->factory->post->create( array( 'post_type' => $cpt_name ) );
+
+		$this->go_to( "/$cpt_name/" );
+		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
+		$this->assertEquals( get_queried_object(), get_post_type_object( $cpt_name ) );
+		$this->assertEquals( get_queried_object(), get_post_type_object( array( $cpt_name ) ) );
+		$this->assertEquals( get_queried_object(), get_post_type_object( array( $cpt_name, 'post' ) ) );
+
+		add_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_type_array' ) );
+
+		$this->go_to( "/$cpt_name/" );
+		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
+		$this->assertEquals( get_queried_object(), get_post_type_object( 'post' ) );
+		$this->assertEquals( get_queried_object(), get_post_type_object( array( 'post' ) ) );
+		$this->assertEquals( get_queried_object(), get_post_type_object( array( 'post', $cpt_name ) ) );
+
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_type_array' ) );
+	}
+
+	function pre_get_posts_with_type_array( &$query ) {
+		$query->set( 'post_type', array( 'post', 'thearray' ) );
+	}
 }
