@@ -648,4 +648,39 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->go_to( '/2013/11/41/' );
 		$this->assertQueryTrue( 'is_404' );
 	}
+
+	function test_post_type_archive_with_tax_query() {
+		delete_option( 'rewrite_rules' );
+
+		$cpt_name = 'ptawtq';
+		register_post_type( $cpt_name, array(
+			'taxonomies' => array( 'post_tag', 'category' ),
+			'rewrite' => true,
+			'has_archive' => true,
+			'public' => true
+		) );
+
+		$tag_id = $this->factory->tag->create( array( 'slug' => 'tag-slug' ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => $cpt_name ) );
+		wp_set_object_terms( $post_id, $tag_id, 'post_tag' );
+
+		$this->go_to( '/ptawtq/' );
+		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
+		$this->assertEquals( get_queried_object(), get_post_type_object( $cpt_name ) );
+
+		add_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_tax_query' ) );
+
+		$this->go_to( '/ptawtq/' );
+		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
+		$this->assertEquals( get_queried_object(), get_post_type_object( $cpt_name ) );
+
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_tax_query' ) );
+	}
+
+	function pre_get_posts_with_tax_query( &$query ) {
+		$term = get_term_by( 'slug', 'tag-slug', 'post_tag' );
+		$query->set( 'tax_query', array(
+			array( 'taxonomy' => 'post_tag', 'field' => 'term_id', 'terms' => $term->term_id )
+		) );
+	}
 }
