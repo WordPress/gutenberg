@@ -629,4 +629,12 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	// '[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[^/]+/attachment/([^/]+)/trackback/?$' => 'index.php?attachment=$matches[1]&tb=1',
 	// '[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[^/]+/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
 	// '[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[^/]+/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+
+	function test_bad_dates() {
+		$this->go_to( '/2013/13/13/' );
+		$this->assertQueryTrue( 'is_404' );
+
+		$this->go_to( '/2013/11/41/' );
+		$this->assertQueryTrue( 'is_404' );
+	}
 }

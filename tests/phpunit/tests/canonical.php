@@ -239,6 +239,9 @@ class Tests_Canonical extends WP_UnitTestCase {
 
 			array( '/?year=2008', '/2008/'),
 
+			array( '/2012/13/', '/2012/'),
+			array( '/2012/11/51/', '/2012/11/'),
+
 			// Authors
 			array( '/?author=%d', '/author/canonical-author/' ),
 //			array( '/?author=%d&year=2008', '/2008/?author=3'),

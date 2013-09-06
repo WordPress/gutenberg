@@ -486,4 +486,51 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
 		$this->assertEqualSets( array( $author_1 ), $author_ids );
 	}
+
+	/**
+	 * @ticket 10935
+	 */
+	function test_query_is_date() {
+		$this->q->query( array(
+			'year' => '2007',
+			'monthnum' => '01',
+			'day' => '01',
+		) );
+
+		$this->assertTrue( $this->q->is_date );
+		$this->assertTrue( $this->q->is_day );
+		$this->assertFalse( $this->q->is_month );
+		$this->assertFalse( $this->q->is_year );
+
+		$this->q->query( array(
+			'year' => '2007',
+			'monthnum' => '01',
+		) );
+
+		$this->assertTrue( $this->q->is_date );
+		$this->assertFalse( $this->q->is_day );
+		$this->assertTrue( $this->q->is_month );
+		$this->assertFalse( $this->q->is_year );
+
+		$this->q->query( array(
+			'year' => '2007',
+		) );
+
+		$this->assertTrue( $this->q->is_date );
+		$this->assertFalse( $this->q->is_day );
+		$this->assertFalse( $this->q->is_month );
+		$this->assertTrue( $this->q->is_year );
+
+		$this->q->query( array(
+			'year' => '2007',
+			'monthnum' => '01',
+			'day' => '50',
+		) );
+
+		$this->assertTrue( $this->q->is_404 );
+		$this->assertFalse( $this->q->is_date );
+		$this->assertFalse( $this->q->is_day );
+		$this->assertFalse( $this->q->is_month );
+		$this->assertFalse( $this->q->is_year );
+	}
 }
