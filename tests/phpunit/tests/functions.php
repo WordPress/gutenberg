@@ -355,4 +355,11 @@ class Tests_Functions extends WP_UnitTestCase {
 			array( array( 1, 2, 3, 4 ), array( -1, 2, '-3', '4' ) ),
 		);
 	}
+
+	/**
+	 * @ticket 19354
+	 */
+	function test_data_is_not_an_allowed_protocol() {
+		$this->assertNotContains( 'data', wp_allowed_protocols() );
+	}
 }
