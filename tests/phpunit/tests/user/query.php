@@ -76,4 +76,29 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->assertInstanceOf( 'WP_User', $user );
 		}
 	}
+
+	function test_orderby() {
+		$user_ids = $this->factory->user->create_many( 10, array(
+			'role' => 'author'
+		) );
+
+		$names = array( 'd', 'f', 'n', 'f', 'd', 'j', 'r', 'p', 'h', 'g' );
+
+		foreach ( $names as $i => $name )
+			update_user_meta( $user_ids[$i], 'last_name', $name );
+
+		$u = new WP_User_Query( array(
+			'include' => $user_ids,
+			'meta_key' => 'last_name',
+			'orderby' => 'meta_value',
+			'fields' => 'ids'
+		) );
+		$values = array();
+		foreach ( $u->get_results() as $user )
+			$values[] = get_user_meta( $user, 'last_name', true );
+
+		sort( $names );
+
+		$this->assertEquals( $names, $values );
+	}
 }
