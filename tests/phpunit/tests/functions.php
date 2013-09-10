@@ -99,9 +99,9 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	function test_wp_unique_filename() {
-		
+
 		$testdir = DIR_TESTDATA . '/images/';
-		
+
 		// sanity check
 		$this->assertEquals( 'abcdefg.png', wp_unique_filename( $testdir, 'abcdefg.png' ), 'Sanitiy check failed' );
 
@@ -112,10 +112,10 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		// check special chars
 		$this->assertEquals( 'testtést-imagé.png', wp_unique_filename( $testdir, 'testtést-imagé.png' ), 'Filename with special chars failed' );
-		
+
 		// check special chars with potential conflicting name
 		$this->assertEquals( 'tést-imagé.png', wp_unique_filename( $testdir, 'tést-imagé.png' ), 'Filename with special chars failed' );
-		
+
 		// check with single quotes in name (somehow)
 		$this->assertEquals( "abcdefgh.png", wp_unique_filename( $testdir, "abcdefg'h.png" ), 'File with quote failed' );
 
@@ -124,7 +124,7 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		// test crazy name (useful for regression tests)
 		$this->assertEquals( '12%af34567890@..%^_+qwerty-fghjkl-zx.png', wp_unique_filename( $testdir, '12%af34567890#~!@#$..%^&*()|_+qwerty  fgh`jkl zx<>?:"{}[]="\'/?.png' ), 'Failed crazy file name' );
-		
+
 		// test slashes in names
 		$this->assertEquals( 'abcdefg.png', wp_unique_filename( $testdir, 'abcde\fg.png' ), 'Slash not removed' );
 		$this->assertEquals( 'abcdefg.png', wp_unique_filename( $testdir, 'abcde\\fg.png' ), 'Double slashed not removed' );
@@ -361,5 +361,162 @@ class Tests_Functions extends WP_UnitTestCase {
 	 */
 	function test_data_is_not_an_allowed_protocol() {
 		$this->assertNotContains( 'data', wp_allowed_protocols() );
+	}
+
+	/**
+	 * @ticket 9064
+	 */
+	function test_wp_extract_urls() {
+		$original_urls = array(
+			'http://woo.com/1,2,3,4,5,6/-1-2-3-4-/woo.html',
+			'http://this.com',
+			'http://www111.urwyeoweytwutreyytqytwetowteuiiu.com/?346236346326&2134362574863.437',
+			'http://wordpress-core/1,2,3,4,5,6/-1-2-3-4-/woo.html',
+			'http://wordpress-core.com:8080/',
+			'http://www.website.com:5000',
+			'http://wordpress-core/?346236346326&2134362574863.437',
+			'http://افغانستا.icom.museum',
+			'http://الجزائر.icom.museum',
+			'http://österreich.icom.museum',
+			'http://বাংলাদেশ.icom.museum',
+			'http://беларусь.icom.museum',
+			'http://belgië.icom.museum',
+			'http://българия.icom.museum',
+			'http://تشادر.icom.museum',
+			'http://中国.icom.museum',
+			#'http://القمر.icom.museum', // Comoros	http://القمر.icom.museum
+			#'http://κυπρος.icom.museum', Cyprus 	http://κυπρος.icom.museum
+			'http://českárepublika.icom.museum',
+			#'http://مصر.icom.museum', // Egypt	http://مصر.icom.museum
+			'http://ελλάδα.icom.museum',
+			'http://magyarország.icom.museum',
+			'http://ísland.icom.museum',
+			'http://भारत.icom.museum',
+			'http://ايران.icom.museum',
+			'http://éire.icom.museum',
+			'http://איקו״ם.ישראל.museum',
+			'http://日本.icom.museum',
+			'http://الأردن.icom.museum',
+			'http://қазақстан.icom.museum',
+			'http://한국.icom.museum',
+			'http://кыргызстан.icom.museum',
+			'http://ລາວ.icom.museum',
+			'http://لبنان.icom.museum',
+			'http://македонија.icom.museum',
+			#'http://موريتانيا.icom.museum', // Mauritania	http://موريتانيا.icom.museum
+			'http://méxico.icom.museum',
+			'http://монголулс.icom.museum',
+			#'http://المغرب.icom.museum', // Morocco	http://المغرب.icom.museum
+			'http://नेपाल.icom.museum',
+			#'http://عمان.icom.museum', // Oman	http://عمان.icom.museum
+			'http://قطر.icom.museum',
+			'http://românia.icom.museum',
+			'http://россия.иком.museum',
+			'http://србијаицрнагора.иком.museum',
+			'http://இலங்கை.icom.museum',
+			'http://españa.icom.museum',
+			'http://ไทย.icom.museum',
+			'http://تونس.icom.museum',
+			'http://türkiye.icom.museum',
+			'http://украина.icom.museum',
+			'http://việtnam.icom.museum'
+		);
+
+		$blob ="
+			http://woo.com/1,2,3,4,5,6/-1-2-3-4-/woo.html
+
+			http://this.com
+
+			http://www111.urwyeoweytwutreyytqytwetowteuiiu.com/?346236346326&amp;2134362574863.437
+
+			http://wordpress-core/1,2,3,4,5,6/-1-2-3-4-/woo.html
+
+			http://wordpress-core.com:8080/
+
+			http://www.website.com:5000
+
+			http://wordpress-core/?346236346326&amp;2134362574863.437
+
+			http://افغانستا.icom.museum
+			http://الجزائر.icom.museum
+			http://österreich.icom.museum
+			http://বাংলাদেশ.icom.museum
+			http://беларусь.icom.museum
+			http://belgië.icom.museum
+			http://българия.icom.museum
+			http://تشادر.icom.museum
+			http://中国.icom.museum
+			http://českárepublika.icom.museum
+			http://ελλάδα.icom.museum
+			http://magyarország.icom.museum
+			http://ísland.icom.museum
+			http://भारत.icom.museum
+			http://ايران.icom.museum
+			http://éire.icom.museum
+			http://איקו״ם.ישראל.museum
+			http://日本.icom.museum
+			http://الأردن.icom.museum
+			http://қазақстан.icom.museum
+			http://한국.icom.museum
+			http://кыргызстан.icom.museum
+			http://ລາວ.icom.museum
+			http://لبنان.icom.museum
+			http://македонија.icom.museum
+			http://méxico.icom.museum
+			http://монголулс.icom.museum
+			http://नेपाल.icom.museum
+			http://قطر.icom.museum
+			http://românia.icom.museum
+			http://россия.иком.museum
+			http://србијаицрнагора.иком.museum
+			http://இலங்கை.icom.museum
+			http://españa.icom.museum
+			http://ไทย.icom.museum
+			http://تونس.icom.museum
+			http://türkiye.icom.museum
+			http://украина.icom.museum
+			http://việtnam.icom.museum
+		";
+
+		$urls = wp_extract_urls( $blob );
+		$this->assertNotEmpty( $urls );
+		$this->assertInternalType( 'array', $urls );
+		$this->assertCount( count( $original_urls ), $urls );
+		$this->assertEquals( $original_urls, $urls );
+
+		$exploded = array_values( array_filter( array_map( 'trim', explode( "\n", $blob ) ) ) );
+		// wp_extract_urls calls html_entity_decode
+		$decoded = array_map( 'html_entity_decode', $exploded );
+
+		$this->assertEquals( $decoded, $urls );
+		$this->assertEquals( $original_urls, $decoded );
+
+		$blob ="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+			incididunt ut labore http://woo.com/1,2,3,4,5,6/-1-2-3-4-/woo.html et dolore magna aliqua.
+			Ut http://this.com enim ad minim veniam, quis nostrud exercitation ullamco
+			laboris nisi ut aliquip ex http://www111.urwyeoweytwutreyytqytwetowteuiiu.com/?346236346326&amp;2134362574863.437 ea
+			commodo consequat. http://wordpress-core/1,2,3,4,5,6/-1-2-3-4-/woo.html Duis aute irure dolor in reprehenderit in voluptate
+			velit esse http://wordpress-core.com:8080/ cillum dolore eu fugiat nulla <A href=\"http://www.website.com:5000\">http://www.website.com:5000</B> pariatur. Excepteur sint occaecat cupidatat non proident,
+			sunt in culpa qui officia deserunt mollit http://wordpress-core/?346236346326&amp;2134362574863.437 anim id est laborum.";
+
+		$urls = wp_extract_urls( $blob );
+		$this->assertNotEmpty( $urls );
+		$this->assertInternalType( 'array', $urls );
+		$this->assertCount( 7, $urls );
+		$this->assertEquals( array_slice( $original_urls, 0, 7 ), $urls );
+
+		$blob = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+			incididunt ut labore <a href="http://woo.com/1,2,3,4,5,6/-1-2-3-4-/woo.html">343462^</a> et dolore magna aliqua.
+			Ut <a href="http://this.com">&amp;3640i6p1yi499</a> enim ad minim veniam, quis nostrud exercitation ullamco
+			laboris nisi ut aliquip ex <a href="http://www111.urwyeoweytwutreyytqytwetowteuiiu.com/?346236346326&amp;2134362574863.437">343462^</a> ea
+			commodo consequat. <a href="http://wordpress-core/1,2,3,4,5,6/-1-2-3-4-/woo.html">343462^</a> Duis aute irure dolor in reprehenderit in voluptate
+			velit esse <a href="http://wordpress-core.com:8080/">-3-4--321-64-4@#!$^$!@^@^</a> cillum dolore eu <A href="http://www.website.com:5000">http://www.website.com:5000</B> fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+			sunt in culpa qui officia deserunt mollit <a href="http://wordpress-core/?346236346326&amp;2134362574863.437">)(*&^%$</a> anim id est laborum.';
+
+		$urls = wp_extract_urls( $blob );
+		$this->assertNotEmpty( $urls );
+		$this->assertInternalType( 'array', $urls );
+		$this->assertCount( 7, $urls );
+		$this->assertEquals( array_slice( $original_urls, 0, 7 ), $urls );
 	}
 }
