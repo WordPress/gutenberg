@@ -699,16 +699,12 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->go_to( "/$cpt_name/" );
 		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
 		$this->assertEquals( get_queried_object(), get_post_type_object( $cpt_name ) );
-		$this->assertEquals( get_queried_object(), get_post_type_object( array( $cpt_name ) ) );
-		$this->assertEquals( get_queried_object(), get_post_type_object( array( $cpt_name, 'post' ) ) );
 
 		add_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_type_array' ) );
 
 		$this->go_to( "/$cpt_name/" );
 		$this->assertQueryTrue( 'is_post_type_archive', 'is_archive' );
 		$this->assertEquals( get_queried_object(), get_post_type_object( 'post' ) );
-		$this->assertEquals( get_queried_object(), get_post_type_object( array( 'post' ) ) );
-		$this->assertEquals( get_queried_object(), get_post_type_object( array( 'post', $cpt_name ) ) );
 
 		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_with_type_array' ) );
 	}
