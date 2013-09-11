@@ -14,7 +14,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// keep track of users we create
 		$this->_flush_roles();
 
-		$this->orig_users = get_users_of_blog();
+		$this->orig_users = get_users();
 	}
 
 	function _flush_roles() {
