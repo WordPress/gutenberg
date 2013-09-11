@@ -110,7 +110,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	function test_query_tag_id() {
 		$tag = tag_exists('tag-a');
-		$posts = $this->q->query("tag_id={$tag[term_id]}");
+		$posts = $this->q->query( "tag_id=" . $tag['term_id'] );
 
 		// there are 4 posts with Tag A
 		$this->assertCount( 4, $posts );
@@ -137,7 +137,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	function test_query_tag__in() {
 		$tag_a = tag_exists('tag-a');
 		$tag_b = tag_exists('tag-b');
-		$posts = $this->q->query("tag__in[]={$tag_a[term_id]}&tag__in[]={$tag_b[term_id]}");
+		$posts = $this->q->query( "tag__in[]=". $tag_a['term_id'] . "&tag__in[]=" . $tag_b['term_id'] );
 
 		// there are 6 posts with either Tag A or Tag B
 		$this->assertCount( 6, $posts );
@@ -151,7 +151,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	function test_query_tag__not_in() {
 		$tag_a = tag_exists('tag-a');
-		$posts = $this->q->query("tag__not_in[]={$tag_a[term_id]}");
+		$posts = $this->q->query( "tag__not_in[]=" . $tag_a['term_id'] );
 
 		// the most recent 10 posts with Tag A excluded
 		// (note the different between this and test_query_default)
@@ -174,7 +174,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	function test_query_tag__in_but__not_in() {
 		$tag_a = tag_exists('tag-a');
 		$tag_b = tag_exists('tag-b');
-		$posts = $this->q->query("tag__in[]={$tag_a[term_id]}&tag__not_in[]={$tag_b[term_id]}");
+		$posts = $this->q->query( "tag__in[]=" . $tag_a['term_id'] . "&tag__not_in[]=" . $tag_b['term_id'] );
 
 		// there are 4 posts with Tag A, only 2 when we exclude Tag B
 		$this->assertCount( 2, $posts );
