@@ -25,7 +25,7 @@ class Tests_Theme extends WP_UnitTestCase {
 	}
 
 	function filter_deprecated_function_trigger_error() {
-		remove_filter( 'filter_deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
 		return false;
 	}
 
