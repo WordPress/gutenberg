@@ -17,6 +17,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
+		set_current_screen( 'front' );
+
 		update_option( 'comments_per_page', 5 );
 		update_option( 'posts_per_page', 5 );
 
