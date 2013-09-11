@@ -6,17 +6,20 @@
  * @group comment
  */
 class Tests_Comment_Query extends WP_UnitTestCase {
-	var $comment_id;
+	protected $post_id;
+	protected $comment_id;
 
 	function setUp() {
 		parent::setUp();
+
+		$this->post_id = $this->factory->post->create();
 	}
 
 	/**
 	 * @ticket 21101
 	 */
 	function test_get_comment_comment_approved_0() {
-		$comment_id = $this->factory->comment->create();
+		$comment_id = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
 		$comments_approved_0 = get_comments( array( 'status' => 'hold' ) );
 		$this->assertEquals( 0, count( $comments_approved_0 ) );
 	}
@@ -25,7 +28,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	 * @ticket 21101
 	 */
 	function test_get_comment_comment_approved_1() {
-		$comment_id = $this->factory->comment->create();
+		$comment_id = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
 		$comments_approved_1 = get_comments( array( 'status' => 'approve' ) );
 
 		$this->assertEquals( 1, count( $comments_approved_1 ) );
@@ -80,9 +83,9 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	 * @ticket 21003
 	 */
 	function test_orderby_meta() {
-		$comment_id = $this->factory->comment->create();
-		$comment_id2 = $this->factory->comment->create();
-		$comment_id3 = $this->factory->comment->create();
+		$comment_id = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+		$comment_id2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+		$comment_id3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
 
 		add_comment_meta( $comment_id, 'key', 'value1', true );
 		add_comment_meta( $comment_id, 'key1', 'value1', true );
