@@ -489,7 +489,7 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( array( $term4['term_id'] ), $post->post_category );
 
 		wp_set_post_categories( $post_id, array( $term1['term_id'], $term2['term_id'] ), true );
-		$this->assertEquals( array( $term2['term_id'], $term4['term_id'],$term1['term_id'] ), $post->post_category );
+		$this->assertEquals( array( $term2['term_id'], $term4['term_id'], $term1['term_id'] ), $post->post_category );
 
 		wp_set_post_categories( $post_id, array(), true );
 		$this->assertEquals( 1, count( $post->post_category ) );
@@ -498,5 +498,11 @@ class Tests_Term extends WP_UnitTestCase {
 		wp_set_post_categories( $post_id, array() );
 		$this->assertEquals( 1, count( $post->post_category ) );
 		$this->assertEquals( get_option( 'default_category' ), $post->post_category[0] );
+	}
+
+	function test_get_term_by_tt_id() {
+		$term1 = wp_insert_term( 'Foo', 'category' );
+		$term2 = get_term_by( 'term_taxonomy_id', $term1['term_taxonomy_id'], 'category' );
+		$this->assertEquals( get_term( $term1['term_id'], 'category' ), $term2 );
 	}
 }
