@@ -15,6 +15,18 @@ class Tests_Theme extends WP_UnitTestCase {
 		add_filter( 'extra_theme_headers', array( $this, '_theme_data_extra_headers' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
+	}
+
+	function deprecated_function_run_check( $function ) {
+		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
+	}
+
+	function filter_deprecated_function_trigger_error() {
+		remove_filter( 'filter_deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	function tearDown() {
@@ -69,11 +81,10 @@ class Tests_Theme extends WP_UnitTestCase {
 
 	function test_get_themes_contents() {
 		$themes = get_themes();
-
 		// Generic tests that should hold true for any theme
-		foreach ($themes as $k=>$theme) {
-			$this->assertEquals($theme['Name'], $k);
-			$this->assertTrue(!empty($theme['Title']));
+		foreach ( $themes as $k => $theme ) {
+			$this->assertEquals( $theme['Name'], $k );
+			$this->assertNotEmpty( $theme['Title'] );
 
 			// important attributes should all be set
 			$default_headers = array(
@@ -100,11 +111,11 @@ class Tests_Theme extends WP_UnitTestCase {
 			$dir = isset($theme['Theme Root']) ? '' : WP_CONTENT_DIR;
 
 			// important attributes should all not be empty as well
-			$this->assertTrue(!empty($theme['Description']));
-			$this->assertTrue(!empty($theme['Author']));
+			$this->assertNotEmpty( $theme['Description'] );
+			$this->assertNotEmpty( $theme['Author'] );
 			$this->assertTrue(version_compare($theme['Version'], 0) > 0);
-			$this->assertTrue(!empty($theme['Template']));
-			$this->assertTrue(!empty($theme['Stylesheet']));
+			$this->assertNotEmpty( $theme['Template'] );
+			$this->assertNotEmpty( $theme['Stylesheet'] );
 
 			// template files should all exist
 			$this->assertTrue(is_array($theme['Template Files']));
@@ -179,7 +190,7 @@ class Tests_Theme extends WP_UnitTestCase {
 		// Do it a third time to ensure switch_theme() works with one argument.
 
 		for ( $i = 0; $i < 3; $i++ ) {
-			foreach ($themes as $name=>$theme) {
+			foreach ( $themes as $name => $theme ) {
 				// switch to this theme
 				if ( $i === 2 )
 					switch_theme( $theme['Template'], $theme['Stylesheet'] );
