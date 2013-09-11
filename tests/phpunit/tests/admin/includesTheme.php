@@ -40,15 +40,15 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 	 * @ticket 11216
 	 */
 	function test_page_templates() {
-		$theme = get_theme('Page Template Theme');
-		$this->assertFalse( empty($theme) );
+		$theme = wp_get_theme( 'page-templates' );
+		$this->assertNotEmpty( $theme );
 
-		switch_theme($theme['Template'], $theme['Stylesheet']);
+		switch_theme( $theme['Template'], $theme['Stylesheet'] );
 
 		$templates = get_page_templates();
-		$this->assertEquals(3, count($templates));
-		$this->assertEquals("template-top-level.php", $templates['Top Level']);
-		$this->assertEquals("subdir/template-sub-dir.php", $templates['Sub Dir']);
-		$this->assertEquals("template-header.php", $templates['This Template Header Is On One Line']);
+		$this->assertCount( 3, $templates );
+		$this->assertEquals( "template-top-level.php", $templates['Top Level'] );
+		$this->assertEquals( "subdir/template-sub-dir.php", $templates['Sub Dir'] );
+		$this->assertEquals( "template-header.php", $templates['This Template Header Is On One Line'] );
 	}
 }
