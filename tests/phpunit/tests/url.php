@@ -6,6 +6,7 @@ class Tests_URL extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		$this->_old_server = $_SERVER;
+		$GLOBALS['pagenow'] = '';
 	}
 
 	function tearDown() {
