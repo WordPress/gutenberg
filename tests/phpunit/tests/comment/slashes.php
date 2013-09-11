@@ -22,6 +22,8 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		$this->slash_5 = 'String with 5 slashes \\\\\\\\\\';
 		$this->slash_6 = 'String with 6 slashes \\\\\\\\\\\\';
 		$this->slash_7 = 'String with 7 slashes \\\\\\\\\\\\\\';
+
+		$_SERVER['REMOTE_ADDR'] = null;
 	}
 
 	function tearDown() {
@@ -41,6 +43,9 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		$data = array(
 			'comment_post_ID' => $post_id,
 			'comment_author' => $this->slash_1,
+			'comment_author_url' => '',
+			'comment_author_email' => '',
+			'comment_type' => '',
 			'comment_content' => $this->slash_7,
 		);
 		$id = wp_new_comment( $data );
@@ -53,6 +58,9 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		$data = array(
 			'comment_post_ID' => $post_id,
 			'comment_author' => $this->slash_2,
+			'comment_author_url' => '',
+			'comment_author_email' => '',
+			'comment_type' => '',
 			'comment_content' => $this->slash_4,
 		);
 		$id = wp_new_comment( $data );
@@ -77,7 +85,10 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		// as slashes are not permitted in that data
 		$_POST = array();
 		$_POST['comment_ID'] = $comment_id;
+		$_POST['comment_status'] = '';
 		$_POST['newcomment_author'] = $this->slash_1;
+		$_POST['newcomment_author_url'] = '';
+		$_POST['newcomment_author_email'] = '';
 		$_POST['content'] = $this->slash_7;
 		$_POST = add_magic_quotes( $_POST );
 
@@ -89,7 +100,10 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 
 		$_POST = array();
 		$_POST['comment_ID'] = $comment_id;
+		$_POST['comment_status'] = '';
 		$_POST['newcomment_author'] = $this->slash_2;
+		$_POST['newcomment_author_url'] = '';
+		$_POST['newcomment_author_email'] = '';
 		$_POST['content'] = $this->slash_4;
 		$_POST = add_magic_quotes( $_POST );
 
