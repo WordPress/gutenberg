@@ -120,7 +120,7 @@ class Tests_Cron extends WP_UnitTestCase {
 
 		// clear the schedule for the args events and make sure they're gone too
 		// note: wp_clear_scheduled_hook() expects args passed directly, rather than as an array
-		wp_clear_scheduled_hook($hook, $args[0]);
+		wp_clear_scheduled_hook($hook, $args);
 		$this->assertFalse( wp_next_scheduled($hook, $args) );
 	}
 
@@ -146,7 +146,7 @@ class Tests_Cron extends WP_UnitTestCase {
 
 		// clear the schedule for the args events and make sure they're gone too
 		// note: wp_clear_scheduled_hook() used to expect args passed directly, rather than as an array pre WP 3.0
-		wp_clear_scheduled_hook($hook, $args[0], $args[1]);
+		wp_clear_scheduled_hook($hook, $args);
 		$this->assertFalse( wp_next_scheduled($hook, $args) );
 	}
 
