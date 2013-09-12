@@ -281,6 +281,8 @@ class Tests_URL extends WP_UnitTestCase {
 		sleep( 1 ); // get_adjacent_post() doesn't handle posts created in the same second.
 		$post_id2 = $this->factory->post->create();
 
+		if ( ! isset( $GLOBALS['post'] ) )
+			$GLOBALS['post'] = null;
 		$orig_post = $GLOBALS['post'];
 		$GLOBALS['post'] = get_post( $post_id2 );
 
