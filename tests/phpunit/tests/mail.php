@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @group pluggable
  * @group mail
@@ -7,6 +6,13 @@
 class Tests_Mail extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
+		$_SERVER['SERVER_NAME'] = 'example.com';
+		unset( $GLOBALS['phpmailer']->mock_sent );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	function test_wp_mail_custom_boundaries() {
@@ -57,29 +63,23 @@ class Tests_Mail extends WP_UnitTestCase {
 		$body .= '------=_Part_4892_25692638.1192452070893--' . "\n";
 		$body .= "\n";
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail($to, $subject, $body, $headers);
 
 		// We need some better assertions here but these catch the failure for now.
 		$this->assertEquals($body, $GLOBALS['phpmailer']->mock_sent[0]['body']);
 		$this->assertTrue(strpos($GLOBALS['phpmailer']->mock_sent[0]['header'], 'boundary="----=_Part_4892_25692638.1192452070893"') > 0);
 		$this->assertTrue(strpos($GLOBALS['phpmailer']->mock_sent[0]['header'], 'charset=') > 0);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**
 	 * @ticket 15448
 	 */
 	function test_wp_mail_plain_and_html() {
-
 		$to = 'user@example.com';
 		$subject = 'Test email with plain text and html versions';
 		$messages = array( 'text/plain' => 'Here is some plain text.',
 					   'text/html' =>'<html><head></head><body>Here is the HTML ;-)<body></html>' );
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $messages );
 
 		preg_match( '/boundary="(.*)"/', $GLOBALS['phpmailer']->mock_sent[0]['header'], $matches);
@@ -103,14 +103,12 @@ Content-Transfer-Encoding: 8bit
 ';
 		// We need some better assertions here but these test the behaviour for now.
 		$this->assertEquals($body, $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**
 	 * @ticket 17305
 	 */
 	function test_wp_mail_rfc2822_addresses() {
-
 		$to = "Name <address@tld.com>";
 		$from = "Another Name <another_address@different-tld.com>";
 		$cc = "The Carbon Guy <cc@cc.com>";
@@ -121,8 +119,6 @@ Content-Transfer-Encoding: 8bit
 		$headers[] = "CC: {$cc}";
 		$headers[] = "BCC: {$bcc}";
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $message, $headers );
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
@@ -133,22 +129,17 @@ Content-Transfer-Encoding: 8bit
 		$this->assertEquals('The Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][1]);
 		$this->assertEquals('bcc@bcc.com', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][0]);
 		$this->assertEquals('The Blind Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][1]);
-
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**
 	 * @ticket 17305
 	 */
 	function test_wp_mail_multiple_rfc2822_to_addresses() {
-
 		$to = "Name <address@tld.com>, Another Name <another_address@different-tld.com>";
 		$subject = "RFC2822 Testing";
 		$message = "My RFC822 Test Message";
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $message );
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
@@ -157,9 +148,7 @@ Content-Transfer-Encoding: 8bit
 		$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
 		$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
 		$this->assertEquals('Another Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][1]);
-
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	function test_wp_mail_multiple_to_addresses() {
@@ -167,33 +156,25 @@ Content-Transfer-Encoding: 8bit
 		$subject = "RFC2822 Testing";
 		$message = "My RFC822 Test Message";
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $message );
 
 		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
 		$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**
 	 * @ticket 18463
 	 */
 	function test_wp_mail_to_address_no_name() {
-
 		$to = "<address@tld.com>";
 		$subject = "RFC2822 Testing";
 		$message = "My RFC822 Test Message";
 
-		unset($GLOBALS['phpmailer']->mock_sent);
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		wp_mail( $to, $subject, $message );
 
 		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-
 		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**
