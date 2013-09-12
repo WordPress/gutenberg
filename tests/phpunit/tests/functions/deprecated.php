@@ -136,6 +136,7 @@ class Test_Functions_Deprecated extends WP_UnitTestCase {
 	/**
 	 * Test that wp_save_image_file has a deprecated argument when passed a GD resource
 	 * @ticket 6821
+	 * @expectedDeprecated wp_save_image_file
 	 */
 	public function test_wp_save_image_file_deprecated_with_gd_resource() {
 		if ( !function_exists( 'imagejpeg' ) )

@@ -5,9 +5,9 @@
  * tags within `<pre>` elements as part of wpautop().
  *
  * @group formatting
+ * @expectedDeprecated clean_pre
  */
 class Tests_Formatting_CleanPre extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'clean_pre' );
 
 	function test_removes_self_closing_br_with_space() {
 		$source = 'a b c\n<br />sldfj<br />';

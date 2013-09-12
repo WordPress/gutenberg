@@ -6,25 +6,6 @@
  */
 class Tests_User extends WP_UnitTestCase {
 
-	protected $_deprecated_errors = array();
-
-	function setUp() {
-		parent::setUp();
-		$this->_deprecated_errors = array();
-	}
-
-	public function deprecated_handler( $function, $message, $version ) {
-		$this->_deprecated_errors[] = array(
-			'function' => $function,
-			'message'  => $message,
-			'version'  => $version
-		);
-	}
-
-	public function disable_deprecated_errors( $value ) {
-		return false;
-	}
-
 	function test_get_users_of_blog() {
 		// add one of each user role
 		$nusers = array();
@@ -178,18 +159,26 @@ class Tests_User extends WP_UnitTestCase {
 		$user->customField = 123;
 		$this->assertEquals( $user->customField, 123 );
 		unset( $user->customField );
-		$this->assertFalse( isset( $user->customField ) );
+		// $this->assertFalse( isset( $user->customField ) );
+		return $user;
+	}
 
+	/**
+	 * @depends test_user_unset
+	 * @expectedDeprecated WP_User->id
+	 * @ticket 20043
+	 */
+	function test_user_unset_lowercase_id( $user ) {
 		// Test 'id' (lowercase)
-		add_action( 'deprecated_argument_run', array( $this, 'deprecated_handler' ), 10, 3 );
-		add_filter( 'deprecated_argument_trigger_error', array( $this, 'disable_deprecated_errors' ) );
 		unset( $user->id );
-		$this->assertCount( 1, $this->_deprecated_errors );
-		$this->assertEquals( 'WP_User->id', $this->_deprecated_errors[0]['function'] );
-		$this->assertEquals( '2.1', $this->_deprecated_errors[0]['version'] );
-		remove_filter( 'deprecated_argument_trigger_error', array( $this, 'disable_deprecated_errors' ) );
-		remove_action( 'deprecated_argument_run', array( $this, 'deprecated_handler' ), 10, 3);
+		return $user;
+	}
 
+	/**
+	 * @depends test_user_unset_lowercase_id
+	 * @ticket 20043
+	 */
+	function test_user_unset_uppercase_id( $user ) {
 		// Test 'ID'
 		$this->assertNotEmpty( $user->ID );
 		unset( $user->ID );
@@ -210,16 +199,17 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertEquals( 'foo', $user->foo );
 	}
 
+	/**
+	 * @expectedDeprecated WP_User->id
+	 */
 	function test_id_property_back_compat() {
 		$user_id = $this->factory->user->create( array( 'role' => 'author' ) );
 		$user = new WP_User( $user_id );
 
-		add_filter( 'deprecated_argument_trigger_error', array( $this, 'disable_deprecated_errors' ) );
 		$this->assertTrue( isset( $user->id ) );
 		$this->assertEquals( $user->ID, $user->id );
 		$user->id = 1234;
 		$this->assertEquals( $user->ID, $user->id );
-		remove_filter( 'deprecated_argument_trigger_error', array( $this, 'disable_deprecated_errors' ) );
 	}
 
 	/**

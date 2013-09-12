@@ -3,7 +3,6 @@
  * @group themes
  */
 class Tests_Admin_includesTheme extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' );
 
 	function setUp() {
 		parent::setUp();
@@ -40,6 +39,8 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 	/**
 	 * @ticket 10959
 	 * @ticket 11216
+	 * @expectedDeprecated get_theme
+	 * @expectedDeprecated get_themes
 	 */
 	function test_page_templates() {
 		$theme = get_theme( 'Page Template Theme' );

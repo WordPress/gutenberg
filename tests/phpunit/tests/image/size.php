@@ -6,8 +6,7 @@
  * @group upload
  */
 class Tests_Image_Size extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'wp_shrink_dimensions' );
-	
+
 	function test_constrain_dims_zero() {
 		if (!is_callable('wp_constrain_dimensions'))
 			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
@@ -97,6 +96,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$this->assertequals(array(525, 700), $out);
 	}
 
+	/**
+	 * @expectedDeprecated wp_shrink_dimensions
+	 */
 	function test_shrink_dimensions_default() {
 		$out = wp_shrink_dimensions(640, 480);
 		$this->assertEquals(array(128, 96), $out);
@@ -105,6 +107,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$this->assertEquals(array(72, 96), $out);
 	}
 
+	/**
+	 * @expectedDeprecated wp_shrink_dimensions
+	 */
 	function test_shrink_dimensions_smaller() {
 		// image size is smaller than the constraint - no effect
 		$out = wp_shrink_dimensions(500, 600, 1024, 768);
@@ -114,6 +119,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$this->assertEquals(array(600, 500), $out);
 	}
 
+	/**
+	 * @expectedDeprecated wp_shrink_dimensions
+	 */
 	function test_shrink_dimensions_equal() {
 		// image size is equal to the constraint - no effect
 		$out = wp_shrink_dimensions(500, 600, 500, 600);
@@ -123,6 +131,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$this->assertEquals(array(600, 500), $out);
 	}
 
+	/**
+	 * @expectedDeprecated wp_shrink_dimensions
+	 */
 	function test_shrink_dimensions_larger() {
 		// image size is larger than the constraint - result should be constrained
 		$out = wp_shrink_dimensions(1024, 768, 500, 600);
@@ -132,6 +143,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$this->assertequals(array(225, 600), $out);
 	}
 
+	/**
+	 * @expectedDeprecated wp_shrink_dimensions
+	 */
 	function test_shrink_dimensions_boundary() {
 		// one dimension is larger than the constraint, one smaller - result should be constrained
 		$out = wp_shrink_dimensions(1024, 768, 500, 800);

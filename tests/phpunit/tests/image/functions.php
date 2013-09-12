@@ -6,7 +6,6 @@
  * @group upload
  */
 class Tests_Image_Functions extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'wp_load_image' );
 
 	/**
 	 * Setup test fixture
@@ -235,7 +234,9 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 	/**
 	 * Try loading a directory
+	 *
 	 * @ticket 17814
+	 * @expectedDeprecated wp_load_image
 	 */
 	public function test_load_directory() {
 

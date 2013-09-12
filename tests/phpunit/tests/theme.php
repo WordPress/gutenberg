@@ -6,7 +6,6 @@
  * @group themes
  */
 class Tests_Theme extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' );
 	protected $theme_slug = 'twentyeleven';
 	protected $theme_name = 'Twenty Eleven';
 
@@ -34,6 +33,10 @@ class Tests_Theme extends WP_UnitTestCase {
 		$this->assertEquals( $themes[ $this->theme_slug ], $single_theme );
 	}
 
+	/**
+	 * @expectedDeprecated get_theme
+	 * @expectedDeprecated get_themes
+	 */
 	function test_get_themes_default() {
 		$themes = get_themes();
 		$this->assertInstanceOf( 'WP_Theme', $themes[ $this->theme_name ] );
@@ -44,6 +47,10 @@ class Tests_Theme extends WP_UnitTestCase {
 		$this->assertEquals( $this->theme_name, $themes[ $this->theme_name ]->name );
 	}
 
+	/**
+	 * @expectedDeprecated get_theme
+	 * @expectedDeprecated get_themes
+	 */
 	function test_get_theme() {
 		$themes = get_themes();
 		foreach (array_keys($themes) as $name) {
@@ -67,6 +74,9 @@ class Tests_Theme extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @expectedDeprecated get_themes
+	 */
 	function test_get_themes_contents() {
 		$themes = get_themes();
 		// Generic tests that should hold true for any theme
@@ -153,6 +163,7 @@ class Tests_Theme extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 20897
+	 * @expectedDeprecated get_theme_data
 	 */
 	function test_extra_theme_headers() {
 		$wp_theme = wp_get_theme( $this->theme_slug );
@@ -170,6 +181,10 @@ class Tests_Theme extends WP_UnitTestCase {
 		return array( 'License' );
 	}
 
+	/**
+	 * @expectedDeprecated get_themes
+	 * @expectedDeprecated get_current_theme
+	 */
 	function test_switch_theme() {
 		$themes = get_themes();
 

@@ -5,7 +5,6 @@
  * @group shortcode
  */
 class Tests_Media extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'wp_convert_bytes_to_hr' );
 
 	function setUp() {
 		parent::setUp();
@@ -151,6 +150,7 @@ CAP;
 
 	/**
 	 * @ticket 19067
+	 * @expectedDeprecated wp_convert_bytes_to_hr
 	 */
 	function test_wp_convert_bytes_to_hr() {
 		$kb = 1024;

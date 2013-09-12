@@ -8,7 +8,6 @@ if ( is_multisite() ) :
  * @group multisite
  */
 class Tests_MS extends WP_UnitTestCase {
-	protected $deprecated_functions = array( 'is_blog_user', 'get_dashboard_blog' );
 	protected $plugin_hook_count = 0;
 
 	function setUp() {
@@ -137,6 +136,9 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertEquals( array(), get_blogs_of_user( $user1_id ) );
 	}
 
+	/**
+	 * @expectedDeprecated is_blog_user
+	 */
 	function test_is_blog_user() {
 		global $wpdb;
 
@@ -263,6 +265,9 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertFalse( users_can_register_signup_filter() );
 	}
 
+	/**
+	 * @expectedDeprecated get_dashboard_blog
+	 */
 	function test_get_dashboard_blog() {
 		// if there is no dashboard blog set, current blog is used
 		$dashboard_blog = get_dashboard_blog();
