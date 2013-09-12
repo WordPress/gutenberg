@@ -20,7 +20,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$users = new WP_User_Query();
 
 		$this->assertEquals( '', $users->get( 'fields' ) );
-		$this->assertEquals( '', $users->query_vars['fields'] );
+		$this->assertEquals( '', @$users->query_vars['fields'] );
 
 		$users->set( 'fields', 'all' );
 
