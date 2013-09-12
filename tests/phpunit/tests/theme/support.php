@@ -5,6 +5,26 @@
  */
 class Tests_Theme_Support extends WP_UnitTestCase {
 
+	function setUp() {
+		parent::setUp();
+		add_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		remove_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
+	}
+
+	function doing_it_wrong_run( $function ) {
+		if ( in_array( $function, array( "add_theme_support( 'html5' )" ) ) )
+			add_filter( 'doing_it_wrong_trigger_error', array( $this, 'doing_it_wrong_trigger_error' ) );
+	}
+
+	function doing_it_wrong_trigger_error() {
+		remove_filter( 'doing_it_wrong_trigger_error', array( $this, 'doing_it_wrong_trigger_error' ) );
+		return false;
+	}
+
 	function test_the_basics() {
 		add_theme_support( 'automatic-feed-links' );
 		$this->assertTrue( current_theme_supports( 'automatic-feed-links' ) );
