@@ -5,6 +5,12 @@ if ( is_multisite() ) :
  * @group option
  */
 class Tests_Option_BlogOption extends WP_UnitTestCase {
+	function setUp() {
+		parent::setUp();
+
+		$_SERVER['REMOTE_ADDR'] = null;
+	}
+
 	function test_from_same_site() {
 		$key = rand_str();
 		$key2 = rand_str();
@@ -81,6 +87,7 @@ class Tests_Option_BlogOption extends WP_UnitTestCase {
 	function test_with_another_site() {
 		global $current_site, $base;
 
+		$title = 'Fooblog';
 		$domain = 'blogoptiontest';
 
 		if ( is_subdomain_install() ) {

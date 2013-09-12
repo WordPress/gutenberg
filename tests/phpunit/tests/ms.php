@@ -11,6 +11,28 @@ class Tests_MS extends WP_UnitTestCase {
 
 	protected $plugin_hook_count = 0;
 
+	function setUp() {
+		parent::setUp();
+
+		$_SERVER['REMOTE_ADDR'] = '';
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
+	}
+
+	function deprecated_function_run_check( $function ) {
+		if ( in_array( $function, array( 'is_blog_user', 'get_dashboard_blog' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
+	}
+
+	function filter_deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
+		return false;
+	}
+
 	function test_create_and_delete_blog() {
 		global $wpdb;
 
@@ -308,7 +330,7 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertFalse( upload_is_user_over_quota( $echo ) );
 		$this->assertTrue( is_upload_space_available() );
 
-		if ( ! file_exists( BLOGSUPLOADDIR ) )
+		if ( defined( 'BLOGSUPLOADDIR' ) && ! file_exists( BLOGSUPLOADDIR ) )
 			$this->markTestSkipped( 'This test is broken when blogs.dir does not exist. ');
 
 		/*
@@ -525,7 +547,7 @@ class Tests_MS extends WP_UnitTestCase {
 
 	/**
 	 * Test fetching a blog that doesn't exist and again after it exists.
-	 * 
+	 *
 	 * @ticket 23405
 	 */
 	function test_get_blog_details_blog_does_not_exist() {
@@ -1013,7 +1035,7 @@ class Tests_MS extends WP_UnitTestCase {
 			'user_login' => $spam_username,
 		) );
 		update_user_status( $spam_user_id, 'spam', '1' );
-		
+
 		$this->assertTrue( is_user_spammy( $spam_username ) );
 		$this->assertFalse( is_user_spammy( 'testuser1' ) );
 	}
