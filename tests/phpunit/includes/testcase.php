@@ -6,7 +6,8 @@ require_once dirname( __FILE__ ) . '/trac.php';
 class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected static $forced_tickets = array();
-	protected $deprecated_functions = array();
+	protected $expected_deprecated = array();
+	protected $caught_deprecated = array();
 
 	/**
 	 * @var WP_UnitTest_Factory
@@ -24,30 +25,17 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
 		$this->start_transaction();
+		$this->expectDeprecated();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
-
-		if ( ! empty( $this->deprecated_functions ) )
-			add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
 		global $wpdb;
+		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
 		remove_filter( 'dbdelta_create_queries', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
-		if ( ! empty( $this->deprecated_functions ) )
-			remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, $this->deprecated_functions ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function clean_up_global_scope() {
@@ -94,6 +82,35 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	function wp_die_handler( $message ) {
 		throw new WPDieException( $message );
+	}
+
+	function expectDeprecated() {
+		$annotations = $this->getAnnotations();
+		foreach ( array( 'class', 'method' ) as $depth ) {
+			if ( ! empty( $annotations[ $depth ]['expectedDeprecated'] ) )
+				$this->expected_deprecated = array_merge( $this->expected_deprecated, $annotations[ $depth ]['expectedDeprecated'] );
+		}
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+		add_action( 'deprecated_argument_run', array( $this, 'deprecated_function_run' ) );
+		add_action( 'deprecated_function_trigger_error', '__return_false' );
+		add_action( 'deprecated_argument_trigger_error', '__return_false' );
+	}
+
+	function expectedDeprecated() {
+		$not_caught_deprecated = array_diff( $this->expected_deprecated, $this->caught_deprecated );
+		foreach ( $not_caught_deprecated as $not_caught ) {
+			$this->fail( "Failed to assert that $not_caught triggered a deprecated notice" );
+		}
+
+		$unexpected_deprecated = array_diff( $this->caught_deprecated, $this->expected_deprecated );
+		foreach ( $unexpected_deprecated as $unexpected ) {
+			$this->fail( "Unexpected deprecated notice for $unexpected" );
+		}
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( ! in_array( $function, $this->caught_deprecated ) )
+			$this->caught_deprecated[] = $function;
 	}
 
 	function assertWPError( $actual, $message = '' ) {
