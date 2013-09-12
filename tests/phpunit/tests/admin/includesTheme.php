@@ -3,6 +3,8 @@
  * @group themes
  */
 class Tests_Admin_includesTheme extends WP_UnitTestCase {
+	protected $deprecated_functions = array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' );
+
 	function setUp() {
 		parent::setUp();
 		$this->theme_root = DIR_TESTDATA . '/themedir1';
@@ -17,18 +19,6 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 		// clear caches
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
-		
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function deprecated_function_run_check( $function ) {
-		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-	}
-
-	function filter_deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function tearDown() {

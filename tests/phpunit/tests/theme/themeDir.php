@@ -6,6 +6,8 @@
  * @group themes
  */
 class Tests_Theme_ThemeDir extends WP_UnitTestCase {
+	protected $deprecated_functions = array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme', 'get_broken_themes' );
+
 	function setUp() {
 		parent::setUp();
 		$this->theme_root = DIR_TESTDATA . '/themedir1';
@@ -21,7 +23,6 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		// clear caches
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
@@ -32,17 +33,6 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		parent::tearDown();
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme', 'get_broken_themes' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	// replace the normal theme root dir with our premade test dir

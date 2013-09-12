@@ -8,29 +8,13 @@ if ( is_multisite() ) :
  * @group multisite
  */
 class Tests_MS extends WP_UnitTestCase {
-
+	protected $deprecated_functions = array( 'is_blog_user', 'get_dashboard_blog' );
 	protected $plugin_hook_count = 0;
 
 	function setUp() {
 		parent::setUp();
 
 		$_SERVER['REMOTE_ADDR'] = '';
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function deprecated_function_run_check( $function ) {
-		if ( in_array( $function, array( 'is_blog_user', 'get_dashboard_blog' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-	}
-
-	function filter_deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function test_create_and_delete_blog() {

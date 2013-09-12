@@ -6,6 +6,8 @@
  * @group upload
  */
 class Tests_Image_Functions extends WP_UnitTestCase {
+	protected $deprecated_functions = array( 'wp_load_image' );
+
 	/**
 	 * Setup test fixture
 	 */
@@ -17,22 +19,6 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 		require_once( ABSPATH . WPINC . '/class-wp-image-editor-imagick.php' );
 
 		include_once( DIR_TESTDATA . '/../includes/mock-image-editor.php' );
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, array( 'wp_load_image' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	/**

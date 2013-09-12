@@ -6,6 +6,7 @@ require_once dirname( __FILE__ ) . '/trac.php';
 class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected static $forced_tickets = array();
+	protected $deprecated_functions = array();
 
 	/**
 	 * @var WP_UnitTest_Factory
@@ -24,6 +25,9 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->clean_up_global_scope();
 		$this->start_transaction();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
+
+		if ( ! empty( $this->deprecated_functions ) )
+			add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
@@ -32,6 +36,18 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		remove_filter( 'dbdelta_create_queries', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
+		if ( ! empty( $this->deprecated_functions ) )
+			remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( in_array( $function, $this->deprecated_functions ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+	}
+
+	function deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	function clean_up_global_scope() {

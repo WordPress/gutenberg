@@ -6,28 +6,8 @@
  * @group upload
  */
 class Tests_Image_Size extends WP_UnitTestCase {
-	function setUp() {
-		parent::setUp();
-
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function deprecated_function_run_check( $function ) {
-		if ( in_array( $function, array( 'wp_shrink_dimensions' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-	}
-
-	function filter_deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-		return false;
-	}
-
+	protected $deprecated_functions = array( 'wp_shrink_dimensions' );
+	
 	function test_constrain_dims_zero() {
 		if (!is_callable('wp_constrain_dimensions'))
 			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');

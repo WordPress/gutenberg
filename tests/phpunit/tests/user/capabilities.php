@@ -7,7 +7,8 @@
  * @group capabilities
  */
 class Tests_User_Capabilities extends WP_UnitTestCase {
-	var $user_ids = array();
+	protected $user_ids = array();
+	protected $deprecated_functions = array( 'set_current_user' );
 
 	function setUp() {
 		parent::setUp();
@@ -15,22 +16,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->_flush_roles();
 
 		$this->orig_users = get_users();
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, array( 'set_current_user' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function _flush_roles() {

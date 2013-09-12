@@ -6,17 +6,15 @@
  * @group themes
  */
 class Tests_Theme extends WP_UnitTestCase {
-
-	var $theme_slug = 'twentyeleven';
-	var $theme_name = 'Twenty Eleven';
+	protected $deprecated_functions = array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' );
+	protected $theme_slug = 'twentyeleven';
+	protected $theme_name = 'Twenty Eleven';
 
 	function setUp() {
 		parent::setUp();
 		add_filter( 'extra_theme_headers', array( $this, '_theme_data_extra_headers' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
-
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
@@ -24,18 +22,6 @@ class Tests_Theme extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		parent::tearDown();
-
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function test_wp_get_themes_default() {

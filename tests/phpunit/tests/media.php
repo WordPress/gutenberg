@@ -5,6 +5,7 @@
  * @group shortcode
  */
 class Tests_Media extends WP_UnitTestCase {
+	protected $deprecated_functions = array( 'wp_convert_bytes_to_hr' );
 
 	function setUp() {
 		parent::setUp();
@@ -19,22 +20,6 @@ CAP;
 		$this->img_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $this->img_name;
 		$this->img_html = '<img src="' . $this->img_url . '"/>';
 		$this->img_dimensions = array( 'width' => 100, 'height' => 100 );
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
-	}
-
-	function deprecated_function_run( $function ) {
-		if ( in_array( $function, array( 'wp_convert_bytes_to_hr' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-	}
-
-	function deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
-		return false;
 	}
 
 	function test_img_caption_shortcode_added() {
