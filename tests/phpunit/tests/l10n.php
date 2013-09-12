@@ -10,16 +10,10 @@ class Tests_L10n extends WP_UnitTestCase {
 		$this->assertFalse( is_textdomain_loaded( 'wp-tests-domain' ) );
 		$this->assertFalse( unload_textdomain( 'wp-tests-domain' ) );
 
-		$file = DIR_TESTDATA . '/wpcom-themes/p2/languages/es_ES.mo';
-		if ( file_exists( $file ) ) {
-			$this->assertTrue( load_textdomain( 'wp-tests-domain', $file ) );
-			$this->assertTrue( is_textdomain_loaded( 'wp-tests-domain' ) );
-			$this->assertTrue( unload_textdomain( 'wp-tests-domain' ) );
-		} else {
-			$this->assertFalse( load_textdomain( 'wp-tests-domain', $file ) );
-			$this->assertFalse( is_textdomain_loaded( 'wp-tests-domain' ) );
-			$this->assertFalse( unload_textdomain( 'wp-tests-domain' ) );
-		}
+		$file = DIR_TESTDATA . '/pomo/simple.mo';
+		$this->assertTrue( load_textdomain( 'wp-tests-domain', $file ) );
+		$this->assertTrue( is_textdomain_loaded( 'wp-tests-domain' ) );
+		$this->assertTrue( unload_textdomain( 'wp-tests-domain' ) );
 		$this->assertFalse( is_textdomain_loaded( 'wp-tests-domain' ) );
 	}
 
