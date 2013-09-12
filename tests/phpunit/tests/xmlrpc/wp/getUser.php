@@ -126,7 +126,10 @@ class Tests_XMLRPC_wp_getUser extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( $editor_id, $result['user_id'] );
 
 		$expected_fields = array( 'user_id', 'username', 'email', 'registered', 'display_name', 'nicename' );
-		$this->assertEquals( sort( $expected_fields ), sort( array_keys( $result ) ) );
+		$keys = array_keys( $result );
+		sort( $expected_fields );
+		sort( $keys );
+		$this->assertEqualSets( $expected_fields, $keys );
 	}
 
 	function test_arbitrary_fields() {
@@ -138,7 +141,10 @@ class Tests_XMLRPC_wp_getUser extends WP_XMLRPC_UnitTestCase {
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( $editor_id, $result['user_id'] );
 
-		$expected_fields = array_merge( array( 'user_id' ), $fields );
-		$this->assertEquals( sort( $expected_fields ), sort( array_keys( $result ) ) );
+		$expected_fields = array( 'user_id', 'email', 'bio' );
+		$keys = array_keys( $result );
+		sort( $expected_fields );
+		sort( $keys );
+		$this->assertEqualSets( $expected_fields, $keys );
 	}
 }
