@@ -21,6 +21,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		// clear caches
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
@@ -31,6 +32,17 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		parent::tearDown();
+		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme', 'get_broken_themes' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+	}
+
+	function deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	// replace the normal theme root dir with our premade test dir
@@ -79,10 +91,15 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( '0.6.1-wpcom', $theme['Version'] );
 		$this->assertEquals( 'sandbox', $theme['Template'] );
 		$this->assertEquals( 'sandbox', $theme['Stylesheet'] );
-		$this->assertEquals( $this->theme_root.'/sandbox/functions.php', reset($theme['Template Files']) );
-		$this->assertEquals( $this->theme_root.'/sandbox/index.php', next($theme['Template Files']) );
 
-		$this->assertEquals( $this->theme_root.'/sandbox/style.css', reset($theme['Stylesheet Files']) );
+		$template_files = $theme['Template Files'];
+
+		$this->assertEquals( $this->theme_root.'/sandbox/functions.php', reset( $template_files ) );
+		$this->assertEquals( $this->theme_root.'/sandbox/index.php', next( $template_files ) );
+
+		$stylesheet_files = $theme['Stylesheet Files'];
+
+		$this->assertEquals( $this->theme_root.'/sandbox/style.css', reset( $stylesheet_files ) );
 
 		$this->assertEquals( $this->theme_root.'/sandbox', $theme['Template Dir'] );
 		$this->assertEquals( $this->theme_root.'/sandbox', $theme['Stylesheet Dir'] );

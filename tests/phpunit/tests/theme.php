@@ -16,17 +16,7 @@ class Tests_Theme extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 
-		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run_check' ) );
-	}
-
-	function deprecated_function_run_check( $function ) {
-		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' ) ) )
-			add_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-	}
-
-	function filter_deprecated_function_trigger_error() {
-		remove_filter( 'deprecated_function_trigger_error', array( $this, 'filter_deprecated_function_trigger_error' ) );
-		return false;
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 	}
 
 	function tearDown() {
@@ -34,6 +24,18 @@ class Tests_Theme extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		parent::tearDown();
+
+		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( in_array( $function, array( 'get_theme', 'get_themes', 'get_theme_data', 'get_current_theme' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+	}
+
+	function deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	function test_wp_get_themes_default() {
