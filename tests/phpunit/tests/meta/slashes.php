@@ -9,6 +9,7 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		$this->author_id = $this->factory->user->create( array( 'role' => 'editor' ) );
+		$this->post_id = $this->factory->post->create();
 		$this->old_current_user = get_current_user_id();
 		wp_set_current_user( $this->author_id );
 
@@ -173,7 +174,7 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_add_comment_meta() {
-		$id = $this->factory->comment->create();
+		$id = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
 
 		add_comment_meta( $id, 'slash_test_1', $this->slash_1 );
 		add_comment_meta( $id, 'slash_test_2', $this->slash_3 );
@@ -197,7 +198,7 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_update_comment_meta() {
-		$id = $this->factory->comment->create();
+		$id = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
 
 		add_comment_meta( $id, 'slash_test_1', 'foo' );
 		add_comment_meta( $id, 'slash_test_2', 'foo' );
