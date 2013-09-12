@@ -9,12 +9,30 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	/**
 	 * Setup test fixture
 	 */
-	public function setup() {
+	public function setUp() {
+		parent::setUp();
+
 		require_once( ABSPATH . WPINC . '/class-wp-image-editor.php' );
 		require_once( ABSPATH . WPINC . '/class-wp-image-editor-gd.php' );
 		require_once( ABSPATH . WPINC . '/class-wp-image-editor-imagick.php' );
 
 		include_once( DIR_TESTDATA . '/../includes/mock-image-editor.php' );
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( in_array( $function, array( 'wp_load_image' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+	}
+
+	function deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	/**
@@ -236,8 +254,11 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	public function test_load_directory() {
 
 		// First, test with deprecated wp_load_image function
-		$editor = wp_load_image( DIR_TESTDATA );
-		$this->assertNotInternalType( 'resource', $editor );
+		$editor1 = wp_load_image( DIR_TESTDATA );
+		$this->assertNotInternalType( 'resource', $editor1 );
+
+		$editor2 = wp_get_image_editor( DIR_TESTDATA );
+		$this->assertNotInternalType( 'resource', $editor2 );
 
 		// Then, test with editors.
 		$classes = array('WP_Image_Editor_GD', 'WP_Image_Editor_Imagick');

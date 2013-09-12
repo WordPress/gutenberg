@@ -11,7 +11,7 @@ if (class_exists( 'WP_Image_Editor' ) ) :
 		public function load() {
 			return self::$load_return;
 		}
-		public static function test() {
+		public static function test( $args = array() ) {
 			return self::$test_return;
 		}
 		public static function supports_mime_type( $mime_type ) {
