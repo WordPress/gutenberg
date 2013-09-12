@@ -19,7 +19,8 @@ class Tests_Actions extends WP_UnitTestCase {
 		// only our hook was called
 		$this->assertEquals(array($tag), $a->get_tags());
 
-		$args = array_pop($a->get_args());
+		$argsvar = $a->get_args();
+		$args = array_pop( $argsvar );
 		$this->assertEquals(array(''), $args);
 	}
 
@@ -43,17 +44,17 @@ class Tests_Actions extends WP_UnitTestCase {
 	}
 
 	function test_has_action() {
-			$tag = rand_str();
-			$func = rand_str();
+		$tag = rand_str();
+		$func = rand_str();
 
-			$this->assertFalse( has_action($tag, $func) );
-			$this->assertFalse( has_action($tag) );
-			add_action($tag, $func);
-			$this->assertEquals( 10, has_action($tag, $func) );
-			$this->assertTrue( has_action($tag) );
-			remove_action($tag, $func);
-			$this->assertFalse( has_action($tag, $func) );
-			$this->assertFalse( has_action($tag) );
+		$this->assertFalse( has_action($tag, $func) );
+		$this->assertFalse( has_action($tag) );
+		add_action($tag, $func);
+		$this->assertEquals( 10, has_action($tag, $func) );
+		$this->assertTrue( has_action($tag) );
+		remove_action($tag, $func);
+		$this->assertFalse( has_action($tag, $func) );
+		$this->assertFalse( has_action($tag) );
 	}
 
 	// one tag with multiple actions
@@ -82,8 +83,10 @@ class Tests_Actions extends WP_UnitTestCase {
 		// call the action with a single argument
 		do_action($tag, $val);
 
-		$this->assertEquals(1, $a->get_call_count());
-		$this->assertEquals(array($val), array_pop($a->get_args()));
+		$call_count = $a->get_call_count();
+		$this->assertEquals(1, $call_count);
+		$argsvar = $a->get_args();
+		$this->assertEquals( array( $val ), array_pop( $argsvar ) );
 	}
 
 	function test_action_args_2() {
@@ -99,13 +102,16 @@ class Tests_Actions extends WP_UnitTestCase {
 		// call the action with two arguments
 		do_action($tag, $val1, $val2);
 
+		$call_count = $a1->get_call_count();
 		// a1 should be called with both args
-		$this->assertEquals(1, $a1->get_call_count());
-		$this->assertEquals(array($val1, $val2), array_pop($a1->get_args()));
+		$this->assertEquals(1, $call_count);
+		$argsvar1 = $a1->get_args();
+		$this->assertEquals( array( $val1, $val2 ), array_pop( $argsvar1 ) );
 
 		// a2 should be called with one only
 		$this->assertEquals(1, $a2->get_call_count());
-		$this->assertEquals(array($val1), array_pop($a2->get_args()));
+		$argsvar2 = $a2->get_args();
+		$this->assertEquals( array( $val1 ), array_pop( $argsvar2 ) );
 	}
 
 	function test_action_priority() {
