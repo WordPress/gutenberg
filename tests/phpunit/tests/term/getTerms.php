@@ -85,7 +85,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	function test_get_terms_should_allow_arbitrary_indexed_taxonomies_array() {
 		$term_id = $this->factory->tag->create();
 		$terms = get_terms( array( '111' => 'post_tag' ), array( 'hide_empty' => false ) );
-		$this->assertEquals( $term_id, $terms[0]->term_id );
+		$this->assertEquals( $term_id, reset( $terms )->term_id );
 	}
 
 	/**
