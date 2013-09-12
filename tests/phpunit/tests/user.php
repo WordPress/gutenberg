@@ -130,7 +130,8 @@ class Tests_User extends WP_UnitTestCase {
 			$this->assertTrue(isset($out[$k]) && $out[$k][0] == $v);
 
 		// delete one key and check again
-		$key_to_delete = array_pop(array_keys($vals));
+		$keys = array_keys( $vals );
+		$key_to_delete = array_pop( $keys );
 		delete_user_meta($user_id, $key_to_delete);
 		$out = get_user_meta($user_id);
 		// make sure that key is excluded from the results
@@ -572,7 +573,7 @@ class Tests_User extends WP_UnitTestCase {
 		$user = WP_User::get_data_by( 'id', false );
 		$this->assertEquals( false, $user );
 
-		$user = WP_User::get_data_by( 'id', $user->user_nicename );
+		$user = WP_User::get_data_by( 'id', @$user->user_nicename );
 		$this->assertEquals( false, $user );
 
 		$user = WP_User::get_data_by( 'id', 99999 );
