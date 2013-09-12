@@ -15,6 +15,22 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->_flush_roles();
 
 		$this->orig_users = get_users();
+		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+		remove_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
+	}
+
+	function deprecated_function_run( $function ) {
+		if ( in_array( $function, array( 'set_current_user' ) ) )
+			add_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+	}
+
+	function deprecated_function_trigger_error() {
+		remove_filter( 'deprecated_function_trigger_error', array( $this, 'deprecated_function_trigger_error' ) );
+		return false;
 	}
 
 	function _flush_roles() {
@@ -666,5 +682,26 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse( current_user_can_for_blog( $blog_id, 'foo_the_bar' ) );
 
 		set_current_user( $old_uid );
+	}
+
+	function test_wp_set_current_user() {
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$old_uid = get_current_user_id();
+		wp_set_current_user( $user->ID );
+
+		$this->assertTrue( current_user_can_for_blog( get_current_blog_id(), 'edit_posts' ) );
+		$this->assertFalse( current_user_can_for_blog( get_current_blog_id(), 'foo_the_bar' ) );
+		if ( ! is_multisite() ) {
+			$this->assertTrue( current_user_can_for_blog( 12345, 'edit_posts' ) );
+			return;
+		}
+
+		$this->assertFalse( current_user_can_for_blog( 12345, 'edit_posts' ) );
+
+		$blog_id = $this->factory->blog->create( array( 'user_id' => $user->ID ) );
+		$this->assertTrue( current_user_can_for_blog( $blog_id, 'edit_posts' ) );
+		$this->assertFalse( current_user_can_for_blog( $blog_id, 'foo_the_bar' ) );
+
+		wp_set_current_user( $old_uid );
 	}
 }
