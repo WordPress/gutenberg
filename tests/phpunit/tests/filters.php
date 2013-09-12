@@ -20,7 +20,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		// only our hook was called
 		$this->assertEquals(array($tag), $a->get_tags());
 
-		$args = array_pop($a->get_args());
+		$argsvar = $a->get_args();
+		$args = array_pop( $argsvar );
 		$this->assertEquals(array($val), $args);
 	}
 
@@ -87,7 +88,8 @@ class Tests_Filters extends WP_UnitTestCase {
 		$this->assertEquals($val, apply_filters($tag, $val, $arg1));
 
 		$this->assertEquals(1, $a->get_call_count());
-		$this->assertEquals(array($val, $arg1), array_pop($a->get_args()));
+		$argsvar = $a->get_args();
+		$this->assertEquals( array( $val, $arg1 ), array_pop( $argsvar ) );
 	}
 
 	function test_filter_args_2() {
@@ -106,11 +108,13 @@ class Tests_Filters extends WP_UnitTestCase {
 
 		// a1 should be called with both args
 		$this->assertEquals(1, $a1->get_call_count());
-		$this->assertEquals(array($val, $arg1, $arg2), array_pop($a1->get_args()));
+		$argsvar1 = $a1->get_args();
+		$this->assertEquals( array( $val, $arg1, $arg2 ), array_pop( $argsvar1 ) );
 
 		// a2 should be called with one only
 		$this->assertEquals(1, $a2->get_call_count());
-		$this->assertEquals(array($val), array_pop($a2->get_args()));
+		$argsvar2 = $a2->get_args();
+		$this->assertEquals( array( $val ), array_pop( $argsvar2 ) );
 	}
 
 	function test_filter_priority() {
@@ -246,9 +250,9 @@ class Tests_Filters extends WP_UnitTestCase {
 		return $tag;
 	}
 
-        /**
-         * @ticket 21169
-         */
+	/**
+	 * @ticket 21169
+	 */
 	function test_filter_removal_during_filter() {
 		$tag = rand_str();
 		$a = new MockAction();
