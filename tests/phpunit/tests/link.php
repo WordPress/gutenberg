@@ -35,6 +35,8 @@ class Tests_Link extends WP_UnitTestCase {
 		// Basic case
 		$this->assertEquals( get_permalink( $post_id ), wp_get_shortlink( $post_id, 'post' ) );
 
+		unset( $GLOBALS['post'] );
+
 		// Global post is not set
 		$this->assertEquals( '', wp_get_shortlink( 0, 'post' ) );
 		$this->assertEquals( '', wp_get_shortlink( 0 ) );
