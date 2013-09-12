@@ -12,7 +12,7 @@ class Tests_Formatting_SeemsUtf8 extends WP_UnitTestCase {
 	 */
     function test_returns_true_for_utf8_strings( $utf8_string ) {
 		// from http://www.i18nguy.com/unicode-example.html
-		$this->assertTrue( seems_utf8( $string ) );
+		$this->assertTrue( seems_utf8( $utf8_string ) );
 	}
 
 	function utf8_strings() {
