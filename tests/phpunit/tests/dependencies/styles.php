@@ -8,6 +8,8 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
+		if ( empty( $GLOBALS['wp_styles'] ) )
+			$GLOBALS['wp_styles'] = null;
 		$this->old_wp_styles = $GLOBALS['wp_styles'];
 		remove_action( 'wp_default_styles', 'wp_default_styles' );
 		$GLOBALS['wp_styles'] = new WP_Styles();
