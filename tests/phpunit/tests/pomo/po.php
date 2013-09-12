@@ -37,57 +37,57 @@ http://wordpress.org/
     }
 
 	function test_prepend_each_line() {
-		$this->assertEquals('baba_', PO::prepend_each_line('', 'baba_'));
-		$this->assertEquals('baba_dyado', PO::prepend_each_line('dyado', 'baba_'));
-		$this->assertEquals("# baba\n# dyado\n# \n", PO::prepend_each_line("baba\ndyado\n\n", '# '));
+		$this->assertEquals('baba_', @PO::prepend_each_line('', 'baba_'));
+		$this->assertEquals('baba_dyado', @PO::prepend_each_line('dyado', 'baba_'));
+		$this->assertEquals("# baba\n# dyado\n# \n", @PO::prepend_each_line("baba\ndyado\n\n", '# '));
 	}
 
 	function test_poify() {
 		//simple
-		$this->assertEquals('"baba"', PO::poify('baba'));
+		$this->assertEquals('"baba"', @PO::poify('baba'));
 		//long word
-		$this->assertEquals($this->po_a90, PO::poify($this->a90));
+		$this->assertEquals($this->po_a90, @PO::poify($this->a90));
 		// tab
-		$this->assertEquals('"ba\tba"', PO::poify("ba\tba"));
+		$this->assertEquals('"ba\tba"', @PO::poify("ba\tba"));
 		// do not add leading empty string of one-line string ending on a newline
-		$this->assertEquals('"\\\\a\\\\n\\n"', PO::poify("\a\\n\n"));
+		$this->assertEquals('"\\\\a\\\\n\\n"', @PO::poify("\a\\n\n"));
 		// backslash
-		$this->assertEquals('"ba\\\\ba"', PO::poify('ba\\ba'));
+		$this->assertEquals('"ba\\\\ba"', @PO::poify('ba\\ba'));
 		// random wordpress.pot string
 		$src = 'Categories can be selectively converted to tags using the <a href="%s">category to tag converter</a>.';
-		$this->assertEquals("\"Categories can be selectively converted to tags using the <a href=\\\"%s\\\">category to tag converter</a>.\"", PO::poify($src));
+		$this->assertEquals("\"Categories can be selectively converted to tags using the <a href=\\\"%s\\\">category to tag converter</a>.\"", @PO::poify($src));
 
-		$this->assertEquals($this->po_mail, PO::poify($this->mail));
+		$this->assertEquals($this->po_mail, @PO::poify($this->mail));
 	}
 
 	function test_unpoify() {
-		$this->assertEquals('baba', PO::unpoify('"baba"'));
-		$this->assertEquals("baba\ngugu", PO::unpoify('"baba\n"'."\t\t\t\n".'"gugu"'));
-		$this->assertEquals($this->a90, PO::unpoify($this->po_a90));
-		$this->assertEquals('\\t\\n', PO::unpoify('"\\\\t\\\\n"'));
+		$this->assertEquals('baba', @PO::unpoify('"baba"'));
+		$this->assertEquals("baba\ngugu", @PO::unpoify('"baba\n"'."\t\t\t\n".'"gugu"'));
+		$this->assertEquals($this->a90, @PO::unpoify($this->po_a90));
+		$this->assertEquals('\\t\\n', @PO::unpoify('"\\\\t\\\\n"'));
 		// wordwrapped
-		$this->assertEquals('babadyado', PO::unpoify("\"\"\n\"baba\"\n\"dyado\""));
-		$this->assertEquals($this->mail, PO::unpoify($this->po_mail));
+		$this->assertEquals('babadyado', @PO::unpoify("\"\"\n\"baba\"\n\"dyado\""));
+		$this->assertEquals($this->mail, @PO::unpoify($this->po_mail));
 	}
 
 	function test_export_entry() {
 		$entry = new Translation_Entry(array('singular' => 'baba'));
-		$this->assertEquals("msgid \"baba\"\nmsgstr \"\"", PO::export_entry($entry));
+		$this->assertEquals("msgid \"baba\"\nmsgstr \"\"", @PO::export_entry($entry));
 		// plural
 		$entry = new Translation_Entry(array('singular' => 'baba', 'plural' => 'babas'));
 		$this->assertEquals('msgid "baba"
 msgid_plural "babas"
 msgstr[0] ""
-msgstr[1] ""', PO::export_entry($entry));
+msgstr[1] ""', @PO::export_entry($entry));
 		$entry = new Translation_Entry(array('singular' => 'baba', 'translator_comments' => "baba\ndyado"));
 		$this->assertEquals('#  baba
 #  dyado
 msgid "baba"
-msgstr ""', PO::export_entry($entry));
+msgstr ""', @PO::export_entry($entry));
 		$entry = new Translation_Entry(array('singular' => 'baba', 'extracted_comments' => "baba"));
 		$this->assertEquals('#. baba
 msgid "baba"
-msgstr ""', PO::export_entry($entry));
+msgstr ""', @PO::export_entry($entry));
 		$entry = new Translation_Entry(array(
 			'singular' => 'baba',
 			'extracted_comments' => "baba",
@@ -96,24 +96,24 @@ msgstr ""', PO::export_entry($entry));
 #: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
 #: 29
 msgid "baba"
-msgstr ""', PO::export_entry($entry));
+msgstr ""', @PO::export_entry($entry));
 		$entry = new Translation_Entry(array('singular' => 'baba', 'translations' => array()));
-		$this->assertEquals("msgid \"baba\"\nmsgstr \"\"", PO::export_entry($entry));
+		$this->assertEquals("msgid \"baba\"\nmsgstr \"\"", @PO::export_entry($entry));
 
 		$entry = new Translation_Entry(array('singular' => 'baba', 'translations' => array('куку', 'буку')));
-		$this->assertEquals("msgid \"baba\"\nmsgstr \"куку\"", PO::export_entry($entry));
+		$this->assertEquals("msgid \"baba\"\nmsgstr \"куку\"", @PO::export_entry($entry));
 
 		$entry = new Translation_Entry(array('singular' => 'baba', 'plural' => 'babas', 'translations' => array('кукубуку')));
 		$this->assertEquals('msgid "baba"
 msgid_plural "babas"
-msgstr[0] "кукубуку"', PO::export_entry($entry));
+msgstr[0] "кукубуку"', @PO::export_entry($entry));
 
 		$entry = new Translation_Entry(array('singular' => 'baba', 'plural' => 'babas', 'translations' => array('кукубуку', 'кукуруку', 'бабаяга')));
 		$this->assertEquals('msgid "baba"
 msgid_plural "babas"
 msgstr[0] "кукубуку"
 msgstr[1] "кукуруку"
-msgstr[2] "бабаяга"', PO::export_entry($entry));
+msgstr[2] "бабаяга"', @PO::export_entry($entry));
 		// context
 		$entry = new Translation_Entry(array('context' => 'ctxt', 'singular' => 'baba', 'plural' => 'babas', 'translations' => array('кукубуку', 'кукуруку', 'бабаяга'), 'flags' => array('fuzzy', 'php-format')));
 		$this->assertEquals('#, fuzzy, php-format
@@ -122,7 +122,7 @@ msgid "baba"
 msgid_plural "babas"
 msgstr[0] "кукубуку"
 msgstr[1] "кукуруку"
-msgstr[2] "бабаяга"', PO::export_entry($entry));
+msgstr[2] "бабаяга"', @PO::export_entry($entry));
     }
 
 	function test_export_entries() {
