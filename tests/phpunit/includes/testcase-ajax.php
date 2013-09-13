@@ -129,7 +129,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	 */
 	public function dieHandler( $message ) {
 		$this->_last_response .= ob_get_clean();
-		ob_end_clean();
+
 		if ( '' === $this->_last_response ) {
 			if ( is_scalar( $message) ) {
 				throw new WPAjaxDieStopException( (string) $message );
