@@ -191,7 +191,6 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 
 		// Save the data stop buffering
 		$data = ob_get_clean();
-		ob_end_clean();
 
 		// Done
 		return $data;
