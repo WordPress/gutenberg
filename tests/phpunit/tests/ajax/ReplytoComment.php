@@ -38,6 +38,8 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 
 		$post_id = $this->factory->post->create( array( 'post_status' => 'draft' ) );
 		$this->_draft_post = get_post( $post_id );
+
+		$_SERVER['REMOTE_ADDR'] = '';
 	}
 
 	/**
