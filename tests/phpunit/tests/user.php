@@ -159,7 +159,7 @@ class Tests_User extends WP_UnitTestCase {
 		$user->customField = 123;
 		$this->assertEquals( $user->customField, 123 );
 		unset( $user->customField );
-		// $this->assertFalse( isset( $user->customField ) );
+		$this->assertFalse( isset( $user->customField ) );
 		return $user;
 	}
 
