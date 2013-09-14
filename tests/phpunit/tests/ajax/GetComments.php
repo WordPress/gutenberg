@@ -38,6 +38,8 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 
 		$post_id = $this->factory->post->create();
 		$this->_no_comment_post = get_post( $post_id );
+
+		unset( $GLOBALS['post_id'] );
 	}
 
 	/**
