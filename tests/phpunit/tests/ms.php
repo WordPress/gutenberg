@@ -1029,6 +1029,45 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertFalse( is_user_spammy( 'testuser1' ) );
 	}
 
+	/**
+	 * @ticket 14511
+	 */
+	function test_wp_get_sites() {
+		global $wpdb;
+		$this->factory->blog->create_many( 2, array( 'site_id' => 2, 'meta' => array( 'public' => 1 ) ) );
+		$this->factory->blog->create_many( 3, array( 'site_id' => 3, 'meta' => array( 'public' => 0 ) ) );
+
+		// Expect no sites when passed an invalid network_id
+		$this->assertCount( 0, wp_get_sites( array( 'network_id' => 0 ) ) );
+		$this->assertCount( 0, wp_get_sites( array( 'network_id' => 4 ) ) );
+
+		// Expect 1 site when no network_id is specified - defaults to current network.
+		$this->assertCount( 1, wp_get_sites() );
+		// Expect 6 sites when network_id = null.
+		$this->assertCount( 6, wp_get_sites( array( 'network_id' => null ) ) );
+
+		// Expect 1 site with a network_id of 1, 2 for network_id 2, 3 for 3
+		$this->assertCount( 1, wp_get_sites( array( 'network_id' => 1 ) ) );
+		$this->assertCount( 2, wp_get_sites( array( 'network_id' => 2 ) ) );
+		$this->assertCount( 3, wp_get_sites( array( 'network_id' => 3 ) ) );
+
+		// Expect 6 sites when public is null (across all networks)
+		$this->assertCount( 6, wp_get_sites( array( 'public' => null, 'network_id' => null ) ) );
+
+		// Expect 3 sites when public is 1
+		$this->assertCount( 3, wp_get_sites( array( 'public' => 1, 'network_id' => null ) ) );
+
+		// Expect 2 sites when public is 1 and network_id is 2
+		$this->assertCount( 2, wp_get_sites( array( 'network_id' => 2, 'public' => 1 ) ) );
+
+		// Expect no sites when public is set to 0 and network_id is not 3
+		$this->assertCount( 0, wp_get_sites( array( 'network_id' => 1, 'public' => 0 ) ) );
+
+		// Test public + network_id = 3
+		$this->assertCount( 0, wp_get_sites( array( 'network_id' => 3, 'public' => 1 ) ) );
+		$this->assertCount( 3, wp_get_sites( array( 'network_id' => 3, 'public' => 0 ) ) );
+	}
+
 }
 
 endif;
