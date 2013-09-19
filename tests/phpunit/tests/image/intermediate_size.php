@@ -42,5 +42,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		$this->assertEquals( 'image/jpeg', $image['mime-type'] );
 
 		$this->assertFalse( isset( $image['path'] ) );
+
+		unlink( DIR_TESTDATA . '/images/a2-small-100x75.jpg' );
 	}
 }
