@@ -1033,7 +1033,6 @@ class Tests_MS extends WP_UnitTestCase {
 	 * @ticket 14511
 	 */
 	function test_wp_get_sites() {
-		global $wpdb;
 		$this->factory->blog->create_many( 2, array( 'site_id' => 2, 'meta' => array( 'public' => 1 ) ) );
 		$this->factory->blog->create_many( 3, array( 'site_id' => 3, 'meta' => array( 'public' => 0 ) ) );
 
@@ -1066,6 +1065,29 @@ class Tests_MS extends WP_UnitTestCase {
 		// Test public + network_id = 3
 		$this->assertCount( 0, wp_get_sites( array( 'network_id' => 3, 'public' => 1 ) ) );
 		$this->assertCount( 3, wp_get_sites( array( 'network_id' => 3, 'public' => 0 ) ) );
+	}
+
+	/**
+	 * @ticket 14511
+	 */
+	function test_wp_get_sites_limit_offset() {
+		// Create 4 more sites (in addition to the default one)
+		$this->factory->blog->create_many( 4, array( 'meta' => array( 'public' => 1 ) ) );
+
+		// Expect all 5 sites when no limit/offset is specified
+		$this->assertCount( 5, wp_get_sites() );
+
+		// Expect first 2 sites when using limit
+		$this->assertCount( 2, wp_get_sites( array( 'limit' => 2 ) ) );
+
+		// Expect only the last 3 sites when using offset of 2 (limit will default to 100)
+		$this->assertCount( 3, wp_get_sites( array( 'offset' => 2 ) ) );
+
+		// Expect only the last 1 site when using offset of 4 and limit of 2
+		$this->assertCount( 1, wp_get_sites( array( 'limit' => 2, 'offset' => 4 ) ) );
+
+		// Expect 0 sites when using an offset larger than the number of sites
+		$this->assertCount( 0, wp_get_sites( array( 'offset' => 20 ) ) );
 	}
 
 	/**
