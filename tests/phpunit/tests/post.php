@@ -808,6 +808,28 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( new stdClass, wp_count_posts( $post_type, 'readable' ) );
 	}
 
+	function test_wp_count_posts_filtered() {
+		$post_type = rand_str(20);
+		register_post_type( $post_type );
+		$this->factory->post->create_many( 10, array(
+			'post_type' => $post_type,
+			'post_author' => $this->author_id
+		) );
+		$count1 = wp_count_posts( $post_type, 'readable' );
+		$this->assertEquals( 10, $count1->publish );
+		add_filter( 'count_posts', array( $this, 'filter_wp_count_posts' ) );
+
+		$count2 = wp_count_posts( $post_type, 'readable' );
+		$this->assertEquals( 7, $count2->publish );
+
+		remove_filter( 'count_posts', array( $this, 'filter_wp_count_posts' ) );
+	}
+
+	function filter_wp_count_posts( $counts ) {
+		$counts->publish = 7;
+		return $counts;
+	}
+
 	/**
 	 * @ticket 22074
 	 */
