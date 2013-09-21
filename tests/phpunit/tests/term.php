@@ -505,4 +505,11 @@ class Tests_Term extends WP_UnitTestCase {
 		$term2 = get_term_by( 'term_taxonomy_id', $term1['term_taxonomy_id'], 'category' );
 		$this->assertEquals( get_term( $term1['term_id'], 'category' ), $term2 );
 	}
+
+	function test_wp_count_terms() {
+		$count = wp_count_terms( 'category', array( 'hide_empty' => true ) );
+		// the terms inserted in setUp aren't attached to any posts, so should return 0
+		// this previously returned 2
+		$this->assertEquals( 0, $count );
+	}
 }
