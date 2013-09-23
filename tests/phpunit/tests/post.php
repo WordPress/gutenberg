@@ -817,12 +817,12 @@ class Tests_Post extends WP_UnitTestCase {
 		) );
 		$count1 = wp_count_posts( $post_type, 'readable' );
 		$this->assertEquals( 10, $count1->publish );
-		add_filter( 'count_posts', array( $this, 'filter_wp_count_posts' ) );
+		add_filter( 'wp_count_posts', array( $this, 'filter_wp_count_posts' ) );
 
 		$count2 = wp_count_posts( $post_type, 'readable' );
 		$this->assertEquals( 7, $count2->publish );
 
-		remove_filter( 'count_posts', array( $this, 'filter_wp_count_posts' ) );
+		remove_filter( 'wp_count_posts', array( $this, 'filter_wp_count_posts' ) );
 	}
 
 	function filter_wp_count_posts( $counts ) {
