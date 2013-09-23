@@ -3,14 +3,16 @@
 /* Path to the WordPress codebase you'd like to test. Add a backslash in the end. */
 define( 'ABSPATH', dirname( __FILE__ ) . '/src/' );
 
-// Test with multisite enabled: (previously -m)
+// Test with multisite enabled.
+// Alternatively, use the tests/phpunit/multisite.xml configuration file.
 // define( 'WP_TESTS_MULTISITE', true );
 
-// Force known bugs: (previously -f)
+// Force known bugs to be run.
+// Tests with an associated Trac ticket that is still open are normally skipped.
 // define( 'WP_TESTS_FORCE_KNOWN_BUGS', true );
 
-// Test with WordPress debug mode on (previously -d)
-// define( 'WP_DEBUG', true );
+// Test with WordPress debug mode (default).
+define( 'WP_DEBUG', true );
 
 // ** MySQL settings ** //
 
