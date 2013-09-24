@@ -57,4 +57,25 @@ class Tests_Query extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	/**
+	 * @ticket 24785
+	 *
+	 */
+	function test_nested_loop_reset_postdata() {
+		$post_id = $this->factory->post->create();
+		$nested_post_id = $this->factory->post->create();
+
+		$first_query = new WP_Query( array( 'post__in' => array( $post_id ) ) );
+		while ( $first_query->have_posts() ) { $first_query->the_post();
+			$second_query = new WP_Query( array( 'post__in' => array( $nested_post_id ) ) );
+			while ( $second_query->have_posts() ) {
+				$second_query->the_post();
+				$this->assertEquals( get_the_ID(), $nested_post_id );
+			}
+			$first_query->reset_postdata();
+			$this->assertEquals( get_the_ID(), $post_id );
+		}
+
+	}
 }
