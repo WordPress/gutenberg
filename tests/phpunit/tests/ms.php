@@ -1089,25 +1089,6 @@ class Tests_MS extends WP_UnitTestCase {
 		// Expect 0 sites when using an offset larger than the number of sites
 		$this->assertCount( 0, wp_get_sites( array( 'offset' => 20 ) ) );
 	}
-
-	/**
-	 * Test the 'archived' argument for wp_get_sites().
-	 *
-	 * archived is an ENUM, not an integer field.
-	 * ENUM('0', '1') means '0' is index 1 and '1' is index 2.
-	 * `WHERE archived = 1` is like saying `WHERE archived = '0'`.
-	 * `WHERE archived = 0` would produce no results.
-	 * 
-	 * @ticket 14511
-	 */
-	function test_wp_get_sites_archived_enum() {
-		global $wpdb;
-		$id = $this->factory->blog->create( array( 'site_id' => 2, 'meta' => array( 'archived' => '1' ) ) );
-		$this->factory->blog->create(       array( 'site_id' => 2, 'meta' => array( 'archived' => '0' ) ) );
-		$results = wp_get_sites( array( 'network_id' => 2, 'archived' => 1 ) );
-		$this->assertCount( 1, $results );
-		$this->assertEquals( $id, $results[0]['blog_id'], "This query is wrong:\n" . $wpdb->last_query );
-	}
 }
 
 endif;
