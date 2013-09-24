@@ -103,4 +103,53 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	function test_register_long_taxonomy() {
 		$this->assertInstanceOf( 'WP_Error', register_taxonomy( 'abcdefghijklmnopqrstuvwxyz0123456789', 'post', array() ) );
 	}
+
+	/**
+	 * @ticket 11058
+	 */
+	function test_registering_taxonomies_to_object_types() {
+		// Create a taxonomy to test with
+		$tax = 'test_tax';
+		$this->assertFalse( taxonomy_exists($tax) );
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		// Create a post type to test with
+		$post_type = 'test_cpt';
+		$this->assertFalse( get_post_type( $post_type ) );
+		$this->assertObjectHasAttribute( 'name', register_post_type( $post_type ) );
+
+		// Core taxonomy, core post type
+		$this->assertTrue( unregister_taxonomy_for_object_type( 'category', 'post' ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( 'category', 'post' ) );
+		$this->assertTrue( register_taxonomy_for_object_type( 'category', 'post' ) );
+
+		// Core taxonomy, non-core post type
+		$this->assertTrue( register_taxonomy_for_object_type( 'category', $post_type ) );
+		$this->assertTrue( unregister_taxonomy_for_object_type( 'category', $post_type ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( 'category', $post_type ) );
+		$this->assertTrue( register_taxonomy_for_object_type( 'category', $post_type ) );
+
+		// Core taxonomies, non-post object types
+		$this->assertFalse( register_taxonomy_for_object_type( 'category', 'user' ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( 'category', 'user' ) );
+
+		// Non-core taxonomy, core post type
+		$this->assertTrue( unregister_taxonomy_for_object_type( $tax, 'post' ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( $tax, 'post' ) );
+		$this->assertTrue( register_taxonomy_for_object_type( $tax, 'post' ) );
+
+		// Non-core taxonomy, non-core post type
+		$this->assertTrue( register_taxonomy_for_object_type( $tax, $post_type ) );
+		$this->assertTrue( unregister_taxonomy_for_object_type( $tax, $post_type ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( $tax, $post_type ) );
+		$this->assertTrue( register_taxonomy_for_object_type( $tax, $post_type ) );
+
+		// Non-core taxonomies, non-post object types
+		$this->assertFalse( register_taxonomy_for_object_type( $tax, 'user' ) );
+		$this->assertFalse( unregister_taxonomy_for_object_type( $tax, 'user' ) );
+
+		unset($GLOBALS['wp_taxonomies'][$tax]);
+		_unregister_post_type( $post_type );
+
+	}
 }
