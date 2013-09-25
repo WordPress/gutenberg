@@ -16,6 +16,63 @@ class Tests_MS extends WP_UnitTestCase {
 		$_SERVER['REMOTE_ADDR'] = '';
 	}
 
+	/**
+	 * @ticket 22917
+	 */
+	function test_enable_live_network_site_counts_filter() {
+		$site_count_start = get_blog_count();
+		// false for large networks by default
+		add_filter( 'enable_live_network_counts', '__return_false' );
+		$this->factory->blog->create_many( 4 );
+
+		// count only updated when cron runs, so unchanged
+		$this->assertEquals( $site_count_start, (int) get_blog_count() );
+
+		add_filter( 'enable_live_network_counts', '__return_true' );
+		$site_ids = $this->factory->blog->create_many( 4 );
+
+		$this->assertEquals( $site_count_start + 9, (int) get_blog_count() );
+
+		//clean up
+		remove_filter( 'enable_live_network_counts', '__return_false' );
+		remove_filter( 'enable_live_network_counts', '__return_true' );
+		foreach ( $site_ids as $site_id ) {
+			wpmu_delete_blog( $site_id, true );
+		}
+	}
+
+	/**
+	 * @ticket 22917
+	 */
+	function test_enable_live_network_user_counts_filter() {
+		// false for large networks by default
+		add_filter( 'enable_live_network_counts', '__return_false' );
+
+		// Refresh the cache
+		wp_update_network_counts();
+		$start_count = get_user_count();
+
+		wpmu_create_user( 'user', 'pass', 'email' );
+
+		// No change, cache not refreshed
+		$count = get_user_count();
+
+		$this->assertEquals( $start_count, $count );
+
+		wp_update_network_counts();
+		$start_count = get_user_count();
+
+		add_filter( 'enable_live_network_counts', '__return_true' );
+
+		wpmu_create_user( 'user2', 'pass2', 'email2' );
+
+		$count = get_user_count();
+		$this->assertEquals( $start_count + 1, $count );
+
+		remove_filter( 'enable_live_network_counts', '__return_false' );
+		remove_filter( 'enable_live_network_counts', '__return_true' );
+	}
+
 	function test_create_and_delete_blog() {
 		global $wpdb;
 
@@ -230,6 +287,8 @@ class Tests_MS extends WP_UnitTestCase {
 		wp_update_network_counts();
 		$start_count = get_user_count();
 
+		// Only false for large networks as of 3.7
+		add_filter( 'enable_live_network_counts', '__return_false' );
 		$this->factory->user->create( array( 'role' => 'administrator' ) );
 
 		$count = get_user_count(); // No change, cache not refreshed
@@ -239,6 +298,7 @@ class Tests_MS extends WP_UnitTestCase {
 
 		$count = get_user_count();
 		$this->assertEquals( $start_count + 1, $count );
+		remove_filter( 'enable_live_network_counts', '__return_false' );
 	}
 
 	function test_wp_schedule_update_network_counts() {
