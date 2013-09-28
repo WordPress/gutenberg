@@ -77,15 +77,23 @@ jQuery( function() {
 		}
 	});
 
-	test( 'username in password should be penalized', function() {
+	test( 'blacklisted words in password should be penalized', function() {
 		var allowedPasswordScore, penalizedPasswordScore,
 			allowedPassword   = 'a[janedoe]4',
 			penalizedPassword = 'a[johndoe]4',
-			username          = 'johndoe';
+			blacklist         = [ 'extra', 'johndoe', 'superfluous' ];
 
-		allowedPasswordScore = passwordStrength( allowedPassword, username, allowedPassword );
-		penalizedPasswordScore = passwordStrength( penalizedPassword, username, penalizedPassword );
+		allowedPasswordScore = passwordStrength( allowedPassword, blacklist, allowedPassword );
+		penalizedPasswordScore = passwordStrength( penalizedPassword, blacklist, penalizedPassword );
 
 		ok( penalizedPasswordScore < allowedPasswordScore, 'Penalized password scored ' + penalizedPasswordScore + '; allowed password scored: ' + allowedPasswordScore );
+	});
+
+	test( 'user input blacklist array should contain expected words', function() {
+		var blacklist = wp.passwordStrength.userInputBlacklist();
+
+		ok( jQuery.isArray( blacklist ), 'blacklist is an array' );
+		ok( jQuery.inArray( 'WordPress', blacklist ) > -1, 'blacklist contains "WordPress" from page title' );
+		ok( jQuery.inArray( 'tests', blacklist ) > -1, 'blacklist contains "tests" from site URL' );
 	});
 });
