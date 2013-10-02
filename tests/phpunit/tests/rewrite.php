@@ -32,6 +32,18 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
 	}
 
+	function test_url_to_postid_custom_post_type() {
+		delete_option( 'rewrite_rules' );
+		
+		$post_type = rand_str( 12 );
+		register_post_type( $post_type, array( 'public' => true ) );
+		
+		$id = $this->factory->post->create( array( 'post_type' => $post_type ) );
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );		
+		
+		_unregister_post_type( $post_type );		
+	}
+	
 	function test_url_to_postid_hierarchical() {
 
 		$parent_id = $this->factory->post->create( array( 'post_title' => 'Parent', 'post_type' => 'page' ) );
