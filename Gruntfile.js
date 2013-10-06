@@ -26,18 +26,35 @@ module.exports = function(grunt) {
 			}
 		},
 		copy: {
-			all: {
+			files: {
 				files: [
 					{
 						dot: true,
 						expand: true,
 						cwd: SOURCE_DIR,
-						src: ['**','!**/.{svn,git}/**'], // Ignore version control directories.
+						src: [
+							'**',
+							'!**/.{svn,git}/**', // Ignore version control directories.
+							'!wp-includes/version.php' // Exclude version.php
+						],
 						dest: BUILD_DIR
 					},
 					{
 						src: 'wp-config-sample.php',
 						dest: BUILD_DIR
+					}
+				]
+			},
+			version: {
+				options: {
+					processContent: function( src, filepath ) {
+						return src.replace( /^(\$wp_version.+?)-src';/m, "$1';" );
+					}
+				},
+				files: [
+					{
+						src: SOURCE_DIR + 'wp-includes/version.php',
+						dest: BUILD_DIR + 'wp-includes/version.php'
 					}
 				]
 			},
@@ -158,6 +175,11 @@ module.exports = function(grunt) {
 	});
 
 	// Register tasks.
+
+	// Copy task.
+	grunt.registerTask('copy:all', ['copy:files', 'copy:version']);
+	
+	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'uglify:core',
 		'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
