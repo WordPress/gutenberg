@@ -136,41 +136,4 @@ class Tests_Dependencies extends WP_UnitTestCase {
 		$this->assertFalse( $dep->query( 'one' ) );
 
 	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_add_deps_should_add_one_string_dep() {
-		$dep = new WP_Dependencies;
-		$dep->add( 'baba', '', array( 'dep0' ) );
-		$dep->add_deps( 'baba', 'new-dep' );
-		$this->assertEquals( array( 'dep0', 'new-dep' ), $dep->query( 'baba' )->deps );
-	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_add_deps_should_merge_deps() {
-		$dep = new WP_Dependencies;
-		$dep->add( 'baba', '', array( 'dep0' ) );
-		$dep->add_deps( 'baba', array( 'new-dep', 'another-dep' ) );
-		$this->assertEquals( array( 'dep0', 'new-dep', 'another-dep' ), $dep->query( 'baba' )->deps );
-	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_add_deps_should_return_false_on_non_string_non_array_deps() {
-		$dep = new WP_Dependencies;
-		$dep->add( 'baba', '', array( 'dep0' ) );
-		$this->assertFalse( $dep->add_deps( 'baba', 5 ) );
-	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_add_deps_should_return_false_on_non_registered_handle() {
-		$dep = new WP_Dependencies;
-		$this->assertFalse( $dep->add_deps( 'baba', 'dep0' ) );
-	}
 }
