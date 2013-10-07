@@ -44,7 +44,7 @@ class Tests_Auth extends WP_UnitTestCase {
 		$this->assertEquals( false, wp_validate_auth_cookie( $cookie, 'bar' ) );
 	}
 
-	/*
+	/**
 	 * @ticket 23494
 	 */
 	function test_password_trimming() {
@@ -64,5 +64,31 @@ class Tests_Auth extends WP_UnitTestCase {
 			$this->assertInstanceOf( 'WP_User', $authed_user );
 			$this->assertEquals( $another_user, $authed_user->ID );
 		}
+	}
+
+	/**
+	 * Test wp_hash_password trims whitespace
+	 * 
+	 * This is similar to test_password_trimming but tests the "lower level" 
+	 * wp_hash_password function
+	 * 
+	 * @ticket 24973
+	 */
+	function test_wp_hash_password_trimming() {
+
+		$password = ' pass with leading whitespace';
+		$this->assertTrue( wp_check_password( 'pass with leading whitespace', wp_hash_password( $password ) ) );
+
+		$password = 'pass with trailing whitespace ';
+		$this->assertTrue( wp_check_password( 'pass with trailing whitespace', wp_hash_password( $password ) ) );
+
+		$password = ' pass with whitespace ';
+		$this->assertTrue( wp_check_password( 'pass with whitespace', wp_hash_password( $password ) ) );
+
+		$password = "pass with new line \n";
+		$this->assertTrue( wp_check_password( 'pass with new line', wp_hash_password( $password ) ) );
+
+		$password = "pass with vertial tab o_O\x0B";
+		$this->assertTrue( wp_check_password( 'pass with vertial tab o_O', wp_hash_password( $password ) ) );
 	}
 }
