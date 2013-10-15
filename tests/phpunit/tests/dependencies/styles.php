@@ -86,4 +86,124 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 		// Cleanup
 		$wp_styles->base_url = $base_url_backup;
 	}
+
+	/**
+	 * Test if inline styles work
+	 * @ticket 24813
+	 */
+	public function test_inline_styles() {
+
+		$style  = ".thing {\n";
+		$style .= "\tbackground: red;\n";
+		$style .= "}";
+		
+		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "<style type='text/css'>\n";
+		$expected .= "$style\n";
+		$expected .= "</style>\n";
+
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1 );
+		wp_add_inline_style( 'handle', $style );
+
+		// No styles left to print
+		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
+	}
+
+	/**
+	 * Test if inline styles work with concatination
+	 * @global WP_Styles $wp_styles
+	 * @ticket 24813
+	 */
+	public function test_inline_styles_concat() {
+
+		global $wp_styles;
+
+		$wp_styles->do_concat = true;
+		$wp_styles->default_dirs = array( '/wp-admin/', '/wp-includes/css/' ); // Default dirs as in wp-includes/script-loader.php
+
+		$style  = ".thing {\n";
+		$style .= "\tbackground: red;\n";
+		$style .= "}";
+
+		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "<style type='text/css'>\n";
+		$expected .= "$style\n";
+		$expected .= "</style>\n";
+
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1 );
+		wp_add_inline_style( 'handle', $style );
+
+		wp_print_styles();
+		$this->assertEquals( $expected, $wp_styles->print_html );
+
+	}
+
+	/**
+	 * Test if multiple inline styles work
+	 * @ticket 24813
+	 */
+	public function test_multiple_inline_styles() {
+
+		$style1  = ".thing1 {\n";
+		$style1 .= "\tbackground: red;\n";
+		$style1 .= "}";
+		
+		$style2  = ".thing2 {\n";
+		$style2 .= "\tbackground: blue;\n";
+		$style2 .= "}";
+
+		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "<style type='text/css'>\n";
+		$expected .= "$style1\n";
+		$expected .= "$style2\n";
+		$expected .= "</style>\n";
+
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1 );
+		wp_add_inline_style( 'handle', $style1 );
+		wp_add_inline_style( 'handle', $style2 );
+
+		// No styles left to print
+		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
+
+	}
+
+	/**
+	 * Test if a plugin doing it the wrong way still works
+	 *
+	 * @expectedIncorrectUsage wp_add_inline_style
+	 * @ticket 24813
+	 */
+	public function test_plugin_doing_inline_styles_wrong() {
+
+		$style  = "<style type='text/css'>\n";
+		$style .= ".thing {\n";
+		$style .= "\tbackground: red;\n";
+		$style .= "}\n";
+		$style .= "</style>";
+
+		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "$style\n";
+
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1 );
+
+		wp_add_inline_style( 'handle', $style );
+
+		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
+
+	}
+
+	/**
+	 * Test to make sure <style> tags aren't output if there are no inline styles.
+	 * @ticket 24813
+	 */
+	public function test_unnecessary_style_tags() {
+
+		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1 );
+
+		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
+
+	}
+
 }
