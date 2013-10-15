@@ -38,6 +38,8 @@ class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22896
+	 *
+	 * @expectedIncorrectUsage wp_deregister_script
 	 */
 	function test_dont_allow_deregister_core_scripts_in_admin() {
 		set_current_screen( 'edit.php' );
@@ -51,26 +53,13 @@ class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 			'jquery-ui-tooltip', 'jquery-ui-widget', 'backbone', 'underscore',
 		);
 
-		add_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
-
 		foreach ( $libraries as $library ) {
 			// Try to deregister the script, which should fail.
 			wp_deregister_script( $library );
 			$this->assertTrue( wp_script_is( $library, 'registered' ) );
 		}
 
-		remove_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
-
 		set_current_screen( 'front' );
-	}
-
-	function doing_it_wrong_run() {
-		add_filter( 'doing_it_wrong_trigger_error', array( $this, 'doing_it_wrong_trigger_error' ) );
-	}
-
-	function doing_it_wrong_trigger_error() {
-		remove_filter( 'doing_it_wrong_trigger_error', array( $this, 'doing_it_wrong_trigger_error' ) );
-		return false;
 	}
 
 	/**

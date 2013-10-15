@@ -8,6 +8,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected static $forced_tickets = array();
 	protected $expected_deprecated = array();
 	protected $caught_deprecated = array();
+	protected $expected_doing_it_wrong = array();
+	protected $caught_doing_it_wrong = array();
 
 	/**
 	 * @var WP_UnitTest_Factory
@@ -89,11 +91,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( array( 'class', 'method' ) as $depth ) {
 			if ( ! empty( $annotations[ $depth ]['expectedDeprecated'] ) )
 				$this->expected_deprecated = array_merge( $this->expected_deprecated, $annotations[ $depth ]['expectedDeprecated'] );
+			if ( ! empty( $annotations[ $depth ]['expectedIncorrectUsage'] ) )
+				$this->expected_doing_it_wrong = array_merge( $this->expected_doing_it_wrong, $annotations[ $depth ]['expectedIncorrectUsage'] );
 		}
 		add_action( 'deprecated_function_run', array( $this, 'deprecated_function_run' ) );
 		add_action( 'deprecated_argument_run', array( $this, 'deprecated_function_run' ) );
+		add_action( 'doing_it_wrong_run', array( $this, 'doing_it_wrong_run' ) );
 		add_action( 'deprecated_function_trigger_error', '__return_false' );
 		add_action( 'deprecated_argument_trigger_error', '__return_false' );
+		add_action( 'doing_it_wrong_trigger_error',      '__return_false' );
 	}
 
 	function expectedDeprecated() {
@@ -106,11 +112,26 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( $unexpected_deprecated as $unexpected ) {
 			$this->fail( "Unexpected deprecated notice for $unexpected" );
 		}
+
+		$not_caught_doing_it_wrong = array_diff( $this->expected_doing_it_wrong, $this->caught_doing_it_wrong );
+		foreach ( $not_caught_doing_it_wrong as $not_caught ) {
+			$this->fail( "Failed to assert that $not_caught triggered an incorrect usage notice" );
+		}
+
+		$unexpected_doing_it_wrong = array_diff( $this->caught_doing_it_wrong, $this->expected_doing_it_wrong );
+		foreach ( $unexpected_doing_it_wrong as $unexpected ) {
+			$this->fail( "Unexpected incorrect usage notice for $unexpected" );
+		}
 	}
 
 	function deprecated_function_run( $function ) {
 		if ( ! in_array( $function, $this->caught_deprecated ) )
 			$this->caught_deprecated[] = $function;
+	}
+
+	function doing_it_wrong_run( $function ) {
+		if ( ! in_array( $function, $this->caught_doing_it_wrong ) )
+			$this->caught_doing_it_wrong[] = $function;
 	}
 
 	function assertWPError( $actual, $message = '' ) {
