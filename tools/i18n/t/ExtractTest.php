@@ -13,7 +13,7 @@ class ExtractTest extends PHPUnit_Framework_TestCase {
 
 	function test_with_just_a_string() {
 		$expected = new Translation_Entry( array( 'singular' => 'baba', 'references' => array('baba.php:1') ) );
-		$result = $this->extractor->extract_entries('<?php __("baba"); ?>', 'baba.php' );
+		$result = $this->extractor->extract_from_code('<?php __("baba"); ?>', 'baba.php' );
 		$this->assertEquals( $expected, $result->entries['baba'] );
 	}
 

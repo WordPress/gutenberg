@@ -40,7 +40,7 @@ class StringExtractor {
 
 	function extract_from_file( $file_name, $prefix ) {
 		$code = file_get_contents( $file_name );
-		return $this->extract_entries( $code, $prefix . $file_name );
+		return $this->extract_from_code( $code, $prefix . $file_name );
 	}
 
 	function does_file_name_match( $path, $excludes, $includes ) {
@@ -126,7 +126,7 @@ class StringExtractor {
 		return $entry;
 	}
 
-	function extract_entries( $code, $file_name ) {
+	function extract_from_code( $code, $file_name ) {
 		$translations = new Translations;
 		$function_calls = $this->find_function_calls( array_keys( $this->rules ), $code );
 		foreach( $function_calls as $call ) {
