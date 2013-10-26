@@ -152,6 +152,38 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 25710
+	 */
+	function test_get_terms_exclude_tree() {
+
+		$term_id_uncategorized = get_option( 'default_category' );
+
+		$term_id1 = $this->factory->category->create();
+		$term_id11 = $this->factory->category->create( array( 'parent' => $term_id1 ) );
+		$term_id2 = $this->factory->category->create();
+		$term_id22 = $this->factory->category->create( array( 'parent' => $term_id2 ) );
+
+		// There's something else broken in the cache cleaning routines that leads to this having to be done manually
+		delete_option( 'category_children' );
+
+		$terms = get_terms( 'category', array(
+			'exclude' => $term_id_uncategorized,
+			'fields' => 'ids',
+			'hide_empty' => false,
+		) );
+		$this->assertEquals( array( $term_id1, $term_id11, $term_id2, $term_id22 ), $terms );
+
+		$terms = get_terms( 'category', array(
+			'fields' => 'ids',
+			'exclude_tree' => "$term_id1,$term_id_uncategorized",
+			'hide_empty' => false,
+		) );
+
+		$this->assertEquals( array( $term_id2, $term_id22 ), $terms );
+
+	}
+
+	/**
 	 * @ticket 13992
 	 */
 	function test_get_terms_search() {
