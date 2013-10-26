@@ -9,7 +9,13 @@ require_once "$pomo/translations.php";
  */
 class StringExtractor {
 
-	var $rules = array();
+	var $rules = array(
+		'_' => array( 'string' ),
+		'__' => array( 'string' ),
+		'_e' => array( 'string' ),
+		'_c' => array( 'string' ),
+		'_n' => array( 'singular', 'plural' ),
+	);
 	var $comment_prefix = 'translators:';
 
 	function __construct( $rules = array() ) {
