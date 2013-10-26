@@ -152,4 +152,20 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		_unregister_post_type( $post_type );
 
 	}
+	/**
+	 * @ticket 25706
+	 */
+	function test_in_category() {
+		$post = $this->factory->post->create_and_get();
+
+		// in_category() returns false when first parameter is empty()
+		$this->assertFalse( in_category( '', $post ) );
+		$this->assertFalse( in_category( false, $post ) );
+		$this->assertFalse( in_category( null, $post ) );
+
+		// Test expected behavior of in_category()
+		$term = wp_insert_term( 'Test', 'category' );
+		wp_set_object_terms( $post->ID, $term['term_id'], 'category' );
+		$this->assertTrue( in_category( $term['term_id'], $post ) );
+	}
 }
