@@ -3,6 +3,10 @@ $pomo = dirname( dirname( dirname( __FILE__ ) ) ) . '/src/wp-includes/pomo';
 require_once "$pomo/entry.php";
 require_once "$pomo/translations.php";
 
+/**
+ * Responsible for extracting translatable strings from PHP source files
+ * in the form of Translations instances
+ */
 class StringExtractor {
 
 	var $rules = array();
