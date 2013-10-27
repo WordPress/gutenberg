@@ -1,8 +1,8 @@
-/*global module:false*/
+/* jshint node:true */
 module.exports = function(grunt) {
-	var path = require('path');
-	var SOURCE_DIR = 'src/';
-	var BUILD_DIR = 'build/';
+	var path = require('path'),
+		SOURCE_DIR = 'src/',
+		BUILD_DIR = 'build/';
 
 	// Load tasks. 
 	require('matchdep').filterDev('grunt-*').forEach( grunt.loadNpmTasks );
@@ -47,8 +47,8 @@ module.exports = function(grunt) {
 			},
 			version: {
 				options: {
-					processContent: function( src, filepath ) {
-						return src.replace( /^(\$wp_version.+?)-src';/m, "$1';" );
+					processContent: function( src ) {
+						return src.replace( /^(\$wp_version.+?)-src';/m, '$1\';' );
 					}
 				},
 				files: [
@@ -78,6 +78,60 @@ module.exports = function(grunt) {
 					// Exceptions
 					'!wp-admin/css/farbtastic.css'
 				]
+			}
+		},
+		jshint: {
+			options: grunt.file.readJSON('.jshintrc'),
+			grunt: {
+				files: {
+					src: ['Gruntfile.js']
+				},
+				options: {
+					onevar: true
+				}
+			},
+			tests: {
+				files: {
+					src: [
+						'tests/qunit/**/*.js',
+						'!tests/qunit/vendor/qunit.js'
+					]
+				},
+				options: grunt.file.readJSON('tests/qunit/.jshintrc')
+			},
+			'wp-admin': {
+				files: {
+					src: [
+						'src/wp-admin/js/**/*.js',
+						'!src/wp-admin/js/farbtastic.js',
+						'!src/wp-admin/js/iris.min.js'
+					]
+				}
+			},
+			'wp-includes': {
+				files: {
+					src: [
+						'src/wp-includes/js/**/*.js',
+						// 3rd-Party Scripts
+						'!src/wp-includes/js/backbone.min.js',
+						'!src/wp-includes/js/colorpicker.js',
+						'!src/wp-includes/js/crop/**/*.js',
+						'!src/wp-includes/js/hoverIntent.js',
+						'!src/wp-includes/js/imgareaselect/**/*.js',
+						'!src/wp-includes/js/jcrop/**/*.js',
+						'!src/wp-includes/js/jquery/**/*.js',
+						'!src/wp-includes/js/json2.js',
+						'!src/wp-includes/js/mediaelement/**/*.js',
+						'!src/wp-includes/js/plupload/**/*.js',
+						'!src/wp-includes/js/swfobject.js',
+						'!src/wp-includes/js/swfupload/**/*.js',
+						'!src/wp-includes/js/thickbox/**/*.js',
+						'!src/wp-includes/js/tinymce/**/*.js',
+						'!src/wp-includes/js/tw-sack.js',
+						'!src/wp-includes/js/underscore.min.js',
+						'!src/wp-includes/js/zxcvbn.min.js'
+					]
+				}
 			}
 		},
 		qunit: {
@@ -194,12 +248,13 @@ module.exports = function(grunt) {
 	// On `watch:all`, automatically updates the `copy:dynamic` and `clean:dynamic`
 	// configurations so that only the changed files are updated.
 	grunt.event.on('watch', function( action, filepath, target ) {
-		if ( target != 'all' )
+		if ( target !== 'all' ) {
 			return;
+		}
 
-		var relativePath = path.relative( SOURCE_DIR, filepath );
-		var cleanSrc = ( action == 'deleted' ) ? [relativePath] : [];
-		var copySrc = ( action == 'deleted' ) ? [] : [relativePath];
+		var relativePath = path.relative( SOURCE_DIR, filepath ),
+			cleanSrc = ( action === 'deleted' ) ? [relativePath] : [],
+			copySrc = ( action === 'deleted' ) ? [] : [relativePath];
 
 		grunt.config(['clean', 'dynamic', 'src'], cleanSrc);
 		grunt.config(['copy', 'dynamic', 'src'], copySrc);

@@ -18,6 +18,7 @@
     "grunt-contrib-watch": "~0.5.1",
     "grunt-contrib-compress": "~0.5.2",
     "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.7.0",
     "matchdep": "~0.1.2"
   }
 }
