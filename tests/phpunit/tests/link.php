@@ -96,4 +96,75 @@ class Tests_Link extends WP_UnitTestCase {
 		$wp_rewrite->flush_rules();
 	}
 
+	/**
+	 * @ticket 17807
+	 */
+	function test_get_adjacent_post() {
+		// Need some sample posts to test adjacency
+		$post_one = $this->factory->post->create_and_get( array(
+			'post_title' => 'First',
+			'post_date' => '2012-01-01 12:00:00'
+		) );
+
+		$post_two = $this->factory->post->create_and_get( array(
+			'post_title' => 'Second',
+			'post_date' => '2012-02-01 12:00:00'
+		) );
+
+		$post_three = $this->factory->post->create_and_get( array(
+			'post_title' => 'Third',
+			'post_date' => '2012-03-01 12:00:00'
+		) );
+
+		$post_four = $this->factory->post->create_and_get( array(
+			'post_title' => 'Fourth',
+			'post_date' => '2012-04-01 12:00:00'
+		) );
+
+		// Assign some terms
+		wp_set_object_terms( $post_one->ID, 'wordpress', 'category', false );
+		wp_set_object_terms( $post_three->ID, 'wordpress', 'category', false );
+
+		wp_set_object_terms( $post_two->ID, 'plugins', 'post_tag', false );
+		wp_set_object_terms( $post_four->ID, 'plugins', 'post_tag', false );
+
+		// Test normal post adjacency
+		$this->go_to( get_permalink( $post_two->ID ) );
+
+		$this->assertEquals( $post_one, get_adjacent_post( false, '', true ) );
+		$this->assertEquals( $post_three, get_adjacent_post( false, '', false ) );
+
+		$this->assertNotEquals( $post_two, get_adjacent_post( false, '', true ) );
+		$this->assertNotEquals( $post_two, get_adjacent_post( false, '', false ) );
+
+		// Test category adjacency
+		$this->go_to( get_permalink( $post_one->ID ) );
+
+		$this->assertEquals( '', get_adjacent_post( true, '', true, 'category' ) );
+		$this->assertEquals( $post_three, get_adjacent_post( true, '', false, 'category' ) );
+
+		// Test tag adjacency
+		$this->go_to( get_permalink( $post_two->ID ) );
+
+		$this->assertEquals( '', get_adjacent_post( true, '', true, 'post_tag' ) );
+		$this->assertEquals( $post_four, get_adjacent_post( true, '', false, 'post_tag' ) );
+
+		// Test normal boundary post
+		$this->go_to( get_permalink( $post_two->ID ) );
+
+		$this->assertEquals( array( $post_one ), get_boundary_post( false, '', true ) );
+		$this->assertEquals( array( $post_four ), get_boundary_post( false, '', false ) );
+
+		// Test category boundary post
+		$this->go_to( get_permalink( $post_one->ID ) );
+
+		$this->assertEquals( array( $post_one ), get_boundary_post( true, '', true, 'category' ) );
+		$this->assertEquals( array( $post_three ), get_boundary_post( true, '', false, 'category' ) );
+
+		// Test tag boundary post
+		$this->go_to( get_permalink( $post_two->ID ) );
+
+		$this->assertEquals( array( $post_two ), get_boundary_post( true, '', true, 'post_tag' ) );
+		$this->assertEquals( array( $post_four ), get_boundary_post( true, '', false, 'post_tag' ) );
+	}
 }
