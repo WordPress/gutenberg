@@ -68,9 +68,8 @@ function twentyfourteen_setup() {
 	add_theme_support( 'post-thumbnails' );
 
 	// Add several sizes for Post Thumbnails.
-	add_image_size( 'featured-thumbnail-large', 672, 0 );
-	add_image_size( 'featured-thumbnail-featured', 672, 372, true );
-	add_image_size( 'featured-thumbnail-formatted', 306, 0 );
+	add_image_size( 'post-thumbnail-grid', 672, 372, true );
+	add_image_size( 'post-thumbnail', 672, 0 );
 
 	// This theme uses wp_nav_menu() in two locations.
 	register_nav_menus( array(
@@ -361,9 +360,11 @@ endif;
  *
  * Adds body classes to denote:
  * 1. Single or multiple authors.
- * 2. Index views.
- * 3. Full-width content layout.
- * 4. Presence of footer widgets.
+ * 2. Presense of header image.
+ * 3. Index views.
+ * 4. Full-width content layout.
+ * 5. Presence of footer widgets.
+ * 6. Single views.
  *
  * @since Twenty Fourteen 1.0
  *
@@ -391,6 +392,9 @@ function twentyfourteen_body_classes( $classes ) {
 	if ( is_active_sidebar( 'sidebar-3' ) )
 		$classes[] = 'footer-widgets';
 
+	if ( is_singular() )
+		$classes[] = 'singular';
+
 	return $classes;
 }
 add_filter( 'body_class', 'twentyfourteen_body_classes' );
@@ -399,7 +403,7 @@ add_filter( 'body_class', 'twentyfourteen_body_classes' );
  * Extend the default WordPress post classes.
  *
  * Adds a post class to denote:
- * Non-password protected page with a featured image.
+ * Non-password protected page with a post thumbnail.
  *
  * @since Twenty Fourteen 1.0
  *
@@ -408,7 +412,9 @@ add_filter( 'body_class', 'twentyfourteen_body_classes' );
  */
 function twentyfourteen_post_classes( $classes ) {
 	if ( ! post_password_required() && has_post_thumbnail() )
-		$classes[] = 'has-featured-image';
+		$classes[] = 'has-post-thumbnail';
+	else
+		$classes[] = 'no-post-thumbnail';
 
 	return $classes;
 }

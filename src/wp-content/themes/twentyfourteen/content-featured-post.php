@@ -12,7 +12,7 @@
 	<a class="attachment-featured-featured" href="<?php the_permalink(); ?>" rel="<?php the_ID(); ?>">
 		<?php
 			if ( has_post_thumbnail() ) :
-				the_post_thumbnail( 'featured-thumbnail-featured' );
+				the_post_thumbnail( 'post-thumbnail-grid' );
 
 			else :
 				$images = get_children( array(
@@ -26,7 +26,7 @@
 
 				if ( $images ) :
 					$image = array_shift( $images );
-					echo wp_get_attachment_image( $image->ID, 'featured-thumbnail-featured' );
+					echo wp_get_attachment_image( $image->ID, 'post-thumbnail-grid' );
 				endif;
 			endif;
 		?>

@@ -35,7 +35,8 @@ Use it to make something cool, have fun, and share what you've learned with othe
  *   6.9 - Contributor Page
  *   6.10 - 404 Page
  *   6.11 - Front Page
- *   6.12 - Comments
+ *   6.12 - Full-width
+ *   6.13 - Comments
  * 7.0 - Sidebar
  *   7.1 - Widgets
  *   7.2 - Content Sidebar Widgets
@@ -561,7 +562,7 @@ img.wp-post-image {
 }
 
 .attachment-featured-featured img,
-.featured-thumbnail img {
+.post-thumbnail img {
 	height: auto;
 	max-width: 100%;
 }
@@ -984,10 +985,6 @@ span + .edit-link:before,
 	max-width: 672px;
 }
 
-.full-width .hentry {
-	max-width: 100%;
-}
-
 .site-content .entry-header,
 .site-content .entry-content,
 .site-content .entry-summary,
@@ -1003,7 +1000,7 @@ span + .edit-link:before,
  * -----------------------------------------------------------------------------
  */
 
- .featured-thumbnail {
+ .post-thumbnail {
 	background: url(images/pattern-light.svg) #767676 repeat fixed;
 	display: none;
 	float: none;
@@ -1015,17 +1012,17 @@ span + .edit-link:before,
 	z-index: 0;
 }
 
-a.featured-thumbnail:hover {
+a.post-thumbnail:hover {
 	background: url(images/pattern-light.svg) #919191 repeat fixed;
 }
 
-.featured-thumbnail img {
+.post-thumbnail img {
 	display: block;
 	margin: 0 auto;
 }
 
-.has-featured-image .featured-thumbnail,
-.format-standard .featured-thumbnail {
+.has-post-thumbnail .post-thumbnail,
+.format-standard .post-thumbnail {
 	display: block;
 }
 
@@ -1045,7 +1042,7 @@ a.featured-thumbnail:hover {
 	padding: 0 10px 12px;
 }
 
-.site-content .has-featured-image .entry-header,
+.site-content .has-post-thumbnail .entry-header,
 .site-content .format-standard .entry-header {
 	padding-top: 24px;
 }
@@ -1732,7 +1729,30 @@ a.featured-thumbnail:hover {
 
 
 /**
- * 6.11 Comments
+ * 6.12 Full-width
+ * -----------------------------------------------------------------------------
+ */
+
+.full-width.singular .content-area {
+	padding-top: 0;
+}
+
+.full-width .hentry {
+	max-width: 100%;
+}
+
+.full-width.singular .hentry.no-post-thumbnail,
+.full-width.singular .hentry.no-post-thumbnail.format-standard.post-password-required {
+	padding-top: 24px;
+}
+
+.full-width.singular .hentry.no-post-thumbnail.format-standard {
+	padding-top: 0;
+}
+
+
+/**
+ * 6.13 Comments
  * -----------------------------------------------------------------------------
  */
 
@@ -2519,14 +2539,14 @@ a.featured-thumbnail:hover {
  */
 
 @media screen and (max-width: 400px) {
-	.list-view .featured-thumbnail {
+	.list-view .post-thumbnail {
 		background: none;
 		min-height: 0;
 		width: auto;
 		z-index: 2;
 	}
 
-	.list-view .featured-thumbnail img {
+	.list-view .post-thumbnail img {
 		float: left;
 		margin: 0 10px 3px 0;
 		width: 84px;
@@ -2589,7 +2609,7 @@ a.featured-thumbnail:hover {
 }
 
 @media screen and (min-width: 401px) {
-	a.featured-thumbnail:hover img {
+	a.post-thumbnail:hover img {
 		opacity: 0.85;
 	}
 
@@ -2691,8 +2711,8 @@ a.featured-thumbnail:hover {
 		margin: -3px 2px 0 0;
 	}
 
-	.list-view .site-content .has-featured-image .featured-thumbnail,
-	.list-view .site-content .format-standard .featured-thumbnail {
+	.list-view .site-content .has-post-thumbnail .post-thumbnail,
+	.list-view .site-content .format-standard .post-thumbnail {
 		margin-top: -49px;
 	}
 
@@ -2714,7 +2734,7 @@ a.featured-thumbnail:hover {
 		padding-left: 30px;
 	}
 
-	.site-content .has-featured-image .entry-header,
+	.site-content .has-post-thumbnail .entry-header,
 	.site-content .format-standard .entry-header {
 		margin-top: -48px;
 	}
@@ -2731,6 +2751,10 @@ a.featured-thumbnail:hover {
 		width: 100%;
 	}
 
+	.full-width.singular .content-area {
+		padding-top: 0;
+	}
+
 	.site-content {
 		margin-right: 33.33333333%;
 	}
@@ -2739,14 +2763,23 @@ a.featured-thumbnail:hover {
 		margin-right: 0;
 	}
 
-	.site-content .has-featured-image .entry-header,
+	.site-content .has-post-thumbnail .entry-header,
 	.site-content .format-standard .entry-header {
 		margin-top: 0;
 	}
 
-	.full-width .site-content .has-featured-image .entry-header,
+	.full-width .site-content .has-post-thumbnail .entry-header,
 	.full-width .site-content .format-standard .entry-header {
 		margin-top: -48px;
+	}
+
+	.full-width.singular .hentry.no-post-thumbnail,
+	.full-width.singular .hentry.no-post-thumbnail.format-standard.post-password-required {
+		padding-top: 36px;
+	}
+
+	.full-width.singular .hentry.no-post-thumbnail.format-standard {
+		padding-top: 0;
 	}
 
 	.archive-header,
@@ -2971,7 +3004,20 @@ a.featured-thumbnail:hover {
 		padding-top: 72px;
 	}
 
-	.site-content .has-featured-image .entry-header,
+	.full-width.singular .content-area {
+		padding-top: 0;
+	}
+
+	.full-width.singular .hentry.no-post-thumbnail,
+	.full-width.singular .hentry.no-post-thumbnail.format-standard.post-password-required {
+		padding-top: 72px;
+	}
+
+	.full-width.singular .hentry.no-post-thumbnail.format-standard {
+		padding-top: 0;
+	}
+
+	.site-content .has-post-thumbnail .entry-header,
 	.site-content .format-standard .entry-header {
 		margin-top: -48px;
 	}
@@ -3030,7 +3076,7 @@ a.featured-thumbnail:hover {
 		margin-top: 0;
 	}
 
-	.site-content .has-featured-image .entry-header,
+	.site-content .has-post-thumbnail .entry-header,
 	.site-content .format-standard .entry-header {
 		margin-top: 0;
 	}
@@ -3191,7 +3237,7 @@ a.featured-thumbnail:hover {
 }
 
 @media screen and (min-width: 1040px) {
-	.site-content .has-featured-image .entry-header,
+	.site-content .has-post-thumbnail .entry-header,
 	.site-content .format-standard .entry-header {
 		margin-top: -48px;
 	}
