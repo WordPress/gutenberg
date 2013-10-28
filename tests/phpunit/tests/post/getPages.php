@@ -108,6 +108,59 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 22074
+	 */
+	function test_get_pages_include_exclude() {
+		$page_ids = array();
+
+		foreach ( range( 1, 20 ) as $i )
+			$page_ids[] = $this->factory->post->create( array( 'post_type' => 'page' ) );
+
+		$inc = array_slice( $page_ids, 0, 10 );
+		sort( $inc );
+		$exc = array_slice( $page_ids, 10 );
+		sort( $exc );
+
+		$include = get_pages( array( 'include' => $inc ) );
+		$inc_result = wp_list_pluck( $include, 'ID' );
+		sort( $inc_result );
+		$this->assertEquals( $inc, $inc_result );
+
+		$exclude = get_pages( array( 'exclude' => $exc ) );
+		$exc_result = wp_list_pluck( $exclude, 'ID' );
+		sort( $exc_result );
+		$this->assertEquals( $inc, $exc_result );
+	}
+
+	/**
+	 * @ticket 9470
+	 */
+	function test_get_pages_parent() {
+		$page_id1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_id2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+		$page_id3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id2 ) );
+		$page_id4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+
+		$pages = get_pages( array( 'parent' => 0, 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id1 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => $page_id1, 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id2, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => array( $page_id1, $page_id2 ), 'hierarchical' => false ) );
+		$this->assertEqualSets( array( $page_id2, $page_id3, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => 0 ) );
+		$this->assertEqualSets( array( $page_id1 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => $page_id1 ) );
+		$this->assertEqualSets( array( $page_id2, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+
+		$pages = get_pages( array( 'parent' => array( $page_id1, $page_id2 ) ) );
+		$this->assertEqualSets( array( $page_id2, $page_id3, $page_id4 ), wp_list_pluck( $pages, 'ID' ) );
+	}
+
+	/**
 	 * @ticket 22389
 	 */
 	function test_wp_dropdown_pages() {
