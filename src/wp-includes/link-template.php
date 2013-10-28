@@ -1378,7 +1378,7 @@ function get_previous_post_link( $format = '&laquo; %link', $link = '%title', $i
  * Display previous post link that is adjacent to the current post.
  *
  * @since 1.5.0
- * @uses get_previous_post_link()
+ * @see get_previous_post_link()
  *
  * @param string       $format         Optional. Link anchor format.
  * @param string       $link           Optional. Link permalink format.
@@ -1410,6 +1410,7 @@ function get_next_post_link( $format = '%link &raquo;', $link = '%title', $in_sa
  * Display next post link that is adjacent to the current post.
  *
  * @since 1.5.0
+ * @see get_next_post_link()
  *
  * @param string       $format         Optional. Link anchor format.
  * @param string       $link           Optional. Link permalink format.
