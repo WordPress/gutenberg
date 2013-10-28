@@ -1058,7 +1058,7 @@ a.featured-thumbnail:hover {
 	clear: none;
 	font-size: 15px;
 	font-weight: 900;
-	line-height: 18px;
+	line-height: 1.2;
 	margin: 0 0 6px 0;
 }
 
@@ -1077,7 +1077,6 @@ a.featured-thumbnail:hover {
 .entry-title a:hover {
 	color: #55d737;
 }
-
 
 
 /**
@@ -1506,20 +1505,10 @@ a.featured-thumbnail:hover {
 	padding-top: 0;
 }
 
-.site-content .entry-meta .entry-title {
-	font-size: 12px;
-	font-weight: 400;
-	line-height: 1.3333333333;
-	margin-bottom: 8px;
-	text-transform: none;
-}
-
-.entry-meta .entry-title a {
-	color: #767676;
-}
-
-.entry-meta .entry-title a:hover {
-	color: #2b2b2b;
+.site-content .format-link .entry-title,
+.site-content .format-aside .entry-title,
+.site-content .format-quote .entry-title {
+	display: none;
 }
 
 
