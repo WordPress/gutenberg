@@ -697,14 +697,16 @@ img.wp-smiley {
 
 /* Clearing floats */
 
-.clear:before,
-.clear:after,
 .footer-sidebar:before,
 .footer-sidebar:after,
 .hentry:before,
 .hentry:after,
 .slider-direction-nav:before,
 .slider-direction-nav:after,
+.contributor-info:before,
+.contributor-info:after,
+.search-box:before,
+.search-box:after,
 [class*="content"]:before,
 [class*="content"]:after,
 [class*="site"]:before,
@@ -713,10 +715,11 @@ img.wp-smiley {
 	display: table;
 }
 
-.clear:after,
 .footer-sidebar:after,
 .hentry:after,
 .slider-direction-nav:after,
+.contributor-info:after,
+.search-box:after,
 [class*="content"]:after,
 [class*="site"]:after {
 	clear: both;

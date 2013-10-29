@@ -336,7 +336,7 @@ function twentyfourteen_list_authors() {
 	?>
 
 	<div class="contributor">
-		<div class="contributor-info clear">
+		<div class="contributor-info">
 			<div class="contributor-avatar"><?php echo get_avatar( $contributor_id, 132 ); ?></div>
 			<div class="contributor-summary">
 				<h2 class="contributor-name"><?php echo get_the_author_meta( 'display_name', $contributor_id ); ?></h2>
