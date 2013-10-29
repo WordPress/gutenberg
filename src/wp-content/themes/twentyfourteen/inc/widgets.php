@@ -157,15 +157,15 @@ class Twenty_Fourteen_Ephemera_Widget extends WP_Widget {
 									$total_images = count( $images );
 
 									if ( has_post_thumbnail() ) :
-										$featured_image = get_the_post_thumbnail( get_the_ID(), 'featured-thumbnail-formatted' );
+										$post_thumbnail = get_the_post_thumbnail( get_the_ID(), 'post-thumbnail' );
 									elseif ( $total_images > 0 ) :
 										$image          = array_shift( $images );
-										$featured_image = wp_get_attachment_image( $image, 'featured-thumbnail-formatted' );
+										$post_thumbnail = wp_get_attachment_image( $image, 'post-thumbnail' );
 									endif;
 
-									if ( ! empty ( $featured_image ) ) :
+									if ( ! empty ( $post_thumbnail ) ) :
 						?>
-									<a href="<?php the_permalink(); ?>"><?php echo $featured_image; ?></a>
+									<a href="<?php the_permalink(); ?>"><?php echo $post_thumbnail; ?></a>
 								<?php
 									endif;
 								?>

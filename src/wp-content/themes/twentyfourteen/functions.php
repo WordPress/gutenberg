@@ -68,6 +68,7 @@ function twentyfourteen_setup() {
 	add_theme_support( 'post-thumbnails' );
 
 	// Add several sizes for Post Thumbnails.
+	add_image_size( 'post-thumbnail-slider', 1038, 576, true );
 	add_image_size( 'post-thumbnail-grid', 672, 372, true );
 	add_image_size( 'post-thumbnail', 672, 0 );
 
@@ -219,9 +220,8 @@ function twentyfourteen_font_url() {
  * @return void
  */
 function twentyfourteen_scripts() {
-
 	// Add Lato font, used in the main stylesheet.
-	wp_enqueue_style( 'twentyfourteen-lato' );
+	wp_enqueue_style( 'twentyfourteen-lato', twentyfourteen_font_url(), array(), null );
 
 	// Add Genericons font, used in the main stylesheet.
 	wp_enqueue_style( 'genericons', get_template_directory_uri() . '/fonts/genericons.css', array(), '3.0' );
@@ -238,10 +238,10 @@ function twentyfourteen_scripts() {
 	if ( is_active_sidebar( 'sidebar-3' ) )
 		wp_enqueue_script( 'jquery-masonry' );
 
-	wp_enqueue_script( 'twentyfourteen-script', get_template_directory_uri() . '/js/functions.js', array( 'jquery' ), '20131011', true );
+	if ( 'slider' == get_theme_mod( 'featured_content_layout' ) )
+		wp_enqueue_script( 'twentyfourteen-slider', get_template_directory_uri() . '/js/slider.js', array( 'jquery' ), '20131028', true );
 
-	// Add Lato font used in the main stylesheet.
-	wp_enqueue_style( 'twentyfourteen-lato', twentyfourteen_font_url(), array(), null );
+	wp_enqueue_script( 'twentyfourteen-script', get_template_directory_uri() . '/js/functions.js', array( 'jquery' ), '20131011', true );
 }
 add_action( 'wp_enqueue_scripts', 'twentyfourteen_scripts' );
 
@@ -365,6 +365,7 @@ endif;
  * 4. Full-width content layout.
  * 5. Presence of footer widgets.
  * 6. Single views.
+ * 7. Featured content layout.
  *
  * @since Twenty Fourteen 1.0
  *
@@ -394,6 +395,11 @@ function twentyfourteen_body_classes( $classes ) {
 
 	if ( is_singular() )
 		$classes[] = 'singular';
+
+	if ( is_front_page() && 'slider' == get_theme_mod( 'featured_content_layout' ) )
+		$classes[] = 'slider';
+	elseif ( is_front_page() )
+		$classes[] = 'grid';
 
 	return $classes;
 }
