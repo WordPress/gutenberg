@@ -181,4 +181,34 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$post_ids = get_children( array( 'fields' => 'ids', 'post_parent' => $post_id ) );
 		$this->assertEqualSets( $child_ids, $post_ids );
 	}
+
+	/**
+	 * @ticket 25750
+	 */
+	function test_get_pages_hierarchical_and_no_parent() {
+		global $wpdb;
+		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_2 ) );
+
+		$pages = get_pages(); // Defaults: hierarchical = true, parent = -1
+		$pages_default_args = get_pages( array( 'hierarchical' => true, 'parent' => -1 ) );
+		// Confirm the defaults.
+		$this->assertEquals( $pages, $pages_default_args );
+
+		/*
+		 * Here's the tree we are testing:
+		 *
+		 * page 1
+		 * - page 2
+		 * -- page 4
+		 * - page 3
+		 *
+		 * If hierarchical => true works, the order will be 1,2,4,3.
+		 * If it doesn't, they will be in the creation order, 1,2,3,4.
+		 */
+
+		$this->assertEqualSets( array( $page_1, $page_2, $page_4, $page_3 ), wp_list_pluck( $pages, 'ID' ) );
+	}
 }
