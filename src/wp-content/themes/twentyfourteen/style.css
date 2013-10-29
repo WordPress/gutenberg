@@ -13,7 +13,6 @@ This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
 */
 
-
 /**
  * Table of Contents:
  *
@@ -34,9 +33,8 @@ Use it to make something cool, have fun, and share what you've learned with othe
  *   6.8 - Archives
  *   6.9 - Contributor Page
  *   6.10 - 404 Page
- *   6.11 - Front Page
- *   6.12 - Full-width
- *   6.13 - Comments
+ *   6.11 - Full-width
+ *   6.12 - Comments
  * 7.0 - Sidebar
  *   7.1 - Widgets
  *   7.2 - Content Sidebar Widgets
@@ -768,6 +766,10 @@ span + .edit-link:before,
 	background-color: #fff;
 	max-width: 1260px;
 	position: relative;
+}
+
+.main-content {
+	width: 100%;
 }
 
 
@@ -1721,17 +1723,7 @@ a.post-thumbnail:hover {
 
 
 /**
- * 6.11 Front Page
- * -----------------------------------------------------------------------------
- */
-
-.front-page-content-wrapper {
-	width: 100%;
-}
-
-
-/**
- * 6.12 Full-width
+ * 6.11 Full-width
  * -----------------------------------------------------------------------------
  */
 
@@ -1754,7 +1746,7 @@ a.post-thumbnail:hover {
 
 
 /**
- * 6.13 Comments
+ * 6.12 Comments
  * -----------------------------------------------------------------------------
  */
 
@@ -3243,6 +3235,10 @@ a.post-thumbnail:hover {
 		padding-left: 182px;
 	}
 
+	.main-content {
+		float: left;
+	}
+
 	.site-content {
 		margin: 0 29.04761904% 0 182px;
 	}
@@ -3375,10 +3371,6 @@ a.post-thumbnail:hover {
 		float: left;
 		padding: 0 30px;
 		width: 25%;
-	}
-
-	.front-page-content-wrapper {
-		float: left;
 	}
 
 	.featured-content {
