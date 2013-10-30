@@ -1,3 +1,4 @@
+/* global passwordStrength, wp, jQuery */
 jQuery( function() {
 	module( 'password-strength-meter' );
 
