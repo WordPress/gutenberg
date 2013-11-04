@@ -16,7 +16,7 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
-	function _make_attachment($upload, $parent_post_id=-1) {
+	function _make_attachment( $upload, $parent_post_id = 0 ) {
 
 		$type = '';
 		if ( !empty($upload['type']) ) {
