@@ -363,3 +363,22 @@ function _unregister_post_type( $cpt_name ) {
 function _unregister_taxonomy( $taxonomy_name ) {
 	unset( $GLOBALS['wp_taxonomies'][$taxonomy_name] );
 }
+
+function _cleanup_query_vars() {
+	// clean out globals to stop them polluting wp and wp_query
+	foreach ( $GLOBALS['wp']->public_query_vars as $v )
+		unset( $GLOBALS[$v] );
+
+	foreach ( $GLOBALS['wp']->private_query_vars as $v )
+		unset( $GLOBALS[$v] );
+
+	foreach ( get_taxonomies( array() , 'objects' ) as $t ) {
+		if ( ! empty( $t->query_var ) )
+			$GLOBALS['wp']->add_query_var( $t->query_var );
+	}
+
+	foreach ( get_post_types( array() , 'objects' ) as $t ) {
+		if ( ! empty( $t->query_var ) )
+			$GLOBALS['wp']->add_query_var( $t->query_var );
+	}
+}
