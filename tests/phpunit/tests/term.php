@@ -433,6 +433,20 @@ class Tests_Term extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_taxonomies'][ $random_tax ] );
 	}
 
+	function test_get_object_terms_types() {
+		$post_id = $this->factory->post->create();
+		$term = wp_insert_term( 'one', $this->taxonomy );
+		wp_set_object_terms( $post_id, $term, $this->taxonomy );
+
+		$term = array_shift( wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'all_with_object_id' ) ) );
+		$int_fields = array( 'parent', 'term_id', 'count', 'term_group', 'term_taxonomy_id', 'object_id' );
+		foreach ( $int_fields as $field )
+			$this->assertInternalType( 'int', $term->$field, $field );
+
+		$term = array_shift( wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'ids' ) ) );
+		$this->assertInternalType( 'int', $term, 'term' );
+	}
+
 	private function assertPostHasTerms( $post_id, $expected_term_ids, $taxonomy ) {
 		$assigned_term_ids = wp_get_object_terms( $post_id, $taxonomy, array(
 			'fields' => 'ids'
