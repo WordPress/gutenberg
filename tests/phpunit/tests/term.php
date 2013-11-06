@@ -433,6 +433,9 @@ class Tests_Term extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_taxonomies'][ $random_tax ] );
 	}
 
+	/**
+	 * @ticket 17646
+	 */
 	function test_get_object_terms_types() {
 		$post_id = $this->factory->post->create();
 		$term = wp_insert_term( 'one', $this->taxonomy );
@@ -445,6 +448,18 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$term = array_shift( wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'ids' ) ) );
 		$this->assertInternalType( 'int', $term, 'term' );
+	}
+
+	/**
+	 * @ticket 25852
+	 */
+	function test_sanitize_term_field() {
+		$term = wp_insert_term( 'foo', $this->taxonomy );
+
+		$this->assertEquals( 0, sanitize_term_field( 'parent',  0, $term['term_id'], $this->taxonomy, 'raw' ) );
+		$this->assertEquals( 1, sanitize_term_field( 'parent',  1, $term['term_id'], $this->taxonomy, 'raw' ) );
+		$this->assertEquals( 0, sanitize_term_field( 'parent', -1, $term['term_id'], $this->taxonomy, 'raw' ) );
+		$this->assertEquals( 0, sanitize_term_field( 'parent', '', $term['term_id'], $this->taxonomy, 'raw' ) );
 	}
 
 	private function assertPostHasTerms( $post_id, $expected_term_ids, $taxonomy ) {
