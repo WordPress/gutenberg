@@ -83,54 +83,47 @@ module.exports = function(grunt) {
 		jshint: {
 			options: grunt.file.readJSON('.jshintrc'),
 			grunt: {
-				files: {
-					src: ['Gruntfile.js']
-				},
-				options: {
-					onevar: true
-				}
+				src: ['Gruntfile.js']
 			},
 			tests: {
-				files: {
-					src: [
-						'tests/qunit/**/*.js',
-						'!tests/qunit/vendor/qunit.js'
-					]
-				},
+				src: [
+					'tests/qunit/**/*.js',
+					'!tests/qunit/vendor/qunit.js'
+				],
 				options: grunt.file.readJSON('tests/qunit/.jshintrc')
 			},
-			'wp-admin': {
-				files: {
-					src: [
-						'src/wp-admin/js/**/*.js',
-						'!src/wp-admin/js/farbtastic.js',
-						'!src/wp-admin/js/iris.min.js'
-					]
-				}
-			},
-			'wp-includes': {
-				files: {
-					src: [
-						'src/wp-includes/js/**/*.js',
-						// 3rd-Party Scripts
-						'!src/wp-includes/js/backbone.min.js',
-						'!src/wp-includes/js/colorpicker.js',
-						'!src/wp-includes/js/crop/**/*.js',
-						'!src/wp-includes/js/hoverIntent.js',
-						'!src/wp-includes/js/imgareaselect/**/*.js',
-						'!src/wp-includes/js/jcrop/**/*.js',
-						'!src/wp-includes/js/jquery/**/*.js',
-						'!src/wp-includes/js/json2.js',
-						'!src/wp-includes/js/mediaelement/**/*.js',
-						'!src/wp-includes/js/plupload/**/*.js',
-						'!src/wp-includes/js/swfobject.js',
-						'!src/wp-includes/js/swfupload/**/*.js',
-						'!src/wp-includes/js/thickbox/**/*.js',
-						'!src/wp-includes/js/tinymce/**/*.js',
-						'!src/wp-includes/js/tw-sack.js',
-						'!src/wp-includes/js/underscore.min.js',
-						'!src/wp-includes/js/zxcvbn.min.js'
-					]
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				src: [
+					'wp-admin/js/*.js',
+					'wp-includes/js/*.js',
+					// WordPress scripts inside directories
+					'wp-includes/js/jquery/jquery.table-hotkeys.js',
+					'wp-includes/js/mediaelement/wp-mediaelement.js',
+					'wp-includes/js/plupload/handlers.js',
+					'wp-includes/js/plupload/wp-plupload.js',
+					'wp-includes/js/tinymce/langs/wp-langs-en.js',
+					'wp-includes/js/tinymce/plugins/wordpress/editor_plugin_src.js',
+					'wp-includes/js/tinymce/plugins/wp*/editor_plugin_src.js',
+					'wp-includes/js/tinymce/mark_loaded_src.js',
+					'wp-includes/js/tinymce/wp-tinymce-schema.js',
+					// Third party scripts
+					'!wp-admin/js/farbtastic.js',
+					'!wp-admin/js/iris.min.js',
+					'!wp-includes/js/backbone.min.js',
+					'!wp-includes/js/swfobject.js',
+					'!wp-includes/js/underscore.min.js',
+					'!wp-includes/js/zxcvbn.min.js',
+					'!wp-includes/js/colorpicker.js',
+					'!wp-includes/js/hoverIntent.js',
+					'!wp-includes/js/json2.js',
+					'!wp-includes/js/tw-sack.js'
+				],
+				// Remove once other JSHint errors are resolved
+				options: {
+					curly: false,
+					eqeqeq: false
 				}
 			}
 		},
