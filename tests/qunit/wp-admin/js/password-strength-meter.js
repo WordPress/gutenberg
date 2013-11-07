@@ -12,9 +12,9 @@ jQuery( function() {
 
 	test( 'long complicated passwords should return 4', function() {
 		var password = function( length ) {
-			var possibility = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-				retVal = '';
-			for ( var i = 0, n = possibility.length; i < length; i++ ) {
+			var i, n, retVal = '',
+				possibility = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+			for ( i = 0, n = possibility.length; i < length; i++ ) {
 				retVal += possibility.charAt( Math.floor( Math.random() * n ) );
 			}
 			return retVal + 'aB2'; // add a lower case, uppercase and number just to make sure we always have one of each
@@ -36,7 +36,8 @@ jQuery( function() {
 	});
 
 	test( 'zxcvbn password tests should return the score we expect', function() {
-		var passwords = [
+		var passwords, i;
+		passwords = [
 			{ pw: 'zxcvbn', score: 0 },
 			{ pw: 'qwER43@!', score: 1 },
 			{ pw: 'Tr0ub4dour&3', score: 2 },
@@ -73,7 +74,7 @@ jQuery( function() {
 			{ pw: 'Ba9ZyWABu99[BK#6MBgbH88Tofv)vs$w', score: 4 }
 		];
 
-		for ( var i = 0; i < passwords.length; i++ ) {
+		for ( i = 0; i < passwords.length; i++ ) {
 			equal( passwordStrength( passwords[i].pw, 'username', passwords[i].pw ), passwords[i].score, 'password of `' + passwords[i].pw + '` returns ' + passwords[i].score );
 		}
 	});
