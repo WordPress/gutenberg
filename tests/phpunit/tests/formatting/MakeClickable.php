@@ -289,6 +289,46 @@ class Tests_Formatting_MakeClickable extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 23756
+	 */
+	function test_no_links_inside_pre_or_code() {
+		$before = array(
+			'<pre>http://wordpress.org</pre>',
+			'<code>http://wordpress.org</code>',
+			'<pre class="foobar" id="foo">http://wordpress.org</pre>',
+			'<code class="foobar" id="foo">http://wordpress.org</code>',
+			'<precustomtag>http://wordpress.org</precustomtag>',
+			'<codecustomtag>http://wordpress.org</codecustomtag>',
+			'URL before pre http://wordpress.org<pre>http://wordpress.org</pre>',
+			'URL before code http://wordpress.org<code>http://wordpress.org</code>',
+			'URL after pre <pre>http://wordpress.org</pre>http://wordpress.org',
+			'URL after code <code>http://wordpress.org</code>http://wordpress.org',
+			'URL before and after pre http://wordpress.org<pre>http://wordpress.org</pre>http://wordpress.org',
+			'URL before and after code http://wordpress.org<code>http://wordpress.org</code>http://wordpress.org',
+			'code inside pre <pre>http://wordpress.org <code>http://wordpress.org</code> http://wordpress.org</pre>',
+		);
+
+		$expected = array(
+			'<pre>http://wordpress.org</pre>',
+			'<code>http://wordpress.org</code>',
+			'<pre class="foobar" id="foo">http://wordpress.org</pre>',
+			'<code class="foobar" id="foo">http://wordpress.org</code>',
+			'<precustomtag><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a></precustomtag>',
+			'<codecustomtag><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a></codecustomtag>',
+			'URL before pre <a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a><pre>http://wordpress.org</pre>',
+			'URL before code <a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a><code>http://wordpress.org</code>',
+			'URL after pre <pre>http://wordpress.org</pre><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a>',
+			'URL after code <code>http://wordpress.org</code><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a>',
+			'URL before and after pre <a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a><pre>http://wordpress.org</pre><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a>',
+			'URL before and after code <a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a><code>http://wordpress.org</code><a href="http://wordpress.org" rel="nofollow">http://wordpress.org</a>',
+			'code inside pre <pre>http://wordpress.org <code>http://wordpress.org</code> http://wordpress.org</pre>',
+		);
+
+		foreach ( $before as $key => $url )
+			$this->assertEquals( $expected[ $key ], make_clickable( $url ) );
+	}
+
+	/**
 	 * @ticket 16892
 	 */
 	function test_click_inside_html() {
