@@ -108,7 +108,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22967
-	 */ 
+	 */
 	function test_null_value_sql() {
 		global $wpdb;
 
@@ -118,5 +118,38 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
 		$this->assertEquals( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) = '')" ) );
+	}
+
+	/**
+	 * @ticket 23033
+	 */
+	function test_get_cast_for_type() {
+		$query = new WP_Meta_Query();
+		$this->assertEquals( 'BINARY', $query->get_cast_for_type( 'BINARY' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'CHAR' ) );
+		$this->assertEquals( 'DATE', $query->get_cast_for_type( 'DATE' ) );
+		$this->assertEquals( 'DATETIME', $query->get_cast_for_type( 'DATETIME' ) );
+		$this->assertEquals( 'SIGNED', $query->get_cast_for_type( 'SIGNED' ) );
+		$this->assertEquals( 'UNSIGNED', $query->get_cast_for_type( 'UNSIGNED' ) );
+		$this->assertEquals( 'TIME', $query->get_cast_for_type( 'TIME' ) );
+		$this->assertEquals( 'SIGNED', $query->get_cast_for_type( 'NUMERIC' ) );
+		$this->assertEquals( 'NUMERIC(10)', $query->get_cast_for_type( 'NUMERIC(10)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'NUMERIC( 10)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'NUMERIC( 10 )' ) );
+		$this->assertEquals( 'NUMERIC(10, 5)', $query->get_cast_for_type( 'NUMERIC(10, 5)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'NUMERIC(10,  5)' ) );
+		$this->assertEquals( 'NUMERIC(10,5)', $query->get_cast_for_type( 'NUMERIC(10,5)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'NUMERIC( 10, 5 )' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'NUMERIC(10, 5 )' ) );
+		$this->assertEquals( 'DECIMAL', $query->get_cast_for_type( 'DECIMAL' ) );
+		$this->assertEquals( 'DECIMAL(10)', $query->get_cast_for_type( 'DECIMAL(10)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'DECIMAL( 10 )' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'DECIMAL( 10)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'DECIMAL(10 )' ) );
+		$this->assertEquals( 'DECIMAL(10, 5)', $query->get_cast_for_type( 'DECIMAL(10, 5)' ) );
+		$this->assertEquals( 'DECIMAL(10,5)', $query->get_cast_for_type( 'DECIMAL(10,5)' ) );
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'DECIMAL(10,  5)' ) );
+
+		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'ANYTHING ELSE' ) );
 	}
 }

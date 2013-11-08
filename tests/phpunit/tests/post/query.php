@@ -199,6 +199,139 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	$this->assertEquals( 0, count( $posts ) );
     }
 
+	/**
+	 * @ticket 23033
+	 */
+	function test_meta_query_decimal_results() {
+		$post_1 = $this->factory->post->create();
+		$post_2 = $this->factory->post->create();
+		$post_3 = $this->factory->post->create();
+		$post_4 = $this->factory->post->create();
+
+		update_post_meta( $post_1, 'decimal_value', '-0.3' );
+		update_post_meta( $post_2, 'decimal_value', '0.23409844' );
+		update_post_meta( $post_3, 'decimal_value', '0.3' );
+		update_post_meta( $post_4, 'decimal_value', '0.4' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '.300',
+						'compare' => '=',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '0.35',
+						'compare' => '>',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '0.3',
+						'compare' => '>=',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_3, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '0',
+						'compare' => '<',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_1 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '0.3',
+						'compare' => '<=',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+
+		) );
+		$this->assertEquals( array( $post_1, $post_2, $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => array( 0.23409845, .31 ),
+						'compare' => 'BETWEEN',
+						'type' => 'DECIMAL(10, 10)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => array( 0.23409845, .31 ),
+						'compare' => 'NOT BETWEEN',
+						'type' => 'DECIMAL(10,10)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_1, $post_2, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+					array(
+						'key' => 'decimal_value',
+						'value' => '.3',
+						'compare' => 'LIKE',
+						'type' => 'DECIMAL(10,2)'
+					)
+				),
+		) );
+		$this->assertEquals( array( $post_1, $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+			$query = new WP_Query( array(
+				'meta_query' => array(
+						array(
+							'key' => 'decimal_value',
+							'value' => '.3',
+							'compare' => 'NOT LIKE',
+							'type' => 'DECIMAL(10,2)'
+						)
+					),
+			) );
+			$this->assertEquals( array( $post_2, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+		$query = new WP_Query( array(
+			'orderby' => 'meta_value',
+			'order' => 'DESC',
+			'meta_key' => 'decimal_value',
+			'meta_type' => 'DECIMAL(10, 2)'
+		) );
+		$this->assertEquals( array( $post_4, $post_3, $post_2, $post_1 ), wp_list_pluck( $query->posts, 'ID' ) );
+
+	}
+
     /**
      * @ticket 20604
      */
