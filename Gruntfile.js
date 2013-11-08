@@ -123,6 +123,26 @@ module.exports = function(grunt) {
 				options: {
 					curly: false,
 					eqeqeq: false
+				},
+				// Limit JSHint's run to a single specified file
+				//     grunt jshint:core --file=filename.js
+				filter: function( filepath ) {
+					var file = grunt.option( 'file' );
+
+					// Don't filter when no target file is specified
+					if ( ! file ) {
+						return true;
+					}
+
+					// Normalize filepath for Windows
+					filepath = filepath.replace( /\\/g, '/' );
+
+					// Match only the filename passed from cli
+					if ( filepath.lastIndexOf( '/' + file ) === filepath.length - ( file.length + 1 ) ) {
+						return true;
+					}
+
+					return false;
 				}
 			}
 		},
