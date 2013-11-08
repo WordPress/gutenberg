@@ -105,4 +105,18 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 		$this->assertEquals( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_key = 'my_third_key'" ) );
 
 	}
+
+	/**
+	 * @ticket 22967
+	 */ 
+	function test_null_value_sql() {
+		global $wpdb;
+
+		$query = new WP_Meta_Query( array(
+			array( 'key' => 'abc', 'value' => null, 'compare' => '=' )
+		) );
+		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
+
+		$this->assertEquals( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) = '')" ) );
+	}
 }
