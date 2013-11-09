@@ -23,7 +23,8 @@ module.exports = function(grunt) {
 					BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce-schema.min.js',
 					BUILD_DIR + 'wp-includes/js/tinymce/mark_loaded.js'
 				]
-			}
+			},
+			qunit: ['tests/qunit/compiled.html']
 		},
 		copy: {
 			files: {
@@ -64,6 +65,15 @@ module.exports = function(grunt) {
 				cwd: SOURCE_DIR,
 				dest: BUILD_DIR,
 				src: []
+			},
+			'qunit-compiled': {
+				src: 'tests/qunit/index.html',
+				dest: 'tests/qunit/compiled.html',
+				options: {
+					processContent: function( src ) {
+						return src.replace( /([^\.])*\.\.\/src/ig , '/../build' );
+					}
+				}
 			}
 		},
 		cssmin: {
@@ -249,8 +259,9 @@ module.exports = function(grunt) {
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'uglify:core',
 		'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
-	// Testing task.
+	// Testing tasks.
 	grunt.registerTask('test', ['qunit']);
+	grunt.registerTask('test:compiled', ['build', 'clean:qunit', 'copy:qunit-compiled', 'qunit']);
 
 	// Default task.
 	grunt.registerTask('default', ['build']);
