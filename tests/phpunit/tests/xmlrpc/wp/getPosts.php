@@ -51,9 +51,14 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 			'public' => true
 		));
 
+		$post_ids = array();
 		$num_posts = 17;
-		$post_ids = $this->factory->post->create_many( $num_posts, array( 'post_type' => $cpt_name ) );
-
+		foreach ( range( 1, $num_posts ) as $i ) {
+			$post_ids[] = $this->factory->post->create( array(
+				'post_type' => $cpt_name,
+				'post_date' => date( 'Y-m-d H:i:s', time() + $i )
+			) );
+		}
 		// get them all
 		$filter = array( 'post_type' => $cpt_name, 'number' => $num_posts + 10 );
 		$results = $this->myxmlrpcserver->wp_getPosts( array( 1, 'editor', 'editor', $filter ) );
@@ -66,9 +71,7 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 		$filter['offset'] = 0;
 		do {
 			$presults = $this->myxmlrpcserver->wp_getPosts( array( 1, 'editor', 'editor', $filter ) );
-			foreach( $presults as $post ) {
-				$posts_found[] = $post['post_id'];
-			}
+			$posts_found = array_merge( $posts_found, wp_list_pluck( $presults, 'post_id' ) );
 			$filter['offset'] += $filter['number'];
 		} while ( count( $presults ) > 0 );
 		// verify that $post_ids matches $posts_found
