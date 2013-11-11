@@ -50,9 +50,6 @@ class Tests_Upload extends WP_UnitTestCase {
 		$this->assertEquals( '', $info['error'] );
 	}
 
-	/**
-	 * @ticket 5953
-	 */
 	function test_upload_dir_absolute() {
 		$path = '/tmp/wp-unit-test';
 		// wp_upload_dir() with an absolute upload path
