@@ -19,7 +19,7 @@ class Tests_Ajax_MediaEdit extends WP_Ajax_UnitTestCase {
 	 * @var array
 	 */
 	protected $_ids = array();
-	
+
 	/**
 	 * Set up the test fixture.
 	 */
@@ -39,14 +39,14 @@ class Tests_Ajax_MediaEdit extends WP_Ajax_UnitTestCase {
 		$uploads = wp_upload_dir();
 		foreach ( scandir( $uploads['basedir'] ) as $file )
 			_rmdir( $uploads['basedir'] . '/' . $file );
-		
+
 		parent::tearDown();
 	}
-	
+
 	/**
 	 * Function snagged from ./tests/post/attachments.php
 	 */
-	function _make_attachment($upload, $parent_post_id = -1) {
+	function _make_attachment($upload, $parent_post_id = 0) {
 		$type = '';
 		if ( !empty($upload['type']) ) {
 			$type = $upload['type'];
@@ -82,19 +82,19 @@ class Tests_Ajax_MediaEdit extends WP_Ajax_UnitTestCase {
 
 		$upload = wp_upload_bits(basename($filename), null, $contents);
 		$id = $this->_make_attachment($upload);
-		
+
 		$_REQUEST['action'] = 'image-editor';
 		$_REQUEST['context'] = 'edit-attachment';
 		$_REQUEST['postid'] = $id;
 		$_REQUEST['target'] = 'thumbnail';
 		$_REQUEST['do'] = 'save';
 		$_REQUEST['history'] = '[{"c":{"x":5,"y":8,"w":289,"h":322}}]';
-		
+
 		$media_meta = wp_get_attachment_metadata($id);
 		$this->assertArrayHasKey('sizes', $media_meta, 'attachment should have size data');
 		$this->assertArrayHasKey('medium', $media_meta['sizes'], 'attachment should have data for medium size');
 		$ret = wp_save_image($id);
-		
+
 		$media_meta = wp_get_attachment_metadata($id);
 		$this->assertArrayHasKey('sizes', $media_meta, 'cropped attachment should have size data');
 		$this->assertArrayHasKey('medium', $media_meta['sizes'], 'cropped attachment should have data for medium size');
