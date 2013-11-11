@@ -21,6 +21,7 @@ class Tests_Canonical extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
+		update_option( 'page_comments', true );
 		update_option( 'comments_per_page', 5 );
 		update_option( 'posts_per_page', 5 );
 
@@ -220,7 +221,7 @@ class Tests_Canonical extends WP_UnitTestCase {
 			array( '/2008/09/03/images-te?page=3', '/2008/09/03/images-test/3/' ),
 
 			// Comments
-			array( '/2008/03/03/comment-test/?cpage=2', '/2008/03/03/comment-test/comment-page-2/', 20388 ),
+			array( '/2008/03/03/comment-test/?cpage=2', '/2008/03/03/comment-test/comment-page-2/' ),
 			array( '/2008/03/03/comment-test/comment-page-20/', '/2008/03/03/comment-test/comment-page-3/', 20388 ), // there's only 3 pages
 			array( '/2008/03/03/comment-test/?cpage=30', '/2008/03/03/comment-test/comment-page-3/', 20388 ), // there's only 3 pages
 
