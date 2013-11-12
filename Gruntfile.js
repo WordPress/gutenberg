@@ -88,6 +88,42 @@ module.exports = function(grunt) {
 					// Exceptions
 					'!wp-admin/css/farbtastic.css'
 				]
+			},
+			rtl: {
+				expand: true,
+				cwd: BUILD_DIR,
+				dest: BUILD_DIR,
+				ext: '.min.css',
+				src: [
+					'wp-admin/css/*-rtl.css',
+					'wp-includes/css/*-rtl.css'
+				]
+			}
+		},
+		cssjanus: {
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '-rtl.css',
+				src: [
+					'wp-admin/css/*.css',
+					'wp-includes/css/*.css',
+					// Temporary exceptions while .rtl body classes are in use
+					'!wp-admin/css/colors-fresh.css',
+					'!wp-admin/css/install.css',
+					'!wp-includes/css/editor.css',
+					'!wp-includes/css/wp-pointer.css',
+					// Farbtastic is deprecated, uses .rtl classes.
+					'!wp-admin/css/farbtastic.css'
+				]
+			},
+			dynamic: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '-rtl.css',
+				src: []
 			}
 		},
 		jshint: {
@@ -257,6 +293,17 @@ module.exports = function(grunt) {
 					interval: 2000
 				}
 			},
+			rtl: {
+				files: [
+					SOURCE_DIR + 'wp-admin/css/*.css',
+					SOURCE_DIR + 'wp-includes/css/*.css'
+				],
+				tasks: ['cssjanus:dynamic'],
+				options: {
+					spawn: false,
+					interval: 2000
+				}
+			},
 			test: {
 				files: ['tests/qunit/**'],
 				tasks: ['qunit']
@@ -268,10 +315,13 @@ module.exports = function(grunt) {
 
 	// Copy task.
 	grunt.registerTask('copy:all', ['copy:files', 'copy:version']);
-	
+
+	// RTL task.
+	grunt.registerTask('rtl', ['cssjanus:core']);
+
 	// Build task.
-	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'uglify:core',
-		'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
+	grunt.registerTask('build', ['clean:all', 'copy:all', 'rtl', 'cssmin:core', 'cssmin:rtl',
+		'uglify:core', 'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax and multisite tests.', function() {
@@ -293,8 +343,9 @@ module.exports = function(grunt) {
 	//
 	// On `watch:all`, automatically updates the `copy:dynamic` and `clean:dynamic`
 	// configurations so that only the changed files are updated.
+	// On `watch:rtl`, automatically updates the `cssjanus:dynamic` configuration.
 	grunt.event.on('watch', function( action, filepath, target ) {
-		if ( target !== 'all' ) {
+		if ( target !== 'all' && target !== 'rtl' ) {
 			return;
 		}
 
@@ -304,5 +355,6 @@ module.exports = function(grunt) {
 
 		grunt.config(['clean', 'dynamic', 'src'], cleanSrc);
 		grunt.config(['copy', 'dynamic', 'src'], copySrc);
+		grunt.config(['cssjanus', 'dynamic', 'src'], copySrc);
 	});
 };

@@ -19,6 +19,7 @@
     "grunt-contrib-compress": "~0.5.2",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-jshint": "~0.7.0",
+    "grunt-cssjanus": "~0.1.0",
     "matchdep": "~0.1.2"
   }
 }
