@@ -152,7 +152,6 @@ module.exports = function(grunt) {
 					'wp-includes/js/tinymce/plugins/wordpress/editor_plugin_src.js',
 					'wp-includes/js/tinymce/plugins/wp*/editor_plugin_src.js',
 					'wp-includes/js/tinymce/mark_loaded_src.js',
-					'wp-includes/js/tinymce/wp-tinymce-schema.js',
 					// Third party scripts
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
