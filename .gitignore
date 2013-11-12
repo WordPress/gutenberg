@@ -14,6 +14,7 @@ results
 wp-config.php
 wp-tests-config.php
 phpunit.xml
+qunit/tests/compiled.html
 
 node_modules
 npm-debug.log
