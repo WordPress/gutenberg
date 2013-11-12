@@ -138,6 +138,16 @@ module.exports = function(grunt) {
 				],
 				options: grunt.file.readJSON('tests/qunit/.jshintrc')
 			},
+			themes: {
+				expand: true,
+				cwd: SOURCE_DIR + 'wp-content/themes',
+				src: [
+					'**/*.js',
+					'!twenty{eleven,twelve,thirteen}/**',
+					// Third party scripts
+					'!twentyfourteen/js/html5.js'
+				]
+			},
 			core: {
 				expand: true,
 				cwd: SOURCE_DIR,
