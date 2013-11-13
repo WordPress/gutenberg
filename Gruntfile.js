@@ -102,6 +102,7 @@ module.exports = function(grunt) {
 					'wp-admin/css/*.css',
 					'wp-includes/css/*.css',
 					// Exceptions
+					'!wp-admin/css/theme.css', // Temporary file
 					'!wp-admin/css/farbtastic.css'
 				]
 			},
