@@ -78,18 +78,14 @@ module.exports = function(grunt) {
 		},
 		sass: {
 			colors: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '.css',
+				src: ['wp-admin/css/color-schemes/*/colors.scss'],
 				options: {
-					style: 'expanded',
-					sourcemap: true,
-					noCache: true
-				},
-				files : [{
-					expand: true,
-					cwd: SOURCE_DIR,
-					dest: BUILD_DIR,
-					ext: '.css',
-					src: ['wp-admin/css/color-schemes/*/colors.scss']
-				}]
+					outputStyle: 'expanded'
+				}
 			}
 		},
 		cssmin: {
@@ -328,6 +324,10 @@ module.exports = function(grunt) {
 					interval: 2000
 				}
 			},
+			colors: {
+				files: [SOURCE_DIR + 'wp-admin/css/color-schemes/**'],
+				tasks: ['sass:colors']
+			},
 			rtl: {
 				files: [
 					SOURCE_DIR + 'wp-admin/css/*.css',
@@ -342,10 +342,6 @@ module.exports = function(grunt) {
 			test: {
 				files: ['tests/qunit/**'],
 				tasks: ['qunit']
-			},
-			colors: {
-				files: [SOURCE_DIR + 'wp-admin/css/color-schemes/**'],
-				tasks: ['sass:colors']
 			}
 		}
 	});
@@ -358,10 +354,11 @@ module.exports = function(grunt) {
 	// RTL task.
 	grunt.registerTask('rtl', ['cssjanus:core']);
 
-	grunt.registerTask('colors', ['sass:colors', 'cssmin:colors']);
+	// Color schemes task.
+	grunt.registerTask('colors', ['sass:colors']);
 
 	// Build task.
-	grunt.registerTask('build', ['clean:all', 'copy:all', 'rtl', 'cssmin:core', 'cssmin:rtl',
+	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'cssmin:colors', 'rtl', 'cssmin:rtl',
 		'uglify:core', 'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
 	// Testing tasks.
