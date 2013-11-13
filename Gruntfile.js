@@ -361,7 +361,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('colors', ['sass:colors', 'cssmin:colors']);
 
 	// Build task.
-	grunt.registerTask('build', ['clean:all', 'copy:all', 'rtl', 'colors', 'cssmin:core', 'cssmin:rtl',
+	grunt.registerTask('build', ['clean:all', 'copy:all', 'rtl', 'cssmin:core', 'cssmin:rtl',
 		'uglify:core', 'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
 	// Testing tasks.
