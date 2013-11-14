@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/';
 
-	// Load tasks. 
+	// Load tasks.
 	require('matchdep').filterDev('grunt-*').forEach( grunt.loadNpmTasks );
 
 	// Project configuration.
@@ -204,7 +204,7 @@ module.exports = function(grunt) {
 				// Limit JSHint's run to a single specified file
 				//     grunt jshint:core --file=filename.js
 				filter: function( filepath ) {
-					var file = grunt.option( 'file' );
+					var index, file = grunt.option( 'file' );
 
 					// Don't filter when no target file is specified
 					if ( ! file ) {
@@ -213,9 +213,10 @@ module.exports = function(grunt) {
 
 					// Normalize filepath for Windows
 					filepath = filepath.replace( /\\/g, '/' );
+					index = filepath.lastIndexOf( '/' + file );
 
 					// Match only the filename passed from cli
-					if ( filepath.lastIndexOf( '/' + file ) === filepath.length - ( file.length + 1 ) ) {
+					if ( filepath === file || ( -1 !== index && index === filepath.length - ( file.length + 1 ) ) ) {
 						return true;
 					}
 
