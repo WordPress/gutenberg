@@ -8,6 +8,8 @@ class Tests_Term extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
+		
+		_clean_term_filters();
 		// insert one term into every post taxonomy
 		// otherwise term_ids and term_taxonomy_ids might be identical, which could mask bugs
 		$term = rand_str();
@@ -441,12 +443,14 @@ class Tests_Term extends WP_UnitTestCase {
 		$term = wp_insert_term( 'one', $this->taxonomy );
 		wp_set_object_terms( $post_id, $term, $this->taxonomy );
 
-		$term = array_shift( wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'all_with_object_id' ) ) );
+		$terms = wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'all_with_object_id' ) );
+		$term = array_shift( $terms );
 		$int_fields = array( 'parent', 'term_id', 'count', 'term_group', 'term_taxonomy_id', 'object_id' );
 		foreach ( $int_fields as $field )
 			$this->assertInternalType( 'int', $term->$field, $field );
 
-		$term = array_shift( wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'ids' ) ) );
+		$terms = wp_get_object_terms( $post_id, $this->taxonomy, array( 'fields' => 'ids' ) );
+		$term = array_shift( $terms );
 		$this->assertInternalType( 'int', $term, 'term' );
 	}
 

@@ -6,7 +6,8 @@
 class Tests_Term_getTerms extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-
+		
+		_clean_term_filters();
 		wp_cache_delete( 'last_changed', 'terms' );
 	}
 
@@ -28,7 +29,8 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		// last_changed and num_queries should bump
 		$terms = get_terms( 'post_tag' );
 		$this->assertEquals( 15, count( $terms ) );
-		$this->assertNotEmpty( $time1 = wp_cache_get( 'last_changed', 'terms' ) );
+		$time1 = wp_cache_get( 'last_changed', 'terms' );
+		$this->assertNotEmpty( $time1 );
 		$this->assertEquals( $num_queries + 1, $wpdb->num_queries );
 
 		$num_queries = $wpdb->num_queries;
