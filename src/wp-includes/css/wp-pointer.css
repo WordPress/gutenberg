@@ -98,10 +98,11 @@
 	padding-bottom: 13px;
 }
 
+/* @noflip */
 .wp-pointer-left {
 	padding-left: 13px;
 }
-
+/* @noflip */
 .wp-pointer-right {
 	padding-right: 13px;
 }
@@ -133,45 +134,16 @@
 	border-top-color: #fff;
 }
 
+/* @noflip */
 .wp-pointer-left .wp-pointer-arrow {
 	left: 0;
 	border-width: 17px 15px 17px 0;
 	border-right-color: #fff;
 }
 
+/* @noflip */
 .wp-pointer-right .wp-pointer-arrow {
 	right:0;
 	border-width: 17px 0 17px 15px;
 	border-left-color: #fff;
-}
-
-/* - RTL
-------------------------------------------------------------------------------*/
-
-.rtl .wp-pointer-content h3 {
-	padding-right: 60px;
-	padding-left: 18px;
-}
-
-.rtl .wp-pointer-content h3:before {
-	right: 15px;
-}
-
-.rtl .wp-pointer-buttons a {
-	float: left;
-}
-
-.rtl .wp-pointer-buttons a.close {
-	padding-right:3px;
-	padding-left: 0;
-}
-
-.rtl .wp-pointer-buttons a.close:before {
-	right:-10px;
-}
-
-.rtl .wp-pointer-top .wp-pointer-arrow,
-.rtl .wp-pointer-bottom .wp-pointer-arrow,
-.rtl .wp-pointer-undefined .wp-pointer-arrow {
-	right: 50px;
 }

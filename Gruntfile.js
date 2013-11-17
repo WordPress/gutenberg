@@ -131,13 +131,6 @@ module.exports = function(grunt) {
 				src: [
 					'wp-admin/css/*.css',
 					'wp-includes/css/*.css',
-					// Temporary exceptions while .rtl body classes are in use
-					'!wp-admin/css/colors-fresh.css',
-					'!wp-admin/css/install.css',
-					'!wp-includes/css/editor.css',
-					'!wp-includes/css/wp-pointer.css',
-					// Farbtastic is deprecated, uses .rtl classes.
-					'!wp-admin/css/farbtastic.css'
 				]
 			},
 			dynamic: {

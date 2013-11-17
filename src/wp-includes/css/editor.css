@@ -163,10 +163,6 @@
 	overflow: visible;
 }
 
-.rtl .wp_themeSkin .mceStatusbar {
-	padding: 0 8px 0 0;
-}
-
 .wp_themeSkin .mceStatusbar * {
 	color: #555;
 }
@@ -176,10 +172,6 @@
 	padding: 2px;
 }
 
-.rtl .wp_themeSkin .mceStatusbar div {
-	float: right;
-}
-
 .wp_themeSkin .mceStatusbar a.mceResize {
 	display: block;
 	float: right;
@@ -187,10 +179,6 @@
 	width: 20px;
 	height: 20px;
 	cursor: se-resize;
-}
-
-.rtl .wp_themeSkin .mceStatusbar a.mceResize {
-	float: left;
 }
 
 .wp_themeSkin .mceStatusbar a:hover {
@@ -1113,10 +1101,6 @@ span.mce_ltr:before {
 	padding: 0;
 }
 
-.rtl .wp-editor-tools {
-	padding: 0 0 0 10px;
-}
-
 .wp-editor-container textarea.wp-editor-area {
 	width: 100%;
 	margin: 0;
@@ -1140,10 +1124,6 @@ span.mce_ltr:before {
 	height: 19px;
 	margin: 5px 0 0 5px;
 	padding: 3px 8px 4px;
-}
-
-html[dir="rtl"] .wp-switch-editor {
-	float: left;
 }
 
 .wp-switch-editor:active {
@@ -1185,18 +1165,8 @@ html[dir="rtl"] .wp-switch-editor {
 	margin-bottom: 1px;
 }
 
-.rtl .wp-media-buttons .button {
-	margin-right: 0;
-	margin-left: 5px;
-}
-
 .wp-media-buttons .insert-media {
 	padding-left: 5px;
-}
-
-.rtl .wp-media-buttons .insert-media {
-	padding-left: 7px;
-	padding-right: 5px;
 }
 
 .wp-media-buttons a {
@@ -1703,6 +1673,7 @@ html[dir="rtl"] .wp-switch-editor {
 .ui-dialog {
 	position: absolute;
 	top: 0;
+	/* @noflip */
 	left: 0;
 	padding: .2em;
 	outline: 0;
@@ -1822,80 +1793,6 @@ html[dir="rtl"] .wp-switch-editor {
 	background-color: #000;
 	opacity: 0.6;
 	filter: alpha(opacity=60);
-}
-
-.rtl .wp-dialog .ui-dialog-titlebar-close {
-	right: auto;
-	left: 6px;
-}
-
-/*
-RTL
-*/
-.rtl #wp-link #internal-toggle {
-	padding-right: 18px;
-	padding-left: 0;
-}
-
-.rtl #wp-link #link-options label span,
-.rtl #wp-link #search-panel label span.search-label {
-	text-align: left;
-	padding-right: 0;
-	padding-left: 5px;
-}
-
-.rtl #wp-link #link-options label #url-field {
-	direction: ltr;
-}
-
-.rtl #wp-link .link-search-field,
-.rtl #wp-link .link-search-wrapper span {
-	float: right;
-}
-
-.rtl #wp-link .link-target {
-	margin-right: 87px;
-	margin-left: 0;
-}
-
-.rtl #wp-link .item-info {
-	left: 5px;
-	right: auto;
-	top: 4px;
-	bottom: 0;
-}
-
-.rtl #wp-link #search-panel {
-	float: right;
-}
-
-.rtl #wp-link-cancel {
-	float: right;
-}
-
-.rtl #wp-link-update {
-	float: left;
-}
-
-.rtl #wp-link .toggle-arrow {
-	background-position: top right;
-}
-
-.rtl #wp-link .toggle-arrow-active {
-	background-position: center right;
-}
-
-.rtl .wp_themeSkin .mceListBox .mceText {
-	text-align: right;
-}
-
-.rtl .wp_themeSkin .mceNoIcons a .mceText {
-	padding-right: 10px;
-	padding-left: 25px;
-}
-
-.rtl .mceListBoxMenu.mceNoIcons {
-	direction: rtl;
 }
 
 /* TinyMCE modal */
@@ -2279,92 +2176,6 @@ RTL
 .fade-trigger {
 	opacity: 1;
 }
-
-/* Distraction Free Writing - RTL
- * =Overlay Styles
--------------------------------------------------------------- */
-
-/* No RTL for now, this space intentionally left blank */
-
-/* =Overlay Body
--------------------------------------------------------------- */
-.rtl #wp-fullscreen-tagline {
-	float: left;
-}
-
-/* =Top bar
--------------------------------------------------------------- */
-.rtl #fullscreen-topbar {
-	left:auto;
-	right: 0;
-}
-
-.rtl #wp-fullscreen-mode-bar,
-.rtl #wp-fullscreen-button-bar,
-.rtl #wp-fullscreen-close,
-.rtl #wp-fullscreen-count {
-	float: right;
-}
-
-.rtl #wp-fullscreen-save {
-	float: left;
-}
-
-.rtl #wp-fullscreen-save {
-	padding: 2px 5px 0 2px;
-}
-
-.rtl #wp-fullscreen-buttons > div {
-	float: right;
-}
-
-.rtl #wp-fullscreen-mode-bar {
-	padding: 1px 0 0 14px;
-}
-
-.rtl #wp-fullscreen-modes a {
-	float: right;
-	border-width: 1px 0 1px 1px;
-}
-
-.rtl #wp-fullscreen-modes a:first-child {
-	-webkit-border-top-left-radius: 0;
-	-webkit-border-top-right-radius: 3px;
-	-webkit-border-bottom-left-radius: 0;
-	-webkit-border-bottom-right-radius: 3px;
-	border-width: 1px;
-	border-top-left-radius: 0;
-	border-top-right-radius: 3px;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 3px;
-}
-
-.rtl #wp-fullscreen-modes a:last-child {
-	-webkit-border-top-right-radius: 0;
-	-webkit-border-top-left-radius: 3px;
-	-webkit-border-bottom-right-radius: 0;
-	-webkit-border-bottom-left-radius: 3px;
-	border-top-right-radius: 0;
-	border-top-left-radius: 3px;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 3px;
-}
-
-.rtl #wp-fullscreen-save img,
-.rtl #wp-fullscreen-save span {
-	padding-right: 0;
-	padding-left: 4px;
-}
-
-/* =Thickbox Adjustments
--------------------------------------------------------------- */
-/* No RTL for now, this space intentionally left blank */
-
-
-/* =TinyMCE Adjustments
--------------------------------------------------------------- */
-/* No RTL for now, this space intentionally left blank */
-
 
 /* HiDPI */
 @media print,
