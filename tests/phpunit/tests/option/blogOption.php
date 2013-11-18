@@ -5,10 +5,20 @@ if ( is_multisite() ) :
  * @group option
  */
 class Tests_Option_BlogOption extends WP_UnitTestCase {
+	protected $suppress = false; 
+
 	function setUp() {
+		global $wpdb;
 		parent::setUp();
+		$this->suppress = $wpdb->suppress_errors();
 
 		$_SERVER['REMOTE_ADDR'] = null;
+	}
+
+	function tearDown() {
+		global $wpdb;
+		parent::tearDown();
+		$wpdb->suppress_errors( $this->suppress );
 	}
 
 	function test_from_same_site() {

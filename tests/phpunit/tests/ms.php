@@ -9,11 +9,20 @@ if ( is_multisite() ) :
  */
 class Tests_MS extends WP_UnitTestCase {
 	protected $plugin_hook_count = 0;
+	protected $suppress = false;
 
 	function setUp() {
+		global $wpdb;
 		parent::setUp();
+		$this->suppress = $wpdb->suppress_errors();
 
 		$_SERVER['REMOTE_ADDR'] = '';
+	}
+
+	function tearDown() {
+		global $wpdb;
+		parent::tearDown();
+		$wpdb->suppress_errors( $this->suppress );
 	}
 
 	/**
@@ -105,9 +114,9 @@ class Tests_MS extends WP_UnitTestCase {
 			$this->assertEquals( $details, wp_cache_get( $key, 'blog-lookup' ) );
 
 			foreach ( $wpdb->tables( 'blog', false ) as $table ) {
-				$wpdb->suppress_errors();
+				$suppress = $wpdb->suppress_errors();
 				$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
-				$wpdb->suppress_errors( false );
+				$wpdb->suppress_errors( $suppress );
 				$this->assertNotEmpty( $table_fields );
 				$result = $wpdb->get_results( "SELECT * FROM $prefix$table LIMIT 1" );
 				if ( 'commentmeta' == $table || 'links' == $table )
@@ -139,9 +148,9 @@ class Tests_MS extends WP_UnitTestCase {
 
 			$prefix = $wpdb->get_blog_prefix( $blog_id );
 			foreach ( $wpdb->tables( 'blog', false ) as $table ) {
-				$wpdb->suppress_errors();
+				$suppress = $wpdb->suppress_errors();
 				$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
-				$wpdb->suppress_errors( false );
+				$wpdb->suppress_errors( $suppress );
 				if ( $drop_tables )
 					$this->assertEmpty( $table_fields );
 				else

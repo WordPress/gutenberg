@@ -159,9 +159,14 @@ class WP_UnitTest_Factory_For_Blog extends WP_UnitTest_Factory_For_Thing {
 	}
 
 	function create_object( $args ) {
+		global $wpdb;
 		$meta = isset( $args['meta'] ) ? $args['meta'] : array();
 		$user_id = isset( $args['user_id'] ) ? $args['user_id'] : get_current_user_id();
-		return wpmu_create_blog( $args['domain'], $args['path'], $args['title'], $user_id, $meta, $args['site_id'] );
+		// temp tables will trigger db errors when we attempt to reference them as new temp tables
+		$suppress = $wpdb->suppress_errors();
+		$blog = wpmu_create_blog( $args['domain'], $args['path'], $args['title'], $user_id, $meta, $args['site_id'] );
+		$wpdb->suppress_errors( $suppress );
+		return $blog;
 	}
 
 	function update_object( $blog_id, $fields ) {}
