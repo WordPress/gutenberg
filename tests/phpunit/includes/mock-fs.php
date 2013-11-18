@@ -81,7 +81,8 @@ class WP_Filesystem_MockFS extends WP_Filesystem_Base {
 	 * Locates a filesystem node for the parent of the given item
 	 */
 	private function locate_parent_node( $path ) {
-		return $this->locate_node( trailingslashit( dirname( $path ) ) );
+		$dirname = str_replace( '\\', '/', dirname( $path ) );
+		return $this->locate_node( trailingslashit( $dirname ) );
 	}
 
 	// Here starteth the WP_Filesystem functions.
@@ -91,7 +92,8 @@ class WP_Filesystem_MockFS extends WP_Filesystem_Base {
 
 		$parent_node = $this->locate_parent_node( $path );
 		if ( ! $parent_node ) {
-			$this->mkdir( dirname( $path ) );
+			$dirname = str_replace( '\\', '/', dirname( $path ) );
+			$this->mkdir( $dirname );
 			$parent_node = $this->locate_parent_node( $path );
 			if ( ! $parent_node )
 				return false;
