@@ -130,7 +130,7 @@ module.exports = function(grunt) {
 				ext: '-rtl.css',
 				src: [
 					'wp-admin/css/*.css',
-					'wp-includes/css/*.css',
+					'wp-includes/css/*.css'
 				]
 			},
 			dynamic: {
