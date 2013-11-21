@@ -95,6 +95,10 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 	 * @group multisite
 	 */
 	function test_site_notoptions() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Should only run in multisite' );
+		}
+
 		global $wpdb;
 		$notoptions_key = "{$wpdb->siteid}:notoptions";
 
