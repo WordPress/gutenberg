@@ -171,4 +171,19 @@ class Tests_Meta extends WP_UnitTestCase {
 		$this->assertEquals( array( $post_id2, $post_id1 ), $posts->posts );
 		$this->assertEquals( 2, substr_count( $posts->request, 'CAST(' ) );
 	}
+
+	function test_meta_cache_order_asc() {
+		$post_id = $this->factory->post->create();
+		$colors = array( 'red', 'blue', 'yellow', 'green' );
+		foreach ( $colors as $color )
+			add_post_meta( $post_id, 'color', $color );
+
+		foreach ( range( 1, 10 ) as $i ) {
+			$meta = get_post_meta( $post_id, 'color' );
+			$this->assertEquals( $meta, $colors );
+
+			if ( 0 === $i % 2 )
+				wp_cache_delete( $post_id, 'post_meta' );
+		}
+	}
 }
