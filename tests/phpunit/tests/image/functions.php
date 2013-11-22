@@ -30,7 +30,7 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 		if ( extension_loaded( 'fileinfo' ) ) {
 			$finfo = new finfo();
 			$mime_type = $finfo->file( $filename, FILEINFO_MIME );
-		} elseif ( function_exists('mime_content_type') ) {
+		} elseif ( function_exists( 'mime_content_type' ) ) {
 			$mime_type = mime_content_type( $filename );
 		}
 		if ( false !== strpos( $mime_type, ';' ) ) {
@@ -112,6 +112,10 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	 * @ticket 6821
 	 */
 	public function test_wp_save_image_file() {
+		if ( ! extension_loaded( 'fileinfo' ) && ! function_exists( 'mime_content_type' ) ) {
+			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
+		}
+
 		include_once( ABSPATH . 'wp-admin/includes/image-edit.php' );
 
 		// Mime types
@@ -156,6 +160,9 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	 * @ticket 6821
 	 */
 	public function test_mime_overrides_filename() {
+		if ( ! extension_loaded( 'fileinfo' ) && ! function_exists( 'mime_content_type' ) ) {
+			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
+		}
 
 		// Test each image editor engine
 		$classes = array('WP_Image_Editor_GD', 'WP_Image_Editor_Imagick');
@@ -191,6 +198,9 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	 * @ticket 6821
 	 */
 	public function test_inferred_mime_types() {
+		if ( ! extension_loaded( 'fileinfo' ) && ! function_exists( 'mime_content_type' ) ) {
+			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
+		}
 
 		// Mime types
 		$mime_types = array(
