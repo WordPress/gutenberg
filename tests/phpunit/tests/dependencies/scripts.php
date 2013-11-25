@@ -97,6 +97,10 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 	 * @ticket 22229
 	 */
 	function test_json_encode_should_not_encode_special_literal_values() {
+		if ( ! class_exists( 'WP_JS_Literal' ) ) {
+			$this->markTestSkipped( "WP_JS_Literal class doesn't exist" );
+		}
+
 		$literal = new WP_JS_Literal( 'baba()' );
 		$this->assertEquals( '{"x":baba()}', WP_JS_Literal::json_encode( array( 'x' => $literal ), array( $literal ) ) );
 	}
@@ -105,6 +109,10 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 	 * @ticket 22229
 	 */
 	function test_json_encode_should_not_encode_special_literal_values_with_dependencies() {
+		if ( ! class_exists( 'WP_JS_Literal' ) ) {
+			$this->markTestSkipped( "WP_JS_Literal class doesn't exist" );
+		}
+		
 		$literal = new WP_JS_Literal( 'baba()', array( 'dep0', 'dep1' ) );
 		$this->assertEquals( '{"x":baba()}', WP_JS_Literal::json_encode( array( 'x' => $literal ), array( $literal ) ) );
 	}

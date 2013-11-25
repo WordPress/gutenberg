@@ -8,6 +8,9 @@
  */
 class Test_WP_Export_Writers extends WP_UnitTestCase {
 	function test_export_returner_returns_all_the_return_values() {
+		if ( ! class_exists( 'WP_Export_Returner' ) ) {
+			$this->markTestSkipped( "WP_Export_Returner class doesn't exist" );
+		}
 		$returner = new WP_Export_Returner( $this->get_x_formatter() );
 		$this->assertEquals( 'xxx' , $returner->export() );
 	}

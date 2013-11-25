@@ -7,6 +7,14 @@
  * @ticket 22435
  */
 class Test_WP_Export_Functions extends WP_UnitTestCase {
+	function setUp() {
+		if ( ! function_exists( 'wp_export' ) ) {
+			$this->markTestSkipped( "wp_export function doesn't exist" );
+		}
+
+		parent::setUp();
+	}
+	
 	function test_wp_export_returns_wp_error_if_the_writer_throws_Export_exception() {
 		$this->assertTrue( is_wp_error( wp_export( array( 'writer' => 'Test_WP_Export_Stub_Writer_Throws_Export_Exception' ) ) ) );
 	}

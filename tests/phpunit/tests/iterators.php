@@ -4,6 +4,14 @@
  * @ticket 22435
  */
 class Test_WP_Post_IDs_Iterator extends WP_UnitTestCase {
+	function setUp() {
+		if ( ! class_exists( 'WP_Post_IDs_Iterator' ) ) {
+			$this->markTestSkipped( "WP_Post_IDs_Iterator class doesn't exist" );
+		}
+
+		parent::setUp();
+	}
+
 	function test_create() {
 		new WP_Post_IDs_Iterator( array( 1, 2, 3 ) );
 	}

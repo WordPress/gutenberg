@@ -4,6 +4,14 @@
  * @ticket 22300
  */
 class Tests_Formatting_MapDeep extends WP_UnitTestCase {
+	function setUp() {
+		if ( ! function_exists( 'map_deep' ) ) {
+			$this->markTestSkipped( "map_deep function doesn't exist" );
+		}
+
+		parent::setUp();
+	}
+
 	function test_map_deep_with_any_function_over_empty_array_should_return_empty_array() {
 		$this->assertEquals( array(), map_deep( array( $this, 'return_baba' ), array() ) );
 	}

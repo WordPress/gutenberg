@@ -7,6 +7,14 @@
  * @ticket 22435
  */
 class Test_WP_Export_Query extends WP_UnitTestCase {
+	function setUp() {
+		if ( ! class_exists( 'WP_Export_Query' ) ) {
+			$this->markTestSkipped( "WP_Export_Query class doesn't exist" );
+		}
+
+		parent::setUp();
+	}
+
 	function test_WP_Export_Query_should_be_initialized_with_an_array() {
 		$export = new WP_Export_Query( array( 'author' => 'all' ) );
 		$this->assertTrue( (bool) $export );
