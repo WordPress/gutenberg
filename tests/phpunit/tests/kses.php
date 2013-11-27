@@ -361,7 +361,7 @@ EOF;
 	}
 
 	/**
-	 * @ticket 
+	 * @ticket 26290
 	 */
 	public function test_wp_kses_normalize_entities() {
 		$this->assertEquals( '&spades;', wp_kses_normalize_entities( '&spades;' ) );
