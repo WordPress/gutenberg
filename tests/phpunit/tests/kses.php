@@ -359,4 +359,19 @@ EOF;
 		$this->assertEquals( $allowedposttags, wp_kses_allowed_html( 'post' ) );
 		$this->assertEquals( $allowedtags, wp_kses_allowed_html( 'data' ) );
 	}
+
+	/**
+	 * @ticket 
+	 */
+	public function test_wp_kses_normalize_entities() {
+		$this->assertEquals( '&spades;', wp_kses_normalize_entities( '&spades;' ) );
+
+		$this->assertEquals( '&sup1;', wp_kses_normalize_entities( '&sup1;' ) );
+		$this->assertEquals( '&sup2;', wp_kses_normalize_entities( '&sup2;' ) );
+		$this->assertEquals( '&sup3;', wp_kses_normalize_entities( '&sup3;' ) );
+		$this->assertEquals( '&frac14;', wp_kses_normalize_entities( '&frac14;' ) );
+		$this->assertEquals( '&frac12;', wp_kses_normalize_entities( '&frac12;' ) );
+		$this->assertEquals( '&frac34;', wp_kses_normalize_entities( '&frac34;' ) );
+		$this->assertEquals( '&there4;', wp_kses_normalize_entities( '&there4;' ) );
+	}
 }
