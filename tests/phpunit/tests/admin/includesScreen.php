@@ -175,6 +175,32 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 		$this->assertEquals( $screen->get_help_tabs(), array() );
 	}
 
+	/**
+	 * @ticket 25799
+	 */
+	function test_options() {
+		$option = rand_str();
+		$option_args = array(
+			'label'   => 'Option',
+			'default' => 10,
+			'option'  => $option
+		);
+
+		$screen = get_current_screen();
+
+		$screen->add_option( $option, $option_args );
+		$this->assertEquals( $screen->get_option( $option ), $option_args );
+
+		$options = $screen->get_options();
+		$this->assertArrayHasKey( $option, $options );
+
+		$screen->remove_option( $option );
+		$this->assertNull( $screen->get_option( $option ) );
+
+		$screen->remove_options();
+		$this->assertEquals( $screen->get_options(), array() );
+	}
+
 	function test_in_admin() {
 		$screen = get_current_screen();
 
