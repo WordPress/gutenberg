@@ -26,7 +26,7 @@ class Tests_Basic extends WP_UnitTestCase {
 		$readme = file_get_contents( ABSPATH . 'readme.html' );
 		preg_match( '#<br /> Version (.*)#', $readme, $matches );
 		list( $version ) = explode( '-', $GLOBALS['wp_version'] );
-		$this->assertEquals( $version, $matches[1], "readme.html's version needs to be updated to $version." );
+		$this->assertEquals( $version, trim( $matches[1] ), "readme.html's version needs to be updated to $version." );
 	}
 
 	// two tests for a lame bug in PHPUnit that broke the $GLOBALS reference
