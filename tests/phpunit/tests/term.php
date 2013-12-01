@@ -8,7 +8,7 @@ class Tests_Term extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		
+
 		_clean_term_filters();
 		// insert one term into every post taxonomy
 		// otherwise term_ids and term_taxonomy_ids might be identical, which could mask bugs
@@ -85,6 +85,26 @@ class Tests_Term extends WP_UnitTestCase {
 
 		// clean up
 		$this->assertTrue( wp_delete_term($t['term_id'], $this->taxonomy) );
+	}
+
+	function test_get_object_terms() {
+		$post_id = $this->factory->post->create();
+		$terms_1 = array('foo', 'bar', 'baz');
+
+		wp_set_object_terms( $post_id, $terms_1, $this->taxonomy );
+		add_filter( 'wp_get_object_terms', array( $this, 'filter_get_object_terms' ) );
+		$terms = wp_get_object_terms( $post_id, $this->taxonomy );
+		remove_filter( 'wp_get_object_terms', array( $this, 'filter_get_object_terms' ) );
+		foreach ( $terms as $term ) {
+			$this->assertInternalType( 'object', $term );
+		}
+	}
+
+	function filter_get_object_terms( $terms ) {
+		// var_dump reveals an array of objects
+		$term_ids = wp_list_pluck( $terms, 'term_id' );
+		// last term is now an integer
+		return $terms;
 	}
 
 	function test_set_object_terms_by_id() {
