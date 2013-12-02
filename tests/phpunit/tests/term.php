@@ -87,6 +87,9 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertTrue( wp_delete_term($t['term_id'], $this->taxonomy) );
 	}
 
+	/**
+	 * @ticket 26339
+	 */
 	function test_get_object_terms() {
 		$post_id = $this->factory->post->create();
 		$terms_1 = array('foo', 'bar', 'baz');
@@ -101,9 +104,8 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	function filter_get_object_terms( $terms ) {
-		// var_dump reveals an array of objects
 		$term_ids = wp_list_pluck( $terms, 'term_id' );
-		// last term is now an integer
+		// all terms should still be objects
 		return $terms;
 	}
 
