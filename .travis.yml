@@ -1,0 +1,19 @@
+language: php
+
+php:
+    - "5.2"
+    - "5.3"
+    - "5.4"
+    - "5.5"
+
+before_script:
+    - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
+    - cp wp-tests-config-sample.php wp-tests-config.php
+    - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
+    - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
+    - sed -i "s/yourpasswordhere//" wp-tests-config.php
+    - svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
+    - npm install -g grunt-cli
+    - npm install
+
+script: grunt test
