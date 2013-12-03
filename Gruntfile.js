@@ -82,7 +82,7 @@ module.exports = function(grunt) {
 				cwd: SOURCE_DIR,
 				dest: BUILD_DIR,
 				ext: '.css',
-				src: ['wp-admin/css/color-schemes/*/colors.scss'],
+				src: ['wp-admin/css/colors/*/colors.scss'],
 				options: {
 					outputStyle: 'expanded'
 				}
@@ -118,7 +118,7 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.css',
 				src: [
-					'wp-admin/css/color-schemes/**/*.css'
+					'wp-admin/css/colors/**/*.css'
 				]
 			}
 		},
@@ -319,7 +319,7 @@ module.exports = function(grunt) {
 				}
 			},
 			colors: {
-				files: [SOURCE_DIR + 'wp-admin/css/color-schemes/**'],
+				files: [SOURCE_DIR + 'wp-admin/css/colors/**'],
 				tasks: ['sass:colors']
 			},
 			rtl: {
