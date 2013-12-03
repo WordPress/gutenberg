@@ -94,4 +94,20 @@ class Tests_Formatting_RemoveAccents extends WP_UnitTestCase {
 
 		remove_filter( 'locale', array( $this, '_remove_accents_germanic_umlauts_cb' ) );
 	}
+
+	public function _set_locale_to_danish() {
+		return 'da_DK';
+	}
+
+	/**
+	 * @ticket 23907
+	 */
+	public function test_remove_danish_accents() {
+		add_filter( 'locale', array( $this, '_set_locale_to_danish' ) );
+		
+		$this->assertEquals( 'AeOeAaaeoeaa', remove_accents( 'ÆØÅæøå' ) );
+		
+		remove_filter( 'locale', array( $this, '_set_locale_to_danish' ) );
+	}
+
 }
