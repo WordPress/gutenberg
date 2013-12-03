@@ -14,7 +14,9 @@ results
 wp-config.php
 wp-tests-config.php
 phpunit.xml
-qunit/tests/compiled.html
+tests/phpunit/data/plugins/wordpress-importer
+tests/phpunit/data/.trac-ticket-cache*
+tests/qunit/compiled.html
 
 node_modules
 npm-debug.log
