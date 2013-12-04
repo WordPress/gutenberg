@@ -133,6 +133,20 @@ module.exports = function(grunt) {
 					'wp-includes/css/*.css'
 				]
 			},
+			colors: {
+				options: {
+					processContent: function( src ) {
+						return src.replace( /([^/]+)\.css/gi, "$1-rtl.css" );
+					}
+				},
+				expand: true,
+				cwd: BUILD_DIR,
+				dest: BUILD_DIR,
+				ext: '-rtl.css',
+				src: [
+					'wp-admin/css/colors/**/*.css'
+				]
+			},
 			dynamic: {
 				expand: true,
 				cwd: SOURCE_DIR,
@@ -346,13 +360,13 @@ module.exports = function(grunt) {
 	grunt.registerTask('copy:all', ['copy:files', 'copy:version']);
 
 	// RTL task.
-	grunt.registerTask('rtl', ['cssjanus:core']);
+	grunt.registerTask('rtl', ['cssjanus:core', 'cssjanus:colors']);
 
 	// Color schemes task.
 	grunt.registerTask('colors', ['sass:colors']);
 
 	// Build task.
-	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'cssmin:colors', 'rtl', 'cssmin:rtl',
+	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
 		'uglify:core', 'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
 	// Testing tasks.
