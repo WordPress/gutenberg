@@ -136,7 +136,7 @@ module.exports = function(grunt) {
 			colors: {
 				options: {
 					processContent: function( src ) {
-						return src.replace( /([^/]+)\.css/gi, "$1-rtl.css" );
+						return src.replace( /([^/]+)\.css/gi, '$1-rtl.css' );
 					}
 				},
 				expand: true,
