@@ -124,6 +124,9 @@ module.exports = function(grunt) {
 		},
 		cssjanus: {
 			core: {
+				options: {
+					swapLtrRtlInUrl: false
+				},
 				expand: true,
 				cwd: SOURCE_DIR,
 				dest: BUILD_DIR,
