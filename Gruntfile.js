@@ -118,7 +118,7 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.css',
 				src: [
-					'wp-admin/css/colors/**/*.css'
+					'wp-admin/css/colors/*/*.css'
 				]
 			}
 		},
@@ -147,7 +147,7 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '-rtl.css',
 				src: [
-					'wp-admin/css/colors/**/*.css'
+					'wp-admin/css/colors/*/colors.css'
 				]
 			},
 			dynamic: {
