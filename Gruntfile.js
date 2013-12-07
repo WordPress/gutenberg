@@ -36,8 +36,7 @@ module.exports = function(grunt) {
 						src: [
 							'**',
 							'!**/.{svn,git}/**', // Ignore version control directories.
-							'!wp-includes/version.php', // Exclude version.php
-							'!wp-content/themes/wpcom-themes/**'
+							'!wp-includes/version.php' // Exclude version.php
 						],
 						dest: BUILD_DIR
 					},
