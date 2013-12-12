@@ -8,6 +8,7 @@
 class Tests_Theme extends WP_UnitTestCase {
 	protected $theme_slug = 'twentyeleven';
 	protected $theme_name = 'Twenty Eleven';
+	protected $default_themes = array( 'twentyten', 'twentyeleven', 'twentytwelve', 'twentythirteen', 'twentyfourteen' );
 
 	function setUp() {
 		parent::setUp();
@@ -159,6 +160,13 @@ class Tests_Theme extends WP_UnitTestCase {
 		$this->assertEquals( WP_CONTENT_DIR . '/themes/' . $this->theme_slug, $theme->get_template_directory(), 'get_template_directory' );
 		$this->assertEquals( content_url( 'themes/' . $this->theme_slug ), $theme->get_stylesheet_directory_uri(), 'get_stylesheet_directory_uri' );
 		$this->assertEquals( content_url( 'themes/' . $this->theme_slug ), $theme->get_template_directory_uri(), 'get_template_directory_uri' );
+	}
+
+	function test_default_themes_have_textdomain() {
+		$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
+		foreach ( $this->default_themes as $theme ) {
+			$this->assertEquals( $theme, wp_get_theme( $theme )->get( 'TextDomain' ) );
+		}
 	}
 
 	/**
