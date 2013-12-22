@@ -17,6 +17,7 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 	protected $post_id;
 
 	protected $cat;
+	protected $uncat;
 	protected $tag;
 	protected $tax;
 
@@ -47,6 +48,9 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 		$this->cat = get_term( $this->cat_id, 'category' );
 		_make_cat_compat( $this->cat );
 		$this->tag = get_term( $this->tag_id, 'post_tag' );
+
+		$this->uncat = get_term_by( 'slug', 'uncategorized', 'category' );
+		_make_cat_compat( $this->uncat );
 
 		add_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
 	}
@@ -104,6 +108,29 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 		$this->assertNotEmpty( get_query_var( 'taxonomy' ) );
 		$this->assertNotEmpty( get_query_var( 'term_id' ) );
 		$this->assertEquals( get_queried_object(), $this->cat );
+	}
+
+	function test_cat_uncat_action_tax() {
+		// category with tax added
+		add_action( 'pre_get_posts', array( $this, '_cat_uncat_action_tax' ), 11 );
+
+		$this->go_to( home_url( "/category/uncategorized/" ) );
+		$this->assertQueryTrue( 'is_category', 'is_archive' );
+		$this->assertNotEmpty( get_query_var( 'cat' ) );
+		$this->assertNotEmpty( get_query_var( 'tax_query' ) );
+		$this->assertNotEmpty( get_query_var( 'taxonomy' ) );
+		$this->assertNotEmpty( get_query_var( 'term_id' ) );
+		$this->assertEquals( get_queried_object(), $this->uncat );
+
+		remove_action( 'pre_get_posts', array( $this, '_cat_uncat_action_tax' ), 11 );
+	}
+
+	function _cat_uncat_action_tax( &$query ) {
+		$this->assertTrue( $query->is_category() );
+		$this->assertTrue( $query->is_archive() );
+		$this->assertNotEmpty( $query->get( 'category_name' ) );
+		$this->assertNotEmpty( $query->get( 'tax_query' ) );
+		$this->assertEquals( $query->get_queried_object(), $this->uncat );
 	}
 
 	function test_tax_query_tag_action_tax() {
