@@ -110,6 +110,9 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 		$this->assertEquals( get_queried_object(), $this->cat );
 	}
 
+	/**
+	 * @ticket 26627
+	 */
 	function test_cat_uncat_action_tax() {
 		// category with tax added
 		add_action( 'pre_get_posts', array( $this, '_cat_uncat_action_tax' ), 11 );
