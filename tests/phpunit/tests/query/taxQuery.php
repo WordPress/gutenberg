@@ -136,6 +136,19 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 		$this->assertEquals( $query->get_queried_object(), $this->uncat );
 	}
 
+	/**
+	 * @ticket 26728
+	 */
+	function test_tax_action_tax() {
+		// tax with tax added
+		$this->go_to( home_url( '/testtax/tax-slug2/' ) );
+		$this->assertQueryTrue( 'is_tax', 'is_archive' );
+		$this->assertNotEmpty( get_query_var( 'tax_query' ) );
+		$this->assertNotEmpty( get_query_var( 'taxonomy' ) );
+		$this->assertNotEmpty( get_query_var( 'term_id' ) );
+		$this->assertEquals( get_queried_object(), get_term( $this->tax_id, 'testtax' ) );
+	}
+
 	function test_tax_query_tag_action_tax() {
 		// tax + tag with tax added
 		$this->go_to( home_url( "/testtax/tax-slug2/?tag_id=$this->tag_id" ) );
