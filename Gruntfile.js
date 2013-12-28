@@ -17,13 +17,7 @@ module.exports = function(grunt) {
 				cwd: BUILD_DIR,
 				src: []
 			},
-			tinymce: {
-				src: [
-					'<%= concat.tinymce.dest %>',
-					BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce-schema.min.js',
-					BUILD_DIR + 'wp-includes/js/tinymce/mark_loaded.js'
-				]
-			},
+			tinymce: ['<%= concat.tinymce.dest %>'],
 			qunit: ['tests/qunit/compiled.html']
 		},
 		copy: {
@@ -191,9 +185,8 @@ module.exports = function(grunt) {
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
 					'wp-includes/js/plupload/handlers.js',
 					'wp-includes/js/plupload/wp-plupload.js',
-					'wp-includes/js/tinymce/plugins/wordpress/editor_plugin_src.js',
-					'wp-includes/js/tinymce/plugins/wp*/editor_plugin_src.js',
-					'wp-includes/js/tinymce/mark_loaded_src.js',
+					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
+					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 					// Third party scripts
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
@@ -262,8 +255,9 @@ module.exports = function(grunt) {
 					'wp-includes/js/*.js',
 					'wp-includes/js/plupload/handlers.js',
 					'wp-includes/js/plupload/wp-plupload.js',
-					'wp-includes/js/tinymce/plugins/wp*/js/*.js',
-					'wp-includes/js/tinymce/wp-tinymce-schema.js',
+					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
+					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
+
 					// Exceptions
 					'!wp-admin/js/custom-header.js', // Why? We should minify this.
 					'!wp-admin/js/farbtastic.js',
@@ -271,26 +265,8 @@ module.exports = function(grunt) {
 					'!wp-includes/js/backbone.min.js',
 					'!wp-includes/js/swfobject.js',
 					'!wp-includes/js/underscore.min.js',
-					'!wp-includes/js/zxcvbn.min.js',
-					// Hard-coded in editimage.html
-					'!wp-includes/js/tinymce/plugins/wpeditimage/js/editimage.js'
+					'!wp-includes/js/zxcvbn.min.js'
 				]
-			},
-			tinymce: {
-				expand: true,
-				cwd: SOURCE_DIR,
-				dest: BUILD_DIR,
-				src: [
-					'wp-includes/js/tinymce/plugins/wordpress/editor_plugin_src.js',
-					'wp-includes/js/tinymce/plugins/wp*/editor_plugin_src.js',
-					'wp-includes/js/tinymce/mark_loaded_src.js'
-				],
-				// TinyMCE plugins use a nonstandard naming scheme: plugin files are named
-				// `editor_plugin_src.js`, and are compressed into `editor_plugin.js`.
-				rename: function(destBase, destPath) {
-					destPath = destPath.replace(/_src.js$/, '.js');
-					return path.join(destBase || '', destPath);
-				}
 			}
 		},
 		concat: {
@@ -302,11 +278,9 @@ module.exports = function(grunt) {
 					}
 				},
 				src: [
-					BUILD_DIR + 'wp-includes/js/tinymce/tiny_mce.js',
-					BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce-schema.min.js',
-					BUILD_DIR + 'wp-includes/js/tinymce/themes/advanced/editor_template.js',
-					BUILD_DIR + 'wp-includes/js/tinymce/plugins/*/editor_plugin.js',
-					BUILD_DIR + 'wp-includes/js/tinymce/mark_loaded.js'
+					BUILD_DIR + 'wp-includes/js/tinymce/tinymce.min.js',
+					BUILD_DIR + 'wp-includes/js/tinymce/themes/modern/theme.min.js',
+					BUILD_DIR + 'wp-includes/js/tinymce/plugins/*/plugin.min.js'
 				],
 				dest: BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce.js'
 			}
@@ -370,7 +344,7 @@ module.exports = function(grunt) {
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
-		'uglify:core', 'uglify:tinymce', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
+		'uglify:core', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax and multisite tests.', function() {
@@ -383,6 +357,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('qunit:compiled', 'Runs QUnit tests on compiled as well as uncompiled scripts.',
 		['build', 'copy:qunit', 'qunit']);
+
 	grunt.registerTask('test', 'Runs all QUnit and PHPUnit tasks.', ['qunit:compiled', 'phpunit']);
 
 	// Default task.
