@@ -217,7 +217,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownWPBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://core.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://core.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'WordPress Ticket #%d is not fixed', $ticket_id ) );
 	}
 
@@ -227,7 +227,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownUTBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'UT' . $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://unit-tests.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://unit-tests.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'Unit Tests Ticket #%d is not fixed', $ticket_id ) );
 	}
 
@@ -237,7 +237,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function knownPluginBug( $ticket_id ) {
 		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'Plugin' . $ticket_id, self::$forced_tickets ) )
 			return;
-		if ( ! TracTickets::isTracTicketClosed( 'http://plugins.trac.wordpress.org', $ticket_id ) )
+		if ( ! TracTickets::isTracTicketClosed( 'https://plugins.trac.wordpress.org', $ticket_id ) )
 			$this->markTestSkipped( sprintf( 'WordPress Plugin Ticket #%d is not fixed', $ticket_id ) );
 	}
 
