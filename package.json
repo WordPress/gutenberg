@@ -1,6 +1,6 @@
 {
   "name": "WordPress",
-  "version": "3.7.0",
+  "version": "3.9.0",
   "description": "WordPress is web software you can use to create a beautiful website or blog.",
   "repository": {
     "type": "svn",
