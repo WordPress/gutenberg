@@ -22,6 +22,11 @@ require_once ABSPATH . '/wp-settings.php';
 require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 require_once ABSPATH . '/wp-includes/wp-db.php';
 
+// Override the PHPMailer
+global $phpmailer;
+require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
+$phpmailer = new MockPHPMailer();
+
 $wpdb->query( 'SET storage_engine = INNODB' );
 $wpdb->select( DB_NAME, $wpdb->dbh );
 
