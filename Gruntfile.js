@@ -295,6 +295,18 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce.js.gz'
 			}
 		},
+		jsvalidate:{
+			options:{
+				globals: {},
+				esprimaOptions:{},
+				verbose: false
+			},
+			build: {
+				files: {
+					src: BUILD_DIR + '/**/*.js'
+				}
+			} 
+		},
 		watch: {
 			all: {
 				files: [
@@ -344,7 +356,7 @@ module.exports = function(grunt) {
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
-		'uglify:core', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce']);
+		'uglify:core', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax and multisite tests.', function() {

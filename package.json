@@ -21,6 +21,7 @@
     "grunt-contrib-jshint": "~0.7.0",
     "grunt-cssjanus": "git://github.com/yoavf/grunt-cssjanus.git#e0158f4087d1c4bb5a8d1648a63ef133338b5879",
     "grunt-sass": "~0.8.0",
+    "grunt-jsvalidate": "~0.2.2",
     "matchdep": "~0.1.2"
   }
 }
