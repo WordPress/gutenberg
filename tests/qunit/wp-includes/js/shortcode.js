@@ -4,7 +4,7 @@ jQuery( function() {
 
 	test( 'next() should find the shortcode', function() {
 		var result;
-		
+
 		// Basic
 		result = wp.shortcode.next( 'foo', 'this has the [foo] shortcode' );
 		equal( result.index, 13, 'foo shortcode found at index 13' );
@@ -26,7 +26,7 @@ jQuery( function() {
 
 	test( 'next() should find the shortcode when told to start looking beyond the start of the string', function() {
 		var result;
-		
+
 		// Starting at indices
 		result = wp.shortcode.next( 'foo', 'this has the [foo] shortcode', 12 );
 		equal( result.index, 13, 'foo shortcode found before index 13' );
@@ -78,11 +78,11 @@ jQuery( function() {
 
 	test( 'replace() should replace the shortcode', function() {
 		var result;
-		
+
 		// Basic
 		result = wp.shortcode.replace( 'foo', 'this has the [foo] shortcode', shortcodeReplaceCallback );
 		equal( result, 'this has the bar shortcode', 'foo replaced with bar' );
-		
+
 		result = wp.shortcode.replace( 'foo', 'this has the [foo param="foo"] shortcode', shortcodeReplaceCallback );
 		equal( result, 'this has the bar shortcode', 'foo and params replaced with bar' );
 	});
@@ -111,7 +111,7 @@ jQuery( function() {
 
 	test( 'replace() should not replace the escaped shortcodes', function() {
 		var result;
-		
+
 		// Escaped
 		result = wp.shortcode.replace( 'foo', 'this has the [[foo]] shortcode', shortcodeReplaceCallback );
 		equal( result, 'this has the [[foo]] shortcode', 'escaped foo not replaced' );
@@ -134,7 +134,36 @@ jQuery( function() {
 		equal( result, 'this has the [foo] shortcode', 'stub not replaced' );
 	});
 
+    // A callback function for the replace tests
 	function shortcodeReplaceCallback( ) {
 		return 'bar';
 	}
+
+    test( 'attrs() should return named attributes created with single, double, and no quotes', function() {
+        var expected = {
+            'named': {
+                'param': 'foo',
+                'another': 'bar',
+                'andagain': 'baz'
+            }, 'numeric' : []
+        };
+
+        deepEqual( wp.shortcode.attrs('param="foo" another=\'bar\' andagain=baz'), expected, 'attr parsed all three named types');
+    });
+
+    test( 'attrs() should return numeric attributes in the order they are used', function() {
+        var expected = {
+            'named': {}, 'numeric' : ['foo', 'bar', 'baz']
+        };
+
+        deepEqual( wp.shortcode.attrs('foo bar baz'), expected, 'attr parsed numeric attributes');
+    });
+
+    test( 'attrs() should return numeric attributes in the order they are used when they have named attributes in between', function() {
+        var expected = {
+            'named': { 'not': 'a blocker'  }, 'numeric' : ['foo', 'bar', 'baz']
+        };
+
+        deepEqual( wp.shortcode.attrs('foo not="a blocker" bar baz'), expected, 'attr parsed numeric attributes');
+    });
 });
