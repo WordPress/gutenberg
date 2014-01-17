@@ -380,4 +380,13 @@ class Tests_Formatting_MakeClickable extends WP_UnitTestCase {
 			$this->assertEquals( $urls_expected[$key], make_clickable( $url ) );
 		}
 	}
+
+	/**
+	 * @ticket 19028
+	 */
+	function test_line_break_in_existing_clickable_link() {
+		$html = "<a
+				  href='mailto:someone@example.com'>someone@example.com</a>";
+		$this->assertEquals( $html, make_clickable( $html ) );
+	}
 }
