@@ -114,6 +114,24 @@ CAP;
 		$this->assertFalse( wp_oembed_remove_provider( 'http://foo.bar/*' ) );
 	}
 
+	/**
+	 * Test secure youtube.com embeds
+	 *
+	 * @ticket 23149
+	 */
+	function test_youtube_com_secure_embed() {
+		global $wp_embed;
+
+		$out = wp_oembed_get( 'http://www.youtube.com/watch?v=oHg5SJYRHA0' );
+		$this->assertContains( 'http://www.youtube.com/embed/oHg5SJYRHA0?feature=oembed', $out );
+
+		$out = wp_oembed_get( 'https://www.youtube.com/watch?v=oHg5SJYRHA0' );
+		$this->assertContains( 'https://www.youtube.com/embed/oHg5SJYRHA0?feature=oembed', $out );
+
+		$out = wp_oembed_get( 'https://youtu.be/zHjMoNQN7s0' );
+		$this->assertContains( 'https://www.youtube.com/embed/zHjMoNQN7s0?feature=oembed', $out );
+	}
+
 	function test_wp_prepare_attachment_for_js() {
 		// Attachment without media
 		$id = wp_insert_attachment(array(
