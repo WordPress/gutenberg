@@ -670,4 +670,43 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	function pre_get_posts_with_type_array( &$query ) {
 		$query->set( 'post_type', array( 'post', 'thearray' ) );
 	}
+
+	function test_is_single() {
+		$post_id = $this->factory->post->create();
+		$this->go_to( "/?p=$post_id" );
+
+		$post = get_queried_object();
+
+		$this->assertTrue( is_single() );
+		$this->assertTrue( is_single( $post ) );
+		$this->assertTrue( is_single( $post->ID ) );
+		$this->assertTrue( is_single( $post->post_title ) );
+		$this->assertTrue( is_single( $post->post_name ) );
+	}
+
+	function test_is_page() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$this->go_to( "/?page_id=$post_id" );
+
+		$post = get_queried_object();
+
+		$this->assertTrue( is_page() );
+		$this->assertTrue( is_page( $post ) );
+		$this->assertTrue( is_page( $post->ID ) );
+		$this->assertTrue( is_page( $post->post_title ) );
+		$this->assertTrue( is_page( $post->post_name ) );
+	}
+
+	function test_is_attachment() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'attachment' ) );
+		$this->go_to( "/?attachment_id=$post_id" );
+
+		$post = get_queried_object();
+
+		$this->assertTrue( is_attachment() );
+		$this->assertTrue( is_attachment( $post ) );
+		$this->assertTrue( is_attachment( $post->ID ) );
+		$this->assertTrue( is_attachment( $post->post_title ) );
+		$this->assertTrue( is_attachment( $post->post_name ) );
+	}
 }
