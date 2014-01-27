@@ -7,7 +7,7 @@ class Tests_Formatting_BalanceTags extends WP_UnitTestCase {
 
 	function nestable_tags() {
 		return array(
-			array( 'blockquote', 'div', 'object', 'q', 'span' )
+			array( 'blockquote' ), array( 'div' ), array( 'object' ), array( 'q' ), array( 'span' ),
 		);
 	}
 
@@ -20,24 +20,6 @@ class Tests_Formatting_BalanceTags extends WP_UnitTestCase {
 		);
 	}
 
-	// These are single/self-closing tags that WP has traditionally recognized.
-	function basic_single_tags() {
-		return array(
-			array( 'br' ), array( 'hr' ), array( 'img' ), array( 'input' )
-		);
-	}
-
-	/**
-	 * These are single tags WP has traditionally properly handled
-	 * This test can be removed if #1597 is fixed and the next test passes, as
-	 * it supercedes this test.
-	 *
-	 * @dataProvider basic_single_tags
-	 */
-	function test_selfcloses_unclosed_basic_known_single_tags( $tag ) {
-		$this->assertEquals( "<$tag />", balanceTags( "<$tag>", true ) );
-	}
-
 	/**
 	 * If a recognized valid single tag appears unclosed, it should get self-closed
 	 *
@@ -46,17 +28,6 @@ class Tests_Formatting_BalanceTags extends WP_UnitTestCase {
 	 */
 	function test_selfcloses_unclosed_known_single_tags( $tag ) {
 		$this->assertEquals( "<$tag />", balanceTags( "<$tag>", true ) );
-	}
-
-	/**
-	 * These are single tags WP has traditionally properly handled
-	 * This test can be removed if #1597 is fixed and the next test passes, as
-	 * it supercedes this test.
-	 *
-	 * @dataProvider basic_single_tags
-	 */
-	function test_selfcloses_basic_known_single_tags_having_closing_tag( $tag ) {
-		$this->assertEquals( "<$tag />", balanceTags( "<$tag></$tag>", true ) );
 	}
 
 	/**
@@ -121,16 +92,19 @@ class Tests_Formatting_BalanceTags extends WP_UnitTestCase {
 		}
 	}
 
-	function test_balances_nestable_tags() {
+	/**
+	 * @dataProvider nestable_tags
+	 */
+	function test_balances_nestable_tags( $tag ) {
 		$inputs = array(
-			'<q>Test<q>Test</q>',
-			'<div><div>Test',
-			'<div>Test</div></div>',
+			"<$tag>Test<$tag>Test</$tag>",
+			"<$tag><$tag>Test",
+			"<$tag>Test</$tag></$tag>",
 		);
 		$expected = array(
-			'<q>Test<q>Test</q></q>',
-			'<div><div>Test</div></div>',
-			'<div>Test</div>',
+			"<$tag>Test<$tag>Test</$tag></$tag>",
+			"<$tag><$tag>Test</$tag></$tag>",
+			"<$tag>Test</$tag>",
 		);
 
 		foreach ( $inputs as $key => $input ) {
@@ -156,7 +130,6 @@ class Tests_Formatting_BalanceTags extends WP_UnitTestCase {
 	 * @ticket 20401
 	 */
 	function test_allows_immediately_nested_object_tags() {
-
 		$object = '<object id="obj1"><param name="param1"/><object id="obj2"><param name="param2"/></object></object>';
 		$this->assertEquals( $object, balanceTags( $object, true ) );
 	}
