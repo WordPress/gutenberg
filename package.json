@@ -9,19 +9,19 @@
   "author": "The WordPress Contributors",
   "license": "GPLv2 or later",
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "~0.4.2",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-cssmin": "~0.6.1",
-    "grunt-contrib-qunit": "~0.2.2",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-watch": "~0.5.1",
-    "grunt-contrib-compress": "~0.5.2",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-qunit": "~0.4.0",
+    "grunt-contrib-uglify": "~0.3.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-compress": "~0.6.0",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-jshint": "~0.7.0",
-    "grunt-cssjanus": "git://github.com/yoavf/grunt-cssjanus.git#e0158f4087d1c4bb5a8d1648a63ef133338b5879",
-    "grunt-sass": "~0.8.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-cssjanus": "~0.2.2",
+    "grunt-sass": "~0.10.0",
     "grunt-jsvalidate": "~0.2.2",
-    "matchdep": "~0.1.2"
+    "matchdep": "~0.3.0"
   }
 }
