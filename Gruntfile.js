@@ -303,9 +303,12 @@ module.exports = function(grunt) {
 			},
 			build: {
 				files: {
-					src: BUILD_DIR + '/**/*.js'
+					src: [
+						BUILD_DIR + '/**/*.js',
+						'!' + BUILD_DIR + '/wp-content/**/*.js',
+					]
 				}
-			} 
+			}
 		},
 		watch: {
 			all: {
