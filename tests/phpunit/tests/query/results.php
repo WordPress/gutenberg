@@ -533,4 +533,14 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertFalse( $this->q->is_month );
 		$this->assertFalse( $this->q->is_year );
 	}
+
+	function test_perm_with_status_array() {
+		global $wpdb;
+		$this->q->query( array( 'perm' => 'readable', 'post_status' => array( 'publish', 'private' ) ) );
+		$this->assertTrue( $this->q->have_posts() );
+		$this->assertContains( "(({$wpdb->posts}.post_status = 'publish') OR ({$wpdb->posts}.post_author = 0 AND ({$wpdb->posts}.post_status = 'private')))",
+			$this->q->request
+		);
+		$this->assertNotContains( "({$wpdb->posts}.post_status = 'publish') AND", $this->q->request );
+	}
 }

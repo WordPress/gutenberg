@@ -76,6 +76,5 @@ class Tests_Query extends WP_UnitTestCase {
 			$first_query->reset_postdata();
 			$this->assertEquals( get_the_ID(), $post_id );
 		}
-
 	}
 }
