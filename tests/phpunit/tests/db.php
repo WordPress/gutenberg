@@ -41,6 +41,23 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that WPDB will reconnect when the DB link dies
+	 * @ticket 5932
+	 */
+	public function test_db_reconnect() {
+		global $wpdb;
+
+		$var = $wpdb->get_var( "SELECT ID FROM $wpdb->users LIMIT 1" );
+		$this->assertGreaterThan( 0, $var );
+
+		mysql_close( $wpdb->dbh );
+		unset( $wpdb->dbh );
+
+		$var = $wpdb->get_var( "SELECT ID FROM $wpdb->users LIMIT 1" );
+		$this->assertGreaterThan( 0, $var );
+	}
+
+	/**
 	 * Test that floats formatted as "0,700" get sanitized properly by wpdb
 	 * @global mixed $wpdb
 	 *
