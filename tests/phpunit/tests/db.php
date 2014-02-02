@@ -193,4 +193,16 @@ class Tests_DB extends WP_UnitTestCase {
 		unset( $modes[ $pos ] );
 		return $modes;
 	}
+
+	/**
+	 * @ticket 25604
+	 * @expectedIncorrectUsage wpdb::prepare
+	 */
+	function test_prepare_without_arguments() {
+		global $wpdb;
+		$id = 0;
+		// This, obviously, is an incorrect prepare.
+		$prepared = $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE id = $id", $id );
+		$this->assertEquals( "SELECT * FROM $wpdb->users WHERE id = 0", $prepared );
+	}
 }
