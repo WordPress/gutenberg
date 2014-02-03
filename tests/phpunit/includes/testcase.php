@@ -35,8 +35,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		global $wpdb;
 		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
-		remove_filter( 'query', array( $this, '_create_temporary_table' ) );
-		remove_filter( 'query', array( $this, '_drop_temporary_table' ) );
+		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
+		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 	}
 
@@ -64,19 +64,19 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		global $wpdb;
 		$wpdb->query( 'SET autocommit = 0;' );
 		$wpdb->query( 'START TRANSACTION;' );
-		add_filter( 'query', array( $this, '_create_temporary_table' ) );
-		add_filter( 'query', array( $this, '_drop_temporary_table' ) );
+		add_filter( 'query', array( $this, '_create_temporary_tables' ) );
+		add_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 	}
 
-	function _create_temporary_table( $query ) {
-		if ( 'CREATE TABLE' === substr( $query, 0, 12 ) )
-			return substr_replace( $query, 'CREATE TEMPORARY TABLE', 0, 12 );
+	function _create_temporary_tables( $query ) {
+		if ( 'CREATE TABLE' === substr( trim( $query ), 0, 12 ) )
+			return substr_replace( trim( $query ), 'CREATE TEMPORARY TABLE', 0, 12 );
 		return $query;
 	}
 
-	function _drop_temporary_table( $query ) {
-		if ( 'DROP TABLE' === substr( $query, 0, 10 ) )
-			return substr_replace( $query, 'DROP TEMPORARY TABLE', 0, 10 );
+	function _drop_temporary_tables( $query ) {
+		if ( 'DROP TABLE' === substr( trim( $query ), 0, 10 ) )
+			return substr_replace( trim( $query ), 'DROP TEMPORARY TABLE', 0, 10 );
 		return $query;
 	}
 
