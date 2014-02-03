@@ -829,4 +829,40 @@ class Tests_Post extends WP_UnitTestCase {
 		$counts->publish = 7;
 		return $counts;
 	}
+
+	function test_wp_count_posts_insert_invalidation() {
+		$post_ids = $this->factory->post->create_many( 10 );
+		$initial_counts = wp_count_posts();
+
+		$key = array_rand( $post_ids );
+		$_post = get_post( $post_ids[$key], ARRAY_A );
+		$_post['post_status'] = 'draft';
+		wp_insert_post( $_post );
+		$post = get_post( $post_ids[$key] );
+		$this->assertEquals( 'draft', $post->post_status );
+		$this->assertNotEquals( 'publish', $post->post_status );
+
+		$after_draft_counts = wp_count_posts();
+		$this->assertEquals( 1, $after_draft_counts->draft );
+		$this->assertEquals( 9, $after_draft_counts->publish );
+		$this->assertNotEquals( $initial_counts->publish, $after_draft_counts->publish );
+	}
+
+	function test_wp_count_posts_trash_invalidation() {
+		$post_ids = $this->factory->post->create_many( 10 );
+		$initial_counts = wp_count_posts();
+
+		$key = array_rand( $post_ids );
+
+		wp_trash_post( $post_ids[$key] );
+
+		$post = get_post( $post_ids[$key] );
+		$this->assertEquals( 'trash', $post->post_status );
+		$this->assertNotEquals( 'publish', $post->post_status );
+
+		$after_trash_counts = wp_count_posts();
+		$this->assertEquals( 1, $after_trash_counts->trash );
+		$this->assertEquals( 9, $after_trash_counts->publish );
+		$this->assertNotEquals( $initial_counts->publish, $after_trash_counts->publish );
+	}
 }
