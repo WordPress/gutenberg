@@ -25,6 +25,20 @@ class Tests_MS extends WP_UnitTestCase {
 		$wpdb->suppress_errors( $this->suppress );
 	}
 
+	function test_remove_user_from_blog() {
+		$user1 = $this->factory->user->create_and_get();
+		$user2 = $this->factory->user->create_and_get();
+
+		$post_id = $this->factory->post->create( array( 'post_author' => $user1->ID ) );
+
+		remove_user_from_blog( $user1->ID, 1, $user2->ID );
+
+		$post = get_post( $post_id );
+
+		$this->assertNotEquals( $user1->ID, $post->post_author );
+		$this->assertEquals( $user2->ID, $post->post_author );
+	}
+
 	/**
 	 * @ticket 22917
 	 */
