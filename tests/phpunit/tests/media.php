@@ -364,4 +364,45 @@ CONTENT;
 		$matches = get_media_embedded_in_content( $content, $types );
 		$this->assertEquals( $contents, $matches );
 	}
+
+	/**
+	 * Test [video] shortcode processing
+	 *
+	 * @ticket 26864
+	 */
+	function test_video_shortcode_body() {
+		$width = 720;
+		$height = 480;
+
+		$video =<<<VIDEO
+[video width="720" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]
+<!-- WebM/VP8 for Firefox4, Opera, and Chrome -->
+<source type="video/webm" src="myvideo.webm" />
+<!-- Ogg/Vorbis for older Firefox and Opera versions -->
+<source type="video/ogg" src="myvideo.ogv" />
+<!-- Optional: Add subtitles for each language -->
+<track kind="subtitles" src="subtitles.srt" srclang="en" />
+<!-- Optional: Add chapters -->
+<track kind="chapters" src="chapters.srt" srclang="en" />
+[/video]
+VIDEO;
+
+		$w = $GLOBALS['content_width'];
+		$h = ceil( ( $height * $w ) / $width );
+
+		$content = apply_filters( 'the_content', $video );
+
+		$expected = '<div style="width: ' . $w . 'px; max-width: 100%;" class="wp-video">' .
+			"<!--[if lt IE 9]><script>document.createElement(\'video\');</script><![endif]-->\n" .
+			'<video class="wp-video-shortcode" id="video-0-1" width="' . $w . '" height="' . $h . '" preload="metadata" controls="controls">' .
+			'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4" />' .
+			'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' .
+			'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' .
+			'<!-- Optional: Add subtitles for each language --><track kind="subtitles" src="subtitles.srt" srclang="en" />' .
+			'<!-- Optional: Add chapters --><track kind="chapters" src="chapters.srt" srclang="en" />' .
+			'<a href="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4">' .
+			"http://domain.tld/wp-content/uploads/2013/12/xyz.mp4</a></video></div>\n";
+
+		$this->assertEquals( $expected, $content );
+	}
 }
