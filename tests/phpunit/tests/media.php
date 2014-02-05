@@ -373,6 +373,8 @@ CONTENT;
 		$width = 720;
 		$height = 480;
 
+		$post_id = get_post() ? get_the_ID() : 0;
+
 		$video =<<<VIDEO
 [video width="720" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]
 <!-- WebM/VP8 for Firefox4, Opera, and Chrome -->
@@ -386,14 +388,14 @@ CONTENT;
 [/video]
 VIDEO;
 
-		$w = $GLOBALS['content_width'];
+		$w = empty( $GLOBALS['content_width'] ) ? 640 : $GLOBALS['content_width'];
 		$h = ceil( ( $height * $w ) / $width );
 
 		$content = apply_filters( 'the_content', $video );
 
 		$expected = '<div style="width: ' . $w . 'px; max-width: 100%;" class="wp-video">' .
 			"<!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n" .
-			'<video class="wp-video-shortcode" id="video-0-1" width="' . $w . '" height="' . $h . '" preload="metadata" controls="controls">' .
+			'<video class="wp-video-shortcode" id="video-' . $post_id . '-1" width="' . $w . '" height="' . $h . '" preload="metadata" controls="controls">' .
 			'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4" />' .
 			'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' .
 			'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' .
