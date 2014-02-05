@@ -567,4 +567,21 @@ class Tests_Term extends WP_UnitTestCase {
 		// this previously returned 2
 		$this->assertEquals( 0, $count );
 	}
+
+	/**
+	 * @ticket 22526
+	 */
+	function test_category_name_change() {
+		$term = $this->factory->category->create_and_get( array( 'name' => 'Foo' ) );
+		$post_id = $this->factory->post->create();
+		wp_set_post_categories( $post_id, $term->term_id );
+
+		$post = get_post( $post_id );
+		$cats1 = get_the_category( $post->ID );
+		$this->assertEquals( $term->name, reset( $cats1 )->name );
+
+		wp_update_term( $term->term_id, 'category', array( 'name' => 'Bar' ) );
+		$cats2 = get_the_category( $post->ID );
+		$this->assertNotEquals( $term->name, reset( $cats2 )->name );
+	}
 }
