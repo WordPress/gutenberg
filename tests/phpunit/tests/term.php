@@ -585,7 +585,7 @@ class Tests_Term extends WP_UnitTestCase {
 		$last_changed3 = get_taxonomy_last_changed( 'category' );
 		$this->assertNotEquals( $last_changed2, $last_changed3 );
 	}
-	
+
 	/**
 	 * @ticket 22526
 	 */
@@ -633,5 +633,50 @@ class Tests_Term extends WP_UnitTestCase {
 		wp_update_term( $term->term_id, 'category', array( 'name' => 'Bar' ) );
 		$cats2 = get_the_category( $post->ID );
 		$this->assertNotEquals( $term->name, reset( $cats2 )->name );
+	}
+
+	function test_hierachy_invalidation() {
+		$tax = 'burrito';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+		$this->assertTrue( get_taxonomy( $tax )->hierarchical );
+
+		$step = 1;
+		$parent_id = 0;
+		$children = 0;
+
+		foreach ( range( 1, 99 ) as $i ) {
+			switch ( $step ) {
+			case 1:
+				$parent = wp_insert_term( 'Parent' . $i, $tax );
+				$parent_id = $parent['term_id'];
+				break;
+			case 2:
+				$parent = wp_insert_term( 'Child' . $i, $tax, array( 'parent' => $parent_id ) );
+				$parent_id = $parent['term_id'];
+				$children++;
+				break;
+			case 3:
+				wp_insert_term( 'Grandchild' . $i, $tax, array( 'parent' => $parent_id ) );
+				$parent_id = 0;
+				$children++;
+				break;
+			}
+
+			$terms = get_terms( $tax, array( 'hide_empty' => false ) );
+			$this->assertEquals( $i, count( $terms ) );
+			if ( 1 < $i ) {
+				$hierarchy = _get_term_hierarchy( $tax );
+				$this->assertNotEmpty( $hierarchy );
+				$this->assertEquals( $children, count( $hierarchy, COUNT_RECURSIVE ) - count( $hierarchy ) );
+			}
+
+			if ( $i % 3 === 0 ) {
+				$step = 1;
+			} else {
+				$step++;
+			}
+		}
+
+		_unregister_taxonomy( $tax );
 	}
 }
