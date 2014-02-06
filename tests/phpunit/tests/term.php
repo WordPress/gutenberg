@@ -571,6 +571,56 @@ class Tests_Term extends WP_UnitTestCase {
 	/**
 	 * @ticket 22526
 	 */
+	function test_get_taxonomy_last_changed() {
+		$last_changed = get_taxonomy_last_changed( 'category' );
+		$last_changed_cache = wp_cache_get( 'last_changed', 'category' );
+		$this->assertEquals( $last_changed, $last_changed_cache );
+		wp_cache_delete( 'last_changed', 'category' );
+		$this->assertEquals( $last_changed, $last_changed_cache );
+		$last_changed = get_taxonomy_last_changed( 'category' );
+		$this->assertNotEquals( $last_changed, $last_changed_cache );
+
+		$last_changed2 = get_taxonomy_last_changed( 'category' );
+		$this->factory->category->create();
+		$last_changed3 = get_taxonomy_last_changed( 'category' );
+		$this->assertNotEquals( $last_changed2, $last_changed3 );
+	}
+	
+	/**
+	 * @ticket 22526
+	 */
+	function test_set_taxonomy_last_changed() {
+		$last_changed1 = set_taxonomy_last_changed( 'category' );
+		$last_changed2 = set_taxonomy_last_changed( 'category' );
+		$this->assertNotEquals( $last_changed1, $last_changed2 );
+
+		$last_changed3 = set_taxonomy_last_changed( 'category' );
+		$last_changed4 = get_taxonomy_last_changed( 'category' );
+		$this->assertEquals( $last_changed3, $last_changed4 );
+	}
+
+	/**
+	 * @ticket 22526
+	 */
+	function test_post_taxonomy_is_fresh() {
+		$post_id = $this->factory->post->create();
+		$term_id = $this->factory->category->create( array( 'name' => 'Foo' ) );
+		wp_set_post_categories( $post_id, $term_id );
+
+		$this->assertFalse( post_taxonomy_is_fresh( $post_id, 'category' ) );
+		$this->assertTrue( post_taxonomy_is_fresh( $post_id, 'category' ) );
+		$this->assertTrue( post_taxonomy_is_fresh( $post_id, 'category' ) );
+
+		wp_update_term( $term_id, 'category', array( 'name' => 'Bar' ) );
+
+		$this->assertFalse( post_taxonomy_is_fresh( $post_id, 'category' ) );
+		get_the_category( $post_id );
+		$this->assertTrue( post_taxonomy_is_fresh( $post_id, 'category' ) );
+	}
+
+	/**
+	 * @ticket 22526
+	 */
 	function test_category_name_change() {
 		$term = $this->factory->category->create_and_get( array( 'name' => 'Foo' ) );
 		$post_id = $this->factory->post->create();
