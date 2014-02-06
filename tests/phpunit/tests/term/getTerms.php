@@ -6,7 +6,7 @@
 class Tests_Term_getTerms extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-		
+
 		_clean_term_filters();
 		wp_cache_delete( 'last_changed', 'terms' );
 	}
@@ -223,5 +223,54 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		$terms8 = get_terms( 'post_tag', array( 'hide_empty' => false, 'description__like' => '.', 'fields' => 'ids' ) );
 		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms8 );
+	}
+
+	function test_get_terms_parent_zero() {
+		$tax = 'food';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$cheese = $this->factory->term->create( array( 'name' => 'Cheese', 'taxonomy' => $tax ) );
+
+		$cheddar = $this->factory->term->create( array( 'name' => 'Cheddar', 'parent' => $cheese, 'taxonomy' => $tax ) );
+
+		$post_ids = $this->factory->post->create_many( 2 );
+		foreach ( $post_ids as $id ) {
+			wp_set_post_terms( $id, $cheddar, $tax );
+		}
+		$term = get_term( $cheddar, $tax );
+		$this->assertEquals( 2, $term->count );
+
+		$brie = $this->factory->term->create( array( 'name' => 'Brie', 'parent' => $cheese, 'taxonomy' => $tax ) );
+		$post_ids = $this->factory->post->create_many( 7 );
+		foreach ( $post_ids as $id ) {
+			wp_set_post_terms( $id, $brie, $tax );
+		}
+		$term = get_term( $brie, $tax );
+		$this->assertEquals( 7, $term->count );
+
+		$crackers = $this->factory->term->create( array( 'name' => 'Crackers', 'taxonomy' => $tax ) );
+
+		$butter = $this->factory->term->create( array( 'name' => 'Butter', 'parent' => $crackers, 'taxonomy' => $tax ) );
+		$post_ids = $this->factory->post->create_many( 1 );
+		foreach ( $post_ids as $id ) {
+			wp_set_post_terms( $id, $butter, $tax );
+		}
+		$term = get_term( $butter, $tax );
+		$this->assertEquals( 1, $term->count );
+
+		$multigrain = $this->factory->term->create( array( 'name' => 'Multigrain', 'parent' => $crackers, 'taxonomy' => $tax ) );
+		$post_ids = $this->factory->post->create_many( 3 );
+		foreach ( $post_ids as $id ) {
+			wp_set_post_terms( $id, $multigrain, $tax );
+		}
+		$term = get_term( $multigrain, $tax );
+		$this->assertEquals( 3, $term->count );
+
+		$fruit = $this->factory->term->create( array( 'name' => 'Fruit', 'taxonomy' => $tax ) );
+		$cranberries = $this->factory->term->create( array( 'name' => 'Cranberries', 'parent' => $fruit, 'taxonomy' => $tax ) );
+
+		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
+		$this->assertNotEmpty( $terms );
+		$this->assertEquals( wp_list_pluck( $terms, 'name' ), array( 'Cheese', 'Crackers' ) );
 	}
 }
