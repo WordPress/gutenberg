@@ -273,4 +273,44 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertNotEmpty( $terms );
 		$this->assertEquals( wp_list_pluck( $terms, 'name' ), array( 'Cheese', 'Crackers' ) );
 	}
+
+	function test_get_terms_grandparent_zero() {
+		$tax = 'food';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$cheese = $this->factory->term->create( array( 'name' => 'Cheese', 'taxonomy' => $tax ) );
+		$cheddar = $this->factory->term->create( array( 'name' => 'Cheddar', 'parent' => $cheese, 'taxonomy' => $tax ) );
+		$spread = $this->factory->term->create( array( 'name' => 'Spread', 'parent' => $cheddar, 'taxonomy' => $tax ) );
+		$post_id = $this->factory->post->create();
+		wp_set_post_terms( $post_id, $spread, $tax );
+		$term = get_term( $spread, $tax );
+		$this->assertEquals( 1, $term->count );
+
+		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
+		$this->assertNotEmpty( $terms );
+		$this->assertEquals( array( 'Cheese' ), wp_list_pluck( $terms, 'name' ) );
+
+		_unregister_taxonomy( $tax );
+	}
+
+	function test_get_terms_seven_levels_deep() {
+		$tax = 'deep';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+		$parent = 0;
+		$t = array();
+		foreach ( range( 1, 7 ) as $depth ) {
+			$t[$depth] = $this->factory->term->create( array( 'name' => 'term' . $depth, 'taxonomy' => $tax, 'parent' => $parent ) );
+			$parent = $t[$depth];
+		}
+		$post_id = $this->factory->post->create();
+		wp_set_post_terms( $post_id, $t[7], $tax );
+		$term = get_term( $t[7], $tax );
+		$this->assertEquals( 1, $term->count );
+
+		$terms = get_terms( $tax, array( 'parent' => 0, 'cache_domain' => $tax ) );
+		$this->assertNotEmpty( $terms );
+		$this->assertEquals( array( 'term1' ), wp_list_pluck( $terms, 'name' ) );
+
+		_unregister_taxonomy( $tax );
+	}
 }
