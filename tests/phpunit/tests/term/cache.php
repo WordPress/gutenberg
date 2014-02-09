@@ -34,9 +34,10 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 	 */
 	function test_get_taxonomy_last_changed() {
 		$last_changed = get_taxonomy_last_changed( 'category' );
-		$last_changed_cache = wp_cache_get( 'last_changed', 'category' );
+		$key = 'category_last_changed';
+		$last_changed_cache = wp_cache_get( $key, 'terms' );
 		$this->assertEquals( $last_changed, $last_changed_cache );
-		wp_cache_delete( 'last_changed', 'category' );
+		wp_cache_delete( $key, 'terms' );
 		$this->assertEquals( $last_changed, $last_changed_cache );
 		$last_changed = get_taxonomy_last_changed( 'category' );
 		$this->assertNotEquals( $last_changed, $last_changed_cache );
