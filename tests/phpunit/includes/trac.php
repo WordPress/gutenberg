@@ -14,6 +14,10 @@ class TracTickets {
 	 * @return bool|null true if the ticket is resolved, false if not resolved, null on error
 	 */
 	public static function isTracTicketClosed( $trac_url, $ticket_id ) {
+		if ( ! extension_loaded( 'openssl' ) ) {
+			$trac_url = preg_replace( "/^https:/", "http:", $trac_url );
+		}
+
 		if ( ! isset( self::$trac_ticket_cache[ $trac_url ] ) ) {
 			// In case you're running the tests offline, keep track of open tickets.
 			$file = DIR_TESTDATA . '/.trac-ticket-cache.' . str_replace( array( 'http://', 'https://', '/' ), array( '', '', '-' ), rtrim( $trac_url, '/' ) );
