@@ -303,7 +303,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jsvalidate:{
-			options:{
+			options: {
 				globals: {},
 				esprimaOptions:{},
 				verbose: false
@@ -315,6 +315,17 @@ module.exports = function(grunt) {
 						'!' + BUILD_DIR + '/wp-content/**/*.js'
 					]
 				}
+			}
+		},
+		imagemin: {
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				src: [
+					'wp-{admin,includes}/images/**/*.{png,jpg,gif,jpeg}',
+					'wp-includes/js/tinymce/skins/wordpress/images/*.{png,jpg,gif,jpeg}'
+				],
+				dest: SOURCE_DIR
 			}
 		},
 		watch: {

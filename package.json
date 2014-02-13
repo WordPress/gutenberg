@@ -22,6 +22,7 @@
     "grunt-cssjanus": "~0.2.2",
     "grunt-sass": "~0.10.0",
     "grunt-jsvalidate": "~0.2.2",
+    "grunt-contrib-imagemin" : "~0.4.1",
     "matchdep": "~0.3.0"
   }
 }
