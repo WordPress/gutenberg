@@ -1172,6 +1172,53 @@ class Tests_MS extends WP_UnitTestCase {
 		// Expect 0 sites when using an offset larger than the number of sites
 		$this->assertCount( 0, wp_get_sites( array( 'offset' => 20 ) ) );
 	}
+
+	/**
+	 * @ticket 27003
+	 */
+	function test_get_network_by_path() {
+		global $wpdb;
+
+		$ids = array(
+			'wordpress.org/'         => array( 'domain' => 'wordpress.org', 'path' => '/' ),
+			'wordpress.org/one/'     => array( 'domain' => 'wordpress.org', 'path' => '/one/' ),
+			'wordpress.net/'         => array( 'domain' => 'wordpress.net', 'path' => '/' ),
+			'www.wordpress.net/'     => array( 'domain' => 'www.wordpress.net', 'path' => '/' ),
+			'www.wordpress.net/two/' => array( 'domain' => 'www.wordpress.net', 'path' => '/two/' ),
+			'wordpress.net/three/'   => array( 'domain' => 'wordpress.net', 'path' => '/three/' ),
+		);
+
+		foreach ( $ids as &$id ) {
+			$id = $this->factory->network->create( $id );
+		}
+		unset( $id );
+
+		$this->assertEquals( $ids['www.wordpress.net/'],
+			get_network_by_path( 'www.wordpress.net', '/notapath/' )->id );
+
+		$this->assertEquals( $ids['www.wordpress.net/two/'],
+			get_network_by_path( 'www.wordpress.net', '/two/' )->id );
+
+		// This should find /one/ despite the www.
+		$this->assertEquals( $ids['wordpress.org/one/'],
+			get_network_by_path( 'www.wordpress.org', '/one/' )->id );
+
+		// This should not find /one/ because the domains don't match.
+		$this->assertEquals( $ids['wordpress.org/'],
+			get_network_by_path( 'site1.wordpress.org', '/one/' )->id );
+
+		$this->assertEquals( $ids['wordpress.net/three/'],
+			get_network_by_path( 'wordpress.net', '/three/' )->id );
+
+		$this->assertEquals( $ids['wordpress.net/'],
+			get_network_by_path( 'wordpress.net', '/notapath/' )->id );
+
+		$this->assertEquals( $ids['wordpress.net/'],
+			get_network_by_path( 'site1.wordpress.net', '/notapath/' )->id );
+
+		$this->assertEquals( $ids['wordpress.net/'],
+			get_network_by_path( 'site1.wordpress.net', '/three/' )->id );
+	}
 }
 
 endif;
