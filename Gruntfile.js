@@ -399,6 +399,10 @@ module.exports = function(grunt) {
 	// Color schemes task.
 	grunt.registerTask('colors', ['sass:colors', 'autoprefixer:colors']);
 
+	// Pre-commit task.
+	grunt.registerTask('precommit', 'Runs front-end dev/test tasks in preparation for a commit.',
+		['autoprefixer:core', 'imagemin:core', 'jshint', 'qunit:compiled']);
+
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
 		'uglify:core', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
