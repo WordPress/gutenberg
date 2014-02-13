@@ -9,6 +9,28 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
+		autoprefixer: {
+			options: {
+				browsers: ['Android >= 2.1', 'Chrome >= 21', 'Explorer >= 7', 'Firefox >= 17', 'Opera >= 12.1', 'Safari >= 6.0']
+			},
+			core: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: SOURCE_DIR,
+				src: [
+					'wp-admin/css/*.css',
+					'wp-includes/css/*.css'
+				]
+			},
+			colors: {
+				expand: true,
+				cwd: BUILD_DIR,
+				dest: BUILD_DIR,
+				src: [
+					'wp-admin/css/colors/*/colors.css'
+				]
+			}
+		},
 		clean: {
 			all: [BUILD_DIR],
 			dynamic: {
@@ -95,7 +117,6 @@ module.exports = function(grunt) {
 					'wp-admin/css/*.css',
 					'wp-includes/css/*.css',
 					// Exceptions
-					'!wp-admin/css/theme.css', // Temporary file
 					'!wp-admin/css/farbtastic.css'
 				]
 			},
@@ -376,7 +397,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('rtl', ['cssjanus:core', 'cssjanus:colors']);
 
 	// Color schemes task.
-	grunt.registerTask('colors', ['sass:colors']);
+	grunt.registerTask('colors', ['sass:colors', 'autoprefixer:colors']);
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
