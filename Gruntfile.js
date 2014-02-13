@@ -215,9 +215,9 @@ module.exports = function(grunt) {
 					// Third party scripts
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
-					'!wp-includes/js/backbone.min.js',
+					'!wp-includes/js/backbone*.js',
 					'!wp-includes/js/swfobject.js',
-					'!wp-includes/js/underscore.min.js',
+					'!wp-includes/js/underscore*.js',
 					'!wp-includes/js/zxcvbn.min.js',
 					'!wp-includes/js/colorpicker.js',
 					'!wp-includes/js/hoverIntent.js',
