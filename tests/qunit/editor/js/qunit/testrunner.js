@@ -45,6 +45,9 @@
 					hashToStates();
 					// WP
 					wpTests();
+					// Auto-start
+					started = true;
+					start();
 				}
 			}
 
