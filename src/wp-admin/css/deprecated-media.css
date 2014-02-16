@@ -5,8 +5,8 @@ div#media-upload-header {
 	padding: 5px 5px 0;
 	font-weight: bold;
 	position: relative;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
+	border-bottom: 1px solid #dfdfdf;
+	background: #f9f9f9;
 }
 
 body#media-upload ul#sidemenu {
