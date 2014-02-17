@@ -32,9 +32,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function tearDown() {
-		global $wpdb;
+		global $wpdb, $wp_query, $post;
 		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
+		$wp_query = new WP_Query();
+		$post = null;
 		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
