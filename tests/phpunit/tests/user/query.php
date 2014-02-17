@@ -43,7 +43,6 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 		$ids = $users->get_results();
 		$this->assertEquals( array( $this->user_id ), $ids );
-
 	}
 
 	function test_exclude() {
@@ -100,5 +99,39 @@ class Tests_User_Query extends WP_UnitTestCase {
 		sort( $names );
 
 		$this->assertEquals( $names, $values );
+	}
+
+	function test_prepare_query() {
+		$query = new WP_User_Query();
+		$this->assertEmpty( $query->query_fields );
+		$this->assertEmpty( $query->query_from );
+		$this->assertEmpty( $query->query_limit );
+		$this->assertEmpty( $query->query_orderby );
+		$this->assertEmpty( $query->query_where );
+		$this->assertEmpty( $query->query_vars );
+		$_query_vars = $query->query_vars;
+
+		$query->prepare_query();
+		$this->assertNotEmpty( $query->query_fields );
+		$this->assertNotEmpty( $query->query_from );
+		$this->assertEmpty( $query->query_limit );
+		$this->assertNotEmpty( $query->query_orderby );
+		$this->assertNotEmpty( $query->query_where );
+		$this->assertNotEmpty( $query->query_vars );
+		$this->assertNotEquals( $_query_vars, $query->query_vars );
+
+		// All values get reset
+		$query->prepare_query( array( 'number' => 8 ) );
+		$this->assertNotEmpty( $query->query_limit );
+		$this->assertEquals( 'LIMIT 8', $query->query_limit );
+
+		// All values get reset
+		$query->prepare_query( array( 'fields' => 'all' ) );
+		$this->assertEmpty( $query->query_limit );
+		$this->assertEquals( '', $query->query_limit );
+		$_query_vars = $query->query_vars;
+
+		$query->prepare_query();
+		$this->assertEquals( $_query_vars, $query->query_vars );
 	}
 }
