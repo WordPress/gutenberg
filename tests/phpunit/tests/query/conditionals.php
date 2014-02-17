@@ -676,8 +676,12 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->go_to( "/?p=$post_id" );
 
 		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
 
 		$this->assertTrue( is_single() );
+		$this->assertTrue( $q->is_single );
+		$this->assertFalse( $q->is_page );
+		$this->assertFalse( $q->is_attachment );
 		$this->assertTrue( is_single( $post ) );
 		$this->assertTrue( is_single( $post->ID ) );
 		$this->assertTrue( is_single( $post->post_title ) );
@@ -689,8 +693,12 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->go_to( "/?page_id=$post_id" );
 
 		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
 
 		$this->assertTrue( is_page() );
+		$this->assertFalse( $q->is_single );
+		$this->assertTrue( $q->is_page );
+		$this->assertFalse( $q->is_attachment );
 		$this->assertTrue( is_page( $post ) );
 		$this->assertTrue( is_page( $post->ID ) );
 		$this->assertTrue( is_page( $post->post_title ) );
@@ -702,8 +710,13 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->go_to( "/?attachment_id=$post_id" );
 
 		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
 
 		$this->assertTrue( is_attachment() );
+		$this->assertTrue( is_single() );
+		$this->assertTrue( $q->is_attachment );
+		$this->assertTrue( $q->is_single );
+		$this->assertFalse( $q->is_page );
 		$this->assertTrue( is_attachment( $post ) );
 		$this->assertTrue( is_attachment( $post->ID ) );
 		$this->assertTrue( is_attachment( $post->post_title ) );
