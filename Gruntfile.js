@@ -65,18 +65,23 @@ module.exports = function(grunt) {
 					}
 				]
 			},
+			'wp-admin-rtl': {
+				options: {
+					processContent: function( src ) {
+						return src.replace( /\.css/g, '-rtl.css' );
+					}
+				},
+				src: SOURCE_DIR + 'wp-admin/css/wp-admin.css',
+				dest: BUILD_DIR + 'wp-admin/css/wp-admin-rtl.css'
+			},
 			version: {
 				options: {
 					processContent: function( src ) {
 						return src.replace( /^(\$wp_version.+?)-src';/m, '$1\';' );
 					}
 				},
-				files: [
-					{
-						src: SOURCE_DIR + 'wp-includes/version.php',
-						dest: BUILD_DIR + 'wp-includes/version.php'
-					}
-				]
+				src: SOURCE_DIR + 'wp-includes/version.php',
+				dest: BUILD_DIR + 'wp-includes/version.php'
 			},
 			dynamic: {
 				dot: true,
@@ -108,16 +113,17 @@ module.exports = function(grunt) {
 			}
 		},
 		cssmin: {
+			options: {
+				'wp-admin': ['wp-admin', 'color-picker', 'customize-controls', 'ie', 'install', 'deprecated-*']
+			},
 			core: {
 				expand: true,
 				cwd: SOURCE_DIR,
 				dest: BUILD_DIR,
 				ext: '.min.css',
 				src: [
-					'wp-admin/css/*.css',
-					'wp-includes/css/*.css',
-					// Exceptions
-					'!wp-admin/css/farbtastic.css'
+					'wp-admin/css/{<%= cssmin.options["wp-admin"] %>}.css',
+					'wp-includes/css/*.css'
 				]
 			},
 			rtl: {
@@ -126,7 +132,7 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.css',
 				src: [
-					'wp-admin/css/*-rtl.css',
+					'wp-admin/css/{<%= cssmin.options["wp-admin"] %>}-rtl.css',
 					'wp-includes/css/*-rtl.css'
 				]
 			},
@@ -390,9 +396,6 @@ module.exports = function(grunt) {
 
 	// Register tasks.
 
-	// Copy task.
-	grunt.registerTask('copy:all', ['copy:files', 'copy:version']);
-
 	// RTL task.
 	grunt.registerTask('rtl', ['cssjanus:core', 'cssjanus:colors']);
 
@@ -402,6 +405,9 @@ module.exports = function(grunt) {
 	// Pre-commit task.
 	grunt.registerTask('precommit', 'Runs front-end dev/test tasks in preparation for a commit.',
 		['autoprefixer:core', 'imagemin:core', 'jshint', 'qunit:compiled']);
+
+	// Copy task.
+	grunt.registerTask('copy:all', ['copy:files', 'copy:wp-admin-rtl', 'copy:version']);
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
