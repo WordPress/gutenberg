@@ -196,6 +196,9 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms );
 	}
 
+	/**
+	 * @ticket 8214
+	 */
 	function test_get_terms_like() {
 		$term_id1 = $this->factory->tag->create( array( 'name' => 'burrito', 'description' => 'This is a burrito.' ) );
 		$term_id2 = $this->factory->tag->create( array( 'name' => 'taco', 'description' => 'Burning man.' ) );
@@ -225,6 +228,9 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms8 );
 	}
 
+	/**
+	 * @ticket 26903
+	 */
 	function test_get_terms_parent_zero() {
 		$tax = 'food';
 		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
@@ -274,6 +280,9 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( wp_list_pluck( $terms, 'name' ), array( 'Cheese', 'Crackers' ) );
 	}
 
+	/**
+	 * @ticket 26903
+	 */
 	function test_get_terms_grandparent_zero() {
 		$tax = 'food';
 		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
@@ -293,6 +302,9 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		_unregister_taxonomy( $tax );
 	}
 
+	/**
+	 * @ticket 26903
+	 */
 	function test_get_terms_seven_levels_deep() {
 		$tax = 'deep';
 		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
