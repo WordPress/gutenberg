@@ -114,7 +114,7 @@ module.exports = function(grunt) {
 		},
 		cssmin: {
 			options: {
-				'wp-admin': ['wp-admin', 'color-picker', 'customize-controls', 'ie', 'install', 'deprecated-*']
+				'wp-admin': ['wp-admin', 'color-picker', 'customize-controls', 'ie', 'install', 'login', 'deprecated-*']
 			},
 			core: {
 				expand: true,
