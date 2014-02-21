@@ -156,4 +156,31 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		remove_theme_support( 'foobar' );
 		$this->assertFalse( current_theme_supports( 'foobar', 'bar' ) );
 	}
+
+	/**
+	 * @ticket 26900
+	 */
+	function test_supports_menus() {
+		// Start fresh
+		_remove_theme_support( 'menus' );
+		$this->assertFalse( current_theme_supports( 'menus' ) );
+
+		// Registering a nav menu automatically adds support.
+		register_nav_menu( 'primary', 'Primary Navigation' );
+		register_nav_menu( 'secondary', 'Secondary Navigation' );
+		$this->assertTrue( current_theme_supports( 'menus' ) );
+
+		// Support added internally, can't be removed.
+		remove_theme_support( 'menus' );
+		$this->assertTrue( current_theme_supports( 'menus' ) );
+
+		// Still supports because of secondary.
+		unregister_nav_menu( 'primary' );
+		$this->assertTrue( current_theme_supports( 'menus' ) );
+
+		// No longer support because we have no menus.
+		unregister_nav_menu( 'secondary' );
+		$this->assertEmpty( get_registered_nav_menus() );
+		$this->assertFalse( current_theme_supports( 'menus' ) );
+	}
 }
