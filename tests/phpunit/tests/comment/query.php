@@ -156,4 +156,28 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( 10, count( get_comments( array( 'status' => 'trash' ) ) ) );
 		$this->assertEquals( 10, count( get_comments( array( 'status' => 'spam' ) ) ) );
 	}
+
+	/**
+	 * @ticket 27064
+	 */
+	function test_get_comments_by_user() {
+		$users = $this->factory->user->create_many( 2 );
+		$this->factory->comment->create( array( 'user_id' => $users[0], 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$this->factory->comment->create( array( 'user_id' => $users[0], 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$this->factory->comment->create( array( 'user_id' => $users[1], 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+
+		$comments = get_comments( array( 'user_id' => $users[0] ) );
+
+		$this->assertCount( 2, $comments );
+		$this->assertEquals( $users[0], $comments[0]->user_id );
+		$this->assertEquals( $users[0], $comments[1]->user_id );
+
+		$comments = get_comments( array( 'user_id' => $users ) );
+
+		$this->assertCount( 3, $comments );
+		$this->assertEquals( $users[0], $comments[0]->user_id );
+		$this->assertEquals( $users[0], $comments[1]->user_id );
+		$this->assertEquals( $users[1], $comments[2]->user_id );
+
+	}
 }
