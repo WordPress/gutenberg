@@ -1219,6 +1219,48 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertEquals( $ids['wordpress.net/'],
 			get_network_by_path( 'site1.wordpress.net', '/three/' )->id );
 	}
+
+	/**
+	 * @ticket 20601
+	 */
+	function test_user_member_of_blog() {
+		global $wp_rewrite;
+
+		$this->factory->blog->create();
+		$user_id = $this->factory->user->create();
+		$this->factory->blog->create( array( 'user_id' => $user_id ) );
+
+		$blogs = get_blogs_of_user( $user_id );
+		$this->assertCount( 2, $blogs );
+		$first = reset( $blogs )->userblog_id;
+		remove_user_from_blog( $user_id, $first );
+
+		$blogs = get_blogs_of_user( $user_id );
+		$second = reset( $blogs )->userblog_id;
+		$this->assertCount( 1, $blogs );
+
+		switch_to_blog( $first );
+		$wp_rewrite->init();
+
+		$this->go_to( get_author_posts_url( $user_id ) );
+		$this->assertQueryTrue( 'is_404' );
+
+		switch_to_blog( $second );
+		$wp_rewrite->init();
+
+		$this->go_to( get_author_posts_url( $user_id ) );
+		$this->assertQueryTrue( 'is_author', 'is_archive' );
+
+		add_user_to_blog( $first, $user_id, 'administrator' );
+		$blogs = get_blogs_of_user( $user_id );
+		$this->assertCount( 2, $blogs );
+
+		switch_to_blog( $first );
+		$wp_rewrite->init();
+
+		$this->go_to( get_author_posts_url( $user_id ) );
+		$this->assertQueryTrue( 'is_author', 'is_archive' );
+	}
 }
 
 endif;
