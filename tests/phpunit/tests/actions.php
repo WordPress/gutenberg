@@ -256,4 +256,104 @@ class Tests_Actions extends WP_UnitTestCase {
 	function action_self_removal() {
 		remove_action( 'test_action_self_removal', array( $this, 'action_self_removal' ) );
 	}
+
+	/**
+	 * Make sure current_action() behaves as current_filter()
+	 *
+	 * @ticket 14994
+	 */
+	function test_current_action() {
+		global $wp_current_filter;
+		$wp_current_filter[] = 'first';
+		$wp_current_filter[] = 'second'; // Let's say a second action was invoked.
+
+		$this->assertEquals( 'second', current_action() );
+	}
+
+	/**
+	 * @ticket 14994
+	 */
+	function test_doing_filter() {
+		global $wp_current_filter;
+		$wp_current_filter = array(); // Set to an empty array first
+
+		$this->assertFalse( doing_filter() ); // No filter is passed in, and no filter is being processed
+		$this->assertFalse( doing_filter( 'testing' ) ); // Filter is passed in but not being processed
+
+		$wp_current_filter[] = 'testing';
+
+		$this->assertTrue( doing_filter() ); // No action is passed in, and a filter is being processed
+		$this->assertTrue( doing_filter( 'testing') ); // Filter is passed in and is being processed
+		$this->assertFalse( doing_filter( 'something_else' ) ); // Filter is passed in but not being processed
+
+		$wp_current_filter = array();
+	}
+
+	/**
+	 * @ticket 14994
+	 */
+	function test_doing_action() {
+		global $wp_current_filter;
+		$wp_current_filter = array(); // Set to an empty array first
+
+		$this->assertFalse( doing_action() ); // No action is passed in, and no filter is being processed
+		$this->assertFalse( doing_action( 'testing' ) ); // Action is passed in but not being processed
+
+		$wp_current_filter[] = 'testing';
+
+		$this->assertTrue( doing_action() ); // No action is passed in, and a filter is being processed
+		$this->assertTrue( doing_action( 'testing') ); // Action is passed in and is being processed
+		$this->assertFalse( doing_action( 'something_else' ) ); // Action is passed in but not being processed
+
+		$wp_current_filter = array();
+	}
+
+	/**
+	 * @ticket 14994
+	 */
+	function test_doing_filter_real() {
+		$this->assertFalse( doing_filter() ); // No filter is passed in, and no filter is being processed
+		$this->assertFalse( doing_filter( 'testing' ) ); // Filter is passed in but not being processed
+
+		add_filter( 'testing', array( $this, 'apply_testing_filter' ) );
+		$this->assertTrue( has_action( 'testing' ) );
+		$this->assertEquals( 10, has_action( 'testing', array( $this, 'apply_testing_filter' ) ) );
+
+		apply_filters( 'testing', '' );
+
+		// Make sure it ran.
+		$this->assertTrue( $this->apply_testing_filter );
+
+		$this->assertFalse( doing_filter() ); // No longer doing any filters
+		$this->assertFalse( doing_filter( 'testing' ) ); // No longer doing this filter
+	}
+
+	function apply_testing_filter() {
+		$this->apply_testing_filter = true;
+
+		$this->assertTrue( doing_filter() );
+		$this->assertTrue( doing_filter( 'testing' ) );
+		$this->assertFalse( doing_filter( 'something_else' ) );
+		$this->assertFalse( doing_filter( 'testing_nested' ) );
+
+		add_filter( 'testing_nested', array( $this, 'apply_testing_nested_filter' ) );
+		$this->assertTrue( has_action( 'testing_nested' ) );
+		$this->assertEquals( 10, has_action( 'testing_nested', array( $this, 'apply_testing_nested_filter' ) ) );
+
+		apply_filters( 'testing_nested', '' );
+
+		// Make sure it ran.
+		$this->assertTrue( $this->apply_testing_nested_filter );
+
+		$this->assertFalse( doing_filter( 'testing_nested' ) );
+		$this->assertFalse( doing_filter( 'testing_nested' ) );
+	}
+
+	function apply_testing_nested_filter() {
+		$this->apply_testing_nested_filter = true;
+		$this->assertTrue( doing_filter() );
+		$this->assertTrue( doing_filter( 'testing' ) );
+		$this->assertTrue( doing_filter( 'testing_nested' ) );
+		$this->assertFalse( doing_filter( 'something_else' ) );
+	}
 }
