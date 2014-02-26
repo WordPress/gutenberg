@@ -1,25 +1,43 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
+# gitignore file for WordPress Core
 
-pids
-logs
-results
-
+# Configuration files with possibly sensitive information
 wp-config.php
 wp-tests-config.php
-phpunit.xml
-tests/phpunit/data/plugins/wordpress-importer
-tests/phpunit/data/.trac-ticket-cache*
-tests/qunit/compiled.html
+.htaccess
 
-node_modules
-npm-debug.log
+# Files and folders related to build/test tools
+/phpunit.xml
+/tests/phpunit/data/plugins/wordpress-importer
+/tests/phpunit/data/.trac-ticket-cache*
+/tests/qunit/compiled.html
+/src/.wp-tests-version
+/node_modules
+/npm-debug.log
+/build
+/tests/phpunit/build
 
-# The WordPress output directory.
-build
+# Files and folders that get created in wp-content
+/src/wp-content/blogs.dir
+/src/wp-content/languages
+/src/wp-content/mu-plugins
+/src/wp-content/plugins/*
+/src/wp-content/themes/*
+/src/wp-content/upgrade
+/src/wp-content/uploads
+/src/wp-content/advanced-cache.php
+/src/wp-content/blog-deleted.php
+/src/wp-content/blog-inactive.php
+/src/wp-content/blog-suspended.php
+/src/wp-content/db.php
+/src/wp-content/db-error.php
+/src/wp-content/debug.log
+/src/wp-content/install.php
+/src/wp-content/maintenance.php
+/src/wp-content/object-cache.php
+/src/wp-content/sunrise.php
+
+# Do not ignore "twenty*" themes
+!/src/wp-content/themes/twenty*
+
+# Ignore other .gitignore files to allow for personal customizations
+.gitignore
