@@ -77,4 +77,14 @@ class Tests_Query extends WP_UnitTestCase {
 			$this->assertEquals( get_the_ID(), $post_id );
 		}
 	}
+
+	/**
+	 * @ticket 16471
+	 */
+	function test_default_query_var() {
+		$query = new WP_Query;
+		$this->assertEquals( '', $query->get( 'nonexistent' ) );
+		$this->assertFalse( $query->get( 'nonexistent', false ) );
+		$this->assertTrue( $query->get( 'nonexistent', true ) );
+	}
 }
