@@ -20,8 +20,8 @@ wp-tests-config.php
 /src/wp-content/blogs.dir
 /src/wp-content/languages
 /src/wp-content/mu-plugins
-/src/wp-content/plugins/*
-/src/wp-content/themes/*
+/src/wp-content/plugins
+/src/wp-content/themes
 /src/wp-content/upgrade
 /src/wp-content/uploads
 /src/wp-content/advanced-cache.php
@@ -35,9 +35,6 @@ wp-tests-config.php
 /src/wp-content/maintenance.php
 /src/wp-content/object-cache.php
 /src/wp-content/sunrise.php
-
-# Do not ignore "twenty*" themes
-!/src/wp-content/themes/twenty*
 
 # Ignore other .gitignore files to allow for personal customizations
 .gitignore
