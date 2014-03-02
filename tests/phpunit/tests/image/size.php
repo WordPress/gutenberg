@@ -173,6 +173,9 @@ class Tests_Image_Size extends WP_UnitTestCase {
 	function test_constrain_size_for_editor_medium() {
 		// default max width is 500, no constraint on height
 		global $content_width;
+
+		$_content_width = $content_width;
+
 		$content_width = 0;
 		update_option('medium_size_w', 500);
 		update_option('medium_size_h', 0);
@@ -190,10 +193,15 @@ class Tests_Image_Size extends WP_UnitTestCase {
 		$content_width = 350;
 		$out = image_constrain_size_for_editor(600, 400, 'medium');
 		$this->assertEquals(array(500, 333), $out);
+
+		$content_width = $_content_width;
 	}
 
 	function test_constrain_size_for_editor_full() {
 		global $content_width;
+
+		$_content_width = $content_width;
+
 		$content_width = 400;
 		$out = image_constrain_size_for_editor(600, 400, 'full');
 		$this->assertEquals(array(600, 400), $out);
@@ -209,6 +217,8 @@ class Tests_Image_Size extends WP_UnitTestCase {
 
 		$out = image_constrain_size_for_editor(64, 64, 'full');
 		$this->assertEquals(array(64, 64), $out);
+
+		$content_width = $_content_width;
 	}
 
 }
