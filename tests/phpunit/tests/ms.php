@@ -1221,6 +1221,45 @@ class Tests_MS extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 27003
+	 */
+	function test_get_site_by_path() {
+		$ids = array(
+			'wordpress.org/'              => array( 'domain' => 'wordpress.org',      'path' => '/' ),
+			'wordpress.org/foo/'          => array( 'domain' => 'wordpress.org',      'path' => '/foo/' ),
+			'wordpress.org/foo/bar/'      => array( 'domain' => 'wordpress.org',      'path' => '/foo/bar/' ),
+			'make.wordpress.org/'         => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
+			'make.wordpress.org/foo/'     => array( 'domain' => 'make.wordpress.org', 'path' => '/foo/' ),
+		);
+
+		foreach ( $ids as &$id ) {
+			$id = $this->factory->blog->create( $id );
+		}
+		unset( $id );
+
+		$this->assertEquals( $ids['wordpress.org/'],
+			get_site_by_path( 'wordpress.org', '/notapath/' )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'wordpress.org', '/foo/bar/baz/' )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 3 )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 2 )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/'],
+			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 1 )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/'],
+			get_site_by_path( 'wordpress.org', '/', 0 )->blog_id );
+
+		$this->assertEquals( $ids['make.wordpress.org/foo/'],
+			get_site_by_path( 'make.wordpress.org', '/foo/bar/baz/qux/', 4 )->blog_id );
+	}
+
+	/**
 	 * @ticket 20601
 	 */
 	function test_user_member_of_blog() {
