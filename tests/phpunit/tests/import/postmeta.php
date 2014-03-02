@@ -13,6 +13,10 @@ class Tests_Import_Postmeta extends WP_Import_UnitTestCase {
 		if ( ! defined( 'WP_LOAD_IMPORTERS' ) )
 			define( 'WP_LOAD_IMPORTERS', true );
 
+		if ( ! file_exists( DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php' ) ) {
+			$this->markTestSkipped( 'WordPress Importer plugin is not installed.' );
+		}
+
 		require_once DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php';
 	}
 
