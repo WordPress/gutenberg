@@ -13,7 +13,7 @@ jQuery( function() {
 		equal( result.index, 13, 'foo shortcode with params found at index 13' );
 	});
 
-	test( 'next() should not shortcodes that are not there', function() {
+	test( 'next() should not find shortcodes that are not there', function() {
 		var result;
 
 		// Not found
