@@ -865,4 +865,12 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( 9, $after_trash_counts->publish );
 		$this->assertNotEquals( $initial_counts->publish, $after_trash_counts->publish );
 	}
+
+	/**
+	 * @ticket 13771
+	 */
+	function test_get_the_date_with_id() {
+		$post_id = $this->factory->post->create( array( 'post_date' => '2014-03-01 16:35:00' ) );
+		$this->assertEquals( 'March 1, 2014', get_the_date( 'F j, Y', $post_id ) );
+	}
 }
