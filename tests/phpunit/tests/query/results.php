@@ -543,4 +543,44 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		);
 		$this->assertNotContains( "({$wpdb->posts}.post_status = 'publish') AND", $this->q->request );
 	}
+
+	/**
+	 * @ticket 20308
+	 */
+	function test_post_password() {
+		$one   = (string) $this->factory->post->create( array( 'post_password' => '' ) );
+		$two   = (string) $this->factory->post->create( array( 'post_password' => 'burrito' ) );
+		$three = (string) $this->factory->post->create( array( 'post_password' => 'burrito' ) );
+
+		$args = array( 'post__in' => array( $one, $two, $three ), 'fields' => 'ids' );
+
+		$result1 = $this->q->query( array_merge( $args, array( 'has_password' => true ) ) );
+		$this->assertEqualSets( array( $two, $three ), $result1 );
+		$result2 = $this->q->query( array_merge( $args, array( 'has_password' => false ) ) );
+		$this->assertEquals( array( $one ), $result2 );
+
+		// This is equivalent to not passing it at all.
+		$result3 = $this->q->query( array_merge( $args, array( 'has_password' => null ) ) );
+		$this->assertEqualSets( array( $one, $two, $three ), $result3 );
+
+		// If both arguments are passed, only post_password is considered.
+		$result4 = $this->q->query( array_merge( $args, array( 'has_password' => true, 'post_password' => '' ) ) );
+		$this->assertEquals( array( $one ), $result4 );
+		$result5 = $this->q->query( array_merge( $args, array( 'has_password' => false, 'post_password' => '' ) ) );
+		$this->assertEquals( array( $one ), $result5 );
+		$result6 = $this->q->query( array_merge( $args, array( 'has_password' => null, 'post_password' => '' ) ) );
+		$this->assertEquals( array( $one ), $result6 );
+
+		$result7 = $this->q->query( array_merge( $args, array( 'has_password' => true, 'post_password' => 'burrito' ) ) );
+		$this->assertEqualSets( array( $two, $three ), $result7 );
+		$result8 = $this->q->query( array_merge( $args, array( 'has_password' => false, 'post_password' => 'burrito' ) ) );
+		$this->assertEqualSets( array( $two, $three ), $result8 );
+		$result9 = $this->q->query( array_merge( $args, array( 'has_password' => null, 'post_password' => 'burrito' ) ) );
+		$this->assertEqualSets( array( $two, $three ), $result9 );
+
+		$result10 = $this->q->query( array_merge( $args, array( 'post_password' => '' ) ) );
+		$this->assertEquals( array( $one ), $result10 );
+		$result11 = $this->q->query( array_merge( $args, array( 'post_password' => 'burrito' ) ) );
+		$this->assertEqualSets( array( $two, $three ), $result11 );
+	}
 }
