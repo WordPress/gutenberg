@@ -951,6 +951,14 @@ test('Caret format inside single inline wrapped word', function() {
 	equal(editor.getContent(), '<p>abc <b><em>123</em></b> 456</p>');
 });
 
+test('Caret format inside word before similar format', function() {
+	editor.setContent('<p>abc 123 <b>456</b></p>');
+	editor.formatter.register('format', {inline: 'b'});
+	setSelection('p', 1, 'p', 1);
+	editor.formatter.apply('format');
+	equal(editor.getContent(), '<p><b>abc</b> 123 <b>456</b></p>');
+});
+
 test('Caret format inside last inline wrapped word', function() {
 	editor.setContent('<p>abc <em>abc 123</em> 456</p>');
 	editor.formatter.register('format', {inline: 'b'});
@@ -1112,6 +1120,20 @@ test('Align specified table element with collapsed: false and selection collapse
 	equal(getContent(), '<table style="float: right;"><tbody><tr><td>a</td></tr></tbody></table>');
 });
 
+test('Apply ID format to around existing bookmark node', function() {
+	editor.getBody().innerHTML = '<p>a<span id="b" data-mce-type="bookmark"></span>b</p>';
+
+	rng = editor.dom.createRng();
+	rng.setStart(editor.dom.select('p')[0].firstChild, 0);
+	rng.setEnd(editor.dom.select('p')[0].lastChild, 1);
+	editor.selection.setRng(rng);
+
+	editor.formatter.register('format', {inline: 'span', attributes: {id: 'id'}});
+	editor.formatter.apply('format');
+
+	equal(normalizeHtml(editor.getBody().innerHTML), '<p><span id="id">a<span data-mce-type="bookmark" id="b"></span>b</span></p>');
+});
+
 test('Bug #5134 - TinyMCE removes formatting tags in the getContent', function() {
 	editor.setContent('');
 	editor.formatter.register('format', {inline : 'strong', toggle: false});
@@ -1159,13 +1181,16 @@ test('Bug #6518 - Apply div blocks to inline editor paragraph', function() {
 	equal(inlineEditor.getContent(), '<div>a</div><p>b</p>');
 });
 
+// WP
 var url = document.location.href.substring( 0, document.location.href.lastIndexOf('tinymce/') );
 
 tinymce.init({
 	selector: "#elm1",
+	// WP
 	external_plugins: {
 		noneditable: url + 'external-plugins/noneditable/plugin.js'
 	},
+	// WP end
 	add_unload_trigger: false,
 	indent: false,
 	theme_advanced_styles: 'test1=test1;test2=test2',
@@ -1189,9 +1214,11 @@ tinymce.init({
 tinymce.init({
 	selector: "#elm2",
 	inline: true,
+	// WP
 	external_plugins: {
 		noneditable: url + 'external-plugins/noneditable/plugin.js'
 	},
+	// WP end
 	add_unload_trigger: false,
 	indent: false,
 	theme_advanced_styles: 'test1=test1;test2=test2',

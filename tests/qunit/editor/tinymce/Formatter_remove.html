@@ -360,14 +360,17 @@ test('Remove format bug 1', function() {
 });
 */
 
+// WP
 var url = document.location.href.substring( 0, document.location.href.lastIndexOf('tinymce/') );
 
 tinymce.init({
 	mode : "exact",
 	elements : "elm1",
+	// WP
 	external_plugins: {
 		noneditable: url + 'external-plugins/noneditable/plugin.js'
 	},
+	// WP end
 	indent : false,
 	add_unload_trigger : false,
 	theme_advanced_styles : 'test1=test1;test2=test2',

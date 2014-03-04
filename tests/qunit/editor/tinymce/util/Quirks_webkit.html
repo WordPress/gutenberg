@@ -98,13 +98,16 @@
 		});
 	}
 
+	// WP
 	var url = document.location.href.substring( 0, document.location.href.lastIndexOf('tinymce/') );
 	
 	tinymce.init({
 		mode : "exact",
+		// WP
 		external_plugins: {
-			noneditable: url + 'external-plugins/table/plugin.js'
+			table: url + 'external-plugins/table/plugin.js'
 		},
+		// WP end
 		elements : "elm1",
 		indent: false,
 		init_instance_callback : function(ed) {
