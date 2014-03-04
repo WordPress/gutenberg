@@ -524,6 +524,33 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		}
 	}
 
+	function authorless_post_statuses() {
+		return array( array( 'draft' ), array( 'private' ), array( 'publish' ) );
+	}
+
+	/**
+	 * @ticket 27020
+	 * @dataProvider authorless_post_statuses
+	 */
+	function test_authorless_post( $status ) {
+		// Make a post without an author
+		$post = $this->factory->post->create( array( 'post_author' => 0, 'post_type' => 'post', 'post_status' => $status ) );
+
+		// Add an editor and contributor
+		$editor = $this->factory->user->create_and_get( array( 'role' => 'editor' ) );
+		$contributor = $this->factory->user->create_and_get( array( 'role' => 'contributor' ) );
+
+		// editor can edit, view, and trash
+		$this->assertTrue( $editor->has_cap( 'edit_post', $post ) );
+		$this->assertTrue( $editor->has_cap( 'delete_post', $post ) );
+		$this->assertTrue( $editor->has_cap( 'read_post', $post ) );
+
+		// a contributor cannot (except read a published post)
+		$this->assertFalse( $contributor->has_cap( 'edit_post', $post ) );
+		$this->assertFalse( $contributor->has_cap( 'delete_post', $post ) );
+		$this->assertEquals( $status === 'publish', $contributor->has_cap( 'read_post', $post ) );
+	}
+
 	/**
 	 * @ticket 16714
 	 */

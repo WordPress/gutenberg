@@ -232,4 +232,18 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 		$this->assertEquals( array( 'update_core' ), map_meta_cap( 'update_core', $this->user_id ) );
 		$this->assertEquals( array( 'edit_plugins' ), map_meta_cap( 'edit_plugins', $this->user_id ) );
 	}
+
+	/**
+	 * Test a post without an author.
+	 *
+	 * @ticket 27020
+	 */
+	function test_authorless_posts_capabilties() {
+		$post_id = $this->factory->post->create( array( 'post_author' => 0, 'post_type' => 'post', 'post_status' => 'publish' ) );
+		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
+
+		$this->assertEquals( array( 'edit_others_posts', 'edit_published_posts' ), map_meta_cap( 'edit_post', $editor, $post_id ) );
+		$this->assertEquals( array( 'delete_others_posts', 'delete_published_posts' ), map_meta_cap( 'delete_post', $editor, $post_id ) );
+
+	}
 }
