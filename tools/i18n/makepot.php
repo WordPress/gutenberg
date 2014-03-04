@@ -433,8 +433,44 @@ class MakePOT {
 		if (is_null($slug)) {
 			$slug = $this->guess_plugin_slug($dir);
 		}
-		$main_file = $dir.'/'.$slug.'.php';
-		$source = $this->get_first_lines($main_file, $this->max_header_lines);
+
+		$plugins_dir = @opendir( $dir );
+		$plugin_files = array();
+		if ( $plugins_dir ) {
+			while ( ( $file = readdir( $plugins_dir ) ) !== false ) {
+				if ( '.' === substr( $file, 0, 1 ) ) {
+					continue;
+				}
+
+				if ( '.php' === substr( $file, -4 ) ) {
+					$plugin_files[] = $file;
+				}
+			}
+			closedir( $plugins_dir );
+		}
+
+		if ( empty( $plugin_files ) ) {
+			return false;
+		}
+
+		$main_file = '';
+		foreach ( $plugin_files as $plugin_file ) {
+			if ( ! is_readable( "$dir/$plugin_file" ) ) {
+				continue;
+			}
+
+			$source = $this->get_first_lines( "$dir/$plugin_file", $this->max_header_lines );
+
+			// Stop when we find a file with a plugin name header in it.
+			if ( $this->get_addon_header( 'Plugin Name', $source ) != false ) {
+				$main_file = "$dir/$plugin_file";
+				break;
+			}
+		}
+
+		if ( empty( $main_file ) ) {
+			return false;
+		}
 
 		$placeholders['version'] = $this->get_addon_header('Version', $source);
 		$placeholders['author'] = $this->get_addon_header('Author', $source);
