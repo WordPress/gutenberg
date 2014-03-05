@@ -114,4 +114,26 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 	}
+
+	/**
+	 * edit_post() should convert an existing auto-draft to a draft.
+	 *
+	 * @ticket 25272
+	 */
+	function test_edit_post_auto_draft() {
+		$user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $user_id );
+		$post = $this->factory->post->create_and_get( array( 'post_status' => 'auto-draft' ) );
+		$this->assertEquals( 'auto-draft', $post->post_status );
+		$post_data = array(
+			'post_title' => 'Post title',
+			'content' => 'Post content',
+			'post_type' => 'post',
+			'post_ID' => $post->ID,
+		);
+		edit_post( $post_data );
+		$this->assertEquals( 'draft', get_post( $post->ID )->post_status );
+		wp_set_current_user( 0 );
+	}
+
 }
