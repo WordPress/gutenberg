@@ -200,7 +200,7 @@ module.exports = function(grunt) {
 				expand: true,
 				cwd: SOURCE_DIR + 'wp-content/themes',
 				src: [
-					'**/*.js',
+					'twenty*/**/*.js',
 					'!twenty{eleven,twelve,thirteen}/**',
 					// Third party scripts
 					'!twentyfourteen/js/html5.js'
