@@ -102,6 +102,6 @@ class Tests_Query extends WP_UnitTestCase {
 	}
 
 	function filter_posts_per_page( &$query ) {
-		$query->set( 'posts_per_page', 30 );
+		$query->set( 'posts_per_rss', 30 );
 	}
 }
