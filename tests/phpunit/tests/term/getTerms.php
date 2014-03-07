@@ -165,9 +165,6 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$term_id2 = $this->factory->category->create();
 		$term_id22 = $this->factory->category->create( array( 'parent' => $term_id2 ) );
 
-		// There's something else broken in the cache cleaning routines that leads to this having to be done manually
-		delete_option( 'category_children' );
-
 		$terms = get_terms( 'category', array(
 			'exclude' => $term_id_uncategorized,
 			'fields' => 'ids',
