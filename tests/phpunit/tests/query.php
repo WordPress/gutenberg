@@ -87,4 +87,21 @@ class Tests_Query extends WP_UnitTestCase {
 		$this->assertFalse( $query->get( 'nonexistent', false ) );
 		$this->assertTrue( $query->get( 'nonexistent', true ) );
 	}
+
+	/**
+	 * @ticket 25380
+	 */
+	function test_pre_posts_per_page() {
+		$this->factory->post->create_many( 10 );
+
+		add_action( 'pre_get_posts', array( $this, 'filter_posts_per_page' ) );
+
+		$this->go_to( get_feed_link() );
+
+		$this->assertEquals( 30, get_query_var( 'posts_per_page' ) );
+	}
+
+	function filter_posts_per_page( &$query ) {
+		$query->set( 'posts_per_page', 30 );
+	}
 }
