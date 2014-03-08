@@ -128,4 +128,33 @@ class Tests_Image_Dimensions extends WP_UnitTestCase {
 		$this->assertEquals( array(0, 0, 0, 20, 400, 500, 480, 600), $out );
 	}
 
+	/**
+	 * @ticket 19393
+	 */
+	function test_crop_anchors() {
+		// landscape: crop 640x480 to fit 400x500: 400x400 taken from a 480x480 crop
+		// src_x = 0 (left), src_y = 0 (top)
+		$out = image_resize_dimensions(640, 480, 400, 500, array( 'left', 'top' ) );
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 0, 0, 400, 480, 400, 480), $out );
+
+		// portrait: resize 480x640 to fit 400x400: 400x400 taken from a 480x480 crop
+		// src_x = 0 (left), src_y = 0 (top)
+		$out = image_resize_dimensions(480, 640, 400, 500, array( 'left', 'top' ) );
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 0, 0, 400, 500, 480, 600), $out );
+
+		// landscape: crop 640x480 to fit 400x500: 400x400 taken from a 480x480 crop
+		// src_x = 240 (left), src_y = 0 (due to landscape crop)
+		$out = image_resize_dimensions(640, 480, 400, 500, array( 'right', 'bottom' ) );
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 240, 0, 400, 480, 400, 480), $out );
+
+		// portrait: resize 480x640 to fit 400x400: 400x400 taken from a 480x480 crop
+		// src_x = 0 (due to portrait crop), src_y = 40 (bottom)
+		$out = image_resize_dimensions(480, 640, 400, 500, array( 'right', 'bottom' ) );
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 0, 40, 400, 500, 480, 600), $out );
+	}
+
 }
