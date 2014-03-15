@@ -309,6 +309,33 @@ class Tests_XMLRPC_wp_editPost extends WP_XMLRPC_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 26686
+	 */
+	function test_clear_categories_on_edit() {
+		$editor_id = $this->make_user_by_role( 'editor' );
+
+		$post_id = $this->factory->post->create( array( 'post_author'  => $editor_id ) );
+		$term_id = $this->factory->category->create();
+		$this->factory->term->add_post_terms( $post_id, $term_id, 'category', true );
+		$term_ids = wp_list_pluck( get_the_category( $post_id ), 'term_id' );
+		$this->assertContains( $term_id, $term_ids );
+
+		$new_post_content = array(
+			'ID' => $post_id,
+			'post_title' => 'Updated',
+			'terms' => array(
+				'category' => array()
+			)
+		);
+		$result = $this->myxmlrpcserver->wp_editPost( array( 1, 'editor', 'editor', $post_id, $new_post_content ) );
+		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertEquals( 'Updated', get_post( $post_id )->post_title );
+
+		$term_ids = wp_list_pluck( get_the_category( $post_id ), 'term_id' );
+		$this->assertNotContains( $term_id, $term_ids );
+	}
+
+	/**
 	 * @ticket 23219
 	 */
 	function test_add_enclosure_if_new() {
