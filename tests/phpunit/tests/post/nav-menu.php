@@ -88,4 +88,32 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$page_items = wp_get_associated_nav_menu_items( $page_id );
 		$this->assertEqualSets( array(), $page_items );
 	}
+
+	/**
+	 * @ticket 27113
+	 */
+	function test_orphan_nav_menu_item() {
+
+		// Create an orphan nav menu item
+		$custom_item_id = wp_update_nav_menu_item( 0, 0, array(
+			'menu-item-type'      => 'custom',
+			'menu-item-title'     => 'Wordpress.org',
+			'menu-item-link'      => 'http://wordpress.org',
+			'menu-item-status'    => 'publish'
+		) );
+
+		// Confirm it saved properly
+		$custom_item = wp_setup_nav_menu_item( get_post( $custom_item_id ) );
+		$this->assertEquals( 'Wordpress.org', $custom_item->title );
+
+		// Update the orphan with an associated nav menu
+		wp_update_nav_menu_item( $this->menu_id, $custom_item_id, array( 
+			'menu-item-title'     => 'WordPress.org',
+			) );
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		$custom_item = wp_filter_object_list( $menu_items, array( 'db_id' => $custom_item_id ) );
+		$custom_item = array_pop( $custom_item );
+		$this->assertEquals( 'WordPress.org', $custom_item->title );
+
+	}
 }
