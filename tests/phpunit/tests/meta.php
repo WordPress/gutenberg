@@ -84,6 +84,17 @@ class Tests_Meta extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 22746
+	 */
+	function test_metadata_exists_with_filter() {
+		// Let's see if it returns the correct value when adding a filter.
+		add_filter( 'get_user_metadata', '__return_zero' );
+		$this->assertFalse( metadata_exists( 'user', $this->author->ID, 'meta_key' ) ); // existing meta key
+		$this->assertFalse( metadata_exists( 'user', 1234567890, 'meta_key' ) );
+		remove_filter( 'get_user_metadata', '__return_zero' );
+	}
+
+	/**
 	 * @ticket 18158
 	 */
 	function test_user_metadata_not_exists() {
