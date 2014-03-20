@@ -208,6 +208,12 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( $post_four, get_adjacent_post( false, null, false ) );
 		remove_filter( 'get_next_post_where', array( $this, 'filter_next_post_where' ) );
 
+		// Test "where" filter that writes its own query
+		add_filter( 'get_previous_post_where', array( $this, 'override_previous_post_where_clause' ) );
+		$this->go_to( get_permalink( $post_four->ID ) );
+		$this->assertEquals( $post_two, get_adjacent_post( false, null, true ) );
+		remove_filter( 'get_previous_post_where', array( $this, 'override_previous_post_where_clause' ) );
+
 		// Test "join" filter by joining the postmeta table and restricting by meta key
 		add_filter( 'get_next_post_join', array( $this, 'filter_next_post_join' ) );
 		add_filter( 'get_next_post_where', array( $this, 'filter_next_post_where_with_join' ) );
@@ -248,10 +254,18 @@ class Tests_Link extends WP_UnitTestCase {
 	/**
 	 * Filter callback for `test_legacy_get_adjacent_post_filters()`
 	 */
+	function override_previous_post_where_clause( $where ) {
+		$where = "WHERE p.post_date < '2012-02-28'";
+		return $where;
+	}
+
+	/**
+	 * Filter callback for `test_legacy_get_adjacent_post_filters()`
+	 */
 	function filter_next_post_join( $join ) {
 		global $wpdb;
 
-		$join .= " INNER JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id";
+		$join .= " INNER JOIN {$wpdb->postmeta} ON p.ID = {$wpdb->postmeta}.post_id";
 		return $join;
 	}
 
@@ -269,10 +283,7 @@ class Tests_Link extends WP_UnitTestCase {
 	 * Filter callback for `test_legacy_get_adjacent_post_filters()`
 	 */
 	function filter_next_post_sort( $sort ) {
-		global $wpdb;
-
-		$sort = str_replace( $wpdb->posts . '.post_date', $wpdb->posts . '.post_title', $sort );
-		return $sort;
+		return str_replace( 'p.post_date', 'p.post_title', $sort );
 	}
 
 	/**
