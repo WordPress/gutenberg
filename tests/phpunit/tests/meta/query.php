@@ -152,4 +152,46 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( 'CHAR', $query->get_cast_for_type( 'ANYTHING ELSE' ) );
 	}
+
+	function test_not_exists() {
+		global $wpdb;
+
+		$query = new WP_Meta_Query( array(
+			'relation' => 'OR',
+			array(
+				'key' => 'exclude',
+				'compare' => 'NOT EXISTS'
+			),
+			array(
+				'key' => 'exclude',
+				'compare' => '!=',
+				'value' => '1'
+			),
+		) );
+
+		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
+		$this->assertNotContains( "{$wpdb->postmeta}.meta_key = 'exclude'\nOR", $sql['where'] );
+		$this->assertContains( "{$wpdb->postmeta}.post_id IS NULL", $sql['where'] );
+	}
+
+	function test_empty_compare() {
+		global $wpdb;
+
+		$query = new WP_Meta_Query( array(
+			'relation' => 'OR',
+			array(
+				'key' => 'exclude',
+				'compare' => ''
+			),
+			array(
+				'key' => 'exclude',
+				'compare' => '!=',
+				'value' => '1'
+			),
+		) );
+
+		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
+		$this->assertContains( "{$wpdb->postmeta}.meta_key = 'exclude'\nOR", $sql['where'] );
+		$this->assertNotContains( "{$wpdb->postmeta}.post_id IS NULL", $sql['where'] );
+	}
 }
