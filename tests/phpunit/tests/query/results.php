@@ -46,10 +46,10 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->parent_one = $this->factory->post->create( array( 'post_title' => 'parent-one', 'post_date' => '2007-01-01 00:00:00' ) );
 		$this->parent_two = $this->factory->post->create( array( 'post_title' => 'parent-two', 'post_date' => '2007-01-01 00:00:00' ) );
 		$this->parent_three = $this->factory->post->create( array( 'post_title' => 'parent-three', 'post_date' => '2007-01-01 00:00:00' ) );
-		$this->factory->post->create( array( 'post_title' => 'child-one', 'post_parent' => $this->parent_one, 'post_date' => '2007-01-01 00:00:01' ) );
-		$this->factory->post->create( array( 'post_title' => 'child-two', 'post_parent' => $this->parent_one, 'post_date' => '2007-01-01 00:00:02' ) );
-		$this->factory->post->create( array( 'post_title' => 'child-three', 'post_parent' => $this->parent_two, 'post_date' => '2007-01-01 00:00:03' ) );
-		$this->factory->post->create( array( 'post_title' => 'child-four', 'post_parent' => $this->parent_two, 'post_date' => '2007-01-01 00:00:04' ) );
+		$this->child_one = $this->factory->post->create( array( 'post_title' => 'child-one', 'post_parent' => $this->parent_one, 'post_date' => '2007-01-01 00:00:01' ) );
+		$this->child_two = $this->factory->post->create( array( 'post_title' => 'child-two', 'post_parent' => $this->parent_one, 'post_date' => '2007-01-01 00:00:02' ) );
+		$this->child_three = $this->factory->post->create( array( 'post_title' => 'child-three', 'post_parent' => $this->parent_two, 'post_date' => '2007-01-01 00:00:03' ) );
+		$this->child_four = $this->factory->post->create( array( 'post_title' => 'child-four', 'post_parent' => $this->parent_two, 'post_date' => '2007-01-01 00:00:04' ) );
 
 		unset( $this->q );
 		$this->q = new WP_Query();
@@ -368,6 +368,38 @@ class Tests_Query_Results extends WP_UnitTestCase {
 			'child-one',
 			'child-two',
 		), wp_list_pluck( $posts, 'post_title' ) );
+	}
+
+	/**
+	 * @ticket 27252
+	 */
+	function test_query_fields_integers() {
+
+		$parents = array(
+			(int) $this->parent_one,
+			(int) $this->parent_two
+		);
+		$posts1 = $this->q->query( array(
+			'post__in'  => $parents,
+			'fields'    => 'ids',
+			'orderby'   => 'post__in',
+		) );
+
+		$this->assertSame( $parents, $posts1 );
+
+		$children = array(
+			(int) $this->child_one => (int) $this->parent_one,
+			(int) $this->child_two => (int) $this->parent_one
+		);
+
+		$posts2 = $this->q->query( array(
+			'post__in'  => array_keys( $children ),
+			'fields'    => 'id=>parent',
+			'orderby'   => 'post__in',
+		) );
+
+		$this->assertSame( $children, $posts2 );
+
 	}
 
 	function test_exlude_from_search_empty() {
