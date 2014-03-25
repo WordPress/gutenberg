@@ -149,7 +149,7 @@ CAP;
 		$this->assertEquals( '', $prepped['type'] );
 		$this->assertEquals( '', $prepped['subtype'] );
 		$this->assertEquals( '', $prepped['url'] );
-		$this->assertEquals( site_url( 'wp-includes/images/crystal/default.png' ), $prepped['icon'] );
+		$this->assertEquals( site_url( 'wp-includes/images/media/default.png' ), $prepped['icon'] );
 
 		// Fake a mime
 		$post->post_mime_type = 'image/jpeg';
