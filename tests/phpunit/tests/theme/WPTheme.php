@@ -110,4 +110,22 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 		$this->assertEquals( admin_url( 'customize.php?theme=theme+with+spaces' ), wp_customize_url( 'theme with spaces' ) );
 	}
 
+	/**
+	 * @ticket 21969
+	 */
+	function test_theme_uris_with_spaces() {
+		$callback = array( $this, 'filter_theme_with_spaces' );
+		add_filter( 'stylesheet', $callback );
+		add_filter( 'template', $callback );
+
+		$this->assertEquals( get_theme_root_uri() . '/subdir/theme%20with%20spaces', get_stylesheet_directory_uri() );
+		$this->assertEquals( get_theme_root_uri() . '/subdir/theme%20with%20spaces', get_template_directory_uri() );
+
+		remove_filter( 'stylesheet', $callback );
+		add_filter( 'template', $callback );
+	}
+
+	function filter_theme_with_spaces() {
+		return 'subdir/theme with spaces';
+	}
 }
