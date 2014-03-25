@@ -1300,6 +1300,41 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->go_to( get_author_posts_url( $user_id ) );
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 	}
+
+	/**
+	 * @ticket 27205
+	 */
+	function test_granting_super_admins() {
+		if ( isset( $GLOBALS['super_admins'] ) ) {
+			$old_global = $GLOBALS['super_admins'];
+			unset( $GLOBALS['super_admins'] );
+		}
+
+		$user_id = $this->factory->user->create();
+
+		$this->assertFalse( is_super_admin( $user_id ) );
+		$this->assertFalse( revoke_super_admin( $user_id ) );
+		$this->assertTrue( grant_super_admin( $user_id ) );
+		$this->assertTrue( is_super_admin( $user_id ) );
+		$this->assertFalse( grant_super_admin( $user_id ) );
+		$this->assertTrue( revoke_super_admin( $user_id ) );
+
+		// None of these operations should set the $super_admins global.
+		$this->assertFalse( isset( $GLOBALS['super_admins'] ) );
+
+		// Try with two users.
+		$second_user = $this->factory->user->create();
+		$this->assertTrue( grant_super_admin( $user_id ) );
+		$this->assertTrue( grant_super_admin( $second_user ) );
+		$this->assertTrue( is_super_admin( $second_user ) );
+		$this->assertTrue( is_super_admin( $user_id ) );
+		$this->assertTrue( revoke_super_admin( $user_id ) );
+		$this->assertTrue( revoke_super_admin( $second_user ) );
+
+		if ( isset( $old_global ) ) {
+			$GLOBALS['super_admins'] = $old_global;
+		}
+	}
 }
 
 endif;
