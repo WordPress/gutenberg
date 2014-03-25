@@ -976,7 +976,7 @@ class Tests_MS extends WP_UnitTestCase {
 	}
 
 	function _domain_exists_cb( $exists, $domain, $path, $site_id ) {
-		if ( 'foo' == $domain && 'bar' == $path )
+		if ( 'foo' == $domain && 'bar/' == $path )
 			return 1234;
 		else
 			return null;
@@ -997,6 +997,9 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertEquals( 1234, domain_exists( 'foo', 'bar' ) );
 		$this->assertEquals( null, domain_exists( 'foo', 'baz' ) );
 		$this->assertEquals( null, domain_exists( 'bar', 'foo' ) );
+
+		// Make sure the same result is returned with or without a trailing slash
+		$this->assertEquals( domain_exists( 'foo', 'bar' ), domain_exists( 'foo', 'bar/' ) );
 
 		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
 		$this->assertEquals( null, domain_exists( 'foo', 'bar' ) );
