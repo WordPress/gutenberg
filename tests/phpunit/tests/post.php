@@ -873,4 +873,43 @@ class Tests_Post extends WP_UnitTestCase {
 		$post_id = $this->factory->post->create( array( 'post_date' => '2014-03-01 16:35:00' ) );
 		$this->assertEquals( 'March 1, 2014', get_the_date( 'F j, Y', $post_id ) );
 	}
+
+	/**
+	 * @ticket 25566
+	 */
+	function test_wp_tag_cloud_link_with_post_type() {
+		$post_type = 'new_post_type';
+		$tax = 'new_tag';
+		register_post_type( $post_type, array( 'taxonomies' => array( 'post_tag', $tax ) ) );
+		register_taxonomy( $tax, $post_type );
+
+		$post = $this->factory->post->create( array( 'post_type' => $post_type ) );
+		wp_set_object_terms( $post, rand_str(), $tax );
+
+		$wp_tag_cloud = wp_tag_cloud( array(
+			'post_type' => $post_type,
+			'taxonomy' => $tax,
+			'echo' => false,
+			'link' => 'edit'
+		) );
+
+		$terms = get_terms( $tax );
+		$term = reset( $terms );
+		$url = sprintf( '%s?action=edit&#038;taxonomy=%s&#038;tag_ID=%d&#038;post_type=%s',
+			admin_url( 'edit-tags.php' ),
+			$tax,
+			$term->term_id,
+			$post_type
+		);
+		$expected_wp_tag_cloud = sprintf( "<a href='%s' class='tag-link-%d' title='1 topic' style='font-size: 8pt;'>%s</a>",
+			$url,
+			$term->term_id,
+			$term->name
+		);
+		$this->assertEquals( $expected_wp_tag_cloud, $wp_tag_cloud );
+
+		_unregister_post_type( $post_type );
+		_unregister_taxonomy( $tax );
+	}
+
 }
