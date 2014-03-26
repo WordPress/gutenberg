@@ -128,4 +128,15 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	function filter_theme_with_spaces() {
 		return 'subdir/theme with spaces';
 	}
+
+	/**
+	 * @ticket 26873
+	 */
+	function test_display_method_on_get_method_failure() {
+		$theme = new WP_Theme( 'nonexistent', $this->theme_root );
+		$this->assertEquals( 'nonexistent', $theme->get( 'Name' ) );
+		$this->assertFalse( $theme->get( 'AuthorURI' ) );
+		$this->assertFalse( $theme->get( 'Tags' ) );
+		$this->assertFalse( $theme->display( 'Tags' ) );
+	}
 }
