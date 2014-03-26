@@ -211,4 +211,29 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $page_1, $page_2, $page_4, $page_3 ), wp_list_pluck( $pages, 'ID' ) );
 	}
+
+	function test_wp_list_pages_classes() {
+		$type = 'taco';
+		register_post_type( $type, array( 'hierarchical' => true, 'public' => true ) );
+
+		$posts = $this->factory->post->create_many( 2, array( 'post_type' => $type ) );
+		$post_id = reset( $posts );
+
+		$this->go_to( "/?p=$post_id&post_type=$type" );
+
+		$this->assertEquals( $post_id, get_queried_object_id() );
+
+		$output = wp_list_pages( array(
+			'echo' => false,
+			'title_li' => '',
+			'post_type' => $type
+		) );
+
+		$this->assertNotEmpty( $output );
+		$this->assertEquals( 2, substr_count( $output, 'class="page_item ' ) );
+		$this->assertContains( 'current_page_item', $output );
+		$this->assertEquals( 1, substr_count( $output, 'current_page_item' ) );
+
+		_unregister_post_type( $type );
+	}
 }
