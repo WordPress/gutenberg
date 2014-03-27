@@ -263,4 +263,14 @@ Paragraph two.';
 		$this->assertEquals( $expected1, trim( wpautop( $content1 ) ) );
 		$this->assertEquals( $expected2, trim( wpautop( $content2 ) ) );
 	}
+
+	/**
+	 * wpautop() Should not add <br/> to "<select>" or "<option>" elements
+	 *
+	 * @ticket 22230
+	 */
+	public function test_skip_select_option_elements() {
+		$str = 'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
+		$this->assertEquals( "<p>$str</p>", trim( wpautop( $str ) ) );
+	}
 }
