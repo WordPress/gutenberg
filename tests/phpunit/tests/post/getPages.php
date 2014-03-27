@@ -236,4 +236,36 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 
 		_unregister_post_type( $type );
 	}
+
+	function test_exclude_tree() {
+		$post_id1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id1 ) );
+		$post_id3 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id3 ) );
+
+		$all = get_pages();
+
+		$this->assertCount( 4, $all );
+
+		$exclude1 = get_pages( "exclude_tree=$post_id1" );
+		$this->assertCount( 2, $exclude1 );
+
+		$exclude2 = get_pages( array( 'exclude_tree' => $post_id1 ) );
+		$this->assertCount( 2, $exclude2 );
+
+		$exclude3 = get_pages( array( 'exclude_tree' => array( $post_id1 ) ) );
+		$this->assertCount( 2, $exclude3 );
+
+		$exclude4 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id2 ) ) );
+		$this->assertCount( 2, $exclude4 );
+
+		$exclude5 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id3 ) ) );
+		$this->assertCount( 0, $exclude5 );
+
+		$post_id5 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id6 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id5 ) );
+
+		$exclude6 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id3 ) ) );
+		$this->assertCount( 2, $exclude6 );
+	}
 }
