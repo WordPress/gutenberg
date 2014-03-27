@@ -39,12 +39,35 @@ abstract class WP_Image_UnitTestCase extends WP_UnitTestCase {
 	 * @param  int $alpha
 	 */
 	protected function assertImageAlphaAtPoint( $image_path, $point, $alpha ) {
-
 		$im = imagecreatefrompng( $image_path );
-		$rgb = imagecolorat($im, $point[0], $point[1]);
+		$rgb = imagecolorat( $im, $point[0], $point[1] );
 
-		$colors = imagecolorsforindex($im, $rgb);
+		$colors = imagecolorsforindex( $im, $rgb );
 
 		$this->assertEquals( $alpha, $colors['alpha'] );
+	}
+
+	/**
+	 * Helper assertion to check actual image dimensions on disk
+	 *
+	 * @param string $filename Image filename.
+	 * @param int    $width    Width to verify.
+	 * @param int    $height   Height to verify.
+	 */
+	protected function assertImageDimensions( $filename, $width, $height ) {
+		$detected_width = 0;
+		$detected_height = 0;
+		$image_size = @getimagesize( $filename );
+
+		if ( isset( $image_size[0] ) ) {
+			$detected_width = $image_size[0];
+		}
+
+		if ( isset( $image_size[1] ) ) {
+			$detected_height = $image_size[1];
+		}
+
+		$this->assertEquals( $width, $detected_width );
+		$this->assertEquals( $height, $detected_height );
 	}
 }
