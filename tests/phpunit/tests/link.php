@@ -97,6 +97,27 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 26871
+	 */
+	function test_wp_get_shortlink_with_home_page() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $post_id );
+
+		$this->assertEquals( home_url( '/' ), wp_get_shortlink( $post_id, 'post' ) );
+
+		global $wp_rewrite;
+		$wp_rewrite->permalink_structure = '';
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->flush_rules();
+
+		$this->assertEquals( home_url( '/' ), wp_get_shortlink( $post_id, 'post' ) );
+
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
+	}
+
+	/**
 	 * @ticket 17807
 	 */
 	function test_get_adjacent_post() {
