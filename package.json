@@ -24,7 +24,7 @@
     "grunt-autoprefixer": "~0.7.1",
     "grunt-jsvalidate": "~0.2.2",
     "grunt-contrib-imagemin" : "~0.4.1",
-    "grunt-patch-wordpress" : "~0.2.0",
+    "grunt-patch-wordpress" : "~0.2.1",
     "matchdep": "~0.3.0"
   }
 }
