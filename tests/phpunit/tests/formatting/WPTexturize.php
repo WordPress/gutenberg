@@ -14,7 +14,11 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals('[a]a&#8211;b[code]---[/code]a&#8211;b[/a]', wptexturize('[a]a--b[code]---[/code]a--b[/a]'));
 		$this->assertEquals('<pre><code></code>--</pre>', wptexturize('<pre><code></code>--</pre>'));
 
-		$this->assertEquals('<code>---</code>', wptexturize('<code>---</code>'));
+		$this->assertEquals( '<code>---</code>',     wptexturize( '<code>---</code>'     ) );
+		$this->assertEquals( '<kbd>---</kbd>',       wptexturize( '<kbd>---</kbd>'       ) );
+		$this->assertEquals( '<style>---</style>',   wptexturize( '<style>---</style>'   ) );
+		$this->assertEquals( '<script>---</script>', wptexturize( '<script>---</script>' ) );
+		$this->assertEquals( '<tt>---</tt>',         wptexturize( '<tt>---</tt>'         ) );
 
 		$this->assertEquals('<code>href="baba"</code> &#8220;baba&#8221;', wptexturize('<code>href="baba"</code> "baba"'));
 
@@ -43,7 +47,6 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 
 	//WP Ticket #4539
 	function test_basic_quotes() {
-		$this->assertEquals('test&#8217;s', wptexturize('test\'s'));
 		$this->assertEquals('test&#8217;s', wptexturize('test\'s'));
 
 		$this->assertEquals('&#8216;quoted&#8217;', wptexturize('\'quoted\''));
@@ -193,5 +196,802 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals( '&nbsp;&#8212;&nbsp;', wptexturize( '&nbsp;--&nbsp;' ) );
 		$this->assertEquals( ' &#8212;&nbsp;', wptexturize( ' --&nbsp;' ) );
 		$this->assertEquals( '&nbsp;&#8212; ', wptexturize( '&nbsp;-- ') );
+	}
+
+	/**
+	 * Test spaces around quotes.
+	 *
+	 * These should never happen, even if the desired output changes some day.
+	 *
+	 * @ticket 22692
+	 */
+	function test_spaces_around_quotes_never() {
+		$nbsp = "\xC2\xA0";
+
+		$problem_input  = "$nbsp\"A";
+		$problem_output = "$nbsp&#8221;A";
+
+		$this->assertNotEquals( $problem_output, wptexturize( $problem_input ) );
+	}
+
+	/**
+	 * Test spaces around quotes.
+	 *
+	 * These are desirable outputs for the current design.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_spaces_around_quotes
+	 */
+	function test_spaces_around_quotes( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_spaces_around_quotes() {
+		$nbsp = "\xC2\xA0";
+		$pi   = "\xCE\xA0";
+
+		return array(
+			array(
+				"stop. $nbsp\"A quote after 2 spaces.\"",
+				"stop. $nbsp&#8220;A quote after 2 spaces.&#8221;",
+			),
+			array(
+				"stop.$nbsp$nbsp\"A quote after 2 spaces.\"",
+				"stop.$nbsp$nbsp&#8220;A quote after 2 spaces.&#8221;",
+			),
+			array(
+				"stop. $nbsp'A quote after 2 spaces.'",
+				"stop. $nbsp&#8216;A quote after 2 spaces.&#8217;",
+			),
+			array(
+				"stop.$nbsp$nbsp'A quote after 2 spaces.'",
+				"stop.$nbsp$nbsp&#8216;A quote after 2 spaces.&#8217;",
+			),
+			array(
+				"stop. &nbsp;\"A quote after 2 spaces.\"",
+				"stop. &nbsp;&#8220;A quote after 2 spaces.&#8221;",
+			),
+			array(
+				"stop.&nbsp;&nbsp;\"A quote after 2 spaces.\"",
+				"stop.&nbsp;&nbsp;&#8220;A quote after 2 spaces.&#8221;",
+			),
+			array(
+				"stop. &nbsp;'A quote after 2 spaces.'",
+				"stop. &nbsp;&#8216;A quote after 2 spaces.&#8217;",
+			),
+			array(
+				"stop.&nbsp;&nbsp;'A quote after 2 spaces.'",
+				"stop.&nbsp;&nbsp;&#8216;A quote after 2 spaces.&#8217;",
+			),
+			array(
+				"Contraction: $pi's",
+				"Contraction: $pi&#8217;s",
+			),
+		);
+	}
+
+	/**
+	 * Apostrophe before a number always becomes &#8217 (apos);
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_apos_before_digits
+	 */
+	function test_apos_before_digits( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_apos_before_digits() {
+		return array(
+			array(
+				"word '99 word",
+				"word &#8217;99 word",
+			),
+			array(
+				"word'99 word",
+				"word&#8217;99 word",
+			),
+			array(
+				"word '99word",
+				"word &#8217;99word",
+			),
+			array(
+				"word'99word",
+				"word&#8217;99word",
+			),
+			array(
+				"word '99&#8217;s word", // Appears as a separate but logically superfluous pattern in 3.8.
+				"word &#8217;99&#8217;s word",
+			),
+			array(
+				"word '99's word", // Due to the logic error, second apos becomes a prime.  See ticket #22823
+				"word &#8217;99&#8242;s word",
+			),
+			array(
+				"word '99'samsonite",
+				"word &#8217;99&#8242;samsonite",
+			),
+			array(
+				"according to our source, '33% of all students scored less than 50' on the test.", // Apostrophes and primes have priority over quotes
+				"according to our source, &#8217;33% of all students scored less than 50&#8242; on the test.",
+			),
+			array(
+				"word '99' word", // See ticket #8775
+				"word &#8217;99&#8242; word",
+			),
+		);
+	}
+
+	/**
+	 * Apostrophe after a space or ([{<" becomes &#8216; (opening_single_quote)
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_opening_single_quote
+	 */
+	function test_opening_single_quote( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_opening_single_quote() {
+		return array(
+			array(
+				"word 'word word",
+				"word &#8216;word word",
+			),
+			array(
+				"word ('word word",
+				"word (&#8216;word word",
+			),
+			array(
+				"word ['word word",
+				"word [&#8216;word word",
+			),
+			array(
+				"word <'word word", // Invalid HTML input?
+				"word <&#8216;word word",
+			),
+			array(
+				"word &lt;'word word", // Valid HTML input triggers the apos in a word pattern
+				"word &lt;&#8217;word word",
+			),
+			array(
+				"word {'word word",
+				"word {&#8216;word word",
+			),
+			array(
+				"word \"'word word",
+				"word &#8220;&#8216;word word", // Two opening quotes
+			),
+			array(
+				"'word word",
+				"&#8216;word word",
+			),
+			array(
+				"word('word word",
+				"word(&#8216;word word",
+			),
+			array(
+				"word['word word",
+				"word[&#8216;word word",
+			),
+			array(
+				"word<'word word",
+				"word<&#8216;word word",
+			),
+			array(
+				"word&lt;'word word",
+				"word&lt;&#8217;word word",
+			),
+			array(
+				"word{'word word",
+				"word{&#8216;word word",
+			),
+			array(
+				"word\"'word word",
+				"word&#8221;&#8216;word word", // Closing quote, then opening quote
+			),
+			array(
+				"word ' word word",
+				"word &#8216; word word",
+			),
+			array(
+				"word (' word word",
+				"word (&#8216; word word",
+			),
+			array(
+				"word [' word word",
+				"word [&#8216; word word",
+			),
+			array(
+				"word <' word word", // Invalid HTML input?
+				"word <&#8216; word word",
+			),
+			array(
+				"word &lt;' word word", // Valid HTML input triggers the closing single quote here
+				"word &lt;&#8217; word word",
+			),
+			array(
+				"word {' word word",
+				"word {&#8216; word word",
+			),
+			array(
+				"word \"' word word",
+				"word &#8220;&#8216; word word", // Two opening quotes
+			),
+			array(
+				"' word word",
+				"&#8216; word word",
+			),
+			array(
+				"word(' word word",
+				"word(&#8216; word word",
+			),
+			array(
+				"word[' word word",
+				"word[&#8216; word word",
+			),
+			array(
+				"word<' word word",
+				"word<&#8216; word word",
+			),
+			array(
+				"word&lt;' word word",
+				"word&lt;&#8217; word word",
+			),
+			array(
+				"word{' word word",
+				"word{&#8216; word word",
+			),
+			array(
+				"word\"' word word",
+				"word&#8221;&#8216; word word", // Closing quote, then opening quote
+			),
+		);
+	}
+
+	/**
+	 * Double quote after a number becomes &#8243; (double_prime)
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_double_prime
+	 */
+	function test_double_prime( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_double_prime() {
+		return array(
+			array(
+				'word 99" word',
+				'word 99&#8243; word',
+			),
+			array(
+				'word 99"word',
+				'word 99&#8243;word',
+			),
+			array(
+				'word99" word',
+				'word99&#8243; word',
+			),
+			array(
+				'word99"word',
+				'word99&#8243;word',
+			),
+		);
+	}
+
+	/**
+	 * Apostrophe after a number becomes &#8242; (prime)
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_single_prime
+	 */
+	function test_single_prime( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_single_prime() {
+		return array(
+			array(
+				"word 99' word",
+				"word 99&#8242; word",
+			),
+			array(
+				"word 99'word",
+				"word 99&#8242;word",
+			),
+			array(
+				"word99' word",
+				"word99&#8242; word",
+			),
+			array(
+				"word99'word",
+				"word99&#8242;word",
+			),
+		);
+	}
+
+	/**
+	 * Apostrophe "in a word" becomes &#8217; (apos)
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_contractions
+	 */
+	function test_contractions( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_contractions() {
+		return array(
+			array(
+				"word word's word",
+				"word word&#8217;s word",
+			),
+			array(
+				"word word'. word", // Quotes with outside punctuation could end with apostrophes instead of closing quotes (may affect i18n)
+				"word word&#8217;. word",
+			),
+			array(
+				"word ]'. word",
+				"word ]&#8217;. word",
+			),
+			array(
+				"word )'. word",
+				"word )&#8217;. word",
+			),
+			array(
+				"word }'. word",
+				"word }&#8217;. word",
+			),
+			array(
+				"word >'. word", // Not tested
+				"word >&#8217;. word",
+			),
+			array(
+				"word &gt;'. word",
+				"word &gt;&#8217;. word",
+			),
+		);
+	}
+
+	/**
+	 * Double quote after a space or ([{< becomes &#8220; (opening_quote) if not followed by spaces
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_opening_quote
+	 */
+	function test_opening_quote( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_opening_quote() {
+		return array(
+			array(
+				'word "word word',
+				'word &#8220;word word',
+			),
+			array(
+				'word ("word word',
+				'word (&#8220;word word',
+			),
+			array(
+				'word ["word word',
+				'word [&#8220;word word',
+			),
+			array(
+				'word <"word word', // Invalid HTML input?
+				'word <&#8220;word word',
+			),
+			array(
+				'word &lt;"word word', // Valid HTML input triggers the closing quote pattern
+				'word &lt;&#8221;word word',
+			),
+			array(
+				'word {"word word',
+				'word {&#8220;word word',
+			),
+			array(
+				'"word word',
+				'&#8220;word word',
+			),
+			array(
+				'word("word word',
+				'word(&#8220;word word',
+			),
+			array(
+				'word["word word',
+				'word[&#8220;word word',
+			),
+			array(
+				'word<"word word', // Invalid HTML input?
+				'word<&#8220;word word',
+			),
+			array(
+				'word&lt;"word word', // Valid HTML input triggers the closing quote pattern
+				'word&lt;&#8221;word word',
+			),
+			array(
+				'word{"word word',
+				'word{&#8220;word word',
+			),
+			array(
+				'word "99 word',
+				'word &#8220;99 word',
+			),
+		);
+	}
+
+	/**
+	 * Double quote becomes &#8221; (closing_quote) unless it is already converted to double_prime or opening_quote.
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_closing_quote
+	 */
+	function test_closing_quote( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_closing_quote() {
+		return array(
+			array(
+				'word word" word',
+				'word word&#8221; word',
+			),
+			array(
+				'word word") word',
+				'word word&#8221;) word',
+			),
+			array(
+				'word word"] word',
+				'word word&#8221;] word',
+			),
+			array(
+				'word word"} word',
+				'word word&#8221;} word',
+			),
+			array(
+				'word word"> word', // Invalid HTML input?
+				'word word&#8221;> word',
+			),
+			array(
+				'word word"&gt; word', // Valid HTML should work
+				'word word&#8221;&gt; word',
+			),
+			array(
+				'word word"',
+				'word word&#8221;',
+			),
+			array(
+				'word word"word',
+				'word word&#8221;word',
+			),
+			array(
+				'word"word"word',
+				'word&#8221;word&#8221;word',
+			),
+			array(
+				'test sentence".',
+				'test sentence&#8221;.',
+			),
+			array(
+				'test sentence."',
+				'test sentence.&#8221;',
+			),
+			array(
+				'test sentence". word',
+				'test sentence&#8221;. word',
+			),
+			array(
+				'test sentence." word',
+				'test sentence.&#8221; word',
+			),
+		);
+	}
+
+	/**
+	 * Test that single quotes followed by a space or a period become &#8217; (closing_single_quote)
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_closing_single_quote
+	 */
+	function test_closing_single_quote( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_closing_single_quote() {
+		return array(
+			array(
+				"word word' word",
+				"word word&#8217; word",
+			),
+			array(
+				"word word'. word",
+				"word word&#8217;. word",
+			),
+			array(
+				"word word'.word",
+				"word word&#8217;.word",
+			),
+			array(
+				"word word'",
+				"word word&#8217;",
+			),
+			array(
+				"test sentence'.",
+				"test sentence&#8217;.",
+			),
+			array(
+				"test sentence.'",
+				"test sentence.&#8217;",
+			),
+			array(
+				"test sentence'. word",
+				"test sentence&#8217;. word",
+			),
+			array(
+				"test sentence.' word",
+				"test sentence.&#8217; word",
+			),
+		);
+	}
+
+	/**
+	 * Tests multiplication.
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_multiplication
+	 */
+	function test_multiplication( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_multiplication() {
+		return array(
+			array(
+				"9x9",
+				"9&#215;9",
+			),
+			array(
+				"12x34",
+				"12&#215;34",
+			),
+			array(
+				"9 x 9",
+				"9 x 9",
+			),
+		);
+	}
+
+	/**
+	 * Test ampersands. & always becomes &#038; unless it is followed by # or ;
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_ampersand
+	 */
+	function test_ampersand( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_ampersand() {
+		return array(
+			array(
+				"word & word",
+				"word &#038; word",
+			),
+			array(
+				"word&word",
+				"word&#038;word",
+			),
+			array(
+				"word &nbsp; word",
+				"word &nbsp; word",
+			),
+			array(
+				"word &#038; word",
+				"word &#038; word",
+			),
+			array(
+				"word &# word",
+				"word &# word", // invalid output?
+			),
+			array(
+				"word &44; word",
+				"word &44; word",
+			),
+			array(
+				"word &&amp; word",
+				"word &&amp; word",
+			),
+			array(
+				"word &!amp; word",
+				"word &!amp; word",
+			),
+		);
+	}
+
+	/**
+	 * Test "cockney" phrases, which begin with an apostrophe instead of an opening single quote.
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_cockney
+	 */
+	function test_cockney( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_cockney() {
+		return array(
+			array(
+				"word 'tain't word",
+				"word &#8217;tain&#8217;t word",
+			),
+			array(
+				"word 'twere word",
+				"word &#8217;twere word",
+			),
+			array(
+				"word 'twas word",
+				"word &#8217;twas word",
+			),
+			array(
+				"word 'tis word",
+				"word &#8217;tis word",
+			),
+			array(
+				"word 'twill word",
+				"word &#8217;twill word",
+			),
+			array(
+				"word 'til word",
+				"word &#8217;til word",
+			),
+			array(
+				"word 'bout word",
+				"word &#8217;bout word",
+			),
+			array(
+				"word 'nuff word",
+				"word &#8217;nuff word",
+			),
+			array(
+				"word 'round word",
+				"word &#8217;round word",
+			),
+			array(
+				"word 'cause word",
+				"word &#8217;cause word",
+			),
+			array(
+				"word 'em word",
+				"word &#8216;em word",
+			),
+		);
+	}
+
+	/**
+	 * Test smart dashes.
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_smart_dashes
+	 */
+	function test_smart_dashes( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_smart_dashes() {
+		return array(
+			array(
+				"word --- word",
+				"word &#8212; word",
+			),
+			array(
+				"word---word",
+				"word&#8212;word",
+			),
+			array(
+				"word -- word",
+				"word &#8212; word",
+			),
+			array(
+				"word--word",
+				"word&#8211;word",
+			),
+			array(
+				"word - word",
+				"word &#8211; word",
+			),
+			array(
+				"word-word",
+				"word-word",
+			),
+			array(
+				"word xn&#8211; word",
+				"word xn-- word",
+			),
+			array(
+				"wordxn&#8211;word",
+				"wordxn--word",
+			),
+		);
+	}
+
+	/**
+	 * Test miscellaneous static replacements.
+	 *
+	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
+	 *
+	 * @ticket 22692
+	 * @dataProvider data_misc_static_replacements
+	 */
+	function test_misc_static_replacements( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_misc_static_replacements() {
+		return array(
+			array(
+				"word ... word",
+				"word &#8230; word",
+			),
+			array(
+				"word...word",
+				"word&#8230;word",
+			),
+			array(
+				"word `` word",
+				"word &#8220; word",
+			),
+			array(
+				"word``word",
+				"word&#8220;word",
+			),
+			array(
+				"word '' word",
+				"word &#8221; word",
+			),
+			array(
+				"word''word",
+				"word&#8221;word",
+			),
+			array(
+				"word (tm) word",
+				"word &#8482; word",
+			),
+			array(
+				"word (tm)word",
+				"word &#8482;word",
+			),
+			array(
+				"word(tm) word",
+				"word(tm) word",
+			),
+			array(
+				"word(tm)word",
+				"word(tm)word",
+			),
+		);
 	}
 }
