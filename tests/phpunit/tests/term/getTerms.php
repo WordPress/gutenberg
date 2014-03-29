@@ -333,4 +333,22 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$terms = get_terms( 'category', array( 'child_of' => $parent, 'hide_empty' => false ) );
 		$this->assertEquals( 1, count( $terms ) );
 	}
+
+	/**
+	 * @ticket 27123
+	 */
+	function test_get_term_children_recursion() {
+		// Assume there is a way to insert a term with the parent pointing to itself
+		// See: https://core.trac.wordpress.org/changeset/15806
+		remove_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10 );
+
+		$term = wp_insert_term( 'Test', 'category' );
+		$term = wp_update_term( $term['term_id'], 'category', array( 'parent' => $term['term_id'] ) );
+		$term = get_term( $term['term_id'], 'category' );
+
+		$this->assertEquals( $term->term_id, $term->parent );
+		$this->assertInternalType( 'array', get_term_children( $term->term_id, 'category' ) );
+
+		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
+	}
 }
