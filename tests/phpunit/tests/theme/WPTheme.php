@@ -122,7 +122,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 		$this->assertEquals( get_theme_root_uri() . '/subdir/theme%20with%20spaces', get_template_directory_uri() );
 
 		remove_filter( 'stylesheet', $callback );
-		add_filter( 'template', $callback );
+		remove_filter( 'template', $callback );
 	}
 
 	function filter_theme_with_spaces() {
