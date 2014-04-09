@@ -29,6 +29,13 @@ class Tests_Basic extends WP_UnitTestCase {
 		$this->assertEquals( $version, trim( $matches[1] ), "readme.html's version needs to be updated to $version." );
 	}
 
+	function test_license() {
+		$license = file_get_contents( ABSPATH . 'license.txt' );
+		preg_match( '#Copyright (\d+) by the contributors#', $license, $matches );
+		$this_year = date( 'Y' );
+		$this->assertEquals( $this_year, trim( $matches[1] ), "license.txt's year needs to be updated to $this_year." );
+	}
+
 	function test_package_json() {
 		$package_json = file_get_contents( dirname( ABSPATH ) . '/package.json' );
 		$package_json = json_decode( $package_json, true );
