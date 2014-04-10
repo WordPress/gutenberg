@@ -12,13 +12,15 @@ class Tests_XMLRPC_wp_setOptions extends WP_XMLRPC_UnitTestCase {
 		$string_with_quote = "Mary's Lamb Shop";
 		$escaped_string_with_quote = esc_html( $string_with_quote ); // title is passed through esc_html()
 
+		update_option( 'default_comment_status', 'closed' );
+		$this->assertEquals( 'closed', get_option( 'default_comment_status' ) );
 		$result = $this->myxmlrpcserver->wp_setOptions( array( 1, 'administrator', 'administrator', array(
 			'blog_title' => $string_with_quote,
-			'users_can_register' => true,
+			'default_comment_status' => 'open',
 		) ) );
 
 		$this->assertInternalType( 'array', $result );
 		$this->assertEquals( $escaped_string_with_quote, $result['blog_title']['value'] );
-		$this->assertEquals( true, $result['users_can_register']['value'] );
+		$this->assertEquals( 'open', $result['default_comment_status']['value'] );
 	}
 }
