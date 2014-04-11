@@ -56,6 +56,7 @@ module.exports = function(grunt) {
 							'!wp-includes/js/backbone.js',
 							'!wp-includes/js/underscore.js',
 							'!wp-includes/js/jquery/jquery.masonry.js',
+							'!wp-includes/js/tinymce/tinymce.js',
 							'!wp-includes/version.php' // Exclude version.php
 						],
 						dest: BUILD_DIR
