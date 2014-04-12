@@ -101,6 +101,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertEquals( $names, $values );
 	}
 
+	/**
+	 * @ticket 21119
+	 */
 	function test_prepare_query() {
 		$query = new WP_User_Query();
 		$this->assertEmpty( $query->query_fields );
