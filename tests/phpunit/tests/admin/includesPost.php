@@ -5,6 +5,11 @@
  */
 class Tests_Admin_includesPost extends WP_UnitTestCase {
 
+	function tearDown() {
+		wp_set_current_user( 0 );
+		parent::tearDown();
+	}
+
 	function test__wp_translate_postdata_cap_checks_contributor() {
 		$contributor_id = $this->factory->user->create( array( 'role' => 'contributor' ) );
 		$editor_id = $this->factory->user->create( array( 'role' => 'editor' ) );
@@ -56,8 +61,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Error', $_results );
 		$this->assertEquals( 'edit_others_posts', $_results->get_error_code() );
 		$this->assertEquals( 'You are not allowed to edit posts as this user.', $_results->get_error_message() );
-
-		wp_set_current_user( 0 );
 	}
 
 	function test__wp_translate_postdata_cap_checks_editor() {
@@ -111,8 +114,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$this->assertNotInstanceOf( 'WP_Error', $_results );
 		$this->assertEquals( $_post_data['post_author'], $_results['post_author'] );
 		$this->assertEquals( 'draft', $_results['post_status'] );
-
-		wp_set_current_user( 0 );
 	}
 
 	/**
@@ -133,7 +134,48 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		);
 		edit_post( $post_data );
 		$this->assertEquals( 'draft', get_post( $post->ID )->post_status );
-		wp_set_current_user( 0 );
+	}
+
+	/**
+	 * @ticket 27792
+	 */
+	function test_bulk_edit_posts_stomping() {
+		$admin = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$users = $this->factory->user->create_many( 2, array( 'role' => 'author' ) );
+		wp_set_current_user( $admin );
+
+		$post1 = $this->factory->post->create( array(
+			'post_author'    => $users[0],
+			'comment_status' => 'open',
+			'ping_status'    => 'open',
+			'post_status'    => 'publish',
+		) );
+
+		$post2 = $this->factory->post->create( array(
+			'post_author'    => $users[1],
+			'comment_status' => 'closed',
+			'ping_status'    => 'closed',
+			'post_status'    => 'draft',
+		) );
+
+		$request = array(
+			'post_type'        => 'post',
+			'post_author'      => -1,
+			'ping_status'      => -1,
+			'comment_status'   => -1,
+			'_status'          => -1,
+			'post'             => array( $post1, $post2 ),
+		);
+
+		$done = bulk_edit_posts( $request );
+
+		$post = get_post( $post2 );
+
+		// Check that the first post's values don't stomp the second post.
+		$this->assertEquals( 'draft', $post->post_status );
+		$this->assertEquals( $users[1], $post->post_author );
+		$this->assertEquals( 'closed', $post->comment_status );
+		$this->assertEquals( 'closed', $post->ping_status );
 	}
 
 }
