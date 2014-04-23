@@ -62,4 +62,40 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( array( $image_id ), $posts );
 	}
+
+	/**
+	 * @ticket 27193
+	 */
+	function test_cat_or_tag() {
+		$category1 = $this->factory->term->create( array( 'taxonomy' => 'category', 'name' => 'alpha' ) );
+		$category2 = $this->factory->term->create( array( 'taxonomy' => 'category', 'name' => 'beta' ) );
+
+		$tag1 = $this->factory->term->create( array( 'taxonomy' => 'post_tag', 'name' => 'gamma' ) );
+		$tag2 = $this->factory->term->create( array( 'taxonomy' => 'post_tag', 'name' => 'delta' ) );
+
+		$post_id1 = $this->factory->post->create( array( 'post_title' => 'alpha', 'post_category' => array( $category1 ) ) );
+		$terms1 = get_the_category( $post_id1 );
+		$this->assertEquals( array( get_category( $category1 ) ), $terms1 );
+
+		$post_id2 = $this->factory->post->create( array( 'post_title' => 'beta', 'post_category' => array( $category2 ) ) );
+		$terms2 = get_the_category( $post_id2 );
+		$this->assertEquals( array( get_category( $category2 ) ), $terms2 );
+
+		$post_id3 = $this->factory->post->create( array( 'post_title' => 'gamma', 'post_tag' => array( $tag1 ) ) );
+		$post_id4 = $this->factory->post->create( array( 'post_title' => 'delta', 'post_tag' => array( $tag2 ) ) );
+
+		$query = new WP_Query( array(
+			'fields' => 'ids',
+			'tax_query' => array(
+				//'relation' => 'OR',
+				array(
+					'taxonomy' => 'category',
+					'field' => 'term_id',
+					'terms' => array( $category1, $category2 )
+				)
+			)
+		) );
+		$ids = $query->get_posts();
+		$this->assertEquals( array( $post_id1, $post_id2 ), $ids );
+	}
 }
