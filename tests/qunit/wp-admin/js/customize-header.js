@@ -103,6 +103,29 @@ jQuery( function() {
 			imageWidth: 10000,
 			imageHeight: 8600
 		});
+
+		equal(this.model.shouldBeCropped(), false);
+	});
+
+	test('should not be cropped when the image width is smaller or equal as theme width', function() {
+		this.model.set({
+			themeFlexWidth: false,
+			themeFlexHeight: false,
+			imageWidth: 1000,
+			imageHeight: 100
+		});
+
+		equal(this.model.shouldBeCropped(), false);
+	});
+
+	test('should not be cropped when the image width is smaller or equal as theme width, theme supports flex height and width', function() {
+		this.model.set({
+			themeFlexWidth: true,
+			themeFlexHeight: true,
+			imageWidth: 900,
+			imageHeight: 100
+		});
+
 		equal(this.model.shouldBeCropped(), false);
 	});
 });
