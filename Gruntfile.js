@@ -236,8 +236,14 @@ module.exports = function(grunt) {
 					curly: false,
 					eqeqeq: false
 				},
-				// Limit JSHint's run to a single specified file
-				//     grunt jshint:core --file=filename.js
+				// Limit JSHint's run to a single specified file:
+				//
+				//    grunt jshint:core --file=filename.js
+				//
+				// Optionally, include the file path:
+				//
+				//    grunt jshint:core --file=path/to/filename.js
+				//
 				filter: function( filepath ) {
 					var index, file = grunt.option( 'file' );
 
