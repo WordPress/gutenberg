@@ -57,6 +57,26 @@ jQuery( function() {
 		equal( result, undefined, 'foo shortcode not found when escaped with params' );
 	});
 
+	test( 'next() should find shortcodes that are incorrectly escaped by newlines', function() {
+		var result;
+
+		result = wp.shortcode.next( 'foo', 'this has the [\n[foo]] shortcode' );
+		equal( result.index, 15, 'shortcode found when incorrectly escaping the start of it' );
+
+		result = wp.shortcode.next( 'foo', 'this has the [[foo]\n] shortcode' );
+		equal( result.index, 14, 'shortcode found when incorrectly escaping the end of it' );
+	});
+
+	test( 'next() should still work when there are not equal ammounts of square brackets', function() {
+		var result;
+
+		result = wp.shortcode.next( 'foo', 'this has the [[foo] shortcode' );
+		equal( result.index, 14, 'shortcode found when there are offset square brackets' );
+
+		result = wp.shortcode.next( 'foo', 'this has the [foo]] shortcode' );
+		equal( result.index, 13, 'shortcode found when there are offset square brackets' );
+	});
+
 	test( 'next() should find the second instances of the shortcode when the first one is escaped', function() {
 		var result;
 
@@ -121,6 +141,16 @@ jQuery( function() {
 
 		result = wp.shortcode.replace( 'foo', 'this [foo] has the [[foo param="bar"]] shortcode escaped', shortcodeReplaceCallback );
 		equal( result, 'this bar has the [[foo param="bar"]] shortcode escaped', 'escaped foo with params not replaced but unescaped foo replaced' );
+	});
+
+	test( 'replace() should replace improperly escaped shortcodes that include newlines', function() {
+		var result;
+
+		result = wp.shortcode.replace( 'foo', 'this [foo] has the [[foo param="bar"]\n] shortcode ', shortcodeReplaceCallback );
+		equal( result, 'this bar has the [bar\n] shortcode ', 'escaping with newlines should not actually escape the content' );
+
+		result = wp.shortcode.replace( 'foo', 'this [foo] has the [\n[foo param="bar"]] shortcode ', shortcodeReplaceCallback );
+		equal( result, 'this bar has the [\nbar] shortcode ', 'escaping with newlines should not actually escape the content' );
 	});
 
 	test( 'replace() should not replace the shortcode when it is an incomplete match', function() {
