@@ -555,4 +555,49 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 	}
+
+	public function test_date_params_monthnum_m_duplicate() {
+		$posts = $this->_get_query_result( array(
+			'date_query' => array(
+				'month' => 5,
+				'monthnum' => 9
+			),
+		) );
+
+		$expected_dates = array(
+			'1972-05-24 14:53:45',
+			'2003-05-27 22:45:07',
+			'2004-05-22 12:34:12',
+			'2007-05-16 17:32:22',
+			'2025-05-20 10:13:01',
+		);
+
+		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+
+		$this->assertContains( "AND ( ( MONTH( post_date ) = 5 ) ) AND", $this->q->request );
+
+		$this->assertNotContains( "AND ( ( MONTH( post_date ) = 5 AND MONTH( post_date ) = 9 ) ) AND", $this->q->request );
+	}
+
+	public function test_date_params_week_w_duplicate() {
+		$posts = $this->_get_query_result( array(
+			'date_query' => array(
+				'week' => 21,
+				'w' => 22
+			),
+		) );
+
+		$expected_dates = array(
+			'1972-05-24 14:53:45',
+			'2004-05-22 12:34:12',
+			'2025-05-20 10:13:01',
+		);
+
+
+		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+
+		$this->assertContains( "AND ( ( WEEK( post_date, 1 ) = 21 ) ) AND", $this->q->request );
+
+		$this->assertNotContains( "AND ( ( WEEK( post_date, 1 ) = 21 AND WEEK( post_date, 1 ) = 22 ) ) AND", $this->q->request );
+	}
 }
