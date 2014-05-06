@@ -1225,6 +1225,7 @@ class Tests_MS extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27003
+	 * @ticket 27927
 	 */
 	function test_get_site_by_path() {
 		$ids = array(
@@ -1233,6 +1234,9 @@ class Tests_MS extends WP_UnitTestCase {
 			'wordpress.org/foo/bar/'      => array( 'domain' => 'wordpress.org',      'path' => '/foo/bar/' ),
 			'make.wordpress.org/'         => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
 			'make.wordpress.org/foo/'     => array( 'domain' => 'make.wordpress.org', 'path' => '/foo/' ),
+			'www.w.org/'                  => array( 'domain' => 'www.w.org',          'path' => '/' ),
+			'www.w.org/foo/'              => array( 'domain' => 'www.w.org',          'path' => '/foo/' ),
+			'www.w.org/foo/bar/'          => array( 'domain' => 'www.w.org',          'path' => '/foo/bar/' ),
 		);
 
 		foreach ( $ids as &$id ) {
@@ -1243,23 +1247,66 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertEquals( $ids['wordpress.org/'],
 			get_site_by_path( 'wordpress.org', '/notapath/' )->blog_id );
 
+		$this->assertEquals( $ids['wordpress.org/'],
+			get_site_by_path( 'www.wordpress.org', '/notapath/' )->blog_id );
+
 		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
 			get_site_by_path( 'wordpress.org', '/foo/bar/baz/' )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/' )->blog_id );
 
 		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
 			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 3 )->blog_id );
 
 		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 3 )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
 			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 2 )->blog_id );
+
+		$this->assertEquals( $ids['wordpress.org/foo/bar/'],
+			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 2 )->blog_id );
 
 		$this->assertEquals( $ids['wordpress.org/foo/'],
 			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 1 )->blog_id );
 
+		$this->assertEquals( $ids['wordpress.org/foo/'],
+			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 1 )->blog_id );
+
 		$this->assertEquals( $ids['wordpress.org/'],
 			get_site_by_path( 'wordpress.org', '/', 0 )->blog_id );
 
+		$this->assertEquals( $ids['wordpress.org/'],
+			get_site_by_path( 'www.wordpress.org', '/', 0 )->blog_id );
+
 		$this->assertEquals( $ids['make.wordpress.org/foo/'],
 			get_site_by_path( 'make.wordpress.org', '/foo/bar/baz/qux/', 4 )->blog_id );
+
+		$this->assertEquals( $ids['make.wordpress.org/foo/'],
+			get_site_by_path( 'www.make.wordpress.org', '/foo/bar/baz/qux/', 4 )->blog_id );
+
+		$this->assertEquals( $ids['www.w.org/'],
+			get_site_by_path( 'www.w.org', '/', 0 )->blog_id );
+
+		$this->assertEquals( $ids['www.w.org/'],
+			get_site_by_path( 'www.w.org', '/notapath/' )->blog_id );
+
+		$this->assertEquals( $ids['www.w.org/foo/bar/'],
+			get_site_by_path( 'www.w.org', '/foo/bar/baz/' )->blog_id );
+
+		$this->assertEquals( $ids['www.w.org/foo/'],
+			get_site_by_path( 'www.w.org', '/foo/bar/baz/', 1 )->blog_id );
+
+		// A site installed with www will not be found by the root domain.
+		$this->assertFalse( get_site_by_path( 'w.org', '/' ) );
+		$this->assertFalse( get_site_by_path( 'w.org', '/notapath/' ) );
+		$this->assertFalse( get_site_by_path( 'w.org', '/foo/bar/baz/' ) );
+		$this->assertFalse( get_site_by_path( 'w.org', '/foo/bar/baz/', 1 ) );
+
+		// A site will not be found by its root domain when an invalid subdomain is requested.
+		$this->assertFalse( get_site_by_path( 'invalid.wordpress.org', '/' ) );
+		$this->assertFalse( get_site_by_path( 'invalid.wordpress.org', '/foo/bar/' ) );
 	}
 
 	/**
