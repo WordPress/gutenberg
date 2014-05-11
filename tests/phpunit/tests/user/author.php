@@ -75,4 +75,11 @@ class Tests_User_Author extends WP_UnitTestCase {
 		$this->assertEquals( '', get_the_author_meta( 'user_login' ) );
 		$this->assertEquals( '', get_the_author_meta( 'does_not_exist' ) );
 	}
+
+	function test_get_the_author_posts() {
+		// Test with no global post, result should be 0 because no author is found
+		$this->assertEquals( 0, get_the_author_posts() );
+		$GLOBALS['post'] = $this->post_id;
+		$this->assertEquals( 1, get_the_author_posts() );
+	}
 }
