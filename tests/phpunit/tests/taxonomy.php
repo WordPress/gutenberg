@@ -168,4 +168,40 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		wp_set_object_terms( $post->ID, $term['term_id'], 'category' );
 		$this->assertTrue( in_category( $term['term_id'], $post ) );
 	}
+
+	function test_insert_category_create() {
+		$cat = array(
+			'cat_ID' => 0,
+			'taxonomy' => 'category',
+			'cat_name' => 'test1'
+		);
+		$this->assertTrue( is_numeric( wp_insert_category( $cat, true ) ) );
+	}
+
+	function test_insert_category_update() {
+		$cat = array(
+			'cat_ID' => 1,
+			'taxonomy' => 'category',
+			'cat_name' => 'Updated Name'
+		);
+		$this->assertEquals( 1, wp_insert_category( $cat ) );
+	}
+
+	function test_insert_category_force_error_handle() {
+		$cat = array(
+			'cat_ID' => 0,
+			'taxonomy' => 'force_error',
+			'cat_name' => 'Error'
+		);
+		$this->assertTrue( is_a( wp_insert_category( $cat, true ), 'WP_Error' ) );
+	}
+
+	function test_insert_category_force_error_no_handle() {
+		$cat = array(
+			'cat_ID' => 0,
+			'taxonomy' => 'force_error',
+			'cat_name' => 'Error'
+		);
+		$this->assertEquals( 0, wp_insert_category( $cat, false ) );
+	}
 }
