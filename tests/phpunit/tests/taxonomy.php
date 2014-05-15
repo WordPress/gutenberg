@@ -49,6 +49,18 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertEquals( array( 'category', 'post_tag' ), array_keys( $taxes ) );
 	}
 
+	function test_the_taxonomies() {
+		$post_id = $this->factory->post->create();
+
+		ob_start();
+		the_taxonomies( array( 'post' => $post_id ) );
+		$output = ob_get_clean();
+
+		$link = get_category_link( 1 );
+		$expected = "Categories: <a href='$link'>Uncategorized</a>.";
+		$this->assertEquals( $expected, $output );
+	}
+
 	function test_get_link_taxonomy() {
 		foreach ( get_object_taxonomies('link') as $taxonomy ) {
 			$tax = get_taxonomy($taxonomy);
