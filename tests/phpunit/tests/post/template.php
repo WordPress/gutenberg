@@ -72,4 +72,63 @@ class Tests_Post_Template extends WP_UnitTestCase {
 
 		$this->assertEquals( $pagelink, $output );
 	}
+
+	function test_wp_dropdown_pages() {
+		$none = wp_dropdown_pages( array( 'echo' => 0 ) );
+		$this->assertEmpty( $none );
+
+		$bump = '&nbsp;&nbsp;&nbsp;';
+		$page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$child_id = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id ) );
+		$grandchild_id = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $child_id ) );
+
+		$lineage =<<<LINEAGE
+<select name='page_id' id='page_id'>
+	<option class="level-0" value="$page_id">Post title 1</option>
+	<option class="level-1" value="$child_id">{$bump}Post title 2</option>
+	<option class="level-2" value="$grandchild_id">{$bump}{$bump}Post title 3</option>
+</select>
+
+LINEAGE;
+
+		$output = wp_dropdown_pages( array( 'echo' => 0 ) );
+		$this->assertEquals( $lineage, $output );
+
+		$depth =<<<DEPTH
+<select name='page_id' id='page_id'>
+	<option class="level-0" value="$page_id">Post title 1</option>
+</select>
+
+DEPTH;
+
+		$output = wp_dropdown_pages( array( 'echo' => 0, 'depth' => 1 ) );
+		$this->assertEquals( $depth, $output );
+
+		$option_none =<<<NONE
+<select name='page_id' id='page_id'>
+	<option value="Woo">Hoo</option>
+	<option class="level-0" value="$page_id">Post title 1</option>
+</select>
+
+NONE;
+
+		$output = wp_dropdown_pages( array( 'echo' => 0, 'depth' => 1,
+			'show_option_none' => 'Hoo', 'option_none_value' => 'Woo'
+		) );
+		$this->assertEquals( $option_none, $output );
+
+		$option_no_change =<<<NO
+<select name='page_id' id='page_id'>
+	<option value="-1">Burrito</option>
+	<option value="Woo">Hoo</option>
+	<option class="level-0" value="$page_id">Post title 1</option>
+</select>
+
+NO;
+		$output = wp_dropdown_pages( array( 'echo' => 0, 'depth' => 1,
+			'show_option_none' => 'Hoo', 'option_none_value' => 'Woo',
+			'show_option_no_change' => 'Burrito'
+		) );
+		$this->assertEquals( $option_no_change, $output );
+	}
 }

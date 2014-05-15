@@ -164,7 +164,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 22389
 	 */
 	function test_wp_dropdown_pages() {
-		$posts = $this->factory->post->create_many( 5, array( 'post_type' => 'page' ) );
+		$this->factory->post->create_many( 5, array( 'post_type' => 'page' ) );
 
 		preg_match_all( '#<option#', wp_dropdown_pages( 'echo=0' ), $matches );
 
