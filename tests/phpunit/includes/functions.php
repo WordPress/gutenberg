@@ -42,3 +42,10 @@ function _delete_all_posts() {
 	}
 }
 
+class Basic_Object {
+	private $foo = 'bar';
+
+	function __get( $name ) {
+		return $this->$name;
+	}
+}

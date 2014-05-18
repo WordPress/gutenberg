@@ -1,5 +1,4 @@
 <?php
-
 /**
  * just make sure the test framework is working
  *
@@ -121,5 +120,11 @@ EOF;
 		$empty_array[$page][$field] = 'foo';
 
 		unset( $empty_array[$page]['bar']['baz'] );
+	}
+
+	function test_magic_getter() {
+		$basic = new Basic_Object();
+
+		$this->assertEquals( 'bar', $basic->foo );
 	}
 }
