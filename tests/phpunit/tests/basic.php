@@ -145,4 +145,18 @@ EOF;
 
 		$this->assertEquals( 'maybe', $basic->callMe() );
 	}
+
+	function test_subclass_isset() {
+		$basic = new Basic_Subclass();
+
+		$this->assertTrue( isset( $basic->foo ) );
+	}
+
+	function test_subclass_unset() {
+		$basic = new Basic_Subclass();
+
+		unset( $basic->foo );
+
+		$this->assertFalse( isset( $basic->foo ) );
+	}
 }
