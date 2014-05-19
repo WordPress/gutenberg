@@ -127,4 +127,22 @@ EOF;
 
 		$this->assertEquals( 'bar', $basic->foo );
 	}
+
+	function test_subclass_magic_getter() {
+		$basic = new Basic_Subclass();
+
+		$this->assertEquals( 'bar', $basic->foo );
+	}
+
+	function test_call_method() {
+		$basic = new Basic_Object();
+
+		$this->assertEquals( 'maybe', $basic->callMe() );
+	}
+
+	function test_subclass_call_method() {
+		$basic = new Basic_Subclass();
+
+		$this->assertEquals( 'maybe', $basic->callMe() );
+	}
 }

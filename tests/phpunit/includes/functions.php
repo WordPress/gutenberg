@@ -45,7 +45,17 @@ function _delete_all_posts() {
 class Basic_Object {
 	private $foo = 'bar';
 
-	function __get( $name ) {
+	public function __get( $name ) {
 		return $this->$name;
 	}
+
+	public function __call( $name, $arguments ) {
+		return call_user_func_array( array( $this, $name ), $arguments );
+	}
+
+	private function callMe() {
+		return 'maybe';
+	}
 }
+
+class Basic_Subclass extends Basic_Object {}
