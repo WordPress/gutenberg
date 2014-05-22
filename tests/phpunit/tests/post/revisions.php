@@ -338,4 +338,51 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			$this->assertTrue( user_can( $author_user_id, 'read_post', $revision->ID ) );
 		}
 	}
+
+	/**
+	 * @ticket 26042
+	 */
+	function test_wp_get_posts_revisions_sql() {
+		$post = get_default_post_to_edit( 'post', true );
+
+		add_filter( 'query', array( $this, '_filter_query' ) );
+
+		wp_get_post_revisions( $post->ID );
+	}
+
+	function _filter_query( $sql ) {
+		remove_filter( 'query', array( $this, '_filter_query' ) );
+		global $wpdb;
+		$this->assertContains( "ORDER BY $wpdb->posts.post_date ASC, $wpdb->posts.ID ASC", $sql );
+		return $sql;
+	}
+
+	/**
+	 * @ticket 26042
+	 */
+	function test_revision_order() {
+		$ok = 0;
+		$reversed = 0;
+
+		for ( $i = 0; $i < 100; $i++ ) {
+			$post_id = $this->factory->post->create( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
+
+			for ( $j = 1; $j < 3; $j++ ) {
+				wp_update_post( array( 'post_content' => 'updated post' . $j , 'ID' => $post_id ) );
+			}
+
+			$revisions = wp_get_post_revisions( $post_id );
+			$first = array_shift( $revisions );
+			$last = array_pop( $revisions );
+
+			if ( $first->ID < $last->ID ) {
+				$reversed++;
+			} else {
+				$ok++;
+			}
+		}
+
+		$this->assertEquals( 100, $ok );
+		$this->assertEquals( 0, $reversed );
+	}
 }
