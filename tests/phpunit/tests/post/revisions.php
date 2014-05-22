@@ -353,7 +353,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	function _filter_query( $sql ) {
 		remove_filter( 'query', array( $this, '_filter_query' ) );
 		global $wpdb;
-		$this->assertContains( "ORDER BY $wpdb->posts.post_date ASC, $wpdb->posts.ID ASC", $sql );
+		$this->assertContains( "ORDER BY $wpdb->posts.post_date DESC, $wpdb->posts.ID DESC", $sql );
 		return $sql;
 	}
 
