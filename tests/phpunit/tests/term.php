@@ -325,6 +325,9 @@ class Tests_Term extends WP_UnitTestCase {
 			$this->assertTrue( (bool) wp_delete_post( $post_id, true ) );
 	}
 
+	/**
+	 * @group category.php
+	 */
 	function test_term_is_ancestor_of( ) {
 		$term = rand_str();
 		$term2 = rand_str();
