@@ -98,4 +98,108 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		$ids = $query->get_posts();
 		$this->assertEquals( array( $post_id1, $post_id2 ), $ids );
 	}
+
+	function test_tax_query_no_taxonomy() {
+		$cat_id = $this->factory->category->create( array( 'name' => 'alpha' ) );
+		$this->factory->post->create( array( 'post_title' => 'alpha', 'post_category' => array( $cat_id ) ) );
+
+		$response1 = new WP_Query( array(
+			'tax_query' => array(
+				array( 'terms' => array( $cat_id ) )
+			)
+		) );
+		$this->assertEmpty( $response1->posts );
+
+		$response2 = new WP_Query( array(
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'category',
+					'terms' => array( $cat_id )
+				)
+			)
+		) );
+		$this->assertNotEmpty( $response2->posts );
+
+		$term = get_category( $cat_id );
+		$response3 = new WP_Query( array(
+			'tax_query' => array(
+				array(
+					'field' => 'term_taxonomy_id',
+					'terms' => array( $term->term_taxonomy_id )
+				)
+			)
+		) );
+		$this->assertNotEmpty( $response3->posts );
+	}
+
+	function test_term_taxonomy_id_field_no_taxonomy() {
+		$posts = $this->factory->post->create_many( 5 );
+
+		$cats = $tags = array();
+
+		// need term_taxonomy_ids in addition to term_ids, so no factory
+		for ( $i = 0; $i < 5; $i++ ) {
+			$cats[$i] = wp_insert_term( 'category-' . $i , 'category' );
+			$tags[$i] = wp_insert_term( 'tag-' . $i, 'post_tag' );
+
+			// post 0 gets all terms
+			wp_set_object_terms( $posts[0], array( $cats[$i]['term_id'] ), 'category', true );
+			wp_set_object_terms( $posts[0], array( $tags[$i]['term_id'] ), 'post_tag', true );
+		}
+
+		wp_set_object_terms( $posts[1], array( $cats[0]['term_id'], $cats[2]['term_id'], $cats[4]['term_id'] ), 'category' );
+		wp_set_object_terms( $posts[1], array( $tags[0]['term_id'], $tags[2]['term_id'], $cats[4]['term_id'] ), 'post_tag' );
+
+		wp_set_object_terms( $posts[2], array( $cats[1]['term_id'], $cats[3]['term_id'] ), 'category' );
+		wp_set_object_terms( $posts[2], array( $tags[1]['term_id'], $tags[3]['term_id'] ), 'post_tag' );
+
+		wp_set_object_terms( $posts[3], array( $cats[0]['term_id'], $cats[2]['term_id'], $cats[4]['term_id'] ), 'category' );
+		wp_set_object_terms( $posts[3], array( $tags[1]['term_id'], $tags[3]['term_id'] ), 'post_tag' );
+
+		$results1 = $this->q->query( array(
+			'fields' => 'ids',
+			'orderby' => 'id',
+			'order' => 'ASC',
+			'tax_query' => array(
+				'relation' => 'OR',
+				array(
+					'field' => 'term_taxonomy_id',
+					'terms' => array( $cats[0]['term_taxonomy_id'], $cats[2]['term_taxonomy_id'], $cats[4]['term_taxonomy_id'], $tags[0]['term_taxonomy_id'], $tags[2]['term_taxonomy_id'], $cats[4]['term_taxonomy_id'] ),
+					'operator' => 'AND',
+					'include_children' => false,
+				),
+				array(
+					'field' => 'term_taxonomy_id',
+					'terms' => array( $cats[1]['term_taxonomy_id'], $cats[3]['term_taxonomy_id'], $tags[1]['term_taxonomy_id'], $tags[3]['term_taxonomy_id'] ),
+					'operator' => 'AND',
+					'include_children' => false,
+				)
+			)
+		) );
+
+		$this->assertEquals( array( $posts[0], $posts[1], $posts[2] ), $results1, 'Relation: OR; Operator: AND' );
+
+		$results2 = $this->q->query( array(
+			'fields' => 'ids',
+			'orderby' => 'id',
+			'order' => 'ASC',
+			'tax_query' => array(
+				'relation' => 'AND',
+				array(
+					'field' => 'term_taxonomy_id',
+					'terms' => array( $cats[0]['term_taxonomy_id'], $tags[0]['term_taxonomy_id'] ),
+					'operator' => 'IN',
+					'include_children' => false,
+				),
+				array(
+					'field' => 'term_taxonomy_id',
+					'terms' => array( $cats[3]['term_taxonomy_id'], $tags[3]['term_taxonomy_id'] ),
+					'operator' => 'IN',
+					'include_children' => false,
+				)
+			)
+		) );
+
+		$this->assertEquals( array( $posts[0], $posts[3] ), $results2, 'Relation: AND; Operator: IN' );
+	}
 }
