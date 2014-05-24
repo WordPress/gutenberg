@@ -1,4 +1,4 @@
-// 4.0.21.1 (2014-04-09)
+// 4.0.26 (2014-05-06)
 
 /**
  * Compiled inline version. (Library mode)
@@ -3512,8 +3512,16 @@ define("tinymce/html/Styles", [], function() {
 
 					url = decode(url || url2 || url3);
 
-					if (!settings.allow_script_urls && /(java|vb)script:/i.test(url.replace(/[\s\r\n]+/, ''))) {
-						return "";
+					if (!settings.allow_script_urls) {
+						var scriptUrl = url.replace(/[\s\r\n]+/, '');
+
+						if (/(java|vb)script:/i.test(scriptUrl)) {
+							return "";
+						}
+
+						if (!settings.allow_svg_data_urls && /^data:image\/svg/i.test(scriptUrl)) {
+							return "";
+						}
 					}
 
 					// Convert the URL to relative/absolute depending on config
@@ -3538,8 +3546,16 @@ define("tinymce/html/Styles", [], function() {
 						name = matches[1].replace(trimRightRegExp, '').toLowerCase();
 						value = matches[2].replace(trimRightRegExp, '');
 
+						// Decode escaped sequences like \65 -> e
+						/*jshint loopfunc:true*/
+						/*eslint no-loop-func:0 */
+						value = value.replace(/\\[0-9a-f]+/g, function(e) {
+							return String.fromCharCode(parseInt(e.substr(1), 16));
+						});
+
 						if (name && value.length > 0) {
-							if (!settings.allow_script_urls && (name == "behavior" || /expression\s*\(/.test(value))) {
+							// Don't allow behavior name or expression/comments within the values
+							if (!settings.allow_script_urls && (name == "behavior" || /expression\s*\(|\/\*|\*\//.test(value))) {
 								continue;
 							}
 
@@ -5029,7 +5045,7 @@ define("tinymce/html/Entities", [
 	var makeMap = Tools.makeMap;
 
 	var namedEntities, baseEntities, reverseEntities,
-		attrsCharsRegExp = /[&<>\"\u007E-\uD7FF\uE000-\uFFEF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+		attrsCharsRegExp = /[&<>\"\u0060\u007E-\uD7FF\uE000-\uFFEF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
 		textCharsRegExp = /[<>&\u007E-\uD7FF\uE000-\uFFEF]|[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
 		rawCharsRegExp = /[<>&\"\']/g,
 		entityRegExp = /&(#x|#)?([\w]+);/g,
@@ -5047,7 +5063,8 @@ define("tinymce/html/Entities", [
 		"'": '&#39;',
 		'<': '&lt;',
 		'>': '&gt;',
-		'&': '&amp;'
+		'&': '&amp;',
+		'\u0060': '&#96;'
 	};
 
 	// Reverse lookup table for raw entities
@@ -7580,7 +7597,7 @@ define("tinymce/dom/DOMUtils", [
 			var contentEditable;
 
 			// Check type
-			if (node.nodeType != 1) {
+			if (!node || node.nodeType != 1) {
 				return null;
 			}
 
@@ -7592,6 +7609,20 @@ define("tinymce/dom/DOMUtils", [
 
 			// Check for real content editable
 			return node.contentEditable !== "inherit" ? node.contentEditable : null;
+		},
+
+		getContentEditableParent: function(node) {
+			var root = this.getRoot(), state = null;
+
+			for (; node && node !== root; node = node.parentNode) {
+				state = this.getContentEditable(node);
+
+				if (state !== null) {
+					break;
+				}
+			}
+
+			return state;
 		},
 
 		/**
@@ -7621,6 +7652,18 @@ define("tinymce/dom/DOMUtils", [
 			}
 
 			self.win = self.doc = self.root = self.events = self.frag = null;
+		},
+
+		isChildOf: function(node, parent) {
+			while (node) {
+				if (parent === node) {
+					return true;
+				}
+
+				node = node.parentNode;
+			}
+
+			return false;
 		},
 
 		// #ifdef debug
@@ -8925,8 +8968,8 @@ define("tinymce/html/Schema", [
 			add("mark rt rp summary bdi", "", phrasingContent);
 			add("canvas", "width height", flowContent);
 			add("video", "src crossorigin poster preload autoplay mediagroup loop " +
-				"muted controls width height", flowContent, "track source");
-			add("audio", "src crossorigin preload autoplay mediagroup loop muted controls", flowContent, "track source");
+				"muted controls width height buffered", flowContent, "track source");
+			add("audio", "src crossorigin preload autoplay mediagroup loop muted controls buffered volume", flowContent, "track source");
 			add("source", "src type media");
 			add("track", "kind src srclang label default");
 			add("datalist", "", phrasingContent, "option");
@@ -8985,7 +9028,7 @@ define("tinymce/html/Schema", [
 			addAttrs("input textarea", "placeholder");
 			addAttrs("a", "download");
 			addAttrs("link script img", "crossorigin");
-			addAttrs("iframe", "srcdoc sandbox seamless allowfullscreen");
+			addAttrs("iframe", "sandbox seamless allowfullscreen"); // Excluded: srcdoc
 		}
 
 		// Special: iframe, ruby, video, audio, label
@@ -9044,7 +9087,7 @@ define("tinymce/html/Schema", [
 				}
 			} else {
 				// Create custom map
-				value = makeMap(value, ',', makeMap(value.toUpperCase(), ' '));
+				value = makeMap(value, /[, ]/, makeMap(value.toUpperCase(), /[, ]/));
 			}
 
 			return value;
@@ -9742,8 +9785,8 @@ define("tinymce/html/SaxParser", [
 			var validate, elementRule, isValidElement, attr, attribsValue, validAttributesMap, validAttributePatterns;
 			var attributesRequired, attributesDefault, attributesForced;
 			var anyAttributesRequired, selfClosing, tokenRegExp, attrRegExp, specialElements, attrValue, idCount = 0;
-			var decode = Entities.decode, fixSelfClosing, filteredUrlAttrs = Tools.makeMap('src,href');
-			var scriptUriRegExp = /(java|vb)script:/i;
+			var decode = Entities.decode, fixSelfClosing, filteredUrlAttrs = Tools.makeMap('src,href,data,background,formaction,poster');
+			var scriptUriRegExp = /((java|vb)script|mhtml):/i, dataUriRegExp = /^data:/i;
 
 			function processEndTag(name) {
 				var pos, i;
@@ -9809,22 +9852,24 @@ define("tinymce/html/SaxParser", [
 					}
 				}
 
-				// Block any javascript: urls
+				// Block any javascript: urls or non image data uris
 				if (filteredUrlAttrs[name] && !settings.allow_script_urls) {
 					var uri = value.replace(trimRegExp, '');
 
 					try {
 						// Might throw malformed URI sequence
 						uri = decodeURIComponent(uri);
-						if (scriptUriRegExp.test(uri)) {
-							return;
-						}
 					} catch (ex) {
 						// Fallback to non UTF-8 decoder
 						uri = unescape(uri);
-						if (scriptUriRegExp.test(uri)) {
-							return;
-						}
+					}
+
+					if (scriptUriRegExp.test(uri)) {
+						return;
+					}
+
+					if (!settings.allow_html_data_urls && dataUriRegExp.test(uri) && !/^data:image\//i.test(uri)) {
+						return;
 					}
 				}
 
@@ -12628,6 +12673,8 @@ define("tinymce/dom/ControlSelection", [
 				}
 			});
 
+			editor.on('hide', hideResizeRect);
+
 			// Hide rect on focusout since it would float on top of windows otherwise
 			//editor.on('focusout', hideResizeRect);
 		});
@@ -12947,6 +12994,11 @@ define("tinymce/dom/RangeUtils", [
 					// Walk left until we hit a text node we can move to or a block/br/img
 					walker = new TreeWalker(startNode, parentBlockContainer);
 					while ((node = walker[left ? 'prev' : 'next']())) {
+						// Break if we hit a non content editable node
+						if (dom.getContentEditableParent(node) === "false") {
+							return;
+						}
+
 						// Found text node that has a length
 						if (node.nodeType === 3 && node.nodeValue.length > 0) {
 							container = node;
@@ -14628,6 +14680,19 @@ define("tinymce/Formatter", [
 
 		function defaultFormats() {
 			register({
+				
+				valigntop: [
+					{selector: 'td,th', styles: {'verticalAlign': 'top'}}
+				],
+
+				valignmiddle: [
+					{selector: 'td,th', styles: {'verticalAlign': 'middle'}}
+				],
+
+				valignbottom: [
+					{selector: 'td,th', styles: {'verticalAlign': 'bottom'}}
+				],
+
 				alignleft: [
 					{selector: 'figure,p,h1,h2,h3,h4,h5,h6,td,th,tr,div,ul,ol,li', styles: {textAlign: 'left'}, defaultBlock: 'div'},
 					{selector: 'img,table', collapsed: false, styles: {'float': 'left'}}
@@ -14841,6 +14906,16 @@ define("tinymce/Formatter", [
 					each(fmt.styles, function(value, name) {
 						dom.setStyle(elm, name, replaceVars(value, vars));
 					});
+
+					// Needed for the WebKit span spam bug
+					// TODO: Remove this once WebKit/Blink fixes this
+					if (fmt.styles) {
+						var styleVal = dom.getAttrib(elm, 'style');
+
+						if (styleVal) {
+							elm.setAttribute('data-mce-style', styleVal);
+						}
+					}
 
 					each(fmt.attributes, function(value, name) {
 						dom.setAttrib(elm, name, replaceVars(value, vars));
@@ -17063,7 +17138,7 @@ define("tinymce/UndoManager", [
 		});
 
 		editor.on('SaveContent ObjectResized blur', addNonTypingUndoLevel);
-		editor.dom.bind(editor.dom.getRoot(), 'dragend', addNonTypingUndoLevel);
+		editor.on('DragEnd', addNonTypingUndoLevel);
 
 		editor.on('KeyUp', function(e) {
 			var keyCode = e.keyCode;
@@ -18887,7 +18962,13 @@ define("tinymce/EditorCommands", [
 define("tinymce/util/URI", [
 	"tinymce/util/Tools"
 ], function(Tools) {
-	var each = Tools.each, trim = Tools.trim;
+	var each = Tools.each, trim = Tools.trim,
+		DEFAULT_PORTS = {
+			'ftp': 21,
+			'http': 80,
+			'https': 443,
+			'mailto': 25
+		};
 
 	/**
 	 * Constructs a new URI instance.
@@ -19059,7 +19140,31 @@ define("tinymce/util/URI", [
 		toAbsolute: function(uri, noHost) {
 			uri = new URI(uri, {base_uri: this});
 
-			return uri.getURI(this.host == uri.host && this.protocol == uri.protocol ? noHost : 0);
+			return uri.getURI(noHost && this.isSameOrigin(uri));
+		},
+
+		/**
+		 * Determine whether the given URI has the same origin as this URI.  Based on RFC-6454.
+		 * Supports default ports for protocols listed in DEFAULT_PORTS.  Unsupported protocols will fail safe: they
+		 * won't match, if the port specifications differ.
+		 *
+		 * @method isSameOrigin
+		 * @param {tinymce.util.URI} uri Uri instance to compare.
+		 * @returns {Boolean} True if the origins are the same.
+		 */
+		isSameOrigin: function(uri) {
+			if (this.host == uri.host && this.protocol == uri.protocol){
+				if (this.port == uri.port) {
+					return true;
+				}
+
+				var defaultPort = DEFAULT_PORTS[this.protocol];
+				if (defaultPort && ((this.port || defaultPort) == (uri.port || defaultPort))) {
+					return true;
+				}
+			}
+
+			return false;
 		},
 
 		/**
@@ -19317,6 +19422,8 @@ define("tinymce/util/Class", [
 		// Instantiate a base class (but only create the instance,
 		// don't run the init constructor)
 		initializing = true;
+		
+		/*eslint new-cap:0 */
 		prototype = new self();
 		initializing = false;
 
@@ -19401,6 +19508,269 @@ define("tinymce/util/Class", [
 	};
 
 	return Class;
+});
+
+// Included from: js/tinymce/classes/util/EventDispatcher.js
+
+/**
+ * EventDispatcher.js
+ *
+ * Copyright, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * This class lets you add/remove and fire events by name on the specified scope. This makes
+ * it easy to add event listener logic to any class.
+ *
+ * @class tinymce.util.EventDispatcher
+ * @example
+ *  var eventDispatcher = new EventDispatcher();
+ *
+ *  eventDispatcher.on('click', function() {console.log('data');});
+ *  eventDispatcher.fire('click', {data: 123});
+ */
+define("tinymce/util/EventDispatcher", [
+	"tinymce/util/Tools"
+], function(Tools) {
+	var nativeEvents = Tools.makeMap(
+		"focus blur focusin focusout click dblclick mousedown mouseup mousemove mouseover beforepaste paste cut copy selectionchange " +
+		"mouseout mouseenter mouseleave wheel keydown keypress keyup input contextmenu dragstart dragend dragover " +
+		"draggesture dragdrop drop drag submit",
+		' '
+	);
+
+	function Dispatcher(settings) {
+		var self = this, scope, bindings = {}, toggleEvent;
+
+		function returnFalse() {
+			return false;
+		}
+
+		function returnTrue() {
+			return true;
+		}
+
+		settings = settings || {};
+		scope = settings.scope || self;
+		toggleEvent = settings.toggleEvent || returnFalse;
+
+		/**
+		 * Fires the specified event by name.
+		 *
+		 * @method fire
+		 * @param {String} name Name of the event to fire.
+		 * @param {Object?} args Event arguments.
+		 * @return {Object} Event args instance passed in.
+		 * @example
+		 * instance.fire('event', {...});
+		 */
+		function fire(name, args) {
+			var handlers, i, l, callback;
+
+			name = name.toLowerCase();
+			args = args || {};
+			args.type = name;
+
+			// Setup target is there isn't one
+			if (!args.target) {
+				args.target = scope;
+			}
+
+			// Add event delegation methods if they are missing
+			if (!args.preventDefault) {
+				// Add preventDefault method
+				args.preventDefault = function() {
+					args.isDefaultPrevented = returnTrue;
+				};
+
+				// Add stopPropagation
+				args.stopPropagation = function() {
+					args.isPropagationStopped = returnTrue;
+				};
+
+				// Add stopImmediatePropagation
+				args.stopImmediatePropagation = function() {
+					args.isImmediatePropagationStopped = returnTrue;
+				};
+
+				// Add event delegation states
+				args.isDefaultPrevented = returnFalse;
+				args.isPropagationStopped = returnFalse;
+				args.isImmediatePropagationStopped = returnFalse;
+			}
+
+			if (settings.beforeFire) {
+				settings.beforeFire(args);
+			}
+
+			handlers = bindings[name];
+			if (handlers) {
+				for (i = 0, l = handlers.length; i < l; i++) {
+					handlers[i] = callback = handlers[i];
+
+					// Stop immediate propagation if needed
+					if (args.isImmediatePropagationStopped()) {
+						args.stopPropagation();
+						return args;
+					}
+
+					// If callback returns false then prevent default and stop all propagation
+					if (callback.call(scope, args) === false) {
+						args.preventDefault();
+						return args;
+					}
+				}
+			}
+
+			return args;
+		}
+
+		/**
+		 * Binds an event listener to a specific event by name.
+		 *
+		 * @method on
+		 * @param {String} name Event name or space separated list of events to bind.
+		 * @param {callback} callback Callback to be executed when the event occurs.
+		 * @param {Boolean} first Optional flag if the event should be prepended. Use this with care.
+		 * @return {Object} Current class instance.
+		 * @example
+		 * instance.on('event', function(e) {
+		 *     // Callback logic
+		 * });
+		 */
+		function on(name, callback, prepend) {
+			var handlers, names, i;
+
+			if (callback === false) {
+				callback = returnFalse;
+			}
+
+			if (callback) {
+				names = name.toLowerCase().split(' ');
+				i = names.length;
+				while (i--) {
+					name = names[i];
+					handlers = bindings[name];
+					if (!handlers) {
+						handlers = bindings[name] = [];
+						toggleEvent(name, true);
+					}
+
+					if (prepend) {
+						handlers.unshift(callback);
+					} else {
+						handlers.push(callback);
+					}
+				}
+			}
+
+			return self;
+		}
+
+		/**
+		 * Unbinds an event listener to a specific event by name.
+		 *
+		 * @method off
+		 * @param {String?} name Name of the event to unbind.
+		 * @param {callback?} callback Callback to unbind.
+		 * @return {Object} Current class instance.
+		 * @example
+		 * // Unbind specific callback
+		 * instance.off('event', handler);
+		 *
+		 * // Unbind all listeners by name
+		 * instance.off('event');
+		 *
+		 * // Unbind all events
+		 * instance.off();
+		 */
+		function off(name, callback) {
+			var i, handlers, bindingName, names, hi;
+
+			if (name) {
+				names = name.toLowerCase().split(' ');
+				i = names.length;
+				while (i--) {
+					name = names[i];
+					handlers = bindings[name];
+
+					// Unbind all handlers
+					if (!name) {
+						for (bindingName in bindings) {
+							toggleEvent(bindingName, false);
+							delete bindings[bindingName];
+						}
+
+						return self;
+					}
+
+					if (handlers) {
+						// Unbind all by name
+						if (!callback) {
+							handlers.length = 0;
+						} else {
+							// Unbind specific ones
+							hi = handlers.length;
+							while (hi--) {
+								if (handlers[hi] === callback) {
+									handlers.splice(hi, 1);
+								}
+							}
+						}
+
+						if (!handlers.length) {
+							toggleEvent(name, false);
+							delete bindings[name];
+						}
+					}
+				}
+			} else {
+				for (name in bindings) {
+					toggleEvent(name, false);
+				}
+
+				bindings = {};
+			}
+
+			return self;
+		}
+
+		/**
+		 * Returns true/false if the dispatcher has a event of the specified name.
+		 *
+		 * @method has
+		 * @param {String} name Name of the event to check for.
+		 * @return {Boolean} true/false if the event exists or not.
+		 */
+		function has(name) {
+			name = name.toLowerCase();
+			return !(!bindings[name] || bindings[name].length === 0);
+		}
+
+		// Expose
+		self.fire = fire;
+		self.on = on;
+		self.off = off;
+		self.has = has;
+	}
+
+	/**
+	 * Returns true/false if the specified event name is a native browser event or not.
+	 *
+	 * @method isNative
+	 * @param {String} name Name to check if it's native.
+	 * @return {Boolean} true/false if the event is native or not.
+	 * @static
+	 */
+	Dispatcher.isNative = function(name) {
+		return !!nativeEvents[name.toLowerCase()];
+	};
+
+	return Dispatcher;
 });
 
 // Included from: js/tinymce/classes/ui/Selector.js
@@ -20329,18 +20699,39 @@ define("tinymce/ui/DomUtils", [
 define("tinymce/ui/Control", [
 	"tinymce/util/Class",
 	"tinymce/util/Tools",
+	"tinymce/util/EventDispatcher",
 	"tinymce/ui/Collection",
 	"tinymce/ui/DomUtils"
-], function(Class, Tools, Collection, DomUtils) {
+], function(Class, Tools, EventDispatcher, Collection, DomUtils) {
 	"use strict";
-
-	var nativeEvents = Tools.makeMap("focusin focusout scroll click dblclick mousedown mouseup mousemove mouseover" +
-								" mouseout mouseenter mouseleave wheel keydown keypress keyup contextmenu", " ");
 
 	var elementIdCache = {};
 	var hasMouseWheelEventSupport = "onmousewheel" in document;
 	var hasWheelEventSupport = false;
 	var classPrefix = "mce-";
+
+	function getEventDispatcher(obj) {
+		if (!obj._eventDispatcher) {
+			obj._eventDispatcher = new EventDispatcher({
+				scope: obj,
+				toggleEvent: function(name, state) {
+					if (state && EventDispatcher.isNative(name)) {
+						if (!obj._nativeEvents) {
+							obj._nativeEvents = {};
+						}
+
+						obj._nativeEvents[name] = true;
+
+						if (obj._rendered) {
+							obj.bindPendingEvents();
+						}
+					}
+				}
+			});
+		}
+
+		return obj._eventDispatcher;
+	}
 
 	var Control = Class.extend({
 		Statics: {
@@ -20815,10 +21206,14 @@ define("tinymce/ui/Control", [
 		 * @return {tinymce.ui.Control} Current control object.
 		 */
 		on: function(name, callback) {
-			var self = this, bindings, handlers, names, i;
+			var self = this;
 
 			function resolveCallbackName(name) {
 				var callback, scope;
+
+				if (typeof(name) != 'string') {
+					return name;
+				}
 
 				return function(e) {
 					if (!callback) {
@@ -20836,41 +21231,7 @@ define("tinymce/ui/Control", [
 				};
 			}
 
-			if (callback) {
-				if (typeof(callback) == 'string') {
-					callback = resolveCallbackName(callback);
-				}
-
-				names = name.toLowerCase().split(' ');
-				i = names.length;
-				while (i--) {
-					name = names[i];
-
-					bindings = self._bindings;
-					if (!bindings) {
-						bindings = self._bindings = {};
-					}
-
-					handlers = bindings[name];
-					if (!handlers) {
-						handlers = bindings[name] = [];
-					}
-
-					handlers.push(callback);
-
-					if (nativeEvents[name]) {
-						if (!self._nativeEvents) {
-							self._nativeEvents = {};
-						}
-
-						self._nativeEvents[name] = true;
-
-						if (self._rendered) {
-							self.bindPendingEvents();
-						}
-					}
-				}
-			}
+			getEventDispatcher(self).on(name, resolveCallbackName(callback));
 
 			return self;
 		},
@@ -20886,46 +21247,8 @@ define("tinymce/ui/Control", [
 		 * @return {mxex.ui.Control} Current control object.
 		 */
 		off: function(name, callback) {
-			var self = this, i, bindings = self._bindings, handlers, bindingName, names, hi;
-
-			if (bindings) {
-				if (name) {
-					names = name.toLowerCase().split(' ');
-					i = names.length;
-					while (i--) {
-						name = names[i];
-						handlers = bindings[name];
-
-						// Unbind all handlers
-						if (!name) {
-							for (bindingName in bindings) {
-								bindings[bindingName].length = 0;
-							}
-
-							return self;
-						}
-
-						if (handlers) {
-							// Unbind all by name
-							if (!callback) {
-								handlers.length = 0;
-							} else {
-								// Unbind specific ones
-								hi = handlers.length;
-								while (hi--) {
-									if (handlers[hi] === callback) {
-										handlers.splice(hi, 1);
-									}
-								}
-							}
-						}
-					}
-				} else {
-					self._bindings = [];
-				}
-			}
-
-			return self;
+			getEventDispatcher(this).off(name, callback);
+			return this;
 		},
 
 		/**
@@ -20939,75 +21262,22 @@ define("tinymce/ui/Control", [
 		 * @return {Object} Current arguments object.
 		 */
 		fire: function(name, args, bubble) {
-			var self = this, i, l, handlers, parentCtrl;
+			var self = this;
 
-			name = name.toLowerCase();
-
-			// Dummy function that gets replaced on the delegation state functions
-			function returnFalse() {
-				return false;
-			}
-
-			// Dummy function that gets replaced on the delegation state functions
-			function returnTrue() {
-				return true;
-			}
-
-			// Setup empty object if args is omited
 			args = args || {};
 
-			// Stick type into event object
-			if (!args.type) {
-				args.type = name;
-			}
-
-			// Stick control into event
 			if (!args.control) {
 				args.control = self;
 			}
 
-			// Add event delegation methods if they are missing
-			if (!args.preventDefault) {
-				// Add preventDefault method
-				args.preventDefault = function() {
-					args.isDefaultPrevented = returnTrue;
-				};
+			args = getEventDispatcher(self).fire(name, args);
 
-				// Add stopPropagation
-				args.stopPropagation = function() {
-					args.isPropagationStopped = returnTrue;
-				};
-
-				// Add stopImmediatePropagation
-				args.stopImmediatePropagation = function() {
-					args.isImmediatePropagationStopped = returnTrue;
-				};
-
-				// Add event delegation states
-				args.isDefaultPrevented = returnFalse;
-				args.isPropagationStopped = returnFalse;
-				args.isImmediatePropagationStopped = returnFalse;
-			}
-
-			if (self._bindings) {
-				handlers = self._bindings[name];
-
-				if (handlers) {
-					for (i = 0, l = handlers.length; i < l; i++) {
-						// Execute callback and break if the callback returns a false
-						if (!args.isImmediatePropagationStopped() && handlers[i].call(self, args) === false) {
-							break;
-						}
-					}
-				}
-			}
-
-			// Bubble event up to parent controls
-			if (bubble !== false) {
-				parentCtrl = self.parent();
-				while (parentCtrl && !args.isPropagationStopped()) {
-					parentCtrl.fire(name, args, false);
-					parentCtrl = parentCtrl.parent();
+			// Bubble event up to parents
+			if (bubble !== false && self.parent) {
+				var parent = self.parent();
+				while (parent && !args.isPropagationStopped()) {
+					parent.fire(name, args, false);
+					parent = parent.parent();
 				}
 			}
 
@@ -21022,7 +21292,7 @@ define("tinymce/ui/Control", [
 		 * @return {Boolean} True/false state if the event has listeners.
 		 */
 		hasEventListeners: function(name) {
-			return name in this._bindings;
+			return getEventDispatcher(this).has(name);
 		},
 
 		/**
@@ -24824,7 +25094,7 @@ define("tinymce/util/Quirks", [
 		 */
 		function cleanupStylesWhenDeleting() {
 			var doc = editor.getDoc(), urlPrefix = 'data:text/mce-internal,';
-			var MutationObserver = window.MutationObserver, olderWebKit;
+			var MutationObserver = window.MutationObserver, olderWebKit, dragStartRng;
 
 			// Add mini polyfill for older WebKits
 			// TODO: Remove this when old Safari versions gets updated
@@ -24853,9 +25123,10 @@ define("tinymce/util/Quirks", [
 					};
 
 					this.disconnect = function() {
-						target.removeEventListener('DOMNodeInserted', nodeInsert);
-						target.removeEventListener('DOMAttrModified', attrModified);
 						target.removeEventListener('DOMSubtreeModified', nodeInsert, false);
+						target.removeEventListener('DOMNodeInsertedIntoDocument', nodeInsert, false);
+						target.removeEventListener('DOMNodeInserted', nodeInsert, false);
+						target.removeEventListener('DOMAttrModified', attrModified, false);
 					};
 
 					this.takeRecords = function() {
@@ -24893,6 +25164,10 @@ define("tinymce/util/Quirks", [
 				var caretElement = rng.startContainer.parentNode;
 
 				Tools.each(mutationObserver.takeRecords(), function(record) {
+					if (!dom.isChildOf(record.target, editor.getBody())) {
+						return;
+					}
+
 					// Restore style attribute to previous value
 					if (record.attributeName == "style") {
 						var oldValue = record.target.getAttribute('data-mce-style');
@@ -24978,8 +25253,19 @@ define("tinymce/util/Quirks", [
 			}
 
 			editor.on('dragstart', function(e) {
+				var selectionHtml;
+
+				if (editor.selection.isCollapsed() && e.target.tagName == 'IMG') {
+					selection.select(e.target);
+				}
+
+				dragStartRng = selection.getRng();
+				selectionHtml = editor.selection.getContent();
+
 				// Safari doesn't support custom dataTransfer items so we can only use URL and Text
-				e.dataTransfer.setData('URL', 'data:text/mce-internal,' + escape(editor.selection.getContent()));
+				if (selectionHtml.length > 0) {
+					e.dataTransfer.setData('URL', 'data:text/mce-internal,' + escape(selectionHtml));
+				}
 			});
 
 			editor.on('drop', function(e) {
@@ -24993,10 +25279,26 @@ define("tinymce/util/Quirks", [
 					internalContent = unescape(internalContent.substr(urlPrefix.length));
 					if (doc.caretRangeFromPoint) {
 						e.preventDefault();
-						customDelete();
-						editor.selection.setRng(doc.caretRangeFromPoint(e.x, e.y));
-						editor.insertContent(internalContent);
+
+						// Safari has a weird issue where drag/dropping images sometimes
+						// produces a green plus icon. When this happens the caretRangeFromPoint
+						// will return "null" even though the x, y coordinate is correct.
+						// But if we detach the insert from the drop event we will get a proper range
+						window.setTimeout(function() {
+							var pointRng = doc.caretRangeFromPoint(e.x, e.y);
+
+							if (dragStartRng) {
+								selection.setRng(dragStartRng);
+								dragStartRng = null;
+							}
+
+							customDelete();
+
+							selection.setRng(pointRng);
+							editor.insertContent(internalContent);
+						}, 0);
 					}
+
 				}
 			});
 
@@ -25790,7 +26092,7 @@ define("tinymce/util/Quirks", [
 		 */
 		function doubleTrailingBrElements() {
 			if (!editor.inline) {
-				editor.on('focus blur', function() {
+				editor.on('focus blur beforegetcontent', function() {
 					var br = editor.dom.create('br');
 					editor.getBody().appendChild(br);
 					br.parentNode.removeChild(br);
@@ -25818,6 +26120,18 @@ define("tinymce/util/Quirks", [
 			editor.contentStyles.push('.mce-content-body {-webkit-touch-callout: none}');
 		}
 
+		/**
+		 * WebKit has a bug where it will allow forms to be submitted if they are inside a contentEditable element.
+		 * For example this: <form><button></form>
+		 */
+		function blockFormSubmitInsideEditor() {
+			editor.on('init', function() {
+				editor.dom.bind(editor.getBody(), 'submit', function(e) {
+					e.preventDefault();
+				});
+			});
+		}
+
 		// All browsers
 		disableBackspaceIntoATable();
 		removeBlockQuoteOnBackSpace();
@@ -25830,6 +26144,7 @@ define("tinymce/util/Quirks", [
 			inputMethodFocus();
 			selectControlElements();
 			setDefaultBlockType();
+			blockFormSubmitInsideEditor();
 
 			// iOS
 			if (Env.iOS) {
@@ -25896,20 +26211,21 @@ define("tinymce/util/Quirks", [
  * @mixin tinymce.util.Observable
  */
 define("tinymce/util/Observable", [
-	"tinymce/util/Tools"
-], function(Tools) {
-	var bindingsName = "__bindings";
-	var nativeEvents = Tools.makeMap(
-		"focusin focusout click dblclick mousedown mouseup mousemove mouseover beforepaste paste cut copy selectionchange" +
-		" mouseout mouseenter mouseleave keydown keypress keyup contextmenu dragstart dragend dragover draggesture dragdrop drop drag", ' '
-	);
+	"tinymce/util/EventDispatcher"
+], function(EventDispatcher) {
+	function getEventDispatcher(obj) {
+		if (!obj._eventDispatcher) {
+			obj._eventDispatcher = new EventDispatcher({
+				scope: obj,
+				toggleEvent: function(name, state) {
+					if (EventDispatcher.isNative(name) && obj.toggleNativeEvent) {
+						obj.toggleNativeEvent(name, state);
+					}
+				}
+			});
+		}
 
-	function returnFalse() {
-		return false;
-	}
-
-	function returnTrue() {
-		return true;
+		return obj._eventDispatcher;
 	}
 
 	return {
@@ -25918,78 +26234,25 @@ define("tinymce/util/Observable", [
 		 *
 		 * @method fire
 		 * @param {String} name Name of the event to fire.
-		 * @param {tinymce.Event/Object?} args Event arguments.
+		 * @param {Object?} args Event arguments.
 		 * @param {Boolean?} bubble True/false if the event is to be bubbled.
-		 * @return {tinymce.Event} Event instance passed in converted into tinymce.Event instance.
+		 * @return {Object} Event args instance passed in.
 		 * @example
 		 * instance.fire('event', {...});
 		 */
 		fire: function(name, args, bubble) {
-			var self = this, handlers, i, l, callback, parent;
+			var self = this;
 
-			name = name.toLowerCase();
-			args = args || {};
-			args.type = name;
-
-			// Prevent all events except the remove event after the editor has been removed
+			// Prevent all events except the remove event after the instance has been removed
 			if (self.removed && name !== "remove") {
-				return;
+				return args;
 			}
 
-			// Setup target is there isn't one
-			if (!args.target) {
-				args.target = self;
-			}
-
-			// Add event delegation methods if they are missing
-			if (!args.preventDefault) {
-				// Add preventDefault method
-				args.preventDefault = function() {
-					args.isDefaultPrevented = returnTrue;
-				};
-
-				// Add stopPropagation
-				args.stopPropagation = function() {
-					args.isPropagationStopped = returnTrue;
-				};
-
-				// Add stopImmediatePropagation
-				args.stopImmediatePropagation = function() {
-					args.isImmediatePropagationStopped = returnTrue;
-				};
-
-				// Add event delegation states
-				args.isDefaultPrevented = returnFalse;
-				args.isPropagationStopped = returnFalse;
-				args.isImmediatePropagationStopped = returnFalse;
-			}
-
-			//console.log(name, args);
-
-			if (self[bindingsName]) {
-				handlers = self[bindingsName][name];
-
-				if (handlers) {
-					for (i = 0, l = handlers.length; i < l; i++) {
-						handlers[i] = callback = handlers[i];
-
-						// Stop immediate propagation if needed
-						if (args.isImmediatePropagationStopped()) {
-							break;
-						}
-
-						// If callback returns false then prevent default and stop all propagation
-						if (callback.call(self, args) === false) {
-							args.preventDefault();
-							return args;
-						}
-					}
-				}
-			}
+			args = getEventDispatcher(self).fire(name, args, bubble);
 
 			// Bubble event up to parents
 			if (bubble !== false && self.parent) {
-				parent = self.parent();
+				var parent = self.parent();
 				while (parent && !args.isPropagationStopped()) {
 					parent.fire(name, args, false);
 					parent = parent.parent();
@@ -26013,42 +26276,7 @@ define("tinymce/util/Observable", [
 		 * });
 		 */
 		on: function(name, callback, prepend) {
-			var self = this, bindings, handlers, names, i;
-
-			if (callback === false) {
-				callback = function() {
-					return false;
-				};
-			}
-
-			if (callback) {
-				names = name.toLowerCase().split(' ');
-				i = names.length;
-				while (i--) {
-					name = names[i];
-
-					bindings = self[bindingsName];
-					if (!bindings) {
-						bindings = self[bindingsName] = {};
-					}
-
-					handlers = bindings[name];
-					if (!handlers) {
-						handlers = bindings[name] = [];
-						if (self.bindNative && nativeEvents[name]) {
-							self.bindNative(name);
-						}
-					}
-
-					if (prepend) {
-						handlers.unshift(callback);
-					} else {
-						handlers.push(callback);
-					}
-				}
-			}
-
-			return self;
+			return getEventDispatcher(this).on(name, callback, prepend);
 		},
 
 		/**
@@ -26069,67 +26297,150 @@ define("tinymce/util/Observable", [
 		 * instance.off();
 		 */
 		off: function(name, callback) {
-			var self = this, i, bindings = self[bindingsName], handlers, bindingName, names, hi;
-
-			if (bindings) {
-				if (name) {
-					names = name.toLowerCase().split(' ');
-					i = names.length;
-					while (i--) {
-						name = names[i];
-						handlers = bindings[name];
-
-						// Unbind all handlers
-						if (!name) {
-							for (bindingName in bindings) {
-								bindings[name].length = 0;
-							}
-
-							return self;
-						}
-
-						if (handlers) {
-							// Unbind all by name
-							if (!callback) {
-								handlers.length = 0;
-							} else {
-								// Unbind specific ones
-								hi = handlers.length;
-								while (hi--) {
-									if (handlers[hi] === callback) {
-										handlers.splice(hi, 1);
-									}
-								}
-							}
-
-							if (!handlers.length && self.unbindNative && nativeEvents[name]) {
-								self.unbindNative(name);
-								delete bindings[name];
-							}
-						}
-					}
-				} else {
-					if (self.unbindNative) {
-						for (name in bindings) {
-							self.unbindNative(name);
-						}
-					}
-
-					self[bindingsName] = [];
-				}
-			}
-
-			return self;
+			return getEventDispatcher(this).off(name, callback);
 		},
 
+		/**
+		 * Returns true/false if the object has a event of the specified name.
+		 *
+		 * @method hasEventListeners
+		 * @param {String} name Name of the event to check for.
+		 * @return {Boolean} true/false if the event exists or not.
+		 */
 		hasEventListeners: function(name) {
-			var bindings = this[bindingsName];
-
-			name = name.toLowerCase();
-
-			return !(!bindings || !bindings[name] || bindings[name].length === 0);
+			return getEventDispatcher(this).has(name);
 		}
 	};
+});
+
+// Included from: js/tinymce/classes/EditorObservable.js
+
+/**
+ * EditorObservable.js
+ *
+ * Copyright, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * This mixin contains the event logic for the tinymce.Editor class.
+ *
+ * @mixin tinymce.EditorObservable
+ * @extends tinymce.util.Observable
+ */
+define("tinymce/EditorObservable", [
+	"tinymce/util/Observable",
+	"tinymce/dom/DOMUtils",
+	"tinymce/util/Tools"
+], function(Observable, DOMUtils, Tools) {
+	var DOM = DOMUtils.DOM;
+
+	function getEventTarget(editor, eventName) {
+		if (eventName == 'selectionchange') {
+			return editor.getDoc();
+		}
+
+		// Need to bind mousedown/mouseup etc to document not body in iframe mode
+		// Since the user might click on the HTML element not the BODY
+		if (!editor.inline && /^mouse|click|contextmenu|drop/.test(eventName)) {
+			return editor.getDoc();
+		}
+
+		return editor.getBody();
+	}
+
+	function bindEventDelegate(editor, name) {
+		var eventRootSelector = editor.settings.event_root, editorManager = editor.editorManager;
+		var eventRootElm = editorManager.eventRootElm || getEventTarget(editor, name);
+
+		if (eventRootSelector) {
+			if (!editorManager.rootEvents) {
+				editorManager.rootEvents = {};
+
+				editorManager.on('RemoveEditor', function() {
+					if (!editorManager.activeEditor) {
+						DOM.unbind(eventRootElm);
+						delete editorManager.rootEvents;
+					}
+				});
+			}
+
+			if (editorManager.rootEvents[name]) {
+				return;
+			}
+
+			if (eventRootElm == editor.getBody()) {
+				eventRootElm = DOM.select(eventRootSelector)[0];
+				editorManager.eventRootElm = eventRootElm;
+			}
+
+			editorManager.rootEvents[name] = true;
+
+			DOM.bind(eventRootElm, name, function(e) {
+				var target = e.target, editors = editorManager.editors, i = editors.length;
+
+				while (i--) {
+					var body = editors[i].getBody();
+
+					if (body === target || DOM.isChildOf(target, body)) {
+						if (!editors[i].hidden) {
+							editors[i].fire(name, e);
+						}
+					}
+				}
+			});
+		} else {
+			editor.dom.bind(eventRootElm, name, function(e) {
+				if (!editor.hidden) {
+					editor.fire(name, e);
+				}
+			});
+		}
+	}
+
+	var EditorObservable = {
+		bindPendingEventDelegates: function() {
+			var self = this;
+
+			Tools.each(self._pendingNativeEvents, function(name) {
+				bindEventDelegate(self, name);
+			});
+		},
+
+		toggleNativeEvent: function(name, state) {
+			var self = this;
+
+			if (self.settings.readonly) {
+				return;
+			}
+
+			// Never bind focus/blur since the FocusManager fakes those
+			if (name == "focus" || name == "blur") {
+				return;
+			}
+
+			if (state) {
+				if (self.initialized) {
+					bindEventDelegate(self, name);
+				} else {
+					if (!self._pendingNativeEvents) {
+						self._pendingNativeEvents = [name];
+					} else {
+						self._pendingNativeEvents.push(name);
+					}
+				}
+			} else if (self.initialized) {
+				self.dom.unbind(getEventTarget(self, name), name);
+			}
+		}
+	};
+
+	EditorObservable = Tools.extend({}, Observable, EditorObservable);
+
+	return EditorObservable;
 });
 
 // Included from: js/tinymce/classes/Shortcuts.js
@@ -26311,13 +26622,13 @@ define("tinymce/Editor", [
 	"tinymce/util/Quirks",
 	"tinymce/Env",
 	"tinymce/util/Tools",
-	"tinymce/util/Observable",
+	"tinymce/EditorObservable",
 	"tinymce/Shortcuts"
 ], function(
 	DOMUtils, AddOnManager, Node, DomSerializer, Serializer,
 	Selection, Formatter, UndoManager, EnterKey, ForceBlocks, EditorCommands,
 	URI, ScriptLoader, EventUtils, WindowManager,
-	Schema, DomParser, Quirks, Env, Tools, Observable, Shortcuts
+	Schema, DomParser, Quirks, Env, Tools, EditorObservable, Shortcuts
 ) {
 	// Shorten these names
 	var DOM = DOMUtils.DOM, ThemeManager = AddOnManager.ThemeManager, PluginManager = AddOnManager.PluginManager;
@@ -26325,20 +26636,6 @@ define("tinymce/Editor", [
 	var inArray = Tools.inArray, trim = Tools.trim, resolve = Tools.resolve;
 	var Event = EventUtils.Event;
 	var isGecko = Env.gecko, ie = Env.ie;
-
-	function getEventTarget(editor, eventName) {
-		if (eventName == 'selectionchange') {
-			return editor.getDoc();
-		}
-
-		// Need to bind mousedown/mouseup etc to document not body in iframe mode
-		// Since the user might click on the HTML element not the BODY
-		if (!editor.inline && /^mouse|click|contextmenu|drop/.test(eventName)) {
-			return editor.getDoc();
-		}
-
-		return editor.getBody();
-	}
 
 	/**
 	 * Include documentation for all the events.
@@ -27199,12 +27496,7 @@ define("tinymce/Editor", [
 			 * }
 			 */
 			self.initialized = true;
-
-			each(self._pendingNativeEvents, function(name) {
-				self.dom.bind(getEventTarget(self, name), name, function(e) {
-					self.fire(e.type, e);
-				});
-			});
+			self.bindPendingEventDelegates();
 
 			self.fire('init');
 			self.focus(true);
@@ -27776,10 +28068,19 @@ define("tinymce/Editor", [
 		show: function() {
 			var self = this;
 
-			DOM.show(self.getContainer());
-			DOM.hide(self.id);
-			self.load();
-			self.fire('show');
+			if (self.hidden) {
+				self.hidden = false;
+
+				if (self.inline) {
+					self.getBody().contentEditable = true;
+				} else {
+					DOM.show(self.getContainer());
+					DOM.hide(self.id);
+				}
+
+				self.load();
+				self.fire('show');
+			}
 		},
 
 		/**
@@ -27790,18 +28091,31 @@ define("tinymce/Editor", [
 		hide: function() {
 			var self = this, doc = self.getDoc();
 
-			// Fixed bug where IE has a blinking cursor left from the editor
-			if (ie && doc && !self.inline) {
-				doc.execCommand('SelectAll');
+			if (!self.hidden) {
+				self.hidden = true;
+
+				// Fixed bug where IE has a blinking cursor left from the editor
+				if (ie && doc && !self.inline) {
+					doc.execCommand('SelectAll');
+				}
+
+				// We must save before we hide so Safari doesn't crash
+				self.save();
+
+				if (self.inline) {
+					self.getBody().contentEditable = false;
+
+					// Make sure the editor gets blurred
+					if (self == self.editorManager.focusedEditor) {
+						self.editorManager.focusedEditor = null;
+					}
+				} else {
+					DOM.hide(self.getContainer());
+					DOM.setStyle(self.id, 'display', self.orgDisplay);
+				}
+
+				self.fire('hide');
 			}
-
-			// We must save before we hide so Safari doesn't crash
-			self.save();
-
-			// defer the call to hide to prevent an IE9 crash #4921
-			DOM.hide(self.getContainer());
-			DOM.setStyle(self.id, 'display', self.orgDisplay);
-			self.fire('hide');
 		},
 
 		/**
@@ -27811,7 +28125,7 @@ define("tinymce/Editor", [
 		 * @return {Boolean} True/false if the editor is hidden or not.
 		 */
 		isHidden: function() {
-			return !DOM.isHidden(this.id);
+			return !!this.hidden;
 		},
 
 		/**
@@ -28303,34 +28617,6 @@ define("tinymce/Editor", [
 			}
 		},
 
-		bindNative: function(name) {
-			var self = this;
-
-			if (self.settings.readonly) {
-				return;
-			}
-
-			if (self.initialized) {
-				self.dom.bind(getEventTarget(self, name), name, function(e) {
-					self.fire(name, e);
-				});
-			} else {
-				if (!self._pendingNativeEvents) {
-					self._pendingNativeEvents = [name];
-				} else {
-					self._pendingNativeEvents.push(name);
-				}
-			}
-		},
-
-		unbindNative: function(name) {
-			var self = this;
-
-			if (self.initialized) {
-				self.dom.unbind(name);
-			}
-		},
-
 		/**
 		 * Destroys the editor instance by removing all events, element references or other resources
 		 * that could leak memory. This method will be called automatically when the page is unloaded
@@ -28425,7 +28711,7 @@ define("tinymce/Editor", [
 		}
 	};
 
-	extend(Editor.prototype, Observable);
+	extend(Editor.prototype, EditorObservable);
 
 	return Editor;
 });
@@ -28538,7 +28824,7 @@ define("tinymce/FocusManager", [
 	"tinymce/dom/DOMUtils",
 	"tinymce/Env"
 ], function(DOMUtils, Env) {
-	var selectionChangeHandler, documentFocusInHandler, DOM = DOMUtils.DOM;
+	var selectionChangeHandler, documentFocusInHandler, documentMouseUpHandler, DOM = DOMUtils.DOM;
 
 	/**
 	 * Constructs a new focus manager instance.
@@ -28559,8 +28845,13 @@ define("tinymce/FocusManager", [
 
 		// We can't store a real range on IE 11 since it gets mutated so we need to use a bookmark object
 		// TODO: Move this to a separate range utils class since it's it's logic is present in Selection as well.
-		function createBookmark(rng) {
+		function createBookmark(dom, rng) {
 			if (rng && rng.startContainer) {
+				// Verify that the range is within the root of the editor
+				if (!dom.isChildOf(rng.startContainer, dom.getRoot()) || !dom.isChildOf(rng.endContainer, dom.getRoot())) {
+					return;
+				}
+
 				return {
 					startContainer: rng.startContainer,
 					startOffset: rng.startOffset,
@@ -28590,18 +28881,6 @@ define("tinymce/FocusManager", [
 			return !!DOM.getParent(elm, FocusManager.isEditorUIElement);
 		}
 
-		function isNodeInBodyOfEditor(node, editor) {
-			var body = editor.getBody();
-
-			while (node) {
-				if (node == body) {
-					return true;
-				}
-
-				node = node.parentNode;
-			}
-		}
-
 		function registerEvents(e) {
 			var editor = e.editor;
 
@@ -28617,7 +28896,7 @@ define("tinymce/FocusManager", [
 							node = editor.getBody();
 						}
 
-						if (isNodeInBodyOfEditor(node, editor)) {
+						if (editor.dom.isChildOf(node, editor.getBody())) {
 							editor.lastRng = editor.selection.getRng();
 						}
 					});
@@ -28691,6 +28970,8 @@ define("tinymce/FocusManager", [
 				}, 0);
 			});
 
+			// Check if focus is moved to an element outside the active editor by checking if the target node
+			// isn't within the body of the activeEditor nor a UI element such as a dialog child control
 			if (!documentFocusInHandler) {
 				documentFocusInHandler = function(e) {
 					var activeEditor = editorManager.activeEditor;
@@ -28698,7 +28979,7 @@ define("tinymce/FocusManager", [
 					if (activeEditor && e.target.ownerDocument == document) {
 						// Check to make sure we have a valid selection
 						if (activeEditor.selection) {
-							activeEditor.selection.lastFocusBookmark = createBookmark(activeEditor.lastRng);
+							activeEditor.selection.lastFocusBookmark = createBookmark(activeEditor.dom, activeEditor.lastRng);
 						}
 
 						// Fire a blur event if the element isn't a UI element
@@ -28709,9 +28990,26 @@ define("tinymce/FocusManager", [
 					}
 				};
 
-				// Check if focus is moved to an element outside the active editor by checking if the target node
-				// isn't within the body of the activeEditor nor a UI element such as a dialog child control
 				DOM.bind(document, 'focusin', documentFocusInHandler);
+			}
+
+			// Handle edge case when user starts the selection inside the editor and releases
+			// the mouse outside the editor producing a new selection. This weird workaround is needed since
+			// Gecko doesn't have the "selectionchange" event we need to do this. Fixes: #6843
+			if (editor.inline && !documentMouseUpHandler) {
+				documentMouseUpHandler = function(e) {
+					var activeEditor = editorManager.activeEditor;
+
+					if (activeEditor.inline && !activeEditor.dom.isChildOf(e.target, activeEditor.getBody())) {
+						var rng = activeEditor.selection.getRng();
+
+						if (!rng.collapsed) {
+							activeEditor.lastRng = rng;
+						}
+					}
+				};
+
+				DOM.bind(document, 'mouseup', documentMouseUpHandler);
 			}
 		}
 
@@ -28723,7 +29021,8 @@ define("tinymce/FocusManager", [
 			if (!editorManager.activeEditor) {
 				DOM.unbind(document, 'selectionchange', selectionChangeHandler);
 				DOM.unbind(document, 'focusin', documentFocusInHandler);
-				selectionChangeHandler = documentFocusInHandler = null;
+				DOM.unbind(document, 'mouseup', documentMouseUpHandler);
+				selectionChangeHandler = documentFocusInHandler = documentMouseUpHandler = null;
 			}
 		}
 
@@ -28780,9 +29079,46 @@ define("tinymce/EditorManager", [
 ], function(Editor, DOMUtils, URI, Env, Tools, Observable, I18n, FocusManager) {
 	var DOM = DOMUtils.DOM;
 	var explode = Tools.explode, each = Tools.each, extend = Tools.extend;
-	var instanceCounter = 0, beforeUnloadDelegate;
+	var instanceCounter = 0, beforeUnloadDelegate, EditorManager;
 
-	var EditorManager = {
+	function removeEditorFromList(editor) {
+		var editors = EditorManager.editors, removedFromList;
+
+		delete editors[editor.id];
+
+		for (var i = 0; i < editors.length; i++) {
+			if (editors[i] == editor) {
+				editors.splice(i, 1);
+				removedFromList = true;
+				break;
+			}
+		}
+
+		// Select another editor since the active one was removed
+		if (EditorManager.activeEditor == editor) {
+			EditorManager.activeEditor = editors[0];
+		}
+
+		// Clear focusedEditor if necessary, so that we don't try to blur the destroyed editor
+		if (EditorManager.focusedEditor == editor) {
+			EditorManager.focusedEditor = null;
+		}
+
+		return removedFromList;
+	}
+
+	function purgeDestroyedEditor(editor) {
+		// User has manually destroyed the editor lets clean up the mess
+		if (editor && !(editor.getContainer() || editor.getBody()).parentNode) {
+			removeEditorFromList(editor);
+			editor.destroy(true);
+			editor = null;
+		}
+
+		return editor;
+	}
+
+	EditorManager = {
 		/**
 		 * Major version of TinyMCE build.
 		 *
@@ -28797,7 +29133,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion : '0.21.1',
+		minorVersion : '0.26',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -28805,7 +29141,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2014-04-09',
+		releaseDate: '2014-05-06',
 
 		/**
 		 * Collection of editor instances.
@@ -28838,7 +29174,7 @@ define("tinymce/EditorManager", [
 		activeEditor: null,
 
 		setup: function() {
-			var self = this, baseURL, documentBaseURL, suffix = "", preInit;
+			var self = this, baseURL, documentBaseURL, suffix = "", preInit, src;
 
 			// Get base URL for the current document
 			documentBaseURL = document.location.href.replace(/[\?#].*$/, '').replace(/[\/\\][^\/]+$/, '');
@@ -28855,7 +29191,7 @@ define("tinymce/EditorManager", [
 				// Get base where the tinymce script is located
 				var scripts = document.getElementsByTagName('script');
 				for (var i = 0; i < scripts.length; i++) {
-					var src = scripts[i].src;
+					src = scripts[i].src;
 
 					// Script types supported:
 					// tinymce.js tinymce.min.js tinymce.dev.js
@@ -28869,6 +29205,18 @@ define("tinymce/EditorManager", [
 						baseURL = src.substring(0, src.lastIndexOf('/'));
 						break;
 					}
+				}
+
+				// We didn't find any baseURL by looking at the script elements
+				// Try to use the document.currentScript as a fallback
+				if (!baseURL && document.currentScript) {
+					src = document.currentScript.src;
+
+					if (src.indexOf('.min') != -1) {
+						suffix = '.min';
+					}
+
+					baseURL = src.substring(0, src.lastIndexOf('/'));
 				}
 			}
 
@@ -28947,7 +29295,7 @@ define("tinymce/EditorManager", [
 			}
 
 			function createEditor(id, settings) {
-				if (!self.get(id)) {
+				if (!purgeDestroyedEditor(self.get(id))) {
 					var editor = new Editor(id, settings, self);
 					editors.push(editor);
 					editor.render();
@@ -29160,7 +29508,7 @@ define("tinymce/EditorManager", [
 		 * @return {tinymce.Editor} The editor that got passed in will be return if it was found otherwise null.
 		 */
 		remove: function(selector) {
-			var self = this, i, editors = self.editors, editor, removedFromList;
+			var self = this, i, editors = self.editors, editor;
 
 			// Remove all editors
 			if (!selector) {
@@ -29190,28 +29538,13 @@ define("tinymce/EditorManager", [
 				return null;
 			}
 
-			delete editors[editor.id];
-
-			for (i = 0; i < editors.length; i++) {
-				if (editors[i] == editor) {
-					editors.splice(i, 1);
-					removedFromList = true;
-					break;
-				}
-			}
-
-			// Select another editor since the active one was removed
-			if (self.activeEditor == editor) {
-				self.activeEditor = editors[0];
-			}
-
 			/**
 			 * Fires when an editor is removed from EditorManager collection.
 			 *
 			 * @event RemoveEditor
 			 * @param {Object} e Event arguments.
 			 */
-			if (removedFromList) {
+			if (removeEditorFromList(editor)) {
 				self.fire('RemoveEditor', {editor: editor});
 			}
 
@@ -32388,7 +32721,7 @@ define("tinymce/ui/FormatControls", [
 		}
 
 		function createFormats(formats) {
-			formats = formats.split(';');
+			formats = formats.replace(/;$/, '').split(';');
 
 			var i = formats.length;
 			while (i--) {
@@ -33111,6 +33444,7 @@ define("tinymce/ui/Iframe", [
 			self.addClass('iframe');
 			self.canFocus = false;
 
+			/*eslint no-script-url:0 */
 			return (
 				'<iframe id="' + self._id + '" class="' + self.classes() + '" tabindex="-1" src="' +
 				(self.settings.url || "javascript:\'\'") + '" frameborder="0"></iframe>'
@@ -34985,5 +35319,5 @@ define("tinymce/ui/Throbber", [
 	};
 });
 
-expose(["tinymce/dom/EventUtils","tinymce/dom/Sizzle","tinymce/dom/DomQuery","tinymce/html/Styles","tinymce/dom/TreeWalker","tinymce/util/Tools","tinymce/dom/Range","tinymce/html/Entities","tinymce/Env","tinymce/dom/StyleSheetLoader","tinymce/dom/DOMUtils","tinymce/dom/ScriptLoader","tinymce/AddOnManager","tinymce/html/Node","tinymce/html/Schema","tinymce/html/SaxParser","tinymce/html/DomParser","tinymce/html/Writer","tinymce/html/Serializer","tinymce/dom/Serializer","tinymce/dom/TridentSelection","tinymce/util/VK","tinymce/dom/ControlSelection","tinymce/dom/RangeUtils","tinymce/dom/Selection","tinymce/fmt/Preview","tinymce/Formatter","tinymce/UndoManager","tinymce/EnterKey","tinymce/ForceBlocks","tinymce/EditorCommands","tinymce/util/URI","tinymce/util/Class","tinymce/ui/Selector","tinymce/ui/Collection","tinymce/ui/DomUtils","tinymce/ui/Control","tinymce/ui/Factory","tinymce/ui/KeyboardNavigation","tinymce/ui/Container","tinymce/ui/DragHelper","tinymce/ui/Scrollable","tinymce/ui/Panel","tinymce/ui/Movable","tinymce/ui/Resizable","tinymce/ui/FloatPanel","tinymce/ui/Window","tinymce/ui/MessageBox","tinymce/WindowManager","tinymce/util/Quirks","tinymce/util/Observable","tinymce/Shortcuts","tinymce/Editor","tinymce/util/I18n","tinymce/FocusManager","tinymce/EditorManager","tinymce/LegacyInput","tinymce/util/XHR","tinymce/util/JSON","tinymce/util/JSONRequest","tinymce/util/JSONP","tinymce/util/LocalStorage","tinymce/Compat","tinymce/ui/Layout","tinymce/ui/AbsoluteLayout","tinymce/ui/Tooltip","tinymce/ui/Widget","tinymce/ui/Button","tinymce/ui/ButtonGroup","tinymce/ui/Checkbox","tinymce/ui/PanelButton","tinymce/ui/ColorButton","tinymce/ui/ComboBox","tinymce/ui/Path","tinymce/ui/ElementPath","tinymce/ui/FormItem","tinymce/ui/Form","tinymce/ui/FieldSet","tinymce/ui/FilePicker","tinymce/ui/FitLayout","tinymce/ui/FlexLayout","tinymce/ui/FlowLayout","tinymce/ui/FormatControls","tinymce/ui/GridLayout","tinymce/ui/Iframe","tinymce/ui/Label","tinymce/ui/Toolbar","tinymce/ui/MenuBar","tinymce/ui/MenuButton","tinymce/ui/ListBox","tinymce/ui/MenuItem","tinymce/ui/Menu","tinymce/ui/Radio","tinymce/ui/ResizeHandle","tinymce/ui/Spacer","tinymce/ui/SplitButton","tinymce/ui/StackLayout","tinymce/ui/TabPanel","tinymce/ui/TextBox","tinymce/ui/Throbber"]);
+expose(["tinymce/dom/EventUtils","tinymce/dom/Sizzle","tinymce/dom/DomQuery","tinymce/html/Styles","tinymce/dom/TreeWalker","tinymce/util/Tools","tinymce/dom/Range","tinymce/html/Entities","tinymce/Env","tinymce/dom/StyleSheetLoader","tinymce/dom/DOMUtils","tinymce/dom/ScriptLoader","tinymce/AddOnManager","tinymce/html/Node","tinymce/html/Schema","tinymce/html/SaxParser","tinymce/html/DomParser","tinymce/html/Writer","tinymce/html/Serializer","tinymce/dom/Serializer","tinymce/dom/TridentSelection","tinymce/util/VK","tinymce/dom/ControlSelection","tinymce/dom/RangeUtils","tinymce/dom/Selection","tinymce/fmt/Preview","tinymce/Formatter","tinymce/UndoManager","tinymce/EnterKey","tinymce/ForceBlocks","tinymce/EditorCommands","tinymce/util/URI","tinymce/util/Class","tinymce/util/EventDispatcher","tinymce/ui/Selector","tinymce/ui/Collection","tinymce/ui/DomUtils","tinymce/ui/Control","tinymce/ui/Factory","tinymce/ui/KeyboardNavigation","tinymce/ui/Container","tinymce/ui/DragHelper","tinymce/ui/Scrollable","tinymce/ui/Panel","tinymce/ui/Movable","tinymce/ui/Resizable","tinymce/ui/FloatPanel","tinymce/ui/Window","tinymce/ui/MessageBox","tinymce/WindowManager","tinymce/util/Quirks","tinymce/util/Observable","tinymce/EditorObservable","tinymce/Shortcuts","tinymce/Editor","tinymce/util/I18n","tinymce/FocusManager","tinymce/EditorManager","tinymce/LegacyInput","tinymce/util/XHR","tinymce/util/JSON","tinymce/util/JSONRequest","tinymce/util/JSONP","tinymce/util/LocalStorage","tinymce/Compat","tinymce/ui/Layout","tinymce/ui/AbsoluteLayout","tinymce/ui/Tooltip","tinymce/ui/Widget","tinymce/ui/Button","tinymce/ui/ButtonGroup","tinymce/ui/Checkbox","tinymce/ui/PanelButton","tinymce/ui/ColorButton","tinymce/ui/ComboBox","tinymce/ui/Path","tinymce/ui/ElementPath","tinymce/ui/FormItem","tinymce/ui/Form","tinymce/ui/FieldSet","tinymce/ui/FilePicker","tinymce/ui/FitLayout","tinymce/ui/FlexLayout","tinymce/ui/FlowLayout","tinymce/ui/FormatControls","tinymce/ui/GridLayout","tinymce/ui/Iframe","tinymce/ui/Label","tinymce/ui/Toolbar","tinymce/ui/MenuBar","tinymce/ui/MenuButton","tinymce/ui/ListBox","tinymce/ui/MenuItem","tinymce/ui/Menu","tinymce/ui/Radio","tinymce/ui/ResizeHandle","tinymce/ui/Spacer","tinymce/ui/SplitButton","tinymce/ui/StackLayout","tinymce/ui/TabPanel","tinymce/ui/TextBox","tinymce/ui/Throbber"]);
 })(this);
