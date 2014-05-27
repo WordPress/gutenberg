@@ -570,4 +570,24 @@ class Tests_Term extends WP_UnitTestCase {
 		// this previously returned 2
 		$this->assertEquals( 0, $count );
 	}
+
+	function test_wp_get_object_terms_no_dupes() {
+		$post_id1 = $this->factory->post->create();
+		$post_id2 = $this->factory->post->create();
+		$cat_id = $this->factory->category->create();
+		$cat_id2 = $this->factory->category->create();
+		wp_set_post_categories( $post_id1, array( $cat_id, $cat_id2 ) );
+		wp_set_post_categories( $post_id2, $cat_id );
+
+		$terms = wp_get_object_terms( array( $post_id1, $post_id2 ), 'category' );
+		$this->assertCount( 2, $terms );
+		$this->assertEquals( array( $cat_id, $cat_id2 ), wp_list_pluck( $terms, 'term_id' ) );
+
+		$terms2 = wp_get_object_terms( array( $post_id1, $post_id2 ), 'category', array(
+			'fields' => 'all_with_object_id'
+		) );
+
+		$this->assertCount( 3, $terms2 );
+		$this->assertEquals( array( $cat_id, $cat_id, $cat_id2 ), wp_list_pluck( $terms2, 'term_id' ) );
+	}
 }
