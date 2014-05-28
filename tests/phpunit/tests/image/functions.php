@@ -88,7 +88,7 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 		// these are image files but aren't suitable for web pages because of compatibility or size issues
 		$files = array(
 			// 'test-image-cmyk.jpg', Allowed in r9727
-			'test-image.bmp',
+			// 'test-image.bmp', Allowed in r28589 
 			// 'test-image-grayscale.jpg', Allowed in r9727
 			'test-image.pct',
 			'test-image.tga',
