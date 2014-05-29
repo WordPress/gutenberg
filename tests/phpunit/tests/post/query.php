@@ -741,4 +741,24 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		) );
 		$this->assertEqualSets( $ordered, wp_list_pluck( $attached->posts, 'ID' ) );
 	}
+
+	function test_post_status() {
+		$statuses1 = get_post_stati();
+		$this->assertContains( 'auto-draft', $statuses1 );
+
+		$statuses2 = get_post_stati( array( 'exclude_from_search' => true ) );
+		$this->assertContains( 'auto-draft', $statuses2 );
+
+		$statuses3 = get_post_stati( array( 'exclude_from_search' => false ) );
+		$this->assertNotContains( 'auto-draft', $statuses3 );
+
+		$q1 = new WP_Query( array( 'post_status' => 'any' ) );
+		$this->assertContains( "post_status <> 'auto-draft'", $q1->request );
+
+		$q2 = new WP_Query( array( 'post_status' => 'any, auto-draft' ) );
+		$this->assertNotContains( "post_status <> 'auto-draft'", $q2->request );
+
+		$q3 = new WP_Query( array( 'post_status' => array( 'any', 'auto-draft' ) ) );
+		$this->assertNotContains( "post_status <> 'auto-draft'", $q3->request );
+	}
 }
