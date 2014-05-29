@@ -1,6 +1,9 @@
 <?php
 
 // tests for link-template.php and related URL functions
+/**
+ * @group url
+ */
 class Tests_URL extends WP_UnitTestCase {
 	var $_old_server;
 	function setUp() {
@@ -264,9 +267,9 @@ class Tests_URL extends WP_UnitTestCase {
 			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link, 'rpc' ) );
 
 			force_ssl_login( true );
-			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link, 'admin' ) );
+			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'admin' ) );
 			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'login_post' ) );
-			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link, 'login' ) );
+			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'login' ) );
 			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'rpc' ) );
 
 			$i++;
