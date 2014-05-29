@@ -85,6 +85,7 @@ module.exports = function(grunt) {
 							// If the version includes an SVN commit (-12345), it's not a released alpha/beta. Append a date.
 							version = version.replace( /-[\d]{5}$/, '-' + grunt.template.today( 'yyyymmdd' ) );
 
+							/* jshint quotmark: true */
 							return "$wp_version = '" + version + "';";
 						});
 					}
