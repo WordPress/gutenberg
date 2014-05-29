@@ -93,7 +93,6 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 	 * @dataProvider get_custom_smilies_input_output
 	 *
 	 * Validate Custom Smilies are converted to images when use_smilies = 1
-	 * @uses $wpsmiliestrans
 	 */
 	function test_convert_custom_smilies ( $in_txt, $converted_txt ) {
 		global $wpsmiliestrans;
@@ -141,7 +140,6 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 	 *
 	 * @ticket 16448
 	 * @dataProvider get_smilies_ignore_tags
-	 * @uses $wpsmiliestrans
 	 */
 	public function test_ignore_smilies_in_tags( $element ) {
 		global $wpsmiliestrans;
@@ -205,7 +203,6 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 	 *
 	 * @ticket 20124
 	 * @dataProvider get_smilies_combinations
-	 * @uses $wpsmiliestrans
 	 */
 	public function test_smilies_combinations( $in_txt, $converted_txt ) {
 		global $wpsmiliestrans;
@@ -251,7 +248,6 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 	 *
 	 * @ticket 25303
 	 * @dataProvider get_single_smilies_input_output
-	 * @uses $wpsmiliestrans
 	 */
 	public function test_single_smilies_in_wpsmiliestrans( $in_txt, $converted_txt ) {
 		global $wpsmiliestrans;
