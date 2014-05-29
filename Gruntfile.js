@@ -79,7 +79,14 @@ module.exports = function(grunt) {
 			version: {
 				options: {
 					processContent: function( src ) {
-						return src.replace( /^(\$wp_version.+?)-src';/m, '$1\';' );
+						return src.replace( /^\$wp_version = '(.+?)';/m, function( str, version ) {
+							version = version.replace( /-src$/, '' );
+
+							// If the version includes an SVN commit (-12345), it's not a released alpha/beta. Append a date.
+							version = version.replace( /-[\d]{5}$/, '-' + grunt.template.today( 'yyyymmdd' ) );
+
+							return "$wp_version = '" + version + "';";
+						});
 					}
 				},
 				src: SOURCE_DIR + 'wp-includes/version.php',
