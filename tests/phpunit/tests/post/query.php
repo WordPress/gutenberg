@@ -706,23 +706,24 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	function test_post__in_attachment_ordering() {
 		$post_id = $this->factory->post->create();
 		$att_ids = array();
-		$att_ids[1] = $this->factory->attachment->create_object( 'woo1.jpg', $post_id, array(
+		$file = DIR_TESTDATA . '/images/canola.jpg';
+		$att_ids[1] = $this->factory->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[2] = $this->factory->attachment->create_object( 'woo2.jpg', $post_id, array(
+		$att_ids[2] = $this->factory->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[3] = $this->factory->attachment->create_object( 'woo3.jpg', $post_id, array(
+		$att_ids[3] = $this->factory->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[4] = $this->factory->attachment->create_object( 'woo4.jpg', $post_id, array(
+		$att_ids[4] = $this->factory->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[5] = $this->factory->attachment->create_object( 'woo5.jpg', $post_id, array(
+		$att_ids[5] = $this->factory->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
