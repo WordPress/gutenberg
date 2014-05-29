@@ -402,6 +402,15 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	}
 
+	function test_empty_post__in() {
+		$posts1 = $this->q->query( array() );
+		$this->assertNotEmpty( $posts1 );
+		$posts2 = $this->q->query( array( 'post__in' => array() ) );
+		$this->assertEmpty( $posts2 );
+		$posts3 = $this->q->query( array( 'post_parent__in' => array() ) );
+		$this->assertEmpty( $posts3 );
+	}
+
 	function test_exlude_from_search_empty() {
 		global $wp_post_types;
 		foreach ( array_keys( $wp_post_types ) as $slug )
