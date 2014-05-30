@@ -159,4 +159,22 @@ EOF;
 
 		$this->assertFalse( isset( $basic->foo ) );
 	}
+
+	function test_switch_order() {
+		$return = $this->_switch_order_helper( 1 );
+		$this->assertEquals( 'match', $return );
+	}
+
+	function _switch_order_helper( $var ) {
+		$return = 'no match';
+		switch ( $var ) {
+		default:
+			break;
+		case 1:
+			$return = 'match';
+			break;
+		}
+
+		return $return;
+	}
 }
