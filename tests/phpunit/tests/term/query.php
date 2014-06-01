@@ -158,7 +158,7 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 
 		$results1 = $this->q->query( array(
 			'fields' => 'ids',
-			'orderby' => 'id',
+			'orderby' => 'ID',
 			'order' => 'ASC',
 			'tax_query' => array(
 				'relation' => 'OR',
@@ -181,7 +181,7 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 
 		$results2 = $this->q->query( array(
 			'fields' => 'ids',
-			'orderby' => 'id',
+			'orderby' => 'ID',
 			'order' => 'ASC',
 			'tax_query' => array(
 				'relation' => 'AND',
