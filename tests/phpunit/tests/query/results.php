@@ -513,6 +513,9 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );
 		$this->assertEqualSets( array( $author_1, $author_2 ), $author_ids );
 
+		$posts = $this->q->query( array( 'author__in' => array() ) );
+		$this->assertEmpty( $posts );
+
 		$posts = $this->q->query( array(
 			'author__not_in' => array( $author_1, $author_2 ),
 			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
