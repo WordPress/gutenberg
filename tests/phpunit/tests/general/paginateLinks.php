@@ -79,4 +79,40 @@ EXPECTED;
 		$this->assertEquals( 5, $this->i18n_count );
 		remove_filter( 'number_format_i18n', array( $this, 'increment_i18n_count' ) );
 	}
+
+	/**
+	 * @ticket 24606
+	 */
+	function test_paginate_links_base_value() {
+
+		// Current page: 2
+		$links = paginate_links( array(
+			'current'  => 2,
+			'total'    => 5,
+			'end_size' => 1,
+			'mid_size' => 1,
+			'type'     => 'array',
+		) );
+
+		// It's supposed to link to page 1:
+		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => '?page=1' ) ), $links[0] );
+		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => '?page=1' ) ), $links[1] );
+
+		// It's not supposed to have an empty href.
+		$this->assertNotTag( array( 'tag' => 'a', 'attributes' => array( 'class' => 'prev page-numbers', 'href' => '' ) ), $links[0] );
+		$this->assertNotTag( array( 'tag' => 'a', 'attributes' => array( 'class' => 'page-numbers',      'href' => '' ) ), $links[1] );
+
+		// Current page: 1
+		$links = paginate_links( array(
+			'current'  => 1,
+			'total'    => 5,
+			'end_size' => 1,
+			'mid_size' => 1,
+			'type'     => 'array',
+		) );
+
+		$this->assertTag( array( 'tag' => 'span', 'attributes' => array( 'class' => 'current' ) ), $links[0] );
+		$this->assertTag( array( 'tag' => 'a',    'attributes' => array( 'href' => '?page=2'  ) ), $links[1] );
+	}
+
 }
