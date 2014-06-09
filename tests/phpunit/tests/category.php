@@ -17,6 +17,8 @@ class Tests_Category extends WP_UnitTestCase {
 
 	/**
 	 * Validate get_all_category_ids
+	 *
+	 * @expectedDeprecated get_all_category_ids
 	 */
 	function test_get_all_category_ids() {
 		// create categories

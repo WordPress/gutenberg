@@ -55,7 +55,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( 'WordPress Default', $theme['Name'] );
 		$this->assertEquals( 'WordPress Default', $theme['Title'] );
 		$this->assertEquals( 'The default WordPress theme based on the famous <a href="http://binarybonsai.com/kubrick/">Kubrick</a>.', $theme['Description'] );
-		$this->assertEquals( '<a href="http://binarybonsai.com/" title="Visit author homepage">Michael Heilemann</a>', $theme['Author'] );
+		$this->assertEquals( '<a href="http://binarybonsai.com/">Michael Heilemann</a>', $theme['Author'] );
 		$this->assertEquals( '1.6', $theme['Version'] );
 		$this->assertEquals( 'default', $theme['Template'] );
 		$this->assertEquals( 'default', $theme['Stylesheet'] );
@@ -121,7 +121,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( 'Stylesheet Only', $theme['Name'] );
 		$this->assertEquals( 'Stylesheet Only', $theme['Title'] );
 		$this->assertEquals( 'A three-column widget-ready theme in dark blue.', $theme['Description'] );
-		$this->assertEquals( '<a href="http://www.example.com/" title="Visit author homepage">Henry Crun</a>', $theme['Author'] );
+		$this->assertEquals( '<a href="http://www.example.com/">Henry Crun</a>', $theme['Author'] );
 		$this->assertEquals( '1.0', $theme['Version'] );
 		$this->assertEquals( 'sandbox', $theme['Template'] );
 		$this->assertEquals( 'stylesheetonly', $theme['Stylesheet'] );
@@ -205,7 +205,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( 'My Theme', $theme_data['Name'] );
 		$this->assertEquals( 'http://example.org/', $theme_data['URI'] );
 		$this->assertEquals( 'An example theme', $theme_data['Description'] );
-		$this->assertEquals( '<a href="http://example.com/" title="Visit author homepage">Minnie Bannister</a>', $theme_data['Author'] );
+		$this->assertEquals( '<a href="http://example.com/">Minnie Bannister</a>', $theme_data['Author'] );
 		$this->assertEquals( 'http://example.com/', $theme_data['AuthorURI'] );
 		$this->assertEquals( '1.3', $theme_data['Version'] );
 		$this->assertEquals( '', $theme_data['Template'] );
@@ -224,7 +224,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( 'My Subdir Theme', $theme_data['Name'] );
 		$this->assertEquals( 'http://example.org/', $theme_data['URI'] );
 		$this->assertEquals( 'An example theme in a sub directory', $theme_data['Description'] );
-		$this->assertEquals( '<a href="http://wordpress.org/" title="Visit author homepage">Mr. WordPress</a>', $theme_data['Author'] );
+		$this->assertEquals( '<a href="http://wordpress.org/">Mr. WordPress</a>', $theme_data['Author'] );
 		$this->assertEquals( 'http://wordpress.org/', $theme_data['AuthorURI'] );
 		$this->assertEquals( '0.1', $theme_data['Version'] );
 		$this->assertEquals( '', $theme_data['Template'] );
