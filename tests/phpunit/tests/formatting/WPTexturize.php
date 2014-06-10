@@ -187,15 +187,23 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	 * @ticket 23185
 	 */
 	function test_spaces_around_hyphens() {
+		$nbsp = "\xC2\xA0";
+
 		$this->assertEquals( ' &#8211; ', wptexturize( ' - ' ) ); 
 		$this->assertEquals( '&nbsp;&#8211;&nbsp;', wptexturize( '&nbsp;-&nbsp;' ) );
 		$this->assertEquals( ' &#8211;&nbsp;', wptexturize( ' -&nbsp;' ) );
 		$this->assertEquals( '&nbsp;&#8211; ', wptexturize( '&nbsp;- ') );
+		$this->assertEquals( "$nbsp&#8211;$nbsp", wptexturize( "$nbsp-$nbsp" ) );
+		$this->assertEquals( " &#8211;$nbsp", wptexturize( " -$nbsp" ) );
+		$this->assertEquals( "$nbsp&#8211; ", wptexturize( "$nbsp- ") );
 
 		$this->assertEquals( ' &#8212; ', wptexturize( ' -- ' ) ); 
 		$this->assertEquals( '&nbsp;&#8212;&nbsp;', wptexturize( '&nbsp;--&nbsp;' ) );
 		$this->assertEquals( ' &#8212;&nbsp;', wptexturize( ' --&nbsp;' ) );
 		$this->assertEquals( '&nbsp;&#8212; ', wptexturize( '&nbsp;-- ') );
+		$this->assertEquals( "$nbsp&#8212;$nbsp", wptexturize( "$nbsp--$nbsp" ) );
+		$this->assertEquals( " &#8212;$nbsp", wptexturize( " --$nbsp" ) );
+		$this->assertEquals( "$nbsp&#8212; ", wptexturize( "$nbsp-- ") );
 	}
 
 	/**
@@ -929,10 +937,14 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				"word xn&#8211; word",
-				"word xn-- word",
+				"word xn&#8211; word",
 			),
 			array(
 				"wordxn&#8211;word",
+				"wordxn&#8211;word",
+			),
+			array(
+				"wordxn--word",
 				"wordxn--word",
 			),
 		);
