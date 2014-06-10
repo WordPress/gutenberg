@@ -154,8 +154,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	function test_wptexturize_quotes_around_numbers() {
 		$this->assertEquals('&#8220;12345&#8221;', wptexturize('"12345"'));
 		$this->assertEquals('&#8216;12345&#8217;', wptexturize('\'12345\''));
-		$this->assertEquals('&#8220;a 9&#8242; plus a &#8216;9&#8217;, maybe a 9&#8242; &#8216;9&#8217; &#8221;', wptexturize('"a 9\' plus a \'9\', maybe a 9\' \'9\' "'));
-		$this->assertEquals('<p>&#8216;99<br />&#8216;123&#8217;<br />&#8217;tis<br />&#8216;s&#8217;</p>', wptexturize('<p>\'99<br />\'123\'<br />\'tis<br />\'s\'</p>'));
+		$this->assertEquals('&#8220;a 9&#8242; plus a &#8216;9&#8217;, maybe a 9&#8242; &#8216;9&#8217;&#8221;', wptexturize('"a 9\' plus a \'9\', maybe a 9\' \'9\'"'));
+		$this->assertEquals('<p>&#8217;99<br />&#8216;123&#8217;<br />&#8217;tis<br />&#8216;s&#8217;</p>', wptexturize('<p>\'99<br />\'123\'<br />\'tis<br />\'s\'</p>'));
 	}
 
 	/**
@@ -313,20 +313,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word &#8217;99&#8217;s word",
 			),
 			array(
-				"word '99's word", // Due to the logic error, second apos becomes a prime.  See ticket #22823
-				"word &#8217;99&#8242;s word",
-			),
-			array(
-				"word '99'samsonite",
-				"word &#8217;99&#8242;samsonite",
-			),
-			array(
 				"according to our source, '33% of all students scored less than 50' on the test.", // Apostrophes and primes have priority over quotes
 				"according to our source, &#8217;33% of all students scored less than 50&#8242; on the test.",
-			),
-			array(
-				"word '99' word", // See ticket #8775
-				"word &#8217;99&#8242; word",
 			),
 		);
 	}
@@ -1026,4 +1014,56 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Numbers inside of matching quotes get curly quotes instead of apostrophes and primes.
+	 *
+	 * @ticket 8775
+	 * @dataProvider data_quoted_numbers
+	 */
+	function test_quoted_numbers( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_quoted_numbers() {
+		return array(
+			array(
+				'word "42.00" word',
+				'word &#8220;42.00&#8221; word',
+			),
+			array(
+				'word "42.00"word',
+				'word &#8220;42.00&#8221;word',
+			),
+			array(
+				"word '42.00' word",
+				"word &#8216;42.00&#8217; word",
+			),
+			array(
+				"word '42.00'word",
+				"word &#8216;42.00&#8217;word",
+			),
+			array(
+				'word "42" word',
+				'word &#8220;42&#8221; word',
+			),
+			array(
+				'word "42,00" word',
+				'word &#8220;42,00&#8221; word',
+			),
+			array(
+				'word "4,242.00" word',
+				'word &#8220;4,242.00&#8221; word',
+			),
+			array(
+				"word '99's word", // Is this correct?
+				"word &#8216;99&#8217;s word",
+			),
+			array(
+				"word '99'samsonite",
+				"word &#8216;99&#8217;samsonite",
+			),
+		);
+	}
+
 }
