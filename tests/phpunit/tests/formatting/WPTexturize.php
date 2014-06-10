@@ -1128,4 +1128,155 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Test HTML and shortcode avoidance.
+	 *
+	 * @ticket 12690
+	 * @dataProvider data_tag_avoidance
+	 */
+	function test_tag_avoidance( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_tag_avoidance() {
+		return array(
+			array(
+				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a> ]',
+				'[ photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a> ]',
+			),
+			array(
+				'[gallery ...]',
+				'[gallery ...]',
+			),
+			array(
+				'[[gallery ...]', // This tag is still valid.
+				'[[gallery ...]',
+			),
+			array(
+				'[gallery ...]]', // This tag is also valid.
+				'[gallery ...]]',
+			),
+			array(
+				'[/...]', // This would actually be ignored by the shortcode system.  The decision to not texturize it is intentional, if not correct.
+				'[/...]',
+			),
+			array(
+				'[...]...[/...]', // These are potentially usable shortcodes.
+				'[...]&#8230;[/...]',
+			),
+			array(
+				'[[...]]...[[/...]]', // Shortcode parsing will ignore the inner ]...[ part and treat this as a single escaped shortcode.
+				'[[...]]&#8230;[[/...]]',
+			),
+			array(
+				'[[[...]]]...[[[/...]]]', // Again, shortcode parsing matches, but only the [[...] and [/...]] parts.
+				'[[[...]]]&#8230;[[[/...]]]',
+			),
+			array(
+				'[[code]...[/code]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[/code] is ambiguous unless we run the entire shortcode regexp.
+				'[[code]&#8230;[/code]...', // Same behavior as 3.9 due to buggy logic in _wptexturize_pushpop_element().  See ticket #28483.
+			),
+			array(
+				'[code]...[/code]]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [/code]] is ambiguous unless we run the entire shortcode regexp.
+				'[code]...[/code]]...', // This test would not pass in 3.9 because the extra brace was always ignored by texturize.
+			),
+			array(
+				'[gal>ery ...]',
+				'[gal>ery &#8230;]',
+			),
+			array(
+				'[gallery ...',
+				'[gallery &#8230;',
+			),
+			array(
+				'[gallery <br ... /> ...]',
+				'[gallery <br ... /> &#8230;]',
+			),
+			array(
+				'<br [gallery ...] ... />',
+				'<br [gallery ...] ... />',
+			),
+			array(
+				'<br [gallery ...] ... /',
+				'<br [gallery ...] &#8230; /',
+			),
+			array(
+				'<br ... />',
+				'<br ... />',
+			),
+			array(
+				'<br ... />...<br ... />',
+				'<br ... />&#8230;<br ... />',
+			),
+			array(
+				'[gallery ...]...[gallery ...]',
+				'[gallery ...]&#8230;[gallery ...]',
+			),
+			array(
+				'[[gallery ...]]',
+				'[[gallery ...]]',
+			),
+			array(
+				'[[gallery ...]',
+				'[[gallery ...]',
+			),
+			array(
+				'[gallery ...]]',
+				'[gallery ...]]',
+			),
+			array(
+				'[/gallery ...]]',
+				'[/gallery ...]]',
+			),
+			array(
+				'[[gallery <br ... /> ...]]',
+				'[[gallery <br ... /> &#8230;]]',
+			),
+			array(
+				'<br [[gallery ...]] ... />',
+				'<br [[gallery ...]] ... />',
+			),
+			array(
+				'<br [[gallery ...]] ... /',
+				'<br [[gallery ...]] &#8230; /',
+			),
+			array(
+				'[[gallery ...]]...[[gallery ...]]',
+				'[[gallery ...]]&#8230;[[gallery ...]]',
+			),
+			array(
+				'[[gallery ...]...[/gallery]]',
+				'[[gallery ...]&#8230;[/gallery]]',
+			),
+			array(
+				'<!-- ... -->',
+				'<!-- ... -->',
+			),
+			array(
+				'<!--...-->',
+				'<!--...-->',
+			),
+			array(
+				'<!-- ... -- >',
+				'<!-- ... -- >',
+			),
+			array(
+				'<!-- <br /> [gallery] ... -->',
+				'<!-- <br /> [gallery] ... -->',
+			),
+			array(
+				'...<!-- ... -->...',
+				'&#8230;<!-- ... -->&#8230;',
+			),
+			array(
+				'[gallery ...]...<!-- ... -->...<br ... />',
+				'[gallery ...]&#8230;<!-- ... -->&#8230;<br ... />',
+			),
+			array(
+				'<ul><li>Hello.</li><!--<li>Goodbye.</li>--></ul>',
+				'<ul><li>Hello.</li><!--<li>Goodbye.</li>--></ul>',
+			),
+		);
+	}
 }
