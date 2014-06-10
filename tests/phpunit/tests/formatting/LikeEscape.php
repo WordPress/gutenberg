@@ -19,8 +19,8 @@ class Tests_Formatting_LikeEscape extends WP_UnitTestCase {
 		$expected = array(
 			"howdy\\%",
 			'howdy\\_',
-			'howdy\\\\',
-			'howdy\\\\howdy\\%howdy\\_'
+			'howdy\\',
+			'howdy\\howdy\\%howdy\\_'
 		);
 
 		foreach ($inputs as $key => $input) {
