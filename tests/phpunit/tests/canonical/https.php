@@ -15,10 +15,6 @@ class Tests_Canonical_HTTPS extends Tests_Canonical {
 		$this->https = set_url_scheme( home_url( 'sample-page/' ), 'https' );
 	}
 
-	public function test( $test_url, $expected, $ticket = 0 ) {
-		// Nothing
-	}
-
 	public function set_https( $url ) {
 		return set_url_scheme( $url, 'https' );
 	}
