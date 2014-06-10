@@ -109,6 +109,105 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 10041
+	 */
+	function test_esc_like() {
+		global $wpdb;
+
+		$inputs = array(
+			'howdy%', //Single Percent
+			'howdy_', //Single Underscore
+			'howdy\\', //Single slash
+			'howdy\\howdy%howdy_', //The works
+			'howdy\'"[[]*#[^howdy]!+)(*&$#@!~|}{=--`/.,<>?', //Plain text
+		);
+		$expected = array(
+			'howdy\\%',
+			'howdy\\_',
+			'howdy\\\\',
+			'howdy\\\\howdy\\%howdy\\_',
+			'howdy\'"[[]*#[^howdy]!+)(*&$#@!~|}{=--`/.,<>?',
+		);
+
+		foreach ($inputs as $key => $input) {
+			$this->assertEquals($expected[$key], $wpdb->esc_like($input));
+		}
+	}
+
+	/**
+	 * Test LIKE Queries
+	 *
+	 * Make sure $wpdb is fully compatible with esc_like() by testing the identity of various strings.
+	 * When escaped properly, a string literal is always LIKE itself (1)
+	 * and never LIKE any other string literal (0) no matter how crazy the SQL looks.
+	 *
+	 * @ticket 10041
+	 * @dataProvider data_like_query
+	 * @param $data string The haystack, raw.
+	 * @param $like string The like phrase, raw.
+         * @param $result string The expected comparison result; '1' = true, '0' = false
+	 */
+	function test_like_query( $data, $like, $result ) {
+		global $wpdb;
+		return $this->assertEquals( $result, $wpdb->get_var( $wpdb->prepare( "SELECT %s LIKE %s", $data, $wpdb->esc_like( $like ) ) ) );
+	}
+
+	function data_like_query() {
+		return array(
+			array(
+				'aaa',
+				'aaa',
+				'1',
+			),
+			array(
+				'a\\aa', // SELECT 'a\\aa'  # This represents a\aa in both languages.
+				'a\\aa', // LIKE 'a\\\\aa'
+				'1',
+			),
+			array(
+				'a%aa',
+				'a%aa',
+				'1',
+			),
+			array(
+				'aaaa',
+				'a%aa',
+				'0',
+			),
+			array(
+				'a\\%aa', // SELECT 'a\\%aa'
+				'a\\%aa', // LIKE 'a\\\\\\%aa' # The PHP literal would be "LIKE 'a\\\\\\\\\\\\%aa'".  This is why we need reliable escape functions!
+				'1',
+			),
+			array(
+				'a%aa',
+				'a\\%aa',
+				'0',
+			),
+			array(
+				'a\\%aa',
+				'a%aa',
+				'0',
+			),
+			array(
+				'a_aa',
+				'a_aa',
+				'1',
+			),
+			array(
+				'aaaa',
+				'a_aa',
+				'0',
+			),
+			array(
+				'howdy\'"[[]*#[^howdy]!+)(*&$#@!~|}{=--`/.,<>?',
+				'howdy\'"[[]*#[^howdy]!+)(*&$#@!~|}{=--`/.,<>?',
+				'1',
+			),
+		);
+	}
+
+	/**
 	 * @ticket 18510
 	 */
 	function test_wpdb_supposedly_protected_properties() {
