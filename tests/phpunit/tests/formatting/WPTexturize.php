@@ -1066,4 +1066,66 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Quotations should be allowed to have dashes around them.
+	 *
+	 * @ticket 20342
+	 * @dataProvider data_quotes_and_dashes
+	 */
+	function test_quotes_and_dashes( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_quotes_and_dashes() {
+		return array(
+			array(
+				'word---"quote"',
+				'word&#8212;&#8220;quote&#8221;',
+			),
+			array(
+				'word--"quote"',
+				'word&#8211;&#8220;quote&#8221;',
+			),
+			array(
+				'word-"quote"',
+				'word-&#8220;quote&#8221;',
+			),
+			array(
+				"word---'quote'",
+				"word&#8212;&#8216;quote&#8217;",
+			),
+			array(
+				"word--'quote'",
+				"word&#8211;&#8216;quote&#8217;",
+			),
+			array(
+				"word-'quote'",
+				"word-&#8216;quote&#8217;",
+			),
+			array(
+				'"quote"---word',
+				'&#8220;quote&#8221;&#8212;word',
+			),
+			array(
+				'"quote"--word',
+				'&#8220;quote&#8221;&#8211;word',
+			),
+			array(
+				'"quote"-word',
+				'&#8220;quote&#8221;-word',
+			),
+			array(
+				"'quote'---word",
+				"&#8216;quote&#8217;&#8212;word",
+			),
+			array(
+				"'quote'--word",
+				"&#8216;quote&#8217;&#8211;word",
+			),
+			array(
+				"'quote'-word",
+				"&#8216;quote&#8217;-word",
+			),
+		);
+	}
 }
