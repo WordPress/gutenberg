@@ -500,16 +500,16 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word 99&#8242; word",
 			),
 			array(
-				"word 99'word",
-				"word 99&#8242;word",
+				"word 99'word", // Not a prime anymore. Apostrophes get priority.
+				"word 99&#8217;word",
 			),
 			array(
 				"word99' word",
 				"word99&#8242; word",
 			),
 			array(
-				"word99'word",
-				"word99&#8242;word",
+				"word99'word", // Not a prime anymore.
+				"word99&#8217;word",
 			),
 		);
 	}
