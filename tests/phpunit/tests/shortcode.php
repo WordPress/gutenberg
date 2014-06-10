@@ -373,4 +373,25 @@ EOF;
 		remove_filter( 'shortcode_atts_bartag', array( $this, '_filter_atts2' ), 10, 3 );
 	}
 
+	/**
+	 * Check that shortcode_unautop() will always recognize spaces around shortcodes.
+	 *
+	 * @ticket 22692
+	 */
+	function test_spaces_around_shortcodes() {
+		$nbsp = "\xC2\xA0";
+
+		$input  = array();
+
+		$input[] = "<p>[gallery ids=\"37,15,11\"]</p>";
+		$input[] = "<p> [gallery ids=\"37,15,11\"] </p>";
+		$input[] = "<p> {$nbsp}[gallery ids=\"37,15,11\"] {$nbsp}</p>";
+		$input[] = "<p> &nbsp;[gallery ids=\"37,15,11\"] &nbsp;</p>";
+
+		$output = "[gallery ids=\"37,15,11\"]";
+
+		foreach($input as $in) {
+			$this->assertEquals( $output, shortcode_unautop( $in ) );
+		}
+	}
 }
