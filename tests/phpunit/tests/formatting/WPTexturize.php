@@ -781,8 +781,28 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"12&#215;34",
 			),
 			array(
+				"-123x1=-123",
+				"-123&#215;1=-123",
+			),
+			array(
+				"-123x-1",
+				"-123&#215;-1",
+			),
+			array(
+				"0.675x1=0.675",
+				"0.675&#215;1=0.675",
+			),
+			array(
 				"9 x 9",
 				"9 x 9",
+			),
+			array(
+				"0x70",
+				"0x70",
+			),
+			array(
+				"3x2x1x0",
+				"3x2x1x0",
 			),
 		);
 	}
