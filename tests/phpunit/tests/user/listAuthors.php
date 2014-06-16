@@ -83,20 +83,20 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 	}
 
 	function test_wp_list_authors_feed() {
-		$expected['feed'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (<a href="http://example.org/?feed=rss2&amp;author=' . $this->users[1] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (<a href="http://example.org/?feed=rss2&amp;author=' . $this->users[2] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (<a href="http://example.org/?feed=rss2&amp;author=' . $this->users[0] . '">link to feed</a>)</li>';
+		$expected['feed'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[1] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[2] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[0] . '">link to feed</a>)</li>';
 		$this->AssertEquals( $expected['feed'], wp_list_authors( array( 'echo' => false, 'feed' => 'link to feed' ) ) );
 	}
 
 	function test_wp_list_authors_feed_image() {
-		$expected['feed_image'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> <a href="http://example.org/?feed=rss2&amp;author=' . $this->users[1] . '"><img src="http://example.com/path/to/a/graphic.png" style="border: none;" /></a></li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> <a href="http://example.org/?feed=rss2&amp;author=' . $this->users[2] . '"><img src="http://example.com/path/to/a/graphic.png" style="border: none;" /></a></li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> <a href="http://example.org/?feed=rss2&amp;author=' . $this->users[0] . '"><img src="http://example.com/path/to/a/graphic.png" style="border: none;" /></a></li>';
-		$this->AssertEquals( $expected['feed_image'], wp_list_authors( array( 'echo' => false, 'feed_image' => 'example.com/path/to/a/graphic.png' ) ) );
+		$expected['feed_image'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> <a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[1] . '"><img src="http://' . WP_TESTS_DOMAIN . '/path/to/a/graphic.png" style="border: none;" /></a></li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> <a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[2] . '"><img src="http://' . WP_TESTS_DOMAIN . '/path/to/a/graphic.png" style="border: none;" /></a></li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> <a href="http://' . WP_TESTS_DOMAIN . '/?feed=rss2&amp;author=' . $this->users[0] . '"><img src="http://' . WP_TESTS_DOMAIN . '/path/to/a/graphic.png" style="border: none;" /></a></li>';
+		$this->AssertEquals( $expected['feed_image'], wp_list_authors( array( 'echo' => false, 'feed_image' => WP_TESTS_DOMAIN . '/path/to/a/graphic.png' ) ) );
 	}
 
 	/**
 	 * @ticket 26538
 	 */
 	function test_wp_list_authors_feed_type() {
-		$expected['feed_type'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (<a href="http://example.org/?feed=atom&amp;author=' . $this->users[1] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (<a href="http://example.org/?feed=atom&amp;author=' . $this->users[2] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (<a href="http://example.org/?feed=atom&amp;author=' . $this->users[0] . '">link to feed</a>)</li>';
+		$expected['feed_type'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=atom&amp;author=' . $this->users[1] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=atom&amp;author=' . $this->users[2] . '">link to feed</a>)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (<a href="http://' . WP_TESTS_DOMAIN . '/?feed=atom&amp;author=' . $this->users[0] . '">link to feed</a>)</li>';
 		$this->AssertEquals( $expected['feed_type'], wp_list_authors( array( 'echo' => false, 'feed' => 'link to feed', 'feed_type' => 'atom' ) ) );
 	}
 

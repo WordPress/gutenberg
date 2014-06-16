@@ -33,12 +33,14 @@ class Tests_Get_Archives extends WP_UnitTestCase {
 		$ids = array_slice( array_reverse( $this->post_ids ), 0, 5 );
 
 		$expected['limit'] = <<<EOF
-<li><a href='http://example.org/?p={$ids[0]}'>Post title 8</a></li>
-	<li><a href='http://example.org/?p={$ids[1]}'>Post title 7</a></li>
-	<li><a href='http://example.org/?p={$ids[2]}'>Post title 6</a></li>
-	<li><a href='http://example.org/?p={$ids[3]}'>Post title 5</a></li>
-	<li><a href='http://example.org/?p={$ids[4]}'>Post title 4</a></li>
+<li><a href='http://{WP_TESTS_DOMAIN}/?p={$ids[0]}'>Post title 8</a></li>
+	<li><a href='http://{WP_TESTS_DOMAIN}/?p={$ids[1]}'>Post title 7</a></li>
+	<li><a href='http://{WP_TESTS_DOMAIN}/?p={$ids[2]}'>Post title 6</a></li>
+	<li><a href='http://{WP_TESTS_DOMAIN}/?p={$ids[3]}'>Post title 5</a></li>
+	<li><a href='http://{WP_TESTS_DOMAIN}/?p={$ids[4]}'>Post title 4</a></li>
 EOF;
+		$expected['limit'] = str_replace( '{WP_TESTS_DOMAIN}', WP_TESTS_DOMAIN, $expected['limit'] );
+
 		$this->assertEquals( $expected['limit'], trim( wp_get_archives( array( 'echo' => false, 'type' => 'postbypost', 'limit' => 5 ) ) ) );
 	}
 
