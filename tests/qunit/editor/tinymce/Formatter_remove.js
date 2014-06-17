@@ -5,9 +5,7 @@ module("tinymce.Formatter - Remove", {
 
 		tinymce.init({
 			selector: "textarea",
-			external_plugins: {
-				noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js'
-			},
+			external_plugins: { noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js' }, // WP
 			indent: false,
 			add_unload_trigger: false,
 			skin: false,
@@ -311,6 +309,16 @@ test('Caret format at end of text inside other format with text after 2', functi
 	editor.formatter.remove('format');
 	Utils.type('d');
 	equal(editor.getContent(), '<p><em><b>abc</b></em><b>d</b>e</p>');
+});
+
+test('Toggle styles at the end of the content don\' removes the format where it is not needed.', function() {
+	editor.setContent('<p><em><b>abce</b></em></p>');
+	editor.formatter.register('b', {inline: 'b'});
+	editor.formatter.register('em', {inline: 'em'});
+	Utils.setSelection('b', 4, 'b', 4);
+	editor.formatter.remove('b');
+	editor.formatter.remove('em');
+	equal(editor.getContent(), '<p><em><b>abce</b></em></p>');
 });
 
 test('Caret format on second word in table cell', function() {

@@ -5,9 +5,7 @@ module("tinymce.Formatter - Apply", {
 
 		tinymce.init({
 			selector: "#elm1",
-			external_plugins: {
-				noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js'
-			},
+			external_plugins: { noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js' }, // WP
 			add_unload_trigger: false,
 			skin: false,
 			indent: false,
