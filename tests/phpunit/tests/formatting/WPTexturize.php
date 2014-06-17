@@ -1178,8 +1178,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[[[...]]]&#8230;[[[/...]]]',
 			),
 			array(
-				'[[code]...[/code]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[/code] is ambiguous unless we run the entire shortcode regexp.
-				'[[code]&#8230;[/code]...', // Same behavior as 3.9 due to buggy logic in _wptexturize_pushpop_element().  See ticket #28483.
+				'[[code]...[/code]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[code] is ambiguous unless we run the entire shortcode regexp.
+				'[[code]&#8230;[/code]&#8230;',
 			),
 			array(
 				'[code]...[/code]]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [/code]] is ambiguous unless we run the entire shortcode regexp.
@@ -1582,6 +1582,77 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"word word', she said",
 				"word word!closeq1!, she said",
+			),
+		);
+	}
+
+	/**
+	 * Extra sanity checks for _wptexturize_pushpop_element()
+	 *
+	 * @ticket 28483
+	 * @dataProvider data_quotes_and_dashes
+	 */
+	function test_element_stack( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_element_stack() {
+		return array(
+			array(
+				'<span>hello</code>---</span>',
+				'<span>hello</code>&#8212;</span>',
+			),
+			array(
+				'</code>hello<span>---</span>',
+				'</code>hello<span>&#8212;</span>',
+			),
+			array(
+				'<code>hello</code>---</span>',
+				'<code>hello</code>&#8212;</span>',
+			),
+			array(
+				'<span>hello</span>---<code>',
+				'<span>hello</span>&#8212;<code>',
+			),
+			array(
+				'<span>hello<code>---</span>',
+				'<span>hello<code>---</span>',
+			),
+			array(
+				'<code>hello<span>---</span>',
+				'<code>hello<span>---</span>',
+			),
+			array(
+				'<code>hello</span>---</span>',
+				'<code>hello</span>---</span>',
+			),
+			array(
+				'<span>hello[/code]---</span>',
+				'<span>hello[/code]&#8212;</span>',
+			),
+			array(
+				'[/code]hello<span>---</span>',
+				'[/code]hello<span>&#8212;</span>',
+			),
+			array(
+				'[code]hello[/code]---</span>',
+				'[code]hello[/code]&#8212;</span>',
+			),
+			array(
+				'<span>hello</span>---[code]',
+				'<span>hello</span>&#8212;[code]',
+			),
+			array(
+				'<span>hello[code]---</span>',
+				'<span>hello[code]---</span>',
+			),
+			array(
+				'[code]hello<span>---</span>',
+				'[code]hello<span>---</span>',
+			),
+			array(
+				'[code]hello</span>---</span>',
+				'[code]hello</span>---</span>',
 			),
 		);
 	}
