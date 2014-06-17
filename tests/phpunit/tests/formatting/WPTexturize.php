@@ -189,7 +189,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	function test_spaces_around_hyphens() {
 		$nbsp = "\xC2\xA0";
 
-		$this->assertEquals( ' &#8211; ', wptexturize( ' - ' ) ); 
+		$this->assertEquals( ' &#8211; ', wptexturize( ' - ' ) );
 		$this->assertEquals( '&nbsp;&#8211;&nbsp;', wptexturize( '&nbsp;-&nbsp;' ) );
 		$this->assertEquals( ' &#8211;&nbsp;', wptexturize( ' -&nbsp;' ) );
 		$this->assertEquals( '&nbsp;&#8211; ', wptexturize( '&nbsp;- ') );
@@ -197,7 +197,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals( " &#8211;$nbsp", wptexturize( " -$nbsp" ) );
 		$this->assertEquals( "$nbsp&#8211; ", wptexturize( "$nbsp- ") );
 
-		$this->assertEquals( ' &#8212; ', wptexturize( ' -- ' ) ); 
+		$this->assertEquals( ' &#8212; ', wptexturize( ' -- ' ) );
 		$this->assertEquals( '&nbsp;&#8212;&nbsp;', wptexturize( '&nbsp;--&nbsp;' ) );
 		$this->assertEquals( ' &#8212;&nbsp;', wptexturize( ' --&nbsp;' ) );
 		$this->assertEquals( '&nbsp;&#8212; ', wptexturize( '&nbsp;-- ') );
@@ -722,6 +722,10 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"word word'.word",
 				"word word&#8217;.word",
+			),
+			array(
+				"word word', she said",
+				"word word&#8217;, she said",
 			),
 			array(
 				"word word'",
@@ -1359,6 +1363,225 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"testing's '4' through 'quotes'",
 				"testing&#8217;s &#8216;4&#8217; through &#8216;quotes&#8217;",
+			),
+		);
+	}
+
+	/**
+	 * Make sure translation actually works.
+	 *
+	 * Also make sure apostrophes and closing quotes aren't being confused by default.
+	 *
+	 * @ticket 27426
+	 * @dataProvider data_tag_avoidance
+	 */
+	function test_translate( $input, $output ) {
+		add_filter( 'gettext_with_context', array( $this, 'filter_translate' ), 10, 4 );
+
+		$result = wptexturize( $input, true );
+
+		remove_filter( 'gettext_with_context', array( $this, 'filter_translate' ), 10, 4 );
+		wptexturize( 'reset', true );
+
+		return $this->assertEquals( $output, $result );
+	}
+
+	function filter_translate( $translations, $text, $context, $domain ) {
+		switch ($text) {
+			case '&#8211;' : return '!endash!';
+			case '&#8212;' : return '!emdash!';
+			case '&#8216;' : return '!openq1!';
+			case '&#8217;' :
+				if ( 'apostrophe' == $context ) {
+					return '!apos!';
+				} else {
+					return '!closeq1!';
+				}
+			case '&#8220;' : return '!openq2!';
+			case '&#8221;' : return '!closeq2!';
+			case '&#8242;' : return '!prime1!';
+			case '&#8243;' : return '!prime2!';
+			default : return $translations;
+		}
+	}
+
+	function data_translate() {
+		return array(
+			array(
+				"word '99 word",
+				"word !apos!99 word",
+			),
+			array(
+				"word'99 word",
+				"word!apos!99 word",
+			),
+			array(
+				"word 'test sentence' word",
+				"word !openq1!test sentence!closeq1! word",
+			),
+			array(
+				"'test sentence'",
+				"!openq1!test sentence!closeq1!",
+			),
+			array(
+				'word "test sentence" word',
+				'word !openq2!test sentence!closeq2! word',
+			),
+			array(
+				'"test sentence"',
+				'!openq2!test sentence!closeq2!',
+			),
+			array(
+				"word 'word word",
+				"word !openq1!word word",
+			),
+			array(
+				"word ('word word",
+				"word (!openq1!word word",
+			),
+			array(
+				"word ['word word",
+				"word [!openq1!word word",
+			),
+			array(
+				'word 99" word',
+				'word 99!prime2! word',
+			),
+			array(
+				'word 99"word',
+				'word 99!prime2!word',
+			),
+			array(
+				'word99" word',
+				'word99!prime2! word',
+			),
+			array(
+				'word99"word',
+				'word99!prime2!word',
+			),
+			array(
+				"word 99' word",
+				"word 99!prime1! word",
+			),
+			array(
+				"word99' word",
+				"word99!prime1! word",
+			),
+			array(
+				"word word's word",
+				"word word!apos!s word",
+			),
+			array(
+				"word word'. word",
+				"word word!closeq1!. word",
+			),
+			array(
+				"word ]'. word",
+				"word ]!closeq1!. word",
+			),
+			array(
+				'word "word word',
+				'word !openq2!word word',
+			),
+			array(
+				'word ("word word',
+				'word (!openq2!word word',
+			),
+			array(
+				'word ["word word',
+				'word [!openq2!word word',
+			),
+			array(
+				'word word" word',
+				'word word!closeq2! word',
+			),
+			array(
+				'word word") word',
+				'word word!closeq2!) word',
+			),
+			array(
+				'word word"] word',
+				'word word!closeq2!] word',
+			),
+			array(
+				'word word"',
+				'word word!closeq2!',
+			),
+			array(
+				'word word"word',
+				'word word!closeq2!word',
+			),
+			array(
+				'test sentence".',
+				'test sentence!closeq2!.',
+			),
+			array(
+				'test sentence."',
+				'test sentence.!closeq2!',
+			),
+			array(
+				'test sentence." word',
+				'test sentence.!closeq2! word',
+			),
+			array(
+				"word word' word",
+				"word word!closeq1! word",
+			),
+			array(
+				"word word'. word",
+				"word word!closeq1!. word",
+			),
+			array(
+				"word word'.word",
+				"word word!closeq1!.word",
+			),
+			array(
+				"word word'",
+				"word word!closeq1!",
+			),
+			array(
+				"test sentence'.",
+				"test sentence!closeq1!.",
+			),
+			array(
+				"test sentence.'",
+				"test sentence.!closeq1!",
+			),
+			array(
+				"test sentence'. word",
+				"test sentence!closeq1!. word",
+			),
+			array(
+				"test sentence.' word",
+				"test sentence.!closeq1! word",
+			),
+			array(
+				"word 'tain't word",
+				"word !apos!tain!apos!t word",
+			),
+			array(
+				"word 'twere word",
+				"word !apos!twere word",
+			),
+			array(
+				'word "42.00" word',
+				'word !openq2!42.00!closeq2! word',
+			),
+			array(
+				"word '42.00' word",
+				"word !openq1!42.00!closeq1! word",
+			),
+			array(
+				"word word'. word",
+				"word word!closeq1!. word",
+			),
+			array(
+				"word word'.word",
+				"word word!closeq1!.word",
+			),
+			array(
+				"word word', she said",
+				"word word!closeq1!, she said",
 			),
 		);
 	}
