@@ -313,8 +313,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word &#8217;99&#8217;s word",
 			),
 			array(
-				"according to our source, '33% of all students scored less than 50' on the test.", // Apostrophes and primes have priority over quotes
-				"according to our source, &#8217;33% of all students scored less than 50&#8242; on the test.",
+				"according to our source, '33 students scored less than 50' on the test.", // Apostrophes and primes have priority over quotes
+				"according to our source, &#8217;33 students scored less than 50&#8242; on the test.",
 			),
 		);
 	}
@@ -1060,12 +1060,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'word &#8220;4,242.00&#8221; word',
 			),
 			array(
-				"word '99's word", // Is this correct?
-				"word &#8216;99&#8217;s word",
+				"word '99's word",
+				"word &#8217;99&#8217;s word",
 			),
 			array(
 				"word '99'samsonite",
-				"word &#8216;99&#8217;samsonite",
+				"word &#8217;99&#8217;samsonite",
 			),
 		);
 	}
@@ -1339,6 +1339,10 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"word '999 word", // Does not match the apos pattern, should be opening quote.
 				"word &#8216;999 word",
+			),
+			array(
+				"word '99% word",
+				"word &#8216;99% word",
 			),
 			array(
 				"word '9 word",
