@@ -1279,4 +1279,87 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Year abbreviations consist of exactly two digits.
+	 *
+	 * @ticket 26850
+	 * @dataProvider data_quotes_and_dashes
+	 */
+	function test_year_abbr( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_year_abbr() {
+		return array(
+			array(
+				"word '99 word",
+				"word &#8217;99 word",
+			),
+			array(
+				"word '99. word",
+				"word &#8217;99. word",
+			),
+			array(
+				"word '99, word",
+				"word &#8217;99, word",
+			),
+			array(
+				"word '99; word",
+				"word &#8217;99; word",
+			),
+			array(
+				"word '99' word", // For this pattern, prime doesn't make sense.  Should get apos and a closing quote.
+				"word &#8217;99&#8217; word",
+			),
+			array(
+				"word '99'. word",
+				"word &#8217;99&#8217;. word",
+			),
+			array(
+				"word '99', word",
+				"word &#8217;99&#8217;, word",
+			),
+			array(
+				"word '99.' word",
+				"word &#8217;99.&#8217; word",
+			),
+			array(
+				"word '99",
+				"word &#8217;99",
+			),
+			array(
+				"'99 word",
+				"&#8217;99 word",
+			),
+			array(
+				"word '999 word", // Does not match the apos pattern, should be opening quote.
+				"word &#8216;999 word",
+			),
+			array(
+				"word '9 word",
+				"word &#8216;9 word",
+			),
+			array(
+				"word '99.9 word",
+				"word &#8216;99.9 word",
+			),
+			array(
+				"word '999",
+				"word &#8216;999",
+			),
+			array(
+				"word '9",
+				"word &#8216;9",
+			),
+			array(
+				"in '4 years, 3 months,' Obama cut the deficit",
+				"in &#8216;4 years, 3 months,&#8217; Obama cut the deficit",
+			),
+			array(
+				"testing's '4' through 'quotes'",
+				"testing&#8217;s &#8216;4&#8217; through &#8216;quotes&#8217;",
+			),
+		);
+	}
 }
