@@ -1146,6 +1146,10 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	function data_tag_avoidance() {
 		return array(
 			array(
+				'[ is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
+				'[ is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
+			),
+			array(
 				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a> ]',
 				'[ photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a> ]',
 			),
@@ -1194,8 +1198,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[gallery &#8230;',
 			),
 			array(
+				'[gallery <br ... /> ...]', // This tag is still valid. Shortcode 'attributes' are not considered in the initial parsing of shortcodes, and HTML is allowed.
 				'[gallery <br ... /> ...]',
-				'[gallery <br ... /> &#8230;]',
 			),
 			array(
 				'<br [gallery ...] ... />',
@@ -1234,8 +1238,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[/gallery ...]]',
 			),
 			array(
+				'[[gallery <br ... /> ...]]', // This gets parsed as an escaped shortcode with embedded HTML.  Brains may explode.
 				'[[gallery <br ... /> ...]]',
-				'[[gallery <br ... /> &#8230;]]',
 			),
 			array(
 				'<br [[gallery ...]] ... />',
