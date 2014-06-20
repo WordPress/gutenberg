@@ -402,13 +402,16 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 28099
+	 */
 	function test_empty_post__in() {
 		$posts1 = $this->q->query( array() );
 		$this->assertNotEmpty( $posts1 );
 		$posts2 = $this->q->query( array( 'post__in' => array() ) );
-		$this->assertEmpty( $posts2 );
+		$this->assertNotEmpty( $posts2 );
 		$posts3 = $this->q->query( array( 'post_parent__in' => array() ) );
-		$this->assertEmpty( $posts3 );
+		$this->assertNotEmpty( $posts3 );
 	}
 
 	function test_exlude_from_search_empty() {
@@ -514,7 +517,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $author_1, $author_2 ), $author_ids );
 
 		$posts = $this->q->query( array( 'author__in' => array() ) );
-		$this->assertEmpty( $posts );
+		$this->assertNotEmpty( $posts );
 
 		$posts = $this->q->query( array(
 			'author__not_in' => array( $author_1, $author_2 ),

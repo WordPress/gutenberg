@@ -203,6 +203,9 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		$this->assertEquals( array( $posts[0], $posts[3] ), $results2, 'Relation: AND; Operator: IN' );
 	}
 
+	/**
+	 * @ticket 28099
+	 */
 	function test_empty__in() {
 		$cat_id = $this->factory->category->create();
 		$post_id = $this->factory->post->create();
@@ -211,7 +214,7 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		$q1 = get_posts( array( 'category__in' => array( $cat_id ) ) );
 		$this->assertNotEmpty( $q1 );
 		$q2 = get_posts( array( 'category__in' => array() ) );
-		$this->assertEmpty( $q2 );
+		$this->assertNotEmpty( $q2 );
 
 		$tag = wp_insert_term( 'woo', 'post_tag' );
 		$tag_id = $tag['term_id'];
@@ -221,11 +224,11 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		$q3 = get_posts( array( 'tag__in' => array( $tag_id ) ) );
 		$this->assertNotEmpty( $q3 );
 		$q4 = get_posts( array( 'tag__in' => array() ) );
-		$this->assertEmpty( $q4 );
+		$this->assertNotEmpty( $q4 );
 
 		$q5 = get_posts( array( 'tag_slug__in' => array( $slug ) ) );
 		$this->assertNotEmpty( $q5 );
 		$q6 = get_posts( array( 'tag_slug__in' => array() ) );
-		$this->assertEmpty( $q6 );
+		$this->assertNotEmpty( $q6 );
 	}
 }
