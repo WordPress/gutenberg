@@ -231,4 +231,30 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		$this->assertFalse( empty( $guid ) );
 	}
 
+	/**
+	 * @ticket 21963
+	 */
+	function test_update_attachment_fields() {
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents($filename);
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		$id = $this->_make_attachment( $upload );
+
+		$attached_file = get_post_meta( $id, '_wp_attached_file', true );
+
+		$post = get_post( $id, ARRAY_A );
+
+		$post['post_title'] = 'title';
+		$post['post_excerpt'] = 'caption';
+		$post['post_content'] = 'description';
+
+		wp_update_post( $post );
+
+		// Make sure the update didn't remove the attached file.
+		$this->assertEquals( $attached_file, get_post_meta( $id, '_wp_attached_file', true ) );
+	}
+
 }

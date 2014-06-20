@@ -148,7 +148,8 @@ CAP;
 		$this->assertEquals( '', $prepped['mime'] );
 		$this->assertEquals( '', $prepped['type'] );
 		$this->assertEquals( '', $prepped['subtype'] );
-		$this->assertEquals( '', $prepped['url'] );
+		// #21963, there will be a guid always, so there will be a URL
+		$this->assertNotEquals( '', $prepped['url'] );
 		$this->assertEquals( site_url( 'wp-includes/images/media/default.png' ), $prepped['icon'] );
 
 		// Fake a mime
