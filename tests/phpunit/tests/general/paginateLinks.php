@@ -4,11 +4,24 @@ class Tests_Paginate_Links extends WP_UnitTestCase {
 
 	private $i18n_count = 0;
 
+	function setUp() {
+		parent::setUp();
+
+		$this->go_to( home_url( '/' ) );
+	}
+
 	function test_defaults() {
+		$page2 = get_pagenum_link( 2 );
+		$page3 = get_pagenum_link( 3 );
+		$page50 = get_pagenum_link( 50 );
+
 		$expected =<<<EXPECTED
-<a class='page-numbers' href=''>1</a>
+<span class='page-numbers current'>1</span>
+<a class='page-numbers' href='$page2'>2</a>
+<a class='page-numbers' href='$page3'>3</a>
 <span class="page-numbers dots">&hellip;</span>
-<a class='page-numbers' href='?page=50'>50</a>
+<a class='page-numbers' href='$page50'>50</a>
+<a class="next page-numbers" href="$page2">Next &raquo;</a>
 EXPECTED;
 
 		$links = paginate_links( array( 'total' => 50 ) );
@@ -16,24 +29,36 @@ EXPECTED;
 	}
 
 	function test_format() {
+		$page2 = home_url( '/page/2/' );
+		$page3 = home_url( '/page/3/' );
+		$page50 = home_url( '/page/50/' );
+
 		$expected =<<<EXPECTED
-<a class='page-numbers' href=''>1</a>
+<span class='page-numbers current'>1</span>
+<a class='page-numbers' href='$page2'>2</a>
+<a class='page-numbers' href='$page3'>3</a>
 <span class="page-numbers dots">&hellip;</span>
-<a class='page-numbers' href='/page/50/'>50</a>
+<a class='page-numbers' href='$page50'>50</a>
+<a class="next page-numbers" href="$page2">Next &raquo;</a>
 EXPECTED;
 
-		$links = paginate_links( array( 'total' => 50, 'format' => '/page/%#%/' ) );
+		$links = paginate_links( array( 'total' => 50, 'format' => 'page/%#%/' ) );
 		$this->assertEquals( $expected, $links );
 	}
 
 	function test_prev_next_false() {
+		$home = home_url( '/' );
+		$page3 = get_pagenum_link( 3 );
+		$page4 = get_pagenum_link( 4 );
+		$page50 = get_pagenum_link( 50 );
+
 		$expected =<<<EXPECTED
-<a class='page-numbers' href=''>1</a>
+<a class='page-numbers' href='$home'>1</a>
 <span class='page-numbers current'>2</span>
-<a class='page-numbers' href='?page=3'>3</a>
-<a class='page-numbers' href='?page=4'>4</a>
+<a class='page-numbers' href='$page3'>3</a>
+<a class='page-numbers' href='$page4'>4</a>
 <span class="page-numbers dots">&hellip;</span>
-<a class='page-numbers' href='?page=50'>50</a>
+<a class='page-numbers' href='$page50'>50</a>
 EXPECTED;
 
 		$links = paginate_links( array( 'total' => 50, 'prev_next' => false, 'current' => 2 ) );
@@ -41,15 +66,20 @@ EXPECTED;
 	}
 
 	function test_prev_next_true() {
+		$home = home_url( '/' );
+		$page3 = get_pagenum_link( 3 );
+		$page4 = get_pagenum_link( 4 );
+		$page50 = get_pagenum_link( 50 );
+
 		$expected =<<<EXPECTED
-<a class="prev page-numbers" href="">&laquo; Previous</a>
-<a class='page-numbers' href=''>1</a>
+<a class="prev page-numbers" href="$home">&laquo; Previous</a>
+<a class='page-numbers' href='$home'>1</a>
 <span class='page-numbers current'>2</span>
-<a class='page-numbers' href='?page=3'>3</a>
-<a class='page-numbers' href='?page=4'>4</a>
+<a class='page-numbers' href='$page3'>3</a>
+<a class='page-numbers' href='$page4'>4</a>
 <span class="page-numbers dots">&hellip;</span>
-<a class='page-numbers' href='?page=50'>50</a>
-<a class="next page-numbers" href="?page=3">Next &raquo;</a>
+<a class='page-numbers' href='$page50'>50</a>
+<a class="next page-numbers" href="$page3">Next &raquo;</a>
 EXPECTED;
 
 		$links = paginate_links( array( 'total' => 50, 'prev_next' => true, 'current' => 2 ) );
@@ -95,8 +125,8 @@ EXPECTED;
 		) );
 
 		// It's supposed to link to page 1:
-		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => '?page=1' ) ), $links[0] );
-		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => '?page=1' ) ), $links[1] );
+		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => 'http://' . WP_TESTS_DOMAIN . '/' ) ), $links[0] );
+		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => 'http://' . WP_TESTS_DOMAIN . '/' ) ), $links[1] );
 
 		// It's not supposed to have an empty href.
 		$this->assertNotTag( array( 'tag' => 'a', 'attributes' => array( 'class' => 'prev page-numbers', 'href' => '' ) ), $links[0] );
@@ -112,7 +142,7 @@ EXPECTED;
 		) );
 
 		$this->assertTag( array( 'tag' => 'span', 'attributes' => array( 'class' => 'current' ) ), $links[0] );
-		$this->assertTag( array( 'tag' => 'a',    'attributes' => array( 'href' => '?page=2'  ) ), $links[1] );
+		$this->assertTag( array( 'tag' => 'a',    'attributes' => array( 'href' => get_pagenum_link( 2 ) ) ), $links[1] );
 	}
 
 }
