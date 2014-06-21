@@ -273,6 +273,36 @@ module.exports = function(grunt) {
 
 					return false;
 				}
+			},
+			plugins: {
+				expand: true,
+				cwd: SOURCE_DIR + 'wp-content/plugins',
+				src: [
+					'**/*.js',
+					'!**/*.min.js'
+				],
+				// Limit JSHint's run to a single specified plugin folder:
+				//
+				//    grunt jshint:plugins --folder=foldername
+				//
+				filter: function( folderpath ) {
+					var index, folder = grunt.option( 'folder' );
+
+					// Don't filter when no target folder is specified
+					if ( ! folder ) {
+						return true;
+					}
+
+					folderpath = folderpath.replace( /\\/g, '/' );
+					index = folderpath.lastIndexOf( '/' + folder );
+
+					// Match only the folder name passed from cli
+					if ( -1 !== index ) {
+						return true;
+					}
+
+					return false;
+				}
 			}
 		},
 		qunit: {
