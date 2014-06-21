@@ -71,3 +71,35 @@ class Basic_Object {
 }
 
 class Basic_Subclass extends Basic_Object {}
+
+function _wp_die_handler( $message, $title = '', $args = array() ) {
+	if ( !$GLOBALS['_wp_die_disabled'] ) {
+		_wp_die_handler_txt( $message, $title, $args);
+	} else {
+		//Ignore at our peril
+	}
+}
+
+function _disable_wp_die() {
+	$GLOBALS['_wp_die_disabled'] = true;
+}
+
+function _enable_wp_die() {
+	$GLOBALS['_wp_die_disabled'] = false;
+}
+
+function _wp_die_handler_filter() {
+	return '_wp_die_handler';
+}
+
+function _wp_die_handler_txt( $message, $title, $args ) {
+	echo "\nwp_die called\n";
+	echo "Message : $message\n";
+	echo "Title : $title\n";
+	if ( ! empty( $args ) ) {
+		echo "Args: \n";
+		foreach( $args as $k => $v ){
+			echo "\t $k : $v\n";
+		}
+	}
+}
