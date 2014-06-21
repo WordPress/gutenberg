@@ -5,7 +5,9 @@ module.exports = function(grunt) {
 		BUILD_DIR = 'build/';
 
 	// Load tasks.
-	require('matchdep').filterDev('grunt-*').forEach( grunt.loadNpmTasks );
+	require('matchdep').filterDev(['grunt-*', '!grunt-legacy-util']).forEach( grunt.loadNpmTasks );
+	// Load legacy utils
+	grunt.util = require('grunt-legacy-util');
 
 	// Project configuration.
 	grunt.initConfig({
