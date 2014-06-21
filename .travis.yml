@@ -1,19 +1,47 @@
+# Travis CI Configuration File
+
+# Tell Travis CI we're using PHP
 language: php
 
-php:
-    - "5.2"
-    - "5.3"
-    - "5.4"
-    - "5.5"
+# Build matrix options
+matrix:
+  include:
+    - php: 5.5
+      env: WP_TRAVISCI=travis:js
+    - php: 5.2
+      env: WP_TRAVISCI=travis:phpunit
+    - php: 5.3
+      env: WP_TRAVISCI=travis:phpunit
+    - php: 5.4
+      env: WP_TRAVISCI=travis:phpunit
+    - php: 5.5
+      env: WP_TRAVISCI=travis:phpunit
+    - php: 5.6
+      env: WP_TRAVISCI=travis:phpunit
+    - php: hhvm
+      env: WP_TRAVISCI=travis:phpunit
+  allow_failures:
+    - php: 5.6
+    - php: hhvm
+  fast_finish: true
 
+# Before install, failures in this section will result in build status 'errored'
+before_install:
+  - WP_CORE_DIR=/tmp/wordpress/
+  - >
+    if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
+        mysql -e "CREATE DATABASE wordpress_tests;" -uroot
+        cp wp-tests-config-sample.php wp-tests-config.php
+        sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
+        sed -i "s/yourusernamehere/travis/" wp-tests-config.php
+        sed -i "s/yourpasswordhere//" wp-tests-config.php
+        svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
+    fi
+
+# Before script, failures in this section will result in build status 'failed'
 before_script:
-    - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
-    - cp wp-tests-config-sample.php wp-tests-config.php
-    - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
-    - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
-    - sed -i "s/yourpasswordhere//" wp-tests-config.php
-    - svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
-    - npm install -g grunt-cli
-    - npm install
+  - npm install -g grunt-cli
+  - npm install
 
-script: grunt travis 
+# Script, failures in this section will result in build status 'failed'
+script: grunt $WP_TRAVISCI

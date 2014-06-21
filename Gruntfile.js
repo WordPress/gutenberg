@@ -473,7 +473,10 @@ module.exports = function(grunt) {
 		['build', 'copy:qunit', 'qunit']);
 
 	grunt.registerTask('test', 'Runs all QUnit and PHPUnit tasks.', ['qunit:compiled', 'phpunit']);
-	grunt.registerTask('travis', ['jshint', 'test']);
+
+	// Travis CI tasks.
+	grunt.registerTask('travis:js', 'Runs Javascript Travis CI tasks.', [ 'jshint', 'qunit:compiled' ]);
+	grunt.registerTask('travis:phpunit', 'Runs PHPUnit Travis CI tasks.', 'phpunit');
 
 	// Patch task.
 	grunt.renameTask('patch_wordpress', 'patch');
