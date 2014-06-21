@@ -17598,43 +17598,11 @@ define("tinymce/UndoManager", [
 		editor.addShortcut('ctrl+z', '', 'Undo');
 		editor.addShortcut('ctrl+y,ctrl+shift+z', '', 'Redo');
 
-		editor.on('AddUndo Undo Redo ClearUndos', function(e) {
+		editor.on('AddUndo Undo Redo ClearUndos MouseUp', function(e) {
 			if (!e.isDefaultPrevented()) {
 				editor.nodeChanged();
 			}
 		});
-
-		// Selection range isn't updated until after the click events default handler is executed
-		// so we need to wait for the selection to update on Gecko/WebKit it happens right away.
-		// On IE it might take a while so we listen for the SelectionChange event.
-		//
-		// We can't use the SelectionChange on all browsers event since Gecko doesn't support that.
-		if (Env.ie) {
-			editor.on('MouseUp', function(e) {
-				if (!e.isDefaultPrevented()) {
-					editor.once('SelectionChange', function() {
-						// Selection change might fire when focus is lost
-						if (editor.dom.isChildOf(editor.selection.getStart(), editor.getBody())) {
-							editor.nodeChanged();
-						}
-					});
-
-					editor.nodeChanged();
-				}
-			});
-		} else {
-			editor.on('MouseUp', function() {
-				editor.nodeChanged();
-			});
-
-			editor.on('Click', function(e) {
-				if (!e.isDefaultPrevented()) {
-					setTimeout(function() {
-						editor.nodeChanged();
-					}, 0);
-				}
-			});
-		}
 
 		self = {
 			// Explose for debugging reasons
