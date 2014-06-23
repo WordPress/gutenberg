@@ -636,4 +636,19 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$result11 = $this->q->query( array_merge( $args, array( 'post_password' => 'burrito' ) ) );
 		$this->assertEqualSets( array( $two, $three ), $result11 );
 	}
+
+	/**
+	 * @ticket 28611
+	 */
+	function test_duplicate_slug_in_hierarchical_post_type() {
+		register_post_type( 'handbook', array( 'hierarchical' => true ) );
+
+		$post_1 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_type' => 'handbook' ) );
+		$post_2 = $this->factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
+		$post_3 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_2, 'post_type' => 'handbook' ) );
+
+		$result = $this->q->query( array( 'handbook' => 'getting-started', 'post_type' => 'handbook' ) );
+		$this->assertEquals( 1, $this->q->post_count );
+	}
+
 }
