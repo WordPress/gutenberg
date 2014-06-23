@@ -648,7 +648,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$post_3 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_2, 'post_type' => 'handbook' ) );
 
 		$result = $this->q->query( array( 'handbook' => 'getting-started', 'post_type' => 'handbook' ) );
-		$this->assertEquals( 1, $this->q->post_count );
+		$this->assertCount( 1, $result );
 	}
 
 }
