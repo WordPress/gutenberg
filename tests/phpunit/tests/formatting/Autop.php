@@ -276,6 +276,8 @@ Paragraph two.';
 
 	/**
 	 * wpautop() should treat block level HTML elements as blocks.
+	 *
+	 * @ticket 27268
 	 */
 	function test_that_wpautop_treats_block_level_elements_as_blocks() {
 		$blocks = array(
@@ -343,6 +345,8 @@ Paragraph two.';
 
 	/**
 	 * wpautop() should autop a blockquote's contents but not the blockquote itself
+	 *
+	 * @ticket 27268
 	 */
 	function test_that_wpautop_does_not_wrap_blockquotes_but_does_autop_their_contents() {
 		$content  = "<blockquote>foo</blockquote>";
@@ -353,6 +357,8 @@ Paragraph two.';
 
 	/**
 	 * wpautop() should treat inline HTML elements as inline.
+	 *
+	 * @ticket 27268
 	 */
 	function test_that_wpautop_treats_inline_elements_as_inline() {
 		$inlines = array(
