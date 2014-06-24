@@ -436,4 +436,21 @@ class Tests_DB extends WP_UnitTestCase {
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d", $last ) );
 		$this->assertEquals( 'Walter Replace Sobchak', $row->display_name );
 	}
+
+	/**
+	 *
+	 * @ticket 26106
+	 */
+	function test_empty_where() {
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_name' => 'burrito' ), array() );
+
+		$expected1 = "UPDATE `{$wpdb->posts}` SET `post_name` = 'burrito'";
+		$this->assertEquals( $expected1, $wpdb->last_query );
+
+		$wpdb->update( $wpdb->posts, array( 'post_name' => 'burrito' ), array( 'post_status' => 'taco' ) );
+
+		$expected2 = "UPDATE `{$wpdb->posts}` SET `post_name` = 'burrito' WHERE `post_status` = 'taco'";
+		$this->assertEquals( $expected2, $wpdb->last_query );
+	}
 }
