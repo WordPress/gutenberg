@@ -281,20 +281,20 @@ module.exports = function(grunt) {
 					'**/*.js',
 					'!**/*.min.js'
 				],
-				// Limit JSHint's run to a single specified plugin folder:
+				// Limit JSHint's run to a single specified plugin directory:
 				//
-				//    grunt jshint:plugins --folder=foldername
+				//    grunt jshint:plugins --dir=foldername
 				//
-				filter: function( folderpath ) {
-					var index, folder = grunt.option( 'folder' );
+				filter: function( dirpath ) {
+					var index, dir = grunt.option( 'dir' );
 
 					// Don't filter when no target folder is specified
-					if ( ! folder ) {
+					if ( ! dir ) {
 						return true;
 					}
 
-					folderpath = folderpath.replace( /\\/g, '/' );
-					index = folderpath.lastIndexOf( '/' + folder );
+					dirpath = dirpath.replace( /\\/g, '/' );
+					index = dirpath.lastIndexOf( '/' + dir );
 
 					// Match only the folder name passed from cli
 					if ( -1 !== index ) {
