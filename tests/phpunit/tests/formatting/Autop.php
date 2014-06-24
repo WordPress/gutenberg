@@ -273,4 +273,126 @@ Paragraph two.';
 		$str = 'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
 		$this->assertEquals( "<p>$str</p>", trim( wpautop( $str ) ) );
 	}
+
+	/**
+	 * wpautop() should treat block level HTML elements as blocks.
+	 */
+	function test_that_wpautop_treats_block_level_elements_as_blocks() {
+		$blocks = array(
+			'table',
+			'thead',
+			'tfoot',
+			'caption',
+			'col',
+			'colgroup',
+			'tbody',
+			'tr',
+			'td',
+			'th',
+			'div',
+			'dl',
+			'dd',
+			'dt',
+			'ul',
+			'ol',
+			'li',
+			'pre',
+			'select',
+			'option',
+			'form',
+			'map',
+			'area',
+			'address',
+			'math',
+			'style',
+			'p',
+			'h1',
+			'h2',
+			'h3',
+			'h4',
+			'h5',
+			'h6',
+			'hr',
+			'fieldset',
+			'legend',
+			'section',
+			'article',
+			'aside',
+			'hgroup',
+			'header',
+			'footer',
+			'nav',
+			'figure',
+			'figcaption',
+			'details',
+			'menu',
+			'summary',
+		);
+
+		$content = array();
+
+		foreach ( $blocks as $block ) {
+			$content[] = "<$block>foo</$block>";
+		}
+
+		$expected = join( "\n", $content );
+		$content = join( "\n\n", $content ); // WS difference
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
+
+	/**
+	 * wpautop() should autop a blockquote's contents but not the blockquote itself
+	 */
+	function test_that_wpautop_does_not_wrap_blockquotes_but_does_autop_their_contents() {
+		$content  = "<blockquote>foo</blockquote>";
+		$expected = "<blockquote><p>foo</p></blockquote>";
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
+
+	/**
+	 * wpautop() should treat inline HTML elements as inline.
+	 */
+	function test_that_wpautop_treats_inline_elements_as_inline() {
+		$inlines = array(
+			'a',
+			'em',
+			'strong',
+			'small',
+			's',
+			'cite',
+			'q',
+			'dfn',
+			'abbr',
+			'data',
+			'time',
+			'code',
+			'var',
+			'samp',
+			'kbd',
+			'sub',
+			'sup',
+			'i',
+			'b',
+			'u',
+			'mark',
+			'span',
+			'del',
+			'ins',
+			'noscript',
+		);
+
+		$content = $expected = array();
+
+		foreach ( $inlines as $inline ) {
+			$content[] = "<$inline>foo</$inline>";
+			$expected[] = "<p><$inline>foo</$inline></p>";
+		}
+
+		$content = join( "\n\n", $content );
+		$expected = join( "\n", $expected );
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
 }
