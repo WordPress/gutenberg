@@ -830,8 +830,16 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word &#038; word",
 			),
 			array(
+				"word &#xabc; word",
+				"word &#xabc; word",
+			),
+			array(
+				"word &#X394; word",
+				"word &#X394; word",
+			),
+			array(
 				"word &# word",
-				"word &# word", // invalid output?
+				"word &#038;# word",
 			),
 			array(
 				"word &44; word",
@@ -839,11 +847,19 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				"word &&amp; word",
-				"word &&amp; word",
+				"word &#038;&amp; word",
 			),
 			array(
 				"word &!amp; word",
-				"word &!amp; word",
+				"word &#038;!amp; word",
+			),
+			array(
+				"word &#",
+				"word &#038;#",
+			),
+			array(
+				"word &",
+				"word &#038;",
 			),
 		);
 	}
@@ -1284,6 +1300,10 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				'<ul><li>Hello.</li><!--<li>Goodbye.</li>--></ul>',
 				'<ul><li>Hello.</li><!--<li>Goodbye.</li>--></ul>',
+			),
+			array(
+				'word <img src="http://example.com/wp-content/uploads/2014/06/image-300x216.gif" /> word', // Ensure we are not corrupting image URLs.
+				'word <img src="http://example.com/wp-content/uploads/2014/06/image-300x216.gif" /> word',
 			),
 		);
 	}
