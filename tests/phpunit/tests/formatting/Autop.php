@@ -299,8 +299,6 @@ Paragraph two.';
 			'ol',
 			'li',
 			'pre',
-			'select',
-			'option',
 			'form',
 			'map',
 			'area',
@@ -325,7 +323,6 @@ Paragraph two.';
 			'footer',
 			'nav',
 			'figure',
-			'figcaption',
 			'details',
 			'menu',
 			'summary',
@@ -387,6 +384,9 @@ Paragraph two.';
 			'del',
 			'ins',
 			'noscript',
+			'figcaption',
+			'select',
+			'option'
 		);
 
 		$content = $expected = array();
