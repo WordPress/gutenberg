@@ -1385,6 +1385,18 @@ class Tests_MS extends WP_UnitTestCase {
 			$GLOBALS['super_admins'] = $old_global;
 		}
 	}
+
+	/**
+	 * @ticket 27952
+	 */
+	function test_posts_count() {
+		$this->factory->post->create();
+		$post2 = $this->factory->post->create();
+		$this->assertEquals( 2, get_blog_details()->post_count );
+
+		wp_delete_post( $post2 );
+		$this->assertEquals( 1, get_blog_details()->post_count );
+	}
 }
 
 endif;
