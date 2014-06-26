@@ -1328,7 +1328,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	 * Year abbreviations consist of exactly two digits.
 	 *
 	 * @ticket 26850
-	 * @dataProvider data_quotes_and_dashes
+	 * @dataProvider data_year_abbr
 	 */
 	function test_year_abbr( $input, $output ) {
 		return $this->assertEquals( $output, wptexturize( $input ) );
@@ -1634,7 +1634,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	 * Extra sanity checks for _wptexturize_pushpop_element()
 	 *
 	 * @ticket 28483
-	 * @dataProvider data_quotes_and_dashes
+	 * @dataProvider data_element_stack
 	 */
 	function test_element_stack( $input, $output ) {
 		return $this->assertEquals( $output, wptexturize( $input ) );
