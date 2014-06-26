@@ -1305,6 +1305,22 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'word <img src="http://example.com/wp-content/uploads/2014/06/image-300x216.gif" /> word', // Ensure we are not corrupting image URLs.
 				'word <img src="http://example.com/wp-content/uploads/2014/06/image-300x216.gif" /> word',
 			),
+			array(
+				'[ do texturize "[quote]" here ]',
+				'[ do texturize &#8220;[quote]&#8221; here ]',
+			),
+			array(
+				'[ regex catches this <a href="[quote]">here</a> ]',
+				'[ regex catches this <a href="[quote]">here</a> ]',
+			),
+			array(
+				'[ but also catches the <b>styled "[quote]" here</b> ]',
+				'[ but also catches the <b>styled &#8220;[quote]&#8221; here</b> ]',
+			),
+			array(
+				'[Let\'s get crazy<input>[plugin code="<a href=\'?a[]=100\'>hello</a>"]</input>world]',
+				'[Let&#8217;s get crazy<input>[plugin code="<a href=\'?a[]=100\'>hello</a>"]</input>world]',
+			),
 		);
 	}
 
