@@ -305,4 +305,28 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( 401, $result2->code );
 	}
 
+	/**
+	 * @ticket 28601
+	 */
+	function test_invalid_post_date_does_not_fatal() {
+		$this->make_user_by_role( 'author' );
+		$date_string = '2014-01-01 10:10:10';
+		$post = array( 'post_title' => 'test', 'post_content' => 'test', 'post_date' => $date_string );
+		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
+		$fetched_post = get_post( $result );
+		$this->assertStringMatchesFormat( '%d', $result );
+	}
+
+	/**
+	 * @ticket 28601
+	 */
+	function test_invalid_post_date_gmt_does_not_fatal() {
+		$this->make_user_by_role( 'author' );
+		$date_string = 'invalid date';
+		$post = array( 'post_title' => 'test', 'post_content' => 'test', 'post_date_gmt' => $date_string );
+		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
+		$fetched_post = get_post( $result );
+		$this->assertStringMatchesFormat( '%d', $result );
+	}
+
 }
