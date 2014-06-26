@@ -1417,7 +1417,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	 * Also make sure apostrophes and closing quotes aren't being confused by default.
 	 *
 	 * @ticket 27426
-	 * @dataProvider data_tag_avoidance
+	 * @dataProvider data_translate
 	 */
 	function test_translate( $input, $output ) {
 		add_filter( 'gettext_with_context', array( $this, 'filter_translate' ), 10, 4 );
