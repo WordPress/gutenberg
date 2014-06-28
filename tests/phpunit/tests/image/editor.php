@@ -52,19 +52,15 @@ class Tests_Image_Editor extends WP_Image_UnitTestCase {
 		// Get an editor
 		$editor = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
 
-		// Make quality readable
-		$property = new ReflectionProperty( $editor, 'quality' );
-		$property->setAccessible( true );
-
 		// Ensure set_quality works
 		$this->assertTrue( $editor->set_quality( 75 ) );
-		$this->assertEquals( 75, $property->getValue( $editor ) );
+		$this->assertEquals( 75, $editor->get_quality() );
 
 		// Ensure the quality filter works
 		$func = create_function( '', "return 100;");
 		add_filter( 'wp_editor_set_quality', $func );
 		$this->assertTrue( $editor->set_quality( 75 ) );
-		$this->assertEquals( 100, $property->getValue( $editor ) );
+		$this->assertEquals( 75, $editor->get_quality() );
 
 		// Clean up
 		remove_filter( 'wp_editor_set_quality', $func );
