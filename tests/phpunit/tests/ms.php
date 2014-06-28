@@ -1397,6 +1397,19 @@ class Tests_MS extends WP_UnitTestCase {
 		wp_delete_post( $post2 );
 		$this->assertEquals( 1, get_blog_details()->post_count );
 	}
+
+	/**
+	 * @ticket 26410
+	 */
+	function test_blog_details_cache_invalidation() {
+		update_option( 'blogname', 'foo' );
+		$details = get_blog_details( get_current_blog_id() );
+		$this->assertEquals( 'foo', $details->blogname );
+
+		update_option( 'blogname', 'bar' );
+		$details = get_blog_details( get_current_blog_id() );
+		$this->assertEquals( 'bar', $details->blogname );
+	}
 }
 
 endif;
