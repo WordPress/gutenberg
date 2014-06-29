@@ -11,9 +11,9 @@ class Tests_Functions_ListFilter extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		$this->array_list['foo'] = array( 'name' => 'foo', 'field1' => true, 'field2' => true, 'field3' => true, 'field4' => array( 'red' ) );
-		$this->array_list['bar'] = array( 'name' => 'bar', 'field1' => true, 'field2' => true, 'field3' => false, 'field4' => array( 'green' ) );
-		$this->array_list['baz'] = array( 'name' => 'baz', 'field1' => true, 'field2' => false, 'field3' => false, 'field4' => array( 'blue' ) );
+		$this->array_list['foo'] = array( 'name' => 'foo', 'id' => 'f', 'field1' => true, 'field2' => true, 'field3' => true, 'field4' => array( 'red' ) );
+		$this->array_list['bar'] = array( 'name' => 'bar', 'id' => 'b', 'field1' => true, 'field2' => true, 'field3' => false, 'field4' => array( 'green' ) );
+		$this->array_list['baz'] = array( 'name' => 'baz', 'id' => 'z', 'field1' => true, 'field2' => false, 'field3' => false, 'field4' => array( 'blue' ) );
 		foreach ( $this->array_list as $key => $value ) {
 			$this->object_list[ $key ] = (object) $value;
 		}
@@ -64,6 +64,50 @@ class Tests_Functions_ListFilter extends WP_UnitTestCase {
 
 		$list = wp_list_pluck( $this->array_list, 'name' );
 		$this->assertEquals( array( 'foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz' ) , $list );
+	}
+
+	/**
+	 * @ticket 28666
+	 */
+	function test_wp_list_pluck_index_key() {
+		$list = wp_list_pluck( $this->array_list, 'name', 'id' );
+		$this->assertEquals( array( 'f' => 'foo', 'b' => 'bar', 'z' => 'baz' ), $list );
+	}
+
+	/**
+	 * @ticket 28666
+	 */
+	function test_wp_list_pluck_object_index_key() {
+		$list = wp_list_pluck( $this->object_list, 'name', 'id' );
+		$this->assertEquals( array( 'f' => 'foo', 'b' => 'bar', 'z' => 'baz' ), $list );
+	}
+
+	/**
+	 * @ticket 28666
+	 */
+	function test_wp_list_pluck_missing_index_key() {
+		$list = wp_list_pluck( $this->array_list, 'name', 'nonexistent' );
+		$this->assertEquals( array( 0 => 'foo', 1 => 'bar', 2 => 'baz' ), $list );
+	}
+
+	/**
+	 * @ticket 28666
+	 */
+	function test_wp_list_pluck_partial_missing_index_key() {
+		$array_list = $this->array_list;
+		unset( $array_list[ 'bar']['id'] );
+		$list = wp_list_pluck( $array_list, 'name', 'id' );
+		$this->assertEquals( array( 'f' => 'foo', 0 => 'bar', 'z' => 'baz' ), $list );
+	}
+
+	/**
+	 * @ticket 28666
+	 */
+	function test_wp_list_pluck_mixed_index_key() {
+		$mixed_list = $this->array_list;
+		$mixed_list['bar'] = (object) $mixed_list['bar'];
+		$list = wp_list_pluck( $mixed_list, 'name', 'id' );
+		$this->assertEquals( array( 'f' => 'foo', 'b' => 'bar', 'z' => 'baz' ), $list );
 	}
 
 	function test_filter_object_list_nested_array_and() {
