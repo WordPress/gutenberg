@@ -455,7 +455,7 @@ class Tests_MS extends WP_UnitTestCase {
 		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/test_blogname', 'title' => 'Test Title' ) );
 		$this->assertInternalType( 'int', $blog_id );
 
-		$this->assertEquals( 'http://' . DOMAIN_CURRENT_SITE . PATH_CURRENT_SITE . 'test_blogname/', get_blogaddress_by_name('test_blogname') );
+		$this->assertEquals( 'http://' . $current_site->domain . $current_site->path . 'test_blogname/', get_blogaddress_by_name('test_blogname') );
 
 		$this->assertEquals( $blog_id, get_id_from_blogname('test_blogname') );
 	}
@@ -1409,6 +1409,114 @@ class Tests_MS extends WP_UnitTestCase {
 		update_option( 'blogname', 'bar' );
 		$details = get_blog_details( get_current_blog_id() );
 		$this->assertEquals( 'bar', $details->blogname );
+	}
+
+	/**
+	 * @ticket 27884
+	 *
+	 * @expectedDeprecated define()
+	 */
+	function test_multisite_bootstrap() {
+		global $current_site, $current_blog;
+
+		$network_ids = array(
+			'wordpress.org/'         => array( 'domain' => 'wordpress.org', 'path' => '/' ),
+			'make.wordpress.org/'    => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
+		);
+
+		foreach ( $network_ids as &$id ) {
+			$id = $this->factory->network->create( $id );
+		}
+		unset( $id );
+
+		$ids = array(
+			'wordpress.org/'              => array( 'domain' => 'wordpress.org',      'path' => '/',         'site_id' => $network_ids['wordpress.org/'] ),
+			'wordpress.org/foo/'          => array( 'domain' => 'wordpress.org',      'path' => '/foo/',     'site_id' => $network_ids['wordpress.org/'] ),
+			'wordpress.org/foo/bar/'      => array( 'domain' => 'wordpress.org',      'path' => '/foo/bar/', 'site_id' => $network_ids['wordpress.org/'] ),
+			'make.wordpress.org/'         => array( 'domain' => 'make.wordpress.org', 'path' => '/',         'site_id' => $network_ids['make.wordpress.org/'] ),
+			'make.wordpress.org/foo/'     => array( 'domain' => 'make.wordpress.org', 'path' => '/foo/',     'site_id' => $network_ids['make.wordpress.org/'] ),
+		);
+
+		foreach ( $ids as &$id ) {
+			$id = $this->factory->blog->create( $id );
+		}
+		unset( $id );
+
+		$this->_setup_host_request( 'wordpress.org', '/' );
+		$this->assertEquals( $ids['wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/2014/04/23/hello-world/' );
+		$this->assertEquals( $ids['wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/sample-page/' );
+		$this->assertEquals( $ids['wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/?p=1' );
+		$this->assertEquals( $ids['wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/wp-admin/' );
+		$this->assertEquals( $ids['wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/foo/' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/FOO/' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/foo/2014/04/23/hello-world/' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/foo/sample-page/' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/foo/?p=1' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'wordpress.org', '/foo/wp-admin/' );
+		$this->assertEquals( $ids['wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		// @todo not currently passing.
+		//$this->_setup_host_request( 'wordpress.org', '/foo/bar/' );
+		//$this->assertEquals( $ids['wordpress.org/foo/bar/'], $current_blog->blog_id );
+		//$this->assertEquals( $network_ids['wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'make.wordpress.org', '/' );
+		$this->assertEquals( $ids['make.wordpress.org/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['make.wordpress.org/'], $current_blog->site_id );
+
+		$this->_setup_host_request( 'make.wordpress.org', '/foo/' );
+		$this->assertEquals( $ids['make.wordpress.org/foo/'], $current_blog->blog_id );
+		$this->assertEquals( $network_ids['make.wordpress.org/'], $current_blog->site_id );
+	}
+
+	/**
+	 * Reset various globals required for a 'clean' multisite boot.
+	 *
+	 * The $wpdb and $table_prefix globals are required for ms-settings.php to
+	 * load properly.
+	 *
+	 * @param string $domain HTTP_HOST of the bootstrap request.
+	 * @param string $path   REQUEST_URI of the boot strap request.
+	 */
+	function _setup_host_request( $domain, $path ) {
+		global $current_site, $current_blog, $wpdb, $table_prefix;
+
+		$current_site = $current_blog = null;
+		$_SERVER['HTTP_HOST'] = $domain;
+		$_SERVER['REQUEST_URI'] = $path;
+
+		include ABSPATH . '/wp-includes/ms-settings.php';
 	}
 }
 
