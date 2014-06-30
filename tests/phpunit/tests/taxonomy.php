@@ -127,6 +127,8 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 21593
+	 *
+	 * @expectedIncorrectUsage register_taxonomy
 	 */
 	function test_register_long_taxonomy() {
 		$this->assertInstanceOf( 'WP_Error', register_taxonomy( 'abcdefghijklmnopqrstuvwxyz0123456789', 'post', array() ) );
