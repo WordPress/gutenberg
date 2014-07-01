@@ -1510,8 +1510,9 @@ class Tests_MS extends WP_UnitTestCase {
 	 * @param string $path   REQUEST_URI of the boot strap request.
 	 */
 	function _setup_host_request( $domain, $path ) {
-		global $current_site, $current_blog, $wpdb, $table_prefix;
+		global $current_site, $current_blog, $table_prefix;
 
+		$table_prefix = WP_TESTS_TABLE_PREFIX;
 		$current_site = $current_blog = null;
 		$_SERVER['HTTP_HOST'] = $domain;
 		$_SERVER['REQUEST_URI'] = $path;

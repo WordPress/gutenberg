@@ -23,6 +23,7 @@ if ( !is_readable( $config_file_path ) ) {
 }
 require_once $config_file_path;
 
+define( 'WP_TESTS_TABLE_PREFIX', $table_prefix );
 define( 'DIR_TESTDATA', dirname( __FILE__ ) . '/../data' );
 
 if ( ! defined( 'WP_TESTS_FORCE_KNOWN_BUGS' ) )

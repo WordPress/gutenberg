@@ -35,6 +35,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		global $wpdb, $wp_query, $post;
 		$this->expectedDeprecated();
 		$wpdb->query( 'ROLLBACK' );
+		if ( is_multisite() ) {
+			while ( ms_is_switched() ) {
+				restore_current_blog();
+			}
+		}
 		$wp_query = new WP_Query();
 		$post = null;
 		remove_theme_support( 'html5' );
