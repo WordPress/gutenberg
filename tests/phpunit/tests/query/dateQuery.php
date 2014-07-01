@@ -254,6 +254,37 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 	}
 
+	/**
+	 * @ticket 26653
+	 */
+	public function test_date_query_inclusive_between_dates() {
+		$posts = $this->_get_query_result( array(
+			'date_query' => array(
+				'after' => array(
+					'year' => 2007,
+					'month' => 1
+				),
+				'before' => array(
+					'year' => 2008,
+					'month' => 12
+				),
+				'inclusive' => true
+			),
+		) );
+
+
+		$expected_dates = array(
+			'2007-01-22 03:49:21',
+			'2007-05-16 17:32:22',
+			'2007-09-24 07:17:23',
+			'2008-03-29 09:04:25',
+			'2008-07-15 11:32:26',
+			'2008-12-10 13:06:27',
+		);
+
+		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+	}
+
 	public function test_date_query_year_expecting_results() {
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
