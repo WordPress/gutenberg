@@ -374,4 +374,41 @@ EOF;
 		$this->assertEquals( '&frac34;', wp_kses_normalize_entities( '&frac34;' ) );
 		$this->assertEquals( '&there4;', wp_kses_normalize_entities( '&there4;' ) );
 	}
+	
+	/**
+	 * Test removal of invalid binary data for HTML.
+	 *
+	 * @ticket 28506
+	 * @dataProvider data_ctrl_removal
+	 */
+	function test_ctrl_removal( $input, $output ) {
+		global $allowedposttags;
+
+		return $this->assertEquals( $output, wp_kses( $input, $allowedposttags ) );
+	}
+
+	function data_ctrl_removal() {
+		return array(
+			array(
+				"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\X1C\x1D\x1E\x1F",
+				'',
+			),
+			array(
+				"\x00h\x01e\x02l\x03l\x04o\x05 \x06w\x07o\x08r\x0Bl\x0Cd\x0E.\x0F \x10W\x11O\x12R\x13D\x14P\x15R\x16E\x17S\x18S\x19 \x1AK\x1BS\X1CE\x1DS\x1E.\x1F/",
+				'hello world. WORDPRESS KSES./',
+			),
+			array(
+				"\x1F\x1E\x1D\x1C\x1B\x1A\x19\x18\x17\x16\x15\x14\x13\x12\x11\x10\x0F\x0E\x0C\x0B\x08\x07\x06\x05\x04\X03\x02\x01\x00",
+				'',
+			),
+			array(
+				"\x1Fh\x1Ee\x1Dl\x1Cl\x1Bo\x1A \x19w\x18o\x17r\x16l\x15d\x14.\x13 \x12W\x11O\x10R\x0FD\x0EP\x0CR\x0BE\x08S\x07S\x06 \x05K\x04S\X03E\x02S\x01.\x00/",
+				'hello world. WORDPRESS KSES./',
+			),
+			array(
+				"\t\r\n word \n\r\t",
+				"\t\r\n word \n\r\t",
+			),
+		);
+	}
 }
