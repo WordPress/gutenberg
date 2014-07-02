@@ -40,7 +40,6 @@ class Tests_Option_Transient extends WP_UnitTestCase {
 	function test_transient_data_with_timeout() {
 		$key = rand_str();
 		$value = rand_str();
-		$value2 = rand_str();
 
 		$this->assertFalse( get_option( '_transient_timeout_' . $key ) );
 		$now = time();
