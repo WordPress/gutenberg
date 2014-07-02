@@ -109,6 +109,94 @@ class Tests_Term extends WP_UnitTestCase {
 		return $terms;
 	}
 
+	/**
+	 * @ticket 26570
+	 */
+	function test_set_object_terms() {
+		$non_hier = rand_str( 10 );
+		$hier     = rand_str( 10 );
+
+		// Register taxonomies
+		register_taxonomy( $non_hier, array() );
+		register_taxonomy( $hier, array( 'hierarchical' => true ) );
+
+		// Create a post.
+		$post_id = $this->factory->post->create();
+
+		/*
+		 * Set a single term (non-hierarchical) by ID.
+		 */
+		$tag = wp_insert_term( 'Foo', $non_hier );
+		$this->assertFalse( has_term( $tag['term_id'], $non_hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, $tag['term_id'], $non_hier );
+		$this->assertTrue( has_term( $tag['term_id'], $non_hier, $post_id ) );
+
+		/*
+		 * Set a single term (non-hierarchical) by slug.
+		 */
+		$tag = wp_insert_term( 'Bar', $non_hier );
+		$tag = get_term( $tag['term_id'], $non_hier );
+
+		$this->assertFalse( has_term( $tag->slug, $non_hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, $tag->slug, $non_hier );
+		$this->assertTrue( has_term( $tag->slug, $non_hier, $post_id ) );
+
+		/*
+		 * Set a single term (hierarchical) by ID.
+		 */
+		$cat = wp_insert_term( 'Baz', $hier );
+		$this->assertFalse( has_term( $cat['term_id'], $hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, $cat['term_id'], $hier );
+		$this->assertTrue( has_term( $cat['term_id'], $hier, $post_id ) );
+
+		/*
+		 * Set a single term (hierarchical) by slug.
+		 */
+		$cat = wp_insert_term( 'Qux', $hier );
+		$cat = get_term( $cat['term_id'], $hier );
+
+		$this->assertFalse( has_term( $cat->slug, $hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, $cat->slug, $hier );
+		$this->assertTrue( has_term( $cat->slug, $hier, $post_id ) );
+
+		/*
+		 * Set an array of term IDs (non-hierarchical) by ID.
+		 */
+		$tag1 = wp_insert_term( '_tag1', $non_hier );
+		$this->assertFalse( has_term( $tag1['term_id'], $non_hier, $post_id ) );
+
+		$tag2 = wp_insert_term( '_tag2', $non_hier );
+		$this->assertFalse( has_term( $tag2['term_id'], $non_hier, $post_id ) );
+
+		$tag3 = wp_insert_term( '_tag3', $non_hier );
+		$this->assertFalse( has_term( $tag3['term_id'], $non_hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, array( $tag1['term_id'], $tag2['term_id'], $tag3['term_id'] ), $non_hier );
+		$this->assertTrue( has_term( array( $tag1['term_id'], $tag2['term_id'], $tag3['term_id'] ), $non_hier, $post_id ) );
+
+		/*
+		 * Set an array of term slugs (hierarchical) by slug.
+		 */
+		$cat1 = wp_insert_term( '_cat1', $hier );
+		$cat1 = get_term( $cat1['term_id'], $hier );
+		$this->assertFalse( has_term( $cat1->slug, $hier, $post_id ) );
+
+		$cat2 = wp_insert_term( '_cat2', $hier );
+		$cat2 = get_term( $cat2['term_id'], $hier );
+		$this->assertFalse( has_term( $cat2->slug, $hier, $post_id ) );
+
+		$cat3 = wp_insert_term( '_cat3', $hier );
+		$cat3 = get_term( $cat3['term_id'], $hier );
+		$this->assertFalse( has_term( $cat3->slug, $hier, $post_id ) );
+
+		wp_set_object_terms( $post_id, array( $cat1->slug, $cat2->slug, $cat3->slug ), $hier );
+		$this->assertTrue( has_term( array( $cat1->slug, $cat2->slug, $cat3->slug ), $hier, $post_id ) );
+	}
+
 	function test_set_object_terms_by_id() {
 		$ids = $this->factory->post->create_many(5);
 
