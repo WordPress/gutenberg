@@ -29,8 +29,13 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_shortlink() {
+		global $wp_rewrite;
+
 		$post_id = $this->factory->post->create();
 		$post_id2 = $this->factory->post->create();
+
+		$wp_rewrite->permalink_structure = '';
+		$wp_rewrite->set_permalink_structure( '' );
 
 		// Basic case
 		$this->assertEquals( get_permalink( $post_id ), wp_get_shortlink( $post_id, 'post' ) );
@@ -59,7 +64,6 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( '', wp_get_shortlink( 0 ) );
 		$this->assertEquals( '', wp_get_shortlink() );
 
-		global $wp_rewrite;
 		$wp_rewrite->permalink_structure = '';
 		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 		$wp_rewrite->flush_rules();
