@@ -117,6 +117,9 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;s&#8217;', wptexturize("'Class of '99&#8217;s'"));
 		//$this->assertEquals('&#8220;Class of 99&#8221;', wptexturize("\"Class of 99\""));
 		$this->assertEquals('&#8220;Class of &#8217;99&#8221;', wptexturize("\"Class of '99\""));
+		$this->assertEquals('{&#8220;Class of &#8217;99&#8221;}', wptexturize("{\"Class of '99\"}"));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221; ', wptexturize(" \"Class of '99\" "));
+		$this->assertEquals('}&#8221;Class of &#8217;99&#8243;{', wptexturize("}\"Class of '99\"{")); // Not a quotation, may be between two other quotations.
 	}
 
 	function test_quotes_after_numbers() {
@@ -346,12 +349,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word [&#8216;word word",
 			),
 			array(
-				"word <'word word", // Invalid HTML input?
-				"word <&#8216;word word",
+				"word <'word word", // Invalid HTML input triggers the apos in a word pattern.
+				"word <&#8217;word word",
 			),
 			array(
-				"word &lt;'word word", // Valid HTML input triggers the apos in a word pattern
-				"word &lt;&#8217;word word",
+				"word &lt;'word word", // Valid HTML input makes curly quotes.
+				"word &lt;&#8216;word word",
 			),
 			array(
 				"word {'word word",
@@ -375,11 +378,11 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				"word<'word word",
-				"word<&#8216;word word",
+				"word<&#8217;word word",
 			),
 			array(
 				"word&lt;'word word",
-				"word&lt;&#8217;word word",
+				"word&lt;&#8216;word word",
 			),
 			array(
 				"word{'word word",
@@ -402,12 +405,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word [&#8216; word word",
 			),
 			array(
-				"word <' word word", // Invalid HTML input?
-				"word <&#8216; word word",
+				"word <' word word",
+				"word <&#8217; word word",
 			),
 			array(
-				"word &lt;' word word", // Valid HTML input triggers the closing single quote here
-				"word &lt;&#8217; word word",
+				"word &lt;' word word",
+				"word &lt;&#8216; word word",
 			),
 			array(
 				"word {' word word",
@@ -431,11 +434,11 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				"word<' word word",
-				"word<&#8216; word word",
+				"word<&#8217; word word",
 			),
 			array(
 				"word&lt;' word word",
-				"word&lt;&#8217; word word",
+				"word&lt;&#8216; word word",
 			),
 			array(
 				"word{' word word",
@@ -533,34 +536,30 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"word word&#8217;s word",
 			),
 			array(
-				"word word'. word", // Quotes with outside punctuation could end with apostrophes instead of closing quotes (may affect i18n)
-				"word word&#8217;. word",
+				"word'[ word", // Apostrophes are never followed by opening punctuation.
+				"word'[ word",
 			),
 			array(
-				"word ]'. word",
-				"word ]&#8217;. word",
+				"word'( word",
+				"word'( word",
 			),
 			array(
-				"word )'. word",
-				"word )&#8217;. word",
+				"word'{ word",
+				"word'{ word",
 			),
 			array(
-				"word }'. word",
-				"word }&#8217;. word",
+				"word'&lt; word",
+				"word'&lt; word",
 			),
 			array(
-				"word >'. word", // Not tested
-				"word >&#8217;. word",
-			),
-			array(
-				"word &gt;'. word",
-				"word &gt;&#8217;. word",
+				"word'< word", // Invalid HTML input does trigger the apos pattern.
+				"word&#8217;< word",
 			),
 		);
 	}
 
 	/**
-	 * Double quote after a space or ([{< becomes &#8220; (opening_quote) if not followed by spaces
+	 * Double quote after a space or ([-{< becomes &#8220; (opening_quote) if not followed by spaces
 	 *
 	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
 	 *
@@ -586,16 +585,24 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'word [&#8220;word word',
 			),
 			array(
-				'word <"word word', // Invalid HTML input?
-				'word <&#8220;word word',
+				'word <"word word', // Invalid HTML input triggers the closing quote pattern.
+				'word <&#8221;word word',
 			),
 			array(
-				'word &lt;"word word', // Valid HTML input triggers the closing quote pattern
-				'word &lt;&#8221;word word',
+				'word &lt;"word word',
+				'word &lt;&#8220;word word',
 			),
 			array(
 				'word {"word word',
 				'word {&#8220;word word',
+			),
+			array(
+				'word -"word word',
+				'word -&#8220;word word',
+			),
+			array(
+				'word-"word word',
+				'word-&#8220;word word',
 			),
 			array(
 				'"word word',
@@ -610,12 +617,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'word[&#8220;word word',
 			),
 			array(
-				'word<"word word', // Invalid HTML input?
-				'word<&#8220;word word',
+				'word<"word word',
+				'word<&#8221;word word',
 			),
 			array(
-				'word&lt;"word word', // Valid HTML input triggers the closing quote pattern
-				'word&lt;&#8221;word word',
+				'word&lt;"word word',
+				'word&lt;&#8220;word word',
 			),
 			array(
 				'word{"word word',
@@ -698,7 +705,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that single quotes followed by a space or a period become &#8217; (closing_single_quote)
+	 * Test that single quotes followed by a space or .,-)}]> become &#8217; (closing_single_quote)
 	 *
 	 * Checks all baseline patterns. If anything ever changes in wptexturize(), these tests may fail.
 	 *
@@ -726,6 +733,26 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"word word', she said",
 				"word word&#8217;, she said",
+			),
+			array(
+				"word word'- word",
+				"word word&#8217;- word",
+			),
+			array(
+				"word word') word",
+				"word word&#8217;) word",
+			),
+			array(
+				"word word'} word",
+				"word word&#8217;} word",
+			),
+			array(
+				"word word'] word",
+				"word word&#8217;] word",
+			),
+			array(
+				"word word'&gt; word",
+				"word word&#8217;&gt; word",
 			),
 			array(
 				"word word'",
