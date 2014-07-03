@@ -9,7 +9,6 @@ error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
 $config_file_path = $argv[1];
 $multisite = ! empty( $argv[2] );
 
-define( 'WP_INSTALLING', true );
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';
 
