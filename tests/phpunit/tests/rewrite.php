@@ -8,19 +8,22 @@
 class Tests_Rewrite extends WP_UnitTestCase {
 
 	function setUp() {
+		global $wp_rewrite;
 		parent::setUp();
 
 		// Need rewrite rules in place to use url_to_postid
-		global $wp_rewrite;
-		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+
 		create_initial_taxonomies();
-		$GLOBALS['wp_rewrite']->init();
-		flush_rewrite_rules();
+
+		$wp_rewrite->flush_rules();
 	}
 
 	function tearDown() {
+		global $wp_rewrite;
 		parent::tearDown();
-		$GLOBALS['wp_rewrite']->init();
+		$wp_rewrite->init();
 	}
 
 	function test_url_to_postid() {
@@ -34,16 +37,16 @@ class Tests_Rewrite extends WP_UnitTestCase {
 
 	function test_url_to_postid_custom_post_type() {
 		delete_option( 'rewrite_rules' );
-		
+
 		$post_type = rand_str( 12 );
 		register_post_type( $post_type, array( 'public' => true ) );
-		
+
 		$id = $this->factory->post->create( array( 'post_type' => $post_type ) );
-		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );		
-		
-		_unregister_post_type( $post_type );		
+		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
+
+		_unregister_post_type( $post_type );
 	}
-	
+
 	function test_url_to_postid_hierarchical() {
 
 		$parent_id = $this->factory->post->create( array( 'post_title' => 'Parent', 'post_type' => 'page' ) );

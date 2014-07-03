@@ -15,7 +15,13 @@ class Tests_Canonical_PageOnFront extends Tests_Canonical {
 		update_option( 'page_for_posts', $this->factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
 		update_option( 'page_on_front', $this->factory->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
 		$wp_rewrite->init();
-		flush_rewrite_rules();
+		$wp_rewrite->flush_rules();
+	}
+
+	function tearDown() {
+		global $wp_rewrite;
+		parent::tearDown();
+		$wp_rewrite->init();
 	}
 
 	function data() {

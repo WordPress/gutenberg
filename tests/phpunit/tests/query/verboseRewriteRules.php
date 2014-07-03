@@ -8,11 +8,15 @@ require_once dirname( dirname( __FILE__ ) ) . '/query.php';
  */
 class Tests_Query_VerbosePageRules extends Tests_Query_Conditionals {
 	function setUp() {
-		parent::setUp();
 		global $wp_rewrite;
-		update_option( 'permalink_structure', '/%category%/%year%/%postname%/' );
+
+		parent::setUp();
+		
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%category%/%year%/%postname%/' );
+
 		create_initial_taxonomies();
-		$GLOBALS['wp_rewrite']->init();
-		flush_rewrite_rules();
+
+		$wp_rewrite->flush_rules();
 	}
 }

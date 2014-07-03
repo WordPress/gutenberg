@@ -22,20 +22,21 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 	protected $tax;
 
 	function setUp() {
+		global $wp_rewrite;
 		parent::setUp();
 
 		set_current_screen( 'front' );
 
-		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
-
 		$GLOBALS['wp_the_query'] = new WP_Query();
 		$GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];
+
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		create_initial_taxonomies();
 		register_taxonomy( 'testtax', 'post', array( 'public' => true ) );
 
-		$GLOBALS['wp_rewrite']->init();
-		flush_rewrite_rules();
+		$wp_rewrite->flush_rules();
 
 		$this->tag_id = $this->factory->tag->create( array( 'slug' => 'tag-slug' ) );
 		$this->cat_id = $this->factory->category->create( array( 'slug' => 'cat-slug' ) );
@@ -56,9 +57,12 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
+		global $wp_rewrite;
 		parent::tearDown();
 
 		_unregister_taxonomy( 'testtax' );
+
+		$wp_rewrite->init();
 
 		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
 	}

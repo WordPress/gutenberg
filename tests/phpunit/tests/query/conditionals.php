@@ -23,15 +23,19 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		update_option( 'posts_per_page', 5 );
 
 		global $wp_rewrite;
-		update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+
 		create_initial_taxonomies();
-		$GLOBALS['wp_rewrite']->init();
-		flush_rewrite_rules();
+
+		$wp_rewrite->flush_rules();
 	}
 
 	function tearDown() {
+		global $wp_rewrite;
 		parent::tearDown();
-		$GLOBALS['wp_rewrite']->init();
+		$wp_rewrite->init();
 	}
 
 	function test_home() {

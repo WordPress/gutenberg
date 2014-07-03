@@ -84,10 +84,11 @@ class Tests_Canonical extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
+		global $wp_rewrite;
 		parent::tearDown();
 		wp_set_current_user( $this->old_current_user );
 
-		$GLOBALS['wp_rewrite']->init();
+		$wp_rewrite->init();
 	}
 
 	// URL's are relative to the site "front", ie. /category/uncategorized/ instead of http://site.../category..

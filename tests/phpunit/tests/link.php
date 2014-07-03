@@ -4,6 +4,12 @@
  */
 class Tests_Link extends WP_UnitTestCase {
 
+	function tearDown() {
+		global $wp_rewrite;
+		parent::tearDown();
+		$wp_rewrite->init();
+	}
+
 	function _get_pagenum_link_cb( $url ) {
 		return $url . '/WooHoo';
 	}
@@ -65,7 +71,6 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( '', wp_get_shortlink( 0 ) );
 		$this->assertEquals( '', wp_get_shortlink() );
 
-		$wp_rewrite->permalink_structure = '';
 		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 		$wp_rewrite->flush_rules();
 
@@ -78,9 +83,6 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( 0, 'post' ) );
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( 0 ) );
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink() );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
 	}
 
 	function test_wp_get_shortlink_with_page() {
@@ -91,14 +93,10 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( $post_id, 'post' ) );
 
 		global $wp_rewrite;
-		$wp_rewrite->permalink_structure = '';
 		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 		$wp_rewrite->flush_rules();
 
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( $post_id, 'post' ) );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
 	}
 
 	/**
@@ -117,9 +115,6 @@ class Tests_Link extends WP_UnitTestCase {
 		$wp_rewrite->flush_rules();
 
 		$this->assertEquals( home_url( '/' ), wp_get_shortlink( $post_id, 'post' ) );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
 	}
 
 	/**
