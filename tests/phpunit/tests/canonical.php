@@ -19,16 +19,20 @@ class Tests_Canonical extends WP_UnitTestCase {
 	var $term_ids;
 
 	function setUp() {
+		global $wp_rewrite;
+
 		parent::setUp();
 
 		update_option( 'page_comments', true );
 		update_option( 'comments_per_page', 5 );
 		update_option( 'posts_per_page', 5 );
 
-		update_option( 'permalink_structure', $this->structure );
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( $this->structure );
+
 		create_initial_taxonomies();
-		$GLOBALS['wp_rewrite']->init();
-		flush_rewrite_rules();
+
+		$wp_rewrite->flush_rules();
 
 		$this->old_current_user = get_current_user_id();
 		$this->author_id = $this->factory->user->create( array( 'user_login' => 'canonical-author' ) );
