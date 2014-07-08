@@ -761,4 +761,74 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$q3 = new WP_Query( array( 'post_status' => array( 'any', 'auto-draft' ) ) );
 		$this->assertNotContains( "post_status <> 'auto-draft'", $q3->request );
 	}
+
+	/**
+	 *
+	 * @ticket 17065
+	 */
+	function test_orderby_array() {
+		global $wpdb;
+
+		$q1 = new WP_Query( array(
+			'orderby' => array(
+				'type' => 'DESC',
+				'name' => 'ASC'
+			)
+		) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_type DESC, $wpdb->posts.post_name ASC",
+			$q1->request
+		);
+
+		$q2 = new WP_Query( array( 'orderby' => array() ) );
+		$this->assertNotContains( 'ORDER BY', $q2->request );
+		$this->assertNotContains( 'ORDER', $q2->request );
+
+		$q3 = new WP_Query( array( 'post_type' => 'post' ) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_date DESC",
+			$q3->request
+		);
+
+		$q4 = new WP_Query( array( 'post_type' => 'post' ) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_date DESC",
+			$q4->request
+		);
+	}
+
+	/**
+	 *
+	 * @ticket 17065
+	 */
+	function test_order() {
+		global $wpdb;
+
+		$q1 = new WP_Query( array(
+			'orderby' => array(
+				'post_type' => 'foo'
+			)
+		) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_type DESC",
+			$q1->request
+		);
+
+		$q2 = new WP_Query( array(
+			'orderby' => 'title',
+			'order'   => 'foo'
+		) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_title DESC",
+			$q2->request
+		);
+
+		$q3 = new WP_Query( array(
+			'order' => 'asc'
+		) );
+		$this->assertContains(
+			"ORDER BY $wpdb->posts.post_date ASC",
+			$q3->request
+		);
+	}
 }
