@@ -692,6 +692,53 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertTrue( is_single( $post->post_name ) );
 	}
 
+	/**
+	 * @ticket 16802
+	 */
+	function test_is_single_with_parent() {
+		// Use custom hierarchical post type
+		$post_type = 'test_hierarchical';
+
+		register_post_type( $post_type, array(
+			'hierarchical' => true,
+			'rewrite'      => true,
+			'has_archive'  => true,
+			'public'       => true
+		) );
+
+		// Create parent and child posts
+		$parent_id = $this->factory->post->create( array(
+			'post_type' => $post_type,
+			'post_name' => 'foo'
+		) );
+
+		$post_id = $this->factory->post->create( array(
+			'post_type'   => $post_type,
+			'post_name'   => 'bar',
+			'post_parent' => $parent_id
+		) );
+
+		// Tests
+		$this->go_to( "/?p=$post_id&post_type=$post_type" );
+
+		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( is_single() );
+		$this->assertFalse( $q->is_page );
+		$this->assertTrue( $q->is_single );
+		$this->assertFalse( $q->is_attachment );
+		$this->assertTrue( is_single( $post ) );
+		$this->assertTrue( is_single( $post->ID ) );
+		$this->assertTrue( is_single( $post->post_title ) );
+		$this->assertTrue( is_single( $post->post_name ) );
+		$this->assertTrue( is_single( 'foo/bar' ) );
+		$this->assertFalse( is_single( $parent_id ) );
+		$this->assertFalse( is_single( 'foo/bar/baz' ) );
+		$this->assertFalse( is_single( 'bar/bar' ) );
+		$this->assertFalse( is_single( 'foo' ) );
+	}
+
 	function test_is_page() {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
 		$this->go_to( "/?page_id=$post_id" );
@@ -707,6 +754,39 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertTrue( is_page( $post->ID ) );
 		$this->assertTrue( is_page( $post->post_title ) );
 		$this->assertTrue( is_page( $post->post_name ) );
+	}
+
+	/**
+	 * @ticket 16802
+	 */
+	function test_is_page_with_parent() {
+		$parent_id = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+		$post_id = $this->factory->post->create( array(
+			'post_type'   => 'page',
+			'post_name'   => 'bar',
+			'post_parent' => $parent_id,
+		) );
+		$this->go_to( "/?page_id=$post_id" );
+
+		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( is_page() );
+		$this->assertFalse( $q->is_single );
+		$this->assertTrue( $q->is_page );
+		$this->assertFalse( $q->is_attachment );
+		$this->assertTrue( is_page( $post ) );
+		$this->assertTrue( is_page( $post->ID ) );
+		$this->assertTrue( is_page( $post->post_title ) );
+		$this->assertTrue( is_page( $post->post_name ) );
+		$this->assertTrue( is_page( 'foo/bar' ) );
+		$this->assertFalse( is_page( $parent_id ) );
+		$this->assertFalse( is_page( 'foo/bar/baz' ) );
+		$this->assertFalse( is_page( 'bar/bar' ) );
+		$this->assertFalse( is_page( 'foo' ) );
 	}
 
 	function test_is_attachment() {
