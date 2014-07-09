@@ -180,4 +180,22 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( $users[1], $comments[2]->user_id );
 
 	}
+
+	/**
+	 * @ticket 28434
+	 */
+	function test_fields_ids_query() {
+		$comment_1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$comment_2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$comment_3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		// Ensure we are dealing with integers, and not objects.
+		$this->assertInternalType( 'integer', $comment_1 );
+		$this->assertInternalType( 'integer', $comment_2 );
+		$this->assertInternalType( 'integer', $comment_3 );
+
+		$comment_ids = get_comments( array( 'fields' => 'ids' ) );
+		$this->assertCount( 3, $comment_ids );
+		$this->assertEquals( array( $comment_1, $comment_2, $comment_3 ), $comment_ids );
+	}
 }
