@@ -315,6 +315,7 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
 		$fetched_post = get_post( $result );
 		$this->assertStringMatchesFormat( '%d', $result );
+		$this->assertEquals( '1970-01-01 00:00:00', $fetched_post->post_date );
 	}
 
 	/**
@@ -327,6 +328,33 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
 		$fetched_post = get_post( $result );
 		$this->assertStringMatchesFormat( '%d', $result );
+		$this->assertEquals( '1970-01-01 00:00:00', $fetched_post->post_date_gmt );
+	}
+
+	/**
+	 * @ticket 28601
+	 */
+	function test_valid_string_post_date() {
+		$this->make_user_by_role( 'author' );
+		$date_string = '1984-01-11 05:00:00';
+		$post = array( 'post_title' => 'test', 'post_content' => 'test', 'post_date' => $date_string );
+		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
+		$fetched_post = get_post( $result );
+		$this->assertStringMatchesFormat( '%d', $result );
+		$this->assertEquals( $date_string , $fetched_post->post_date );
+	}
+
+	/**
+	 * @ticket 28601
+	 */
+	function test_valid_string_post_date_gmt() {
+		$this->make_user_by_role( 'author' );
+		$date_string = '1984-01-11 05:00:00';
+		$post = array( 'post_title' => 'test', 'post_content' => 'test', 'post_date_gmt' => $date_string );
+		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
+		$fetched_post = get_post( $result );
+		$this->assertStringMatchesFormat( '%d', $result );
+		$this->assertEquals( $date_string , $fetched_post->post_date_gmt );
 	}
 
 }
