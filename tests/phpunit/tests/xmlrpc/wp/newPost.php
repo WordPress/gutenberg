@@ -310,7 +310,7 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 	 */
 	function test_invalid_post_date_does_not_fatal() {
 		$this->make_user_by_role( 'author' );
-		$date_string = '2014-01-01 10:10:10';
+		$date_string = 'invalid_date';
 		$post = array( 'post_title' => 'test', 'post_content' => 'test', 'post_date' => $date_string );
 		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );
 		$fetched_post = get_post( $result );
