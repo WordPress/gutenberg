@@ -148,7 +148,7 @@ class Test_Functions_Deprecated extends WP_UnitTestCase {
 		$img = imagecreatefromjpeg( DIR_TESTDATA . '/images/canola.jpg' );
 		wp_save_image_file( $file, $img, 'image/jpeg', 1 );
 		imagedestroy( $img );
-		@unlink($file);
+		unlink( $file );
 
 		// Check if the arg was deprecated
 		$check = $this->was_deprecated( 'argument', 'wp_save_image_file' );
@@ -169,7 +169,7 @@ class Test_Functions_Deprecated extends WP_UnitTestCase {
 		$img = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
 		wp_save_image_file( $file, $img, 'image/jpeg', 1 );
 		unset( $img );
-		@unlink($file);
+		unlink( $file );
 
 		// Check if the arg was deprecated
 		$check = $this->was_deprecated( 'argument', 'wp_save_image_file' );

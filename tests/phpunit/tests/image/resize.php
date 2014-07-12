@@ -4,7 +4,10 @@
  * @group image
  * @group media
  * @group upload
+ * @group resize
  */
+require_once( dirname( __FILE__ ) . '/base.php' );
+
 abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase {
 
 	function test_resize_jpg() {
@@ -108,7 +111,7 @@ abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase 
 		$this->assertEquals( 100, $h );
 		$this->assertEquals( IMAGETYPE_JPEG, $type );
 
-		unlink($image);
+		unlink( $image );
 	}
 
 	function test_resize_thumb_50x150_crop() {

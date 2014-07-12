@@ -313,18 +313,6 @@ if ( !function_exists( 'str_getcsv' ) ) {
 	}
 }
 
-function _rmdir( $path ) {
-	if ( in_array(basename( $path ), array( '.', '..' ) ) ) {
-		return;
-	} elseif ( is_file( $path ) ) {
-		unlink( $path );
-	} elseif ( is_dir( $path ) ) {
-		foreach ( scandir( $path ) as $file )
-			_rmdir( $path . '/' . $file );
-		rmdir( $path );
-	}
-}
-
 /**
  * Removes the post type and its taxonomy associations.
  */

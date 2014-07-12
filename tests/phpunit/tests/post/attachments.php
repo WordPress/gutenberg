@@ -9,10 +9,7 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 
 	function tearDown() {
 		// Remove all uploads.
-		$uploads = wp_upload_dir();
-		foreach ( scandir( $uploads['basedir'] ) as $file )
-			_rmdir( $uploads['basedir'] . '/' . $file );
-
+		$this->remove_added_uploads();
 		parent::tearDown();
 	}
 

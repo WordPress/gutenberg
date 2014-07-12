@@ -1,11 +1,15 @@
 <?php
-
 /**
  * @group image
  * @group media
  * @group upload
  */
 class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
+	function tearDown() {
+		$this->remove_added_uploads();
+		parent::tearDown();
+	}
+
 	function test_make_intermediate_size_no_size() {
 		$image = image_make_intermediate_size( DIR_TESTDATA . '/images/a2-small.jpg', 0, 0, false );
 

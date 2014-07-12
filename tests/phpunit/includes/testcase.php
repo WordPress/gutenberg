@@ -11,6 +11,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected $expected_doing_it_wrong = array();
 	protected $caught_doing_it_wrong = array();
 
+	protected static $ignore_files;
+
 	/**
 	 * @var WP_UnitTest_Factory
 	 */
@@ -18,6 +20,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	function setUp() {
 		set_time_limit(0);
+
+		if ( ! self::$ignore_files ) {
+			self::$ignore_files = $this->scan_user_uploads();
+		}
 
 		global $wpdb;
 		$wpdb->suppress_errors = false;
@@ -324,5 +330,55 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( count($not_false) )
 			$message .= implode( $not_false, ', ' ) . ' should be false.';
 		$this->assertTrue( $passed, $message );
+	}
+
+	function unlink( $file ) {
+		$exists = is_file( $file );
+		if ( $exists && ! in_array( $file, self::$ignore_files ) ) {
+			//error_log( $file );
+			unlink( $file );
+		} elseif ( ! $exists ) {
+			$this->fail( "Trying to delete a file that doesn't exist: $file" );
+		}
+	}
+
+	function rmdir( $path ) {
+		$files = $this->files_in_dir( $path );
+		foreach ( $files as $file ) {
+			if ( ! in_array( $file, self::$ignore_files ) ) {
+				$this->unlink( $file );
+			}
+		}
+	}
+
+	function remove_added_uploads() {
+		// Remove all uploads.
+		$uploads = wp_upload_dir();
+		$this->rmdir( $uploads['basedir'] );
+	}
+
+	function files_in_dir( $dir ) {
+		$files = array();
+
+		$iterator = new RecursiveDirectoryIterator( $dir );
+		$objects = new RecursiveIteratorIterator( $iterator );
+		foreach ( $objects as $name => $object ) {
+			if ( is_file( $name ) ) {
+				$files[] = $name;
+			}
+		}
+
+		return $files;
+	}
+
+	function scan_user_uploads() {
+		static $files = array();
+		if ( ! empty( $files ) ) {
+			return $files;
+		}
+
+		$uploads = wp_upload_dir();
+		$files = $this->files_in_dir( $uploads['basedir'] );
+		return $files;
 	}
 }

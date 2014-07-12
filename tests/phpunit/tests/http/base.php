@@ -284,6 +284,6 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$res = wp_remote_get( 'https://wordpress.org/' );
 		$this->assertTrue( ! is_wp_error( $res ), print_r( $res, true ) );
 	}
-	
-	
+
+
 }

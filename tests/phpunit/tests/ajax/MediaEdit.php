@@ -32,13 +32,9 @@ class Tests_Ajax_MediaEdit extends WP_Ajax_UnitTestCase {
 	 */
 	public function tearDown() {
 		// Cleanup
-		foreach ($this->_ids as $id){
-			wp_delete_attachment($id, true);
+		foreach ( $this->_ids as $id ) {
+			wp_delete_attachment( $id, true );
 		}
-
-		$uploads = wp_upload_dir();
-		foreach ( scandir( $uploads['basedir'] ) as $file )
-			_rmdir( $uploads['basedir'] . '/' . $file );
 
 		parent::tearDown();
 	}

@@ -22,13 +22,9 @@ class Tests_Upload extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
+		$this->remove_added_uploads();
 
-		// Remove year/month folders created by wp_upload_dir().
-		$uploads = wp_upload_dir();
-		foreach ( scandir( $uploads['basedir'] ) as $file )
-			_rmdir( $uploads['basedir'] . '/' . $file );
-		_rmdir( ABSPATH . 'foo/' );
+		parent::tearDown();
 	}
 
 	function test_upload_dir_default() {
