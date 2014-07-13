@@ -196,6 +196,6 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$comment_ids = get_comments( array( 'fields' => 'ids' ) );
 		$this->assertCount( 3, $comment_ids );
-		$this->assertEquals( array( $comment_1, $comment_2, $comment_3 ), $comment_ids );
+		$this->assertEqualSets( array( $comment_1, $comment_2, $comment_3 ), $comment_ids );
 	}
 }
