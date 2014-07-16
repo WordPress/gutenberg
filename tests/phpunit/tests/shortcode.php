@@ -394,4 +394,17 @@ EOF;
 			$this->assertEquals( $output, shortcode_unautop( $in ) );
 		}
 	}
+
+	/**
+	 * @ticket 26343
+	 */
+	function test_has_shortcode() {
+		$content = 'This is a blob with [gallery] in it';
+		$this->assertTrue( has_shortcode( $content, 'gallery' ) );
+
+		add_shortcode( 'foo', '__return_false' );
+		$content_nested = 'This is a blob with [foo] [gallery] [/foo] in it';
+		$this->assertTrue( has_shortcode( $content_nested, 'gallery' ) );
+		remove_shortcode( 'foo' );
+	}
 }
