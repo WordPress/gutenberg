@@ -690,4 +690,16 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( $tag_id, $terms[0]->term_id );
 		$this->assertEquals( 'This description is even more amazing!', $terms[0]->description );
 	}
+
+	/**
+	 * @ticket 19205
+	 */
+	function test_orphan_category() {
+		$cat_id1 = $this->factory->category->create();
+
+		wp_delete_category( $cat_id1 );
+
+		$cat_id2 = $this->factory->category->create( array( 'parent' => $cat_id1 ) );
+		$this->assertWPError( $cat_id2 );
+	}
 }
