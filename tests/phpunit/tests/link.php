@@ -188,4 +188,65 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( array( $post_two ), get_boundary_post( true, '', true, 'post_tag' ) );
 		$this->assertEquals( array( $post_four ), get_boundary_post( true, '', false, 'post_tag' ) );
 	}
+
+	/**
+	* @ticket 22112
+	*/
+	function test_get_adjacent_post_exclude_self_term() {
+		$include = $this->factory->category->create();
+		$exclude = $this->factory->category->create();
+
+		$one = $this->factory->post->create_and_get( array(
+			'post_date' => '2012-01-01 12:00:00',
+			'post_category' => array( $include, $exclude ),
+		) );
+
+		$two = $this->factory->post->create_and_get( array(
+			'post_date' => '2012-01-02 12:00:00',
+			'post_category' => array(),
+		) );
+
+		$three = $this->factory->post->create_and_get( array(
+			'post_date' => '2012-01-03 12:00:00',
+			'post_category' => array( $include, $exclude ),
+		) );
+
+		$four = $this->factory->post->create_and_get( array(
+			'post_date' => '2012-01-04 12:00:00',
+			'post_category' => array( $include ),
+		) );
+
+		$five = $this->factory->post->create_and_get( array(
+			'post_date' => '2012-01-05 12:00:00',
+			'post_category' => array( $include, $exclude ),
+		) );
+
+		// First post
+		$this->go_to( get_permalink( $one ) );
+		$this->assertEquals( $two, get_adjacent_post( false, array(), false ) );
+		$this->assertEquals( $three, get_adjacent_post( true, array(), false ) );
+		$this->assertEquals( $two, get_adjacent_post( false, array( $exclude ), false ) );
+		$this->assertEquals( $four, get_adjacent_post( true, array( $exclude ), false ) );
+		$this->assertEmpty( get_adjacent_post( false, array(), true ) );
+
+		// Fourth post
+		$this->go_to( get_permalink( $four ) );
+		$this->assertEquals( $five, get_adjacent_post( false, array(), false ) );
+		$this->assertEquals( $five, get_adjacent_post( true, array(), false ) );
+		$this->assertEmpty( get_adjacent_post( false, array( $exclude ), false ) );
+		$this->assertEmpty( get_adjacent_post( true, array( $exclude ), false ) );
+
+		$this->assertEquals( $three, get_adjacent_post( false, array(), true ) );
+		$this->assertEquals( $three, get_adjacent_post( true, array(), true ) );
+		$this->assertEquals( $two, get_adjacent_post( false, array( $exclude ), true ) );
+		$this->assertEmpty( get_adjacent_post( true, array( $exclude ), true ) );
+
+		// Last post
+		$this->go_to( get_permalink( $five ) );
+		$this->assertEquals( $four, get_adjacent_post( false, array(), true ) );
+		$this->assertEquals( $four, get_adjacent_post( true, array(), true ) );
+		$this->assertEquals( $four, get_adjacent_post( false, array( $exclude ), true ) );
+		$this->assertEquals( $four, get_adjacent_post( true, array( $exclude ), true ) );
+		$this->assertEmpty( get_adjacent_post( false, array(), false ) );
+	}
 }
