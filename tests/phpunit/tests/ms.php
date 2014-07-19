@@ -25,17 +25,6 @@ class Tests_MS extends WP_UnitTestCase {
 		$wpdb->suppress_errors( $this->suppress );
 	}
 
-	/**
-	 * @ticket 28697
-	 */
-	function test_ms_subdomain_constants() {
-		global $subdomain_error;
-
-		$this->assertFalse( $subdomain_error );
-		ms_subdomain_constants();
-		$this->assertFalse( $subdomain_error );
-	}
-
 	function test_remove_user_from_blog() {
 		$user1 = $this->factory->user->create_and_get();
 		$user2 = $this->factory->user->create_and_get();
