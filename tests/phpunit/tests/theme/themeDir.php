@@ -234,4 +234,47 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		$this->assertEquals( 'Mr. WordPress', $theme_data['AuthorName'] );
 	}
 
+	/**
+	 * @ticket 28662
+	 */
+	function test_theme_dir_slashes() {
+		$size = count( $GLOBALS['wp_theme_directories'] );
+
+		@mkdir( WP_CONTENT_DIR . '/themes/foo' );
+		@mkdir( WP_CONTENT_DIR . '/themes/foo-themes' );
+
+		$this->assertTrue( file_exists( WP_CONTENT_DIR . '/themes/foo' ) );
+		$this->assertTrue( file_exists( WP_CONTENT_DIR . '/themes/foo-themes') );
+
+		register_theme_directory( '/' );
+
+		$this->assertCount( $size, $GLOBALS['wp_theme_directories'] );
+
+		register_theme_directory( 'themes/' );
+
+		$this->assertCount( $size, $GLOBALS['wp_theme_directories'] );
+
+		register_theme_directory( '/foo/' );
+
+		$this->assertCount( $size, $GLOBALS['wp_theme_directories'] );
+
+		register_theme_directory( 'foo/' );
+
+		$this->assertCount( $size, $GLOBALS['wp_theme_directories'] );
+
+		register_theme_directory( 'themes/foo/' );
+
+		$this->assertCount( $size + 1, $GLOBALS['wp_theme_directories'] );
+
+		register_theme_directory( WP_CONTENT_DIR . '/foo-themes/' );
+
+		$this->assertCount( $size + 1, $GLOBALS['wp_theme_directories'] );
+
+		foreach ( $GLOBALS['wp_theme_directories'] as $dir ) {
+			$this->assertNotEquals( '/', substr( $dir, -1 ) );
+		}
+
+		rmdir( WP_CONTENT_DIR . '/themes/foo' );
+		rmdir( WP_CONTENT_DIR . '/themes/foo-themes' );
+	}
 }
