@@ -11,6 +11,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected $expected_doing_it_wrong = array();
 	protected $caught_doing_it_wrong = array();
 
+	protected static $hooks_saved = array();
 	protected static $ignore_files;
 
 	/**
@@ -23,6 +24,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		if ( ! self::$ignore_files ) {
 			self::$ignore_files = $this->scan_user_uploads();
+		}
+
+		if ( ! self::$hooks_saved ) {
+			$this->_backup_hooks();
 		}
 
 		global $wpdb;
@@ -52,6 +57,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
+		$this->_restore_hooks();
 	}
 
 	function clean_up_global_scope() {
@@ -60,6 +66,42 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->flush_cache();
 	}
 
+	/**
+	 * Saves the action and filter-related globals so they can be restored later
+	 *
+	 * Stores $merged_filters, $wp_actions, $wp_current_filter, and $wp_filter
+	 * on a class variable so they can be restored on tearDown() using _restore_hooks()
+	 * @global array $merged_filters
+	 * @global array $wp_actions
+	 * @global array $wp_current_filter
+	 * @global array $wp_filter
+	 * @return void
+	 */
+	protected function _backup_hooks() {
+		$globals = array( 'merged_filters', 'wp_actions', 'wp_current_filter', 'wp_filter' );
+		foreach ( $globals as $key ) {
+			self::$hooks_saved[ $key ] = $GLOBALS[ $key ];
+		}
+	}
+
+	/**
+	 * Restores the hook-related globals to their state at setUp()
+	 *
+	 * so that future tests aren't affected by hooks set during this last test
+	 *
+	 * @global array $merged_filters
+	 * @global array $wp_actions
+	 * @global array $wp_current_filter
+	 * @global array $wp_filter
+	 * @return void
+	 */
+	protected function _restore_hooks(){
+		$globals = array( 'merged_filters', 'wp_actions', 'wp_current_filter', 'wp_filter' );
+		foreach ( $globals as $key ) {
+			$GLOBALS[ $key ] = self::$hooks_saved[ $key ];
+		}
+	}
+	
 	function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
