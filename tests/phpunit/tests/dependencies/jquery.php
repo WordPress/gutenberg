@@ -69,4 +69,16 @@ class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 		$contents = trim( file_get_contents( ABSPATH . WPINC . '/js/jquery/jquery.js' ) );
 		$this->assertFalse( strpos( $contents, 'sourceMappingURL' ), 'Presence of sourceMappingURL' );
 	}
+
+	/**
+	 * @ticket 28404
+	 */
+	function test_wp_script_is_dep_enqueued() {
+		wp_enqueue_script( 'jquery-ui-accordion' );
+
+		$this->assertTrue( wp_script_is( 'jquery', 'enqueued' ) );
+		$this->assertFalse( wp_script_is( 'underscore', 'enqueued' ) );
+
+		unset( $GLOBALS['wp_scripts'] );
+	}
 }
