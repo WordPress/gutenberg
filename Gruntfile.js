@@ -161,7 +161,10 @@ module.exports = function(grunt) {
 		cssjanus: {
 			core: {
 				options: {
-					swapLtrRtlInUrl: false
+					swapLtrRtlInUrl: false,
+					processContent: function( src ) {
+						return src.replace( /url\((.+?)\.css\)/g, 'url($1-rtl.css)' );
+					}
 				},
 				expand: true,
 				cwd: SOURCE_DIR,
