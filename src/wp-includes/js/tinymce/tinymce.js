@@ -3465,7 +3465,7 @@ define("tinymce/dom/DomQuery", [
 		'readonly': 'readOnly'
 	};
 	var cssFix = {
-		float: 'cssFloat'
+		'float': 'cssFloat'
 	};
 
 	var attrHooks = {}, cssHooks = {};
@@ -4868,7 +4868,7 @@ define("tinymce/dom/DomQuery", [
 	}
 
 	if (Env.ie && Env.ie < 9) {
-		cssFix.float = 'styleFloat';
+		cssFix['float'] = 'styleFloat';
 
 		appendHooks(cssHooks, 'set', {
 			opacity: function(elm, value) {
