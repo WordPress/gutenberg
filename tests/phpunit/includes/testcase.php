@@ -11,12 +11,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected $expected_doing_it_wrong = array();
 	protected $caught_doing_it_wrong = array();
 
-	protected static $hooks_saved = array(
-		'merged_filters' => array(),
-		'wp_actions' => array(),
-		'wp_current_filter' => array(),
-		'wp_filter' => array(),
-	);
+	protected static $hooks_saved = array();
 	protected static $ignore_files;
 
 	/**
@@ -106,7 +101,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$GLOBALS[ $key ] = self::$hooks_saved[ $key ];
 		}
 	}
-
+	
 	function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
