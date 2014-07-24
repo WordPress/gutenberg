@@ -19,6 +19,24 @@ class Tests_Formatting_SanitizeFileName extends WP_UnitTestCase {
 		$this->assertEquals( 'testtest', sanitize_file_name( $string ) );
 	}
 
+	/**
+	 * Test that spaces are correctly replaced with dashes.
+	 *
+	 * @ticket 16330
+	 */
+	function test_replace_spaces() {
+		$urls = array(
+			'unencoded space.png'   => 'unencoded-space.png',
+			'encoded%20space.jpg'   => 'encoded-space.jpg',
+			'plus+space.jpg'        => 'plus-space.jpg',
+			'multi %20 +space.png'   => 'multi-space.png',
+		);
+
+		foreach( $urls as $test => $expected ) {
+			$this->assertEquals( $expected, sanitize_file_name( $test ) );
+		}
+	}
+
 	function test_replaces_any_number_of_hyphens_with_one_hyphen() {
 		$this->assertEquals("a-t-t", sanitize_file_name("a----t----t"));
 	}
