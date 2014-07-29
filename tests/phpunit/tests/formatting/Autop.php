@@ -386,7 +386,6 @@ Paragraph two.';
 			'noscript',
 			'figcaption',
 			'select',
-			'option'
 		);
 
 		$content = $expected = array();
