@@ -632,11 +632,24 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 28315
 	 */
 	function test_user_meta_error() {
-		$this->factory->user->create( array( 'user_email' => 'taco@burrito.com' ) );
-		$id = $this->factory->user->create( array( 'user_email' => 'taco@burrito.com' ) );
+		$id1 = wp_insert_user( array(
+			'user_login' => rand_str(),
+			'user_pass' => 'password',
+			'user_email' => 'taco@burrito.com',
+		) );
+		$this->assertEquals( $id1, email_exists( 'taco@burrito.com' ) );
 
-		$this->assertWPError( $id );
-		@update_user_meta( $id, 'key', 'value' );
+		$id2 = wp_insert_user( array(
+			'user_login' => rand_str(),
+			'user_pass' => 'password',
+			'user_email' => 'taco@burrito.com',
+		) );
+
+		if ( ! defined( 'WP_IMPORTING' ) ) {
+			$this->assertWPError( $id2 );
+		}
+
+		@update_user_meta( $id2, 'key', 'value' );
 
 		$metas = array_keys( get_user_meta( 1 ) );
 		$this->assertNotContains( 'key', $metas );
