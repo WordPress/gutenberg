@@ -869,7 +869,7 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 13771
 	 */
-	function test_get_the_date_with_id() {
+	function test_get_the_date_with_id_returns_correct_time() {
 		$post_id = $this->factory->post->create( array( 'post_date' => '2014-03-01 16:35:00' ) );
 		$this->assertEquals( 'March 1, 2014', get_the_date( 'F j, Y', $post_id ) );
 	}
@@ -877,28 +877,10 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 28310
 	 */
-	function test_get_the_date_returns_false_with_null_post() {
+	function test_get_the_date_returns_false_with_null_or_non_existing_post() {
 		$this->assertFalse( get_the_date() );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_date_returns_false_with_format_and_null_post() {
 		$this->assertFalse( get_the_date( 'F j, Y h:i:s' ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_date_returns_false_with_post_that_is_not_found() {
 		$this->assertFalse( get_the_date( '', 9 ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_date_returns_false_with_format_and_post_that_is_not_found() {
 		$this->assertFalse( get_the_date( 'F j, Y h:i:s', 9 ) );
 	}
 
@@ -913,28 +895,10 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 28310
 	 */
-	function test_get_the_time_returns_false_with_null_post() {
+	function test_get_the_time_returns_false_with_null_or_non_existing_post() {
 		$this->assertFalse( get_the_time() );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_time_returns_false_with_format_and_null_post() {
 		$this->assertFalse( get_the_time( 'h:i:s' ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_time_returns_false_with_post_that_is_not_found() {
 		$this->assertFalse( get_the_time( '', 9 ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_the_time_returns_false_with_format_and_post_that_is_not_found() {
 		$this->assertFalse( get_the_time( 'h:i:s', 9 ) );
 	}
 
@@ -949,28 +913,10 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 28310
 	 */
-	function test_get_post_time_returns_false_with_null_post() {
+	function test_get_post_time_returns_false_with_null_or_non_existing_post() {
 		$this->assertFalse( get_post_time() );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_time_returns_false_with_format_and_null_post() {
 		$this->assertFalse( get_post_time( 'h:i:s' ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_time_returns_false_with_post_that_is_not_found() {
 		$this->assertFalse( get_post_time( '', false, 9 ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_time_returns_false_with_format_and_post_that_is_not_found() {
 		$this->assertFalse( get_post_time( 'h:i:s', false, 9 ) );
 	}
 
@@ -985,28 +931,10 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 28310
 	 */
-	function test_get_post_modified_time_returns_false_with_null_post() {
+	function test_get_post_modified_time_returns_false_with_null_or_non_existing_post() {
 		$this->assertFalse( get_post_modified_time() );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_modified_time_returns_false_with_format_and_null_post() {
 		$this->assertFalse( get_post_modified_time( 'h:i:s' ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_modified_time_returns_false_with_post_that_is_not_found() {
 		$this->assertFalse( get_post_modified_time( '', false, 9 ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_get_post_modified_time_returns_false_with_format_and_post_that_is_not_found() {
 		$this->assertFalse( get_post_modified_time( 'h:i:s', false, 9 ) );
 	}
 
@@ -1020,14 +948,8 @@ class Tests_Post extends WP_UnitTestCase {
 	/**
 	 * @ticket 28310
 	 */
-	function test_mysql2date_returns_gmt_unix_timestamp() {
+	function test_mysql2date_returns_gmt_or_unix_timestamp() {
 		$this->assertEquals( '441013392', mysql2date( 'G', '1983-12-23 07:43:12' ) );
-	}
-
-	/**
-	 * @ticket 28310
-	 */
-	function test_mysql2date_returns_unix_timestamp() {
 		$this->assertEquals( '441013392', mysql2date( 'U', '1983-12-23 07:43:12' ) );
 	}
 
