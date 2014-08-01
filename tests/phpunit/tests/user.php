@@ -627,4 +627,18 @@ class Tests_User extends WP_UnitTestCase {
 		// If this test fails, it will error out for calling the to_array() method on a non-object.
 		$this->assertInstanceOf( 'WP_Error', wp_update_user( array( 'ID' => $user_id ) ) );
 	}
+
+	/**
+	 * @ticket 28315
+	 */
+	function test_user_meta_error() {
+		$this->factory->user->create( array( 'user_email' => 'taco@burrito.com' ) );
+		$id = $this->factory->user->create( array( 'user_email' => 'taco@burrito.com' ) );
+
+		$this->assertWPError( $id );
+		@update_user_meta( $id, 'key', 'value' );
+
+		$metas = array_keys( get_user_meta( 1 ) );
+		$this->assertNotContains( 'key', $metas );
+	}
 }
