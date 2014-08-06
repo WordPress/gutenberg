@@ -236,4 +236,24 @@ class Tests_Meta extends WP_UnitTestCase {
 
 		$this->assertEquals( wp_list_pluck( $posts, 'post_title' ), wp_list_pluck( $posts2, 'post_title' ) );
 	}
+
+	/**
+	 * @ticket 28315
+	 */
+	function test_non_numeric_object_id() {
+		$this->assertFalse( add_metadata( 'user', array( 1 ), 'meta_key', 'meta_value' ) );
+		$this->assertFalse( update_metadata( 'user', array( 1 ), 'meta_key', 'meta_new_value' ) );
+		$this->assertFalse( delete_metadata( 'user', array( 1 ), 'meta_key' ) );
+		$this->assertFalse( get_metadata( 'user', array( 1 ) ) );
+		$this->assertFalse( metadata_exists( 'user', array( 1 ), 'meta_key' ) );
+	}
+
+	/**
+	 * @ticket 28315
+	 */
+	function test_non_numeric_meta_id() {
+		$this->assertFalse( get_metadata_by_mid( 'user', array( 1 ) ) );
+		$this->assertFalse( update_metadata_by_mid( 'user', array( 1 ), 'meta_new_value' ) );
+		$this->assertFalse( delete_metadata_by_mid( 'user', array( 1 ) ) );
+	}
 }
