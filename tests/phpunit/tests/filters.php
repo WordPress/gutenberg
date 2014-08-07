@@ -267,4 +267,30 @@ class Tests_Filters extends WP_UnitTestCase {
 		$this->assertEquals( 1, $b->get_call_count(), 'priority 12 filters should run after priority 10 empties itself and priority 11 runs' );
 		$this->assertEquals( $result, $tag . '_append_append', 'priority 11 and 12 filters should run after priority 10 empties itself' );
 	}
+
+	/**
+	 * @ticket 29070
+	 */
+	function test_has_filter_after_remove_all_filters() {
+		$a = new MockAction();
+		$tag = rand_str();
+		$val = rand_str();
+
+		// No priority
+		add_filter( $tag, array( $a, 'filter' ), 11 );
+		add_filter( $tag, array( $a, 'filter' ), 12 );
+		$this->assertTrue( has_filter( $tag ) );
+
+		remove_all_filters( $tag );
+		$this->assertFalse( has_filter( $tag ) );
+
+		// Remove priorities one at a time
+		add_filter( $tag, array( $a, 'filter' ), 11 );
+		add_filter( $tag, array( $a, 'filter' ), 12 );
+		$this->assertTrue( has_filter( $tag ) );
+
+		remove_all_filters( $tag, 11 );
+		remove_all_filters( $tag, 12 );
+		$this->assertFalse( has_filter( $tag ) );
+	}
 }
