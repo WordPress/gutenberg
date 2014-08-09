@@ -1,5 +1,9 @@
 (function() {
-	module("tinymce.dom.DOMUtils");
+	module("tinymce.dom.DOMUtils", {
+		teardownModule: function() {
+			DOM = null;
+		}
+	});
 
 	var DOM = new tinymce.dom.DOMUtils(document, {keep_values : true, schema : new tinymce.html.Schema()});
 
@@ -260,6 +264,11 @@
 		equal(DOM.getAttrib(document, 'test', 'x'), 'x');
 
 		DOM.remove('test');
+	});
+
+	test('setGetAttrib on null', function() {
+		strictEqual(DOM.getAttrib(null, 'test'), '');
+		DOM.setAttrib(null, 'test');
 	});
 
 	test('getAttribs', 2, function() {
