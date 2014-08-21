@@ -32,17 +32,19 @@ class PotExtMeta {
 	}
 
 	function load_from_file($ext_filename) {
-		$source = MakePOT::get_first_lines($ext_filename);
+		$makepot = new MakePOT;
+		$source = $makepot->get_first_lines($ext_filename);
 		$pot = '';
+		$po = new PO;
 		foreach($this->headers as $header) {
-			$string = MakePOT::get_addon_header($header, $source);
+			$string = $makepot->get_addon_header($header, $source);
 			if (!$string) continue;
 			$args = array(
 				'singular' => $string,
 				'extracted_comments' => $header.' of the plugin/theme',
 			);
 			$entry = new Translation_Entry($args);
-			$pot .= "\n".PO::export_entry($entry)."\n";
+			$pot .= "\n".$po->export_entry($entry)."\n";
 		}
 		return $pot;
 	}
