@@ -91,4 +91,12 @@ class Tests_Auth extends WP_UnitTestCase {
 		$password = "pass with vertial tab o_O\x0B";
 		$this->assertTrue( wp_check_password( 'pass with vertial tab o_O', wp_hash_password( $password ) ) );
 	}
+
+	/**
+	 * @ticket 29217
+	 */
+	function test_wp_verify_nonce_with_empty_arg() {
+		$this->assertFalse( wp_verify_nonce( '' ) );
+		$this->assertFalse( wp_verify_nonce( null ) );
+	}
 }
