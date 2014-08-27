@@ -18,35 +18,35 @@ class Tests_User_Session extends WP_UnitTestCase {
 
 	function test_verify_and_destroy_token() {
 		$expiration = time() + DAY_IN_SECONDS;
-		$token = $this->manager->create_token( $expiration );
-		$this->assertFalse( $this->manager->verify_token( 'foo' ) );
-		$this->assertTrue( $this->manager->verify_token( $token ) );
-		$this->manager->destroy_token( $token );
-		$this->assertFalse( $this->manager->verify_token( $token ) );
+		$token = $this->manager->create( $expiration );
+		$this->assertFalse( $this->manager->verify( 'foo' ) );
+		$this->assertTrue( $this->manager->verify( $token ) );
+		$this->manager->destroy( $token );
+		$this->assertFalse( $this->manager->verify( $token ) );
 	}
 
 	function test_destroy_other_tokens() {
 		$expiration = time() + DAY_IN_SECONDS;
-		$token_1 = $this->manager->create_token( $expiration );
-		$token_2 = $this->manager->create_token( $expiration );
-		$token_3 = $this->manager->create_token( $expiration );
-		$this->assertTrue( $this->manager->verify_token( $token_1 ) );
-		$this->assertTrue( $this->manager->verify_token( $token_2 ) );
-		$this->assertTrue( $this->manager->verify_token( $token_3 ) );
-		$this->manager->destroy_other_tokens( $token_2 );
-		$this->assertFalse( $this->manager->verify_token( $token_1 ) );
-		$this->assertTrue( $this->manager->verify_token( $token_2 ) );
-		$this->assertFalse( $this->manager->verify_token( $token_3 ) );
+		$token_1 = $this->manager->create( $expiration );
+		$token_2 = $this->manager->create( $expiration );
+		$token_3 = $this->manager->create( $expiration );
+		$this->assertTrue( $this->manager->verify( $token_1 ) );
+		$this->assertTrue( $this->manager->verify( $token_2 ) );
+		$this->assertTrue( $this->manager->verify( $token_3 ) );
+		$this->manager->destroy_others( $token_2 );
+		$this->assertFalse( $this->manager->verify( $token_1 ) );
+		$this->assertTrue( $this->manager->verify( $token_2 ) );
+		$this->assertFalse( $this->manager->verify( $token_3 ) );
 	}
 
 	function test_destroy_all_tokens() {
 		$expiration = time() + DAY_IN_SECONDS;
-		$token_1 = $this->manager->create_token( $expiration );
-		$token_2 = $this->manager->create_token( $expiration );
-		$this->assertTrue( $this->manager->verify_token( $token_1 ) );
-		$this->assertTrue( $this->manager->verify_token( $token_2 ) );
-		$this->manager->destroy_all_tokens();
-		$this->assertFalse( $this->manager->verify_token( $token_1 ) );
-		$this->assertFalse( $this->manager->verify_token( $token_2 ) );
+		$token_1 = $this->manager->create( $expiration );
+		$token_2 = $this->manager->create( $expiration );
+		$this->assertTrue( $this->manager->verify( $token_1 ) );
+		$this->assertTrue( $this->manager->verify( $token_2 ) );
+		$this->manager->destroy_all();
+		$this->assertFalse( $this->manager->verify( $token_1 ) );
+		$this->assertFalse( $this->manager->verify( $token_2 ) );
 	}
 }
