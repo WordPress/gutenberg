@@ -293,4 +293,25 @@ class Tests_Filters extends WP_UnitTestCase {
 		remove_all_filters( $tag, 12 );
 		$this->assertFalse( has_filter( $tag ) );
 	}
+
+	/**
+	 * @ticket 29070
+	 */
+	 function test_has_filter_doesnt_reset_wp_filter() {
+	 	add_action( 'action_test_has_filter_doesnt_reset_wp_filter', '__return_null', 1 );
+	 	add_action( 'action_test_has_filter_doesnt_reset_wp_filter', '__return_null', 2 );
+	 	add_action( 'action_test_has_filter_doesnt_reset_wp_filter', '__return_null', 3 );
+	 	add_action( 'action_test_has_filter_doesnt_reset_wp_filter', array( $this, '_action_test_has_filter_doesnt_reset_wp_filter' ), 4 );
+
+	 	do_action( 'action_test_has_filter_doesnt_reset_wp_filter' );
+	 }
+	 function _action_test_has_filter_doesnt_reset_wp_filter() {
+	 	global $wp_filter;
+
+	 	has_action( 'action_test_has_filter_doesnt_reset_wp_filter', '_function_that_doesnt_exist' );
+
+		$filters = current( $wp_filter['action_test_has_filter_doesnt_reset_wp_filter'] );
+	 	$the_ = current( $filters );
+	 	$this->assertEquals( $the_['function'], array( $this, '_action_test_has_filter_doesnt_reset_wp_filter' ) );
+	 }
 }
