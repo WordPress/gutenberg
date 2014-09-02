@@ -438,19 +438,24 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
+	 * wpdb::update() requires a WHERE condition.
 	 *
 	 * @ticket 26106
 	 */
-	function test_empty_where() {
+	function test_empty_where_on_update() {
 		global $wpdb;
+		$show = $wpdb->show_errors(false);
 		$wpdb->update( $wpdb->posts, array( 'post_name' => 'burrito' ), array() );
 
-		$expected1 = "UPDATE `{$wpdb->posts}` SET `post_name` = 'burrito'";
+		$expected1 = "UPDATE `{$wpdb->posts}` SET `post_name` = 'burrito' WHERE ";
+		$this->assertNotEmpty( $wpdb->last_error );
 		$this->assertEquals( $expected1, $wpdb->last_query );
 
 		$wpdb->update( $wpdb->posts, array( 'post_name' => 'burrito' ), array( 'post_status' => 'taco' ) );
 
 		$expected2 = "UPDATE `{$wpdb->posts}` SET `post_name` = 'burrito' WHERE `post_status` = 'taco'";
+		$this->assertEmpty( $wpdb->last_error );
 		$this->assertEquals( $expected2, $wpdb->last_query );
+		$wpdb->show_errors( $show );
 	}
 }
