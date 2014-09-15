@@ -254,4 +254,28 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		$this->assertEquals( $attached_file, get_post_meta( $id, '_wp_attached_file', true ) );
 	}
 
+	/**
+	 * @ticket 29646
+	 */
+	function test_update_orphan_attachment_parent() {
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Assert that the attachment is an orphan
+		$attachment = get_post( $attachment_id );
+		$this->assertEquals( $attachment->post_parent, 0 );
+
+		$post_id = wp_insert_post( array( 'post_content' => rand_str(), 'post_title' => rand_str() ) );
+
+		// Assert that the attachment has a parent
+		wp_insert_attachment( $attachment, '', $post_id );
+		$attachment = get_post( $attachment_id );
+		$this->assertEquals( $attachment->post_parent, $post_id );
+	}
+
 }
