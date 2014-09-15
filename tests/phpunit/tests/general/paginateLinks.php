@@ -124,13 +124,34 @@ EXPECTED;
 			'type'     => 'array',
 		) );
 
-		// It's supposed to link to page 1:
-		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => 'http://' . WP_TESTS_DOMAIN . '/' ) ), $links[0] );
-		$this->assertTag( array( 'tag' => 'a', 'attributes' => array( 'href' => 'http://' . WP_TESTS_DOMAIN . '/' ) ), $links[1] );
+		$expected_attributes = array(
+			array(
+				'href'  => 'http://' . WP_TESTS_DOMAIN . '/',
+				'class' => 'prev page-numbers'
+			),
+			array(
+				'href'  => 'http://' . WP_TESTS_DOMAIN . '/',
+				'class' => 'page-numbers'
+			)
+		);
 
-		// It's not supposed to have an empty href.
-		$this->assertNotTag( array( 'tag' => 'a', 'attributes' => array( 'class' => 'prev page-numbers', 'href' => '' ) ), $links[0] );
-		$this->assertNotTag( array( 'tag' => 'a', 'attributes' => array( 'class' => 'page-numbers',      'href' => '' ) ), $links[1] );
+		$document = new DOMDocument();
+		$document->preserveWhiteSpace = false;
+
+		// The first two links should link to page 1
+		foreach ( $expected_attributes as $link_idx => $attributes ) {
+
+			$document->loadHTML( $links[$link_idx] );
+			$tag = $document->getElementsByTagName( 'a' )->item( 0 );
+
+			$this->assertNotNull( $tag );
+
+			$href  = $tag->attributes->getNamedItem( 'href' )->value;
+			$class = $tag->attributes->getNamedItem( 'class' )->value;
+
+			$this->assertEquals( $attributes['href'], $href );
+			$this->assertEquals( $attributes['class'], $class );
+		}
 
 		// Current page: 1
 		$links = paginate_links( array(
@@ -141,8 +162,19 @@ EXPECTED;
 			'type'     => 'array',
 		) );
 
-		$this->assertTag( array( 'tag' => 'span', 'attributes' => array( 'class' => 'current' ) ), $links[0] );
-		$this->assertTag( array( 'tag' => 'a',    'attributes' => array( 'href' => get_pagenum_link( 2 ) ) ), $links[1] );
+		$document->loadHTML( $links[0] );
+		$tag = $document->getElementsByTagName( 'span' )->item( 0 );
+		$this->assertNotNull( $tag );
+
+		$class = $tag->attributes->getNamedItem( 'class' )->value;
+		$this->assertEquals( 'page-numbers current', $class );
+
+		$document->loadHTML( $links[1] );
+		$tag = $document->getElementsByTagName( 'a' )->item( 0 );
+		$this->assertNotNull( $tag );
+
+		$href = $tag->attributes->getNamedItem( 'href' )->value;
+		$this->assertEquals( get_pagenum_link( 2 ), $href );
 	}
 
 }
