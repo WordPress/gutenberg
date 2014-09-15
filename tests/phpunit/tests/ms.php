@@ -1413,11 +1413,9 @@ class Tests_MS extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27884
-	 *
-	 * @expectedDeprecated define()
 	 */
 	function test_multisite_bootstrap() {
-		global $current_site, $current_blog;
+		global $current_blog;
 
 		$network_ids = array(
 			'wordpress.org/'         => array( 'domain' => 'wordpress.org', 'path' => '/' ),
