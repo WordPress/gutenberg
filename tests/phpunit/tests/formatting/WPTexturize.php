@@ -11,7 +11,6 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 
 	function test_disable() {
 		$this->assertEquals('<pre>---</pre>', wptexturize('<pre>---</pre>'));
-		$this->assertEquals('[a]a&#8211;b[code]---[/code]a&#8211;b[/a]', wptexturize('[a]a--b[code]---[/code]a--b[/a]'));
 		$this->assertEquals('<pre><code></code>--</pre>', wptexturize('<pre><code></code>--</pre>'));
 
 		$this->assertEquals( '<code>---</code>',     wptexturize( '<code>---</code>'     ) );
@@ -1209,28 +1208,20 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[gallery ...]]',
 			),
 			array(
-				'[/...]', // This would actually be ignored by the shortcode system.  The decision to not texturize it is intentional, if not correct.
-				'[/...]',
+				'[/gallery ...]', // This would actually be ignored by the shortcode system.  The decision to not texturize it is intentional, if not correct.
+				'[/gallery ...]',
 			),
 			array(
 				'[...]...[/...]', // These are potentially usable shortcodes.
-				'[...]&#8230;[/...]',
+				'[&#8230;]&#8230;[/&#8230;]',
 			),
 			array(
-				'[[...]]...[[/...]]', // Shortcode parsing will ignore the inner ]...[ part and treat this as a single escaped shortcode.
-				'[[...]]&#8230;[[/...]]',
+				'[[gallery]]...[[/gallery]]', // Shortcode parsing will ignore the inner ]...[ part and treat this as a single escaped shortcode.
+				'[[gallery]]&#8230;[[/gallery]]',
 			),
 			array(
-				'[[[...]]]...[[[/...]]]', // Again, shortcode parsing matches, but only the [[...] and [/...]] parts.
-				'[[[...]]]&#8230;[[[/...]]]',
-			),
-			array(
-				'[[code]...[/code]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[code] is ambiguous unless we run the entire shortcode regexp.
-				'[[code]&#8230;[/code]&#8230;',
-			),
-			array(
-				'[code]...[/code]]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [/code]] is ambiguous unless we run the entire shortcode regexp.
-				'[code]...[/code]]...', // This test would not pass in 3.9 because the extra brace was always ignored by texturize.
+				'[[[gallery]]]...[[[/gallery]]]', // Again, shortcode parsing matches, but only the [[gallery] and [/gallery]] parts.
+				'[[[gallery]]]&#8230;[[[/gallery]]]',
 			),
 			array(
 				'[gal>ery ...]',
@@ -1345,8 +1336,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[ but also catches the <b>styled &#8220;[quote]&#8221; here</b> ]',
 			),
 			array(
-				'[Let\'s get crazy<input>[plugin code="<a href=\'?a[]=100\'>hello</a>"]</input>world]',
-				'[Let&#8217;s get crazy<input>[plugin code="<a href=\'?a[]=100\'>hello</a>"]</input>world]',
+				'[Let\'s get crazy<input>[caption code="<a href=\'?a[]=100\'>hello</a>"]</input>world]', // caption shortcode is invalid here because it contains [] chars.
+				'[Let&#8217;s get crazy<input>[caption code=&#8221;<a href=\'?a[]=100\'>hello</a>&#8220;]</input>world]',
 			),
 		);
 	}
@@ -1698,32 +1689,85 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'<code>hello</span>---</span>',
 			),
 			array(
-				'<span>hello[/code]---</span>',
-				'<span>hello[/code]&#8212;</span>',
+				'<span><code>hello</code>---</span>',
+				'<span><code>hello</code>&#8212;</span>',
 			),
 			array(
-				'[/code]hello<span>---</span>',
-				'[/code]hello<span>&#8212;</span>',
+				'<code>hello</code>world<span>---</span>',
+				'<code>hello</code>world<span>&#8212;</span>',
+			),
+		);
+	}
+
+	/**
+	 * Test disabling shortcode texturization.
+	 *
+	 * @ticket 29557
+	 * @dataProvider data_unregistered_shortcodes
+	 */
+	function test_unregistered_shortcodes( $input, $output ) {
+		add_filter( 'no_texturize_shortcodes', array( $this, 'filter_shortcodes' ), 10, 1 );
+	
+		$output = $this->assertEquals( $output, wptexturize( $input ) );
+	
+		remove_filter( 'no_texturize_shortcodes', array( $this, 'filter_shortcodes' ), 10, 1 );
+		return $output;
+	}
+	
+	function filter_shortcodes( $disabled ) {
+		$disabled[] = 'audio';
+		return $disabled;
+	}
+
+	function data_unregistered_shortcodes() {
+		return array(
+			array(
+				'[a]a--b[audio]---[/audio]a--b[/a]',
+				'[a]a&#8211;b[audio]---[/audio]a&#8211;b[/a]',
 			),
 			array(
-				'[code]hello[/code]---</span>',
-				'[code]hello[/code]&#8212;</span>',
+				'[code ...]...[/code]', // code is not a registered shortcode.
+				'[code &#8230;]&#8230;[/code]',
 			),
 			array(
-				'<span>hello</span>---[code]',
-				'<span>hello</span>&#8212;[code]',
+				'[hello ...]...[/hello]', // hello is not a registered shortcode.
+				'[hello &#8230;]&#8230;[/hello]',
 			),
 			array(
-				'<span>hello[code]---</span>',
-				'<span>hello[code]---</span>',
+				'[[audio]...[/audio]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[audio] is ambiguous unless we run the entire shortcode regexp.
+				'[[audio]&#8230;[/audio]&#8230;',
 			),
 			array(
-				'[code]hello<span>---</span>',
-				'[code]hello<span>---</span>',
+				'[audio]...[/audio]]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [/audio]] is ambiguous unless we run the entire shortcode regexp.
+				'[audio]...[/audio]]...', // This test would not pass in 3.9 because the extra brace was always ignored by texturize.
 			),
 			array(
-				'[code]hello</span>---</span>',
-				'[code]hello</span>---</span>',
+				'<span>hello[/audio]---</span>',
+				'<span>hello[/audio]&#8212;</span>',
+			),
+			array(
+				'[/audio]hello<span>---</span>',
+				'[/audio]hello<span>&#8212;</span>',
+			),
+			array(
+				'[audio]hello[/audio]---</span>',
+				'[audio]hello[/audio]&#8212;</span>',
+			),
+			array(
+				'<span>hello</span>---[audio]',
+				'<span>hello</span>&#8212;[audio]',
+			),
+			array(
+				'<span>hello[audio]---</span>',
+				'<span>hello[audio]---</span>',
+			),
+			array(
+				'[audio]hello<span>---</span>',
+				'[audio]hello<span>---</span>',
+			),
+			array(
+				'[audio]hello</span>---</span>',
+				'[audio]hello</span>---</span>',
 			),
 		);
 	}
