@@ -831,4 +831,39 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			$q3->request
 		);
 	}
+
+	/**
+	 * @ticket 29629
+	 */
+	function test_orderby() {
+		// 'rand' is a valid value
+		$q = new WP_Query( array( 'orderby' => 'rand' ) );
+		$this->assertContains( 'ORDER BY RAND()', $q->request );
+		$this->assertNotContains( 'ASC', $q->request );
+		$this->assertNotContains( 'DESC', $q->request );
+
+		// This isn't allowed
+		$q2 = new WP_Query( array( 'order' => 'rand' ) );
+		$this->assertContains( 'ORDER BY', $q2->request );
+		$this->assertNotContains( 'RAND()', $q2->request );
+		$this->assertContains( 'DESC', $q2->request );
+
+		// 'none' is a valid value
+		$q3 = new WP_Query( array( 'orderby' => 'none' ) );
+		$this->assertNotContains( 'ORDER BY', $q3->request );
+		$this->assertNotContains( 'DESC', $q3->request );
+		$this->assertNotContains( 'ASC', $q3->request );
+
+		// false is a valid value
+		$q4 = new WP_Query( array( 'orderby' => false ) );
+		$this->assertNotContains( 'ORDER BY', $q4->request );
+		$this->assertNotContains( 'DESC', $q4->request );
+		$this->assertNotContains( 'ASC', $q4->request );
+
+		// empty array() is a valid value
+		$q5 = new WP_Query( array( 'orderby' => array() ) );
+		$this->assertNotContains( 'ORDER BY', $q5->request );
+		$this->assertNotContains( 'DESC', $q5->request );
+		$this->assertNotContains( 'ASC', $q5->request );
+	}
 }
