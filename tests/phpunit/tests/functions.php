@@ -421,7 +421,9 @@ class Tests_Functions extends WP_UnitTestCase {
 			'http://türkiye.icom.museum',
 			'http://украина.icom.museum',
 			'http://việtnam.icom.museum',
-			'ftp://127.0.0.1/'
+			'ftp://127.0.0.1/',
+			'http://www.woo.com/video?v=exvUH2qKLTU',
+			'http://taco.com?burrito=enchilada#guac'
 		);
 
 		$blob ="
@@ -481,6 +483,9 @@ class Tests_Functions extends WP_UnitTestCase {
 			http://украина.icom.museum
 			http://việtnam.icom.museum
 			ftp://127.0.0.1/
+			http://www.woo.com/video?v=exvUH2qKLTU
+
+			http://taco.com?burrito=enchilada#guac
 		";
 
 		$urls = wp_extract_urls( $blob );
