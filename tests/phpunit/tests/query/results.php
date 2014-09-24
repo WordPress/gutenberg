@@ -651,4 +651,28 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertCount( 1, $result );
 	}
 
+	/**
+	 * @ticket 29615
+	 */
+	function test_child_post_in_hierarchical_post_type_with_default_permalinks() {
+		global $wp_rewrite;
+
+		$old_permastruct = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
+
+		register_post_type( 'handbook', array( 'hierarchical' => true ) );
+
+		$post_1 = $this->factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
+		$post_2 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_1, 'post_type' => 'handbook' ) );
+
+		$this->assertContains( 'contributing-to-the-wordpress-codex/getting-started', get_permalink( $post_2 ) );
+
+		$result = $this->q->query( array( 'handbook' => 'contributing-to-the-wordpress-codex/getting-started', 'post_type' => 'handbook' ) );
+		$this->assertCount( 1, $result );
+
+		$wp_rewrite->set_permalink_structure( $old_permastruct );
+		$wp_rewrite->flush_rules();
+	}
+
 }
