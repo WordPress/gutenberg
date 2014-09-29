@@ -4,7 +4,7 @@
  * @group formatting
  */
 class Tests_Formatting_Autop extends WP_UnitTestCase {
-	//From ticket http://core.trac.wordpress.org/ticket/11008
+	//From ticket https://core.trac.wordpress.org/ticket/11008
 	function test_first_post() {
 		$expected = '<p>Welcome to WordPress!  This post contains important information.  After you read it, you can make it private to hide it from visitors but still have the information handy for future reference.</p>
 <p>First things first:</p>
