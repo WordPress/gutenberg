@@ -53,10 +53,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 
 	public function _get_query_result( $args = array() ) {
 		$args = wp_parse_args( $args, array(
-			'post_status'    => 'any', // For the future post
-			'posts_per_page' => '-1',  // To make sure results are accurate
-			'orderby'        => 'ID',  // Same order they were created
-			'order'          => 'ASC',
+			'post_status'            => 'any', // For the future post
+			'posts_per_page'         => '-1',  // To make sure results are accurate
+			'orderby'                => 'ID',  // Same order they were created
+			'order'                  => 'ASC',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
 		) );
 
 		return $this->q->query( $args );
