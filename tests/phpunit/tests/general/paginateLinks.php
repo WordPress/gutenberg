@@ -126,11 +126,11 @@ EXPECTED;
 
 		$expected_attributes = array(
 			array(
-				'href'  => 'http://' . WP_TESTS_DOMAIN . '/',
+				'href'  => home_url( '/' ),
 				'class' => 'prev page-numbers'
 			),
 			array(
-				'href'  => 'http://' . WP_TESTS_DOMAIN . '/',
+				'href'  => home_url( '/' ),
 				'class' => 'page-numbers'
 			)
 		);
@@ -177,4 +177,43 @@ EXPECTED;
 		$this->assertEquals( get_pagenum_link( 2 ), $href );
 	}
 
+	function add_query_arg( $url ) {
+		return add_query_arg( array( 'foo' => 'bar' ), $url );
+	}
+
+	/**
+	 * @ticket 29636
+	 */
+	function test_paginate_links_query_args() {
+		add_filter( 'get_pagenum_link', array( $this, 'add_query_arg' ) );
+		$links = paginate_links( array(
+			'current'  => 2,
+			'total'    => 5,
+			'end_size' => 1,
+			'mid_size' => 1,
+			'type'     => 'array',
+		) );
+		remove_filter( 'get_pagenum_link', array( $this, 'add_query_arg' ) );
+
+		$document = new DOMDocument();
+		$document->preserveWhiteSpace = false;
+
+		// All links should have foo=bar arguments:
+		$data = array(
+			0 => home_url( '/?foo=bar' ),
+			1 => home_url( '/?foo=bar' ),
+			3 => home_url( '/?paged=3&foo=bar' ),
+			5 => home_url( '/?paged=5&foo=bar' ),
+			6 => home_url( '/?paged=3&foo=bar' ),
+		);
+
+		foreach ( $data as $index => $expected_href ) {
+			$document->loadHTML( $links[ $index ] );
+			$tag = $document->getElementsByTagName( 'a' )->item( 0 );
+			$this->assertNotNull( $tag );
+
+			$href = $tag->attributes->getNamedItem( 'href' )->value;
+			$this->assertEquals( $expected_href, $href );
+		}
+	}
 }
