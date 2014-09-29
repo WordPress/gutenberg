@@ -165,7 +165,7 @@ class Tests_Post extends WP_UnitTestCase {
 
 	function test_vb_insert_future_edit_bug() {
 		// future post bug: posts get published at the wrong time if you edit the timestamp
-		// http://trac.wordpress.org/ticket/4710
+		// https://core.trac.wordpress.org/ticket/4710
 
 		$future_date_1 = strtotime('+1 day');
 		$future_date_2 = strtotime('+2 day');
