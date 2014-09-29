@@ -1188,12 +1188,28 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	function data_tag_avoidance() {
 		return array(
 			array(
+				'[ ... ]',
+				'[ &#8230; ]',
+			),
+			array(
 				'[ is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 				'[ is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 			),
 			array(
+				'[is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]', // HTML corruption is a known bug.  See tickets #12690 and #29557.
+				'[is it wise to <a title="allow user content ] here? hmm&#8221;> maybe </a> ]',
+			),
+			array(
+				'[caption - is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
+				'[caption - is it wise to <a title="allow user content ] here? hmm&#8221;> maybe </a> ]',
+			),
+			array(
 				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a> ]',
 				'[ photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a> ]',
+			),
+			array(
+				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a>]',
+				'[photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a>]',
 			),
 			array(
 				'[gallery ...]',
@@ -1212,20 +1228,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[/gallery ...]',
 			),
 			array(
-				'[...]...[/...]', // These are potentially usable shortcodes.
-				'[&#8230;]&#8230;[/&#8230;]',
-			),
-			array(
 				'[[gallery]]...[[/gallery]]', // Shortcode parsing will ignore the inner ]...[ part and treat this as a single escaped shortcode.
 				'[[gallery]]&#8230;[[/gallery]]',
 			),
 			array(
 				'[[[gallery]]]...[[[/gallery]]]', // Again, shortcode parsing matches, but only the [[gallery] and [/gallery]] parts.
 				'[[[gallery]]]&#8230;[[[/gallery]]]',
-			),
-			array(
-				'[gal>ery ...]',
-				'[gal>ery &#8230;]',
 			),
 			array(
 				'[gallery ...',
@@ -1300,8 +1308,40 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'<!--...-->',
 			),
 			array(
-				'<!-- ... -- >',
-				'<!-- ... -- >',
+				'<!-- ... -- > ...',
+				'<!-- ... -- > ...',
+			),
+			array(
+				'<!-- ...', // An unclosed comment is still a comment.
+				'<!-- ...',
+			),
+			array(
+				'a<!-->b', // Browsers seem to allow this.
+				'a<!-->b',
+			),
+			array(
+				'a<!--->b',
+				'a<!--->b',
+			),
+			array(
+				'a<!---->b',
+				'a<!---->b',
+			),
+			array(
+				'a<!----->b',
+				'a<!----->b',
+			),
+			array(
+				'a<!-- c --->b',
+				'a<!-- c --->b',
+			),
+			array(
+				'a<!-- c -- d -->b',
+				'a<!-- c -- d -->b',
+			),
+			array(
+				'a<!-- <!-- c --> -->b<!-- close -->',
+				'a<!-- <!-- c --> &#8211;>b<!-- close -->',
 			),
 			array(
 				'<!-- <br /> [gallery] ... -->',
@@ -1727,11 +1767,23 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				'[code ...]...[/code]', // code is not a registered shortcode.
-				'[code &#8230;]&#8230;[/code]',
+				'[code ...]...[/code]',
 			),
 			array(
 				'[hello ...]...[/hello]', // hello is not a registered shortcode.
-				'[hello &#8230;]&#8230;[/hello]',
+				'[hello ...]&#8230;[/hello]',
+			),
+			array(
+				'[...]...[/...]', // These are potentially usable shortcodes.
+				'[...]&#8230;[/...]',
+			),
+			array(
+				'[gal>ery ...]',
+				'[gal>ery ...]',
+			),
+			array(
+				'[randomthing param="test"]',
+				'[randomthing param="test"]',
 			),
 			array(
 				'[[audio]...[/audio]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[audio] is ambiguous unless we run the entire shortcode regexp.
