@@ -116,4 +116,27 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->assertEquals( 'WordPress.org', $custom_item->title );
 
 	}
+
+	/**
+	 * @ticket 29460
+	 */
+	function test_orderby_name_by_default() {
+		// We are going to create a random number of menus (min 2, max 10) 
+		$menus_no = rand( 2, 10 );
+
+		for ( $i = 0; $i <= $menus_no; $i++ ) {
+			wp_create_nav_menu( rand_str() );
+		}
+
+		// This is the expected array of menu names
+		$expected_nav_menus_names = wp_list_pluck( 
+			get_terms( 'nav_menu',  array( 'hide_empty' => false, 'orderby' => 'name' ) ),
+			'name'
+		);
+
+		// And this is what we got when calling wp_get_nav_menus()
+		$nav_menus_names = wp_list_pluck( wp_get_nav_menus(), 'name' );
+		
+		$this->assertEquals( $nav_menus_names, $expected_nav_menus_names );
+	}
 }
