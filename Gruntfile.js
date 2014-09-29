@@ -419,6 +419,9 @@ module.exports = function(grunt) {
 					interval: 2000
 				}
 			},
+			config: {
+				files: 'Gruntfile.js'
+			},
 			colors: {
 				files: [SOURCE_DIR + 'wp-admin/css/colors/**'],
 				tasks: ['sass:colors']
