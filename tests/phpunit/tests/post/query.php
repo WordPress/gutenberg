@@ -1,14 +1,433 @@
 <?php
 
-/**
- * @group meta
- */
 class Tests_Post_Query extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 	}
 
-	function test_meta_key_or_query() {
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_no_key() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'oof', 'bar' );
+		add_post_meta( $p3, 'oof', 'baz' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$expected = array( $p1, $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_no_value() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'oof', 'bar' );
+		add_post_meta( $p3, 'oof', 'baz' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'oof',
+				),
+			),
+		) );
+
+		$expected = array( $p2, $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_default() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_equals() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+					'compare' => '=',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_not_equals() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+					'compare' => '!=',
+				),
+			),
+		) );
+
+		$expected = array( $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_arithmetic_comparisons() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', '1' );
+		add_post_meta( $p2, 'foo', '2' );
+		add_post_meta( $p3, 'foo', '3' );
+
+		// <
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 2,
+					'compare' => '<',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEqualSets( $expected, $query->posts );
+
+		// <=
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 2,
+					'compare' => '<=',
+				),
+			),
+		) );
+
+		$expected = array( $p1, $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+
+		// >=
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 2,
+					'compare' => '>=',
+				),
+			),
+		) );
+
+		$expected = array( $p2, $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+
+		// >
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 2,
+					'compare' => '>',
+				),
+			),
+		) );
+
+		$expected = array( $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_like() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'ba',
+					'compare' => 'LIKE',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_not_like() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'foo', 'rab' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'ba',
+					'compare' => 'NOT LIKE',
+				),
+			),
+		) );
+
+		$expected = array( $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_between_not_between() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', '1' );
+		add_post_meta( $p2, 'foo', '10' );
+		add_post_meta( $p3, 'foo', '100' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => array( 9, 12 ),
+					'compare' => 'BETWEEN',
+					'type' => 'NUMERIC',
+				),
+			),
+		) );
+
+		$expected = array( $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => array( 9, 12 ),
+					'compare' => 'NOT BETWEEN',
+					'type' => 'NUMERIC',
+				),
+			),
+		) );
+
+		$expected = array( $p1, $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_regexp_rlike() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'z$',
+					'compare' => 'REGEXP',
+				),
+			),
+		) );
+
+		$expected = array( $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+
+		// RLIKE is a synonym for REGEXP.
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'z$',
+					'compare' => 'RLIKE',
+				),
+			),
+		) );
+
+		$expected = array( $p2 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_single_query_compare_not_regexp() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'z$',
+					'compare' => 'NOT REGEXP',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_relation_default() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'foo value 1' );
+		add_post_meta( $p1, 'bar', 'bar value 1' );
+		add_post_meta( $p2, 'foo', 'foo value 1' );
+		add_post_meta( $p2, 'bar', 'bar value 2' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'foo value 1',
+				),
+				array(
+					'key' => 'bar',
+					'value' => 'bar value 1',
+				),
+			),
+		) );
+
+		$expected = array( $p1 );
+		$this->assertEquals( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_relation_or() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, 'foo', rand_str() );
 		add_post_meta( $post_id, 'foo', rand_str() );
@@ -24,6 +443,9 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		add_post_meta( $post_id6, 'bar', 'val1' );
 
 		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 			'meta_query' => array(
 				array(
 					'key' => 'foo'
@@ -42,18 +464,14 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			),
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 4, count( $posts ) );
-		foreach ( $posts as $post ) {
-			$this->assertInstanceOf( 'WP_Post', $post );
-			$this->assertEquals( 'raw', $post->filter );
-		}
-
-		$post_ids = wp_list_pluck( $posts, 'ID' );
-		$this->assertEqualSets( array( $post_id, $post_id2, $post_id3, $post_id4 ), $post_ids );
+		$expected = array( $post_id, $post_id2, $post_id3, $post_id4 );
+		$this->assertEqualSets( $expected, $query->posts );
 	}
 
-	function test_meta_key_and_query() {
+	/**
+	 * @group meta
+	 */
+	public function test_meta_query_relation_and() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, 'foo', rand_str() );
 		add_post_meta( $post_id, 'foo', rand_str() );
@@ -92,17 +510,13 @@ class Tests_Post_Query extends WP_UnitTestCase {
 				),
 				'relation' => 'AND',
 			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 1, count( $posts ) );
-		foreach ( $posts as $post ) {
-			$this->assertInstanceOf( 'WP_Post', $post );
-			$this->assertEquals( 'raw', $post->filter );
-		}
-
-		$post_ids = wp_list_pluck( $posts, 'ID' );
-		$this->assertEquals( array( $post_id7 ), $post_ids );
+		$expected = array( $post_id7 );
+		$this->assertEqualSets( $expected, $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
@@ -114,23 +528,20 @@ class Tests_Post_Query extends WP_UnitTestCase {
 				),
 				'relation' => 'AND',
 			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 3, count( $posts ) );
-		foreach ( $posts as $post ) {
-			$this->assertInstanceOf( 'WP_Post', $post );
-			$this->assertEquals( 'raw', $post->filter );
-		}
-
-		$post_ids = wp_list_pluck( $posts, 'ID' );
-		$this->assertEqualSets( array( $post_id2, $post_id6, $post_id7 ), $post_ids );
+		$expected = array( $post_id2, $post_id6, $post_id7 );
+		$this->assertEqualSets( $expected, $query->posts );
 	}
 
 	/**
 	 * @ticket 18158
+	 * @group meta
 	 */
-	function test_meta_key_not_exists() {
+	public function test_meta_query_compare_not_exists() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, 'foo', rand_str() );
 		$post_id2 = $this->factory->post->create();
@@ -144,65 +555,66 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-			array(
-				'key' => 'foo',
-				'compare' => 'NOT EXISTS',
+				array(
+					'key' => 'foo',
+					'compare' => 'NOT EXISTS',
+				),
 			),
-			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 3, count( $posts ) );
-		foreach ( $posts as $post ) {
-			$this->assertInstanceOf( 'WP_Post', $post );
-			$this->assertEquals( 'raw', $post->filter );
-		}
+		$expected = array( $post_id2, $post_id3, $post_id4 );
+		$this->assertEqualSets( $expected, $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-			array(
-				'key' => 'foo',
-				'compare' => 'NOT EXISTS',
-			),
 				array(
-				'key' => 'bar',
-				'compare' => 'NOT EXISTS',
+					'key' => 'foo',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key' => 'bar',
+					'compare' => 'NOT EXISTS',
+				),
 			),
-			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 1, count( $posts ) );
-		foreach ( $posts as $post ) {
-			$this->assertInstanceOf( 'WP_Post', $post );
-			$this->assertEquals( 'raw', $post->filter );
-		}
+		$expected = array( $post_id4 );
+		$this->assertEquals( $expected, $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-			array(
-				'key' => 'foo',
-				'compare' => 'NOT EXISTS',
-			),
 				array(
-				'key' => 'bar',
-				'compare' => 'NOT EXISTS',
-			),
+					'key' => 'foo',
+					'compare' => 'NOT EXISTS',
+				),
 				array(
-				'key' => 'baz',
-				'compare' => 'NOT EXISTS',
+					'key' => 'bar',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key' => 'baz',
+					'compare' => 'NOT EXISTS',
+				),
 			),
-			)
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
 
-		$posts = $query->get_posts();
-		$this->assertEquals( 0, count( $posts ) );
+		$this->assertEquals( 0, count( $query->posts ) );
 	}
 
 	/**
 	 * @ticket 23033
+	 * @group meta
 	 */
-	function test_meta_query_decimal_results() {
+	public function test_meta_query_decimal_results() {
 		$post_1 = $this->factory->post->create();
 		$post_2 = $this->factory->post->create();
 		$post_3 = $this->factory->post->create();
@@ -215,121 +627,149 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '.300',
-						'compare' => '=',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => '.300',
+					'compare' => '=',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_3 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '0.35',
-						'compare' => '>',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => '0.35',
+					'compare' => '>',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_4 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '0.3',
-						'compare' => '>=',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => '0.3',
+					'compare' => '>=',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_3, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_3, $post_4 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '0',
-						'compare' => '<',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => '0',
+					'compare' => '<',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_1 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_1 ), $query->posts, 'ID' );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '0.3',
-						'compare' => '<=',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
-
+				array(
+					'key' => 'decimal_value',
+					'value' => '0.3',
+					'compare' => '<=',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_1, $post_2, $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
-
-		$query = new WP_Query( array(
-			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => array( 0.23409845, .31 ),
-						'compare' => 'BETWEEN',
-						'type' => 'DECIMAL(10, 10)'
-					)
-				),
-		) );
-		$this->assertEqualSets( array( $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_1, $post_2, $post_3 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => array( 0.23409845, .31 ),
-						'compare' => 'NOT BETWEEN',
-						'type' => 'DECIMAL(10,10)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => array( 0.23409845, .31 ),
+					'compare' => 'BETWEEN',
+					'type' => 'DECIMAL(10, 10)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_1, $post_2, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_3 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '.3',
-						'compare' => 'LIKE',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => array( 0.23409845, .31 ),
+					'compare' => 'NOT BETWEEN',
+					'type' => 'DECIMAL(10,10)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_1, $post_3 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_1, $post_2, $post_4 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
-					array(
-						'key' => 'decimal_value',
-						'value' => '.3',
-						'compare' => 'NOT LIKE',
-						'type' => 'DECIMAL(10,2)'
-					)
-				),
+				array(
+					'key' => 'decimal_value',
+					'value' => '.3',
+					'compare' => 'LIKE',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_2, $post_4 ), wp_list_pluck( $query->posts, 'ID' ) );
+		$this->assertEqualSets( array( $post_1, $post_3 ), $query->posts );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				array(
+					'key' => 'decimal_value',
+					'value' => '.3',
+					'compare' => 'NOT LIKE',
+					'type' => 'DECIMAL(10,2)'
+				)
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+		$this->assertEqualSets( array( $post_2, $post_4 ), $query->posts );
 
 		$query = new WP_Query( array(
 			'orderby' => 'meta_value',
 			'order' => 'DESC',
 			'meta_key' => 'decimal_value',
-			'meta_type' => 'DECIMAL(10, 2)'
+			'meta_type' => 'DECIMAL(10, 2)',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
 		) );
-		$this->assertEqualSets( array( $post_4, $post_3, $post_2, $post_1 ), wp_list_pluck( $query->posts, 'ID' ) );
-
+		$this->assertEqualSets( array( $post_4, $post_3, $post_2, $post_1 ), $query->posts );
 	}
 
 	/**
