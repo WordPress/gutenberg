@@ -229,6 +229,9 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 		$this->assertFalse( $q->build_value( 'foo', null ) );
 	}
 
+	/**
+	 * @ticket 29801
+	 */
 	public function test_build_value_compare_in() {
 		$q = new WP_Date_Query( array() );
 
@@ -238,7 +241,7 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 
 		// Single non-integer
 		$found = $q->build_value( 'IN', 'foo' );
-		$this->assertSame( '(0)', $found );
+		$this->assertFalse( $found );
 
 		// Array of integers
 		$found = $q->build_value( 'IN', array( 1, 4, 7 ) );
@@ -246,9 +249,12 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 
 		// Array containing non-integers
 		$found = $q->build_value( 'IN', array( 1, 'foo', 7 ) );
-		$this->assertSame( '(1,0,7)', $found );
+		$this->assertSame( '(1,7)', $found );
 	}
 
+	/**
+	 * @ticket 29801
+	 */
 	public function test_build_value_compare_not_in() {
 		$q = new WP_Date_Query( array() );
 
@@ -258,7 +264,7 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 
 		// Single non-integer
 		$found = $q->build_value( 'NOT IN', 'foo' );
-		$this->assertSame( '(0)', $found );
+		$this->assertFalse( $found );
 
 		// Array of integers
 		$found = $q->build_value( 'NOT IN', array( 1, 4, 7 ) );
@@ -266,7 +272,7 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 
 		// Array containing non-integers
 		$found = $q->build_value( 'NOT IN', array( 1, 'foo', 7 ) );
-		$this->assertSame( '(1,0,7)', $found );
+		$this->assertSame( '(1,7)', $found );
 	}
 
 	public function test_build_value_compare_between_single_integer() {
@@ -277,32 +283,27 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @todo This is a bug. Should return false when non-numeric
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_between_single_non_numeric() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'BETWEEN', 'foo' );
-		$this->assertSame( '0 AND 0', $found );
+		$this->assertFalse( $found );
 	}
 
 	/**
-	 * @todo This is a bug
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_between_array_with_other_than_two_items() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'BETWEEN', array( 2, 3, 4 ) );
-
-		// array_map( 'intval', array(
-		//     array( 2, 3, 4 ),
-		//     array( 2, 3, 4 ),
-		// ) );
-		$this->assertSame( '1 AND 1', $found );
+		$this->assertFalse( $found );
 	}
 
 	/**
-	 * @todo This is a bug
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_between_incorrect_array_key() {
 		$q = new WP_Date_Query( array() );
@@ -312,18 +313,17 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 			3 => 5,
 		) );
 
-		// array_map( 'intval', array(
-		//     array( 2 => 4, 3 => 5 ),
-		//     array( 2 => 4, 3 => 5 ),
-		// ) );
-		$this->assertSame( '1 AND 1', $found );
+		$this->assertSame( '4 AND 5', $found );
 	}
 
+	/**
+	 * @ticket 29801
+	 */
 	public function test_build_value_compare_between_array_contains_non_numeric() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'BETWEEN', array( 2, 'foo' ) );
-		$this->assertSame( '2 AND 0', $found );
+		$this->assertFalse( $found );
 	}
 
 	public function test_build_value_compare_between() {
@@ -340,30 +340,28 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 		$this->assertSame( '4 AND 4', $found );
 	}
 
+	/**
+	 * @ticket 29801
+	 */
 	public function test_build_value_compare_not_between_single_non_numeric() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'NOT BETWEEN', 'foo' );
-		$this->assertSame( '0 AND 0', $found );
+		$this->assertFalse( $found );
 	}
 
 	/**
-	 * @todo This is a bug
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_not_between_array_with_other_than_two_items() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'NOT BETWEEN', array( 2, 3, 4 ) );
-
-		// array_map( 'intval', array(
-		//     array( 2, 3, 4 ),
-		//     array( 2, 3, 4 ),
-		// ) );
-		$this->assertSame( '1 AND 1', $found );
+		$this->assertFalse( $found );
 	}
 
 	/**
-	 * @todo This is a bug
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_not_between_incorrect_array_key() {
 		$q = new WP_Date_Query( array() );
@@ -373,18 +371,17 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 			3 => 5,
 		) );
 
-		// array_map( 'intval', array(
-		//     array( 2 => 4, 3 => 5 ),
-		//     array( 2 => 4, 3 => 5 ),
-		// ) );
-		$this->assertSame( '1 AND 1', $found );
+		$this->assertSame( '4 AND 5', $found );
 	}
 
+	/**
+	 * @ticket 29801
+	 */
 	public function test_build_value_compare_not_between_array_contains_non_numeric() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'NOT BETWEEN', array( 2, 'foo' ) );
-		$this->assertSame( '2 AND 0', $found );
+		$this->assertFalse( $found );
 	}
 
 	public function test_build_value_compare_not_between() {
@@ -402,13 +399,13 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @todo This is probably a bug - ought to return false
+	 * @ticket 29801
 	 */
 	public function test_build_value_compare_default_value_non_numeric() {
 		$q = new WP_Date_Query( array() );
 
 		$found = $q->build_value( 'foo', 'foo' );
-		$this->assertSame( 0, $found );
+		$this->assertFalse( $found );
 	}
 
 	public function test_build_mysql_datetime_datetime_non_array() {
