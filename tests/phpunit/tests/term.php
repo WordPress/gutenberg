@@ -53,6 +53,178 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( $initial_count, wp_count_terms($this->taxonomy) );
 	}
 
+	public function test_term_exists_term_0() {
+		$this->assertSame( 0, term_exists( 0 ) );
+	}
+
+	public function test_term_exists_term_int_taxonomy_nonempty_term_exists() {
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'post_tag',
+		) );
+
+		$found = term_exists( intval( $t ), 'post_tag' );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_term_int_taxonomy_nonempty_term_does_not_exist() {
+		$this->assertNull( term_exists( 54321, 'post_tag' ) );
+	}
+
+	public function test_term_exists_term_int_taxonomy_nonempty_wrong_taxonomy() {
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'post_tag',
+		) );
+
+		$this->assertNull( term_exists( intval( $t ), 'foo' ) );
+	}
+
+	public function test_term_exists_term_int_taxonomy_empty_term_exists() {
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'post_tag',
+		) );
+
+		$found = term_exists( intval( $t ), 'post_tag' );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_term_int_taxonomy_empty_term_does_not_exist() {
+		$this->assertNull( term_exists( 54321 ) );
+	}
+
+	public function test_term_exists_unslash_term() {
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'post_tag',
+			'name' => 'I "love" WordPress\'s taxonomy system',
+		) );
+
+		$found = term_exists( 'I \"love\" WordPress\\\'s taxonomy system' );
+		$this->assertEquals( $t, $found );
+	}
+
+	public function test_term_exists_trim_term() {
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'post_tag',
+			'slug' => 'foo',
+		) );
+
+		$found = term_exists( '  foo  ' );
+		$this->assertEquals( $t, $found );
+	}
+
+	public function test_term_exists_term_trimmed_to_empty_string() {
+		$this->assertSame( 0, term_exists( '   ' ) );
+	}
+
+	public function test_term_exists_taxonomy_nonempty_parent_nonempty_match_slug() {
+		register_taxonomy( 'foo', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent_term = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+		) );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'parent' => $parent_term,
+			'slug' => 'child-term',
+		) );
+
+		$found = term_exists( 'child-term', 'foo', $parent_term );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_taxonomy_nonempty_parent_nonempty_match_name() {
+		register_taxonomy( 'foo', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent_term = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+		) );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'parent' => $parent_term,
+			'name' => 'Child Term',
+		) );
+
+		$found = term_exists( 'Child Term', 'foo', $parent_term );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_taxonomy_nonempty_parent_empty_match_slug() {
+		register_taxonomy( 'foo', 'post', array() );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'slug' => 'kewl-dudez',
+		) );
+
+		$found = term_exists( 'kewl-dudez', 'foo' );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_taxonomy_nonempty_parent_empty_match_name() {
+		register_taxonomy( 'foo', 'post', array() );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'name' => 'Kewl Dudez',
+		) );
+
+		$found = term_exists( 'Kewl Dudez', 'foo' );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertEquals( $t, $found['term_id'] );
+	}
+
+	public function test_term_exists_taxonomy_empty_parent_empty_match_slug() {
+		register_taxonomy( 'foo', 'post', array() );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'name' => 'juicy-fruit',
+		) );
+
+		$found = term_exists( 'juicy-fruit' );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'string', $found );
+		$this->assertEquals( $t, $found );
+	}
+
+	public function test_term_exists_taxonomy_empty_parent_empty_match_name() {
+		register_taxonomy( 'foo', 'post', array() );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'name' => 'Juicy Fruit',
+		) );
+
+		$found = term_exists( 'Juicy Fruit' );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertInternalType( 'string', $found );
+		$this->assertEquals( $t, $found );
+	}
+
 	function test_term_exists_known() {
 		// insert a term
 		$term = rand_str();
@@ -70,6 +242,77 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( 0, term_exists(0) );
 		$this->assertEquals( 0, term_exists('') );
 		$this->assertEquals( 0, term_exists(NULL) );
+	}
+
+	public function test_wp_insert_term_duplicate_name_slug_non_hierarchical() {
+		register_taxonomy( 'foo', 'post', array() );
+
+		$existing_term = $this->factory->term->create( array(
+			'slug' => 'new-term',
+			'name' => 'New Term',
+			'taxonomy' => 'foo',
+		) );
+
+		$found = wp_insert_term( 'New Term', 'foo', array(
+			'slug' => 'new-term',
+		) );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertEquals( $existing_term, $found->get_error_data() );
+	}
+
+	public function test_wp_insert_term_duplicate_name_hierarchical() {
+		register_taxonomy( 'foo', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent_term = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+		) );
+
+		$existing_term = $this->factory->term->create( array(
+			'name' => 'New Term',
+			'taxonomy' => 'foo',
+			'parent' => $parent_term,
+		) );
+
+		$found = wp_insert_term( 'New Term', 'foo', array(
+			'parent' => $parent_term,
+		) );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertEquals( $existing_term, $found->get_error_data() );
+	}
+
+	public function test_wp_insert_term_duplicate_name_slug_hierarchical() {
+		register_taxonomy( 'foo', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent_term = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+		) );
+
+		$existing_term = $this->factory->term->create( array(
+			'name' => 'New Term',
+			'slug' => 'new-term-slug',
+			'taxonomy' => 'foo',
+			'parent' => $parent_term,
+		) );
+
+		$found = wp_insert_term( 'New Term', 'foo', array(
+			'parent' => $parent_term,
+			'slug' => 'new-term-slug',
+		) );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertEquals( $existing_term, $found->get_error_data() );
 	}
 
 	/**
