@@ -198,4 +198,76 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertCount( 3, $comment_ids );
 		$this->assertEqualSets( array( $comment_1, $comment_2, $comment_3 ), $comment_ids );
 	}
+
+	/**
+	 * @ticket 29189
+	 */
+	function test_fields_comment__in() {
+		$comment_1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$comment_2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$comment_3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'comment__in' => array( $comment_1, $comment_3 ),
+		) );
+
+		$this->assertEqualSets( array( $comment_1, $comment_3 ), $comment_ids );
+	}
+
+	/**
+	 * @ticket 29189
+	 */
+	function test_fields_comment__not_in() {
+		$comment_1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$comment_2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$comment_3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'comment__not_in' => array( $comment_2, $comment_3 ),
+		) );
+
+		$this->assertEqualSets( array( $comment_1 ), $comment_ids );
+	}
+
+	/**
+	 * @ticket 29189
+	 */
+	function test_fields_post__in() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p3, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'post__in' => array( $p1, $p2 ),
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $comment_ids );
+	}
+
+	/**
+	 * @ticket 29189
+	 */
+	function test_fields_post__not_in() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p3, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'post__not_in' => array( $p1, $p2 ),
+		) );
+
+		$this->assertEqualSets( array( $c3 ), $comment_ids );
+	}
 }
