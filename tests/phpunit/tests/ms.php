@@ -301,6 +301,29 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->assertEquals( 1, $this->plugin_hook_count ); // testing actions and silent mode
 	}
 
+	/**
+	 * @ticket 28651
+	 */
+	function test_duplicate_network_active_plugin() {
+		$path = "hello.php";
+		$mock = new MockAction();
+		add_action( 'activate_' . $path, array ( $mock, 'action' ) );
+
+		// should activate on the first try
+		activate_plugin( $path, '', true );
+		$active_plugins = wp_get_active_network_plugins();
+		$this->assertCount( 1, $active_plugins );
+		$this->assertEquals( 1, $mock->get_call_count() );
+
+		// should do nothing on the second try
+		activate_plugin( $path, '', true );
+		$active_plugins = wp_get_active_network_plugins();
+		$this->assertCount( 1, $active_plugins );
+		$this->assertEquals( 1, $mock->get_call_count() );
+
+		remove_action( 'activate_' . $path, array ( $mock, 'action' ) );
+	}
+
 	function _helper_deactivate_hook() {
 		$this->plugin_hook_count++;
 	}
