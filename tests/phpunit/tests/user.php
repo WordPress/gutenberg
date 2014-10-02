@@ -654,4 +654,19 @@ class Tests_User extends WP_UnitTestCase {
 		$metas = array_keys( get_user_meta( 1 ) );
 		$this->assertNotContains( 'key', $metas );
 	}
+
+	/**
+	 * @ticket 29696
+	 */
+	public function test_wp_insert_user_should_sanitize_user_nicename_parameter() {
+		$user = $this->factory->user->create_and_get();
+
+		$userdata = $user->to_array();
+		$userdata['user_nicename'] = str_replace( '-', '.', $user->user_nicename );
+		wp_insert_user( $userdata );
+
+		$updated_user = new WP_User( $user->ID );
+
+		$this->assertSame( $user->user_nicename, $updated_user->user_nicename );
+	}
 }
