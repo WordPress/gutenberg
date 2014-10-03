@@ -244,6 +244,179 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( 0, term_exists(NULL) );
 	}
 
+	public function test_wp_insert_term_taxonomy_does_not_exist() {
+		$found = wp_insert_term( 'foo', 'bar' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'invalid_taxonomy', $found->get_error_code() );
+	}
+
+	public function test_wp_insert_term_pre_insert_term_filter_returns_wp_error() {
+		add_filter( 'pre_insert_term', array( $this, '_pre_insert_term_callback' ) );
+		$found = wp_insert_term( 'foo', 'post_tag' );
+		remove_filter( 'pre_insert_term', array( $this, '_pre_insert_term_callback' ) );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'custom_error', $found->get_error_code() );
+	}
+
+	public function test_wp_insert_term_term_0() {
+		$found = wp_insert_term( 0, 'post_tag' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'invalid_term_id', $found->get_error_code() );
+	}
+
+	public function test_wp_insert_term_term_trims_to_empty_string() {
+		$found = wp_insert_term( '  ', 'post_tag' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'empty_term_name', $found->get_error_code() );
+	}
+
+	public function test_wp_insert_term_parent_does_not_exist() {
+		$found = wp_insert_term( 'foo', 'post_tag', array(
+			'parent' => 999999,
+		) );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'missing_parent', $found->get_error_code() );
+	}
+
+	public function test_wp_insert_term_unslash_name() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Let\\\'s all say \\"Hooray\\" for WordPress taxonomy', 'wptests_tax' );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'Let\'s all say "Hooray" for WordPress taxonomy', $term->name );
+	}
+
+	public function test_wp_insert_term_unslash_description() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Quality', 'wptests_tax', array(
+			'description' => 'Let\\\'s all say \\"Hooray\\" for WordPress taxonomy',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'Let\'s all say "Hooray" for WordPress taxonomy', $term->description );
+	}
+
+	public function test_wp_insert_term_parent_string() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Quality', 'wptests_tax', array(
+			'parent' => 'foo1',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		// 'foo1' is cast to 0 in sanitize_term().
+		$this->assertSame( 0, $term->parent );
+	}
+
+	public function test_wp_insert_term_slug_empty_string() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Quality', 'wptests_tax', array(
+			'slug' => '',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'quality', $term->slug );
+
+	}
+
+	public function test_wp_insert_term_slug_whitespace_string() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Quality', 'wptests_tax', array(
+			'slug' => '  ',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'quality', $term->slug );
+	}
+
+	public function test_wp_insert_term_slug_0() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'Quality', 'wptests_tax', array(
+			'slug' => 0,
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'quality', $term->slug );
+	}
+
+	/**
+	 * @ticket 17689
+	 */
+	public function test_wp_insert_term_duplicate_name() {
+		$term = $this->factory->tag->create_and_get( array( 'name' => 'Bozo' ) );
+		$this->assertFalse( is_wp_error( $term ) );
+		$this->assertTrue( empty( $term->errors ) );
+
+		// Test existing term name with unique slug
+		$term1 = $this->factory->tag->create( array( 'name' => 'Bozo', 'slug' => 'bozo1' ) );
+		$this->assertFalse( is_wp_error( $term1 ) );
+		$this->assertTrue( empty($term1->errors ) );
+
+		// Test an existing term name
+		$term2 = $this->factory->tag->create( array( 'name' => 'Bozo' ) );
+		$this->assertTrue( is_wp_error( $term2 ) );
+		$this->assertNotEmpty( $term2->errors );
+
+		// Test named terms ending in special characters
+		$term3 = $this->factory->tag->create( array( 'name' => 'T$' ) );
+		$term4 = $this->factory->tag->create( array( 'name' => 'T$$' ) );
+		$term5 = $this->factory->tag->create( array( 'name' => 'T$$$' ) );
+		$term6 = $this->factory->tag->create( array( 'name' => 'T$$$$' ) );
+		$term7 = $this->factory->tag->create( array( 'name' => 'T$$$$' ) );
+		$this->assertTrue( is_wp_error( $term7 ) );
+		$this->assertNotEmpty( $term7->errors );
+		$this->assertEquals( $term6, $term7->error_data['term_exists'] );
+
+		$terms = array_map( 'get_tag', array( $term3, $term4, $term5, $term6 ) );
+		$this->assertCount( 4, array_unique( wp_list_pluck( $terms, 'slug' ) ) );
+
+		// Test named terms with only special characters
+		$term8 = $this->factory->tag->create( array( 'name' => '$' ) );
+		$term9 = $this->factory->tag->create( array( 'name' => '$$' ) );
+		$term10 = $this->factory->tag->create( array( 'name' => '$$$' ) );
+		$term11 = $this->factory->tag->create( array( 'name' => '$$$$' ) );
+		$term12 = $this->factory->tag->create( array( 'name' => '$$$$' ) );
+		$this->assertTrue( is_wp_error( $term12 ) );
+		$this->assertNotEmpty( $term12->errors );
+		$this->assertEquals( $term11, $term12->error_data['term_exists'] );
+
+		$terms = array_map( 'get_tag', array( $term8, $term9, $term10, $term11 ) );
+		$this->assertCount( 4, array_unique( wp_list_pluck( $terms, 'slug' ) ) );
+
+		$term13 = $this->factory->tag->create( array( 'name' => 'A' ) );
+		$this->assertFalse( is_wp_error( $term13 ) );
+		$term14 = $this->factory->tag->create( array( 'name' => 'A' ) );
+		$this->assertTrue( is_wp_error( $term14 ) );
+		$term15 = $this->factory->tag->create( array( 'name' => 'A+', 'slug' => 'a' ) );
+		$this->assertFalse( is_wp_error( $term15 ) );
+		$term16 = $this->factory->tag->create( array( 'name' => 'A+' ) );
+		$this->assertTrue( is_wp_error( $term16 ) );
+		$term17 = $this->factory->tag->create( array( 'name' => 'A++' ) );
+		$this->assertFalse( is_wp_error( $term17 ) );
+		$term18 = $this->factory->tag->create( array( 'name' => 'A-', 'slug' => 'a' ) );
+		$this->assertFalse( is_wp_error( $term18 ) );
+		$term19 = $this->factory->tag->create( array( 'name' => 'A-' ) );
+		$this->assertTrue( is_wp_error( $term19 ) );
+		$term20 = $this->factory->tag->create( array( 'name' => 'A--' ) );
+		$this->assertFalse( is_wp_error( $term20 ) );
+	}
+
 	public function test_wp_insert_term_duplicate_name_slug_non_hierarchical() {
 		register_taxonomy( 'foo', 'post', array() );
 
@@ -313,6 +486,55 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$this->assertTrue( is_wp_error( $found ) );
 		$this->assertEquals( $existing_term, $found->get_error_data() );
+	}
+
+	public function test_wp_insert_term_should_return_term_id_and_term_taxonomy_id() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$found = wp_insert_term( 'foo', 'wptests_tax' );
+
+		$term_by_id = get_term( $found['term_id'], 'wptests_tax' );
+		$term_by_slug = get_term_by( 'slug', 'foo', 'wptests_tax' );
+		$term_by_ttid = get_term_by( 'term_taxonomy_id', $found['term_taxonomy_id'], 'wptests_tax' );
+
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertNotEmpty( $found['term_id'] );
+		$this->assertNotEmpty( $found['term_taxonomy_id'] );
+		$this->assertNotEmpty( $term_by_id );
+		$this->assertEquals( $term_by_id, $term_by_slug );
+		$this->assertEquals( $term_by_id, $term_by_ttid );
+	}
+
+	public function test_wp_insert_term_should_clean_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		/**
+		 * It doesn't appear that WordPress itself ever sets these
+		 * caches, but we should ensure that they're being cleared for
+		 * compatibility with third-party addons. Prime the caches
+		 * manually.
+		 */
+		wp_cache_set( 'all_ids', array( 1, 2, 3 ), 'wptests_tax' );
+		wp_cache_set( 'get', array( 1, 2, 3 ), 'wptests_tax' );
+
+		$found = wp_insert_term( 'foo', 'wptests_tax', array(
+			'parent' => $t,
+		) );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( false, wp_cache_get( 'all_ids', 'wptests_tax' ) );
+		$this->assertSame( false, wp_cache_get( 'get', 'wptests_tax' ) );
+
+		$cached_children = get_option( 'wptests_tax_children' );
+		$this->assertNotEmpty( $cached_children[ $t ] );
+		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t ] ) );
 	}
 
 	/**
@@ -944,5 +1166,11 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$cat_id2 = $this->factory->category->create( array( 'parent' => $cat_id1 ) );
 		$this->assertWPError( $cat_id2 );
+	}
+
+	/** Helpers **********************************************************/
+
+	public function _pre_insert_term_callback() {
+		return new WP_Error( 'custom_error' );
 	}
 }
