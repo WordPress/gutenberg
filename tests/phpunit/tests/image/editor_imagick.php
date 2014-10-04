@@ -463,6 +463,9 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$editor = wp_get_image_editor( $file );
+
+		$this->assertNotInstanceOf( 'WP_Error', $editor );
+		
 		$editor->load();
 		$editor->resize( 5, 5 );
 		$save_to_file = tempnam( get_temp_dir(), '' ) . '.png';
@@ -483,6 +486,9 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$editor = wp_get_image_editor( $file );
+
+		$this->assertNotInstanceOf( 'WP_Error', $editor );
+
 		$editor->load();
 
 		$save_to_file = tempnam( get_temp_dir(), '' ) . '.png';

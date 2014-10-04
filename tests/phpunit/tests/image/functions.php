@@ -224,6 +224,8 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 			// Save the image as each file extension, check the mime type
 			$img = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
+			$this->assertNotInstanceOf( 'WP_Error', $img );
+
 			$temp = get_temp_dir();
 			foreach ( $mime_types as $ext => $mime_type ) {
 				$file = wp_unique_filename( $temp, uniqid() . ".$ext" );
