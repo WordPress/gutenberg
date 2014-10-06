@@ -351,4 +351,435 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
 	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_ids() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array(
+			$terms['parent1'],
+			$terms['parent2'],
+			$terms['child1'],
+			$terms['child2'],
+			$terms['grandchild1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_ids() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'ids',
+		) );
+
+		$expected = array(
+			$terms['parent1'],
+			$terms['parent2'],
+			$terms['child1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_ids_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'ids',
+			'hierarchical' => false,
+		) );
+
+		$expected = array(
+			$terms['parent2'],
+			$terms['child1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_names() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'names',
+		) );
+
+		$expected = array(
+			'Parent 1',
+			'Parent 2',
+			'Child 1',
+			'Child 2',
+			'Grandchild 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_names() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'names',
+		) );
+
+		$expected = array(
+			'Parent 1',
+			'Parent 2',
+			'Child 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_names_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'names',
+			'hierarchical' => false,
+		) );
+
+		$expected = array(
+			'Parent 2',
+			'Child 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_count() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'count',
+		) );
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEquals( 5, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_count() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'count',
+		) );
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		// When using 'fields=count', 'hierarchical' is forced to false.
+		$this->assertEquals( 2, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_count_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'count',
+			'hierarchical' => false,
+		) );
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEquals( 2, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_idparent() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'id=>parent',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 0,
+			$terms['parent2'] => 0,
+			$terms['child1'] => $terms['parent1'],
+			$terms['child2'] => $terms['parent1'],
+			$terms['grandchild1'] => $terms['child1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idparent() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>parent',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 0,
+			$terms['parent2'] => 0,
+			$terms['child1'] => $terms['parent1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idparent_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>parent',
+			'hierarchical' => false,
+		) );
+
+		$expected = array(
+			$terms['parent2'] => 0,
+			$terms['child2'] => $terms['parent1'],
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_idslug() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'id=>slug',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 'parent-1',
+			$terms['parent2'] => 'parent-2',
+			$terms['child1'] => 'child-1',
+			$terms['child2'] => 'child-2',
+			$terms['grandchild1'] => 'grandchild-1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 29859
+	 */
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idslug() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>slug',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 'parent-1',
+			$terms['parent2'] => 'parent-2',
+			$terms['child1'] => 'child-1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idslug_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>slug',
+			'hierarchical' => false,
+		) );
+
+		$expected = array(
+			$terms['parent2'] => 'parent-2',
+			$terms['child1'] => 'child-1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_idname() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => false,
+			'fields' => 'id=>name',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 'Parent 1',
+			$terms['parent2'] => 'Parent 2',
+			$terms['child1'] => 'Child 1',
+			$terms['child2'] => 'Child 2',
+			$terms['grandchild1'] => 'Grandchild 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 29859
+	 */
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idname() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>name',
+		) );
+
+		$expected = array(
+			$terms['parent1'] => 'Parent 1',
+			$terms['parent2'] => 'Parent 2',
+			$terms['child1'] => 'Child 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idname_hierarchical_false() {
+		// Set up a clean taxonomy.
+		$tax = 'hierarchical_fields';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		$terms = $this->create_hierarchical_terms_and_posts();
+
+		$found = get_terms( $tax, array(
+			'hide_empty' => true,
+			'fields' => 'id=>name',
+			'hierarchical' => false,
+		) );
+
+		$expected = array(
+			$terms['parent2'] => 'Parent 2',
+			$terms['child1'] => 'Child 1',
+		);
+
+		_unregister_taxonomy( 'hierarchical_fields' );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	protected function create_hierarchical_terms_and_posts() {
+
+		$terms = array();
+
+		$terms['parent1'] = $this->factory->term->create( array( 'slug' => 'parent-1', 'name' => 'Parent 1', 'taxonomy' => 'hierarchical_fields' ) );
+		$terms['parent2'] = $this->factory->term->create( array( 'slug' => 'parent-2', 'name' => 'Parent 2', 'taxonomy' => 'hierarchical_fields' ) );
+		$terms['child1'] = $this->factory->term->create( array( 'slug' => 'child-1', 'name' => 'Child 1', 'taxonomy' => 'hierarchical_fields', 'parent' => $terms['parent1'] ) );
+		$terms['child2'] = $this->factory->term->create( array( 'slug' => 'child-2', 'name' => 'Child 2', 'taxonomy' => 'hierarchical_fields', 'parent' => $terms['parent1'] ) );
+		$terms['grandchild1'] = $this->factory->term->create( array( 'slug' => 'grandchild-1', 'name' => 'Grandchild 1', 'taxonomy' => 'hierarchical_fields', 'parent' => $terms['child1'] ) );
+
+		$post_id = $this->factory->post->create();
+		wp_set_post_terms( $post_id, $terms['parent2'], 'hierarchical_fields', true );
+		wp_set_post_terms( $post_id, $terms['child1'], 'hierarchical_fields', true );
+
+		return $terms;
+	}
 }
