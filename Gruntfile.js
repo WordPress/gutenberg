@@ -58,6 +58,7 @@ module.exports = function(grunt) {
 							'!wp-includes/js/backbone.js',
 							'!wp-includes/js/underscore.js',
 							'!wp-includes/js/jquery/jquery.masonry.js',
+							'!wp-includes/js/jquery/ui/*.js',
 							'!wp-includes/js/tinymce/tinymce.js',
 							'!wp-includes/version.php' // Exclude version.php
 						],
@@ -351,6 +352,16 @@ module.exports = function(grunt) {
 					'!wp-includes/js/underscore.min.js',
 					'!wp-includes/js/zxcvbn.min.js'
 				]
+			},
+			jqueryui: {
+				options: {
+					preserveComments: 'some'
+				},
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '.min.js',
+				src: ['wp-includes/js/jquery/ui/*.js']
 			}
 		},
 		concat: {
@@ -467,7 +478,7 @@ module.exports = function(grunt) {
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
-		'uglify:core', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
+		'uglify:core', 'uglify:jqueryui', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax and multisite tests.', function() {
