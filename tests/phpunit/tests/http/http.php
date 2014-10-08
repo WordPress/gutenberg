@@ -56,7 +56,11 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			array( 'otherfile.ext?query=string', 'http://example.com/file.ext?existing=query-string', 'http://example.com/otherfile.ext?query=string' ),
 
 			// A file with a leading dot
-			array( '.ext', 'http://example.com/', 'http://example.com/.ext' )
+			array( '.ext', 'http://example.com/', 'http://example.com/.ext' ),
+
+			// URls within URLs
+			array( '/expected', 'http://example.com/sub/http://site.com/sub/', 'http://example.com/expected' ),
+			array( '/expected/http://site.com/sub/', 'http://example.com/', 'http://example.com/expected/http://site.com/sub/' ),
 		);
 	}
 }
