@@ -61,6 +61,9 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			// URls within URLs
 			array( '/expected', 'http://example.com/sub/http://site.com/sub/', 'http://example.com/expected' ),
 			array( '/expected/http://site.com/sub/', 'http://example.com/', 'http://example.com/expected/http://site.com/sub/' ),
+
+			// Schemeless URL's (Not valid in HTTP Headers, but may be used elsewhere)
+			array( '//example.com/sub/', 'https://example.net', 'https://example.com/sub/' ),
 		);
 	}
 }
