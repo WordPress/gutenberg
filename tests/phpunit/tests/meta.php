@@ -162,11 +162,16 @@ class Tests_Meta extends WP_UnitTestCase {
 		$this->assertEquals( $expected2, get_metadata( 'user', $this->author->ID, $key, true ) );
 	}
 
+	/**
+	 * @ticket 16814
+	 */
 	function test_meta_type_cast() {
 		$post_id1 = $this->factory->post->create();
 		add_post_meta( $post_id1, 'num_as_longtext', 123 );
+		add_post_meta( $post_id1, 'num_as_longtext_desc', 10 );
 		$post_id2 = $this->factory->post->create();
 		add_post_meta( $post_id2, 'num_as_longtext', 99 );
+		add_post_meta( $post_id2, 'num_as_longtext_desc', 100 );
 
 		$posts = new WP_Query( array(
 			'fields' => 'ids',
@@ -175,6 +180,47 @@ class Tests_Meta extends WP_UnitTestCase {
 			'meta_value' => '0',
 			'meta_compare' => '>',
 			'meta_type' => 'UNSIGNED',
+			'orderby' => 'meta_value',
+			'order' => 'ASC'
+		) );
+
+		$this->assertEquals( array( $post_id2, $post_id1 ), $posts->posts );
+		$this->assertEquals( 2, substr_count( $posts->request, 'CAST(' ) );
+
+		// Make sure the newer meta_query syntax behaves in a consistent way
+		$posts = new WP_Query( array(
+			'fields' => 'ids',
+			'post_type' => 'any',
+			'meta_query' => array(
+				array(
+					'key' => 'num_as_longtext',
+					'value' => '0',
+					'compare' => '>',
+					'type' => 'UNSIGNED',
+				),
+			),
+			'orderby' => 'meta_value',
+			'order' => 'ASC'
+		) );
+
+		$this->assertEquals( array( $post_id2, $post_id1 ), $posts->posts );
+		$this->assertEquals( 2, substr_count( $posts->request, 'CAST(' ) );
+
+		// The legacy `meta_key` value should take precedence.
+		$posts = new WP_Query( array(
+			'fields' => 'ids',
+			'post_type' => 'any',
+			'meta_key' => 'num_as_longtext',
+			'meta_compare' => '>',
+			'meta_type' => 'UNSIGNED',
+			'meta_query' => array(
+				array(
+					'key' => 'num_as_longtext_desc',
+					'value' => '0',
+					'compare' => '>',
+					'type' => 'UNSIGNED',
+				),
+			),
 			'orderby' => 'meta_value',
 			'order' => 'ASC'
 		) );
