@@ -1200,7 +1200,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			),
 		) );
 
-		$this->assertEquals( array( $p1, $p2 ), $q->posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $q->posts );
 	}
 
 	/**
