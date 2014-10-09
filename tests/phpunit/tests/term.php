@@ -417,6 +417,62 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertFalse( is_wp_error( $term20 ) );
 	}
 
+	public function test_wp_insert_term_alias_of_no_term_group() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$term_1 = get_term( $t1, 'wptests_tax' );
+
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'alias_of' => $term_1->slug,
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+
+		$updated_term_1 = get_term( $term_1->term_id, 'wptests_tax' );
+
+		$term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 0, $term_1->term_group );
+		$this->assertNotEmpty( $created_term->term_group );
+		$this->assertSame( $created_term->term_group, $updated_term_1->term_group );
+	}
+
+	public function test_wp_insert_term_alias_of_existing_term_group() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$term_1 = get_term( $t1, 'wptests_tax' );
+
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'alias_of' => $term_1->slug,
+		) );
+		$term_2 = get_term( $t2, 'wptests_tax' );
+
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'alias_of' => $term_2->slug,
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertNotEmpty( $created_term->term_group );
+		$this->assertSame( $created_term->term_group, $term_2->term_group );
+	}
+
+	public function test_wp_insert_term_alias_of_nonexistent_term() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'alias_of' => 'foo',
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 0, $created_term->term_group );
+	}
+
 	public function test_wp_insert_term_duplicate_name_slug_non_hierarchical() {
 		register_taxonomy( 'foo', 'post', array() );
 
@@ -537,6 +593,62 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t ] ) );
 	}
 
+	public function test_wp_update_term_alias_of_no_term_group() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$term_1 = get_term( $t1, 'wptests_tax' );
+
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax' );
+		wp_update_term( $created_term_ids['term_id'], 'wptests_tax', array(
+			'alias_of' => $term_1->slug,
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+
+		$updated_term_1 = get_term( $t1, 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 0, $term_1->term_group );
+		$this->assertNotEmpty( $created_term->term_group );
+		$this->assertSame( $created_term->term_group, $updated_term_1->term_group );
+	}
+
+	public function test_wp_update_term_alias_of_existing_term_group() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$term_1 = get_term( $t1, 'wptests_tax' );
+
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'alias_of' => $term_1->slug,
+		) );
+		$term_2 = get_term( $t2, 'wptests_tax' );
+
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax' );
+		wp_update_term( $created_term_ids['term_id'], 'wptests_tax', array(
+			'alias_of' => $term_2->slug,
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertNotEmpty( $created_term->term_group );
+		$this->assertSame( $created_term->term_group, $term_2->term_group );
+	}
+
+	public function test_wp_update_term_alias_of_nonexistent_term() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$created_term_ids = wp_insert_term( 'Foo', 'wptests_tax' );
+		wp_update_term( $created_term_ids['term_id'], 'wptests_tax', array(
+			'alias_of' => 'bar',
+		) );
+		$created_term = get_term( $created_term_ids['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 0, $created_term->term_group );
+	}
 	/**
 	 * @ticket 5381
 	 */
