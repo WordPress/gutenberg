@@ -66,4 +66,49 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			array( '//example.com/sub/', 'https://example.net', 'https://example.com/sub/' ),
 		);
 	}
+
+	/**
+	 * @dataProvider parse_url_testcases
+	 */
+	function test_parse_url( $url, $expected ) {
+		if ( ! is_callable( array( 'WP_HTTP_Testable', 'parse_url' ) ) ) {
+			$this->markTestSkipped( "This version of WP_HTTP doesn't support WP_HTTP::parse_url()" );
+			return;
+		}
+		$actual = WP_HTTP_Testable::parse_url( $url );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function parse_url_testcases() {
+		// 0: The URL, 1: The expected resulting structure
+		return array(
+			array( 'http://example.com/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/' ) ),
+
+			// < PHP 5.4.7: Schemeless URL
+			array( '//example.com/path/', array( 'host' => 'example.com', 'path' => '/path/' ) ),
+			array( '//example.com/', array( 'host' => 'example.com', 'path' => '/' ) ),
+			array( 'http://example.com//path/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '//path/' ) ),
+
+			// < PHP 5.4.7: Scheme seperator in the URL
+			array( 'http://example.com/http://example.net/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/http://example.net/' ) ),
+			array( '/path/http://example.net/', array( 'path' => '/path/http://example.net/' ) ),
+			// PHP's parse_url() calls this an invalid url, we handle it as a path
+			array( '/://example.com/', array( 'path' => '/://example.com/' ) ),
+
+		);
+		/*
+		Untestable edge cases in various PHP:
+		  - ///example.com - Fails in PHP >= 5.4.7, assumed path in <5.4.7
+		  - ://example.com - assumed path in PHP >= 5.4.7, fails in <5.4.7
+		*/
+	}
+}
+
+/**
+ * A Wrapper of WP_HTTP to make parse_url() publicaly accessible for testing purposes.
+ */
+class WP_HTTP_Testable extends WP_HTTP {
+	public static function parse_url( $url ) {
+		return parent::parse_url( $url );
+	}
 }
