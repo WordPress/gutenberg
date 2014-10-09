@@ -138,6 +138,31 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( $t, $found['term_id'] );
 	}
 
+	/**
+	 * @ticket 29851
+	 */
+	public function test_term_exists_taxonomy_nonempty_parent_0_should_return_false_for_child_term() {
+		register_taxonomy( 'foo', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent_term = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+		) );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'foo',
+			'parent' => $parent_term,
+			'slug' => 'child-term',
+		) );
+
+		$found = term_exists( 'child-term', 'foo', 0 );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertSame( null, $found['term_id'] );
+	}
+
 	public function test_term_exists_taxonomy_nonempty_parent_nonempty_match_name() {
 		register_taxonomy( 'foo', 'post', array(
 			'hierarchical' => true,
