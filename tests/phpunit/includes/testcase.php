@@ -37,6 +37,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		ini_set('display_errors', 1 );
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
+		$this->reset_post_types();
+		$this->reset_taxonomies();
 		$this->start_transaction();
 		$this->expectDeprecated();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
@@ -64,6 +66,34 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$_GET = array();
 		$_POST = array();
 		$this->flush_cache();
+	}
+
+	/**
+	 * Unregister existing post types and register defaults.
+	 *
+	 * Run before each test in order to clean up the global scope, in case
+	 * a test forgets to unregister a post type on its own, or fails before
+	 * it has a chance to do so.
+	 */
+	protected function reset_post_types() {
+		foreach ( get_post_types() as $pt ) {
+			_unregister_post_type( $pt );
+		}
+		create_initial_post_types();
+	}
+
+	/**
+	 * Unregister existing taxonomies and register defaults.
+	 *
+	 * Run before each test in order to clean up the global scope, in case
+	 * a test forgets to unregister a taxonomy on its own, or fails before
+	 * it has a chance to do so.
+	 */
+	protected function reset_taxonomies() {
+		foreach ( get_taxonomies() as $tax ) {
+			_unregister_taxonomy( $tax );
+		}
+		create_initial_taxonomies();
 	}
 
 	/**
