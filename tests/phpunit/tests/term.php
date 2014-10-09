@@ -631,6 +631,32 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t ] ) );
 	}
 
+	/**
+	 * @ticket 29614
+	 */
+	function test_wp_update_term_parent_does_not_exist() {
+		register_taxonomy( 'wptests_tax', array(
+			'hierarchical' => true,
+		) );
+		$fake_term_id = 787878;
+
+		$this->assertNull( term_exists( $fake_term_id, 'wptests_tax' ) );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'parent' => $fake_term_id,
+		) );
+
+		$this->assertWPError( $found );
+		$this->assertSame( 'missing_parent', $found->get_error_code() );
+
+		$term = get_term( $t, 'wptests_tax' );
+		$this->assertEquals( 0, $term->parent );
+	}
+
 	public function test_wp_update_term_alias_of_no_term_group() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$t1 = $this->factory->term->create( array(
