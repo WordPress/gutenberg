@@ -112,7 +112,20 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_term_trimmed_to_empty_string() {
-		$this->assertSame( 0, term_exists( '   ' ) );
+		$this->assertNull( term_exists( '   ' ) );
+	}
+
+	/**
+	 * @ticket 29589
+	 */
+	public function test_term_exists_existing_term_that_sanitizes_to_empty() {
+		wp_insert_term( '//', 'category' );
+		$this->assertNotEmpty( term_exists( '//' ) );
+		$this->assertNotEmpty( term_exists( '//', 'category' ) );
+
+		wp_insert_term( '&gt;&gt;', 'category' );
+		$this->assertNotEmpty( term_exists( '&gt;&gt;' ) );
+		$this->assertNotEmpty( term_exists( '&gt;&gt;', 'category' ) );
 	}
 
 	public function test_term_exists_taxonomy_nonempty_parent_nonempty_match_slug() {
