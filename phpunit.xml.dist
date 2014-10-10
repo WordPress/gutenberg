@@ -25,4 +25,7 @@
     <logging>
         <log type="junit" target="tests/phpunit/build/logs/junit.xml" logIncompleteSkipped="false"/>
     </logging>
+    <php>
+        <const name="WP_RUN_CORE_TESTS" value="1" />
+    </php>
 </phpunit>

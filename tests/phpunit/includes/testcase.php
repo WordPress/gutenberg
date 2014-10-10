@@ -37,8 +37,18 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		ini_set('display_errors', 1 );
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
-		$this->reset_post_types();
-		$this->reset_taxonomies();
+
+		/*
+		 * When running core tests, ensure that post types and taxonomies
+		 * are reset for each test. We skip this step for non-core tests,
+		 * given the large number of plugins that register post types and
+		 * taxonomies at 'init'.
+		 */
+		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
+			$this->reset_post_types();
+			$this->reset_taxonomies();
+		}
+
 		$this->start_transaction();
 		$this->expectDeprecated();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
