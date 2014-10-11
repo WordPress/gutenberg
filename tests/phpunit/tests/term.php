@@ -631,6 +631,67 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t ] ) );
 	}
 
+	public function test_wp_update_term_taxonomy_does_not_exist() {
+		$found = wp_update_term( 1, 'bar' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'invalid_taxonomy', $found->get_error_code() );
+	}
+
+	public function test_wp_update_term_term_empty_string_should_return_wp_error() {
+		$found = wp_update_term( '', 'post_tag' );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'invalid_term', $found->get_error_code() );
+	}
+
+	public function test_wp_update_term_unslash_name() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'name' => 'Let\\\'s all say \\"Hooray\\" for WordPress taxonomy',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'Let\'s all say "Hooray" for WordPress taxonomy', $term->name );
+	}
+
+	public function test_wp_update_term_unslash_description() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'description' => 'Let\\\'s all say \\"Hooray\\" for WordPress taxonomy',
+		) );
+
+		$term = get_term( $found['term_id'], 'wptests_tax' );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( 'Let\'s all say "Hooray" for WordPress taxonomy', $term->description );
+	}
+
+	public function test_wp_update_term_name_empty_string() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'name' => '',
+		) );
+
+		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertSame( 'empty_term_name', $found->get_error_code() );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
 	/**
 	 * @ticket 29614
 	 */
@@ -655,6 +716,54 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$term = get_term( $t, 'wptests_tax' );
 		$this->assertEquals( 0, $term->parent );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_slug_empty_string_while_not_updating_name() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'Foo Bar',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'slug' => '',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+		$this->assertSame( 'foo-bar', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_slug_empty_string_while_updating_name() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'name' => 'Foo Bar',
+			'slug' => '',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+		$this->assertSame( 'foo-bar', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_slug_set_slug() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'slug' => 'foo-bar',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+		$this->assertSame( 'foo-bar', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
 	}
 
 	public function test_wp_update_term_alias_of_no_term_group() {
@@ -713,6 +822,190 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$this->assertSame( 0, $created_term->term_group );
 	}
+
+	public function test_wp_update_term_slug_same_as_old_slug() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+		) );
+
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+
+		$this->assertSame( $t, $found['term_id'] );
+		$this->assertSame( 'foo', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_duplicate_slug_generated_due_to_empty_slug_param() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo-bar',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'not foo bar',
+		) );
+
+		$found = wp_update_term( $t2, 'wptests_tax', array(
+			'slug' => '',
+			'name' => 'Foo? Bar!', // Will sanitize to 'foo-bar'.
+		) );
+
+		$term = get_term( $t2, 'wptests_tax' );
+
+		$this->assertSame( $t2, $found['term_id'] );
+		$this->assertSame( 'foo-bar-2', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_duplicate_slug_with_changed_parent() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+		$p = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo-bar',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_update_term( $t2, 'wptests_tax', array(
+			'parent' => $p,
+			'slug' => 'foo-bar',
+		) );
+
+		$term = get_term( $t2, 'wptests_tax' );
+		$parent_term = get_term( $p, 'wptests_tax' );
+
+		$this->assertSame( $t2, $found['term_id'] );
+		$this->assertSame( 'foo-bar-' . $parent_term->slug, $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_duplicate_slug_failure() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo-bar',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'my-old-slug',
+		) );
+
+		$found = wp_update_term( $t2, 'wptests_tax', array(
+			'slug' => 'foo-bar',
+		) );
+
+		$term = get_term( $t2, 'wptests_tax' );
+
+		$this->assertWPError( $found );
+		$this->assertSame( 'duplicate_term_slug', $found->get_error_code() );
+		$this->assertSame( 'my-old-slug', $term->slug );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_wp_update_term_should_return_term_id_and_term_taxonomy_id() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$term_by_id = get_term( $found['term_id'], 'wptests_tax' );
+		$term_by_slug = get_term_by( 'slug', 'foo', 'wptests_tax' );
+		$term_by_ttid = get_term_by( 'term_taxonomy_id', $found['term_taxonomy_id'], 'wptests_tax' );
+
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertNotEmpty( $found['term_id'] );
+		$this->assertNotEmpty( $found['term_taxonomy_id'] );
+		$this->assertNotEmpty( $term_by_id );
+		$this->assertEquals( $term_by_id, $term_by_slug );
+		$this->assertEquals( $term_by_id, $term_by_ttid );
+	}
+
+	public function test_wp_update_term_should_clean_object_term_cache() {
+		register_taxonomy( 'wptests_tax_for_post', 'post' );
+		register_taxonomy( 'wptests_tax_for_page', 'page' );
+		$post = $this->factory->post->create();
+		$page = $this->factory->post->create( array(
+			'post_type' => 'page',
+		) );
+
+		$t_for_post = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_for_post',
+		) );
+		$t_for_page = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_for_page',
+		) );
+
+		wp_set_post_terms( $post, array( $t_for_post ), 'wptests_tax_for_post' );
+		wp_set_post_terms( $page, array( $t_for_page ), 'wptests_tax_for_page' );
+
+		// Prime caches and verify.
+		update_object_term_cache( array( $post ), 'post' );
+		update_object_term_cache( array( $page ), 'page' );
+		$this->assertNotEmpty( wp_cache_get( $post, 'wptests_tax_for_post_relationships' ) );
+		$this->assertNotEmpty( wp_cache_get( $page, 'wptests_tax_for_page_relationships' ) );
+
+		// Update a term in just one of the taxonomies.
+		$found = wp_update_term( $t_for_post, 'wptests_tax_for_post', array(
+			'slug' => 'foo',
+		) );
+
+		// Only the relevant cache should have been cleared.
+		$this->assertFalse( wp_cache_get( $post, 'wptests_tax_for_post_relationships' ) );
+		$this->assertNotEmpty( wp_cache_get( $page, 'wptests_tax_for_page_relationships' ) );
+	}
+
+	public function test_wp_update_term_should_clean_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		/*
+		 * It doesn't appear that WordPress itself ever sets these
+		 * caches, but we should ensure that they're being cleared for
+		 * compatibility with third-party addons. Prime the caches
+		 * manually.
+		 */
+		wp_cache_set( 'all_ids', array( 1, 2, 3 ), 'wptests_tax' );
+		wp_cache_set( 'get', array( 1, 2, 3 ), 'wptests_tax' );
+
+		$found = wp_update_term( $t1, 'wptests_tax', array(
+			'parent' => $t2,
+		) );
+		_unregister_taxonomy( 'wptests_tax' );
+
+		$this->assertSame( false, wp_cache_get( 'all_ids', 'wptests_tax' ) );
+		$this->assertSame( false, wp_cache_get( 'get', 'wptests_tax' ) );
+
+		$cached_children = get_option( 'wptests_tax_children' );
+		$this->assertNotEmpty( $cached_children[ $t2 ] );
+		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t2 ] ) );
+	}
+
 	/**
 	 * @ticket 5381
 	 */
