@@ -413,6 +413,11 @@ VIDEO;
 	 */
 	function test_add_image_size() {
 		global $_wp_additional_image_sizes;
+
+		if ( ! isset( $_wp_additional_image_sizes ) ) {
+			$_wp_additional_image_sizes = array();
+		}
+
 		$this->assertArrayNotHasKey( 'test-size', $_wp_additional_image_sizes );
 		add_image_size( 'test-size', 200, 600 );
 		$this->assertArrayHasKey( 'test-size', $_wp_additional_image_sizes );
