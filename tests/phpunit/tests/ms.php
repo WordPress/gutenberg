@@ -1595,6 +1595,9 @@ class Tests_MS extends WP_UnitTestCase {
 		$this->_setup_host_request( 'make.wordpress.org', '/foo/' );
 		$this->assertEquals( $ids['make.wordpress.org/foo/'], $current_blog->blog_id );
 		$this->assertEquals( $network_ids['make.wordpress.org/'], $current_blog->site_id );
+
+		// Request the original tests domain and path to unpollute the stack.
+		$this->_setup_host_request( WP_TESTS_DOMAIN, '/' );
 	}
 
 	/**
