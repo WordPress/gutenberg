@@ -772,6 +772,100 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $post_4, $post_3, $post_2, $post_1 ), $query->posts );
 	}
 
+	/**
+	 * @ticket 29642
+	 * @group meta
+	 */
+	public function test_meta_query_nested() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p2, 'foo2', 'bar' );
+		add_post_meta( $p3, 'foo2', 'bar' );
+		add_post_meta( $p3, 'foo3', 'bar' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_term_meta_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+				array(
+					'relation' => 'AND',
+					array(
+						'key' => 'foo2',
+						'value' => 'bar',
+					),
+					array(
+						'key' => 'foo3',
+						'value' => 'bar',
+					),
+				),
+			),
+		) );
+
+		$expected = array( $p1, $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 29642
+	 * @group meta
+	 */
+	public function test_meta_query_nested_two_levels_deep() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		add_post_meta( $p1, 'foo', 'bar' );
+		add_post_meta( $p3, 'foo2', 'bar' );
+		add_post_meta( $p3, 'foo3', 'bar' );
+		add_post_meta( $p3, 'foo4', 'bar' );
+
+		$query = new WP_Query( array(
+			'update_post_meta_cache' => false,
+			'update_term_meta_cache' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+				array(
+					'relation' => 'OR',
+					array(
+						'key' => 'foo2',
+						'value' => 'bar',
+					),
+					array(
+						'relation' => 'AND',
+						array(
+							'key' => 'foo3',
+							'value' => 'bar',
+						),
+						array(
+							'key' => 'foo4',
+							'value' => 'bar',
+						),
+					),
+				),
+			),
+		) );
+
+		$expected = array( $p1, $p3 );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 */
 	function test_meta_between_not_between() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, 'time', 500 );
@@ -819,6 +913,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 16829
+	 * @group meta
 	 */
 	function test_meta_default_compare() {
 		// compare should default to IN when meta_value is an array
@@ -859,6 +954,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 17264
+	 * @group meta
 	 */
 	function test_duplicate_posts_when_no_key() {
 		$post_id = $this->factory->post->create();
@@ -890,6 +986,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 15292
+	 * @group meta
 	 */
 	function test_empty_meta_value() {
 		$post_id = $this->factory->post->create();
