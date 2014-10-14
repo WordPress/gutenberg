@@ -218,7 +218,7 @@ module.exports = function(grunt) {
 					'twenty*/**/*.js',
 					'!twenty{eleven,twelve,thirteen}/**',
 					// Third party scripts
-					'!twentyfourteen/js/html5.js'
+					'!twenty{fourteen,fifteen}/js/html5.js'
 				]
 			},
 			core: {
