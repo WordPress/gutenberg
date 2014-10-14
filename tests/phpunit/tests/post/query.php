@@ -1459,7 +1459,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			),
 		) );
 
-		$this->assertEquals( array( $p1, $p2 ), $q->posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $q->posts );
 	}
 
 	/**
@@ -1502,7 +1502,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			),
 		) );
 
-		$this->assertEquals( array( $p1, $p2 ), $q->posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $q->posts );
 	}
 
 	/**
@@ -1780,7 +1780,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			)
 		) );
 		$ids = $query->get_posts();
-		$this->assertEquals( array( $post_id1, $post_id2 ), $ids );
+		$this->assertEqualSets( array( $post_id1, $post_id2 ), $ids );
 	}
 
 	/**
