@@ -8,7 +8,10 @@
 class Tests_Theme extends WP_UnitTestCase {
 	protected $theme_slug = 'twentyeleven';
 	protected $theme_name = 'Twenty Eleven';
-	protected $default_themes = array( 'twentyten', 'twentyeleven', 'twentytwelve', 'twentythirteen', 'twentyfourteen' );
+	protected $default_themes = array(
+		'twentyten', 'twentyeleven', 'twentytwelve', 'twentythirteen',
+		'twentyfourteen', 'twentyfifteen',
+	);
 
 	function setUp() {
 		parent::setUp();
