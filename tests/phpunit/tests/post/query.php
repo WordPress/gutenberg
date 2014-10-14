@@ -611,6 +611,42 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 29062
+	 */
+	public function test_meta_query_compare_not_exists_with_another_condition_relation_or() {
+		$posts = $this->factory->post->create_many( 4 );
+		update_post_meta( $posts[0], 'color', 'orange' );
+		update_post_meta( $posts[1], 'color', 'blue' );
+		update_post_meta( $posts[1], 'vegetable', 'onion' );
+		update_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$post_3_meta = get_post_meta( $posts[3] );
+		foreach ( $post_3_meta as $meta_key => $meta_value ) {
+			delete_post_meta( $posts[3], $meta_key );
+		}
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+				),
+				array(
+					'key' => 'color',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[1], $posts[2], $posts[3] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
 	 * @ticket 23033
 	 * @group meta
 	 */
