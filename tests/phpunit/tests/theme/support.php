@@ -162,6 +162,9 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 	 */
 	function test_supports_menus() {
 		// Start fresh
+		foreach ( get_registered_nav_menus() as $location => $desc ) {
+			unregister_nav_menu( $location );
+		}
 		_remove_theme_support( 'menus' );
 		$this->assertFalse( current_theme_supports( 'menus' ) );
 
