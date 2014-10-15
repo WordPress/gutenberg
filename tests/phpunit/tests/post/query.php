@@ -1413,6 +1413,134 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 29181
+	 */
+	public function test_tax_query_operator_not_exists() {
+		register_taxonomy( 'wptests_tax1', 'post' );
+		register_taxonomy( 'wptests_tax2', 'post' );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, array( $t1 ), 'wptests_tax1' );
+		wp_set_object_terms( $p2, array( $t2 ), 'wptests_tax2' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax2',
+					'operator' => 'NOT EXISTS',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p3 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 29181
+	 */
+	public function test_tax_query_operator_exists() {
+		register_taxonomy( 'wptests_tax1', 'post' );
+		register_taxonomy( 'wptests_tax2', 'post' );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, array( $t1 ), 'wptests_tax1' );
+		wp_set_object_terms( $p2, array( $t2 ), 'wptests_tax2' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax2',
+					'operator' => 'EXISTS',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 29181
+	 */
+	public function test_tax_query_operator_exists_should_ignore_terms() {
+		register_taxonomy( 'wptests_tax1', 'post' );
+		register_taxonomy( 'wptests_tax2', 'post' );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, array( $t1 ), 'wptests_tax1' );
+		wp_set_object_terms( $p2, array( $t2 ), 'wptests_tax2' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax2',
+					'operator' => 'EXISTS',
+					'terms' => array( 'foo', 'bar' ),
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 29181
+	 */
+	public function test_tax_query_operator_exists_with_no_taxonomy() {
+		register_taxonomy( 'wptests_tax1', 'post' );
+		register_taxonomy( 'wptests_tax2', 'post' );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, array( $t1 ), 'wptests_tax1' );
+		wp_set_object_terms( $p2, array( $t2 ), 'wptests_tax2' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'orderby' => 'ID',
+			'order' => 'ASC',
+			'tax_query' => array(
+				array(
+					'operator' => 'EXISTS',
+				),
+			),
+		) );
+
+		$this->assertEmpty( $q->posts );
+	}
+
+	/**
 	 * @group taxonomy
 	 */
 	public function test_tax_query_multiple_queries_relation_and() {
