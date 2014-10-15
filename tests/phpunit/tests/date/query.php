@@ -413,8 +413,8 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 
 		// This might be a fragile test if it takes longer than 1 second to run
 		$found = $q->build_mysql_datetime( 'foo' );
-		$expected = gmdate( 'Y-m-d H:i:s', strtotime( current_time( 'timestamp' ) ) );
-		$this->assertSame( $found, $expected );
+		$expected = gmdate( 'Y-m-d H:i:s', false );
+		$this->assertSame( $expected, $found );
 	}
 
 	public function test_build_mysql_datetime_default_to_max_true() {
