@@ -218,4 +218,138 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 
 		$this->assertTrue( is_wp_error( $tq->queries[0] ) );
 	}
+
+	/**
+	 * @ticket 18105
+	 */
+	public function test_get_sql_relation_or_operator_in() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$tq = new WP_Tax_Query( array(
+			'relation' => 'OR',
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t1,
+			),
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t2,
+			),
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t3,
+			),
+		) );
+
+		global $wpdb;
+		$sql = $tq->get_sql( $wpdb->posts, 'ID' );
+
+		// Only one JOIN is required with OR + IN.
+		$this->assertSame( 1, substr_count( $sql['join'], 'JOIN' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	/**
+	 * @ticket 18105
+	 */
+	public function test_get_sql_relation_and_operator_in() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$tq = new WP_Tax_Query( array(
+			'relation' => 'AND',
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t1,
+			),
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t2,
+			),
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t3,
+			),
+		) );
+
+		global $wpdb;
+		$sql = $tq->get_sql( $wpdb->posts, 'ID' );
+
+		$this->assertSame( 3, substr_count( $sql['join'], 'JOIN' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	/**
+	 * @ticket 18105
+	 */
+	public function test_get_sql_nested_relation_or_operator_in() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$tq = new WP_Tax_Query( array(
+			'relation' => 'OR',
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'terms' => $t1,
+			),
+			array(
+				'relation' => 'OR',
+				array(
+					'taxonomy' => 'wptests_tax',
+					'field' => 'term_id',
+					'terms' => $t2,
+				),
+				array(
+					'taxonomy' => 'wptests_tax',
+					'field' => 'term_id',
+					'terms' => $t3,
+				),
+			),
+		) );
+
+		global $wpdb;
+		$sql = $tq->get_sql( $wpdb->posts, 'ID' );
+
+		$this->assertSame( 2, substr_count( $sql['join'], 'JOIN' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
 }

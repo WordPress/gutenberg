@@ -1376,6 +1376,52 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 	/**
 	 * @group taxonomy
+	 * @ticket 18105
+	 */
+	public function test_tax_query_single_query_multiple_queries_operator_not_in() {
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => 'foo',
+			'name' => 'Foo',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => 'bar',
+			'name' => 'Bar',
+		) );
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_post_terms( $p1, $t1, 'category' );
+		wp_set_post_terms( $p2, $t2, 'category' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'tax_query' => array(
+				'relation' => 'AND',
+				array(
+					'taxonomy' => 'category',
+					'terms' => array( 'foo' ),
+					'field' => 'slug',
+					'operator' => 'NOT IN',
+				),
+				array(
+					'taxonomy' => 'category',
+					'terms' => array( 'bar' ),
+					'field' => 'slug',
+					'operator' => 'NOT IN',
+				),
+			),
+		) );
+
+		$this->assertEquals( array( $p3 ), $q->posts );
+	}
+
+	/**
+	 * @group taxonomy
 	 */
 	public function test_tax_query_single_query_multiple_terms_operator_and() {
 		$t1 = $this->factory->term->create( array(
