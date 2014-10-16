@@ -55,7 +55,13 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 					'year' => 2008,
 					'month' => 6,
 				),
+				'column' => 'post_date',
+				'compare' => '=',
+				'relation' => 'AND',
 			),
+			'column' => 'post_date',
+			'compare' => '=',
+			'relation' => 'AND',
 		);
 
 		$this->assertSame( $expected, $q->queries );
@@ -73,17 +79,22 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 			),
 		) );
 
-		// Note: WP_Date_Query does not reset indexes
 		$expected = array(
-			2 => array(
+			array(
 				'before' => array(
 					'year' => 2008,
 					'month' => 6,
 				),
+				'column' => 'post_date',
+				'compare' => '=',
+				'relation' => 'AND',
 			),
+			'column' => 'post_date',
+			'compare' => '=',
+			'relation' => 'AND',
 		);
 
-		$this->assertSame( $expected, $q->queries );
+		$this->assertEquals( $expected, $q->queries );
 	}
 
 	public function test_get_compare_empty() {
