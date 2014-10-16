@@ -9,6 +9,14 @@
  * @group date
  */
 class Tests_WP_Date_Query extends WP_UnitTestCase {
+	public $q;
+
+	public function setUp() {
+		parent::setUp();
+		unset( $this->q );
+		$this->q = new WP_Date_Query( array( 'm' => 2 ) );
+	}
+
 	public function test_construct_date_query_empty() {
 		$q = new WP_Date_Query( array() );
 		$this->assertSame( 'AND', $q->relation );
@@ -581,5 +589,317 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 		// $compare value is floating point - use regex to account for
 		// varying precision on different PHP installations
 		$this->assertRegExp( "/DATE_FORMAT\( post_date, '0\.%i%s' \) = 0\.15350*/", $found );
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_query_before_after(){
+		// Valid values.
+		$valid_args = array(
+			array(
+				'month' => 2,
+				'year'  => 2014,
+			),
+			array(
+				'day'  => 8,
+				'year' => 2014,
+			),
+		);
+
+		foreach ( $valid_args as $args ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'before' => $args ) ) );
+			$this->assertTrue( $this->q->validate_date_values( array( 'after' => $args ) ) );
+		}
+
+		// Invalid values.
+		$invalid_args = array(
+			array(
+				'month' => 13,
+			),
+			array(
+				'day' => 32,
+			),
+			array(
+				'minute' => 60,
+			),
+			array(
+				'second' => 60,
+			),
+			array(
+				'week' => 54,
+			),
+		);
+
+		foreach ( $invalid_args as $args ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'before' => $args ) ) );
+			$this->assertFalse( $this->q->validate_date_values( array( 'after' => $args ) ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_query_before_after_with_month(){
+		// Both are valid.
+		$args = array(
+			'before' => array(
+				'month' => 2,
+				'year'  => 2014,
+			),
+			'month' => 10,
+		);
+		$this->assertTrue( $this->q->validate_date_values( $args ) );
+
+		// 'before' is invalid, 'month' is valid.
+		$args = array(
+			'before' => array(
+				'month' => 13,
+				'year'  => 2014,
+			),
+			'month' => 10,
+		);
+		$this->assertFalse( $this->q->validate_date_values( $args ) );
+
+		// 'before' is valid, 'month' is invalid.
+		$args = array(
+			'before' => array(
+				'month' => 10,
+				'year'  => 2014,
+			),
+			'month' => 14,
+		);
+		$this->assertFalse( $this->q->validate_date_values( $args ) );
+
+		// Both are invalid.
+		$args = array(
+			'before' => array(
+				'month' => 14,
+				'year'  => 2014,
+			),
+			'month' => 14,
+		);
+		$this->assertFalse( $this->q->validate_date_values( $args ) );
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_week() {
+		// Valid values.
+		$weeks = range( 1, 53 );
+		foreach ( $weeks as $week ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'week' => $week ) ) );
+		}
+
+		// Invalid values.
+		$weeks = array( -1, 0, 54 );
+		foreach ( $weeks as $week ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'week' => $week ) ) );
+		}
+
+		// Valid combinations.
+		$weeks = array(
+			array(
+				'week' => 52,
+				'year' => 2012,
+			),
+			array(
+				'week' => 53,
+				'year' => 2009,
+			),
+		);
+
+		foreach ( $weeks as $week_args ) {
+			$this->assertTrue( $this->q->validate_date_values( $week_args ) );
+		}
+
+		// Invalid combinations.
+		$weeks = array(
+			// 2012 has 52 weeks.
+			array(
+				'week' => 53,
+				'year' => 2012,
+			),
+
+			// 2013 has 53 weeks.
+			array(
+				'week' => 54,
+				'year' => 2009,
+			)
+		);
+
+		foreach ( $weeks as $week_args ) {
+			$this->assertFalse( $this->q->validate_date_values( $week_args ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_month() {
+		// Valid values.
+		$months = range( 1, 12 );
+		foreach ( $months as $month ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'month' => $month ) ) );
+		}
+
+		// Invalid values.
+		$months = array( -1, 0, 13, 'string who wants to be a int' );
+		foreach ( $months as $month ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'month' => $month ) ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_day() {
+		// Valid values.
+		$days = range( 1, 31 );
+		foreach ( $days as $day ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'day' => $day ) ) );
+		}
+
+		// Invalid values.
+		$days = array( -1, 32 );
+		foreach ( $days as $day ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'day' => $day ) ) );
+		}
+
+		// Valid combinations.
+		$days = array(
+			array(
+				'day'   => 29,
+				'month' => 2,
+				'year'  => 2008,
+			),
+			array(
+				'day'   => 28,
+				'month' => 2,
+				'year'  => 2009,
+			),
+		);
+
+		foreach ( $days as $args ) {
+			$this->assertTrue( $this->q->validate_date_values( $args ) );
+		}
+
+		// Invalid combinations.
+		$days = array(
+			// February 2008 has 29 days.
+			array(
+				'day'   => 30,
+				'month' => 2,
+				'year'  => 2008,
+			),
+
+			// February 2009 has 29 days.
+			array(
+				'day'   => 29,
+				'month' => 2,
+				'year'  => 2009,
+			),
+		);
+
+		foreach ( $days as $args ) {
+			$this->assertFalse( $this->q->validate_date_values( $args ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_hour() {
+		// Valid values.
+		$hours = range( 1, 23 );
+		foreach ( $hours as $hour ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'hour' => $hour ) ) );
+		}
+
+		// Invalid values.
+		$hours = array( -1, 24, 25, 'string who wants to be a int' );
+		foreach ( $hours as $hour ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'hour' => $hour ) ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_minute() {
+		// Valid values.
+		$minutes = range( 0, 59 );
+		foreach ( $minutes as $minute ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'minute' => $minute ) ) );
+		}
+
+		// Invalid values.
+		$minutes = array( -1, 60 );
+		foreach ( $minutes as $minute ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'minute' => $minute ) ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_second() {
+		// Valid values.
+		$seconds = range( 0, 59 );
+		foreach ( $seconds as $second ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'second' => $second ) ) );
+		}
+
+		// Invalid values.
+		$seconds = array( -1, 60 );
+		foreach ( $seconds as $second ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'second' => $second ) ) );
+		}
+
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_day_of_week() {
+		// Valid values.
+		$days_of_week = range( 1, 7 );
+		foreach ( $days_of_week as $day_of_week ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'dayofweek' => $day_of_week ) ) );
+		}
+
+		// Invalid values.
+		$days_of_week = array( -1, 0, 8 );
+		foreach ( $days_of_week as $day_of_week ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'dayofweek' => $day_of_week ) ) );
+		}
+	}
+
+	/**
+	 * @ticket 25834
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_day_of_year() {
+		// Valid values.
+		$days_of_year = range( 1, 366 );
+		foreach ( $days_of_year as $day_of_year ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'dayofyear' => $day_of_year ) ) );
+		}
+
+		// Invalid values.
+		$days_of_year = array( -1, 0, 367 );
+		foreach ( $days_of_year as $day_of_year ) {
+			$this->assertFalse( @$this->q->validate_date_values( array( 'dayofyear' => $day_of_year ) ) );
+		}
 	}
 }
