@@ -93,4 +93,120 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 
 		_unregister_taxonomy( $tax );
 	}
+
+	/**
+	 * @ticket 21760
+	 */
+	function test_get_term_by_slug_cache() {
+		global $wpdb;
+		$term_id = $this->factory->term->create( array( 'slug' => 'burrito', 'taxonomy' => 'post_tag' ) );
+
+		$queries = $wpdb->num_queries;
+		get_term_by( 'slug', 'burrito', 'post_tag' );
+		$initial = $queries + 1;
+		$this->assertEquals( $initial, $wpdb->num_queries );
+		$term = get_term_by( 'slug', 'burrito', 'post_tag' );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+
+		$this->assertEquals( $term, wp_cache_get( $term_id, 'post_tag' ) );
+
+		$this->assertEquals( get_term( $term_id, 'post_tag' ), $term );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 21760
+	 */
+	function test_get_term_by_slug_cache_update() {
+		global $wpdb;
+		$term_id = $this->factory->term->create( array( 'slug' => 'burrito', 'taxonomy' => 'post_tag' ) );
+
+		$queries = $wpdb->num_queries;
+		get_term_by( 'slug', 'burrito', 'post_tag' );
+		$initial = $queries + 1;
+		$this->assertEquals( $initial, $wpdb->num_queries );
+		$term = get_term_by( 'slug', 'burrito', 'post_tag' );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+
+		$this->assertEquals( $term, wp_cache_get( $term_id, 'post_tag' ) );
+
+		wp_update_term( $term_id, 'post_tag', array( 'name' => 'Taco' ) );
+		$this->assertNotEquals( $term, get_term( $term_id, 'post_tag' ) );
+		$after_queries = $wpdb->num_queries;
+		get_term_by( 'slug', 'burrito', 'post_tag' );
+		$this->assertEquals( $after_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 21760
+	 */
+	function test_get_term_by_name_cache() {
+		global $wpdb;
+		$term_id = $this->factory->term->create( array( 'name' => 'burrito', 'taxonomy' => 'post_tag' ) );
+
+		$queries = $wpdb->num_queries;
+		get_term_by( 'name', 'burrito', 'post_tag' );
+		$initial = $queries + 1;
+		$this->assertEquals( $initial, $wpdb->num_queries );
+		$term = get_term_by( 'name', 'burrito', 'post_tag' );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+
+		$this->assertEquals( get_term( $term_id, 'post_tag' ), $term );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 21760
+	 */
+	function test_get_term_by_name_cache_update() {
+		global $wpdb;
+		$term_id = $this->factory->term->create( array( 'name' => 'burrito', 'taxonomy' => 'post_tag' ) );
+
+		$queries = $wpdb->num_queries;
+		get_term_by( 'name', 'burrito', 'post_tag' );
+		$initial = $queries + 1;
+		$this->assertEquals( $initial, $wpdb->num_queries );
+		$term = get_term_by( 'name', 'burrito', 'post_tag' );
+		$this->assertEquals( $initial, $wpdb->num_queries );
+
+		wp_update_term( $term_id, 'post_tag', array( 'slug' => 'Taco' ) );
+		$this->assertNotEquals( $term, get_term( $term_id, 'post_tag' ) );
+		$after_queries = $wpdb->num_queries;
+		get_term_by( 'name', 'burrito', 'post_tag' );
+		$this->assertEquals( $after_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 21760
+	 */
+	function test_invalidating_term_caches_should_fail_when_invalidation_is_suspended() {
+		$slug = 'taco';
+		$name = 'Taco';
+		$taxonomy = 'post_tag';
+		$cache_key_slug = 'slug:' . $slug;
+		$cache_key_name = 'name:' . md5( $name );
+
+		$term_id = $this->factory->term->create( array( 'slug' => $slug, 'name' => $name, 'taxonomy' => $taxonomy ) );
+
+		$last_changed = wp_get_last_changed( 'terms' );
+		$group = $taxonomy . ':' . $last_changed;
+
+		$term = get_term_by( 'slug', $slug, $taxonomy );
+
+		// Verify the term is cached by ID, slug and name
+		$this->assertEquals( $term, wp_cache_get( $term_id, $taxonomy ) );
+		$this->assertEquals( $term_id, wp_cache_get( $cache_key_slug, $group ) );
+		$this->assertEquals( $term_id, wp_cache_get( $cache_key_name, $group ) );
+
+		wp_suspend_cache_invalidation();
+		clean_term_cache( $term_id, $taxonomy );
+
+		// Verify that the cached value still matches the correct value
+		$this->assertEquals( $term, wp_cache_get( $term_id, $taxonomy ) );
+		$this->assertEquals( $term_id, wp_cache_get( $cache_key_slug, $group ) );
+		$this->assertEquals( $term_id, wp_cache_get( $cache_key_name, $group ) );
+
+		// Verify that last changed has not been updated as part of an invalidation routine
+		$this->assertEquals( $last_changed, wp_get_last_changed( 'terms' ) );
+	}
 }
