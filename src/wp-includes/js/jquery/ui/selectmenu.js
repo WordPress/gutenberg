@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Selectmenu 1.11.1
+ * jQuery UI Selectmenu 1.11.2
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
@@ -27,7 +27,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.selectmenu", {
-	version: "1.11.1",
+	version: "1.11.2",
 	defaultElement: "<select>",
 	options: {
 		appendTo: null,
@@ -144,6 +144,12 @@ return $.widget( "ui.selectmenu", {
 				role: "listbox",
 				select: function( event, ui ) {
 					event.preventDefault();
+
+					// support: IE8
+					// If the item was selected via a click, the text selection
+					// will be destroyed in IE
+					that._setSelection();
+
 					that._select( ui.item.data( "ui-selectmenu-item" ), event );
 				},
 				focus: function( event, ui ) {
@@ -254,6 +260,7 @@ return $.widget( "ui.selectmenu", {
 		this.isOpen = false;
 		this._toggleAttr();
 
+		this.range = null;
 		this._off( this.document );
 
 		this._trigger( "close", event );
@@ -342,6 +349,29 @@ return $.widget( "ui.selectmenu", {
 		this[ this.isOpen ? "close" : "open" ]( event );
 	},
 
+	_setSelection: function() {
+		var selection;
+
+		if ( !this.range ) {
+			return;
+		}
+
+		if ( window.getSelection ) {
+			selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange( this.range );
+
+		// support: IE8
+		} else {
+			this.range.select();
+		}
+
+		// support: IE
+		// Setting the text selection kills the button focus in IE, but
+		// restoring the focus doesn't kill the selection.
+		this.button.focus();
+	},
+
 	_documentClick: {
 		mousedown: function( event ) {
 			if ( !this.isOpen ) {
@@ -357,11 +387,25 @@ return $.widget( "ui.selectmenu", {
 	_buttonEvents: {
 
 		// Prevent text selection from being reset when interacting with the selectmenu (#10144)
-		mousedown: function( event ) {
-			event.preventDefault();
+		mousedown: function() {
+			var selection;
+
+			if ( window.getSelection ) {
+				selection = window.getSelection();
+				if ( selection.rangeCount ) {
+					this.range = selection.getRangeAt( 0 );
+				}
+
+			// support: IE8
+			} else {
+				this.range = document.selection.createRange();
+			}
 		},
 
-		click: "_toggle",
+		click: function( event ) {
+			this._setSelection();
+			this._toggle( event );
+		},
 
 		keydown: function( event ) {
 			var preventDefault = true;

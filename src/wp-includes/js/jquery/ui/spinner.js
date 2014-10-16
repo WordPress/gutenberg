@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Spinner 1.11.1
+ * jQuery UI Spinner 1.11.2
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
@@ -37,7 +37,7 @@ function spinner_modifier( fn ) {
 }
 
 return $.widget( "ui.spinner", {
-	version: "1.11.1",
+	version: "1.11.2",
 	defaultElement: "<input>",
 	widgetEventPrefix: "spin",
 	options: {

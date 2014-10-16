@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Tabs 1.11.1
+ * jQuery UI Tabs 1.11.2
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
@@ -25,7 +25,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.tabs", {
-	version: "1.11.1",
+	version: "1.11.2",
 	delay: 300,
 	options: {
 		active: null,
@@ -372,7 +372,10 @@ return $.widget( "ui.tabs", {
 	},
 
 	_processTabs: function() {
-		var that = this;
+		var that = this,
+			prevTabs = this.tabs,
+			prevAnchors = this.anchors,
+			prevPanels = this.panels;
 
 		this.tablist = this._getList()
 			.addClass( "ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" )
@@ -456,6 +459,13 @@ return $.widget( "ui.tabs", {
 		this.panels
 			.addClass( "ui-tabs-panel ui-widget-content ui-corner-bottom" )
 			.attr( "role", "tabpanel" );
+
+		// Avoid memory leaks (#10056)
+		if ( prevTabs ) {
+			this._off( prevTabs.not( this.tabs ) );
+			this._off( prevAnchors.not( this.anchors ) );
+			this._off( prevPanels.not( this.panels ) );
+		}
 	},
 
 	// allow overriding how to find the list for rare usage scenarios (#7715)

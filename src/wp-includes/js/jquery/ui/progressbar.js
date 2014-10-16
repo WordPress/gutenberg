@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Progressbar 1.11.1
+ * jQuery UI Progressbar 1.11.2
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
@@ -25,7 +25,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.progressbar", {
-	version: "1.11.1",
+	version: "1.11.2",
 	options: {
 		max: 100,
 		value: 0,

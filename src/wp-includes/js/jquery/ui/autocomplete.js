@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Autocomplete 1.11.1
+ * jQuery UI Autocomplete 1.11.2
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors
@@ -27,7 +27,7 @@
 }(function( $ ) {
 
 $.widget( "ui.autocomplete", {
-	version: "1.11.1",
+	version: "1.11.2",
 	defaultElement: "<input>",
 	options: {
 		appendTo: null,
