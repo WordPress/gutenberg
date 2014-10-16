@@ -1,10 +1,15 @@
 <?php
 
 if ( is_multisite() ) :
+
 /**
+ * Tests specific to network and site options in Multisite.
+ *
  * @group option
+ * @group ms-option
+ * @group multisite
  */
-class Tests_Option_BlogOption extends WP_UnitTestCase {
+class Tests_Multisite_Option extends WP_UnitTestCase {
 	protected $suppress = false; 
 
 	function setUp() {
@@ -150,5 +155,68 @@ class Tests_Option_BlogOption extends WP_UnitTestCase {
 		$this->assertFalse( get_blog_option( $blog_id, $key2 ) );
 		//$this->assertFalse( get_option( $key2 ) ); // check get_option()
 	}
+
+	/**
+	 * @group multisite
+	 */
+	function test_site_notoptions() {
+		global $wpdb;
+		$notoptions_key = "{$wpdb->siteid}:notoptions";
+
+		$_notoptions = wp_cache_get( 'notoptions', 'site-options' );
+		$this->assertEmpty( $_notoptions );
+		$_notoptions1 = wp_cache_get( $notoptions_key, 'site-options' );
+		$this->assertEmpty( $_notoptions1 );
+
+		get_site_option( 'burrito' );
+
+		$notoptions = wp_cache_get( 'notoptions', 'site-options' );
+		$this->assertEmpty( $notoptions );
+		$notoptions1 = wp_cache_get( $notoptions_key, 'site-options' );
+		$this->assertNotEmpty( $notoptions1 );
+	}
+
+	function test_users_can_register_signup_filter() {
+
+		$registration = get_site_option('registration');
+		$this->assertFalse( users_can_register_signup_filter() );
+
+		update_site_option('registration', 'all');
+		$this->assertTrue( users_can_register_signup_filter() );
+
+		update_site_option('registration', 'user');
+		$this->assertTrue( users_can_register_signup_filter() );
+
+		update_site_option('registration', 'none');
+		$this->assertFalse( users_can_register_signup_filter() );
+	}
+
+	/**
+	 * @ticket 21552
+	 * @ticket 23418
+	 */
+	function test_sanitize_ms_options() {
+		update_site_option( 'illegal_names', array( '', 'Woo', '' ) );
+		update_site_option( 'limited_email_domains', array(  'woo', '', 'boo.com', 'foo.net.biz..'  ) );
+		update_site_option( 'banned_email_domains', array(  'woo', '', 'boo.com', 'foo.net.biz..'  ) );
+
+		$this->assertEquals( array( 'Woo' ), get_site_option( 'illegal_names' ) );
+		$this->assertEquals( array( 'woo', 'boo.com' ), get_site_option( 'limited_email_domains' ) );
+		$this->assertEquals( array( 'woo', 'boo.com' ), get_site_option( 'banned_email_domains' ) );
+
+		update_site_option( 'illegal_names', 'foo bar' );
+		update_site_option( 'limited_email_domains', "foo\nbar" );
+		update_site_option( 'banned_email_domains', "foo\nbar" );
+
+		$this->assertEquals( array( 'foo', 'bar' ), get_site_option( 'illegal_names' ) );
+		$this->assertEquals( array( 'foo', 'bar' ), get_site_option( 'limited_email_domains' ) );
+		$this->assertEquals( array( 'foo', 'bar' ), get_site_option( 'banned_email_domains' ) );
+
+		foreach ( array( 'illegal_names', 'limited_email_domains', 'banned_email_domains' ) as $option ) {
+			update_site_option( $option, array() );
+			$this->assertSame( '', get_site_option( $option ) );
+		}
+	}
 }
+
 endif;

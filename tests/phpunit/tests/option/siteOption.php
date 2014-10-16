@@ -90,28 +90,4 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 		$this->assertEquals( get_site_option( $option, $default ), $default );
 		$this->assertFalse( get_site_option( $option ) );
 	}
-
-	/**
-	 * @group multisite
-	 */
-	function test_site_notoptions() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Should only run in multisite' );
-		}
-
-		global $wpdb;
-		$notoptions_key = "{$wpdb->siteid}:notoptions";
-
-		$_notoptions = wp_cache_get( 'notoptions', 'site-options' );
-		$this->assertEmpty( $_notoptions );
-		$_notoptions1 = wp_cache_get( $notoptions_key, 'site-options' );
-		$this->assertEmpty( $_notoptions1 );
-
-		get_site_option( 'burrito' );
-
-		$notoptions = wp_cache_get( 'notoptions', 'site-options' );
-		$this->assertEmpty( $notoptions );
-		$notoptions1 = wp_cache_get( $notoptions_key, 'site-options' );
-		$this->assertNotEmpty( $notoptions1 );
-	}
 }
