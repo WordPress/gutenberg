@@ -3,11 +3,21 @@
 class Tests_Paginate_Links extends WP_UnitTestCase {
 
 	private $i18n_count = 0;
+	private $permalink_structure = '';
 
 	function setUp() {
 		parent::setUp();
+		global $wp_rewrite;
 
 		$this->go_to( home_url( '/' ) );
+
+		$this->permalink_structure = $wp_rewrite->permalink_structure;
+		$wp_rewrite->set_permalink_structure( get_option( 'permalink_structure' ) );
+	}
+
+	function tearDown() {
+		global $wp_rewrite;
+		$wp_rewrite->set_permalink_structure( $this->permalink_structure );
 	}
 
 	function test_defaults() {
