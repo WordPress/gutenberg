@@ -352,4 +352,57 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		_unregister_taxonomy( 'wptests_tax' );
 	}
 
+	/**
+	 * @ticket 29738
+	 */
+	public function test_get_sql_operator_not_in_empty_terms() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$tq = new WP_Tax_Query( array(
+			'relation' => 'OR',
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'operator' => 'NOT IN',
+				'terms' => array(),
+			),
+		) );
+
+		global $wpdb;
+		$expected = array(
+			'join' => '',
+			'where' => '',
+		);
+
+		$this->assertSame( $expected, $tq->get_sql( $wpdb->posts, 'ID' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	/**
+	 * @ticket 29738
+	 */
+	public function test_get_sql_operator_and_empty_terms() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$tq = new WP_Tax_Query( array(
+			'relation' => 'OR',
+			array(
+				'taxonomy' => 'wptests_tax',
+				'field' => 'term_id',
+				'operator' => 'AND',
+				'terms' => array(),
+			),
+		) );
+
+		global $wpdb;
+		$expected = array(
+			'join' => '',
+			'where' => '',
+		);
+
+		$this->assertSame( $expected, $tq->get_sql( $wpdb->posts, 'ID' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
 }
