@@ -214,20 +214,39 @@ class Tests_Cron extends WP_UnitTestCase {
 	function test_not_duplicate_event() {
 		// duplicate events far apart should work normally
 		$hook = rand_str();
-		$args = array(rand_str());
-		$ts1 = strtotime('+30 minutes');
-		$ts2 = strtotime('+3 minutes');
+		$args = array( rand_str() );
+		$ts1 = strtotime( '+30 minutes' );
+		$ts2 = strtotime( '+3 minutes' );
 
 		// first one works
 		wp_schedule_single_event( $ts1, $hook, $args );
 		// second works too
 		wp_schedule_single_event( $ts2, $hook, $args );
 
-		// the next event should be at +5 minutes, not +3
-		$this->assertEquals( $ts2, wp_next_scheduled($hook, $args) );
+		// the next event should be at +3 minutes, even though that one was scheduled second
+		$this->assertEquals( $ts2, wp_next_scheduled( $hook, $args ) );
 		wp_unschedule_event( $ts2, $hook, $args );
+		// following event at +30 minutes should be there too
+		$this->assertEquals( $ts1, wp_next_scheduled( $hook, $args ) );
+	}
+
+	function test_not_duplicate_event_reversed() {
+		// duplicate events far apart should work normally regardless of order
+		$hook = rand_str();
+		$args = array( rand_str() );
+		$ts1 = strtotime( '+3 minutes' );
+		$ts2 = strtotime( '+30 minutes' );
+
+		// first one works
+		wp_schedule_single_event( $ts1, $hook, $args );
+		// second works too
+		wp_schedule_single_event( $ts2, $hook, $args );
+
+		// the next event should be at +3 minutes
+		$this->assertEquals( $ts1, wp_next_scheduled( $hook, $args ) );
+		wp_unschedule_event( $ts1, $hook, $args );
 		// following event should be there too
-		$this->assertEquals( $ts1, wp_next_scheduled($hook, $args) );
+		$this->assertEquals( $ts2, wp_next_scheduled( $hook, $args ) );
 	}
 }
 
