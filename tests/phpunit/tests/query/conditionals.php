@@ -603,6 +603,9 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	// '[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[^/]+/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
 	// '[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/[^/]+/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
 
+	/**
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
 	function test_bad_dates() {
 		$this->go_to( '/2013/13/13/' );
 		$this->assertQueryTrue( 'is_404' );

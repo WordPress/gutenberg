@@ -106,7 +106,9 @@ class Tests_Canonical extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data
 	 */
-	function test($test_url, $expected, $ticket = 0) {
+	function test( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
+		$this->expected_doing_it_wrong = array_merge( $this->expected_doing_it_wrong, (array) $expected_doing_it_wrong );
+
 		if ( $ticket )
 			$this->knownWPBug( $ticket );
 
@@ -246,7 +248,7 @@ class Tests_Canonical extends WP_UnitTestCase {
 			array( '/?year=2008', '/2008/'),
 
 			array( '/2012/13/', '/2012/'),
-			array( '/2012/11/51/', '/2012/11/'),
+			array( '/2012/11/51/', '/2012/11/', 0, array( 'WP_Date_Query' ) ),
 
 			// Authors
 			array( '/?author=%d', '/author/canonical-author/' ),

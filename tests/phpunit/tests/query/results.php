@@ -573,7 +573,13 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertFalse( $this->q->is_day );
 		$this->assertFalse( $this->q->is_month );
 		$this->assertTrue( $this->q->is_year );
+	}
 
+	/**
+	 * @ticket 10935
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_query_is_date_with_bad_date() {
 		$this->q->query( array(
 			'year' => '2007',
 			'monthnum' => '01',
