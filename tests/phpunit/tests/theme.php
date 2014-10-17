@@ -165,8 +165,17 @@ class Tests_Theme extends WP_UnitTestCase {
 		$this->assertEquals( content_url( 'themes/' . $this->theme_slug ), $theme->get_template_directory_uri(), 'get_template_directory_uri' );
 	}
 
+	/**
+	 * Make sure we update the default theme list to include the lastest default theme
+	 * @ticket 29925
+	 */
+	function test_default_theme_in_default_theme_list(){
+		if ( substr(WP_DEFAULT_THEME, 0, 6) === 'twenty') {
+			$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
+		}
+	}
+
 	function test_default_themes_have_textdomain() {
-		$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
 		foreach ( $this->default_themes as $theme ) {
 			$this->assertEquals( $theme, wp_get_theme( $theme )->get( 'TextDomain' ) );
 		}
