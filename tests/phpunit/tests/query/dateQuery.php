@@ -610,6 +610,8 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	}
 
 	public function test_date_params_monthnum_m_duplicate() {
+		global $wpdb;
+
 		$this->create_posts();
 
 		$posts = $this->_get_query_result( array(
@@ -629,11 +631,13 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 
-		$this->assertContains( "MONTH( post_date ) = 5", $this->q->request );
-		$this->assertNotContains( "MONTH( post_date ) = 9", $this->q->request );
+		$this->assertContains( "MONTH( $wpdb->posts.post_date ) = 5", $this->q->request );
+		$this->assertNotContains( "MONTH( $wpdb->posts.post_date ) = 9", $this->q->request );
 	}
 
 	public function test_date_params_week_w_duplicate() {
+		global $wpdb;
+
 		$this->create_posts();
 
 		$posts = $this->_get_query_result( array(
@@ -652,8 +656,40 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 
-		$this->assertContains( "WEEK( post_date, 1 ) = 21", $this->q->request );
-		$this->assertNotContains( "WEEK( post_date, 1 ) = 22", $this->q->request );
+		$this->assertContains( "WEEK( $wpdb->posts.post_date, 1 ) = 21", $this->q->request );
+		$this->assertNotContains( "WEEK( $wpdb->posts.post_date, 1 ) = 22", $this->q->request );
+	}
+
+	/**
+	 * @ticket 25775
+	 */
+	public function test_date_query_with_taxonomy_join() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2013-04-27 01:01:01',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2013-03-21 01:01:01',
+		) );
+
+		register_taxonomy( 'foo', 'post' );
+		wp_set_object_terms( $p1, 'bar', 'foo' );
+
+		$posts = $this->_get_query_result( array(
+			'date_query' => array(
+				'year' => 2013,
+			),
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'foo',
+					'terms' => array( 'bar' ),
+					'field' => 'name',
+				),
+			),
+		) );
+
+		_unregister_taxonomy( 'foo' );
+
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
