@@ -647,6 +647,385 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_or_compare_equals() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => 'shallot',
+					'compare' => '=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[1], $posts[2] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_or_compare_equals_different_keys() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'color',
+					'value' => 'orange',
+					'compare' => '=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[0], $posts[1] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_or_compare_equals_and_in() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'color',
+					'value' => array( 'orange', 'green' ),
+					'compare' => 'IN',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[0], $posts[1] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_or_compare_equals_and_like() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => 'hall',
+					'compare' => 'LIKE',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[1], $posts[2] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_or_compare_equals_and_between() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'number_of_colors', '2' );
+		add_post_meta( $posts[1], 'number_of_colors', '5' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'vegetable',
+					'value' => 'shallot',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'number_of_colors',
+					'value' => array( 1, 3 ),
+					'compare' => 'BETWEEN',
+					'type' => 'SIGNED',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[0], $posts[2] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_in_same_keys() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+		add_post_meta( $posts[3], 'vegetable', 'banana' );
+		add_post_meta( $posts[3], 'vegetable', 'onion' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => array( 'onion', 'shallot' ),
+					'compare' => 'IN',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => array( 'banana' ),
+					'compare' => 'IN',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[3] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_in_different_keys() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[1], 'vegetable', 'shallot' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+		add_post_meta( $posts[3], 'vegetable', 'banana' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => array( 'onion', 'shallot' ),
+					'compare' => 'IN',
+				),
+				array(
+					'key' => 'color',
+					'value' => array( 'blue' ),
+					'compare' => 'IN',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[1] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_not_equals() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+		add_post_meta( $posts[3], 'vegetable', 'banana' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '!=',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => 'shallot',
+					'compare' => '!=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[3] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_not_equals_different_keys() {
+		$posts = $this->factory->post->create_many( 4 );
+
+		// !shallot, but orange.
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[0], 'vegetable', 'onion' );
+
+		// !orange, but shallot.
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'shallot' );
+
+		// Neither.
+		add_post_meta( $posts[2], 'color', 'blue' );
+		add_post_meta( $posts[2], 'vegetable', 'onion' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => 'shallot',
+					'compare' => '!=',
+				),
+				array(
+					'key' => 'color',
+					'value' => 'orange',
+					'compare' => '!=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[2] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_not_equals_not_in() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+		add_post_meta( $posts[3], 'vegetable', 'banana' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '!=',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => array( 'shallot' ),
+					'compare' => 'NOT IN',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[3] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
+	 * @ticket 24093
+	 */
+	public function test_meta_query_relation_and_compare_not_equals_and_not_like() {
+		$posts = $this->factory->post->create_many( 4 );
+		add_post_meta( $posts[0], 'color', 'orange' );
+		add_post_meta( $posts[1], 'color', 'blue' );
+		add_post_meta( $posts[1], 'vegetable', 'onion' );
+		add_post_meta( $posts[2], 'vegetable', 'shallot' );
+		add_post_meta( $posts[3], 'vegetable', 'banana' );
+
+		$query = new WP_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'vegetable',
+					'value' => 'onion',
+					'compare' => '!=',
+				),
+				array(
+					'key' => 'vegetable',
+					'value' => 'hall',
+					'compare' => 'NOT LIKE',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $posts[3] );
+		$this->assertEqualSets( $expected, $query->posts );
+	}
+
+	/**
 	 * @ticket 23033
 	 * @group meta
 	 */
@@ -1040,13 +1419,13 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$post_id6 = $this->factory->post->create();
 		add_post_meta( $post_id6, 'baz', 0 );
 
-		$posts = get_posts( array( 'meta_key' => 'foo', 'meta_value' => '0' ) );
-		$this->assertEquals( 1, count ( $posts ) );
-		foreach ( $posts as $post ) {
+		$q = new WP_Query( array( 'meta_key' => 'foo', 'meta_value' => '0' ) );
+		$this->assertEquals( 1, count ( $q->posts ) );
+		foreach ( $q->posts as $post ) {
 			$this->assertInstanceOf( 'WP_Post', $post );
 			$this->assertEquals( 'raw', $post->filter );
 		}
-		$this->assertEquals( $post_id, $posts[0]->ID );
+		$this->assertEquals( $post_id, $q->posts[0]->ID );
 
 		$posts = get_posts( array( 'meta_key' => 'bar', 'meta_value' => '0' ) );
 		$this->assertEquals( 2, count ( $posts ) );

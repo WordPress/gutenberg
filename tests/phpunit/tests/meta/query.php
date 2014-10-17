@@ -73,7 +73,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID' );
 
-		$this->assertEquals( 2, substr_count( $sql['join'], 'INNER JOIN' ) );
+		$this->assertEquals( 1, substr_count( $sql['join'], 'INNER JOIN' ) );
 	}
 
 	/**
@@ -476,12 +476,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		// We should have 2 joins - one for my_first_key and one for my_second_key
-		$this->assertEquals( 2, substr_count( $sql['join'], 'JOIN' ) );
-
-		// The WHERE should check my_third_key against an unaliased table
-		$this->assertEquals( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_key = 'my_third_key'" ) );
-
+		$this->assertEquals( 3, substr_count( $sql['join'], 'JOIN' ) );
 	}
 
 	/**
@@ -545,9 +540,6 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		// NOT EXISTS compare queries are not key-only so should not be non-aliased
 		$this->assertSame( 0, substr_count( $sql['where'], "$wpdb->postmeta.meta_key = 'baz'" ) );
-
-		// When a value exists, it's not a key-only query
-		$this->assertSame( 0, substr_count( $sql['where'], "$wpdb->postmeta.meta_key = 'barry'" ) );
 
 		// 'AND' queries don't have key-only queries
 		$query2 = new WP_Meta_Query( array(
