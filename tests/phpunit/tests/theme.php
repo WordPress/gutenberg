@@ -166,11 +166,12 @@ class Tests_Theme extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Make sure we update the default theme list to include the lastest default theme
+	 * Make sure we update the default theme list to include the latest default theme.
+	 *
 	 * @ticket 29925
 	 */
-	function test_default_theme_in_default_theme_list(){
-		if ( substr(WP_DEFAULT_THEME, 0, 6) === 'twenty') {
+	function test_default_theme_in_default_theme_list() {
+		if ( 'twenty' === substr( WP_DEFAULT_THEME, 0, 6 ) ) {
 			$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
 		}
 	}
