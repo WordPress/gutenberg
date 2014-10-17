@@ -1007,6 +1007,33 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 29911
+	 */
+	public function test_wp_delete_term_should_invalidate_cache_for_child_terms() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$parent = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$child = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'parent' => $parent,
+			'slug' => 'foo',
+		) );
+
+		// Prime the cache.
+		$child_term = get_term( $child, 'wptests_tax' );
+		$this->assertSame( $parent, $child_term->parent );
+
+		wp_delete_term( $parent, 'wptests_tax' );
+		$child_term = get_term( $child, 'wptests_tax' );
+		$this->assertSame( 0, $child_term->parent );
+	}
+
+	/**
 	 * @ticket 5381
 	 */
 	function test_is_term_type() {
