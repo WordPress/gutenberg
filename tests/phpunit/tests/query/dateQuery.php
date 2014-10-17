@@ -271,6 +271,378 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 	}
 
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Y() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2007-05-07 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2007',
+			),
+		) );
+
+		$this->assertEquals( array( $p2 ), $before_posts );
+		$this->assertEquals( array( $p1 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Y_inclusive() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2007-05-07 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008',
+				'inclusive' => true,
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2007',
+				'inclusive' => true,
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $before_posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Ym() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-04-07 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-04',
+			),
+		) );
+
+		$this->assertEquals( array( $p2 ), $before_posts );
+		$this->assertEquals( array( $p1 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Ym_inclusive() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-04-07 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05',
+				'inclusive' => true,
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-04',
+				'inclusive' => true,
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $before_posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Ymd() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-05 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-05',
+			),
+		) );
+
+		$this->assertEquals( array( $p2 ), $before_posts );
+		$this->assertEquals( array( $p1 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_Ymd_inclusive() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 13:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-05 13:00:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06',
+				'inclusive' => true,
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-05',
+				'inclusive' => true,
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $before_posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_YmdHi() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:04:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06 14:05',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-06 14:04',
+			),
+		) );
+
+		$this->assertEquals( array( $p2 ), $before_posts );
+		$this->assertEquals( array( $p1 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_YmdHi_inclusive() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:04:00',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06 14:05',
+				'inclusive' => true,
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-06 14:04',
+				'inclusive' => true,
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $before_posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_YmdHis() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:15',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:14',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06 14:05:15',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-06 14:05:14',
+			),
+		) );
+
+		$this->assertEquals( array( $p2 ), $before_posts );
+		$this->assertEquals( array( $p1 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_YmdHis_inclusive() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:04:15',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:04:14',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => '2008-05-06 14:04:15',
+				'inclusive' => true,
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => '2008-05-06 14:04:14',
+				'inclusive' => true,
+			),
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $before_posts );
+		$this->assertEqualSets( array( $p1, $p2 ), $after_posts );
+	}
+
+	/**
+	 * @ticket 29908
+	 */
+	public function test_beforeafter_with_date_string_non_parseable() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:15',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2008-05-06 14:05:14',
+		) );
+
+		$before_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'before' => 'June 12, 2008',
+			),
+		) );
+
+		$after_posts = $this->_get_query_result( array(
+			'fields' => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'date_query' => array(
+				'after' => 'June 12, 2007',
+			),
+		) );
+
+		$this->assertEquals( array( $p1, $p2 ), $before_posts );
+	}
+
 	public function test_date_query_year_expecting_results() {
 		$this->create_posts();
 
