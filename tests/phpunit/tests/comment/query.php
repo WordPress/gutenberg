@@ -270,4 +270,94 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $c3 ), $comment_ids );
 	}
+
+	/**
+	 * @ticket 29885
+	 */
+	function test_fields_post_author__in() {
+		$author_id1 = 105;
+		$author_id2 = 106;
+
+		$p1 = $this->factory->post->create( array( 'post_author' => $author_id1	) );
+		$p2 = $this->factory->post->create( array( 'post_author' => $author_id1	) );
+		$p3 = $this->factory->post->create( array( 'post_author' => $author_id2	) );
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p3, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'post_author__in' => array( $author_id1 ),
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $comment_ids );
+	}
+
+	/**
+	 * @ticket 29885
+	 */
+	function test_fields_post_author__not_in() {
+		$author_id1 = 111;
+		$author_id2 = 112;
+
+		$p1 = $this->factory->post->create( array( 'post_author' => $author_id1	) );
+		$p2 = $this->factory->post->create( array( 'post_author' => $author_id1	) );
+		$p3 = $this->factory->post->create( array( 'post_author' => $author_id2	) );
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p3, 'user_id' => 1, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'post_author__not_in' => array( $author_id1 ),
+		) );
+
+		$this->assertEqualSets( array( $c3 ), $comment_ids );
+	}
+
+        /**
+         * @ticket 29885
+         */
+	function test_fields_author__in() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 2, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 3, 'comment_approved' => '1' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $p4, 'user_id' => 4, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'author__in' => array( 1, 3 ),
+		) );
+
+		$this->assertEqualSets( array( $c1, $c3 ), $comment_ids );
+	}
+
+        /**
+         * @ticket 29885
+         */
+	function test_fields_author__not_in() {
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p1, 'user_id' => 2, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p2, 'user_id' => 3, 'comment_approved' => '1' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $p4, 'user_id' => 4, 'comment_approved' => '1' ) );
+
+		$comment_ids = get_comments( array(
+			'fields' => 'ids',
+			'author__not_in' => array( 1, 2 ),
+		) );
+
+		$this->assertEqualSets( array( $c3, $c4 ), $comment_ids );
+	}
 }
