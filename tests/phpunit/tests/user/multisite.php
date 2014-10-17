@@ -40,27 +40,40 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertEquals( $user2->ID, $post->post_author );
 	}
 
+	/**
+	 * Test the returned data from get_blogs_of_user()
+	 */
 	function test_get_blogs_of_user() {
-		// Logged out users don't have blogs.
-		$this->assertEquals( array(), get_blogs_of_user( 0 ) );
-
 		$user1_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_ids = $this->factory->blog->create_many( 10, array( 'user_id' => $user1_id ) );
 
-		foreach ( $blog_ids as $blog_id )
-			$this->assertInternalType( 'int', $blog_id );
+		// Maintain a list of 6 total sites and include the primary network site.
+		$blog_ids = $this->factory->blog->create_many( 5, array( 'user_id' => $user1_id ) );
+		$blog_ids = array_merge( array( 1 ), $blog_ids );
 
-		$blogs_of_user = array_keys( get_blogs_of_user( $user1_id, false ) );
-		sort( $blogs_of_user );
-		$this->assertEquals ( array_merge( array( 1 ), $blog_ids), $blogs_of_user );
+		// All sites are new and not marked as spam, archived, or deleted.
+		$blog_ids_of_user = array_keys( get_blogs_of_user( $user1_id ) );
 
-		$this->assertTrue( remove_user_from_blog( $user1_id, 1 ) );
+		// User should be a member of the created sites and the network's initial site.
+		$this->assertEquals( $blog_ids, $blog_ids_of_user );
 
-		$blogs_of_user = array_keys( get_blogs_of_user( $user1_id, false ) );
-		sort( $blogs_of_user );
-		$this->assertEquals ( $blog_ids, $blogs_of_user );
+		$this->assertTrue( remove_user_from_blog( $user1_id, $blog_ids[0] ) );
+		$this->assertTrue( remove_user_from_blog( $user1_id, $blog_ids[2] ) );
+		$this->assertTrue( remove_user_from_blog( $user1_id, $blog_ids[4] ) );
 
-		foreach ( get_blogs_of_user( $user1_id, false ) as $blog ) {
+		unset( $blog_ids[0] );
+		unset( $blog_ids[2] );
+		unset( $blog_ids[4] );
+		sort( $blog_ids );
+
+		$blogs_of_user = get_blogs_of_user( $user1_id, false );
+
+		// The user should still be a member of all remaining sites.
+		$blog_ids_of_user = array_keys( $blogs_of_user );
+		$this->assertEquals( $blog_ids, $blog_ids_of_user );
+
+		// Each site retrieved should match the expected structure.
+		foreach ( $blogs_of_user as $blog_id => $blog ) {
+			$this->assertEquals( $blog_id, $blog->userblog_id );
 			$this->assertTrue( isset( $blog->userblog_id ) );
 			$this->assertTrue( isset( $blog->blogname ) );
 			$this->assertTrue( isset( $blog->domain ) );
@@ -72,11 +85,23 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 			$this->assertTrue( isset( $blog->deleted ) );
 		}
 
-		// Non-existent users don't have blogs.
-		wpmu_delete_user( $user1_id );
-		$user = new WP_User( $user1_id );
-		$this->assertFalse( $user->exists(), 'WP_User->exists' );
-		$this->assertEquals( array(), get_blogs_of_user( $user1_id ) );
+		// Mark each remaining site as spam, archived, and deleted.
+		update_blog_details( $blog_ids[0], array( 'spam' => 1 ) );
+		update_blog_details( $blog_ids[1], array( 'archived' => 1 ) );
+		update_blog_details( $blog_ids[2], array( 'deleted' => 1 ) );
+
+		// Passing true as the second parameter should retrieve ALL sites, even if marked.
+		$blog_ids_of_user = array_keys( get_blogs_of_user( $user1_id, true ) );
+		$this->assertEquals( $blog_ids, $blog_ids_of_user );
+
+		unset( $blog_ids[0] );
+		unset( $blog_ids[1] );
+		unset( $blog_ids[2] );
+		sort( $blog_ids );
+
+		// Passing false (the default) as the second parameter should retrieve only good sites.
+		$blog_ids_of_user = array_keys( get_blogs_of_user( $user1_id, false ) );
+		$this->assertEquals( $blog_ids, $blog_ids_of_user );
 	}
 
 	/**

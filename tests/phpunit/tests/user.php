@@ -375,6 +375,9 @@ class Tests_User extends WP_UnitTestCase {
 			wpmu_delete_user( $user_id );
 		else
 			wp_delete_user( $user_id );
+
+		$user = new WP_User( $user_id );
+		$this->assertFalse( $user->exists(), 'WP_User->exists' );
 		$this->assertEquals( array(), get_blogs_of_user( $user_id ) );
 	}
 
