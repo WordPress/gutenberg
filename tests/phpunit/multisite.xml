@@ -25,4 +25,7 @@
             <group>ajax</group>
         </exclude>
     </groups>
+    <php>
+        <const name="WP_RUN_CORE_TESTS" value="1" />
+    </php>
 </phpunit>
