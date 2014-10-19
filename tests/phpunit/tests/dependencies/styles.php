@@ -98,7 +98,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 		$style .= "}";
 		
 		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
-		$expected .= "<style type='text/css'>\n";
+		$expected .= "<style id='handle-inline-css' type='text/css'>\n";
 		$expected .= "$style\n";
 		$expected .= "</style>\n";
 
@@ -126,7 +126,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 		$style .= "}";
 
 		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
-		$expected .= "<style type='text/css'>\n";
+		$expected .= "<style id='handle-inline-css' type='text/css'>\n";
 		$expected .= "$style\n";
 		$expected .= "</style>\n";
 
@@ -153,7 +153,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 		$style2 .= "}";
 
 		$expected  = "<link rel='stylesheet' id='handle-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
-		$expected .= "<style type='text/css'>\n";
+		$expected .= "<style id='handle-inline-css' type='text/css'>\n";
 		$expected .= "$style1\n";
 		$expected .= "$style2\n";
 		$expected .= "</style>\n";
@@ -175,7 +175,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 	 */
 	public function test_plugin_doing_inline_styles_wrong() {
 
-		$style  = "<style type='text/css'>\n";
+		$style  = "<style id='handle-inline-css' type='text/css'>\n";
 		$style .= ".thing {\n";
 		$style .= "\tbackground: red;\n";
 		$style .= "}\n";
