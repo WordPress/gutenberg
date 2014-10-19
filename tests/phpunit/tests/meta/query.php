@@ -104,9 +104,12 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 		$this->assertEquals( $expected0, $query->queries[0] );
 
 		$expected1 = array(
-			'key' => 'foo1',
-			'compare' => 'baz1',
-			'value' => 'bar1',
+			'relation' => 'OR',
+			array(
+				'key' => 'foo1',
+				'compare' => 'baz1',
+				'value' => 'bar1',
+			),
 		);
 		$this->assertEquals( $expected1, $query->queries[1] );
 	}

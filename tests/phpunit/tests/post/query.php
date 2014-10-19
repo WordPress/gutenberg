@@ -1188,6 +1188,90 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @group meta
+	 * @ticket 29604
+	 */
+	public function test_meta_query_with_orderby_meta_value_relation_or() {
+		$posts = $this->factory->post->create_many( 4 );
+		update_post_meta( $posts[0], 'foo', 5 );
+		update_post_meta( $posts[1], 'foo', 6 );
+		update_post_meta( $posts[2], 'foo', 4 );
+		update_post_meta( $posts[3], 'foo', 7 );
+
+		update_post_meta( $posts[0], 'bar1', 'baz' );
+		update_post_meta( $posts[1], 'bar1', 'baz' );
+		update_post_meta( $posts[2], 'bar2', 'baz' );
+
+		$query = new WP_Query( array(
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'meta_key' => 'foo',
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'bar1',
+					'value' => 'baz',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'bar2',
+					'value' => 'baz',
+					'compare' => '=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $posts[2], $posts[0], $posts[1] ), $query->posts );
+	}
+
+	/**
+	 * @group meta
+	 * @ticket 29604
+	 */
+	public function test_meta_query_with_orderby_meta_value_relation_and() {
+		$posts = $this->factory->post->create_many( 4 );
+		update_post_meta( $posts[0], 'foo', 5 );
+		update_post_meta( $posts[1], 'foo', 6 );
+		update_post_meta( $posts[2], 'foo', 4 );
+		update_post_meta( $posts[3], 'foo', 7 );
+
+		update_post_meta( $posts[0], 'bar1', 'baz' );
+		update_post_meta( $posts[1], 'bar1', 'baz' );
+		update_post_meta( $posts[2], 'bar1', 'baz' );
+		update_post_meta( $posts[3], 'bar1', 'baz' );
+		update_post_meta( $posts[0], 'bar2', 'baz' );
+		update_post_meta( $posts[1], 'bar2', 'baz' );
+		update_post_meta( $posts[2], 'bar2', 'baz' );
+
+		$query = new WP_Query( array(
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'meta_key' => 'foo',
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'bar1',
+					'value' => 'baz',
+					'compare' => '=',
+				),
+				array(
+					'key' => 'bar2',
+					'value' => 'baz',
+					'compare' => '=',
+				),
+			),
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $posts[2], $posts[0], $posts[1] ), $query->posts );
+	}
+
+	/**
 	 * @ticket 29642
 	 * @group meta
 	 */
