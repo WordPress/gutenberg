@@ -360,4 +360,129 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $c3, $c4 ), $comment_ids );
 	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_status_all() {
+		$comment_1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$comment_2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$comment_3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '0' ) );
+		$comments_approved_1 = get_comments( array( 'status' => 'all' ) );
+
+		$comment_ids = get_comments( array( 'fields' => 'ids' ) );
+		$this->assertEqualSets( array( $comment_1, $comment_2, $comment_3 ), $comment_ids );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_user_id() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '0' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 6, 'comment_approved' => '0' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => 1,
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3 ), $found );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_user_id_array() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '0' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 6, 'comment_approved' => '0' ) );
+		$c5 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 8, 'comment_approved' => '0' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => array( 1, 8 ),
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3, $c5 ), $found );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_user_id_comma_separated() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '1' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 1, 'comment_approved' => '0' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 6, 'comment_approved' => '0' ) );
+		$c5 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 8, 'comment_approved' => '0' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => '1,8',
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3, $c5 ), $found );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_author_email() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '1', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'bar@example.com' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => 'foo@example.com',
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3 ), $found );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_mixed_array() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '1', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'bar@example.com' ) );
+		$c5 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 4, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'bar@example.com' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => array( 'foo@example.com', 4 ),
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3, $c5 ), $found );
+	}
+
+	/**
+	 * @ticket 19623
+	 */
+	public function test_get_comments_with_include_unapproved_mixed_comma_separated() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '1', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'foo@example.com' ) );
+		$c4 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 0, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'bar@example.com' ) );
+		$c5 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 4, 'comment_approved' => '0', 'comment_author' => 'foo', 'comment_author_email' => 'bar@example.com' ) );
+
+		$found = get_comments( array(
+			'fields' => 'ids',
+			'include_unapproved' => 'foo@example.com, 4',
+			'status' => 'approve',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3, $c5 ), $found );
+	}
 }
