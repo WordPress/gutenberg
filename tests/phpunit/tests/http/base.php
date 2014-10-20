@@ -184,12 +184,35 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$size = 87348;
 		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30 ) ); //Auto generate the filename.
 
+		// Cleanup before we assert, as it'll return early. 
+		if ( ! is_wp_error( $res ) ) {
+			$filesize = filesize( $res['filename'] );
+			unlink( $res['filename'] );
+		}		
+
 		$this->assertFalse( is_wp_error( $res ) );
 		$this->assertEquals( '', $res['body'] ); // The body should be empty.
 		$this->assertEquals( $size, $res['headers']['content-length'] ); // Check the headers are returned (and the size is the same..)
-		$this->assertEquals( $size, filesize($res['filename']) ); // Check that the file is written to disk correctly without any extra characters
+		$this->assertEquals( $size, $filesize ); // Check that the file is written to disk correctly without any extra characters
+	}
 
-		unlink($res['filename']); // Remove the temporary file
+	/**
+	 * @ticket 26726
+	 */
+	function test_file_stream_limited_size() {
+		$url = 'http://unit-tests.svn.wordpress.org/trunk/data/images/2004-07-22-DSC_0007.jpg'; // we'll test against a file in the unit test data
+		$size = 10000;
+		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30, 'limit_response_size' => $size ) ); //Auto generate the filename.
+
+		// Cleanup before we assert, as it'll return early. 
+		if ( ! is_wp_error( $res ) ) {
+			$filesize = filesize( $res['filename'] );
+			unlink( $res['filename'] );
+		}
+
+		$this->assertFalse( is_wp_error( $res ) );
+		$this->assertEquals( $size, $filesize ); // Check that the file is written to disk correctly without any extra characters
+
 	}
 
 	/**
