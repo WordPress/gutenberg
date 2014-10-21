@@ -171,30 +171,6 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( 1, count( $comments ) );
 	}
 
-	function test_get_status() {
-		$post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id, 10 );
-
-		$post_id2 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id2, 10 );
-
-		$post_id3 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id3, 10, array( 'comment_approved' => '0' ) );
-
-		$post_id4 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id4, 10, array( 'comment_approved' => 'trash' ) );
-
-		$post_id5 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id5, 10, array( 'comment_approved' => 'spam' ) );
-
-		$this->assertEquals( 30, count( get_comments() ) );
-		$this->assertEquals( 30, count( get_comments( array( 'status' => 'all' ) ) ) );
-		$this->assertEquals( 20, count( get_comments( array( 'status' => 'approve' ) ) ) );
-		$this->assertEquals( 10, count( get_comments( array( 'status' => 'hold' ) ) ) );
-		$this->assertEquals( 10, count( get_comments( array( 'status' => 'trash' ) ) ) );
-		$this->assertEquals( 10, count( get_comments( array( 'status' => 'spam' ) ) ) );
-	}
-
 	/**
 	 * @ticket 27064
 	 */
