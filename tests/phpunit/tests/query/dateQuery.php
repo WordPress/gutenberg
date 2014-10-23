@@ -33,7 +33,10 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	}
 
 	public function test_date_query_before_array() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2007-09-24 07:17:23',) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2008-03-29 07:17:23',) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2008-07-15 07:17:23',) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '2009-06-11 07:17:23',) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -46,21 +49,7 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'1984-07-28 19:28:56',
-			'2003-05-27 22:45:07',
-			'2004-01-03 08:54:10',
-			'2004-05-22 12:34:12',
-			'2005-02-17 00:00:15',
-			'2005-12-31 23:59:20',
-			'2007-01-22 03:49:21',
-			'2007-05-16 17:32:22',
-			'2007-09-24 07:17:23',
-			'2008-03-29 09:04:25',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEqualSets( array( $p1, $p2 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
@@ -68,7 +57,8 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	 * their minimum values when being used with "before".
 	 */
 	public function test_date_query_before_array_test_defaulting() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2007-09-24 07:17:23',) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2008-03-29 07:17:23',) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -80,24 +70,14 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'1984-07-28 19:28:56',
-			'2003-05-27 22:45:07',
-			'2004-01-03 08:54:10',
-			'2004-05-22 12:34:12',
-			'2005-02-17 00:00:15',
-			'2005-12-31 23:59:20',
-			'2007-01-22 03:49:21',
-			'2007-05-16 17:32:22',
-			'2007-09-24 07:17:23',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEqualSets( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_before_string() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2007-09-24 07:17:23',) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2008-03-29 07:17:23',) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2008-07-15 07:17:23',) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '2009-06-11 07:17:23',) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -107,25 +87,13 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'1984-07-28 19:28:56',
-			'2003-05-27 22:45:07',
-			'2004-01-03 08:54:10',
-			'2004-05-22 12:34:12',
-			'2005-02-17 00:00:15',
-			'2005-12-31 23:59:20',
-			'2007-01-22 03:49:21',
-			'2007-05-16 17:32:22',
-			'2007-09-24 07:17:23',
-			'2008-03-29 09:04:25',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1, $p2 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_after_array() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-10-18 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2009-12-18 10:42:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2010-06-11 07:17:23', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -139,18 +107,7 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2010-06-17 17:09:30',
-			'2011-02-23 12:12:31',
-			'2011-07-04 01:56:32',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEqualSets( array( $p3 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
@@ -158,7 +115,8 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	 * their maximum values when being used with "after".
 	 */
 	public function test_date_query_after_array_test_defaulting() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2008-12-18 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2009-01-18 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -170,24 +128,13 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2009-06-11 21:30:28',
-			'2009-12-18 10:42:29',
-			'2010-06-17 17:09:30',
-			'2011-02-23 12:12:31',
-			'2011-07-04 01:56:32',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p2 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_after_string() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-12-18 09:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2009-12-18 10:42:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2009-12-19 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -197,22 +144,13 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2010-06-17 17:09:30',
-			'2011-02-23 12:12:31',
-			'2011-07-04 01:56:32',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p3 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_after_string_inclusive() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-12-18 09:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2009-12-18 10:42:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2009-12-19 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -223,26 +161,18 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2009-12-18 10:42:29',
-			'2010-06-17 17:09:30',
-			'2011-02-23 12:12:31',
-			'2011-07-04 01:56:32',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p2, $p3 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
 	 * @ticket 26653
 	 */
 	public function test_date_query_inclusive_between_dates() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2006-12-18 09:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2007-01-18 10:42:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2007-12-19 10:42:29', ) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '2008-12-19 10:42:29', ) );
+		$p5 = $this->factory->post->create( array( 'post_date' => '2009-12-19 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -258,17 +188,7 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-
-		$expected_dates = array(
-			'2007-01-22 03:49:21',
-			'2007-05-16 17:32:22',
-			'2007-09-24 07:17:23',
-			'2008-03-29 09:04:25',
-			'2008-07-15 11:32:26',
-			'2008-12-10 13:06:27',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p2, $p3, $p4 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
@@ -643,9 +563,9 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$this->assertEquals( array( $p1, $p2 ), $before_posts );
 	}
 
-	public function test_date_query_year_expecting_results() {
-		$this->create_posts();
-
+	public function test_date_query_year() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-12-19 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2010-12-19 10:42:29', ) );
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
 				array(
@@ -654,31 +574,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2009-06-11 21:30:28',
-			'2009-12-18 10:42:29',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_year_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'year' => 2001,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
-	}
-
-	public function test_date_query_month_expecting_results() {
-		$this->create_posts();
-
+	public function test_date_query_month() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-12-19 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2010-11-19 10:42:29', ) );
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
 				array(
@@ -687,33 +588,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2005-12-31 23:59:20',
-			'2008-12-10 13:06:27',
-			'2009-12-18 10:42:29',
-			'2011-12-12 16:39:33',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_month_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'month' => 8,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
-	}
-
-	public function test_date_query_week_expecting_results() {
-		$this->create_posts();
-
+	public function test_date_query_week() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-01-02 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2010-03-19 10:42:29', ) );
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
 				array(
@@ -722,29 +602,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2004-01-03 08:54:10',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_week_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'week' => 10,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
-	}
-
-	public function test_date_query_day_expecting_results() {
-		$this->create_posts();
+	public function test_date_query_day() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2009-01-17 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2009-01-18 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -754,52 +617,27 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2005-02-17 00:00:15',
-			'2010-06-17 17:09:30',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_day_expecting_noresults() {
-		$this->create_posts();
+	public function test_date_query_dayofweek() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-20 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
 				array(
-					'day' => 19,
+					'dayofweek' => 3,
 				),
 			),
 		) );
 
-		$this->assertCount( 0, $posts );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_dayofweek_expecting_results() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'dayofweek' => 7,
-				),
-			),
-		) );
-
-		$expected_dates = array(
-			'1984-07-28 19:28:56',
-			'2004-01-03 08:54:10',
-			'2004-05-22 12:34:12',
-			'2005-12-31 23:59:20',
-			'2008-03-29 09:04:25',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
-	}
-
-	public function test_date_query_hour_expecting_results() {
-		$this->create_posts();
+	public function test_date_query_hour() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 13:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 12:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -809,29 +647,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2008-12-10 13:06:27',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_hour_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'hour' => 2,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
-	}
-
-	public function test_date_query_minute_expecting_results() {
-		$this->create_posts();
+	public function test_date_query_minute() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:56:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -841,29 +662,12 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2011-07-04 01:56:32',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
-	public function test_date_query_minute_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'minute' => 2,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
-	}
-
-	public function test_date_query_second_expecting_results() {
-		$this->create_posts();
+	public function test_date_query_second() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:42:21', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -873,29 +677,15 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'2007-01-22 03:49:21',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
-	}
-
-	public function test_date_query_second_expecting_noresults() {
-		$this->create_posts();
-
-		$posts = $this->_get_query_result( array(
-			'date_query' => array(
-				array(
-					'second' => 2,
-				),
-			),
-		) );
-
-		$this->assertCount( 0, $posts );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_between_two_times() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2005-12-18 08:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2006-12-18 09:00:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2007-12-18 10:42:29', ) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '2008-12-18 17:00:29', ) );
+		$p5 = $this->factory->post->create( array( 'post_date' => '2009-12-18 18:42:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -912,26 +702,13 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'2004-05-22 12:34:12',
-			'2008-03-29 09:04:25',
-			'2008-07-15 11:32:26',
-			'2008-12-10 13:06:27',
-			'2009-12-18 10:42:29',
-			'2011-02-23 12:12:31',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEqualSets( array( $p2, $p3, $p4 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_relation_or() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2006-12-18 14:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2007-01-18 10:42:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2007-12-19 10:34:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -945,17 +722,14 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'2004-05-22 12:34:12',
-			'2012-06-13 14:03:34',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1, $p3 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_query_compare_greater_than_or_equal_to() {
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2006-12-18 13:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2007-01-18 14:34:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2007-12-19 14:37:29', ) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '2007-12-19 15:34:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -967,24 +741,15 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'1984-07-28 19:28:56',
-			'2003-05-27 22:45:07',
-			'2005-12-31 23:59:20',
-			'2007-05-16 17:32:22',
-			'2009-06-11 21:30:28',
-			'2010-06-17 17:09:30',
-			'2011-12-12 16:39:33',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p2, $p3, $p4 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	public function test_date_params_monthnum_m_duplicate() {
 		global $wpdb;
 
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2006-05-18 13:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2007-09-18 14:34:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2007-01-18 14:34:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
@@ -993,15 +758,7 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'2003-05-27 22:45:07',
-			'2004-05-22 12:34:12',
-			'2007-05-16 17:32:22',
-			'2025-05-20 10:13:01',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 
 		$this->assertContains( "MONTH( $wpdb->posts.post_date ) = 5", $this->q->request );
 		$this->assertNotContains( "MONTH( $wpdb->posts.post_date ) = 9", $this->q->request );
@@ -1010,26 +767,21 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	public function test_date_params_week_w_duplicate() {
 		global $wpdb;
 
-		$this->create_posts();
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-01 13:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-22 14:34:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2014-10-15 14:34:29', ) );
 
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
-				'week' => 21,
-				'w' => 22
+				'week' => 43,
+				'w' => 42,
 			),
 		) );
 
-		$expected_dates = array(
-			'1972-05-24 14:53:45',
-			'2004-05-22 12:34:12',
-			'2025-05-20 10:13:01',
-		);
+		$this->assertEquals( array( $p2 ), wp_list_pluck( $posts, 'ID' ) );
 
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
-
-		$this->assertContains( "WEEK( $wpdb->posts.post_date, 1 ) = 21", $this->q->request );
-		$this->assertNotContains( "WEEK( $wpdb->posts.post_date, 1 ) = 22", $this->q->request );
+		$this->assertContains( "WEEK( $wpdb->posts.post_date, 1 ) = 43", $this->q->request );
+		$this->assertNotContains( "WEEK( $wpdb->posts.post_date, 1 ) = 42", $this->q->request );
 	}
 
 	/**
@@ -1068,8 +820,10 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	 * @ticket 29822
 	 */
 	public function test_date_query_one_nested_query() {
-		$this->create_posts();
-
+		$p1 = $this->factory->post->create( array( 'post_date' => '2004-10-01 13:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2004-01-22 14:34:29', ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '1984-10-15 14:34:29', ) );
+		$p4 = $this->factory->post->create( array( 'post_date' => '1985-10-15 14:34:29', ) );
 		$posts = $this->_get_query_result( array(
 			'date_query' => array(
 				'relation' => 'OR',
@@ -1088,12 +842,7 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 			),
 		) );
 
-		$expected_dates = array(
-			'1984-07-28 19:28:56',
-			'2004-01-03 08:54:10',
-		);
-
-		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
+		$this->assertEquals( array( $p2, $p3 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
 	/**
@@ -1215,39 +964,6 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	}
 
 	/** Helpers **********************************************************/
-
-	protected function create_posts() {
-		// Be careful modifying this. Tests are coded to expect this exact sample data.
-		$post_dates = array(
-			'1972-05-24 14:53:45',
-			'1984-07-28 19:28:56',
-			'2003-05-27 22:45:07',
-			'2004-01-03 08:54:10',
-			'2004-05-22 12:34:12',
-			'2005-02-17 00:00:15',
-			'2005-12-31 23:59:20',
-			'2007-01-22 03:49:21',
-			'2007-05-16 17:32:22',
-			'2007-09-24 07:17:23',
-			'2008-03-29 09:04:25',
-			'2008-07-15 11:32:26',
-			'2008-12-10 13:06:27',
-			'2009-06-11 21:30:28',
-			'2009-12-18 10:42:29',
-			'2010-06-17 17:09:30',
-			'2011-02-23 12:12:31',
-			'2011-07-04 01:56:32',
-			'2011-12-12 16:39:33',
-			'2012-06-13 14:03:34',
-			'2025-04-20 10:13:00',
-			'2025-04-20 10:13:01',
-			'2025-05-20 10:13:01',
-		);
-
-		foreach ( $post_dates as $post_date ) {
-			$this->factory->post->create( array( 'post_date' => $post_date ) );
-		}
-	}
 
 	/**
 	 * There's no way to change post_modified through the API.
