@@ -28,7 +28,7 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 		$this->users[] = $this->factory->user->create( array( 'user_login' => 'paul', 'display_name' => 'paul', 'role' => 'author', 'first_name' => 'paul', 'last_name' => 'norris' ) );
 		$count = 0;
 		foreach ( $this->users as $userid ) {
-			$count = $count + 5;
+			$count = $count + 1;
 			for ( $i = 0; $i < $count; $i++ ) {
 				$this->factory->post->create( array( 'post_type' => 'post', 'post_author' => $userid ) );
 			}
@@ -53,7 +53,7 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 	}
 
 	function test_wp_list_authors_optioncount() {
-		$expected['optioncount'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (10)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (15)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (5)</li>';
+		$expected['optioncount'] = '<li><a href="' . $this->user_urls[1] . '" title="Posts by bob">bob</a> (2)</li><li><a href="' . $this->user_urls[2] . '" title="Posts by paul">paul</a> (3)</li><li><a href="' . $this->user_urls[0] . '" title="Posts by zack">zack</a> (1)</li>';
 		$this->AssertEquals( $expected['optioncount'], wp_list_authors( array( 'echo' => false, 'optioncount' => 1 ) ) );
 	}
 
