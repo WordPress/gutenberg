@@ -16,7 +16,7 @@ module("tinymce.plugins.Lists", {
 
 		tinymce.init({
 			selector: '#elm1',
-			plugins: "lists",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			skin: false,
 			indent: false,
@@ -38,7 +38,7 @@ module("tinymce.plugins.Lists", {
 			inline: true,
 			add_unload_trigger: false,
 			skin: false,
-			plugins: "lists",
+			plugins: wpPlugins,
 			disable_nodechange: true,
 			init_instance_callback: function(ed) {
 				window.inlineEditor = ed;

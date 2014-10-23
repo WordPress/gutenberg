@@ -5,6 +5,7 @@ module("tinymce.Formatter - Remove", {
 
 		tinymce.init({
 			selector: "textarea",
+			plugins: wpPlugins,
 			external_plugins: { noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js' }, // WP
 			indent: false,
 			add_unload_trigger: false,

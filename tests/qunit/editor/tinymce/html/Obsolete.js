@@ -4,6 +4,7 @@ module( 'tinymce.html.Obsolete', {
 
 		tinymce.init({
 			selector: 'textarea',
+			plugins: wpPlugins,
 			add_unload_trigger : false,
 			skin: false,
 			indent : false,

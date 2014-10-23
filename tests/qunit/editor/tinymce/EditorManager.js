@@ -4,6 +4,7 @@ module("tinymce.EditorManager", {
 
 		tinymce.init({
 			selector: "textarea",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,

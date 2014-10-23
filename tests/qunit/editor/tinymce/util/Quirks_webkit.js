@@ -5,6 +5,7 @@ module("tinymce.utils.Quirks_WebKit", {
 		tinymce.init({
 			selector: "textarea",
 			elements: "elm1",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			skin: false,
 			indent: false,

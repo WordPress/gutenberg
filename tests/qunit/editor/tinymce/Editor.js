@@ -5,6 +5,7 @@ module("tinymce.Editor", {
 
 		tinymce.init({
 			selector: "#elm1",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,
@@ -26,6 +27,7 @@ module("tinymce.Editor", {
 
 		tinymce.init({
 			selector: "#elm2",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,
@@ -307,6 +309,7 @@ asyncTest('remove editor', function() {
 
 	tinymce.init({
 		selector: "#elmx",
+		plugins: wpPlugins,
 		add_unload_trigger: false,
 		disable_nodechange: true,
 		skin: false,

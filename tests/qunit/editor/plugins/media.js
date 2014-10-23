@@ -6,7 +6,7 @@ module("tinymce.plugins.Media", {
 			selector: "textarea",
 			add_unload_trigger: false,
 			skin: false,
-			plugins: 'media',
+			plugins: wpPlugins,
 			document_base_url: '/tinymce/tinymce/trunk/tests/',
 			media_scripts: [
 				{filter: 'http://media1.tinymce.com'},

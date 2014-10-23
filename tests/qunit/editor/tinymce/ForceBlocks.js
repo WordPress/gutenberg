@@ -5,6 +5,7 @@ module("tinymce.ForceBlocks", {
 
 		tinymce.init({
 			selector: "textarea",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			indent: false,
 			skin: false,

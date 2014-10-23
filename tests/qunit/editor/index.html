@@ -20,10 +20,17 @@
 	<script src="http://www.google.com/jsapi"></script>
 	<script>google.load("jquery", "1");</script>
 	<script src="js/qunit/qunit.js"></script>
-	<script src="../../../src/wp-includes/js/tinymce/tinymce.min.js"></script>
+	<script src="../../../build/wp-includes/js/tinymce/tinymce.min.js"></script>
 <!--<script src="../js/tinymce/classes/jquery.tinymce.js"></script> -->
 	<script src="js/utils.js"></script>
 	<script src="js/init.js"></script>
+
+	<script>
+		var wpPlugins = 'charmap colorpicker hr lists media paste tabfocus textcolor ' +
+			'fullscreen wordpress wpautoresize wpeditimage wpgallery wplink wpdialogs wpview';
+
+		getUserSetting = setUserSetting = function() {}
+	</script>
 
 	<!-- tinymce.dom.* -->
 	<script src="tinymce/dom/DomQuery.js"></script>

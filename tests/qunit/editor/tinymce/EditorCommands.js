@@ -4,6 +4,7 @@ module("tinymce.EditorCommands", {
 
 		tinymce.init({
 			selector: "textarea",
+			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			indent: false,
@@ -250,7 +251,7 @@ test('mceInsertContent - forced root block', function() {
 	editor.getBody().innerHTML = '';
 	editor.execCommand('mceInsertContent', false, 'test<b>123</b><!-- a -->');
 	// Opera adds an extra paragraph since it adds a BR at the end of the contents pass though this for now since it's an minority browser
-	equal(editor.getContent().replace(/<p>\u00a0<\/p>/g, ''), '<p>test<strong>123</strong></p><!-- a -->');
+	equal(editor.getContent().replace(/<p>\u00a0<\/p>/g, ''), '<p>test<b>123</b></p><!-- a -->'); // WordPress doesn't convert <b> to <strong>
 });
 
 test('mceInsertContent - mixed inline content inside td', function() {
@@ -260,7 +261,7 @@ test('mceInsertContent - mixed inline content inside td', function() {
 	editor.getBody().innerHTML = '<table><tr><td>X</td></tr></table>';
 	Utils.setSelection('td', 0, 'td', 0);
 	editor.execCommand('mceInsertContent', false, 'test<b>123</b><!-- a -->');
-	equal(editor.getContent(), '<table><tbody><tr><td>test<strong>123</strong><!-- a -->X</td></tr></tbody></table>');
+	equal(editor.getContent(), '<table><tbody><tr><td>test<b>123</b><!-- a -->X</td></tr></tbody></table>');  // WordPress doesn't convert <b> to <strong>
 });
 
 test('mceInsertContent - invalid insertion with spans on page', function(){

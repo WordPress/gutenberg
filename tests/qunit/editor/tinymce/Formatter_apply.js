@@ -5,6 +5,7 @@ module("tinymce.Formatter - Apply", {
 
 		tinymce.init({
 			selector: "#elm1",
+			plugins: wpPlugins,
 			external_plugins: { noneditable: '../../../../tests/qunit/editor/external-plugins/noneditable/plugin.min.js' }, // WP
 			add_unload_trigger: false,
 			skin: false,
@@ -28,6 +29,7 @@ module("tinymce.Formatter - Apply", {
 
 		tinymce.init({
 			selector: "#elm2",
+			plugins: wpPlugins,
 			inline: true,
 			add_unload_trigger: false,
 			skin: false,

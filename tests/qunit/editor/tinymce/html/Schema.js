@@ -166,9 +166,9 @@ test('getBoolAttrs', function() {
 		"CONTROLS": {}, "LOOP": {}, "AUTOPLAY": {}, "SELECTED": {}, "READONLY": {}, "NOWRAP": {},
 		"NOSHADE": {}, "NORESIZE": {}, "NOHREF": {}, "MULTIPLE": {}, "ISMAP": {}, "DISABLED": {}, "DEFER": {},
 		"DECLARE": {}, "COMPACT": {}, "CHECKED": {},
-		"controls": {}, "loop": {}, "autoplay": {}, "selected": {}, "readonly": {}, "nowrap": {},
-		"noshade": {}, "noresize": {}, "nohref": {}, "multiple": {}, "ismap": {}, "disabled": {}, "defer": {},
-		"declare": {}, "compact": {}, "checked": {}
+		"allowfullscreen": {}, "controls": {}, "loop": {}, "autoplay": {}, "selected": {}, "readonly": {}, "mozallowfullscreen": {},
+		"nowrap": {}, "noshade": {}, "noresize": {}, "nohref": {}, "multiple": {}, "ismap": {}, "disabled": {}, "defer": {},
+		"declare": {}, "compact": {}, "checked": {}, "webkitallowfullscreen": {}
 	});
 });
 
