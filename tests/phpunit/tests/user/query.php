@@ -10,10 +10,6 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-
-		$this->user_id = $this->factory->user->create( array(
-			'role' => 'author'
-		) );
 	}
 
 	function test_get_and_set() {
@@ -78,60 +74,64 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $users[0], $users[2] ), $ids );
 	}
 
-	function test_exclude() {
-		$users = new WP_User_Query();
-		$users->set( 'fields', '' );
-		$users->set( 'exclude', $this->user_id );
-		$users->prepare_query();
-		$users->query();
+	public function test_exclude() {
+		$users = $this->factory->user->create_many( 3, array(
+			'role' => 'author',
+		) );
 
-		$ids = $users->get_results();
-		$this->assertNotContains( $this->user_id, $ids );
+		$q = new WP_User_Query( array(
+			'fields' => '',
+			'exclude' => $users[1],
+		) );
+
+		$ids = $q->get_results();
+
+		// Indirect test in order to ignore default user created during installation.
+		$this->assertNotEmpty( $ids );
+		$this->assertNotContains( $users[1], $ids );
 	}
 
-	function test_get_all() {
-		$this->factory->user->create_many( 10, array(
+	public function test_get_all() {
+		$this->factory->user->create_many( 3, array(
 			'role' => 'author'
 		) );
 
 		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id() ) );
 		$users = $users->get_results();
-		$this->assertEquals( 12, count( $users ) );
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 4, count( $users ) );
 		foreach ( $users as $user ) {
 			$this->assertInstanceOf( 'WP_User', $user );
 		}
 
 		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'fields' => 'all_with_meta' ) );
 		$users = $users->get_results();
-		$this->assertEquals( 12, count( $users ) );
+		$this->assertEquals( 4, count( $users ) );
 		foreach ( $users as $user ) {
 			$this->assertInstanceOf( 'WP_User', $user );
 		}
 	}
 
-	function test_orderby() {
-		$user_ids = $this->factory->user->create_many( 10, array(
+	public function test_orderby_meta_value() {
+		$users = $this->factory->user->create_many( 3, array(
 			'role' => 'author'
 		) );
 
-		$names = array( 'd', 'f', 'n', 'f', 'd', 'j', 'r', 'p', 'h', 'g' );
+		update_user_meta( $users[0], 'last_name', 'Jones' );
+		update_user_meta( $users[1], 'last_name', 'Albert' );
+		update_user_meta( $users[2], 'last_name', 'Zorro' );
 
-		foreach ( $names as $i => $name )
-			update_user_meta( $user_ids[$i], 'last_name', $name );
-
-		$u = new WP_User_Query( array(
-			'include' => $user_ids,
+		$q = new WP_User_Query( array(
+			'include' => $users,
 			'meta_key' => 'last_name',
 			'orderby' => 'meta_value',
 			'fields' => 'ids'
 		) );
-		$values = array();
-		foreach ( $u->get_results() as $user )
-			$values[] = get_user_meta( $user, 'last_name', true );
 
-		sort( $names );
+		$expected = array( $users[1], $users[0], $users[2] );
 
-		$this->assertEquals( $names, $values );
+		$this->assertEquals( $expected, $q->get_results() );
 	}
 
 	/**
