@@ -733,24 +733,44 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertFalse( $site );
 	}
 
+	/**
+	 * Test the original and cached responses for a created and then deleted site when
+	 * the blog ID is requested through get_blog_id_from_url().
+	 */
 	function test_get_blog_id_from_url() {
 		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/testdomainexists', 'title' => 'Test Title' ) );
 
 		$details = get_blog_details( $blog_id, false );
-
-		$this->assertEquals( $blog_id, get_blog_id_from_url( $details->domain, $details->path ) );
 		$key = md5( $details->domain . $details->path );
+
+		// Test the original response and cached response for the newly created site.
+		$this->assertEquals( $blog_id, get_blog_id_from_url( $details->domain, $details->path ) );
 		$this->assertEquals( $blog_id, wp_cache_get( $key, 'blog-id-cache' ) );
 
-		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, 'foo' ) );
+		// Test the case insensitivity of the site lookup.
+		$this->assertEquals( $blog_id, get_blog_id_from_url( strtoupper( $details->domain ) , strtoupper( $details->path ) ) );
 
+		// Test the first and cached responses for a non existent site.
+		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, 'foo' ) );
+		$this->assertEquals( -1, wp_cache_get( md5( $details->domain . 'foo' ), 'blog-id-cache' ) );
+
+		// A blog ID is still available if only the 'deleted' flag is set for a site.
 		wpmu_delete_blog( $blog_id );
 		$this->assertEquals( $blog_id, get_blog_id_from_url( $details->domain, $details->path ) );
-		wpmu_delete_blog( $blog_id, true );
+		$this->assertEquals( $blog_id, wp_cache_get( $key, 'blog-id-cache' ) );
 
+		// Explicitly pass $drop = false (default), a blog ID will still be available.
+		wpmu_delete_blog( $blog_id, false );
+		$this->assertEquals( $blog_id, get_blog_id_from_url( $details->domain, $details->path ) );
+		$this->assertEquals( $blog_id, wp_cache_get( $key, 'blog-id-cache' ) );
+
+		// When deleted with the drop parameter at true, the cache will first be false, and then
+		// set to -1 after an attempt at get_blog_id_from_url() is made.
+		wpmu_delete_blog( $blog_id, true );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
 		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, $details->path ) );
+		$this->assertEquals( -1, wp_cache_get( $key, 'blog-id-cache' ) );
 	}
 
 	function test_is_main_site() {
