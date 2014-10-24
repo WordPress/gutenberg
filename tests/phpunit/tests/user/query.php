@@ -135,6 +135,57 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30064
+	 */
+	public function test_orderby_include_with_empty_include() {
+		$q = new WP_User_Query( array(
+			'orderby' => 'include',
+		) );
+
+		$this->assertContains( 'ORDER BY user_login', $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 30064
+	 */
+	public function test_orderby_include() {
+		global $wpdb;
+
+		$users = $this->factory->user->create_many( 4 );
+		$q = new WP_User_Query( array(
+			'orderby' => 'include',
+			'include' => array( $users[1], $users[0], $users[3] ),
+			'fields' => '',
+		) );
+
+		$expected_orderby = 'ORDER BY FIELD( ' . $wpdb->users . '.ID, ' . $users[1] . ',' . $users[0] . ',' . $users[3] . ' )';
+		$this->assertContains( $expected_orderby, $q->query_orderby );
+
+		// assertEquals() respects order but ignores type (get_results() returns numeric strings).
+		$this->assertEquals( array( $users[1], $users[0], $users[3] ), $q->get_results() );
+	}
+
+	/**
+	 * @ticket 30064
+	 */
+	public function test_orderby_include_duplicate_values() {
+		global $wpdb;
+
+		$users = $this->factory->user->create_many( 4 );
+		$q = new WP_User_Query( array(
+			'orderby' => 'include',
+			'include' => array( $users[1], $users[0], $users[1], $users[3] ),
+			'fields' => '',
+		) );
+
+		$expected_orderby = 'ORDER BY FIELD( ' . $wpdb->users . '.ID, ' . $users[1] . ',' . $users[0] . ',' . $users[3] . ' )';
+		$this->assertContains( $expected_orderby, $q->query_orderby );
+
+		// assertEquals() respects order but ignores type (get_results() returns numeric strings).
+		$this->assertEquals( array( $users[1], $users[0], $users[3] ), $q->get_results() );
+	}
+
+	/**
 	 * @ticket 21119
 	 */
 	function test_prepare_query() {
