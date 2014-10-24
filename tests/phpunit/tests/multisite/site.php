@@ -71,59 +71,80 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertFalse( restore_current_blog() );
 	}
 
-	function test_create_and_delete_blog() {
+	/**
+	 * Test the cache keys and database tables setup through the creation of a site.
+	 */
+	function test_created_site_details() {
 		global $wpdb;
 
-		$blog_ids = $this->factory->blog->create_many( 4 );
-		foreach ( $blog_ids as $blog_id ) {
-			$this->assertInternalType( 'int', $blog_id );
-			$prefix = $wpdb->get_blog_prefix( $blog_id );
+		$blog_id = $this->factory->blog->create();
 
-			// $get_all = false
-			$details = get_blog_details( $blog_id, false );
-			$this->assertEquals( $details, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertInternalType( 'int', $blog_id );
+		$prefix = $wpdb->get_blog_prefix( $blog_id );
 
-			// get_id_from_blogname(), see #20950
-			$this->assertEquals( $blog_id, get_id_from_blogname( $details->path ) );
-			$this->assertEquals( $blog_id, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
+		// $get_all = false, only retrieve details from the blogs table
+		$details = get_blog_details( $blog_id, false );
 
-			// get_blog_id_from_url()
-			$this->assertEquals( $blog_id, get_blog_id_from_url( $details->domain, $details->path ) );
-			$key = md5( $details->domain . $details->path );
-			$this->assertEquals( $blog_id, wp_cache_get( $key, 'blog-id-cache' ) );
+		// Combine domain and path for a site specific cache key.
+		$key = md5( $details->domain . $details->path );
 
-			// These are empty until get_blog_details() is called with $get_all = true
-			$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
-			$key = md5( $details->domain . $details->path );
-			$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
+		$this->assertEquals( $details, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 
-			// $get_all = true should propulate the full blog-details cache and the blog slug lookup cache
-			$details = get_blog_details( $blog_id, true );
-			$this->assertEquals( $details, wp_cache_get( $blog_id, 'blog-details' ) );
-			$this->assertEquals( $details, wp_cache_get( $key, 'blog-lookup' ) );
+		// get_id_from_blogname(), see #20950
+		$this->assertEquals( $blog_id, get_id_from_blogname( $details->path ) );
+		$this->assertEquals( $blog_id, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
 
-			foreach ( $wpdb->tables( 'blog', false ) as $table ) {
-				$suppress = $wpdb->suppress_errors();
-				$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
-				$wpdb->suppress_errors( $suppress );
-				$this->assertNotEmpty( $table_fields );
-				$result = $wpdb->get_results( "SELECT * FROM $prefix$table LIMIT 1" );
-				if ( 'commentmeta' == $table || 'links' == $table )
-					$this->assertEmpty( $result );
-				else
-					$this->assertNotEmpty( $result );
+		// get_blogaddress_by_name()
+		$this->assertEquals( 'http://' . $details->domain . $details->path, get_blogaddress_by_name( trim( $details->path, '/' ) ) );
+
+		// These are empty until get_blog_details() is called with $get_all = true
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
+
+		// $get_all = true, populate the full blog-details cache and the blog slug lookup cache
+		$details = get_blog_details( $blog_id, true );
+		$this->assertEquals( $details, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( $details, wp_cache_get( $key, 'blog-lookup' ) );
+
+		// Check existence of each database table for the created site.
+		foreach ( $wpdb->tables( 'blog', false ) as $table ) {
+			$suppress     = $wpdb->suppress_errors();
+			$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
+			$wpdb->suppress_errors( $suppress );
+
+			// The table should exist.
+			$this->assertNotEmpty( $table_fields );
+
+			// And the table should not be empty, unless commentmeta or links.
+			$result = $wpdb->get_results( "SELECT * FROM $prefix$table LIMIT 1" );
+			if ( 'commentmeta' == $table || 'links' == $table ) {
+				$this->assertEmpty( $result );
+			} else {
+				$this->assertNotEmpty( $result );
 			}
 		}
 
 		// update the blog count cache to use get_blog_count()
 		wp_update_network_counts();
-		$this->assertEquals( 4 + 1, (int) get_blog_count() );
+		$this->assertEquals( 2, (int) get_blog_count() );
+	}
+
+	/**
+	 * Test the deletion of a site, including a case where database tables are
+	 * intentionally not deleted.
+	 */
+	function test_wpmu_delete_blog() {
+		global $wpdb;
+
+		$blog_ids = $this->factory->blog->create_many( 2 );
 
 		$drop_tables = false;
-		// delete all blogs
+
+		// Delete both sites, but keep the database tables for one.
 		foreach ( $blog_ids as $blog_id ) {
 			// drop tables for every second blog
 			$drop_tables = ! $drop_tables;
+
 			$details = get_blog_details( $blog_id, false );
 
 			wpmu_delete_blog( $blog_id, $drop_tables );
@@ -140,10 +161,11 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 				$suppress = $wpdb->suppress_errors();
 				$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
 				$wpdb->suppress_errors( $suppress );
-				if ( $drop_tables )
+				if ( $drop_tables ) {
 					$this->assertEmpty( $table_fields );
-				else
+				} else {
 					$this->assertNotEmpty( $table_fields, $prefix . $table );
+				}
 			}
 		}
 
@@ -162,27 +184,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$current_time = time();
 		$time_difference = $current_time - strtotime( $blog->last_updated );
 		$this->assertLessThan( 2, $time_difference );
-	}
-
-	function test_getters(){
-		global $current_site;
-
-		$blog_id = get_current_blog_id();
-		$blog = get_blog_details( $blog_id );
-		$this->assertEquals( $blog_id, $blog->blog_id );
-		$this->assertEquals( $current_site->domain, $blog->domain );
-		$this->assertEquals( '/', $blog->path );
-
-		// Test defaulting to current blog
-		$this->assertEquals( $blog, get_blog_details() );
-
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/test_blogname', 'title' => 'Test Title' ) );
-		$this->assertInternalType( 'int', $blog_id );
-
-		$this->assertEquals( 'http://' . $current_site->domain . $current_site->path . 'test_blogname/', get_blogaddress_by_name('test_blogname') );
-
-		$this->assertEquals( $blog_id, get_id_from_blogname('test_blogname') );
 	}
 
 	function test_update_blog_details() {
