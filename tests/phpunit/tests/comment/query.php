@@ -516,4 +516,65 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( array( $c1, $c2, $c3, $c4, $c5 ), $found );
 	}
+
+	public function test_orderby_default() {
+		$q = new WP_Comment_Query();
+		$q->query( array() );
+
+		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+	}
+
+	public function test_orderby_single() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => 'comment_agent',
+		) );
+
+		$this->assertContains( 'ORDER BY comment_agent', $q->request );
+	}
+
+	public function test_orderby_single_invalid() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => 'foo',
+		) );
+
+		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+	}
+
+	public function test_orderby_comma_separated() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => 'comment_agent, comment_approved',
+		) );
+
+		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+	}
+
+	public function test_orderby_array() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => array( 'comment_agent', 'comment_approved' ),
+		) );
+
+		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+	}
+
+	public function test_orderby_array_contains_invalid_item() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => array( 'comment_agent', 'foo', 'comment_approved' ),
+		) );
+
+		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+	}
+
+	public function test_orderby_array_contains_all_invalid_items() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => array( 'foo', 'bar', 'baz' ),
+		) );
+
+		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+	}
 }
