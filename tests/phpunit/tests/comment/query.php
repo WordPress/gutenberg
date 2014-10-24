@@ -577,4 +577,40 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
 	}
+
+	/**
+	 * @ticket 29902
+	 */
+	public function test_orderby_none() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => 'none',
+		) );
+
+		$this->assertNotContains( 'ORDER BY', $q->request );
+	}
+
+	/**
+	 * @ticket 29902
+	 */
+	public function test_orderby_empty_array() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => array(),
+		) );
+
+		$this->assertNotContains( 'ORDER BY', $q->request );
+	}
+
+	/**
+	 * @ticket 29902
+	 */
+	public function test_orderby_false() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => false,
+		) );
+
+		$this->assertNotContains( 'ORDER BY', $q->request );
+	}
 }
