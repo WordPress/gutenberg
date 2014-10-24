@@ -70,6 +70,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 		$this->_restore_hooks();
+		wp_set_current_user( 0 );
 	}
 
 	function clean_up_global_scope() {
