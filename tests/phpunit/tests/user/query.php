@@ -34,15 +34,48 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertNull( $users->get( 'does-not-exist' ) );
 	}
 
-	function test_include() {
-		$users = new WP_User_Query();
-		$users->set( 'fields', '' );
-		$users->set( 'include', $this->user_id );
-		$users->prepare_query();
-		$users->query();
+	public function test_include_single() {
+		$users = $this->factory->user->create_many( 2 );
+		$q = new WP_User_Query( array(
+			'fields' => '',
+			'include' => $users[0],
+		) );
+		$ids = $q->get_results();
 
-		$ids = $users->get_results();
-		$this->assertEquals( array( $this->user_id ), $ids );
+		$this->assertEquals( array( $users[0] ), $ids );
+	}
+
+	public function test_include_comma_separated() {
+		$users = $this->factory->user->create_many( 3 );
+		$q = new WP_User_Query( array(
+			'fields' => '',
+			'include' => $users[0] . ', ' . $users[2],
+		) );
+		$ids = $q->get_results();
+
+		$this->assertEqualSets( array( $users[0], $users[2] ), $ids );
+	}
+
+	public function test_include_array() {
+		$users = $this->factory->user->create_many( 3 );
+		$q = new WP_User_Query( array(
+			'fields' => '',
+			'include' => array( $users[0], $users[2] ),
+		) );
+		$ids = $q->get_results();
+
+		$this->assertEqualSets( array( $users[0], $users[2] ), $ids );
+	}
+
+	public function test_include_array_bad_values() {
+		$users = $this->factory->user->create_many( 3 );
+		$q = new WP_User_Query( array(
+			'fields' => '',
+			'include' => array( $users[0], 'foo', $users[2] ),
+		) );
+		$ids = $q->get_results();
+
+		$this->assertEqualSets( array( $users[0], $users[2] ), $ids );
 	}
 
 	function test_exclude() {
