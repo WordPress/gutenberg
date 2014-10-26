@@ -613,4 +613,40 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertNotContains( 'ORDER BY', $q->request );
 	}
+
+	public function test_count() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'count' => true,
+		) );
+
+		$this->assertEquals( 2, $found );
+	}
+
+	/**
+	 * @ticket 23369
+	 */
+	public function test_count_with_meta_query() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
+		add_comment_meta( $c1, 'foo', 'bar' );
+		add_comment_meta( $c3, 'foo', 'bar' );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'count' => true,
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEquals( 2, $found );
+	}
 }
