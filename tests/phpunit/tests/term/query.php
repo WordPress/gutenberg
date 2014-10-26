@@ -85,6 +85,21 @@ class Tests_Tax_Query extends WP_UnitTestCase {
 		$this->assertEquals( array( 'foo', ), $tq->queries[0]['terms'] );
 	}
 
+	/**
+	 * @ticket 30117
+	 */
+	public function test_construct_empty_strings_array_members_should_be_discarded() {
+		$q = new WP_Tax_Query( array(
+			'',
+			array(
+				'taxonomy' => 'post_tag',
+				'terms' => 'foo',
+			),
+		) );
+
+		$this->assertSame( 1, count( $q->queries ) );
+	}
+
 	public function test_transform_query_terms_empty() {
 		$tq = new WP_Tax_Query( array(
 			array(),
