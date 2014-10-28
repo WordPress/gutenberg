@@ -16,7 +16,7 @@
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-cssmin": "~0.10.0",
-    "grunt-contrib-imagemin": "~0.4.1",
+    "grunt-contrib-imagemin": "~0.9.1",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-qunit": "~0.5.2",
     "grunt-contrib-uglify": "~0.5.0",
