@@ -19,7 +19,7 @@
     "grunt-contrib-imagemin": "~0.9.1",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-qunit": "~0.5.2",
-    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-cssjanus": "git://github.com/ocean90/grunt-cssjanus.git#97c43554ff7a86e2ff414d34e66725b05118bf10",
     "grunt-jsvalidate": "~0.2.2",
