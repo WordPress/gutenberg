@@ -352,6 +352,36 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
 	}
 
+	public function test_get_terms_by_slug() {
+		$t1 = $this->factory->tag->create( array( 'slug' => 'foo' ) );
+		$t2 = $this->factory->tag->create( array( 'slug' => 'bar' ) );
+
+		$found = get_terms( 'post_tag', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'slug' => 'foo',
+		) );
+
+		$this->assertEquals( array( $t1 ), $found );
+	}
+
+	/**
+	 * @ticket 23636
+	 */
+	public function test_get_terms_by_multiple_slugs() {
+		$t1 = $this->factory->tag->create( array( 'slug' => 'foo' ) );
+		$t2 = $this->factory->tag->create( array( 'slug' => 'bar' ) );
+		$t3 = $this->factory->tag->create( array( 'slug' => 'barry' ) );
+
+		$found = get_terms( 'post_tag', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'slug' => array( 'foo', 'barry' )
+		) );
+
+		$this->assertEquals( array( $t1, $t3 ), $found );
+	}
+
 	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_ids() {
 		// Set up a clean taxonomy.
 		$tax = 'hierarchical_fields';
