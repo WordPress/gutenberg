@@ -188,7 +188,7 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 
 		$term_id = $this->factory->term->create( array( 'slug' => $slug, 'name' => $name, 'taxonomy' => $taxonomy ) );
 
-		$last_changed = wp_get_last_changed( 'terms' );
+		$last_changed = wp_cache_get( 'last_changed', 'terms' );
 		$group = $taxonomy . ':' . $last_changed;
 
 		$term = get_term_by( 'slug', $slug, $taxonomy );
