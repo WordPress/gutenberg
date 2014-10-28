@@ -13,7 +13,8 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		autoprefixer: {
 			options: {
-				browsers: ['Android >= 2.1', 'Chrome >= 21', 'Explorer >= 7', 'Firefox >= 17', 'Opera >= 12.1', 'Safari >= 6.0']
+				browsers: ['Android >= 2.1', 'Chrome >= 21', 'Explorer >= 7', 'Firefox >= 17', 'Opera >= 12.1', 'Safari >= 6.0'],
+				cascade: false
 			},
 			core: {
 				expand: true,
