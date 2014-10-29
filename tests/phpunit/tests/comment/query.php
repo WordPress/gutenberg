@@ -961,7 +961,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 			'fields' => 'ids',
 		) );
 
-		$this->assertEquals( array( $c1, $c2, $c3, $c4, $c5 ), $found );
+		$this->assertEqualSets( array( $c1, $c2, $c3, $c4, $c5 ), $found );
 	}
 
 	public function test_orderby_default() {
