@@ -221,4 +221,33 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$query->prepare_query();
 		$this->assertEquals( $_query_vars, $query->query_vars );
 	}
+
+	/**
+	 * @ticket 23849
+	 */
+	function test_meta_query_with_role() {
+		$author_ids = $this->factory->user->create_many( 4, array( 'role' => 'author' ) );
+
+		add_user_meta( $author_ids[0], 'foo', 'bar' );
+		add_user_meta( $author_ids[1], 'foo', 'baz' );
+
+		// Users with foo = bar or baz restricted to the author role.
+		$query = new WP_User_Query( array(
+			'fields' => '',
+			'role' => 'author',
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+				array(
+					'key' => 'foo',
+					'value' => 'baz',
+				),
+			),
+		) );
+
+		$this->assertEquals( array( $author_ids[0], $author_ids[1] ), $query->get_results() );
+	}
 }
