@@ -75,6 +75,70 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $c1, $c3 ), $found );
 	}
 
+	public function test_status_default_to_all() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => 'foo' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '0' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c3 ), $found );
+	}
+
+	/**
+	 * @ticket 29612
+	 */
+	public function test_status_comma_any() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => 'foo' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '0' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'status' => 'any',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3 ), $found );
+	}
+
+	/**
+	 * @ticket 29612
+	 */
+	public function test_status_comma_separated() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => 'foo' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '0' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'status' => 'approve,foo,bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 29612
+	 */
+	public function test_status_array() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => 'foo' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '0' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'status' => array( 'approve', 'foo', 'bar', ),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $found );
+	}
+
 	function test_get_comments_for_post() {
 		$post_id = $this->factory->post->create();
 		$this->factory->comment->create_post_comments( $post_id, 10 );
