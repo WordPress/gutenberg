@@ -16,6 +16,23 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 29612
+	 */
+	public function test_status_empty_string() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '0' ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => 'spam' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'status' => '',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $found );
+	}
+
+	/**
 	 * @ticket 21101
 	 */
 	public function test_status_hold() {
