@@ -1014,6 +1014,10 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		restore_current_blog();
 	}
 
+	/**
+	 * Added as a callback to the domain_exists filter to provide manual results for
+	 * the testing of the filter and for a test which does not need the database.
+	 */
 	function _domain_exists_cb( $exists, $domain, $path, $site_id ) {
 		if ( 'foo' == $domain && 'bar/' == $path )
 			return 1234;
@@ -1021,32 +1025,51 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 			return null;
 	}
 
-	function test_domain_exists() {
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/testdomainexists', 'title' => 'Test Title' ) );
+	function test_domain_exists_with_default_site_id() {
+		$details = get_blog_details( 1, false );
 
-		$details = get_blog_details( $blog_id, false );
+		$this->assertEquals( 1, domain_exists( $details->domain, $details->path ) );
+	}
 
-		$this->assertEquals( $blog_id, domain_exists( $details->domain, $details->path ) );
-		$this->assertEquals( $blog_id, domain_exists( $details->domain, $details->path, $details->site_id ) );
+	function test_domain_exists_with_specified_site_id() {
+		$details = get_blog_details( 1, false );
+
+		$this->assertEquals( 1, domain_exists( $details->domain, $details->path, $details->site_id ) );
+	}
+
+	/**
+	 * When the domain is valid, but the resulting site does not belong to the specified network,
+	 * it is marked as not existing.
+	 */
+	function test_domain_does_not_exist_with_invalid_site_id() {
+		$details = get_blog_details( 1, false );
+
 		$this->assertEquals( null, domain_exists( $details->domain, $details->path, 999 ) );
-		$this->assertEquals( null, domain_exists( 'foo', 'bar' ) );
+	}
 
+	function test_invalid_domain_does_not_exist_with_default_site_id() {
+		$this->assertEquals( null, domain_exists( 'foo', 'bar' ) );
+	}
+
+	function test_domain_filtered_to_exist() {
 		add_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+
 		$this->assertEquals( 1234, domain_exists( 'foo', 'bar' ) );
-		$this->assertEquals( null, domain_exists( 'foo', 'baz' ) );
-		$this->assertEquals( null, domain_exists( 'bar', 'foo' ) );
+
+		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+	}
+
+	/**
+	 * When a path is passed to domain_exists, it is immediately trailing slashed. A path
+	 * value with or without the slash should result in the same return value.
+	 */
+	function test_slashed_path_in_domain_exists() {
+		add_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
 
 		// Make sure the same result is returned with or without a trailing slash
 		$this->assertEquals( domain_exists( 'foo', 'bar' ), domain_exists( 'foo', 'bar/' ) );
 
 		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
-		$this->assertEquals( null, domain_exists( 'foo', 'bar' ) );
-
-		wpmu_delete_blog( $blog_id );
-		$this->assertEquals( $blog_id, domain_exists( $details->domain, $details->path ) );
-		wpmu_delete_blog( $blog_id, true );
-		$this->assertEquals( null, domain_exists( $details->domain, $details->path ) );
 	}
 }
 
