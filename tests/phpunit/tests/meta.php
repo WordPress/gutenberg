@@ -263,4 +263,41 @@ class Tests_Meta extends WP_UnitTestCase {
 		$this->assertFalse( update_metadata_by_mid( 'user', array( 1 ), 'meta_new_value' ) );
 		$this->assertFalse( delete_metadata_by_mid( 'user', array( 1 ) ) );
 	}
+
+	/**
+	 * @ticket 15030
+	 */
+	public function test_get_metadata_with_empty_key_array_value_should_be_unserialized() {
+		$data = array( 1, 2 );
+		add_metadata( 'user', $this->author->ID, 'foo', $data );
+		$found = get_metadata( 'user', $this->author->ID );
+
+		$this->assertSame( array( $data ), $found['foo'] );
+	}
+
+	/**
+	 * @ticket 15030
+	 */
+	public function test_get_metadata_with_empty_key_object_value_should_be_unserialized() {
+		$data = new stdClass;
+		$data->foo = 'bar';
+		add_metadata( 'user', $this->author->ID, 'foo', $data );
+		$found = get_metadata( 'user', $this->author->ID );
+
+		$this->assertEquals( array( $data ), $found['foo'] );
+	}
+
+	/**
+	 * @ticket 15030
+	 */
+	public function test_get_metadata_with_empty_key_nested_array_value_should_be_unserialized() {
+		$data = array(
+			array( 1, 2 ),
+			array( 3, 4 ),
+		);
+		add_metadata( 'user', $this->author->ID, 'foo', $data );
+		$found = get_metadata( 'user', $this->author->ID );
+
+		$this->assertSame( array( $data ), $found['foo'] );
+	}
 }
