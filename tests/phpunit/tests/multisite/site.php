@@ -130,44 +130,144 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the deletion of a site, including a case where database tables are
-	 * intentionally not deleted.
+	 * When a site is flagged as 'deleted', its data should be cleared from cache.
 	 */
-	function test_wpmu_delete_blog() {
+	function test_data_in_cache_after_wpmu_delete_blog_drop_false() {
+		$blog_id = $this->factory->blog->create();
+
+		$details = get_blog_details( $blog_id, false );
+		$key = md5( $details->domain . $details->path );
+
+		// Delete the site without forcing a table drop.
+		wpmu_delete_blog( $blog_id, false );
+
+		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
+	}
+
+	/**
+	 * When a site is flagged as 'deleted', its data should remain in the database.
+	 */
+	function test_data_in_tables_after_wpmu_delete_blog_drop_false() {
 		global $wpdb;
 
-		$blog_ids = $this->factory->blog->create_many( 2 );
+		$blog_id = $this->factory->blog->create();
 
-		$drop_tables = false;
+		// Delete the site without forcing a table drop.
+		wpmu_delete_blog( $blog_id, false );
 
-		// Delete both sites, but keep the database tables for one.
-		foreach ( $blog_ids as $blog_id ) {
-			// drop tables for every second blog
-			$drop_tables = ! $drop_tables;
-
-			$details = get_blog_details( $blog_id, false );
-
-			wpmu_delete_blog( $blog_id, $drop_tables );
-
-			$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
-			$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
-			$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
-			$key = md5( $details->domain . $details->path );
-			$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
-			$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
-
-			$prefix = $wpdb->get_blog_prefix( $blog_id );
-			foreach ( $wpdb->tables( 'blog', false ) as $table ) {
-				$suppress = $wpdb->suppress_errors();
-				$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
-				$wpdb->suppress_errors( $suppress );
-				if ( $drop_tables ) {
-					$this->assertEmpty( $table_fields );
-				} else {
-					$this->assertNotEmpty( $table_fields, $prefix . $table );
-				}
-			}
+		$prefix = $wpdb->get_blog_prefix( $blog_id );
+		foreach ( $wpdb->tables( 'blog', false ) as $table ) {
+			$suppress = $wpdb->suppress_errors();
+			$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
+			$wpdb->suppress_errors( $suppress );
+			$this->assertNotEmpty( $table_fields, $prefix . $table );
 		}
+	}
+
+	/**
+	 * When a site is fully deleted, its data should be cleared from cache.
+	 */
+	function test_data_in_cache_after_wpmu_delete_blog_drop_true() {
+		$blog_id = $this->factory->blog->create();
+
+		$details = get_blog_details( $blog_id, false );
+		$key = md5( $details->domain . $details->path );
+
+		// Delete the site and force a table drop.
+		wpmu_delete_blog( $blog_id, true );
+
+		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
+	}
+
+	/**
+	 * When a site is fully deleted, its data should be removed from the database.
+	 */
+	function test_data_in_tables_after_wpmu_delete_blog_drop_true() {
+		global $wpdb;
+
+		$blog_id = $this->factory->blog->create();
+
+		// Delete the site and force a table drop.
+		wpmu_delete_blog( $blog_id, true );
+
+		$prefix = $wpdb->get_blog_prefix( $blog_id );
+		foreach ( $wpdb->tables( 'blog', false ) as $table ) {
+			$suppress = $wpdb->suppress_errors();
+			$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
+			$wpdb->suppress_errors( $suppress );
+			$this->assertEmpty( $table_fields );
+		}
+	}
+
+	/**
+	 * When the main site of a network is fully deleted, its data should be cleared from cache.
+	 */
+	function test_data_in_cache_after_wpmu_delete_blog_main_site_drop_true() {
+		$blog_id = 1; // The main site in our test suite has an ID of 1.
+
+		$details = get_blog_details( $blog_id, false );
+		$key = md5( $details->domain . $details->path );
+
+		// Delete the site and force a table drop.
+		wpmu_delete_blog( $blog_id, true );
+
+		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
+		$this->assertEquals( false, wp_cache_get( $key, 'blog-id-cache' ) );
+	}
+
+	/**
+	 * When the main site of a network is fully deleted, its data should remain in the database.
+	 */
+	function test_data_in_tables_after_wpmu_delete_blog_main_site_drop_true() {
+		global $wpdb;
+
+		$blog_id = 1; // The main site in our test suite has an ID of 1.
+
+		// Delete the site and force a table drop.
+		wpmu_delete_blog( $blog_id, true );
+
+		$prefix = $wpdb->get_blog_prefix( $blog_id );
+		foreach ( $wpdb->tables( 'blog', false ) as $table ) {
+			$suppress = $wpdb->suppress_errors();
+			$table_fields = $wpdb->get_results( "DESCRIBE $prefix$table;" );
+			$wpdb->suppress_errors( $suppress );
+			$this->assertNotEmpty( $table_fields, $prefix . $table );
+		}
+	}
+
+	/**
+	 * The site count of a network should change when a site is flagged as 'deleted'.
+	 */
+	function test_network_count_after_wpmu_delete_blog_drop_false() {
+		$blog_id = $this->factory->blog->create();
+
+		// Delete the site without forcing a table drop.
+		wpmu_delete_blog( $blog_id, false );
+
+		// update the blog count cache to use get_blog_count()
+		wp_update_network_counts();
+		$this->assertEquals( 1, get_blog_count() );
+	}
+
+	/**
+	 * The site count of a network should change when a site is fully deleted.
+	 */
+	function test_blog_count_after_wpmu_delete_blog_drop_true() {
+		$blog_id = $this->factory->blog->create();
+
+		// Delete the site and force a table drop.
+		wpmu_delete_blog( $blog_id, true );
 
 		// update the blog count cache to use get_blog_count()
 		wp_update_network_counts();
