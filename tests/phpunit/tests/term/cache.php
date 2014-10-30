@@ -197,7 +197,7 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 		$this->assertSame( $term_id, wp_cache_get( $cache_key_slug, $taxonomy . ':slugs:' . wp_cache_get( 'last_changed', 'terms' ) ) );
 		$this->assertSame( $term_id, wp_cache_get( $cache_key_name, $taxonomy . ':names:' . wp_cache_get( 'last_changed', 'terms' ) ) );
 
-		wp_suspend_cache_invalidation();
+		$suspend = wp_suspend_cache_invalidation();
 		clean_term_cache( $term_id, $taxonomy );
 
 		// Verify that the cached value still matches the correct value
@@ -207,5 +207,8 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 
 		// Verify that last changed has not been updated as part of an invalidation routine
 		$this->assertSame( $last_changed, wp_cache_get( 'last_changed', 'terms' ) );
+
+		// Clean up.
+		wp_suspend_cache_invalidation( $suspend );
 	}
 }
