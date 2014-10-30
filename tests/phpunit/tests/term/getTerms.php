@@ -820,8 +820,151 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t4, $t1, $t2 ), $found );
 	}
 
-	protected function create_hierarchical_terms_and_posts() {
+	public function test_hierarchical_false_with_parent() {
+		$initial_terms = $this->create_hierarchical_terms();
 
+		// Case where hierarchical is false
+		$terms = get_terms( 'category', array(
+			'hierarchical' => false,
+			'parent' => $initial_terms['one_term']['term_id']
+		) );
+
+		// Verify that there are no children
+		$this->assertEquals( 0, count( $terms ) );
+	}
+
+	/**
+	 * @ticket 29185
+	 */
+	public function test_hierarchical_true_with_parent() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		// Case where hierarchical is true
+		$terms = get_terms( 'category', array(
+			'hierarchical' => true,
+			'parent' => $initial_terms['one_term']['term_id']
+		) );
+
+		// Verify that the children with non-empty descendants are returned
+		$expected = array(
+			$initial_terms['two_term']['term_id'],
+			$initial_terms['five_term']['term_id'],
+		);
+		$actual = wp_list_pluck( $terms, 'term_id' );
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	public function test_hierarchical_false_with_child_of_and_direct_child() {
+		$initial_terms = $this->create_hierarchical_terms();
+		$post_id = $this->factory->post->create();
+		wp_set_post_terms(
+			$post_id,
+			array( $initial_terms['seven_term']['term_id'] ),
+			'category'
+		);
+
+		// Case where hierarchical is false
+		$terms = get_terms( 'category', array(
+			'hierarchical' => false,
+			'child_of' => $initial_terms['one_term']['term_id']
+		) );
+
+		$expected = array(
+			$initial_terms['seven_term']['term_id'],
+		);
+
+		$actual = wp_list_pluck( $terms, 'term_id' );
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	public function test_hierarchical_false_with_child_of_should_not_return_grandchildren() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		// Case where hierarchical is false
+		$terms = get_terms( 'category', array(
+			'hierarchical' => false,
+			'child_of' => $initial_terms['one_term']['term_id']
+		) );
+
+		// Verify that there are no children
+		$this->assertEquals( 0, count( $terms ) );
+	}
+
+	public function test_hierarchical_true_with_child_of_should_return_grandchildren() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		// Case where hierarchical is true
+		$terms = get_terms( 'category', array(
+			'hierarchical' => true,
+			'child_of' => $initial_terms['one_term']['term_id']
+		) );
+
+		$expected = array(
+			$initial_terms['two_term']['term_id'],
+			$initial_terms['three_term']['term_id'],
+			$initial_terms['five_term']['term_id'],
+			$initial_terms['six_term']['term_id'],
+		);
+		$actual = wp_list_pluck( $terms, 'term_id' );
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	public function test_parent_should_override_child_of() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		$terms = get_terms( 'category', array(
+			'hide_empty' => false,
+			'child_of' => $initial_terms['one_term']['term_id'],
+			'parent' => $initial_terms['one_term']['term_id']
+		) );
+
+		// Verify that parent takes precedence over child_of and returns only direct children.
+		$expected = array(
+			$initial_terms['two_term']['term_id'],
+			$initial_terms['five_term']['term_id'],
+			$initial_terms['seven_term']['term_id']
+		);
+		$actual = wp_list_pluck( $terms, 'term_id' );
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	public function test_hierarchical_false_parent_should_override_child_of() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		// Case where hierarchical is false
+		$terms = get_terms( 'category', array(
+			'hierarchical' => false,
+			'child_of' => $initial_terms['one_term']['term_id'],
+			'parent' => $initial_terms['one_term']['term_id']
+		) );
+
+		// hierarchical=false means that descendants are not fetched.
+		$this->assertEquals( 0, count( $terms ) );
+	}
+
+	/**
+	 * @ticket 29185
+	 */
+	public function test_hierarchical_true_parent_overrides_child_of() {
+		$initial_terms = $this->create_hierarchical_terms();
+
+		// Case where hierarchical is true
+		$terms = get_terms( 'category', array(
+			'hierarchical' => true,
+			'child_of' => $initial_terms['one_term']['term_id'],
+			'parent' => $initial_terms['one_term']['term_id'],
+		) );
+
+		// Verify that parent takes precedence over child_of
+		$expected = array(
+			$initial_terms['two_term']['term_id'],
+			$initial_terms['five_term']['term_id'],
+		);
+		$actual = wp_list_pluck( $terms, 'term_id' );
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
 		$terms['parent1'] = $this->factory->term->create( array( 'slug' => 'parent-1', 'name' => 'Parent 1', 'taxonomy' => 'hierarchical_fields' ) );
@@ -835,5 +978,78 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		wp_set_post_terms( $post_id, $terms['child1'], 'hierarchical_fields', true );
 
 		return $terms;
+	}
+
+	protected function create_hierarchical_terms() {
+		// Set up the following hierarchy:
+		// - One
+		//   - Two
+		//     - Three (1)
+		//     - Four
+		//   - Five
+		//     - Six (1)
+		//   - Seven
+		$one_term = wp_insert_term(
+			'One',
+			'category'
+		);
+		$two_term = wp_insert_term(
+			'Two',
+			'category',
+			array(
+				'parent' => $one_term['term_id']
+			)
+		);
+		$three_term = wp_insert_term(
+			'Three',
+			'category',
+			array(
+				'parent' => $two_term['term_id']
+			)
+		);
+		$four_term = wp_insert_term(
+			'Four',
+			'category',
+			array(
+				'parent' => $two_term['term_id']
+			)
+		);
+		$five_term = wp_insert_term(
+			'Five',
+			'category',
+			array(
+				'parent' => $one_term['term_id']
+			)
+		);
+		$six_term = wp_insert_term(
+			'Six',
+			'category',
+			array(
+				'parent' => $five_term['term_id']
+			)
+		);
+		$seven_term = wp_insert_term(
+			'Seven',
+			'category',
+			array(
+				'parent' => $one_term['term_id']
+			)
+		);
+
+		// Ensure child terms are not empty
+		$first_post_id = $this->factory->post->create();
+		$second_post_id = $this->factory->post->create();
+		wp_set_post_terms( $first_post_id, array( $three_term['term_id'] ), 'category' );
+		wp_set_post_terms( $second_post_id, array( $six_term['term_id'] ), 'category' );
+
+		return array(
+			'one_term' => $one_term,
+			'two_term' => $two_term,
+			'three_term' => $three_term,
+			'four_term' => $four_term,
+			'five_term' => $five_term,
+			'six_term' => $six_term,
+			'seven_term' => $seven_term
+		);
 	}
 }
