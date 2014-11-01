@@ -268,4 +268,18 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$exclude6 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id3 ) ) );
 		$this->assertCount( 2, $exclude6 );
 	}
+
+	/**
+	 * @ticket 14477
+	 */
+	function test_get_pages_interrupted_hierarchy() {
+		$page1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page1 ) );
+		add_post_meta( $page2, 'color', 'red' );
+		$page3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page2 ) );
+		add_post_meta( $page3, 'color', 'blue' );
+
+		$pages = get_pages( array( 'child_of' => $page1, 'meta_key' => 'color', 'meta_value' => 'blue' ) );
+		$this->assertEqualSets( array( $page3 ), wp_list_pluck( $pages, 'ID' ) );
+	}
 }
