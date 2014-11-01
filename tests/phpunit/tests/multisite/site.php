@@ -873,16 +873,37 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( -1, wp_cache_get( $key, 'blog-id-cache' ) );
 	}
 
+	/**
+	 * Test with default parameter of site_id as null.
+	 */
 	function test_is_main_site() {
 		$this->assertTrue( is_main_site() );
+	}
+
+	/**
+	 * Test with a site id of get_current_blog_id(), which should be the same as the
+	 * default parameter tested above.
+	 */
+	function test_current_blog_id_is_main_site() {
 		$this->assertTrue( is_main_site( get_current_blog_id() ) );
+	}
 
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id ) );
+	/**
+	 * Test with a site ID other than the main site to ensure a false response.
+	 */
+	function test_is_main_site_is_false_with_other_blog_id() {
+		$blog_id = $this->factory->blog->create();
 
-		switch_to_blog( $blog_id  );
 		$this->assertFalse( is_main_site( $blog_id ) );
-		$this->assertFalse( is_main_site( get_current_blog_id() ) );
+	}
+
+	/**
+	 * Test with no passed ID after switching to another site ID.
+	 */
+	function test_is_main_site_is_false_after_switch_to_blog() {
+		$blog_id = $this->factory->blog->create();
+		switch_to_blog( $blog_id );
+
 		$this->assertFalse( is_main_site() );
 
 		restore_current_blog();
