@@ -986,32 +986,36 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertFalse( is_upload_space_available() );
 	}
 
-	function test_get_blog_post() {
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
-		$current_blog_id = get_current_blog_id();
+	/**
+	 * Test the primary purpose of get_blog_post(), to retrieve a post from
+	 * another site on the network.
+	 */
+	function test_get_blog_post_from_another_site_on_network() {
+		$blog_id = $this->factory->blog->create();
+		$post_id = $this->factory->post->create(); // Create a post on the primary site, ID 1.
+		$post = get_post( $post_id );
+		switch_to_blog( $blog_id );
 
+		// The post created and retrieved on the main site should match the one retrieved "remotely".
+		$this->assertEquals( $post, get_blog_post( 1, $post_id ) );
+
+		restore_current_blog();
+	}
+
+	/**
+	 * If get_blog_post() is used on the same site, it should still work.
+	 */
+	function test_get_blog_post_from_same_site() {
 		$post_id = $this->factory->post->create();
-		$this->assertInstanceOf( 'WP_Post', get_post( $post_id ) );
-		switch_to_blog( $blog_id );
-		$this->assertNull( get_post( $post_id ) );
-		$post = get_blog_post( $current_blog_id, $post_id );
-		$this->assertInstanceOf( 'WP_Post', $post );
-		$this->assertEquals( $post_id, $post->ID );
-		restore_current_blog();
 
-		wp_update_post( array( 'ID' => $post_id, 'post_title' => 'A Different Title' ) );
-		switch_to_blog( $blog_id );
-		$post = get_blog_post( $current_blog_id, $post_id );
-		// Make sure cache is good
-		$this->assertEquals( 'A Different Title', $post->post_title );
+		$this->assertEquals( get_blog_post( 1, $post_id ), get_post( $post_id ) );
+	}
 
-		$post_id2 = $this->factory->post->create();
-		// Test get_blog_post() with currently active blog ID.
-		$post = get_blog_post( $blog_id, $post_id2 );
-		$this->assertInstanceOf( 'WP_Post', $post );
-		$this->assertEquals( $post_id2, $post->ID );
-		restore_current_blog();
+	/**
+	 * A null response should be returned if an invalid post is requested.
+	 */
+	function test_get_blog_post_invalid_returns_null() {
+		$this->assertNull( get_blog_post( 1, 999999 ) );
 	}
 
 	/**
