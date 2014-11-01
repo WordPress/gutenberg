@@ -44,21 +44,6 @@ class Tests_Canonical_HTTPS extends Tests_Canonical {
 	/**
 	 * @ticket 27954
 	 */
-	public function test_http_request_with_https_home() {
-
-		add_filter( 'home_url', array( $this, 'set_https' ) );
-
-		$redirect = redirect_canonical( $this->http, false );
-
-		$this->assertEquals( $redirect, $this->https );
-
-		remove_filter( 'home_url', array( $this, 'set_https' ) );
-
-	}
-
-	/**
-	 * @ticket 27954
-	 */
 	public function test_https_request_with_https_home() {
 
 		add_filter( 'home_url', array( $this, 'set_https' ) );
