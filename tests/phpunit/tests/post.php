@@ -991,4 +991,29 @@ class Tests_Post extends WP_UnitTestCase {
 		_unregister_taxonomy( $tax );
 	}
 
+	/**
+	 * @ticket 18962
+	 */
+	function test_wp_unique_post_slug_with_multiple_hierarchies() {
+		register_post_type( 'post-type-1', array( 'hierarchical' => true ) );
+		register_post_type( 'post-type-2', array( 'hierarchical' => true ) );
+
+		$args = array(
+			'post_type' => 'post-type-1',
+			'post_name' => 'some-slug',
+			'post_status' => 'publish',
+		);
+		$one = $this->factory->post->create( $args );
+		$args['post_type'] = 'post-type-2';
+		$two = $this->factory->post->create( $args );
+
+		$this->assertEquals( 'some-slug', get_post( $one )->post_name );
+		$this->assertEquals( 'some-slug', get_post( $two )->post_name );
+
+		$this->assertEquals( 'some-other-slug', wp_unique_post_slug( 'some-other-slug', $one, 'publish', 'post-type-1', 0 ) );
+		$this->assertEquals( 'some-other-slug', wp_unique_post_slug( 'some-other-slug', $one, 'publish', 'post-type-2', 0 ) );
+
+		_unregister_post_type( 'post-type-1' );
+		_unregister_post_type( 'post-type-2' );
+	}
 }
