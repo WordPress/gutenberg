@@ -4,6 +4,8 @@
  * @group meta
  */
 class Tests_Meta extends WP_UnitTestCase {
+	protected $updated_mids = array();
+
 	function setUp() {
 		parent::setUp();
 		$this->author = new WP_User( $this->factory->user->create( array( 'role' => 'author' ) ) );
@@ -74,6 +76,32 @@ class Tests_Meta extends WP_UnitTestCase {
 		$this->assertTrue( update_metadata_by_mid( 'user', $this->meta_id, 'other_meta_value' ) );
 		$second = get_user_meta( $meta->user_id, $meta->meta_key );
 		$this->assertFalse( $first === $second );
+	}
+
+	/**
+	 * @ticket 11683
+	 */
+	public function test_update_metadata_hooks_for_multiple_updated_rows() {
+		add_metadata( 'post', 1, 'test_key', 'value_1' );
+		add_metadata( 'post', 1, 'test_key', 'value_2' );
+		add_action( 'update_post_meta', array( $this, 'updated_meta' ) );
+		add_action( 'update_postmeta', array( $this, 'updated_meta' ) );
+		add_action( 'updated_post_meta', array( $this, 'updated_meta' ) );
+		add_action( 'updated_postmeta', array( $this, 'updated_meta' ) );
+
+		update_metadata( 'post', 1, 'test_key', 'value_3' );
+
+		remove_action( 'update_post_meta', array( $this, 'updated_meta' ) );
+		remove_action( 'update_postmeta', array( $this, 'updated_meta' ) );
+		remove_action( 'updated_post_meta', array( $this, 'updated_meta' ) );
+		remove_action( 'updated_postmeta', array( $this, 'updated_meta' ) );
+
+		$found = $this->updated_mids;
+		$this->updated_mids = array();
+
+		foreach ( $found as $action => $mids ) {
+			$this->assertSame( 2, count( $mids ) );
+		}
 	}
 
 	function test_metadata_exists() {
@@ -299,5 +327,11 @@ class Tests_Meta extends WP_UnitTestCase {
 		$found = get_metadata( 'user', $this->author->ID );
 
 		$this->assertSame( array( $data ), $found['foo'] );
+	}
+
+	/** Helpers **********************************************************/
+
+	public function updated_meta( $meta_id ) {
+		$this->updated_mids[ current_action() ][] = $meta_id;
 	}
 }
