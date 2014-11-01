@@ -34,48 +34,31 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		$this->assertFalse( get_theme_support( 'admin-bar' ) );
 	}
 
-	function test_post_thumbnails() {
+	public function test_post_thumbnails() {
 		add_theme_support( 'post-thumbnails' );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
 		remove_theme_support( 'post-thumbnails' );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
 		add_theme_support( 'post-thumbnails' );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
+	}
 
-		// simple array of post types.
+	public function test_post_thumbnails_flat_array_of_post_types() {
 		add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'post' ) );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails', 'book' ) );
 		remove_theme_support( 'post-thumbnails' );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
+	}
 
-		#WP18548
-		if ( ! function_exists( '_wp_render_title_tag' ) )
-			return;
-
-		// array of arguments, with the key of 'types' holding the post types.
-		add_theme_support( 'post-thumbnails', array( 'types' => array( 'post', 'page' ) ) );
-		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
-		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'post' ) );
-		$this->assertFalse( current_theme_supports( 'post-thumbnails', 'book' ) );
-		remove_theme_support( 'post-thumbnails' );
-		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
-
+	public function test_post_thumbnails_types_true() {
 		// array of arguments, with the key of 'types' holding the post types.
 		add_theme_support( 'post-thumbnails', array( 'types' => true ) );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails', rand_str() ) ); // any type
 		remove_theme_support( 'post-thumbnails' );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
-
-		// array of arguments, with some other argument, and no 'types' argument.
-		add_theme_support( 'post-thumbnails', array( rand_str() => rand_str() ) );
-		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
-		$this->assertTrue( current_theme_supports( 'post-thumbnails', rand_str() ) ); // any type
-		remove_theme_support( 'post-thumbnails' );
-		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
-
 	}
 
 	/**
