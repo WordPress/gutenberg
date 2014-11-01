@@ -325,7 +325,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 			'fields' => 'ids',
 		) );
 
-		$this->assertEquals( array( $c3, $c2 ), $found );
+		$this->assertEqualSets( array( $c3, $c2 ), $found );
 	}
 
 	/**
@@ -378,7 +378,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 			'fields' => 'ids',
 		) );
 
-		$this->assertEquals( array( $c3, $c2 ), $found );
+		$this->assertEqualSets( array( $c3, $c2 ), $found );
 	}
 
 	/**
