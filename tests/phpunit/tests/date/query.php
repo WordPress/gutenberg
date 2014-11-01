@@ -925,6 +925,24 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 28063
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_day_of_week_iso() {
+		// Valid values.
+		$days_of_week = range( 1, 7 );
+		foreach ( $days_of_week as $day_of_week ) {
+			$this->assertTrue( $this->q->validate_date_values( array( 'dayofweek_iso' => $day_of_week ) ) );
+		}
+
+		// Invalid values.
+		$days_of_week = array( -1, 0, 8 );
+		foreach ( $days_of_week as $day_of_week ) {
+			$this->assertFalse( $this->q->validate_date_values( array( 'dayofweek_iso' => $day_of_week ) ) );
+		}
+	}
+
+	/**
 	 * @ticket 25834
 	 * @expectedIncorrectUsage WP_Date_Query
 	 */

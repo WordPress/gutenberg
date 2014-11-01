@@ -635,6 +635,24 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
+	/**
+	 * @ticket 28063
+	 */
+	public function test_date_query_dayofweek_iso() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-31 10:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-30 10:42:29', ) );
+
+		$posts = $this->_get_query_result( array(
+			'date_query' => array(
+				array(
+					'dayofweek_iso' => 5,
+				),
+			),
+		) );
+
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
+	}
+
 	public function test_date_query_hour() {
 		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 13:42:29', ) );
 		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 12:42:29', ) );
