@@ -234,4 +234,103 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 0, wp_insert_category( $cat, false ) );
 	}
+
+	public function test_get_ancestors_taxonomy_non_hierarchical() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$this->assertSame( array(), get_ancestors( $t, 'wptests_tax' ) );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_get_ancestors_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'parent' => $t1,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'parent' => $t2,
+		) );
+		$t4 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'parent' => $t1,
+		) );
+
+		$this->assertEqualSets( array( $t2, $t1 ), get_ancestors( $t3, 'wptests_tax' ) );
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	public function test_get_ancestors_post_type_non_hierarchical() {
+		register_post_type( 'wptests_pt' );
+		$p = $this->factory->post->create( array(
+			'taxonomy' => 'wptests_pt',
+		) );
+
+		$this->assertEqualSets( array(), get_ancestors( $p, 'wptests_tax' ) );
+	}
+
+	public function test_get_ancestors_post_type() {
+		register_post_type( 'wptests_pt', array(
+			'hierarchical' => true,
+		) );
+		$p1 = $this->factory->post->create( array(
+			'post_type' => 'wptests_pt',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_type' => 'wptests_pt',
+			'post_parent' => $p1,
+		) );
+		$p3 = $this->factory->post->create( array(
+			'post_type' => 'wptests_pt',
+			'post_parent' => $p2,
+		) );
+		$p4 = $this->factory->post->create( array(
+			'post_type' => 'wptests_pt',
+			'post_parent' => $p1,
+		) );
+
+		$this->assertEqualSets( array( $p2, $p1 ), get_ancestors( $p3, 'wptests_pt' ) );
+		_unregister_post_type( 'wptests_pt' );
+	}
+
+	/**
+	 * @ticket 15029
+	 */
+	public function test_get_ancestors_taxonomy_post_type_conflict_resource_type_taxonomy() {
+		register_post_type( 'wptests_conflict', array(
+			'hierarchical' => true,
+		) );
+		$p1 = $this->factory->post->create( array(
+			'post_type' => 'wptests_conflict',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_type' => 'wptests_conflict',
+			'post_parent' => $p1,
+		) );
+
+		register_taxonomy( 'wptests_conflict', 'post', array(
+			'hierarchical' => true,
+		) );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_conflict',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_conflict',
+			'parent' => $t1,
+		) );
+
+		$this->assertEqualSets( array( $p1 ), get_ancestors( $p2, 'wptests_conflict', 'post_type' ) );
+		$this->assertEqualSets( array( $t1 ), get_ancestors( $t2, 'wptests_conflict', 'taxonomy' ) );
+		$this->assertEqualSets( array( $t1 ), get_ancestors( $t2, 'wptests_conflict' ) );
+		_unregister_post_type( 'wptests_pt' );
+	}
 }
