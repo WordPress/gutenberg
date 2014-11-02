@@ -444,46 +444,31 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test fetching a blog that doesn't exist and again after it exists.
+	 * Test cached data for a site that does not exist and then again after it exists.
 	 *
 	 * @ticket 23405
 	 */
-	function test_get_blog_details_blog_does_not_exist() {
-		global $wpdb;
-
-		$blog_id = $wpdb->get_var( "SELECT MAX(blog_id) FROM $wpdb->blogs" );
-
-		// An idosyncrancy of the unit tests is that the max blog_id gets reset
-		// to 1 in between test cases but picks up where it previously left off
-		// on the next insert. If 1 is reported, burn a blog create to get
-		// the max counter back in sync.
-		if ( 1 == $blog_id ) {
-			$blog_id = $this->factory->blog->create();
-		}
+	function test_get_blog_details_when_site_does_not_exist() {
+		// Create an unused site so that we can then assume an invalid site ID.
+		$blog_id = $this->factory->blog->create();
 		$blog_id++;
 
-		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' ) );
-		$this->assertFalse( get_blog_details( $blog_id ) );
-		$this->assertEquals( -1, wp_cache_get( $blog_id, 'blog-details' ) );
-		$this->assertFalse( get_blog_details( $blog_id ) );
+		// Prime the cache for an invalid site.
+		get_blog_details( $blog_id );
+
+		// When the cache is primed with an invalid site, the value is set to -1.
 		$this->assertEquals( -1, wp_cache_get( $blog_id, 'blog-details' ) );
 
-		$this->assertEquals( $blog_id, $this->factory->blog->create() );
+		// Create a site in the invalid site's place.
+		$this->factory->blog->create();
+
+		// When a new site is created, its cache is cleared through refresh_blog_details.
 		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' )  );
 
 		$blog = get_blog_details( $blog_id );
-		$this->assertEquals( $blog_id, $blog->blog_id );
-		$this->assertEquals( $blog, wp_cache_get( $blog_id, 'blog-details' ) );
 
-		wpmu_delete_blog( $blog_id );
-		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' ) );
-		$blog->deleted = '1';
-		$this->assertEQuals( $blog, get_blog_details( $blog_id ) );
+		// When the cache is refreshed, it should now equal the site data.
 		$this->assertEquals( $blog, wp_cache_get( $blog_id, 'blog-details' ) );
-
-		wpmu_delete_blog( $blog_id, true );
-		$this->assertFalse( get_blog_details( $blog_id ) );
-		$this->assertEquals( -1, wp_cache_get( $blog_id, 'blog-details' ) );
 	}
 
 	function test_update_blog_status() {
