@@ -49,6 +49,20 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertEquals( array( 'category', 'post_tag' ), array_keys( $taxes ) );
 	}
 
+	/**
+	 * @group 27238
+	 */
+	public function test_get_the_taxonomies_term_template() {
+		$post_id = $this->factory->post->create();
+
+		$taxes = get_the_taxonomies( $post_id, array( 'term_template' => '%2$s' ) );
+		$this->assertEquals( 'Categories: Uncategorized.', $taxes['category'] );
+
+		$taxes = get_the_taxonomies( $post_id, array( 'term_template' => '<span class="foo"><a href="%1$s">%2$s</a></span>' ) );
+		$link = get_category_link( 1 );
+		$this->assertEquals( 'Categories: <span class="foo"><a href="' . $link . '">Uncategorized</a></span>.', $taxes['category'] );
+	}
+
 	function test_the_taxonomies() {
 		$post_id = $this->factory->post->create();
 
@@ -57,8 +71,22 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$output = ob_get_clean();
 
 		$link = get_category_link( 1 );
-		$expected = "Categories: <a href='$link'>Uncategorized</a>.";
+		$expected = 'Categories: <a href="' . $link . '">Uncategorized</a>.';
 		$this->assertEquals( $expected, $output );
+	}
+
+	/**
+	 * @group 27238
+	 */
+	function test_the_taxonomies_term_template() {
+		$post_id = $this->factory->post->create();
+
+		$output = get_echo( 'the_taxonomies', array( array( 'post' => $post_id, 'term_template' => '%2$s' ) ) );
+		$this->assertEquals( 'Categories: Uncategorized.', $output );
+
+		$output = get_echo( 'the_taxonomies', array( array( 'post' => $post_id, 'term_template' => '<span class="foo"><a href="%1$s">%2$s</a></span>' ) ) );
+		$link = get_category_link( 1 );
+		$this->assertEquals( 'Categories: <span class="foo"><a href="' . $link . '">Uncategorized</a></span>.', $output );
 	}
 
 	function test_get_link_taxonomy() {
