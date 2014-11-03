@@ -56,4 +56,20 @@ class Tests_Functions_WpValidateBoolean extends WP_UnitTestCase {
 		// Differs from (bool) conversion.
 		$this->assertFalse( wp_validate_boolean( 'false' ) );
 	}
+
+	/**
+	 * @ticket 30238
+	 */
+	public function test_string_false_uppercase() {
+		// Differs from (bool) conversion.
+		$this->assertFalse( wp_validate_boolean( 'FALSE' ) );
+	}
+
+	/**
+	 * @ticket 30238
+	 */
+	public function test_string_false_mixedcase() {
+		// Differs from (bool) conversion.
+		$this->assertFalse( wp_validate_boolean( 'FaLsE' ) );
+	}
 }
