@@ -637,6 +637,141 @@ class Tests_Term extends WP_UnitTestCase {
 		_unregister_taxonomy( 'wptests_tax' );
 	}
 
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_update_term_duplicate_slug_same_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$updated = wp_update_term( $t2, 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertWPError( $updated );
+		$this->assertSame( 'duplicate_term_slug', $updated->get_error_code() );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_update_term_duplicate_slug_different_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax_2',
+		) );
+
+		$updated = wp_update_term( $t2, 'wptests_tax_2', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertWPError( $updated );
+		$this->assertSame( 'duplicate_term_slug', $updated->get_error_code() );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_update_term_should_split_shared_term() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
+
+		// Manually modify because split terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$posts = $this->factory->post->create_many( 2 );
+		wp_set_object_terms( $posts[0], array( 'Foo' ), 'wptests_tax' );
+		wp_set_object_terms( $posts[1], array( 'Foo' ), 'wptests_tax_2' );
+
+		// Verify that the terms are shared.
+		$t1_terms = wp_get_object_terms( $posts[0], 'wptests_tax' );
+		$t2_terms = wp_get_object_terms( $posts[1], 'wptests_tax_2' );
+		$this->assertSame( $t1_terms[0]->term_id, $t2_terms[0]->term_id );
+
+		wp_update_term( $t2_terms[0]->term_id, 'wptests_tax_2', array(
+			'name' => 'New Foo',
+		) );
+
+		$t1_terms = wp_get_object_terms( $posts[0], 'wptests_tax' );
+		$t2_terms = wp_get_object_terms( $posts[1], 'wptests_tax_2' );
+		$this->assertNotEquals( $t1_terms[0]->term_id, $t2_terms[0]->term_id );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_update_term_should_not_split_shared_term_before_410_schema_change() {
+		global $wpdb;
+
+		$db_version = get_option( 'db_version' );
+		update_option( 'db_version', 30055 );
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
+
+		// Manually modify because split terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$posts = $this->factory->post->create_many( 2 );
+		wp_set_object_terms( $posts[0], array( 'Foo' ), 'wptests_tax' );
+		wp_set_object_terms( $posts[1], array( 'Foo' ), 'wptests_tax_2' );
+
+		// Verify that the term is shared.
+		$t1_terms = wp_get_object_terms( $posts[0], 'wptests_tax' );
+		$t2_terms = wp_get_object_terms( $posts[1], 'wptests_tax_2' );
+		$this->assertSame( $t1_terms[0]->term_id, $t2_terms[0]->term_id );
+
+		wp_update_term( $t2_terms[0]->term_id, 'wptests_tax_2', array(
+			'name' => 'New Foo',
+		) );
+
+		// Term should still be shared.
+		$t1_terms = wp_get_object_terms( $posts[0], 'wptests_tax' );
+		$t2_terms = wp_get_object_terms( $posts[1], 'wptests_tax_2' );
+		$this->assertSame( $t1_terms[0]->term_id, $t2_terms[0]->term_id );
+
+		update_option( 'db_version', $db_version );
+	}
+
 	public function test_wp_update_term_alias_of_no_term_group() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$t1 = $this->factory->term->create( array(
@@ -1463,52 +1598,6 @@ class Tests_Term extends WP_UnitTestCase {
 		// clean up
 		foreach ( array( $a, $b, $c, $d, $e, $f ) as $t )
 			$this->assertTrue( wp_delete_term( $t['term_id'], $this->taxonomy ) );
-	}
-
-	/**
-	 * @ticket 5809
-	 */
-	function test_update_shared_term() {
-		$random_tax = __FUNCTION__;
-
-		register_taxonomy( $random_tax, 'post' );
-
-		$post_id = $this->factory->post->create();
-
-		$old_name = 'Initial';
-
-		$t1 = wp_insert_term( $old_name, 'category' );
-		$t2 = wp_insert_term( $old_name, 'post_tag' );
-
-		$this->assertEquals( $t1['term_id'], $t2['term_id'] );
-
-		wp_set_post_categories( $post_id, array( $t1['term_id'] ) );
-		wp_set_post_tags( $post_id, array( (int) $t2['term_id'] ) );
-
-		$new_name = 'Updated';
-
-		// create the term in a third taxonomy, just to keep things interesting
-		$t3 = wp_insert_term( $old_name, $random_tax );
-		wp_set_post_terms( $post_id, array( (int) $t3['term_id'] ), $random_tax );
-		$this->assertPostHasTerms( $post_id, array( $t3['term_id'] ), $random_tax );
-
-		$t2_updated = wp_update_term( $t2['term_id'], 'post_tag', array(
-			'name' => $new_name
-		) );
-
-		$this->assertNotEquals( $t2_updated['term_id'], $t3['term_id'] );
-
-		// make sure the terms have split
-		$this->assertEquals( $old_name, get_term_field( 'name', $t1['term_id'], 'category' ) );
-		$this->assertEquals( $new_name, get_term_field( 'name', $t2_updated['term_id'], 'post_tag' ) );
-
-		// and that they are still assigned to the correct post
-		$this->assertPostHasTerms( $post_id, array( $t1['term_id'] ), 'category' );
-		$this->assertPostHasTerms( $post_id, array( $t2_updated['term_id'] ), 'post_tag' );
-		$this->assertPostHasTerms( $post_id, array( $t3['term_id'] ), $random_tax );
-
-		// clean up
-		unset( $GLOBALS['wp_taxonomies'][ $random_tax ] );
 	}
 
 	/**
