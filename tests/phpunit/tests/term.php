@@ -226,6 +226,93 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertFalse( is_wp_error( $term20 ) );
 	}
 
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_insert_term_duplicate_slug_same_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+
+		$created = wp_insert_term( 'Foo 2', 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$created_term = get_term( $created['term_id'], 'wptests_tax' );
+		$this->assertSame( 'foo-2', $created_term->slug );
+
+		_unregister_taxonomy( 'wptests_tax', 'post' );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_insert_term_duplicate_slug_different_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+		$t = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+
+		$created = wp_insert_term( 'Foo 2', 'wptests_tax_2', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertFalse( is_wp_error( $created ) );
+
+		$new_term = get_term( $created['term_id'], 'wptests_tax_2' );
+
+		$this->assertSame( 'foo', $new_term->slug );
+
+		_unregister_taxonomy( 'wptests_tax', 'post' );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_insert_term_duplicate_slug_different_taxonomy_before_410_schema_change() {
+
+		$db_version = get_option( 'db_version' );
+		update_option( 'db_version', 30055 );
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+		$t = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+
+		$created = wp_insert_term( 'Foo 2', 'wptests_tax_2', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertFalse( is_wp_error( $created ) );
+
+		$new_term = get_term( $created['term_id'], 'wptests_tax_2' );
+
+		/*
+		 * As of 4.1, we no longer create a shared term, but we also do not
+		 * allow for duplicate slugs.
+		 */
+		$this->assertSame( 'foo-2', $new_term->slug );
+		$this->assertNotEquals( $new_term->term_id, $term->term_id );
+
+		_unregister_taxonomy( 'wptests_tax', 'post' );
+		update_option( 'db_version', $db_version );
+	}
+
 	public function test_wp_insert_term_alias_of_no_term_group() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$t1 = $this->factory->term->create( array(
@@ -351,6 +438,19 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$this->assertTrue( is_wp_error( $found ) );
 		$this->assertEquals( $existing_term, $found->get_error_data() );
+	}
+
+	/**
+	 * @ticket 5809
+	 */
+	public function test_wp_insert_term_should_not_create_shared_term() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
+
+		$this->assertNotEquals( $t1['term_id'], $t2['term_id'] );
 	}
 
 	public function test_wp_insert_term_should_return_term_id_and_term_taxonomy_id() {
