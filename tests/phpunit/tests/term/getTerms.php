@@ -174,6 +174,28 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30275
+	 */
+	public function test_exclude_with_hierarchical_true_for_non_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'taxonomy' => 'wptests_tax',
+			'hide_empty' => false,
+			'exclude_tree' => array( $terms[0] ),
+			'hierarchical' => true,
+		) );
+
+		$this->assertEquals( array( $terms[1] ), wp_list_pluck( $found, 'term_id' ) );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	/**
 	 * @ticket 25710
 	 */
 	function test_get_terms_exclude_tree() {
