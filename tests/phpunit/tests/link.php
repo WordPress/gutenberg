@@ -190,10 +190,17 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	/**
-	* @ticket 22112
-	*/
+	 * @ticket 22112
+	 */
 	function test_get_adjacent_post_exclude_self_term() {
-		$include = $this->factory->category->create();
+		// Bump term_taxonomy to mimic shared term offsets.
+		global $wpdb;
+		$wpdb->insert( $wpdb->term_taxonomy, array( 'taxonomy' => 'foo', 'term_id' => 12345 ) );
+
+		$include = $this->factory->term->create( array(
+			'taxonomy' => 'category',
+			'name' => 'Include',
+		) );
 		$exclude = $this->factory->category->create();
 
 		$one = $this->factory->post->create_and_get( array(
