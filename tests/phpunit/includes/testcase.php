@@ -369,7 +369,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( empty( $tmp_dir ) ) {
 			$tmp_dir = '/tmp';
 		}
-		$tmp_dir = realpath( $dir );
+		$tmp_dir = realpath( $tmp_dir );
 		return tempnam( $tmp_dir, 'wpunit' );
 	}
 
