@@ -56,4 +56,5 @@ if ( $multisite ) {
 
 	install_network();
 	populate_network( 1, WP_TESTS_DOMAIN, WP_TESTS_EMAIL, $title, '/', $subdomain_install );
+	$wp_rewrite->set_permalink_structure( '' );
 }
