@@ -91,57 +91,72 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		$posts = get_posts('numberposts='.$this->post_count);
 
 		// check each of the items against the known post data
-		for ($i=0; $i < $this->post_count; $i++) {
+		foreach ( $items as $key => $item ) {
+
+			// Get post for comparison
+			$guid = xml_find( $items[$key]['child'], 'guid' );
+			preg_match( '/\?p=(\d+)/', $guid[0]['content'], $matches );
+			$post = get_post( $matches[1] );
 
 			// title
-			$title = xml_find($items[$i]['child'], 'title');
-			$this->assertEquals($posts[$i]->post_title, $title[0]['content']);
+			$title = xml_find( $items[$key]['child'], 'title' );
+			$this->assertEquals( $post->post_title, $title[0]['content'] );
 
 			// link
-			$link = xml_find($items[$i]['child'], 'link');
-			$this->assertEquals(get_permalink($posts[$i]->ID), $link[0]['content']);
+			$link = xml_find( $items[$key]['child'], 'link' );
+			$this->assertEquals( get_permalink( $post ), $link[0]['content'] );
 
 			// comment link
-			$comments_link = xml_find($items[$i]['child'], 'comments');
-			$this->assertEquals(get_permalink($posts[$i]->ID) . '#comments', $comments_link[0]['content']);
+			$comments_link = xml_find( $items[$key]['child'], 'comments' );
+			$this->assertEquals( get_permalink( $post) . '#comments', $comments_link[0]['content'] );
 
 			// pub date
-			$pubdate = xml_find($items[$i]['child'], 'pubDate');
-			$this->assertEquals(strtotime($posts[$i]->post_date), strtotime($pubdate[0]['content']));
+			$pubdate = xml_find( $items[$key]['child'], 'pubDate' );
+			$this->assertEquals( strtotime( $post->post_date_gmt ), strtotime( $pubdate[0]['content'] ) );
 
 			// author
-			$creator = xml_find($items[$i]['child'], 'dc:creator');
-			$this->assertEquals($this->author->user_nicename, $creator[0]['content']);
+			$creator = xml_find( $items[$key]['child'], 'dc:creator' );
+			$user = new WP_User( $post->post_author );
+			$this->assertEquals( $user->user_login, $creator[0]['content'] );
 
 			// categories (perhaps multiple)
-			$categories = xml_find($items[$i]['child'], 'category');
-			$cat_ids = wp_get_post_categories($post->ID);
-			if (empty($cat_ids))	$cat_ids = array(1);
+			$categories = xml_find( $items[$key]['child'], 'category' );
+			$cats = array();
+			foreach ( get_the_category( $post->ID ) as $term ) {
+				$cats[] = $term->name;
+			}
+			foreach ( get_the_tags( $post->ID ) as $term ) {
+				$cats[] = $term->name;
+			}
+			$cats = array_filter( $cats );
 			// should be the same number of categories
-			$this->assertEquals(count($cat_ids), count($categories));
+			$this->assertEquals( count( $cats ), count( $categories ) );
+
 			// ..with the same names
-			for ($j=0; $j < count($cat_ids); $j++)
-				$this->assertEquals(get_cat_name($cat_ids[$j]), $categories[$j]['content']);
+			foreach ( $cats as $id => $cat ) {
+				$this->assertEquals( $cat, $categories[$id]['content']);
+			}
 
 			// GUID
-			$guid = xml_find($items[$i]['child'], 'guid');
-			$this->assertEquals('false', $guid[0]['attributes']['isPermaLink']);
-			$this->assertEquals($posts[$i]->guid, $guid[0]['content']);
+			$guid = xml_find( $items[$key]['child'], 'guid' );
+			$this->assertEquals('false', $guid[0]['attributes']['isPermaLink'] );
+			$this->assertEquals( $post->guid, $guid[0]['content'] );
 
 			// description/excerpt
-			$description = xml_find($items[$i]['child'], 'description');
-			$this->assertEquals(trim($posts[$i]->post_excerpt), trim($description[0]['content']));
+			if ( !empty( $post->post_excerpt ) ) {
+				$description = xml_find( $items[$key]['child'], 'description' );
+				$this->assertEquals( trim( $post->post_excerpt ), trim( $description[0]['content'] ) );
+			}
 
 			// post content
-			if (!$this->excerpt_only) {
-				$content = xml_find($items[$i]['child'], 'content:encoded');
-				$this->assertEquals(trim(apply_filters('the_content', $posts[$i]->post_content)), trim($content[0]['content']));
+			if ( !$this->excerpt_only ) {
+				$content = xml_find( $items[$key]['child'], 'content:encoded' );
+				$this->assertEquals( trim( apply_filters( 'the_content', $post->post_content ) ), trim( $content[0]['content'] ) );
 			}
 
 			// comment rss
-			$comment_rss = xml_find($items[$i]['child'], 'wfw:commentRss');
-			$this->assertEquals(html_entity_decode(get_post_comments_feed_link($posts[$i]->ID)), $comment_rss[0]['content']);
+			$comment_rss = xml_find( $items[$key]['child'], 'wfw:commentRss' );
+			$this->assertEquals( html_entity_decode( get_post_comments_feed_link( $post->ID) ), $comment_rss[0]['content'] );
 		}
-
 	}
 }
