@@ -7,11 +7,34 @@ require_once dirname( dirname( __FILE__ ) ) . '/canonical.php';
  * @group rewrite
  * @group query
  */
-class Tests_Canonical_NoRewrite extends Tests_Canonical {
-
-	var $structure = '';
+class Tests_Canonical_NoRewrite extends WP_Canonical_UnitTestCase {
 
 	// These test cases are run against the test handler in WP_Canonical
+	public static function setUpBeforeClass() {
+		self::generate_shared_fixtures();
+	}
+
+	public static function tearDownAfterClass() {
+		self::delete_shared_fixtures();
+	}
+
+	public function setUp() {
+		global $wp_rewrite;
+
+		parent::setUp();
+
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
+		$wp_rewrite->init();
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	function test( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
+		$this->assertCanonical( $test_url, $expected, $ticket, $expected_doing_it_wrong );
+	}
 
 	function data() {
 		/* Format:

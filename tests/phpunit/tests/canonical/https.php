@@ -1,16 +1,21 @@
 <?php
 
-require_once dirname( dirname( __FILE__ ) ) . '/canonical.php';
-
 /**
  * @group canonical
  * @group rewrite
  * @group query
  */
-class Tests_Canonical_HTTPS extends Tests_Canonical {
-
+class Tests_Canonical_HTTPS extends WP_Canonical_UnitTestCase {
 	function setUp() {
+		global $wp_rewrite;
+
 		parent::setUp();
+
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		create_initial_taxonomies();
+		$wp_rewrite->flush_rules();
+		$wp_rewrite->init();
+
 		$this->http  = set_url_scheme( home_url( 'sample-page/' ), 'http' );
 		$this->https = set_url_scheme( home_url( 'sample-page/' ), 'https' );
 	}

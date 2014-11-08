@@ -1,13 +1,19 @@
 <?php
 
-require_once dirname( dirname( __FILE__ ) ) . '/canonical.php';
-
 /**
  * @group canonical
  * @group rewrite
  * @group query
  */
-class Tests_Canonical_PageOnFront extends Tests_Canonical {
+class Tests_Canonical_PageOnFront extends WP_Canonical_UnitTestCase {
+	public static function setUpBeforeClass() {
+		self::generate_shared_fixtures();
+	}
+
+	public static function tearDownAfterClass() {
+		self::delete_shared_fixtures();
+	}
+
 	function setUp() {
 		parent::setUp();
 		global $wp_rewrite;
@@ -22,6 +28,13 @@ class Tests_Canonical_PageOnFront extends Tests_Canonical {
 		global $wp_rewrite;
 		parent::tearDown();
 		$wp_rewrite->init();
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	function test( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
+		$this->assertCanonical( $test_url, $expected, $ticket, $expected_doing_it_wrong );
 	}
 
 	function data() {

@@ -1,19 +1,25 @@
 <?php
 
-require_once dirname( dirname( __FILE__ ) ) . '/canonical.php';
-
 /**
  * @group canonical
  * @group rewrite
  * @group query
  */
-class Tests_Canonical_CustomRules extends Tests_Canonical {
+class Tests_Canonical_CustomRules extends WP_Canonical_UnitTestCase {
+
 	function setUp() {
 		parent::setUp();
 		global $wp_rewrite;
 		// Add a custom Rewrite rule to test category redirections.
 		$wp_rewrite->add_rule('ccr/(.+?)/sort/(asc|desc)', 'index.php?category_name=$matches[1]&order=$matches[2]', 'top'); // ccr = Custom_Cat_Rule
 		$wp_rewrite->flush_rules();
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	function test( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
+		$this->assertCanonical( $test_url, $expected, $ticket, $expected_doing_it_wrong );
 	}
 
 	function data() {
