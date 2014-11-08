@@ -167,6 +167,16 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		add_filter( 'query', array( $this, '_drop_temporary_tables' ) );
 	}
 
+	/**
+	 * Commit the queries in a transaction.
+	 *
+	 * @since 4.1.0
+	 */
+	public static function commit_transaction() {
+		global $wpdb;
+		$wpdb->query( 'COMMIT;' );
+	}
+
 	function _create_temporary_tables( $query ) {
 		if ( 'CREATE TABLE' === substr( trim( $query ), 0, 12 ) )
 			return substr_replace( trim( $query ), 'CREATE TEMPORARY TABLE', 0, 12 );
