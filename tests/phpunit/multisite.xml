@@ -23,6 +23,7 @@
     <groups>
         <exclude>
             <group>ajax</group>
+            <group>ms-files</group>
         </exclude>
     </groups>
     <php>

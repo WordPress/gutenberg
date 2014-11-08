@@ -129,10 +129,12 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 		}
 
 		$ajax_message = true;
+		$ms_files_message = true;
 		foreach ( $options as $option ) {
 			switch ( $option[0] ) {
 				case '--exclude-group' :
 					$ajax_message = false;
+					$ms_files_message = false;
 					continue 2;
 				case '--group' :
 					$groups = explode( ',', $option[1] );
@@ -142,11 +144,15 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 						}
 					}
 					$ajax_message = ! in_array( 'ajax', $groups );
+					$ms_files_message = ! in_array( 'ms-files', $groups );
 					continue 2;
 			}
 		}
 		if ( $ajax_message ) {
 			echo "Not running ajax tests... To execute these, use --group ajax." . PHP_EOL;
+		}
+		if ( $ms_files_message ) {
+			echo "Not running ms_files_rewriting tests... To execute these, use --group ms-files." . PHP_EOL;
 		}
     }
 }

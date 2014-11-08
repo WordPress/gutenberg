@@ -949,27 +949,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( ABSPATH . 'wp-content/uploads/' . gmstrftime('%Y/%m'), $info['path'] );
 		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
 		$this->assertEquals( '', $info['error'] );
-
-		update_site_option( 'ms_files_rewriting', 1 );
-		ms_upload_constants();
-
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id2 = $this->factory->blog->create( array( 'user_id' => $user_id ) );
-		$info = wp_upload_dir();
-		$this->assertEquals( 'http://' . $site->domain . '/wp-content/uploads/' . gmstrftime('%Y/%m'), $info['url'] );
-		$this->assertEquals( ABSPATH . 'wp-content/uploads/' . gmstrftime('%Y/%m'), $info['path'] );
-		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
-		$this->assertEquals( '', $info['error'] );
-
-		switch_to_blog( $blog_id2 );
-		$info2 = wp_upload_dir();
-		$this->assertNotEquals( $info, $info2 );
-		$this->assertEquals( get_option( 'siteurl' )  . '/wp-content/blogs.dir/' . get_current_blog_id() . '/files/' . gmstrftime('%Y/%m'), $info2['url'] );
-		$this->assertEquals( ABSPATH . 'wp-content/blogs.dir/' . get_current_blog_id() . '/files/' . gmstrftime('%Y/%m'), $info2['path'] );
-		$this->assertEquals( gmstrftime('/%Y/%m'), $info2['subdir'] );
-		$this->assertEquals( '', $info2['error'] );
-		restore_current_blog();
-		update_site_option( 'ms_files_rewriting', 0 );
 	}
 
 	/**
