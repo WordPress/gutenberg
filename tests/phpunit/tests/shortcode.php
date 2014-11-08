@@ -308,16 +308,6 @@ EOF;
 	}
 
 	/**
-	 * @ticket 14050
-	 */
-	function test_multiple_shortcode_unautop() {
-		// a blank line is added at the end, so test with it already there
-		$test_string = "[footag]\n[footag]\n";
-		$actual = shortcode_unautop( wpautop( $test_string ) );
-		$this->assertEquals( $test_string, $actual );
-	}
-
-	/**
 	 * @ticket 10326
 	 */
 	function test_strip_shortcodes() {
