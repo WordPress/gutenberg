@@ -116,7 +116,11 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	public static function delete_shared_fixtures() {
 		global $wp_rewrite;
 
-		wp_delete_user( self::$author_id );
+		if ( is_multisite() ) {
+			wpmu_delete_user( self::$author_id );
+		} else {
+			wp_delete_user( self::$author_id );
+		}
 
 		foreach ( self::$post_ids as $pid ) {
 			wp_delete_post( $pid, true );
