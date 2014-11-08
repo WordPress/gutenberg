@@ -54,26 +54,4 @@ class Tests_XMLRPC_wp_uploadFile extends WP_XMLRPC_UnitTestCase {
 		else
 			$this->assertNotInstanceOf( 'IXR_Error', $result );
 	}
-
-	/**
-	 * @ticket 11946
-	 */
-	function test_valid_mime() {
-		$this->make_user_by_role( 'editor' );
-
-		// create attachment
-		$filename = ( DIR_TESTDATA . '/images/test-image-mime-jpg.png' );
-		$contents = file_get_contents( $filename );
-		$data = array(
-			'name' => 'test-image-mime-jpg.png',
-			'type' => 'image/png',
-			'bits' => $contents
-		);
-
-		$result = $this->myxmlrpcserver->mw_newMediaObject( array( 0, 'editor', 'editor', $data ) );
-
-		$this->assertNotInstanceOf( 'IXR_Error', $result );
-
-		$this->assertEquals( 'image/jpeg', $result['type'] );
-	}
 }
