@@ -35,7 +35,6 @@ class Tests_Canonical_CustomRules extends WP_Canonical_UnitTestCase {
 			// Custom Rewrite rules leading to Categories
 			array( '/ccr/uncategorized/sort/asc/', array( 'url' => '/ccr/uncategorized/sort/asc/', 'qv' => array( 'category_name' => 'uncategorized', 'order' => 'asc' ) ) ),
 			array( '/ccr/uncategorized/sort/desc/', array( 'url' => '/ccr/uncategorized/sort/desc/', 'qv' => array( 'category_name' => 'uncategorized', 'order' => 'desc' ) ) ),
-			array( '/ccr/uncategorized/sort/desc/?year=2008', array( 'url' => '/ccr/uncategorized/sort/desc/?year=2008', 'qv' => array( 'category_name' => 'uncategorized', 'order' => 'desc', 'year' => '2008' ) ), 17661 ),
 		);
 	}
 }
