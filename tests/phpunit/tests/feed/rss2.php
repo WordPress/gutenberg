@@ -125,8 +125,12 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 			foreach ( get_the_category( $post->ID ) as $term ) {
 				$cats[] = $term->name;
 			}
-			foreach ( get_the_tags( $post->ID ) as $term ) {
-				$cats[] = $term->name;
+
+			$tags = get_the_tags( $post->ID );
+			if ( $tags ) {
+				foreach ( get_the_tags( $post->ID ) as $term ) {
+					$cats[] = $term->name;
+				}
 			}
 			$cats = array_filter( $cats );
 			// should be the same number of categories
