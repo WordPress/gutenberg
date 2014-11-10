@@ -328,6 +328,10 @@ module.exports = function(grunt) {
 			multisite: {
 				cmd: 'phpunit',
 				args: ['-c', 'tests/phpunit/multisite.xml']
+			},
+			'external-http': {
+				cmd: 'phpunit',
+				args: ['-c', 'phpunit.xml.dist', '--group', 'external-http']
 			}
 		},
 		uglify: {
@@ -482,7 +486,7 @@ module.exports = function(grunt) {
 		'uglify:core', 'uglify:jqueryui', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
 
 	// Testing tasks.
-	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax and multisite tests.', function() {
+	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax, external-http, and multisite tests.', function() {
 		grunt.util.spawn({
 			cmd: this.data.cmd,
 			args: this.data.args,
