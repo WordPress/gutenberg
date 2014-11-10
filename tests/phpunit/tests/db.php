@@ -458,4 +458,36 @@ class Tests_DB extends WP_UnitTestCase {
 		$this->assertEquals( $expected2, $wpdb->last_query );
 		$wpdb->suppress_errors( $suppress );
 	}
+
+	/**
+	 * mysqli_ incorrect flush and further sync issues.
+	 *
+	 * @ticket 28155
+	 */
+	function test_mysqli_flush_sync() {
+		global $wpdb;
+		if ( ! $wpdb->use_mysqli ) {
+			$this->markTestSkipped( 'mysqli not being used' );
+		}
+
+		$suppress = $wpdb->suppress_errors( true );
+
+		$wpdb->query( 'DROP PROCEDURE IF EXISTS `test_mysqli_flush_sync_procedure`' );
+		$wpdb->query( 'CREATE PROCEDURE `test_mysqli_flush_sync_procedure`() BEGIN
+			SELECT ID FROM `' . $wpdb->posts . '` LIMIT 1;
+		END' );
+
+		if ( count( $wpdb->get_results( 'SHOW CREATE PROCEDURE `test_mysqli_flush_sync_procedure`' ) ) < 1 ) {
+			$wpdb->suppress_errors( $suppress );
+			$this->markTestSkipped( 'procedure could not be created (missing privileges?)' );
+		}
+
+		$this->factory->post->create();
+
+		$this->assertNotEmpty( $wpdb->get_results( 'CALL `test_mysqli_flush_sync_procedure`' ) );
+		$this->assertNotEmpty( $wpdb->get_results( "SELECT ID FROM `{$wpdb->posts}` LIMIT 1" ) );
+
+		$wpdb->query( 'DROP PROCEDURE IF EXISTS `test_mysqli_flush_sync_procedure`' );
+		$wpdb->suppress_errors( $suppress );
+	}
 }
