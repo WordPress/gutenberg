@@ -79,7 +79,9 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 
 		// This should bump last_changed.
 		wp_delete_post( $pages[0]->ID );
-		$this->assertGreaterThan( $last_changed, wp_cache_get( 'last_changed', 'posts' ) );
+		$old_changed_float = $this->_microtime_to_float( $last_changed );
+		$new_changed_float = $this->_microtime_to_float( wp_cache_get( 'last_changed', 'posts' ) );
+		$this->assertGreaterThan( $old_changed_float, $new_changed_float );
 
 		$num_queries = $wpdb->num_queries;
 		$last_changed = wp_cache_get( 'last_changed', 'posts' );

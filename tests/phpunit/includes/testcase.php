@@ -144,7 +144,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			}
 		}
 	}
-	
+
 	function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
@@ -475,5 +475,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$uploads = wp_upload_dir();
 		$files = $this->files_in_dir( $uploads['basedir'] );
 		return $files;
+	}
+
+	/**
+	 * Helper to Convert a microtime string into a float
+	 */
+	protected function _microtime_to_float($microtime ){
+		$time_array = explode( ' ', $microtime );
+		return array_sum( $time_array );
 	}
 }
