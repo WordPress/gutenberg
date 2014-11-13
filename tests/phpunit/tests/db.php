@@ -482,10 +482,13 @@ class Tests_DB extends WP_UnitTestCase {
 			$this->markTestSkipped( 'procedure could not be created (missing privileges?)' );
 		}
 
-		$this->factory->post->create();
+		$post_id = $this->factory->post->create();
 
 		$this->assertNotEmpty( $wpdb->get_results( 'CALL `test_mysqli_flush_sync_procedure`' ) );
 		$this->assertNotEmpty( $wpdb->get_results( "SELECT ID FROM `{$wpdb->posts}` LIMIT 1" ) );
+
+		// DROP PROCEDURE will cause a COMMIT, so we delete the post manually before that happens.
+		wp_delete_post( $post_id, true );
 
 		$wpdb->query( 'DROP PROCEDURE IF EXISTS `test_mysqli_flush_sync_procedure`' );
 		$wpdb->suppress_errors( $suppress );
