@@ -89,4 +89,36 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 
 		$this->assertEquals( $this->tt_ids['t2_child'], $children[0]->term_taxonomy_id );
 	}
+
+	/**
+	 * @ticket 30335
+	 */
+	public function test_should_rebuild_split_term_taxonomy_hierarchy() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax_3', 'post' );
+		register_taxonomy( 'wptests_tax_4', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t1 = wp_insert_term( 'Foo1', 'wptests_tax_3' );
+		$t2 = wp_insert_term( 'Foo1 Parent', 'wptests_tax_4' );
+		$t3 = wp_insert_term( 'Foo1', 'wptests_tax_4', array(
+			'parent' => $t2['term_id'],
+		) );
+
+		// Manually modify because split terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t3['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+		$th = _get_term_hierarchy( 'wptests_tax_4' );
+
+		$new_term_id = _split_shared_term( $t1['term_id'], $t3['term_taxonomy_id'] );
+
+		$t2_children = get_term_children( $t2['term_id'], 'wptests_tax_4' );
+		$this->assertEquals( array( $new_term_id ), $t2_children );
+	}
 }
