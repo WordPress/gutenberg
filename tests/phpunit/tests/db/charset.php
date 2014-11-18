@@ -231,7 +231,7 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	protected $table_and_column_defs = array(
 		array(
 			'definition'      => '( a INT, b FLOAT )',
-			'table_expected'  => 'latin1',
+			'table_expected'  => false,
 			'column_expected' => array( 'a' => false, 'b' => false )
 		),
 		array(
@@ -344,6 +344,32 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		}
 
 		self::$_wpdb->query( $drop );
+	}
+
+	/**
+	 * @dataProvider data_test_get_column_charset
+	 * @ticket 21212
+	 */
+	function test_get_column_charset_non_mysql( $drop, $create, $table, $columns ) {
+		self::$_wpdb->query( $drop );
+
+		if ( ! self::$_wpdb->has_cap( 'utf8mb4' ) && preg_match( '/utf8mb[34]/i', $create ) ) {
+			$this->markTestSkipped( "This version of MySQL doesn't support utf8mb4." );
+			return;
+		}
+
+		self::$_wpdb->is_mysql = false;
+
+		self::$_wpdb->query( $create );
+
+		$columns = array_keys( $columns );
+		foreach ( $columns as $column => $charset ) {
+			$this->assertEquals( false, self::$_wpdb->get_col_charset( $table, $column ) );
+		}
+
+		self::$_wpdb->query( $drop );
+
+		self::$_wpdb->is_mysql = true;
 	}
 
 	/**
