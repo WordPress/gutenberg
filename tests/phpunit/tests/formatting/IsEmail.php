@@ -4,7 +4,7 @@
  * @group formatting
  */
 class Tests_Formatting_IsEmail extends WP_UnitTestCase {
-	function test_returns_true_if_given_a_valid_email_address() {
+	function test_returns_the_email_address_if_it_is_valid() {
 		$data = array(
 			"bob@example.com",
 			"phil@example.info",
@@ -12,7 +12,7 @@ class Tests_Formatting_IsEmail extends WP_UnitTestCase {
 			"kevin@many.subdomains.make.a.happy.man.edu"
 			);
 		foreach ( $data as $datum ) {
-			$this->assertEquals( $datum, is_email($datum), $datum );
+			$this->assertEquals( $datum, is_email( $datum ), $datum );
 		}
 	}
 
