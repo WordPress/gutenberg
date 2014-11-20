@@ -274,6 +274,37 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( 1, get_blog_count() );
 	}
 
+	/**
+	 * When a site is deleted with wpmu_delete_blog(), only the files associated with
+	 * that site should be removed. When wpmu_delete_blog() is run a second time, nothing
+	 * should change with upload directories.
+	 */
+	function test_upload_directories_after_multiple_wpmu_delete_blog() {
+		$filename = rand_str().'.jpg';
+		$contents = rand_str();
+
+		// Upload a file to the main site on the network.
+		$file1 = wp_upload_bits( $filename, null, $contents );
+
+		$blog_id = $this->factory->blog->create();
+
+		switch_to_blog( $blog_id );
+		$file2 = wp_upload_bits( $filename, null, $contents );
+		restore_current_blog();
+
+		wpmu_delete_blog( $blog_id, true );
+
+		// The file on the main site should still exist. The file on the deleted site should not.
+		$this->assertTrue( file_exists( $file1['file'] ) );
+		$this->assertFalse( file_exists( $file2['file'] ) );
+
+		wpmu_delete_blog( $blog_id, true );
+
+		// The file on the main site should still exist. The file on the deleted site should not.
+		$this->assertTrue( file_exists( $file1['file'] ) );
+		$this->assertFalse( file_exists( $file2['file'] ) );
+	}
+
 	function test_wpmu_update_blogs_date() {
 		global $wpdb;
 
