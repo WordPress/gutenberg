@@ -133,6 +133,15 @@ class Tests_Auth extends WP_UnitTestCase {
 		// Password broken by setting it to be too long.
 		$this->assertEquals( '*', $user->data->user_pass );
 
+		$user = wp_authenticate( 'password-length-test', '*' );
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+		$user = wp_authenticate( 'password-length-test', '*0' );
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+		$user = wp_authenticate( 'password-length-test', '*1' );
+		$this->assertInstanceOf( 'WP_Error', $user );
+
 		$user = wp_authenticate( 'password-length-test', $passwords[0] );
 		// Wrong Password
 		$this->assertInstanceOf( 'WP_Error', $user );
