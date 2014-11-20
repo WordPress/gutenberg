@@ -1,4 +1,4 @@
-// 4.1.6 (2014-10-22)
+// 4.1.6 (2014-11-19)
 
 /**
  * Compiled inline version. (Library mode)
@@ -3400,6 +3400,10 @@ define("tinymce/dom/DomQuery", [
 		return typeof obj === 'string';
 	}
 
+	function isWindow(obj) {
+		return obj && obj == obj.window;
+	}
+
 	function createFragment(html, fragDoc) {
 		var frag, node, container;
 
@@ -3688,10 +3692,6 @@ define("tinymce/dom/DomQuery", [
 
 			if (isString(items)) {
 				return self.add(DomQuery(items));
-			}
-
-			if (items.nodeType) {
-				return self.add([items]);
 			}
 
 			if (sort !== false) {
@@ -4474,7 +4474,13 @@ define("tinymce/dom/DomQuery", [
 		 * @param {Object} object Object to convert to array.
 		 * @return {Arrau} Array produced from object.
 		 */
-		makeArray: Tools.toArray,
+		makeArray: function(array) {
+			if (isWindow(array) || array.nodeType) {
+				return [array];
+			}
+
+			return Tools.toArray(array);
+		},
 
 		/**
 		 * Returns the index of the specified item inside the array.
@@ -10301,7 +10307,7 @@ define("tinymce/html/Schema", [
 		add("a", "href target rel media hreflang type", phrasingContent);
 		add("q", "cite", phrasingContent);
 		add("ins del", "cite datetime", flowContent);
-		add("img", "src alt usemap ismap width height");
+		add("img", "src srcset alt usemap ismap width height");
 		add("iframe", "src name width height", flowContent);
 		add("embed", "src type width height");
 		add("object", "data type typemustmatch name usemap form width height", flowContent, "param");
@@ -10340,7 +10346,8 @@ define("tinymce/html/Schema", [
 			add("video", "src crossorigin poster preload autoplay mediagroup loop " +
 				"muted controls width height buffered", flowContent, "track source");
 			add("audio", "src crossorigin preload autoplay mediagroup loop muted controls buffered volume", flowContent, "track source");
-			add("source", "src type media");
+			add("picture", "", "img source");
+			add("source", "src srcset type media sizes");
 			add("track", "kind src srclang label default");
 			add("datalist", "", phrasingContent, "option");
 			add("article section nav aside header footer", "", flowContent);
@@ -20942,11 +20949,11 @@ define("tinymce/util/EventDispatcher", [
 			handlers = bindings[name];
 			if (handlers) {
 				for (i = 0, l = handlers.length; i < l; i++) {
-					handlers[i] = callback = handlers[i];
+					callback = handlers[i];
 
 					// Unbind handlers marked with "once"
 					if (callback.once) {
-						off(name, callback);
+						off(name, callback.func);
 					}
 
 					// Stop immediate propagation if needed
@@ -20956,7 +20963,7 @@ define("tinymce/util/EventDispatcher", [
 					}
 
 					// If callback returns false then prevent default and stop all propagation
-					if (callback.call(scope, args) === false) {
+					if (callback.func.call(scope, args) === false) {
 						args.preventDefault();
 						return args;
 					}
@@ -20979,7 +20986,7 @@ define("tinymce/util/EventDispatcher", [
 		 *     // Callback logic
 		 * });
 		 */
-		function on(name, callback, prepend) {
+		function on(name, callback, prepend, extra) {
 			var handlers, names, i;
 
 			if (callback === false) {
@@ -20987,6 +20994,14 @@ define("tinymce/util/EventDispatcher", [
 			}
 
 			if (callback) {
+				callback = {
+					func: callback
+				};
+
+				if (extra) {
+					Tools.extend(callback, extra);
+				}
+
 				names = name.toLowerCase().split(' ');
 				i = names.length;
 				while (i--) {
@@ -21053,7 +21068,7 @@ define("tinymce/util/EventDispatcher", [
 							// Unbind specific ones
 							hi = handlers.length;
 							while (hi--) {
-								if (handlers[hi] === callback) {
+								if (handlers[hi].func === callback) {
 									handlers = handlers.slice(0, hi).concat(handlers.slice(hi + 1));
 									bindings[name] = handlers;
 								}
@@ -21092,8 +21107,7 @@ define("tinymce/util/EventDispatcher", [
 		 * });
 		 */
 		function once(name, callback, prepend) {
-			callback.once = true;
-			return on(name, callback, prepend);
+			return on(name, callback, prepend, {once: true});
 		}
 
 		/**
@@ -30744,7 +30758,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2014-10-22',
+		releaseDate: '2014-11-19',
 
 		/**
 		 * Collection of editor instances.
