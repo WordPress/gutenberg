@@ -2,6 +2,7 @@
 
 /**
  * @group pluggable
+ * @group auth
  */
 class Tests_Auth extends WP_UnitTestCase {
 	var $user_id;
@@ -98,5 +99,50 @@ class Tests_Auth extends WP_UnitTestCase {
 	function test_wp_verify_nonce_with_empty_arg() {
 		$this->assertFalse( wp_verify_nonce( '' ) );
 		$this->assertFalse( wp_verify_nonce( null ) );
+	}
+
+	function test_password_length_limit() {
+		$passwords = array(
+			str_repeat( 'a', 4095 ), // short
+			str_repeat( 'a', 4096 ), // limit
+			str_repeat( 'a', 4097 ), // long
+		);
+
+		$user_id = $this->factory->user->create( array( 'user_login' => 'password-length-test' ) );
+
+		wp_set_password( $passwords[1], $user_id );
+		$user = get_user_by( 'id', $user_id );
+		// phpass hashed password
+		$this->assertStringStartsWith( '$P$', $user->data->user_pass );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[0] );
+		// Wrong Password
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[1] );
+		$this->assertInstanceOf( 'WP_User', $user );
+		$this->assertEquals( $user_id, $user->ID );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[2] );
+		// Wrong Password
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+
+		wp_set_password( $passwords[2], $user_id );
+		$user = get_user_by( 'id', $user_id );
+		// Password broken by setting it to be too long.
+		$this->assertEquals( '*', $user->data->user_pass );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[0] );
+		// Wrong Password
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[1] );
+		// Wrong Password
+		$this->assertInstanceOf( 'WP_Error', $user );
+
+		$user = wp_authenticate( 'password-length-test', $passwords[2] );
+		// Password broken by setting it to be too long.
+		$this->assertInstanceOf( 'WP_Error', $user );
 	}
 }
