@@ -672,4 +672,36 @@ class Tests_User extends WP_UnitTestCase {
 
 		$this->assertSame( $user->user_nicename, $updated_user->user_nicename );
 	}
+
+	function test_changing_email_invalidates_password_reset_key() {
+		global $wpdb;
+
+		$user = $this->factory->user->create_and_get();
+		$wpdb->update( $wpdb->users, array( 'user_activation_key' => 'key' ), array( 'ID' => $user->ID ) );
+		clean_user_cache( $user );
+
+		$user = get_userdata( $user->ID );
+		$this->assertEquals( 'key', $user->user_activation_key );
+
+		// Check that changing something other than the email doesn't remove the key.
+		$userdata = array(
+			'ID'            => $user->ID,
+			'user_nicename' => 'wat',
+		);
+		wp_update_user( $userdata );
+
+		$user = get_userdata( $user->ID );
+		$this->assertEquals( 'key', $user->user_activation_key );
+
+		// Now check that changing the email does remove it.
+		$userdata = array(
+			'ID'            => $user->ID,
+			'user_nicename' => 'cat',
+			'user_email'    => 'foo@bar.dev',
+		);
+		wp_update_user( $userdata );
+
+		$user = get_userdata( $user->ID );
+		$this->assertEmpty( $user->user_activation_key );
+	}
 }
