@@ -30,4 +30,16 @@ class Tests_Comment extends WP_UnitTestCase {
 		// all comments types will be returned
 		$this->assertEquals( array( $ca1, $ca2, $c2, $c3, $c4, $c5 ), wp_list_pluck( $found, 'comment_ID' ) );
 	}
+
+	/**
+	 * @ticket 30412
+	 */
+	public function test_get_approved_comments_with_post_id_0_should_return_empty_array() {
+		$p = $this->factory->post->create();
+		$ca1 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_approved' => '1' ) );
+
+		$found = get_approved_comments( 0 );
+
+		$this->assertSame( array(), $found );
+	}
 }

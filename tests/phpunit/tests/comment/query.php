@@ -30,6 +30,18 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $c1, $c2, $c3, $c4, $c5 ), $found );
 	}
 
+	public function test_query_post_id_0() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'post_id' => 0,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $c1 ), $found );
+	}
+
 	/**
 	 * @ticket 12668
 	 */
