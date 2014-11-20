@@ -195,7 +195,7 @@ class Tests_Link extends WP_UnitTestCase {
 	function test_get_adjacent_post_exclude_self_term() {
 		// Bump term_taxonomy to mimic shared term offsets.
 		global $wpdb;
-		$wpdb->insert( $wpdb->term_taxonomy, array( 'taxonomy' => 'foo', 'term_id' => 12345 ) );
+		$wpdb->insert( $wpdb->term_taxonomy, array( 'taxonomy' => 'foo', 'term_id' => 12345, 'description' => '' ) );
 
 		$include = $this->factory->term->create( array(
 			'taxonomy' => 'category',
