@@ -276,15 +276,18 @@ class Tests_DB extends WP_UnitTestCase {
 	 * Test that SQL modes are set correctly
 	 * @ticket 26847
 	 */
-	public function test_set_sql_mode() {
+	function test_set_sql_mode() {
 		global $wpdb;
 
 		$current_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
 
-		$new_modes = array( 'IGNORE_SPACE', 'NO_AUTO_CREATE_USER' );
+		$new_modes = $expected_modes = array( 'IGNORE_SPACE', 'NO_AUTO_CREATE_USER' );
+		$expected_modes[] = 'STRICT_ALL_TABLES';
+
 		$wpdb->set_sql_mode( $new_modes );
+
 		$check_new_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
-		$this->assertEquals( implode( ',', $new_modes ), $check_new_modes );
+		$this->assertEqualSets( $expected_modes, explode( ',', $check_new_modes ) );
 
 		$wpdb->set_sql_mode( explode( ',', $current_modes ) );
 	}
@@ -293,7 +296,7 @@ class Tests_DB extends WP_UnitTestCase {
 	 * Test that incompatible SQL modes are blocked
 	 * @ticket 26847
 	 */
-	public function test_set_incompatible_sql_mode() {
+	function test_set_incompatible_sql_mode() {
 		global $wpdb;
 
 		$current_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
@@ -301,7 +304,7 @@ class Tests_DB extends WP_UnitTestCase {
 		$new_modes = array( 'IGNORE_SPACE', 'NO_ZERO_DATE', 'NO_AUTO_CREATE_USER' );
 		$wpdb->set_sql_mode( $new_modes );
 		$check_new_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
-		$this->assertFalse( in_array( 'NO_ZERO_DATE', explode( ',', $check_new_modes ) ) );
+		$this->assertNotContains( 'NO_ZERO_DATE', explode( ',', $check_new_modes ) );
 
 		$wpdb->set_sql_mode( explode( ',', $current_modes ) );
 	}
@@ -310,7 +313,7 @@ class Tests_DB extends WP_UnitTestCase {
 	 * Test that incompatible SQL modes can be changed
 	 * @ticket 26847
 	 */
-	public function test_set_allowed_incompatible_sql_mode() {
+	function test_set_allowed_incompatible_sql_mode() {
 		global $wpdb;
 
 		$current_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
@@ -322,7 +325,7 @@ class Tests_DB extends WP_UnitTestCase {
 		remove_filter( 'incompatible_sql_modes', array( $this, 'filter_allowed_incompatible_sql_mode' ), 1 );
 
 		$check_new_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
-		$this->assertTrue( in_array( 'NO_ZERO_DATE', explode( ',', $check_new_modes ) ) );
+		$this->assertContains( 'NO_ZERO_DATE', explode( ',', $check_new_modes ) );
 
 		$wpdb->set_sql_mode( explode( ',', $current_modes ) );
 	}
@@ -337,6 +340,146 @@ class Tests_DB extends WP_UnitTestCase {
 
 		unset( $modes[ $pos ] );
 		return $modes;
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_set_sql_mode_strict() {
+		global $wpdb;
+		$wpdb->set_sql_mode();
+		$sql_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
+		$this->assertContains( 'STRICT_ALL_TABLES', explode( ',', $sql_modes ) );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_numeric_strings() {
+		global $wpdb;
+		$post_id = $this->factory->post->create();
+		$wpdb->update( $wpdb->posts, array( 'post_parent' => 4 ), array( 'ID' => $post_id ), array( '%s' ) );
+		$this->assertContains( "`post_parent` = '4'", $wpdb->last_query );
+		$this->assertEmpty( $wpdb->last_error );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_numeric_strings_using_query() {
+		global $wpdb;
+		$post_id = $this->factory->post->create();
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_parent = %s WHERE ID = %s", '4', $post_id ) );
+		$this->assertEmpty( $wpdb->last_error );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_nan() {
+		global $wpdb;
+		$post_id = $this->factory->post->create();
+		$suppress = $wpdb->suppress_errors( true );
+		$wpdb->update( $wpdb->posts, array( 'post_parent' => 'foo' ), array( 'ID' => $post_id ), array( '%s' ) );
+		$this->assertContains( "`post_parent` = 'foo'", $wpdb->last_query );
+		$this->assertContains( 'Incorrect integer value', $wpdb->last_error );
+		$wpdb->suppress_errors( $suppress );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_nan_using_query() {
+		global $wpdb;
+		$post_id = $this->factory->post->create();
+		$suppress = $wpdb->suppress_errors( true );
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_parent = %s WHERE ID = %s", 'foo', $post_id ) );
+		$this->assertContains( 'Incorrect integer value', $wpdb->last_error );
+		$wpdb->suppress_errors( $suppress );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_number_start_of_string() {
+		global $wpdb;
+		$post_id = $this->factory->post->create();
+		$suppress = $wpdb->suppress_errors( true );
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_parent = %s WHERE ID = %s", '4foo', $post_id ) );
+		$this->assertContains( "Data truncated for column 'post_parent'", $wpdb->last_error );
+		$wpdb->suppress_errors( $suppress );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_booleans_true() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$wpdb->query( "UPDATE $wpdb->users SET user_status = true WHERE ID = $user_id" );
+		$this->assertEmpty( $wpdb->last_error );
+		$user = get_userdata( $user_id );
+		$this->assertSame( '1', $user->user_status );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_booleans_false() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$wpdb->query( "UPDATE $wpdb->users SET user_status = false WHERE ID = $user_id" );
+		$this->assertEmpty( $wpdb->last_error );
+		$user = get_userdata( $user_id );
+		$this->assertEquals( '0', $user->user_status );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_zero_date_is_valid() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$wpdb->query( "UPDATE $wpdb->users SET user_registered = '0000-00-00' WHERE ID = $user_id" );
+		$this->assertEmpty( $wpdb->last_error );
+		$user = get_userdata( $user_id );
+		$this->assertEquals( '0000-00-00 00:00:00', $user->user_registered );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_zero_datetime_is_valid() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$wpdb->query( "UPDATE $wpdb->users SET user_registered = '0000-00-00 00:00:00' WHERE ID = $user_id" );
+		$this->assertEmpty( $wpdb->last_error );
+		$user = get_userdata( $user_id );
+		$this->assertEquals( '0000-00-00 00:00:00', $user->user_registered );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_invalid_dates_are_invalid() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$suppress = $wpdb->suppress_errors( true );
+		$wpdb->query( "UPDATE $wpdb->users SET user_registered = '2014-02-29 00:00:00' WHERE ID = $user_id" );
+		$this->assertContains( 'Incorrect datetime value', $wpdb->last_error );
+		$wpdb->suppress_errors( $suppress );
+	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function test_strict_mode_nulls_are_invalid() {
+		global $wpdb;
+		$user_id = $this->factory->user->create();
+		$suppress = $wpdb->suppress_errors( true );
+		$wpdb->query( "UPDATE $wpdb->users SET user_nicename = NULL WHERE ID = $user_id" );
+		$this->assertContains( 'cannot be null', $wpdb->last_error );
+		$wpdb->suppress_errors( $suppress );
 	}
 
 	/**
@@ -766,7 +909,7 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ ticket 21212
+	 * @ticket 21212
 	 */
 	function test_pre_get_col_charset_filter() {
 		add_filter( 'pre_get_col_charset', array( $this, 'filter_pre_get_col_charset' ), 10, 3 );
