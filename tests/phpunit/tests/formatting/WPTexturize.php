@@ -1196,12 +1196,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[ is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 			),
 			array(
-				'[is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]', // HTML corruption is a known bug.  See tickets #12690 and #29557.
-				'[is it wise to <a title="allow user content ] here? hmm&#8221;> maybe </a> ]',
+				'[is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
+				'[is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 			),
 			array(
 				'[caption - is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
-				'[caption - is it wise to <a title="allow user content ] here? hmm&#8221;> maybe </a> ]',
+				'[caption &#8211; is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 			),
 			array(
 				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a> ]',
@@ -1767,23 +1767,23 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				'[code ...]...[/code]', // code is not a registered shortcode.
-				'[code ...]...[/code]',
+				'[code &#8230;]&#8230;[/code]',
 			),
 			array(
 				'[hello ...]...[/hello]', // hello is not a registered shortcode.
-				'[hello ...]&#8230;[/hello]',
+				'[hello &#8230;]&#8230;[/hello]',
 			),
 			array(
 				'[...]...[/...]', // These are potentially usable shortcodes.
-				'[...]&#8230;[/...]',
+				'[&#8230;]&#8230;[/&#8230;]',
 			),
 			array(
 				'[gal>ery ...]',
-				'[gal>ery ...]',
+				'[gal>ery &#8230;]',
 			),
 			array(
 				'[randomthing param="test"]',
-				'[randomthing param="test"]',
+				'[randomthing param=&#8221;test&#8221;]',
 			),
 			array(
 				'[[audio]...[/audio]...', // These are potentially usable shortcodes.  Unfortunately, the meaning of [[audio] is ambiguous unless we run the entire shortcode regexp.
