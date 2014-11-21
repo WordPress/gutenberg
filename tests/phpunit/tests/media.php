@@ -443,4 +443,28 @@ VIDEO;
 		$this->assertTrue( has_image_size( 'test-size' ) );
 	}
 
+	/**
+	 * @ticket 30346
+	 */
+	function test_attachment_url_to_postid() {
+		$image_path = '2014/11/' . $this->img_name;
+		$attachment_id = $this->factory->attachment->create_object( $image_path, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+		) );
+
+		$image_url  = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_path;
+		$this->assertEquals( $attachment_id, attachment_url_to_postid( $image_url ) );
+
+		add_filter( 'upload_dir', array( $this, '_upload_dir' ) );
+		$image_url = 'http://192.168.1.20.com/wp-content/uploads/' . $image_path;
+		$this->assertEquals( $attachment_id, attachment_url_to_postid( $image_url ) );
+		remove_filter( 'upload_dir', array( $this, '_upload_dir' ) );
+	}
+
+	function _upload_dir( $dir ) {
+		$dir['baseurl'] = 'http://192.168.1.20.com/wp-content/uploads';
+		return $dir;
+	}
+
 }
