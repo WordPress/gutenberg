@@ -318,30 +318,6 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 18897
-	 */
-	function test_query_offset_and_paged() {
-		$posts = $this->q->query('paged=2&offset=3');
-
-		$expected = array (
-			0 => 'many-trackbacks',
-			1 => 'one-trackback',
-			2 => 'comment-test',
-			3 => 'lorem-ipsum',
-			4 => 'cat-c',
-			5 => 'cat-b',
-			6 => 'cat-a',
-			7 => 'cats-a-and-c',
-			8 => 'cats-b-and-c',
-			9 => 'cats-a-and-b',
-		);
-
-		$this->assertCount( 10, $posts );
-		$this->assertTrue( $this->q->is_paged() );
-		$this->assertEquals( $expected, wp_list_pluck( $posts, 'post_name' ) );
-	}
-
-	/**
 	 * @ticket 11056
 	 */
 	function test_query_post_parent__in() {
