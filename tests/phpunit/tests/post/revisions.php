@@ -342,29 +342,61 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	/**
 	 * @ticket 26042
 	 */
-	function test_revision_order() {
-		$ok = 0;
-		$reversed = 0;
+	function test_wp_get_post_revisions_should_order_by_post_date() {
+		global $wpdb;
 
-		for ( $i = 0; $i < 100; $i++ ) {
-			$post_id = $this->factory->post->create( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
+		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
-			for ( $j = 1; $j < 3; $j++ ) {
-				wp_update_post( array( 'post_content' => 'updated post' . $j , 'ID' => $post_id ) );
-			}
+		$post = (array) $post;
+		$post_revision_fields = _wp_post_revision_fields( $post );
+		$post_revision_fields = wp_slash( $post_revision_fields );
 
-			$revisions = wp_get_post_revisions( $post_id );
-			$first = array_shift( $revisions );
-			$last = array_pop( $revisions );
+		$revision_ids = array();
+		$now = time();
+		for ( $j = 1; $j < 3; $j++ ) {
+			// Manually modify dates to ensure they're different.
+			$date = date( 'Y-m-d H:i:s', $now - ( $j * 10 ) );
+			$post_revision_fields['post_date'] = $date;
+			$post_revision_fields['post_date_gmt'] = $date;
 
-			if ( $first->ID < $last->ID ) {
-				$reversed++;
-			} else {
-				$ok++;
-			}
+			$revision_id = wp_insert_post( $post_revision_fields );
+
+			$revision_ids[] = $revision_id;
 		}
 
-		$this->assertEquals( 100, $ok );
-		$this->assertEquals( 0, $reversed );
+		$revisions = wp_get_post_revisions( $post['ID'] );
+
+		$this->assertEquals( $revision_ids, array_values( wp_list_pluck( $revisions, 'ID' ) ) );
+	}
+
+	/**
+	 * @ticket 26042
+	 */
+	function test_wp_get_post_revisions_should_order_by_ID_when_post_date_matches() {
+		global $wpdb;
+
+		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
+
+		$post = (array) $post;
+		$post_revision_fields = _wp_post_revision_fields( $post );
+		$post_revision_fields = wp_slash( $post_revision_fields );
+
+		$revision_ids = array();
+		$date = date( 'Y-m-d H:i:s', time() - 10 );
+		for ( $j = 1; $j < 3; $j++ ) {
+			// Manually modify dates to ensure they're the same.
+			$post_revision_fields['post_date'] = $date;
+			$post_revision_fields['post_date_gmt'] = $date;
+
+			$revision_id = wp_insert_post( $post_revision_fields );
+
+			$revision_ids[] = $revision_id;
+		}
+
+		rsort( $revision_ids );
+
+		$revisions = wp_get_post_revisions( $post['ID'] );
+
+		$this->assertEquals( $revision_ids, array_values( wp_list_pluck( $revisions, 'ID' ) ) );
 	}
 }
