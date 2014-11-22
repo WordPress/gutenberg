@@ -72,40 +72,6 @@ class Tests_Mail extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 15448
-	 */
-	function test_wp_mail_plain_and_html() {
-		$to = 'user@example.com';
-		$subject = 'Test email with plain text and html versions';
-		$messages = array( 'text/plain' => 'Here is some plain text.',
-					   'text/html' =>'<html><head></head><body>Here is the HTML ;-)<body></html>' );
-
-		wp_mail( $to, $subject, $messages );
-
-		preg_match( '/boundary="(.*)"/', $GLOBALS['phpmailer']->mock_sent[0]['header'], $matches);
-		$boundry = $matches[1];
-		$body = '--' . $boundry . '
-Content-Type: text/plain; charset = "UTF-8"
-Content-Transfer-Encoding: 8bit
-
-Here is some plain text.
-
-
---' . $boundry . '
-Content-Type: text/html; charset = "UTF-8"
-Content-Transfer-Encoding: 8bit
-
-<html><head></head><body>Here is the HTML ;-)<body></html>
-
-
-
---' . $boundry . '--
-';
-		// We need some better assertions here but these test the behaviour for now.
-		$this->assertEquals($body, $GLOBALS['phpmailer']->mock_sent[0]['body']);
-	}
-
-	/**
 	 * @ticket 17305
 	 */
 	function test_wp_mail_rfc2822_addresses() {
