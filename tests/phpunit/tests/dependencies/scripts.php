@@ -84,36 +84,4 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		// Cleanup
 		$wp_scripts->base_url = $base_url_backup;
 	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_inline_should_not_output_script_tag_with_src() {
-		wp_enqueue_script( 'baba-inline-0', 'inline' );
-		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
-	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_json_encode_should_not_encode_special_literal_values() {
-		if ( ! class_exists( 'WP_JS_Literal' ) ) {
-			$this->markTestSkipped( "WP_JS_Literal class doesn't exist" );
-		}
-
-		$literal = new WP_JS_Literal( 'baba()' );
-		$this->assertEquals( '{"x":baba()}', WP_JS_Literal::json_encode( array( 'x' => $literal ), array( $literal ) ) );
-	}
-
-	/**
-	 * @ticket 22229
-	 */
-	function test_json_encode_should_not_encode_special_literal_values_with_dependencies() {
-		if ( ! class_exists( 'WP_JS_Literal' ) ) {
-			$this->markTestSkipped( "WP_JS_Literal class doesn't exist" );
-		}
-		
-		$literal = new WP_JS_Literal( 'baba()', array( 'dep0', 'dep1' ) );
-		$this->assertEquals( '{"x":baba()}', WP_JS_Literal::json_encode( array( 'x' => $literal ), array( $literal ) ) );
-	}
 }
