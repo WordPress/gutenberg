@@ -304,6 +304,12 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected function checkRequirements() {
 		parent::checkRequirements();
+
+		// Core tests no longer check against open Trac tickets, but others using WP_UnitTestCase may do so.
+		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
+			return;
+		}
+
 		if ( WP_TESTS_FORCE_KNOWN_BUGS )
 			return;
 		$tickets = PHPUnit_Util_Test::getTickets( get_class( $this ), $this->getName( false ) );
