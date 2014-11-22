@@ -365,23 +365,6 @@ class Tests_Formatting_MakeClickable extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 16859
-	 */
-	function test_square_brackets() {
-		$urls_before = array(
-			'http://example.com/?foo[bar]=baz',
-			'http://example.com/?baz=bar&foo[bar]=baz',
-		);
-		$urls_expected = array(
-			'<a href="http://example.com/?foo%5Bbar%5D=baz" rel="nofollow">http://example.com/?foo%5Bbar%5D=baz</a>',
-			'<a href="http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz" rel="nofollow">http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz</a>',
-		);
-		foreach ($urls_before as $key => $url) {
-			$this->assertEquals( $urls_expected[$key], make_clickable( $url ) );
-		}
-	}
-
-	/**
 	 * @ticket 19028
 	 */
 	function test_line_break_in_existing_clickable_link() {

@@ -63,18 +63,6 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 16859
-	 */
-	function test_square_brackets() {
-		$this->assertEquals( 'http://example.com/?foo%5Bbar%5D=baz', esc_url( 'http://example.com/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz', esc_url( 'http://example.com/?baz=bar&foo[bar]=baz' ) );
-		//IPv6 addresses in urls - RFC2732
-		$this->assertEquals( 'http://[::FFFF::127.0.0.1]', esc_url( 'http://[::FFFF::127.0.0.1]' ) );
-		$this->assertEquals( 'http://[::127.0.0.1]', esc_url( 'http://[::127.0.0.1]' ) );
-		$this->assertEquals( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]', esc_url( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]' ) );
-	}
-
-	/**
 	 * @ticket 21974
 	 */
 	function test_protocol_relative_with_colon() {
