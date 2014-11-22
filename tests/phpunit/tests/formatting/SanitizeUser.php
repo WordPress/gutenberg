@@ -11,11 +11,25 @@ class Tests_Formatting_SanitizeUser extends WP_UnitTestCase {
 	}
 
 	public function test_strips_encoded_ampersand() {
-		$this->assertEquals("ATT", sanitize_user("AT&amp;T"));
+		$expected = 'ATT';
+
+		// Multisite forces user logins to lowercase.
+		if ( is_multisite() ) {
+			$expected = strtolower( $expected );
+		}
+
+		$this->assertEquals( $expected, sanitize_user( "AT&amp;T" ) );
 	}
 
 	public function test_strips_encoded_ampersand_when_followed_by_semicolon() {
-		$this->assertEquals("ATT Test;", sanitize_user("AT&amp;T Test;"));
+		$expected = 'ATT Test;';
+
+		// Multisite forces user logins to lowercase.
+		if ( is_multisite() ) {
+			$expected = strtolower( $expected );
+		}
+
+		$this->assertEquals( $expected, sanitize_user( "AT&amp;T Test;" ) );
 	}
 
 	function test_strips_percent_encoded_octets() {
