@@ -131,9 +131,6 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertEquals( 'abcdefg.png', wp_unique_filename( $testdir, 'abcde\\\fg.png' ), 'Tripple slashed not removed' );
 	}
 
-	/**
-	 * @ticket 9930
-	 */
 	function test_is_serialized() {
 		$cases = array(
 			serialize(null),
@@ -142,7 +139,6 @@ class Tests_Functions extends WP_UnitTestCase {
 			serialize(-25),
 			serialize(25),
 			serialize(1.1),
-			serialize(2.1E+200),
 			serialize('this string will be serialized'),
 			serialize("a\nb"),
 			serialize(array()),
@@ -155,7 +151,6 @@ class Tests_Functions extends WP_UnitTestCase {
 		$not_serialized = array(
 			'a string',
 			'garbage:a:0:garbage;',
-			'b:4;',
 			's:4:test;'
 		);
 		foreach ( $not_serialized as $case )
