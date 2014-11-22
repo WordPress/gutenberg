@@ -738,61 +738,6 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 19373
-	 */
-	function test_insert_programmatic_without_current_user_success() {
-		$this->_unset_current_user();
-
-		register_taxonomy( 'test_tax', 'post' );
-
-		$title = rand_str();
-		$post_data = array(
-			'post_author' => $this->author_id,
-			'post_status' => 'public',
-			'post_content' => rand_str(),
-			'post_title' => $title,
-			'tax_input' => array(
-				'test_tax' => array( 'term', 'term2', 'term3' )
-			)
-		);
-		// with sanitize set to false
-		$insert_post_id = wp_insert_post( $post_data, true, false );
-
-		$post = get_post( $insert_post_id );
-		$this->assertEquals( $post->post_author, $this->author_id );
-		$this->assertEquals( $post->post_title, $title );
-
-		$terms = wp_get_object_terms( $insert_post_id, 'test_tax' );
-		$this->assertTrue( ( is_array( $terms ) && count( $terms ) == 3 ) );
-	}
-
-	/**
-	 * @ticket 19373
-	 */
-	function test_insert_programmatic_without_current_user_fail() {
-		$this->_unset_current_user();
-
-		register_taxonomy( 'test_tax', 'post' );
-
-		$title = rand_str();
-		$post_data = array(
-			// post_author not set
-			'post_status' => 'public',
-			'post_content' => rand_str(),
-			'post_title' => $title,
-			'tax_input' => array(
-				'test_tax' => array( 'term', 'term2', 'term3' )
-			)
-		);
-		// with sanitize set to false
-		$insert_post_id = wp_insert_post( $post_data, true, false );
-
-		// should error because no default user exists and no post author is passed in
-		$this->assertInstanceOf( 'WP_Error', $insert_post_id );
-		$this->assertEquals( 'empty_author', $insert_post_id->get_error_code() );
-	}
-
-	/**
 	 * @ticket 24803
 	 */
 	function test_wp_count_posts() {
