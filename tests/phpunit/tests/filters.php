@@ -251,24 +251,6 @@ class Tests_Filters extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 21169
-	 */
-	function test_filter_removal_during_filter() {
-		$tag = rand_str();
-		$a = new MockAction();
-		$b = new MockAction();
-
-		add_action( $tag, array($a, 'filter_append'), 11, 1 );
-		add_action( $tag, array($b, 'filter_append'), 12, 1 );
-		add_action( $tag, array($this, '_self_removal'), 10, 1 );
-
-		$result = apply_filters($tag, $tag);
-		$this->assertEquals( 1, $a->get_call_count(), 'priority 11 filters should run after priority 10 empties itself' );
-		$this->assertEquals( 1, $b->get_call_count(), 'priority 12 filters should run after priority 10 empties itself and priority 11 runs' );
-		$this->assertEquals( $result, $tag . '_append_append', 'priority 11 and 12 filters should run after priority 10 empties itself' );
-	}
-
-	/**
 	 * @ticket 29070
 	 */
 	function test_has_filter_after_remove_all_filters() {
