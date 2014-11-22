@@ -14,6 +14,7 @@ class Tests_User_CountUserPosts extends WP_UnitTestCase {
 		self::$user_id = $factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'count_user_posts_user',
+			'user_email' => 'count_user_posts_user@example.com',
 		) );
 
 		self::$post_ids = $factory->post->create_many( 4, array(
