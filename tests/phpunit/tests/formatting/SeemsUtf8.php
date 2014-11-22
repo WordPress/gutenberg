@@ -10,7 +10,7 @@ class Tests_Formatting_SeemsUtf8 extends WP_UnitTestCase {
 	 *
 	 * @dataProvider utf8_strings
 	 */
-    function test_returns_true_for_utf8_strings( $utf8_string ) {
+	function test_returns_true_for_utf8_strings( $utf8_string ) {
 		// from http://www.i18nguy.com/unicode-example.html
 		$this->assertTrue( seems_utf8( $utf8_string ) );
 	}
@@ -28,19 +28,17 @@ class Tests_Formatting_SeemsUtf8 extends WP_UnitTestCase {
 	 * @dataProvider big5_strings
 	 */
 	function test_returns_false_for_non_utf8_strings( $big5_string ) {
-		$this->markTestIncomplete( 'This test does not have any assertions.' );
-
-		$big5 = $big5[0];
-		$strings = array(
-			"abc",
-			"123",
-			$big5
-		);
+		$this->assertFalse( seems_utf8( $big5_string ) );
 	}
 
 	function big5_strings() {
 		// Get data from formatting/big5.txt
-		return array( array( 'incomplete' ) );
+		$big5_strings = file( DIR_TESTDATA . '/formatting/big5.txt' );
+		foreach ( $big5_strings as &$string ) {
+			$string = (array) trim( $string );
+		}
+		unset( $string );
+		return $big5_strings;
 	}
 }
 
