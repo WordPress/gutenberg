@@ -9,14 +9,15 @@ class Tests_Formatting_SanitizeUser extends WP_UnitTestCase {
 		$expected = is_multisite() ? 'captain awesome' : 'Captain Awesome';
 		$this->assertEquals($expected, sanitize_user($input));
 	}
-	/**
-	 * @ticket 10823
-	 */
-	function test_strips_entities() {
+
+	public function test_strips_encoded_ampersand() {
 		$this->assertEquals("ATT", sanitize_user("AT&amp;T"));
-		$this->assertEquals("ATT Test;", sanitize_user("AT&amp;T Test;"));
-		$this->assertEquals("AT&T Test;", sanitize_user("AT&T Test;"));
 	}
+
+	public function test_strips_encoded_ampersand_when_followed_by_semicolon() {
+		$this->assertEquals("ATT Test;", sanitize_user("AT&amp;T Test;"));
+	}
+
 	function test_strips_percent_encoded_octets() {
 		$expected = is_multisite() ? 'franois' : 'Franois';
 		$this->assertEquals( $expected, sanitize_user( "Fran%c3%a7ois" ) );
