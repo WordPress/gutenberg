@@ -145,46 +145,6 @@ class Tests_User extends WP_UnitTestCase {
 		}
 	}
 
-	/**
-	 * Test the magic __unset method
-	 *
-	 * @ticket 20043
-	 */
-	public function test_user_unset() {
-		// New user
-		$user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$user = new WP_User( $user_id );
-
-		// Test custom fields
-		$user->customField = 123;
-		$this->assertEquals( $user->customField, 123 );
-		unset( $user->customField );
-		$this->assertFalse( isset( $user->customField ) );
-		return $user;
-	}
-
-	/**
-	 * @depends test_user_unset
-	 * @expectedDeprecated WP_User->id
-	 * @ticket 20043
-	 */
-	function test_user_unset_lowercase_id( $user ) {
-		// Test 'id' (lowercase)
-		unset( $user->id );
-		return $user;
-	}
-
-	/**
-	 * @depends test_user_unset_lowercase_id
-	 * @ticket 20043
-	 */
-	function test_user_unset_uppercase_id( $user ) {
-		// Test 'ID'
-		$this->assertNotEmpty( $user->ID );
-		unset( $user->ID );
-		$this->assertEmpty( $user->ID );
-	}
-
 	// Test meta property magic functions for property get/set/isset.
 	function test_user_meta_properties() {
 		global $wpdb;
