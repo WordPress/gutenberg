@@ -446,7 +446,9 @@ class Tests_Post extends WP_UnitTestCase {
 		// might only fail if the post ID is greater than four characters
 
 		global $wp_rewrite;
+		$wp_rewrite->init();
 		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+		$wp_rewrite->flush_rules();
 
 		$post = array(
 			'post_author' => $this->author_id,
