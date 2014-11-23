@@ -923,20 +923,3 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 }
 
-/**
- * Special class for exposing protected wpdb methods we need to access
- */
-class wpdb_exposed_methods_for_testing extends wpdb {
-	public function __construct() {
-		global $wpdb;
-		$this->dbh = $wpdb->dbh;
-		$this->use_mysqli = $wpdb->use_mysqli;
-		$this->ready = true;
-		$this->field_types = $wpdb->field_types;
-		$this->charset = $wpdb->charset;
-	}
-
-	public function __call( $name, $arguments ) {
-		return call_user_func_array( array( $this, $name ), $arguments );
-	}
-}

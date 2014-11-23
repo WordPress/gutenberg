@@ -354,3 +354,21 @@ function _clean_term_filters() {
 	remove_filter( 'get_terms',     array( 'Featured_Content', 'hide_featured_term'     ), 10, 2 );
 	remove_filter( 'get_the_terms', array( 'Featured_Content', 'hide_the_featured_term' ), 10, 3 );
 }
+
+/**
+ * Special class for exposing protected wpdb methods we need to access
+ */
+class wpdb_exposed_methods_for_testing extends wpdb {
+	public function __construct() {
+		global $wpdb;
+		$this->dbh = $wpdb->dbh;
+		$this->use_mysqli = $wpdb->use_mysqli;
+		$this->ready = true;
+		$this->field_types = $wpdb->field_types;
+		$this->charset = $wpdb->charset;
+	}
+
+	public function __call( $name, $arguments ) {
+		return call_user_func_array( array( $this, $name ), $arguments );
+	}
+}
