@@ -472,7 +472,11 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 
 		$editor->save( $save_to_file );
 
-		$this->assertImageAlphaAtPoint( $save_to_file, array( 0,0 ), 127 );
+		$im = new Imagick( $save_to_file );
+		$pixel = $im->getImagePixelColor( 0, 0 );
+		$expected = $pixel->getColorValue( imagick::COLOR_ALPHA );
+
+		$this->assertImageAlphaAtPointImagick( $save_to_file, array( 0,0 ), $expected );
 
 		unlink( $save_to_file );
 	}
@@ -495,7 +499,11 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 
 		$editor->save( $save_to_file );
 
-		$this->assertImageAlphaAtPoint( $save_to_file, array( 0,0 ), 127 );
+		$im = new Imagick( $save_to_file );
+		$pixel = $im->getImagePixelColor( 0, 0 );
+		$expected = $pixel->getColorValue( imagick::COLOR_ALPHA );
+
+		$this->assertImageAlphaAtPointImagick( $save_to_file, array( 0,0 ), $expected );
 
 		unlink( $save_to_file );
 	}

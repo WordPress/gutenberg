@@ -472,7 +472,7 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 
 		$editor->save( $save_to_file );
 
-		$this->assertImageAlphaAtPoint( $save_to_file, array( 0,0 ), 127 );
+		$this->assertImageAlphaAtPointGD( $save_to_file, array( 0,0 ), 127 );
 
 		unlink( $save_to_file );
 	}
@@ -495,7 +495,7 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 
 		$editor->save( $save_to_file );
 
-		$this->assertImageAlphaAtPoint( $save_to_file, array( 0,0 ), 127 );
+		$this->assertImageAlphaAtPointGD( $save_to_file, array( 0,0 ), 127 );
 
 		unlink( $save_to_file );
 	}
