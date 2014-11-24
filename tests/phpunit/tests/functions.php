@@ -543,10 +543,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 28786
 	 */
 	function test_wp_json_encode_non_utf8() {
-		if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
-			$this->markTestSkipped( 'EUC-JP character set added in PHP 5.4' );
-		};
-
 		$old_charsets = $charsets = mb_detect_order();
 		if ( ! in_array( 'EUC-JP', $charsets ) ) {
 			$charsets[] = 'EUC-JP';
@@ -558,7 +554,43 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		$this->assertEquals( 'aあb', $utf8 );
 
-		$this->assertEquals( wp_json_encode( $eucjp ), '"a\u3042b"' );
+		// json_encode() returns different things in different PHP versions.
+		// See: https://core.trac.wordpress.org/ticket/30471
+		if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
+			$expected = '"a\u3042b"';
+		} else {
+			$expected = 'null';
+		}
+
+		$this->assertEquals( $expected, wp_json_encode( $eucjp ) );
+
+		mb_detect_order( $old_charsets );
+	}
+
+	/**
+	 * @ticket 28786
+	 */
+	function test_wp_json_encode_non_utf8_in_array() {
+		$old_charsets = $charsets = mb_detect_order();
+		if ( ! in_array( 'EUC-JP', $charsets ) ) {
+			$charsets[] = 'EUC-JP';
+			mb_detect_order( $charsets );
+		}
+
+		$eucjp = mb_convert_encoding( 'aあb', 'EUC-JP', 'UTF-8' );
+		$utf8 = mb_convert_encoding( $eucjp, 'UTF-8', 'EUC-JP' );
+
+		$this->assertEquals( 'aあb', $utf8 );
+
+		// json_encode() returns different things in different PHP versions.
+		// See: https://core.trac.wordpress.org/ticket/30471
+		if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
+			$expected = '["c","a\u3042b"]';
+		} else {
+			$expected = '["c",null]';
+		}
+
+		$this->assertEquals( $expected, wp_json_encode( array( 'c', $eucjp ) ) );
 
 		mb_detect_order( $old_charsets );
 	}
