@@ -639,13 +639,21 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->factory->comment->create( array( 'user_id' => $users[0], 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
 		$this->factory->comment->create( array( 'user_id' => $users[1], 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
 
-		$comments = get_comments( array( 'user_id' => $users[0] ) );
+		$comments = get_comments( array(
+			'user_id' => $users[0],
+			'orderby' => 'comment_ID',
+			'order' => 'ASC',
+		) );
 
 		$this->assertCount( 2, $comments );
 		$this->assertEquals( $users[0], $comments[0]->user_id );
 		$this->assertEquals( $users[0], $comments[1]->user_id );
 
-		$comments = get_comments( array( 'user_id' => $users ) );
+		$comments = get_comments( array(
+			'user_id' => $users,
+			'orderby' => 'comment_ID',
+			'order' => 'ASC',
+		) );
 
 		$this->assertCount( 3, $comments );
 		$this->assertEquals( $users[0], $comments[0]->user_id );
