@@ -56,4 +56,28 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 
 		wp_set_current_user( $current_user );
 	}
+
+	function test_is_plugin_active_true() {
+		activate_plugin( 'hello.php' );
+		$test = is_plugin_active( 'hello.php' );
+		$this->assertTrue( $test );
+	}
+
+	function test_is_plugin_active_false() {
+		deactivate_plugins( 'hello.php' );
+		$test = is_plugin_active( 'hello.php' );
+		$this->assertFalse( $test );
+	}
+
+	function test_is_plugin_inactive_true() {
+		deactivate_plugins( 'hello.php' );
+		$test = is_plugin_inactive( 'hello.php' );
+		$this->assertTrue( $test );
+	}
+
+	function test_is_plugin_inactive_false() {
+		activate_plugin( 'hello.php' );
+		$test = is_plugin_inactive( 'hello.php' );
+		$this->assertFalse( $test );
+	}
 }
