@@ -554,15 +554,7 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		$this->assertEquals( 'aあb', $utf8 );
 
-		// json_encode() returns different things in different PHP versions.
-		// See: https://core.trac.wordpress.org/ticket/30471
-		if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
-			$expected = '"a\u3042b"';
-		} else {
-			$expected = 'null';
-		}
-
-		$this->assertEquals( $expected, wp_json_encode( $eucjp ) );
+		$this->assertEquals( '"a\u3042b"', wp_json_encode( $eucjp ) );
 
 		mb_detect_order( $old_charsets );
 	}
@@ -582,15 +574,7 @@ class Tests_Functions extends WP_UnitTestCase {
 
 		$this->assertEquals( 'aあb', $utf8 );
 
-		// json_encode() returns different things in different PHP versions.
-		// See: https://core.trac.wordpress.org/ticket/30471
-		if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
-			$expected = '["c","a\u3042b"]';
-		} else {
-			$expected = '["c",null]';
-		}
-
-		$this->assertEquals( $expected, wp_json_encode( array( 'c', $eucjp ) ) );
+		$this->assertEquals( '["c","a\u3042b"]', wp_json_encode( array( 'c', $eucjp ) ) );
 
 		mb_detect_order( $old_charsets );
 	}
