@@ -133,6 +133,16 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		remove_action( 'activate_' . $path, array ( $mock, 'action' ) );
 	}
 
+	function test_is_plugin_active_for_network_true() {
+		activate_plugin( 'hello.php', '', true );
+		$this->assertTrue( is_plugin_active_for_network( 'hello.php' ) );
+	}
+
+	function test_is_plugin_active_for_network_false() {
+		deactivate_plugins( 'hello.php', false, true );
+		$this->assertFalse( is_plugin_active_for_network( 'hello.php' ) );
+	}
+
 	function _helper_deactivate_hook() {
 		$this->plugin_hook_count++;
 	}
