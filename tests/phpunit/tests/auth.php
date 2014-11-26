@@ -69,10 +69,10 @@ class Tests_Auth extends WP_UnitTestCase {
 
 	/**
 	 * Test wp_hash_password trims whitespace
-	 * 
-	 * This is similar to test_password_trimming but tests the "lower level" 
+	 *
+	 * This is similar to test_password_trimming but tests the "lower level"
 	 * wp_hash_password function
-	 * 
+	 *
 	 * @ticket 24973
 	 */
 	function test_wp_hash_password_trimming() {
@@ -99,6 +99,13 @@ class Tests_Auth extends WP_UnitTestCase {
 	function test_wp_verify_nonce_with_empty_arg() {
 		$this->assertFalse( wp_verify_nonce( '' ) );
 		$this->assertFalse( wp_verify_nonce( null ) );
+	}
+
+	/**
+	 * @ticket 29542
+	 */
+	function test_wp_verify_nonce_with_integer_arg() {
+		$this->assertFalse( wp_verify_nonce( 1 ) );
 	}
 
 	function test_password_length_limit() {
