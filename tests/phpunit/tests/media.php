@@ -467,4 +467,13 @@ VIDEO;
 		return $dir;
 	}
 
+	function test_wp_check_filetype() {
+		$url = 'http://example.com/testFile.mp4?autoplay=true&otherstuff=false';
+		$filetype = wp_check_filetype( $url );
+		$expected = array(
+			'ext'  => 'mp4',
+			'type' => 'video/mp4'
+		);
+		$this->assertEquals( $expected, $filetype );
+	}
 }
