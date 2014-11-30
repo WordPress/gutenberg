@@ -21,6 +21,7 @@
 			delete editor.settings.file_browser_callback;
 			delete editor.settings.image_list;
 			delete editor.settings.image_class_list;
+			delete editor.settings.document_base_url;
 
 			var win = Utils.getFontmostWindow();
 
@@ -125,4 +126,64 @@
 			'<p><img class="class1" src="src" alt="alt" width="100" height="200" /></p>'
 		);
 	});
+
+	test("Image recognizes relative src url and prepends relative document_base_url setting.", function () {
+		var win, elementId, element;
+
+		editor.settings.document_base_url = 'testing/images/';
+		editor.setContent('');
+		editor.execCommand('mceImage', true);
+
+		var data = {
+			"src": "src",
+			"alt": "alt"
+		};
+
+		win = Utils.getFontmostWindow();
+		elementId = win.find('#src')[0]._id;
+		element = document.getElementById(elementId).childNodes[0];
+
+		win.fromJSON(data);
+		Utils.triggerElementChange(element);
+
+		win.find('form')[0].submit();
+		win.close();
+
+		equal(
+			cleanHtml(editor.getContent()),
+			'<p><img src="' + editor.settings.document_base_url + 'src" alt="alt" /></p>'
+		);
+
+
+ 	});
+
+ 	test("Image recognizes relative src url and prepends absolute document_base_url setting.", function () {
+		var win, elementId, element;
+
+		editor.settings.document_base_url = 'http://testing.com/images/';
+		editor.setContent('');
+		editor.execCommand('mceImage', true);
+
+		var data = {
+			"src": "src",
+			"alt": "alt"
+		};
+
+		win = Utils.getFontmostWindow();
+		elementId = win.find('#src')[0]._id;
+		element = document.getElementById(elementId).childNodes[0];
+
+		win.fromJSON(data);
+		Utils.triggerElementChange(element);
+
+		win.find('form')[0].submit();
+		win.close();
+
+		equal(
+			cleanHtml(editor.getContent()),
+			'<p><img src="' + editor.settings.document_base_url + 'src" alt="alt" /></p>'
+		);
+
+
+ 	});
 })();

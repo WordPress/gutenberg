@@ -1,4 +1,4 @@
-// 4.1.6 (2014-11-19)
+// 4.1.7 (2014-11-27)
 
 /**
  * Compiled inline version. (Library mode)
@@ -2996,18 +2996,18 @@ define("tinymce/util/Tools", [
 	 * one array list into another.
 	 *
 	 * @method map
-	 * @param {Array} a Array of items to iterate.
-	 * @param {function} f Function to call for each item. It's return value will be the new value.
+	 * @param {Array} array Array of items to iterate.
+	 * @param {function} callback Function to call for each item. It's return value will be the new value.
 	 * @return {Array} Array with new values based on function return values.
 	 */
-	function map(a, f) {
-		var o = [];
+	function map(array, callback) {
+		var out = [];
 
-		each(a, function(v) {
-			o.push(f(v));
+		each(array, function(item) {
+			out.push(callback(item));
 		});
 
-		return o;
+		return out;
 	}
 
 	/**
@@ -13700,7 +13700,7 @@ define("tinymce/util/VK", [
 		UP: 38,
 
 		modifierPressed: function(e) {
-			return e.shiftKey || e.ctrlKey || e.altKey;
+			return e.shiftKey || e.ctrlKey || e.altKey || this.metaKeyPressed(e);
 		},
 
 		metaKeyPressed: function(e) {
@@ -18298,10 +18298,11 @@ define("tinymce/Formatter", [
  * @class tinymce.UndoManager
  */
 define("tinymce/UndoManager", [
+	"tinymce/util/VK",
 	"tinymce/Env",
 	"tinymce/util/Tools",
 	"tinymce/html/SaxParser"
-], function(Env, Tools, SaxParser) {
+], function(VK, Env, Tools, SaxParser) {
 	var trim = Tools.trim, trimContentRegExp;
 
 	trimContentRegExp = new RegExp([
@@ -18426,7 +18427,8 @@ define("tinymce/UndoManager", [
 			}
 
 			// If key isn't shift,ctrl,alt,capslock,metakey
-			if ((keyCode < 16 || keyCode > 20) && keyCode != 224 && keyCode != 91 && !self.typing) {
+			var modKey = VK.modifierPressed(e);
+			if ((keyCode < 16 || keyCode > 20) && keyCode != 224 && keyCode != 91 && !self.typing && !modKey) {
 				self.beforeChange();
 				self.typing = true;
 				self.add({}, e);
@@ -30750,7 +30752,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '1.6',
+		minorVersion: '1.7',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -30758,7 +30760,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2014-11-19',
+		releaseDate: '2014-11-27',
 
 		/**
 		 * Collection of editor instances.
