@@ -504,9 +504,16 @@ class Tests_Post extends WP_UnitTestCase {
 	 * @ticket 15665
 	 */
 	function test_get_page_by_path_priority() {
+		global $wpdb;
+
 		$attachment = $this->factory->post->create_and_get( array( 'post_title' => 'some-page', 'post_type' => 'attachment' ) );
 		$page       = $this->factory->post->create_and_get( array( 'post_title' => 'some-page', 'post_type' => 'page' ) );
 		$other_att  = $this->factory->post->create_and_get( array( 'post_title' => 'some-other-page', 'post_type' => 'attachment' ) );
+
+		$wpdb->update( $wpdb->posts, array( 'post_name' => 'some-page' ), array( 'ID' => $page->ID ) );
+		clean_post_cache( $page->ID );
+
+		$page = get_post( $page->ID );
 
 		$this->assertEquals( 'some-page', $attachment->post_name );
 		$this->assertEquals( 'some-page', $page->post_name );
@@ -983,6 +990,44 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( 'some-slug-2', get_post( $two )->post_name );
 
 		$this->assertEquals( 'some-slug-3', wp_unique_post_slug( 'some-slug', 0, 'publish', 'post-type-1', 0 ) );
+
+		_unregister_post_type( 'post-type-1' );
+	}
+
+	/**
+	 * @ticket 18962
+	 */
+	function test_wp_unique_post_slug_with_hierarchy_and_attachments() {
+		register_post_type( 'post-type-1', array( 'hierarchical' => true ) );
+
+		$args = array(
+			'post_type' => 'post-type-1',
+			'post_name' => 'some-slug',
+			'post_status' => 'publish',
+		);
+		$one = $this->factory->post->create( $args );
+
+		$args = array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment',
+			'post_name' => 'image'
+		);
+		$attachment = $this->factory->attachment->create_object( 'image.jpg', $one, $args );
+
+		$args = array(
+			'post_type' => 'post-type-1',
+			'post_name' => 'image',
+			'post_status' => 'publish',
+			'post_parent' => $one
+		);
+		$two = $this->factory->post->create( $args );
+
+		$this->assertEquals( 'some-slug', get_post( $one )->post_name );
+		$this->assertEquals( 'image', get_post( $attachment )->post_name );
+		$this->assertEquals( 'image-2', get_post( $two )->post_name );
+
+		// 'image' can be a child of image-2
+		$this->assertEquals( 'image', wp_unique_post_slug( 'image', 0, 'publish', 'post-type-1', $two ) );
 
 		_unregister_post_type( 'post-type-1' );
 	}
