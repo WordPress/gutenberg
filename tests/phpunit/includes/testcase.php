@@ -483,6 +483,28 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		return $files;
 	}
 
+	function delete_folders( $path ) {
+		$this->matched_dirs = array();
+		if ( ! is_dir( $path ) ) {
+			return;
+		}
+
+		$this->scandir( $path );
+		foreach ( array_reverse( $this->matched_dirs ) as $dir ) {
+			rmdir( $dir );
+		}
+		rmdir( $path );
+	}
+
+	function scandir( $dir ) {
+		foreach ( scandir( $dir ) as $path ) {
+			if ( 0 !== strpos( $path, '.' ) && is_dir( $dir . '/' . $path ) ) {
+				$this->matched_dirs[] = $dir . '/' . $path;
+				$this->scandir( $dir . '/' . $path );
+			}
+		}
+	}
+
 	/**
 	 * Helper to Convert a microtime string into a float
 	 */

@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * @group upload
  * @group media
@@ -10,21 +8,19 @@ class Tests_Upload extends WP_UnitTestCase {
 	var $siteurl;
 
 	function setUp() {
-		if ( is_multisite() )
+		if ( is_multisite() ) {
 			$this->knownUTBug( 35 );
+		}
 
+		$this->_reset_options();
 		parent::setUp();
-		return;
+	}
+
+	function _reset_options() {
 		// system defaults
 		update_option( 'upload_path', 'wp-content/uploads' );
 		update_option( 'upload_url_path', '' );
 		update_option( 'uploads_use_yearmonth_folders', 1 );
-	}
-
-	function tearDown() {
-		$this->remove_added_uploads();
-
-		parent::tearDown();
 	}
 
 	function test_upload_dir_default() {
@@ -40,6 +36,8 @@ class Tests_Upload extends WP_UnitTestCase {
 		// wp_upload_dir() with a relative upload path that is not 'wp-content/uploads'
 		update_option( 'upload_path', 'foo/bar' );
 		$info = wp_upload_dir();
+		$this->delete_folders( ABSPATH . 'foo' );
+
 		$this->assertEquals( get_option( 'siteurl' ) . '/foo/bar/' . gmstrftime('%Y/%m'), $info['url'] );
 		$this->assertEquals( ABSPATH . 'foo/bar/' . gmstrftime('%Y/%m'), $info['path'] );
 		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
@@ -56,6 +54,8 @@ class Tests_Upload extends WP_UnitTestCase {
 		// doesn't make sense to use an absolute file path without setting the url path
 		update_option( 'upload_url_path', '/baz' );
 		$info = wp_upload_dir();
+		$this->delete_folders( $path );
+
 		$this->assertEquals( '/baz/' . gmstrftime('%Y/%m'), $info['url'] );
 		$this->assertEquals( "$path/" . gmstrftime('%Y/%m'), $info['path'] );
 		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
