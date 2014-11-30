@@ -76,19 +76,21 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			),
 		);
 
-		// big5 is a non-Unicode multibyte charset
-		$utf8 = "a\xe5\x85\xb1b"; // UTF-8 Character 20849
-		$big5 = mb_convert_encoding( $utf8, 'BIG-5', 'UTF-8' );
-		$conv_utf8 = mb_convert_encoding( $big5, 'UTF-8', 'BIG-5' );
-		// Make sure PHP's multibyte conversions are working correctly
-		$this->assertNotEquals( $utf8, $big5 );
-		$this->assertEquals( $utf8, $conv_utf8 );
+		if ( function_exists( 'mb_convert_encoding' ) ) {
+			// big5 is a non-Unicode multibyte charset
+			$utf8 = "a\xe5\x85\xb1b"; // UTF-8 Character 20849
+			$big5 = mb_convert_encoding( $utf8, 'BIG-5', 'UTF-8' );
+			$conv_utf8 = mb_convert_encoding( $big5, 'UTF-8', 'BIG-5' );
+			// Make sure PHP's multibyte conversions are working correctly
+			$this->assertNotEquals( $utf8, $big5 );
+			$this->assertEquals( $utf8, $conv_utf8 );
 
-		$fields['big5'] = array(
-			'charset'  => 'big5',
-			'value'    => $big5,
-			'expected' => $big5
-		);
+			$fields['big5'] = array(
+				'charset'  => 'big5',
+				'value'    => $big5,
+				'expected' => $big5
+			);
+		}
 
 		// The data above is easy to edit. Now, prepare it for the data provider.
 		$data_provider = $multiple = $multiple_expected = array();
