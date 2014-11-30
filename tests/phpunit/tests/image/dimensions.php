@@ -128,6 +128,18 @@ class Tests_Image_Dimensions extends WP_UnitTestCase {
 		$this->assertEquals( array(0, 0, 0, 20, 400, 500, 480, 600), $out );
 	}
 
+	function test_640x480() {
+		// crop 640x480 to fit 640x480 (no change)
+		$out = image_resize_dimensions(640, 480, 640, 480, true);
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 0, 0, 640, 480, 640, 480), $out );
+
+		// resize 640x480 to fit 640x480 (no change)
+		$out = image_resize_dimensions(640, 480, 640, 480, false);
+		// dst_x, dst_y, src_x, src_y, dst_w, dst_h, src_w, src_h
+		$this->assertEquals( array(0, 0, 0, 0, 640, 480, 640, 480), $out );
+	}
+
 	/**
 	 * @ticket 19393
 	 */
