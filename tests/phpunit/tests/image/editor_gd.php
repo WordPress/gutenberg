@@ -282,9 +282,9 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 
 			// #0
 			array(
-				'file'      => 'waffles-10x6.jpg',
+				'file'      => 'waffles-10x7.jpg',
 				'width'     => 10,
-				'height'    => 6,
+				'height'    => 7,
 				'mime-type' => 'image/jpeg',
 			),
 
@@ -322,16 +322,16 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 
 			// #5
 			array(
-				'file'      => 'waffles-55x36.jpg',
+				'file'      => 'waffles-55x37.jpg',
 				'width'     => 55,
-				'height'    => 36,
+				'height'    => 37,
 				'mime-type' => 'image/jpeg',
 			),
 
 			// #6
 			array(
-				'file'      => 'waffles-82x55.jpg',
-				'width'     => 82,
+				'file'      => 'waffles-83x55.jpg',
+				'width'     => 83,
 				'height'    => 55,
 				'mime-type' => 'image/jpeg',
 			),
