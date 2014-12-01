@@ -641,7 +641,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idparent() {
@@ -664,7 +664,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idparent_hierarchical_false() {
@@ -682,12 +682,12 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		$expected = array(
 			$terms['parent2'] => 0,
-			$terms['child2'] => $terms['parent1'],
+			$terms['child1'] => $terms['parent1'],
 		);
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_idslug() {
@@ -712,7 +712,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	/**
@@ -738,7 +738,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idslug_hierarchical_false() {
@@ -761,7 +761,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_idname() {
@@ -786,7 +786,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	/**
@@ -812,7 +812,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	public function test_get_terms_hierarchical_tax_hide_empty_true_fields_idname_hierarchical_false() {
@@ -835,7 +835,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'hierarchical_fields' );
 
-		$this->assertEqualSets( $expected, $found );
+		$this->assertEqualSetsWithIndex( $expected, $found );
 	}
 
 	/**
