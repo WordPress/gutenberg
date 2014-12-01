@@ -262,8 +262,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function assertEqualSets( $expected, $actual ) {
-		$this->assertEquals( array(), array_diff( $expected, $actual ) );
-		$this->assertEquals( array(), array_diff( $actual, $expected ) );
+		sort( $expected );
+		sort( $actual );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function assertEqualSetsWithIndex( $expected, $actual ) {
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	function go_to( $url ) {
