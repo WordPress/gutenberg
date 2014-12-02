@@ -307,6 +307,9 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		$charset = self::$_wpdb->get_table_charset( $table );
 		$this->assertEquals( $charset, $expected_charset );
 
+		$charset = self::$_wpdb->get_table_charset( strtoupper( $table ) );
+		$this->assertEquals( $charset, $expected_charset );
+
 		self::$_wpdb->query( $drop );
 	}
 
@@ -343,6 +346,7 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 
 		foreach ( $expected_charset as $column => $charset ) {
 			$this->assertEquals( $charset, self::$_wpdb->get_col_charset( $table, $column ) );
+			$this->assertEquals( $charset, self::$_wpdb->get_col_charset( strtoupper( $table ), strtoupper( $column ) ) );
 		}
 
 		self::$_wpdb->query( $drop );
