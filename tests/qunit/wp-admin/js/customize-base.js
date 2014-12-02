@@ -1,7 +1,8 @@
 /* global wp */
 
 jQuery( function( $ ) {
-	var FooSuperClass, BarSubClass, foo, bar;
+	var FooSuperClass, BarSubClass, foo, bar, ConstructorTestClass, newConstructor, constructorTest, $mockElement, mockString,
+	firstInitialValue, firstValueInstance, wasCallbackFired, mockValueCallback;
 
 	module( 'Customize Base: Class' );
 
@@ -46,10 +47,8 @@ jQuery( function( $ ) {
 		equal( foo.instanceProp, 'instancePropValue' );
 	});
 
-	// @todo Test Class.constructor() manipulation
 	// @todo Test Class.applicator?
 	// @todo do we test object.instance?
-
 
 	module( 'Customize Base: Subclass' );
 
@@ -82,4 +81,81 @@ jQuery( function( $ ) {
 		equal( bar.extended( FooSuperClass ), true );
 	});
 
+
+	// Implements todo : Test Class.constructor() manipulation
+	module( 'Customize Base: Constructor Manipulation' );
+
+	newConstructor = function ( instanceProps ) {
+			$.extend( this , instanceProps || {} );
+	};
+
+	ConstructorTestClass = wp.customize.Class.extend(
+		{
+			constructor : newConstructor,
+			protoProp: 'protoPropValue'
+		},
+		{
+			staticProp: 'staticPropValue'
+		}
+	);
+
+	test( 'New constructor added to class' , function () {
+		equal( ConstructorTestClass.prototype.constructor , newConstructor );
+	});
+	test( 'Class with new constructor has protoPropValue' , function () {
+		equal( ConstructorTestClass.prototype.protoProp , 'protoPropValue' );
+	});
+
+	constructorTest = new ConstructorTestClass( { instanceProp: 'instancePropValue' } );
+		test( 'ConstructorTestClass instance constructorTest has the new constructor', function () {
+		equal( constructorTest.constructor, newConstructor );
+	});
+
+	test( 'ConstructorTestClass instance constructorTest extended Class', function () {
+		equal( constructorTest.extended( wp.customize.Class ), true );
+	});
+
+	test( 'ConstructorTestClass instance constructorTest has the added instance property', function () {
+		equal( constructorTest.instanceProp , 'instancePropValue' );
+	});
+
+
+	module( 'Customize Base: wp.customizer.ensure' );
+
+	$mockElement = $( '<div id="mockElement"></div>' );
+
+	test( 'Handles jQuery argument' , function() {
+		equal( wp.customize.ensure( $mockElement ) , $mockElement );
+	});
+
+	mockString = '<div class="mockString"></div>';
+
+	test( 'Handles string argument' , function() {
+		ok( wp.customize.ensure( mockString ) instanceof jQuery );
+	});
+
+
+	module( 'Customize Base: Value Class' );
+
+	firstInitialValue = true;
+	firstValueInstance = new wp.customize.Value( firstInitialValue );
+
+	test( 'Initialized with the right value' , function() {
+		equal( firstValueInstance.get() , firstInitialValue );
+	});
+
+	test( '.set() works' , function() {
+		firstValueInstance.set( false );
+		equal( firstValueInstance.get() , false );
+	});
+
+	test( '.bind() adds new callback that fires on set()' , function() {
+		wasCallbackFired = false;
+		mockValueCallback = function() {
+			wasCallbackFired = true;
+		};
+		firstValueInstance.bind( mockValueCallback );
+		firstValueInstance.set( 'newValue' );
+		ok( wasCallbackFired );
+	});
 });
