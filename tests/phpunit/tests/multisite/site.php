@@ -983,50 +983,186 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 18119
+	 * Tests to handle the possibilities provided for in `get_space_allowed()`,
+	 * which is used when checking for upload quota limits. Originally part of
+	 * ticket #18119.
 	 */
-	function test_upload_is_user_over_quota() {
-		$default_space_allowed = 100;
-		$echo = false;
+	function test_get_space_allowed_default() {
+		$this->assertEquals( 100, get_space_allowed() );
+	}
 
-		$this->assertFalse( upload_is_user_over_quota( $echo ) );
-		$this->assertTrue( is_upload_space_available() );
+	/**
+	 * When an individual site's option is defined, it is used over the option
+	 * defined at the network level.
+	 */
+	function test_get_space_allowed_from_blog_option() {
+		update_option( 'blog_upload_space', 123 );
+		update_site_option( 'blog_upload_space', 200 );
+		$this->assertEquals( 123, get_space_allowed() );
+	}
 
-		update_site_option('upload_space_check_disabled', true);
-		$this->assertFalse( upload_is_user_over_quota( $echo ) );
-		$this->assertTrue( is_upload_space_available() );
+	/**
+	 * If an individual site's option is not available, the default network
+	 * level option is used as a fallback.
+	 */
+	function test_get_space_allowed_from_network_option() {
+		update_option( 'blog_upload_space', false );
+		update_site_option( 'blog_upload_space', 200 );
+		$this->assertEquals( 200, get_space_allowed() );
+	}
 
-		update_site_option( 'blog_upload_space', 0 );
-		$this->assertFalse( upload_is_user_over_quota( $echo ) );
-		$this->assertEquals( $default_space_allowed, get_space_allowed() );
-		$this->assertTrue( is_upload_space_available() );
+	/**
+	 * If neither the site or network options are available, 100 is used as
+	 * a hard coded fallback.
+	 */
+	function test_get_space_allowed_no_option_fallback() {
+		update_option( 'blog_upload_space', false );
+		update_site_option( 'blog_upload_space', false );
+		$this->assertEquals( 100, get_space_allowed() );
+	}
 
-		update_site_option('upload_space_check_disabled', false);
-		$this->assertFalse( upload_is_user_over_quota( $echo ) );
-		$this->assertTrue( is_upload_space_available() );
-
-		if ( defined( 'BLOGSUPLOADDIR' ) && ! file_exists( BLOGSUPLOADDIR ) )
-			$this->markTestSkipped( 'This test is broken when blogs.dir does not exist. ');
-
-		/*
-		This is broken when blogs.dir does not exist, as get_upload_space_available()
-		simply returns the value of blog_upload_space (converted to bytes), which would
-		be negative but still not false. When blogs.dir does exist, < 0 is returned as 0.
-		*/
-
-		update_site_option( 'blog_upload_space', -1 );
-		$this->assertTrue( upload_is_user_over_quota( $echo ) );
+	function test_get_space_allowed_negative_blog_option() {
+		update_option( 'blog_upload_space', -1 );
+		update_site_option( 'blog_upload_space', 200 );
 		$this->assertEquals( -1, get_space_allowed() );
+	}
+
+	function test_get_space_allowed_negative_site_option() {
+		update_option( 'blog_upload_space', false );
+		update_site_option( 'blog_upload_space', -1 );
+		$this->assertEquals( -1, get_space_allowed() );
+	}
+
+	/**
+	 * Provide a hardcoded amount for space used when testing upload quota,
+	 * allowed space, and available space.
+	 *
+	 * @return int
+	 */
+	function _filter_space_used() {
+		return 300;
+	}
+
+	function test_upload_is_user_over_quota_default() {
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+	}
+
+	function test_upload_is_user_over_quota_check_enabled() {
+		update_site_option('upload_space_check_disabled', false);
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+	}
+
+	/**
+	 * When the upload space check is disabled, using more than the available
+	 * quota is allowed.
+	 */
+	function test_upload_is_user_over_check_disabled() {
+		update_site_option( 'upload_space_check_disabled', true );
+		update_site_option( 'blog_upload_space', 100 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	/**
+	 * If 0 is set for `blog_upload_space`, a fallback of 100 is used.
+	 */
+	function test_upload_is_user_over_quota_upload_space_0() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 0 );
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+	}
+
+	/**
+	 * Filter the space space used as 300 to trigger a true upload quota
+	 * without requiring actual files.
+	 */
+	function test_upload_is_user_over_quota_upload_space_0_filter_space_used() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 0 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertTrue( upload_is_user_over_quota( false ) );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	function test_upload_is_user_over_quota_upload_space_200() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 200 );
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+	}
+
+	function test_upload_is_user_over_quota_upload_space_200_filter_space_used() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 200 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertTrue( upload_is_user_over_quota( false ) );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	/**
+	 * If the space used is exactly the same as the available quota, an over
+	 * quota response is not expected.
+	 */
+	function test_upload_is_user_over_quota_upload_space_exact() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 300 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertFalse( upload_is_user_over_quota( false ) );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	function test_upload_is_user_over_quota_upload_space_negative() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', -1 );
+		$this->assertTrue( upload_is_user_over_quota( false ) );
+	}
+
+	function test_is_upload_space_available_default() {
+		$this->assertTrue( is_upload_space_available() );
+	}
+
+	function test_is_upload_space_available_check_disabled() {
+		update_site_option( 'upload_space_check_disabled', true );
+		$this->assertTrue( is_upload_space_available() );
+	}
+
+	function test_is_upload_space_available_space_used_is_less() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 350 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertTrue( is_upload_space_available() );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	function test_is_upload_space_available_space_used_is_more() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 250 );
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
 		$this->assertFalse( is_upload_space_available() );
 
-		update_option( 'blog_upload_space', 0 );
-		$this->assertFalse( upload_is_user_over_quota( $echo ) );
-		$this->assertEquals( $default_space_allowed, get_space_allowed() );
-		$this->assertTrue( is_upload_space_available() );
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
 
-		update_option( 'blog_upload_space', -1 );
-		$this->assertTrue( upload_is_user_over_quota( $echo ) );
-		$this->assertEquals( -1, get_space_allowed() );
+	function test_is_upload_space_available_upload_space_0() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', 0 );
+		$this->assertTrue( is_upload_space_available() );
+	}
+
+	function test_is_upload_space_available_upload_space_negative() {
+		update_site_option( 'upload_space_check_disabled', false );
+		update_site_option( 'blog_upload_space', -1 );
 		$this->assertFalse( is_upload_space_available() );
 	}
 
