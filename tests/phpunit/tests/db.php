@@ -317,20 +317,20 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$current_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
 
-		$new_modes = array( 'IGNORE_SPACE', 'NO_ZERO_DATE', 'NO_AUTO_CREATE_USER' );
+		$new_modes = array( 'IGNORE_SPACE', 'ONLY_FULL_GROUP_BY', 'NO_AUTO_CREATE_USER' );
 
 		add_filter( 'incompatible_sql_modes', array( $this, 'filter_allowed_incompatible_sql_mode' ), 1, 1 );
 		$wpdb->set_sql_mode( $new_modes );
 		remove_filter( 'incompatible_sql_modes', array( $this, 'filter_allowed_incompatible_sql_mode' ), 1 );
 
 		$check_new_modes = $wpdb->get_var( 'SELECT @@SESSION.sql_mode;' );
-		$this->assertContains( 'NO_ZERO_DATE', explode( ',', $check_new_modes ) );
+		$this->assertContains( 'ONLY_FULL_GROUP_BY', explode( ',', $check_new_modes ) );
 
 		$wpdb->set_sql_mode( explode( ',', $current_modes ) );
 	}
 
 	public function filter_allowed_incompatible_sql_mode( $modes ) {
-		$pos = array_search( 'NO_ZERO_DATE', $modes );
+		$pos = array_search( 'ONLY_FULL_GROUP_BY', $modes );
 		$this->assertGreaterThanOrEqual( 0, $pos );
 
 		if ( FALSE === $pos ) {
