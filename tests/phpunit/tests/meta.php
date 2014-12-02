@@ -295,38 +295,41 @@ class Tests_Meta extends WP_UnitTestCase {
 	/**
 	 * @ticket 15030
 	 */
-	public function test_get_metadata_with_empty_key_array_value_should_be_unserialized() {
+	public function test_get_metadata_with_empty_key_array_value() {
 		$data = array( 1, 2 );
+		$value = serialize( $data );
 		add_metadata( 'user', $this->author->ID, 'foo', $data );
 		$found = get_metadata( 'user', $this->author->ID );
 
-		$this->assertSame( array( $data ), $found['foo'] );
+		$this->assertSame( array( $value ), $found['foo'] );
 	}
 
 	/**
 	 * @ticket 15030
 	 */
-	public function test_get_metadata_with_empty_key_object_value_should_be_unserialized() {
+	public function test_get_metadata_with_empty_key_object_value() {
 		$data = new stdClass;
 		$data->foo = 'bar';
+		$value = serialize( $data );
 		add_metadata( 'user', $this->author->ID, 'foo', $data );
 		$found = get_metadata( 'user', $this->author->ID );
 
-		$this->assertEquals( array( $data ), $found['foo'] );
+		$this->assertEquals( array( $value ), $found['foo'] );
 	}
 
 	/**
 	 * @ticket 15030
 	 */
-	public function test_get_metadata_with_empty_key_nested_array_value_should_be_unserialized() {
+	public function test_get_metadata_with_empty_key_nested_array_value() {
 		$data = array(
 			array( 1, 2 ),
 			array( 3, 4 ),
 		);
+		$value = serialize( $data );
 		add_metadata( 'user', $this->author->ID, 'foo', $data );
 		$found = get_metadata( 'user', $this->author->ID );
 
-		$this->assertSame( array( $data ), $found['foo'] );
+		$this->assertSame( array( $value ), $found['foo'] );
 	}
 
 	/** Helpers **********************************************************/
