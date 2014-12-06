@@ -802,9 +802,10 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				"-123x1=-123",
 				"-123&#215;1=-123",
 			),
+			// @ticket 30445
 			array(
 				"-123x-1",
-				"-123&#215;-1",
+				"-123x-1",
 			),
 			array(
 				"0.675x1=0.675",
