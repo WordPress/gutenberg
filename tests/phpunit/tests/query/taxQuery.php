@@ -180,4 +180,103 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 			array( 'taxonomy' => 'testtax', 'field' => 'term_id', 'terms' => $this->tax_id )
 		) );
 	}
+
+	/**
+	 * @group 30623
+	 */
+	public function test_get_queried_object_with_custom_taxonomy_tax_query_and_field_term_id_should_return_term_object() {
+		// Don't override the args provided below.
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
+
+		$args = array(
+			'tax_query' => array(
+				'relation' => 'AND',
+				array(
+					'taxonomy' => 'testtax',
+					'field' => 'term_id',
+					'terms' => array(
+						$this->tax_id,
+					),
+				),
+			)
+		);
+
+		$q = new WP_Query( $args );
+		$object = $q->get_queried_object();
+
+		$expected = get_term( $this->tax_id, 'testtax' );
+
+		$this->assertEquals( $expected, $object );
+	}
+
+	/**
+	 * @group 30623
+	 */
+	public function test_get_queried_object_with_custom_taxonomy_tax_query_and_field_slug_should_return_term_object() {
+		// Don't override the args provided below.
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
+
+		$args = array(
+			'tax_query' => array(
+				'relation' => 'AND',
+				array(
+					'taxonomy' => 'testtax',
+					'field' => 'slug',
+					'terms' => array(
+						'tax-slug',
+					),
+				),
+			)
+		);
+
+		$q = new WP_Query( $args );
+		$object = $q->get_queried_object();
+
+		$expected = get_term( $this->tax_id, 'testtax' );
+
+		// Only compare term_id because object_id may or may not be part of either value.
+		$this->assertEquals( $expected->term_id, $object->term_id );
+	}
+
+	/**
+	 * @group 30623
+	 */
+	public function test_get_queried_object_with_custom_taxonomy_tax_query_with_multiple_clauses_should_return_term_object_corresponding_to_the_first_queried_tax() {
+		// Don't override the args provided below.
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
+
+		register_taxonomy( 'testtax2', 'post' );
+		$testtax2_term_id = $this->factory->term->create( array(
+			'taxonomy' => 'testtax2',
+			'slug' => 'testtax2-slug',
+		) );
+
+		$args = array(
+			'tax_query' => array(
+				'relation' => 'AND',
+				array(
+					'taxonomy' => 'testtax',
+					'field' => 'slug',
+					'terms' => array(
+						'tax-slug',
+					),
+				),
+				array(
+					'taxonomy' => 'testtax2',
+					'field' => 'slug',
+					'terms' => array(
+						'testtax2-slug',
+					),
+				),
+			)
+		);
+
+		$q = new WP_Query( $args );
+		$object = $q->get_queried_object();
+
+		$expected = get_term( $this->tax_id, 'testtax' );
+
+		// Only compare term_id because object_id may or may not be part of either value.
+		$this->assertEquals( $expected->term_id, $object->term_id );
+	}
 }
