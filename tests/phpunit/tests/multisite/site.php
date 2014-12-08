@@ -36,8 +36,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		wp_cache_set( 'switch-test', $current_blog_id, 'switch-test' );
 		$this->assertEquals( $current_blog_id, wp_cache_get( 'switch-test', 'switch-test' ) );
 
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id, 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		$cap_key = wp_get_current_user()->cap_key;
 		switch_to_blog( $blog_id );
@@ -335,7 +334,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 	
 	function test_update_blog_details() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		$result = update_blog_details( $blog_id, array( 'domain' => 'example.com', 'path' => 'my_path/' ) );
 
@@ -352,7 +351,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		update_blog_details( $blog_id, array( 'spam' => 1 ) );
 
 		add_action( 'make_ham_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -376,7 +375,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		add_action( 'make_spam_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_details( $blog_id, array( 'spam' => 1 ) );
@@ -399,7 +398,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		add_action( 'archive_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_details( $blog_id, array( 'archived' => 1 ) );
@@ -422,7 +421,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		update_blog_details( $blog_id, array( 'archived' => 1 ) );
 
 		add_action( 'unarchive_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -445,7 +444,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		add_action( 'make_delete_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_details( $blog_id, array( 'deleted' => 1 ) );
@@ -468,7 +467,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		update_blog_details( $blog_id, array( 'deleted' => 1 ) );
 
 		add_action( 'make_undelete_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -492,7 +491,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 
 		add_action( 'mature_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_details( $blog_id, array( 'mature' => 1 ) );
@@ -515,7 +514,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create( array( 'path' => '/test_blogpath', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		update_blog_details( $blog_id, array( 'mature' => 1 ) );
 
 		add_action( 'unmature_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -993,7 +992,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * the blog ID is requested through get_blog_id_from_url().
 	 */
 	function test_get_blog_id_from_url() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 
@@ -1006,7 +1005,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test the case insensitivity of the site lookup.
 	 */
 	function test_get_blog_id_from_url_is_case_insensitive() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create( array( 'domain' => 'example.com', 'path' => '/xyz' ) );
 		$details = get_blog_details( $blog_id, false );
 
 		$this->assertEquals( $blog_id, get_blog_id_from_url( strtoupper( $details->domain ), strtoupper( $details->path ) ) );
@@ -1016,7 +1015,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test the first and cached responses for a site that does not exist.
 	 */
 	function test_get_blog_id_from_url_that_does_not_exist() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz' ) );
 		$details = get_blog_details( $blog_id, false );
 
 		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, 'foo' ) );
@@ -1028,7 +1027,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * behavior would be expected if passing `false` explicitly to `wpmu_delete_blog()`.
 	 */
 	function test_get_blog_id_from_url_with_deleted_flag() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id );
@@ -1042,7 +1041,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * -1 after an attempt at `get_blog_id_from_url()` is made.
 	 */
 	function test_get_blog_id_from_url_after_dropped() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz', 'title' => 'Test Title' ) );
+		$blog_id = $this->factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id, true );
@@ -1099,8 +1098,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
 		$this->assertEquals( '', $info['error'] );
 
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = $this->factory->blog->create( array( 'user_id' => $user_id ) );
+		$blog_id = $this->factory->blog->create();
 
 		switch_to_blog( $blog_id );
 		$info = wp_upload_dir();
