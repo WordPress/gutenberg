@@ -538,6 +538,71 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30681
+	 */
+	public function test_meta_query_compare_exists() {
+		$posts = $this->factory->post->create_many( 3 );
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[2], 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'compare' => 'EXISTS',
+					'key' => 'foo',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $posts[0], $posts[2] ), $query->posts );
+	}
+
+	/**
+	 * @ticket 30681
+	 */
+	public function test_meta_query_compare_exists_with_value_should_convert_to_equals() {
+		$posts = $this->factory->post->create_many( 3 );
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[2], 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'compare' => 'EXISTS',
+					'value' => 'baz',
+					'key' => 'foo',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $posts[2] ), $query->posts );
+	}
+
+	/**
+	 * @ticket 30681
+	 */
+	public function test_meta_query_compare_not_exists_should_ignore_value() {
+		$posts = $this->factory->post->create_many( 3 );
+		add_post_meta( $posts[0], 'foo', 'bar' );
+		add_post_meta( $posts[2], 'foo', 'baz' );
+
+		$query = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'compare' => 'NOT EXISTS',
+					'value' => 'bar',
+					'key' => 'foo',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $posts[1] ), $query->posts );
+	}
+
+	/**
 	 * @ticket 18158
 	 * @group meta
 	 */
