@@ -8,6 +8,11 @@ if (class_exists( 'WP_Image_Editor' ) ) :
 		public static $test_return = true;
 		public static $save_return = array();
 
+		// Allow testing of jpeg_quality filter.
+		public function set_mime_type( $mime_type = null ) {
+			$this->mime_type = $mime_type;
+		}
+
 		public function load() {
 			return self::$load_return;
 		}

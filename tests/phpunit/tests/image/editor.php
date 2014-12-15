@@ -51,22 +51,42 @@ class Tests_Image_Editor extends WP_Image_UnitTestCase {
 
 		// Get an editor
 		$editor = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
+		$editor->set_mime_type( "image/jpeg" ); // Ensure mime-specific filters act properly.
 
 		// Check default value
 		$this->assertEquals( 90, $editor->get_quality() );
 
-		// Ensure set_quality works
+		// Ensure the quality filters do not have precedence if created after editor instantiation.
+		$func_100_percent = create_function( '', "return 100;" );
+		add_filter( 'wp_editor_set_quality', $func_100_percent );
+		$this->assertEquals( 90, $editor->get_quality() );
+
+		$func_95_percent = create_function( '', "return 95;" );
+		add_filter( 'jpeg_quality', $func_95_percent );
+		$this->assertEquals( 90, $editor->get_quality() );
+
+		// Ensure set_quality() works and overrides the filters
 		$this->assertTrue( $editor->set_quality( 75 ) );
 		$this->assertEquals( 75, $editor->get_quality() );
 
-		// Ensure the quality filter works
-		$func = create_function( '', "return 100;");
-		add_filter( 'wp_editor_set_quality', $func );
-		$this->assertTrue( $editor->set_quality( 70 ) );
-		$this->assertEquals( 70, $editor->get_quality() );
+		// Get a new editor to clear default quality state
+		unset( $editor );
+		$editor = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
+		$editor->set_mime_type( "image/jpeg" ); // Ensure mime-specific filters act properly.
+
+		// Ensure jpeg_quality filter applies if it exists before editor instantiation.
+		$this->assertEquals( 95, $editor->get_quality() );
+
+		// Get a new editor to clear jpeg_quality state
+		remove_filter( 'jpeg_quality', $func_95_percent );
+		unset( $editor );
+		$editor = wp_get_image_editor( DIR_TESTDATA . '/images/canola.jpg' );
+
+		// Ensure wp_editor_set_quality filter applies if it exists before editor instantiation.
+		$this->assertEquals( 100, $editor->get_quality() );
 
 		// Clean up
-		remove_filter( 'wp_editor_set_quality', $func );
+		remove_filter( 'wp_editor_set_quality', $func_100_percent );
 	}
 
 	/**
