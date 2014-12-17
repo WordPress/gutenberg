@@ -93,4 +93,111 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 
 		_unregister_taxonomy( $tax );
 	}
+
+	public function test_get_term_should_update_term_cache_when_passed_an_object() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term_object = get_term( $term, 'wptests_tax' );
+		wp_cache_delete( $term, 'wptests_tax' );
+
+		// Affirm that the cache is empty.
+		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+
+		$num_queries = $wpdb->num_queries;
+
+		// get_term() will only be update the cache if the 'filter' prop is unset.
+		unset( $term_object->filter );
+
+		$term_object_2 = get_term( $term_object, 'wptests_tax' );
+
+		// No new queries should have fired.
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEquals( $term_object, $term_object_2 );
+	}
+
+	public function test_get_term_should_update_term_cache_when_passed_a_valid_term_identifier() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		wp_cache_delete( $term, 'wptests_tax' );
+
+		// Affirm that the cache is empty.
+		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+
+		$num_queries = $wpdb->num_queries;
+
+		// Prime cache.
+		$term_object = get_term( $term, 'wptests_tax' );
+		$this->assertNotEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+
+		$term_object_2 = get_term( $term, 'wptests_tax' );
+
+		// No new queries should have fired.
+		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+		$this->assertEquals( $term_object, $term_object_2 );
+	}
+
+	public function test_get_term_by_should_update_term_cache_when_passed_a_valid_term_identifier() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		wp_cache_delete( $term, 'wptests_tax' );
+
+		// Affirm that the cache is empty.
+		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+
+		$num_queries = $wpdb->num_queries;
+
+		// Prime cache.
+		$term_object = get_term_by( 'id', $term, 'wptests_tax' );
+		$this->assertNotEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+
+		$term_object_2 = get_term( $term, 'wptests_tax' );
+
+		// No new queries should have fired.
+		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+		$this->assertEquals( $term_object, $term_object_2 );
+	}
+
+	/**
+	 * @ticket 30749
+	 */
+	public function test_get_terms_should_update_cache_for_located_terms() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = $this->factory->term->create_many( 5, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term_objects = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		foreach ( $terms as $term_id ) {
+			get_term( $term_id, 'wptests_tax' );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
 }
