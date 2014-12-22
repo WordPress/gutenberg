@@ -640,7 +640,7 @@ class Tests_Term extends WP_UnitTestCase {
 	/**
 	 * @ticket 5809
 	 */
-	public function test_wp_update_term_duplicate_slug_same_taxonomy() {
+	public function test_wp_update_term_should_not_create_duplicate_slugs_within_the_same_taxonomy() {
 		register_taxonomy( 'wptests_tax', 'post' );
 
 		$t1 = $this->factory->term->create( array(
@@ -650,7 +650,7 @@ class Tests_Term extends WP_UnitTestCase {
 		) );
 
 		$t2 = $this->factory->term->create( array(
-			'name' => 'Foo',
+			'name' => 'Bar',
 			'slug' => 'bar',
 			'taxonomy' => 'wptests_tax',
 		) );
@@ -666,7 +666,7 @@ class Tests_Term extends WP_UnitTestCase {
 	/**
 	 * @ticket 5809
 	 */
-	public function test_wp_update_term_duplicate_slug_different_taxonomy() {
+	public function test_wp_update_term_should_allow_duplicate_slugs_in_different_taxonomy() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		register_taxonomy( 'wptests_tax_2', 'post' );
 
@@ -686,8 +686,78 @@ class Tests_Term extends WP_UnitTestCase {
 			'slug' => 'foo',
 		) );
 
-		$this->assertWPError( $updated );
-		$this->assertSame( 'duplicate_term_slug', $updated->get_error_code() );
+		$this->assertFalse( is_wp_error( $updated ) );
+
+		$t1_term = get_term( $t1, 'wptests_tax' );
+		$t2_term = get_term( $t2, 'wptests_tax_2' );
+		$this->assertSame( $t1_term->slug, $t2_term->slug );
+	}
+
+	/**
+	 * @ticket 30780
+	 */
+	public function test_wp_update_term_should_allow_duplicate_names_in_different_taxonomies() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax_2',
+		) );
+
+		$updated = wp_update_term( $t2, 'wptests_tax_2', array(
+			'name' => 'Foo',
+		) );
+
+		$this->assertFalse( is_wp_error( $updated ) );
+
+		$t2_term = get_term( $t2, 'wptests_tax_2' );
+		$this->assertSame( 'Foo', $t2_term->name );
+	}
+
+	/**
+	 * @ticket 30780
+	 */
+	public function test_wp_update_term_should_allow_duplicate_names_at_different_levels_of_the_same_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax',
+			'parent' => $t1,
+		) );
+
+		$t3 = $this->factory->term->create( array(
+			'name' => 'Bar Child',
+			'slug' => 'bar-child',
+			'taxonomy' => 'wptests_tax',
+			'parent' => $t2,
+		) );
+
+		$updated = wp_update_term( $t3, 'wptests_tax', array(
+			'name' => 'Bar',
+		) );
+
+		$this->assertFalse( is_wp_error( $updated ) );
+
+		$t3_term = get_term( $t3, 'wptests_tax' );
+		$this->assertSame( 'Bar', $t3_term->name );
 	}
 
 	public function test_wp_update_term_alias_of_no_term_group() {
@@ -1603,6 +1673,76 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$cat_id2 = $this->factory->category->create( array( 'parent' => $cat_id1 ) );
 		$this->assertWPError( $cat_id2 );
+	}
+
+	/**
+	 * @ticket 30780
+	 */
+	public function test_wp_update_term_should_assign_new_slug_when_reassigning_parent_as_long_as_there_is_no_other_term_with_the_same_slug() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+		register_taxonomy( 'wptests_tax_2', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'parent-term',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+		) );
+
+		wp_update_term( $t2, 'wptests_tax', array(
+			'parent' => $t1,
+		) );
+
+		$t2_term = get_term( $t2, 'wptests_tax' );
+
+		$this->assertSame( 'foo', $t2_term->slug );
+
+		_unregister_taxonomy( 'wptests_tax' );
+	}
+
+	/**
+	 * @ticket 30780
+	 */
+	public function test_wp_update_term_should_not_assign_new_slug_when_reassigning_parent_as_long_as_there_is_no_other_slug_conflict_within_the_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'hierarchical' => true,
+		) );
+		register_taxonomy( 'wptests_tax_2', 'post', array(
+			'hierarchical' => true,
+		) );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'parent-term',
+		) );
+
+		// Same slug but in a different tax.
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_2',
+			'slug' => 'foo',
+		) );
+
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+		) );
+
+		wp_update_term( $t3, 'wptests_tax', array(
+			'parent' => $t1,
+		) );
+
+		$t3_term = get_term( $t3, 'wptests_tax' );
+
+		$this->assertSame( 'foo', $t3_term->slug );
+
+		_unregister_taxonomy( 'wptests_tax' );
 	}
 
 	/** Helpers **********************************************************/
