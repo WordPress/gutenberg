@@ -462,7 +462,7 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 	public function test_image_preserves_alpha_on_resize() {
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
-		$editor = wp_get_image_editor( $file );
+		$editor = new WP_Image_Editor_Imagick( $file );
 
 		$this->assertNotInstanceOf( 'WP_Error', $editor );
 		
@@ -489,7 +489,7 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 	public function test_image_preserves_alpha() {
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
-		$editor = wp_get_image_editor( $file );
+		$editor = new WP_Image_Editor_Imagick( $file );
 
 		$this->assertNotInstanceOf( 'WP_Error', $editor );
 
