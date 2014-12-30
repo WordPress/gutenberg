@@ -293,6 +293,13 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::validate_active_plugins
+	 */
+	public function test_validate_active_plugins_empty() {
+		$this->assertEquals( array(), validate_active_plugins() );
+	}
+
+	/**
 	 * @covers ::is_uninstallable_plugin
 	 */
 	public function test_is_uninstallable_plugin() {
