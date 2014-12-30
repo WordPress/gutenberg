@@ -61,6 +61,8 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 		activate_plugin( 'hello.php' );
 		$test = is_plugin_active( 'hello.php' );
 		$this->assertTrue( $test );
+
+		deactivate_plugins( 'hello.php' );
 	}
 
 	function test_is_plugin_active_false() {
@@ -79,5 +81,331 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 		activate_plugin( 'hello.php' );
 		$test = is_plugin_inactive( 'hello.php' );
 		$this->assertFalse( $test );
+
+		deactivate_plugins( 'hello.php' );
+	}
+
+	/**
+	 * @covers ::get_plugin_files
+	 */
+	public function test_get_plugin_files_single() {
+		$name = 'hello.php';
+		$this->assertEquals( array( $name ), get_plugin_files( $name ) );
+	}
+
+	/**
+	 * @covers ::get_mu_plugins
+	 */
+	public function test_get_mu_plugins_when_mu_plugins_exists_but_is_empty() {
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$exists = true;
+			$this->_back_up_mu_plugins();
+		} else {
+			$exists = false;
+			mkdir( WPMU_PLUGIN_DIR );
+		}
+
+		$this->assertEquals( array(), get_mu_plugins() );
+
+		// Clean up.
+		if ( $exists ) {
+			$this->_restore_mu_plugins();
+		} else {
+			rmdir( WPMU_PLUGIN_DIR );
+		}
+	}
+
+	/**
+	 * @covers ::get_mu_plugins
+	 */
+	public function test_get_mu_plugins_when_mu_plugins_directory_does_not_exist() {
+		$exists = false;
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$exists = true;
+			$this->_back_up_mu_plugins();
+			rmdir( WPMU_PLUGIN_DIR );
+		}
+
+		$this->assertEquals( array(), get_mu_plugins() );
+
+		// Clean up.
+		if ( $exists ) {
+			mkdir( WPMU_PLUGIN_DIR );
+			$this->_restore_mu_plugins();
+		}
+	}
+
+	/**
+	 * @covers ::get_mu_plugins
+	 */
+	public function test_get_mu_plugins_should_ignore_index_php_containing_silence_is_golden() {
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$exists = true;
+			$this->_back_up_mu_plugins();
+		} else {
+			$exists = false;
+			mkdir( WPMU_PLUGIN_DIR );
+		}
+
+		$this->_create_plugin( '<?php\n//Silence is golden.', 'index.php', WPMU_PLUGIN_DIR );
+		$this->assertEquals( array(), get_mu_plugins() );
+
+		// Clean up.
+		unlink( WPMU_PLUGIN_DIR . '/index.php' );
+		if ( $exists ) {
+			$this->_restore_mu_plugins();
+		} else {
+			rmdir( WPMU_PLUGIN_DIR );
+		}
+	}
+
+	/**
+	 * @covers ::get_mu_plugins
+	 */
+	public function test_get_mu_plugins_should_not_ignore_index_php_containing_something_other_than_silence_is_golden() {
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$exists = true;
+			$this->_back_up_mu_plugins();
+		} else {
+			$exists = false;
+			mkdir( WPMU_PLUGIN_DIR );
+		}
+
+		$this->_create_plugin( '<?php\n//Silence is not golden.', 'index.php', WPMU_PLUGIN_DIR );
+		$found = get_mu_plugins();
+		$this->assertEquals( array( 'index.php' ), array_keys( $found ) );
+
+		// Clean up.
+		unlink( WPMU_PLUGIN_DIR . '/index.php' );
+		if ( $exists ) {
+			$this->_restore_mu_plugins();
+		} else {
+			rmdir( WPMU_PLUGIN_DIR );
+		}
+	}
+
+	/**
+	 * @covers ::get_mu_plugins
+	 */
+	public function test_get_mu_plugins_should_ignore_files_without_php_extensions() {
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$exists = true;
+			$this->_back_up_mu_plugins();
+		} else {
+			$exists = false;
+			mkdir( WPMU_PLUGIN_DIR );
+		}
+
+		$this->_create_plugin( '<?php\n//Test', 'foo.php', WPMU_PLUGIN_DIR );
+		$this->_create_plugin( '<?php\n//Test 2', 'bar.txt', WPMU_PLUGIN_DIR );
+		$found = get_mu_plugins();
+		$this->assertEquals( array( 'foo.php' ), array_keys( $found ) );
+
+		// Clean up.
+		unlink( WPMU_PLUGIN_DIR . '/foo.php' );
+		unlink( WPMU_PLUGIN_DIR . '/bar.txt' );
+		if ( $exists ) {
+			$this->_restore_mu_plugins();
+		} else {
+			rmdir( WPMU_PLUGIN_DIR );
+		}
+	}
+
+	/**
+	 * @covers ::_sort_uname_callback
+	 */
+	public function test__sort_uname_callback() {
+		$this->assertLessThan( 0, _sort_uname_callback( array( 'Name' => 'a' ), array( 'Name' => 'b' ) ) );
+		$this->assertGreaterThan( 0, _sort_uname_callback( array( 'Name' => 'c' ), array( 'Name' => 'b' ) ) );
+		$this->assertEquals( 0, _sort_uname_callback( array( 'Name' => 'a' ), array( 'Name' => 'a' ) ) );
+	}
+
+	/**
+	 * @covers ::get_dropins
+	 */
+	public function test_get_dropins_empty() {
+		$this->assertEquals( array(), get_dropins() );
+	}
+
+	/**
+	 * @covers ::get_dropins
+	 */
+	public function test_get_dropins_not_empty() {
+		$p1 = $this->_create_plugin( "<?php\n//Test", 'advanced-cache.php', WP_CONTENT_DIR );
+		$p2 = $this->_create_plugin( "<?php\n//Test", 'not-a-dropin.php', WP_CONTENT_DIR );
+
+		$dropins = get_dropins();
+		$this->assertEquals( array( 'advanced-cache.php' ), array_keys( $dropins ) );
+
+		unlink( $p1[1] );
+		unlink( $p2[1] );
+	}
+
+	/**
+	 * @covers ::is_network_only_plugin
+	 */
+	public function test_is_network_only_plugin_hello() {
+		$this->assertFalse( is_network_only_plugin( 'hello.php' ) );
+	}
+
+	/**
+	 * @covers ::is_network_only_plugin
+	 */
+	public function test_is_network_only_plugin() {
+		$p = $this->_create_plugin( "<?php\n/*\nPlugin Name: test\nNetwork: true" );
+
+		$this->assertTrue( is_network_only_plugin( $p[0] ) );
+
+		unlink( $p[1] );
+	}
+
+	/**
+	 * @covers ::activate_plugins
+	 */
+	public function test_activate_plugins_single_no_array() {
+		$name = 'hello.php';
+		activate_plugins( $name );
+		$this->assertTrue( is_plugin_active( $name ) );
+		deactivate_plugins( $name );
+	}
+
+	/**
+	 * @covers ::activate_plugins
+	 */
+	public function test_activate_plugins_single_array() {
+		$name = 'hello.php';
+		activate_plugins( array( $name ) );
+		$this->assertTrue( is_plugin_active( $name ) );
+		deactivate_plugins( $name );
+	}
+
+	/**
+	 * @covers ::validate_active_plugins
+	 */
+	public function test_validate_active_plugins_remove_invalid() {
+		$plugin = $this->_create_plugin();
+
+		activate_plugin( $plugin[ 0 ] );
+		unlink( $plugin[ 1 ] );
+
+		$result = validate_active_plugins();
+		$this->assertTrue( isset( $result[ $plugin[ 0 ] ] ) );
+	}
+
+	/**
+	 * @covers ::is_uninstallable_plugin
+	 */
+	public function test_is_uninstallable_plugin() {
+		$this->assertFalse( is_uninstallable_plugin( 'hello' ) );
+	}
+
+	/**
+	 * @covers ::is_uninstallable_plugin
+	 */
+	public function test_is_uninstallable_plugin_true() {
+		$plugin = $this->_create_plugin();
+
+		$uninstallable_plugins = (array) get_option( 'uninstall_plugins' );
+		$uninstallable_plugins[ $plugin[0] ] = true;
+		update_option( 'uninstall_plugins', $uninstallable_plugins );
+
+		$this->assertTrue( is_uninstallable_plugin( $plugin[0] ) );
+
+		unset( $uninstallable_plugins[ $plugin[0] ] );
+		update_option( 'uninstall_plugins', $uninstallable_plugins );
+
+		unlink( $plugin[1] );
+	}
+
+	/**
+	 * Generate a plugin.
+	 *
+	 * This creates a single-file plugin.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @access private
+	 *
+	 * @param string $data     Optional. Data for the plugin file. Default is a dummy plugin header.
+	 * @param string $filename Optional. Filename for the plugin file. Default is a random string.
+	 * @param string $dir_path Optional. Path for directory where the plugin should live.
+	 * @return array Two-membered array of filename and full plugin path.
+	 */
+	private function _create_plugin( $data = "<?php\n/*\nPlugin Name: Test\n*/", $filename = false, $dir_path = false ) {
+		if ( false === $filename ) {
+			$filename = rand_str() . '.php';
+		}
+
+		if ( false === $dir_path ) {
+			$dir_path = WP_PLUGIN_DIR;
+		}
+
+		$full_name = $dir_path . '/' . wp_unique_filename( $dir_path, $filename );
+
+		$file = fopen( $full_name, 'w' );
+		fwrite( $file, $data );
+		fclose( $file );
+
+		return array( $filename, $full_name );
+	}
+
+	/**
+	 * Move existing mu-plugins to wp-content/mu-plugin/backup.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @access private
+	 */
+	private function _back_up_mu_plugins() {
+		if ( is_dir( WPMU_PLUGIN_DIR ) ) {
+			$mu_bu_dir = WP_CONTENT_DIR . '/mu-plugin-backup';
+			if ( ! is_dir( $mu_bu_dir ) ) {
+				mkdir( $mu_bu_dir );
+			}
+
+			$files_to_move = array();
+			if ( $mu_plugins = opendir( WPMU_PLUGIN_DIR ) ) {
+				while ( false !== $plugin = readdir( $mu_plugins ) ) {
+					if ( 0 !== strpos( $plugin, '.' ) ) {
+						$files_to_move[] = $plugin;
+					}
+				}
+			}
+
+			@closedir( $mu_plugins );
+
+			foreach ( $files_to_move as $file_to_move ) {
+				$f = rename( WPMU_PLUGIN_DIR . '/' . $file_to_move, $mu_bu_dir . '/' . $file_to_move );
+			}
+		}
+	}
+
+	/**
+	 * Restore backed-up mu-plugins.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @access private
+	 */
+	private function _restore_mu_plugins() {
+		$mu_bu_dir = WP_CONTENT_DIR . '/mu-plugin-backup';
+		$files_to_move = array();
+		if ( is_dir( $mu_bu_dir ) && $mu_plugins = opendir( $mu_bu_dir ) ) {
+			while ( false !== $plugin = readdir( $mu_plugins ) ) {
+				if ( 0 !== strpos( $plugin, '.' ) ) {
+					$files_to_move[] = $plugin;
+				}
+			}
+		}
+
+		@closedir( $mu_plugins );
+
+		foreach ( $files_to_move as $file_to_move ) {
+			rename( $mu_bu_dir . '/' . $file_to_move, WPMU_PLUGIN_DIR . '/' . $file_to_move );
+		}
+
+		if ( is_dir( $mu_bu_dir ) ) {
+			rmdir( $mu_bu_dir );
+		}
 	}
 }
