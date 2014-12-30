@@ -246,4 +246,86 @@ class Tests_Category extends WP_UnitTestCase {
 		$this->assertNull( get_category_by_path( 'nocat/nocat/', false) );
 	}
 
+	/**
+	 * @ticket 30306
+	 */
+	public function test_wp_dropdown_categories_value_field_should_default_to_term_id() {
+		// Create a test category.
+		$cat_id	= $this->factory->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		// Get the default functionality of wp_dropdown_categories().
+		$dropdown_default = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+		) );
+
+		// Test to see if it returns the default with the category ID.
+		$this->assertContains( 'value="' . $cat_id . '"', $dropdown_default );
+	}
+
+	/**
+	 * @ticket 30306
+	 */
+	public function test_wp_dropdown_categories_value_field_term_id() {
+		// Create a test category.
+		$cat_id	= $this->factory->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		// Get the default functionality of wp_dropdown_categories().
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'value_field' => 'term_id',
+		) );
+
+		// Test to see if it returns the default with the category ID.
+		$this->assertContains( 'value="' . $cat_id . '"', $found );
+	}
+
+	/**
+	 * @ticket 30306
+	 */
+	public function test_wp_dropdown_categories_value_field_slug() {
+		// Create a test category.
+		$cat_id	= $this->factory->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		// Get the default functionality of wp_dropdown_categories().
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'value_field' => 'slug',
+		) );
+
+		// Test to see if it returns the default with the category slug.
+		$this->assertContains( 'value="test_category"', $found );
+	}
+
+	/**
+	 * @ticket 30306
+	 */
+	public function test_wp_dropdown_categories_value_field_should_fall_back_on_term_id_when_an_invalid_value_is_provided() {
+		// Create a test category.
+		$cat_id	= $this->factory->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		// Get the default functionality of wp_dropdown_categories().
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'value_field' => 'foo',
+		) );
+
+		// Test to see if it returns the default with the category slug.
+		$this->assertContains( 'value="' . $cat_id . '"', $found );
+	}
 }
