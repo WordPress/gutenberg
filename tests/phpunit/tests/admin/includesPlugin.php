@@ -224,13 +224,20 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 	 * @covers ::get_dropins
 	 */
 	public function test_get_dropins_empty() {
+		$this->_back_up_drop_ins();
+
 		$this->assertEquals( array(), get_dropins() );
+
+		// Clean up.
+		$this->_restore_drop_ins();
 	}
 
 	/**
 	 * @covers ::get_dropins
 	 */
 	public function test_get_dropins_not_empty() {
+		$this->_back_up_drop_ins();
+
 		$p1 = $this->_create_plugin( "<?php\n//Test", 'advanced-cache.php', WP_CONTENT_DIR );
 		$p2 = $this->_create_plugin( "<?php\n//Test", 'not-a-dropin.php', WP_CONTENT_DIR );
 
@@ -239,6 +246,9 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 
 		unlink( $p1[1] );
 		unlink( $p2[1] );
+
+		// Clean up.
+		$this->_restore_drop_ins();
 	}
 
 	/**
@@ -413,6 +423,47 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 
 		if ( is_dir( $mu_bu_dir ) ) {
 			rmdir( $mu_bu_dir );
+		}
+	}
+
+	/**
+	 * Move existing drop-ins to wp-content/drop-ins-backup.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @access private
+	 */
+	private function _back_up_drop_ins() {
+		$di_bu_dir = WP_CONTENT_DIR . '/drop-ins-backup';
+		if ( ! is_dir( $di_bu_dir ) ) {
+			mkdir( $di_bu_dir );
+		}
+
+		foreach( _get_dropins() as $file_to_move => $v ) {
+			if ( file_exists( WP_CONTENT_DIR . '/' . $file_to_move ) ) {
+				rename( WP_CONTENT_DIR . '/' . $file_to_move, $di_bu_dir . '/' . $file_to_move );
+			}
+		}
+	}
+
+	/**
+	 * Restore backed-up drop-ins.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @access private
+	 */
+	private function _restore_drop_ins() {
+		$di_bu_dir = WP_CONTENT_DIR . '/drop-ins-backup';
+
+		foreach( _get_dropins() as $file_to_move => $v ) {
+			if ( file_exists( $di_bu_dir . '/' . $file_to_move ) ) {
+				rename( $di_bu_dir . '/' . $file_to_move, WP_CONTENT_DIR . '/' . $file_to_move );
+			}
+		}
+
+		if ( is_dir( $di_bu_dir ) ) {
+			rmdir( $di_bu_dir );
 		}
 	}
 }
