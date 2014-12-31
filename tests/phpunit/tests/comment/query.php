@@ -1116,4 +1116,190 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( 2, $found );
 	}
+
+	public function test_post_type_single_value() {
+		register_post_type( 'post-type-1' );
+		register_post_type( 'post-type-2' );
+
+		$p1 = $this->factory->post->create( array( 'post_type' => 'post-type-1' ) );
+		$p2 = $this->factory->post->create( array( 'post_type' => 'post-type-2' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_type' => 'post-type-2',
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+
+		_unregister_post_type( 'post-type-1' );
+		_unregister_post_type( 'post-type-2' );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_type_singleton_array() {
+		register_post_type( 'post-type-1' );
+		register_post_type( 'post-type-2' );
+
+		$p1 = $this->factory->post->create( array( 'post_type' => 'post-type-1' ) );
+		$p2 = $this->factory->post->create( array( 'post_type' => 'post-type-2' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_type' => array( 'post-type-2' ),
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+
+		_unregister_post_type( 'post-type-1' );
+		_unregister_post_type( 'post-type-2' );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_type_array() {
+		register_post_type( 'post-type-1' );
+		register_post_type( 'post-type-2' );
+
+		$p1 = $this->factory->post->create( array( 'post_type' => 'post-type-1' ) );
+		$p2 = $this->factory->post->create( array( 'post_type' => 'post-type-2' ) );
+		$p3 = $this->factory->post->create( array( 'post_type' => 'post-type-3' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+		$c3 = $this->factory->comment->create_post_comments( $p3, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_type' => array( 'post-type-1', 'post-type-3' ),
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c3 ), $found );
+
+		_unregister_post_type( 'post-type-1' );
+		_unregister_post_type( 'post-type-2' );
+	}
+
+	public function test_post_name_single_value() {
+		$p1 = $this->factory->post->create( array( 'post_name' => 'foo' ) );
+		$p2 = $this->factory->post->create( array( 'post_name' => 'bar' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_name' => 'bar',
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_name_singleton_array() {
+		$p1 = $this->factory->post->create( array( 'post_name' => 'foo' ) );
+		$p2 = $this->factory->post->create( array( 'post_name' => 'bar' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_name' => array( 'bar' ),
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_name_array() {
+		$p1 = $this->factory->post->create( array( 'post_name' => 'foo' ) );
+		$p2 = $this->factory->post->create( array( 'post_name' => 'bar' ) );
+		$p3 = $this->factory->post->create( array( 'post_name' => 'baz' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+		$c3 = $this->factory->comment->create_post_comments( $p3, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_name' => array( 'foo', 'baz' ),
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c3 ), $found );
+	}
+
+	public function test_post_status_single_value() {
+		$p1 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$p2 = $this->factory->post->create( array( 'post_status' => 'draft' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_status' => 'draft',
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_status_singleton_array() {
+		$p1 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$p2 = $this->factory->post->create( array( 'post_status' => 'draft' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_status' => array( 'draft' ),
+		) );
+
+		$this->assertEqualSets( $c2, $found );
+	}
+
+	/**
+	 * @ticket 20006
+	 */
+	public function test_post_status_array() {
+		$p1 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$p2 = $this->factory->post->create( array( 'post_status' => 'draft' ) );
+		$p3 = $this->factory->post->create( array( 'post_status' => 'future' ) );
+
+		$c1 = $this->factory->comment->create_post_comments( $p1, 1 );
+		$c2 = $this->factory->comment->create_post_comments( $p2, 1 );
+		$c3 = $this->factory->comment->create_post_comments( $p3, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_status' => array( 'publish', 'future' ),
+		) );
+
+		$this->assertEqualSets( array_merge( $c1, $c3 ), $found );
+	}
 }
