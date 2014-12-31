@@ -197,6 +197,25 @@ class Tests_Filters extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 20920
+	 */
+	function test_remove_all_filters_should_respect_the_priority_argument() {
+		$a = new MockAction();
+		$tag = rand_str();
+		$val = rand_str();
+
+		add_filter( $tag, array( $a, 'filter' ), 12 );
+		$this->assertTrue( has_filter( $tag ) );
+
+		// Should not be removed.
+		remove_all_filters( $tag, 11 );
+		$this->assertTrue( has_filter( $tag ) );
+
+		remove_all_filters( $tag, 12 );
+		$this->assertFalse( has_filter( $tag ) );
+	}
+
+	/**
 	 * @ticket 9886
 	 */
 	function test_filter_ref_array() {
