@@ -424,6 +424,39 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t1, $t3 ), $found );
 	}
 
+	/**
+	 * @ticket 30611
+	 */
+	public function test_get_terms_by_name() {
+		$t1 = $this->factory->tag->create( array( 'name' => 'Foo' ) );
+		$t2 = $this->factory->tag->create( array( 'name' => 'Bar' ) );
+
+		$found = get_terms( 'post_tag', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'name' => 'Foo',
+		) );
+
+		$this->assertEquals( array( $t1 ), $found );
+	}
+
+	/**
+	 * @ticket 30611
+	 */
+	public function test_get_terms_by_multiple_names() {
+		$t1 = $this->factory->tag->create( array( 'name' => 'Foo' ) );
+		$t2 = $this->factory->tag->create( array( 'name' => 'Bar' ) );
+		$t3 = $this->factory->tag->create( array( 'name' => 'Barry' ) );
+
+		$found = get_terms( 'post_tag', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'name' => array( 'Foo', 'Barry' )
+		) );
+
+		$this->assertEqualSets( array( $t3, $t1 ), $found );
+	}
+
 	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_ids() {
 		// Set up a clean taxonomy.
 		$tax = 'hierarchical_fields';
