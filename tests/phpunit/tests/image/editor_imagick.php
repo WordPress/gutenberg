@@ -507,4 +507,28 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 
 		unlink( $save_to_file );
 	}
+
+	/**
+	 *
+	 * @ticket 30596
+	 */
+	public function test_image_peserves_alpha_on_rotate() {
+		$file = DIR_TESTDATA . '/images/transparent.png';
+
+		$pre_rotate_editor = new Imagick( $file );
+		$pre_rotate_pixel = $pre_rotate_editor->getImagePixelColor( 0, 0 );
+		$pre_rotate_alpha = $pre_rotate_pixel->getColorValue( imagick::COLOR_ALPHA );
+		$save_to_file = tempnam( get_temp_dir(),'' ) . '.png';
+		$pre_rotate_editor->writeImage( $save_to_file );
+		$pre_rotate_editor->destroy();
+
+		$image_editor = new WP_Image_Editor_Imagick( $save_to_file );
+		$image_editor->load();
+		$this->assertNotInstanceOf( 'WP_Error', $image_editor );
+		$image_editor->rotate( 180 );
+		$image_editor->save( $save_to_file );
+
+		$this->assertImageAlphaAtPointImagick( $save_to_file, array( 0, 0 ), $pre_rotate_alpha );
+		unlink( $save_to_file );
+	}
 }

@@ -499,4 +499,28 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 
 		unlink( $save_to_file );
 	}
+
+	/**
+	 *
+	 * @ticket 30596
+	 */
+	public function test_image_preserves_alpha_on_rotate() {
+		$file = DIR_TESTDATA . '/images/transparent.png';
+
+		$image = imagecreatefrompng( $file );
+		$rgb = imagecolorat( $image, 0, 0 );
+		$expected = imagecolorsforindex( $image, $rgb );
+
+		$editor = new WP_Image_Editor_GD( $file );
+                $this->assertNotInstanceOf( 'WP_Error', $editor );
+                $editor->load();
+                $editor->rotate( 180 );
+                $save_to_file = tempnam( get_temp_dir(), '' ) . '.png';
+
+                $editor->save( $save_to_file );
+
+                $this->assertImageAlphaAtPointGD( $save_to_file, array( 0,0 ), $expected['alpha'] );
+                unlink( $save_to_file );
+
+	}
 }
