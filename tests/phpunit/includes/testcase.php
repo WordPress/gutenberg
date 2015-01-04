@@ -47,6 +47,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
+			$this->reset_post_statuses();
 		}
 
 		$this->start_transaction();
@@ -105,6 +106,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			_unregister_taxonomy( $tax );
 		}
 		create_initial_taxonomies();
+	}
+
+	/**
+	 * Unregister non-built-in post statuses.
+	 */
+	protected function reset_post_statuses() {
+		foreach ( get_post_stati( array( '_builtin' => false ) ) as $post_status ) {
+			_unregister_post_status( $post_status );
+		}
 	}
 
 	/**

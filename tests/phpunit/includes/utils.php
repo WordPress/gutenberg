@@ -331,6 +331,17 @@ function _unregister_taxonomy( $taxonomy_name ) {
 	unset( $GLOBALS['wp_taxonomies'][$taxonomy_name] );
 }
 
+/**
+ * Unregister a post status.
+ *
+ * @since 4.2.0
+ *
+ * @param string $status
+ */
+function _unregister_post_status( $status ) {
+	unset( $GLOBALS['wp_post_statuses'][ $status ] );
+}
+
 function _cleanup_query_vars() {
 	// clean out globals to stop them polluting wp and wp_query
 	foreach ( $GLOBALS['wp']->public_query_vars as $v )

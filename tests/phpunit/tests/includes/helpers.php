@@ -159,4 +159,13 @@ class Tests_TestHelpers extends WP_UnitTestCase {
 			$this->assertEqualSetsWithIndex( $expected, $actual );
 		}
 	}
+
+	public function test__unregister_post_status() {
+		register_post_status( 'foo' );
+		_unregister_post_status( 'foo' );
+
+		$stati = get_post_stati();
+
+		$this->assertFalse( isset( $stati['foo'] ) );
+	}
 }
