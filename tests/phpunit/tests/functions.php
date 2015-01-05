@@ -39,6 +39,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertEquals($ss, wp_parse_args($q));
 	}
 	function test_size_format() {
+		$b  = 1;
 		$kb = 1024;
 		$mb = $kb*1024;
 		$gb = $mb*1024;
@@ -47,6 +48,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertEquals('1 GB', size_format($gb, 0));
 		$this->assertEquals('1 MB', size_format($mb, 0));
 		$this->assertEquals('1 kB', size_format($kb, 0));
+		$this->assertEquals('1 B',  size_format($b, 0));
 		// now some values around
 		// add some bytes to make sure the result isn't 1.4999999
 		$this->assertEquals('1.5 TB', size_format($tb + $tb/2 + $mb, 1));
