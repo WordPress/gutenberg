@@ -13,7 +13,7 @@ class Tests_Post_Slashes extends WP_UnitTestCase {
 		wp_set_current_user( $this->author_id );
 
 		// it is important to test with both even and odd numbered slashes as
-		// kses does a strip-then-add slashes in some of it's function calls
+		// kses does a strip-then-add slashes in some of its function calls
 		$this->slash_1 = 'String with 1 slash \\';
 		$this->slash_2 = 'String with 2 slashes \\\\';
 		$this->slash_3 = 'String with 3 slashes \\\\\\';
