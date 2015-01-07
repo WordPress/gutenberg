@@ -132,6 +132,40 @@ CAP;
 		$this->assertContains( 'https://www.youtube.com/embed/zHjMoNQN7s0?feature=oembed', $out );
 	}
 
+	/**
+	 * @ticket 23776
+	 */
+	function test_autoembed_empty() {
+		global $wp_embed;
+
+		$content = '';
+
+		$result = $wp_embed->autoembed( $content );
+		$this->assertEquals( $content, $result );
+	}
+
+	/**
+	 * @ticket 23776
+	 */
+	function test_autoembed_no_paragraphs_around_urls() {
+		global $wp_embed;
+
+		$content = <<<EOF
+$ my command
+First line.
+
+http://example.com/1/
+http://example.com/2/
+Last line.
+
+<pre>http://some.link/
+http://some.other.link/</pre>
+EOF;
+
+		$result = $wp_embed->autoembed( $content );
+		$this->assertEquals( $content, $result );
+	}
+
 	function test_wp_prepare_attachment_for_js() {
 		// Attachment without media
 		$id = wp_insert_attachment(array(
