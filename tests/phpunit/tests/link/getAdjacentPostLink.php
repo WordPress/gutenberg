@@ -25,37 +25,37 @@ class Tests_Link_GetAdjacentPostLink extends WP_UnitTestCase {
 
 	public function test_get_next_post_link_default() {
 		$actual = get_next_post_link();
-		$expected = '<a href="http://example.org/?p=' . $this->post_ids[1] . '" rel="next">Post title 2</a> &raquo;';
+		$expected = '<a href="' . home_url( '?p=' . $this->post_ids[1] ) . '" rel="next">Post title 2</a> &raquo;';
 		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_previous_post_link_default() {
 		$actual = get_previous_post_link();
-		$expected = '&laquo; <a href="http://example.org/?p=' . $this->post_ids[3] . '" rel="prev">Post title 4</a>';
+		$expected = '&laquo; <a href="' . home_url( '?p=' . $this->post_ids[3] ) . '" rel="prev">Post title 4</a>';
 		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_next_post_link_same_category() {
 		$actual = get_next_post_link( '%link &raquo;', '%title', true );
-		$expected = '<a href="http://example.org/?p=' . $this->post_ids[1] . '" rel="next">Post title 2</a> &raquo;';
+		$expected = '<a href="' . home_url( '?p=' . $this->post_ids[1] ) . '" rel="next">Post title 2</a> &raquo;';
 		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_previous_post_link_same_category() {
 		$actual = get_previous_post_link( '&laquo; %link', '%title', true );
-		$expected = '&laquo; <a href="http://example.org/?p=' . $this->post_ids[3] . '" rel="prev">Post title 4</a>';
+		$expected = '&laquo; <a href="' . home_url( '?p=' . $this->post_ids[3] ) . '" rel="prev">Post title 4</a>';
 		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_next_post_link_exclude_category() {
 		$actual = get_next_post_link( '%link &raquo;', '%title', false, $this->cat_id );
-		$expected = '<a href="http://example.org/?p=' . $this->post_ids[1] . '" rel="next">Post title 2</a> &raquo;';
+		$expected = '<a href="' . home_url( '?p=' . $this->post_ids[1] ) . '" rel="next">Post title 2</a> &raquo;';
 		$this->assertSame( $expected, $actual );
 	}
 
 	public function test_get_previous_post_link_exclude_category() {
 		$actual = get_previous_post_link( '&laquo; %link', '%title', false, $this->cat_id );
-		$expected = '&laquo; <a href="http://example.org/?p=' . $this->post_ids[3] . '" rel="prev">Post title 4</a>';
+		$expected = '&laquo; <a href="' . home_url( '?p=' . $this->post_ids[3] ) . '" rel="prev">Post title 4</a>';
 		$this->assertSame( $expected, $actual );
 	}
 }
