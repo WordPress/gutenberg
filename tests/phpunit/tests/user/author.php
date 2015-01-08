@@ -82,4 +82,21 @@ class Tests_User_Author extends WP_UnitTestCase {
 		$GLOBALS['post'] = $this->post_id;
 		$this->assertEquals( 1, get_the_author_posts() );
 	}
+
+	/**
+	 * @ticket 30904
+	 */
+	function test_get_the_author_posts_with_custom_post_type() {
+		register_post_type( 'wptests_pt' );
+
+		$cpt_ids = $this->factory->post->create_many( 2, array(
+			'post_author' => $this->author_id,
+			'post_type'   => 'wptests_pt',
+		) );
+		$GLOBALS['post'] = $cpt_ids[0];
+
+		$this->assertEquals( 2, get_the_author_posts() );
+
+		_unregister_post_type( 'wptests_pt' );
+	}
 }
