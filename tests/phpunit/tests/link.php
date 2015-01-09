@@ -286,4 +286,46 @@ class Tests_Link extends WP_UnitTestCase {
 		$relative_link = wp_make_link_relative( $link );
 		$this->assertEquals( '/this-is-a-test/?redirect=https://example.org/a-different-test-post/', $relative_link );
 	}
+
+	/**
+	 * @ticket 30910
+	 */
+	public function test_get_permalink_should_not_reveal_post_name_for_post_with_post_status_future() {
+		update_option( 'permalink_structure','/%year%/%monthnum%/%day%/%postname%/' );
+
+		flush_rewrite_rules();
+
+		$p = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_date'   => strftime( '%Y-%m-%d %H:%M:%S', strtotime( '+1 day' ) )
+		) );
+
+		$non_pretty_permalink = add_query_arg( 'p', $p, trailingslashit( home_url() ) );
+
+		$this->assertEquals( $non_pretty_permalink, get_permalink( $p ) );
+	}
+
+	/**
+	 * @ticket 30910
+	 */
+	public function test_get_permalink_should_not_reveal_post_name_for_cpt_with_post_status_future() {
+		update_option( 'permalink_structure','/%year%/%monthnum%/%day%/%postname%/' );
+
+		register_post_type( 'wptests_pt', array( 'public' => true ) );
+
+		flush_rewrite_rules();
+
+		$p = $this->factory->post->create( array(
+			'post_status' => 'future',
+			'post_type'   => 'wptests_pt',
+			'post_date'   => strftime( '%Y-%m-%d %H:%M:%S', strtotime( '+1 day' ) )
+		) );
+
+		$non_pretty_permalink = add_query_arg( array(
+			'post_type' => 'wptests_pt',
+			'p' => $p,
+		), trailingslashit( home_url() ) );
+
+		$this->assertEquals( $non_pretty_permalink, get_permalink( $p ) );
+	}
 }

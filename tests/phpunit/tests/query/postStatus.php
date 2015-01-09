@@ -195,8 +195,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 		$q = new WP_Query( array(
 			'posts_per_page' => -1,
 		) );
-global $wpdb;
-//print_r( $wpdb->get_results( "SELECT * FROM $wpdb->posts" ) );
+
 		$this->assertContains( self::$author_privatefoo_post, wp_list_pluck( $q->posts, 'ID' ) );
 		$this->assertContains( self::$editor_privatefoo_post, wp_list_pluck( $q->posts, 'ID' ) );
 	}
