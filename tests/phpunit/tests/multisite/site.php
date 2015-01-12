@@ -332,7 +332,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$result = update_blog_details( 999, array( 'domain' => 'example.com' ) );
 		$this->assertFalse( $result );
 	}
-	
+
 	function test_update_blog_details() {
 		$blog_id = $this->factory->blog->create();
 
@@ -1460,6 +1460,22 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( domain_exists( 'foo', 'bar' ), domain_exists( 'foo', 'bar/' ) );
 
 		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+	}
+
+	/**
+	 * Tests returning an address for a given valid id.
+	 */
+	function test_get_blogaddress_by_id_with_valid_id() {
+		$blogaddress = get_blogaddress_by_id( 1 );
+		$this->assertEquals( 'http://example.org/', $blogaddress );
+	}
+
+	/**
+	 * Tests returning the appropriate response for a invalid id given.
+	 */
+	function test_get_blogaddress_by_id_with_invalid_id() {
+		$blogaddress = get_blogaddress_by_id( 42 );
+		$this->assertEquals( '', $blogaddress );
 	}
 }
 
