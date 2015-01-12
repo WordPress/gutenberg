@@ -98,14 +98,6 @@ class Tests_Avatar extends WP_UnitTestCase {
 		$this->assertEquals( $url, $url2 );
 	}
 
-	/**
-	 * @ticket 21195
-	 */
-	public function test_get_avatar_url_bad_id() {
-		$this->assertFalse( get_avatar_url( false ) );
-		$this->assertFalse( get_avatar_url( 100000 ) );
-	}
-
 	protected $fakeURL;
 	/**
 	 * @ticket 21195
