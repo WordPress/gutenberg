@@ -343,7 +343,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$blog = get_blog_details( $blog_id );
 
 		$this->assertEquals( 'example.com', $blog->domain );
-		$this->assertEquals( 'my_path/', $blog->path );
+		$this->assertEquals( '/my_path/', $blog->path );
 		$this->assertEquals( '0', $blog->spam );
 	}
 
@@ -540,6 +540,79 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function _action_counter_cb() {
 		global $test_action_counter;
 		$test_action_counter++;
+	}
+
+	/**
+	 * When the path for a site is updated with update_blog_details(), the final
+	 * path should have a leading and trailing slash. When multiple directories
+	 * are part of the path, only one slash should separate each directory.
+	 * 
+	 * @ticket 18117 
+	 */ 
+	function test_update_blog_details_single_path_no_slashes() {
+		update_blog_details( 1, array( 'path' => 'my_path' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_single_path_double_trailing_slashes() {
+		update_blog_details( 1, array( 'path' => 'my_path//' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_single_path_double_leading_slashes() {
+		update_blog_details( 1, array( 'path' => '//my_path' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_single_path_single_trailing_slash() {
+		update_blog_details( 1, array( 'path' => 'my_path/' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_single_path_single_leading_slashes() {
+		update_blog_details( 1, array( 'path' => '/my_path' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_single_path_both_slashes() {
+		update_blog_details( 1, array( 'path' => '/my_path/' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/my_path/', $blog->path );
+	}
+
+	function test_update_blog_details_multiple_paths_no_slashes() {
+		update_blog_details( 1, array( 'path' => 'multiple/dirs' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/multiple/dirs/', $blog->path );
+	}
+
+	function test_update_blog_details_multiple_paths_middle_slashes() {
+		update_blog_details( 1, array( 'path' => 'multiple///dirs' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/multiple/dirs/', $blog->path );
+	}
+
+	function test_update_blog_details_multiple_paths_leading_slash() {
+		update_blog_details( 1, array( 'path' => '/multiple/dirs' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/multiple/dirs/', $blog->path );
+	}
+
+	function test_update_blog_details_multiple_paths_trailing_slash() {
+		update_blog_details( 1, array( 'path' => 'multiple/dirs/' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/multiple/dirs/', $blog->path );
+	}
+
+	function test_update_blog_details_multiple_paths_both_slashes() {
+		update_blog_details( 1, array( 'path' => '/multiple/dirs/' ) );
+		$blog = get_blog_details( 1 );
+		$this->assertEquals( '/multiple/dirs/', $blog->path );
 	}
 
 	/**
