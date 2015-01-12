@@ -591,10 +591,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( '/multiple/dirs/', $blog->path );
 	}
 
+	/**
+	 * `update_blog_details()` does not resolve multiple slashes in the
+	 * middle of a path string.
+	 */
 	function test_update_blog_details_multiple_paths_middle_slashes() {
 		update_blog_details( 1, array( 'path' => 'multiple///dirs' ) );
 		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple/dirs/', $blog->path );
+		$this->assertEquals( '/multiple///dirs/', $blog->path );
 	}
 
 	function test_update_blog_details_multiple_paths_leading_slash() {
