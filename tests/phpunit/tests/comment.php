@@ -28,6 +28,19 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertEquals( 'pingback', $comment->comment_type );
 	}
 
+	/**
+	 * @ticket 30307
+	 */
+	function test_wp_update_comment_updates_user_id() {
+		$post_id = $this->factory->post->create();
+		$comment_id = $this->factory->comment->create( array( 'comment_post_ID' => $post_id ) );
+
+		wp_update_comment( array( 'comment_ID' => $comment_id, 'user_id' => 1 ) );
+
+		$comment = get_comment( $comment_id );
+		$this->assertEquals( 1, $comment->user_id );
+	}
+
 	public function test_get_approved_comments() {
 		$p = $this->factory->post->create();
 		$ca1 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_approved' => '1' ) );
