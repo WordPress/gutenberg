@@ -15,6 +15,19 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertEquals( 0, $result );
 	}
 
+	/**
+	 * @ticket 30627
+	 */
+	function test_wp_update_comment_updates_comment_type() {
+		$post_id = $this->factory->post->create();
+		$comment_id = $this->factory->comment->create( array( 'comment_post_ID' => $post_id ) );
+
+		wp_update_comment( array( 'comment_ID' => $comment_id, 'comment_type' => 'pingback' ) );
+
+		$comment = get_comment( $comment_id );
+		$this->assertEquals( 'pingback', $comment->comment_type );
+	}
+
 	public function test_get_approved_comments() {
 		$p = $this->factory->post->create();
 		$ca1 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_approved' => '1' ) );
