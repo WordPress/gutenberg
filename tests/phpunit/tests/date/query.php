@@ -960,6 +960,68 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 31001
+	 */
+	public function test_validate_date_values_should_process_array_value_for_year() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2015-01-12' ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2013-01-12' ) );
+
+		$q = new WP_Query( array(
+			'date_query' => array(
+				array(
+					'compare' => 'BETWEEN',
+					'year' => array( 2012, 2014 ),
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 31001
+	 */
+	public function test_validate_date_values_should_process_array_value_for_day() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2015-01-12' ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2015-01-10' ) );
+
+		$q = new WP_Query( array(
+			'date_query' => array(
+				array(
+					'compare' => 'BETWEEN',
+					'day' => array( 9, 11 ),
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 31001
+	 * @expectedIncorrectUsage WP_Date_Query
+	 */
+	public function test_validate_date_values_should_process_array_value_for_day_when_values_are_invalid() {
+		$p1 = $this->factory->post->create( array( 'post_date' => '2015-01-12' ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2015-01-10' ) );
+
+		$q = new WP_Query( array(
+			'date_query' => array(
+				array(
+					'compare' => 'BETWEEN',
+					'day' => array( 9, 32 ),
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		// MySQL ignores the invalid clause.
+		$this->assertEquals( array( $p1, $p2 ), $q->posts );
+	}
+
 	/** Helpers **********************************************************/
 
 	public function date_query_valid_columns_callback( $columns ) {
