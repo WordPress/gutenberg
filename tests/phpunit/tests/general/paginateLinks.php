@@ -229,4 +229,66 @@ EXPECTED;
 			$this->assertEquals( $expected_href, $href );
 		}
 	}
+
+	/**
+	 * @ticket 30831
+	 */
+	function test_paginate_links_with_custom_query_args() {
+		add_filter( 'get_pagenum_link', array( $this, 'add_query_arg' ) );
+		$links = paginate_links( array(
+			'current'  => 2,
+			'total'    => 5,
+			'end_size' => 1,
+			'mid_size' => 1,
+			'type'     => 'array',
+			'add_args' => array(
+				'baz' => 'qux',
+			),
+		) );
+		remove_filter( 'get_pagenum_link', array( $this, 'add_query_arg' ) );
+
+		$document = new DOMDocument();
+		$document->preserveWhiteSpace = false;
+
+		$data = array(
+			0 => home_url( '/?baz=qux&foo=bar&s=search+term' ),
+			1 => home_url( '/?baz=qux&foo=bar&s=search+term' ),
+			3 => home_url( '/?paged=3&baz=qux&foo=bar&s=search+term' ),
+			5 => home_url( '/?paged=5&baz=qux&foo=bar&s=search+term' ),
+			6 => home_url( '/?paged=3&baz=qux&foo=bar&s=search+term' ),
+		);
+
+		foreach ( $data as $index => $expected_href ) {
+			$document->loadHTML( $links[ $index ] );
+			$tag = $document->getElementsByTagName( 'a' )->item( 0 );
+			$this->assertNotNull( $tag );
+
+			$href = $tag->attributes->getNamedItem( 'href' )->value;
+			$this->assertEquals( $expected_href, $href );
+		}
+	}
+
+	/**
+	 * @ticket 30831
+	 */
+	public function test_paginate_links_should_allow_non_default_format_without_add_args() {
+		// Fake the query params.
+		$request_uri = $_SERVER['REQUEST_URI'];
+		$_SERVER['REQUEST_URI'] = add_query_arg( 'foo', 3, home_url() );
+
+		$links = paginate_links( array(
+			'base'    => add_query_arg( 'foo', '%#%' ),
+			'format'  => '',
+			'total'   => 5,
+			'current' => 3,
+			'type'    => 'array',
+		) );
+
+		$this->assertContains( '?foo=1', $links[1] );
+		$this->assertContains( '?foo=2', $links[2] );
+		$this->assertContains( '?foo=4', $links[4] );
+		$this->assertContains( '?foo=5', $links[5] );
+
+		$_SERVER['REQUEST_URI'] = $request_uri;
+	}
 }
