@@ -1039,6 +1039,31 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( $expected, $actual );
 	}
 
+	/*
+	 * @ticket 20635
+	 */
+	public function test_pad_counts_should_not_recurse_infinitely_when_term_hierarchy_has_a_loop() {
+		remove_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10 );
+
+		$c1 = $this->factory->category->create();
+		$c2 = $this->factory->category->create( array( 'parent' => $c1 ) );
+		$c3 = $this->factory->category->create( array( 'parent' => $c2 ) );
+		wp_update_term( $c1, 'category', array( 'parent' => $c3 ) );
+
+		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
+
+		$posts = $this->factory->post->create_many( 3 );
+		wp_set_post_terms( $posts[0], $c1, 'category' );
+		wp_set_post_terms( $posts[1], $c2, 'category' );
+		wp_set_post_terms( $posts[2], $c3, 'category' );
+
+		$terms = get_terms( 'category', array(
+			'pad_counts' => true,
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2, $c3 ), wp_list_pluck( $terms, 'term_id' ) );
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
