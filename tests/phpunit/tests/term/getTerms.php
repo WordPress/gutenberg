@@ -394,6 +394,44 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
 	}
 
+	/**
+	 * @covers ::_get_term_children
+	 * @ticket 24461
+	 */
+	public function test__get_term_children_handles_cycles() {
+		remove_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10 );
+
+		$c1 = $this->factory->category->create();
+		$c2 = $this->factory->category->create( array( 'parent' => $c1 ) );
+		$c3 = $this->factory->category->create( array( 'parent' => $c2 ) );
+		wp_update_term( $c1, 'category', array( 'parent' => $c3 ) );
+
+		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
+
+		$result = _get_term_children( $c1, array( $c1, $c2, $c3 ), 'category' );
+
+		$this->assertEqualSets( array( $c2, $c3 ), $result );
+	}
+
+	/**
+	 * @covers ::_get_term_children
+	 * @ticket 24461
+	 */
+	public function test__get_term_children_handles_cycles_when_terms_argument_contains_objects() {
+		remove_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10 );
+
+		$c1 = $this->factory->category->create_and_get();
+		$c2 = $this->factory->category->create_and_get( array( 'parent' => $c1->term_id ) );
+		$c3 = $this->factory->category->create_and_get( array( 'parent' => $c2->term_id ) );
+		wp_update_term( $c1->term_id, 'category', array( 'parent' => $c3->term_id ) );
+
+		add_filter( 'wp_update_term_parent', 'wp_check_term_hierarchy_for_loops', 10, 3 );
+
+		$result = _get_term_children( $c1->term_id, array( $c1, $c2, $c3 ), 'category' );
+
+		$this->assertEqualSets( array( $c2, $c3 ), $result );
+	}
+
 	public function test_get_terms_by_slug() {
 		$t1 = $this->factory->tag->create( array( 'slug' => 'foo' ) );
 		$t2 = $this->factory->tag->create( array( 'slug' => 'bar' ) );
