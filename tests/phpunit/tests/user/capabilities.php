@@ -694,4 +694,20 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		wp_set_current_user( $old_uid );
 	}
+
+	/**
+	 * @ticket 28374
+	 */
+	function test_current_user_edit_caps() {
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'contributor' ) ) );
+		wp_set_current_user( $user->ID );
+
+		$user->add_cap( 'publish_posts' );
+		$user->add_cap( 'publish_pages' );
+		$this->assertTrue( $user->has_cap( 'publish_posts' ) );
+		$this->assertTrue( $user->has_cap( 'publish_pages' ) );
+
+		$user->remove_cap( 'publish_pages' );
+		$this->assertFalse( $user->has_cap( 'publish_pages' ) );
+	}
 }
