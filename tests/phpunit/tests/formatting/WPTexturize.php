@@ -209,6 +209,19 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31030
+	 */
+	function test_hyphens_at_start_and_end() {
+		$this->assertEquals( '&#8211; ', wptexturize( '- ' ) );
+		$this->assertEquals( '&#8211; &#8211;', wptexturize( '- -' ) );
+		$this->assertEquals( ' &#8211;', wptexturize( ' -' ) );
+
+		$this->assertEquals( '&#8212; ', wptexturize( '-- ' ) );
+		$this->assertEquals( '&#8212; &#8212;', wptexturize( '-- --' ) );
+		$this->assertEquals( ' &#8212;', wptexturize( ' --' ) );
+	}
+
+	/**
 	 * Test spaces around quotes.
 	 *
 	 * These should never happen, even if the desired output changes some day.
