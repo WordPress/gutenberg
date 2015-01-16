@@ -384,7 +384,6 @@ Paragraph two.';
 			'del',
 			'ins',
 			'noscript',
-			'figcaption',
 			'select',
 		);
 
