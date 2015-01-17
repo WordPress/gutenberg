@@ -85,6 +85,175 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_orderby_name() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'AAA',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'ZZZ',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'JJJ',
+		) );
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'name',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	public function test_orderby_count() {
+		$posts = $this->factory->post->create_many( 3 );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'AAA',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'ZZZ',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'JJJ',
+		) );
+
+		wp_set_object_terms( $posts[0], array( $t3, $t2, $t1 ), $this->taxonomy );
+		wp_set_object_terms( $posts[1], array( $t3, $t1 ), $this->taxonomy );
+		wp_set_object_terms( $posts[2], array( $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $posts[0], $this->taxonomy, array(
+			'orderby' => 'count',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t2, $t1, $t3 ), $found );
+	}
+
+	public function test_orderby_slug() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'slug' => 'aaa',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'slug' => 'zzz',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'slug' => 'jjj',
+		) );
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'slug',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	public function test_orderby_term_group() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+
+		// No great way to do this in the API.
+		global $wpdb;
+		$wpdb->update( $wpdb->terms, array( 'term_group' => 1 ), array( 'term_id' => $t1 ) );
+		$wpdb->update( $wpdb->terms, array( 'term_group' => 3 ), array( 'term_id' => $t2 ) );
+		$wpdb->update( $wpdb->terms, array( 'term_group' => 2 ), array( 'term_id' => $t3 ) );
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'term_group',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	public function test_orderby_term_order() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+
+		$set = wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		// No great way to do this in the API.
+		$term_1 = get_term( $t1, $this->taxonomy );
+		$term_2 = get_term( $t2, $this->taxonomy );
+		$term_3 = get_term( $t3, $this->taxonomy );
+
+		global $wpdb;
+		$wpdb->update( $wpdb->term_relationships, array( 'term_order' => 1 ), array( 'term_taxonomy_id' => $term_1->term_taxonomy_id, 'object_id' => $p ) );
+		$wpdb->update( $wpdb->term_relationships, array( 'term_order' => 3 ), array( 'term_taxonomy_id' => $term_2->term_taxonomy_id, 'object_id' => $p ) );
+		$wpdb->update( $wpdb->term_relationships, array( 'term_order' => 2 ), array( 'term_taxonomy_id' => $term_3->term_taxonomy_id, 'object_id' => $p ) );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'term_order',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	public function test_order_desc() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'AAA',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'ZZZ',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'name' => 'JJJ',
+		) );
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'name',
+			'order' => 'DESC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t2, $t3, $t1 ), $found );
+	}
+
 	public function filter_get_object_terms( $terms ) {
 		$term_ids = wp_list_pluck( $terms, 'term_id' );
 		// all terms should still be objects
