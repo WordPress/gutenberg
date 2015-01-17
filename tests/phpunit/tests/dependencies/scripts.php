@@ -84,4 +84,39 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		// Cleanup
 		$wp_scripts->base_url = $base_url_backup;
 	}
+
+	/**
+	 * Testing add data & conditional
+	 * @ticket 16024
+	 */
+	function test_wp_script_add_data() {
+		// Enqueue & add data
+		wp_enqueue_script( 'test-only-data', 'example.com', array(), null );
+		wp_script_add_data( 'test-only-data', 'data', 'testing' );
+		$expected = "<script type='text/javascript'>\n/* <![CDATA[ */\ntesting\n/* ]]> */\n</script>\n";
+		$expected.= "<script type='text/javascript' src='http://example.com'></script>\n";
+
+		// Enqueue & add conditional comments
+		wp_enqueue_script( 'test-only-conditional', 'example.com', array(), null );
+		wp_script_add_data( 'test-only-conditional', 'conditional', 'gt IE 7' );
+		$expected.= "<!--[if gt IE 7]>\n<script type='text/javascript' src='http://example.com'></script>\n<![endif]-->\n";
+
+		// Enqueue & add data plus conditional comments for both
+		wp_enqueue_script( 'test-conditional-with-data', 'example.com', array(), null );
+		wp_script_add_data( 'test-conditional-with-data', 'data', 'testing' );
+		wp_script_add_data( 'test-conditional-with-data', 'conditional', 'lt IE 9' );
+		$expected.= "<!--[if lt IE 9]>\n<script type='text/javascript'>\n/* <![CDATA[ */\ntesting\n/* ]]> */\n</script>\n<![endif]-->\n";
+		$expected.= "<!--[if lt IE 9]>\n<script type='text/javascript' src='http://example.com'></script>\n<![endif]-->\n";
+
+		// Enqueue & add an invalid key for brevity
+		wp_enqueue_script( 'test-invalid', 'example.com', array(), null );
+		wp_script_add_data( 'test-invalid', 'invalid', 'testing' );
+		$expected.= "<script type='text/javascript' src='http://example.com'></script>\n";
+
+		// Go!
+		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
+
+		// No scripts left to print
+		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
+	}
 }
