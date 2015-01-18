@@ -501,6 +501,15 @@ VIDEO;
 		return $dir;
 	}
 
+	/**
+	 * @ticket 31044
+	 */
+	function test_attachment_url_to_postid_with_empty_url() {
+		$post_id = attachment_url_to_postid( '' );
+		$this->assertInternalType( 'int', $post_id );
+		$this->assertEquals( 0, $post_id );
+	}
+
 	function test_wp_check_filetype() {
 		$url = 'http://example.com/testFile.mp4?autoplay=true&otherstuff=false';
 		$filetype = wp_check_filetype( $url );
