@@ -227,6 +227,108 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
 	}
 
+	/**
+	 * @ticket 28688
+	 */
+	public function test_orderby_parent() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+
+		$set = wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$term_1 = get_term( $t1, $this->taxonomy );
+		$term_2 = get_term( $t2, $this->taxonomy );
+		$term_3 = get_term( $t3, $this->taxonomy );
+
+		global $wpdb;
+		$wpdb->update( $wpdb->term_taxonomy, array( 'parent' => 1 ), array( 'term_taxonomy_id' => $term_1->term_taxonomy_id ) );
+		$wpdb->update( $wpdb->term_taxonomy, array( 'parent' => 3 ), array( 'term_taxonomy_id' => $term_2->term_taxonomy_id ) );
+		$wpdb->update( $wpdb->term_taxonomy, array( 'parent' => 2 ), array( 'term_taxonomy_id' => $term_3->term_taxonomy_id ) );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'parent',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	/**
+	 * @ticket 28688
+	 */
+	public function test_orderby_taxonomy() {
+		register_taxonomy( 'wptests_tax_2', 'post' );
+		register_taxonomy( 'wptests_tax_3', 'post' );
+
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_3',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_2',
+		) );
+
+		wp_set_object_terms( $p, $t1, $this->taxonomy );
+		wp_set_object_terms( $p, $t2, 'wptests_tax_3' );
+		wp_set_object_terms( $p, $t3, 'wptests_tax_2' );
+
+		$found = wp_get_object_terms( $p, array( $this->taxonomy, 'wptests_tax_2', 'wptests_tax_3' ), array(
+			'orderby' => 'taxonomy',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
+	/**
+	 * @ticket 28688
+	 */
+	public function test_orderby_tt_id() {
+		$p = $this->factory->post->create();
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+
+		// term_taxonomy_id will only have a different order from term_id in legacy situations.
+		$term_1 = get_term( $t1, $this->taxonomy );
+		$term_2 = get_term( $t2, $this->taxonomy );
+		$term_3 = get_term( $t3, $this->taxonomy );
+
+		global $wpdb;
+		$wpdb->update( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => 100004 ), array( 'term_taxonomy_id' => $term_1->term_taxonomy_id ) );
+		$wpdb->update( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => 100006 ), array( 'term_taxonomy_id' => $term_2->term_taxonomy_id ) );
+		$wpdb->update( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => 100005 ), array( 'term_taxonomy_id' => $term_3->term_taxonomy_id ) );
+
+		$set = wp_set_object_terms( $p, array( $t1, $t2, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'orderby' => 'term_taxonomy_id',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t3, $t2 ), $found );
+	}
+
 	public function test_order_desc() {
 		$p = $this->factory->post->create();
 
