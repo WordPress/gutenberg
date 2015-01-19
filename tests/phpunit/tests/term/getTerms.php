@@ -1077,7 +1077,45 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( $expected, $actual );
 	}
 
-	/*
+	public function test_pad_counts() {
+		register_taxonomy( 'wptests_tax_1', 'post', array( 'hierarchical' => true ) );
+
+		$posts = $this->factory->post->create_many( 3 );
+
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_1',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_1',
+			'parent' => $t1,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax_1',
+			'parent' => $t2,
+		) );
+
+		wp_set_object_terms( $posts[0], array( $t1 ), 'wptests_tax_1' );
+		wp_set_object_terms( $posts[1], array( $t2 ), 'wptests_tax_1' );
+		wp_set_object_terms( $posts[2], array( $t3 ), 'wptests_tax_1' );
+
+		$found = get_terms( 'wptests_tax_1', array(
+			'pad_counts' => true,
+		) );
+
+		$this->assertEqualSets( array( $t1, $t2, $t3 ), wp_list_pluck( $found, 'term_id' ) );
+
+		foreach ( $found as $f ) {
+			if ( $t1 == $f->term_id ) {
+				$this->assertSame( 3, $f->count );
+			} elseif ( $t2 == $f->term_id ) {
+				$this->assertSame( 2, $f->count );
+			} else {
+				$this->assertSame( 1, $f->count );
+			}
+		}
+	}
+
+	/**
 	 * @ticket 20635
 	 */
 	public function test_pad_counts_should_not_recurse_infinitely_when_term_hierarchy_has_a_loop() {
@@ -1100,6 +1138,10 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		) );
 
 		$this->assertEqualSets( array( $c1, $c2, $c3 ), wp_list_pluck( $terms, 'term_id' ) );
+
+		foreach ( $terms as $term ) {
+			$this->assertSame( 3, $term->count );
+		}
 	}
 
 	protected function create_hierarchical_terms_and_posts() {
