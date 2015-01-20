@@ -960,7 +960,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				"word 'em word",
-				"word &#8216;em word",
+				"word &#8217;em word",
 			),
 		);
 	}
