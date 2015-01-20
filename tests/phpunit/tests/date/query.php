@@ -857,13 +857,13 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 	 */
 	public function test_validate_date_values_hour() {
 		// Valid values.
-		$hours = range( 1, 23 );
+		$hours = range( 0, 23 );
 		foreach ( $hours as $hour ) {
 			$this->assertTrue( $this->q->validate_date_values( array( 'hour' => $hour ) ) );
 		}
 
 		// Invalid values.
-		$hours = array( -1, 24, 25, 'string who wants to be a int' );
+		$hours = array( -1, 24, 25, 'string' );
 		foreach ( $hours as $hour ) {
 			$this->assertFalse( $this->q->validate_date_values( array( 'hour' => $hour ) ) );
 		}
