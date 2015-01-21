@@ -148,23 +148,6 @@ abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase 
 	}
 
 	/**
-	 * Try resizing a php file (bad image)
-	 * @ticket 6821
-	 */
-	public function test_resize_bad_image() {
-
-		if ( $this->editor_engine == 'WP_Image_Editor_Imagick' ) {
-			$this->markTestSkipped( sprintf( 'Avoid GLib-GObject-CRITICAL assertion in %s', $this->editor_engine ) );
-			return;
-		}
-
-		$image = $this->resize_helper( DIR_TESTDATA.'/export/crazy-cdata.xml', 25, 25 );
-		$this->assertInstanceOf( 'WP_Error', $image );
-		$this->assertEquals( 'invalid_image', $image->get_error_code() );
-	}
-
-
-	/**
 	 * Function to help out the tests
 	 */
 	protected function resize_helper( $file, $width, $height, $crop = false ) {
