@@ -292,7 +292,11 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 		if ( !function_exists( 'imagejpeg' ) )
 			$this->markTestSkipped( 'jpeg support unavailable' );
 
-		$file = wp_crop_image( 'http://asdftestblog1.files.wordpress.com/2008/04/canola.jpg',
+		if ( ! extension_loaded( 'openssl' ) ) {
+			$this->markTestSkipped( 'Tests_Image_Functions::test_wp_crop_image_url() requires openssl.' );
+		}
+
+		$file = wp_crop_image( 'https://asdftestblog1.files.wordpress.com/2008/04/canola.jpg',
 							  0, 0, 100, 100, 100, 100, false,
 							  DIR_TESTDATA . '/images/' . rand_str() . '.jpg' );
 		$this->assertNotInstanceOf( 'WP_Error', $file );
@@ -312,7 +316,11 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	}
 
 	public function test_wp_crop_image_url_not_exist() {
-		$file = wp_crop_image( 'http://asdftestblog1.files.wordpress.com/2008/04/canoladoesnotexist.jpg',
+		if ( ! extension_loaded( 'openssl' ) ) {
+			$this->markTestSkipped( 'Tests_Image_Functions::test_wp_crop_image_url_not_exist() requires openssl.' );
+		}
+
+		$file = wp_crop_image( 'https://asdftestblog1.files.wordpress.com/2008/04/canoladoesnotexist.jpg',
 							  0, 0, 100, 100, 100, 100 );
 		$this->assertInstanceOf( 'WP_Error', $file );
 	}
