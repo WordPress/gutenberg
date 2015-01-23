@@ -356,6 +356,68 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t2, $t3, $t1 ), $found );
 	}
 
+	/**
+	 * @ticket 15675
+	 */
+	public function test_parent() {
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'parent' => $t1,
+		) );
+		$t4 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'parent' => $t2,
+		) );
+
+		$p = $this->factory->post->create();
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'parent' => $t1,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t3 ), $found );
+	}
+
+	/**
+	 * @ticket 15675
+	 */
+	public function test_parent_0() {
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'parent' => $t1,
+		) );
+		$t4 = $this->factory->term->create( array(
+			'taxonomy' => $this->taxonomy,
+			'parent' => $t2,
+		) );
+
+		$p = $this->factory->post->create();
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3, $t3 ), $this->taxonomy );
+
+		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+			'parent' => 0,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $t1, $t2 ), $found );
+	}
+
 	public function filter_get_object_terms( $terms ) {
 		$term_ids = wp_list_pluck( $terms, 'term_id' );
 		// all terms should still be objects
