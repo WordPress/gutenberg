@@ -495,6 +495,121 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $t3, $t1 ), $found );
 	}
 
+	/**
+	 * @ticket 29839
+	 */
+	public function test_childless_should_return_all_terms_for_flat_hierarchy() {
+		// If run on a flat hierarchy it should return everything.
+		$flat_tax = 'countries';
+		register_taxonomy( $flat_tax, 'post', array( 'hierarchical' => false ) );
+		$australia = $this->factory->term->create( array( 'name' => 'Australia', 'taxonomy' => $flat_tax ) );
+		$china     = $this->factory->term->create( array( 'name' => 'China',     'taxonomy' => $flat_tax ) );
+		$tanzania  =  $this->factory->term->create( array( 'name' => 'Tanzania',  'taxonomy' => $flat_tax ) );
+
+		$terms = get_terms( $flat_tax, array(
+			'childless' => true,
+			'hide_empty' => false,
+			'fields' => 'ids',
+		) );
+
+		$expected = array( $australia, $china, $tanzania );
+		$this->assertEqualSets( $expected, $terms );
+	}
+
+
+	/**
+	 * @ticket 29839
+	 */
+	public function test_childless_hierarchical_taxonomy() {
+		$tax = 'location';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+		/*
+		Canada
+			Ontario
+				Ottawa
+					Nepean
+				Toronto
+			Quebec
+				Montreal
+			PEI
+		*/
+		// Level 1
+		$canada = $this->factory->term->create( array( 'name' => 'Canada', 'taxonomy' => $tax ) );
+
+		// Level 2
+		$ontario = $this->factory->term->create( array( 'name' => 'Ontario', 'parent' => $canada, 'taxonomy' => $tax ) );
+		$quebec  = $this->factory->term->create( array( 'name' => 'Quebec', 'parent' => $canada, 'taxonomy' => $tax ) );
+		$pei     = $this->factory->term->create( array( 'name' => 'PEI', 'parent' => $canada, 'taxonomy' => $tax ) );
+
+		// Level 3
+		$toronto  = $this->factory->term->create( array( 'name' => 'Toronto', 'parent' => $ontario, 'taxonomy' => $tax ) );
+		$ottawa   = $this->factory->term->create( array( 'name' => 'Ottawa', 'parent' => $ontario, 'taxonomy' => $tax ) );
+		$montreal = $this->factory->term->create( array( 'name' => 'Montreal', 'parent' => $quebec, 'taxonomy' => $tax ) );
+
+		// Level 4
+		$nepean = $this->factory->term->create( array( 'name' => 'Nepean', 'parent' => $ottawa, 'taxonomy' => $tax ) );
+
+		$terms = get_terms( $tax, array(
+			'childless' => true,
+			'hide_empty' => false,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $montreal, $nepean, $toronto, $pei ), $terms );
+	}
+
+	/**
+	 * @ticket 29839
+	 */
+	public function test_childless_hierarchical_taxonomy_used_with_child_of() {
+		$tax = 'location';
+		register_taxonomy( $tax, 'post', array( 'hierarchical' => true ) );
+
+		// Level 1
+		$canada = $this->factory->term->create( array( 'name' => 'Canada', 'taxonomy' => $tax ) );
+
+		// Level 2
+		$ontario = $this->factory->term->create( array( 'name' => 'Ontario', 'parent' => $canada, 'taxonomy' => $tax ) );
+		$quebec  = $this->factory->term->create( array( 'name' => 'Quebec', 'parent' => $canada, 'taxonomy' => $tax ) );
+
+		// Level 3
+		$laval   = $this->factory->term->create( array( 'name' => 'Laval', 'parent' => $quebec, 'taxonomy' => $tax ) );
+		$montreal = $this->factory->term->create( array( 'name' => 'Montreal', 'parent' => $quebec, 'taxonomy' => $tax ) );
+
+		// Level 4
+		$dorval = $this->factory->term->create( array( 'name' => 'Dorval', 'parent' => $montreal, 'taxonomy' => $tax ) );
+
+		$terms = get_terms( $tax, array(
+			'childless' => true,
+			'child_of' => $quebec,
+			'hide_empty' => false,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $laval ), $terms );
+	}
+
+	/**
+	 * @ticket 29839
+	 */
+	public function test_childless_should_enforce_childless_status_for_all_queried_taxonomies() {
+		register_taxonomy( 'wptests_tax1', 'post', array( 'hierarchical' => true ) );
+		register_taxonomy( 'wptests_tax2', 'post', array( 'hierarchical' => true ) );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1', 'parent' => $t1 ) );
+		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t4 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t3 ) );
+
+		$found = get_terms( array( 'wptests_tax1', 'wptests_tax2' ), array(
+			'fields' => 'ids',
+			'hide_empty' => false,
+			'childless' => true,
+		) );
+
+		$this->assertEqualSets( array( $t2, $t4 ), $found );
+	}
+
 	public function test_get_terms_hierarchical_tax_hide_empty_false_fields_ids() {
 		// Set up a clean taxonomy.
 		$tax = 'hierarchical_fields';
