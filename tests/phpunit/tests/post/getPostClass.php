@@ -50,6 +50,10 @@ class Tests_Post_GetPostClass extends WP_UnitTestCase {
 	public function test_taxonomy_classes_hit_cache() {
 		global $wpdb;
 
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
+		}
+
 		register_taxonomy( 'wptests_tax', 'post' );
 		wp_set_post_terms( $this->post_id, array( 'foo', 'bar' ), 'wptests_tax' );
 		wp_set_post_terms( $this->post_id, array( 'footag', 'bartag' ), 'post_tag' );

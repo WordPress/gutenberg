@@ -382,6 +382,10 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	public function test_child_of_should_skip_query_when_specified_parent_is_not_found_in_hierarchy_cache() {
 		global $wpdb;
 
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
+		}
+
 		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true, ) );
 
 		$terms = $this->factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
@@ -1202,6 +1206,10 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	 */
 	public function test_parent_should_skip_query_when_specified_parent_is_not_found_in_hierarchy_cache() {
 		global $wpdb;
+
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
+		}
 
 		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true, ) );
 
