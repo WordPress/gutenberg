@@ -42,6 +42,11 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 		$_SERVER['REMOTE_ADDR'] = '';
 	}
 
+	public function tearDown() {
+		parent::tearDown();
+		remove_filter( 'query', array( $this, '_block_comments' ) );
+	}
+
 	/**
 	 * Reply as a privilged user (administrator)
 	 * Expects test to pass
@@ -220,7 +225,6 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 	public function _block_comments( $sql ) {
 		global $wpdb;
 		if ( false !== strpos( $sql, $wpdb->comments ) && 0 === stripos( trim ( $sql ), 'INSERT INTO') ) {
-			remove_filter( 'query', array( $this, '_block_comments' ) );
 			return '';
 		}
 		return $sql;
