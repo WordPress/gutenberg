@@ -99,4 +99,30 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	function test_special_option_name_notoptions() {
 		delete_option( 'notoptions' );
 	}
+
+	function data_option_autoloading() {
+		return array(
+			array( 'autoload_yes',    'yes',   'yes' ),
+			array( 'autoload_true',   true,    'yes' ),
+			array( 'autoload_string', 'foo',   'yes' ),
+			array( 'autoload_int',    123456,  'yes' ),
+			array( 'autoload_array',  array(), 'yes' ),
+			array( 'autoload_no',     'no',    'no'  ),
+			array( 'autoload_false',  false,   'no'  ),
+		);
+	}
+	/**
+	 * Options should be autoloaded unless they were added with "no" or `false`.
+	 *
+	 * @ticket 31119
+	 * @dataProvider data_option_autoloading
+	 */
+	function test_option_autoloading( $name, $autoload_value, $expected ) {
+		global $wpdb;
+		$added = add_option( $name, 'Autoload test', '', $autoload_value );
+		$this->assertTrue( $added );
+
+		$actual = $wpdb->get_row( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s LIMIT 1", $name ) );
+		$this->assertEquals( $expected, $actual->autoload );
+	}
 }
