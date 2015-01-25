@@ -377,6 +377,47 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31118
+	 */
+	public function test_child_of_should_skip_query_when_specified_parent_is_not_found_in_hierarchy_cache() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true, ) );
+
+		$terms = $this->factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'child_of' => $terms[0],
+		) );
+
+		$this->assertEmpty( $found );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 31118
+	 */
+	public function test_child_of_should_respect_multiple_taxonomies() {
+		register_taxonomy( 'wptests_tax1', 'post', array( 'hierarchical' => true ) );
+		register_taxonomy( 'wptests_tax2', 'post', array( 'hierarchical' => true ) );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t2 ) );
+
+		$found = get_terms( array( 'wptests_tax1', 'wptests_tax2' ), array(
+			'fields' => 'ids',
+			'hide_empty' => false,
+			'child_of' => $t2,
+		) );
+
+		$this->assertEqualSets( array( $t3 ), $found );
+	}
+
+	/**
 	 * @ticket 27123
 	 */
 	function test_get_term_children_recursion() {
@@ -1154,6 +1195,47 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		);
 		$actual = wp_list_pluck( $terms, 'term_id' );
 		$this->assertEqualSets( $expected, $actual );
+	}
+
+	/**
+	 * @ticket 31118
+	 */
+	public function test_parent_should_skip_query_when_specified_parent_is_not_found_in_hierarchy_cache() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true, ) );
+
+		$terms = $this->factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'parent' => $terms[0],
+		) );
+
+		$this->assertEmpty( $found );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 31118
+	 */
+	public function test_parent_should_respect_multiple_taxonomies() {
+		register_taxonomy( 'wptests_tax1', 'post', array( 'hierarchical' => true ) );
+		register_taxonomy( 'wptests_tax2', 'post', array( 'hierarchical' => true ) );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t2 ) );
+
+		$found = get_terms( array( 'wptests_tax1', 'wptests_tax2' ), array(
+			'fields' => 'ids',
+			'hide_empty' => false,
+			'parent' => $t2,
+		) );
+
+		$this->assertEqualSets( array( $t3 ), $found );
 	}
 
 	public function test_hierarchical_false_parent_should_override_child_of() {
