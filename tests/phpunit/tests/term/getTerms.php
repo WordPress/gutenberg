@@ -1070,6 +1070,48 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31118
+	 */
+	public function test_hierarchical_should_recurse_properly_for_all_taxonomies() {
+		register_taxonomy( 'wptests_tax1', 'post', array( 'hierarchical' => true ) );
+		register_taxonomy( 'wptests_tax2', 'post', array( 'hierarchical' => true ) );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1', 'parent' => $t1 ) );
+		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1', 'parent' => $t2 ) );
+
+		$t4 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t5 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t4 ) );
+		$t6 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t5 ) );
+
+		$p = $this->factory->post->create();
+
+		wp_set_object_terms( $p, $t3, 'wptests_tax1' );
+		wp_set_object_terms( $p, $t6, 'wptests_tax2' );
+
+		$found = get_terms( array( 'wptests_tax1', 'wptests_tax2' ), array(
+			'hierarchical' => true,
+			'hide_empty' => true,
+			'fields' => 'ids',
+		) );
+
+		/*
+		 * Should contain all terms, since they all have non-empty descendants.
+		 * To make the case clearer, test taxonomies separately.
+		 */
+
+		// First taxonomy.
+		$this->assertContains( $t1, $found );
+		$this->assertContains( $t2, $found );
+		$this->assertContains( $t3, $found );
+
+		// Second taxonomy.
+		$this->assertContains( $t4, $found );
+		$this->assertContains( $t5, $found );
+		$this->assertContains( $t6, $found );
+	}
+
+	/**
 	 * @ticket 23261
 	 */
 	public function test_orderby_include() {
