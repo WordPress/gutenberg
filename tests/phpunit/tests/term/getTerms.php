@@ -1349,6 +1349,39 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 31118
+	 */
+	public function test_pad_counts_should_work_when_first_taxonomy_is_nonhierarchical_and_second_taxonomy_is_hierarchical() {
+		register_taxonomy( 'wptests_tax1', 'post', array( 'hierarchical' => false ) );
+		register_taxonomy( 'wptests_tax2', 'post', array( 'hierarchical' => true ) );
+
+		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2', 'parent' => $t2 ) );
+
+		$posts = $this->factory->post->create_many( 3 );
+		wp_set_object_terms( $posts[0], $t1, 'wptests_tax1' );
+		wp_set_object_terms( $posts[1], $t2, 'wptests_tax2' );
+		wp_set_object_terms( $posts[2], $t3, 'wptests_tax2' );
+
+		$found = get_terms( array( 'wptests_tax1', 'wptests_tax2' ), array(
+			'pad_counts' => true,
+		) );
+
+		$this->assertEqualSets( array( $t1, $t2, $t3 ), wp_list_pluck( $found, 'term_id' ) );
+
+		foreach ( $found as $f ) {
+			if ( $t1 == $f->term_id ) {
+				$this->assertEquals( 1, $f->count );
+			} elseif ( $t2 == $f->term_id ) {
+				$this->assertEquals( 2, $f->count );
+			} else {
+				$this->assertEquals( 1, $f->count );
+			}
+		}
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
