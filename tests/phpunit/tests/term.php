@@ -1585,6 +1585,35 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31086
+	 */
+	public function test_get_the_terms_should_return_zero_indexed_array_when_cache_is_empty() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, array( 'foo', 'bar' ), 'wptests_tax' );
+
+		$found = get_the_terms( $p, 'wptests_tax' );
+
+		$this->assertEqualSets( array( 0, 1 ), array_keys( $found ) );
+	}
+
+	/**
+	 * @ticket 31086
+	 */
+	public function test_get_the_terms_should_return_zero_indexed_array_when_cache_is_primed() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, array( 'foo', 'bar' ), 'wptests_tax' );
+
+		// Prime cache.
+		update_object_term_cache( array( $p ), array( 'post' ) );
+
+		$found = get_the_terms( $p, 'wptests_tax' );
+
+		$this->assertEqualSets( array( 0, 1 ), array_keys( $found ) );
+	}
+
+	/**
 	 * @ticket 19205
 	 */
 	function test_orphan_category() {
