@@ -216,6 +216,22 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests Limiting the response size when returning strings
+	 *
+	 * @ticket 31172
+	 */
+	function test_request_limited_size() {
+		// we'll test against a file in the unit test data
+		$url = 'http://develop.svn.wordpress.org/trunk/tests/phpunit/data/images/2004-07-22-DSC_0007.jpg';
+		$size = 10000;
+
+		$res = wp_remote_request( $url, array( 'timeout' => 30, 'limit_response_size' => $size ) );
+
+		$this->assertFalse( is_wp_error( $res ) );
+		$this->assertEquals( $size, strlen( $res['body'] ) );
+	}
+
+	/**
 	 * Test POST redirection methods
 	 *
 	 * @ticket 17588
