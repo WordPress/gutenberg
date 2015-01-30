@@ -245,6 +245,30 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	/**
+	 * Declare an expected `_deprecated_function()` or `_deprecated_argument()` call from within a test.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $deprecated Name of the function, method, class, or argument that is deprecated. Must match
+	 *                           first parameter of the `_deprecated_function()` or `_deprecated_argument()` call.
+	 */
+	public function setExpectedDeprecated( $deprecated ) {
+		array_push( $this->expected_deprecated, $deprecated );
+	}
+
+	/**
+	 * Declare an expected `_doing_it_wrong()` call from within a test.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $deprecated Name of the function, method, or class that appears in the first argument of the
+	 *                           source `_doing_it_wrong()` call.
+	 */
+	public function setExpectedIncorrectUsage( $doing_it_wrong ) {
+		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
+	}
+
 	function deprecated_function_run( $function ) {
 		if ( ! in_array( $function, $this->caught_deprecated ) )
 			$this->caught_deprecated[] = $function;

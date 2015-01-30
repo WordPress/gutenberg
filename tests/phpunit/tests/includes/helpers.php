@@ -168,4 +168,28 @@ class Tests_TestHelpers extends WP_UnitTestCase {
 
 		$this->assertFalse( isset( $stati['foo'] ) );
 	}
+
+	/**
+	 * @ticket 28486
+	 */
+	public function test_setExpectedDeprecated() {
+		$this->setExpectedDeprecated( 'Tests_TestHelpers::mock_deprecated' );
+		$this->mock_deprecated();
+	}
+
+	/**
+	 * @ticket 28486
+	 */
+	public function test_setExpectedIncorrectUsage() {
+		$this->setExpectedIncorrectUsage( 'Tests_TestHelpers::mock_incorrect_usage' );
+		$this->mock_incorrect_usage();
+	}
+
+	protected function mock_deprecated() {
+		_deprecated_function( __METHOD__, '2.5' );
+	}
+
+	protected function mock_incorrect_usage() {
+		_doing_it_wrong( __METHOD__, __( 'Incorrect usage test' ), '2.5' );
+	}
 }
