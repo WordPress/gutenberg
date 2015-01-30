@@ -70,6 +70,36 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		$this->assertNotContains( 'Test Cat 1', $found );
 	}
 
+	public function test_show_option_all_link_should_go_to_home_page_when_show_on_front_is_false() {
+		$cats = $this->factory->category->create_many( 2 );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'category',
+		) );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . home_url( '/' ) . "'>All</a></li>", $found );
+	}
+
+	public function test_show_option_all_link_should_respect_page_for_posts() {
+		$cats = $this->factory->category->create_many( 2 );
+		$p = $this->factory->post->create( array( 'post_type' => 'page' ) );
+
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_for_posts', $p );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'category',
+		) );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . get_permalink( $p ) . "'>All</a></li>", $found );
+	}
+
 	public function list_cats_callback( $cat ) {
 		if ( 'Test Cat 1' === $cat ) {
 			return '';
