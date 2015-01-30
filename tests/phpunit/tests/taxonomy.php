@@ -163,6 +163,25 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 26948
+	 */
+	public function test_register_taxonomy_show_in_quick_edit_should_default_to_value_of_show_ui() {
+		register_taxonomy( 'wptests_tax_1', 'post', array(
+			'show_ui' => true,
+		) );
+
+		register_taxonomy( 'wptests_tax_2', 'post', array(
+			'show_ui' => false,
+		) );
+
+		$tax_1 = get_taxonomy( 'wptests_tax_1' );
+		$this->assertTrue( $tax_1->show_in_quick_edit );
+
+		$tax_2 = get_taxonomy( 'wptests_tax_2' );
+		$this->assertFalse( $tax_2->show_in_quick_edit );
+	}
+
+	/**
 	 * @ticket 11058
 	 */
 	function test_registering_taxonomies_to_object_types() {
