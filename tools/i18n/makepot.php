@@ -23,6 +23,7 @@ class MakePOT {
 		'bb',
 		'mu',
 		'bp',
+		'glotpress',
 		'rosetta',
 		'wporg-bb-forums',
 	);
@@ -241,52 +242,73 @@ class MakePOT {
 		) );
 	}
 
-	function wp_frontend($dir, $output) {
-		if ( ! file_exists( "$dir/wp-admin/user/about.php" ) ) return false;
+	function wp_frontend( $dir, $output ) {
+		if ( ! file_exists( "$dir/wp-admin/user/about.php" ) ) {
+			return false;
+		}
+
+		$excludes = array( 'wp-admin/.*', 'wp-content/themes/.*', 'wp-includes/class-pop3\.php' );
+
+		// Exclude Akismet all together for 3.9+.
+		if ( file_exists( "$dir/wp-admin/css/about.css" ) ) {
+			$excludes[] = 'wp-content/plugins/akismet/.*';
+		}
 
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-frontend', 'output' => $output,
 			'includes' => array(),
-			'excludes' => array( 'wp-admin/.*', 'wp-content/themes/.*', 'wp-includes/class-pop3\.php' ),
+			'excludes' => $excludes,
 			'default_output' => 'wordpress.pot',
 		) );
 	}
 
 	function wp_admin($dir, $output) {
-		if ( ! file_exists( "$dir/wp-admin/user/about.php" ) ) return false;
+		if ( ! file_exists( "$dir/wp-admin/user/about.php" ) ) {
+			return false;
+		}
 
 		$frontend_pot = $this->tempnam( 'frontend.pot' );
-		if ( false === $frontend_pot ) return false;
+		if ( false === $frontend_pot ) {
+			return false;
+		}
 
 		$frontend_result = $this->wp_frontend( $dir, $frontend_pot );
-		if ( ! $frontend_result )
+		if ( ! $frontend_result ) {
 			return false;
+		}
 
 		$result = $this->wp_generic( $dir, array(
 			'project' => 'wp-admin', 'output' => $output,
 			'includes' => array( 'wp-admin/.*' ),
-			'excludes' => array( 'wp-admin/network/.*', 'wp-admin/network.php' ),
+			'excludes' => array( 'wp-admin/includes/continents-cities\.php', 'wp-admin/network/.*', 'wp-admin/network.php' ),
 			'default_output' => 'wordpress-admin.pot',
 		) );
-
-		if ( ! $result )
+		if ( ! $result ) {
 			return false;
+		}
 
 		$potextmeta = new PotExtMeta;
-		$result = $potextmeta->append( "$dir/wp-content/plugins/akismet/akismet.php", $output );
-		if ( ! $result )
-			return false;
+
+		if ( ! file_exists( "$dir/wp-admin/css/about.css" ) ) { // < 3.9
+			$result = $potextmeta->append( "$dir/wp-content/plugins/akismet/akismet.php", $output );
+			if ( ! $result ) {
+				return false;
+			}
+		}
+
 		$result = $potextmeta->append( "$dir/wp-content/plugins/hello.php", $output );
-		if ( ! $result )
+		if ( ! $result ) {
 			return false;
+		}
 
 		/* Adding non-gettexted strings can repeat some phrases */
 		$output_shell = escapeshellarg( $output );
 		system( "msguniq $output_shell -o $output_shell" );
 
 		$common_pot = $this->tempnam( 'common.pot' );
-		if ( ! $common_pot )
+		if ( ! $common_pot ) {
 			return false;
+		}
 		$admin_pot = realpath( is_null( $output ) ? 'wordpress-admin.pot' : $output );
 		system( "msgcat --more-than=1 --use-first $frontend_pot $admin_pot > $common_pot" );
 		system( "msgcat -u --use-first $admin_pot $common_pot -o $admin_pot" );
@@ -570,6 +592,7 @@ class MakePOT {
 	function rosetta( $dir, $output ) {
 		$output = is_null( $output )? 'rosetta.pot' : $output;
 		return $this->xgettext( 'rosetta', $dir, $output, array(), array(), array(
+			'mu-plugins/(roles|showcase|downloads)/.*\.php',
 			'mu-plugins/rosetta.*\.php',
 			'mu-plugins/rosetta/[^/]+\.php',
 			'mu-plugins/rosetta/tmpl/.*\.php',
