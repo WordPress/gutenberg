@@ -1558,4 +1558,101 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$posts = wp_list_pluck( $posts, 'ID' );
 		$this->assertEqualSets( array( $post_id, $post_id3, $post_id4, $post_id5, $post_id6 ), $posts );
 	}
+
+	/**
+	 * @ticket 31045
+	 */
+	public function test_orderby_name() {
+		$posts = $this->factory->post->create_many( 3 );
+		add_post_meta( $posts[0], 'foo', 'aaa' );
+		add_post_meta( $posts[1], 'foo', 'zzz' );
+		add_post_meta( $posts[2], 'foo', 'jjj' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'name' => 'foo_name',
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'foo_name',
+			'order' => 'DESC',
+		) );
+
+		$this->assertEquals( array( $posts[1], $posts[2], $posts[0] ), $q->posts );
+	}
+
+	/**
+	 * @ticket 31045
+	 */
+	public function test_orderby_name_as_secondary_sort() {
+		$p1 = $this->factory->post->create( array(
+			'post_date' => '2015-01-28 03:00:00',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_date' => '2015-01-28 05:00:00',
+		) );
+		$p3 = $this->factory->post->create( array(
+			'post_date' => '2015-01-28 03:00:00',
+		) );
+
+		add_post_meta( $p1, 'foo', 'jjj' );
+		add_post_meta( $p2, 'foo', 'zzz' );
+		add_post_meta( $p3, 'foo', 'aaa' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'name' => 'foo_name',
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'post_date' => 'asc',
+				'foo_name' => 'asc',
+			),
+		) );
+
+		$this->assertEquals( array( $p3, $p1, $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 31045
+	 */
+	public function test_orderby_more_than_one_name() {
+		$posts = $this->factory->post->create_many( 3 );
+
+		add_post_meta( $posts[0], 'foo', 'jjj' );
+		add_post_meta( $posts[1], 'foo', 'zzz' );
+		add_post_meta( $posts[2], 'foo', 'jjj' );
+		add_post_meta( $posts[0], 'bar', 'aaa' );
+		add_post_meta( $posts[1], 'bar', 'ccc' );
+		add_post_meta( $posts[2], 'bar', 'bbb' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'name' => 'foo_name',
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'name' => 'bar_name',
+					'key' => 'bar',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'foo_name' => 'asc',
+				'bar_name' => 'desc',
+			),
+		) );
+
+		$this->assertEquals( array( $posts[2], $posts[0], $posts[1] ), $q->posts );
+	}
 }
