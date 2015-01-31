@@ -237,7 +237,7 @@ class MakePOT {
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-core', 'output' => $output,
 			'extract_not_gettexted' => true,
-                        'not_gettexted_files_filter' => array( $this, 'is_not_ms_file' ),
+			'not_gettexted_files_filter' => array( $this, 'is_not_ms_file' ),
 		) );
 	}
 
@@ -246,7 +246,8 @@ class MakePOT {
 
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-frontend', 'output' => $output,
-			'includes' => array(), 'excludes' => array( 'wp-admin/.*', 'wp-content/themes/.*' ),
+			'includes' => array(),
+			'excludes' => array( 'wp-admin/.*', 'wp-content/themes/.*' ),
 			'default_output' => 'wordpress.pot',
 		) );
 	}
@@ -263,23 +264,25 @@ class MakePOT {
 
 		$result = $this->wp_generic( $dir, array(
 			'project' => 'wp-admin', 'output' => $output,
-			'includes' => array( 'wp-admin/.*' ), 'excludes' => array( 'wp-admin/includes/continents-cities\.php', 'wp-admin/network/.*', 'wp-admin/network.php' ),
+			'includes' => array( 'wp-admin/.*' ),
+			'excludes' => array( 'wp-admin/network/.*', 'wp-admin/network.php' ),
 			'default_output' => 'wordpress-admin.pot',
 		) );
 
 		if ( ! $result )
 			return false;
 
-                $potextmeta = new PotExtMeta;
-                $result = $potextmeta->append( "$dir/wp-content/plugins/akismet/akismet.php", $output );
+		$potextmeta = new PotExtMeta;
+		$result = $potextmeta->append( "$dir/wp-content/plugins/akismet/akismet.php", $output );
 		if ( ! $result )
 			return false;
 		$result = $potextmeta->append( "$dir/wp-content/plugins/hello.php", $output );
 		if ( ! $result )
 			return false;
-                /* Adding non-gettexted strings can repeat some phrases */
-                $output_shell = escapeshellarg($output);
-                system("msguniq $output_shell -o $output_shell");
+
+		/* Adding non-gettexted strings can repeat some phrases */
+		$output_shell = escapeshellarg( $output );
+		system( "msguniq $output_shell -o $output_shell" );
 
 		$common_pot = $this->tempnam( 'common.pot' );
 		if ( ! $common_pot )
@@ -309,7 +312,8 @@ class MakePOT {
 
 		$result = $this->wp_generic( $dir, array(
 			'project' => 'wp-network-admin', 'output' => $output,
-			'includes' => array( 'wp-admin/network/.*', 'wp-admin/network.php' ), 'excludes' => array(),
+			'includes' => array( 'wp-admin/network/.*', 'wp-admin/network.php' ),
+			'excludes' => array(),
 			'default_output' => 'wordpress-admin-network.pot',
 		) );
 
@@ -337,7 +341,8 @@ class MakePOT {
 			return false;
 		$ms_result = $this->wp_generic( $dir, array(
 			'project' => 'wp-ms', 'output' => $output,
-			'includes' => $this->ms_files, 'excludes' => array(),
+			'includes' => $this->ms_files,
+			'excludes' => array(),
 			'default_output' => 'wordpress-ms.pot',
 			'extract_not_gettexted' => true,
 			'not_gettexted_files_filter' => array( $this, 'is_ms_file' ),
@@ -359,7 +364,8 @@ class MakePOT {
 		if ( !file_exists( "$dir/$continents_path" ) ) return false;
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-tz', 'output' => $output,
-			'includes' => array($continents_path), 'excludes' => array(),
+			'includes' => array( $continents_path ),
+			'excludes' => array(),
 			'default_output' => 'wordpress-continents-cities.pot',
 		) );
 	}
