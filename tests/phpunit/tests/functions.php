@@ -46,7 +46,7 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 30753
 	 */
 	function test_wp_parse_args_boolean_strings() {
-		$args = wp_parse_args( 'foo=false&bar=true', array() );
+		$args = wp_parse_args( 'foo=false&bar=true' );
 		$this->assertInternalType( 'string', $args['foo'] );
 		$this->assertInternalType( 'string', $args['bar'] );
 	}
