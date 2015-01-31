@@ -247,7 +247,7 @@ class MakePOT {
 		return $this->wp_generic( $dir, array(
 			'project' => 'wp-frontend', 'output' => $output,
 			'includes' => array(),
-			'excludes' => array( 'wp-admin/.*', 'wp-content/themes/.*' ),
+			'excludes' => array( 'wp-admin/.*', 'wp-content/themes/.*', 'wp-includes/class-pop3\.php' ),
 			'default_output' => 'wordpress.pot',
 		) );
 	}
