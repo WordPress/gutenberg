@@ -86,32 +86,68 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Testing add data & conditional
+	 * Testing `wp_script_add_data` with the data key.
 	 * @ticket 16024
 	 */
-	function test_wp_script_add_data() {
+	function test_wp_script_add_data_with_data_key() {
 		// Enqueue & add data
 		wp_enqueue_script( 'test-only-data', 'example.com', array(), null );
 		wp_script_add_data( 'test-only-data', 'data', 'testing' );
 		$expected = "<script type='text/javascript'>\n/* <![CDATA[ */\ntesting\n/* ]]> */\n</script>\n";
 		$expected.= "<script type='text/javascript' src='http://example.com'></script>\n";
 
+		// Go!
+		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
+
+		// No scripts left to print
+		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
+	}
+
+	/**
+	 * Testing `wp_script_add_data` with the conditional key.
+	 * @ticket 16024
+	 */
+	function test_wp_script_add_data_with_conditional_key() {
 		// Enqueue & add conditional comments
 		wp_enqueue_script( 'test-only-conditional', 'example.com', array(), null );
 		wp_script_add_data( 'test-only-conditional', 'conditional', 'gt IE 7' );
-		$expected.= "<!--[if gt IE 7]>\n<script type='text/javascript' src='http://example.com'></script>\n<![endif]-->\n";
+		$expected = "<!--[if gt IE 7]>\n<script type='text/javascript' src='http://example.com'></script>\n<![endif]-->\n";
 
+		// Go!
+		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
+
+		// No scripts left to print
+		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
+	}
+
+	/**
+	 * Testing `wp_script_add_data` with both the data & conditional keys.
+	 * @ticket 16024
+	 */
+	function test_wp_script_add_data_with_data_and_conditional_keys() {
 		// Enqueue & add data plus conditional comments for both
 		wp_enqueue_script( 'test-conditional-with-data', 'example.com', array(), null );
 		wp_script_add_data( 'test-conditional-with-data', 'data', 'testing' );
 		wp_script_add_data( 'test-conditional-with-data', 'conditional', 'lt IE 9' );
-		$expected.= "<!--[if lt IE 9]>\n<script type='text/javascript'>\n/* <![CDATA[ */\ntesting\n/* ]]> */\n</script>\n<![endif]-->\n";
+		$expected = "<!--[if lt IE 9]>\n<script type='text/javascript'>\n/* <![CDATA[ */\ntesting\n/* ]]> */\n</script>\n<![endif]-->\n";
 		$expected.= "<!--[if lt IE 9]>\n<script type='text/javascript' src='http://example.com'></script>\n<![endif]-->\n";
 
-		// Enqueue & add an invalid key for brevity
+		// Go!
+		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
+
+		// No scripts left to print
+		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
+	}
+
+	/**
+	 * Testing `wp_script_add_data` with an anvalid key.
+	 * @ticket 16024
+	 */
+	function test_wp_script_add_data_with_invalid_key() {
+		// Enqueue & add an invalid key
 		wp_enqueue_script( 'test-invalid', 'example.com', array(), null );
 		wp_script_add_data( 'test-invalid', 'invalid', 'testing' );
-		$expected.= "<script type='text/javascript' src='http://example.com'></script>\n";
+		$expected = "<script type='text/javascript' src='http://example.com'></script>\n";
 
 		// Go!
 		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
