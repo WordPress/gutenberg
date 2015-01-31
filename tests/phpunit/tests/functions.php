@@ -13,6 +13,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$y = new MockClass;
 		$this->assertEquals(array(), wp_parse_args($y));
 	}
+
 	function test_wp_parse_args_array()  {
 		// arrays
 		$a = array();
@@ -20,6 +21,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$b = array('_baba' => 5, 'yZ' => 'baba', 'a' => array(5, 111, 'x'));
 		$this->assertEquals(array('_baba' => 5, 'yZ' => 'baba', 'a' => array(5, 111, 'x')), wp_parse_args($b));
 	}
+
 	function test_wp_parse_args_defaults() {
 		$x = new MockClass;
 		$x->_baba = 5;
@@ -30,6 +32,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$e = array('_baba' => 6);
 		$this->assertEquals(array('_baba' => 5, 'yZ' => 'baba', 'a' => array(5, 111, 'x')), wp_parse_args($x, $e));
 	}
+
 	function test_wp_parse_args_other() {
 		$b = true;
 		wp_parse_str($b, $s);
@@ -38,6 +41,16 @@ class Tests_Functions extends WP_UnitTestCase {
 		wp_parse_str($q, $ss);
 		$this->assertEquals($ss, wp_parse_args($q));
 	}
+
+	/**
+	 * @ticket 30753
+	 */
+	function test_wp_parse_args_boolean_strings() {
+		$args = wp_parse_args( 'foo=false&bar=true', array() );
+		$this->assertInternalType( 'string', $args['foo'] );
+		$this->assertInternalType( 'string', $args['bar'] );
+	}
+
 	function test_size_format() {
 		$b  = 1;
 		$kb = 1024;
