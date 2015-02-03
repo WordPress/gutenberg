@@ -387,6 +387,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27252
+	 * @ticket 31194
 	 */
 	function test_query_fields_integers() {
 
@@ -401,6 +402,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		) );
 
 		$this->assertSame( $parents, $posts1 );
+		$this->assertSame( $parents, $this->q->posts );
 
 		$children = array(
 			(int) self::$child_one => (int) self::$parent_one,
@@ -414,6 +416,11 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		) );
 
 		$this->assertSame( $children, $posts2 );
+
+		foreach ( $this->q->posts as $post ) {
+			$this->assertInternalType( 'int', $post->ID );
+			$this->assertInternalType( 'int', $post->post_parent );
+		}
 
 	}
 
