@@ -109,7 +109,9 @@ module.exports = function(grunt) {
 				dest: 'tests/qunit/compiled.html',
 				options: {
 					processContent: function( src ) {
-						return src.replace( /([^\.])*\.\.\/src/ig , '/../build' );
+						src = src.replace( /([^\.])*\.\.\/src/ig , '/../build' );
+						src = src.replace( '/jquery/ui/core.js', '/jquery/ui/core.min.js' );
+						return src;
 					}
 				}
 			}
