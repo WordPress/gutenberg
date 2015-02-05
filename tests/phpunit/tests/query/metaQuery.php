@@ -1562,7 +1562,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 	/**
 	 * @ticket 31045
 	 */
-	public function test_orderby_name() {
+	public function test_orderby_clause_key() {
 		$posts = $this->factory->post->create_many( 3 );
 		add_post_meta( $posts[0], 'foo', 'aaa' );
 		add_post_meta( $posts[1], 'foo', 'zzz' );
@@ -1571,13 +1571,12 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$q = new WP_Query( array(
 			'fields' => 'ids',
 			'meta_query' => array(
-				array(
-					'name' => 'foo_name',
+				'foo_key' => array(
 					'key' => 'foo',
 					'compare' => 'EXISTS',
 				),
 			),
-			'orderby' => 'foo_name',
+			'orderby' => 'foo_key',
 			'order' => 'DESC',
 		) );
 
@@ -1587,7 +1586,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 	/**
 	 * @ticket 31045
 	 */
-	public function test_orderby_name_as_secondary_sort() {
+	public function test_orderby_clause_key_as_secondary_sort() {
 		$p1 = $this->factory->post->create( array(
 			'post_date' => '2015-01-28 03:00:00',
 		) );
@@ -1605,15 +1604,14 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$q = new WP_Query( array(
 			'fields' => 'ids',
 			'meta_query' => array(
-				array(
-					'name' => 'foo_name',
+				'foo_key' => array(
 					'key' => 'foo',
 					'compare' => 'EXISTS',
 				),
 			),
 			'orderby' => array(
 				'post_date' => 'asc',
-				'foo_name' => 'asc',
+				'foo_key' => 'asc',
 			),
 		) );
 
@@ -1623,7 +1621,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 	/**
 	 * @ticket 31045
 	 */
-	public function test_orderby_more_than_one_name() {
+	public function test_orderby_more_than_one_clause_key() {
 		$posts = $this->factory->post->create_many( 3 );
 
 		add_post_meta( $posts[0], 'foo', 'jjj' );
@@ -1636,23 +1634,50 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$q = new WP_Query( array(
 			'fields' => 'ids',
 			'meta_query' => array(
-				array(
-					'name' => 'foo_name',
+				'foo_key' => array(
 					'key' => 'foo',
 					'compare' => 'EXISTS',
 				),
-				array(
-					'name' => 'bar_name',
+				'bar_key' => array(
 					'key' => 'bar',
 					'compare' => 'EXISTS',
 				),
 			),
 			'orderby' => array(
-				'foo_name' => 'asc',
-				'bar_name' => 'desc',
+				'foo_key' => 'asc',
+				'bar_key' => 'desc',
 			),
 		) );
 
 		$this->assertEquals( array( $posts[2], $posts[0], $posts[1] ), $q->posts );
+	}
+
+	/**
+	 * @ticket 31045
+	 */
+	public function test_duplicate_clause_keys_should_be_made_unique() {
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'foo_key' => array(
+						'key' => 'bar',
+						'compare' => 'EXISTS',
+					),
+				),
+				array(
+					'foo_key' => array(
+						'key' => 'baz',
+						'compare' => 'EXISTS',
+					),
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( 'foo_key', 'foo_key-1', 'foo_key-2' ), array_keys( $q->meta_query->get_clauses() ) );
 	}
 }
