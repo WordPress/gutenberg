@@ -226,7 +226,9 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			$this->assertArrayHasKey( 'foo', $base_value );
 			$this->assertEquals( $this->post_data_overrides[ $name ], $base_value['foo'] );
 			$this->arrayHasKey( 'bar', call_user_func( $type_options['getter'], $base_name, $this->undefined ) );
-			$this->assertEquals( $base_initial_value['bar'], call_user_func( $type_options['getter'], $base_name, $this->undefined )['bar'] );
+
+			$getter = call_user_func( $type_options['getter'], $base_name, $this->undefined );
+			$this->assertEquals( $base_initial_value['bar'], $getter['bar'] );
 		}
 	}
 
