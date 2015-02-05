@@ -215,7 +215,9 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			$this->arrayHasKey( 'foo', $base_value );
 			$this->arrayHasKey( 'bar', $base_value );
 			$this->assertEquals( $base_initial_value['foo'], $base_value['foo'] );
-			$this->assertEquals( $base_initial_value['bar'], call_user_func( $type_options['getter'], $base_name, $this->undefined )['bar'] );
+
+			$getter = call_user_func( $type_options['getter'], $base_name, $this->undefined );
+			$this->assertEquals( $base_initial_value['bar'], $getter['bar'] );
 			$this->assertEquals( $initial_value, $setting->value() );
 			$setting->preview();
 			$this->assertEquals( 0, did_action( "customize_preview_{$setting->id}" ) ); // only applicable for custom types (not options or theme_mods)
