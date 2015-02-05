@@ -131,4 +131,70 @@ NO;
 		) );
 		$this->assertEquals( $option_no_change, $output );
 	}
+
+	/**
+	 * @ticket 12494
+	 */
+	public function test_wp_dropdown_pages_value_field_should_default_to_ID() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+		) );
+
+		// Should contain page ID by default.
+		$this->assertContains( 'value="' . $p . '"', $found );
+	}
+
+	/**
+	 * @ticket 12494
+	 */
+	public function test_wp_dropdown_pages_value_field_ID() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+			'value_field' => 'ID',
+		) );
+
+		$this->assertContains( 'value="' . $p . '"', $found );
+	}
+
+	/**
+	 * @ticket 12494
+	 */
+	public function test_wp_dropdown_pages_value_field_post_name() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+			'value_field' => 'post_name',
+		) );
+
+		$this->assertContains( 'value="foo"', $found );
+	}
+
+	/**
+	 * @ticket 12494
+	 */
+	public function test_wp_dropdown_pages_value_field_should_fall_back_on_ID_when_an_invalid_value_is_provided() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+			'value_field' => 'foo',
+		) );
+
+		$this->assertContains( 'value="' . $p . '"', $found );
+	}
 }
