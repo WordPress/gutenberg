@@ -4,8 +4,6 @@ matrix:
   include:
   - php: 5.5
     env: WP_TRAVISCI=travis:js
-  - php: 5.2
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.3
     env: WP_TRAVISCI=travis:phpunit
   - php: 5.4
