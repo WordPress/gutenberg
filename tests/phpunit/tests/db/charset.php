@@ -130,11 +130,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ ticket 21212
+	 * @ticket 21212
 	 */
 	function test_process_fields_failure() {
 		global $wpdb;
-		$data = array( 'post_content' => "H€llo\xf0\x9f\x98\x88World¢" );
+		// \xf0\xff\xff\xff is invalid in utf8 and utf8mb4.
+		$data = array( 'post_content' => "H€llo\xf0\xff\xff\xffWorld¢" );
 		$this->assertFalse( self::$_wpdb->process_fields( $wpdb->posts, $data, null ) );
 	}
 
@@ -436,6 +437,6 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 */
 	function test_invalid_characters_in_query() {
 		global $wpdb;
-		$this->assertFalse( $wpdb->query( "INSERT INTO {$wpdb->posts} (post_content) VALUES ('foo\xf0\x9f\x98\x88bar')" ) );
+		$this->assertFalse( $wpdb->query( "INSERT INTO {$wpdb->posts} (post_content) VALUES ('foo\xf0\xff\xff\xffbar')" ) );
 	}
 }
