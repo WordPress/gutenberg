@@ -59,6 +59,36 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 		$this->assertEquals( array( $p1 ), $q->posts );
 	}
 
+	/**
+	 * @ticket 27810
+	 */
+	public function test_field_name_should_work_for_names_with_spaces() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+			'name' => 'Foo Bar',
+		) );
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $t, 'wptests_tax' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax',
+					'terms' => array( 'Foo Bar' ),
+					'field' => 'name',
+				),
+			),
+		) );
+
+		$this->assertEquals( array( $p1 ), $q->posts );
+	}
+
 	public function test_tax_query_single_query_single_term_field_term_taxonomy_id() {
 		$t = $this->factory->term->create( array(
 			'taxonomy' => 'category',
