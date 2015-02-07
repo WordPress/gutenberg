@@ -91,4 +91,35 @@ class Tests_Query extends WP_UnitTestCase {
 		$this->assertCount( 1, $query->get( 'tag_slug__in' ) );
 		$this->assertEquals( $query->get_queried_object(), $tag );
 	}
+
+	/**
+	 * @ticket 31246
+	 */
+	public function test_get_queried_object_should_return_null_when_is_tax_is_true_but_the_taxonomy_args_have_been_removed_in_a_parse_query_callback() {
+		// Don't override the args provided below.
+		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$posts = $this->factory->post->create_many( 2 );
+
+		wp_set_object_terms( $posts[0], array( $terms[0] ), 'wptests_tax' );
+		wp_set_object_terms( $posts[1], array( $terms[1] ), 'wptests_tax' );
+
+		add_action( 'parse_query', array( $this, 'filter_parse_query_to_remove_tax' ) );
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'wptests_tax' => $terms[1],
+		) );
+
+		remove_action( 'parse_query', array( $this, 'filter_parse_query_to_remove_tax' ) );
+
+		$this->assertNull( $q->get_queried_object() );
+	}
+
+	public function filter_parse_query_to_remove_tax( $q ) {
+		unset( $q->query_vars['wptests_tax'] );
+	}
 }
