@@ -135,6 +135,30 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 27887
+	 */
+	public function test_orderby_meta_value_num() {
+		$users = $this->factory->user->create_many( 3, array(
+			'role' => 'author'
+		) );
+
+		update_user_meta( $users[0], 'user_age', '101' );
+		update_user_meta( $users[1], 'user_age', '20' );
+		update_user_meta( $users[2], 'user_age', '25' );
+
+		$q = new WP_User_Query( array(
+			'include' => $users,
+			'meta_key' => 'user_age',
+			'orderby' => 'meta_value_num',
+			'fields' => 'ids'
+		) );
+
+		$expected = array( $users[1], $users[2], $users[0] );
+
+		$this->assertEquals( $expected, $q->get_results() );
+	}
+
+	/**
 	 * @ticket 30064
 	 */
 	public function test_orderby_include_with_empty_include() {
