@@ -176,6 +176,36 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30615
+	 */
+	public function test_edit_post_should_not_create_terms_for_an_empty_tag_input_field() {
+		$u = $this->factory->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $u );
+
+		register_taxonomy( 'wptests_tax', array( 'post' ) );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'foo',
+			'slug' => 'bar',
+		) );
+
+		$p = $this->factory->post->create();
+
+		$post_data = array(
+			'post_ID' => $p,
+			'tax_input' => array(
+				'wptests_tax' => ' ',
+			),
+		);
+
+		edit_post( $post_data );
+
+		$found = wp_get_post_terms( $p, 'wptests_tax' );
+
+		$this->assertEmpty( $found );
+	}
+
+	/**
 	 * @ticket 27792
 	 */
 	function test_bulk_edit_posts_stomping() {
