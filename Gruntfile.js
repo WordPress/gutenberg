@@ -116,6 +116,17 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		browserify: {
+			media: {
+				files: {
+					'src/wp-includes/js/media/models.js' : [ SOURCE_DIR + 'wp-includes/js/media/models.manifest.js' ],
+					'src/wp-includes/js/media/views.js' : [ SOURCE_DIR + 'wp-includes/js/media/views.manifest.js' ],
+					'src/wp-includes/js/media/audio-video.js' : [ SOURCE_DIR + 'wp-includes/js/media/audio-video.manifest.js' ],
+					'src/wp-includes/js/media/grid.js' : [ SOURCE_DIR + 'wp-includes/js/media/grid.manifest.js' ]
+				},
+				options: { debug: true }
+			}
+		},
 		sass: {
 			colors: {
 				expand: true,
@@ -360,6 +371,18 @@ module.exports = function(grunt) {
 					'!wp-includes/js/zxcvbn.min.js'
 				]
 			},
+			media: {
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '.min.js',
+				src: [
+					'wp-includes/js/media/audio-video.js',
+					'wp-includes/js/media/grid.js',
+					'wp-includes/js/media/models.js',
+					'wp-includes/js/media/views.js'
+				]
+			},
 			jqueryui: {
 				options: {
 					preserveComments: 'some'
@@ -437,6 +460,16 @@ module.exports = function(grunt) {
 					interval: 2000
 				}
 			},
+			browserify: {
+				files: [
+					SOURCE_DIR + 'wp-includes/js/media/**/*.js',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/audio-video.js',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/grid.js',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/models.js',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/views.js'
+				],
+				tasks: ['browserify', 'uglify:media']
+			},
 			config: {
 				files: 'Gruntfile.js'
 			},
@@ -485,7 +518,8 @@ module.exports = function(grunt) {
 
 	// Build task.
 	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
-		'uglify:core', 'uglify:jqueryui', 'concat:tinymce', 'compress:tinymce', 'clean:tinymce', 'jsvalidate:build']);
+		'browserify:media', 'uglify:core', 'uglify:media', 'uglify:jqueryui', 'concat:tinymce', 'compress:tinymce',
+		'clean:tinymce', 'jsvalidate:build']);
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax, external-http, and multisite tests.', function() {
