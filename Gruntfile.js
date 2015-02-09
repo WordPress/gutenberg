@@ -123,8 +123,7 @@ module.exports = function(grunt) {
 					'src/wp-includes/js/media/views.js' : [ SOURCE_DIR + 'wp-includes/js/media/views.manifest.js' ],
 					'src/wp-includes/js/media/audio-video.js' : [ SOURCE_DIR + 'wp-includes/js/media/audio-video.manifest.js' ],
 					'src/wp-includes/js/media/grid.js' : [ SOURCE_DIR + 'wp-includes/js/media/grid.manifest.js' ]
-				},
-				options: { debug: true }
+				}
 			}
 		},
 		sass: {
@@ -233,6 +232,18 @@ module.exports = function(grunt) {
 					'!twenty{eleven,twelve,thirteen}/**',
 					// Third party scripts
 					'!twenty{fourteen,fifteen}/js/html5.js'
+				]
+			},
+			media: {
+				options: {
+					browserify: true
+				},
+				expand: true,
+				cwd: SOURCE_DIR,
+				src: [
+					'wp-includes/js/media/**/*.js',
+					'!wp-includes/js/media/*.js',
+					'wp-includes/js/media/*.manifest.js'
 				]
 			},
 			core: {
@@ -507,7 +518,13 @@ module.exports = function(grunt) {
 	grunt.registerTask('colors', ['sass:colors', 'autoprefixer:colors']);
 
 	// JSHint task.
-	grunt.registerTask('jshint:corejs', ['jshint:grunt', 'jshint:tests', 'jshint:themes', 'jshint:core']);
+	grunt.registerTask( 'jshint:corejs', [
+		'jshint:grunt',
+		'jshint:tests',
+		'jshint:themes',
+		'jshint:core',
+		'jshint:media'
+	] );
 
 	// Pre-commit task.
 	grunt.registerTask('precommit', 'Runs front-end dev/test tasks in preparation for a commit.',
