@@ -729,12 +729,23 @@ class Tests_DB extends WP_UnitTestCase {
 	 */
 	function test_process_fields() {
 		global $wpdb;
+
+		if ( $wpdb->charset ) {
+			$expected_charset = $wpdb->charset;
+		} else {
+			$expected_charset = $wpdb->get_col_charset( $wpdb->posts, 'post_content' );
+		}
+
+		if ( ! in_array( $expected_charset, array( 'utf8', 'utf8mb4', 'latin1' ) ) ) {
+			$this->markTestSkipped( "This test only works with utf8, utf8mb4 or latin1 character sets" );
+		}
+
 		$data = array( 'post_content' => '¡foo foo foo!' );
 		$expected = array(
 			'post_content' => array(
 				'value' => '¡foo foo foo!',
 				'format' => '%s',
-				'charset' => $wpdb->charset,
+				'charset' => $expected_charset,
 				'ascii' => false,
 			)
 		);

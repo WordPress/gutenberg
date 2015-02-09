@@ -122,9 +122,6 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 * @ticket 21212
 	 */
 	function test_strip_invalid_text( $data, $expected, $message ) {
-		if ( $data[0]['charset'] === 'koi8r' ) {
-			self::$_wpdb->query( 'SET NAMES koi8r' );
-		}
 		$actual = self::$_wpdb->strip_invalid_text( $data );
 		$this->assertSame( $expected, $actual, $message );
 	}
@@ -134,6 +131,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 */
 	function test_process_fields_failure() {
 		global $wpdb;
+
+		$charset = $wpdb->get_col_charset( $wpdb->posts, 'post_content' );
+		if ( 'utf8' !== $charset && 'utf8mb4' !== $charset ) {
+			$this->markTestSkipped( 'This test requires a utf8 character set' );
+		}
+
 		// \xf0\xff\xff\xff is invalid in utf8 and utf8mb4.
 		$data = array( 'post_content' => "H€llo\xf0\xff\xff\xffWorld¢" );
 		$this->assertFalse( self::$_wpdb->process_fields( $wpdb->posts, $data, null ) );
@@ -143,7 +146,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 * @ticket 21212
 	 */
 	function data_process_field_charsets() {
-		$charset = $GLOBALS['wpdb']->charset; // This is how all tables were installed
+		if ( $GLOBALS['wpdb']->charset ) {
+			$charset = $GLOBALS['wpdb']->charset;
+		} else {
+			$charset = $GLOBALS['wpdb']->get_col_charset( $GLOBALS['wpdb']->posts, 'post_content' );
+		}
+
 		// 'value' and 'format' are $data, 'charset' ends up as part of $expected
 
 		$no_string_fields = array(
@@ -220,6 +228,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 */
 	function test_strip_invalid_text_for_column() {
 		global $wpdb;
+
+		$charset = $wpdb->get_col_charset( $wpdb->posts, 'post_content' );
+		if ( 'utf8' !== $charset && 'utf8mb4' !== $charset ) {
+			$this->markTestSkipped( 'This test requires a utf8 character set' );
+		}
+
 		// Invalid 3-byte and 4-byte sequences
 		$value = "H€llo\xe0\x80\x80World\xf0\xff\xff\xff¢";
 		$expected = "H€lloWorld¢";
@@ -437,6 +451,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 */
 	function test_invalid_characters_in_query() {
 		global $wpdb;
+
+		$charset = $wpdb->get_col_charset( $wpdb->posts, 'post_content' );
+		if ( 'utf8' !== $charset && 'utf8mb4' !== $charset ) {
+			$this->markTestSkipped( 'This test requires a utf8 character set' );
+		}
+
 		$this->assertFalse( $wpdb->query( "INSERT INTO {$wpdb->posts} (post_content) VALUES ('foo\xf0\xff\xff\xffbar')" ) );
 	}
 }
