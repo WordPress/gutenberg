@@ -22,7 +22,7 @@
     "grunt-contrib-qunit": "~0.5.2",
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-cssjanus": "git://github.com/ocean90/grunt-cssjanus.git#97c43554ff7a86e2ff414d34e66725b05118bf10",
+    "grunt-cssjanus": "~0.2.4",
     "grunt-jsvalidate": "~0.2.2",
     "grunt-legacy-util": "^0.2.0",
     "grunt-patch-wordpress": "~0.2.1",
