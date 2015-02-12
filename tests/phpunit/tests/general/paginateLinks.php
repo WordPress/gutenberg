@@ -291,4 +291,24 @@ EXPECTED;
 
 		$_SERVER['REQUEST_URI'] = $request_uri;
 	}
+
+	/**
+	 * @ticket 30831
+	 */
+	public function test_paginate_links_should_allow_add_args_to_be_bool_false() {
+		// Fake the query params.
+		$request_uri = $_SERVER['REQUEST_URI'];
+		$_SERVER['REQUEST_URI'] = add_query_arg( 'foo', 3, home_url() );
+
+		$links = paginate_links( array(
+			'add_args' => false,
+			'base'    => add_query_arg( 'foo', '%#%' ),
+			'format'  => '',
+			'total'   => 5,
+			'current' => 3,
+			'type'    => 'array',
+		) );
+
+		$this->assertContains( "<span class='page-numbers current'>3</span>", $links );
+	}
 }
