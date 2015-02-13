@@ -19,6 +19,26 @@ class Tests_Post_Types extends WP_UnitTestCase {
 		_unregister_post_type( 'foo' );
 	}
 
+	/**
+	 * @ticket 31134
+	 *
+	 * @expectedIncorrectUsage register_post_type
+	 */
+	function test_register_post_type_length_long() {
+		// post type too long
+		$this->assertInstanceOf( 'WP_Error', register_post_type( 'abcdefghijklmnopqrstuvwxyz0123456789' ) );
+	}
+
+	/**
+	 * @ticket 31134
+	 *
+	 * @expectedIncorrectUsage register_post_type
+	 */
+	function test_register_post_type_length_short() {
+		// post type too short
+		$this->assertInstanceOf( 'WP_Error', register_post_type( '' ) );
+	}
+
 	function test_register_taxonomy_for_object_type() {
 		global $wp_taxonomies;
 
