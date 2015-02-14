@@ -742,6 +742,27 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertFalse( is_single( 'foo' ) );
 	}
 
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_single_with_slug_that_begins_with_a_number_that_clashes_with_another_post_id() {
+		$p1 = $this->factory->post->create();
+
+		$p2_name = $p1 . '-post';
+		$p2 = $this->factory->post->create( array(
+			'slug' => $p2_name,
+		) );
+
+		$this->go_to( "/?p=$p1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_single() );
+		$this->assertTrue( $q->is_single( $p1 ) );
+		$this->assertFalse( $q->is_single( $p2_name ) );
+		$this->assertFalse( $q->is_single( $p2 ) );
+	}
+
 	function test_is_page() {
 		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
 		$this->go_to( "/?page_id=$post_id" );
@@ -808,5 +829,134 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertTrue( is_attachment( $post->ID ) );
 		$this->assertTrue( is_attachment( $post->post_title ) );
 		$this->assertTrue( is_attachment( $post->post_name ) );
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_attachment_with_slug_that_begins_with_a_number_that_clashes_with_a_page_ID() {
+		$p1 = $this->factory->post->create( array( 'post_type' => 'attachment' ) );
+
+		$p2_name = $p1 . '-attachment';
+		$p2 = $this->factory->post->create( array(
+			'post_type' => 'attachment',
+			'post_name' => $p2_name,
+		) );
+
+		$this->go_to( "/?attachment_id=$p1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_attachment() );
+		$this->assertTrue( $q->is_attachment( $p1 ) );
+		$this->assertFalse( $q->is_attachment( $p2_name ) );
+		$this->assertFalse( $q->is_attachment( $p2 ) );
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_author_with_nicename_that_begins_with_a_number_that_clashes_with_another_author_id() {
+		$u1 = $this->factory->user->create();
+
+		$u2_name = $u1 . '_user';
+		$u2 = $this->factory->user->create( array(
+			'user_nicename' => $u2_name,
+		) );
+
+		$this->go_to( "/?author=$u1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_author() );
+		$this->assertTrue( $q->is_author( $u1 ) );
+		$this->assertFalse( $q->is_author( $u2_name ) );
+		$this->assertFalse( $q->is_author( $u2 ) );
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_category_with_slug_that_begins_with_a_number_that_clashes_with_another_category_id() {
+		$c1 = $this->factory->category->create();
+
+		$c2_name = $c1 . '-category';
+		$c2 = $this->factory->category->create( array(
+			'slug' => $c2_name,
+		) );
+
+		$this->go_to( "/?cat=$c1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_category() );
+		$this->assertTrue( $q->is_category( $c1 ) );
+		$this->assertFalse( $q->is_category( $c2_name ) );
+		$this->assertFalse( $q->is_category( $c2 ) );
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_tag_with_slug_that_begins_with_a_number_that_clashes_with_another_tag_id() {
+		$t1 = $this->factory->tag->create();
+
+		$t2_name = $t1 . '-tag';
+		$t2 = $this->factory->tag->create( array(
+			'slug' => $t2_name,
+		) );
+
+		$this->go_to( "/?tag_id=$t1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_tag() );
+		$this->assertTrue( $q->is_tag( $t1 ) );
+		$this->assertFalse( $q->is_tag( $t2_name ) );
+		$this->assertFalse( $q->is_tag( $t2 ) );
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_page_with_page_id_zero_and_random_page_slug() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$this->go_to( "/?page_id=$post_id" );
+
+		// override post ID to 0 temporarily for testing
+		$_id = $GLOBALS['wp_query']->post->ID;
+		$GLOBALS['wp_query']->post->ID = 0;
+
+		$post = get_queried_object();
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_page() );
+		$this->assertFalse( $q->is_page( 'sample-page' ) );
+		$this->assertFalse( $q->is_page( 'random-page-slug' ) );
+
+		// revert $wp_query global change
+		$GLOBALS['wp_query']->post->ID = $_id;
+	}
+
+	/**
+	 * @ticket 24674
+	 */
+	public function test_is_page_with_page_slug_that_begins_with_a_number_that_clashes_with_a_page_ID() {
+		$p1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+
+		$p2_name = $p1 . '-page';
+		$p2 = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => $p2_name,
+		) );
+
+		$this->go_to( "/?page_id=$p1" );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_page() );
+		$this->assertTrue( $q->is_page( $p1 ) );
+		$this->assertFalse( $q->is_page( $p2_name ) );
+		$this->assertFalse( $q->is_page( $p2 ) );
 	}
 }
