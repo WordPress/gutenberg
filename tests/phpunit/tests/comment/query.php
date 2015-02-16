@@ -612,14 +612,10 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( $comment_id2, $comments[1]->comment_ID );
 
 		$comments = get_comments( array( 'meta_value' => 'value3', 'orderby' => array( 'key' ) ) );
-		$this->assertEquals( 2, count( $comments ) );
-		$this->assertEquals( $comment_id, $comments[0]->comment_ID );
-		$this->assertEquals( $comment_id3, $comments[1]->comment_ID );
+		$this->assertEquals( array( $comment_id3, $comment_id ), wp_list_pluck( $comments, 'comment_ID' ) );
 
 		$comments = get_comments( array( 'meta_value' => 'value3', 'orderby' => array( 'meta_value' ) ) );
-		$this->assertEquals( 2, count( $comments ) );
-		$this->assertEquals( $comment_id, $comments[0]->comment_ID );
-		$this->assertEquals( $comment_id3, $comments[1]->comment_ID );
+		$this->assertEquals( array( $comment_id3, $comment_id ), wp_list_pluck( $comments, 'comment_ID' ) );
 
 		// value1 is present on two different keys for $comment_id yet we should get only one instance
 		// of that comment in the results
@@ -629,6 +625,103 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$comments = get_comments( array( 'meta_value' => 'value1', 'orderby' => array( 'meta_value' ) ) );
 		$this->assertEquals( 1, count( $comments ) );
 	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_clause_key() {
+		$comments = $this->factory->comment->create_many( 3 );
+		add_comment_meta( $comments[0], 'foo', 'aaa' );
+		add_comment_meta( $comments[1], 'foo', 'zzz' );
+		add_comment_meta( $comments[2], 'foo', 'jjj' );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'foo_key',
+			'order' => 'DESC',
+		) );
+
+		$this->assertEquals( array( $comments[1], $comments[2], $comments[0] ), $found );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_clause_key_as_secondary_sort() {
+		$c1 = $this->factory->comment->create( array(
+			'comment_date' => '2015-01-28 03:00:00',
+		) );
+		$c2 = $this->factory->comment->create( array(
+			'comment_date' => '2015-01-28 05:00:00',
+		) );
+		$c3 = $this->factory->comment->create( array(
+			'comment_date' => '2015-01-28 03:00:00',
+		) );
+
+		add_comment_meta( $c1, 'foo', 'jjj' );
+		add_comment_meta( $c2, 'foo', 'zzz' );
+		add_comment_meta( $c3, 'foo', 'aaa' );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'comment_date' => 'asc',
+				'foo_key' => 'asc',
+			),
+		) );
+
+		$this->assertEquals( array( $c3, $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_more_than_one_clause_key() {
+		$comments = $this->factory->comment->create_many( 3 );
+
+		add_comment_meta( $comments[0], 'foo', 'jjj' );
+		add_comment_meta( $comments[1], 'foo', 'zzz' );
+		add_comment_meta( $comments[2], 'foo', 'jjj' );
+		add_comment_meta( $comments[0], 'bar', 'aaa' );
+		add_comment_meta( $comments[1], 'bar', 'ccc' );
+		add_comment_meta( $comments[2], 'bar', 'bbb' );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'bar_key' => array(
+					'key' => 'bar',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'foo_key' => 'asc',
+				'bar_key' => 'desc',
+			),
+		) );
+
+		$this->assertEquals( array( $comments[2], $comments[0], $comments[1] ), $found );
+	}
+
 
 	/**
 	 * @ticket 27064
@@ -985,64 +1078,78 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	public function test_orderby_default() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array() );
 
-		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_date_gmt", $q->request );
 	}
 
 	public function test_orderby_single() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => 'comment_agent',
 		) );
 
-		$this->assertContains( 'ORDER BY comment_agent', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent", $q->request );
 	}
 
 	public function test_orderby_single_invalid() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => 'foo',
 		) );
 
-		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_date_gmt", $q->request );
 	}
 
 	public function test_orderby_comma_separated() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => 'comment_agent, comment_approved',
 		) );
 
-		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_approved DESC", $q->request );
 	}
 
-	public function test_orderby_array() {
+	public function test_orderby_flat_array() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => array( 'comment_agent', 'comment_approved' ),
 		) );
 
-		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_approved DESC", $q->request );
 	}
 
 	public function test_orderby_array_contains_invalid_item() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => array( 'comment_agent', 'foo', 'comment_approved' ),
 		) );
 
-		$this->assertContains( 'ORDER BY comment_agent, comment_approved', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_approved DESC", $q->request );
 	}
 
 	public function test_orderby_array_contains_all_invalid_items() {
+		global $wpdb;
+
 		$q = new WP_Comment_Query();
 		$q->query( array(
 			'orderby' => array( 'foo', 'bar', 'baz' ),
 		) );
 
-		$this->assertContains( 'ORDER BY comment_date_gmt', $q->request );
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_date_gmt", $q->request );
 	}
 
 	/**
@@ -1079,6 +1186,158 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		) );
 
 		$this->assertNotContains( 'ORDER BY', $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'DESC',
+				'comment_date_gmt' => 'ASC',
+				'comment_ID' => 'DESC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_date_gmt ASC, $wpdb->comments.comment_ID DESC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array_should_discard_invalid_columns() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'DESC',
+				'foo' => 'ASC',
+				'comment_ID' => 'DESC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_ID DESC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array_should_convert_invalid_order_to_DESC() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'DESC',
+				'comment_date_gmt' => 'foo',
+				'comment_ID' => 'DESC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_date_gmt DESC, $wpdb->comments.comment_ID DESC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array_should_sort_by_comment_ID_as_fallback_and_should_inherit_order_from_comment_date_gmt() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'DESC',
+				'comment_date_gmt' => 'ASC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_date_gmt ASC, $wpdb->comments.comment_ID ASC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array_should_sort_by_comment_ID_as_fallback_and_should_inherit_order_from_comment_date() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'DESC',
+				'comment_date' => 'ASC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_date ASC, $wpdb->comments.comment_ID ASC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_array_should_sort_by_comment_ID_DESC_as_fallback_when_not_sorted_by_date() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'orderby' => array(
+				'comment_agent' => 'ASC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent ASC, $wpdb->comments.comment_ID DESC", $q->request );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_date_modified_gmt_should_order_by_comment_ID_in_case_of_tie_ASC() {
+		$now = current_time( 'mysql', 1 );
+		$comments = $this->factory->comment->create_many( 5, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_date_gmt' => $now,
+		) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'orderby' => 'comment_date_gmt',
+			'order' => 'ASC',
+		) );
+
+		// $comments is ASC by default.
+		$this->assertEquals( $comments, wp_list_pluck( $found, 'comment_ID' ) );
+	}
+
+	/**
+	 * @ticket 30478
+	 */
+	public function test_orderby_date_modified_gmt_should_order_by_comment_ID_in_case_of_tie_DESC() {
+		$now = current_time( 'mysql', 1 );
+		$comments = $this->factory->comment->create_many( 5, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_date_gmt' => $now,
+		) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'orderby' => 'comment_date_gmt',
+			'order' => 'DESC',
+		) );
+
+		// $comments is ASC by default.
+		rsort( $comments );
+
+		$this->assertEquals( $comments, wp_list_pluck( $found, 'comment_ID' ) );
 	}
 
 	public function test_count() {
