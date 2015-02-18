@@ -59,6 +59,30 @@ class Tests_Option_Option extends WP_UnitTestCase {
 		$this->assertFalse( get_option( 'doesnotexist' ) );
 	}
 
+	/**
+	 * @ticket 31047
+	 */
+	public function test_add_option_should_respect_default_option_filter() {
+		add_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
+		$added = add_option( 'doesnotexist', 'bar' );
+		remove_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
+
+		$this->assertTrue( $added );
+		$this->assertSame( 'bar', get_option( 'doesnotexist' ) );
+	}
+
+	/**
+	 * @ticket 31047
+	 */
+	public function test_update_option_should_respect_default_option_filter_when_option_does_not_yet_exist_in_database() {
+		add_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
+		$added = update_option( 'doesnotexist', 'bar' );
+		remove_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
+
+		$this->assertTrue( $added );
+		$this->assertSame( 'bar', get_option( 'doesnotexist' ) );
+	}
+
 	function test_serialized_data() {
 		$key = rand_str();
 		$value = array( 'foo' => true, 'bar' => true );
