@@ -1,47 +1,43 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-  <title>WordPress QUnit Test Suite</title>
+	<head>
+		<title>WordPress QUnit Test Suite</title>
 
-  <!-- Dependencies -->
-  <script src="../../src/wp-includes/js/jquery/jquery.js"></script>
-  <script src="../../src/wp-includes/js/jquery/ui/core.js"></script>
-  <script src="../../src/wp-includes/js/underscore.min.js"></script>
-  <script src="../../src/wp-includes/js/backbone.min.js"></script>
-  <script src="../../src/wp-includes/js/zxcvbn.min.js"></script>
+		<!-- Dependencies -->
+		<script src="../../src/wp-includes/js/jquery/jquery.js"></script>
+		<script src="../../src/wp-includes/js/jquery/ui/core.js"></script>
+		<script src="../../src/wp-includes/js/underscore.min.js"></script>
+		<script src="../../src/wp-includes/js/backbone.min.js"></script>
+		<script src="../../src/wp-includes/js/zxcvbn.min.js"></script>
 
-  <!-- QUnit -->
-  <link rel="stylesheet" href="vendor/qunit.css" type="text/css" media="screen" />
-  <script src="vendor/qunit.js"></script>
-  <script src="vendor/sinon.js"></script>
-  <script src="vendor/sinon-qunit.js"></script>
-</head>
-<body>
-  <div>
-    <h1 id="qunit-header">WordPress QUnit Test Suite</h1>
-    <h2 id="qunit-banner"></h2>
-    <h2 id="qunit-userAgent"></h2>
-    <ol id="qunit-tests"></ol>
-    <div id="qunit-fixture">
-      <script src="fixtures/customize-header.js"></script>
-      <script src="fixtures/customize-settings.js"></script>
-    </div>
-    <p><a href="editor">TinyMCE tests</a></p>
+		<!-- QUnit -->
+		<link rel="stylesheet" href="vendor/qunit.css" type="text/css" media="screen" />
+		<script src="vendor/qunit.js"></script>
+		<script src="vendor/sinon.js"></script>
+		<script src="vendor/sinon-qunit.js"></script>
+		<script>QUnit.config.hidepassed = false;</script>
+	</head>
+	<body>
+		<div id="qunit"></div>
+		<div id="qunit-fixture">
+			<script src="fixtures/customize-header.js"></script>
+			<script src="fixtures/customize-settings.js"></script>
+		</div>
+		<p><a href="editor">TinyMCE tests</a></p>
 
-    <!-- Tested files -->
-    <script src="../../src/wp-admin/js/password-strength-meter.js"></script>
-    <script src="../../src/wp-includes/js/customize-base.js"></script>
-    <script src="../../src/wp-includes/js/customize-models.js"></script>
-    <script src="../../src/wp-includes/js/shortcode.js"></script>
-    <script src="../../src/wp-admin/js/customize-controls.js"></script>
+		<!-- Tested files -->
+		<script src="../../src/wp-admin/js/password-strength-meter.js"></script>
+		<script src="../../src/wp-includes/js/customize-base.js"></script>
+		<script src="../../src/wp-includes/js/customize-models.js"></script>
+		<script src="../../src/wp-includes/js/shortcode.js"></script>
+		<script src="../../src/wp-admin/js/customize-controls.js"></script>
 
-    <!-- Unit tests -->
-    <script src="wp-admin/js/password-strength-meter.js"></script>
-    <script src="wp-admin/js/customize-base.js"></script>
-    <script src="wp-admin/js/customize-header.js"></script>
-    <script src="wp-includes/js/shortcode.js"></script>
-    <script src="wp-admin/js/customize-controls.js"></script>
-    <script src="wp-admin/js/customize-controls-utils.js"></script>
-  </div>
-</body>
+		<!-- Unit tests -->
+		<script src="wp-admin/js/password-strength-meter.js"></script>
+		<script src="wp-admin/js/customize-base.js"></script>
+		<script src="wp-admin/js/customize-header.js"></script>
+		<script src="wp-includes/js/shortcode.js"></script>
+		<script src="wp-admin/js/customize-controls.js"></script>
+		<script src="wp-admin/js/customize-controls-utils.js"></script>
+	</body>
 </html>
