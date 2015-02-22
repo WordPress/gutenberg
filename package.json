@@ -10,7 +10,7 @@
   "license": "GPLv2 or later",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-autoprefixer": "~1.0.1",
+    "grunt-autoprefixer": "~2.2.0",
     "grunt-browserify": "^3.3.0",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-compress": "~0.12.0",
