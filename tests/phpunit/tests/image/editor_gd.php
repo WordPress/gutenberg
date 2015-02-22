@@ -31,15 +31,22 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 		parent::tearDown();
 	}
 
-	/**
-	 * Check support for GD compatible mime types.
-	 */
-	public function test_supports_mime_type() {
+	public function test_supports_mime_type_jpeg() {
 		$gd_image_editor = new WP_Image_Editor_GD( null );
+		$expected = imagetypes() & IMG_JPG;
+		$this->assertEquals( $expected, $gd_image_editor->supports_mime_type( 'image/jpeg' ) );
+	}
 
-		$this->assertTrue( $gd_image_editor->supports_mime_type( 'image/jpeg' ), 'Does not support image/jpeg' );
-		$this->assertTrue( $gd_image_editor->supports_mime_type( 'image/png' ), 'Does not support image/png' );
-		$this->assertTrue( $gd_image_editor->supports_mime_type( 'image/gif' ), 'Does not support image/gif' );
+	public function test_supports_mime_type_png() {
+		$gd_image_editor = new WP_Image_Editor_GD( null );
+		$expected = imagetypes() & IMG_PNG;
+		$this->assertEquals( $expected, $gd_image_editor->supports_mime_type( 'image/png' ) );
+	}
+
+	public function test_supports_mime_type_gif() {
+		$gd_image_editor = new WP_Image_Editor_GD( null );
+		$expected = imagetypes() & IMG_GIF;
+		$this->assertEquals( $expected, $gd_image_editor->supports_mime_type( 'image/gif' ) );
 	}
 
 	/**
@@ -460,6 +467,10 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 * @ticket 23039
 	 */
 	public function test_image_preserves_alpha_on_resize() {
+		if ( ! ( imagetypes() & IMG_PNG ) ) {
+			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+		}
+
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$editor = wp_get_image_editor( $file );
@@ -483,6 +494,10 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 * @ticket 23039
 	 */
 	public function test_image_preserves_alpha() {
+		if ( ! ( imagetypes() & IMG_PNG ) ) {
+			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+		}
+
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$editor = wp_get_image_editor( $file );
@@ -505,6 +520,10 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 * @ticket 30596
 	 */
 	public function test_image_preserves_alpha_on_rotate() {
+		if ( ! ( imagetypes() & IMG_PNG ) ) {
+			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+		}
+
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$image = imagecreatefrompng( $file );

@@ -137,6 +137,10 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 			// Save a file as each mime type, assert it works
 			foreach ( $mime_types as $mime_type ) {
+				if ( ! $class::supports_mime_type( $mime_type ) ) {
+					continue;
+				}
+
 				$file = wp_tempnam();
 				$ret = wp_save_image_file( $file, $img, $mime_type, 1 );
 				$this->assertNotEmpty( $ret );
@@ -228,6 +232,10 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 			$temp = get_temp_dir();
 			foreach ( $mime_types as $ext => $mime_type ) {
+				if ( ! $class::supports_mime_type( $mime_type ) ) {
+					continue;
+				}
+
 				$file = wp_unique_filename( $temp, uniqid() . ".$ext" );
 				$ret = $img->save( trailingslashit( $temp ) . $file );
 				$this->assertNotEmpty( $ret );
