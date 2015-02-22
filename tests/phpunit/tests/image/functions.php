@@ -137,7 +137,7 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 			// Save a file as each mime type, assert it works
 			foreach ( $mime_types as $mime_type ) {
-				if ( ! $class::supports_mime_type( $mime_type ) ) {
+				if ( ! $img->supports_mime_type( $mime_type ) ) {
 					continue;
 				}
 
@@ -232,7 +232,7 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 			$temp = get_temp_dir();
 			foreach ( $mime_types as $ext => $mime_type ) {
-				if ( ! $class::supports_mime_type( $mime_type ) ) {
+				if ( ! $img->supports_mime_type( $mime_type ) ) {
 					continue;
 				}
 
