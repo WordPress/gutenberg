@@ -185,6 +185,16 @@ class Tests_TestHelpers extends WP_UnitTestCase {
 		$this->mock_incorrect_usage();
 	}
 
+	/**
+	 * @ticket 31417
+	 */
+	public function test_go_to_should_go_to_home_page_when_passing_the_untrailingslashed_home_url() {
+		$this->assertFalse( is_home() );
+		$home = untrailingslashit( get_option( 'home' ) );
+		$this->go_to( $home );
+		$this->assertTrue( is_home() );
+	}
+
 	protected function mock_deprecated() {
 		_deprecated_function( __METHOD__, '2.5' );
 	}

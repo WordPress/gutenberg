@@ -333,7 +333,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 		$parts = parse_url($url);
 		if (isset($parts['scheme'])) {
-			$req = $parts['path'];
+			$req = isset( $parts['path'] ) ? $parts['path'] : '';
 			if (isset($parts['query'])) {
 				$req .= '?' . $parts['query'];
 				// parse the url query vars into $_GET
