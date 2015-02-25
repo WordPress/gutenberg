@@ -376,6 +376,7 @@ module.exports = function(grunt) {
 					'!wp-admin/js/custom-header.js', // Why? We should minify this.
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
+					'!wp-admin/js/bookmarklet.js', // Minified and updated in /src with the precommit task. See uglify:bookmarklet.
 					'!wp-includes/js/backbone.min.js',
 					'!wp-includes/js/swfobject.js',
 					'!wp-includes/js/underscore.min.js',
@@ -403,6 +404,15 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.js',
 				src: ['wp-includes/js/jquery/ui/*.js']
+			},
+			bookmarklet: {
+				options: {
+					compress: {
+						negate_iife: false
+					}
+				},
+				src: SOURCE_DIR + 'wp-admin/js/bookmarklet.js',
+				dest: SOURCE_DIR + 'wp-admin/js/bookmarklet.min.js'
 			}
 		},
 		concat: {
@@ -528,7 +538,7 @@ module.exports = function(grunt) {
 
 	// Pre-commit task.
 	grunt.registerTask('precommit', 'Runs front-end dev/test tasks in preparation for a commit.',
-		['autoprefixer:core', 'imagemin:core', 'jshint:corejs', 'qunit:compiled']);
+		['autoprefixer:core', 'imagemin:core', 'jshint:corejs', 'qunit:compiled', 'uglify:bookmarklet']);
 
 	// Copy task.
 	grunt.registerTask('copy:all', ['copy:files', 'copy:wp-admin-rtl', 'copy:version']);
