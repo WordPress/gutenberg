@@ -16,8 +16,11 @@ matrix:
     env: WP_TRAVISCI=travis:phpunit
   - php: hhvm
     env: WP_TRAVISCI=travis:phpunit
+  - php: nightly
+    env: WP_TRAVISCI=travis:phpunit
   allow_failures:
   - php: hhvm
+  - php: nightly
   fast_finish: true
 before_install:
 - WP_CORE_DIR=/tmp/wordpress/
