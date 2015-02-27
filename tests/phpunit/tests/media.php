@@ -378,7 +378,7 @@ $video
 This is a comment
 CONTENT;
 
-		$types = array( 'audio', 'video', 'object', 'embed', 'iframe' );
+		$types = array( 'object', 'embed', 'iframe', 'audio', 'video' );
 		$contents = array_values( compact( $types ) );
 
 		$matches = get_media_embedded_in_content( $content, 'audio' );
@@ -398,6 +398,27 @@ CONTENT;
 
 		$matches = get_media_embedded_in_content( $content, $types );
 		$this->assertEquals( $contents, $matches );
+	}
+
+	function test_get_media_embedded_in_content_order() {
+		$audio =<<<AUDIO
+<audio preload="none">
+	<source />
+</audio>
+AUDIO;
+		$video =<<<VIDEO
+<video preload="none">
+	<source />
+</video>
+VIDEO;
+		$content = $audio . $video;
+
+		$matches1 = get_media_embedded_in_content( $content, array( 'audio', 'video' ) );
+		$this->assertEquals( array( $audio, $video ), $matches1 );
+
+		$reversed = $video . $audio;
+		$matches2 = get_media_embedded_in_content( $reversed, array( 'audio', 'video' ) );
+		$this->assertEquals( array( $video, $audio ), $matches2 );
 	}
 
 	/**
