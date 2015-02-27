@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Slider 1.11.2
+ * jQuery UI Slider 1.11.3
  * http://jqueryui.com
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -26,7 +26,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.slider", $.ui.mouse, {
-	version: "1.11.2",
+	version: "1.11.3",
 	widgetEventPrefix: "slide",
 
 	options: {
@@ -547,8 +547,26 @@ return $.widget( "ui.slider", $.ui.mouse, {
 	},
 
 	_calculateNewMax: function() {
-		var remainder = ( this.options.max - this._valueMin() ) % this.options.step;
-		this.max = this.options.max - remainder;
+		var max = this.options.max,
+			min = this._valueMin(),
+			step = this.options.step,
+			aboveMin = Math.floor( ( max - min ) / step ) * step;
+		max = aboveMin + min;
+		this.max = parseFloat( max.toFixed( this._precision() ) );
+	},
+
+	_precision: function() {
+		var precision = this._precisionOf( this.options.step );
+		if ( this.options.min !== null ) {
+			precision = Math.max( precision, this._precisionOf( this.options.min ) );
+		}
+		return precision;
+	},
+
+	_precisionOf: function( num ) {
+		var str = num.toString(),
+			decimal = str.indexOf( "." );
+		return decimal === -1 ? 0 : str.length - decimal - 1;
 	},
 
 	_valueMin: function() {

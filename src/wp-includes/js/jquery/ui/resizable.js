@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Resizable 1.11.2
+ * jQuery UI Resizable 1.11.3
  * http://jqueryui.com
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -26,7 +26,7 @@
 }(function( $ ) {
 
 $.widget("ui.resizable", $.ui.mouse, {
-	version: "1.11.2",
+	version: "1.11.3",
 	widgetEventPrefix: "resize",
 	options: {
 		alsoResize: false,
@@ -99,7 +99,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 		});
 
 		// Wrap the element if it cannot hold child nodes
-		if (this.element[0].nodeName.match(/canvas|textarea|input|select|button|img/i)) {
+		if (this.element[0].nodeName.match(/^(canvas|textarea|input|select|button|img)$/i)) {
 
 			this.element.wrap(
 				$("<div class='ui-wrapper' style='overflow: hidden;'></div>").css({
@@ -200,7 +200,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 					this.handles[i] = this.element.children( this.handles[ i ] ).first().show();
 				}
 
-				if (this.elementIsWrapper && this.originalElement[0].nodeName.match(/textarea|input|select|button/i)) {
+				if (this.elementIsWrapper && this.originalElement[0].nodeName.match(/^(textarea|input|select|button)$/i)) {
 
 					axis = $(this.handles[i], this.element);
 
@@ -943,7 +943,7 @@ $.ui.plugin.add( "resizable", "containment", {
 			}
 		}
 
-		if ( !continueResize ){
+		if ( !continueResize ) {
 			that.position.left = that.prevPosition.left;
 			that.position.top = that.prevPosition.top;
 			that.size.width = that.prevSize.width;
@@ -1165,7 +1165,7 @@ $.ui.plugin.add("resizable", "grid", {
 				that.size.width = newWidth;
 				that.position.left = op.left - ox;
 			} else {
-				newWidth = gridY - outerDimensions.height;
+				newWidth = gridX - outerDimensions.width;
 				that.size.width = newWidth;
 				that.position.left = op.left + os.width - newWidth;
 			}

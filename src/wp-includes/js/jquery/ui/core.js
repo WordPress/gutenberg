@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Core 1.11.2
+ * jQuery UI Core 1.11.3
  * http://jqueryui.com
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -24,7 +24,7 @@
 $.ui = $.ui || {};
 
 $.extend( $.ui, {
-	version: "1.11.2",
+	version: "1.11.3",
 
 	keyCode: {
 		BACKSPACE: 8,
@@ -97,7 +97,7 @@ function focusable( element, isTabIndexNotNaN ) {
 		img = $( "img[usemap='#" + mapName + "']" )[ 0 ];
 		return !!img && visible( img );
 	}
-	return ( /input|select|textarea|button|object/.test( nodeName ) ?
+	return ( /^(input|select|textarea|button|object)$/.test( nodeName ) ?
 		!element.disabled :
 		"a" === nodeName ?
 			element.href || isTabIndexNotNaN :

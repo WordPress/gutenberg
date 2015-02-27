@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Accordion 1.11.2
+ * jQuery UI Accordion 1.11.3
  * http://jqueryui.com
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -25,7 +25,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.accordion", {
-	version: "1.11.2",
+	version: "1.11.3",
 	options: {
 		active: 0,
 		animate: {},
@@ -483,7 +483,10 @@ return $.widget( "ui.accordion", {
 		toHide.attr({
 			"aria-hidden": "true"
 		});
-		toHide.prev().attr( "aria-selected", "false" );
+		toHide.prev().attr({
+			"aria-selected": "false",
+			"aria-expanded": "false"
+		});
 		// if we're switching panels, remove the old header from the tab order
 		// if we're opening from collapsed state, remove the previous header from the tab order
 		// if we're collapsing, then keep the collapsing header in the tab order
@@ -494,7 +497,7 @@ return $.widget( "ui.accordion", {
 			});
 		} else if ( toShow.length ) {
 			this.headers.filter(function() {
-				return $( this ).attr( "tabIndex" ) === 0;
+				return parseInt( $( this ).attr( "tabIndex" ), 10 ) === 0;
 			})
 			.attr( "tabIndex", -1 );
 		}
@@ -504,8 +507,8 @@ return $.widget( "ui.accordion", {
 			.prev()
 				.attr({
 					"aria-selected": "true",
-					tabIndex: 0,
-					"aria-expanded": "true"
+					"aria-expanded": "true",
+					tabIndex: 0
 				});
 	},
 

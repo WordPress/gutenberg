@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Tabs 1.11.2
+ * jQuery UI Tabs 1.11.3
  * http://jqueryui.com
  *
- * Copyright 2014 jQuery Foundation and other contributors
+ * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -25,7 +25,7 @@
 }(function( $ ) {
 
 return $.widget( "ui.tabs", {
-	version: "1.11.2",
+	version: "1.11.3",
 	delay: 300,
 	options: {
 		active: null,
@@ -201,8 +201,9 @@ return $.widget( "ui.tabs", {
 		clearTimeout( this.activating );
 		selectedIndex = this._focusNextTab( selectedIndex, goingForward );
 
-		// Navigating with control key will prevent automatic activation
-		if ( !event.ctrlKey ) {
+		// Navigating with control/command key will prevent automatic activation
+		if ( !event.ctrlKey && !event.metaKey ) {
+
 			// Update aria-selected immediately so that AT think the tab is already selected.
 			// Otherwise AT may confuse the user by stating that they need to activate the tab,
 			// but the tab will already be activated by the time the announcement finishes.
