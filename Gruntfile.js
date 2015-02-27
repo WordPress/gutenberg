@@ -192,6 +192,28 @@ module.exports = function(grunt) {
 						}
 					]
 				},
+				properties : [
+					{
+						name: 'swap-dashicons-left-right-arrows',
+						expr: /content/im,
+						action: function( prop, value ) {
+							if ( value === '"\\f141"' ) { // dashicons-arrow-left
+								value = '"\\f139"';
+							} else if ( value === '"\\f340"' ) { // dashicons-arrow-left-alt
+								value = '"\\f344"';
+							} else if ( value === '"\\f341"' ) { // dashicons-arrow-left-alt2
+								value = '"\\f345"';
+							} else if ( value === '"\\f139"' ) { // dashicons-arrow-right
+								value = '"\\f141"';
+							} else if ( value === '"\\f344"' ) { // dashicons-arrow-right-alt
+								value = '"\\f340"';
+							} else if ( value === '"\\f345"' ) { // dashicons-arrow-right-alt2
+								value = '"\\f341"';
+							}
+							return { prop: prop, value: value };
+						}
+					}
+				],
 				saveUnmodified: false
 			},
 			core: {
@@ -201,7 +223,10 @@ module.exports = function(grunt) {
 				ext: '-rtl.css',
 				src: [
 					'wp-admin/css/*.css',
-					'wp-includes/css/*.css'
+					'wp-includes/css/*.css',
+
+					// Exceptions
+					'!wp-includes/css/dashicons.css'
 				]
 			},
 			colors: {
