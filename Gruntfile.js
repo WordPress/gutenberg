@@ -172,14 +172,29 @@ module.exports = function(grunt) {
 				]
 			}
 		},
-		cssjanus: {
-			core: {
-				options: {
+		rtlcss: {
+			options: {
+				// rtlcss options
+				config: {
+					swapLeftRightInUrl: false,
 					swapLtrRtlInUrl: false,
-					processContent: function( src ) {
-						return src.replace( /url\((.+?)\.css\)/g, 'url($1-rtl.css)' );
-					}
+					autoRename: false,
+					preserveDirectives: true,
+					stringMap: [
+						{
+							name: 'import-rtl-stylesheet',
+							search: [ '.css' ],
+							replace: [ '-rtl.css' ],
+							options: {
+								scope: 'url',
+								ignoreCase: false
+							}
+						}
+					]
 				},
+				saveUnmodified: false
+			},
+			core: {
 				expand: true,
 				cwd: SOURCE_DIR,
 				dest: BUILD_DIR,
@@ -190,11 +205,6 @@ module.exports = function(grunt) {
 				]
 			},
 			colors: {
-				options: {
-					processContent: function( src ) {
-						return src.replace( /([^/]+)\.css/gi, '$1-rtl.css' );
-					}
-				},
 				expand: true,
 				cwd: BUILD_DIR,
 				dest: BUILD_DIR,
@@ -503,7 +513,7 @@ module.exports = function(grunt) {
 					SOURCE_DIR + 'wp-admin/css/*.css',
 					SOURCE_DIR + 'wp-includes/css/*.css'
 				],
-				tasks: ['cssjanus:dynamic'],
+				tasks: ['rtlcss:dynamic'],
 				options: {
 					spawn: false,
 					interval: 2000
@@ -522,7 +532,7 @@ module.exports = function(grunt) {
 	// Register tasks.
 
 	// RTL task.
-	grunt.registerTask('rtl', ['cssjanus:core', 'cssjanus:colors']);
+	grunt.registerTask('rtl', ['rtlcss:core', 'rtlcss:colors']);
 
 	// Color schemes task.
 	grunt.registerTask('colors', ['sass:colors', 'autoprefixer:colors']);
@@ -576,7 +586,7 @@ module.exports = function(grunt) {
 	//
 	// On `watch:all`, automatically updates the `copy:dynamic` and `clean:dynamic`
 	// configurations so that only the changed files are updated.
-	// On `watch:rtl`, automatically updates the `cssjanus:dynamic` configuration.
+	// On `watch:rtl`, automatically updates the `rtlcss:dynamic` configuration.
 	grunt.event.on('watch', function( action, filepath, target ) {
 		if ( target !== 'all' && target !== 'rtl' ) {
 			return;
@@ -588,6 +598,6 @@ module.exports = function(grunt) {
 
 		grunt.config(['clean', 'dynamic', 'src'], cleanSrc);
 		grunt.config(['copy', 'dynamic', 'src'], copySrc);
-		grunt.config(['cssjanus', 'dynamic', 'src'], copySrc);
+		grunt.config(['rtlcss', 'dynamic', 'src'], copySrc);
 	});
 };

@@ -22,10 +22,10 @@
     "grunt-contrib-qunit": "~0.5.2",
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-cssjanus": "~0.2.4",
     "grunt-jsvalidate": "~0.2.2",
     "grunt-legacy-util": "^0.2.0",
     "grunt-patch-wordpress": "~0.3.0",
+    "grunt-rtlcss": "~1.5.1",
     "grunt-sass": "~0.16.0",
     "matchdep": "~0.3.0"
   }
