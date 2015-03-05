@@ -546,9 +546,9 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * When the path for a site is updated with update_blog_details(), the final
 	 * path should have a leading and trailing slash. When multiple directories
 	 * are part of the path, only one slash should separate each directory.
-	 * 
-	 * @ticket 18117 
-	 */ 
+	 *
+	 * @ticket 18117
+	 */
 	function test_update_blog_details_single_path_no_slashes() {
 		update_blog_details( 1, array( 'path' => 'my_path' ) );
 		$blog = get_blog_details( 1 );

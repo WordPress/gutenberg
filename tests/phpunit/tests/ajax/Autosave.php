@@ -91,7 +91,7 @@ class Tests_Ajax_Autosave extends WP_Ajax_UnitTestCase {
 		$post = get_post( $this->_post->ID );
 		$this->assertGreaterThanOrEqual( 0, strpos( $post->post_content, $md5 ) );
 	}
-	
+
 	/**
 	 * Test autosaving a locked post
 	 * @return void
