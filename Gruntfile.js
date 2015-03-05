@@ -2,12 +2,20 @@
 module.exports = function(grunt) {
 	var path = require('path'),
 		SOURCE_DIR = 'src/',
-		BUILD_DIR = 'build/';
+		BUILD_DIR = 'build/',
+		mediaConfig = {},
+		mediaBuilds = ['audio-video', 'grid', 'models', 'views'];
 
 	// Load tasks.
 	require('matchdep').filterDev(['grunt-*', '!grunt-legacy-util']).forEach( grunt.loadNpmTasks );
 	// Load legacy utils
 	grunt.util = require('grunt-legacy-util');
+
+	mediaBuilds.forEach( function ( build ) {
+		var path = SOURCE_DIR + 'wp-includes/js/media/';
+		mediaConfig[ build ] = { files : {} };
+		mediaConfig[ build ].files[ path + build + '.js' ] = [ path + build + '.manifest.js' ];
+	} );
 
 	// Project configuration.
 	grunt.initConfig({
@@ -116,16 +124,7 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		browserify: {
-			media: {
-				files: {
-					'src/wp-includes/js/media/models.js' : [ SOURCE_DIR + 'wp-includes/js/media/models.manifest.js' ],
-					'src/wp-includes/js/media/views.js' : [ SOURCE_DIR + 'wp-includes/js/media/views.manifest.js' ],
-					'src/wp-includes/js/media/audio-video.js' : [ SOURCE_DIR + 'wp-includes/js/media/audio-video.manifest.js' ],
-					'src/wp-includes/js/media/grid.js' : [ SOURCE_DIR + 'wp-includes/js/media/grid.manifest.js' ]
-				}
-			}
-		},
+		browserify: mediaConfig,
 		sass: {
 			colors: {
 				expand: true,
@@ -502,7 +501,7 @@ module.exports = function(grunt) {
 				dest: SOURCE_DIR
 			}
 		},
-		watch: {
+		_watch: {
 			all: {
 				files: [
 					SOURCE_DIR + '**',
@@ -518,13 +517,10 @@ module.exports = function(grunt) {
 			},
 			browserify: {
 				files: [
-					SOURCE_DIR + 'wp-includes/js/media/**/*.js',
-					'!' + SOURCE_DIR + 'wp-includes/js/media/audio-video.js',
-					'!' + SOURCE_DIR + 'wp-includes/js/media/grid.js',
-					'!' + SOURCE_DIR + 'wp-includes/js/media/models.js',
-					'!' + SOURCE_DIR + 'wp-includes/js/media/views.js'
+					SOURCE_DIR + 'wp-includes/js/media/*.js',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/*.manifest.js'
 				],
-				tasks: ['browserify', 'uglify:media']
+				tasks: ['uglify:media']
 			},
 			config: {
 				files: 'Gruntfile.js'
@@ -571,17 +567,55 @@ module.exports = function(grunt) {
 		'jshint:media'
 	] );
 
-	// Pre-commit task.
-	grunt.registerTask('precommit', 'Runs front-end dev/test tasks in preparation for a commit.',
-		['autoprefixer:core', 'imagemin:core', 'jshint:corejs', 'qunit:compiled', 'uglify:bookmarklet']);
+	grunt.renameTask( 'watch', '_watch' );
 
-	// Copy task.
-	grunt.registerTask('copy:all', ['copy:files', 'copy:wp-admin-rtl', 'copy:version']);
+	grunt.registerTask( 'watch', function() {
+		if ( ! this.args.length || this.args.indexOf( 'browserify' ) > -1 ) {
+			grunt.config( 'browserify.options', {
+				browserifyOptions: {
+					debug: true
+				},
+				watch: true
+			} );
 
-	// Build task.
-	grunt.registerTask('build', ['clean:all', 'copy:all', 'cssmin:core', 'colors', 'rtl', 'cssmin:rtl', 'cssmin:colors',
-		'browserify:media', 'uglify:core', 'uglify:media', 'uglify:jqueryui', 'concat:tinymce', 'compress:tinymce',
-		'clean:tinymce', 'jsvalidate:build']);
+			grunt.task.run( 'browserify' );
+		}
+
+		grunt.task.run( '_' + this.nameArgs );
+	} );
+
+	grunt.registerTask( 'precommit', 'Runs front-end dev/test tasks in preparation for a commit.', [
+		'autoprefixer:core',
+		'imagemin:core',
+		'browserify',
+		'jshint:corejs',
+		'qunit:compiled',
+		'uglify:bookmarklet'
+	] );
+
+	grunt.registerTask( 'copy:all', [
+		'copy:files',
+		'copy:wp-admin-rtl',
+		'copy:version'
+	] );
+
+	grunt.registerTask( 'build', [
+		'clean:all',
+		'copy:all',
+		'cssmin:core',
+		'colors',
+		'rtl',
+		'cssmin:rtl',
+		'cssmin:colors',
+		'browserify',
+		'uglify:core',
+		'uglify:media',
+		'uglify:jqueryui',
+		'concat:tinymce',
+		'compress:tinymce',
+		'clean:tinymce',
+		'jsvalidate:build'
+	] );
 
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax, external-http, and multisite tests.', function() {
