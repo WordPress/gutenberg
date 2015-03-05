@@ -72,4 +72,44 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertSame( array(), $found );
 	}
+
+	/**
+	 * @ticket 14279
+	 */
+	public function test_wp_new_comment_respects_dates() {
+		// `wp_new_comment()` checks REMOTE_ADDR, so we fake it to avoid PHP notices.
+		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$remote_addr = $_SERVER['REMOTE_ADDR'];
+		} else {
+			$_SERVER['REMOTE_ADDR'] = '';
+		}
+
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID' => $post_id,
+			'comment_author' => rand_str(),
+			'comment_author_url' => '',
+			'comment_author_email' => '',
+			'comment_type' => '',
+			'comment_content' => rand_str(),
+			'comment_date' => '2011-01-01 10:00:00',
+			'comment_date_gmt' => '2011-01-01 10:00:00',
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( $data['comment_date'], $comment->comment_date );
+		$this->assertEquals( $data['comment_date_gmt'], $comment->comment_date_gmt );
+
+		// Cleanup.
+		if ( isset( $remote_addr ) ) {
+			$_SERVER['REMOTE_ADDR'] = $remote_addr;
+		} else {
+			unset( $_SERVER['REMOTE_ADDR'] );
+		}
+	}
 }
