@@ -26,8 +26,8 @@ class Tests_Canonical_PageOnFront extends WP_Canonical_UnitTestCase {
 
 	function tearDown() {
 		global $wp_rewrite;
-		parent::tearDown();
 		$wp_rewrite->init();
+		parent::tearDown();
 	}
 
 	/**

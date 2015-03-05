@@ -23,8 +23,8 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 	}
 
 	public function tearDown() {
-		parent::tearDown();
 		wp_set_current_user( self::$old_current_user );
+		parent::tearDown();
 	}
 
 	/**

@@ -10,9 +10,8 @@
 class Tests_Category extends WP_UnitTestCase {
 
 	function tearDown() {
-		parent::tearDown();
-
 		_unregister_taxonomy( 'test_tax_cat' );
+		parent::tearDown();
 	}
 
 	/**

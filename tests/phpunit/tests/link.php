@@ -6,8 +6,8 @@ class Tests_Link extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $wp_rewrite;
-		parent::tearDown();
 		$wp_rewrite->init();
+		parent::tearDown();
 	}
 
 	function _get_pagenum_link_cb( $url ) {

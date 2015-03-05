@@ -24,9 +24,8 @@ class Tests_XMLRPC_wp_getPage extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
-
 		wp_delete_post( $this->post_id );
+		parent::tearDown();
 	}
 
 	function test_invalid_username_password() {

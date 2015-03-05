@@ -13,9 +13,9 @@ class Tests_Cron extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		// make sure the schedule is clear
 		_set_cron_array(array());
+		parent::tearDown();
 	}
 
 	function test_wp_get_schedule_empty() {

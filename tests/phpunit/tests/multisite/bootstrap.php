@@ -21,8 +21,8 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $wpdb;
-		parent::tearDown();
 		$wpdb->suppress_errors( $this->suppress );
+		parent::tearDown();
 	}
 
 

@@ -11,8 +11,8 @@ class Tests_Mail extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		unset( $_SERVER['SERVER_NAME'] );
+		parent::tearDown();
 	}
 
 	function test_wp_mail_custom_boundaries() {

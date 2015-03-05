@@ -26,11 +26,11 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 	 * tearDown options
 	 */
 	function tearDown() {
-		parent::tearDown();
 		update_option( 'page_comments', $this->option_page_comments );
 		update_option( 'comments_per_page', $this->option_page_comments );
 		update_option( 'thread_comments', $this->option_page_comments );
 		update_option( 'posts_per_rss', $this->option_posts_per_rss );
+		parent::tearDown();
 	}
 
 	/**

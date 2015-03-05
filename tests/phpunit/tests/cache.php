@@ -14,8 +14,8 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		$this->flush_cache();
+		parent::tearDown();
 	}
 
 	function &init_cache() {

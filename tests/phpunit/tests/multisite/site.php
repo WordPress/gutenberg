@@ -21,8 +21,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $wpdb;
-		parent::tearDown();
 		$wpdb->suppress_errors( $this->suppress );
+		parent::tearDown();
 	}
 
 	function test_switch_restore_blog() {

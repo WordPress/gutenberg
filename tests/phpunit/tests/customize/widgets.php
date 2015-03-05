@@ -35,10 +35,10 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		$this->manager = null;
 		unset( $GLOBALS['wp_customize'] );
 		unset( $GLOBALS['wp_scripts'] );
+		parent::tearDown();
 	}
 
 	function set_customized_post_data( $customized ) {

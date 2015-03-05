@@ -22,8 +22,8 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $wpdb;
-		parent::tearDown();
 		$wpdb->suppress_errors( $this->suppress );
+		parent::tearDown();
 	}
 
 	function test_remove_user_from_blog() {

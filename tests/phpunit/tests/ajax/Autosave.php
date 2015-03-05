@@ -46,8 +46,8 @@ class Tests_Ajax_Autosave extends WP_Ajax_UnitTestCase {
 	 * Reset the current user
 	 */
 	public function tearDown() {
-		parent::tearDown();
 		wp_set_current_user( 0 );
+		parent::tearDown();
 	}
 
 	/**

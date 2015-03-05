@@ -29,8 +29,9 @@ class Tests_Multisite_MS_Files_Rewriting extends WP_UnitTestCase {
 		global $wpdb;
 
 		update_site_option( 'ms_files_rewriting', 0 );
-		parent::tearDown();
 		$wpdb->suppress_errors( $this->suppress );
+
+		parent::tearDown();
 	}
 
 	function test_switch_upload_dir() {

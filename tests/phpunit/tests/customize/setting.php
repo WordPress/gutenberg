@@ -26,9 +26,9 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		$this->manager = null;
 		unset( $GLOBALS['wp_customize'] );
+		parent::tearDown();
 	}
 
 	function test_constructor_without_args() {

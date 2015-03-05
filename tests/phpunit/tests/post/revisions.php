@@ -12,8 +12,8 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		unset( $GLOBALS['wp_post_types'][ $this->post_type ] );
+		parent::tearDown();
 	}
 
 	/**

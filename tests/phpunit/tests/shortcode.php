@@ -20,9 +20,9 @@ class Tests_Shortcode extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $shortcode_tags;
-		parent::tearDown();
 		foreach ( $this->shortcodes as $shortcode )
 			unset( $shortcode_tags[ $shortcode ] );
+		parent::tearDown();
 	}
 
 	function _shortcode_test_shortcode_tag( $atts, $content = null, $tagname = null ) {

@@ -59,13 +59,13 @@ class Tests_Query_IsTerm extends WP_UnitTestCase {
 
 	function tearDown() {
 		global $wp_rewrite;
-		parent::tearDown();
 
 		_unregister_taxonomy( 'testtax' );
 
 		$wp_rewrite->init();
 
 		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
+		parent::tearDown();
 	}
 
 	function test_tag_action_tax() {

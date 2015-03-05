@@ -13,8 +13,8 @@ class Tests_Basic extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		$this->val = false;
+		parent::tearDown();
 	}
 
 	function test_true() {

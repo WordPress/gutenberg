@@ -18,10 +18,10 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
-
 		_unregister_post_type( $this->post_type );
 		unset( $this->q );
+
+		parent::tearDown();
 	}
 
 	function get_search_results( $terms ) {

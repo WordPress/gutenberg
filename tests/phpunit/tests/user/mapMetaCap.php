@@ -32,10 +32,9 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
-
 		$GLOBALS['super_admins'] = $this->super_admins;
 		unset( $GLOBALS['wp_post_types'][ $this->post_type ] );
+		parent::tearDown();
 	}
 
 	function test_capability_type_post_with_no_extra_caps() {

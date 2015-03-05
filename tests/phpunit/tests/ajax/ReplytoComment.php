@@ -43,8 +43,8 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 	}
 
 	public function tearDown() {
-		parent::tearDown();
 		remove_filter( 'query', array( $this, '_block_comments' ) );
+		parent::tearDown();
 	}
 
 	/**

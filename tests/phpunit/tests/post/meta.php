@@ -33,9 +33,9 @@ class Tests_Post_Meta extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		parent::tearDown();
 		wp_delete_post($this->post_id);
 		wp_delete_post($this->post_id_2);
+		parent::tearDown();
 	}
 
 	function test_unique_postmeta() {
