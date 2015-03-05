@@ -278,4 +278,165 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		$this->assertEquals( $attachment->post_parent, $post_id );
 	}
 
+	/**
+	 * @ticket 15928
+	 */
+	public function test_wp_get_attachment_url_should_not_force_https_when_current_page_is_non_ssl_and_siteurl_is_non_ssl() {
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'http' ) );
+
+		$filename = DIR_TESTDATA . '/images/test-image.jpg';
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID.
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Save server data for cleanup.
+		$is_ssl = is_ssl();
+		$_SERVER['HTTPS'] = 'off';
+
+		$url = wp_get_attachment_url( $attachment_id );
+		$this->assertSame( set_url_scheme( $url, 'http' ), $url );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+	}
+
+	/**
+	 * @ticket 15928
+	 *
+	 * This situation (current request is non-SSL but siteurl is https) should never arise.
+	 */
+	public function test_wp_get_attachment_url_should_not_force_https_when_current_page_is_non_ssl_and_siteurl_is_ssl() {
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'https' ) );
+
+		$filename = DIR_TESTDATA . '/images/test-image.jpg';
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID.
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Save server data for cleanup.
+		$is_ssl = is_ssl();
+		$_SERVER['HTTPS'] = 'off';
+
+		$url = wp_get_attachment_url( $attachment_id );
+		$this->assertSame( set_url_scheme( $url, 'http' ), $url );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+	}
+
+	/**
+	 * @ticket 15928
+	 *
+	 * Canonical siteurl is non-SSL, but SSL support is available/optional.
+	 */
+	public function test_wp_get_attachment_url_should_force_https_with_https_on_same_host_when_siteurl_is_non_ssl_but_ssl_is_available() {
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'http' ) );
+
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Save server data for cleanup
+		$is_ssl = is_ssl();
+		$http_host = $_SERVER['HTTP_HOST'];
+
+		$_SERVER['HTTPS'] = 'on';
+
+		// Verify that server host matches the host of wp_upload_dir().
+		$upload_dir = wp_upload_dir();
+		$_SERVER['HTTP_HOST'] = parse_url( $upload_dir['baseurl'], PHP_URL_HOST );
+
+		// Test that wp_get_attachemt_url returns with https scheme.
+		$url = wp_get_attachment_url( $attachment_id );
+		$this->assertSame( set_url_scheme( $url, 'https' ), $url );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+		$_SERVER['HTTP_HOST'] = $http_host;
+	}
+
+	/**
+	 * @ticket 15928
+	 */
+	public function test_wp_get_attachment_url_with_https_on_same_host_when_siteurl_is_https() {
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'https' ) );
+
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID.
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Save server data for cleanup.
+		$is_ssl = is_ssl();
+		$http_host = $_SERVER['HTTP_HOST'];
+
+		$_SERVER['HTTPS'] = 'on';
+
+		// Verify that server host matches the host of wp_upload_dir().
+		$upload_dir = wp_upload_dir();
+		$_SERVER['HTTP_HOST'] = parse_url( $upload_dir['baseurl'], PHP_URL_HOST );
+
+		// Test that wp_get_attachemt_url returns with https scheme.
+		$url = wp_get_attachment_url( $attachment_id );
+		$this->assertSame( set_url_scheme( $url, 'https' ), $url );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+		$_SERVER['HTTP_HOST'] = $http_host;
+	}
+
+	/**
+	* @ticket 15928
+	*/
+	public function test_wp_get_attachment_url_should_not_force_https_when_https_is_on_but_url_has_a_different_domain() {
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'https' ) );
+
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID
+		$attachment_id = $this->_make_attachment( $upload );
+
+		// Save server data for cleanup.
+		$is_ssl = is_ssl();
+		$http_host = $_SERVER['HTTP_HOST'];
+
+		$_SERVER['HTTPS'] = 'on';
+
+		// Set server host to something random.
+		$_SERVER['HTTP_HOST'] = 'some.otherhostname.com';
+
+		$url = wp_get_attachment_url( $attachment_id );
+		$this->assertSame( set_url_scheme( $url, 'http' ), $url );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+		$_SERVER['HTTP_HOST'] = $http_host;
+	}
+
 }
