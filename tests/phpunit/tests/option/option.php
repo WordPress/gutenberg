@@ -71,18 +71,6 @@ class Tests_Option_Option extends WP_UnitTestCase {
 		$this->assertSame( 'bar', get_option( 'doesnotexist' ) );
 	}
 
-	/**
-	 * @ticket 31047
-	 */
-	public function test_update_option_should_respect_default_option_filter_when_option_does_not_yet_exist_in_database() {
-		add_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
-		$added = update_option( 'doesnotexist', 'bar' );
-		remove_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
-
-		$this->assertTrue( $added );
-		$this->assertSame( 'bar', get_option( 'doesnotexist' ) );
-	}
-
 	function test_serialized_data() {
 		$key = rand_str();
 		$value = array( 'foo' => true, 'bar' => true );
@@ -148,103 +136,5 @@ class Tests_Option_Option extends WP_UnitTestCase {
 
 		$actual = $wpdb->get_row( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s LIMIT 1", $name ) );
 		$this->assertEquals( $expected, $actual->autoload );
-	}
-
-	/**
-	 * @ticket 26394
-	 */
-	public function test_update_option_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_missing() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
-		global $wpdb;
-		wp_cache_flush();
-		update_option( 'test_update_option_default', 'value' );
-		wp_cache_flush();
-
-		// Populate the alloptions cache, which includes autoload=yes options.
-		wp_load_alloptions();
-
-		$before = $wpdb->num_queries;
-		$value = get_option( 'test_update_option_default' );
-		$after = $wpdb->num_queries;
-
-		$this->assertEquals( $before, $after );
-		$this->assertEquals( $value, 'value' );
-	}
-
-	/**
-	 * @ticket 26394
-	 */
-	public function test_update_option_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_yes() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
-		global $wpdb;
-		wp_cache_flush();
-		update_option( 'test_update_option_default', 'value', 'yes' );
-		wp_cache_flush();
-
-		// Populate the alloptions cache, which includes autoload=yes options.
-		wp_load_alloptions();
-
-		$before = $wpdb->num_queries;
-		$value = get_option( 'test_update_option_default' );
-		$after = $wpdb->num_queries;
-
-		$this->assertEquals( $before, $after );
-		$this->assertEquals( $value, 'value' );
-	}
-
-	/**
-	 * @ticket 26394
-	 */
-	public function test_update_option_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_no() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
-		global $wpdb;
-		wp_cache_flush();
-		update_option( 'test_update_option_default', 'value', 'no' );
-		wp_cache_flush();
-
-		// Populate the alloptions cache, which does not include autoload=no options.
-		wp_load_alloptions();
-
-		$before = $wpdb->num_queries;
-		$value = get_option( 'test_update_option_default' );
-		$after = $wpdb->num_queries;
-
-		// Database has been hit.
-		$this->assertEquals( $before + 1, $after );
-		$this->assertEquals( $value, 'value' );
-	}
-
-	/**
-	 * @ticket 26394
-	 */
-	public function test_update_option_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_false() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
-		global $wpdb;
-		wp_cache_flush();
-		update_option( 'test_update_option_default', 'value', false );
-		wp_cache_flush();
-
-		// Populate the alloptions cache, which does not include autoload=no options.
-		wp_load_alloptions();
-
-		$before = $wpdb->num_queries;
-		$value = get_option( 'test_update_option_default' );
-		$after = $wpdb->num_queries;
-
-		// Database has been hit.
-		$this->assertEquals( $before + 1, $after );
-		$this->assertEquals( $value, 'value' );
 	}
 }
