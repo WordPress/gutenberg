@@ -26,7 +26,7 @@
     "grunt-legacy-util": "^0.2.0",
     "grunt-patch-wordpress": "~0.3.0",
     "grunt-rtlcss": "~1.5.1",
-    "grunt-sass": "~0.16.0",
+    "grunt-sass": "~0.18.0",
     "matchdep": "~0.3.0"
   }
 }
