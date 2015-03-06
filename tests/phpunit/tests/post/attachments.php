@@ -439,4 +439,29 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		$_SERVER['HTTP_HOST'] = $http_host;
 	}
 
+	public function test_wp_attachment_is() {
+		$filename = DIR_TESTDATA . '/images/test-image.jpg';
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$attachment_id = $this->_make_attachment( $upload );
+
+		$this->assertTrue( wp_attachment_is_image( $attachment_id ) );
+		$this->assertTrue( wp_attachment_is( 'image', $attachment_id ) );
+		$this->assertFalse( wp_attachment_is( 'audio', $attachment_id ) );
+		$this->assertFalse( wp_attachment_is( 'video', $attachment_id ) );
+	}
+
+	public function test_wp_attachment_is_default() {
+		$filename = DIR_TESTDATA . '/images/test-image.psd';
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$attachment_id = $this->_make_attachment( $upload );
+
+		$this->assertFalse( wp_attachment_is_image( $attachment_id ) );
+		$this->assertTrue( wp_attachment_is( 'psd', $attachment_id ) );
+		$this->assertFalse( wp_attachment_is( 'audio', $attachment_id ) );
+		$this->assertFalse( wp_attachment_is( 'video', $attachment_id ) );
+	}
 }
