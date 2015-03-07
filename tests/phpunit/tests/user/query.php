@@ -362,10 +362,18 @@ class Tests_User_Query extends WP_UnitTestCase {
 			'meta_type' => 'SIGNED',
 		) );
 
-		$this->assertSame( 'foo', $q->meta_query->queries[0]['key'] );
-		$this->assertSame( '5', $q->meta_query->queries[0]['value'] );
-		$this->assertSame( '>', $q->meta_query->queries[0]['compare'] );
-		$this->assertSame( 'SIGNED', $q->meta_query->queries[0]['type'] );
+		// Multisite adds a 'blog_id' clause, so we have to find the 'foo' clause.
+		$mq_clauses = $q->meta_query->get_clauses();
+		foreach ( $mq_clauses as $mq_clause ) {
+			if ( 'foo' === $mq_clause['key'] ) {
+				$clause = $mq_clause;
+			}
+		}
+
+		$this->assertSame( 'foo', $clause['key'] );
+		$this->assertSame( '5', $clause['value'] );
+		$this->assertSame( '>', $clause['compare'] );
+		$this->assertSame( 'SIGNED', $clause['type'] );
 	}
 
 	/**
