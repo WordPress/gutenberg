@@ -122,4 +122,15 @@ class Tests_Query extends WP_UnitTestCase {
 	public function filter_parse_query_to_remove_tax( $q ) {
 		unset( $q->query_vars['wptests_tax'] );
 	}
+
+	public function test_orderby_space_separated() {
+		global $wpdb;
+
+		$q = new WP_Query( array(
+			'orderby' => 'title date',
+			'order' => 'DESC',
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->posts.post_title DESC, $wpdb->posts.post_date DESC", $q->request );
+	}
 }

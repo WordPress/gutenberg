@@ -1108,6 +1108,17 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertContains( "ORDER BY $wpdb->comments.comment_date_gmt", $q->request );
 	}
 
+	public function test_orderby_space_separated() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'orderby' => 'comment_agent comment_approved',
+		) );
+
+		$this->assertContains( "ORDER BY $wpdb->comments.comment_agent DESC, $wpdb->comments.comment_approved DESC", $q->request );
+	}
+
 	public function test_orderby_comma_separated() {
 		global $wpdb;
 
