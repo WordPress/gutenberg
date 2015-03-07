@@ -453,6 +453,11 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 	}
 
 	public function test_wp_attachment_is_default() {
+		// On Multisite, psd is not an allowed mime type by default.
+		if ( is_multisite() ) {
+			add_filter( 'upload_mimes', array( $this, 'whitelist_psd_mime_type' ), 10, 2 );
+		}
+
 		$filename = DIR_TESTDATA . '/images/test-image.psd';
 		$contents = file_get_contents( $filename );
 
@@ -463,5 +468,14 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		$this->assertTrue( wp_attachment_is( 'psd', $attachment_id ) );
 		$this->assertFalse( wp_attachment_is( 'audio', $attachment_id ) );
 		$this->assertFalse( wp_attachment_is( 'video', $attachment_id ) );
+
+		if ( is_multisite() ) {
+			remove_filter( 'upload_mimes', array( $this, 'whitelist_psd_mime_type' ), 10, 2 );
+		}
+	}
+
+	public function whitelist_psd_mime_type( $mimes ) {
+		$mimes['psd'] = 'application/octet-stream';
+		return $mimes;
 	}
 }
