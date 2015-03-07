@@ -1351,6 +1351,21 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( $comments, wp_list_pluck( $found, 'comment_ID' ) );
 	}
 
+	public function test_meta_vars_should_be_converted_to_meta_query() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'meta_key' => 'foo',
+			'meta_value' => '5',
+			'meta_compare' => '>',
+			'meta_type' => 'SIGNED',
+		) );
+
+		$this->assertSame( 'foo', $q->meta_query->queries[0]['key'] );
+		$this->assertSame( '5', $q->meta_query->queries[0]['value'] );
+		$this->assertSame( '>', $q->meta_query->queries[0]['compare'] );
+		$this->assertSame( 'SIGNED', $q->meta_query->queries[0]['type'] );
+	}
+
 	public function test_count() {
 		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );
 		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'user_id' => 7 ) );

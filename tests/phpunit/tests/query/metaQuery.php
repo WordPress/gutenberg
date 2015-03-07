@@ -1208,6 +1208,20 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $post_4, $post_3, $post_2, $post_1 ), $query->posts );
 	}
 
+	public function test_meta_vars_should_be_converted_to_meta_query() {
+		$q = new WP_Query( array(
+			'meta_key' => 'foo',
+			'meta_value' => '5',
+			'meta_compare' => '>',
+			'meta_type' => 'SIGNED',
+		) );
+
+		$this->assertSame( 'foo', $q->meta_query->queries[0]['key'] );
+		$this->assertSame( '5', $q->meta_query->queries[0]['value'] );
+		$this->assertSame( '>', $q->meta_query->queries[0]['compare'] );
+		$this->assertSame( 'SIGNED', $q->meta_query->queries[0]['type'] );
+	}
+
 	/**
 	 * @ticket 29604
 	 */
