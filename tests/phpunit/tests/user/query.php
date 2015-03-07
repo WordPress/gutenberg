@@ -231,6 +231,93 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_space_separated() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => 'login nicename',
+			'order' => 'ASC',
+		) );
+
+		$this->assertContains( "ORDER BY user_login ASC, user_nicename ASC", $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_flat_array() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => array( 'login', 'nicename' ),
+		) );
+
+		$this->assertContains( "ORDER BY user_login ASC, user_nicename ASC", $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_array_contains_invalid_item() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => array( 'login', 'foo', 'nicename' ),
+		) );
+
+		$this->assertContains( "ORDER BY user_login ASC, user_nicename ASC", $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_array_contains_all_invalid_items() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => array( 'foo', 'bar', 'baz' ),
+		) );
+
+		$this->assertContains( "ORDER BY user_login", $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_array() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => array(
+				'login' => 'DESC',
+				'nicename' => 'ASC',
+				'email' => 'DESC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY user_login DESC, user_nicename ASC, user_email DESC", $q->query_orderby );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_array_should_discard_invalid_columns() {
+		global $wpdb;
+
+		$q = new WP_User_Query( array(
+			'orderby' => array(
+				'login' => 'DESC',
+				'foo' => 'ASC',
+				'email' => 'ASC',
+			),
+		) );
+
+		$this->assertContains( "ORDER BY user_login DESC, user_email ASC", $q->query_orderby );
+	}
+
+	/**
 	 * @ticket 21119
 	 */
 	function test_prepare_query() {
