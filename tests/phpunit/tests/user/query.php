@@ -180,6 +180,123 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_somekey_where_meta_key_is_somekey() {
+		$users = $this->factory->user->create_many( 3, array(
+			'role' => 'author'
+		) );
+
+		update_user_meta( $users[0], 'foo', 'zzz' );
+		update_user_meta( $users[1], 'foo', 'aaa' );
+		update_user_meta( $users[2], 'foo', 'jjj' );
+
+		$q = new WP_User_Query( array(
+			'include' => $users,
+			'meta_key' => 'foo',
+			'orderby' => 'foo',
+			'fields' => 'ids'
+		) );
+
+		$expected = array( $users[1], $users[2], $users[0] );
+
+		$this->assertEquals( $expected, $q->get_results() );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_clause_key() {
+		$users = $this->factory->user->create_many( 3 );
+		add_user_meta( $users[0], 'foo', 'aaa' );
+		add_user_meta( $users[1], 'foo', 'zzz' );
+		add_user_meta( $users[2], 'foo', 'jjj' );
+
+		$q = new WP_User_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'foo_key',
+			'order' => 'DESC',
+		) );
+
+		$this->assertEquals( array( $users[1], $users[2], $users[0] ), $q->results );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_clause_key_as_secondary_sort() {
+		$u1 = $this->factory->user->create( array(
+			'user_registered' => '2015-01-28 03:00:00',
+		) );
+		$u2 = $this->factory->user->create( array(
+			'user_registered' => '2015-01-28 05:00:00',
+		) );
+		$u3 = $this->factory->user->create( array(
+			'user_registered' => '2015-01-28 03:00:00',
+		) );
+
+		add_user_meta( $u1, 'foo', 'jjj' );
+		add_user_meta( $u2, 'foo', 'zzz' );
+		add_user_meta( $u3, 'foo', 'aaa' );
+
+		$q = new WP_User_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'comment_date' => 'asc',
+				'foo_key' => 'asc',
+			),
+		) );
+
+		$this->assertEquals( array( $u3, $u1, $u2 ), $q->results );
+	}
+
+	/**
+	 * @ticket 31265
+	 */
+	public function test_orderby_more_than_one_clause_key() {
+		$users = $this->factory->user->create_many( 3 );
+
+		add_user_meta( $users[0], 'foo', 'jjj' );
+		add_user_meta( $users[1], 'foo', 'zzz' );
+		add_user_meta( $users[2], 'foo', 'jjj' );
+		add_user_meta( $users[0], 'bar', 'aaa' );
+		add_user_meta( $users[1], 'bar', 'ccc' );
+		add_user_meta( $users[2], 'bar', 'bbb' );
+
+		$q = new WP_User_Query( array(
+			'fields' => 'ids',
+			'meta_query' => array(
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'bar_key' => array(
+					'key' => 'bar',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => array(
+				'foo_key' => 'asc',
+				'bar_key' => 'desc',
+			),
+		) );
+
+		$this->assertEquals( array( $users[2], $users[0], $users[1] ), $q->results );
+	}
+
+	/**
 	 * @ticket 30064
 	 */
 	public function test_orderby_include_with_empty_include() {
