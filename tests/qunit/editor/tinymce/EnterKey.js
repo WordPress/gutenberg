@@ -1066,4 +1066,17 @@ if (window.getSelection) {
 		Utils.pressEnter();
 		equal(editor.getContent(),'<p>x</p><p>\u00a0</p><table><tbody><tr><td>x</td></tr></tbody></table>');
 	});
+
+	test('Enter twice before table element', function(){
+		var rng = editor.dom.createRng();
+
+		editor.getBody().innerHTML = '<table><tbody><tr><td>x</td></tr></tbody></table>';
+		rng.setStartBefore(editor.getBody().lastChild);
+		rng.setEndBefore(editor.getBody().lastChild);
+		editor.selection.setRng(rng);
+
+		Utils.pressEnter();
+		Utils.pressEnter();
+		equal(editor.getContent(),'<p>\u00a0</p><p>\u00a0</p><table><tbody><tr><td>x</td></tr></tbody></table>');
+	});
 }

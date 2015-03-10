@@ -189,7 +189,7 @@ test("Paste Office 365", function() {
 	equal(editor.getContent(), '<p>Test</p>');
 });
 
-test("Paste Google Docs", function() {
+test("Paste Google Docs 1", function() {
 	var rng = editor.dom.createRng();
 
 	editor.setContent('<p>1234</p>');
@@ -199,6 +199,28 @@ test("Paste Google Docs", function() {
 
 	editor.execCommand('mceInsertClipboardContent', false, {content: '<span id="docs-internal-guid-94e46f1a-1c88-b42b-d502-1d19da30dde7"></span><p dir="ltr>Test</p>'});
 	equal(editor.getContent(), '<p>Test</p>');
+});
+
+test("Paste Google Docs 2", function() {
+	var rng = editor.dom.createRng();
+
+	editor.setContent('<p>1234</p>');
+	rng.setStart(editor.getBody().firstChild.firstChild, 0);
+	rng.setEnd(editor.getBody().firstChild.firstChild, 4);
+	editor.selection.setRng(rng);
+
+	editor.execCommand('mceInsertClipboardContent', false, {
+		content: (
+			'<meta charset="utf-8">' +
+			'<b style="font-weight:normal;" id="docs-internal-guid-adeb6845-fec6-72e6-6831-5e3ce002727c">' +
+			'<p dir="ltr">a</p>' +
+			'<p dir="ltr">b</p>' +
+			'<p dir="ltr">c</p>' +
+			'</b>' +
+			'<br class="Apple-interchange-newline">'
+		)
+	});
+	equal(editor.getContent(), '<p>a</p><p>b</p><p>c</p>');
 });
 
 test("Paste Word without mso markings", function() {
@@ -397,7 +419,7 @@ test("Paste list start index", function() {
 		)
 	});
 	equal(editor.getContent(), '<ol start="10"><li>J</li></ol>');
-})
+});
 
 test("Paste paste_merge_formats: true", function() {
 	editor.settings.paste_merge_formats = true;
@@ -691,14 +713,14 @@ if (tinymce.Env.webkit) {
 		editor.execCommand('mceInsertClipboardContent', false, {content: '<span style="font-size:42px; text-indent: 10px">Test</span>'});
 		equal(editor.getContent(), '<p><span style="font-size: 42px;">Test</span></p>');
 	});
-
+/* WP set to always remove font-family on WebKit with a filtering callback.
 	test('paste webkit remove runtime styles (font-family)', function() {
 		editor.settings.paste_webkit_styles = 'font-family';
 		editor.setContent('');
-		editor.execCommand('mceInsertClipboardContent', false, {content: '<span style="font-family: Arial, Helvetica; text-indent: 10px">Test</span>'});
-		equal(editor.getContent(), '<p><span style="font-family: Arial, Helvetica;">Test</span></p>');
+		editor.execCommand('mceInsertClipboardContent', false, {content: '<span style="font-family:Arial; text-indent: 10px">Test</span>'});
+		equal(editor.getContent(), '<p><span style="font-family: Arial;">Test</span></p>');
 	});
-
+WP end */
 	test('paste webkit remove runtime styles font-family allowed but not specified', function() {
 		editor.settings.paste_webkit_styles = 'font-family';
 		editor.setContent('');

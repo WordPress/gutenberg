@@ -162,7 +162,7 @@ test('getBoolAttrs', function() {
 	expect(1);
 
 	schema = new tinymce.html.Schema();
-	deepEqual(schema.getBoolAttrs(), {
+	deepEqual(schema.getBoolAttrs(), { // WP: include three additional bool attributes used in the "media" plugin.
 		"CONTROLS": {}, "LOOP": {}, "AUTOPLAY": {}, "SELECTED": {}, "READONLY": {}, "NOWRAP": {},
 		"NOSHADE": {}, "NORESIZE": {}, "NOHREF": {}, "MULTIPLE": {}, "ISMAP": {}, "DISABLED": {}, "DEFER": {},
 		"DECLARE": {}, "COMPACT": {}, "CHECKED": {},
@@ -455,6 +455,11 @@ test('validStyles', function() {
 		"a": [
 			"background",
 			"font-family"
+		],
+
+		"A": [
+			"background",
+			"font-family"
 		]
 	});
 });
@@ -493,6 +498,11 @@ test('invalidStyles', function() {
 		'a': {
 			'background': {},
 			'font-family': {}
+		},
+
+		'A': {
+			'background': {},
+			'font-family': {}
 		}
 	});
 });
@@ -529,6 +539,11 @@ test('validClasses', function() {
 		},
 
 		'a': {
+			'classC': {},
+			'classD': {}
+		},
+
+		'A': {
 			'classC': {},
 			'classD': {}
 		}
