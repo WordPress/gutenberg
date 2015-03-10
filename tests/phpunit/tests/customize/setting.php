@@ -44,6 +44,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertEquals( '', $setting->sanitize_js_callback );
 		$this->assertFalse( has_filter( "customize_sanitize_{$setting->id}" ) );
 		$this->assertFalse( has_filter( "customize_sanitize_js_{$setting->id}" ) );
+		$this->assertEquals( false, $setting->dirty );
 	}
 
 	function test_constructor_with_args() {
