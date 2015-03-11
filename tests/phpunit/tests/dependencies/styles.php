@@ -12,6 +12,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 			$GLOBALS['wp_styles'] = null;
 		$this->old_wp_styles = $GLOBALS['wp_styles'];
 		remove_action( 'wp_default_styles', 'wp_default_styles' );
+		remove_action( 'wp_print_styles', 'print_emoji_styles' );
 		$GLOBALS['wp_styles'] = new WP_Styles();
 		$GLOBALS['wp_styles']->default_version = get_bloginfo( 'version' );
 	}
@@ -19,6 +20,7 @@ class Tests_Dependencies_Styles extends WP_UnitTestCase {
 	function tearDown() {
 		$GLOBALS['wp_styles'] = $this->old_wp_styles;
 		add_action( 'wp_default_styles', 'wp_default_styles' );
+		add_action( 'wp_print_styles', 'print_emoji_styles' );
 		parent::tearDown();
 	}
 
