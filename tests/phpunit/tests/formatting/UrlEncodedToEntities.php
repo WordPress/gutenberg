@@ -8,7 +8,7 @@ class Tests_Formatting_UrlEncodedToEntities extends WP_UnitTestCase {
 	 * @dataProvider data
 	 */
 	function test_convert_urlencoded_to_entities( $u_urlencoded, $entity ) {
-		$this->assertEquals( $entity, preg_replace_callback('/\%u([0-9A-F]{4})/', '_convert_urlencoded_to_entities', $u_urlencoded ), $entity );
+		$this->assertEquals( $entity, preg_replace_callback('/\%u([0-9A-F]{4,5})/', '_convert_urlencoded_to_entities', $u_urlencoded ), $entity );
 	}
 
 	function data() {

@@ -174,8 +174,9 @@ class Tests_Term extends WP_UnitTestCase {
 
 		// Test existing term name with unique slug
 		$term1 = $this->factory->tag->create( array( 'name' => 'Bozo', 'slug' => 'bozo1' ) );
-		$this->assertFalse( is_wp_error( $term1 ) );
-		$this->assertTrue( empty($term1->errors ) );
+		$this->assertTrue( is_wp_error( $term1 ) );
+		$this->assertSame( 'term_exists', $term1->get_error_code() );
+		$this->assertEquals( $term->term_id, $term1->get_error_data() );
 
 		// Test an existing term name
 		$term2 = $this->factory->tag->create( array( 'name' => 'Bozo' ) );
