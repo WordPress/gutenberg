@@ -16,6 +16,10 @@ class Tests_General_Archives extends WP_UnitTestCase {
 	function test_get_archives_cache() {
 		global $wpdb;
 
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
+		}
+
 		$this->factory->post->create_many( 15, array( 'post_type' => 'post' ) );
 		wp_cache_delete( 'last_changed', 'posts' );
 		$this->assertFalse( wp_cache_get( 'last_changed', 'posts' ) );
