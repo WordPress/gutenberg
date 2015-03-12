@@ -960,4 +960,32 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertFalse( $q->is_page( $p2_name ) );
 		$this->assertFalse( $q->is_page( $p2 ) );
 	}
+
+	function test_is_page_template() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		update_post_meta($post_id, '_wp_page_template', 'example.php');
+		$this->go_to( "/?page_id=$post_id" );
+		$this->assertTrue( is_page_template( 'example.php' ) );
+	}
+
+	/**
+	 * @ticket 31271
+	 */
+	function test_is_page_template_default() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$this->go_to( "/?page_id=$post_id" );
+		$this->assertTrue( is_page_template( 'default' ) );
+		$this->assertTrue( is_page_template( array( 'random', 'default' ) ) );
+	}
+
+	/**
+	 * @ticket 31271
+	 */
+	function test_is_page_template_array() {
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		update_post_meta($post_id, '_wp_page_template', 'example.php');
+		$this->go_to( "/?page_id=$post_id" );
+		$this->assertFalse( is_page_template( array( 'test.php' ) ) );
+		$this->assertTrue( is_page_template( array('test.php', 'example.php') ) );
+	}
 }
