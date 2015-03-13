@@ -590,8 +590,8 @@ module.exports = function(grunt) {
 		'imagemin:core',
 		'browserify',
 		'jshint:corejs',
-		'qunit:compiled',
-		'uglify:bookmarklet'
+		'uglify:bookmarklet',
+		'qunit:compiled'
 	] );
 
 	grunt.registerTask( 'copy:all', [
