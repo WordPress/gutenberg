@@ -37,5 +37,8 @@ wp-tests-config.php
 /src/wp-content/object-cache.php
 /src/wp-content/sunrise.php
 
+# Operating system specific files
+.DS_Store
+
 # Ignore other .gitignore files to allow for personal customizations
 .gitignore
