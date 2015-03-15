@@ -1055,9 +1055,9 @@ class Tests_Post extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'post_title'   => "foobar",
-			'post_content' => "foobaz",
-			'post_excerpt' => "foobat"
+			'post_title'   => "foo&#x1f608;bar",
+			'post_content' => "foo&#x1f60e;baz",
+			'post_excerpt' => "foo&#x1f61;bat"
 		);
 
 		edit_post( $data );
@@ -1065,7 +1065,7 @@ class Tests_Post extends WP_UnitTestCase {
 		$post = get_post( $post_id );
 
 		foreach( $expected as $field => $value ) {
-			$this->assertEquals( $post->$field, $value );
+			$this->assertEquals( $value, $post->$field );
 		}
 	}
 }
