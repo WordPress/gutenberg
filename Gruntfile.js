@@ -411,7 +411,7 @@ module.exports = function(grunt) {
 					'!wp-admin/js/custom-header.js', // Why? We should minify this.
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
-					'!wp-admin/js/bookmarklet.js', // Minified and updated in /src with the precommit task. See uglify:bookmarklet.
+					'!wp-admin/js/bookmarklet.*', // Minified and updated in /src with the precommit task. See uglify:bookmarklet.
 					'!wp-includes/js/backbone.min.js',
 					'!wp-includes/js/swfobject.js',
 					'!wp-includes/js/underscore.min.js',
