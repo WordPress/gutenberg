@@ -1587,4 +1587,49 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array_merge( $c1, $c3 ), $found );
 	}
+
+	/**
+	 * @ticket 24826
+	 */
+	public function test_comment_query_object() {
+		$comment_id = $this->factory->comment->create();
+
+		$query1 = new WP_Comment_Query();
+		$this->assertNull( $query1->query_vars );
+		$this->assertEmpty( $query1->comments );
+		$comments = $query1->query( array( 'status' => 'all' ) );
+		$this->assertInternalType( 'array', $query1->query_vars );
+		$this->assertNotEmpty( $query1->comments );
+		$this->assertInternalType( 'array', $query1->comments );
+
+		$query2 = new WP_Comment_Query( array( 'status' => 'all' ) );
+		$this->assertNotEmpty( $query2->query_vars );
+		$this->assertNotEmpty( $query2->comments );
+		$this->assertEquals( $query2->comments, $query1->get_comments() );
+	}
+
+	/**
+	 * @ticket 22400
+	 */
+	public function test_comment_cache_key_should_ignore_custom_params() {
+		global $wpdb;
+
+		$p = $this->factory->post->create();
+		$c = $this->factory->comment->create( array( 'comment_post_ID' => $p ) );
+
+		$q1 = new WP_Comment_Query();
+		$q1->query( array(
+			'post_id' => $p,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q2 = new WP_Comment_Query();
+		$q2->query( array(
+			'post_id' => $p,
+			'foo' => 'bar',
+		) );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
 }
