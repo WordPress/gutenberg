@@ -174,9 +174,7 @@ class Tests_Term extends WP_UnitTestCase {
 
 		// Test existing term name with unique slug
 		$term1 = $this->factory->tag->create( array( 'name' => 'Bozo', 'slug' => 'bozo1' ) );
-		$this->assertTrue( is_wp_error( $term1 ) );
-		$this->assertSame( 'term_exists', $term1->get_error_code() );
-		$this->assertEquals( $term->term_id, $term1->get_error_data() );
+		$this->assertFalse( is_wp_error( $term1 ) );
 
 		// Test an existing term name
 		$term2 = $this->factory->tag->create( array( 'name' => 'Bozo' ) );
@@ -227,6 +225,203 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertFalse( is_wp_error( $term20 ) );
 	}
 
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_slug_is_a_duplicate_of_the_same_term_in_non_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertWPError( $t2 );
+		$this->assertSame( 'term_exists', $t2->get_error_code() );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_slug_is_a_duplicate_of_a_different_term_in_non_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t3 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'bar',
+		) );
+
+		$this->assertWPError( $t3 );
+		$this->assertSame( 'term_exists', $t3->get_error_code() );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_allow_duplicate_names_when_a_unique_slug_has_been_provided_in_non_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'foo-unique',
+		) );
+
+		$this->assertFalse( is_wp_error( $t2 ) );
+
+		$t2_term = get_term( $t2['term_id'], 'wptests_tax' );
+		$this->assertSame( 'foo-unique', $t2_term->slug );
+		$this->assertSame( 'Foo', $t2_term->name );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_the_slug_is_not_provided_in_non_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax' );
+
+		$this->assertWPError( $t2 );
+		$this->assertSame( 'term_exists', $t2->get_error_code() );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_slug_is_a_duplicate_of_the_same_term_in_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertWPError( $t2 );
+		$this->assertSame( 'term_exists', $t2->get_error_code() );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_slug_is_a_duplicate_of_a_different_term_at_same_hierarchy_level_in_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t3 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'bar',
+		) );
+
+		$this->assertWPError( $t3 );
+		$this->assertSame( 'term_exists', $t3->get_error_code() );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_allow_duplicate_names_when_slug_is_a_duplicate_of_a_term_at_different_hierarchy_level_in_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = $this->factory->term->create();
+
+		$t3 = $this->factory->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'parent' => $t2,
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t4 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'bar',
+		) );
+
+		$this->assertFalse( is_wp_error( $t4 ) );
+		$t4_term = get_term( $t4['term_id'], 'wptests_tax' );
+
+		// `wp_unique_term_slug()` allows term creation but iterates the slug.
+		$this->assertSame( 'bar-2', $t4_term->slug );
+		$this->assertSame( 'Foo', $t4_term->name );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_allow_duplicate_names_when_a_unique_slug_has_been_provided_in_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax', array(
+			'slug' => 'foo-unique',
+		) );
+
+		$this->assertFalse( is_wp_error( $t2 ) );
+
+		$t2_term = get_term( $t2['term_id'], 'wptests_tax' );
+		$this->assertSame( 'foo-unique', $t2_term->slug );
+		$this->assertSame( 'Foo', $t2_term->name );
+	}
+
+	/**
+	 * @ticket 31328
+	 */
+	public function test_wp_insert_term_should_not_allow_duplicate_names_when_the_slug_is_not_provided_in_hierarchical_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax' );
+
+		$this->assertWPError( $t2 );
+		$this->assertSame( 'term_exists', $t2->get_error_code() );
+	}
 	/**
 	 * @ticket 5809
 	 */
@@ -368,77 +563,6 @@ class Tests_Term extends WP_UnitTestCase {
 		_unregister_taxonomy( 'wptests_tax' );
 
 		$this->assertSame( 0, $created_term->term_group );
-	}
-
-	public function test_wp_insert_term_duplicate_name_slug_non_hierarchical() {
-		register_taxonomy( 'foo', 'post', array() );
-
-		$existing_term = $this->factory->term->create( array(
-			'slug' => 'new-term',
-			'name' => 'New Term',
-			'taxonomy' => 'foo',
-		) );
-
-		$found = wp_insert_term( 'New Term', 'foo', array(
-			'slug' => 'new-term',
-		) );
-
-		_unregister_taxonomy( 'foo' );
-
-		$this->assertTrue( is_wp_error( $found ) );
-		$this->assertEquals( $existing_term, $found->get_error_data() );
-	}
-
-	public function test_wp_insert_term_duplicate_name_hierarchical() {
-		register_taxonomy( 'foo', 'post', array(
-			'hierarchical' => true,
-		) );
-
-		$parent_term = $this->factory->term->create( array(
-			'taxonomy' => 'foo',
-		) );
-
-		$existing_term = $this->factory->term->create( array(
-			'name' => 'New Term',
-			'taxonomy' => 'foo',
-			'parent' => $parent_term,
-		) );
-
-		$found = wp_insert_term( 'New Term', 'foo', array(
-			'parent' => $parent_term,
-		) );
-
-		_unregister_taxonomy( 'foo' );
-
-		$this->assertTrue( is_wp_error( $found ) );
-		$this->assertEquals( $existing_term, $found->get_error_data() );
-	}
-
-	public function test_wp_insert_term_duplicate_name_slug_hierarchical() {
-		register_taxonomy( 'foo', 'post', array(
-			'hierarchical' => true,
-		) );
-
-		$parent_term = $this->factory->term->create( array(
-			'taxonomy' => 'foo',
-		) );
-
-		$existing_term = $this->factory->term->create( array(
-			'name' => 'New Term',
-			'slug' => 'new-term-slug',
-			'taxonomy' => 'foo',
-			'parent' => $parent_term,
-		) );
-
-		$found = wp_insert_term( 'New Term', 'foo', array(
-			'parent' => $parent_term,
-			'slug' => 'new-term-slug',
-		) );
-
-		_unregister_taxonomy( 'foo' );
-
-		$this->assertTrue( is_wp_error( $found ) );
-		$this->assertEquals( $existing_term, $found->get_error_data() );
 	}
 
 	/**
