@@ -9,8 +9,14 @@
  * @group feed
  */
 class Tests_Feed_RSS2 extends WP_UnitTestCase {
+	private $permalink_structure = '';
 
-	function setUp() {
+	public function setUp() {
+		global $wp_rewrite;
+		$this->permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
+
 		parent::setUp();
 
 		$u = $this->factory->user->create();
@@ -22,6 +28,12 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		$this->excerpt_only = get_option('rss_use_excerpt');
 		// this seems to break something
 		update_option('use_smilies', false);
+	}
+
+	public function tearDown() {
+		global $wp_rewrite;
+		$wp_rewrite->set_permalink_structure( $this->permalink_structure );
+		$wp_rewrite->flush_rules();
 	}
 
 	function do_rss2() {
@@ -39,7 +51,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	}
 
 	function test_rss() {
-		$this->go_to('/feed/');
+		$this->go_to( '/?feed=rss2' );
 		$feed = $this->do_rss2();
 		$xml = xml_to_array($feed);
 
@@ -59,7 +71,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	}
 
 	function test_channel() {
-		$this->go_to('/feed/');
+		$this->go_to( '/?feed=rss2' );
 		$feed = $this->do_rss2();
 		$xml = xml_to_array($feed);
 
@@ -85,7 +97,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	 * @ticket UT32
 	 */
 	function test_items() {
-		$this->go_to('/feed/');
+		$this->go_to( '/?feed=rss2' );
 		$feed = $this->do_rss2();
 		$xml = xml_to_array($feed);
 
