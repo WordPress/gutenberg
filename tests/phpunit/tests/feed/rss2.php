@@ -13,7 +13,10 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->factory->post->create_many( 25 );
+		$u = $this->factory->user->create();
+		$this->factory->post->create_many( 25, array(
+			'post_author' => $u,
+		) );
 
 		$this->post_count = get_option('posts_per_rss');
 		$this->excerpt_only = get_option('rss_use_excerpt');
