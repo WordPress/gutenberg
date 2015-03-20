@@ -11,6 +11,34 @@
 class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	private $permalink_structure = '';
 
+	static $user;
+	static $posts;
+
+	public static function setUpBeforeClass() {
+		$factory = new WP_UnitTest_Factory();
+
+		self::$user = $factory->user->create();
+		self::$posts = $factory->post->create_many( 25, array(
+			'post_author' => self::$user,
+		) );
+
+		self::commit_transaction();
+	}
+
+	public static function tearDownAfterClass() {
+		if ( is_multisite() ) {
+			wpmu_delete_user( self::$user );
+		} else {
+			wp_delete_user( self::$user );
+		}
+
+		foreach ( self::$posts as $post ) {
+			wp_delete_post( $post, true );
+		}
+
+		self::commit_transaction();
+	}
+
 	public function setUp() {
 		global $wp_rewrite;
 		$this->permalink_structure = get_option( 'permalink_structure' );
@@ -18,11 +46,6 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		$wp_rewrite->flush_rules();
 
 		parent::setUp();
-
-		$u = $this->factory->user->create();
-		$this->factory->post->create_many( 25, array(
-			'post_author' => $u,
-		) );
 
 		$this->post_count = get_option('posts_per_rss');
 		$this->excerpt_only = get_option('rss_use_excerpt');
