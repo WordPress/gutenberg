@@ -464,6 +464,19 @@ module.exports = function(grunt) {
 					BUILD_DIR + 'wp-includes/js/tinymce/plugins/*/plugin.min.js'
 				],
 				dest: BUILD_DIR + 'wp-includes/js/tinymce/wp-tinymce.js'
+			},
+			emoji: {
+				options: {
+					separator: '\n',
+					process: function( src, filepath ) {
+						return '// Source: ' + filepath.replace( BUILD_DIR, '' ) + '\n' + src;
+					}
+				},
+				src: [
+					BUILD_DIR + 'wp-includes/js/twemoji.min.js',
+					BUILD_DIR + 'wp-includes/js/wp-emoji.min.js'
+				],
+				dest: BUILD_DIR + 'wp-includes/js/wp-emoji-release.min.js'
 			}
 		},
 		compress: {
@@ -500,6 +513,12 @@ module.exports = function(grunt) {
 					'wp-includes/js/tinymce/skins/wordpress/images/*.{png,jpg,gif,jpeg}'
 				],
 				dest: SOURCE_DIR
+			}
+		},
+		includes: {
+			emoji: {
+				src: BUILD_DIR + 'wp-includes/formatting.php',
+				dest: '.'
 			}
 		},
 		_watch: {
@@ -615,6 +634,8 @@ module.exports = function(grunt) {
 		'concat:tinymce',
 		'compress:tinymce',
 		'clean:tinymce',
+		'concat:emoji',
+		'includes:emoji',
 		'jsvalidate:build'
 	] );
 

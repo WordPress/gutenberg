@@ -4082,6 +4082,13 @@ function wp_spaces_regexp() {
  * @since 4.2.0
  */
 function print_emoji_styles() {
+	static $printed = false;
+
+	if ( $printed ) {
+		return;
+	}
+
+	$printed = true;
 ?>
 <style type="text/css">
 img.wp-smiley,
@@ -4098,6 +4105,64 @@ img.emoji {
 }
 </style>
 <?php
+}
+
+function print_emoji_detection_script() {
+	global $wp_version;
+	static $printed = false;
+
+	if ( $printed ) {
+		return;
+	}
+
+	$printed = true;
+
+	$settings = array(
+		/**
+		 * Filter the URL where emoji images are hosted.
+		 *
+		 * @since 4.2.0
+		 *
+		 * @param string The emoji base URL.
+		 */
+		'baseUrl' => apply_filters( 'emoji_url', set_url_scheme( '//s0.wp.com/wp-content/mu-plugins/emoji/twemoji/72x72' ) ),
+
+		/**
+		 * Filter the extension of the emoji files.
+		 *
+		 * @since 4.2.0
+		 *
+		 * @param string The emoji extension. Default .png.
+		 */
+		'ext'     => apply_filters( 'emoji_ext', '.png' ),
+	);
+
+	$version = 'ver=' . $wp_version;
+
+	if ( SCRIPT_DEBUG ) {
+		$settings['source'] = array(
+			'wpemoji' => includes_url( "js/wp-emoji.js?$version" ),
+			'twemoji' => includes_url( "js/twemoji.js?$version" ),
+		);
+
+		?>
+		<script type="text/javascript">
+			window._wpemojiSettings = <?php echo wp_json_encode( $settings ); ?>;
+			<?php readfile( ABSPATH . WPINC . "/js/wp-emoji-loader.js" ); ?>
+		</script>
+		<?php
+	} else {
+		$settings['source'] = array(
+			'concatemoji' => includes_url( "js/wp-emoji-release.min.js?$version" ),
+		);
+
+		?>
+		<script type="text/javascript">
+			window._wpemojiSettings = <?php echo wp_json_encode( $settings ); ?>;
+			include "js/wp-emoji-loader.min.js"
+		</script>
+		<?php
+	}
 }
 
 /**
@@ -4163,10 +4228,10 @@ function wp_staticize_emoji( $text ) {
 		return $text;
 	}
 
-	/** This filter is documented in wp-includes/script-loader.php */
+	/** This filter is documented in wp-includes/formatting.php */
 	$cdn_url = apply_filters( 'emoji_url', set_url_scheme( '//s0.wp.com/wp-content/mu-plugins/emoji/twemoji/72x72/' ) );
 
-	/** This filter is documented in wp-includes/script-loader.php */
+	/** This filter is documented in wp-includes/formatting.php */
 	$ext = apply_filters( 'emoji_ext', '.png' );
 
 	$output = '';
