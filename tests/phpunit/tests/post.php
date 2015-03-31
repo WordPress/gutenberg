@@ -1057,7 +1057,7 @@ class Tests_Post extends WP_UnitTestCase {
 		$expected = array(
 			'post_title'   => "foo&#x1f608;bar",
 			'post_content' => "foo&#x1f60e;baz",
-			'post_excerpt' => "foo&#x1f61;bat"
+			'post_excerpt' => "foo&#x1f610;bat"
 		);
 
 		edit_post( $data );
