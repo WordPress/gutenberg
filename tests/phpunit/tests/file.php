@@ -7,7 +7,10 @@ class Tests_File extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		$this->dir = dirname(tempnam('/tmp', 'foo'));
+
+		$file = tempnam( '/tmp', 'foo') ;
+		$this->dir = dirname( $file );
+		unlink( $file );
 
 		$this->badchars = '"\'[]*&?$';
 	}
