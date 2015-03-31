@@ -152,4 +152,24 @@ class Tests_File extends WP_UnitTestCase {
 		unlink($this->dir . DIRECTORY_SEPARATOR . $filename);
 	}
 
+	/**
+	 * @dataProvider data_wp_tempnam_filenames
+	 */
+	function test_wp_tempnam( $case ) {
+		$file = wp_tempnam( $case );
+		unlink( $file );
+
+		$this->assertNotEmpty( basename( basename( $file, '.tmp' ), '.zip' ) );
+	}
+	function data_wp_tempnam_filenames() {
+		return array(
+			array( '0.zip' ),
+			array( '0.1.2.3.zip' ),
+			array( 'filename.zip' ),
+			array( 'directory/0.zip' ),
+			array( 'directory/filename.zip' ),
+			array( 'directory/0/0.zip' ),
+		);
+	}
+
 }
