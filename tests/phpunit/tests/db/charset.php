@@ -122,6 +122,10 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 * @ticket 21212
 	 */
 	function test_strip_invalid_text( $data, $expected, $message ) {
+		if ( version_compare( PHP_VERSION, '5.3', '<') && stristr( php_uname( 's' ), 'win' ) ) {
+			$this->markTestSkipped( 'This test fails in PHP 5.2 on Windows. See https://core.trac.wordpress.org/ticket/31262' );
+		}
+
 		$actual = self::$_wpdb->strip_invalid_text( $data );
 		$this->assertSame( $expected, $actual, $message );
 	}
