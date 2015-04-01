@@ -619,6 +619,41 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30647
+	 */
+	function test_user_update_email_error() {
+		$id1 = wp_insert_user( array(
+			'user_login' => rand_str(),
+			'user_pass'  => 'password',
+			'user_email' => 'blackburn@battlefield3.com',
+		) );
+		$this->assertEquals( $id1, email_exists( 'blackburn@battlefield3.com' ) );
+
+		$id2 = wp_insert_user( array(
+			'user_login' => rand_str(),
+			'user_pass'  => 'password',
+			'user_email' => 'miller@battlefield3.com',
+		) );
+		$this->assertEquals( $id2, email_exists( 'miller@battlefield3.com' ) );
+
+		if( ! is_wp_error( $id2 ) ){	
+			$return = wp_update_user( array(
+				'ID'         => $id2,
+				'user_email' => 'david@battlefield3.com',
+			) );
+			$this->assertEquals( $id2, email_exists( 'david@battlefield3.com' ) );
+
+			$return = wp_update_user( array(
+				'ID'         => $id2,
+				'user_email' => 'blackburn@battlefield3.com',
+			) );
+			if ( ! defined( 'WP_IMPORTING' ) ) {
+				$this->assertWPError( $return );
+			}			
+		}
+	}
+
+	/**
 	 * @ticket 29696
 	 */
 	public function test_wp_insert_user_should_sanitize_user_nicename_parameter() {
