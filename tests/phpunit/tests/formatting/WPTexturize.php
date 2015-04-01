@@ -1393,6 +1393,18 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[Let\'s get crazy<input>[caption code="<a href=\'?a[]=100\'>hello</a>"]</input>world]', // caption shortcode is invalid here because it contains [] chars.
 				'[Let&#8217;s get crazy<input>[caption code=&#8221;<a href=\'?a[]=100\'>hello</a>&#8220;]</input>world]',
 			),
+			array(
+				'<> ... <>',
+				'<> &#8230; <>',
+			),
+			array(
+				'<> ... <> ... >',
+				'<> &#8230; <> &#8230; >',
+			),
+			array(
+				'<> ... < ... > ... <>',
+				'<> &#8230; < ... > &#8230; <>',
+			),
 		);
 	}
 
