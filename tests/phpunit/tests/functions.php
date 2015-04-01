@@ -259,6 +259,20 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 31306
+	 */
+	function test_add_query_arg_numeric_keys() {
+		$url = add_query_arg( array( 'foo' => 'bar' ), '1=1' );
+		$this->assertEquals('1=1&foo=bar', $url);
+
+		$url = add_query_arg( array( 'foo' => 'bar', '1' => '2' ), '1=1' );
+		$this->assertEquals('1=2&foo=bar', $url);
+
+		$url = add_query_arg( array( '1' => '2' ), 'foo=bar' );
+		$this->assertEquals('foo=bar&1=2', $url);
+	}
+
+	/**
 	 * @ticket 21594
 	 */
 	function test_get_allowed_mime_types() {
