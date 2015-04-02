@@ -54,6 +54,55 @@ class Tests_Post_GetPostClass extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 30883
+	 */
+	public function test_with_utf8_category_slugs() {
+		$cat_id1 = $this->factory->category->create( array( 'name' => 'Первая рубрика' ) );
+		$cat_id2 = $this->factory->category->create( array( 'name' => 'Вторая рубрика' ) );
+		$cat_id3 = $this->factory->category->create( array( 'name' => '25кадр' ) );
+		wp_set_post_terms( $this->post_id, array( $cat_id1, $cat_id2, $cat_id3 ), 'category' );
+
+		$found = get_post_class( '', $this->post_id );
+
+		$this->assertContains( "category-$cat_id1", $found );
+		$this->assertContains( "category-$cat_id2", $found );
+		$this->assertContains( "category-$cat_id3", $found );
+	}
+
+	/**
+	 * @ticket 30883
+	 */
+	public function test_with_utf8_tag_slugs() {
+		$tag_id1 = $this->factory->tag->create( array( 'name' => 'Первая метка' ) );
+		$tag_id2 = $this->factory->tag->create( array( 'name' => 'Вторая метка' ) );
+		$tag_id3 = $this->factory->tag->create( array( 'name' => '25кадр' ) );
+		wp_set_post_terms( $this->post_id, array( $tag_id1, $tag_id2, $tag_id3 ), 'post_tag' );
+
+		$found = get_post_class( '', $this->post_id );
+
+		$this->assertContains( "tag-$tag_id1", $found );
+		$this->assertContains( "tag-$tag_id2", $found );
+		$this->assertContains( "tag-$tag_id3", $found );
+	}
+
+	/**
+	 * @ticket 30883
+	 */
+	public function test_with_utf8_term_slugs() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term_id1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => 'Первая метка' ) );
+		$term_id2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => 'Вторая метка' ) );
+		$term_id3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => '25кадр' ) );
+		wp_set_post_terms( $this->post_id, array( $term_id1, $term_id2, $term_id3 ), 'wptests_tax' );
+
+		$found = get_post_class( '', $this->post_id );
+
+		$this->assertContains( "wptests_tax-$term_id1", $found );
+		$this->assertContains( "wptests_tax-$term_id2", $found );
+		$this->assertContains( "wptests_tax-$term_id3", $found );
+	}
+
+	/**
 	 * @group cache
 	 */
 	public function test_taxonomy_classes_hit_cache() {
