@@ -1,5 +1,7 @@
 <?php
 
+if ( is_multisite() ) :
+
 /**
  * @group multisite
  */
@@ -120,3 +122,5 @@ class Tests_Multisite_WpmuValidateUserSignup extends WP_UnitTestCase {
 	}
 
 }
+
+endif;
