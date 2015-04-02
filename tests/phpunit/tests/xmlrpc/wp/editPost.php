@@ -95,6 +95,25 @@ class Tests_XMLRPC_wp_editPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( $contributor_id, $out->post_author );
 	}
 
+	/**
+	 * @ticket 24916
+	 */
+	function test_capable_reassign_author_to_self() {
+		$contributor_id = $this->make_user_by_role( 'contributor' );
+		$editor_id = $this->make_user_by_role( 'editor' );
+
+		$post = array( 'post_title' => 'Post test', 'post_author' => $contributor_id );
+		$post_id = wp_insert_post( $post );
+
+		$post2 = array( 'post_author' => $editor_id );
+		$result = $this->myxmlrpcserver->wp_editPost( array( 1, 'editor', 'editor', $post_id, $post2 ) );
+		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertTrue($result);
+
+		$out = get_post( $post_id );
+		$this->assertEquals( $editor_id, $out->post_author );
+	}
+	
 	function test_post_thumbnail() {
 		add_theme_support( 'post-thumbnails' );
 
