@@ -599,4 +599,30 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( array( 'author' ), $user->roles );
 		$this->assertSame( array( 'author' => true ), $user->caps );
 	}
+
+	/**
+	 * @ticket 31878
+	 */
+	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_different_blog_id_on_ms_when_fields_all() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
+		}
+
+		$b = $this->factory->blog->create();
+		$u = $this->factory->user->create();
+		add_user_to_blog( $b, $u, 'author' );
+
+		$query = new WP_User_Query( array(
+			'fields' => 'all',
+			'include' => $u,
+			'blog_id' => $b,
+		) );
+
+		$found = $query->get_results();
+
+		$this->assertNotEmpty( $found );
+		$user = reset( $found );
+		$this->assertSame( array( 'author' ), $user->roles );
+		$this->assertSame( array( 'author' => true ), $user->caps );
+	}
 }
