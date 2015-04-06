@@ -1,4 +1,4 @@
-// 4.1.9 (2015-03-10)
+// 4.1.9 (2015-04-05)
 
 /**
  * Compiled inline version. (Library mode)
@@ -2711,7 +2711,7 @@ return Sizzle;
  */
 define("tinymce/Env", [], function() {
 	var nav = navigator, userAgent = nav.userAgent;
-	var opera, webkit, ie, ie11, gecko, mac, iDevice, android;
+	var opera, webkit, ie, ie11, ie12, gecko, mac, iDevice, android;
 
 	opera = window.opera && window.opera.buildNumber;
 	android = /Android/.test(userAgent);
@@ -2719,10 +2719,15 @@ define("tinymce/Env", [], function() {
 	ie = !webkit && !opera && (/MSIE/gi).test(userAgent) && (/Explorer/gi).test(nav.appName);
 	ie = ie && /MSIE (\w+)\./.exec(userAgent)[1];
 	ie11 = userAgent.indexOf('Trident/') != -1 && (userAgent.indexOf('rv:') != -1 || nav.appName.indexOf('Netscape') != -1) ? 11 : false;
-	ie = ie || ie11;
+	ie12 = (document.msElementsFromPoint && !ie && !ie11) ? 12 : false;
+	ie = ie || ie11 || ie12;
 	gecko = !webkit && !ie11 && /Gecko/.test(userAgent);
 	mac = userAgent.indexOf('Mac') != -1;
 	iDevice = /(iPad|iPhone)/.test(userAgent);
+
+	if (ie12) {
+		webkit = false;
+	}
 
 	// Is a iPad/iPhone and not on iOS5 sniff the WebKit version since older iOS WebKit versions
 	// says it has contentEditable support but there is no visible caret.
@@ -2833,7 +2838,7 @@ define("tinymce/Env", [], function() {
 		 * @property documentMode
 		 * @type Number
 		 */
-		documentMode: ie ? (document.documentMode || 7) : 10
+		documentMode: ie && !ie12 ? (document.documentMode || 7) : 10
 	};
 });
 
@@ -16242,12 +16247,12 @@ define("tinymce/Formatter", [
 
 			// BlockFormat shortcuts keys
 			for (var i = 1; i <= 6; i++) {
-				ed.addShortcut('meta+shift+' + i, '', ['FormatBlock', false, 'h' + i]);
+				ed.addShortcut('access+' + i, '', ['FormatBlock', false, 'h' + i]);
 			}
 
-			ed.addShortcut('meta+shift+7', '', ['FormatBlock', false, 'p']);
-			ed.addShortcut('meta+shift+8', '', ['FormatBlock', false, 'div']);
-			ed.addShortcut('meta+shift+9', '', ['FormatBlock', false, 'address']);
+			ed.addShortcut('access+7', '', ['FormatBlock', false, 'p']);
+			ed.addShortcut('access+8', '', ['FormatBlock', false, 'div']);
+			ed.addShortcut('access+9', '', ['FormatBlock', false, 'address']);
 		}
 
 		// Public functions
@@ -26878,6 +26883,22 @@ define("tinymce/util/Quirks", [
 				return true;
 			}
 
+			function isSiblingsIgnoreWhiteSpace(node1, node2) {
+				var node;
+
+				for (node = node1.nextSibling; node && node != node2; node = node.nextSibling) {
+					if (node.nodeType == 3 && $.trim(node.data).length === 0) {
+						continue;
+					}
+
+					if (node !== node2) {
+						return false;
+					}
+				}
+
+				return node === node2;
+			}
+
 			function findCaretNode(node, forward, startNode) {
 				var walker, current, nonEmptyElements;
 
@@ -26989,8 +27010,12 @@ define("tinymce/util/Quirks", [
 					return rng;
 				}
 
-				if (textBlock != targetTextBlock) {
+				if (targetTextBlock && textBlock != targetTextBlock) {
 					if (!isForward) {
+						if (!isSiblingsIgnoreWhiteSpace(targetTextBlock, textBlock)) {
+							return rng;
+						}
+
 						if (targetCaretNode.nodeType == 1) {
 							if (targetCaretNode.nodeName == "BR") {
 								rng.setStartBefore(targetCaretNode);
@@ -27007,6 +27032,10 @@ define("tinymce/util/Quirks", [
 							rng.setEndBefore(caretNode);
 						}
 					} else {
+						if (!isSiblingsIgnoreWhiteSpace(textBlock, targetTextBlock)) {
+							return rng;
+						}
+
 						if (caretNode.nodeType == 1) {
 							if (caretNode.nodeName == "BR") {
 								rng.setStartBefore(caretNode);
@@ -31293,7 +31322,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-03-10',
+		releaseDate: '2015-04-05',
 
 		/**
 		 * Collection of editor instances.
