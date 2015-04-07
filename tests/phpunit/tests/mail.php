@@ -156,4 +156,94 @@ class Tests_Mail extends WP_UnitTestCase {
 		// Fatal errors
 		$this->assertFalse( wp_mail( 'invalid.address', 'subject', 'body', '', array() ) );
 	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_valid_from_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "From: Foo <bar@example.com>";
+		$expected = "From: Foo <bar@example.com>";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_empty_from_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "From: ";
+		$expected = "From: WordPress <wordpress@example.com>";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_empty_from_name_for_the_from_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "From: <wordpress@example.com>";
+		$expected = "From: WordPress <wordpress@example.com>";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_valid_content_type_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "Content-Type: text/html; charset=iso-8859-1";
+		$expected = "Content-Type: text/html; charset=iso-8859-1";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_empty_content_type_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "Content-Type: ";
+		$expected = "Content-Type: text/plain; charset=UTF-8";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
+
+	/**
+	 * @ticket 30266
+	 */
+	public function test_wp_mail_with_empty_charset_for_the_content_type_header() {
+		$to       = "address@tld.com";
+		$subject  = "Testing";
+		$message  = "Test Message";
+		$headers  = "Content-Type: text/plain;";
+		$expected = "Content-Type: text/plain; charset=UTF-8";
+
+		wp_mail( $to, $subject, $message, $headers );
+
+		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+	}
 }
