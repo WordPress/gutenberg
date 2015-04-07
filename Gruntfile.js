@@ -408,13 +408,14 @@ module.exports = function(grunt) {
 					'wp-includes/js/tinymce/plugins/wp*/plugin.js',
 
 					// Exceptions
+					'!wp-admin/js/bookmarklet.*', // Minified and updated in /src with the precommit task. See uglify:bookmarklet.
 					'!wp-admin/js/custom-header.js', // Why? We should minify this.
 					'!wp-admin/js/farbtastic.js',
 					'!wp-admin/js/iris.min.js',
-					'!wp-admin/js/bookmarklet.*', // Minified and updated in /src with the precommit task. See uglify:bookmarklet.
-					'!wp-includes/js/backbone.min.js',
+					'!wp-includes/js/backbone.*',
+					'!wp-includes/js/masonry.min.js',
 					'!wp-includes/js/swfobject.js',
-					'!wp-includes/js/underscore.min.js',
+					'!wp-includes/js/underscore.*',
 					'!wp-includes/js/zxcvbn.min.js'
 				]
 			},
