@@ -169,7 +169,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 		return array (
 			array (
 				'8-O :-(',
-				"\xf0\x9f\x98\xaf \xf0\x9f\x98\xa6"
+				"\xf0\x9f\x98\xaf <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":-(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 			array (
 				'8-) 8-O',
@@ -181,7 +181,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				'8-) :-(',
-				"\xf0\x9f\x98\x8e \xf0\x9f\x98\xa6"
+				"\xf0\x9f\x98\x8e <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":-(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 			array (
 				'8-) :twisted:',
@@ -189,7 +189,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				'8O :twisted: :( :? :(',
-				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 \xf0\x9f\x98\xa6 \xf0\x9f\x98\xaf \xf0\x9f\x98\xa6"
+				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> \xf0\x9f\x98\xaf <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 		);
 	}
