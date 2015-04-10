@@ -16,7 +16,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 		return array (
 			array (
 				'Lorem ipsum dolor sit amet mauris ;-) Praesent gravida sodales. :lol: Vivamus nec diam in faucibus eu, bibendum varius nec, imperdiet purus est, at augue at lacus malesuada elit dapibus a, :eek: mauris. Cras mauris viverra elit. Nam laoreet viverra. Pellentesque tortor. Nam libero ante, porta urna ut turpis. Nullam wisi magna, :mrgreen: tincidunt nec, sagittis non, fringilla enim. Nam consectetuer nec, ullamcorper pede eu dui odio consequat vel, vehicula tortor quis pede turpis cursus quis, egestas ipsum ultricies ut, eleifend velit. Mauris vestibulum iaculis. Sed in nunc. Vivamus elit porttitor egestas. Mauris purus :?:',
-				"Lorem ipsum dolor sit amet mauris \xf0\x9f\x98\x89 Praesent gravida sodales. \xf0\x9f\x98\x84 Vivamus nec diam in faucibus eu, bibendum varius nec, imperdiet purus est, at augue at lacus malesuada elit dapibus a, \xf0\x9f\x98\xaf mauris. Cras mauris viverra elit. Nam laoreet viverra. Pellentesque tortor. Nam libero ante, porta urna ut turpis. Nullam wisi magna, <img src=\"${includes_path}mrgreen.png\" alt=\":mrgreen:\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> tincidunt nec, sagittis non, fringilla enim. Nam consectetuer nec, ullamcorper pede eu dui odio consequat vel, vehicula tortor quis pede turpis cursus quis, egestas ipsum ultricies ut, eleifend velit. Mauris vestibulum iaculis. Sed in nunc. Vivamus elit porttitor egestas. Mauris purus \xe2\x9d\x93"
+				"Lorem ipsum dolor sit amet mauris \xf0\x9f\x98\x89 Praesent gravida sodales. \xf0\x9f\x98\x86 Vivamus nec diam in faucibus eu, bibendum varius nec, imperdiet purus est, at augue at lacus malesuada elit dapibus a, \xf0\x9f\x98\xae mauris. Cras mauris viverra elit. Nam laoreet viverra. Pellentesque tortor. Nam libero ante, porta urna ut turpis. Nullam wisi magna, <img src=\"${includes_path}mrgreen.png\" alt=\":mrgreen:\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> tincidunt nec, sagittis non, fringilla enim. Nam consectetuer nec, ullamcorper pede eu dui odio consequat vel, vehicula tortor quis pede turpis cursus quis, egestas ipsum ultricies ut, eleifend velit. Mauris vestibulum iaculis. Sed in nunc. Vivamus elit porttitor egestas. Mauris purus \xe2\x9d\x93"
 			),
 			array (
 				'<strong>Welcome to the jungle!</strong> We got fun n games! :) We got everything you want 8-) <em>Honey we know the names :)</em>',
@@ -24,7 +24,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				"<strong;)>a little bit of this\na little bit:other: of that :D\n:D a little bit of good\nyeah with a little bit of bad8O",
-				"<strong;)>a little bit of this\na little bit:other: of that \xf0\x9f\x98\x84\n\xf0\x9f\x98\x84 a little bit of good\nyeah with a little bit of bad8O"
+				"<strong;)>a little bit of this\na little bit:other: of that \xf0\x9f\x98\x80\n\xf0\x9f\x98\x80 a little bit of good\nyeah with a little bit of bad8O"
 			),
 			array (
 				'<strong style="here comes the sun :-D">and I say it\'s allright:D:D',
@@ -189,7 +189,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				'8O :twisted: :( :? :(',
-				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> \xf0\x9f\x98\xaf <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
+				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> \xf0\x9f\x98\x95 <img src=\"http://example.org/wp-includes/images/smilies/frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 		);
 	}
