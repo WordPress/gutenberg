@@ -653,4 +653,16 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'wptests_tax' );
 	}
+
+	/**
+	 * @ticket 31954
+	 */
+	public function test_wp_update_term_with_null_get_term() {
+		$t = $this->factory->term->create( array( 'taxonomy' => 'category' ) );
+		$found = wp_update_term( $t, 'post_tag', array( 'slug' => 'foo' ) );
+
+		$this->assertWPError( $found );
+		$this->assertSame( 'invalid_term', $found->get_error_code() );
+	}
+
 }
