@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
 		mediaConfig = {},
-		mediaBuilds = ['audio-video', 'grid', 'models', 'views'];
+		mediaBuilds = ['audiovideo', 'grid', 'models', 'views'];
 
 	// Load tasks.
 	require('matchdep').filterDev(['grunt-*', '!grunt-legacy-util']).forEach( grunt.loadNpmTasks );
@@ -12,9 +12,9 @@ module.exports = function(grunt) {
 	grunt.util = require('grunt-legacy-util');
 
 	mediaBuilds.forEach( function ( build ) {
-		var path = SOURCE_DIR + 'wp-includes/js/media/';
+		var path = SOURCE_DIR + 'wp-includes/js/media';
 		mediaConfig[ build ] = { files : {} };
-		mediaConfig[ build ].files[ path + build + '.js' ] = [ path + build + '.manifest.js' ];
+		mediaConfig[ build ].files[ path + '-' + build + '.js' ] = [ path + '/' + build + '.manifest.js' ];
 	} );
 
 	// Project configuration.
@@ -62,6 +62,7 @@ module.exports = function(grunt) {
 						cwd: SOURCE_DIR,
 						src: [
 							'**',
+							'!wp-includes/js/media/**',
 							'!**/.{svn,git}/**', // Ignore version control directories.
 							// Ignore unminified versions of external libs we don't ship:
 							'!wp-includes/js/backbone.js',
@@ -272,12 +273,8 @@ module.exports = function(grunt) {
 				options: {
 					browserify: true
 				},
-				expand: true,
-				cwd: SOURCE_DIR,
 				src: [
-					'wp-includes/js/media/**/*.js',
-					'!wp-includes/js/media/*.js',
-					'wp-includes/js/media/*.manifest.js'
+					SOURCE_DIR + 'wp-includes/js/media/**/*.js'
 				]
 			},
 			core: {
@@ -286,6 +283,8 @@ module.exports = function(grunt) {
 				src: [
 					'wp-admin/js/*.js',
 					'wp-includes/js/*.js',
+					// Built scripts.
+					'!wp-includes/js/media-*',
 					// WordPress scripts inside directories
 					'wp-includes/js/jquery/jquery.table-hotkeys.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
@@ -628,9 +627,7 @@ module.exports = function(grunt) {
 		'rtl',
 		'cssmin:rtl',
 		'cssmin:colors',
-		'browserify',
 		'uglify:core',
-		'uglify:media',
 		'uglify:jqueryui',
 		'concat:tinymce',
 		'compress:tinymce',
