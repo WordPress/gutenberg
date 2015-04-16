@@ -103,3 +103,15 @@ function _wp_die_handler_txt( $message, $title, $args ) {
 		}
 	}
 }
+
+/**
+ * Set a permalink structure.
+ *
+ * Hooked as a callback to the 'populate_options' action, we use this function to set a permalink structure during
+ * `wp_install()`, so that WP doesn't attempt to do a time-consuming remote request.
+ *
+ * @since 4.2.0
+ */
+function _set_default_permalink_structure_for_tests() {
+	update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
+}

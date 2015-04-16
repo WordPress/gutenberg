@@ -44,7 +44,16 @@ foreach ( $wpdb->tables( 'ms_global' ) as $table => $prefixed_table ) {
 		$wpdb->$table = $prefixed_table;
 }
 
+// Prefill a permalink structure so that WP doesn't try to determine one itself.
+add_action( 'populate_options', '_set_default_permalink_structure_for_tests' );
+
 wp_install( WP_TESTS_TITLE, 'admin', WP_TESTS_EMAIL, true, null, 'password' );
+
+// Delete dummy permalink structure, as prefilled above.
+if ( ! is_multisite() ) {
+	delete_option( 'permalink_structure' );
+}
+remove_action( 'populate_options', '_set_default_permalink_structure_for_tests' );
 
 if ( $multisite ) {
 	echo "Installing network..." . PHP_EOL;
