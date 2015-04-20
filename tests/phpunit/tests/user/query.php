@@ -625,4 +625,65 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( array( 'author' ), $user->roles );
 		$this->assertSame( array( 'author' => true ), $user->caps );
 	}
+
+	/**
+	 * @ticket 32019
+	 */
+	public function test_who_authors() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
+		}
+
+		$b = $this->factory->blog->create();
+		$users = $this->factory->user->create_many( 3 );
+
+		add_user_to_blog( $b, $users[0], 'subscriber' );
+		add_user_to_blog( $b, $users[1], 'author' );
+		add_user_to_blog( $b, $users[2], 'editor' );
+
+		$q = new WP_User_Query( array(
+			'who' => 'authors',
+			'blog_id' => $b,
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+
+		$this->assertNotContains( $users[0], $found );
+		$this->assertContains( $users[1], $found );
+		$this->assertContains( $users[2], $found );
+	}
+
+	/**
+	 * @ticket 32019
+	 */
+	public function test_who_authors_should_work_alongside_meta_query() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
+		}
+
+		$b = $this->factory->blog->create();
+		$users = $this->factory->user->create_many( 3 );
+
+		add_user_to_blog( $b, $users[0], 'subscriber' );
+		add_user_to_blog( $b, $users[1], 'author' );
+		add_user_to_blog( $b, $users[2], 'editor' );
+
+		add_user_meta( $users[1], 'foo', 'bar' );
+		add_user_meta( $users[2], 'foo', 'baz' );
+
+		$q = new WP_User_Query( array(
+			'who' => 'authors',
+			'blog_id' => $b,
+			'meta_query' => array(
+				'key' => 'foo',
+				'value' => 'bar',
+			),
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+
+		$this->assertNotContains( $users[0], $found );
+		$this->assertContains( $users[1], $found );
+		$this->assertNotContains( $users[2], $found );
+	}
 }
