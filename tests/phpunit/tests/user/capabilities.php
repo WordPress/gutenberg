@@ -695,6 +695,39 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		wp_set_current_user( $old_uid );
 	}
 
+	function test_borked_current_user_can_for_blog() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+
+		$orig_blog_id = get_current_blog_id();
+		$blog_id = $this->factory->blog->create();
+
+		$nullify_current_user = function() {
+			// Prevents fatal errors in ::tearDown()'s and other uses of restore_current_blog()
+			$function_stack = wp_debug_backtrace_summary( null, 0, false );
+			if ( in_array( 'restore_current_blog', $function_stack ) ) {
+				return;
+			}
+			$GLOBALS['current_user'] = null;
+		};
+
+		$nullify_current_user_and_keep_nullifying_user = function() use ( $nullify_current_user ) {
+			$nullify_current_user();
+
+			add_action( 'set_current_user', $nullify_current_user );
+		};
+
+		$nullify_current_user();
+
+		add_action( 'switch_blog', $nullify_current_user_and_keep_nullifying_user );
+
+		current_user_can_for_blog( $blog_id, 'edit_posts' );
+
+		$this->assertEquals( $orig_blog_id, get_current_blog_id() );
+	}
+
 	/**
 	 * @ticket 28374
 	 */
