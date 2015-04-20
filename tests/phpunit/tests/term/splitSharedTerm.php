@@ -34,7 +34,7 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
 		$t3 = wp_insert_term( 'Foo', 'wptests_tax_3' );
 
-		// Manually modify because split terms shouldn't naturally occur.
+		// Manually modify because shared terms shouldn't naturally occur.
 		$wpdb->update( $wpdb->term_taxonomy,
 			array( 'term_id' => $t1['term_id'] ),
 			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
@@ -119,7 +119,7 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 			'parent' => $t2['term_id'],
 		) );
 
-		// Manually modify because split terms shouldn't naturally occur.
+		// Manually modify because shared terms shouldn't naturally occur.
 		$wpdb->update( $wpdb->term_taxonomy,
 			array( 'term_id' => $t1['term_id'] ),
 			array( 'term_taxonomy_id' => $t3['term_taxonomy_id'] ),
@@ -146,7 +146,7 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 		register_taxonomy( 'wptests_tax_5', 'post' );
 		$t2 = wp_insert_term( 'Foo Default', 'wptests_tax_5' );
 
-		// Manually modify because split terms shouldn't naturally occur.
+		// Manually modify because shared terms shouldn't naturally occur.
 		$wpdb->update( $wpdb->term_taxonomy,
 			array( 'term_id' => $t1['term_id'] ),
 			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
@@ -173,7 +173,7 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 		register_taxonomy( 'wptests_tax_6', 'post' );
 		$t2 = wp_insert_term( 'Foo Menu', 'wptests_tax_6' );
 
-		// Manually modify because split terms shouldn't naturally occur.
+		// Manually modify because shared terms shouldn't naturally occur.
 		$wpdb->update( $wpdb->term_taxonomy,
 			array( 'term_id' => $t1['term_id'] ),
 			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
