@@ -463,4 +463,67 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 
 		$this->assertFalse( $wpdb->query( "INSERT INTO {$wpdb->posts} (post_content) VALUES ('foo\xf0\xff\xff\xffbar')" ) );
 	}
+
+	/**
+	 * @ticket 21212
+	 */
+	function data_table_collation_check() {
+		$table_name = 'table_collation_check';
+		$data = array(
+			array(
+				// utf8_bin tables don't need extra sanity checking.
+				"( a VARCHAR(50) COLLATE utf8_bin )", // create
+				true                                  // expected result
+			),
+			array(
+				// Neither do utf8_general_ci tables.
+				"( a VARCHAR(50) COLLATE utf8_general_ci )",
+				true
+			),
+			array(
+				// utf8_unicode_ci tables do.
+				"( a VARCHAR(50) COLLATE utf8_unicode_ci )",
+				false
+			),
+			array(
+				// utf8_bin tables don't need extra sanity checking,
+				// except for when they're not just utf8_bin.
+				"( a VARCHAR(50) COLLATE utf8_bin, b VARCHAR(50) COLLATE big5_chinese_ci )",
+				false
+			),
+			array(
+				// utf8_bin tables don't need extra sanity checking
+				// when the other columns aren't strings.
+				"( a VARCHAR(50) COLLATE utf8_bin, b INT )",
+				true
+			),
+		);
+
+		foreach( $data as &$value ) {
+			$this_table_name = $table_name . '_' . rand_str( 5 );
+
+			$value[0] = "CREATE TABLE $this_table_name {$value[0]}";
+			$value[2] = "SELECT * FROM $this_table_name";
+			$value[3] = "DROP TABLE IF EXISTS $this_table_name";
+		}
+		unset( $value );
+
+		return $data;
+	}
+
+
+	/**
+	 * @dataProvider data_table_collation_check
+	 * @ticket 21212
+	 */
+	function test_table_collation_check( $create, $expected, $query, $drop ) {
+		self::$_wpdb->query( $drop );
+
+		self::$_wpdb->query( $create );
+
+		$return = self::$_wpdb->check_safe_collation( $query );
+		$this->assertEquals( $expected, $return );
+
+		self::$_wpdb->query( $drop );
+	}
 }
