@@ -18,6 +18,7 @@
  * @param {boolean}                    [attributes.multiple=false]        Whether multi-select is enabled.
  * @param {boolean}                    [attributes.searchable=false]      Whether the library is searchable.
  * @param {boolean}                    [attributes.sortable=true]         Whether the Attachments should be sortable. Depends on the orderby property being set to menuOrder on the attachments collection.
+ * @param {boolean}                    [attributes.date=true]             Whether to show the date filter in the browser's toolbar.
  * @param {string|false}               [attributes.content=browse]        Initial mode for the content region.
  * @param {string|false}               [attributes.toolbar=image-details] Initial mode for the toolbar region.
  * @param {boolean}                    [attributes.describe=true]         Whether to offer UI to describe attachments - e.g. captioning images in a gallery.
@@ -42,6 +43,7 @@ GalleryEdit = Library.extend({
 		multiple:         false,
 		searchable:       false,
 		sortable:         true,
+		date:             false,
 		display:          false,
 		content:          'browse',
 		toolbar:          'gallery-edit',

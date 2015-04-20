@@ -8,17 +8,17 @@
  * @augments wp.Backbone.View
  * @augments Backbone.View
  *
- * @param {object}      options
- * @param {object}      [options.filters=false] Which filters to show in the browser's toolbar.
- *                                              Accepts 'uploaded' and 'all'.
- * @param {object}      [options.search=true]   Whether to show the search interface in the
- *                                              browser's toolbar.
- * @param {object}      [options.date=true]     Whether to show the date filter in the
- *                                              browser's toolbar.
- * @param {object}      [options.display=false] Whether to show the attachments display settings
- *                                              view in the sidebar.
- * @param {bool|string} [options.sidebar=true]  Whether to create a sidebar for the browser.
- *                                              Accepts true, false, and 'errors'.
+ * @param {object}         [options]               The options hash passed to the view.
+ * @param {boolean|string} [options.filters=false] Which filters to show in the browser's toolbar.
+ *                                                 Accepts 'uploaded' and 'all'.
+ * @param {boolean}        [options.search=true]   Whether to show the search interface in the
+ *                                                 browser's toolbar.
+ * @param {boolean}        [options.date=true]     Whether to show the date filter in the
+ *                                                 browser's toolbar.
+ * @param {boolean}        [options.display=false] Whether to show the attachments display settings
+ *                                                 view in the sidebar.
+ * @param {boolean|string} [options.sidebar=true]  Whether to create a sidebar for the browser.
+ *                                                 Accepts true, false, and 'errors'.
  */
 var View = wp.media.View,
 	mediaTrash = wp.media.view.settings.mediaTrash,

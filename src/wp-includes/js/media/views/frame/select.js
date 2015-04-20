@@ -131,6 +131,7 @@ Select = MediaFrame.extend({
 			sortable:   state.get('sortable'),
 			search:     state.get('searchable'),
 			filters:    state.get('filterable'),
+			date:       state.get('date'),
 			display:    state.has('display') ? state.get('display') : state.get('displaySettings'),
 			dragInfo:   state.get('dragInfo'),
 

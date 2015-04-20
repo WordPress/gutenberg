@@ -20,6 +20,7 @@
  * @param {string}                     attributes.menu                   Initial mode for the menu region. @todo this needs a better explanation.
  * @param {boolean}                    [attributes.searchable=false]     Whether the library is searchable.
  * @param {boolean}                    [attributes.sortable=true]        Whether the Attachments should be sortable. Depends on the orderby property being set to menuOrder on the attachments collection.
+ * @param {boolean}                    [attributes.date=true]            Whether to show the date filter in the browser's toolbar.
  * @param {boolean}                    [attributes.describe=true]        Whether to offer UI to describe the attachments - e.g. captioning images in a gallery.
  * @param {boolean}                    [attributes.dragInfo=true]        Whether to show instructional text about the attachments being sortable.
  * @param {boolean}                    [attributes.dragInfoText]         Instructional text about the attachments being sortable.
@@ -43,6 +44,7 @@ CollectionEdit = Library.extend({
 	defaults: {
 		multiple:         false,
 		sortable:         true,
+		date:             false,
 		searchable:       false,
 		content:          'browse',
 		describe:         true,
