@@ -505,6 +505,12 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			$value[0] = "CREATE TABLE $this_table_name {$value[0]}";
 			$value[2] = "SELECT * FROM $this_table_name";
 			$value[3] = "DROP TABLE IF EXISTS $this_table_name";
+			$value[4] = array(
+				"SHOW FULL TABLES LIKE $this_table_name",
+				"DESCRIBE $this_table_name",
+				"DESC $this_table_name",
+				"EXPLAIN SELECT * FROM $this_table_name",
+			);
 		}
 		unset( $value );
 
@@ -516,13 +522,18 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 * @dataProvider data_table_collation_check
 	 * @ticket 21212
 	 */
-	function test_table_collation_check( $create, $expected, $query, $drop ) {
+	function test_table_collation_check( $create, $expected, $query, $drop, $always_true ) {
 		self::$_wpdb->query( $drop );
 
 		self::$_wpdb->query( $create );
 
 		$return = self::$_wpdb->check_safe_collation( $query );
 		$this->assertEquals( $expected, $return );
+
+		foreach( $always_true as $true_query ) {
+			$return = self::$_wpdb->check_safe_collation( $true_query );
+			$this->assertTrue( $return );
+		}
 
 		self::$_wpdb->query( $drop );
 	}
