@@ -503,9 +503,10 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			$this_table_name = $table_name . '_' . rand_str( 5 );
 
 			$value[0] = "CREATE TABLE $this_table_name {$value[0]}";
-			$value[2] = "SELECT * FROM $this_table_name";
+			$value[2] = "SELECT * FROM $this_table_name WHERE a='\xf0\x9f\x98\x88'";
 			$value[3] = "DROP TABLE IF EXISTS $this_table_name";
 			$value[4] = array(
+				"SELECT * FROM $this_table_name WHERE a='foo'",
 				"SHOW FULL TABLES LIKE $this_table_name",
 				"DESCRIBE $this_table_name",
 				"DESC $this_table_name",
