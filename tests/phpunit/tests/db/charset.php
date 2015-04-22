@@ -55,18 +55,24 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 				'expected' => "H€llo\xf0\x9f\x98\x88World¢"
 			),
 			'koi8r' => array(
-				// koi8r is a character set that needs to be checked in MySQL
 				'charset'  => 'koi8r',
 				'value'    => "\xfdord\xf2ress",
 				'expected' => "\xfdord\xf2ress",
-				'db'       => true
 			),
 			'hebrew' => array(
-				// hebrew needs to be checked in MySQL, too
 				'charset'  => 'hebrew',
 				'value'    => "\xf9ord\xf7ress",
 				'expected' => "\xf9ord\xf7ress",
-				'db'       => true
+			),
+			'cp1251' => array(
+				'charset'  => 'cp1251',
+				'value'    => "\xd8ord\xd0ress",
+				'expected' => "\xd8ord\xd0ress",
+			),
+			'tis620' => array(
+				'charset'  => 'tis620',
+				'value'    => "\xccord\xe3ress",
+				'expected' => "\xccord\xe3ress",
 			),
 			'false' => array(
 				// false is a column with no character set (ie, a number column)
