@@ -121,4 +121,22 @@ class Tests_Rewrite extends WP_UnitTestCase {
 
 		restore_current_blog();
 	}
+
+	/**
+	 * @ticket 25143
+	 */
+	public function test_is_home_should_be_false_when_visiting_custom_endpoint_without_a_registered_query_var_and_page_on_front_is_set() {
+
+		$page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $page_id );
+
+		add_rewrite_endpoint( 'test', EP_ALL, false );
+		flush_rewrite_rules();
+
+		$this->go_to( home_url( '/test/1' ) );
+
+		$this->assertQueryTrue( 'is_front_page', 'is_page', 'is_singular' );
+		$this->assertFalse( is_home() );
+	}
 }
