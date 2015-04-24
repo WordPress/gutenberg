@@ -100,6 +100,96 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		$this->assertContains( "<li class='cat-item-all'><a href='" . get_permalink( $p ) . "'>All</a></li>", $found );
 	}
 
+	/**
+	 * @ticket 21881
+	 */
+	public function test_show_option_all_link_should_link_to_post_type_archive_when_taxonomy_does_not_apply_to_posts() {
+		register_post_type( 'wptests_pt', array( 'has_archive' => true ) );
+		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
+		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
+
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$pt_archive = get_post_type_archive_link( 'wptests_pt' );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . $pt_archive . "'>All</a></li>", $found );
+	}
+
+	/**
+	 * @ticket 21881
+	 */
+	public function test_show_option_all_link_should_not_link_to_post_type_archive_if_has_archive_is_false() {
+		register_post_type( 'wptests_pt', array( 'has_archive' => false ) );
+		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
+		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
+
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$pt_archive = get_post_type_archive_link( 'wptests_pt2' );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . $pt_archive . "'>All</a></li>", $found );
+	}
+
+	public function test_show_option_all_link_should_link_to_post_archive_if_available() {
+		register_post_type( 'wptests_pt', array( 'has_archive' => true ) );
+		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
+		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'post', 'wptests_pt2' ) );
+
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$url = home_url( '/' );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . $url . "'>All</a></li>", $found );
+	}
+
+	public function test_show_option_all_link_should_link_to_post_archive_if_no_associated_post_types_have_archives() {
+		register_post_type( 'wptests_pt', array( 'has_archive' => false ) );
+		register_post_type( 'wptests_pt2', array( 'has_archive' => false ) );
+		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
+
+		$terms = $this->factory->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_all' => 'All',
+			'hide_empty' => false,
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$url = home_url( '/' );
+
+		$this->assertContains( "<li class='cat-item-all'><a href='" . $url . "'>All</a></li>", $found );
+	}
+
 	public function list_cats_callback( $cat ) {
 		if ( 'Test Cat 1' === $cat ) {
 			return '';
