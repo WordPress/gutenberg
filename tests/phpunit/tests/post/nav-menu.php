@@ -117,6 +117,25 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 
 	}
 
+	public function test_wp_get_nav_menu_items_with_taxonomy_term() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$child_terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax', 'parent' => $t ) );
+
+		$term_menu_item = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'wptests_tax',
+			'menu-item-object-id' => $t,
+			'menu-item-status' => 'publish'
+		) );
+
+		$term = get_term( $t, 'wptests_tax' );
+
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		$this->assertSame( $term->name, $menu_items[0]->title );
+		$this->assertEquals( $t, $menu_items[0]->object_id );
+	}
+
 	/**
 	 * @ticket 29460
 	 */
