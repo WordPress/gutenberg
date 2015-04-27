@@ -137,5 +137,12 @@ class Tests_Comment extends WP_UnitTestCase {
 		$id = wp_new_comment( $data );
 
 		$this->assertFalse( $id );
+
+		// Cleanup.
+		if ( isset( $remote_addr ) ) {
+			$_SERVER['REMOTE_ADDR'] = $remote_addr;
+		} else {
+			unset( $_SERVER['REMOTE_ADDR'] );
+		}
 	}
 }
