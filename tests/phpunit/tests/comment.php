@@ -112,4 +112,30 @@ class Tests_Comment extends WP_UnitTestCase {
 			unset( $_SERVER['REMOTE_ADDR'] );
 		}
 	}
+
+	public function test_comment_field_lengths() {
+		// `wp_new_comment()` checks REMOTE_ADDR, so we fake it to avoid PHP notices.
+		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$remote_addr = $_SERVER['REMOTE_ADDR'];
+		} else {
+			$_SERVER['REMOTE_ADDR'] = '';
+		}
+
+		$post_id = $this->factory->post->create();
+
+		$data = array(
+			'comment_post_ID' => $post_id,
+			'comment_author' => rand_str(),
+			'comment_author_url' => '',
+			'comment_author_email' => '',
+			'comment_type' => '',
+			'comment_content' => str_repeat( 'A', 65536 ),
+			'comment_date' => '2011-01-01 10:00:00',
+			'comment_date_gmt' => '2011-01-01 10:00:00',
+		);
+
+		$id = wp_new_comment( $data );
+
+		$this->assertFalse( $id );
+	}
 }

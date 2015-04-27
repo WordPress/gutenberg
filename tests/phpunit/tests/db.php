@@ -747,6 +747,7 @@ class Tests_DB extends WP_UnitTestCase {
 				'format' => '%s',
 				'charset' => $expected_charset,
 				'ascii' => false,
+				'length' => $wpdb->get_col_length( $wpdb->posts, 'post_content' ),
 			)
 		);
 
