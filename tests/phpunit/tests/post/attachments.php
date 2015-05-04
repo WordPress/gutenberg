@@ -409,9 +409,9 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 	/**
 	* @ticket 15928
 	*/
-	public function test_wp_get_attachment_url_should_not_force_https_when_https_is_on_but_url_has_a_different_domain() {
+	public function test_wp_get_attachment_url_should_not_force_https_when_administering_over_https_but_siteurl_is_not_https() {
 		$siteurl = get_option( 'siteurl' );
-		update_option( 'siteurl', set_url_scheme( $siteurl, 'https' ) );
+		update_option( 'siteurl', set_url_scheme( $siteurl, 'http' ) );
 
 		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
 		$contents = file_get_contents( $filename );
@@ -422,21 +422,47 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		// Set attachment ID
 		$attachment_id = $this->_make_attachment( $upload );
 
-		// Save server data for cleanup.
 		$is_ssl = is_ssl();
-		$http_host = $_SERVER['HTTP_HOST'];
-
 		$_SERVER['HTTPS'] = 'on';
-
-		// Set server host to something random.
-		$_SERVER['HTTP_HOST'] = 'some.otherhostname.com';
+		set_current_screen( 'dashboard' );
 
 		$url = wp_get_attachment_url( $attachment_id );
-		$this->assertSame( set_url_scheme( $url, 'http' ), $url );
 
 		// Cleanup.
 		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
-		$_SERVER['HTTP_HOST'] = $http_host;
+		set_current_screen( 'front' );
+
+		$this->assertSame( set_url_scheme( $url, 'http' ), $url );
+	}
+
+	/**
+	 * @ticket 15928
+	 */
+	public function test_wp_get_attachment_url_should_force_https_when_administering_over_https_and_siteurl_is_https() {
+		// Must set the upload_url_path to fake out `wp_upload_dir()`.
+		$siteurl = get_option( 'siteurl' );
+		update_option( 'upload_url_path', set_url_scheme( $siteurl, 'https' ) . '/uploads' );
+
+		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
+		$contents = file_get_contents( $filename );
+
+		$upload = wp_upload_bits( basename( $filename ), null, $contents );
+		$this->assertTrue( empty( $upload['error'] ) );
+
+		// Set attachment ID
+		$attachment_id = $this->_make_attachment( $upload );
+
+		$is_ssl = is_ssl();
+		$_SERVER['HTTPS'] = 'on';
+		set_current_screen( 'dashboard' );
+
+		$url = wp_get_attachment_url( $attachment_id );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+		set_current_screen( 'front' );
+
+		$this->assertSame( set_url_scheme( $url, 'https' ), $url );
 	}
 
 	public function test_wp_attachment_is() {
