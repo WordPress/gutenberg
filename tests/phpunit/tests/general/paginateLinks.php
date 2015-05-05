@@ -311,4 +311,24 @@ EXPECTED;
 
 		$this->assertContains( "<span class='page-numbers current'>3</span>", $links );
 	}
+
+	/**
+	 * @ticket 31939
+	 */
+	public function test_custom_base_query_arg_should_be_stripped_from_current_url_before_generating_pag_links() {
+		// Fake the current URL: example.com?foo
+		$request_uri = $_SERVER['REQUEST_URI'];
+		$_SERVER['REQUEST_URI'] = add_query_arg( 'foo', '', $request_uri );
+
+		$links = paginate_links( array(
+			'base'    => add_query_arg( 'foo', '%_%', home_url() ),
+			'format'  => '%#%',
+			'total'   => 5,
+			'current' => 1,
+			'type'    => 'array',
+		) );
+
+		$page_2_url = home_url() . '?foo=2';
+		$this->assertContains( "<a class='page-numbers' href='$page_2_url'>2</a>", $links );
+	}
 }
