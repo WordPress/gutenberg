@@ -123,7 +123,7 @@ CAP;
 		global $wp_embed;
 
 		$out = wp_oembed_get( 'http://www.youtube.com/watch?v=oHg5SJYRHA0' );
-		$this->assertContains( 'http://www.youtube.com/embed/oHg5SJYRHA0?feature=oembed', $out );
+		$this->assertContains( 'https://www.youtube.com/embed/oHg5SJYRHA0?feature=oembed', $out );
 
 		$out = wp_oembed_get( 'https://www.youtube.com/watch?v=oHg5SJYRHA0' );
 		$this->assertContains( 'https://www.youtube.com/embed/oHg5SJYRHA0?feature=oembed', $out );
