@@ -19,7 +19,7 @@
     "grunt-contrib-cssmin": "~0.10.0",
     "grunt-contrib-imagemin": "~0.9.3",
     "grunt-contrib-jshint": "~0.11.0",
-    "grunt-contrib-qunit": "~0.5.2",
+    "grunt-contrib-qunit": "~0.7.0",
     "grunt-contrib-uglify": "~0.8.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-includes": "~0.4.5",
