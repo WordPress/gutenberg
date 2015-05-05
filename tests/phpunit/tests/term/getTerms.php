@@ -541,6 +541,34 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 32248
+	 */
+	public function test_name_should_match_encoded_html_entities() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'Foo & Bar',
+			'slug' => 'foo-and-bar',
+		) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'name' => 'Foo & Bar',
+		) );
+		$this->assertEqualSets( array( $t ), $found );
+
+		// array format.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'name' => array( 'Foo & Bar' ),
+		) );
+		$this->assertEqualSets( array( $t ), $found );
+	}
+
+	/**
 	 * @ticket 29839
 	 */
 	public function test_childless_should_return_all_terms_for_flat_hierarchy() {
