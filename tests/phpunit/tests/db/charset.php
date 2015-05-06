@@ -643,6 +643,38 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 32104
+	 */
+	function data_dont_strip_text_from_schema_queries() {
+		// An obviously invalid and fake table name.
+		$table_name = "\xff\xff\xff\xff";
+
+		$queries = array(
+			"SHOW CREATE TABLE $table_name",
+			"DESCRIBE $table_name",
+			"DESC $table_name",
+			"EXPLAIN SELECT * FROM $table_name",
+			"CREATE $table_name( a VARCHAR(100))",
+		);
+
+		foreach ( $queries as &$query ) {
+			$query = array( $query );
+		}
+		unset( $query );
+
+		return $queries;
+	}
+
+	/**
+	 * @dataProvider data_dont_strip_text_from_schema_queries
+	 * @ticket 32104
+	 */
+	function test_dont_strip_text_from_schema_queries( $query ) {
+		$return = self::$_wpdb->strip_invalid_text_from_query( $query );
+		$this->assertEquals( $query, $return );
+	}
+
+	/**
 	 * @ticket 21212
 	 */
 	function test_invalid_characters_in_query() {
