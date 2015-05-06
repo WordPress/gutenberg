@@ -526,6 +526,7 @@ class Tests_DB extends WP_UnitTestCase {
 	 */
 	function data_get_table_from_query() {
 		$table = 'a_test_table_name';
+		$db_table = '`a_test_db`.`another_test_table`';
 
 		$queries = array(
 			// Basic
@@ -628,8 +629,13 @@ class Tests_DB extends WP_UnitTestCase {
 			"SHOW INDEX FROM $table",
 		);
 
-		foreach ( $queries as &$query ) {
-			$query = array( $query, $table );
+		$querycount = count( $queries );
+		for ( $ii = 0; $ii < $querycount; $ii++ ) {
+			$db_query = str_replace( $table, $db_table, $queries[ $ii ] );
+			$expected_db_table = str_replace( '`', '', $db_table );
+
+			$queries[ $ii ] = array( $queries[ $ii ], $table );
+			$queries[] = array( $db_query, $expected_db_table );
 		}
 		return $queries;
 	}
