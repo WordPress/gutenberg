@@ -39,7 +39,7 @@ Embed = wp.media.controller.State.extend({
 	},
 
 	// The amount of time used when debouncing the scan.
-	sensitivity: 200,
+	sensitivity: 400,
 
 	initialize: function(options) {
 		this.metadata = options.metadata;
