@@ -9,9 +9,29 @@
  * @augments Backbone.Router
  */
 var Router = Backbone.Router.extend({
+	initialize: function ( options ) {
+		this.controller = options.controller;
+		this.library = options.library;
+		this.on( 'route', this.checkRoute );
+	},
+
 	routes: {
 		'upload.php?item=:slug':    'showItem',
-		'upload.php?search=:query': 'search'
+		'upload.php?search=:query': 'search',
+		'upload.php':				'defaultRoute'
+	},
+
+	checkRoute: function ( event ) {
+		if ( 'defaultRoute' !== event ) {
+			this.modal = true;
+		}
+	},
+
+	defaultRoute: function () {
+		if ( this.modal ) {
+			wp.media.frame.close();
+			this.modal = false;
+		}
 	},
 
 	// Map routes against the page URL
@@ -26,19 +46,18 @@ var Router = Backbone.Router.extend({
 
 	// Show the modal with a specific item
 	showItem: function( query ) {
-		var media = wp.media,
-			library = media.frame.state().get('library'),
+		var frame = this.controller,
 			item;
-
+	
 		// Trigger the media frame to open the correct item
-		item = library.findWhere( { id: parseInt( query, 10 ) } );
+		item = this.library.findWhere( { id: parseInt( query, 10 ) } );
 		if ( item ) {
-			media.frame.trigger( 'edit:attachment', item );
+			frame.trigger( 'edit:attachment', item );
 		} else {
-			item = media.attachment( query );
-			media.frame.listenTo( item, 'change', function( model ) {
-				media.frame.stopListening( item );
-				media.frame.trigger( 'edit:attachment', model );
+			item = wp.media.attachment( query );
+			frame.listenTo( item, 'change', function( model ) {
+				frame.stopListening( item );
+				frame.trigger( 'edit:attachment', model );
 			} );
 			item.fetch();
 		}

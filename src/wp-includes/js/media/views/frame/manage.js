@@ -62,12 +62,10 @@ Manage = MediaFrame.extend({
 				}
 			}).render();
 			this.uploader.ready();
-			$('body').append( this.uploader.el );
+			this.$body.append( this.uploader.el );
 
 			this.options.uploader = false;
 		}
-
-		this.gridRouter = new wp.media.view.MediaFrame.Manage.Router();
 
 		// Call 'initialize' directly on the parent class.
 		MediaFrame.prototype.initialize.apply( this, arguments );
@@ -75,10 +73,23 @@ Manage = MediaFrame.extend({
 		// Append the frame view directly the supplied container.
 		this.$el.appendTo( this.options.container );
 
+		this.setLibrary( this.options );
+		this.setRouter();
 		this.createStates();
 		this.bindRegionModeHandlers();
 		this.render();
 		this.bindSearchHandler();
+	},
+
+	setLibrary: function ( options ) {
+		this.library = wp.media.query( options.library );
+	},
+
+	setRouter: function () {
+		this.gridRouter = new wp.media.view.MediaFrame.Manage.Router({
+			controller: this,
+			library: this.library
+		});
 	},
 
 	bindSearchHandler: function() {
@@ -99,7 +110,9 @@ Manage = MediaFrame.extend({
 
 		// Update the URL when entering search string (at most once per second)
 		search.on( 'input', _.bind( input, this ) );
-		searchView.val( currentSearch ).trigger( 'input' );
+		if ( currentSearch ) {
+			searchView.val( currentSearch ).trigger( 'input' );
+		}
 
 		this.gridRouter.on( 'route:search', function () {
 			var href = window.location.href;
@@ -126,7 +139,7 @@ Manage = MediaFrame.extend({
 		// Add the default states.
 		this.states.add([
 			new Library({
-				library:            wp.media.query( options.library ),
+				library:            this.library,
 				multiple:           options.multiple,
 				title:              options.title,
 				content:            'browse',
