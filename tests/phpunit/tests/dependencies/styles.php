@@ -229,4 +229,14 @@ CSS;
 		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
 	}
 
+    /**
+     * Testing 'wp_register_style' return boolean success/failure value.
+     *
+     * @ticket 31126
+     */
+    function test_wp_register_style(){
+        $this->assertTrue( wp_register_style( 'duplicate-handler', 'http://example.com' ) );
+        $this->assertFalse( wp_register_style( 'duplicate-handler', 'http://example.com' ) );
+    }
+
 }

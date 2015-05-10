@@ -155,4 +155,15 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		// No scripts left to print
 		$this->assertEquals( '', get_echo( 'wp_print_scripts' ) );
 	}
+
+    /**
+     * Testing 'wp_register_script' return boolean success/failure value.
+     *
+     * @ticket 31126
+     */
+    function test_wp_register_script() {
+        $this->assertTrue( wp_register_script( 'duplicate-handler', 'http://example.com' ) );
+        $this->assertFalse( wp_register_script( 'duplicate-handler', 'http://example.com' ) );
+    }
+
 }
