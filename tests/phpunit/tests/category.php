@@ -327,4 +327,28 @@ class Tests_Category extends WP_UnitTestCase {
 		// Test to see if it returns the default with the category slug.
 		$this->assertContains( 'value="' . $cat_id . '"', $found );
 	}
+
+	/**
+	 * @ticket 32330
+	 */
+	public function test_wp_dropdown_categories_selected_should_respect_custom_value_field() {
+		$c1 = $this->factory->category->create( array(
+			'name' => 'Test Category 1',
+			'slug' => 'test_category_1',
+		) );
+
+		$c2 = $this->factory->category->create( array(
+			'name' => 'Test Category 2',
+			'slug' => 'test_category_2',
+		) );
+
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'value_field' => 'slug',
+			'selected' => 'test_category_2',
+		) );
+
+		$this->assertContains( "value=\"test_category_2\" selected=\"selected\"", $found );
+	}
 }
