@@ -471,50 +471,6 @@ class Tests_Term extends WP_UnitTestCase {
 		$this->assertEquals( get_option( 'default_category' ), $post->post_category[0] );
 	}
 
-	function test_wp_unique_term_slug() {
-		// set up test data
-		$a = wp_insert_term( 'parent', $this->taxonomy );
-		$this->assertInternalType( 'array', $a );
-		$b = wp_insert_term( 'child',  $this->taxonomy, array( 'parent' => $a['term_id'] ) );
-		$this->assertInternalType( 'array', $b );
-		$c = wp_insert_term( 'neighbor', $this->taxonomy );
-		$this->assertInternalType( 'array', $c );
-		$d = wp_insert_term( 'pet',  $this->taxonomy, array( 'parent' => $c['term_id'] )  );
-		$this->assertInternalType( 'array', $c );
-
-		$a_term = get_term( $a['term_id'], $this->taxonomy );
-		$b_term = get_term( $b['term_id'], $this->taxonomy );
-		$c_term = get_term( $c['term_id'], $this->taxonomy );
-		$d_term = get_term( $d['term_id'], $this->taxonomy );
-
-		// a unique slug gets unchanged
-		$this->assertEquals( 'unique-term', wp_unique_term_slug( 'unique-term', $c_term ) );
-
-		// a non-hierarchicial dupe gets suffixed with "-#"
-		$this->assertEquals( 'parent-2', wp_unique_term_slug( 'parent', $c_term ) );
-
-		// a hierarchical dupe initially gets suffixed with its parent term
-		$this->assertEquals( 'child-neighbor', wp_unique_term_slug( 'child', $d_term ) );
-
-		// a hierarchical dupe whose parent already contains the {term}-{parent term}
-		// term gets suffixed with parent term name and then '-#'
-		$e = wp_insert_term( 'child-neighbor', $this->taxonomy, array( 'parent' => $c['term_id'] ) );
-		$this->assertEquals( 'child-neighbor-2', wp_unique_term_slug( 'child', $d_term ) );
-
-		$f = wp_insert_term( 'foo', $this->taxonomy );
-		$this->assertInternalType( 'array', $f );
-		$f_term = get_term( $f['term_id'], $this->taxonomy );
-		$this->assertEquals( 'foo', $f_term->slug );
-		$this->assertEquals( 'foo', wp_unique_term_slug(  'foo', $f_term ) );
-
-		$g = wp_insert_term( 'foo',  $this->taxonomy );
-		$this->assertInstanceOf( 'WP_Error', $g );
-
-		// clean up
-		foreach ( array( $a, $b, $c, $d, $e, $f ) as $t )
-			$this->assertTrue( wp_delete_term( $t['term_id'], $this->taxonomy ) );
-	}
-
 	/**
 	 * @ticket 25852
 	 */
