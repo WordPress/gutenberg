@@ -52,4 +52,32 @@ class Tests_Comment_CommentForm extends WP_UnitTestCase {
 		$hidden = get_comment_id_fields( $p );
 		$this->assertRegExp( '|<p class="my\-custom\-submit\-field">\s*' . $button . '\s*' . $hidden . '\s*|', $form );
 	}
+
+	/**
+	 * @ticket 32312
+	 */
+	public function test_submit_button_and_submit_field_should_fall_back_on_defaults_when_filtered_defaults_do_not_contain_the_keys() {
+		$p = $this->factory->post->create();
+
+		$args = array(
+			'name_submit' => 'foo-name',
+			'id_submit' => 'foo-id',
+			'class_submit' => 'foo-class',
+			'label_submit' => 'foo-label',
+		);
+
+		add_filter( 'comment_form_defaults', array( $this, 'filter_comment_form_defaults' ) );
+		$form = get_echo( 'comment_form', array( $args, $p ) );
+		remove_filter( 'comment_form_defaults', array( $this, 'filter_comment_form_defaults' ) );
+
+		$button = '<input name="foo-name" type="submit" id="foo-id" class="foo-class" value="foo-label" />';
+		$hidden = get_comment_id_fields( $p );
+		$this->assertRegExp( '|<p class="form\-submit">\s*' . $button . '\s*' . $hidden . '\s*|', $form );
+	}
+
+	public function filter_comment_form_defaults( $defaults ) {
+		unset( $defaults['submit_field'] );
+		unset( $defaults['submit_button'] );
+		return $defaults;
+	}
 }
