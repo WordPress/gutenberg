@@ -1471,7 +1471,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blogaddress_by_id_with_valid_id() {
 		$blogaddress = get_blogaddress_by_id( 1 );
-		$this->assertEquals( 'http://example.org/', $blogaddress );
+		$this->assertEquals( 'http://' . WP_TESTS_DOMAIN . '/', $blogaddress );
 	}
 
 	/**
