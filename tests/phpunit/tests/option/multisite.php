@@ -100,25 +100,15 @@ class Tests_Multisite_Option extends WP_UnitTestCase {
 	}
 
 	function test_with_another_site() {
-		global $current_site, $base;
-
-		$title = 'Fooblog';
-		$domain = 'blogoptiontest';
-
-		if ( is_subdomain_install() ) {
-			$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
-			$path = $base;
-		} else {
-			$newdomain = $current_site->domain;
-			$path = $base . $domain . '/';
-		}
-
-		$email = 'foo@foo.foo';
-		$password = wp_generate_password( 12, false );
-		$user_id = wpmu_create_user( $domain, $password, $email );
+		$user_id = $this->factory->user->create();
 		$this->assertInternalType( 'integer', $user_id );
 
-		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
+		$blog_id = $this->factory->blog->create( array(
+			'user_id' => $user_id,
+			'meta'    => array(
+				'public' => 1,
+			),
+		) );
 		$this->assertInternalType( 'integer', $blog_id );
 
 		$key = rand_str();
