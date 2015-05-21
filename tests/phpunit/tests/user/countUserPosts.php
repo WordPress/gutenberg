@@ -78,4 +78,18 @@ class Tests_User_CountUserPosts extends WP_UnitTestCase {
 	public function test_count_user_posts_post_type_cpt() {
 		$this->assertEquals( 3, count_user_posts( self::$user_id, 'wptests_pt' ) );
 	}
+
+	/**
+	 * @ticket 32243
+	 */
+	public function test_count_user_posts_with_multiple_post_types() {
+		$this->assertEquals( 7, count_user_posts( self::$user_id, array( 'wptests_pt', 'post' ) ) );
+	}
+
+	/**
+	 * @ticket 32243
+	 */
+	public function test_count_user_posts_should_ignore_non_existent_post_types() {
+		$this->assertEquals( 4, count_user_posts( self::$user_id, array( 'foo', 'post' ) ) );
+	}
 }

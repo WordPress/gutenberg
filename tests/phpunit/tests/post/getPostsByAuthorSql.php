@@ -20,6 +20,18 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		$this->assertContains( '1 = 0', $maybe_string );
 	}
 
+	public function test_multiple_post_types(){
+		register_post_type( 'foo' );
+		register_post_type( 'bar' );
+
+		$maybe_string = get_posts_by_author_sql( 'foo,bar' );
+		$this->assertContains( "post_type = 'foo'", $maybe_string );
+		$this->assertContains( "post_type = 'bar'", $maybe_string );
+
+		_unregister_post_type( 'foo' );
+		_unregister_post_type( 'bar' );
+	}
+
 	public function test_full_true(){
 		$maybe_string = get_posts_by_author_sql( 'post', true );
 		$this->assertRegExp( '/^WHERE /', $maybe_string );
@@ -110,6 +122,27 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		$this->assertContains( "post_status = 'private'", $maybe_string );
 		$this->assertNotContains( 'post_author', $maybe_string );
 
+		wp_set_current_user( $current_user );
+	}
+
+	public function test_user_has_access_only_to_private_posts_for_certain_post_types(){
+		register_post_type( 'foo', array( 'capabilities' => array( 'read_private_posts' => 'read_private_foo' ) )  );
+		register_post_type( 'bar', array( 'capabilities' => array( 'read_private_posts' => 'read_private_bar' ) ) );
+		register_post_type( 'baz', array( 'capabilities' => array( 'read_private_posts' => 'read_private_baz' ) ) );
+		$current_user = get_current_user_id();
+		$u = $this->factory->user->create( array( 'role' => 'editor' ) );
+		$editor_role = get_role('editor');
+		$editor_role->add_cap( 'read_private_baz' );
+		wp_set_current_user( $u );
+
+		$maybe_string = get_posts_by_author_sql( 'foo,bar,baz' );
+		$this->assertNotContains( "post_type = 'foo' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
+		$this->assertNotContains( "post_type = 'bar' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
+		$this->assertContains( "post_type = 'baz' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
+
+		_unregister_post_type( 'foo' );
+		_unregister_post_type( 'bar' );
+		_unregister_post_type( 'baz' );
 		wp_set_current_user( $current_user );
 	}
 }
