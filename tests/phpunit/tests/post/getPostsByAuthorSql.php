@@ -24,7 +24,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		register_post_type( 'foo' );
 		register_post_type( 'bar' );
 
-		$maybe_string = get_posts_by_author_sql( 'foo,bar' );
+		$maybe_string = get_posts_by_author_sql( array( 'foo', 'bar' ) );
 		$this->assertContains( "post_type = 'foo'", $maybe_string );
 		$this->assertContains( "post_type = 'bar'", $maybe_string );
 
@@ -135,7 +135,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		$editor_role->add_cap( 'read_private_baz' );
 		wp_set_current_user( $u );
 
-		$maybe_string = get_posts_by_author_sql( 'foo,bar,baz' );
+		$maybe_string = get_posts_by_author_sql( array( 'foo', 'bar', 'baz' ) );
 		$this->assertNotContains( "post_type = 'foo' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
 		$this->assertNotContains( "post_type = 'bar' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
 		$this->assertContains( "post_type = 'baz' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
