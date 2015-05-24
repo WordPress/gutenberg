@@ -1639,23 +1639,21 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * The optional $filter parameter modifies the query used to retrieve posts.
-	 * Accepted keys are 'post_type', 'post_status', 'number', 'offset',
-	 * 'orderby', and 'order'.
+	 * @see wp_get_recent_posts()
+	 * @see wp_getPost() for more on `$fields`
+	 * @see get_posts() for more on `$filter` values
 	 *
-	 * The optional $fields parameter specifies what fields will be included
-	 * in the response array.
+	 * @param array $args {
+	 *     Method parameters.
 	 *
-	 * @uses wp_get_recent_posts()
-	 * @see wp_getPost() for more on $fields
-	 * @see get_posts() for more on $filter values
-	 *
-	 * @param array $args Method parameters. Contains:
-	 *  - int     $blog_id (unused)
-	 *  - string  $username
-	 *  - string  $password
-	 *  - array   $filter optional
-	 *  - array   $fields optional
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password.
+	 *     @type array  $filter   Optional. Modifies the query used to retrieve posts. Accepts 'post_type',
+	 *                            'post_status', 'number', 'offset', 'orderby', and 'order'.
+	 *                            Default empty array.
+	 *     @type array  $fields   Optional. The subset of post type fields to return in the response array.
+	 * }
 	 * @return array|IXR_Error Array contains a collection of posts.
 	 */
 	public function wp_getPosts( $args ) {
