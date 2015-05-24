@@ -512,7 +512,7 @@ class wp_xmlrpc_server extends IXR_Server {
 				'option'        => 'default_comment_status'
 			),
 			'default_ping_status' => array(
-				'desc'          => __( 'Allow link notifications from other blogs (pingbacks and trackbacks)' ),
+				'desc'          => __( 'Allow link notifications from other blogs (pingbacks and trackbacks) on new articles' ),
 				'readonly'      => false,
 				'option'        => 'default_ping_status'
 			)
