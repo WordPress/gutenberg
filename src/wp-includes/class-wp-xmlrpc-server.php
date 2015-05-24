@@ -1100,33 +1100,47 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @param array  $args {
-	 *     Method arguments. Note: arguments must be ordered as documented.
+	 * @link http://en.wikipedia.org/wiki/RSS_enclosure for information on RSS enclosures.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
-	 *     @type array  $content_struct can contain:
-	 *      - post_type (default: 'post')
-	 *      - post_status (default: 'draft')
-	 *      - post_title
-	 *      - post_author
-	 *      - post_excerpt
-	 *      - post_content
-	 *      - post_date_gmt | post_date
-	 *      - post_format
-	 *      - post_password
-	 *      - comment_status - can be 'open' | 'closed'
-	 *      - ping_status - can be 'open' | 'closed'
-	 *      - sticky
-	 *      - post_thumbnail - ID of a media item to use as the post thumbnail/featured image
-	 *      - custom_fields - array, with each element containing 'key' and 'value'
-	 *      - terms - array, with taxonomy names as keys and arrays of term IDs as values
-	 *      - terms_names - array, with taxonomy names as keys and arrays of term names as values
-	 *      - enclosure
-	 *      - any other fields supported by wp_insert_post()
+	 * @param array  $args {
+	 *     Method arguments. Note: top-level arguments must be ordered as documented.
+	 *
+	 *     @type int    $blog_id        Blog ID (unused).
+	 *     @type string $username       Username.
+	 *     @type string $password       Password.
+	 *     @type array  $content_struct {
+	 *         Content struct for adding a new post. See wp_insert_post() for information on
+	 *         additional post fields
+	 *
+	 *         @type string $post_type      Post type. Default 'post'.
+	 *         @type string $post_status    Post status. Default 'draft'
+	 *         @type string $post_title     Post title.
+	 *         @type int    $post_author    Post author ID.
+	 *         @type string $post_excerpt   Post excerpt.
+	 *         @type string $post_content   Post content.
+	 *         @type string $post_date_gmt  Post date in GMT.
+	 *         @type string $post_date      Post date.
+	 *         @type string $post_password  Post password (20-character limit).
+	 *         @type string $comment_status Post comment enabled status. Accepts 'open' or 'closed'.
+	 *         @type string $ping_status    Post ping status. Accepts 'open' or 'closed'.
+	 *         @type bool   $sticky         Whether the post should be sticky. Automatically false if
+	 *                                      `$post_status` is 'private'.
+	 *         @type int    $post_thumbnail ID of an image to use as the post thumbnail/featured image.
+	 *         @type array  $custom_fields  Array of meta key/value pairs to add to the post.
+	 *         @type array  $terms          Associative array with taxonomy names as keys and arrays
+	 *                                      of term IDs as values.
+	 *         @type array  $terms_names    Associative array with taxonomy names as keys and arrays
+	 *                                      of term names as values.
+	 *         @type array  $enclosure      {
+	 *             Array of feed enclosure data to add to post meta.
+	 *
+	 *             @type string $url    URL for the feed enclosure.
+	 *             @type int    $length Size in bytes of the enclosure.
+	 *             @type string $type   Mime-type for the enclosure.
+	 *         }
+	 *     }
 	 * }
-	 * @return string|IXR_Error post_id
+	 * @return int|IXR_Error Post ID on success, IXR_Error instance otherwise.
 	 */
 	public function wp_newPost( $args ) {
 		if ( ! $this->minimum_args( $args, 4 ) )
