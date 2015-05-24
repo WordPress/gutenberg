@@ -2204,16 +2204,19 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses get_taxonomies()
+	 * @see get_taxonomies()
 	 *
 	 * @param array  $args {
 	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password.
+	 *     @type array  $filter   Optional. An array of arguments for retrieving taxonomies.
+	 *     @type array  $fields   Optional. The subset of taxonomy fields to return.
 	 * }
-	 * @return array taxonomies
+	 * @return array|string An associative array of taxonomy data with returned fields determined
+	 *                      by `$fields`, or an error on failure.
 	 */
 	public function wp_getTaxonomies( $args ) {
 		if ( ! $this->minimum_args( $args, 3 ) )
