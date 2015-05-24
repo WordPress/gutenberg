@@ -1558,13 +1558,17 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * groups are 'post' (all basic fields), 'taxonomies', 'custom_fields',
 	 * and 'enclosure'.
 	 *
-	 * @uses get_post()
-	 * @param array $args Method parameters. Contains:
-	 *  - int     $blog_id (unused)
-	 *  - string  $username
-	 *  - string  $password
-	 *  - int     $post_id
-	 *  - array   $fields optional
+	 * @see get_post()
+	 *
+	 * @param array $args {
+	 *     Method parameters.
+	 *
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password.
+	 *     @type int    $post_id  Post ID.
+	 *     @type array  $fields   The subset of post type fields to return.
+	 * }
 	 * @return array|IXR_Error Array contains (based on $fields parameter):
 	 *  - 'post_id'
 	 *  - 'post_title'
