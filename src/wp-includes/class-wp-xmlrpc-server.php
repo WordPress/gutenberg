@@ -1920,18 +1920,18 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses wp_delete_term()
+	 * @see wp_delete_term()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method parameters.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
-	 *     @type string $taxnomy_name
-	 *     @type string $term_id
+	 *     @type int    $blog_id      Blog ID (unused).
+	 *     @type string $username     Username.
+	 *     @type string $password     Password.
+	 *     @type string $taxnomy_name Taxonomy name.
+	 *     @type int    $term_id      Term ID.
 	 * }
-	 * @return bool|IXR_Error If it suceeded true else a reason why not
+	 * @return bool|IXR_Error True on success, IXR_Error instance on failure.
 	 */
 	public function wp_deleteTerm( $args ) {
 		if ( ! $this->minimum_args( $args, 5 ) )
