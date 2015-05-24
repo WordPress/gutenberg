@@ -1746,7 +1746,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *     @type string $username       Username.
 	 *     @type string $password       Password.
 	 *     @type array  $content_struct Content struct for adding a new term. The struct must contain
-	 *                                  The term 'name' and 'taxonomy'. Optional accepted values include
+	 *                                  the term 'name' and 'taxonomy'. Optional accepted values include
 	 *                                  'parent', 'description', and 'slug'.
 	 * }
 	 * @return int|IXR_Error The term ID on success, or an IXR_Error object on failure.
@@ -1822,21 +1822,20 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses wp_update_term()
-	 * @param array $args Method parameters. Contains:
-	 *  - int     $blog_id (unused)
-	 *  - string  $username
-	 *  - string  $password
-	 *  - string  $term_id
-	 *  - array   $content_struct
-	 *      The $content_struct must contain:
-	 *      - 'taxonomy'
-	 *      Also, it can optionally contain:
-	 *      - 'name'
-	 *      - 'parent'
-	 *      - 'description'
-	 *      - 'slug'
-	 * @return true|IXR_Error True, on success.
+	 * @see wp_update_term()
+	 *
+	 * @param array $args {
+	 *     Method parameters.
+	 *
+	 *     @type int    $blog_id        Blog ID (unused).
+	 *     @type string $username       Username.
+	 *     @type string $password       Password.
+	 *     @type int    $term_id        Term ID.
+	 *     @type array  $content_struct Content struct for editing a term. The struct must contain the
+	 *                                  term ''taxonomy'. Optional accepted values include 'name', 'parent',
+	 *                                  'description', and 'slug'.
+	 * }
+	 * @return true|IXR_Error True on success, IXR_Error instance on failure.
 	 */
 	public function wp_editTerm( $args ) {
 		if ( ! $this->minimum_args( $args, 5 ) )
