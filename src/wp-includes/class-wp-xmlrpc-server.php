@@ -200,7 +200,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int $number1 A number to add.
 	 *     @type int $number2 A second number to add.
@@ -534,7 +534,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.6.0
 	 *
 	 * @param array $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type string $username Username.
 	 *     @type string $password Password.
@@ -1101,7 +1101,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 3.4.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -1435,7 +1435,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 3.4.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id        Blog ID (unused).
 	 *     @type string $username       Username.
@@ -1504,7 +1504,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_delete_post()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id  Blog ID (unused).
 	 *     @type string $username Username.
@@ -1561,7 +1561,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see get_post()
 	 *
 	 * @param array $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id  Blog ID (unused).
 	 *     @type string $username Username.
@@ -1644,7 +1644,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see get_posts() for more on `$filter` values
 	 *
 	 * @param array $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id  Blog ID (unused).
 	 *     @type string $username Username.
@@ -1740,7 +1740,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_insert_term()
 	 *
 	 * @param array $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id        Blog ID (unused).
 	 *     @type string $username       Username.
@@ -1825,7 +1825,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_update_term()
 	 *
 	 * @param array $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id        Blog ID (unused).
 	 *     @type string $username       Username.
@@ -1923,7 +1923,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_delete_term()
 	 *
 	 * @param array  $args {
-	 *     Method parameters.
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id      Blog ID (unused).
 	 *     @type string $username     Username.
@@ -1985,7 +1985,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_term()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2051,7 +2051,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_terms()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2131,7 +2131,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_taxonomy()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2190,7 +2190,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_taxonomies()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2251,7 +2251,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_userdata()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2328,7 +2328,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_getUser() for more on $fields and return values
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2403,7 +2403,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses get_userdata()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2448,7 +2448,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses wp_update_user()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2526,7 +2526,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $page_id
@@ -2572,7 +2572,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2620,9 +2620,10 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 2.2.0
 	 *
+	 * @see wp_xmlrpc_server::mw_newPost()
+	 *
 	 * @param array  $args {
-	 *     See {@link wp_xmlrpc_server::mw_newPost()}
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2655,7 +2656,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2711,7 +2712,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $page_id
@@ -2769,7 +2770,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @global wpdb $wpdb
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2827,7 +2828,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2868,7 +2869,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2916,7 +2917,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -2992,7 +2993,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3040,7 +3041,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.2.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3085,7 +3086,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3133,7 +3134,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3196,7 +3197,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3256,12 +3257,12 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *  - 'author_email'
 	 *  - 'content'
 	 *  - 'date_created_gmt'
-	 *  - 'status'. Common statuses are 'approve', 'hold', 'spam'. See {@link get_comment_statuses()} for more details
+	 *  - 'status'. Common statuses are 'approve', 'hold', 'spam'. See get_comment_statuses() for more details
 	 *
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3269,12 +3270,6 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *     @type int    $comment_ID
 	 *     @type array  $content_struct
 	 * }
-	 * @param array $args Contains:
-	 *  - blog_id (unused)
-	 *  - username
-	 *  - password
-	 *  - comment_id
-	 *  - content_struct
 	 * @return true|IXR_Error True, on success.
 	 */
 	public function wp_editComment( $args ) {
@@ -3358,7 +3353,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int        $blog_id (unused)
 	 *     @type string     $username
@@ -3469,7 +3464,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.7.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3501,7 +3496,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3541,7 +3536,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3573,7 +3568,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3605,7 +3600,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.6.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3637,7 +3632,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.6.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3697,7 +3692,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 2.6.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3741,7 +3736,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 3.1.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3790,21 +3785,21 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * The defaults are as follows:
 	 * - 'number' - Default is 5. Total number of media items to retrieve.
-	 * - 'offset' - Default is 0. See {@link WP_Query::query()} for more.
+	 * - 'offset' - Default is 0. See WP_Query::query() for more.
 	 * - 'parent_id' - Default is ''. The post where the media item is attached. Empty string shows all media items. 0 shows unattached media items.
 	 * - 'mime_type' - Default is ''. Filter by mime type (e.g., 'image/jpeg', 'application/pdf')
 	 *
 	 * @since 3.1.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
 	 *     @type string $password
 	 *     @type array  $struct
 	 * }
-	 * @return array|IXR_Error Contains a collection of media items. See {@link wp_xmlrpc_server::wp_getMediaItem()} for a description of each item contents
+	 * @return array|IXR_Error Contains a collection of media items. See wp_xmlrpc_server::wp_getMediaItem() for a description of each item contents
 	 */
 	public function wp_getMediaLibrary($args) {
 		$this->escape($args);
@@ -3843,7 +3838,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	  * @since 3.1.0
 	  *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3891,9 +3886,10 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses get_post_type_object()
+	 * @see get_post_type_object()
+	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -3958,9 +3954,10 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses get_post_types()
+	 * @see get_post_types()
+	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4019,7 +4016,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @see wp_getPost() for more on $fields
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4098,7 +4095,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @uses wp_restore_post_revision()
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4156,7 +4153,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4231,7 +4228,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4271,7 +4268,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $post_ID
@@ -4322,7 +4319,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type string $appkey (unused)
 	 *     @type int    $blog_id (unused)
@@ -4411,7 +4408,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type string $appkey (unused)
 	 *     @type int    $blog_id (unused)
@@ -4481,7 +4478,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $post_ID
@@ -4556,7 +4553,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $post_ID
@@ -4636,7 +4633,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -4975,7 +4972,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5274,7 +5271,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type int    $post_ID
@@ -5405,7 +5402,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5523,7 +5520,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5578,7 +5575,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @global wpdb $wpdb
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5698,7 +5695,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5758,7 +5755,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $blog_id (unused)
 	 *     @type string $username
@@ -5802,7 +5799,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $post_ID
 	 *     @type string $username
@@ -5851,7 +5848,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $post_ID
 	 *     @type string $username
@@ -5971,7 +5968,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @since 1.5.0
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type int    $post_ID
 	 *     @type string $username
@@ -6022,7 +6019,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * @global string $wp_version
 	 *
 	 * @param array  $args {
-	 *     Method parameters, in this order:
+	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
 	 *     @type string $pagelinkedfrom
 	 *     @type string $pagelinkedto
