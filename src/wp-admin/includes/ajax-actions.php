@@ -2922,10 +2922,15 @@ function wp_ajax_update_plugin() {
 		wp_update_plugins();
 	}
 
-	$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
+	$skin = new Automatic_Upgrader_Skin();
+	$upgrader = new Plugin_Upgrader( $skin );
 	$result = $upgrader->bulk_upgrade( array( $plugin ) );
 
-	if ( is_array( $result ) ) {
+	if ( is_array( $result ) && empty( $result[$plugin] ) && is_wp_error( $skin->result ) ) {
+		$result = $skin->result;
+	}
+
+	if ( is_array( $result ) && !empty( $result[ $plugin ] ) ) {
 		$plugin_update_data = current( $result );
 
 		/*
