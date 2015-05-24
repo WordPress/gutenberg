@@ -1611,7 +1611,7 @@ class wp_xmlrpc_server extends IXR_Server {
 			 *
 			 * @since 3.4.0
 			 *
-			 * @param array $fields  Array of post fields.
+			 * @param array  $fields Array of post fields. Default array contains 'post', 'terms', and 'custom_fields'.
 			 * @param string $method Method name.
 			 */
 			$fields = apply_filters( 'xmlrpc_default_post_fields', array( 'post', 'terms', 'custom_fields' ), 'wp.getPost' );
