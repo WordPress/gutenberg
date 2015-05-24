@@ -2902,6 +2902,7 @@ function wp_ajax_update_plugin() {
 		'oldVersion' => '',
 		'newVersion' => '',
 	);
+
 	$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
 	if ( $plugin_data['Version'] ) {
 		$status['oldVersion'] = sprintf( __( 'Version %s' ), $plugin_data['Version'] );
@@ -2939,7 +2940,8 @@ function wp_ajax_update_plugin() {
  			wp_send_json_error( $status );
 		}
 
-		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
+		$plugin_data = get_plugins( '/' . $result[ $plugin ]['destination_name'] );
+		$plugin_data = reset( $plugin_data );
 
 		if ( $plugin_data['Version'] ) {
 			$status['newVersion'] = sprintf( __( 'Version %s' ), $plugin_data['Version'] );
