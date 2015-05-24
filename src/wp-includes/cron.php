@@ -225,9 +225,12 @@ function spawn_cron( $gmt_time = 0 ) {
 		return;
 
 	/*
-	* multiple processes on multiple web servers can run this code concurrently
-	* try to make this as atomic as possible by setting doing_cron switch
-	*/
+	 * Get the cron lock, which is a unix timestamp of when the last cron was spawned
+	 * and has not finished running.
+	 *
+	 * Multiple processes on multiple web servers can run this code concurrently,
+	 * this lock attempts to make spawning as atomic as possible.
+	 */
 	$lock = get_transient('doing_cron');
 
 	if ( $lock > $gmt_time + 10 * MINUTE_IN_SECONDS )
@@ -266,6 +269,7 @@ function spawn_cron( $gmt_time = 0 ) {
 		return;
 	}
 
+	// Set the cron lock with the current unix timestamp, when the cron is being spawned.
 	$doing_wp_cron = sprintf( '%.22F', $gmt_time );
 	set_transient( 'doing_cron', $doing_wp_cron );
 
