@@ -2069,7 +2069,7 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 *     @type int    $blog_id  Blog ID (unused).
 	 *     @type string $username Username.
-	 *     @type string $password Password
+	 *     @type string $password Password.
 	 *     @type string $taxnomy  Taxonomy name.
 	 *     @type array  $filter   Optional. Modifies the query used to retrieve posts. Accepts 'number',
 	 *                            'offset', 'orderby', 'order', 'hide_empty', and 'search'. Default empty array.
@@ -2143,18 +2143,20 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses get_taxonomy()
+	 * @see get_taxonomy()
 	 *
 	 * @param array  $args {
 	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
-	 *     @type string $taxnomy
-	 *     @type array  $fields (optional)
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password.
+	 *     @type string $taxnomy  Taxonomy name.
+	 *     @type array  $fields   Optional. Array of taxonomy fields to limit to in the return.
+	 *                            Accepts 'labels', 'cap', 'menu', and 'object_type'.
+	 *                            Default empty array.
 	 * }
-	 * @return array|IXR_Error (@see get_taxonomy())
+	 * @return array|IXR_Error An array of taxonomy data on success, IXR_Error instance otherwise.
 	 */
 	public function wp_getTaxonomy( $args ) {
 		if ( ! $this->minimum_args( $args, 4 ) )
