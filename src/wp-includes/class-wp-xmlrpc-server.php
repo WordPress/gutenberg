@@ -2062,18 +2062,19 @@ class wp_xmlrpc_server extends IXR_Server {
 	 * The optional $filter parameter modifies the query used to retrieve terms.
 	 * Accepted keys are 'number', 'offset', 'orderby', 'order', 'hide_empty', and 'search'.
 	 *
-	 * @uses get_terms()
+	 * @see get_terms()
 	 *
 	 * @param array  $args {
 	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
-	 *     @type string $taxnomy
-	 *     @type array  $filter (optional)
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password
+	 *     @type string $taxnomy  Taxonomy name.
+	 *     @type array  $filter   Optional. Modifies the query used to retrieve posts. Accepts 'number',
+	 *                            'offset', 'orderby', 'order', 'hide_empty', and 'search'. Default empty array.
 	 * }
-	 * @return array|IXR_Error terms
+	 * @return array|IXR_Error An associative array of terms data on success, IXR_Error instance otherwise.
 	 */
 	public function wp_getTerms( $args ) {
 		if ( ! $this->minimum_args( $args, 4 ) )
