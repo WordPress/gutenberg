@@ -1996,18 +1996,18 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses get_term()
+	 * @see get_term()
 	 *
 	 * @param array  $args {
 	 *     Method arguments. Note: arguments must be ordered as documented.
 	 *
-	 *     @type int    $blog_id (unused)
-	 *     @type string $username
-	 *     @type string $password
-	 *     @type string $taxnomy
-	 *     @type string $term_id
+	 *     @type int    $blog_id  Blog ID (unused).
+	 *     @type string $username Username.
+	 *     @type string $password Password.
+	 *     @type string $taxnomy  Taxonomy name.
+	 *     @type string $term_id  Term ID.
 	 * }
-	 * @return array|IXR_Error Array contains:
+	 * @return array|IXR_Error IXR_Error on failure, array on success, containing:
 	 *  - 'term_id'
 	 *  - 'name'
 	 *  - 'slug'
