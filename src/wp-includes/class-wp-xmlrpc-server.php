@@ -1719,7 +1719,7 @@ class wp_xmlrpc_server extends IXR_Server {
 		if ( ! $posts_list )
 			return array();
 
-		// holds all the posts data
+		// Holds all the posts data.
 		$struct = array();
 
 		foreach ( $posts_list as $post ) {
@@ -1737,20 +1737,19 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *
 	 * @since 3.4.0
 	 *
-	 * @uses wp_insert_term()
-	 * @param array $args Method parameters. Contains:
-	 *  - int     $blog_id (unused)
-	 *  - string  $username
-	 *  - string  $password
-	 *  - array   $content_struct
-	 *      The $content_struct must contain:
-	 *      - 'name'
-	 *      - 'taxonomy'
-	 *      Also, it can optionally contain:
-	 *      - 'parent'
-	 *      - 'description'
-	 *      - 'slug'
-	 * @return string|IXR_Error term_id
+	 * @see wp_insert_term()
+	 *
+	 * @param array $args {
+	 *     Method parameters.
+	 *
+	 *     @type int    $blog_id        Blog ID (unused).
+	 *     @type string $username       Username.
+	 *     @type string $password       Password.
+	 *     @type array  $content_struct Content struct for adding a new term. The struct must contain
+	 *                                  The term 'name' and 'taxonomy'. Optional accepted values include
+	 *                                  'parent', 'description', and 'slug'.
+	 * }
+	 * @return int|IXR_Error The term ID on success, or an IXR_Error object on failure.
 	 */
 	public function wp_newTerm( $args ) {
 		if ( ! $this->minimum_args( $args, 4 ) )
