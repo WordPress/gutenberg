@@ -2215,8 +2215,8 @@ class wp_xmlrpc_server extends IXR_Server {
 	 *     @type array  $filter   Optional. An array of arguments for retrieving taxonomies.
 	 *     @type array  $fields   Optional. The subset of taxonomy fields to return.
 	 * }
-	 * @return array|string An associative array of taxonomy data with returned fields determined
-	 *                      by `$fields`, or an error on failure.
+	 * @return array|IXR_Error An associative array of taxonomy data with returned fields determined
+	 *                         by `$fields`, or an IXR_Error instance on failure.
 	 */
 	public function wp_getTaxonomies( $args ) {
 		if ( ! $this->minimum_args( $args, 3 ) )
