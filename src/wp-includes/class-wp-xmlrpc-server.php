@@ -5019,9 +5019,10 @@ class wp_xmlrpc_server extends IXR_Server {
 
 		$postdata = get_post( $post_ID, ARRAY_A );
 
-		// If there is no post data for the give post id, stop
-		// now and return an error. Other wise a new post will be
-		// created (which was the old behavior).
+		/*
+		 * If there is no post data for the give post id, stop now and return an error.
+		 * Otherwise a new post will be created (which was the old behavior).
+		 */
 		if ( ! $postdata || empty( $postdata[ 'ID' ] ) )
 			return new IXR_Error( 404, __( 'Invalid post ID.' ) );
 
@@ -5214,9 +5215,9 @@ class wp_xmlrpc_server extends IXR_Server {
 				$to_ping = implode(' ', $to_ping);
 		}
 
-		// Do some timestamp voodoo
+		// Do some timestamp voodoo.
 		if ( !empty( $content_struct['date_created_gmt'] ) )
-			// We know this is supposed to be GMT, so we're going to slap that Z on there by force
+			// We know this is supposed to be GMT, so we're going to slap that Z on there by force.
 			$dateCreated = rtrim( $content_struct['date_created_gmt']->getIso(), 'Z' ) . 'Z';
 		elseif ( !empty( $content_struct['dateCreated']) )
 			$dateCreated = $content_struct['dateCreated']->getIso();
@@ -5229,7 +5230,7 @@ class wp_xmlrpc_server extends IXR_Server {
 			$post_date_gmt = $postdata['post_date_gmt'];
 		}
 
-		// We've got all the data -- post it:
+		// We've got all the data -- post it.
 		$newpost = compact('ID', 'post_content', 'post_title', 'post_category', 'post_status', 'post_excerpt', 'comment_status', 'ping_status', 'post_date', 'post_date_gmt', 'to_ping', 'post_name', 'post_password', 'post_parent', 'menu_order', 'post_author', 'tags_input', 'page_template');
 
 		$result = wp_update_post($newpost, true);
@@ -5251,7 +5252,8 @@ class wp_xmlrpc_server extends IXR_Server {
 			$this->set_custom_fields($post_ID, $content_struct['custom_fields']);
 
 		if ( isset ( $content_struct['wp_post_thumbnail'] ) ) {
-			// empty value deletes, non-empty value adds/updates
+
+			// Empty value deletes, non-empty value adds/updates.
 			if ( empty( $content_struct['wp_post_thumbnail'] ) ) {
 				delete_post_thumbnail( $post_ID );
 			} else {
@@ -5261,14 +5263,13 @@ class wp_xmlrpc_server extends IXR_Server {
 			unset( $content_struct['wp_post_thumbnail'] );
 		}
 
-		// Handle enclosures
+		// Handle enclosures.
 		$thisEnclosure = isset($content_struct['enclosure']) ? $content_struct['enclosure'] : null;
 		$this->add_enclosure_if_new($post_ID, $thisEnclosure);
 
 		$this->attach_uploads( $ID, $post_content );
 
-		// Handle post formats if assigned, validation is handled
-		// earlier in this function
+		// Handle post formats if assigned, validation is handled earlier in this function.
 		if ( isset( $content_struct['wp_post_format'] ) )
 			set_post_format( $post_ID, $content_struct['wp_post_format'] );
 
