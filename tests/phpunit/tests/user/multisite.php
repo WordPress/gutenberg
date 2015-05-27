@@ -91,8 +91,14 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		update_blog_details( $blog_ids[2], array( 'deleted' => 1 ) );
 
 		// Passing true as the second parameter should retrieve ALL sites, even if marked.
-		$blog_ids_of_user = array_keys( get_blogs_of_user( $user1_id, true ) );
+		$blogs_of_user = get_blogs_of_user( $user1_id, true );
+		$blog_ids_of_user = array_keys( $blogs_of_user );
 		$this->assertEquals( $blog_ids, $blog_ids_of_user );
+
+		// Check if sites are flagged as expected.
+		$this->assertEquals( 1, $blogs_of_user[ $blog_ids[0] ]->spam );
+		$this->assertEquals( 1, $blogs_of_user[ $blog_ids[1] ]->archived );
+		$this->assertEquals( 1, $blogs_of_user[ $blog_ids[2] ]->deleted );
 
 		unset( $blog_ids[0] );
 		unset( $blog_ids[1] );
