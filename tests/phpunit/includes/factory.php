@@ -252,6 +252,12 @@ class WP_UnitTest_Factory_For_Term extends WP_UnitTest_Factory_For_Thing {
 		return wp_set_post_terms( $post_id, $terms, $taxonomy, $append );
 	}
 
+	function create_and_get( $args = array(), $generation_definitions = null ) {
+		$term_id = $this->create( $args, $generation_definitions );
+		$taxonomy = isset( $args['taxonomy'] ) ? $args['taxonomy'] : $this->taxonomy;
+		return get_term( $term_id, $taxonomy );
+	}
+
 	function get_object_by_id( $term_id ) {
 		return get_term( $term_id, $this->taxonomy );
 	}
