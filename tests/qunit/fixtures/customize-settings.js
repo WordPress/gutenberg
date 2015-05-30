@@ -15,7 +15,7 @@ window._wpCustomizeSettings = {
 	'controls': {
 		'fixture-control': {
 			'active': true,
-			'content': '<li id="customize-control-fixture-control" class="customize-control customize-control-text">\n\t\t\t\t\t\t\t<label>\n\t\t\t\t\t\t\t\t\t\t\t<span class="customize-control-title">Site Title</span>\n\t\t\t\t\t\t\t\t\t\t<input type="text"  value="sWordPress Developssa!" data-customize-setting-link="blogname" />\n\t\t\t\t</label>\n\t\t\t\t\t\t</li>',
+			'content': '<li id="accordion-section-fixture-section" class="accordion-section control-section control-section-default"> <h3 class="accordion-section-title" tabindex="0"> Section Fixture <span class="screen-reader-text">Press return or enter to open</span> </h3> <ul class="accordion-section-content"> <li class="customize-section-description-container"> <div class="customize-section-title"> <button class="customize-section-back" tabindex="-1"> <span class="screen-reader-text">Back</span> </button> <h3> <span class="customize-action">Customizing &#9656; Fixture Panel</span> Section Fixture </h3> </div> </li> </ul> </li>',
 			'description': '',
 			'instanceNumber': 8,
 			'label': 'Fixture Control',
@@ -35,24 +35,58 @@ window._wpCustomizeSettings = {
 	'panels': {
 		'fixture-panel': {
 			'active': true,
-			'content': '<li id="accordion-panel-fixture-panel" class="accordion-section control-section control-panel control-panel-default">\n\t\t\t<h3 class="accordion-section-title" tabindex="0">\n\t\t\t\tLipsum\t\t\t\t<span class="screen-reader-text">Press return or enter to open this panel</span>\n\t\t\t</h3>\n\t\t\t<ul class="accordion-sub-container control-panel-content">\n\t\t\t\t\t\t<li class="panel-meta accordion-section control-section">\n\t\t\t<div class="accordion-section-title" tabindex="0">\n\t\t\t\t<span class="preview-notice">You are customizing <strong class="panel-title">Lipsum</strong></span>\n\t\t\t</div>\n\t\t\t\t\t\t\t<div class="accordion-section-content description">\n\t\t\t\t\tLorem Ipsum\t\t\t\t</div>\n\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t</li>',
+			'content': '<li id="accordion-panel-fixture-panel" class="accordion-section control-section control-panel control-panel-default"> <h3 class="accordion-section-title" tabindex="0"> Fixture Panel <span class="screen-reader-text">Press return or enter to open this panel</span> </h3> <ul class="accordion-sub-container control-panel-content"> <li class="panel-meta customize-info accordion-section cannot-expand"> <button class="customize-panel-back" tabindex="-1"><span class="screen-reader-text">Back</span></button> <div class="accordion-section-title"> <span class="preview-notice">You are customizing <strong class="panel-title">Fixture Panel</strong></span> <button class="customize-help-toggle dashicons dashicons-editor-help" tabindex="0" aria-expanded="false"><span class="screen-reader-text">Help</span></button> </div> </li> </ul> </li>',
 			'description': 'Lorem ipsum',
 			'instanceNumber': 1,
 			'priority': 110,
-			'title': 'Lorem Ipsum',
+			'title': 'Fixture panel with content',
 			'type': 'default'
+		},
+		'fixture-panel-default-templated': {
+			'active': true,
+			'description': 'Lorem ipsum',
+			'instanceNumber': 2,
+			'priority': 110,
+			'title': 'Fixture default panel using template',
+			'type': 'default'
+		},
+		'fixture-panel-titleless-templated': {
+			'active': true,
+			'description': 'Lorem ipsum',
+			'instanceNumber': 3,
+			'priority': 110,
+			'title': 'Fixture titleless panel using template',
+			'type': 'titleless'
 		}
 	},
 	'sections': {
 		'fixture-section': {
 			'active': true,
-			'content': '<li id="accordion-section-fixture-section" class="accordion-section control-section control-section-default">\n\t\t\t<h3 class="accordion-section-title" tabindex="0">\n\t\t\t\tSite Title &amp; Tagline\t\t\t\t<span class="screen-reader-text">Press return or enter to expand</span>\n\t\t\t</h3>\n\t\t\t<ul class="accordion-section-content">\n\t\t\t\t\t\t\t</ul>\n\t\t</li>',
+			'content': '<li id="accordion-section-fixture-section" class="accordion-section control-section control-section-default"> <h3 class="accordion-section-title" tabindex="0"> Section Fixture <span class="screen-reader-text">Press return or enter to open</span> </h3> <ul class="accordion-section-content"> <li class="customize-section-description-container"> <div class="customize-section-title"> <button class="customize-section-back" tabindex="-1"> <span class="screen-reader-text">Back</span> </button> <h3> <span class="customize-action">Customizing &#9656; Fixture Panel</span> Section Fixture </h3> </div> </li> </ul> </li>',
 			'description': '',
 			'instanceNumber': 2,
 			'panel': 'fixture-panel',
 			'priority': 20,
 			'title': 'Fixture Section',
 			'type': 'default'
+		},
+		'fixture-section-default-templated': {
+			'active': true,
+			'description': '',
+			'instanceNumber': 3,
+			'panel': 'fixture-panel',
+			'priority': 20,
+			'title': 'Fixture default section using template',
+			'type': 'default'
+		},
+		'fixture-section-titleless-templated': {
+			'active': true,
+			'description': '',
+			'instanceNumber': 4,
+			'panel': 'fixture-panel',
+			'priority': 20,
+			'title': 'Fixture titleless section using template',
+			'type': 'titleless'
 		}
 	},
 	'settings': {

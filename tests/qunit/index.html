@@ -9,6 +9,7 @@
 		<script src="../../src/wp-includes/js/underscore.min.js"></script>
 		<script src="../../src/wp-includes/js/backbone.min.js"></script>
 		<script src="../../src/wp-includes/js/zxcvbn.min.js"></script>
+		<script src="../../src/wp-includes/js/wp-util.js"></script>
 
 		<!-- QUnit -->
 		<link rel="stylesheet" href="vendor/qunit.css" type="text/css" media="screen" />
@@ -39,5 +40,73 @@
 		<script src="wp-includes/js/shortcode.js"></script>
 		<script src="wp-admin/js/customize-controls.js"></script>
 		<script src="wp-admin/js/customize-controls-utils.js"></script>
+
+		<!-- Customizer templates for sections -->
+		<script type="text/html" id="tmpl-customize-section-default">
+			<li id="accordion-section-{{ data.id }}" class="accordion-section control-section control-section-{{ data.type }}">
+				<h3 class="accordion-section-title" tabindex="0">
+					{{ data.title }}
+					<span class="screen-reader-text">Press return or enter to expand</span>
+				</h3>
+				<ul class="accordion-section-content">
+					<# if ( data.description ) { #>
+						<li class="customize-section-description-container">
+							<p class="description customize-section-description">{{{ data.description }}}</p>
+						</li>
+					<# } #>
+				</ul>
+			</li>
+		</script>
+		<script type="text/html" id="tmpl-customize-section-titleless">
+			<li id="accordion-section-{{ data.id }}" class="accordion-section control-section control-section-{{ data.type }}">
+				<!-- Notice the lack of an h3 with title displayed inside. -->
+				<ul class="accordion-section-content">
+					<# if ( data.description ) { #>
+						<li class="customize-section-description-container">
+							<p class="description customize-section-description">{{{ data.description }}}</p>
+						</li>
+					<# } #>
+				</ul>
+			</li>
+		</script>
+
+		<!-- Customizer templates for panels -->
+		<script type="text/html" id="tmpl-customize-panel-default">
+			<li id="accordion-panel-{{ data.id }}" class="accordion-section control-section control-panel control-panel-{{ data.type }}">
+				<h3 class="accordion-section-title" tabindex="0">
+					{{ data.title }}
+					<span class="screen-reader-text">Press return or enter to open this panel</span>
+				</h3>
+				<ul class="accordion-sub-container control-panel-content"></ul>
+			</li>
+		</script>
+		<script type="text/html" id="tmpl-customize-panel-default-content">
+			<li class="panel-meta accordion-section control-section<# if ( ! data.description ) { #> cannot-expand<# } #>">
+				<div class="accordion-section-title" tabindex="0">
+					<span class="preview-notice">You are customizing <strong class="panel-title">{{ data.title }}</strong></span>
+				</div>
+				<# if ( data.description ) { #>
+					<div class="accordion-section-content description">
+						{{{ data.description }}}
+					</div>
+				<# } #>
+			</li>
+		</script>
+		<script type="text/html" id="tmpl-customize-panel-titleless">
+			<li id="accordion-panel-{{ data.id }}" class="accordion-section control-section control-panel control-panel-{{ data.type }}">
+				<!-- Notice the lack of an h3 with title displayed inside. -->
+				<ul class="accordion-sub-container control-panel-content"></ul>
+			</li>
+		</script>
+		<script type="text/html" id="tmpl-customize-panel-titleless-content">
+			<li class="panel-meta accordion-section control-section<# if ( ! data.description ) { #> cannot-expand<# } #>">
+				<!-- Notice lack of title containing preview notice -->
+				<# if ( data.description ) { #>
+					<div class="accordion-section-content description">
+						{{{ data.description }}}
+					</div>
+				<# } #>
+			</li>
+		</script>
 	</body>
 </html>
