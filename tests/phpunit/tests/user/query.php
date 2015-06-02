@@ -686,4 +686,107 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertContains( $users[1], $found );
 		$this->assertNotContains( $users[2], $found );
 	}
+
+	/**
+	 * @ticket 32250
+	 */
+	public function test_has_published_posts_with_value_true_should_show_authors_of_posts_in_public_post_types() {
+		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
+		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
+
+		$users = $this->factory->user->create_many( 3 );
+
+		$this->factory->post->create( array( 'post_author' => $users[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
+		$this->factory->post->create( array( 'post_author' => $users[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
+
+		$q = new WP_User_Query( array(
+			'has_published_posts' => true,
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[0] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 32250
+	 */
+	public function test_has_published_posts_should_obey_post_types() {
+		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
+		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
+
+		$users = $this->factory->user->create_many( 3 );
+
+		$this->factory->post->create( array( 'post_author' => $users[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
+		$this->factory->post->create( array( 'post_author' => $users[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
+		$this->factory->post->create( array( 'post_author' => $users[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
+
+		$q = new WP_User_Query( array(
+			'has_published_posts' => array( 'wptests_pt_private', 'post' ),
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[1], $users[2] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 32250
+	 */
+	public function test_has_published_posts_should_ignore_non_published_posts() {
+		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
+		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
+
+		$users = $this->factory->user->create_many( 3 );
+
+		$this->factory->post->create( array( 'post_author' => $users[0], 'post_status' => 'draft', 'post_type' => 'wptests_pt_public' ) );
+		$this->factory->post->create( array( 'post_author' => $users[1], 'post_status' => 'inherit', 'post_type' => 'wptests_pt_private' ) );
+		$this->factory->post->create( array( 'post_author' => $users[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
+
+		$q = new WP_User_Query( array(
+			'has_published_posts' => array( 'wptests_pt_public', 'wptests_pt_private', 'post' ),
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[2] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 32250
+	 */
+	public function test_has_published_posts_should_respect_blog_id() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
+		}
+
+		$users = $this->factory->user->create_many( 3 );
+		$blogs = $this->factory->blog->create_many( 2 );
+
+		add_user_to_blog( $blogs[0], $users[0], 'author' );
+		add_user_to_blog( $blogs[0], $users[1], 'author' );
+		add_user_to_blog( $blogs[1], $users[0], 'author' );
+		add_user_to_blog( $blogs[1], $users[1], 'author' );
+
+		switch_to_blog( $blogs[0] );
+		$this->factory->post->create( array( 'post_author' => $users[0], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		restore_current_blog();
+
+		switch_to_blog( $blogs[1] );
+		$this->factory->post->create( array( 'post_author' => $users[1], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		restore_current_blog();
+
+		$q = new WP_User_Query( array(
+			'has_published_posts' => array( 'post' ),
+			'blog_id' => $blogs[1],
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[1] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
 }
