@@ -148,4 +148,19 @@ class Tests_Comment extends WP_UnitTestCase {
 			unset( $_SERVER['REMOTE_ADDR'] );
 		}
 	}
+
+	/**
+	 * @ticket 32566
+	 */
+	public function test_wp_notify_moderator_should_not_throw_notice_when_post_author_is_0() {
+		$p = $this->factory->post->create( array(
+			'post_author' => 0,
+		) );
+
+		$c = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+		) );
+
+		$this->assertTrue( wp_notify_moderator( $c ) );
+	}
 }
