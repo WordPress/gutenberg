@@ -1,6 +1,10 @@
 ( function( $, QUnit, tinymce, _type, setTimeout ) {
 	var editor;
 
+	if ( tinymce.Env.ie && tinymce.Env.ie < 9 ) {
+		return;
+	}
+
 	function type() {
 		var args = arguments;
 
