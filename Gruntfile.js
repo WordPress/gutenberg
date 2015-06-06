@@ -118,9 +118,10 @@ module.exports = function(grunt) {
 				dest: 'tests/qunit/compiled.html',
 				options: {
 					processContent: function( src ) {
-						src = src.replace( /([^\.])*\.\.\/src/ig , '/../build' );
-						src = src.replace( '/jquery/ui/core.js', '/jquery/ui/core.min.js' );
-						return src;
+						return src.replace( /(\".+?\/)src(\/.+?)(?:.min)?(.js\")/g , function( match, $1, $2, $3 ) {
+							// Don't add `.min` to files that don't have it.
+							return $1 + 'build' + $2 + ( /jquery$/.test( $2 ) ? '' : '.min' ) + $3;
+						} );
 					}
 				}
 			}
