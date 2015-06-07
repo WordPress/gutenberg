@@ -3,7 +3,7 @@ window.wp.customize = window.wp.customize || { get: function(){}  };
 
 var customizerRootElement;
 customizerRootElement = jQuery( '<div id="customize-theme-controls"><ul></ul></div>' );
-customizerRootElement.css( { position: 'absolute', top: -1000 } ); // remove from view
+customizerRootElement.css( { position: 'absolute', left: -1000 } ); // remove from view
 jQuery( document.body ).append( customizerRootElement );
 
 window._wpCustomizeSettings = {
