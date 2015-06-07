@@ -1,5 +1,6 @@
 ( function( $, QUnit, tinymce, _type, setTimeout ) {
-	var editor;
+	var editor,
+		count = 0;
 
 	if ( tinymce.Env.ie && tinymce.Env.ie < 9 ) {
 		return;
@@ -31,35 +32,48 @@
 
 	QUnit.module( 'tinymce.plugins.wptextpattern', {
 		beforeEach: function( assert ) {
-			var done = assert.async();
+			var done;
 
-			$( '#qunit-fixture' ).append( '<textarea id="editor">' );
+			if ( ! editor ) {
+				done = assert.async();
 
-			tinymce.init( {
-				selector: '#editor',
-				plugins: 'wptextpattern',
-				init_instance_callback: function() {
-					editor = arguments[0];
-					editor.focus();
-					editor.selection.setCursorLocation();
-					setTimeout( done );
-				}
-			} );
+				$( document.body ).append( '<textarea id="editor">' );
+
+				tinymce.init( {
+					selector: '#editor',
+					skin: false,
+					plugins: 'wptextpattern',
+					init_instance_callback: function() {
+						editor = arguments[0];
+						editor.focus();
+						editor.selection.setCursorLocation();
+						done();
+					}
+				} );
+			} else {
+				editor.setContent( '' );
+				editor.selection.setCursorLocation();
+			}
 		},
-		afterEach: function() {
-			editor.remove();
+		afterEach: function( assert ) {
+			count++;
+
+			if ( count === assert.test.module.tests.length ) {
+				editor.remove();
+				$( '#editor' ).remove();
+			}
 		}
 	} );
 
 	QUnit.test( 'Unordered list.', function( assert ) {
-		type( '* test', function() {
-			assert.equal( editor.getContent(), '<ul>\n<li>test</li>\n</ul>' );
+		type( '* a', function() {
+			assert.equal( editor.getContent(), '<ul>\n<li>a</li>\n</ul>' );
 		}, assert.async() );
 	} );
 
 	QUnit.test( 'Ordered list.', function( assert ) {
-		type( '1. test', function() {
-			assert.equal( editor.getContent(), '<ol>\n<li>test</li>\n</ol>' );
+		type( '1. a', function() {
+			assert.equal( editor.getContent(), '<ol>\n<li>a</li>\n</ol>' );
 		}, assert.async() );
 	} );
 
@@ -94,8 +108,8 @@
 		editor.setContent( '<p>* test</p>' );
 		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 6 );
 
-		type( ' test', function() {
-			assert.equal( editor.getContent(), '<p>* test test</p>' );
+		type( ' a', function() {
+			assert.equal( editor.getContent(), '<p>* test a</p>' );
 		}, assert.async() );
 	} );
 
