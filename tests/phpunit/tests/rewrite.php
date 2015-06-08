@@ -6,6 +6,7 @@
  * @group rewrite
  */
 class Tests_Rewrite extends WP_UnitTestCase {
+	private $home_url;
 
 	function setUp() {
 		global $wp_rewrite;
@@ -18,12 +19,15 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		create_initial_taxonomies();
 
 		$wp_rewrite->flush_rules();
+
+		$this->home_url = get_option( 'home' );
 	}
 
 	function tearDown() {
 		global $wp_rewrite;
 		$wp_rewrite->init();
 
+		update_option( 'home', $this->home_url );
 		parent::tearDown();
 	}
 
@@ -72,6 +76,39 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( 0, url_to_postid( '/example/ex/' ) );
 		$this->assertEquals( 0, url_to_postid( '/example-page/example/' ) );
 		$this->assertEquals( 0, url_to_postid( '/example-page/ex/' ) );
+	}
+
+	/**
+	 * @ticket 30438
+	 */
+	function test_parse_request_home_path() {
+		$home_url = home_url( '/path/' );
+		update_option( 'home', $home_url );
+
+		$this->go_to( $home_url );
+		$this->assertEquals( array(), $GLOBALS['wp']->query_vars );
+
+		$this->go_to( $home_url . 'page' );
+		$this->assertEquals( array( 'page' => '', 'pagename' => 'page' ), $GLOBALS['wp']->query_vars );
+	}
+
+	/**
+	 * @ticket 30438
+	 */
+	function test_parse_request_home_path_with_regex_character() {
+		$home_url = home_url( '/ma.ch/' );
+		$not_a_home_url = home_url( '/match/' );
+		update_option( 'home', $home_url );
+
+		$this->go_to( $home_url );
+		$this->assertEquals( array(), $GLOBALS['wp']->query_vars );
+
+		$this->go_to( $home_url . 'page' );
+		$this->assertEquals( array( 'page' => '', 'pagename' => 'page' ), $GLOBALS['wp']->query_vars );
+
+		$this->go_to( $not_a_home_url . 'page' );
+		$this->assertNotEquals( array( 'page' => '', 'pagename' => 'page' ), $GLOBALS['wp']->query_vars );
+		$this->assertEquals( array( 'page' => '', 'pagename' => 'match/page' ), $GLOBALS['wp']->query_vars );
 	}
 
 	function test_url_to_postid_dupe_path() {
