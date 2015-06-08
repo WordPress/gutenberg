@@ -238,6 +238,19 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		_unregister_post_type( $post_type );
 
 	}
+
+	/**
+	 * @ticket 32590
+	 */
+	public function test_register_taxonomy_for_post_type_for_taxonomy_with_no_object_type_should_filter_out_empty_object_types() {
+		register_taxonomy( 'wptests_tax', '' );
+		register_taxonomy_for_object_type( 'wptests_tax', 'post' );
+		$tax = get_taxonomy( 'wptests_tax' );
+
+		$expected = array( 'post' );
+		$this->assertEqualSets( $expected, $tax->object_type );
+	}
+
 	/**
 	 * @ticket 25706
 	 */
