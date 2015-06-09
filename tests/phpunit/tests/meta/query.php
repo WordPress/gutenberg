@@ -806,4 +806,82 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 		$this->assertRegExp( "/{$wpdb->postmeta}\.meta_key = \'exclude\'\s+OR/", $sql['where'] );
 		$this->assertNotContains( "{$wpdb->postmeta}.post_id IS NULL", $sql['where'] );
 	}
+
+	/**
+	 * @group 32592
+	 */
+	public function test_has_or_relation_should_return_false() {
+		$q = new WP_Meta_Query( array(
+			'relation' => 'AND',
+			array(
+				'key' => 'foo',
+				'value' => 'bar',
+			),
+			array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo1',
+					'value' => 'bar',
+				),
+				array(
+					'key' => 'foo2',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertFalse( $q->has_or_relation() );
+	}
+
+	/**
+	 * @group 32592
+	 */
+	public function test_has_or_relation_should_return_true_for_top_level_or() {
+		$q = new WP_Meta_Query( array(
+			'relation' => 'OR',
+			array(
+				'key' => 'foo',
+				'value' => 'bar',
+			),
+			array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo1',
+					'value' => 'bar',
+				),
+				array(
+					'key' => 'foo2',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertTrue( $q->has_or_relation() );
+	}
+
+	/**
+	 * @group 32592
+	 */
+	public function test_has_or_relation_should_return_true_for_nested_or() {
+		$q = new WP_Meta_Query( array(
+			'relation' => 'AND',
+			array(
+				'key' => 'foo',
+				'value' => 'bar',
+			),
+			array(
+				'relation' => 'OR',
+				array(
+					'key' => 'foo1',
+					'value' => 'bar',
+				),
+				array(
+					'key' => 'foo2',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertTrue( $q->has_or_relation() );
+	}
 }

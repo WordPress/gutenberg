@@ -789,4 +789,72 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( $expected, $found );
 	}
+
+	/**
+	 * @ticket 32592
+	 */
+	public function test_top_level_or_meta_query_should_eliminate_duplicate_matches() {
+		$users = $this->factory->user->create_many( 3 );
+
+		add_user_meta( $users[0], 'foo', 'bar' );
+		add_user_meta( $users[1], 'foo', 'bar' );
+		add_user_meta( $users[0], 'foo2', 'bar2' );
+
+		$q = new WP_User_Query( array(
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+				array(
+					'key' => 'foo2',
+					'value' => 'bar2',
+				),
+			),
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[0], $users[1] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 32592
+	 */
+	public function test_nested_or_meta_query_should_eliminate_duplicate_matches() {
+		$users = $this->factory->user->create_many( 3 );
+
+		add_user_meta( $users[0], 'foo', 'bar' );
+		add_user_meta( $users[1], 'foo', 'bar' );
+		add_user_meta( $users[0], 'foo2', 'bar2' );
+		add_user_meta( $users[1], 'foo3', 'bar3' );
+
+		$q = new WP_User_Query( array(
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+				array(
+					'relation' => 'OR',
+					array(
+						'key' => 'foo',
+						'value' => 'bar',
+					),
+					array(
+						'key' => 'foo2',
+						'value' => 'bar2',
+					),
+				),
+			),
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( $users[0], $users[1] );
+
+		$this->assertEqualSets( $expected, $found );
+	}
 }
