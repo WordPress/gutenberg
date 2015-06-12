@@ -379,7 +379,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$post_value = rand_str();
 		$this->manager->set_post_value( $name, $post_value );
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type' ) );
-		$this->assertNull( $setting->is_current_blog_previewed() );
+		$this->assertFalse( $setting->is_current_blog_previewed() );
 		$setting->preview();
 		$this->assertTrue( $setting->is_current_blog_previewed() );
 
