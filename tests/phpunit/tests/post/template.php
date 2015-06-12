@@ -199,6 +199,39 @@ NO;
 	}
 
 	/**
+	 * @ticket 30082
+	 */
+	public function test_wp_dropdown_pages_should_not_contain_class_attribute_when_no_class_is_passed() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+		) );
+
+		$this->assertNotRegExp( '/<select[^>]+class=\'/', $found );
+	}
+
+	/**
+	 * @ticket 30082
+	 */
+	public function test_wp_dropdown_pages_should_obey_class_parameter() {
+		$p = $this->factory->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+
+		$found = wp_dropdown_pages( array(
+			'echo' => 0,
+			'class' => 'bar',
+		) );
+
+		$this->assertRegExp( '/<select[^>]+class=\'bar\'/', $found );
+	}
+
+	/**
 	 * @ticket 31389
 	 */
 	public function test_get_page_template_slug_by_id() {
