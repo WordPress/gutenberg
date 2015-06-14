@@ -21,9 +21,68 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		global $wpdb;
+		global $wpdb, $current_site;
 		$wpdb->suppress_errors( $this->suppress );
+		$current_site->id = 1;
 		parent::tearDown();
+	}
+
+	/**
+	 * By default, only one network exists and has a network ID of 1.
+	 */
+	function test_get_main_network_id_default() {
+		$this->assertEquals( 1, get_main_network_id() );
+	}
+
+	/**
+	 * If a second network is created, network ID 1 should still be returned
+	 * as the main network ID.
+	 */
+	function test_get_main_network_id_two_networks() {
+		$this->factory->network->create();
+
+		$this->assertEquals( 1, get_main_network_id() );
+	}
+
+	/**
+	 * When the `$current_site` global is populated with another network, the
+	 * main network should still return as 1.
+	 */
+	function test_get_main_network_id_after_network_switch() {
+		global $current_site;
+
+		$id = $this->factory->network->create();
+
+		$current_site->id = (int) $id;
+
+		$this->assertEquals( 1, get_main_network_id() );
+	}
+
+	/**
+	 * When the first network is removed, the next should return as the main
+	 * network ID.
+	 *
+	 * @todo In the future, we'll have a smarter way of deleting a network. For now,
+	 * fake the process with UPDATE queries.
+	 */
+	function test_get_main_network_id_after_network_delete() {
+		global $wpdb, $current_site;
+		$id = $this->factory->network->create();
+
+		$current_site->id = (int) $id;
+		$wpdb->query( "UPDATE {$wpdb->site} SET id=100 WHERE id=1" );
+		$this->assertEquals( $id, get_main_network_id() );
+		$wpdb->query( "UPDATE {$wpdb->site} SET id=1 WHERE id=100" );
+	}
+
+	function test_get_main_network_id_filtered() {
+		add_filter( 'get_main_network_id', array( $this, '_get_main_network_id' ) );
+		$this->assertEquals( 3, get_main_network_id() );
+		remove_filter( 'get_main_network_id', array( $this, '_get_main_network_id' ) );
+	}
+
+	function _get_main_network_id() {
+		return 3;
 	}
 
 	/**
