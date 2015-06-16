@@ -112,12 +112,25 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals('Class of &#8217;99', wptexturize("Class of '99"));
 		$this->assertEquals('Class of &#8217;99&#8217;s', wptexturize("Class of '99's"));
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;', wptexturize("'Class of '99'"));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217; ', wptexturize("'Class of '99' "));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;.', wptexturize("'Class of '99'."));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;, she said', wptexturize("'Class of '99', she said"));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;:', wptexturize("'Class of '99':"));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;;', wptexturize("'Class of '99';"));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;!', wptexturize("'Class of '99'!"));
+		$this->assertEquals('&#8216;Class of &#8217;99&#8217;?', wptexturize("'Class of '99'?"));
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;s&#8217;', wptexturize("'Class of '99's'"));
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;s&#8217;', wptexturize("'Class of '99&#8217;s'"));
 		//$this->assertEquals('&#8220;Class of 99&#8221;', wptexturize("\"Class of 99\""));
 		$this->assertEquals('&#8220;Class of &#8217;99&#8221;', wptexturize("\"Class of '99\""));
 		$this->assertEquals('{&#8220;Class of &#8217;99&#8221;}', wptexturize("{\"Class of '99\"}"));
 		$this->assertEquals(' &#8220;Class of &#8217;99&#8221; ', wptexturize(" \"Class of '99\" "));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;.', wptexturize(" \"Class of '99\"."));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;, she said', wptexturize(" \"Class of '99\", she said"));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;:', wptexturize(" \"Class of '99\":"));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;;', wptexturize(" \"Class of '99\";"));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;!', wptexturize(" \"Class of '99\"!"));
+		$this->assertEquals(' &#8220;Class of &#8217;99&#8221;?', wptexturize(" \"Class of '99\"?"));
 		$this->assertEquals('}&#8221;Class of &#8217;99&#8243;{', wptexturize("}\"Class of '99\"{")); // Not a quotation, may be between two other quotations.
 	}
 
@@ -702,6 +715,26 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'test sentence&#8221;.',
 			),
 			array(
+				'test sentence",',
+				'test sentence&#8221;,',
+			),
+			array(
+				'test sentence":',
+				'test sentence&#8221;:',
+			),
+			array(
+				'test sentence";',
+				'test sentence&#8221;;',
+			),
+			array(
+				'test sentence"!',
+				'test sentence&#8221;!',
+			),
+			array(
+				'test sentence"?',
+				'test sentence&#8221;?',
+			),
+			array(
 				'test sentence."',
 				'test sentence.&#8221;',
 			),
@@ -745,6 +778,22 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				"word word', she said",
 				"word word&#8217;, she said",
+			),
+			array(
+				"word word': word",
+				"word word&#8217;: word",
+			),
+			array(
+				"word word'; word",
+				"word word&#8217;; word",
+			),
+			array(
+				"word word'! word",
+				"word word&#8217;! word",
+			),
+			array(
+				"word word'? word",
+				"word word&#8217;? word",
 			),
 			array(
 				"word word'- word",
