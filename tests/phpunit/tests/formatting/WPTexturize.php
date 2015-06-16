@@ -1529,6 +1529,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			case '&#8221;' : return '!closeq2!';
 			case '&#8242;' : return '!prime1!';
 			case '&#8243;' : return '!prime2!';
+			case '&#8217;tain&#8217;t,&#8217;twere,&#8217;twas,&#8217;tis,&#8217;twill,&#8217;til,&#8217;bout,&#8217;nuff,&#8217;round,&#8217;cause,&#8217;em' : 
+				return '!apos!tain!apos!t,!apos!twere,!apos!twas,!apos!tis,!apos!twill,!apos!til,!apos!bout,!apos!nuff,!apos!round,!apos!cause,!apos!em';
 			default : return $translations;
 		}
 	}
