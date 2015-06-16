@@ -566,6 +566,9 @@ VIDEO;
 
 		$post = get_post( $post_id );
 
+		// Clean up.
+		wp_delete_attachment( $post_id );
+
 		$this->assertEquals( 'This is a comment. / Это комментарий. / Βλέπετε ένα σχόλιο.', $post->post_excerpt );
 	}
 
