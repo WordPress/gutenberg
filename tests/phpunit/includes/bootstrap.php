@@ -37,6 +37,7 @@ define( 'WP_MAX_MEMORY_LIMIT', -1 );
 
 $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
 $_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
+$_SERVER['REQUEST_METHOD'] = 'GET';
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
 if ( "1" == getenv( 'WP_MULTISITE' ) ||

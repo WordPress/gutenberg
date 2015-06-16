@@ -10,8 +10,6 @@ class Tests_Auth extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		$this->user_id = $this->factory->user->create();
-
-		$_SERVER['REQUEST_METHOD'] = null;
 	}
 
 	function test_auth_cookie_valid() {
