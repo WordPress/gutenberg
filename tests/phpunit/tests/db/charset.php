@@ -763,7 +763,7 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		self::$_wpdb->query( $drop );
 	}
 
-	function test_strip_invalid_test_for_column_bails_if_ascii_input_too_long() {
+	function test_strip_invalid_text_for_column_bails_if_ascii_input_too_long() {
 		global $wpdb;
 
 		// TEXT column
