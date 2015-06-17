@@ -38,204 +38,389 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		return $meta_value;
 	}
 
-	// test the default roles
+	protected function _getSingleSiteCaps() {
+		return array(
 
-	function test_user_administrator() {
-		$id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+			'unfiltered_html'        => array( 'administrator', 'editor' ),
 
-		// make sure the role name is correct
-		$this->assertEquals(array('administrator'), $user->roles);
+			'manage_network'         => array(),
+			'manage_sites'           => array(),
+			'manage_network_users'   => array(),
+			'manage_network_plugins' => array(),
+			'manage_network_themes'  => array(),
+			'manage_network_options' => array(),
 
-		// check a few of the main capabilities
-		$this->assertTrue($user->has_cap('switch_themes'));
-		$this->assertTrue($user->has_cap('list_users'));
-		$this->assertTrue($user->has_cap('manage_options'));
-		$this->assertTrue($user->has_cap('level_10'));
+			'activate_plugins'       => array( 'administrator' ),
+			'create_users'           => array( 'administrator' ),
+			'delete_plugins'         => array( 'administrator' ),
+			'delete_themes'          => array( 'administrator' ),
+			'delete_users'           => array( 'administrator' ),
+			'edit_files'             => array( 'administrator' ),
+			'edit_plugins'           => array( 'administrator' ),
+			'edit_themes'            => array( 'administrator' ),
+			'edit_users'             => array( 'administrator' ),
+			'install_plugins'        => array( 'administrator' ),
+			'install_themes'         => array( 'administrator' ),
+			'update_core'            => array( 'administrator' ),
+			'update_plugins'         => array( 'administrator' ),
+			'update_themes'          => array( 'administrator' ),
+			'edit_theme_options'     => array( 'administrator' ),
+			'export'                 => array( 'administrator' ),
+			'import'                 => array( 'administrator' ),
+			'list_users'             => array( 'administrator' ),
+			'manage_options'         => array( 'administrator' ),
+			'promote_users'          => array( 'administrator' ),
+			'remove_users'           => array( 'administrator' ),
+			'switch_themes'          => array( 'administrator' ),
+			'edit_dashboard'         => array( 'administrator' ),
+
+			'moderate_comments'      => array( 'administrator', 'editor' ),
+			'manage_categories'      => array( 'administrator', 'editor' ),
+			'edit_others_posts'      => array( 'administrator', 'editor' ),
+			'edit_pages'             => array( 'administrator', 'editor' ),
+			'edit_others_pages'      => array( 'administrator', 'editor' ),
+			'edit_published_pages'   => array( 'administrator', 'editor' ),
+			'publish_pages'          => array( 'administrator', 'editor' ),
+			'delete_pages'           => array( 'administrator', 'editor' ),
+			'delete_others_posts'    => array( 'administrator', 'editor' ),
+			'delete_published_pages' => array( 'administrator', 'editor' ),
+			'delete_others_posts'    => array( 'administrator', 'editor' ),
+			'delete_private_posts'   => array( 'administrator', 'editor' ),
+			'edit_private_posts'     => array( 'administrator', 'editor' ),
+			'read_private_posts'     => array( 'administrator', 'editor' ),
+			'delete_private_pages'   => array( 'administrator', 'editor' ),
+			'edit_private_pages'     => array( 'administrator', 'editor' ),
+			'read_private_pages'     => array( 'administrator', 'editor' ),
+
+			'edit_published_posts'   => array( 'administrator', 'editor', 'author' ),
+			'upload_files'           => array( 'administrator', 'editor', 'author' ),
+			'publish_posts'          => array( 'administrator', 'editor', 'author' ),
+			'delete_published_posts' => array( 'administrator', 'editor', 'author' ),
+
+			'edit_posts'             => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'delete_posts'           => array( 'administrator', 'editor', 'author', 'contributor' ),
+
+			'read'                   => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
+
+			'level_10'               => array( 'administrator' ),
+			'level_9'                => array( 'administrator' ),
+			'level_8'                => array( 'administrator' ),
+			'level_7'                => array( 'administrator', 'editor' ),
+			'level_6'                => array( 'administrator', 'editor' ),
+			'level_5'                => array( 'administrator', 'editor' ),
+			'level_4'                => array( 'administrator', 'editor' ),
+			'level_3'                => array( 'administrator', 'editor' ),
+			'level_2'                => array( 'administrator', 'editor', 'author' ),
+			'level_1'                => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'level_0'                => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
+
+		);
+
 	}
 
-	function test_user_editor() {
-		$id = $this->factory->user->create( array( 'role' => 'editor' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+	protected function _getMultiSiteCaps() {
+		return array(
 
-		// make sure the role name is correct
-		$this->assertEquals(array('editor'), $user->roles);
+			'unfiltered_html'        => array(),
 
-		// check a few of the main capabilities
-		$this->assertTrue($user->has_cap('moderate_comments'));
-		$this->assertTrue($user->has_cap('manage_categories'));
-		$this->assertTrue($user->has_cap('upload_files'));
-		$this->assertTrue($user->has_cap('level_7'));
+			'manage_network'         => array(),
+			'manage_sites'           => array(),
+			'manage_network_users'   => array(),
+			'manage_network_plugins' => array(),
+			'manage_network_themes'  => array(),
+			'manage_network_options' => array(),
+			'activate_plugins'       => array(),
+			'create_users'           => array(),
+			'delete_plugins'         => array(),
+			'delete_themes'          => array(),
+			'delete_users'           => array(),
+			'edit_files'             => array(),
+			'edit_plugins'           => array(),
+			'edit_themes'            => array(),
+			'edit_users'             => array(),
+			'install_plugins'        => array(),
+			'install_themes'         => array(),
+			'update_core'            => array(),
+			'update_plugins'         => array(),
+			'update_themes'          => array(),
 
-		// and a few capabilities this user doesn't have
-		$this->assertFalse($user->has_cap('switch_themes'));
-		$this->assertFalse($user->has_cap('edit_users'));
-		$this->assertFalse($user->has_cap('level_8'));
+			'edit_theme_options'     => array( 'administrator' ),
+			'export'                 => array( 'administrator' ),
+			'import'                 => array( 'administrator' ),
+			'list_users'             => array( 'administrator' ),
+			'manage_options'         => array( 'administrator' ),
+			'promote_users'          => array( 'administrator' ),
+			'remove_users'           => array( 'administrator' ),
+			'switch_themes'          => array( 'administrator' ),
+			'edit_dashboard'         => array( 'administrator' ),
+
+			'moderate_comments'      => array( 'administrator', 'editor' ),
+			'manage_categories'      => array( 'administrator', 'editor' ),
+			'edit_others_posts'      => array( 'administrator', 'editor' ),
+			'edit_pages'             => array( 'administrator', 'editor' ),
+			'edit_others_pages'      => array( 'administrator', 'editor' ),
+			'edit_published_pages'   => array( 'administrator', 'editor' ),
+			'publish_pages'          => array( 'administrator', 'editor' ),
+			'delete_pages'           => array( 'administrator', 'editor' ),
+			'delete_others_posts'    => array( 'administrator', 'editor' ),
+			'delete_published_pages' => array( 'administrator', 'editor' ),
+			'delete_others_posts'    => array( 'administrator', 'editor' ),
+			'delete_private_posts'   => array( 'administrator', 'editor' ),
+			'edit_private_posts'     => array( 'administrator', 'editor' ),
+			'read_private_posts'     => array( 'administrator', 'editor' ),
+			'delete_private_pages'   => array( 'administrator', 'editor' ),
+			'edit_private_pages'     => array( 'administrator', 'editor' ),
+			'read_private_pages'     => array( 'administrator', 'editor' ),
+
+			'edit_published_posts'   => array( 'administrator', 'editor', 'author' ),
+			'upload_files'           => array( 'administrator', 'editor', 'author' ),
+			'publish_posts'          => array( 'administrator', 'editor', 'author' ),
+			'delete_published_posts' => array( 'administrator', 'editor', 'author' ),
+
+			'edit_posts'             => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'delete_posts'           => array( 'administrator', 'editor', 'author', 'contributor' ),
+
+			'read'                   => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
+
+			'level_10'               => array( 'administrator' ),
+			'level_9'                => array( 'administrator' ),
+			'level_8'                => array( 'administrator' ),
+			'level_7'                => array( 'administrator', 'editor' ),
+			'level_6'                => array( 'administrator', 'editor' ),
+			'level_5'                => array( 'administrator', 'editor' ),
+			'level_4'                => array( 'administrator', 'editor' ),
+			'level_3'                => array( 'administrator', 'editor' ),
+			'level_2'                => array( 'administrator', 'editor', 'author' ),
+			'level_1'                => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'level_0'                => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
+
+		);
+
 	}
 
-	function test_user_author() {
-		$id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
-
-		// make sure the role name is correct
-		$this->assertEquals(array('author'), $user->roles);
-
-		// check a few of the main capabilities
-		$this->assertTrue($user->has_cap('edit_posts'));
-		$this->assertTrue($user->has_cap('edit_published_posts'));
-		$this->assertTrue($user->has_cap('upload_files'));
-		$this->assertTrue($user->has_cap('level_2'));
-
-		// and a few capabilities this user doesn't have
-		$this->assertFalse($user->has_cap('moderate_comments'));
-		$this->assertFalse($user->has_cap('manage_categories'));
-		$this->assertFalse($user->has_cap('level_3'));
+	protected function getCapsAndRoles() {
+		if ( is_multisite() ) {
+			return $this->_getMultiSiteCaps();
+		} else {
+			return $this->_getSingleSiteCaps();
+		}
 	}
 
-	function test_user_contributor() {
-		$id = $this->factory->user->create( array( 'role' => 'contributor' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
-
-		// make sure the role name is correct
-		$this->assertEquals(array('contributor'), $user->roles);
-
-		// check a few of the main capabilities
-		$this->assertTrue($user->has_cap('edit_posts'));
-		$this->assertTrue($user->has_cap('read'));
-		$this->assertTrue($user->has_cap('level_1'));
-		$this->assertTrue($user->has_cap('level_0'));
-
-		// and a few capabilities this user doesn't have
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_published_posts'));
-		$this->assertFalse($user->has_cap('level_2'));
+	// test the tests
+	function test_single_and_multisite_cap_tests_match() {
+		$single = $this->_getSingleSiteCaps();
+		$multi  = $this->_getMultiSiteCaps();
+		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
 	}
 
-	function test_user_subscriber() {
-		$id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+	// test the default roles and caps
+	function test_all_roles_and_caps() {
+		$users = array(
+			'administrator' => $this->factory->user->create_and_get( array( 'role' => 'administrator' ) ),
+			'editor'        => $this->factory->user->create_and_get( array( 'role' => 'editor' ) ),
+			'author'        => $this->factory->user->create_and_get( array( 'role' => 'author' ) ),
+			'contributor'   => $this->factory->user->create_and_get( array( 'role' => 'contributor' ) ),
+			'subscriber'    => $this->factory->user->create_and_get( array( 'role' => 'subscriber' ) ),
+		);
+		$caps = $this->getCapsAndRoles();
 
-		// make sure the role name is correct
-		$this->assertEquals(array('subscriber'), $user->roles);
+		foreach ( $users as $role => $user ) {
 
-		// check a few of the main capabilities
-		$this->assertTrue($user->has_cap('read'));
-		$this->assertTrue($user->has_cap('level_0'));
+			// make sure the user is valid
+			$this->assertTrue( $user->exists(), "User with {$role} role does not exist" );
 
-		// and a few capabilities this user doesn't have
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_posts'));
-		$this->assertFalse($user->has_cap('level_1'));
+			// make sure the role name is correct
+			$this->assertEquals( array( $role ), $user->roles, "User should only have the {$role} role" );
+
+			foreach ( $caps as $cap => $roles ) {
+				if ( in_array( $role, $roles, true ) ) {
+					$this->assertTrue( $user->has_cap( $cap ), "User with the {$role} role should have the {$cap} capability" );
+					$this->assertTrue( user_can( $user, $cap ), "User with the {$role} role should have the {$cap} capability" );
+				} else {
+					$this->assertFalse( $user->has_cap( $cap ), "User with the {$role} role should not have the {$cap} capability" );
+					$this->assertFalse( user_can( $user, $cap ), "User with the {$role} role should not have the {$cap} capability" );
+				}
+			}
+
+		}
+	}
+
+	// special case for the link manager
+	function test_link_manager_caps() {
+		$users = array(
+			'administrator' => $this->factory->user->create_and_get( array( 'role' => 'administrator' ) ),
+			'editor'        => $this->factory->user->create_and_get( array( 'role' => 'editor' ) ),
+			'author'        => $this->factory->user->create_and_get( array( 'role' => 'author' ) ),
+			'contributor'   => $this->factory->user->create_and_get( array( 'role' => 'contributor' ) ),
+			'subscriber'    => $this->factory->user->create_and_get( array( 'role' => 'subscriber' ) ),
+		);
+		$caps = array(
+			'manage_links' => array( 'administrator', 'editor' ),
+		);
+
+		$this->assertSame( '0', get_option( 'link_manager_enabled' ) );
+
+		// no-one should have access to the link manager by default
+		foreach ( $users as $role => $user ) {
+			foreach ( $caps as $cap => $roles ) {
+				$this->assertFalse( $user->has_cap( $cap ), "User with the {$role} role should not have the {$cap} capability" );
+				$this->assertFalse( user_can( $user, $cap ), "User with the {$role} role should not have the {$cap} capability" );
+			}
+		}
+
+		update_option( 'link_manager_enabled', '1' );
+		$this->assertSame( '1', get_option( 'link_manager_enabled' ) );
+
+		foreach ( $users as $role => $user ) {
+			foreach ( $caps as $cap => $roles ) {
+				if ( in_array( $role, $roles, true ) ) {
+					$this->assertTrue( $user->has_cap( $cap ), "User with the {$role} role should have the {$cap} capability" );
+					$this->assertTrue( user_can( $user, $cap ), "User with the {$role} role should have the {$cap} capability" );
+				} else {
+					$this->assertFalse( $user->has_cap( $cap ), "User with the {$role} role should not have the {$cap} capability" );
+					$this->assertFalse( user_can( $user, $cap ), "User with the {$role} role should not have the {$cap} capability" );
+				}
+			}
+		}
+
+		update_option( 'link_manager_enabled', '0' );
+		$this->assertSame( '0', get_option( 'link_manager_enabled' ) );
+
+	}
+
+	function test_super_admin_caps() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+		$caps = $this->getCapsAndRoles();
+
+		$user = $this->factory->user->create_and_get( array( 'role' => 'administrator' ) );
+		grant_super_admin( $user->ID );
+
+		$this->assertTrue( is_super_admin( $user->ID ) );
+
+		foreach ( $caps as $cap => $roles ) {
+			$this->assertTrue( $user->has_cap( $cap ), "Super Admins should have the {$cap} capability" );
+			$this->assertTrue( user_can( $user, $cap ), "Super Admins should have the {$cap} capability" );
+		}
 	}
 
 	// a role that doesn't exist
 	function test_bogus_role() {
-		_disable_wp_die();
-		$id = $this->factory->user->create( array( 'role' => rand_str() ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+		$user = $this->factory->user->create_and_get( array( 'role' => 'invalid_role' ) );
 
-		// user has no role and no capabilities
-		$this->assertEquals(array(), $user->roles);
-		$this->assertFalse($user->has_cap('level_0'));
-		_enable_wp_die();
+		// make sure the user is valid
+		$this->assertTrue( $user->exists(), "User does not exist" );
+
+		// make sure the role name is correct
+		$this->assertEquals( array(), $user->roles, "User should not have any roles" );
+
+		$caps = $this->getCapsAndRoles();
+
+		foreach ( $caps as $cap => $roles ) {
+			$this->assertFalse( $user->has_cap( $cap ), "User with an invalid role should not have the {$cap} capability" );
+			$this->assertFalse( user_can( $user, $cap ), "User with an invalid role should not have the {$cap} capability" );
+		}
 	}
 
 	// a user with multiple roles
 	function test_user_subscriber_contributor() {
-		$id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
-		$user->add_role('contributor');
+		$user = $this->factory->user->create_and_get( array( 'role' => 'subscriber' ) );
 
-		// nuke and re-fetch the object to make sure it was stored
-		$user = NULL;
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+		// make sure the user is valid
+		$this->assertTrue( $user->exists(), "User does not exist" );
+
+		$user->add_role( 'contributor' );
 
 		// user should have two roles now
-		$this->assertEquals(array('subscriber', 'contributor'), $user->roles);
+		$this->assertEquals( array( 'subscriber', 'contributor' ), $user->roles );
 
-		// with contributor capabilities
-		$this->assertTrue($user->has_cap('edit_posts'));
-		$this->assertTrue($user->has_cap('read'));
-		$this->assertTrue($user->has_cap('level_1'));
-		$this->assertTrue($user->has_cap('level_0'));
+		$caps = $this->getCapsAndRoles();
 
-		// but not these
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_published_posts'));
-		$this->assertFalse($user->has_cap('level_2'));
+		foreach ( $caps as $cap => $roles ) {
+			if ( array_intersect( $user->roles, $roles ) ) {
+				$this->assertTrue( $user->has_cap( $cap ), "User should have the {$cap} capability" );
+				$this->assertTrue( user_can( $user, $cap ), "User should have the {$cap} capability" );
+			} else {
+				$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
+				$this->assertFalse( user_can( $user, $cap ), "User should not have the {$cap} capability" );
+			}
+		}
 	}
 
+	// newly added empty role
 	function test_add_empty_role() {
-		// add_role($role, $display_name, $capabilities = '')
-		// randomly named role with no capabilities
 		global $wp_roles;
-		$role_name = rand_str();
-		add_role($role_name, 'Janitor', array());
+
+		$role_name = 'janitor';
+		add_role( $role_name, 'Janitor', array() );
+
 		$this->_flush_roles();
-		$this->assertTrue($wp_roles->is_role($role_name));
+		$this->assertTrue( $wp_roles->is_role( $role_name ) );
 
-		$id = $this->factory->user->create( array( 'role' => $role_name ) );
+		$user = $this->factory->user->create_and_get( array( 'role' => $role_name ) );
 
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+		// make sure the user is valid
+		$this->assertTrue( $user->exists(), "User does not exist" );
 
-		$this->assertEquals(array($role_name), $user->roles);
+		// make sure the role name is correct
+		$this->assertEquals( array( $role_name ), $user->roles );
 
-		// user shouldn't have any capabilities; test a quick sample
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_published_posts'));
-		$this->assertFalse($user->has_cap('level_1'));
-		$this->assertFalse($user->has_cap('level_0'));
+		$caps = $this->getCapsAndRoles();
+
+		foreach ( $caps as $cap => $roles ) {
+			$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
+			$this->assertFalse( user_can( $user, $cap ), "User should not have the {$cap} capability" );
+		}
 
 		// clean up
-		remove_role($role_name);
+		remove_role( $role_name );
 		$this->_flush_roles();
-		$this->assertFalse($wp_roles->is_role($role_name));
+		$this->assertFalse( $wp_roles->is_role( $role_name ) );
 	}
 
-
+	// newly added role
 	function test_add_role() {
-		// add_role($role, $display_name, $capabilities = '')
-		// randomly named role with a few capabilities
 		global $wp_roles;
-		$role_name = rand_str();
-		add_role($role_name, 'Janitor', array('edit_posts'=>true, 'edit_pages'=>true, 'level_0'=>true, 'level_1'=>true, 'level_2'=>true));
+
+		$role_name = 'janitor';
+		$expected_caps = array(
+			'edit_posts' => true,
+			'edit_pages' => true,
+			'level_0'    => true,
+			'level_1'    => true,
+			'level_2'    => true,
+		);
+		add_role( $role_name, 'Janitor', $expected_caps );
 		$this->_flush_roles();
-		$this->assertTrue($wp_roles->is_role($role_name));
+		$this->assertTrue( $wp_roles->is_role( $role_name ) );
 
-		$id = $this->factory->user->create( array( 'role' => $role_name ) );
+		$user = $this->factory->user->create_and_get( array( 'role' => $role_name ) );
 
-		$user = new WP_User($id);
-		$this->assertTrue($user->exists(), "Problem getting user $id");
+		// make sure the user is valid
+		$this->assertTrue( $user->exists(), "User does not exist" );
 
-		$this->assertEquals(array($role_name), $user->roles);
+		// make sure the role name is correct
+		$this->assertEquals( array( $role_name ), $user->roles );
 
-		// the user should have all the above caps
-		$this->assertTrue($user->has_cap($role_name));
-		$this->assertTrue($user->has_cap('edit_posts'));
-		$this->assertTrue($user->has_cap('edit_pages'));
-		$this->assertTrue($user->has_cap('level_0'));
-		$this->assertTrue($user->has_cap('level_1'));
-		$this->assertTrue($user->has_cap('level_2'));
+		$caps = $this->getCapsAndRoles();
 
-		// shouldn't have any other caps
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_published_posts'));
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('level_3'));
+		foreach ( $caps as $cap => $roles ) {
+			// the user should have all the above caps
+			if ( isset( $expected_caps[ $cap ] ) ) {
+				$this->assertTrue( $user->has_cap( $cap ), "User should have the {$cap} capability" );
+				$this->assertTrue( user_can( $user, $cap ), "User should have the {$cap} capability" );
+			} else {
+				$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
+				$this->assertFalse( user_can( $user, $cap ), "User should not have the {$cap} capability" );
+			}
+		}
 
 		// clean up
-		remove_role($role_name);
+		remove_role( $role_name );
 		$this->_flush_roles();
-		$this->assertFalse($wp_roles->is_role($role_name));
+		$this->assertFalse( $wp_roles->is_role( $role_name ) );
 	}
 
 	function test_role_add_cap() {
