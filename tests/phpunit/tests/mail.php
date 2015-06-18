@@ -6,13 +6,7 @@
 class Tests_Mail extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-		$_SERVER['SERVER_NAME'] = 'example.com';
 		unset( $GLOBALS['phpmailer']->mock_sent );
-	}
-
-	function tearDown() {
-		unset( $_SERVER['SERVER_NAME'] );
-		parent::tearDown();
 	}
 
 	function test_wp_mail_custom_boundaries() {
