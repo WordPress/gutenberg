@@ -77,9 +77,18 @@
 		}, assert.async() );
 	} );
 
-	QUnit.test( 'Ordered list with content.', function( assert ) {
+	QUnit.test( 'Ordered list with content. (1)', function( assert ) {
 		editor.setContent( '<p><strong>test</strong></p>' );
 		editor.selection.setCursorLocation();
+
+		type( '* ', function() {
+			assert.equal( editor.getContent(), '<ul>\n<li><strong>test</strong></li>\n</ul>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Ordered list with content. (2)', function( assert ) {
+		editor.setContent( '<p><strong>test</strong></p>' );
+		editor.selection.setCursorLocation( editor.$( 'p' )[0], 0 );
 
 		type( '* ', function() {
 			assert.equal( editor.getContent(), '<ul>\n<li><strong>test</strong></li>\n</ul>' );
