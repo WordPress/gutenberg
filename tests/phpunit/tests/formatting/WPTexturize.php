@@ -90,8 +90,8 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		//$this->assertEquals('Here is &#8220;<a href="http://example.com">a test with a link</a>&#8221;&#8230; and ellipses.', wptexturize('Here is "<a href="http://example.com">a test with a link</a>"... and ellipses.'));
 		//$this->assertEquals('Here is &#8220;a test <a href="http://example.com">with a link</a>&#8221;.', wptexturize('Here is "a test <a href="http://example.com">with a link</a>".'));
 		//$this->assertEquals('Here is &#8220;<a href="http://example.com">a test with a link</a>&#8221;and a work stuck to the end.', wptexturize('Here is "<a href="http://example.com">a test with a link</a>"and a work stuck to the end.'));
-		//$this->assertEquals('A test with a finishing number, &#8220;like 23&#8221;.', wptexturize('A test with a finishing number, "like 23".'));
-		//$this->assertEquals('A test with a number, &#8220;like 62&#8221;, is nice to have.', wptexturize('A test with a number, "like 62", is nice to have.'));
+		$this->assertEquals('A test with a finishing number, &#8220;like 23&#8221;.', wptexturize('A test with a finishing number, "like 23".'));
+		$this->assertEquals('A test with a number, &#8220;like 62&#8221;, is nice to have.', wptexturize('A test with a number, "like 62", is nice to have.'));
 	}
 
 	/**
@@ -121,7 +121,7 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;?', wptexturize("'Class of '99'?"));
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;s&#8217;', wptexturize("'Class of '99's'"));
 		$this->assertEquals('&#8216;Class of &#8217;99&#8217;s&#8217;', wptexturize("'Class of '99&#8217;s'"));
-		//$this->assertEquals('&#8220;Class of 99&#8221;', wptexturize("\"Class of 99\""));
+		$this->assertEquals('&#8220;Class of 99&#8221;', wptexturize("\"Class of 99\""));
 		$this->assertEquals('&#8220;Class of &#8217;99&#8221;', wptexturize("\"Class of '99\""));
 		$this->assertEquals('{&#8220;Class of &#8217;99&#8221;}', wptexturize("{\"Class of '99\"}"));
 		$this->assertEquals(' &#8220;Class of &#8217;99&#8221; ', wptexturize(" \"Class of '99\" "));
@@ -1897,6 +1897,154 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			array(
 				'[audio]hello</span>---</span>',
 				'[audio]hello</span>---</span>',
+			),
+		);
+	}
+
+	/**
+	 * Ensure primes logic is not too greedy at the end of a quotation.
+	 *
+	 * @ticket 29256
+	 * @dataProvider data_primes_vs_quotes
+	 */
+	function test_primes_vs_quotes( $input, $output ) {
+		return $this->assertEquals( $output, wptexturize( $input ) );
+	}
+
+	function data_primes_vs_quotes() {
+		return array(
+			array(
+				"George's porch is 99' long.",
+				"George&#8217;s porch is 99&#8242; long.",
+			),
+			array(
+				'The best year "was that time in 2012" when everyone partied, he said.',
+				'The best year &#8220;was that time in 2012&#8221; when everyone partied, he said.',
+			),
+			array(
+				"I need 4 x 20' = 80' of trim.", // Works only with a space before the = char.
+				"I need 4 x 20&#8242; = 80&#8242; of trim.",
+			),
+			array(
+				'"Lorem ipsum dolor sit amet 1234"',
+				'&#8220;Lorem ipsum dolor sit amet 1234&#8221;',
+			),
+			array(
+				"'Etiam eu egestas dui 1234'",
+				"&#8216;Etiam eu egestas dui 1234&#8217;",
+			),
+			array(
+				'according to our source, "33% of all students scored less than 50" on the test.',
+				'according to our source, &#8220;33% of all students scored less than 50&#8221; on the test.',
+			),
+			array(
+				"The doctor said, 'An average height is between 5' and 6' in study group 7'.  He then produced a 6' chart of averages.  A man of 7', incredibly, is very possible.",
+				"The doctor said, &#8216;An average height is between 5&#8242; and 6&#8242; in study group 7&#8217;.  He then produced a 6&#8242; chart of averages.  A man of 7&#8242;, incredibly, is very possible.",
+			),
+			array(
+				'Pirates have voted on "The Expendables 3" with their clicks -- and it turns out the Sylvester Stallone-starrer hasn\'t been astoundingly popular among digital thieves, relatively speaking.
+
+As of Sunday, 5.12 million people worldwide had pirated "Expendables 3" since a high-quality copy hit torrent-sharing sites July 23, according to piracy-tracking firm Excipio.
+
+That likely contributed to the action movie\'s dismal box-office debut this weekend. But over the same July 23-Aug. 18 time period, the movie was No. 4 in downloads, after "Captain America: The Winter Soldier" (7.31 million), "Divergent" (6.29 million) and "The Amazing Spider-Man 2" (5.88 million). Moreover, that\'s despite "Expendables 3" becoming available more than three weeks prior to the film\'s U.S. theatrical debut.
+
+String with a number followed by a single quote \'Expendables 3\' vestibulum in arcu mi.',
+
+				'Pirates have voted on &#8220;The Expendables 3&#8221; with their clicks &#8212; and it turns out the Sylvester Stallone-starrer hasn&#8217;t been astoundingly popular among digital thieves, relatively speaking.
+
+As of Sunday, 5.12 million people worldwide had pirated &#8220;Expendables 3&#8221; since a high-quality copy hit torrent-sharing sites July 23, according to piracy-tracking firm Excipio.
+
+That likely contributed to the action movie&#8217;s dismal box-office debut this weekend. But over the same July 23-Aug. 18 time period, the movie was No. 4 in downloads, after &#8220;Captain America: The Winter Soldier&#8221; (7.31 million), &#8220;Divergent&#8221; (6.29 million) and &#8220;The Amazing Spider-Man 2&#8221; (5.88 million). Moreover, that&#8217;s despite &#8220;Expendables 3&#8221; becoming available more than three weeks prior to the film&#8217;s U.S. theatrical debut.
+
+String with a number followed by a single quote &#8216;Expendables 3&#8217; vestibulum in arcu mi.',
+			),
+		);
+	}
+
+	/**
+	 * Make sure translation actually works.
+	 *
+	 * Also make sure opening and closing quotes are allowed to be identical.
+	 *
+	 * @ticket 29256
+	 * @dataProvider data_primes_quotes_translation
+	 */
+	function test_primes_quotes_translation( $input, $output ) {
+		add_filter( 'gettext_with_context', array( $this, 'filter_translate2' ), 10, 4 );
+
+		$result = wptexturize( $input, true );
+
+		remove_filter( 'gettext_with_context', array( $this, 'filter_translate2' ), 10, 4 );
+		wptexturize( 'reset', true );
+
+		return $this->assertEquals( $output, $result );
+	}
+
+	function filter_translate2( $translations, $text, $context, $domain ) {
+		switch ($text) {
+			case '&#8211;' : return '!endash!';
+			case '&#8212;' : return '!emdash!';
+			case '&#8216;' : return '!q1!';
+			case '&#8217;' :
+				if ( 'apostrophe' == $context ) {
+					return '!apos!';
+				} else {
+					return '!q1!';
+				}
+			case '&#8220;' : return '!q2!';
+			case '&#8221;' : return '!q2!';
+			case '&#8242;' : return '!prime1!';
+			case '&#8243;' : return '!prime2!';
+			default : return $translations;
+		}
+	}
+
+	function data_primes_quotes_translation() {
+		return array(
+			array(
+				"George's porch is 99' long.",
+				"George!apos!s porch is 99!prime1! long.",
+			),
+			array(
+				'The best year "was that time in 2012" when everyone partied, he said.',
+				'The best year !q2!was that time in 2012!q2! when everyone partied, he said.',
+			),
+			array(
+				"I need 4 x 20' = 80' of trim.", // Works only with a space before the = char.
+				"I need 4 x 20!prime1! = 80!prime1! of trim.",
+			),
+			array(
+				'"Lorem ipsum dolor sit amet 1234"',
+				'!q2!Lorem ipsum dolor sit amet 1234!q2!',
+			),
+			array(
+				"'Etiam eu egestas dui 1234'",
+				"!q1!Etiam eu egestas dui 1234!q1!",
+			),
+			array(
+				'according to our source, "33% of all students scored less than 50" on the test.',
+				'according to our source, !q2!33% of all students scored less than 50!q2! on the test.',
+			),
+			array(
+				"The doctor said, 'An average height is between 5' and 6' in study group 7'.  He then produced a 6' chart of averages.  A man of 7', incredibly, is very possible.",
+				"The doctor said, !q1!An average height is between 5!prime1! and 6!prime1! in study group 7!q1!.  He then produced a 6!prime1! chart of averages.  A man of 7!prime1!, incredibly, is very possible.",
+			),
+			array(
+				'Pirates have voted on "The Expendables 3" with their clicks -- and it turns out the Sylvester Stallone-starrer hasn\'t been astoundingly popular among digital thieves, relatively speaking.
+
+As of Sunday, 5.12 million people worldwide had pirated "Expendables 3" since a high-quality copy hit torrent-sharing sites July 23, according to piracy-tracking firm Excipio.
+
+That likely contributed to the action movie\'s dismal box-office debut this weekend. But over the same July 23-Aug. 18 time period, the movie was No. 4 in downloads, after "Captain America: The Winter Soldier" (7.31 million), "Divergent" (6.29 million) and "The Amazing Spider-Man 2" (5.88 million). Moreover, that\'s despite "Expendables 3" becoming available more than three weeks prior to the film\'s U.S. theatrical debut.
+
+String with a number followed by a single quote \'Expendables 3\' vestibulum in arcu mi.',
+
+				'Pirates have voted on !q2!The Expendables 3!q2! with their clicks !emdash! and it turns out the Sylvester Stallone-starrer hasn!apos!t been astoundingly popular among digital thieves, relatively speaking.
+
+As of Sunday, 5.12 million people worldwide had pirated !q2!Expendables 3!q2! since a high-quality copy hit torrent-sharing sites July 23, according to piracy-tracking firm Excipio.
+
+That likely contributed to the action movie!apos!s dismal box-office debut this weekend. But over the same July 23-Aug. 18 time period, the movie was No. 4 in downloads, after !q2!Captain America: The Winter Soldier!q2! (7.31 million), !q2!Divergent!q2! (6.29 million) and !q2!The Amazing Spider-Man 2!q2! (5.88 million). Moreover, that!apos!s despite !q2!Expendables 3!q2! becoming available more than three weeks prior to the film!apos!s U.S. theatrical debut.
+
+String with a number followed by a single quote !q1!Expendables 3!q1! vestibulum in arcu mi.',
 			),
 		);
 	}
