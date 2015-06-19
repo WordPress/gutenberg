@@ -85,7 +85,7 @@ class Tests_Formatting_WPSpecialchars extends WP_UnitTestCase {
 		return array(
 			array(
 				'This & that, this &amp; that, &#8212; &quot; &QUOT; &Uacute; &nbsp; &#34; &#034; &#0034; &#x00022; &#x22; &dollar; &times;',
-				'This &amp; that, this &amp; that, &#8212; &quot; &amp;QUOT; &Uacute; &nbsp; &#34; &#034; &#0034; &#x00022; &#x22; &amp;dollar; &times;',
+				'This &amp; that, this &amp; that, &#8212; &quot; &amp;QUOT; &Uacute; &nbsp; &#034; &#034; &#034; &#x22; &#x22; &amp;dollar; &times;',
 			),
 			array(
 				'&& &&amp; &amp;&amp; &amp;;',
