@@ -411,4 +411,57 @@ EOF;
 			),
 		);
 	}
+	
+	/**
+	 * Test removal of '\0' strings.
+	 *
+	 * @ticket 28699
+	 * @dataProvider data_slash_zero_removal
+	 */
+	function test_slash_zero_removal( $input, $output ) {
+		global $allowedposttags;
+
+		return $this->assertEquals( $output, wp_kses( $input, $allowedposttags ) );
+	}
+	
+	function data_slash_zero_removal() {
+		return array(
+			array(
+				'This \\0 should be no big deal.',
+				'This \\0 should be no big deal.',
+			),
+			array(
+				'<div>This \\0 should be no big deal.</div>',
+				'<div>This \\0 should be no big deal.</div>',
+			),
+			array(
+				'<div align="\\0left">This should be no big deal.</div>',
+				'<div align="\\0left">This should be no big deal.</div>',
+			),
+			array(
+				'This <div style="float:\\0left"> is more of a concern.',
+				'This <div style="float:left"> is more of a concern.',
+			),
+			array(
+				'This <div style="float:\\0\\0left"> is more of a concern.',
+				'This <div style="float:left"> is more of a concern.',
+			),
+			array(
+				'This <div style="float:\\\\00left"> is more of a concern.',
+				'This <div style="float:left"> is more of a concern.',
+			),
+			array(
+				'This <div style="float:\\\\\\\\0000left"> is more of a concern.',
+				'This <div style="float:left"> is more of a concern.',
+			),
+			array(
+				'This <div style="float:\\0000left"> is more of a concern.',
+				'This <div style="float:left"> is more of a concern.',
+			),
+			array(
+				'<style type="text/css">div {background-image:\\0}</style>',
+				'div {background-image:\\0}',
+			),
+		);
+	}
 }
