@@ -34,7 +34,6 @@ Details = Attachment.extend({
 		'click .trash-attachment':        'trashAttachment',
 		'click .untrash-attachment':      'untrashAttachment',
 		'click .edit-attachment':         'editAttachment',
-		'click .refresh-attachment':      'refreshAttachment',
 		'keydown':                        'toggleSelectionHandler'
 	},
 
@@ -109,14 +108,6 @@ Details = Attachment.extend({
 		} else {
 			this.$el.addClass('needs-refresh');
 		}
-	},
-	/**
-	 * @param {Object} event
-	 */
-	refreshAttachment: function( event ) {
-		this.$el.removeClass('needs-refresh');
-		event.preventDefault();
-		this.model.fetch();
 	},
 	/**
 	 * When reverse tabbing(shift+tab) out of the right details panel, deliver
