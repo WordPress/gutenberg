@@ -308,7 +308,7 @@ class Tests_User extends WP_UnitTestCase {
 		// Test update of fields in _get_additional_user_keys()
 		$user_data = array( 'ID' => $user_id, 'use_ssl' => 1, 'show_admin_bar_front' => 1,
 						   'rich_editing' => 1, 'first_name' => 'first', 'last_name' => 'last',
-						   'nickname' => 'nick', 'comment_shortcuts' => 1, 'admin_color' => 'classic',
+						   'nickname' => 'nick', 'comment_shortcuts' => 'true', 'admin_color' => 'classic',
 						   'description' => 'describe' );
 		wp_update_user( $user_data );
 
