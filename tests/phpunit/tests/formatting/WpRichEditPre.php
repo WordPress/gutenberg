@@ -2,6 +2,7 @@
 
 /**
  * @group formatting
+ * @expectedDeprecated wp_richedit_pre
  */
 class Tests_Formatting_WpRichEditPre extends WP_UnitTestCase {
 
