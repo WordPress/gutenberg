@@ -80,6 +80,31 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 			array( 'import_id' => 144, 'post_type' => 'page', 'post_title' => 'child-page-1', 'post_parent' => $post_id,
 		) );
 
+		self::$post_ids[] = $parent_id = $factory->post->create( array(
+			'post_name' => 'parent',
+			'post_type' => 'page',
+		) );
+		self::$post_ids[] = $child_id_1 = $factory->post->create( array(
+			'post_name'   => 'child1',
+			'post_type'   => 'page',
+			'post_parent' => $parent_id,
+		) );
+		self::$post_ids[] = $child_id_2 = $factory->post->create( array(
+			'post_name'   => 'child2',
+			'post_type'   => 'page',
+			'post_parent' => $parent_id,
+		) );
+		self::$post_ids[] = $grandchild_id_1 = $factory->post->create( array(
+			'post_name'   => 'grandchild',
+			'post_type'   => 'page',
+			'post_parent' => $child_id_1,
+		) );
+		self::$post_ids[] = $grandchild_id_2 = $factory->post->create( array(
+			'post_name'   => 'grandchild',
+			'post_type'   => 'page',
+			'post_parent' => $child_id_2,
+		) );
+
 		$cat1 = $factory->term->create( array( 'taxonomy' => 'category', 'name' => 'parent' ) );
 		self::$terms['/category/parent/'] = $cat1;
 		self::$term_ids[ $cat1 ] = 'category';

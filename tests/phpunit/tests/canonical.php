@@ -79,6 +79,8 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 			array( '/child-page-1/', '/parent-page/child-page-1/'),
 			array( '/?page_id=144', '/parent-page/child-page-1/'),
 			array( '/abo', '/about/' ),
+			array( '/parent/child1/grandchild/', '/parent/child1/grandchild/' ),
+			array( '/parent/child2/grandchild/', '/parent/child2/grandchild/' ),
 
 			// Posts
 			array( '?p=587', '/2008/06/02/post-format-test-audio/'),

@@ -61,6 +61,39 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( $child_id, url_to_postid( get_permalink( $child_id ) ) );
 	}
 
+	function test_url_to_postid_hierarchical_with_matching_leaves() {
+
+		$parent_id = $this->factory->post->create( array(
+			'post_name' => 'parent',
+			'post_type' => 'page',
+		) );
+		$child_id_1 = $this->factory->post->create( array(
+			'post_name'   => 'child1',
+			'post_type'   => 'page',
+			'post_parent' => $parent_id,
+		) );
+		$child_id_2 = $this->factory->post->create( array(
+			'post_name'   => 'child2',
+			'post_type'   => 'page',
+			'post_parent' => $parent_id,
+		) );
+		$grandchild_id_1 = $this->factory->post->create( array(
+			'post_name'   => 'grandchild',
+			'post_type'   => 'page',
+			'post_parent' => $child_id_1,
+		) );
+		$grandchild_id_2 = $this->factory->post->create( array(
+			'post_name'   => 'grandchild',
+			'post_type'   => 'page',
+			'post_parent' => $child_id_2,
+		) );
+
+		$this->assertEquals( home_url( 'parent/child1/grandchild/' ), get_permalink( $grandchild_id_1 ) );
+		$this->assertEquals( home_url( 'parent/child2/grandchild/' ), get_permalink( $grandchild_id_2 ) );
+		$this->assertEquals( $grandchild_id_1, url_to_postid( get_permalink( $grandchild_id_1 ) ) );
+		$this->assertEquals( $grandchild_id_2, url_to_postid( get_permalink( $grandchild_id_2 ) ) );
+	}
+
 	function test_url_to_postid_home_has_path() {
 
 		update_option( 'home', home_url( '/example/' ) );
