@@ -49,7 +49,14 @@ Details = Attachment.extend({
 
 	initialFocus: function() {
 		if ( ! wp.media.isTouchDevice ) {
-			this.$( ':input' ).eq( 0 ).focus();
+			/*
+			Previously focused the first ':input' (the readonly URL text field).
+			Since the first ':input' is now a button (delete/trash): when pressing
+			spacebar on an attachment, Firefox fires deleteAttachment/trashAttachment
+			as soon as focus is moved. Explicitly target the first text field for now.
+			@todo change initial focus logic, also for accessibility.
+			*/
+			this.$( 'input[type="text"]' ).eq( 0 ).focus();
 		}
 	},
 	/**
