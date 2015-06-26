@@ -597,4 +597,17 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	public function tear_down_wp_mail_globals() {
 		unset( $_SERVER['SERVER_NAME'] );
 	}
+
+	/**
+	 * Multisite-agnostic way to delete a user from the database.
+	 *
+	 * @since 4.3.0
+	 */
+	public static function delete_user( $user_id ) {
+		if ( is_multisite() ) {
+			return wpmu_delete_user( $user_id );
+		} else {
+			return wp_delete_user( $user_id );
+		}
+	}
 }
