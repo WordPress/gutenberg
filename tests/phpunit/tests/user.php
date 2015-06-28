@@ -6,6 +6,23 @@
  */
 class Tests_User extends WP_UnitTestCase {
 
+	protected $user_data;
+
+	function setUp() {
+		parent::setUp();
+
+		$this->user_data = array(
+			'user_login' => 'user1',
+			'user_nicename' => 'userone',
+			'user_pass'  => 'password',
+			'first_name' => 'John',
+			'last_name'  => 'Doe',
+			'display_name' => 'John Doe',
+			'user_email' => 'blackburn@battlefield3.com',
+			'user_url' => 'http://tacos.com'
+		);
+	}
+
 	function test_get_users_of_blog() {
 		// add one of each user role
 		$nusers = array();
@@ -636,7 +653,7 @@ class Tests_User extends WP_UnitTestCase {
 		) );
 		$this->assertEquals( $id2, email_exists( 'miller@battlefield3.com' ) );
 
-		if( ! is_wp_error( $id2 ) ){	
+		if( ! is_wp_error( $id2 ) ){
 			$return = wp_update_user( array(
 				'ID'         => $id2,
 				'user_email' => 'david@battlefield3.com',
@@ -649,7 +666,7 @@ class Tests_User extends WP_UnitTestCase {
 			) );
 			if ( ! defined( 'WP_IMPORTING' ) ) {
 				$this->assertWPError( $return );
-			}			
+			}
 		}
 	}
 
@@ -698,5 +715,45 @@ class Tests_User extends WP_UnitTestCase {
 
 		$user = get_userdata( $user->ID );
 		$this->assertEmpty( $user->user_activation_key );
+	}
+
+	public function test_search_users_login() {
+		$id = $this->factory->user->create( $this->user_data );
+
+		$users = get_users( array( 'search' => 'user1', 'fields' => 'ID' ) );
+
+		$this->assertTrue( in_array( $id, $users ) );
+	}
+
+	public function test_search_users_url() {
+		$id = $this->factory->user->create( $this->user_data );
+
+		$users = get_users( array( 'search' => '*tacos*', 'fields' => 'ID' ) );
+
+		$this->assertTrue( in_array( $id, $users ) );
+	}
+
+	public function test_search_users_email() {
+		$id = $this->factory->user->create( $this->user_data );
+
+		$users = get_users( array( 'search' => '*battle*', 'fields' => 'ID' ) );
+
+		$this->assertTrue( in_array( $id, $users ) );
+	}
+
+	public function test_search_users_nicename() {
+		$id = $this->factory->user->create( $this->user_data );
+
+		$users = get_users( array( 'search' => '*one*', 'fields' => 'ID' ) );
+
+		$this->assertTrue( in_array( $id, $users ) );
+	}
+
+	public function test_search_users_display_name() {
+		$id = $this->factory->user->create( $this->user_data );
+
+		$users = get_users( array( 'search' => '*Doe*', 'fields' => 'ID' ) );
+
+		$this->assertTrue( in_array( $id, $users ) );
 	}
 }
