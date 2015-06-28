@@ -25,9 +25,19 @@ class MockAction {
 	var $events;
 	var $debug;
 
-	function MockAction($debug=0) {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct( $debug = 0 ) {
 		$this->reset();
 		$this->debug = $debug;
+	}
+
+	/**
+	 * PHP4 constructor.
+	 */
+	public function MockAction( $debug = 0 ) {
+		self::__construct( $debug );
 	}
 
 	function reset() {
@@ -129,13 +139,23 @@ class testXMLParser {
 	var $xml;
 	var $data = array();
 
-	function testXMLParser($in) {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct( $in ) {
 		$this->xml = xml_parser_create();
 		xml_set_object($this->xml, $this);
 		xml_parser_set_option($this->xml,XML_OPTION_CASE_FOLDING, 0);
 		xml_set_element_handler($this->xml, array($this, 'startHandler'), array($this, 'endHandler'));
 		xml_set_character_data_handler($this->xml, array($this, 'dataHandler'));
 		$this->parse($in);
+	}
+
+	/**
+	 * PHP4 constructor.
+	 */
+	public function testXMLParser( $in ) {
+		self::__construct( $in );
 	}
 
 	function parse($in) {

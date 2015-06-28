@@ -14,9 +14,19 @@ class AddTextdomain {
 	var $modified_contents = '';
 	var $funcs;
 
-	function AddTextdomain() {
+	/**
+	 * PHP5 constructor.
+	 */
+	function __construct() {
 		$makepot = new MakePOT;
 		$this->funcs = array_keys( $makepot->rules );
+	}
+
+	/**
+	 * PHP4 constructor.
+	 */
+	public function AddTextdomain() {
+		_deprecated_constructor( 'AddTextdomain' , '4.3'  );
 	}
 
 	function usage() {
