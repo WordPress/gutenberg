@@ -164,7 +164,52 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_topic_count_text() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$posts = $this->factory->post->create_many( 2 );
 
+		wp_set_post_terms( $posts[0], $terms, 'wptests_tax' );
+		wp_set_post_terms( $posts[1], array( $terms[1] ), 'wptests_tax' );
+
+		$term_objects = $this->retrieve_terms( array(
+			'include' => $terms,
+		), 'wptests_tax' );
+
+		$actual = wp_generate_tag_cloud( $term_objects, array(
+			'format' => 'array',
+			'topic_count_text' => array(
+				'singular' => 'Term has %s post',
+				'plural' => 'Term has %s posts',
+				'domain' => 'foo',
+				'context' => 'bar',
+			),
+		) );
+
+		$this->assertContains( "title='Term has 1 post'", $actual[0] );
+		$this->assertContains( "title='Term has 2 posts'", $actual[1] );
+	}
+
+	public function test_topic_count_text_callback() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$posts = $this->factory->post->create_many( 2 );
+
+		wp_set_post_terms( $posts[0], $terms, 'wptests_tax' );
+		wp_set_post_terms( $posts[1], array( $terms[1] ), 'wptests_tax' );
+
+		$term_objects = $this->retrieve_terms( array(
+			'include' => $terms,
+		), 'wptests_tax' );
+
+		$actual = wp_generate_tag_cloud( $term_objects, array(
+			'format' => 'array',
+			'topic_count_text_callback' => array( $this, 'topic_count_text_callback' ),
+		) );
+
+		$this->assertContains( "title='1 foo'", $actual[0] );
+		$this->assertContains( "title='2 foo'", $actual[1] );
+	}
 
 	/**
 	 * Helper method retrieve the created terms.
@@ -175,9 +220,8 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	protected function retrieve_terms( $get_terms_args ) {
-
-		$terms = get_terms( array( 'post_tag' ), $get_terms_args );
+	protected function retrieve_terms( $get_terms_args, $taxonomy = 'post_tag' ) {
+		$terms = get_terms( array( $taxonomy ), $get_terms_args );
 
 		$tags = array();
 		foreach ( $terms as $term ) {
@@ -188,5 +232,9 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 		}
 
 		return $tags;
+	}
+
+	public function topic_count_text_callback( $real_count, $tag, $args ) {
+		return sprintf( '%s foo', $real_count );
 	}
 }
