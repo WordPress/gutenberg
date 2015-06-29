@@ -124,6 +124,9 @@ class Tests_Post_GetPostClass extends WP_UnitTestCase {
 
 		$found = get_post_class( '', $this->post_id );
 
-		$this->assertSame( $num_queries, $wpdb->num_queries );
+		// The 'site_icon' option check adds a query during unit tests. See {@see WP_Site_Icon::get_post_metadata()}.
+		$expected_num_queries = $num_queries + 1;
+
+		$this->assertSame( $expected_num_queries, $wpdb->num_queries );
 	}
 }
