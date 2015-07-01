@@ -113,6 +113,130 @@ class Tests_Comment extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 14601
+	 */
+	public function test_wp_new_comment_respects_author_ip() {
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID'      => $post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '192.168.1.1',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( $data['comment_author_IP'], $comment->comment_author_IP );
+	}
+
+	/**
+	 * @ticket 14601
+	 */
+	public function test_wp_new_comment_respects_author_ip_empty_string() {
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID'      => $post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( $data['comment_author_IP'], $comment->comment_author_IP );
+	}
+
+	/**
+	 * @ticket 14601
+	 */
+	public function test_wp_new_comment_respects_comment_agent() {
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID'      => $post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_agent'        => 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( $data['comment_agent'], $comment->comment_agent );
+	}
+
+	/**
+	 * @ticket 14601
+	 */
+	public function test_wp_new_comment_should_trim_provided_comment_agent_to_254_chars() {
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID'      => $post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_agent'        => 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16 Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en; rv:1.8.1.4pre) Gecko/20070511 Camino/1.6pre',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X; en-us) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16 Mozilla/5.0 (Macintosh; U; PPC Mac OS ', $comment->comment_agent );
+	}
+
+	/**
+	 * @ticket 14601
+	 */
+	public function test_wp_new_comment_respects_comment_agent_empty_string() {
+		$u = $this->factory->user->create();
+		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
+
+		$data = array(
+			'comment_post_ID'      => $post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_agent'        => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$id = wp_new_comment( $data );
+
+		$comment = get_comment( $id );
+
+		$this->assertEquals( $data['comment_agent'], $comment->comment_agent );
+	}
+
+
 	public function test_comment_field_lengths() {
 		// `wp_new_comment()` checks REMOTE_ADDR, so we fake it to avoid PHP notices.
 		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
