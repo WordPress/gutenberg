@@ -6,10 +6,14 @@
  */
 class Tests_Auth extends WP_UnitTestCase {
 	var $user_id;
+	var $wp_hasher;
 
 	function setUp() {
 		parent::setUp();
 		$this->user_id = $this->factory->user->create();
+
+		require_once ABSPATH . WPINC . '/class-phpass.php';
+		$this->wp_hasher = new PasswordHash( 8, true );
 	}
 
 	function test_auth_cookie_valid() {
@@ -158,5 +162,125 @@ class Tests_Auth extends WP_UnitTestCase {
 		$user = wp_authenticate( 'password-length-test', $passwords[2] );
 		// Password broken by setting it to be too long.
 		$this->assertInstanceOf( 'WP_Error', $user );
+	}
+
+	/**
+	 * @ticket 32429
+	 */
+	function test_user_activation_key_is_checked() {
+		global $wpdb;
+
+		$key  = wp_generate_password( 20, false );
+		$user = $this->factory->user->create_and_get();
+		$wpdb->update( $wpdb->users, array(
+			'user_activation_key' => strtotime( '-1 hour' ) . ':' . $this->wp_hasher->HashPassword( $key ),
+		), array(
+			'ID' => $user->ID,
+		) );
+
+		// A valid key should be accepted
+		$check = check_password_reset_key( $key, $user->user_login );
+		$this->assertInstanceOf( 'WP_User', $check );
+		$this->assertSame( $user->ID, $check->ID );
+
+		// An invalid key should be rejected
+		$check = check_password_reset_key( 'key', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+
+		// An empty key should be rejected
+		$check = check_password_reset_key( '', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+
+		// A truncated key should be rejected
+		$partial = substr( $key, 0, 10 );
+		$check = check_password_reset_key( $partial, $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+	}
+
+	/**
+	 * @ticket 32429
+	 */
+	function test_expired_user_activation_key_is_rejected() {
+		global $wpdb;
+
+		$key  = wp_generate_password( 20, false );
+		$user = $this->factory->user->create_and_get();
+		$wpdb->update( $wpdb->users, array(
+			'user_activation_key' => strtotime( '-48 hours' ) . ':' . $this->wp_hasher->HashPassword( $key ),
+		), array(
+			'ID' => $user->ID,
+		) );
+
+		// An expired but otherwise valid key should be rejected
+		$check = check_password_reset_key( $key, $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+	}
+
+	/**
+	 * @ticket 32429
+	 */
+	function test_empty_user_activation_key_fails_key_check() {
+		global $wpdb;
+
+		$user = $this->factory->user->create_and_get();
+
+		// An empty user_activation_key should not allow any key to be accepted
+		$check = check_password_reset_key( 'key', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+
+		// An empty user_activation_key should not allow an empty key to be accepted
+		$check = check_password_reset_key( '', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+	}
+
+	/**
+	 * @ticket 32429
+	 */
+	function test_legacy_user_activation_key_is_rejected() {
+		global $wpdb;
+
+		// A legacy user_activation_key is one without the `time()` prefix introduced in WordPress 4.3.
+
+		$key  = wp_generate_password( 20, false );
+		$user = $this->factory->user->create_and_get();
+		$wpdb->update( $wpdb->users, array(
+			'user_activation_key' => $this->wp_hasher->HashPassword( $key ),
+		), array(
+			'ID' => $user->ID,
+		) );
+
+		// A legacy user_activation_key should not be accepted
+		$check = check_password_reset_key( $key, $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+
+		// An empty key with a legacy user_activation_key should be rejected
+		$check = check_password_reset_key( '', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+	}
+
+	/**
+	 * @ticket 32429
+	 * @ticket 24783
+	 */
+	function test_plaintext_user_activation_key_is_rejected() {
+		global $wpdb;
+
+		// A plaintext user_activation_key is one stored before hashing was introduced in WordPress 3.7.
+
+		$key  = wp_generate_password( 20, false );
+		$user = $this->factory->user->create_and_get();
+		$wpdb->update( $wpdb->users, array(
+			'user_activation_key' => $key,
+		), array(
+			'ID' => $user->ID,
+		) );
+
+		// A plaintext user_activation_key should not allow an otherwise valid key to be accepted
+		$check = check_password_reset_key( $key, $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
+
+		// A plaintext user_activation_key should not allow an empty key to be accepted
+		$check = check_password_reset_key( '', $user->user_login );
+		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 }
