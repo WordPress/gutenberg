@@ -19,7 +19,7 @@
 			});
 		},
 		teardown: function() {
-			var win = Utils.getFontmostWindow();
+			var win = Utils.getFrontmostWindow();
 
 			if (win) {
 				win.close();
@@ -35,7 +35,7 @@
 	});
 
 	function fillAndSubmitWindowForm(data) {
-		var win = Utils.getFontmostWindow();
+		var win = Utils.getFrontmostWindow();
 
 		win.fromJSON(data);
 		win.find('form')[0].submit();
@@ -51,7 +51,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"border": "",
 			"caption": false,
@@ -72,7 +72,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"border": "",
 			"caption": false,
@@ -100,7 +100,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"border": "",
 			"caption": false,
@@ -140,7 +140,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"border": "4",
 			"caption": true,
@@ -318,7 +318,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 		"align": "",
 		"backgroundColor": "",
 		"border": "",
@@ -337,7 +337,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableCellProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"valign": "",
 			"height": "",
@@ -357,7 +357,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableCellProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"valign": "",
 			"height": "",
@@ -382,7 +382,7 @@
 		Utils.setSelection('th', 0);
 		editor.execCommand('mceTableCellProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "right",
 			"valign": "top",
 			"height": "11",
@@ -419,7 +419,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableRowProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "",
 			"height": "",
 			"type": "tbody",
@@ -434,7 +434,7 @@
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableRowProps');
 
-		deepEqual(Utils.getFontmostWindow().toJSON(), {
+		deepEqual(Utils.getFrontmostWindow().toJSON(), {
 			"align": "right",
 			"height": "10",
 			"type": "thead",
@@ -548,6 +548,59 @@
 		equal(
 			editor.getContent(),
 			'<table><tbody><tr><td>A1</td><td>A2</td></tr><tr><td>B1</td><td>B2</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p>x</p>'
+		);
+	});
+
+	test("Delete selected cells", function() {
+		editor.getBody().innerHTML = (
+			'<table><tbody>' +
+			'<tr><td class="mce-item-selected">A1</td><td>A2</td></tr>' +
+			'<tr><td class="mce-item-selected">B1</td><td>B2</td></tr>' +
+			'</tbody></table>' +
+			'<p>x</p>'
+		);
+
+		Utils.setSelection('td', 0, 'td', 2);
+		editor.fire('keydown', {keyCode: 46});
+
+		equal(
+			editor.getContent(),
+			'<table><tbody><tr><td>&nbsp;</td><td>A2</td></tr><tr><td>&nbsp;</td><td>B2</td></tr></tbody></table><p>x</p>'
+		);
+	});
+
+	test("Delete all cells", function() {
+		editor.getBody().innerHTML = (
+			'<table><tbody>' +
+			'<tr><td class="mce-item-selected">A1</td><td class="mce-item-selected">A2</td></tr>' +
+			'<tr><td class="mce-item-selected">B1</td><td class="mce-item-selected">B2</td></tr>' +
+			'</tbody></table>' +
+			'<p>x</p>'
+		);
+
+		Utils.setSelection('td', 0, 'td', 2);
+		editor.fire('keydown', {keyCode: 46});
+
+		equal(
+			editor.getContent(),
+			'<p>x</p>'
+		);
+	});
+
+	test("Delete empty like table cell contents", function() {
+		editor.getBody().innerHTML = (
+			'<table><tbody>' +
+			'<tr><td><p><br></p></td><td><p>a</p></td>' +
+			'</tbody></table>' +
+			'<p>x</p>'
+		);
+
+		Utils.setSelection('td', 0);
+		editor.fire('keydown', {keyCode: 46});
+
+		equal(
+			editor.getContent(),
+			'<table><tbody><tr><td>&nbsp;</td><td><p>a</p></td></tr></tbody></table><p>x</p>'
 		);
 	});
 })();

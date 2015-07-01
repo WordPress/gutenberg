@@ -320,7 +320,7 @@
 		ok(true);
 	}
 
-	function getFontmostWindow() {
+	function getFrontmostWindow() {
 		return editor.windowManager.windows[editor.windowManager.windows.length - 1];
 	}
 
@@ -414,7 +414,7 @@
 		size: size,
 		resetScroll: resetScroll,
 		nearlyEqualRects: nearlyEqualRects,
-		getFontmostWindow: getFontmostWindow,
+		getFrontmostWindow: getFrontmostWindow,
 		pressArrowKey: pressArrowKey,
 		pressEnter: pressEnter,
 		trimBrsOnIE: trimBrsOnIE,

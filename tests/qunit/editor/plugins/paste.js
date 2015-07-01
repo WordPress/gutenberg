@@ -52,7 +52,7 @@ test("Paste styled text content", function() {
 	editor.selection.setRng(rng);
 
 	editor.execCommand('mceInsertClipboardContent', false, {content: '<strong><em><span style="color: red;">TEST</span></em></strong>'});
-	equal(editor.getContent(), '<p>1<strong><em><span style="color: red;">TEST</span></em></strong>4</p>'); // Changed in WordPress
+	equal(editor.getContent(), '<p>1<strong><em><span style="color: red;">TEST</span></em></strong>4</p>');
 });
 
 test("Paste paragraph in paragraph", function() {
