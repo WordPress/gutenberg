@@ -54,53 +54,6 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 
 		$term = (string) $t1;
 
-		$actual = get_term_link( $term, 'wptests_tax', 'id' );
-		$this->assertContains( 'wptests_tax=foo', $actual );
-	}
-
-	/**
-	 * @ticket 14156
-	 */
-	public function test_should_match_field_by_name() {
-		$t = $this->factory->term->create( array(
-			'taxonomy' => 'wptests_tax',
-			'slug' => 'foo',
-			'name' => 'Bar Term',
-		) );
-
-		$actual = get_term_link( 'Bar Term', 'wptests_tax', 'name' );
-		$this->assertContains( 'wptests_tax=foo', $actual );
-	}
-
-	/**
-	 * @ticket 14156
-	 */
-	public function test_should_match_field_by_tt_id() {
-		$t = $this->factory->term->create( array(
-			'taxonomy' => 'wptests_tax',
-			'slug' => 'foo',
-			'name' => 'Bar Term',
-		) );
-
-		$actual = get_term_link( 'Bar Term', 'wptests_tax', 'name' );
-		$this->assertContains( 'wptests_tax=foo', $actual );
-	}
-
-	/**
-	 * @ticket 14156
-	 */
-	public function test_numeric_string_should_be_interpreted_as_term_id_if_id_field_is_specified() {
-		$t1 = $this->factory->term->create( array(
-			'taxonomy' => 'wptests_tax',
-			'name' => 'foo',
-		) );
-		$t2 = $this->factory->term->create( array(
-			'taxonomy' => 'wptests_tax',
-			'slug' => $t1,
-		) );
-
-		$term = (string) $t1;
-
 		$actual = get_term_link( $term, 'wptests_tax' );
 		$this->assertContains( 'wptests_tax=' . $term, $actual );
 	}
