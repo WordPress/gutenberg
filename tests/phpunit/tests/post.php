@@ -950,4 +950,77 @@ class Tests_Post extends WP_UnitTestCase {
 			$this->assertEquals( $value, $post->$field );
 		}
 	}
+
+	/**
+	 * @ticket 31168
+	 */
+	function test_wp_insert_post_default_comment_ping_status_open() {
+		$post_id = $this->factory->post->create( array(
+			'post_author' => $this->author_id,
+			'post_status' => 'public',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+		) );
+		$post = get_post( $post_id );
+
+		$this->assertEquals( 'open', $post->comment_status );
+		$this->assertEquals( 'open', $post->ping_status );
+	}
+
+	/**
+	 * @ticket 31168
+	 */
+	function test_wp_insert_post_page_default_comment_ping_status_closed() {
+		$post_id = $this->factory->post->create( array(
+			'post_author' => $this->author_id,
+			'post_status' => 'public',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+			'post_type' => 'page',
+		) );
+		$post = get_post( $post_id );
+
+		$this->assertEquals( 'closed', $post->comment_status );
+		$this->assertEquals( 'closed', $post->ping_status );
+	}
+
+	/**
+	 * @ticket 31168
+	 */
+	function test_wp_insert_post_cpt_default_comment_ping_status_open() {
+		$post_type = rand_str(20);
+		register_post_type( $post_type, array( 'supports' => array( 'comments', 'trackbacks' ) ) );
+		$post_id = $this->factory->post->create( array(
+			'post_author' => $this->author_id,
+			'post_status' => 'public',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+			'post_type' => $post_type,
+		) );
+		$post = get_post( $post_id );
+
+		$this->assertEquals( 'open', $post->comment_status );
+		$this->assertEquals( 'open', $post->ping_status );
+		_unregister_post_type( $post_type );
+	}
+
+	/**
+	 * @ticket 31168
+	 */
+	function test_wp_insert_post_cpt_default_comment_ping_status_closed() {
+		$post_type = rand_str(20);
+		register_post_type( $post_type );
+		$post_id = $this->factory->post->create( array(
+			'post_author' => $this->author_id,
+			'post_status' => 'public',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+			'post_type' => $post_type,
+		) );
+		$post = get_post( $post_id );
+
+		$this->assertEquals( 'closed', $post->comment_status );
+		$this->assertEquals( 'closed', $post->ping_status );
+		_unregister_post_type( $post_type );
+	}
 }
