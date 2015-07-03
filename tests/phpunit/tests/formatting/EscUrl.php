@@ -68,4 +68,32 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 	function test_protocol_relative_with_colon() {
 		$this->assertEquals( '//example.com/foo?foo=abc:def', esc_url( '//example.com/foo?foo=abc:def' ) );
 	}
+
+	/**
+	 * @ticket 31632
+	 */
+	function test_mailto_with_newline() {
+		$body = <<<EOT
+Hi there,
+
+I thought you might want to sign up for this newsletter
+EOT;
+		$email_link = 'mailto:?body=' . rawurlencode( $body );
+		$email_link = esc_url( $email_link );
+		$this->assertEquals( 'mailto:?body=Hi%20there%2C%0A%0AI%20thought%20you%20might%20want%20to%20sign%20up%20for%20this%20newsletter', $email_link );
+	}
+	/**
+	 * @ticket 31632
+	 */
+	function test_mailto_in_http_url_with_newline() {
+		$body = <<<EOT
+Hi there,
+
+I thought you might want to sign up for this newsletter
+EOT;
+		$email_link = 'http://example.com/mailto:?body=' . rawurlencode( $body );
+		$email_link = esc_url( $email_link );
+		$this->assertEquals( 'http://example.com/mailto:?body=Hi%20there%2CI%20thought%20you%20might%20want%20to%20sign%20up%20for%20this%20newsletter', $email_link );
+	}
+
 }
