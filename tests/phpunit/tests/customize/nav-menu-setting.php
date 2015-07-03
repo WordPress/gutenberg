@@ -94,7 +94,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_construct_empty_menus() {
 		do_action( 'customize_register', $this->wp_customize );
 		$_wp_customize = $this->wp_customize;
-		unset($_wp_customize->nav_menus);
+		unset( $_wp_customize->nav_menus );
 
 		$exception = null;
 		try {
@@ -310,6 +310,10 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertEquals( 0, $sanitized['parent'] );
 		$this->assertEquals( true, $sanitized['auto_add'] );
 		$this->assertEqualSets( array( 'name', 'description', 'parent', 'auto_add' ), array_keys( $sanitized ) );
+
+		$value['name'] = '    '; // Blank spaces.
+		$sanitized = $setting->sanitize( $value );
+		$this->assertEquals( '(unnamed)', $sanitized['name'] );
 	}
 
 	/**
@@ -360,6 +364,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'previous_term_id', $update_result );
 		$this->assertArrayHasKey( 'error', $update_result );
 		$this->assertArrayHasKey( 'status', $update_result );
+		$this->assertArrayHasKey( 'saved_value', $update_result );
+		$this->assertEquals( $new_value, $update_result['saved_value'] );
 
 		$this->assertEquals( $menu_id, $update_result['term_id'] );
 		$this->assertNull( $update_result['previous_term_id'] );
@@ -410,11 +416,38 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'previous_term_id', $update_result );
 		$this->assertArrayHasKey( 'error', $update_result );
 		$this->assertArrayHasKey( 'status', $update_result );
+		$this->assertArrayHasKey( 'saved_value', $update_result );
+		$this->assertEquals( $setting->value(), $update_result['saved_value'] );
 
 		$this->assertEquals( $menu->term_id, $update_result['term_id'] );
 		$this->assertEquals( $menu_id, $update_result['previous_term_id'] );
 		$this->assertNull( $update_result['error'] );
 		$this->assertEquals( 'inserted', $update_result['status'] );
+	}
+
+	/**
+	 * Test saving a new name that conflicts with an existing nav menu's name.
+	 *
+	 * @see WP_Customize_Nav_Menu_Setting::update()
+	 */
+	function test_save_inserted_conflicted_name() {
+		do_action( 'customize_register', $this->wp_customize );
+
+		$menu_name = 'Foo';
+		wp_update_nav_menu_object( 0, array( 'menu-name' => $menu_name ) );
+
+		$menu_id = -123;
+		$setting_id = "nav_menu[$menu_id]";
+		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, $setting_id );
+		$this->wp_customize->set_post_value( $setting->id, array( 'name' => $menu_name ) );
+		$setting->save();
+
+		$expected_resolved_menu_name = "$menu_name (2)";
+		$new_menu = wp_get_nav_menu_object( $setting->term_id );
+		$this->assertEquals( $expected_resolved_menu_name, $new_menu->name );
+
+		$save_response = apply_filters( 'customize_save_response', array() );
+		$this->assertEquals( $expected_resolved_menu_name, $save_response['nav_menu_updates'][0]['saved_value']['name'] );
 	}
 
 	/**
@@ -448,6 +481,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'previous_term_id', $update_result );
 		$this->assertArrayHasKey( 'error', $update_result );
 		$this->assertArrayHasKey( 'status', $update_result );
+		$this->assertArrayHasKey( 'saved_value', $update_result );
+		$this->assertNull( $update_result['saved_value'] );
 
 		$this->assertEquals( $menu_id, $update_result['term_id'] );
 		$this->assertNull( $update_result['previous_term_id'] );
