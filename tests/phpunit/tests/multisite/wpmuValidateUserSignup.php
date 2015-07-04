@@ -26,6 +26,7 @@ class Tests_Multisite_WpmuValidateUserSignup extends WP_UnitTestCase {
 			array( 'f', 'User names of 1 characters are not allowed.'  ),
 			array( 'f', 'User names of 1 characters are not allowed.'  ),
 			array( '12345', 'User names consisting only of numbers are not allowed.'  ),
+			array( 'thisusernamecontainsenoughcharacterstobelongerthan60characters', 'User names longer than 60 characters are not allowed.' ),
 		);
 	}
 
