@@ -97,11 +97,12 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		foreach ( $post_ids as $post_id ) {
 			$expected = array(
 				'id'         => 'post-' . $post_id,
+				'title'      => html_entity_decode( get_the_title( $post_id ) ),
 				'type'       => 'post_type',
 				'type_label' => get_post_type_object( 'post' )->labels->singular_name,
 				'object'     => 'post',
 				'object_id'  => intval( $post_id ),
-				'title'      => html_entity_decode( get_the_title( $post_id ) ),
+				'url'        => get_permalink( intval( $post_id ) ),
 			);
 			wp_set_object_terms( $post_id, $term_ids, 'category' );
 			$search = $post_id === $post_ids[0] ? 'test & search' : 'other title';
@@ -115,11 +116,12 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			$term = get_term_by( 'id', $term_id, 'category' );
 			$expected = array(
 				'id'         => 'term-' . $term_id,
+				'title'      => $term->name,
 				'type'       => 'taxonomy',
 				'type_label' => get_taxonomy( 'category' )->labels->singular_name,
 				'object'     => 'category',
 				'object_id'  => intval( $term_id ),
-				'title'      => $term->name,
+				'url'        => get_term_link( intval( $term_id ), 'category' ),
 			);
 			$s = sanitize_text_field( wp_unslash( $term->name ) );
 			$results = $menus->search_available_items_query( array( 'pagenum' => 1, 's' => $s ) );
