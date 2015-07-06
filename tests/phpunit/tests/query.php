@@ -133,4 +133,83 @@ class Tests_Query extends WP_UnitTestCase {
 
 		$this->assertContains( "ORDER BY $wpdb->posts.post_title DESC, $wpdb->posts.post_date DESC", $q->request );
 	}
+
+	public function test_custom_taxonomy_querystring_single_term() {
+		register_taxonomy( 'test_tax_cat', 'post' );
+
+		wp_insert_term( 'test1', 'test_tax_cat' );
+		wp_insert_term( 'test2', 'test_tax_cat' );
+		wp_insert_term( 'test3', 'test_tax_cat' );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, 'test1', 'test_tax_cat' );
+		wp_set_object_terms( $p2, array( 'test1', 'test2' ), 'test_tax_cat' );
+		wp_set_object_terms( $p3, 'test2', 'test_tax_cat' );
+
+		$url = add_query_arg( array(
+			'test_tax_cat' => 'test1',
+		), '/' );
+
+		$this->go_to( $url );
+
+		$this->assertEquals( array( $p1, $p2 ), wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' ) );
+	}
+
+	public function test_custom_taxonomy_querystring_multiple_terms_comma_separated() {
+		register_taxonomy( 'test_tax_cat', 'post' );
+
+		wp_insert_term( 'test1', 'test_tax_cat' );
+		wp_insert_term( 'test2', 'test_tax_cat' );
+		wp_insert_term( 'test3', 'test_tax_cat' );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, 'test1', 'test_tax_cat' );
+		wp_set_object_terms( $p2, array( 'test1', 'test2' ), 'test_tax_cat' );
+		wp_set_object_terms( $p3, 'test2', 'test_tax_cat' );
+		wp_set_object_terms( $p4, "test3", 'test_tax_cat' );
+
+		$url = add_query_arg( array(
+			'test_tax_cat' => 'test1,test2',
+		), '/' );
+
+		$this->go_to( $url );
+
+		$this->assertEquals( array( $p1, $p2, $p3 ), wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' ) );
+	}
+
+	/**
+	 * @ticket 32454
+	 */
+	public function test_custom_taxonomy_querystring_multiple_terms_formatted_as_array() {
+		register_taxonomy( 'test_tax_cat', 'post' );
+
+		wp_insert_term( 'test1', 'test_tax_cat' );
+		wp_insert_term( 'test2', 'test_tax_cat' );
+		wp_insert_term( 'test3', 'test_tax_cat' );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, 'test1', 'test_tax_cat' );
+		wp_set_object_terms( $p2, array( 'test1', 'test2' ), 'test_tax_cat' );
+		wp_set_object_terms( $p3, 'test2', 'test_tax_cat' );
+		wp_set_object_terms( $p4, "test3", 'test_tax_cat' );
+
+		$url = add_query_arg( array(
+			'test_tax_cat' => array( 'test1', 'test2' ),
+		), '/' );
+
+		$this->go_to( $url );
+
+		$this->assertEquals( array( $p1, $p2, $p3 ), wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' ) );
+	}
 }
