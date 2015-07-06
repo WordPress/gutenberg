@@ -1023,4 +1023,103 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( 'closed', $post->ping_status );
 		_unregister_post_type( $post_type );
 	}
+
+	/**
+	 * If a post is sticky and is updated by a user that does not have the publish_post capability, it should _stay_
+	 * sticky.
+	 *
+	 * @ticket 24153
+	 */
+	function test_user_without_publish_cannot_affect_sticky() {
+		// Create a role with edit_others_posts.
+		add_role( 'grammarian', 'Grammarian', array(
+			'read'                 => true,
+			'edit_posts'           => true,
+			'edit_others_posts'    => true,
+			'edit_published_posts' => true,
+		) );
+		$editor_user = $this->factory->user->create( array( 'role' => 'grammarian' ) );
+		$old_uid = get_current_user_id();
+		wp_set_current_user( $editor_user );
+
+		// Sanity Check.
+		$this->assertFalse( current_user_can( 'publish_posts' ) );
+		$this->assertTrue( current_user_can( 'edit_others_posts' ) );
+		$this->assertTrue( current_user_can( 'edit_published_posts' ) );
+
+		// Create a sticky post.
+		$post = $this->factory->post->create_and_get( array(
+			'post_title'   => 'Will be changed',
+			'post_content' => 'Will be changed',
+		) );
+		stick_post( $post->ID );
+
+		// Sanity Check.
+		$this->assertTrue( is_sticky( $post->ID ) );
+
+		// Edit the post.
+		$post->post_title = 'Updated';
+		$post->post_content = 'Updated';
+		wp_update_post( $post );
+
+		// Make sure it's still sticky.
+		$saved_post = get_post( $post->ID );
+		$this->assertTrue( is_sticky( $saved_post->ID ) );
+		$this->assertEquals( 'Updated', $saved_post->post_title );
+		$this->assertEquals( 'Updated', $saved_post->post_content );
+
+		// Teardown
+		wp_set_current_user( $old_uid );
+	}
+
+	/**
+	 * If the `edit_post()` method is invoked by a user without publish_posts permission, the sticky status of the post
+	 * should not be changed.
+	 *
+	 * @ticket 24153
+	 */
+	function test_user_without_publish_cannot_affect_sticky_with_edit_post() {
+		// Create a sticky post.
+		$post = $this->factory->post->create_and_get( array(
+			'post_title'   => 'Will be changed',
+			'post_content' => 'Will be changed',
+		) );
+		stick_post( $post->ID );
+
+		// Sanity Check.
+		$this->assertTrue( is_sticky( $post->ID ) );
+
+		// Create a role with edit_others_posts.
+		add_role( 'grammarian', 'Grammarian', array(
+			'read'                 => true,
+			'edit_posts'           => true,
+			'edit_others_posts'    => true,
+			'edit_published_posts' => true,
+		) );
+		$editor_user = $this->factory->user->create( array( 'role' => 'grammarian' ) );
+		$old_uid = get_current_user_id();
+		wp_set_current_user( $editor_user );
+
+		// Sanity Check.
+		$this->assertFalse( current_user_can( 'publish_posts' ) );
+		$this->assertTrue( current_user_can( 'edit_others_posts' ) );
+		$this->assertTrue( current_user_can( 'edit_published_posts' ) );
+
+		// Edit the post - The key 'sticky' is intentionally unset.
+		$data = array(
+			'post_ID'      => $post->ID,
+			'post_title'   => 'Updated',
+			'post_content' => 'Updated',
+		);
+		edit_post( $data );
+
+		// Make sure it's still sticky
+		$saved_post = get_post( $post->ID );
+		$this->assertTrue( is_sticky( $saved_post->ID ) );
+		$this->assertEquals( 'Updated', $saved_post->post_title );
+		$this->assertEquals( 'Updated', $saved_post->post_content );
+
+		// Teardown
+		wp_set_current_user( $old_uid );
+	}
 }
