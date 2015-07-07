@@ -756,4 +756,48 @@ class Tests_User extends WP_UnitTestCase {
 
 		$this->assertTrue( in_array( $id, $users ) );
 	}
+
+	/**
+	 * @ticket 32158
+	 */
+	function test_email_case() {
+		// Create a test user with a lower-case email address.
+		$user_id = $this->factory->user->create( array(
+			'user_email' => 'test@test.com',
+		) );
+
+		// Alter the case of the email address (which stays the same).
+		$userdata = array(
+			'ID' => $user_id,
+			'user_email' => 'test@TEST.com',
+		);
+		$update = wp_update_user( $userdata );
+
+		$this->assertEquals( $user_id, $update );
+	}
+
+	/**
+	 * @ticket 32158
+	 */
+	function test_email_change() {
+		// Create a test user.
+		$user_id = $this->factory->user->create( array(
+			'user_email' => 'test@test.com',
+		) );
+
+		// Change the email address.
+		$userdata = array(
+			'ID' => $user_id,
+			'user_email' => 'test2@test.com',
+		);
+		$update = wp_update_user( $userdata );
+
+		// Was this successful?
+		$this->assertEquals( $user_id, $update );
+
+		// Verify that the email address has been updated.
+		$user = get_userdata( $user_id );
+		$this->assertEquals( $user->user_email, 'test2@test.com' );
+	}
+
 }
