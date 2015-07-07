@@ -119,6 +119,24 @@ class Tests_Shortcode extends WP_UnitTestCase {
 		$this->assertEquals( '[hyphen-foo-bar-baz]', do_shortcode( '[hyphen-foo-bar-baz]' ) );
 	}
 
+	/**
+	 * @ticket 9405
+	 */
+	function test_attr_hyphen() {
+		do_shortcode('[test-shortcode-tag foo="foo" foo-bar="foo-bar" foo-bar-="foo-bar-" -foo-bar="-foo-bar" -foo-bar-="-foo-bar-" foo-bar-baz="foo-bar-baz" -foo-bar-baz="-foo-bar-baz" foo--bar="foo--bar" /]');
+		$expected_attrs = array(
+			'foo' => 'foo',
+			'foo-bar' => 'foo-bar',
+			'foo-bar-' => 'foo-bar-',
+			'-foo-bar' => '-foo-bar',
+			'-foo-bar-' => '-foo-bar-',
+			'foo-bar-baz' => 'foo-bar-baz',
+			'-foo-bar-baz' => '-foo-bar-baz',
+			'foo--bar' => 'foo--bar',
+		);
+		$this->assertEquals( $expected_attrs, $this->atts );
+	}
+
 	function test_two_atts() {
 		do_shortcode('[test-shortcode-tag foo="asdf" bar="bing" /]');
 		$this->assertEquals( array('foo' => 'asdf', 'bar' => 'bing'), $this->atts );
