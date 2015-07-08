@@ -29,13 +29,6 @@ class WPProfiler {
 		$this->profile = array();
 	}
 
-	/**
-	 * PHP4 constructor.
-	 */
-	public function WPProfiler() {
-		self::__construct();
-	}
-
 	function start($name) {
 		$time = $this->microtime();
 

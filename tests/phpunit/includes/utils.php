@@ -33,13 +33,6 @@ class MockAction {
 		$this->debug = $debug;
 	}
 
-	/**
-	 * PHP4 constructor.
-	 */
-	public function MockAction( $debug = 0 ) {
-		self::__construct( $debug );
-	}
-
 	function reset() {
 		$this->events = array();
 	}
@@ -149,13 +142,6 @@ class testXMLParser {
 		xml_set_element_handler($this->xml, array($this, 'startHandler'), array($this, 'endHandler'));
 		xml_set_character_data_handler($this->xml, array($this, 'dataHandler'));
 		$this->parse($in);
-	}
-
-	/**
-	 * PHP4 constructor.
-	 */
-	public function testXMLParser( $in ) {
-		self::__construct( $in );
 	}
 
 	function parse($in) {
