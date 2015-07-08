@@ -353,6 +353,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			'echo'            => true,
 			'fallback_cb'     => 'wp_page_menu',
 			'walker'          => '',
+			'menu'            => wp_create_nav_menu( 'Foo' ),
 		) );
 		$this->assertEquals( 1, $results['can_partial_refresh'] );
 
@@ -390,6 +391,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 
 		$args = $menus->filter_wp_nav_menu_args( array(
 			'echo'        => true,
+			'menu'        => wp_create_nav_menu( 'Foo' ),
 			'fallback_cb' => 'wp_page_menu',
 			'walker'      => '',
 		) );
@@ -401,11 +403,10 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$object_args = json_decode( json_encode( $args ), false );
 		$result = $menus->filter_wp_nav_menu( $nav_menu_content, $object_args );
 		$expected = sprintf(
-			'<div id="partial-refresh-menu-container-%1$d" class="partial-refresh-menu-container" data-instance-number="%1$d">%2$s</div>',
-			$args['instance_number'],
-			$nav_menu_content
+			'<div class="partial-refreshable-nav-menu partial-refreshable-nav-menu-%1$d menu">',
+			$args['instance_number']
 		);
-		$this->assertEquals( $expected, $result );
+		$this->assertStringStartsWith( $expected, $result );
 	}
 
 	/**
