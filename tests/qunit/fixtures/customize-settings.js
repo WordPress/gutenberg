@@ -133,3 +133,11 @@ window._wpCustomizeSettings = {
 	}
 };
 window._wpCustomizeControlsL10n = {};
+
+jQuery.ajaxSetup( {
+	beforeSend: function( e, data ) {
+		if ( data.data.indexOf( 'wp_customize' ) !== -1 ) {
+			return false;
+		}
+	}
+} );
