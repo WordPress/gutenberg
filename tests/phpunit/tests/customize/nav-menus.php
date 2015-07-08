@@ -358,7 +358,6 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 
 		$expected = array(
 			'echo',
-			'args_hash',
 			'can_partial_refresh',
 			'fallback_cb',
 			'instance_number',
@@ -370,9 +369,14 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			'walker'          => new Walker_Nav_Menu(),
 		) );
 		$this->assertEqualSets( $expected, array_keys( $results ) );
-		$this->assertEquals( '', $results['fallback_cb'] );
-		$this->assertEquals( '', $results['walker'] );
+		$this->assertEquals( 'wp_page_menu', $results['fallback_cb'] );
 		$this->assertEquals( 0, $results['can_partial_refresh'] );
+
+		$this->assertNotEmpty( $menus->preview_nav_menu_instance_args[ $results['instance_number'] ] );
+		$preview_nav_menu_instance_args = $menus->preview_nav_menu_instance_args[ $results['instance_number'] ];
+		$this->assertEquals( '', $preview_nav_menu_instance_args['fallback_cb'] );
+		$this->assertEquals( '', $preview_nav_menu_instance_args['walker'] );
+		$this->assertNotEmpty( $preview_nav_menu_instance_args['args_hash'] );
 	}
 
 	/**
