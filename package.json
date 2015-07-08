@@ -9,8 +9,8 @@
   "author": "The WordPress Contributors",
   "license": "GPL-2.0+",
   "devDependencies": {
+    "autoprefixer-core": "~5.2.1",
     "grunt": "~0.4.5",
-    "grunt-autoprefixer": "~3.0.0",
     "grunt-browserify": "~3.8.0",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-compress": "~0.13.0",
@@ -26,6 +26,7 @@
     "grunt-jsvalidate": "~0.2.2",
     "grunt-legacy-util": "^0.2.0",
     "grunt-patch-wordpress": "~0.3.0",
+    "grunt-postcss": "~0.5.4",
     "grunt-rtlcss": "~1.6.0",
     "grunt-sass": "~1.0.0",
     "matchdep": "~0.3.0"
