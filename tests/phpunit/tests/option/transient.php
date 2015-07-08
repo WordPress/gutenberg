@@ -118,6 +118,10 @@ class Tests_Option_Transient extends WP_UnitTestCase {
 	 * @ticket 30380
 	 */
 	function test_nonexistent_key_old_timeout() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING.' );
+		}
+
 		// Create a transient
 		$key = 'test_transient';
 		set_transient( $key, 'test', 60 * 10 );
