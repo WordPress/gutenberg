@@ -229,6 +229,58 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
 	}
 
+	function test_revoked_super_admin_can_be_deleted() {
+		if ( isset( $GLOBALS['super_admins'] ) ) {
+			$old_global = $GLOBALS['super_admins'];
+			unset( $GLOBALS['super_admins'] );
+		}
+
+		$user_id = $this->factory->user->create();
+		grant_super_admin( $user_id );
+		revoke_super_admin( $user_id );
+
+		$this->assertTrue( wpmu_delete_user( $user_id ) );
+
+		if ( isset( $old_global ) ) {
+			$GLOBALS['super_admins'] = $old_global;
+		}
+	}
+
+	function test_revoked_super_admin_is_deleted() {
+		if ( isset( $GLOBALS['super_admins'] ) ) {
+			$old_global = $GLOBALS['super_admins'];
+			unset( $GLOBALS['super_admins'] );
+		}
+
+		$user_id = $this->factory->user->create();
+		grant_super_admin( $user_id );
+		revoke_super_admin( $user_id );
+		wpmu_delete_user( $user_id );
+		$user = new WP_User( $user_id );
+
+		$this->assertFalse( $user->exists(), 'WP_User->exists' );
+
+		if ( isset( $old_global ) ) {
+			$GLOBALS['super_admins'] = $old_global;
+		}
+	}
+
+	function test_super_admin_cannot_be_deleted() {
+		if ( isset( $GLOBALS['super_admins'] ) ) {
+			$old_global = $GLOBALS['super_admins'];
+			unset( $GLOBALS['super_admins'] );
+		}
+
+		$user_id = $this->factory->user->create();
+		grant_super_admin( $user_id );
+
+		$this->assertFalse( wpmu_delete_user( $user_id ) );
+
+		if ( isset( $old_global ) ) {
+			$GLOBALS['super_admins'] = $old_global;
+		}
+	}
+
 	/**
 	 * @ticket 27205
 	 */
