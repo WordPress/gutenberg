@@ -26,7 +26,7 @@ class Tests_Formatting_EscAttr extends WP_UnitTestCase {
 	}
 
 	function test_esc_attr_amp() {
-		$out = esc_attr( 'foo & bar &baz; &nbsp;' );
-		$this->assertEquals( "foo &amp; bar &amp;baz; &nbsp;", $out );
+		$out = esc_attr( 'foo & bar &baz; &apos;' );
+		$this->assertEquals( "foo &amp; bar &amp;baz; &apos;", $out );
 	}
 }

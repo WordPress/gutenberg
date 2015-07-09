@@ -23,13 +23,13 @@ class Tests_Formatting_JSEscape extends WP_UnitTestCase {
 	}
 
 	function test_js_escape_amp() {
-		$out = esc_js('foo & bar &baz; &nbsp;');
-		$this->assertEquals("foo &amp; bar &amp;baz; &nbsp;", $out);
+		$out = esc_js('foo & bar &baz; &apos;');
+		$this->assertEquals("foo &amp; bar &amp;baz; &apos;", $out);
 	}
 
 	function test_js_escape_quote_entity() {
 		$out = esc_js('foo &#x27; bar &#39; baz &#x26;');
-		$this->assertEquals("foo \\' bar \\' baz &#x26;", $out);
+		$this->assertEquals("foo \\' bar \\' baz &amp;", $out);
 	}
 
 	function test_js_no_carriage_return() {
