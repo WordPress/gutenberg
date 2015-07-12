@@ -251,6 +251,46 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertEqualSets( $expected, $tax->object_type );
 	}
 
+	public function test_get_objects_in_term_should_return_invalid_taxonomy_error() {
+		$terms = get_objects_in_term( 1, 'invalid_taxonomy' );
+		$this->assertInstanceOf( 'WP_Error', $terms );
+		$this->assertEquals( 'Invalid taxonomy', $terms->get_error_message() );
+	}
+
+	public function test_get_objects_in_term_should_return_empty_array() {
+		$this->assertEquals( array(), get_objects_in_term( 1, 'post_tag' ) );
+	}
+
+	public function test_get_objects_in_term_should_return_objects_ids() {
+		$tag_id = $this->factory->tag->create();
+		$cat_id = $this->factory->category->create();
+		$posts_with_tag = array();
+		$posts_with_category = array();
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$post_id = $this->factory->post->create();
+			wp_set_post_tags( $post_id, array( $tag_id ) );
+			$posts_with_tag[] = $post_id;
+		}
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$post_id = $this->factory->post->create();
+			wp_set_post_categories( $post_id, array( $cat_id ) );
+			$posts_with_category[] = $post_id;
+		}
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$this->factory->post->create();
+		}
+
+		$posts_with_terms = array_merge( $posts_with_tag, $posts_with_category );
+
+		$this->assertEquals( $posts_with_tag, get_objects_in_term( $tag_id, 'post_tag' ) );
+		$this->assertEquals( $posts_with_category, get_objects_in_term( $cat_id, 'category' ) );
+		$this->assertEquals( $posts_with_terms, get_objects_in_term( array( $tag_id, $cat_id ), array( 'post_tag', 'category' ) ) );
+		$this->assertEquals( array_reverse( $posts_with_tag ), get_objects_in_term( $tag_id, 'post_tag', array( 'order' => 'desc' ) ) );
+	}
+
 	/**
 	 * @ticket 25706
 	 */
