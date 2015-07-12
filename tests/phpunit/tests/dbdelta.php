@@ -230,9 +230,48 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		$this->assertTableHasNotColumn( 'extra_col', $wpdb->prefix . 'dbdelta_test' );
 	}
 
+	/**
+	 * Test inserting into the database
+	 */
+	public function test_insert_into_table(){
+		global $wpdb;
+
+		$insert = dbDelta(
+			"INSERT INTO {$wpdb->prefix}dbdelta_test (column_1) VALUES ('wcphilly2015')"
+		);
+
+		$this->assertEquals(
+			array( )
+			, $insert
+		);
+
+		$this->assertTableRowHasValue( 'column_1', 'wcphilly2015',  $wpdb->prefix . 'dbdelta_test' );
+
+	}
+	
 	//
 	// Assertions.
 	//
+
+	/**
+	 * Assert that a table has a row with a value in a field.
+	 *
+	 * @param string $column The field name.
+	 * @param string $value  The field value.
+	 * @param string $table  The database table name.
+	 */
+	protected function assertTableRowHasValue( $column, $value, $table ) {
+
+		global $wpdb;
+
+		$table_row = $wpdb->get_row( "select $column from {$table} where $column = '$value'" );
+
+		$expected = (object) array(
+		    $column => $value
+		);
+
+		$this->assertEquals( $expected, $table_row );
+	}
 
 	/**
 	 * Assert that a table has a column.
