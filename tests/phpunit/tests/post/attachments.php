@@ -68,12 +68,12 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 
 		// medium and full size will both point to the original
 		$downsize = image_downsize($id, 'medium');
-		$this->assertEquals( 'test-image.jpg', basename($downsize[0]) );
+		$this->assertEquals( basename( $upload['file'] ), basename($downsize[0]) );
 		$this->assertEquals( 50, $downsize[1] );
 		$this->assertEquals( 50, $downsize[2] );
 
 		$downsize = image_downsize($id, 'full');
-		$this->assertEquals( 'test-image.jpg', basename($downsize[0]) );
+		$this->assertEquals( basename( $upload['file'] ), basename($downsize[0]) );
 		$this->assertEquals( 50, $downsize[1] );
 		$this->assertEquals( 50, $downsize[2] );
 
