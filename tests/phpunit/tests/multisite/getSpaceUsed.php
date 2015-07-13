@@ -90,5 +90,17 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 		$this->delete_folders( $upload_dir['basedir'] );
 		restore_current_blog();
 	}
+
+	function test_get_space_used_pre_get_spaced_used_filter() {
+		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertEquals( 300, get_space_used() );
+
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+	}
+
+	function _filter_space_used() {
+		return 300;
+	}
 }
 endif;
