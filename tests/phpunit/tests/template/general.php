@@ -67,6 +67,7 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$this->_set_site_icon();
 		$output = array(
 			sprintf( '<link rel="icon" href="%s" sizes="32x32" />', esc_url( get_site_icon_url( null, 32 ) ) ),
+			sprintf( '<link rel="icon" href="%s" sizes="192x192" />', esc_url( get_site_icon_url( null, 192 ) ) ),
 			sprintf( '<link rel="apple-touch-icon-precomposed" href="%s">', esc_url( get_site_icon_url( null, 180 ) ) ),
 			sprintf( '<meta name="msapplication-TileImage" content="%s">', esc_url( get_site_icon_url( null, 270 ) ) ),
 			'',
@@ -89,6 +90,7 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$this->_set_site_icon();
 		$output = array(
 			sprintf( '<link rel="icon" href="%s" sizes="32x32" />', esc_url( get_site_icon_url( null, 32 ) ) ),
+			sprintf( '<link rel="icon" href="%s" sizes="192x192" />', esc_url( get_site_icon_url( null, 192 ) ) ),
 			sprintf( '<link rel="apple-touch-icon-precomposed" href="%s">', esc_url( get_site_icon_url( null, 180 ) ) ),
 			sprintf( '<meta name="msapplication-TileImage" content="%s">', esc_url( get_site_icon_url( null, 270 ) ) ),
 			sprintf( '<link rel="apple-touch-icon" sizes="150x150" href="%s">', esc_url( get_site_icon_url( null, 150 ) ) ),
