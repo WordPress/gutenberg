@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname( __FILE__ ) . '/base.php';
+
 /**
  * Test the WP_Image_Editor base class
  * @group image

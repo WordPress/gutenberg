@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname( dirname( __FILE__ ) ) . '/query.php';
+require_once dirname( __FILE__ ) . '/conditionals.php';
 
 /**
  * @group query
