@@ -34,7 +34,7 @@ class Tests_Formatting_EscHtml extends WP_UnitTestCase {
 
 	function test_ignores_existing_entities() {
 		$source = '&#038; &#x00A3; &#x22; &amp;';
-		$res = '&amp; &#xA3; &quot; &amp;';
+		$res = '&#038; &#xA3; &#x22; &amp;';
 		$this->assertEquals( $res, esc_html($source) );
 	}
 }
