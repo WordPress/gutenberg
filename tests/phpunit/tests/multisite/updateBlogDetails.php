@@ -234,80 +234,35 @@ class Tests_Multisite_Update_Blog_Details extends WP_UnitTestCase {
 	}
 
 	/**
-	 * When the path for a site is updated with update_blog_details(), the final
-	 * path should have a leading and trailing slash. When multiple directories
-	 * are part of the path, only one slash should separate each directory.
+	 * When the path for a site is updated with update_blog_details(), the final path
+	 * should have a leading and trailing slash.
 	 *
-	 * @ticket 18117
+	 * @dataProvider data_single_directory_path
 	 */
-	function test_update_blog_details_single_path_no_slashes() {
-		update_blog_details( 1, array( 'path' => 'my_path' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
+	public function test_update_blog_details_single_directory_path( $path, $expected ) {
+		update_blog_details( 1, array( 'path' => $path ) );
+		$site = get_blog_details( 1 );
+
+		$this->assertEquals( $expected, $site->path );
 	}
 
-	function test_update_blog_details_single_path_double_trailing_slashes() {
-		update_blog_details( 1, array( 'path' => 'my_path//' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
-	}
+	public function data_single_directory_path() {
+		return array(
+			array( 'my_path',   '/my_path/' ),
+			array( 'my_path//', '/my_path/' ),
+			array( '//my_path', '/my_path/' ),
+			array( 'my_path/',  '/my_path/' ),
+			array( '/my_path',  '/my_path/' ),
+			array( '/my_path/', '/my_path/' ),
 
-	function test_update_blog_details_single_path_double_leading_slashes() {
-		update_blog_details( 1, array( 'path' => '//my_path' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
-	}
+			array( 'multiple/dirs',   '/multiple/dirs/' ),
+			array( '/multiple/dirs',  '/multiple/dirs/' ),
+			array( 'multiple/dirs/',  '/multiple/dirs/' ),
+			array( '/multiple/dirs/', '/multiple/dirs/' ),
 
-	function test_update_blog_details_single_path_single_trailing_slash() {
-		update_blog_details( 1, array( 'path' => 'my_path/' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
-	}
-
-	function test_update_blog_details_single_path_single_leading_slashes() {
-		update_blog_details( 1, array( 'path' => '/my_path' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
-	}
-
-	function test_update_blog_details_single_path_both_slashes() {
-		update_blog_details( 1, array( 'path' => '/my_path/' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/my_path/', $blog->path );
-	}
-
-	function test_update_blog_details_multiple_paths_no_slashes() {
-		update_blog_details( 1, array( 'path' => 'multiple/dirs' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple/dirs/', $blog->path );
-	}
-
-	/**
-	 * `update_blog_details()` does not resolve multiple slashes in the
-	 * middle of a path string.
-	 */
-	function test_update_blog_details_multiple_paths_middle_slashes() {
-		update_blog_details( 1, array( 'path' => 'multiple///dirs' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple///dirs/', $blog->path );
-	}
-
-	function test_update_blog_details_multiple_paths_leading_slash() {
-		update_blog_details( 1, array( 'path' => '/multiple/dirs' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple/dirs/', $blog->path );
-	}
-
-	function test_update_blog_details_multiple_paths_trailing_slash() {
-		update_blog_details( 1, array( 'path' => 'multiple/dirs/' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple/dirs/', $blog->path );
-	}
-
-	function test_update_blog_details_multiple_paths_both_slashes() {
-		update_blog_details( 1, array( 'path' => '/multiple/dirs/' ) );
-		$blog = get_blog_details( 1 );
-		$this->assertEquals( '/multiple/dirs/', $blog->path );
+			// update_blog_details() does not resolve multiple slashes in the middle of a path string.
+			array( 'multiple///dirs', '/multiple///dirs/' ),
+		);
 	}
 
 }
