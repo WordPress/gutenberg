@@ -189,6 +189,28 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 	/**
 	 * @ticket 5305
 	 */
+	public function test_slugs_resulting_in_permalinks_that_resemble_year_archives_should_not_be_suffixed_for_already_published_posts() {
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		$wp_rewrite->flush_rules();
+
+		$p = $this->factory->post->create( array(
+			'post_type' => 'post',
+			'post_name' => 'foo',
+			'post_status' => 'publish',
+		) );
+
+		$found = wp_unique_post_slug( '2015', $p, 'publish', 'post', 0 );
+		$this->assertEquals( '2015-2', $found );
+
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+	}
+
+	/**
+	 * @ticket 5305
+	 */
 	public function test_yearlike_slugs_should_not_be_suffixed_if_permalink_structure_does_not_result_in_a_clash_with_year_archives() {
 		global $wp_rewrite;
 		$wp_rewrite->init();
