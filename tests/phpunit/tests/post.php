@@ -412,6 +412,29 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 5305
+	 */
+	public function test_wp_insert_post_should_not_allow_a_bare_numeric_slug_that_might_conflict_with_a_date_archive_when_generating_from_an_empty_post_title() {
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		$wp_rewrite->flush_rules();
+
+		$p = wp_insert_post( array(
+			'post_title' => '',
+			'post_content' => 'test',
+			'post_status' => 'publish',
+			'post_type' => 'post',
+		) );
+
+		$post = get_post( $p );
+
+		$wp_rewrite->set_permalink_structure( '' );
+
+		$this->assertEquals( "$p-2", $post->post_name );
+	}
+
+	/**
 	 * @ticket 5364
 	 */
 	function test_delete_future_post_cron() {
