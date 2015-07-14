@@ -533,6 +533,8 @@ class Tests_DB extends WP_UnitTestCase {
 			"SELECT * FROM $table",
 			"SELECT * FROM `$table`",
 
+			"SELECT * FROM (SELECT * FROM $table) as subquery",
+
 			"INSERT $table",
 			"INSERT IGNORE $table",
 			"INSERT IGNORE INTO $table",
@@ -627,6 +629,9 @@ class Tests_DB extends WP_UnitTestCase {
 			"SHOW FULL COLUMNS FROM $table",
 			"SHOW CREATE TABLE $table",
 			"SHOW INDEX FROM $table",
+
+			// @ticket 32763
+			"SELECT " . str_repeat( 'a', 10000 ) . " FROM (SELECT * FROM $table) as subquery",
 		);
 
 		$querycount = count( $queries );
