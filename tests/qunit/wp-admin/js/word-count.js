@@ -1,47 +1,47 @@
-( function( QUnit ) {
-	var wordCounter = new window.wp.utils.WordCounter();
-
+( function( QUnit, wordCounter ) {
 	QUnit.module( 'word-count' );
 
 	QUnit.test( 'All.', function( assert ) {
-		var tests = [
+		_.each( [
 			{
 				message: 'Basic test.',
 				string: 'one two three',
-				wordCount: 3,
-				charCount: 11
+				words: 3,
+				characters: 11,
+				all: 13
 			},
 			{
 				message: 'HTML tags.',
 				string: 'one <em class="test">two</em><br />three',
-				wordCount: 3,
-				charCount: 11
+				words: 3,
+				characters: 11,
+				all: 12
 			},
 			{
 				message: 'Line breaks.',
 				string: 'one\ntwo\nthree',
-				wordCount: 3,
-				charCount: 11
+				words: 3,
+				characters: 11,
+				all: 11
 			},
 			{
 				message: 'Encoded spaces.',
 				string: 'one&nbsp;two&#160;three',
-				wordCount: 3,
-				charCount: 11
+				words: 3,
+				characters: 11,
+				all: 13
 			},
 			{
 				message: 'Punctuation.',
 				string: 'It\'s two three... 4?',
-				wordCount: 3,
-				charCount: 11
+				words: 3,
+				characters: 11,
+				all: 14
 			}
-		];
-
-		var i = tests.length;
-
-		while ( i-- ) {
-			assert.equal( wordCounter.count( tests[ i ].string ), tests[ i ].wordCount, tests[ i ].message + ' (words)' );
-			assert.equal( wordCounter.count( tests[ i ].string, 'characters' ), tests[ i ].charCount, tests[ i ].message + ' (characters)' );
-		}
+		], function( test ) {
+			_.each( [ 'words', 'characters', 'all' ], function( type ) {
+				assert.equal( wordCounter.count( test.string, type ), test[ type ], test.message + ' (' + type + ')' );
+			} );
+		} );
 	} );
-} )( window.QUnit );
+} )( window.QUnit, new window.wp.utils.WordCounter() );
