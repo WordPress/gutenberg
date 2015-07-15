@@ -1,0 +1,56 @@
+---
+# babel support more syntax stuff than eslint for now
+parser: babel-eslint
+
+ecmaFeatures:
+  modules: true
+
+env:
+  es6: true
+  browser: true
+  node: true
+
+# 0: off, 1: warning, 2: error
+rules:
+
+  # trailing coma are cool for diff
+  comma-dangle: [2, "always-multiline"]
+
+  # enforce comma at eol (never before)
+  comma-style: [2, "last"]
+
+  # turn off consistent return
+  consistent-return: 0
+
+  # 2 spaces indentation
+  indent: [2, 2]
+
+  # quotes are always double
+  quotes: [2, "double"]
+
+  # single empty lines only
+  no-multiple-empty-lines: [2, {"max": 1}]
+
+  # allow functions declarations at bottom of scope
+  no-use-before-define: [2, "nofunc"]
+
+  # semicolons are useless
+  semi: [2, "never"]
+
+  # consistent whitespace after keywords
+  space-after-keywords: [2, "always"]
+
+  # consistent whitespace before blocks
+  space-before-blocks: [2, "always"]
+
+  # consistent whitespace before function paren
+  space-before-function-paren: [2, {"anonymous": "always", "named": "never"}]
+
+  # consistent whitespace in brackets
+  space-in-brackets: [2, "always", {"singleValue": false, "propertyName": false}]
+
+  # consistent whitespace in parens
+  space-in-parens: [2, "never"]
+
+  # consistent whitespace in single line comments
+  spaced-line-comment: [2, "always"]

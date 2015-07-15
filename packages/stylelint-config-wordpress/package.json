@@ -1,0 +1,35 @@
+{
+  "name": "stylelint-config-wordpress",
+  "version": "0.1.0",
+  "description": "Wordpress CSS Coding Standards shareable config for stylelint",
+  "keywords": [
+    "stylelint",
+    "stylelintconfig"
+  ],
+  "author": "Stylelint",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stylelint/stylelint-config-wordpress.git"
+  },
+  "main": "index.js",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "index.js"
+  ],
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "babel-eslint": "^3.1.23",
+    "babel-tape-runner": "^1.1.0",
+    "eslint": "^0.24.1",
+    "postcss": "^4.1.16",
+    "stylelint": "^0.1.1",
+    "tape": "^4.0.0"
+  },
+  "scripts": {
+    "lint": "eslint . --ignore-path .gitignore",
+    "tape": "babel-tape-runner \"__tests__/**/*.js\"",
+    "test": "npm run lint && npm run tape"
+  }
+}
