@@ -399,6 +399,9 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
+			options: {
+				ASCIIOnly: true
+			},
 			core: {
 				expand: true,
 				cwd: SOURCE_DIR,

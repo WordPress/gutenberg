@@ -33,9 +33,16 @@
 			},
 			{
 				message: 'Punctuation.',
-				string: 'It\'s two three... 4?',
+				string: 'It\'s two three \u2026 4?',
 				words: 3,
-				characters: 11,
+				characters: 15,
+				all: 19
+			},
+			{
+				message: 'Em dash.',
+				string: 'one\u2014two--three',
+				words: 3,
+				characters: 14,
 				all: 14
 			}
 		], function( test ) {
