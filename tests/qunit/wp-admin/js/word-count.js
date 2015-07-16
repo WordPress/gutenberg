@@ -44,6 +44,13 @@
 				words: 3,
 				characters: 14,
 				all: 14
+			},
+			{
+				message: 'Shortcodes.',
+				string: 'one [shortcode attribute="value"]two[/shortcode]three',
+				words: 3,
+				characters: 11,
+				all: 12
 			}
 		], function( test ) {
 			_.each( [ 'words', 'characters', 'all' ], function( type ) {
@@ -51,4 +58,8 @@
 			} );
 		} );
 	} );
-} )( window.QUnit, new window.wp.utils.WordCounter() );
+} )( window.QUnit, new window.wp.utils.WordCounter( {
+	l10n: {
+		shortcodes: [ 'shortcode' ]
+	}
+} ) );
