@@ -244,6 +244,27 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 				'expected' => str_repeat( "\xcc\xe3", 5 ),
 				'length'   => array( 'type' => 'byte', 'length' => 10 ),
 			),
+			'ujis_with_utf8_connection' => array(
+				'charset'            => 'ujis',
+				'connection_charset' => 'utf8',
+				'value'              => '自動下書き',
+				'expected'           => '自動下書き',
+				'length'             => array( 'type' => 'byte', 'length' => 100 ),
+			),
+			'ujis_with_utf8_connection_char_length' => array(
+				'charset'            => 'ujis',
+				'connection_charset' => 'utf8',
+				'value'              => '自動下書き',
+				'expected'           => '自動下書',
+				'length'             => array( 'type' => 'char', 'length' => 4 ),
+			),
+			'ujis_with_utf8_connection_byte_length' => array(
+				'charset'            => 'ujis',
+				'connection_charset' => 'utf8',
+				'value'              => '自動下書き',
+				'expected'           => '自動',
+				'length'             => array( 'type' => 'byte', 'length' => 6 ),
+			),
 			'false' => array(
 				// false is a column with no character set (ie, a number column)
 				'charset'  => false,
@@ -289,7 +310,7 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		foreach ( $fields as $test_case => $field ) {
 			$expected = $field;
 			$expected['value'] = $expected['expected'];
-			unset( $expected['expected'], $field['expected'] );
+			unset( $expected['expected'], $field['expected'], $expected['connection_charset'] );
 
 			// We're keeping track of these for our multiple-field test.
 			$multiple[] = $field;
@@ -303,9 +324,6 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			$data_provider[] = array( $data, $expected, $test_case );
 		}
 
-		// Time for our test of multiple fields at once.
-		$data_provider[] = array( $multiple, $multiple_expected, 'multiple fields/charsets' );
-
 		return $data_provider;
 	}
 
@@ -318,7 +336,22 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			$this->markTestSkipped( 'This test fails in PHP 5.2 on Windows. See https://core.trac.wordpress.org/ticket/31262' );
 		}
 
+		$charset = self::$_wpdb->charset;
+		if ( isset( $data[0]['connection_charset'] ) ) {
+			$new_charset = $data[0]['connection_charset'];
+			unset( $data[0]['connection_charset'] );
+		} else {
+			$new_charset = $data[0]['charset'];
+		}
+
+		self::$_wpdb->charset = $new_charset;
+		self::$_wpdb->set_charset( self::$_wpdb->dbh, $new_charset );
+
 		$actual = self::$_wpdb->strip_invalid_text( $data );
+
+		self::$_wpdb->charset = $charset;
+		self::$_wpdb->set_charset( self::$_wpdb->dbh, $charset );
+
 		$this->assertSame( $expected, $actual, $message );
 	}
 
