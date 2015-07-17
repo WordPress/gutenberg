@@ -214,6 +214,21 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 				'expected' => "\xd8ord\xd0ress",
 				'length'   => array( 'type' => 'char', 'length' => 100 ),
 			),
+			'cp1251_no_length' => array(
+				'charset'  => 'cp1251',
+				'value'    => "\xd8ord\xd0ress",
+				'expected' => "\xd8ord\xd0ress",
+				'length'   => false,
+			),
+			'cp1251_no_length_ascii' => array(
+				'charset'  => 'cp1251',
+				'value'    => "WordPress",
+				'expected' => "WordPress",
+				'length'   => false,
+				// Don't set 'ascii' => true/false.
+				// That's a different codepath than it being unset even if
+				// three's only only ASCII in the value.
+			),
 			'cp1251_char_length' => array(
 				'charset'  => 'cp1251',
 				'value'    => str_repeat( "\xd8\xd0", 10 ),
@@ -806,5 +821,22 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		// VARCHAR column
 		$stripped = $wpdb->strip_invalid_text_for_column( $wpdb->comments, 'comment_agent', str_repeat( 'A', 256 ) );
 		$this->assertEquals( 255, strlen( $stripped ) );
+	}
+
+	/**
+	 * @ticket 32279
+	 */
+	function test_strip_invalid_text_from_query_cp1251_is_safe() {
+		$tablename = 'test_cp1251_query_' . rand_str( 5 );
+		if ( ! self::$_wpdb->query( "CREATE TABLE $tablename ( a VARCHAR(50) ) DEFAULT CHARSET 'cp1251'" ) ) {
+			$this->markTestSkipped( "Test requires the 'cp1251' charset" );
+		}
+
+		$safe_query = "INSERT INTO $tablename( `a` ) VALUES( 'safe data' )";
+		$stripped_query = self::$_wpdb->strip_invalid_text_from_query( $safe_query );
+
+		self::$_wpdb->query( "DROP TABLE $tablename" );
+
+		$this->assertEquals( $safe_query, $stripped_query );
 	}
 }
