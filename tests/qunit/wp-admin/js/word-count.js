@@ -51,6 +51,13 @@
 				words: 3,
 				characters: 11,
 				all: 12
+			},
+			{
+				message: 'Astrals.',
+				string: '\uD83D\uDCA9',
+				words: 1,
+				characters: 1,
+				all: 1
 			}
 		], function( test ) {
 			_.each( [ 'words', 'characters', 'all' ], function( type ) {
