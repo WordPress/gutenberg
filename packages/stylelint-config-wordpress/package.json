@@ -4,7 +4,7 @@
   "description": "Wordpress shareable config for stylelint",
   "keywords": [
     "stylelint",
-    "stylelintconfig"
+    "stylelint-config"
   ],
   "author": "Stylelint",
   "license": "MIT",
