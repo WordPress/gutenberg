@@ -49,25 +49,161 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the test_load_available_items_ajax method.
+	 * Test that the load_available_items_query method returns a WP_Error object.
 	 *
-	 * @see WP_Customize_Nav_Menus::load_available_items_ajax()
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
 	 */
-	function test_load_available_items_ajax() {
+	function test_load_available_items_query_returns_wp_error() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
 
-		$this->markTestIncomplete( 'This test has not been implemented.' );
+		// Invalid post type $obj_name.
+		$items = $menus->load_available_items_query( 'post_type', 'invalid' );
+		$this->assertInstanceOf( 'WP_Error', $items );
+		$this->assertEquals( 'nav_menus_invalid_post_type', $items->get_error_code() );
 
+		// Invalid taxonomy $obj_name.
+		$items = $menus->load_available_items_query( 'taxonomy', 'invalid' );
+		$this->assertInstanceOf( 'WP_Error', $items );
+		$this->assertEquals( 'invalid_taxonomy', $items->get_error_code() );
 	}
 
 	/**
-	 * Test the search_available_items_ajax method.
+	 * Test the load_available_items_query method maybe returns the home page item.
 	 *
-	 * @see WP_Customize_Nav_Menus::search_available_items_ajax()
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
 	 */
-	function test_search_available_items_ajax() {
+	function test_load_available_items_query_maybe_returns_home() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
 
-		$this->markTestIncomplete( 'This test has not been implemented.' );
+		// Expected menu item array.
+		$expected = array(
+			'id'         => 'home',
+			'title'      => _x( 'Home', 'nav menu home label' ),
+			'type'       => 'custom',
+			'type_label' => __( 'Custom Link' ),
+			'object'     => '',
+			'url'        => home_url(),
+		);
 
+		// Create pages.
+		$this->factory->post->create_many( 15, array( 'post_type' => 'page' ) );
+
+		// Home is included in menu items when page is zero.
+		$items = $menus->load_available_items_query( 'post_type', 'page', 0 );
+		$this->assertContains( $expected, $items );
+
+		// Home is not included in menu items when page is larger than zero.
+		$items = $menus->load_available_items_query( 'post_type', 'page', 1 );
+		$this->assertNotEmpty( $items );
+		$this->assertNotContains( $expected, $items );
+	}
+
+	/**
+	 * Test the load_available_items_query method returns post item.
+	 *
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
+	 */
+	function test_load_available_items_query_returns_post_item_with_page_number() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
+
+		// Create page.
+		$post_id = $this->factory->post->create( array( 'post_title' => 'Post Title' ) );
+
+		// Create pages.
+		$this->factory->post->create_many( 10 );
+
+		// Expected menu item array.
+		$expected = array(
+			'id'         => "post-{$post_id}",
+			'title'      => 'Post Title',
+			'type'       => 'post_type',
+			'type_label' => 'Post',
+			'object'     => 'post',
+			'object_id'  => intval( $post_id ),
+			'url'        => get_permalink( intval( $post_id ) ),
+		);
+
+		// Offset the query and get the second page of menu items.
+		$items = $menus->load_available_items_query( 'post_type', 'post', 1 );
+		$this->assertContains( $expected, $items );
+	}
+
+	/**
+	 * Test the load_available_items_query method returns page item.
+	 *
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
+	 */
+	function test_load_available_items_query_returns_page_item() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
+
+		// Create page.
+		$page_id = $this->factory->post->create( array( 'post_title' => 'Page Title', 'post_type' => 'page' ) );
+
+		// Expected menu item array.
+		$expected = array(
+			'id'         => "post-{$page_id}",
+			'title'      => 'Page Title',
+			'type'       => 'post_type',
+			'type_label' => 'Page',
+			'object'     => 'page',
+			'object_id'  => intval( $page_id ),
+			'url'        => get_permalink( intval( $page_id ) ),
+		);
+
+		$items = $menus->load_available_items_query( 'post_type', 'page', 0 );
+		$this->assertContains( $expected, $items );
+	}
+
+	/**
+	 * Test the load_available_items_query method returns post item.
+	 *
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
+	 */
+	function test_load_available_items_query_returns_post_item() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
+
+		// Create post.
+		$post_id = $this->factory->post->create( array( 'post_title' => 'Post Title' ) );
+
+		// Expected menu item array.
+		$expected = array(
+			'id'         => "post-{$post_id}",
+			'title'      => 'Post Title',
+			'type'       => 'post_type',
+			'type_label' => 'Post',
+			'object'     => 'post',
+			'object_id'  => intval( $post_id ),
+			'url'        => get_permalink( intval( $post_id ) ),
+		);
+
+		$items = $menus->load_available_items_query( 'post_type', 'post', 0 );
+		$this->assertContains( $expected, $items );
+	}
+
+	/**
+	 * Test the load_available_items_query method returns term item.
+	 *
+	 * @see WP_Customize_Nav_Menus::load_available_items_query()
+	 */
+	function test_load_available_items_query_returns_term_item() {
+		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
+
+		// Create term.
+		$term_id = $this->factory->category->create( array( 'name' => 'Term Title' ) );
+
+		// Expected menu item array.
+		$expected = array(
+			'id'         => "term-{$term_id}",
+			'title'      => 'Term Title',
+			'type'       => 'taxonomy',
+			'type_label' => 'Category',
+			'object'     => 'category',
+			'object_id'  => intval( $term_id ),
+			'url'        => get_term_link( intval( $term_id ), 'category' ),
+		);
+
+		$items = $menus->load_available_items_query( 'taxonomy', 'category', 0 );
+		$this->assertContains( $expected, $items );
 	}
 
 	/**
@@ -452,16 +588,6 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$this->assertContains( 'navMenuInstanceArgs', $data );
 		$this->assertContains( 'requestUri', $data );
 
-	}
-
-	/**
-	 * Test the render_menu method.
-	 *
-	 * @see WP_Customize_Nav_Menus::render_menu()
-	 */
-	function test_render_menu() {
-
-		$this->markTestIncomplete( 'This test has not been implemented.' );
 	}
 
 }
