@@ -1,5 +1,3 @@
-/*globals wp, Backbone */
-
 /**
  * wp.media.view.MediaFrame.Manage.Router
  *
@@ -48,7 +46,7 @@ var Router = Backbone.Router.extend({
 	showItem: function( query ) {
 		var frame = this.controller,
 			item;
-	
+
 		// Trigger the media frame to open the correct item
 		item = this.library.findWhere( { id: parseInt( query, 10 ) } );
 		if ( item ) {

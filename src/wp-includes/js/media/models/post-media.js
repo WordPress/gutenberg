@@ -1,5 +1,3 @@
-/*globals wp, Backbone, _ */
-
 /**
  * wp.media.model.PostMedia
  *

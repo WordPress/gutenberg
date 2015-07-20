@@ -1,5 +1,3 @@
-/*globals wp, _, Backbone */
-
 /**
  * wp.media.controller.Cropper
  *

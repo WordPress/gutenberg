@@ -1,5 +1,3 @@
-/*globals wp, _, jQuery */
-
 /**
  * Creates a dropzone on WP editor instances (elements with .wp-editor-wrap)
  * and relays drag'n'dropped files to a media workflow.

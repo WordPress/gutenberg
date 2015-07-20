@@ -1,5 +1,3 @@
-/*globals wp, jQuery, _, Backbone */
-
 var media = wp.media,
 	$ = jQuery,
 	l10n;

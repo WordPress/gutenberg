@@ -1,5 +1,3 @@
-/*globals wp, _ */
-
 var media = wp.media,
 	baseSettings = window._wpmejsSettings || {},
 	l10n = window._wpMediaViewsL10n || {};

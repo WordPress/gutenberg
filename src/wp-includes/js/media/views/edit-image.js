@@ -1,5 +1,3 @@
-/*globals wp, _ */
-
 /**
  * wp.media.view.EditImage
  *

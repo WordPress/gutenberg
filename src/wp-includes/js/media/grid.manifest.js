@@ -1,5 +1,3 @@
-/*globals wp */
-
 var media = wp.media;
 
 media.controller.EditAttachmentMetadata = require( './controllers/edit-attachment-metadata.js' );

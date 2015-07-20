@@ -1,5 +1,3 @@
-/*globals jQuery */
-
 /**
  * wp.media.view.MenuItem
  *
