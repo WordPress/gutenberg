@@ -118,15 +118,6 @@ class Tests_WP_Site_Icon extends WP_UnitTestCase {
 		$this->assertGreaterThan( 0, $cropped_id );
 	}
 
-	function test_delete_site_icon() {
-		$attachment_id = $this->_insert_attachment();
-		update_option( 'site_icon', $attachment_id );
-
-		$this->wp_site_icon->delete_site_icon();
-
-		$this->assertFalse( get_option( 'site_icon', false ) );
-	}
-
 	function test_delete_attachment_data() {
 		$attachment_id = $this->_insert_attachment();
 		update_option( 'site_icon', $attachment_id );
