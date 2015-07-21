@@ -58,6 +58,20 @@
 				words: 1,
 				characters: 1,
 				all: 1
+			},
+			{
+				message: 'HTML comment.',
+				string: 'one<!-- comment -->two three',
+				words: 2,
+				characters: 11,
+				all: 12
+			},
+			{
+				message: 'HTML entity.',
+				string: '&gt; test',
+				words: 1,
+				characters: 5,
+				all: 6
 			}
 		], function( test ) {
 			_.each( [ 'words', 'characters', 'all' ], function( type ) {
