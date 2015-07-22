@@ -464,4 +464,182 @@ EOF;
 			),
 		);
 	}
+
+	/**
+	 * Test new function wp_kses_hair_parse().
+	 *
+	 * @dataProvider data_hair_parse
+	 */
+	function test_hair_parse( $input, $output ) {
+		return $this->assertEquals( $output, wp_kses_hair_parse( $input ) );
+	}
+
+	function data_hair_parse() {
+		return array(
+			array(
+				'title="hello" href="#" id="my_id" ',
+				array( 'title="hello" ', 'href="#" ', 'id="my_id" ' ),
+			),
+			array(
+				'[shortcode attr="value"] href="http://www.google.com/"title="moo"disabled',
+				array( '[shortcode attr="value"] ', 'href="http://www.google.com/"', 'title="moo"', 'disabled' ),
+			),
+			array(
+				'',
+				array(),
+			),
+			array(
+				'a',
+				array( 'a' ),
+			),
+			array(
+				'title="hello"disabled href=# id=\'my_id\'',
+				array( 'title="hello"', 'disabled ', 'href=# ', "id='my_id'" ),
+			),
+			array(
+				'     ', // Calling function is expected to strip leading whitespace.
+				false,
+			),
+			array(
+				'abcd=abcd"abcd"',
+				false,
+			),
+			array(
+				"array[1]='z'z'z'z",
+				false,
+			),
+		);
+	}
+
+	/**
+	 * Test new function wp_kses_attr_parse().
+	 *
+	 * @dataProvider data_attr_parse
+	 */
+	function test_attr_parse( $input, $output ) {
+		return $this->assertEquals( $output, wp_kses_attr_parse( $input ) );
+	}
+
+	function data_attr_parse() {
+		return array(
+			array(
+				'<a title="hello" href="#" id="my_id" >',
+				array( '<a ', 'title="hello" ', 'href="#" ', 'id="my_id" ', '>' ),
+			),
+			array(
+				'<a [shortcode attr="value"] href="http://www.google.com/"title="moo"disabled>',
+				array( '<a ', '[shortcode attr="value"] ', 'href="http://www.google.com/"', 'title="moo"', 'disabled', '>' ),
+			),
+			array(
+				'',
+				false,
+			),
+			array(
+				'a',
+				false,
+			),
+			array(
+				'<a>',
+				array( '<a', '>' ),
+			),
+			array(
+				'<a%%&&**>',
+				false,
+			),
+			array(
+				'<a title="hello"disabled href=# id=\'my_id\'>',
+				array( '<a ', 'title="hello"', 'disabled ', 'href=# ', "id='my_id'", ">" ),
+			),
+			array(
+				'<a     >',
+				array( '<a     ', '>' ),
+			),
+			array(
+				'<a abcd=abcd"abcd">',
+				false,
+			),
+			array(
+				"<a array[1]='z'z'z'z>",
+				false,
+			),
+			array(
+				'<img title="hello" src="#" id="my_id" />',
+				array( '<img ', 'title="hello" ', 'src="#" ', 'id="my_id"', ' />' ),
+			),
+		);
+	}
+
+	/**
+	 * Test new function wp_kses_one_attr().
+	 *
+	 * @dataProvider data_one_attr
+	 */
+	function test_one_attr( $element, $input, $output ) {
+		return $this->assertEquals( $output, wp_kses_one_attr( $input, $element ) );
+	}
+
+	function data_one_attr() {
+		return array(
+			array(
+				'a',
+				' title="hello" ',
+				' title="hello" ',
+			),
+			array(
+				'a',
+				'title  =  "hello"',
+				'title="hello"',
+			),
+			array(
+				'a',
+				"title='hello'",
+				"title='hello'",
+			),
+			array(
+				'a',
+				'title=hello',
+				'title="hello"',
+			),
+			array(
+				'a',
+				'href="javascript:alert(1)"',
+				'href="alert(1)"',
+			),
+			array(
+				'a',
+				'style ="style "',
+				'style="style"',
+			),
+			array(
+				'a',
+				'style="style "',
+				'style="style"',
+			),
+			array(
+				'a',
+				'style ="style ="',
+				'',
+			),
+			array(
+				'img',
+				'src="mypic.jpg"',
+				'src="mypic.jpg"',
+			),
+			array(
+				'img',
+				'onerror=alert(1)',
+				'',
+			),
+			array(
+				'img',
+				'title=>',
+				'title="&gt;"',
+			),
+			array(
+				'img',
+				'title="&garbage";"',
+				'title="&amp;garbage&quot;;"',
+			),
+		);
+	}
 }
