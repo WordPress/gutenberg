@@ -1,4 +1,4 @@
-// 4.2.1 (2015-06-29)
+// 4.2.2 (2015-07-22)
 
 /**
  * Compiled inline version. (Library mode)
@@ -12068,30 +12068,31 @@ define("tinymce/html/DomParser", [
 				for (textNode = node.prev; textNode && textNode.type === 3;) {
 					textVal = textNode.value.replace(endWhiteSpaceRegExp, '');
 
+					// Found a text node with non whitespace then trim that and break
 					if (textVal.length > 0) {
 						textNode.value = textVal;
-						textNode = textNode.prev;
-					} else {
-						textNodeNext = textNode.next;
+						return;
+					}
 
-						// Fix for bug #7543 where bogus nodes would produce empty
-						// text nodes and these would be removed if a nested list was before it
-						if (textNodeNext) {
-							if (textNodeNext.type == 3 && textNodeNext.value.length) {
-								textNode = textNode.prev;
-								continue;
-							}
+					textNodeNext = textNode.next;
 
-							if (!blockElements[textNodeNext.name] && textNodeNext.name != 'script' && textNodeNext.name != 'style') {
-								textNode = textNode.prev;
-								continue;
-							}
+					// Fix for bug #7543 where bogus nodes would produce empty
+					// text nodes and these would be removed if a nested list was before it
+					if (textNodeNext) {
+						if (textNodeNext.type == 3 && textNodeNext.value.length) {
+							textNode = textNode.prev;
+							continue;
 						}
 
-						sibling = textNode.prev;
-						textNode.remove();
-						textNode = sibling;
+						if (!blockElements[textNodeNext.name] && textNodeNext.name != 'script' && textNodeNext.name != 'style') {
+							textNode = textNode.prev;
+							continue;
+						}
 					}
+
+					sibling = textNode.prev;
+					textNode.remove();
+					textNode = sibling;
 				}
 			}
 
@@ -27020,7 +27021,7 @@ define("tinymce/ui/Window", [
 /**
  * This class is used to create MessageBoxes like alerts/confirms etc.
  *
- * @class tinymce.ui.Window
+ * @class tinymce.ui.MessageBox
  * @extends tinymce.ui.FloatPanel
  */
 define("tinymce/ui/MessageBox", [
@@ -32847,7 +32848,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.1',
+		minorVersion: '2.2',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -32855,7 +32856,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-06-29',
+		releaseDate: '2015-07-22',
 
 		/**
 		 * Collection of editor instances.
@@ -35276,11 +35277,27 @@ define("tinymce/ui/ComboBox", [
 			);
 		},
 
+		value: function(value) {
+			if (arguments.length) {
+				this.state.set('value', value);
+				return this;
+			}
+
+			// Make sure the real state is in sync
+			if (this.state.get('rendered')) {
+				this.state.set('value', this.getEl('inp').value);
+			}
+
+			return this.state.get('value');
+		},
+
 		bindStates: function() {
 			var self = this;
 
 			self.state.on('change:value', function(e) {
-				self.getEl('inp').value = e.value;
+				if (self.getEl('inp').value != e.value) {
+					self.getEl('inp').value = e.value;
+				}
 			});
 
 			self.state.on('change:disabled', function(e) {
@@ -36236,7 +36253,7 @@ define("tinymce/ui/ElementPath", [
 			if (editor.settings.elementpath !== false) {
 				self.on('select', function(e) {
 					editor.focus();
-					editor.selection.select(this.data()[e.index].element);
+					editor.selection.select(this.row()[e.index].element);
 					editor.nodeChanged();
 				});
 
@@ -38774,7 +38791,7 @@ define("tinymce/ui/Menu", [
 			self.items().each(function(ctrl) {
 				var settings = ctrl.settings;
 
-				if (settings.icon || settings.selectable) {
+				if (settings.icon || settings.image || settings.selectable) {
 					self._hasIcons = true;
 					return false;
 				}
@@ -40015,7 +40032,9 @@ define("tinymce/ui/TextBox", [
 			var self = this;
 
 			self.state.on('change:value', function(e) {
-				self.getEl().value = e.value;
+				if (self.getEl().value != e.value) {
+					self.getEl().value = e.value;
+				}
 			});
 
 			self.state.on('change:disabled', function(e) {

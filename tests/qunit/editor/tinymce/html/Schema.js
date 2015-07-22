@@ -162,13 +162,13 @@ test('getBoolAttrs', function() {
 	expect(1);
 
 	schema = new tinymce.html.Schema();
-	deepEqual(schema.getBoolAttrs(), { // WP: include three additional bool attributes used in the "media" plugin.
+	deepEqual(schema.getBoolAttrs(), {
 		"CONTROLS": {}, "LOOP": {}, "AUTOPLAY": {}, "SELECTED": {}, "READONLY": {}, "NOWRAP": {},
 		"NOSHADE": {}, "NORESIZE": {}, "NOHREF": {}, "MULTIPLE": {}, "ISMAP": {}, "DISABLED": {}, "DEFER": {},
 		"DECLARE": {}, "COMPACT": {}, "CHECKED": {},
-		"allowfullscreen": {}, "controls": {}, "loop": {}, "autoplay": {}, "selected": {}, "readonly": {}, "mozallowfullscreen": {},
-		"nowrap": {}, "noshade": {}, "noresize": {}, "nohref": {}, "multiple": {}, "ismap": {}, "disabled": {}, "defer": {},
-		"declare": {}, "compact": {}, "checked": {}, "webkitallowfullscreen": {}
+		"controls": {}, "loop": {}, "autoplay": {}, "selected": {}, "readonly": {}, "nowrap": {},
+		"noshade": {}, "noresize": {}, "nohref": {}, "multiple": {}, "ismap": {}, "disabled": {}, "defer": {},
+		"declare": {}, "compact": {}, "checked": {}
 	});
 });
 
