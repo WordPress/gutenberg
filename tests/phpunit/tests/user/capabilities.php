@@ -926,4 +926,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$user->remove_cap( 'publish_pages' );
 		$this->assertFalse( $user->has_cap( 'publish_pages' ) );
 	}
+
+	function test_subscriber_cant_edit_posts() {
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'subscriber' ) ) );
+		wp_set_current_user( $user->ID );
+
+		$post = $this->factory->post->create( array( 'post_author' => 1 ) );
+
+		$this->assertFalse( current_user_can( 'edit_post', $post ) );
+		$this->assertFalse( current_user_can( 'edit_post', $post + 1 ) );
+	}
 }
