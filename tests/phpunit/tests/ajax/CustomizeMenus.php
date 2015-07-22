@@ -122,7 +122,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 				'administrator',
 				array(
 					'success' => false,
-					'data'    => 'nav_menus_missing_obj_type_or_type_parameter',
+					'data'    => 'nav_menus_missing_type_or_object_parameter',
 				),
 			),
 		);
@@ -172,41 +172,41 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 			// Testing empty obj_type and type.
 			array(
 				array(
-					'obj_type' => '',
 					'type'     => '',
+					'object'   => '',
 				),
 				array(
 					'success'  => false,
-					'data'     => 'nav_menus_missing_obj_type_or_type_parameter',
+					'data'     => 'nav_menus_missing_type_or_object_parameter',
 				),
 			),
 			// Testing empty obj_type.
 			array(
 				array(
-					'obj_type' => '',
-					'type'     => 'post',
+					'type'     => '',
+					'object'   => 'post',
 				),
 				array(
 					'success'  => false,
-					'data'     => 'nav_menus_missing_obj_type_or_type_parameter',
+					'data'     => 'nav_menus_missing_type_or_object_parameter',
 				),
 			),
 			// Testing empty type.
 			array(
 				array(
-					'obj_type' => '',
-					'type'     => 'post',
+					'type'     => '',
+					'object'   => 'post',
 				),
 				array(
 					'success'  => false,
-					'data'     => 'nav_menus_missing_obj_type_or_type_parameter',
+					'data'     => 'nav_menus_missing_type_or_object_parameter',
 				),
 			),
 			// Testing incorrect type option.
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'invalid',
+					'type'     => 'post_type',
+					'object'   => 'invalid',
 				),
 				array(
 					'success'  => false,
@@ -259,29 +259,29 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		return array(
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'post',
+					'type'     => 'post_type',
+					'object'   => 'post',
 				),
 				true,
 			),
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'page',
+					'type'     => 'post_type',
+					'object'   => 'page',
 				),
 				true,
 			),
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'custom',
+					'type'     => 'post_type',
+					'object'   => 'custom',
 				),
 				false,
 			),
 			array(
 				array(
-					'obj_type' => 'taxonomy',
-					'type'     => 'post_tag',
+					'type'     => 'taxonomy',
+					'object'   => 'post_tag',
 				),
 				true,
 			),
@@ -363,20 +363,20 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		return array(
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'post',
+					'type'     => 'post_type',
+					'object'   => 'post',
 				),
 			),
 			array(
 				array(
-					'obj_type' => 'post_type',
-					'type'     => 'page',
+					'type'     => 'post_type',
+					'object'   => 'page',
 				),
 			),
 			array(
 				array(
-					'obj_type' => 'taxonomy',
-					'type'     => 'post_tag',
+					'type'     => 'taxonomy',
+					'object'   => 'post_tag',
 				),
 			),
 		);

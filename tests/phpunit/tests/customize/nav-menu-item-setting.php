@@ -38,6 +38,20 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Filter to add a custom menu item type label.
+	 *
+	 * @param object $menu_item Menu item.
+	 * @return object
+	 */
+	function filter_type_label( $menu_item ) {
+		if ( 'custom_type' === $menu_item->type ) {
+			$menu_item->type_label = 'Custom Label';
+		}
+
+		return $menu_item;
+	}
+
+	/**
 	 * Test constants and statics.
 	 */
 	function test_constants() {
@@ -203,6 +217,34 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertEquals( $menu_item->object_id, $value['object_id'] );
 		$this->assertEquals( $menu_id, $value['nav_menu_term_id'] );
 		$this->assertEquals( 'Salutations', $value['original_title'] );
+	}
+
+	/**
+	 * Test value method with a custom object.
+	 *
+	 * @see WP_Customize_Nav_Menu_Item_Setting::value()
+	 */
+	function test_custom_type_label() {
+		do_action( 'customize_register', $this->wp_customize );
+		add_filter( 'wp_setup_nav_menu_item', array( $this, 'filter_type_label' ) );
+
+		$menu_id = wp_create_nav_menu( 'Menu' );
+		$item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-type'   => 'custom_type',
+			'menu-item-object' => 'custom_object',
+			'menu-item-title'  => 'Cool beans',
+			'menu-item-status' => 'publish',
+		) );
+
+		$post = get_post( $item_id );
+		$menu_item = wp_setup_nav_menu_item( $post );
+
+		$setting_id = "nav_menu_item[$item_id]";
+		$setting = new WP_Customize_Nav_Menu_Item_Setting( $this->wp_customize, $setting_id );
+
+		$value = $setting->value();
+		$this->assertEquals( $menu_item->type_label, 'Custom Label' );
+		$this->assertEquals( $menu_item->type_label, $value['type_label'] );
 	}
 
 	/**
