@@ -497,7 +497,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		if ( $post_types ) {
 			foreach ( $post_types as $type ) {
 				$this->assertContains( 'available-menu-items-post_type-' . esc_attr( $type->name ), $template );
-				$this->assertContains( '<h4 class="accordion-section-title">' . esc_html( $type->labels->singular_name ), $template );
+				$this->assertRegExp( '#<h4 class="accordion-section-title".*>\s*' . esc_html( $type->labels->singular_name ) . '#', $template );
 				$this->assertContains( 'data-type="post_type"', $template );
 				$this->assertContains( 'data-object="' . esc_attr( $type->name ) . '"', $template );
 			}
@@ -507,14 +507,14 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		if ( $taxonomies ) {
 			foreach ( $taxonomies as $tax ) {
 				$this->assertContains( 'available-menu-items-taxonomy-' . esc_attr( $tax->name ), $template );
-				$this->assertContains( '<h4 class="accordion-section-title">' . esc_html( $tax->labels->singular_name ), $template );
+				$this->assertRegExp( '#<h4 class="accordion-section-title".*>\s*' . esc_html( $tax->labels->singular_name ) . '#', $template );
 				$this->assertContains( 'data-type="taxonomy"', $template );
 				$this->assertContains( 'data-object="' . esc_attr( $tax->name ) . '"', $template );
 			}
 		}
 
 		$this->assertContains( 'available-menu-items-custom_type', $template );
-		$this->assertContains( '<h4 class="accordion-section-title">Custom', $template );
+		$this->assertRegExp( '#<h4 class="accordion-section-title".*>\s*Custom#', $template );
 		$this->assertContains( 'data-type="custom_type"', $template );
 		$this->assertContains( 'data-object="custom_object"', $template );
 	}
