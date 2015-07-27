@@ -144,4 +144,31 @@
 			assert.equal( editor.getContent(), '<ul>\n<li>tes</li>\n</ul>' );
 		}, assert.async() );
 	} );
+
+	QUnit.test( 'Heading 3', function( assert ) {
+		editor.setContent( '<p>### test</p>' );
+		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 8 );
+
+		type( '\n', function() {
+			assert.equal( editor.getContent(), '<h3>test</h3>\n<p>&nbsp;</p>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Heading 3 with elements.', function( assert ) {
+		editor.setContent( '<p>###<del>test</del></p>' );
+		editor.selection.setCursorLocation( editor.$( 'del' )[0].firstChild, 4 );
+
+		type( '\n', function() {
+			assert.equal( editor.getContent(), '<h3><del>test</del></h3>\n<p>&nbsp;</p>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Don\'t convert without content', function( assert ) {
+		editor.setContent( '<p>###&nbsp;</p>' );
+		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 4 );
+
+		type( '\n', function() {
+			assert.equal( editor.getContent(), '<p>###&nbsp;</p>\n<p>&nbsp;</p>' );
+		}, assert.async() );
+	} );
 } )( window.jQuery, window.QUnit, window.tinymce, window.Utils.type, window.setTimeout );
