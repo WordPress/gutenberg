@@ -60,7 +60,7 @@ class MakePOT {
 	var $meta = array(
 		'default' => array(
 			'from-code' => 'utf-8',
-			'msgid-bugs-address' => 'http://make.wordpress.org/polyglots',
+			'msgid-bugs-address' => 'https://make.wordpress.org/polyglots/',
 			'language' => 'php',
 			'add-comments' => 'translators',
 			'comments' => "Copyright (C) {year} {package-name}\nThis file is distributed under the same license as the {package-name} package.",
@@ -109,14 +109,14 @@ class MakePOT {
 		),
 		'wp-plugin' => array(
 			'description' => 'Translation of the WordPress plugin {name} {version} by {author}',
-			'msgid-bugs-address' => 'http://wordpress.org/support/plugin/{slug}',
+			'msgid-bugs-address' => 'https://wordpress.org/support/plugin/{slug}',
 			'copyright-holder' => '{author}',
 			'package-name' => '{name}',
 			'package-version' => '{version}',
 		),
 		'wp-theme' => array(
 			'description' => 'Translation of the WordPress theme {name} {version} by {author}',
-			'msgid-bugs-address' => 'http://wordpress.org/support/theme/{slug}',
+			'msgid-bugs-address' => 'https://wordpress.org/support/theme/{slug}',
 			'copyright-holder' => '{author}',
 			'package-name' => '{name}',
 			'package-version' => '{version}',
