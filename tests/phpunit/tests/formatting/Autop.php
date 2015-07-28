@@ -399,4 +399,50 @@ Paragraph two.';
 
 		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
 	}
+
+	/**
+	 * Do not allow newlines within HTML elements to become mangled.
+	 *
+	 * @ticket 33106
+	 * @dataProvider data_element_sanity
+	 */
+	function test_element_sanity( $input, $output ) {
+		return $this->assertEquals( $output, wpautop( $input ) );
+	}
+
+	function data_element_sanity() {
+		return array(
+			array(
+				"Hello <a\nhref='world'>",
+				"<p>Hello <a\nhref='world'></p>\n",
+			),
+			array(
+				"Hello <!-- a\nhref='world' -->",
+				"<p>Hello <!-- a\nhref='world' --></p>\n",
+			),
+/* Block elements inside comments will fail this test in all versions, it's not a regression.
+			array(
+				"Hello <!-- <hr> a\nhref='world' -->",
+				"<p>Hello <!-- <hr> a\nhref='world' --></p>\n",
+			),
+			array(
+				"Hello <![CDATA[ <hr> a\nhttps://youtu.be/jgz0uSaOZbE\n ]]>",
+				"<p>Hello <![CDATA[ <hr> a\nhttps://youtu.be/jgz0uSaOZbE\n ]]></p>\n",
+			),
+*/
+			array(
+				"Hello <![CDATA[ a\nhttps://youtu.be/jgz0uSaOZbE\n ]]>",
+				"<p>Hello <![CDATA[ a\nhttps://youtu.be/jgz0uSaOZbE\n ]]></p>\n",
+			),
+			array(
+				"Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 ]]> -->",
+				"<p>Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 ]]> --></p>\n",
+			),
+			array(
+				"Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 --> a\n9 ]]>",
+				"<p>Hello <![CDATA[ <!-- a\nhttps://youtu.be/jgz0uSaOZbE\n a\n9 --> a\n9 ]]></p>\n",
+			),
+		);
+	}
+	
 }
