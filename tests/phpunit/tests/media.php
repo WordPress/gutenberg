@@ -57,7 +57,7 @@ CAP;
 			)
 		);
 		$this->assertEquals( 1, preg_match_all( '/wp-caption &amp;myAlignment/', $result, $_r ) );
-		$this->assertEquals( 1, preg_match_all( '/id="&quot;myId"/', $result, $_r ) );
+		$this->assertEquals( 1, preg_match_all( '/id="myId"/', $result, $_r ) );
 		$this->assertEquals( 1, preg_match_all( "/{$this->caption}/", $result, $_r ) );
 	}
 
