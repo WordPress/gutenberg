@@ -655,11 +655,11 @@ EOF;
 	/**
 	 * @ticket 33016
 	 */
-	function filter_wp_embed_shortcode_custom( $custom, $attr, $url ) {
+	function filter_wp_embed_shortcode_custom( $content, $url ) {
 		if ( 'https://www.example.com/?video=1' == $url ) {
-			$custom = "<iframe src='$url'></iframe>";
+			$content = '@embed URL was replaced@';
 		}
-		return $custom;
+		return $content;
 	}
 
 	/**
@@ -667,14 +667,14 @@ EOF;
 	 */
 	function test_oembed_explicit_media_link() {
 		global $wp_embed;
-		add_filter( 'wp_embed_shortcode_custom', array( $this, 'filter_wp_embed_shortcode_custom' ), 10, 3 );
+		add_filter( 'embed_maybe_make_link', array( $this, 'filter_wp_embed_shortcode_custom' ), 10, 2 );
 
 		$content = <<<EOF
 https://www.example.com/?video=1
 EOF;
 
 		$expected = <<<EOF
-<iframe src='https://www.example.com/?video=1'></iframe>
+@embed URL was replaced@
 EOF;
 
 		$result = $wp_embed->autoembed( $content );
@@ -686,7 +686,7 @@ EOF;
 _my_function('data');
 myvar = 'Hello world
 https://www.example.com/?video=1
-don't break this';
+do not break this';
 // ]]>
 </script>
 EOF;
@@ -694,6 +694,6 @@ EOF;
 		$result = $wp_embed->autoembed( $content );
 		$this->assertEquals( $content, $result );
 
-		remove_filter( 'wp_embed_shortcode_custom', array( $this, 'filter_wp_embed_shortcode_custom' ), 10 );
+		remove_filter( 'embed_maybe_make_link', array( $this, 'filter_wp_embed_shortcode_custom' ), 10 );
 	}
 }
