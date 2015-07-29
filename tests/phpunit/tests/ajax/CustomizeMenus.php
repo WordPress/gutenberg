@@ -520,7 +520,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 				array(
 					'success' => false,
 					'data'    => array(
-						'message' => 'No menu items found.',
+						'message' => 'No results found.',
 					),
 				),
 			),
