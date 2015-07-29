@@ -211,6 +211,13 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$nav_menu_options = get_option( 'nav_menu_options', array( 'auto_add' => array() ) );
 		$this->assertContains( $menu_id, $nav_menu_options['auto_add'] );
+
+		$menus = wp_get_nav_menus();
+		$menus_ids = wp_list_pluck( $menus, 'term_id' );
+		$i = array_search( $menu_id, $menus_ids );
+		$this->assertNotFalse( $i, 'Update-previewed menu does not appear in wp_get_nav_menus()' );
+		$filtered_menu = $menus[ $i ];
+		$this->assertEquals( 'Name 2', $filtered_menu->name );
 	}
 
 	/**
@@ -249,6 +256,13 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$nav_menu_options = $this->get_nav_menu_items_option();
 		$this->assertNotContains( $menu_id, $nav_menu_options['auto_add'] );
+
+		$menus = wp_get_nav_menus();
+		$menus_ids = wp_list_pluck( $menus, 'term_id' );
+		$i = array_search( $menu_id, $menus_ids );
+		$this->assertNotFalse( $i, 'Insert-previewed menu was not injected into wp_get_nav_menus()' );
+		$filtered_menu = $menus[ $i ];
+		$this->assertEquals( 'New Menu Name 1', $filtered_menu->name );
 	}
 
 	/**
