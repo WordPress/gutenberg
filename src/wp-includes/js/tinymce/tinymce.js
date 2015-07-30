@@ -1,4 +1,4 @@
-// 4.2.2 (2015-07-22)
+// 4.2.3 (2015-07-30)
 
 /**
  * Compiled inline version. (Library mode)
@@ -212,6 +212,11 @@ define("tinymce/dom/EventUtils", [], function() {
 			event.isDefaultPrevented = returnFalse;
 			event.isPropagationStopped = returnFalse;
 			event.isImmediatePropagationStopped = returnFalse;
+		}
+
+		// Add missing metaKey for IE 8
+		if (typeof event.metaKey == 'undefined') {
+			event.metaKey = false;
 		}
 
 		return event;
@@ -15459,7 +15464,7 @@ define("tinymce/dom/Selection", [
 				}
 
 				// WebKit egde case selecting images works better using setBaseAndExtent
-				if (!rng.collapsed && rng.startContainer == rng.endContainer && sel.setBaseAndExtent) {
+				if (!rng.collapsed && rng.startContainer == rng.endContainer && sel.setBaseAndExtent && !Env.ie) {
 					if (rng.endOffset - rng.startOffset < 2) {
 						if (rng.startContainer.hasChildNodes()) {
 							node = rng.startContainer.childNodes[rng.startOffset];
@@ -23260,7 +23265,7 @@ define("tinymce/ui/Control", [
 			self.settings = settings = Tools.extend({}, self.Defaults, settings);
 
 			// Initial states
-			self._id = settings.id || ("tinymce-" + (idCounter++));
+			self._id = settings.id || ('mceu_' + (idCounter++));
 			self._aria = {role: settings.role};
 			self._elmCache = {};
 			self.$ = $;
@@ -32848,7 +32853,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.2',
+		minorVersion: '2.3',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -32856,7 +32861,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-07-22',
+		releaseDate: '2015-07-30',
 
 		/**
 		 * Collection of editor instances.
