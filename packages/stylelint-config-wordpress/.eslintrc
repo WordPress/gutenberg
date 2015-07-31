@@ -1,7 +1,4 @@
 ---
-# babel support more syntax stuff than eslint for now
-parser: babel-eslint
-
 ecmaFeatures:
   modules: true
 
