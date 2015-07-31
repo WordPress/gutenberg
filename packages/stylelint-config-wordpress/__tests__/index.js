@@ -14,7 +14,7 @@ function isObject(obj) {
 
 const css = (
 `a {
-  top: .2em;
+\ttop: .2em;
 }
 
 `)
