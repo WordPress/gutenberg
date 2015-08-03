@@ -150,6 +150,7 @@
 		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 8 );
 
 		type( '\n', function() {
+			assert.equal( editor.$( 'h3' )[0].firstChild.data, 'test' );
 			assert.equal( editor.getContent(), '<h3>test</h3>\n<p>&nbsp;</p>' );
 		}, assert.async() );
 	} );
