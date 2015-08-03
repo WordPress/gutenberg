@@ -65,7 +65,6 @@ jQuery( window ).load( function (){
 		controls = section.controls();
 		ok( controls[0].extended( api.Menus.MenuNameControl ), 'first control in menu section is MenuNameControl' );
 		ok( controls[1].extended( api.Menus.MenuItemControl ), 'second control in menu section is MenuItemControl' );
-		console.info( 'noep', controls[ controls.length - 1].id )
 		ok( controls[ controls.length - 1 ].extended( api.Menus.MenuAutoAddControl ), 'last control in menu section is a MenuAutoAddControl' );
 	} );
 	// @todo Add more tests for api.Menus.MenuSection behaviors
