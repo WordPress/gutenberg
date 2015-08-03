@@ -34,6 +34,15 @@
 		<script src="../../src/wp-includes/js/customize-models.js"></script>
 		<script src="../../src/wp-includes/js/shortcode.js"></script>
 		<script src="../../src/wp-admin/js/customize-controls.js"></script>
+
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/core.js'></script>
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/widget.js'></script>
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/mouse.js'></script>
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/sortable.js'></script>
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/draggable.js'></script>
+		<script type='text/javascript' src='../../src/wp-includes/js/jquery/ui/droppable.js'></script>
+
+		<script src="../../src/wp-admin/js/nav-menu.js"></script>
 		<script src="../../src/wp-admin/js/customize-nav-menus.js"></script>
 		<script src="../../src/wp-admin/js/word-count.js"></script>
 
@@ -115,7 +124,257 @@
 			</li>
 		</script>
 
-		<!-- TinyMCE -->
+		<!-- Templates for Customizer Menus -->
+		<script type="text/html" id="tmpl-customize-control-nav_menu-content">
+					<button type="button" class="button-secondary add-new-menu-item" aria-label="Add or remove menu items" aria-expanded="false" aria-controls="available-menu-items">
+			Add Items		</button>
+		<button type="button" class="not-a-button reorder-toggle" aria-label="Reorder menu items" aria-describedby="reorder-items-desc-{{ data.menu_id }}">
+			<span class="reorder">Reorder</span>
+			<span class="reorder-done">Done</span>
+		</button>
+		<p class="screen-reader-text" id="reorder-items-desc-{{ data.menu_id }}">When in reorder mode, additional controls to reorder menu items will be available in the items list above.</p>
+		<span class="add-menu-item-loading spinner"></span>
+		<span class="menu-delete-item">
+			<button type="button" class="not-a-button menu-delete">
+				Delete menu <span class="screen-reader-text">{{ data.menu_name }}</span>
+			</button>
+		</span>
+				<ul class="menu-settings">
+			<li class="customize-control">
+				<span class="customize-control-title">Menu locations</span>
+			</li>
+
+						<li class="customize-control customize-control-checkbox assigned-menu-location">
+				<label>
+					<input type="checkbox" data-menu-id="{{ data.menu_id }}" data-location-id="primary" class="menu-location" /> Primary Menu					<span class="theme-location-set">(Current: <span class="current-menu-location-name-primary"></span>)</span>
+				</label>
+			</li>
+						<li class="customize-control customize-control-checkbox assigned-menu-location">
+				<label>
+					<input type="checkbox" data-menu-id="{{ data.menu_id }}" data-location-id="social" class="menu-location" /> Social Links Menu					<span class="theme-location-set">(Current: <span class="current-menu-location-name-social"></span>)</span>
+				</label>
+			</li>
+
+		</ul>
+				</script>
+				<script type="text/html" id="tmpl-customize-control-nav_menu_name-content">
+					<label>
+			<# if ( data.label ) { #>
+				<span class="customize-control-title screen-reader-text">{{ data.label }}</span>
+			<# } #>
+			<input type="text" class="menu-name-field live-update-section-title" />
+		</label>
+				</script>
+				<script type="text/html" id="tmpl-customize-control-nav_menu_auto_add-content">
+					<span class="customize-control-title">Menu options</span>
+		<label>
+			<input type="checkbox" class="auto_add" />
+			Automatically add new top-level pages to this menu		</label>
+				</script>
+				<script type="text/html" id="tmpl-customize-control-nav_menu_item-content">
+					<div class="menu-item-bar">
+			<div class="menu-item-handle">
+				<span class="item-type" aria-hidden="true">{{ data.item_type_label }}</span>
+				<span class="item-title" aria-hidden="true">
+					<span class="spinner"></span>
+					<span class="menu-item-title<# if ( ! data.title ) { #> no-title<# } #>">{{ data.title || wp.customize.Menus.data.l10n.untitled }}</span>
+				</span>
+				<span class="item-controls">
+					<button type="button" class="not-a-button item-edit" aria-expanded="false"><span class="screen-reader-text">Edit menu item: {{ data.title || wp.customize.Menus.data.l10n.untitled }} ({{ data.item_type_label }})</span><span class="toggle-indicator" aria-hidden="true"></span></button>
+					<button type="button" class="not-a-button item-delete submitdelete deletion"><span class="screen-reader-text">Remove Menu Item: {{ data.title || wp.customize.Menus.data.l10n.untitled }} ({{ data.item_type_label }})</span></button>
+				</span>
+			</div>
+		</div>
+
+		<div class="menu-item-settings" id="menu-item-settings-{{ data.menu_item_id }}">
+			<# if ( 'custom' === data.item_type ) { #>
+			<p class="field-url description description-thin">
+				<label for="edit-menu-item-url-{{ data.menu_item_id }}">
+					URL<br />
+					<input class="widefat code edit-menu-item-url" type="text" id="edit-menu-item-url-{{ data.menu_item_id }}" name="menu-item-url" />
+				</label>
+			</p>
+		<# } #>
+			<p class="description description-thin">
+				<label for="edit-menu-item-title-{{ data.menu_item_id }}">
+					Navigation Label<br />
+					<input type="text" id="edit-menu-item-title-{{ data.menu_item_id }}" class="widefat edit-menu-item-title" name="menu-item-title" />
+				</label>
+			</p>
+			<p class="field-link-target description description-thin">
+				<label for="edit-menu-item-target-{{ data.menu_item_id }}">
+					<input type="checkbox" id="edit-menu-item-target-{{ data.menu_item_id }}" class="edit-menu-item-target" value="_blank" name="menu-item-target" />
+					Open link in a new tab				</label>
+			</p>
+			<p class="field-attr-title description description-thin">
+				<label for="edit-menu-item-attr-title-{{ data.menu_item_id }}">
+					Title Attribute<br />
+					<input type="text" id="edit-menu-item-attr-title-{{ data.menu_item_id }}" class="widefat edit-menu-item-attr-title" name="menu-item-attr-title" />
+				</label>
+			</p>
+			<p class="field-css-classes description description-thin">
+				<label for="edit-menu-item-classes-{{ data.menu_item_id }}">
+					CSS Classes<br />
+					<input type="text" id="edit-menu-item-classes-{{ data.menu_item_id }}" class="widefat code edit-menu-item-classes" name="menu-item-classes" />
+				</label>
+			</p>
+			<p class="field-xfn description description-thin">
+				<label for="edit-menu-item-xfn-{{ data.menu_item_id }}">
+					Link Relationship (XFN)<br />
+					<input type="text" id="edit-menu-item-xfn-{{ data.menu_item_id }}" class="widefat code edit-menu-item-xfn" name="menu-item-xfn" />
+				</label>
+			</p>
+			<p class="field-description description description-thin">
+				<label for="edit-menu-item-description-{{ data.menu_item_id }}">
+					Description<br />
+					<textarea id="edit-menu-item-description-{{ data.menu_item_id }}" class="widefat edit-menu-item-description" rows="3" cols="20" name="menu-item-description">{{ data.description }}</textarea>
+					<span class="description">The description will be displayed in the menu if the current theme supports it.</span>
+				</label>
+			</p>
+
+			<div class="menu-item-actions description-thin submitbox">
+				<# if ( ( 'post_type' === data.item_type || 'taxonomy' === data.item_type ) && '' !== data.original_title ) { #>
+				<p class="link-to-original">
+					Original: <a class="original-link" href="{{ data.url }}">{{ data.original_title }}</a>				</p>
+				<# } #>
+
+				<button type="button" class="not-a-button item-delete submitdelete deletion">Remove</button>
+				<span class="spinner"></span>
+			</div>
+			<input type="hidden" name="menu-item-db-id[{{ data.menu_item_id }}]" class="menu-item-data-db-id" value="{{ data.menu_item_id }}" />
+			<input type="hidden" name="menu-item-parent-id[{{ data.menu_item_id }}]" class="menu-item-data-parent-id" value="{{ data.parent }}" />
+		</div><!-- .menu-item-settings-->
+		<ul class="menu-item-transport"></ul>
+		</script>
+
+				<script type="text/html" id="tmpl-available-menu-item">
+			<li id="menu-item-tpl-{{ data.id }}" class="menu-item-tpl" data-menu-item-id="{{ data.id }}">
+				<div class="menu-item-bar">
+					<div class="menu-item-handle">
+						<span class="item-type" aria-hidden="true">{{ data.type_label }}</span>
+						<span class="item-title" aria-hidden="true">
+							<span class="menu-item-title<# if ( ! data.title ) { #> no-title<# } #>">{{ data.title || wp.customize.Menus.data.l10n.untitled }}</span>
+						</span>
+						<button type="button" class="not-a-button item-add">
+							<span class="screen-reader-text">Add to menu: {{ data.title || wp.customize.Menus.data.l10n.untitled }} ({{ data.type_label }})</span>
+						</button>
+					</div>
+				</div>
+			</li>
+		</script>
+
+		<script type="text/html" id="tmpl-menu-item-reorder-nav">
+			<div class="menu-item-reorder-nav">
+				<button type="button" class="menus-move-up">Move up</button><button type="button" class="menus-move-down">Move down</button><button type="button" class="menus-move-left">Move one level up</button><button type="button" class="menus-move-right">Move one level down</button>			</div>
+		</script>
+		<div hidden>
+			<div id="available-menu-items" class="accordion-container">
+			<div class="customize-section-title">
+				<button type="button" class="customize-section-back" tabindex="-1">
+					<span class="screen-reader-text">Back</span>
+				</button>
+				<h3>
+					<span class="customize-action">
+						Customizing &#9656; Menus					</span>
+					Add Menu Items				</h3>
+			</div>
+			<div id="available-menu-items-search" class="accordion-section cannot-expand">
+				<div class="accordion-section-title">
+					<label class="screen-reader-text" for="menu-items-search">Search Menu Items</label>
+					<input type="text" id="menu-items-search" placeholder="Search menu items&hellip;" aria-describedby="menu-items-search-desc" />
+					<p class="screen-reader-text" id="menu-items-search-desc">The search results will be updated as you type.</p>
+					<span class="spinner"></span>
+					<span class="clear-results"><span class="screen-reader-text">Clear Results</span></span>
+				</div>
+				<ul class="accordion-section-content" data-type="search"></ul>
+			</div>
+			<div id="new-custom-menu-item" class="accordion-section">
+				<h4 class="accordion-section-title" role="presentation">
+					Custom Links					<button type="button" class="not-a-button" aria-expanded="false">
+						<span class="screen-reader-text">Toggle section: Custom Links</span>
+						<span class="toggle-indicator" aria-hidden="true"></span>
+					</button>
+				</h4>
+				<div class="accordion-section-content">
+					<input type="hidden" value="custom" id="custom-menu-item-type" name="menu-item[-1][menu-item-type]" />
+					<p id="menu-item-url-wrap">
+						<label class="howto" for="custom-menu-item-url">
+							<span>URL</span>
+							<input id="custom-menu-item-url" name="menu-item[-1][menu-item-url]" type="text" class="code menu-item-textbox" value="http://">
+						</label>
+					</p>
+					<p id="menu-item-name-wrap">
+						<label class="howto" for="custom-menu-item-name">
+							<span>Link Text</span>
+							<input id="custom-menu-item-name" name="menu-item[-1][menu-item-title]" type="text" class="regular-text menu-item-textbox">
+						</label>
+					</p>
+					<p class="button-controls">
+						<span class="add-to-menu">
+							<input type="submit" class="button-secondary submit-add-to-menu right" value="Add to Menu" name="add-custom-menu-item" id="custom-menu-item-submit">
+							<span class="spinner"></span>
+						</span>
+					</p>
+				</div>
+			</div>
+			<div id="available-menu-items-post_type-post" class="accordion-section">
+					<h4 class="accordion-section-title" role="presentation">
+						Post						<span class="spinner"></span>
+						<span class="no-items">No items</span>
+						<button type="button" class="not-a-button" aria-expanded="false">
+							<span class="screen-reader-text">Toggle section: Post</span>
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</h4>
+					<ul class="accordion-section-content" data-type="post_type" data-object="post"></ul>
+				</div>
+								<div id="available-menu-items-post_type-page" class="accordion-section">
+					<h4 class="accordion-section-title" role="presentation">
+						Page						<span class="spinner"></span>
+						<span class="no-items">No items</span>
+						<button type="button" class="not-a-button" aria-expanded="false">
+							<span class="screen-reader-text">Toggle section: Page</span>
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</h4>
+					<ul class="accordion-section-content" data-type="post_type" data-object="page"></ul>
+				</div>
+								<div id="available-menu-items-taxonomy-category" class="accordion-section">
+					<h4 class="accordion-section-title" role="presentation">
+						Category						<span class="spinner"></span>
+						<span class="no-items">No items</span>
+						<button type="button" class="not-a-button" aria-expanded="false">
+							<span class="screen-reader-text">Toggle section: Category</span>
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</h4>
+					<ul class="accordion-section-content" data-type="taxonomy" data-object="category"></ul>
+				</div>
+								<div id="available-menu-items-taxonomy-post_tag" class="accordion-section">
+					<h4 class="accordion-section-title" role="presentation">
+						Tag						<span class="spinner"></span>
+						<span class="no-items">No items</span>
+						<button type="button" class="not-a-button" aria-expanded="false">
+							<span class="screen-reader-text">Toggle section: Tag</span>
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</h4>
+					<ul class="accordion-section-content" data-type="taxonomy" data-object="post_tag"></ul>
+				</div>
+								<div id="available-menu-items-taxonomy-post_format" class="accordion-section">
+					<h4 class="accordion-section-title" role="presentation">
+						Format						<span class="spinner"></span>
+						<span class="no-items">No items</span>
+						<button type="button" class="not-a-button" aria-expanded="false">
+							<span class="screen-reader-text">Toggle section: Format</span>
+							<span class="toggle-indicator" aria-hidden="true"></span>
+						</button>
+					</h4>
+					<ul class="accordion-section-content" data-type="taxonomy" data-object="post_format"></ul>
+				</div>
+						</div><!-- #available-menu-items -->
+			</div><!-- end nav menu templates -->
+
 
 		<script src="../../src/wp-includes/js/tinymce/tinymce.js"></script>
 		<script src="editor/js/utils.js"></script>

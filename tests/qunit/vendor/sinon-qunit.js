@@ -57,6 +57,7 @@ sinon.config = {
             expected = null;
         }
 
+
         return qTest(testName, expected, sinon.test(callback), async);
     };
 }(this));

@@ -3,7 +3,7 @@ window.wp.customize = window.wp.customize || { get: function(){}  };
 
 var customizerRootElement;
 customizerRootElement = jQuery( '<div id="customize-theme-controls"><ul></ul></div>' );
-customizerRootElement.css( { position: 'absolute', left: -1000 } ); // remove from view
+customizerRootElement.css( { position: 'absolute', left: -10000, top: -10000 } ); // remove from view
 jQuery( document.body ).append( customizerRootElement );
 
 window._wpCustomizeSettings = {
@@ -136,7 +136,7 @@ window._wpCustomizeControlsL10n = {};
 
 jQuery.ajaxSetup( {
 	beforeSend: function( e, data ) {
-		if ( data.data.indexOf( 'wp_customize' ) !== -1 ) {
+		if ( data.url.indexOf( '//example.org' ) !== -1 ) {
 			return false;
 		}
 	}
