@@ -1,7 +1,7 @@
 {
   "name": "stylelint-config-wordpress",
   "version": "0.1.0",
-  "description": "Wordpress shareable config for stylelint",
+  "description": "WordPress shareable config for stylelint",
   "keywords": [
     "stylelint",
     "stylelint-config"
