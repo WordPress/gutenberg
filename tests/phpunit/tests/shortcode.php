@@ -419,6 +419,14 @@ EOF;
 				'<!--[if lt IE 7]>',
 			),
 			array(
+				'1 <a href="[test-shortcode-tag]"> 2 <a href="[test-shortcode-tag]" >',
+				'1 <a href=""> 2 <a href="" >',
+			),
+			array(
+				'1 <a noise="[test-shortcode-tag]"> 2 <a noise=" [test-shortcode-tag] " >',
+				'1 <a noise="[test-shortcode-tag]"> 2 <a noise=" [test-shortcode-tag] " >',
+			),
+			array(
 				'[gallery title="<div>hello</div>"]',
 				'',
 			),
