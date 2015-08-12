@@ -195,6 +195,75 @@ class Tests_Term_SplitSharedTerm extends WP_UnitTestCase {
 		$this->assertEquals( $new_term_id, get_post_meta( $cat_menu_item, '_menu_item_object_id', true ) );
 	}
 
+	/**
+	 * @ticket 33187
+	 * @group navmenus
+	 */
+	public function test_nav_menu_locations_should_be_updated_on_split() {
+		global $wpdb;
+
+		$cat_term = wp_insert_term( 'Foo Menu', 'category' );
+		$shared_term_id = $cat_term['term_id'];
+
+		$nav_term_id = wp_create_nav_menu( 'Foo Menu' );
+		$nav_term = get_term( $nav_term_id, 'nav_menu' );
+
+		// Manually modify because shared terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $shared_term_id ),
+			array( 'term_taxonomy_id' => $nav_term->term_taxonomy_id )
+		);
+
+		set_theme_mod( 'nav_menu_locations', array( 'foo' => $shared_term_id ) );
+
+		// Splitsville.
+		$new_term_id = _split_shared_term( $shared_term_id, $nav_term->term_taxonomy_id );
+
+		$locations = get_nav_menu_locations();
+		$this->assertEquals( $new_term_id, $locations['foo'] );
+	}
+
+	/**
+	 * @ticket 33187
+	 * @group navmenus
+	 */
+	public function test_nav_menu_term_should_retain_menu_items_on_split() {
+		global $wpdb;
+
+		$cat_term = wp_insert_term( 'Foo Menu', 'category' );
+		$shared_term_id = $cat_term['term_id'];
+
+		$nav_term_id = wp_create_nav_menu( 'Foo Menu' );
+		$nav_term = get_term( $nav_term_id, 'nav_menu' );
+
+		// Manually modify because shared terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $shared_term_id ),
+			array( 'term_taxonomy_id' => $nav_term->term_taxonomy_id )
+		);
+
+		$t1 = wp_insert_term( 'Random term', 'category' );
+		$cat_menu_item = wp_update_nav_menu_item( $shared_term_id, 0, array(
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'category',
+			'menu-item-object-id' => $t1['term_id'],
+			'menu-item-status' => 'publish'
+		) );
+
+		// Updating the menu will split the shared term.
+		$new_nav_menu_id = wp_update_nav_menu_object( $shared_term_id, array(
+			'description' => 'Updated Foo Menu',
+			'menu-name' => 'Updated Foo Menu',
+		) );
+
+		$menu = wp_get_nav_menu_object( $new_nav_menu_id );
+		$this->assertSame( 'Updated Foo Menu', $menu->name );
+		$this->assertSame( 'Updated Foo Menu', $menu->description );
+
+		$menu_items = wp_get_nav_menu_items( $new_nav_menu_id );
+		$this->assertEquals( array( $cat_menu_item ), wp_list_pluck( $menu_items, 'ID' ) );
+	}
+
 	public function test_wp_get_split_terms() {
 		$found = wp_get_split_terms( $this->terms['t1']['term_id'] );
 
