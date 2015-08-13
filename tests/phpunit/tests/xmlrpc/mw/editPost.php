@@ -113,7 +113,7 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 		$out = get_post( $post_id );
 		$this->assertEquals( $editor_id, $out->post_author );
 	}
-	
+
 	function test_post_thumbnail() {
 		add_theme_support( 'post-thumbnails' );
 
@@ -201,6 +201,20 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( $post2['title'], $out->post_title );
 		$this->assertEquals( $post3['description'], $out->post_content );
 		$this->assertEquals( $post4['mt_excerpt'], $out->post_excerpt );
+	}
+
+	/**
+	 * @ticket 20662
+	 */
+	function test_make_post_sticky() {
+		$author_id = $this->make_user_by_role( 'editor' );
+
+		$post = array( 'post_title' => 'Title', 'post_content' => 'Content', 'post_author' => $author_id, 'post_status' => 'publish' );
+		$post_id = wp_insert_post( $post );
+
+		$result = $this->myxmlrpcserver->mw_editPost( array( $post_id, 'editor', 'editor', array( 'sticky' => '1' ) ) );
+		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertTrue( $result );
 	}
 
 	// Not allowed since [19914]
