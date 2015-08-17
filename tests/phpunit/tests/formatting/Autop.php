@@ -444,5 +444,47 @@ Paragraph two.';
 			),
 		);
 	}
-	
+
+	/**
+	 * wpautop() should not convert line breaks after <br /> tags
+	 *
+	 * @ticket 33377
+	 */
+	function test_that_wpautop_skips_line_breaks_after_br() {
+		$content = '
+line 1<br>
+line 2<br/>
+line 3<br />
+line 4
+line 5
+';
+
+		$expected = '<p>line 1<br />
+line 2<br />
+line 3<br />
+line 4<br />
+line 5</p>';
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
+
+	/**
+	 * wpautop() should convert multiple line breaks into a paragraph regarless of <br /> format
+	 *
+	 * @ticket 33377
+	 */
+	function test_that_wpautop_adds_a_paragraph_after_multiple_br() {
+		$content = '
+line 1<br>
+<br/>
+line 2<br/>
+<br />
+';
+
+		$expected = '<p>line 1</p>
+<p>line 2</p>';
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
+
 }
