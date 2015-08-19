@@ -472,6 +472,22 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 		$this->assertEquals( $term_by_id, $term_by_ttid );
 	}
 
+	/**
+	 * @ticket 32876
+	 */
+	public function test_wp_update_term_should_return_int_values_for_term_id_and_term_taxonomy_id() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$found = wp_update_term( $t, 'wptests_tax', array(
+			'slug' => 'foo',
+		) );
+
+		$this->assertInternalType( 'int', $found['term_id'] );
+		$this->assertInternalType( 'int', $found['term_taxonomy_id'] );
+	}
+
 	public function test_wp_update_term_should_clean_object_term_cache() {
 		register_taxonomy( 'wptests_tax_for_post', 'post' );
 		register_taxonomy( 'wptests_tax_for_page', 'page' );
