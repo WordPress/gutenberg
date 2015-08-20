@@ -302,4 +302,34 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$this->assertNotContains( 'DESC', $q5->request );
 		$this->assertNotContains( 'ASC', $q5->request );
 	}
+
+	/**
+	 * Tests the post_name__in attribute of WP_Query.
+	 *
+	 * @ticket 33065
+	 */
+	public function test_post_name__in() {
+		$q = new WP_Query();
+
+		$post_ids[0] = $this->factory->post->create( array( 'post_title' => 'woo', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[1] = $this->factory->post->create( array( 'post_title' => 'hoo', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[2] = $this->factory->post->create( array( 'post_title' => 'test', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[3] = $this->factory->post->create( array( 'post_title' => 'me', 'post_date' => '2015-07-23 00:00:00' ) );
+
+		$requested = array( $post_ids[0], $post_ids[3] );
+		$q->query( array(
+			'post_name__in' => array( 'woo', 'me' ),
+			'fields' => 'ids',
+		) );
+		$actual_posts = $q->get_posts();
+		$this->assertEqualSets( $requested, $actual_posts );
+
+		$requested = array( $post_ids[1], $post_ids[2] );
+		$q->query( array(
+			'post_name__in' => array( 'hoo', 'test' ),
+			'fields' => 'ids',
+		) );
+		$actual_posts = $q->get_posts();
+		$this->assertEqualSets( $requested, $actual_posts );
+	}
 }
