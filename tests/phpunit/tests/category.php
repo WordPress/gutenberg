@@ -351,4 +351,47 @@ class Tests_Category extends WP_UnitTestCase {
 
 		$this->assertContains( "value=\"test_category_2\" selected=\"selected\"", $found );
 	}
+
+	/**
+	 * @ticket 33452
+	 */
+	public function test_wp_dropdown_categories_show_option_all_should_be_selected_if_no_selected_value_is_explicitly_passed_and_value_field_does_not_have_string_values() {
+		$cats = $this->factory->category->create_many( 3 );
+
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'show_option_all' => 'Foo',
+			'value_field' => 'slug',
+		) );
+
+		$this->assertContains( "value='0' selected='selected'", $found );
+
+		foreach ( $cats as $cat ) {
+			$_cat = get_term( $cat, 'category' );
+			$this->assertNotContains( 'value="' . $_cat->slug . '" selected="selected"', $found );
+		}
+	}
+
+	/**
+	 * @ticket 33452
+	 */
+	public function test_wp_dropdown_categories_show_option_all_should_be_selected_if_selected_value_of_0_string_is_explicitly_passed_and_value_field_does_not_have_string_values() {
+		$cats = $this->factory->category->create_many( 3 );
+
+		$found = wp_dropdown_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'show_option_all' => 'Foo',
+			'value_field' => 'slug',
+			'selected' => '0',
+		) );
+
+		$this->assertContains( "value='0' selected='selected'", $found );
+
+		foreach ( $cats as $cat ) {
+			$_cat = get_term( $cat, 'category' );
+			$this->assertNotContains( 'value="' . $_cat->slug . '" selected="selected"', $found );
+		}
+	}
 }
