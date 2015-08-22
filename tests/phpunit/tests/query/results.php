@@ -703,4 +703,19 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$wp_rewrite->flush_rules();
 	}
 
+	function test_title() {
+		$title = 'Tacos are Cool';
+		$post_id = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_type' => 'post',
+			'post_status' => 'publish'
+		) );
+
+		$result1 = $this->q->query( array( 'title' => $title, 'fields' => 'ids' ) );
+		$this->assertCount( 1, $result1 );
+		$this->assertContains( $post_id, $result1 );
+
+		$result2 = $this->q->query( array( 'title' => 'Tacos', 'fields' => 'ids' ) );
+		$this->assertCount( 0, $result2 );
+	}
 }
