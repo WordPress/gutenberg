@@ -533,6 +533,28 @@ VIDEO;
 
 		$image_url  = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_path;
 		$this->assertEquals( $attachment_id, attachment_url_to_postid( $image_url ) );
+	}
+
+	function test_attachment_url_to_postid_schemes() {
+		$image_path = '2014/11/' . $this->img_name;
+		$attachment_id = $this->factory->attachment->create_object( $image_path, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+		) );
+
+		/**
+		 * @ticket 33109 Testing protocols not matching
+		 */
+		$image_url  = 'https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_path;
+		$this->assertEquals( $attachment_id, attachment_url_to_postid( $image_url ) );
+	}
+
+	function test_attachment_url_to_postid_filtered() {
+		$image_path = '2014/11/' . $this->img_name;
+		$attachment_id = $this->factory->attachment->create_object( $image_path, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+		) );
 
 		add_filter( 'upload_dir', array( $this, '_upload_dir' ) );
 		$image_url = 'http://192.168.1.20.com/wp-content/uploads/' . $image_path;
