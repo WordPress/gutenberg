@@ -18,5 +18,6 @@ class Tests_Formatting_Redirect extends WP_UnitTestCase {
 		$this->assertEquals('http://example.com/whyisthisintheurl/?param[1]=foo', wp_sanitize_redirect('http://example.com/whyisthisintheurl/?param[1]=foo'));
 		$this->assertEquals('http://[2606:2800:220:6d:26bf:1447:aa7]/', wp_sanitize_redirect('http://[2606:2800:220:6d:26bf:1447:aa7]/'));
 		$this->assertEquals('http://example.com/search.php?search=(amistillhere)', wp_sanitize_redirect('http://example.com/search.php?search=(amistillhere)'));
+		$this->assertEquals('http://example.com/@username', wp_sanitize_redirect('http://example.com/@username'));
 	}
 }
