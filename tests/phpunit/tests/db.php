@@ -526,7 +526,11 @@ class Tests_DB extends WP_UnitTestCase {
 	 */
 	function data_get_table_from_query() {
 		$table = 'a_test_table_name';
-		$db_table = '`a_test_db`.`another_test_table`';
+		$more_tables = array(
+			// table_name => expected_value
+			'`a_test_db`.`another_test_table`' => 'a_test_db.another_test_table',
+			'a-test-with-dashes'               => 'a-test-with-dashes',
+		);
 
 		$queries = array(
 			// Basic
@@ -636,11 +640,12 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$querycount = count( $queries );
 		for ( $ii = 0; $ii < $querycount; $ii++ ) {
-			$db_query = str_replace( $table, $db_table, $queries[ $ii ] );
-			$expected_db_table = str_replace( '`', '', $db_table );
+			foreach ( $more_tables as $name => $expected_name ) {
+				$new_query = str_replace( $table, $name, $queries[ $ii ] );
+				$queries[] = array( $new_query, $expected_name );
+			}
 
 			$queries[ $ii ] = array( $queries[ $ii ], $table );
-			$queries[] = array( $db_query, $expected_db_table );
 		}
 		return $queries;
 	}
