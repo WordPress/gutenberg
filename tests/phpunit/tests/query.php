@@ -134,6 +134,211 @@ class Tests_Query extends WP_UnitTestCase {
 		$this->assertContains( "ORDER BY $wpdb->posts.post_title DESC, $wpdb->posts.post_date DESC", $q->request );
 	}
 
+	public function test_cat_querystring_single_term() {
+		$c1 = $this->factory->category->create( array(
+			'name' => 'Test Category 1',
+			'slug' => 'test1',
+		) );
+		$c2 = $this->factory->category->create( array(
+			'name' => 'Test Category 2',
+			'slug' => 'test2',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $c1, 'category' );
+		wp_set_object_terms( $p2, array( $c1, $c2 ), 'category' );
+		wp_set_object_terms( $p3, $c2, 'category' );
+
+		$url = add_query_arg( array(
+			'cat' => $c1,
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $matching_posts );
+	}
+
+	public function test_category_querystring_multiple_terms_comma_separated() {
+		$c1 = $this->factory->category->create( array(
+			'name' => 'Test Category 1',
+			'slug' => 'test1',
+		) );
+		$c2 = $this->factory->category->create( array(
+			'name' => 'Test Category 2',
+			'slug' => 'test2',
+		) );
+		$c3 = $this->factory->category->create( array(
+			'name' => 'Test Category 3',
+			'slug' => 'test3',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $c1, 'category' );
+		wp_set_object_terms( $p2, array( $c1, $c2 ), 'category' );
+		wp_set_object_terms( $p3, $c2, 'category' );
+		wp_set_object_terms( $p4, $c3, 'category' );
+
+		$url = add_query_arg( array(
+			'cat' => implode( ',',array( $c1,$c2 ) ),
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2, $p3 ), $matching_posts );
+	}
+
+	/**
+	 * @ticket 33532
+	 */
+	public function test_category_querystring_multiple_terms_formatted_as_array() {
+		$c1 = $this->factory->category->create( array(
+			'name' => 'Test Category 1',
+			'slug' => 'test1',
+		) );
+		$c2 = $this->factory->category->create( array(
+			'name' => 'Test Category 2',
+			'slug' => 'test2',
+		) );
+		$c3 = $this->factory->category->create( array(
+			'name' => 'Test Category 3',
+			'slug' => 'test3',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $c1, 'category' );
+		wp_set_object_terms( $p2, array( $c1, $c2 ), 'category' );
+		wp_set_object_terms( $p3, $c2, 'category' );
+		wp_set_object_terms( $p4, $c3, 'category' );
+
+		$url = add_query_arg( array(
+			'cat' => array( $c1, $c2 ),
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2, $p3 ), $matching_posts );
+	}
+
+
+	public function test_tag_querystring_single_term() {
+		$t1 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 1',
+			'slug' => 'test1',
+		) );
+		$t2 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 2',
+			'slug' => 'test2',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $t1->slug, 'post_tag' );
+		wp_set_object_terms( $p2, array( $t1->slug, $t2->slug ), 'post_tag' );
+		wp_set_object_terms( $p3, $t2->slug, 'post_tag' );
+
+		$url = add_query_arg( array(
+			'tag' => $t1,
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $matching_posts );
+	}
+
+	public function test_tag_querystring_multiple_terms_comma_separated() {
+		$c1 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 1',
+			'slug' => 'test1',
+		) );
+		$c2 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 2',
+			'slug' => 'test2',
+		) );
+		$c3 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 3',
+			'slug' => 'test3',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $c1->slug, 'post_tag' );
+		wp_set_object_terms( $p2, array( $c1->slug, $c2->slug ), 'post_tag' );
+		wp_set_object_terms( $p3, $c2->slug, 'post_tag' );
+		wp_set_object_terms( $p4, $c3->slug, 'post_tag' );
+
+		$url = add_query_arg( array(
+			'tag' => implode( ',',array( $c1->slug,$c2->slug ) ),
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2, $p3 ), $matching_posts );
+	}
+
+	/**
+	 * @ticket #33532
+	 */
+	public function test_tag_querystring_multiple_terms_formatted_as_array() {
+		$c1 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 1',
+			'slug' => 'test1',
+		) );
+		$c2 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 2',
+			'slug' => 'test2',
+		) );
+		$c3 = $this->factory->tag->create_and_get( array(
+			'name' => 'Test Tag 3',
+			'slug' => 'test3',
+		) );
+
+		$p1 = $this->factory->post->create();
+		$p2 = $this->factory->post->create();
+		$p3 = $this->factory->post->create();
+		$p4 = $this->factory->post->create();
+
+		wp_set_object_terms( $p1, $c1->slug, 'post_tag' );
+		wp_set_object_terms( $p2, array( $c1->slug, $c2->slug ), 'post_tag' );
+		wp_set_object_terms( $p3, $c2->slug, 'post_tag' );
+		wp_set_object_terms( $p4, $c3->slug, 'post_tag' );
+
+		$url = add_query_arg( array(
+			'tag' => array($c1->slug,$c2->slug),
+		), '/' );
+
+		$this->go_to( $url );
+
+		$matching_posts = wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' );
+
+		$this->assertEqualSets( array( $p1, $p2, $p3 ), $matching_posts );
+	}
+
 	public function test_custom_taxonomy_querystring_single_term() {
 		register_taxonomy( 'test_tax_cat', 'post' );
 
