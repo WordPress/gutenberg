@@ -4,7 +4,7 @@
  */
 class Tests_Shortcode extends WP_UnitTestCase {
 
-	protected $shortcodes = array( 'test-shortcode-tag', 'footag', 'bartag', 'baztag', 'dumptag', 'hyphen', 'hyphen-foo', 'hyphen-foo-bar' );
+	protected $shortcodes = array( 'test-shortcode-tag', 'footag', 'bartag', 'baztag', 'dumptag', 'hyphen', 'hyphen-foo', 'hyphen-foo-bar', 'url' );
 
 	function setUp() {
 		parent::setUp();
@@ -71,6 +71,10 @@ class Tests_Shortcode extends WP_UnitTestCase {
 
 	function _shortcode_hyphen_foo_bar() {
 		return __FUNCTION__;
+	}
+
+	function _shortcode_url() {
+		return 'http://www.wordpress.org/';
 	}
 
 	function test_noatts() {
@@ -453,6 +457,30 @@ EOF;
 			array(
 				'[gallery]<div>Hello</div>[/gallery]',
 				'',
+			),
+			array(
+				'[url]',
+				'http://www.wordpress.org/',
+			),
+			array(
+				'<a href="[url]">',
+				'<a href="http://www.wordpress.org/">',
+			),
+			array(
+				'<a href=[url] >',
+				'<a href=http://www.wordpress.org/ >',
+			),
+			array(
+				'<a href="[url]plugins/">',
+				'<a href="http://www.wordpress.org/plugins/">',
+			),
+			array(
+				'<a href="bad[url]">',
+				'<a href="//www.wordpress.org/">',
+			),
+			array(
+				'<a onclick="bad[url]">',
+				'<a onclick="bad[url]">',
 			),
 		);
 	}
