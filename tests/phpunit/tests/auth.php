@@ -8,6 +8,11 @@ class Tests_Auth extends WP_UnitTestCase {
 	var $user_id;
 	var $wp_hasher;
 
+	/**
+	 * action hook
+	 */
+	protected $nonce_failure_hook = 'wp_verify_nonce_failed';
+
 	function setUp() {
 		parent::setUp();
 		$this->user_id = $this->factory->user->create();
@@ -108,6 +113,30 @@ class Tests_Auth extends WP_UnitTestCase {
 	 */
 	function test_wp_verify_nonce_with_integer_arg() {
 		$this->assertFalse( wp_verify_nonce( 1 ) );
+	}
+
+	/**
+	 * @ticket 24030
+	 */
+	function test_wp_nonce_verify_failed() {
+		$nonce = substr( md5( uniqid() ), 0, 10 );
+		$count = did_action( $this->nonce_failure_hook );
+
+		wp_verify_nonce( $nonce, 'nonce_test_action' );
+
+		$this->assertEquals( ( $count + 1 ), did_action( $this->nonce_failure_hook ) );
+	}
+
+	/**
+	 * @ticket 24030
+	 */
+	function test_wp_nonce_verify_success() {
+		$nonce = wp_create_nonce( 'nonce_test_action' );
+		$count = did_action( $this->nonce_failure_hook );
+
+		wp_verify_nonce( $nonce, 'nonce_test_action' );
+
+		$this->assertEquals( $count, did_action( $this->nonce_failure_hook ) );
 	}
 
 	function test_password_length_limit() {
