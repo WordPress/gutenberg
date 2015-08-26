@@ -197,4 +197,54 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 
 		return $cat;
 	}
+
+	/**
+	 * @ticket 33460
+	 */
+	public function test_title_li_should_be_shown_by_default_for_empty_lists() {
+		$found = wp_list_categories( array(
+			'echo' => false,
+		) );
+
+		$this->assertContains( '<li class="categories">Categories', $found );
+	}
+
+	/**
+	 * @ticket 33460
+	 */
+	public function test_hide_title_if_no_cats_should_be_respected_for_empty_lists_when_true() {
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'hide_title_if_no_cats' => true,
+		) );
+
+		$this->assertNotContains( '<li class="categories">Categories', $found );
+	}
+
+	/**
+	 * @ticket 33460
+	 */
+	public function test_hide_title_if_no_cats_should_be_respected_for_empty_lists_when_false() {
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'hide_title_if_no_cats' => false,
+		) );
+
+		$this->assertContains( '<li class="categories">Categories', $found );
+	}
+
+	/**
+	 * @ticket 33460
+	 */
+	public function test_hide_title_if_no_cats_should_be_ignored_when_category_list_is_not_empty() {
+		$cat = $this->factory->category->create();
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'hide_empty' => false,
+			'hide_title_if_no_cats' => true,
+		) );
+
+		$this->assertContains( '<li class="categories">Categories', $found );
+	}
 }
