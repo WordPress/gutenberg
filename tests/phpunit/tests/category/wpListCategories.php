@@ -212,10 +212,10 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	/**
 	 * @ticket 33460
 	 */
-	public function test_hide_title_if_no_cats_should_be_respected_for_empty_lists_when_true() {
+	public function test_hide_title_if_empty_should_be_respected_for_empty_lists_when_true() {
 		$found = wp_list_categories( array(
 			'echo' => false,
-			'hide_title_if_no_cats' => true,
+			'hide_title_if_empty' => true,
 		) );
 
 		$this->assertNotContains( '<li class="categories">Categories', $found );
@@ -224,10 +224,10 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	/**
 	 * @ticket 33460
 	 */
-	public function test_hide_title_if_no_cats_should_be_respected_for_empty_lists_when_false() {
+	public function test_hide_title_if_empty_should_be_respected_for_empty_lists_when_false() {
 		$found = wp_list_categories( array(
 			'echo' => false,
-			'hide_title_if_no_cats' => false,
+			'hide_title_if_empty' => false,
 		) );
 
 		$this->assertContains( '<li class="categories">Categories', $found );
@@ -236,13 +236,13 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	/**
 	 * @ticket 33460
 	 */
-	public function test_hide_title_if_no_cats_should_be_ignored_when_category_list_is_not_empty() {
+	public function test_hide_title_if_empty_should_be_ignored_when_category_list_is_not_empty() {
 		$cat = $this->factory->category->create();
 
 		$found = wp_list_categories( array(
 			'echo' => false,
 			'hide_empty' => false,
-			'hide_title_if_no_cats' => true,
+			'hide_title_if_empty' => true,
 		) );
 
 		$this->assertContains( '<li class="categories">Categories', $found );
