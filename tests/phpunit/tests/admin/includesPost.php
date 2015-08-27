@@ -315,6 +315,48 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 32954
+	 */
+	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_button_when_changing_slug() {
+		global $wp_rewrite;
+		$old_permalink_structure = get_option( 'permalink_structure' );
+		$permalink_structure = '%postname%';
+		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
+		flush_rewrite_rules();
+
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+
+		// Published posts should use published permalink
+		$p = $this->factory->post->create( array( 'post_status' => 'publish', 'post_name' => 'foo' ) );
+
+		$found = get_sample_permalink_html( $p, null, 'new_slug' );
+		$post = get_post( $p );
+		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/" . $post->post_name . "/'", $found );
+
+		// Scheduled posts should use published permalink
+		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
+		$p = $this->factory->post->create( array( 'post_status' => 'future', 'post_name' => 'bar', 'post_date' => $future_date ) );
+
+		$found = get_sample_permalink_html( $p, null, 'new_slug' );
+		$post = get_post( $p );
+		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/" . $post->post_name . "/'", $found );
+
+		// Draft posts should use preview link
+		$p = $this->factory->post->create( array( 'post_status' => 'draft', 'post_name' => 'baz' ) );
+
+		$found = get_sample_permalink_html( $p, null, 'new_slug' );
+		$post = get_post( $p );
+
+		$preview_link = get_permalink( $post->ID );
+		$preview_link = add_query_arg( 'preview', 'true', $preview_link );
+
+		$this->assertContains( "span id='view-post-btn'><a href='" . esc_url( $preview_link ) . "'", $found );
+
+		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
+		flush_rewrite_rules();
+	}
+
+	/**
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_year_archives() {
