@@ -141,8 +141,15 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		global $wpdb;
 
 		$user1_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user2_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 
 		$old_current = get_current_user_id();
+
+		$this->assertSame( 0, $old_current );
+
+		// test for "get current user" when not logged in
+		$this->assertFalse( is_user_member_of_blog() );
+
 		wp_set_current_user( $user1_id );
 
 		$this->assertTrue( is_user_member_of_blog() );
@@ -154,15 +161,36 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$blog_ids = $this->factory->blog->create_many( 5 );
 		foreach ( $blog_ids as $blog_id ) {
 			$this->assertInternalType( 'int', $blog_id );
+
+			// Current user gets added to new blogs
 			$this->assertTrue( is_user_member_of_blog( $user1_id, $blog_id ) );
+			// Other users should not
+			$this->assertFalse( is_user_member_of_blog( $user2_id, $blog_id ) );
+
+			switch_to_blog( $blog_id );
+
+			$this->assertTrue( is_user_member_of_blog( $user1_id ) );
+			$this->assertFalse( is_user_member_of_blog( $user2_id ) );
+
+			// Remove user 1 from blog
 			$this->assertTrue( remove_user_from_blog( $user1_id, $blog_id ) );
+
+			// Add user 2 to blog
+			$this->assertTrue( add_user_to_blog( $blog_id, $user2_id, 'subscriber' ) );
+
+			$this->assertFalse( is_user_member_of_blog( $user1_id ) );
+			$this->assertTrue( is_user_member_of_blog( $user2_id ) );
+
+			restore_current_blog();
+
 			$this->assertFalse( is_user_member_of_blog( $user1_id, $blog_id ) );
+			$this->assertTrue( is_user_member_of_blog( $user2_id, $blog_id ) );
 		}
 
 		wpmu_delete_user( $user1_id );
 		$user = new WP_User( $user1_id );
-		$this->assertFalse( $user->exists(), 'WP_User->exists' );
-		$this->assertFalse( is_user_member_of_blog( $user1_id ), 'is_user_member_of_blog' );
+		$this->assertFalse( $user->exists() );
+		$this->assertFalse( is_user_member_of_blog( $user1_id ) );
 
 		wp_set_current_user( $old_current );
 	}

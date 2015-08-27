@@ -366,6 +366,11 @@ class Tests_User extends WP_UnitTestCase {
 	function test_is_user_member_of_blog() {
 		$old_current = get_current_user_id();
 
+		$this->assertSame( 0, $old_current );
+
+		// test for "get current user" when not logged in
+		$this->assertFalse( is_user_member_of_blog() );
+
 		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
 
