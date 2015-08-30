@@ -85,6 +85,11 @@ class Tests_Theme extends WP_UnitTestCase {
 		$themes = get_themes();
 		// Generic tests that should hold true for any theme
 		foreach ( $themes as $k => $theme ) {
+			// Don't run these checks for custom themes.
+			if ( empty( $theme['Author'] ) || false === strpos( $theme['Author'], 'WordPress' ) ) {
+				continue;
+			}
+
 			$this->assertEquals( $theme['Name'], $k );
 			$this->assertNotEmpty( $theme['Title'] );
 
