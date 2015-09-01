@@ -98,7 +98,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
-		$this->assertNotFalse( strpos( $image['file'], '330x220' ) );
+		$this->assertTrue( strpos( $image['file'], '330x220' ) > 0 );
 
 		// cleanup
 		remove_image_size( 'test-size' );
@@ -122,7 +122,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
-		$this->assertNotFalse( strpos( $image['file'], '330x220' ) );
+		$this->assertTrue( strpos( $image['file'], '330x220' ) > 0 );
 
 		// cleanup
 		remove_image_size( 'test-size' );
@@ -149,7 +149,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		// you have to test for the string because the image will by definition
 		// return with the correct height and width attributes
-		$this->assertNotFalse( strpos( $image['file'], '450x300' ) );
+		$this->assertTrue( strpos( $image['file'], '450x300' ) > 0 );
 
 		// cleanup
 		remove_image_size( 'test-size' );
@@ -206,7 +206,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
-		$this->assertNotFalse( strpos( $image['file'], $image_w . 'x' . $image_h ) );
+		$this->assertTrue( strpos( $image['file'], $image_w . 'x' . $image_h ) > 0 );
 
 		// cleanup
 		remove_image_size( 'test-size' );
@@ -237,7 +237,7 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
-		$this->assertNotFalse( strpos( $image['file'], $image_w . 'x' . $image_h ) );
+		$this->assertTrue( strpos( $image['file'], $image_w . 'x' . $image_h ) > 0 );
 
 		// cleanup
 		remove_image_size( 'test-size' );
