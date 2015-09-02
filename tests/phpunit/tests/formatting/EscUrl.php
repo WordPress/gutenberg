@@ -30,9 +30,47 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 		$this->assertEquals('?foo=bar', esc_url('?foo=bar'));
 	}
 
+	function test_bare() {
+		$this->assertEquals( 'http://example.com', esc_url( 'example.com' ) );
+		$this->assertEquals( 'http://localhost', esc_url( 'localhost' ) );
+		$this->assertEquals( 'http://example.com/foo', esc_url( 'example.com/foo' ) );
+		$this->assertEquals( 'http://баба.org/баба', esc_url( 'баба.org/баба' ) );
+	}
+
+	function test_encoding() {
+		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&bar=2' ) );
+		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&amp;bar=2' ) );
+		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&#038;bar=2' ) );
+	}
+
 	function test_protocol() {
 		$this->assertEquals('http://example.com', esc_url('http://example.com'));
 		$this->assertEquals('', esc_url('nasty://example.com/'));
+		$this->assertEquals( '', esc_url( 'example.com', array(
+			'https',
+		) ) );
+		$this->assertEquals( '', esc_url( 'http://example.com', array(
+			'https',
+		) ) );
+		$this->assertEquals( 'https://example.com', esc_url( 'https://example.com', array(
+			'http', 'https',
+		) ) );
+
+		foreach ( wp_allowed_protocols() as $scheme ) {
+			$this->assertEquals( "{$scheme}://example.com", esc_url( "{$scheme}://example.com" ), $scheme );
+			$this->assertEquals( "{$scheme}://example.com", esc_url( "{$scheme}://example.com", array(
+				$scheme,
+			) ), $scheme );
+		}
+
+		$this->assertTrue( ! in_array( 'data', wp_allowed_protocols(), true ) );
+		$this->assertEquals( '', esc_url( 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D' ) );
+
+		$this->assertTrue( ! in_array( 'foo', wp_allowed_protocols(), true ) );
+		$this->assertEquals( 'foo://example.com', esc_url( 'foo://example.com', array(
+			'foo',
+		) ) );
+
 	}
 
 	/**
