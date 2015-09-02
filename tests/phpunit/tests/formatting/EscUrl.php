@@ -30,6 +30,15 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 		$this->assertEquals('?foo=bar', esc_url('?foo=bar'));
 	}
 
+	function test_all_url_parts() {
+		$url = 'https://user:password@host.example.com:1234/path;p=1?q=2&r=3#fragment';
+		$this->assertEquals( $url, esc_url_raw( $url ) );
+
+		$this->assertEquals( 'https://user:password@host.example.com:1234/path;p=1?q=2&#038;r=3#fragment', esc_url( $url ) );
+
+		$this->assertEquals( 'http://example.com?foo', esc_url( 'http://example.com?foo' ) );
+	}
+
 	function test_bare() {
 		$this->assertEquals( 'http://example.com', esc_url( 'example.com' ) );
 		$this->assertEquals( 'http://localhost', esc_url( 'localhost' ) );
@@ -38,9 +47,16 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 	}
 
 	function test_encoding() {
+		$this->assertEquals( 'http://example.com?foo=1&bar=2',      esc_url_raw( 'http://example.com?foo=1&bar=2' ) );
+		$this->assertEquals( 'http://example.com?foo=1&amp;bar=2',  esc_url_raw( 'http://example.com?foo=1&amp;bar=2' ) );
+		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url_raw( 'http://example.com?foo=1&#038;bar=2' ) );
+
 		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&bar=2' ) );
 		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&amp;bar=2' ) );
 		$this->assertEquals( 'http://example.com?foo=1&#038;bar=2', esc_url( 'http://example.com?foo=1&#038;bar=2' ) );
+
+		$param = urlencode( 'http://example.com/?one=1&two=2' );
+		$this->assertEquals( "http://example.com?url={$param}", esc_url( "http://example.com?url={$param}" ) );
 	}
 
 	function test_protocol() {
