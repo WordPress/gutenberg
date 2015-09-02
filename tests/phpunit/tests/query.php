@@ -302,7 +302,7 @@ class Tests_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket #33532
+	 * @ticket 33532
 	 */
 	public function test_tag_querystring_multiple_terms_formatted_as_array() {
 		$c1 = $this->factory->tag->create_and_get( array(
