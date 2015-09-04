@@ -24,7 +24,7 @@
     "eslint": "^1.0.0",
     "eslint-config-stylelint": "^0.1.0",
     "postcss": "^4.1.16",
-    "stylelint": "^0.6.2",
+    "stylelint": "^0.8.0",
     "tape": "^4.0.2"
   },
   "scripts": {
