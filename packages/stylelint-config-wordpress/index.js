@@ -22,7 +22,7 @@ module.exports = {
     "function-comma-space-before": [ 2, "never" ],
     "function-parentheses-space-inside": [ 2, "never" ],
     "function-space-after": [ 2, "always" ],
-    "function-url-quotes": [ 2, "double" ],
+    "function-url-quotes": [ 2, "none" ],
     "indentation": [ 2, "tab" ],
     "media-feature-colon-space-after": [ 2, "always" ],
     "media-feature-colon-space-before": [ 2, "never" ],
