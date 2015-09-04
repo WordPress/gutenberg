@@ -1186,6 +1186,33 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t2, $t1, $t4, $t3 ), $found );
 	}
 
+	/**
+	 * @ticket 33726
+	 */
+	public function test_orderby_term_id() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'AAA',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'ZZZ',
+		) );
+		$t3 = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'JJJ',
+		) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'orderby' => 'term_id',
+			'hide_empty' => false,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $t1, $t2, $t3 ), $found );
+	}
+
 	public function test_hierarchical_false_with_parent() {
 		$initial_terms = $this->create_hierarchical_terms();
 
