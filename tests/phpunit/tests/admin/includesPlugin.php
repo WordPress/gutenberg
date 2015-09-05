@@ -47,7 +47,7 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 		$expected['sub-page'] = 'http://example.com/wp-admin/admin.php?page=sub-page';
 		$expected['sub-page2'] = 'http://example.com/wp-admin/admin.php?page=sub-page2';
 		$expected['not_registered'] = '';
-		$expected['With Spaces'] = 'http://example.com/wp-admin/themes.php?page=WithSpaces';
+		$expected['With Spaces'] = 'http://example.com/wp-admin/themes.php?page=With%20Spaces';
 		$expected['testpages'] = 'http://example.com/wp-admin/edit.php?post_type=page&#038;page=testpages';
 
 		foreach ($expected as $name => $value) {
