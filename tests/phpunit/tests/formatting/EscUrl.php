@@ -171,5 +171,11 @@ EOT;
 		$this->assertEquals( 'mailto:?body=Hi%20there,%20I%20thought%20you%20might%20want%20to%20sign%20up%20for%20this%20newsletter', $email_link );
 	}
 
+	/**
+	 * @ticket 28015
+	 */
+	function test_invalid_charaters() {
+		$this->assertEmpty( esc_url_raw('"^[]<>{}`') );
+	}
 
 }
