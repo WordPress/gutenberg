@@ -453,6 +453,25 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 20451
+	 */
+	public function test_wp_insert_post_with_meta_input() {
+		$post_id = wp_insert_post( array(
+			'post_title'   => '',
+			'post_content' => 'test',
+			'post_status'  => 'publish',
+			'post_type'    => 'post',
+			'meta_input'   => array(
+				'hello' => 'world',
+				'foo'   => 'bar'
+			)
+		) );
+
+		$this->assertEquals( 'world', get_post_meta( $post_id, 'hello', true ) );
+		$this->assertEquals( 'bar', get_post_meta( $post_id, 'foo', true ) );
+	}
+
+	/**
 	 * @ticket 5364
 	 */
 	function test_delete_future_post_cron() {
