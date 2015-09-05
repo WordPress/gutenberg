@@ -34,7 +34,7 @@ class Tests_Formatting_GetUrlInContent extends WP_UnitTestCase {
 			), // multiple links
 			array (
 				'ABC<div><a href="http://example.com/Mr%20WordPress 2">LINK</a> CONTENT </div>',
-				"http://example.com/Mr%20WordPress2"
+				"http://example.com/Mr%20WordPress%202"
 			), // escape link
 		);
 	}
