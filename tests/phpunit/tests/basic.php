@@ -37,7 +37,7 @@ class Tests_Basic extends WP_UnitTestCase {
 
 		preg_match_all( '#<tr class="stable">\s*<td>\s*<a [^>]*>\s*([0-9.]*)#s', $php, $phpmatches );
 
-		$this->assertContains( $matches[1], $phpmatches[1] );
+		$this->assertContains( $matches[1], $phpmatches[1], "readme.html's Recommended PHP version is too old. Remember to update the WordPress.org Requirements page, too." );
 	}
 
 	function test_license() {
