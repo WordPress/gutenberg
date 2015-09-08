@@ -328,6 +328,7 @@ Paragraph two.';
 			'summary',
 		);
 
+		// Check whitespace normalization.
 		$content = array();
 
 		foreach ( $blocks as $block ) {
@@ -335,9 +336,37 @@ Paragraph two.';
 		}
 
 		$expected = join( "\n", $content );
-		$content = join( "\n\n", $content ); // WS difference
+		$input = join( "\n\n", $content ); // WS difference
 
-		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+		$this->assertEquals( $expected, trim( wpautop( $input ) ) );
+
+		$input = join( "", $content ); // WS difference
+
+		$this->assertEquals( $expected, trim( wpautop( $input ) ) );
+
+		// Check whitespace addition.
+		$content = array();
+
+		foreach ( $blocks as $block ) {
+			$content[] = "<$block/>";
+		}
+
+		$expected = join( "\n", $content );
+		$input = join( "", $content );
+
+		$this->assertEquals( $expected, trim( wpautop( $input ) ) );
+
+		// Check whitespace addition with attributes.
+		$content = array();
+
+		foreach ( $blocks as $block ) {
+			$content[] = "<$block attr='value'>foo</$block>";
+		}
+
+		$expected = join( "\n", $content );
+		$input = join( "", $content );
+
+		$this->assertEquals( $expected, trim( wpautop( $input ) ) );
 	}
 
 	/**
@@ -419,6 +448,14 @@ Paragraph two.';
 			array(
 				"Hello <!-- a\nhref='world' -->",
 				"<p>Hello <!-- a\nhref='world' --></p>\n",
+			),
+			array(
+				"Hello <!-- <object>\n<param>\n<param>\n<embed>\n</embed>\n</object>\n -->",
+				"<p>Hello <!-- <object>\n<param>\n<param>\n<embed>\n</embed>\n</object>\n --></p>\n",
+			),
+			array(
+				"Hello <!-- <object>\n<param/>\n<param/>\n<embed>\n</embed>\n</object>\n -->",
+				"<p>Hello <!-- <object>\n<param/>\n<param/>\n<embed>\n</embed>\n</object>\n --></p>\n",
 			),
 /* Block elements inside comments will fail this test in all versions, it's not a regression.
 			array(
