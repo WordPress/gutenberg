@@ -34,9 +34,19 @@ class Tests_User_Settings extends WP_UnitTestCase {
 
 		$this->assertEmpty( $foo );
 
-		$this->set_user_setting( 'foo', 'foo-bar' );
+		$this->set_user_setting( 'foo', 'foo-bar-baz' );
 
-		$this->assertEquals( 'foo-bar', get_user_setting( 'foo' ) );
+		$this->assertEquals( 'foo-bar-baz', get_user_setting( 'foo' ) );
+	}
+
+	function test_set_user_setting_strip_asterisks() {
+		$foo = get_user_setting( 'foo' );
+
+		$this->assertEmpty( $foo );
+
+		$this->set_user_setting( 'foo', 'foo*bar*baz' );
+
+		$this->assertEquals( 'foobarbaz', get_user_setting( 'foo' ) );
 	}
 
 	// set_user_setting bails if `headers_sent()` is true
