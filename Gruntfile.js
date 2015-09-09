@@ -534,6 +534,7 @@ module.exports = function(grunt) {
 			all: {
 				files: [
 					SOURCE_DIR + '**',
+					'!' + SOURCE_DIR + 'wp-includes/js/media/**',
 					// Ignore version control directories.
 					'!' + SOURCE_DIR + '**/.{svn,git}/**'
 				],
@@ -549,7 +550,10 @@ module.exports = function(grunt) {
 					SOURCE_DIR + 'wp-includes/js/media/**/*.js',
 					'!' + SOURCE_DIR + 'wp-includes/js/media/*.manifest.js'
 				],
-				tasks: ['browserify']
+				tasks: ['browserify', 'copy:dynamic'],
+				options: {
+					spawn: false
+				}
 			},
 			config: {
 				files: 'Gruntfile.js'
@@ -670,22 +674,26 @@ module.exports = function(grunt) {
 	// Default task.
 	grunt.registerTask('default', ['build']);
 
-	// Add a listener to the watch task.
-	//
-	// On `watch:all`, automatically updates the `copy:dynamic` and `clean:dynamic`
-	// configurations so that only the changed files are updated.
-	// On `watch:rtl`, automatically updates the `rtlcss:dynamic` configuration.
+	/*
+	 * Automatically updates the `:dynamic` configurations
+	 * so that only the changed files are updated.
+	 */
 	grunt.event.on('watch', function( action, filepath, target ) {
-		if ( target !== 'all' && target !== 'rtl' ) {
+		var src;
+
+		if ( [ 'all', 'rtl', 'browserify' ].indexOf( target ) === -1 ) {
 			return;
 		}
 
-		var relativePath = path.relative( SOURCE_DIR, filepath ),
-			cleanSrc = ( action === 'deleted' ) ? [relativePath] : [],
-			copySrc = ( action === 'deleted' ) ? [] : [relativePath];
+		src = [ path.relative( SOURCE_DIR, filepath ) ];
+		if ( action === 'deleted' ) {
+			grunt.config( [ 'clean', 'dynamic', 'src' ], src );
+		} else {
+			grunt.config( [ 'copy', 'dynamic', 'src' ], src );
 
-		grunt.config(['clean', 'dynamic', 'src'], cleanSrc);
-		grunt.config(['copy', 'dynamic', 'src'], copySrc);
-		grunt.config(['rtlcss', 'dynamic', 'src'], copySrc);
+			if ( target === 'rtl' ) {
+				grunt.config( [ 'rtlcss', 'dynamic', 'src' ], src );
+			}
+		}
 	});
 };
