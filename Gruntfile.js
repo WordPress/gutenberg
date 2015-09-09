@@ -433,10 +433,10 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.js',
 				src: [
-					'wp-includes/js/media/audio-video.js',
-					'wp-includes/js/media/grid.js',
-					'wp-includes/js/media/models.js',
-					'wp-includes/js/media/views.js'
+					'wp-includes/js/media-audiovideo.js',
+					'wp-includes/js/media-grid.js',
+					'wp-includes/js/media-models.js',
+					'wp-includes/js/media-views.js'
 				]
 			},
 			jqueryui: {
@@ -546,10 +546,10 @@ module.exports = function(grunt) {
 			},
 			browserify: {
 				files: [
-					SOURCE_DIR + 'wp-includes/js/media/*.js',
+					SOURCE_DIR + 'wp-includes/js/media/**/*.js',
 					'!' + SOURCE_DIR + 'wp-includes/js/media/*.manifest.js'
 				],
-				tasks: ['uglify:media']
+				tasks: ['browserify']
 			},
 			config: {
 				files: 'Gruntfile.js'
