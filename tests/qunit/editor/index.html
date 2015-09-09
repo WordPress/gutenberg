@@ -19,14 +19,19 @@
 
 	<script src="http://www.google.com/jsapi"></script>
 	<script>google.load("jquery", "1");</script>
+	<script src="js/module_loader.js"></script>
 	<script src="js/qunit/qunit.js"></script>
 	<script src="../../../build/wp-includes/js/tinymce/tinymce.min.js"></script>
 <!--<script src="../js/tinymce/classes/jquery.tinymce.js"></script> -->
 	<script src="js/utils.js"></script>
 	<script src="js/init.js"></script>
 
+	<!-- tinymce.data.* -->
+	<script src="tinymce/data/ObservableObject.js"></script>
+
 	<!-- tinymce.file.* -->
 	<script src="tinymce/file/Conversions.js"></script>
+	<script src="tinymce/file/ImageScanner.js"></script>
 
 	<script>
 		var wpPlugins = 'charmap colorpicker hr lists media paste tabfocus textcolor ' +

@@ -25,6 +25,38 @@ module("tinymce.plugins.Media", {
 	}
 });
 
+function fillAndSubmitWindowForm(data) {
+	var win = Utils.getFrontmostWindow();
+
+	win.fromJSON(data);
+	win.find('form')[0].submit();
+	win.close();
+}
+
+test('Default media dialog on empty editor', function() {
+	editor.setContent('');
+	editor.plugins.media.showDialog();
+
+	deepEqual(Utils.getFrontmostWindow().toJSON(), {
+		constrain: true,
+		embed: "",
+		height: "",
+		poster: "",
+		source1: "",
+		source2: "",
+		width: ""
+	});
+
+	fillAndSubmitWindowForm({
+		"source1": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+	});
+
+	equal(
+		editor.getContent(),
+		'<p><iframe src=\"//www.youtube.com/embed/dQw4w9WgXcQ\" width=\"425\" height=\"350\" allowfullscreen=\"allowfullscreen\"></iframe></p>'
+	);
+});
+
 test("Object retain as is", function() {
 	editor.setContent(
 		'<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="425" height="355">' +
@@ -162,4 +194,8 @@ test("XSS content", function() {
 	testXss('<video><img src="x" onload="alert(1)"></video>', '<p><video width="300" height=\"150\"></video></p>');
 	testXss('<video><img src="x"></video>', '<p><video width="300" height="150"><img src="x" /></video></p>');
 	testXss('<video><!--[if IE]><img src="x"><![endif]--></video>', '<p><video width="300" height="150"><!-- [if IE]><img src="x"><![endif]--></video></p>');
+	testXss('<p><p><audio><audio src=x onerror=alert(1)>', '<p><audio></audio></p>');
+	testXss('<p><html><audio><br /><audio src=x onerror=alert(1)></p>', '');
+	testXss('<p><audio><img src="javascript:alert(1)"></audio>', '<p><audio><img /></audio></p>');
+	testXss('<p><audio><img src="x" style="behavior:url(x); width: 1px"></audio>', '<p><audio><img src="x" style="width: 1px;" /></audio></p>');
 });

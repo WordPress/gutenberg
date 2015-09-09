@@ -168,7 +168,8 @@ test('getBoolAttrs', function() {
 		"DECLARE": {}, "COMPACT": {}, "CHECKED": {},
 		"controls": {}, "loop": {}, "autoplay": {}, "selected": {}, "readonly": {}, "nowrap": {},
 		"noshade": {}, "noresize": {}, "nohref": {}, "multiple": {}, "ismap": {}, "disabled": {}, "defer": {},
-		"declare": {}, "compact": {}, "checked": {}
+		"declare": {}, "compact": {}, "checked": {},
+		"allowfullscreen": {}, "mozallowfullscreen": {}, "webkitallowfullscreen": {} // WP
 	});
 });
 
