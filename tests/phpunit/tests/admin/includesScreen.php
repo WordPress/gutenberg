@@ -163,13 +163,75 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 
 		$screen = get_current_screen();
 		$screen->add_help_tab( $tab_args );
-		$this->assertEquals( $screen->get_help_tab( $tab ), $tab_args );
+		$this->assertEquals( $screen->get_help_tab( $tab ), array(
+			'id' => $tab,
+			'title' => 'Help!',
+			'content' => 'Some content',
+			'callback' => false,
+			'priority' => 10,
+		) );
 
 		$tabs = $screen->get_help_tabs();
 		$this->assertArrayHasKey( $tab, $tabs );
 
 		$screen->remove_help_tab( $tab );
 		$this->assertNull( $screen->get_help_tab( $tab ) );
+
+		$screen->remove_help_tabs();
+		$this->assertEquals( $screen->get_help_tabs(), array() );
+	}
+
+	/**
+	 * @ticket 19828
+	 */
+	function test_help_tabs_priority() {
+		$tab_1      = rand_str();
+		$tab_1_args = array(
+			'id'       => $tab_1,
+			'title'    => 'Help!',
+			'content'  => 'Some content',
+			'callback' => false,
+			'priority' => 11,
+		);
+
+		$tab_2      = rand_str();
+		$tab_2_args = array(
+			'id'       => $tab_2,
+			'title'    => 'Help!',
+			'content'  => 'Some content',
+			'callback' => false,
+			'priority' => 9,
+		);
+
+		$screen = get_current_screen();
+
+		// Add help tabs.
+
+		$screen->add_help_tab( $tab_1_args );
+		$this->assertEquals( $screen->get_help_tab( $tab_1 ), $tab_1_args );
+
+		$screen->add_help_tab( $tab_2_args );
+		$this->assertEquals( $screen->get_help_tab( $tab_2 ), $tab_2_args );
+
+		$tabs = $screen->get_help_tabs();
+		$this->assertEquals( 2, count( $tabs ) );
+		$this->assertArrayHasKey( $tab_1, $tabs );
+		$this->assertArrayHasKey( $tab_2, $tabs );
+
+		// Test priority order.
+
+		$this->assertEquals( $tabs, array(
+			$tab_2 => $tab_2_args,
+			$tab_1 => $tab_1_args,
+		) );
+
+		$screen->remove_help_tab( $tab_1 );
+		$this->assertNull( $screen->get_help_tab( $tab_1 ) );
+		$this->assertEquals( 1, count( $screen->get_help_tabs() ) );
+
+		$screen->remove_help_tab( $tab_2 );
+		$this->assertNull( $screen->get_help_tab( $tab_2 ) );
+		$this->assertEquals( 0, count( $screen->get_help_tabs() ) );
 
 		$screen->remove_help_tabs();
 		$this->assertEquals( $screen->get_help_tabs(), array() );
