@@ -963,4 +963,35 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertTrue( current_user_can( 'edit_user', $user->ID ) );
 	}
+
+	function test_multisite_administrator_with_manage_network_users_can_edit_users() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$user->add_cap( 'manage_network_users' );
+		$other_user = new WP_User( $this->factory->user->create( array( 'role' => 'subscriber' ) ) );
+
+		wp_set_current_user( $user->ID );
+
+		$this->assertTrue( current_user_can( 'edit_user', $other_user->ID ) );
+	}
+
+	function test_multisite_administrator_with_manage_network_users_can_not_edit_super_admin() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$user->add_cap( 'manage_network_users' );
+		$super_admin = new WP_User( $this->factory->user->create( array( 'role' => 'subscriber' ) ) );
+		grant_super_admin( $super_admin->ID );
+
+		wp_set_current_user( $user->ID );
+
+		$this->assertFalse( current_user_can( 'edit_user', $super_admin->ID ) );
+	}
 }
