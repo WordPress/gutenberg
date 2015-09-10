@@ -936,4 +936,31 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse( current_user_can( 'edit_post', $post ) );
 		$this->assertFalse( current_user_can( 'edit_post', $post + 1 ) );
 	}
+
+	function test_multisite_administrator_can_not_edit_users() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$other_user = new WP_User( $this->factory->user->create( array( 'role' => 'subscriber' ) ) );
+
+		wp_set_current_user( $user->ID );
+
+		$this->assertFalse( current_user_can( 'edit_user', $other_user->ID ) );
+	}
+
+	function test_multisite_user_can_edit_self() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+			return;
+		}
+
+		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+
+		wp_set_current_user( $user->ID );
+
+		$this->assertTrue( current_user_can( 'edit_user', $user->ID ) );
+	}
 }
