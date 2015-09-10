@@ -651,6 +651,24 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 15963
+	 */
+	function test_get_post_uri_check_orphan() {
+		$parent_id = $this->factory->post->create( array( 'post_name' => 'parent' ) );
+		$child_id = $this->factory->post->create( array( 'post_name' => 'child', 'post_parent' => $parent_id ) );
+
+		// check the parent for good measure
+		$this->assertEquals( 'parent', get_page_uri( $parent_id ) );
+
+		// try the child normally
+		$this->assertEquals( 'parent/child', get_page_uri( $child_id ) );
+
+		// now delete the parent and check
+		wp_delete_post( $parent_id );
+		$this->assertEquals( 'child', get_page_uri( $child_id ) );
+	}
+
+	/**
 	 * @ticket 23708
 	 */
 	function test_get_post_ancestors_within_loop() {
