@@ -344,6 +344,29 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_numeric_string_user_id() {
+		$u = $this->factory->user->create();
+
+		$u_string = (string) $u;
+		$this->assertTrue( wpmu_delete_user( $u_string ) );
+		$this->assertFalse( get_user_by( 'id', $u ) );
+	}
+
+	/**
+	 * @ticket 33800
+	 */
+	public function test_should_return_false_for_non_numeric_string_user_id() {
+		$this->assertFalse( wpmu_delete_user( 'abcde' ) );
+	}
+
+	/**
+	 * @ticket 33800
+	 */
+	public function test_should_return_false_for_object_user_id() {
+		$u_obj = $this->factory->user->create_and_get();
+		$this->assertFalse( wpmu_delete_user( $u_obj ) );
+		$this->assertEquals( $u_obj->ID, username_exists( $u_obj->user_login ) );
+	}
 }
 
 endif ;
