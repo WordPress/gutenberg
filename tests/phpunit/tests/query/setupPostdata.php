@@ -46,6 +46,41 @@ class Tests_Query_SetupPostdata extends WP_UnitTestCase {
 		$this->assertSame( $p->ID, $GLOBALS['id'] );
 	}
 
+	/**
+	 * @ticket 30970
+	 */
+	public function test_setup_by_id() {
+		$p = $this->factory->post->create_and_get();
+		setup_postdata( $p->ID );
+
+		$this->assertSame( $p->ID, $GLOBALS['id'] );
+	}
+
+	/**
+	 * @ticket 30970
+	 */
+	public function test_setup_by_fake_post() {
+		$fake = new stdClass;
+		$fake->ID = 98765;
+		setup_postdata( $fake->ID );
+
+		// Fails because there's no post with this ID.
+		$this->assertNotSame( $fake->ID, $GLOBALS['id'] );
+	}
+
+	/**
+	 * @ticket 30970
+	 */
+	public function test_setup_by_postish_object() {
+		$p = $this->factory->post->create();
+
+		$post = new stdClass();
+		$post->ID = $p;
+		setup_postdata( $p );
+
+		$this->assertSame( $p, $GLOBALS['id'] );
+	}
+
 	public function test_authordata() {
 		$u = $this->factory->user->create_and_get();
 		$p = $this->factory->post->create_and_get( array(
