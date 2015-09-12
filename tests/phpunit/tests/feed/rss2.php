@@ -146,7 +146,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 
 			// comment link
 			$comments_link = xml_find( $items[$key]['child'], 'comments' );
-			$this->assertEquals( get_permalink( $post) . '#comments', $comments_link[0]['content'] );
+			$this->assertEquals( get_permalink( $post) . '#respond', $comments_link[0]['content'] );
 
 			// pub date
 			$pubdate = xml_find( $items[$key]['child'], 'pubDate' );
