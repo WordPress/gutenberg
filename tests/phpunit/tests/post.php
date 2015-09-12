@@ -1200,4 +1200,22 @@ class Tests_Post extends WP_UnitTestCase {
 		// Teardown
 		wp_set_current_user( $old_uid );
 	}
+
+	/**
+	 * @ticket 32585
+	 */
+	public function test_wp_insert_post_author_zero() {
+		$post_id = $this->factory->post->create( array( 'post_author' => 0 ) );
+
+		$this->assertEquals( 0, get_post( $post_id )->post_author );
+	}
+
+	/**
+	 * @ticket 32585
+	 */
+	public function test_wp_insert_post_author_null() {
+		$post_id = $this->factory->post->create( array( 'post_author' => null ) );
+
+		$this->assertEquals( $this->author_id, get_post( $post_id )->post_author );
+	}
 }
