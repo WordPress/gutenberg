@@ -994,4 +994,27 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertFalse( current_user_can( 'edit_user', $super_admin->ID ) );
 	}
+
+	/**
+	 * @ticket 16956
+	 */
+	function test_require_edit_others_posts_if_post_type_doesnt_exist() {
+		register_post_type( 'existed' );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'existed' ) );
+		_unregister_post_type( 'existed' );
+
+		$subscriber_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		$editor_id = $this->factory->user->create( array( 'role' => 'editor' ) );
+
+		$this->setExpectedIncorrectUsage( 'map_meta_cap' );
+		foreach ( array( 'delete_post', 'edit_post', 'read_post', 'publish_post' ) as $cap ) {
+			wp_set_current_user( $subscriber_id );
+			$this->assertSame( array( 'edit_others_posts' ), map_meta_cap( $cap, $subscriber_id, $post_id ) );
+			$this->assertFalse( current_user_can( $cap, $post_id ) );
+
+			wp_set_current_user( $editor_id );
+			$this->assertSame( array( 'edit_others_posts' ), map_meta_cap( $cap, $editor_id, $post_id ) );
+			$this->assertTrue( current_user_can( $cap, $post_id ) );
+		}
+	}
 }
