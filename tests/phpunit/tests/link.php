@@ -257,6 +257,73 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEmpty( get_adjacent_post( false, array(), false ) );
 	}
 
+	/**
+	 * @ticket 32833
+	 */
+	public function test_get_adjacent_post_excluded_terms() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p1 = $this->factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
+
+		wp_set_post_terms( $p2, array( $t ), 'wptests_tax' );
+
+		// Fake current page.
+		$_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+		$GLOBALS['post'] = get_post( $p1 );
+
+		$found = get_adjacent_post( false, array( $t ), true, 'wptests_tax' );
+
+		if ( ! is_null( $_post ) ) {
+			$GLOBALS['post'] = $_post;
+		} else {
+			unset( $GLOBALS['post'] );
+		}
+
+		// Should skip $p2, which belongs to $t.
+		$this->assertEquals( $p3, $found->ID );
+	}
+
+	/**
+	 * @ticket 32833
+	 */
+	public function test_get_adjacent_post_excluded_terms_should_not_require_posts_to_have_terms_in_any_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p1 = $this->factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
+		$p3 = $this->factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
+
+		wp_set_post_terms( $p2, array( $t ), 'wptests_tax' );
+
+		// Make sure that $p3 doesn't have the 'Uncategorized' category.
+		wp_delete_object_term_relationships( $p3, 'category' );
+
+		// Fake current page.
+		$_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+		$GLOBALS['post'] = get_post( $p1 );
+
+		$found = get_adjacent_post( false, array( $t ), true, 'wptests_tax' );
+
+		if ( ! is_null( $_post ) ) {
+			$GLOBALS['post'] = $_post;
+		} else {
+			unset( $GLOBALS['post'] );
+		}
+
+		// Should skip $p2, which belongs to $t.
+		$this->assertEquals( $p3, $found->ID );
+	}
+
 	public function test_wp_make_link_relative_with_http_scheme() {
 		$link = 'http://example.com/this-is-a-test-http-url/';
 		$relative_link = wp_make_link_relative( $link );
