@@ -417,4 +417,46 @@ class Tests_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $p1, $p2, $p3 ), wp_list_pluck( $GLOBALS['wp_query']->posts, 'ID' ) );
 	}
+
+	/**
+	 * @ticket 31355
+	 */
+	public function test_pages_dont_404_when_queried_post_id_is_modified() {
+		$post_id = $this->factory->post->create( array( 'post_title' => 'A Test Page', 'post_type' => 'page' ) );
+
+		add_action( 'parse_query', array( $this, 'filter_parse_query_to_modify_queried_post_id' ) );
+
+		$url = get_permalink( $post_id );
+		$this->go_to( $url );
+
+		remove_action( 'parse_query', array( $this, 'filter_parse_query_to_modify_queried_post_id' ) );
+
+		$this->assertFalse( $GLOBALS['wp_query']->is_404() );
+		$this->assertEquals( $post_id, $GLOBALS['wp_query']->post->ID );
+	}
+
+	/**
+	 * @ticket 31355
+	 */
+	public function test_custom_hierarchical_post_types_404_when_queried_post_id_is_modified() {
+		global $wp_rewrite;
+
+		register_post_type( 'guide', array( 'name' => 'Guide', 'public' => true, 'hierarchical' => true ) );
+		$wp_rewrite->flush_rules();
+		$post_id = $this->factory->post->create( array( 'post_title' => 'A Test Guide', 'post_type' => 'guide' ) );
+
+		add_action( 'parse_query', array( $this, 'filter_parse_query_to_modify_queried_post_id' ) );
+
+		$url = get_permalink( $post_id );
+		$this->go_to( $url );
+
+		remove_action( 'parse_query', array( $this, 'filter_parse_query_to_modify_queried_post_id' ) );
+
+		$this->assertFalse( $GLOBALS['wp_query']->is_404() );
+		$this->assertEquals( $post_id, $GLOBALS['wp_query']->post->ID );
+	}
+
+	public function filter_parse_query_to_modify_queried_post_id( $query ) {
+		$post = get_queried_object();
+	}
 }
