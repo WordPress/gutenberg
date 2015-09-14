@@ -37,6 +37,16 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
+	/**
+	 * @ticket 13905
+	 */
+	function test_capability_type_post_with_invalid_id() {
+		$this->assertEquals(
+			array( 'do_not_allow' ),
+			map_meta_cap( 'edit_post', $this->user_id, $this->post_id + 1 )
+		);
+	}
+
 	function test_capability_type_post_with_no_extra_caps() {
 
 		register_post_type( $this->post_type, array(
