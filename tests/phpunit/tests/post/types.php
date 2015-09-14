@@ -142,4 +142,21 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 		$this->assertFalse( post_type_exists( 'foo' ) );
 	}
+
+	/**
+	 * @ticket 33023
+	 */
+	public function test_get_post_type_object_casting() {
+		register_post_type( 'foo' );
+
+		$before = get_post_type_object( 'foo' )->labels;
+
+		get_post_type_labels( get_post_type_object( 'foo' ) );
+
+		$after = get_post_type_object( 'foo' )->labels;
+
+		$this->assertEquals( $before, $after );
+
+		_unregister_post_type( 'foo' );
+	}
 }
