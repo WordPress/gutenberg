@@ -679,4 +679,86 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertEquals( $user->user_email, 'test2@test.com' );
 	}
 
+	/**
+	 * Testing wp_new_user_notification email statuses.
+	 *
+	 * @dataProvider data_wp_new_user_notifications
+	 * @ticket 33654
+	 */
+	function test_wp_new_user_notification( $notify, $admin_email_sent_expected, $user_email_sent_expected ) {
+		unset( $GLOBALS['phpmailer']->mock_sent );
+
+		$was_admin_email_sent = false;
+		$was_user_email_sent = false;
+
+		$user = $this->factory->user->create( $this->user_data );
+
+		wp_new_user_notification( $user, null, $notify );
+
+		/*
+		 * Check to see if a notification email was sent to the
+		 * post author `blackburn@battlefield3.com` and and site admin `admin@example.org`.
+		 */
+		if ( ! empty( $GLOBALS['phpmailer']->mock_sent ) ) {
+			$was_admin_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[0] ) && WP_TESTS_EMAIL == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] );
+			$was_user_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[1] ) && 'blackburn@battlefield3.com' == $GLOBALS['phpmailer']->mock_sent[1]['to'][0][0] );
+		}
+
+		$this->assertSame( $admin_email_sent_expected, $was_admin_email_sent, 'Admin email result was not as expected in test_wp_new_user_notification' );
+		$this->assertSame( $user_email_sent_expected , $was_user_email_sent, 'User email result was not as expected in test_wp_new_user_notification' );
+	}
+
+	/**
+	 * Data provider for test_wp_new_user_notification().
+	 *
+	 * Passes the three available options for the $notify parameter and the expected email
+	 * emails sent status as a bool.
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $post_args               The arguments that will merged with the $_POST array.
+	 *         @type bool $admin_email_sent_expected The expected result of whether an email was sent to the admin.
+	 *         @type bool $user_email_sent_expected  The expected result of whether an email was sent to the user.
+	 *     }
+	 * }
+	 */
+	function data_wp_new_user_notifications() {
+		return array(
+			array(
+				'',
+				true,
+				false,
+			),
+			array(
+				'admin',
+				true,
+				false,
+			),
+			array(
+				'both',
+				true,
+				true,
+			),
+		);
+	}
+
+	/**
+	 * Set up a user and try sending a notification using the old, deprecated
+	 * function signature `wp_new_user_notification( $user, 'plaintext_password' );`.
+	 *
+	 * @ticket 33654
+	 * @expectedDeprecated wp_new_user_notification
+	 */
+	function test_wp_new_user_notification_old_signature_throws_deprecated_warning() {
+		$user = $this->factory->user->create(
+			array(
+				'role'       => 'author',
+				'user_login' => 'test_wp_new_user_notification',
+				'user_pass'  => 'password',
+				'user_email' => 'test@test.com',
+			)
+		);
+
+		wp_new_user_notification( $user, 'this_is_deprecated' );
+	}
 }
