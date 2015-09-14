@@ -106,7 +106,17 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count1->{'post-trashed'} );
 		$this->assertEquals( 1, $count1->total_comments );
 
+		$all_count1 = wp_count_comments();
+
+		$this->assertEquals( 1, $all_count1->approved );
+		$this->assertEquals( 0, $all_count1->moderated );
+		$this->assertEquals( 0, $all_count1->spam );
+		$this->assertEquals( 0, $all_count1->trash );
+		$this->assertEquals( 0, $all_count1->{'post-trashed'} );
+		$this->assertEquals( 1, $all_count1->total_comments );
+
 		wp_spam_comment( $comment_id );
+
 		$count2 = wp_count_comments( $post_id );
 
 		$this->assertEquals( 0, $count2->approved );
@@ -116,7 +126,17 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count2->{'post-trashed'} );
 		$this->assertEquals( 1, $count2->total_comments );
 
+		$all_count2 = wp_count_comments();
+
+		$this->assertEquals( 0, $all_count2->approved );
+		$this->assertEquals( 0, $all_count2->moderated );
+		$this->assertEquals( 1, $all_count2->spam );
+		$this->assertEquals( 0, $all_count2->trash );
+		$this->assertEquals( 0, $all_count2->{'post-trashed'} );
+		$this->assertEquals( 1, $all_count2->total_comments );
+
 		wp_trash_comment( $comment_id );
+
 		$count3 = wp_count_comments( $post_id );
 
 		$this->assertEquals( 0, $count3->approved );
@@ -125,8 +145,18 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 1, $count3->trash );
 		$this->assertEquals( 0, $count3->{'post-trashed'} );
 		$this->assertEquals( 0, $count3->total_comments );
-		
+
+		$all_count3 = wp_count_comments();
+
+		$this->assertEquals( 0, $all_count3->approved );
+		$this->assertEquals( 0, $all_count3->moderated );
+		$this->assertEquals( 0, $all_count3->spam );
+		$this->assertEquals( 1, $all_count3->trash );
+		$this->assertEquals( 0, $all_count3->{'post-trashed'} );
+		$this->assertEquals( 0, $all_count3->total_comments );
+
 		wp_untrash_comment( $comment_id );
+
 		$count4 = wp_count_comments( $post_id );
 
 		$this->assertEquals( 0, $count4->approved );
@@ -135,5 +165,14 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count4->trash );
 		$this->assertEquals( 0, $count4->{'post-trashed'} );
 		$this->assertEquals( 1, $count4->total_comments );
+
+		$all_count4 = wp_count_comments();
+
+		$this->assertEquals( 0, $all_count4->approved );
+		$this->assertEquals( 0, $all_count4->moderated );
+		$this->assertEquals( 1, $all_count4->spam );
+		$this->assertEquals( 0, $all_count4->trash );
+		$this->assertEquals( 0, $all_count4->{'post-trashed'} );
+		$this->assertEquals( 1, $all_count4->total_comments );
 	}
 }
