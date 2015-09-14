@@ -122,4 +122,24 @@ class Tests_Post_Types extends WP_UnitTestCase {
 		return $labels;
 	}
 
+
+	/**
+	 * @ticket 30013
+	 */
+	public function test_get_post_type_object_with_non_scalar_values() {
+		$this->assertFalse( post_type_exists( 'foo' ) );
+
+		register_post_type( 'foo' );
+
+		$this->assertTrue( post_type_exists( 'foo' ) );
+
+		$this->assertNotNull( get_post_type_object( 'foo' ) );
+		$this->assertNull( get_post_type_object( array() ) );
+		$this->assertNull( get_post_type_object( array( 'foo' ) ) );
+		$this->assertNull( get_post_type_object( new stdClass ) );
+
+		_unregister_post_type( 'foo' );
+
+		$this->assertFalse( post_type_exists( 'foo' ) );
+	}
 }
