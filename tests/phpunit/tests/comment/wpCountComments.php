@@ -87,4 +87,53 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 1, $count->{'post-trashed'} );
 		$this->assertEquals( 0, $count->total_comments );
 	}
+
+	public function test_wp_count_comments_cache() {
+		$post_id = $this->factory->post->create( array(
+			'post_status' => 'publish'
+		) );
+		$comment_id = $this->factory->comment->create( array(
+			'comment_approved' => '1',
+			'comment_post_ID' => $post_id
+		) );
+
+		$count1 = wp_count_comments( $post_id );
+
+		$this->assertEquals( 1, $count1->approved );
+		$this->assertEquals( 0, $count1->moderated );
+		$this->assertEquals( 0, $count1->spam );
+		$this->assertEquals( 0, $count1->trash );
+		$this->assertEquals( 0, $count1->{'post-trashed'} );
+		$this->assertEquals( 1, $count1->total_comments );
+
+		wp_spam_comment( $comment_id );
+		$count2 = wp_count_comments( $post_id );
+
+		$this->assertEquals( 0, $count2->approved );
+		$this->assertEquals( 0, $count2->moderated );
+		$this->assertEquals( 1, $count2->spam );
+		$this->assertEquals( 0, $count2->trash );
+		$this->assertEquals( 0, $count2->{'post-trashed'} );
+		$this->assertEquals( 1, $count2->total_comments );
+
+		wp_trash_comment( $comment_id );
+		$count3 = wp_count_comments( $post_id );
+
+		$this->assertEquals( 0, $count3->approved );
+		$this->assertEquals( 0, $count3->moderated );
+		$this->assertEquals( 0, $count3->spam );
+		$this->assertEquals( 1, $count3->trash );
+		$this->assertEquals( 0, $count3->{'post-trashed'} );
+		$this->assertEquals( 0, $count3->total_comments );
+		
+		wp_untrash_comment( $comment_id );
+		$count4 = wp_count_comments( $post_id );
+
+		$this->assertEquals( 0, $count4->approved );
+		$this->assertEquals( 0, $count4->moderated );
+		$this->assertEquals( 1, $count4->spam );
+		$this->assertEquals( 0, $count4->trash );
+		$this->assertEquals( 0, $count4->{'post-trashed'} );
+		$this->assertEquals( 1, $count4->total_comments );
+	}
 }
