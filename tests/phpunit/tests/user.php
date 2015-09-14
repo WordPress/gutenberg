@@ -446,6 +446,16 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 33869
+	 */
+	public function test_user_get_data_by_ID_should_alias_to_id() {
+		$u = $this->factory->user->create();
+
+		$user = WP_User::get_data_by( 'ID', $u );
+		$this->assertEquals( $u, $user->ID );
+	}
+
+	/**
 	 * @ticket 21431
 	 */
 	function test_count_many_users_posts() {
