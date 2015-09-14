@@ -10,12 +10,12 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 	 * @dataProvider make_absolute_url_testcases
 	 */
 	function test_make_absolute_url( $relative_url, $absolute_url, $expected ) {
-		if ( ! is_callable( array( 'WP_HTTP', 'make_absolute_url' ) ) ) {
+		if ( ! is_callable( array( 'WP_Http', 'make_absolute_url' ) ) ) {
 			$this->markTestSkipped( "This version of WP_HTTP doesn't support WP_HTTP::make_absolute_url()" );
 			return;
 		}
 
-		$actual = WP_HTTP::make_absolute_url( $relative_url, $absolute_url );
+		$actual = WP_Http::make_absolute_url( $relative_url, $absolute_url );
 		$this->assertEquals( $expected, $actual );
 	}
 
@@ -105,9 +105,9 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 }
 
 /**
- * A Wrapper of WP_HTTP to make parse_url() publicaly accessible for testing purposes.
+ * A Wrapper of WP_Http to make parse_url() publicaly accessible for testing purposes.
  */
-class WP_HTTP_Testable extends WP_HTTP {
+class WP_HTTP_Testable extends WP_Http {
 	public static function parse_url( $url ) {
 		return parent::parse_url( $url );
 	}

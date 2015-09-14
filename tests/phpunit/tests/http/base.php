@@ -16,12 +16,12 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 
 	function setUp() {
 
-		if ( is_callable( array('WP_HTTP', '_getTransport') ) ) {
-			$this->markTestSkipped('The WP_HTTP tests require a class-http.php file of r17550 or later.');
+		if ( is_callable( array('WP_Http', '_getTransport') ) ) {
+			$this->markTestSkipped('The WP_Http tests require a class-http.php file of r17550 or later.');
 			return;
 		}
 
-		$class = "WP_HTTP_" . $this->transport;
+		$class = "WP_Http_" . $this->transport;
 		if ( !call_user_func( array($class, 'test') ) ) {
 			$this->markTestSkipped( sprintf('The transport %s is not supported on this system', $this->transport) );
 		}
@@ -184,7 +184,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$size = 87348;
 		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30 ) ); //Auto generate the filename.
 
-		// Cleanup before we assert, as it'll return early. 
+		// Cleanup before we assert, as it'll return early.
 		if ( ! is_wp_error( $res ) ) {
 			$filesize = filesize( $res['filename'] );
 			unlink( $res['filename'] );
@@ -205,7 +205,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$size = 10000;
 		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30, 'limit_response_size' => $size ) ); //Auto generate the filename.
 
-		// Cleanup before we assert, as it'll return early. 
+		// Cleanup before we assert, as it'll return early.
 		if ( ! is_wp_error( $res ) ) {
 			$filesize = filesize( $res['filename'] );
 			unlink( $res['filename'] );
