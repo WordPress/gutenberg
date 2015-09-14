@@ -113,6 +113,30 @@ class Tests_Functions extends WP_UnitTestCase {
 			$this->assertFalse( path_is_absolute($path), "path_is_absolute('$path') should return false" );
 	}
 
+	/**
+	 * @ticket 33265
+	 */
+	function test_wp_normalize_path() {
+		$paths = array(
+			'/WINDOWS' => '/WINDOWS',
+			'C:/' => 'C:/',
+			'C:/WINDOWS' => 'C:/WINDOWS',
+			'C:/WINDOWS/system32' => 'C:/WINDOWS/system32',
+			'\\WINDOWS' => '/WINDOWS',
+			'C:\\' => 'C:/',
+			'C:\\WINDOWS' => 'C:/WINDOWS',
+			'C:\\\\WINDOWS' => 'C:/WINDOWS',
+			'C:\\WINDOWS\\system32' => 'C:/WINDOWS/system32',
+			'\\\\sambashare\\foo' => '/sambashare/foo',
+			'c:/windows' => 'C:/windows',
+			'c:\\windows' => 'C:/windows',
+		);
+
+		foreach ($paths as $original => $expected) {
+			$this->assertEquals( $expected, wp_normalize_path( $original ) );
+		}
+	}
+
 	function test_wp_unique_filename() {
 
 		$testdir = DIR_TESTDATA . '/images/';
