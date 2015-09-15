@@ -362,7 +362,7 @@ function _cleanup_query_vars() {
 	}
 
 	foreach ( get_post_types( array() , 'objects' ) as $t ) {
-		if ( ! empty( $t->query_var ) )
+		if ( is_post_type_viewable( $t ) && ! empty( $t->query_var ) )
 			$GLOBALS['wp']->add_query_var( $t->query_var );
 	}
 }

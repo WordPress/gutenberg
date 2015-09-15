@@ -144,6 +144,21 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( array( 'page' => '', 'pagename' => 'match/page' ), $GLOBALS['wp']->query_vars );
 	}
 
+	/**
+	 * @ticket 30018
+	 */
+	function test_parse_request_home_path_non_public_type() {
+		register_post_type( 'foo', array( 'public' => false ) );
+
+		$url = add_query_arg( 'foo', '1', home_url() );
+
+		$this->go_to( $url );
+
+		_unregister_post_type( 'foo' );
+
+		$this->assertEquals( array(), $GLOBALS['wp']->query_vars );
+	}
+
 	function test_url_to_postid_dupe_path() {
 		update_option( 'home', home_url('/example/') );
 
