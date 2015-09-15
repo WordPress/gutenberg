@@ -120,7 +120,6 @@ class Tests_Image_Header extends WP_UnitTestCase {
 		$this->assertEquals( $object['guid'], $cropped );
 		$this->assertEquals( $object['context'], 'custom-header' );
 		$this->assertEquals( $object['post_mime_type'], 'image/jpeg' );
-		$this->assertEquals( $object['post_content'], $cropped );
 	}
 
 	function test_insert_cropped_attachment() {
