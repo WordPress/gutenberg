@@ -574,6 +574,97 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertSame( $user->user_nicename, $updated_user->user_nicename );
 	}
 
+	/**
+	 * @ticket 33793
+	 */
+	public function test_wp_insert_user_should_reject_user_login_over_60_characters() {
+		$user_login = str_repeat( 'a', 61 );
+		$u = wp_insert_user( array(
+			'user_login' => $user_login,
+			'user_email' => $user_login . '@example.com',
+			'user_pass' => 'password',
+			'user_nicename' => 'something-short',
+		) );
+
+		$this->assertWPError( $u );
+		$this->assertSame( 'user_login_too_long', $u->get_error_code() );
+	}
+
+	/**
+	 * @ticket 33793
+	 */
+	public function test_wp_insert_user_should_reject_user_nicename_over_50_characters() {
+		$user_nicename = str_repeat( 'a', 51 );
+		$u = wp_insert_user( array(
+			'user_login' => 'mynicenamehas50chars',
+			'user_email' => $user_nicename . '@example.com',
+			'user_pass' => 'password',
+			'user_nicename' => $user_nicename,
+		) );
+
+		$this->assertWPError( $u );
+		$this->assertSame( 'user_nicename_too_long', $u->get_error_code() );
+	}
+
+	/**
+	 * @ticket 33793
+	 */
+	public function test_wp_insert_user_should_not_generate_user_nicename_longer_than_50_chars() {
+		$user_login = str_repeat( 'a', 55 );
+		$u = wp_insert_user( array(
+			'user_login' => $user_login,
+			'user_email' => $user_login . '@example.com',
+			'user_pass' => 'password',
+		) );
+
+		$this->assertNotEmpty( $u );
+		$user = new WP_User( $u );
+		$expected = str_repeat( 'a', 50 );
+		$this->assertSame( $expected, $user->user_nicename );
+	}
+
+	/**
+	 * @ticket 33793
+	 */
+	public function test_wp_insert_user_should_not_truncate_to_a_duplicate_user_nicename() {
+		$u1 = $this->factory->user->create( array(
+			'user_nicename' => str_repeat( 'a', 50 ),
+		) );
+
+		$user_login = str_repeat( 'a', 55 );
+		$u = wp_insert_user( array(
+			'user_login' => $user_login,
+			'user_email' => $user_login . '@example.com',
+			'user_pass' => 'password',
+		) );
+
+		$this->assertNotEmpty( $u );
+		$user = new WP_User( $u );
+		$expected = str_repeat( 'a', 48 ) . '-2';
+		$this->assertSame( $expected, $user->user_nicename );
+	}
+
+	/**
+	 * @ticket 33793
+	 */
+	public function test_wp_insert_user_should_not_truncate_to_a_duplicate_user_nicename_when_suffix_has_more_than_one_character() {
+		$users = $this->factory->user->create_many( 9, array(
+			'user_nicename' => str_repeat( 'a', 50 ),
+		) );
+
+		$user_login = str_repeat( 'a', 55 );
+		$u = wp_insert_user( array(
+			'user_login' => $user_login,
+			'user_email' => $user_login . '@example.com',
+			'user_pass' => 'password',
+		) );
+
+		$this->assertNotEmpty( $u );
+		$user = new WP_User( $u );
+		$expected = str_repeat( 'a', 47 ) . '-10';
+		$this->assertSame( $expected, $user->user_nicename );
+	}
+
 	function test_changing_email_invalidates_password_reset_key() {
 		global $wpdb;
 
