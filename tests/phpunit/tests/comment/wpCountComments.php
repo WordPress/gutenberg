@@ -11,6 +11,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count->trash );
 		$this->assertEquals( 0, $count->{'post-trashed'} );
 		$this->assertEquals( 0, $count->total_comments );
+		$this->assertEquals( 0, $count->all );
 	}
 
 	public function test_wp_count_comments_approved() {
@@ -26,6 +27,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count->trash );
 		$this->assertEquals( 0, $count->{'post-trashed'} );
 		$this->assertEquals( 1, $count->total_comments );
+		$this->assertEquals( 1, $count->all );
 	}
 
 	public function test_wp_count_comments_awaiting() {
@@ -41,6 +43,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count->trash );
 		$this->assertEquals( 0, $count->{'post-trashed'} );
 		$this->assertEquals( 1, $count->total_comments );
+		$this->assertEquals( 1, $count->all );
 	}
 
 	public function test_wp_count_comments_spam() {
@@ -56,6 +59,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count->trash );
 		$this->assertEquals( 0, $count->{'post-trashed'} );
 		$this->assertEquals( 1, $count->total_comments );
+		$this->assertEquals( 0, $count->all );
 	}
 
 	public function test_wp_count_comments_trash() {
@@ -71,6 +75,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 1, $count->trash );
 		$this->assertEquals( 0, $count->{'post-trashed'} );
 		$this->assertEquals( 0, $count->total_comments );
+		$this->assertEquals( 0, $count->all );
 	}
 
 	public function test_wp_count_comments_post_trashed() {
@@ -86,6 +91,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count->trash );
 		$this->assertEquals( 1, $count->{'post-trashed'} );
 		$this->assertEquals( 0, $count->total_comments );
+		$this->assertEquals( 0, $count->all );
 	}
 
 	public function test_wp_count_comments_cache() {
@@ -105,6 +111,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count1->trash );
 		$this->assertEquals( 0, $count1->{'post-trashed'} );
 		$this->assertEquals( 1, $count1->total_comments );
+		$this->assertEquals( 1, $count1->all );
 
 		$all_count1 = wp_count_comments();
 
@@ -114,6 +121,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $all_count1->trash );
 		$this->assertEquals( 0, $all_count1->{'post-trashed'} );
 		$this->assertEquals( 1, $all_count1->total_comments );
+		$this->assertEquals( 1, $all_count1->all );
 
 		wp_spam_comment( $comment_id );
 
@@ -125,6 +133,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count2->trash );
 		$this->assertEquals( 0, $count2->{'post-trashed'} );
 		$this->assertEquals( 1, $count2->total_comments );
+		$this->assertEquals( 0, $count2->all );
 
 		$all_count2 = wp_count_comments();
 
@@ -134,6 +143,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $all_count2->trash );
 		$this->assertEquals( 0, $all_count2->{'post-trashed'} );
 		$this->assertEquals( 1, $all_count2->total_comments );
+		$this->assertEquals( 0, $all_count2->all );
 
 		wp_trash_comment( $comment_id );
 
@@ -145,6 +155,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 1, $count3->trash );
 		$this->assertEquals( 0, $count3->{'post-trashed'} );
 		$this->assertEquals( 0, $count3->total_comments );
+		$this->assertEquals( 0, $count3->all );
 
 		$all_count3 = wp_count_comments();
 
@@ -154,6 +165,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 1, $all_count3->trash );
 		$this->assertEquals( 0, $all_count3->{'post-trashed'} );
 		$this->assertEquals( 0, $all_count3->total_comments );
+		$this->assertEquals( 0, $all_count3->all );
 
 		wp_untrash_comment( $comment_id );
 
@@ -165,6 +177,7 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $count4->trash );
 		$this->assertEquals( 0, $count4->{'post-trashed'} );
 		$this->assertEquals( 1, $count4->total_comments );
+		$this->assertEquals( 0, $count4->all );
 
 		$all_count4 = wp_count_comments();
 
@@ -174,5 +187,6 @@ class Tests_WP_Count_Comments extends WP_UnitTestCase {
 		$this->assertEquals( 0, $all_count4->trash );
 		$this->assertEquals( 0, $all_count4->{'post-trashed'} );
 		$this->assertEquals( 1, $all_count4->total_comments );
+		$this->assertEquals( 0, $all_count4->all );
 	}
 }
