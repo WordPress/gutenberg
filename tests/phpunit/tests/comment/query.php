@@ -1737,4 +1737,104 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$q->query_vars['meta_key'] = 'foo';
 		$q->query_vars['meta_value'] = 'bar';
 	}
+
+	/**
+	 * @ticket 33882
+	 */
+	public function test_parent__in() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$ids = new WP_Comment_Query( array(
+			'comment_post_ID' => $this->post_id,
+			'fields' => 'ids',
+			'parent__in' => array( $c1 )
+		) );
+
+		$this->assertEqualSets( array( $c2 ), $ids->comments );
+	}
+
+	/**
+	 * @ticket 33882
+	 */
+	public function test_parent__in_commas() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+		$c3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+		$c4 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c2,
+		) );
+
+		$ids = new WP_Comment_Query( array(
+			'comment_post_ID' => $this->post_id,
+			'fields' => 'ids',
+			'parent__in' => "$c1,$c2"
+		) );
+
+		$this->assertEqualSets( array( $c3, $c4 ), $ids->comments );
+	}
+
+	/**
+	 * @ticket 33882
+	 */
+	public function test_parent__not_in() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+
+		$this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$ids = new WP_Comment_Query( array(
+			'comment_post_ID' => $this->post_id,
+			'fields' => 'ids',
+			'parent__not_in' => array( $c1 )
+		) );
+
+		$this->assertEqualSets( array( $c1 ), $ids->comments );
+	}
+
+	/**
+	 * @ticket 33882
+	 */
+	public function test_parent__not_in_commas() {
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_approved' => '1' ) );
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+
+		$this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+		$this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c2,
+		) );
+
+		$ids = new WP_Comment_Query( array(
+			'comment_post_ID' => $this->post_id,
+			'fields' => 'ids',
+			'parent__not_in' => "$c1,$c2"
+		) );
+
+		$this->assertEqualSets( array( $c1, $c2 ), $ids->comments );
+	}
 }
