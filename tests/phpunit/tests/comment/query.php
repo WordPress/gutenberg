@@ -1837,4 +1837,38 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $c1, $c2 ), $ids->comments );
 	}
+
+	/**
+	 * @ticket 33883
+	 */
+	public function test_orderby_comment__in() {
+		$this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+		$c3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+
+		$this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1'
+		) );
+
+
+		$ids = new WP_Comment_Query( array(
+			'fields' => 'ids',
+			'comment__in' => array( $c2, $c3 ),
+			'orderby' => 'comment__in'
+		) );
+
+		$this->assertEquals( array( $c2, $c3 ), $ids->comments );
+
+	}
 }
