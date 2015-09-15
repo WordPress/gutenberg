@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @group post
+ * @group media
+ */
+class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
+	protected $post;
+	protected $attachment_id;
+
+	function setUp() {
+		parent::setUp();
+
+		$this->post          = $this->factory->post->create_and_get();
+		$file                = DIR_TESTDATA . '/images/canola.jpg';
+		$this->attachment_id = $this->factory->attachment->create_object( $file, $this->post->ID, array(
+			'post_mime_type' => 'image/jpeg',
+		) );
+	}
+
+	function test_has_post_thumbnail() {
+		$this->assertFalse( has_post_thumbnail( $this->post ) );
+		$this->assertFalse( has_post_thumbnail( $this->post->ID ) );
+		$this->assertFalse( has_post_thumbnail() );
+
+		$GLOBALS['post'] = $this->post;
+
+		$this->assertFalse( has_post_thumbnail() );
+
+		unset( $GLOBALS['post'] );
+
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		$this->assertTrue( has_post_thumbnail( $this->post ) );
+		$this->assertTrue( has_post_thumbnail( $this->post->ID ) );
+		$this->assertFalse( has_post_thumbnail() );
+
+		$GLOBALS['post'] = $this->post;
+
+		$this->assertTrue( has_post_thumbnail() );
+	}
+
+	function test_get_post_thumbnail_id() {
+		$this->assertEmpty( get_post_thumbnail_id( $this->post ) );
+		$this->assertEmpty( get_post_thumbnail_id( $this->post->ID ) );
+		$this->assertEmpty( get_post_thumbnail_id() );
+
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		$this->assertEquals( $this->attachment_id, get_post_thumbnail_id( $this->post ) );
+		$this->assertEquals( $this->attachment_id, get_post_thumbnail_id( $this->post->ID ) );
+
+		$GLOBALS['post'] = $this->post;
+
+		$this->assertEquals( $this->attachment_id, get_post_thumbnail_id() );
+	}
+
+	function test_update_post_thumbnail_cache() {
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		$WP_Query = new WP_Query( array(
+			'post_type' => 'any',
+			'post__in'  => array( $this->post->ID ),
+			'orderby'   => 'post__in',
+		) );
+
+		$this->assertFalse( $WP_Query->thumbnails_cached );
+
+		update_post_thumbnail_cache( $WP_Query );
+
+		$this->assertTrue( $WP_Query->thumbnails_cached );
+	}
+
+	function test_get_the_post_thumbnail() {
+		$this->assertEquals( '', get_the_post_thumbnail() );
+		$this->assertEquals( '', get_the_post_thumbnail( $this->post ) );
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array( 'class' => 'attachment-post-thumbnail wp-post-image' ) );
+
+		$this->assertEquals( $expected, get_the_post_thumbnail( $this->post ) );
+
+		$GLOBALS['post'] = $this->post;
+
+		$this->assertEquals( $expected, get_the_post_thumbnail() );
+	}
+
+	function test_the_post_thumbnail() {
+		ob_start();
+		the_post_thumbnail();
+		$actual = ob_get_clean();
+
+		$this->assertEquals( '', $actual );
+
+		$GLOBALS['post'] = $this->post;
+
+		ob_start();
+		the_post_thumbnail();
+		$actual = ob_get_clean();
+
+		$this->assertEquals( '', $actual );
+
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array( 'class' => 'attachment-post-thumbnail wp-post-image' ) );
+
+		ob_start();
+		the_post_thumbnail();
+		$actual = ob_get_clean();
+
+		$this->assertEquals( $expected, $actual );
+	}
+}
