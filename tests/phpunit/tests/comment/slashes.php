@@ -22,8 +22,6 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		$this->slash_5 = 'String with 5 slashes \\\\\\\\\\';
 		$this->slash_6 = 'String with 6 slashes \\\\\\\\\\\\';
 		$this->slash_7 = 'String with 7 slashes \\\\\\\\\\\\\\';
-
-		$_SERVER['REMOTE_ADDR'] = null;
 	}
 
 	function tearDown() {
