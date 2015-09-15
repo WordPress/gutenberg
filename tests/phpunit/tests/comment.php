@@ -77,13 +77,6 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 14279
 	 */
 	public function test_wp_new_comment_respects_dates() {
-		// `wp_new_comment()` checks REMOTE_ADDR, so we fake it to avoid PHP notices.
-		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			$remote_addr = $_SERVER['REMOTE_ADDR'];
-		} else {
-			$_SERVER['REMOTE_ADDR'] = '';
-		}
-
 		$u = $this->factory->user->create();
 		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
 
@@ -104,13 +97,6 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertEquals( $data['comment_date'], $comment->comment_date );
 		$this->assertEquals( $data['comment_date_gmt'], $comment->comment_date_gmt );
-
-		// Cleanup.
-		if ( isset( $remote_addr ) ) {
-			$_SERVER['REMOTE_ADDR'] = $remote_addr;
-		} else {
-			unset( $_SERVER['REMOTE_ADDR'] );
-		}
 	}
 
 	/**
@@ -238,13 +224,6 @@ class Tests_Comment extends WP_UnitTestCase {
 
 
 	public function test_comment_field_lengths() {
-		// `wp_new_comment()` checks REMOTE_ADDR, so we fake it to avoid PHP notices.
-		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			$remote_addr = $_SERVER['REMOTE_ADDR'];
-		} else {
-			$_SERVER['REMOTE_ADDR'] = '';
-		}
-
 		$u = $this->factory->user->create();
 		$post_id = $this->factory->post->create( array( 'post_author' => $u ) );
 
@@ -264,13 +243,6 @@ class Tests_Comment extends WP_UnitTestCase {
 		$comment = get_comment( $id );
 
 		$this->assertEquals( strlen( $comment->comment_content ), 65535 );
-
-		// Cleanup.
-		if ( isset( $remote_addr ) ) {
-			$_SERVER['REMOTE_ADDR'] = $remote_addr;
-		} else {
-			unset( $_SERVER['REMOTE_ADDR'] );
-		}
 	}
 
 	/**

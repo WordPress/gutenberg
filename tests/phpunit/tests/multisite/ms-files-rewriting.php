@@ -19,8 +19,6 @@ class Tests_Multisite_MS_Files_Rewriting extends WP_UnitTestCase {
 		parent::setUp();
 		$this->suppress = $wpdb->suppress_errors();
 
-		$_SERVER[ 'REMOTE_ADDR' ] = '';
-
 		update_site_option( 'ms_files_rewriting', 1 );
 		ms_upload_constants();
 	}
