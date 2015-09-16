@@ -442,4 +442,44 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $t1 ), get_ancestors( $t2, 'wptests_conflict' ) );
 		_unregister_post_type( 'wptests_pt' );
 	}
+
+	/**
+	 * @ticket 21949
+	 */
+	public function test_nonpublic_taxonomy_should_not_be_queryable_using_taxname_query_var() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+		) );
+
+		$t = $this->factory->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		$this->go_to( '/?wptests_tax=' . $t->slug );
+
+		$this->assertFalse( is_tax( 'wptests_tax' ) );
+	}
+
+	/**
+	 * @ticket 21949
+	 */
+	public function test_nonpublic_taxonomy_should_not_be_queryable_using_taxonomy_and_term_vars() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+		) );
+
+		$t = $this->factory->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		$this->go_to( '/?taxonomy=wptests_tax&term=' . $t->slug );
+
+		$this->assertFalse( is_tax( 'wptests_tax' ) );
+	}
 }
