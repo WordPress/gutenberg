@@ -259,4 +259,18 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertTrue( wp_notify_moderator( $c ) );
 	}
+
+	/**
+	 * @ticket 33587
+	 */
+	public function test_wp_new_comment_notify_postauthor_should_not_send_email_when_comment_has_been_marked_as_spam() {
+		$p = $this->factory->post->create();
+		$c = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => 'spam',
+		) );
+
+		$sent = wp_new_comment_notify_postauthor( $c );
+		$this->assertFalse( $sent );
+	}
 }
