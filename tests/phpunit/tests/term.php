@@ -58,6 +58,14 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 33281
+	 */
+	function test_get_term_by_with_nonexistent_id_should_return_false() {
+		$term = get_term_by( 'id', 123456, 'category' );
+		$this->assertFalse( $term );
+	}
+
+	/**
 	 * @ticket 15919
 	 */
 	function test_wp_count_terms() {
