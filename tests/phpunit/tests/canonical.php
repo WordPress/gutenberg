@@ -52,7 +52,7 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 		 * [2]: (optional) The ticket the test refers to, Can be skipped if unknown.
 		 */
 
-		// Please Note: A few test cases are commented out below, Look at the test case following it, in most cases it's simple showing 2 options for the "proper" redirect.
+		// Please Note: A few test cases are commented out below, Look at the test case following it, in most cases it's simply showing 2 options for the "proper" redirect.
 		return array(
 			// Categories
 

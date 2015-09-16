@@ -12,7 +12,7 @@ class Tests_Mail extends WP_UnitTestCase {
 	/**
 	 * Send a mail with a 1000 char long line.
 	 *
-	 * `PHPMailer::createBody()` will set `$this->Encoding = 'quoted-printable'` (away from it's default of 8bit)
+	 * `PHPMailer::createBody()` will set `$this->Encoding = 'quoted-printable'` (away from its default of 8bit)
 	 * when it encounters a line longer than 999 characters. But PHPMailer doesn't clean up after itself / presets
 	 * all variables, which means that following tests would fail. To solve this issue we set `$this->Encoding`
 	 * back to 8bit in `MockPHPMailer::preSend`.
