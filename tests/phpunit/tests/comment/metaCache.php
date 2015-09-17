@@ -4,6 +4,83 @@ class Tests_Comment_Meta_Cache extends WP_UnitTestCase {
 	protected $i = 0;
 	protected $queries = 0;
 
+	/**
+	 * @ticket 16894
+	 */
+	public function test_update_comment_meta_cache_should_default_to_true() {
+		global $wpdb;
+
+		$p = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$comment_ids = $this->factory->comment->create_post_comments( $p, 3 );
+
+		foreach ( $comment_ids as $cid ) {
+			update_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$q = new WP_Comment_Query( array(
+			'post_ID' => $p,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		foreach ( $comment_ids as $cid ) {
+			get_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 16894
+	 */
+	public function test_update_comment_meta_cache_true() {
+		global $wpdb;
+
+		$p = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$comment_ids = $this->factory->comment->create_post_comments( $p, 3 );
+
+		foreach ( $comment_ids as $cid ) {
+			update_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$q = new WP_Comment_Query( array(
+			'post_ID' => $p,
+			'update_comment_meta_cache' => true,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		foreach ( $comment_ids as $cid ) {
+			get_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 16894
+	 */
+	public function test_update_comment_meta_cache_false() {
+		global $wpdb;
+
+		$p = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$comment_ids = $this->factory->comment->create_post_comments( $p, 3 );
+
+		foreach ( $comment_ids as $cid ) {
+			update_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$q = new WP_Comment_Query( array(
+			'post_ID' => $p,
+			'update_comment_meta_cache' => false,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		foreach ( $comment_ids as $cid ) {
+			get_comment_meta( $cid, 'foo', 'bar' );
+		}
+
+		$this->assertSame( $num_queries + 3, $wpdb->num_queries );
+	}
+
 	public function test_comment_meta_cache() {
 		$post_id = $this->factory->post->create( array(
 			'post_status' => 'publish'
