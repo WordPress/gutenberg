@@ -1,4 +1,9 @@
 <?php
+/**
+ * WP_Customize_Manager tests.
+ *
+ * @package WordPress
+ */
 
 /**
  * Tests for the WP_Customize_Manager class.
@@ -7,6 +12,23 @@
  */
 class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 
+	/**
+	 * Customize manager instance re-instantiated with each test.
+	 *
+	 * @var WP_Customize_Manager
+	 */
+	public $manager;
+
+	/**
+	 * Symbol.
+	 *
+	 * @var stdClass
+	 */
+	public $undefined;
+
+	/**
+	 * Set up test.
+	 */
 	function setUp() {
 		parent::setUp();
 		require_once( ABSPATH . WPINC . '/class-wp-customize-manager.php' );
@@ -15,6 +37,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->undefined = new stdClass();
 	}
 
+	/**
+	 * Tear down test.
+	 */
 	function tearDown() {
 		$this->manager = null;
 		unset( $GLOBALS['wp_customize'] );
@@ -156,6 +181,10 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 
 	/**
 	 * In lieu of closures, callback for customize_dynamic_setting_args filter added for test_register_dynamic_settings().
+	 *
+	 * @param array  $setting_args Setting args.
+	 * @param string $setting_id   Setting ID.
+	 * @return array
 	 */
 	function filter_customize_dynamic_setting_args_for_test_dynamic_settings( $setting_args, $setting_id ) {
 		$this->assertEquals( false, $setting_args, 'Expected $setting_args to be false by default.' );
@@ -168,11 +197,134 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 
 	/**
 	 * In lieu of closures, callback for customize_dynamic_setting_class filter added for test_register_dynamic_settings().
+	 *
+	 * @param string $setting_class Setting class.
+	 * @param string $setting_id    Setting ID.
+	 * @param array  $setting_args  Setting args.
+	 * @return string
 	 */
 	function filter_customize_dynamic_setting_class_for_test_dynamic_settings( $setting_class, $setting_id, $setting_args ) {
 		$this->assertEquals( 'WP_Customize_Setting', $setting_class );
 		$this->assertInternalType( 'string', $setting_id );
 		$this->assertInternalType( 'array', $setting_args );
 		return $setting_class;
+	}
+
+	/**
+	 * Test is_ios() method.
+	 *
+	 * @see WP_Customize_Manager::is_ios()
+	 */
+	function test_is_ios() {
+		$this->markTestSkipped( 'WP_Customize_Manager::is_ios() cannot be tested because it uses wp_is_mobile() which contains a static var.' );
+	}
+
+	/**
+	 * Test get_document_title_template() method.
+	 *
+	 * @see WP_Customize_Manager::get_document_title_template()
+	 */
+	function test_get_document_title_template() {
+		$tpl = $this->manager->get_document_title_template();
+		$this->assertContains( '%s', $tpl );
+	}
+
+	/**
+	 * Test get_preview_url()/set_preview_url methods.
+	 *
+	 * @see WP_Customize_Manager::get_preview_url()
+	 * @see WP_Customize_Manager::set_preview_url()
+	 */
+	function test_preview_url() {
+		$this->assertEquals( home_url( '/' ), $this->manager->get_preview_url() );
+		$preview_url = home_url( '/foo/bar/baz/' );
+		$this->manager->set_preview_url( $preview_url );
+		$this->assertEquals( $preview_url, $this->manager->get_preview_url() );
+		$this->manager->set_preview_url( 'http://illegalsite.example.com/food/' );
+		$this->assertEquals( home_url( '/' ), $this->manager->get_preview_url() );
+	}
+
+	/**
+	 * Test get_return_url()/set_return_url() methods.
+	 *
+	 * @see WP_Customize_Manager::get_return_url()
+	 * @see WP_Customize_Manager::set_return_url()
+	 */
+	function test_return_url() {
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'author' ) ) );
+		$this->assertEquals( get_admin_url(), $this->manager->get_return_url() );
+
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$this->assertTrue( current_user_can( 'edit_theme_options' ) );
+		$this->assertEquals( admin_url( 'themes.php' ), $this->manager->get_return_url() );
+
+		$preview_url = home_url( '/foo/' );
+		$this->manager->set_preview_url( $preview_url );
+		$this->assertEquals( $preview_url, $this->manager->get_return_url() );
+
+		$this->manager->set_return_url( admin_url( 'edit.php?trashed=1' ) );
+		$this->assertEquals( admin_url( 'edit.php' ), $this->manager->get_return_url() );
+	}
+
+	/**
+	 * Test get_autofocus()/set_autofocus() methods.
+	 *
+	 * @see WP_Customize_Manager::get_autofocus()
+	 * @see WP_Customize_Manager::set_autofocus()
+	 */
+	function test_autofocus() {
+		$this->assertEmpty( $this->manager->get_autofocus() );
+
+		$this->manager->set_autofocus( array( 'unrecognized' => 'food' ) );
+		$this->assertEmpty( $this->manager->get_autofocus() );
+
+		$autofocus = array( 'control' => 'blogname' );
+		$this->manager->set_autofocus( $autofocus );
+		$this->assertEquals( $autofocus, $this->manager->get_autofocus() );
+
+		$autofocus = array( 'section' => 'colors' );
+		$this->manager->set_autofocus( $autofocus );
+		$this->assertEquals( $autofocus, $this->manager->get_autofocus() );
+
+		$autofocus = array( 'panel' => 'widgets' );
+		$this->manager->set_autofocus( $autofocus );
+		$this->assertEquals( $autofocus, $this->manager->get_autofocus() );
+
+		$autofocus = array( 'control' => array( 'blogname', 'blogdescription' ) );
+		$this->manager->set_autofocus( $autofocus );
+		$this->assertEmpty( $this->manager->get_autofocus() );
+	}
+
+	/**
+	 * Test customize_pane_settings() method.
+	 *
+	 * @see WP_Customize_Manager::customize_pane_settings()
+	 */
+	function test_customize_pane_settings() {
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$this->manager->register_controls();
+		$this->manager->prepare_controls();
+		$autofocus = array( 'control' => 'blogname' );
+		$this->manager->set_autofocus( $autofocus );
+
+		ob_start();
+		$this->manager->customize_pane_settings();
+		$content = ob_get_clean();
+
+		$this->assertContains( 'var _wpCustomizeSettings =', $content );
+		$this->assertContains( '"blogname"', $content );
+		$this->assertContains( '_wpCustomizeSettings.controls', $content );
+		$this->assertContains( '_wpCustomizeSettings.settings', $content );
+		$this->assertContains( '</script>', $content );
+
+		$this->assertNotEmpty( preg_match( '#var _wpCustomizeSettings\s*=\s*({.*?});\s*\n#', $content, $matches ) );
+		$json = $matches[1];
+		$data = json_decode( $json, true );
+		$this->assertNotEmpty( $data );
+
+		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl' ), array_keys( $data ) );
+		$this->assertEquals( $autofocus, $data['autofocus'] );
+		$this->assertArrayHasKey( 'save', $data['nonce'] );
+		$this->assertArrayHasKey( 'preview', $data['nonce'] );
 	}
 }
