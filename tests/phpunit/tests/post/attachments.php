@@ -512,9 +512,9 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 
 		$upload = wp_upload_bits( basename( $filename ), null, $contents );
 
-		$this->assertNotEmpty( $upload['error'] );
-
 		remove_filter( 'upload_mimes', array( $this, 'blacklist_jpg_mime_type' ) );
+
+		$this->assertNotEmpty( $upload['error'] );
 	}
 
 	public function whitelist_psd_mime_type( $mimes ) {
@@ -525,5 +525,23 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 	public function blacklist_jpg_mime_type( $mimes ) {
 		unset( $mimes['jpg|jpeg|jpe'] );
 		return $mimes;
+	}
+
+	/**
+	 * @ticket 33012
+	 */
+	public function test_wp_mime_type_icon() {
+		$icon = wp_mime_type_icon();
+
+		$this->assertContains( 'images/media/default.png', $icon );
+	}
+
+	/**
+	 * @ticket 33012
+	 */
+	public function test_wp_mime_type_icon_video() {
+		$icon = wp_mime_type_icon( 'video/mp4' );
+
+		$this->assertContains( 'images/media/video.png', $icon );
 	}
 }
