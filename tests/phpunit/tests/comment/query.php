@@ -1667,6 +1667,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$q1 = new WP_Comment_Query();
 		$q1->query( array(
 			'post_id' => $p,
+			'fields' => 'ids',
 		) );
 
 		$num_queries = $wpdb->num_queries;
@@ -1674,6 +1675,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$q2 = new WP_Comment_Query();
 		$q2->query( array(
 			'post_id' => $p,
+			'fields' => 'ids',
 			'foo' => 'bar',
 		) );
 

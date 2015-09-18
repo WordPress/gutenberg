@@ -17,6 +17,9 @@ class Tests_Comment_Meta_Cache extends WP_UnitTestCase {
 			update_comment_meta( $cid, 'foo', 'bar' );
 		}
 
+		// Clear comment cache, just in case.
+		clean_comment_cache( $comment_ids );
+
 		$q = new WP_Comment_Query( array(
 			'post_ID' => $p,
 		) );
@@ -41,6 +44,9 @@ class Tests_Comment_Meta_Cache extends WP_UnitTestCase {
 		foreach ( $comment_ids as $cid ) {
 			update_comment_meta( $cid, 'foo', 'bar' );
 		}
+
+		// Clear comment cache, just in case.
+		clean_comment_cache( $comment_ids );
 
 		$q = new WP_Comment_Query( array(
 			'post_ID' => $p,
