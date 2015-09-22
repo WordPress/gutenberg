@@ -110,4 +110,50 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $actual );
 	}
+
+	/**
+	 * @ticket 33070
+	 */
+	function test_get_the_post_thumbnail_url() {
+		$this->assertEquals( '', get_the_post_thumbnail_url() );
+		$this->assertEquals( '', get_the_post_thumbnail_url( $this->post ) );
+
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		var_dump( get_the_post_thumbnail_url( $this->post ) );
+
+		$this->assertEquals( '', get_the_post_thumbnail_url() );
+		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), get_the_post_thumbnail_url( $this->post ) );
+
+		$GLOBALS['post'] = $this->post;
+
+		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), get_the_post_thumbnail_url() );
+	}
+
+	/**
+	 * @ticket 33070
+	 */
+	function test_the_post_thumbnail_url() {
+		$GLOBALS['post'] = $this->post;
+
+		ob_start();
+		the_post_thumbnail_url();
+		$actual = ob_get_clean();
+
+		$this->assertEmpty( $actual );
+
+		ob_start();
+		the_post_thumbnail_url();
+		$actual = ob_get_clean();
+
+		$this->assertEmpty( $actual );
+
+		set_post_thumbnail( $this->post, $this->attachment_id );
+
+		ob_start();
+		the_post_thumbnail_url();
+		$actual = ob_get_clean();
+
+		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), $actual );
+	}
 }
