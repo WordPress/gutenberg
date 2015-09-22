@@ -718,4 +718,21 @@ EOF;
 
 		remove_filter( 'embed_maybe_make_link', array( $this, 'filter_wp_embed_shortcode_custom' ), 10 );
 	}
+
+	/**
+	 * @ticket 33878
+	 */
+	function test_wp_get_attachment_image_url() {
+		$this->assertFalse( wp_get_attachment_image_url( 0 ) );
+
+		$post_id = $this->factory->post->create();
+		$attachment_id = $this->factory->attachment->create_object( $this->img_name, $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment',
+		) );
+
+		$image = wp_get_attachment_image_src( $attachment_id, 'thumbnail', false );
+
+		$this->assertEquals( $image[0], wp_get_attachment_image_url( $attachment_id ) );
+	}
 }
