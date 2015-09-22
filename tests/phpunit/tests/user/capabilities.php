@@ -1017,4 +1017,51 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertTrue( current_user_can( $cap, $post_id ) );
 		}
 	}
+
+	/**
+	 * @ticket 17253
+	 */
+	function test_cpt_with_page_capability_type() {
+
+		register_post_type( 'page_capability', array(
+			'capability_type' => 'page',
+		) );
+
+		$cpt = get_post_type_object( 'page_capability' );
+
+		$admin       = $this->factory->user->create_and_get( array( 'role' => 'administrator' ) );
+		$editor      = $this->factory->user->create_and_get( array( 'role' => 'editor' ) );
+		$author      = $this->factory->user->create_and_get( array( 'role' => 'author' ) );
+		$contributor = $this->factory->user->create_and_get( array( 'role' => 'contributor' ) );
+
+		$this->assertEquals( 'edit_pages', $cpt->cap->edit_posts );
+		$this->assertTrue( user_can( $admin->ID, $cpt->cap->edit_posts ) );
+		$this->assertTrue( user_can( $editor->ID, $cpt->cap->edit_posts ) );
+		$this->assertFalse( user_can( $author->ID, $cpt->cap->edit_posts ) );
+		$this->assertFalse( user_can( $contributor->ID, $cpt->cap->edit_posts ) );
+
+		$admin_post = $this->factory->post->create_and_get( array(
+			'post_author' => $admin->ID,
+			'post_type'   => 'page_capability',
+		) );
+
+		$this->assertTrue( user_can( $admin->ID, 'edit_post', $admin_post->ID ) );
+		$this->assertTrue( user_can( $editor->ID, 'edit_post', $admin_post->ID ) );
+		$this->assertFalse( user_can( $author->ID, 'edit_post', $admin_post->ID ) );
+		$this->assertFalse( user_can( $contributor->ID, 'edit_post', $admin_post->ID ) );
+
+		$author_post = $this->factory->post->create_and_get( array(
+			'post_author' => $author->ID,
+			'post_type'   => 'page_capability',
+		) );
+
+		$this->assertTrue( user_can( $admin->ID, 'edit_post', $author_post->ID ) );
+		$this->assertTrue( user_can( $editor->ID, 'edit_post', $author_post->ID ) );
+		$this->assertFalse( user_can( $author->ID, 'edit_post', $author_post->ID ) );
+		$this->assertFalse( user_can( $contributor->ID, 'edit_post', $author_post->ID ) );
+
+		_unregister_post_type( 'page_capability' );
+
+	}
+
 }
