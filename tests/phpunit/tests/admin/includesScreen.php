@@ -38,7 +38,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 
 	function tearDown() {
 		unset( $GLOBALS['wp_taxonomies']['old-or-new'] );
-		set_current_screen( 'front' );
+		unset( $GLOBALS['screen'] );
 		parent::tearDown();
 	}
 
