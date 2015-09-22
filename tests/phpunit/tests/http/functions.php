@@ -75,4 +75,32 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$response = wp_remote_get( $url, array( 'redirection' => -1 ) );
 		$this->assertWPError( $response );
 	}
+
+	/**
+	 * @ticket 33711
+	 */
+	function test_get_response_cookies() {
+		$url = 'https://wordpress.org/wp-login.php';
+
+		$response = wp_remote_head( $url );
+		$cookies  = wp_remote_retrieve_cookies( $response );
+
+		$this->assertInternalType( 'array', $cookies );
+		$this->assertNotEmpty( $cookies );
+
+		$cookie = wp_remote_retrieve_cookie( $response, 'wordpress_test_cookie' );
+		$this->assertInstanceOf( 'WP_Http_Cookie', $cookie );
+		$this->assertSame( 'wordpress_test_cookie', $cookie->name );
+		$this->assertSame( 'WP Cookie check', $cookie->value );
+
+		$value = wp_remote_retrieve_cookie_value( $response, 'wordpress_test_cookie' );
+		$this->assertSame( 'WP Cookie check', $value );
+
+		$no_value = wp_remote_retrieve_cookie_value( $response, 'not_a_cookie' );
+		$this->assertSame( '', $no_value );
+
+		$no_cookie = wp_remote_retrieve_cookie( $response, 'not_a_cookie' );
+		$this->assertSame( '', $no_cookie );
+	}
+
 }
