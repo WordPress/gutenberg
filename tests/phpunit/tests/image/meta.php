@@ -138,4 +138,26 @@ class Tests_Image_Meta extends WP_UnitTestCase {
 		$out = wp_read_image_metadata(DIR_TESTDATA.'/images/404_image.png');
 		$this->assertFalse($out);
 	}
+
+
+	/**
+	 * @ticket 33772
+	 */
+	public function test_exif_keywords() {
+		$out = wp_read_image_metadata(DIR_TESTDATA.'/images/33772.jpg');
+
+		$this->assertEquals( '8', $out['aperture'] );
+		$this->assertEquals( 'Photoshop Author', $out['credit'] );
+		$this->assertEquals( 'DMC-LX2', $out['camera'] );
+		$this->assertEquals( 'Photoshop Description', $out['caption'] );
+		$this->assertEquals( 1306315327, $out['created_timestamp'] );
+		$this->assertEquals( 'Photoshop Copyrright Notice', $out['copyright'] );
+		$this->assertEquals( '6.3', $out['focal_length'] );
+		$this->assertEquals( '100', $out['iso'] );
+		$this->assertEquals( '0.0025', $out['shutter_speed'] );
+		$this->assertEquals( 'Photoshop Document Ttitle', $out['title'] );
+		$this->assertEquals( 1, $out['orientation']);
+		$this->assertEquals( array( 'beach', 'baywatch', 'LA', 'sunset' ), $out['keywords'] );
+	}
+
 }
