@@ -61,10 +61,13 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'edit_users'             => array( 'administrator' ),
 			'install_plugins'        => array( 'administrator' ),
 			'install_themes'         => array( 'administrator' ),
+			'upload_plugins'         => array( 'administrator' ),
+			'upload_themes'          => array( 'administrator' ),
 			'update_core'            => array( 'administrator' ),
 			'update_plugins'         => array( 'administrator' ),
 			'update_themes'          => array( 'administrator' ),
 			'edit_theme_options'     => array( 'administrator' ),
+			'customize'              => array( 'administrator' ),
 			'export'                 => array( 'administrator' ),
 			'import'                 => array( 'administrator' ),
 			'list_users'             => array( 'administrator' ),
@@ -140,11 +143,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'edit_users'             => array(),
 			'install_plugins'        => array(),
 			'install_themes'         => array(),
+			'upload_plugins'         => array(),
+			'upload_themes'          => array(),
 			'update_core'            => array(),
 			'update_plugins'         => array(),
 			'update_themes'          => array(),
 
 			'edit_theme_options'     => array( 'administrator' ),
+			'customize'              => array( 'administrator' ),
 			'export'                 => array( 'administrator' ),
 			'import'                 => array( 'administrator' ),
 			'list_users'             => array( 'administrator' ),
@@ -243,6 +249,10 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			}
 
 		}
+
+		$this->assertFalse( $user->has_cap( 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
+		$this->assertFalse( user_can( $user, 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
+
 	}
 
 	// special case for the link manager
@@ -304,6 +314,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertTrue( $user->has_cap( $cap ), "Super Admins should have the {$cap} capability" );
 			$this->assertTrue( user_can( $user, $cap ), "Super Admins should have the {$cap} capability" );
 		}
+
+		$this->assertFalse( $user->has_cap( 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
+		$this->assertFalse( user_can( $user, 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
 	}
 
 	// a role that doesn't exist
