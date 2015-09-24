@@ -199,7 +199,7 @@ class Tests_User extends WP_UnitTestCase {
 		// Test 'ID'
 		$this->assertNotEmpty( $user->ID );
 		unset( $user->ID );
-		$this->assertEmpty( $user->ID );
+		$this->assertNotEmpty( $user->ID );
 	}
 
 	// Test meta property magic functions for property get/set/isset.
