@@ -40,7 +40,7 @@ class Tests_Sanitize_Option extends WP_UnitTestCase {
 			array( 'siteurl', 'http://example.org', 'http://example.org' ),
 			array( 'siteurl', 'http://example.org/subdir', 'http://example.org/subdir' ),
 			array( 'siteurl', get_option( 'siteurl' ), '' ),
-			array( 'home', 'http://example.org', 'example.org' ),
+			array( 'home', 'http://example.org', 'http://example.org' ),
 			array( 'home', 'https://example.org', 'https://example.org' ),
 			array( 'home', 'http://localhost:8000', 'http://localhost:8000' ),
 			array( 'home', get_option( 'home' ), '' ),

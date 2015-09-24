@@ -93,7 +93,7 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 					'number' => 1,
 					'hide_empty' => false,
 				),
-				"<a href='http://example.org/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
 				array(
 					'hide_empty' => false,
 				),
@@ -107,7 +107,7 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 					'hide_empty' => false,
 				),
 				array(
-					"<a href='http://example.org/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
+					"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
 				),
 				array(
 					'hide_empty' => false,
@@ -122,7 +122,7 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 					'number' => 1,
 					'hide_empty' => false,
 				),
-				"<ul class='wp-tag-cloud'>\n\t<li><a href='http://example.org/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n</ul>\n",
+				"<ul class='wp-tag-cloud'>\n\t<li><a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n</ul>\n",
 				array(
 					'hide_empty' => false,
 					'format'     => 'list',
@@ -135,10 +135,10 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 					'number' => 4,
 					'hide_empty' => false,
 				),
-				"<a href='http://example.org/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>\n".
-				"<a href='http://example.org/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a>\n".
-				"<a href='http://example.org/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a>\n".
-				"<a href='http://example.org/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>",
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>\n".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a>\n".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a>\n".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>",
 				array(
 					'hide_empty' => false,
 				),
@@ -151,10 +151,10 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 					'hide_empty' => false,
 				),
 				"<ul class='wp-tag-cloud'>\n\t<li>".
-				"<a href='http://example.org/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n\t<li>".
-				"<a href='http://example.org/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a></li>\n\t<li>".
-				"<a href='http://example.org/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a></li>\n\t<li>".
-				"<a href='http://example.org/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n\t<li>".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a></li>\n\t<li>".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a></li>\n\t<li>".
+				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>".
 				"</li>\n</ul>\n",
 				array(
 					'hide_empty' => false,
