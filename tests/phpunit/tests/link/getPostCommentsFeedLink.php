@@ -3,30 +3,12 @@
  * @group link
  */
 class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
-	protected $permalink_structure;
-
-	function setUp() {
-		parent::setUp();
-
-		$this->permalink_structure = get_option( 'permalink_structure' );
-	}
-
-	function tearDown() {
-		$this->remove_added_uploads();
-
-		parent::tearDown();
-
-		$this->set_permalink_structure( $this->permalink_structure );
-	}
-
-	public function set_permalink_structure( $permalink_structure ) {
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure( $permalink_structure );
-		$wp_rewrite->flush_rules();
-	}
-
 	public function test_post_link() {
-		$this->set_permalink_structure( '' );
+		global $wp_rewrite;
+		$permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
 
 		$post_id = $this->factory->post->create();
 
@@ -40,7 +22,11 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_post_pretty_link() {
-		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		global $wp_rewrite;
+		$permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->flush_rules();
 
 		$post_id = $this->factory->post->create();
 
@@ -51,7 +37,10 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_link() {
-		$this->set_permalink_structure( '' );
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
 
 		$post_id = $this->factory->post->create();
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', $post_id, array(
@@ -69,7 +58,10 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_pretty_link() {
-		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->flush_rules();
 
 		$post_id = $this->factory->post->create( array(
 			'post_status' => 'publish'
@@ -89,7 +81,10 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_no_name_pretty_link() {
-		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->flush_rules();
 
 		$post_id = $this->factory->post->create();
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', $post_id, array(
@@ -98,16 +93,16 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 		) );
 
 		$link = get_post_comments_feed_link( $attachment_id );
-		$expected = add_query_arg( array(
-			'feed' => get_default_feed(),
-			'p' => $attachment_id
-		), home_url( '/' ) );
-
+		$expected = get_permalink( $post_id ) . 'attachment/' . $attachment_id . '/feed/';
+		
 		$this->assertEquals( $expected, $link );
 	}
 
 	public function test_unattached_link() {
-		$this->set_permalink_structure( '' );
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
 
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
@@ -124,7 +119,10 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_unattached_pretty_link() {
-		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$wp_rewrite->flush_rules();
 
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
