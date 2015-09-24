@@ -120,8 +120,6 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		set_post_thumbnail( $this->post, $this->attachment_id );
 
-		var_dump( get_the_post_thumbnail_url( $this->post ) );
-
 		$this->assertEquals( '', get_the_post_thumbnail_url() );
 		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), get_the_post_thumbnail_url( $this->post ) );
 
