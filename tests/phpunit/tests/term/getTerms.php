@@ -22,7 +22,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$num_queries = $wpdb->num_queries;
 
 		// last_changed and num_queries should bump
-		$terms = get_terms( 'post_tag' );
+		$terms = get_terms( 'post_tag', array( 'update_term_meta_cache' => false ) );
 		$this->assertEquals( 3, count( $terms ) );
 		$time1 = wp_cache_get( 'last_changed', 'terms' );
 		$this->assertNotEmpty( $time1 );
@@ -31,7 +31,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$num_queries = $wpdb->num_queries;
 
 		// Again. last_changed and num_queries should remain the same.
-		$terms = get_terms( 'post_tag' );
+		$terms = get_terms( 'post_tag', array( 'update_term_meta_cache' => false ) );
 		$this->assertEquals( 3, count( $terms ) );
 		$this->assertEquals( $time1, wp_cache_get( 'last_changed', 'terms' ) );
 		$this->assertEquals( $num_queries, $wpdb->num_queries );
@@ -1500,6 +1500,84 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 				$this->assertEquals( 1, $f->count );
 			}
 		}
+	}
+
+	/**
+	 * @ticket 10142
+	 */
+	public function test_termmeta_cache_should_be_primed_by_default() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'include' => $terms,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		foreach ( $terms as $t ) {
+			$this->assertSame( 'bar', get_term_meta( $t, 'foo', true ) );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 10142
+	 */
+	public function test_termmeta_cache_should_not_be_primed_when_update_term_meta_cache_is_false() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'include' => $terms,
+			'update_term_meta_cache' => false,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		foreach ( $terms as $t ) {
+			$this->assertSame( 'bar', get_term_meta( $t, 'foo', true ) );
+		}
+
+		$this->assertSame( $num_queries + 3, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 10142
+	 */
+	public function test_meta_query() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 5, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'foo', 'baz' );
+		add_term_meta( $terms[3], 'foob', 'ar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
 	}
 
 	protected function create_hierarchical_terms_and_posts() {
