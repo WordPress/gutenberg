@@ -2031,15 +2031,15 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		) );
 
 		// Top-level comments.
-		$this->assertEquals( array( $c1, $c5 ), array_values( wp_list_pluck( $q->comments, 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c1, $c5 ), array_values( wp_list_pluck( $q->comments, 'comment_ID' ) ) );
 
 		// Direct descendants of $c1.
-		$this->assertEquals( array( $c2, $c4 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_children(), 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c2, $c4 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_children(), 'comment_ID' ) ) );
 
 		// Direct descendants of $c2.
-		$this->assertEquals( array( $c3 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_child( $c2 )->get_children(), 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c3 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_child( $c2 )->get_children(), 'comment_ID' ) ) );
 
 		// Direct descendants of $c5.
-		$this->assertEquals( array( $c6 ), array_values( wp_list_pluck( $q->comments[ $c5 ]->get_children(), 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c6 ), array_values( wp_list_pluck( $q->comments[ $c5 ]->get_children(), 'comment_ID' ) ) );
 	}
 }
