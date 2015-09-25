@@ -144,4 +144,111 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	public function test_adding_term_meta_should_bust_get_terms_cache() {
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		add_term_meta( $terms[0], 'foo', 'bar' );
+
+		// Prime cache.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0] ), $found );
+
+		add_term_meta( $terms[1], 'foo', 'bar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
+	}
+
+	public function test_updating_term_meta_should_bust_get_terms_cache() {
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'baz' );
+
+		// Prime cache.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0] ), $found );
+
+		update_term_meta( $terms[1], 'foo', 'bar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
+	}
+
+	public function test_deleting_term_meta_should_bust_get_terms_cache() {
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+
+		// Prime cache.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
+
+		delete_term_meta( $terms[1], 'foo', 'bar' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $terms[0] ), $found );
+	}
 }
