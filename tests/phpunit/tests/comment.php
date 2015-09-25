@@ -273,4 +273,19 @@ class Tests_Comment extends WP_UnitTestCase {
 		$sent = wp_new_comment_notify_postauthor( $c );
 		$this->assertFalse( $sent );
 	}
+
+	/**
+	 * @ticket 12431
+	 */
+	public function test_wp_new_comment_with_meta() {
+		$c = $this->factory->comment->create( array(
+			'comment_approved' => '1',
+			'comment_meta' => array(
+				'food' => 'taco',
+				'sauce' => 'fire'
+			)
+		) );
+
+		$this->assertEquals( 'fire', get_comment_meta( $c, 'sauce', true ) );
+	}
 }
