@@ -71,28 +71,6 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Validate get_comments_pages_count for option page_comments
-	 */
-	function test_option_page_comments() {
-		//setup post and comments
-		$post = $this->factory->post->create_and_get( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
-		$comments = $this->factory->comment->create_post_comments( $post->ID, 15 );
-
-		// comment paging disabled
-		update_option( 'page_comments', false );
-
-		$this->assertEquals( 1, get_comment_pages_count( $comments, 10, false ) );
-		$this->assertEquals( 1, get_comment_pages_count( $comments, 0, true ) );
-		$this->assertEquals( 1, get_comment_pages_count( $comments, 2, true ) );
-
-		// comment paging enabled
-		update_option( 'page_comments', true );
-
-		$this->assertEquals( 2, get_comment_pages_count( $comments, 10, false ) );
-		$this->assertEquals( 3, get_comment_pages_count( $comments, 5, false ) );
-	}
-
-	/**
 	 * Validate get_comments_pages_count for option tread_comments
 	 */
 	function test_option_thread_comments() {
