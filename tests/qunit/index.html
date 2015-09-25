@@ -25,6 +25,7 @@
 			<script src="fixtures/customize-header.js"></script>
 			<script src="fixtures/customize-settings.js"></script>
 			<script src="fixtures/customize-menus.js"></script>
+			<script src="fixtures/customize-widgets.js"></script>
 		</div>
 		<p><a href="editor">TinyMCE tests</a></p>
 
@@ -44,6 +45,7 @@
 
 		<script src="../../src/wp-admin/js/nav-menu.js"></script>
 		<script src="../../src/wp-admin/js/customize-nav-menus.js"></script>
+		<script src="../../src/wp-admin/js/customize-widgets.js"></script>
 		<script src="../../src/wp-admin/js/word-count.js"></script>
 
 		<!-- Unit tests -->
@@ -54,6 +56,7 @@
 		<script src="wp-admin/js/customize-controls.js"></script>
 		<script src="wp-admin/js/customize-controls-utils.js"></script>
 		<script src="wp-admin/js/customize-nav-menus.js"></script>
+		<script src="wp-admin/js/customize-widgets.js"></script>
 		<script src="wp-admin/js/word-count.js"></script>
 
 		<!-- Customizer templates for sections -->
@@ -267,6 +270,36 @@
 			<div class="menu-item-reorder-nav">
 				<button type="button" class="menus-move-up">Move up</button><button type="button" class="menus-move-down">Move down</button><button type="button" class="menus-move-left">Move one level up</button><button type="button" class="menus-move-right">Move one level down</button>			</div>
 		</script>
+
+		<script type="text/html" id="tmpl-customize-section-sidebar">
+			<li id="accordion-section-{{ data.id }}" class="accordion-section control-section control-section-{{ data.type }}">
+			<h3 class="accordion-section-title" tabindex="0">
+				{{ data.title }}
+				<span class="screen-reader-text">Press return or enter to open</span>
+			</h3>
+			<ul class="accordion-section-content">
+				<li class="customize-section-description-container">
+					<div class="customize-section-title">
+						<button class="customize-section-back" tabindex="-1">
+							<span class="screen-reader-text">Back</span>
+						</button>
+						<h3>
+							<span class="customize-action">
+								{{{ data.customizeAction }}}
+							</span>
+							{{ data.title }}
+						</h3>
+					</div>
+					<# if ( data.description ) { #>
+						<div class="description customize-section-description">
+							{{{ data.description }}}
+						</div>
+					<# } #>
+				</li>
+			</ul>
+			</li>
+		</script>
+
 		<div hidden>
 			<div id="available-menu-items" class="accordion-container">
 			<div class="customize-section-title">
@@ -375,7 +408,69 @@
 						</div><!-- #available-menu-items -->
 			</div><!-- end nav menu templates -->
 
+		<div hidden>
+			<div id="widgets-left"><!-- compatibility with JS which looks for widget templates here -->
+				<div id="available-widgets">
+					<div class="customize-section-title">
+						<button class="customize-section-back" tabindex="-1">
+							<span class="screen-reader-text">Back</span>
+						</button>
+						<h3>
+							<span class="customize-action">Customizing &#9656; Widgets</span>
+							Add a Widget				</h3>
+					</div>
+					<div id="available-widgets-filter">
+						<label class="screen-reader-text" for="widgets-search">Search Widgets</label>
+						<input type="search" id="widgets-search" placeholder="Search widgets&hellip;" />
+					</div>
+					<div id="available-widgets-list">
+									<div id="widget-tpl-search-2" data-widget-id="search-2" class="widget-tpl search-2" tabindex="0">
+							<div id='widget-11_search-__i__' class='widget'>	<div class="widget-top">
+			<div class="widget-title-action">
+				<a class="widget-action hide-if-no-js" href="#available-widgets"></a>
+				<a class="widget-control-edit hide-if-js" href="/wp-admin/customize.php?editwidget=search-2&#038;addnew=1&#038;num=3&#038;base=search">
+					<span class="edit">Edit</span>
+					<span class="add">Add</span>
+					<span class="screen-reader-text">Search</span>
+				</a>
+			</div>
+			<div class="widget-title"><h4>Search<span class="in-widget-title"></span></h4></div>
+			</div>
 
+			<div class="widget-inside">
+			<div class="form">
+			<div class="widget-content">
+				<p><label for="widget-search-__i__-title">Title: <input class="widefat" id="widget-search-__i__-title" name="widget-search[__i__][title]" type="text" value="" /></label></p>
+			</div>
+			<input type="hidden" name="widget-id" class="widget-id" value="search-__i__" />
+			<input type="hidden" name="id_base" class="id_base" value="search" />
+			<input type="hidden" name="widget-width" class="widget-width" value="250" />
+			<input type="hidden" name="widget-height" class="widget-height" value="200" />
+			<input type="hidden" name="widget_number" class="widget_number" value="2" />
+			<input type="hidden" name="multi_number" class="multi_number" value="3" />
+			<input type="hidden" name="add_new" class="add_new" value="multi" />
+
+			<div class="widget-control-actions">
+				<div class="alignleft">
+				<a class="widget-control-remove" href="#remove">Delete</a> |
+				<a class="widget-control-close" href="#close">Close</a>
+				</div>
+				<div class="alignright">
+					<input type="submit" name="savewidget" id="widget-search-__i__-savewidget" class="button button-primary widget-control-save right" value="Save"  />			<span class="spinner"></span>
+				</div>
+				<br class="clear" />
+			</div>
+			</div><!-- .form -->
+			</div>
+
+			<div class="widget-description">
+		A search form for your site.
+			</div>
+		</div>				</div>
+					</div><!-- #available-widgets-list -->
+				</div><!-- #available-widgets -->
+			</div><!-- #widgets-left -->
+		</div><!-- end widget templates -->
 		<script src="../../src/wp-includes/js/tinymce/tinymce.js"></script>
 		<script src="editor/js/utils.js"></script>
 		<script src="wp-includes/js/tinymce/plugins/wptextpattern/plugin.js"></script>

@@ -1,9 +1,9 @@
 window.wp = window.wp || {};
-window.wp.customize = window.wp.customize || { get: function(){}  };
+window.wp.customize = window.wp.customize || { get: function() {} };
 
 var customizerRootElement;
 customizerRootElement = jQuery( '<div id="customize-theme-controls"><ul></ul></div>' );
-customizerRootElement.css( { position: 'absolute', left: -10000, top: -10000 } ); // remove from view
+customizerRootElement.css( { position: 'absolute', left: -10000, top: -10000 } ); // Remove from view.
 jQuery( document.body ).append( customizerRootElement );
 
 window._wpCustomizeSettings = {

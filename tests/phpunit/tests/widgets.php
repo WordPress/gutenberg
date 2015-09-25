@@ -306,8 +306,63 @@ class Tests_Widgets extends WP_UnitTestCase {
 		ob_start();
 		$result = dynamic_sidebar( 'Sidebar 1' );
 		ob_end_clean();
-		 
+
 		$this->assertFalse( $result );
 	}
 
+	/**
+	 * @see wp_widget_control()
+	 */
+	function test_wp_widget_control() {
+		global $wp_registered_widgets;
+
+		wp_widgets_init();
+		require_once ABSPATH . '/wp-admin/includes/widgets.php';
+		$widget_id = 'search-2';
+		$widget = $wp_registered_widgets[ $widget_id ];
+		$params = array(
+			'widget_id' => $widget['id'],
+			'widget_name' => $widget['name'],
+		);
+		$args = wp_list_widget_controls_dynamic_sidebar( array( 0 => $params, 1 => $widget['params'][0] ) );
+
+		ob_start();
+		call_user_func_array( 'wp_widget_control', $args );
+		$control = ob_get_clean();
+		$this->assertNotEmpty( $control );
+
+		$this->assertContains( '<div class="widget-top">', $control );
+		$this->assertContains( '<div class="widget-title-action">', $control );
+		$this->assertContains( '<div class="widget-title">', $control );
+		$this->assertContains( '<form method="post">', $control );
+		$this->assertContains( '<div class="widget-content">', $control );
+		$this->assertContains( '<input class="widefat"', $control );
+		$this->assertContains( '<input type="hidden" name="id_base" class="id_base" value="search"', $control );
+		$this->assertContains( '<div class="widget-control-actions">', $control );
+		$this->assertContains( '<div class="alignleft">', $control );
+		$this->assertContains( 'widget-control-remove', $control );
+		$this->assertContains( 'widget-control-close', $control );
+		$this->assertContains( '<div class="alignright">', $control );
+		$this->assertContains( '<input type="submit" name="savewidget"', $control );
+
+		$param_overrides = array(
+			'before_form' => '<!-- before_form -->',
+			'after_form' => '<!-- after_form -->',
+			'before_widget_content' => '<!-- before_widget_content -->',
+			'after_widget_content' => '<!-- after_widget_content -->',
+		);
+		$params = array_merge( $params, $param_overrides );
+		$args = wp_list_widget_controls_dynamic_sidebar( array( 0 => $params, 1 => $widget['params'][0] ) );
+
+		ob_start();
+		call_user_func_array( 'wp_widget_control', $args );
+		$control = ob_get_clean();
+		$this->assertNotEmpty( $control );
+		$this->assertNotContains( '<form method="post">', $control );
+		$this->assertNotContains( '<div class="widget-content">', $control );
+
+		foreach ( $param_overrides as $contained ) {
+			$this->assertContains( $contained, $control );
+		}
+	}
 }
