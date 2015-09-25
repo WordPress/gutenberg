@@ -288,4 +288,55 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertEquals( 'fire', get_comment_meta( $c, 'sauce', true ) );
 	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_wp_comment_get_children_should_fill_children() {
+
+		$p = $this->factory->post->create();
+
+		$c1 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+		) );
+
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$c3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $c2,
+		) );
+
+		$c4 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$c5 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+		) );
+
+		$c6 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $c5,
+		) );
+
+		$comment = get_comment( $c1 );
+		$children = $comment->get_children();
+
+		// Direct descendants of $c1.
+		$this->assertEquals( array( $c2, $c4 ), array_values( wp_list_pluck( $children, 'comment_ID' ) ) );
+
+		// Direct descendants of $c2.
+		$this->assertEquals( array( $c3 ), array_values( wp_list_pluck( $children[ $c2 ]->get_children(), 'comment_ID' ) ) );
+	}
 }

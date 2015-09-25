@@ -1920,4 +1920,126 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( 3, $q->found_comments );
 		$this->assertEquals( 2, $q->max_num_pages );
 	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_hierarchical_should_skip_child_comments_in_offset() {
+		$top_level_0 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$child_of_0 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$top_level_comments = $this->factory->comment->create_many( 3, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'hierarchical' => 'flat',
+			'number' => 2,
+			'offset' => 1,
+			'orderby' => 'comment_ID',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $top_level_comments[0], $top_level_comments[1] ), $q->comments );
+	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_hierarchical_should_not_include_child_comments_in_number() {
+		$top_level_0 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$child_of_0 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$top_level_comments = $this->factory->comment->create_many( 3, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'hierarchical' => 'flat',
+			'number' => 2,
+			'orderby' => 'comment_ID',
+			'order' => 'ASC',
+		) );
+
+		$this->assertEqualSets( array( $top_level_0, $child_of_0, $top_level_comments[0] ), wp_list_pluck( $q->comments, 'comment_ID' ) );
+	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_hierarchical_threaded() {
+		$c1 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$c2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$c3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c2,
+		) );
+
+		$c4 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c1,
+		) );
+
+		$c5 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$c6 = $this->factory->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $c5,
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'hierarchical' => 'threaded',
+			'orderby' => 'comment_ID',
+			'order' => 'ASC',
+		) );
+
+		// Top-level comments.
+		$this->assertEquals( array( $c1, $c5 ), array_values( wp_list_pluck( $q->comments, 'comment_ID' ) ) );
+
+		// Direct descendants of $c1.
+		$this->assertEquals( array( $c2, $c4 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_children(), 'comment_ID' ) ) );
+
+		// Direct descendants of $c2.
+		$this->assertEquals( array( $c3 ), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_child( $c2 )->get_children(), 'comment_ID' ) ) );
+
+		// Direct descendants of $c5.
+		$this->assertEquals( array( $c6 ), array_values( wp_list_pluck( $q->comments[ $c5 ]->get_children(), 'comment_ID' ) ) );
+	}
 }
