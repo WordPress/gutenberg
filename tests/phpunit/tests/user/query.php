@@ -459,7 +459,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 		// All values get reset
 		$query->prepare_query( array( 'number' => 8 ) );
 		$this->assertNotEmpty( $query->query_limit );
-		$this->assertEquals( 'LIMIT 8', $query->query_limit );
+		$this->assertEquals( 'LIMIT 0, 8', $query->query_limit );
 
 		// All values get reset
 		$query->prepare_query( array( 'fields' => 'all' ) );
@@ -856,5 +856,22 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$expected = array( $users[0], $users[1] );
 
 		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 25145
+	 */
+	public function test_paged() {
+		$users = $this->factory->user->create_many( 5 );
+
+		$q = new WP_User_Query( array(
+			'number' => 2,
+			'paged' => 2,
+			'orderby' => 'ID',
+			'order' => 'DESC', // Avoid funkiness with user 1.
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( array( $users[2], $users[1] ), $q->results );
 	}
 }
