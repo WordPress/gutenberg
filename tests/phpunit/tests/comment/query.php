@@ -1873,4 +1873,51 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEquals( array( $c2, $c3 ), $ids->comments );
 
 	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_no_found_rows_should_default_to_true() {
+		$comments = $this->factory->comment->create_many( 3, array( 'comment_post_ID' => $this->post_id ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'number' => 2,
+		) );
+
+		$this->assertEquals( 0, $q->found_comments );
+		$this->assertEquals( 0, $q->max_num_pages );
+	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_should_respect_no_found_rows_true() {
+		$comments = $this->factory->comment->create_many( 3, array( 'comment_post_ID' => $this->post_id ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'number' => 2,
+			'no_found_rows' => true,
+		) );
+
+		$this->assertEquals( 0, $q->found_comments );
+		$this->assertEquals( 0, $q->max_num_pages );
+	}
+
+	/**
+	 * @ticket 8071
+	 */
+	public function test_should_respect_no_found_rows_false() {
+		$comments = $this->factory->comment->create_many( 3, array( 'comment_post_ID' => $this->post_id ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'number' => 2,
+			'no_found_rows' => false,
+		) );
+
+		$this->assertEquals( 3, $q->found_comments );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
 }
