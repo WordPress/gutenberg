@@ -74,14 +74,20 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	 */
 	public function getDefinedPluggableFunctions() {
 
-		preg_match_all( '#^function (\w+)#m', file_get_contents( ABSPATH . '/wp-includes/pluggable.php' ), $functions );
-
+		$test_files = array(
+			'wp-includes/pluggable.php',
+			'wp-includes/cache.php',
+		);
 		$data = array();
 
-		foreach ( $functions[1] as $function ) {
-			$data[] = array(
-				$function,
-			);
+		foreach ( $test_files as $file ) {
+			preg_match_all( '#^function (\w+)#m', file_get_contents( ABSPATH . '/' . $file ), $functions );
+
+			foreach ( $functions[1] as $function ) {
+				$data[] = array(
+					$function
+				);
+			}
 		}
 
 		return $data;
@@ -96,6 +102,8 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	public function getPluggableFunctionSignatures() {
 
 		return array(
+
+			// wp-includes/pluggable.php:
 			'wp_set_current_user'             => array( 'id', 'name' => '' ),
 			'wp_get_current_user'             => array(),
 			'get_currentuserinfo'             => array(),
@@ -135,6 +143,23 @@ class Tests_Pluggable extends WP_UnitTestCase {
 			'wp_set_password'                 => array( 'password', 'user_id' ),
 			'get_avatar'                      => array( 'id_or_email', 'size' => 96, 'default' => '', 'alt' => '', 'args' => null ),
 			'wp_text_diff'                    => array( 'left_string', 'right_string', 'args' => null ),
+
+			// wp-includes/cache.php:
+			'wp_cache_add'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+			'wp_cache_close'                     => array(),
+			'wp_cache_decr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
+			'wp_cache_delete'                    => array( 'key', 'group' => '' ),
+			'wp_cache_flush'                     => array(),
+			'wp_cache_get'                       => array( 'key', 'group' => '', 'force' => false, 'found' => null ),
+			'wp_cache_incr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
+			'wp_cache_init'                      => array(),
+			'wp_cache_replace'                   => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+			'wp_cache_set'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+			'wp_cache_switch_to_blog'            => array( 'blog_id' ),
+			'wp_cache_add_global_groups'         => array( 'groups' ),
+			'wp_cache_add_non_persistent_groups' => array( 'groups' ),
+			'wp_cache_reset'                     => array(),
+
 		);
 
 	}
