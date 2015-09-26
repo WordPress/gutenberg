@@ -2108,4 +2108,41 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		// Direct descendants of $c2.
 		$this->assertEqualSets( array(), array_values( wp_list_pluck( $q->comments[ $c1 ]->get_child( $c2 )->get_children( $args ), 'comment_ID' ) ) );
 	}
+
+	/**
+	 * @ticket 27571
+	 */
+	public function test_update_comment_post_cache_should_be_disabled_by_default() {
+		global $wpdb;
+
+		$p = $this->factory->post->create();
+		$c = $this->factory->comment->create( array( 'comment_post_ID' => $p ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_ID' => $p,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		$this->assertTrue( isset( $q->comments[0]->post_name ) );
+		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 27571
+	 */
+	public function test_should_respect_update_comment_post_cache_true() {
+		global $wpdb;
+
+		$p = $this->factory->post->create();
+		$c = $this->factory->comment->create( array( 'comment_post_ID' => $p ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_ID' => $p,
+			'update_comment_post_cache' => true,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		$this->assertTrue( isset( $q->comments[0]->post_name ) );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
 }

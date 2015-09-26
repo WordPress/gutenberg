@@ -339,4 +339,23 @@ class Tests_Comment extends WP_UnitTestCase {
 		// Direct descendants of $c2.
 		$this->assertEquals( array( $c3 ), array_values( wp_list_pluck( $children[ $c2 ]->get_children(), 'comment_ID' ) ) );
 	}
+
+	/**
+	 * @group 27571
+	 */
+	public function test_post_properties_should_be_lazyloaded() {
+		$p = $this->factory->post->create();
+
+		$c = $this->factory->comment->create( array( 'comment_post_ID' => $p ) );
+
+		$post = get_post( $p );
+		$comment = get_comment( $c );
+
+		$post_fields = array( 'post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_title', 'post_excerpt', 'post_status', 'comment_status', 'ping_status', 'post_name', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_content_filtered', 'post_parent', 'guid', 'menu_order', 'post_type', 'post_mime_type', 'comment_count' );
+
+		foreach ( $post_fields as $pf ) {
+			$this->assertTrue( isset( $comment->$pf ), $pf );
+			$this->assertSame( $post->$pf, $comment->$pf, $pf );
+		}
+	}
 }
