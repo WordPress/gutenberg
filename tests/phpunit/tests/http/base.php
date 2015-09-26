@@ -13,6 +13,7 @@
 abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	// You can use your own version of data/WPHTTP-testcase-redirection-script.php here.
 	var $redirection_script = 'http://api.wordpress.org/core/tests/1.0/redirection.php';
+	var $fileStreamUrl = 'https://s.w.org/screenshots/3.9/dashboard.png';
 
 	function setUp() {
 
@@ -180,8 +181,8 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	function test_file_stream() {
-		$url = 'http://unit-tests.svn.wordpress.org/trunk/data/images/2004-07-22-DSC_0007.jpg'; // we'll test against a file in the unit test data
-		$size = 87348;
+		$url = $this->fileStreamUrl;
+		$size = 153204;
 		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30 ) ); //Auto generate the filename.
 
 		// Cleanup before we assert, as it'll return early.
@@ -201,7 +202,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	 * @ticket 26726
 	 */
 	function test_file_stream_limited_size() {
-		$url = 'http://unit-tests.svn.wordpress.org/trunk/data/images/2004-07-22-DSC_0007.jpg'; // we'll test against a file in the unit test data
+		$url = $this->fileStreamUrl;
 		$size = 10000;
 		$res = wp_remote_request( $url, array( 'stream' => true, 'timeout' => 30, 'limit_response_size' => $size ) ); //Auto generate the filename.
 
@@ -222,8 +223,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	 * @ticket 31172
 	 */
 	function test_request_limited_size() {
-		// we'll test against a file in the unit test data
-		$url = 'http://develop.svn.wordpress.org/trunk/tests/phpunit/data/images/2004-07-22-DSC_0007.jpg';
+		$url = $this->fileStreamUrl;
 		$size = 10000;
 
 		$res = wp_remote_request( $url, array( 'timeout' => 30, 'limit_response_size' => $size ) );
