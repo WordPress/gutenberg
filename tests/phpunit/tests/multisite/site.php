@@ -1095,11 +1095,12 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		update_site_option( 'blog_upload_space', 250 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
 		$available = is_upload_space_available();
+		$used = get_space_used();
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
 
 		$this->assertEquals(
 			$available,
-			self::$space_used < 250
+			$used < 250
 		);
 	}
 

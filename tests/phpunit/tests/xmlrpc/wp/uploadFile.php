@@ -41,7 +41,7 @@ class Tests_XMLRPC_wp_uploadFile extends WP_XMLRPC_UnitTestCase {
 	function test_network_limit() {
 		$this->make_user_by_role( 'editor' );
 
-		update_option( 'blog_upload_space', 0.1 );
+		update_option( 'blog_upload_space', 0 );
 
 		// create attachment
 		$filename = ( DIR_TESTDATA . '/images/canola.jpg' );
