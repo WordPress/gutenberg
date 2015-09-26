@@ -74,11 +74,27 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	 */
 	public function getDefinedPluggableFunctions() {
 
+		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+
+		$test_functions = array(
+			'install_network',
+			'wp_install',
+			'wp_install_defaults',
+			'wp_new_blog_notification',
+			'wp_upgrade',
+			'install_global_terms',
+		);
 		$test_files = array(
 			'wp-includes/pluggable.php',
 			'wp-includes/cache.php',
 		);
 		$data = array();
+
+		foreach ( $test_functions as $function ) {
+			$data[] = array(
+				$function
+			);
+		}
 
 		foreach ( $test_files as $file ) {
 			preg_match_all( '#^function (\w+)#m', file_get_contents( ABSPATH . '/' . $file ), $functions );
@@ -159,6 +175,16 @@ class Tests_Pluggable extends WP_UnitTestCase {
 			'wp_cache_add_global_groups'         => array( 'groups' ),
 			'wp_cache_add_non_persistent_groups' => array( 'groups' ),
 			'wp_cache_reset'                     => array(),
+
+			// wp-admin/includes/schema.php:
+			'install_network'                    => array(),
+
+			// wp-admin/includes/upgrade.php:
+			'wp_install'                         => array( 'blog_title', 'user_name', 'user_email', 'public', 'deprecated' => '', 'user_password' => '', 'language' => '' ),
+			'wp_install_defaults'                => array( 'user_id' ),
+			'wp_new_blog_notification'           => array( 'blog_title', 'blog_url', 'user_id', 'password' ),
+			'wp_upgrade'                         => array(),
+			'install_global_terms'               => array(),
 
 		);
 
