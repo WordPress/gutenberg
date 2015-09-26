@@ -1107,7 +1107,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_is_upload_space_available_upload_space_0() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 0 );
-		$this->assertFalse( is_upload_space_available() );
+		$this->assertTrue( is_upload_space_available() );
 	}
 
 	function test_is_upload_space_available_upload_space_negative() {
