@@ -11,6 +11,16 @@ if ( is_multisite() ) :
 class Tests_Multisite_Site extends WP_UnitTestCase {
 	protected $suppress = false;
 
+	protected static $space_used;
+	protected static $space_allowed;
+
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		self::$space_allowed = get_space_allowed();
+		self::$space_used = get_space_used();
+	}
+
 	function setUp() {
 		global $wpdb;
 		parent::setUp();
@@ -901,7 +911,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * ticket #18119.
 	 */
 	function test_get_space_allowed_default() {
-		$this->assertEquals( 100, get_space_allowed() );
+		$this->assertEquals( 100, self::$space_allowed );
 	}
 
 	/**
@@ -961,8 +971,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	function test_upload_is_user_over_quota_check_enabled() {
-		update_site_option('upload_space_check_disabled', false);
-		$this->assertFalse( upload_is_user_over_quota( false ) );
+		update_site_option( 'upload_space_check_disabled', false );
+		// will be set to ''
+		$this->assertEmpty( get_site_option( 'upload_space_check_disabled' ) );
+
+		$this->assertEquals(
+			upload_is_user_over_quota( false ),
+			self::$space_used > self::$space_allowed
+		);
 	}
 
 	/**
@@ -973,10 +989,10 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		update_site_option( 'upload_space_check_disabled', true );
 		update_site_option( 'blog_upload_space', 100 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertFalse( upload_is_user_over_quota( false ) );
-
+		$quota = upload_is_user_over_quota( false );
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertFalse( $quota );
 	}
 
 	/**
@@ -985,7 +1001,11 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_upload_is_user_over_quota_upload_space_0() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 0 );
-		$this->assertFalse( upload_is_user_over_quota( false ) );
+
+		$this->assertEquals(
+			upload_is_user_over_quota( false ),
+			self::$space_used > self::$space_allowed
+		);
 	}
 
 	/**
@@ -996,40 +1016,49 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 0 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertTrue( upload_is_user_over_quota( false ) );
-
+		$quota = upload_is_user_over_quota( false );
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertTrue( $quota );
 	}
 
 	function test_upload_is_user_over_quota_upload_space_200() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 200 );
-		$this->assertFalse( upload_is_user_over_quota( false ) );
+		$this->assertEquals(
+			upload_is_user_over_quota( false ),
+			self::$space_used > 200
+		);
 	}
 
 	function test_upload_is_user_over_quota_upload_space_200_filter_space_used() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 200 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertTrue( upload_is_user_over_quota( false ) );
-
+		$quota = upload_is_user_over_quota( false );
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertTrue( $quota );
 	}
 
 	/**
 	 * If the space used is exactly the same as the available quota, an over
 	 * quota response is not expected.
+	 *
+	 * @group woo
 	 */
 	function test_upload_is_user_over_quota_upload_space_exact() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 300 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertFalse( upload_is_user_over_quota( false ) );
-
+		$quota = upload_is_user_over_quota( false );
+		$used = get_space_used();
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertEquals(
+			$quota,
+			$used > 300
+		);
 	}
 
 	function test_upload_is_user_over_quota_upload_space_negative() {
@@ -1051,26 +1080,33 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 350 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+		$available = is_upload_space_available();
+		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
 
 		$this->assertTrue( is_upload_space_available() );
-
-		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+		$this->assertEquals(
+			$available,
+			self::$space_used < 350
+		);
 	}
 
 	function test_is_upload_space_available_space_used_is_more() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 250 );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertFalse( is_upload_space_available() );
-
+		$available = is_upload_space_available();
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
+
+		$this->assertEquals(
+			$available,
+			self::$space_used < 250
+		);
 	}
 
 	function test_is_upload_space_available_upload_space_0() {
 		update_site_option( 'upload_space_check_disabled', false );
 		update_site_option( 'blog_upload_space', 0 );
-		$this->assertTrue( is_upload_space_available() );
+		$this->assertFalse( is_upload_space_available() );
 	}
 
 	function test_is_upload_space_available_upload_space_negative() {
@@ -1150,10 +1186,9 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	function test_domain_filtered_to_exist() {
 		add_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
-
-		$this->assertEquals( 1234, domain_exists( 'foo', 'bar' ) );
-
+		$exists = domain_exists( 'foo', 'bar' );
 		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+		$this->assertEquals( 1234, $exists );
 	}
 
 	/**
@@ -1162,11 +1197,12 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_slashed_path_in_domain_exists() {
 		add_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+		$exists1 = domain_exists( 'foo', 'bar' );
+		$exists2 = domain_exists( 'foo', 'bar/' );
+		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
 
 		// Make sure the same result is returned with or without a trailing slash
-		$this->assertEquals( domain_exists( 'foo', 'bar' ), domain_exists( 'foo', 'bar/' ) );
-
-		remove_filter( 'domain_exists', array( $this, '_domain_exists_cb' ), 10, 4 );
+		$this->assertEquals( $exists1, $exists2 );
 	}
 
 	/**
