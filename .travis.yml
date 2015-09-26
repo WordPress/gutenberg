@@ -40,7 +40,8 @@ before_script:
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
-    secure: WuMCpfgrm0GIdPbYzsGOsakZ5x7QIbEBwD+CPHVXGKbL3ZbqQ+BVcDRnMiwzxjgf1vzg2de0taXCSMGKBxsWce23NZkOnmwPdIB8XOnwDV7T7zylgYD5S7p3gI6gV0l8Y3/gROdXFZap6viC1qRr4E79ow53RKk7E3WyOo7TWqo=
+    rooms:
+      secure: WuMCpfgrm0GIdPbYzsGOsakZ5x7QIbEBwD+CPHVXGKbL3ZbqQ+BVcDRnMiwzxjgf1vzg2de0taXCSMGKBxsWce23NZkOnmwPdIB8XOnwDV7T7zylgYD5S7p3gI6gV0l8Y3/gROdXFZap6viC1qRr4E79ow53RKk7E3WyOo7TWqo=
     on_start: never
     on_failure: always
     on_success: change
