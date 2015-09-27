@@ -617,6 +617,25 @@ class Tests_User extends WP_UnitTestCase {
 	/**
 	 * @ticket 33793
 	 */
+	public function test_wp_insert_user_should_accept_user_login_with_60_characters() {
+		$user_login = str_repeat( 'a', 60 );
+		$u = wp_insert_user( array(
+			'user_login' => $user_login,
+			'user_email' => $user_login . '@example.com',
+			'user_pass' => 'password',
+			'user_nicename' => 'something-short',
+		) );
+
+		$this->assertInternalType( 'int', $u );
+		$this->assertGreaterThan( 0, $u );
+
+		$user = new WP_User( $u );
+		$this->assertSame( $user_login, $user->user_login );
+	}
+
+	/**
+	 * @ticket 33793
+	 */
 	public function test_wp_insert_user_should_reject_user_login_over_60_characters() {
 		$user_login = str_repeat( 'a', 61 );
 		$u = wp_insert_user( array(
