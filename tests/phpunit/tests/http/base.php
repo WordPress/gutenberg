@@ -15,6 +15,8 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	var $redirection_script = 'http://api.wordpress.org/core/tests/1.0/redirection.php';
 	var $fileStreamUrl = 'http://s.w.org/screenshots/3.9/dashboard.png';
 
+	protected $http_request_args;
+
 	function setUp() {
 
 		if ( is_callable( array('WP_Http', '_getTransport') ) ) {
@@ -40,6 +42,11 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			remove_filter( "use_{$t}_transport", '__return_false' );
 		}
 		parent::tearDown();
+	}
+
+	function filter_http_request_args( array $args ) {
+		$this->http_request_args = $args;
+		return $args;
 	}
 
 	function test_redirect_on_301() {
@@ -280,6 +287,27 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$res = wp_remote_get( $url, $args );
 		$this->assertEquals( 'PASS', wp_remote_retrieve_body( $res ) );
 
+	}
+
+	/**
+	 * Test HTTP requests where SSL verification is disabled but the CA bundle is still populated
+	 *
+	 * @ticket 33978
+	 */
+	function test_https_url_without_ssl_verification() {
+		$url = 'https://wordpress.org/';
+		$args = array(
+			'sslverify' => false,
+		);
+
+		add_filter( 'http_request_args', array( $this, 'filter_http_request_args' ) );
+
+		$res = wp_remote_head( $url, $args );
+
+		remove_filter( 'http_request_args', array( $this, 'filter_http_request_args' ) );
+
+		$this->assertNotEmpty( $this->http_request_args['sslcertificates'] );
+		$this->assertNotWPError( $res );
 	}
 
 	/**
