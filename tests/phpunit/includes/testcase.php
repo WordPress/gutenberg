@@ -301,6 +301,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf( 'WP_Error', $actual, $message );
 	}
 
+	function assertNotWPError( $actual, $message = '' ) {
+		if ( is_wp_error( $actual ) && '' === $message ) {
+			$message = $actual->get_error_message();
+		}
+		$this->assertNotInstanceOf( 'WP_Error', $actual, $message );
+	}
+
 	function assertEqualFields( $object, $fields ) {
 		foreach( $fields as $field_name => $field_value ) {
 			if ( $object->$field_name != $field_value ) {
