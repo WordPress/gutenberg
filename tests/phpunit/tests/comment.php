@@ -334,10 +334,10 @@ class Tests_Comment extends WP_UnitTestCase {
 		$children = $comment->get_children();
 
 		// Direct descendants of $c1.
-		$this->assertEquals( array( $c2, $c4 ), array_values( wp_list_pluck( $children, 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c2, $c4 ), array_values( wp_list_pluck( $children, 'comment_ID' ) ) );
 
 		// Direct descendants of $c2.
-		$this->assertEquals( array( $c3 ), array_values( wp_list_pluck( $children[ $c2 ]->get_children(), 'comment_ID' ) ) );
+		$this->assertEqualSets( array( $c3 ), array_values( wp_list_pluck( $children[ $c2 ]->get_children(), 'comment_ID' ) ) );
 	}
 
 	/**
