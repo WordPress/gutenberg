@@ -188,7 +188,7 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 			'slug' => 'foo',
 		) );
 
-		$this->assertFalse( is_wp_error( $updated ) );
+		$this->assertNotWPError( $updated );
 
 		$t1_term = get_term( $t1, 'wptests_tax' );
 		$t2_term = get_term( $t2, 'wptests_tax_2' );
@@ -218,7 +218,7 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 			'name' => 'Foo',
 		) );
 
-		$this->assertFalse( is_wp_error( $updated ) );
+		$this->assertNotWPError( $updated );
 
 		$t2_term = get_term( $t2, 'wptests_tax_2' );
 		$this->assertSame( 'Foo', $t2_term->name );
@@ -256,7 +256,7 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 			'name' => 'Bar',
 		) );
 
-		$this->assertFalse( is_wp_error( $updated ) );
+		$this->assertNotWPError( $updated );
 
 		$t3_term = get_term( $t3, 'wptests_tax' );
 		$this->assertSame( 'Bar', $t3_term->name );

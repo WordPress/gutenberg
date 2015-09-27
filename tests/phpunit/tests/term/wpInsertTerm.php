@@ -27,7 +27,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 
 		$t = wp_insert_term( $term, $taxonomy );
 		$this->assertInternalType( 'array', $t );
-		$this->assertFalse( is_wp_error($t) );
+		$this->assertNotWPError( $t );
 		$this->assertTrue( $t['term_id'] > 0 );
 		$this->assertTrue( $t['term_taxonomy_id'] > 0 );
 		$this->assertEquals( $initial_count + 1, wp_count_terms( $taxonomy ) );
@@ -161,12 +161,12 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 	 */
 	public function test_wp_insert_term_duplicate_name() {
 		$term = $this->factory->tag->create_and_get( array( 'name' => 'Bozo' ) );
-		$this->assertFalse( is_wp_error( $term ) );
+		$this->assertNotWPError( $term );
 		$this->assertTrue( empty( $term->errors ) );
 
 		// Test existing term name with unique slug
 		$term1 = $this->factory->tag->create( array( 'name' => 'Bozo', 'slug' => 'bozo1' ) );
-		$this->assertFalse( is_wp_error( $term1 ) );
+		$this->assertNotWPError( $term1 );
 
 		// Test an existing term name
 		$term2 = $this->factory->tag->create( array( 'name' => 'Bozo' ) );
@@ -200,21 +200,21 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$this->assertCount( 4, array_unique( wp_list_pluck( $terms, 'slug' ) ) );
 
 		$term13 = $this->factory->tag->create( array( 'name' => 'A' ) );
-		$this->assertFalse( is_wp_error( $term13 ) );
+		$this->assertNotWPError( $term13 );
 		$term14 = $this->factory->tag->create( array( 'name' => 'A' ) );
 		$this->assertTrue( is_wp_error( $term14 ) );
 		$term15 = $this->factory->tag->create( array( 'name' => 'A+', 'slug' => 'a' ) );
-		$this->assertFalse( is_wp_error( $term15 ) );
+		$this->assertNotWPError( $term15 );
 		$term16 = $this->factory->tag->create( array( 'name' => 'A+' ) );
 		$this->assertTrue( is_wp_error( $term16 ) );
 		$term17 = $this->factory->tag->create( array( 'name' => 'A++' ) );
-		$this->assertFalse( is_wp_error( $term17 ) );
+		$this->assertNotWPError( $term17 );
 		$term18 = $this->factory->tag->create( array( 'name' => 'A-', 'slug' => 'a' ) );
-		$this->assertFalse( is_wp_error( $term18 ) );
+		$this->assertNotWPError( $term18 );
 		$term19 = $this->factory->tag->create( array( 'name' => 'A-' ) );
 		$this->assertTrue( is_wp_error( $term19 ) );
 		$term20 = $this->factory->tag->create( array( 'name' => 'A--' ) );
-		$this->assertFalse( is_wp_error( $term20 ) );
+		$this->assertNotWPError( $term20 );
 	}
 
 	/**
@@ -276,7 +276,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'slug' => 'foo-unique',
 		) );
 
-		$this->assertFalse( is_wp_error( $t2 ) );
+		$this->assertNotWPError( $t2 );
 
 		$t2_term = get_term( $t2['term_id'], 'wptests_tax' );
 		$this->assertSame( 'foo-unique', $t2_term->slug );
@@ -368,7 +368,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'slug' => 'bar',
 		) );
 
-		$this->assertFalse( is_wp_error( $t4 ) );
+		$this->assertNotWPError( $t4 );
 		$t4_term = get_term( $t4['term_id'], 'wptests_tax' );
 
 		// `wp_unique_term_slug()` allows term creation but iterates the slug.
@@ -391,7 +391,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'slug' => 'foo-unique',
 		) );
 
-		$this->assertFalse( is_wp_error( $t2 ) );
+		$this->assertNotWPError( $t2 );
 
 		$t2_term = get_term( $t2['term_id'], 'wptests_tax' );
 		$this->assertSame( 'foo-unique', $t2_term->slug );
@@ -455,7 +455,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'slug' => 'foo',
 		) );
 
-		$this->assertFalse( is_wp_error( $created ) );
+		$this->assertNotWPError( $created );
 
 		$new_term = get_term( $created['term_id'], 'wptests_tax_2' );
 
@@ -486,7 +486,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'slug' => 'foo',
 		) );
 
-		$this->assertFalse( is_wp_error( $created ) );
+		$this->assertNotWPError( $created );
 
 		$new_term = get_term( $created['term_id'], 'wptests_tax_2' );
 

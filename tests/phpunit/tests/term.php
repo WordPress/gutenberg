@@ -411,7 +411,7 @@ class Tests_Term extends WP_UnitTestCase {
 
 		$t = wp_insert_category( array( 'cat_name' => $term ) );
 		$this->assertTrue( is_numeric($t) );
-		$this->assertFalse( is_wp_error($t) );
+		$this->assertNotWPError( $t );
 		$this->assertTrue( $t > 0 );
 		$this->assertEquals( $initial_count + 1, wp_count_terms( 'category' ) );
 
