@@ -76,7 +76,9 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$this->assertEquals( '', get_the_post_thumbnail( $this->post ) );
 		set_post_thumbnail( $this->post, $this->attachment_id );
 
-		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array( 'class' => 'attachment-post-thumbnail wp-post-image' ) );
+		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array(
+			'class' => 'attachment-post-thumbnail size-post-thumbnail wp-post-image'
+		) );
 
 		$this->assertEquals( $expected, get_the_post_thumbnail( $this->post ) );
 
@@ -102,7 +104,9 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		set_post_thumbnail( $this->post, $this->attachment_id );
 
-		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array( 'class' => 'attachment-post-thumbnail wp-post-image' ) );
+		$expected = wp_get_attachment_image( $this->attachment_id, 'post-thumbnail', false, array(
+			'class' => 'attachment-post-thumbnail size-post-thumbnail wp-post-image'
+		) );
 
 		ob_start();
 		the_post_thumbnail();
