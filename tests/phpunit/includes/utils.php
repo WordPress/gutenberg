@@ -380,6 +380,7 @@ class wpdb_exposed_methods_for_testing extends wpdb {
 		global $wpdb;
 		$this->dbh = $wpdb->dbh;
 		$this->use_mysqli = $wpdb->use_mysqli;
+		$this->is_mysql = $wpdb->is_mysql;
 		$this->ready = true;
 		$this->field_types = $wpdb->field_types;
 		$this->charset = $wpdb->charset;
