@@ -119,17 +119,34 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 	 * @ticket 33070
 	 */
 	function test_get_the_post_thumbnail_url() {
-		$this->assertEquals( '', get_the_post_thumbnail_url() );
-		$this->assertEquals( '', get_the_post_thumbnail_url( $this->post ) );
+		$this->assertFalse( has_post_thumbnail( $this->post ) );
+		$this->assertFalse( get_the_post_thumbnail_url() );
+		$this->assertFalse( get_the_post_thumbnail_url( $this->post ) );
 
 		set_post_thumbnail( $this->post, $this->attachment_id );
 
-		$this->assertEquals( '', get_the_post_thumbnail_url() );
+		$this->assertFalse( get_the_post_thumbnail_url() );
 		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), get_the_post_thumbnail_url( $this->post ) );
 
 		$GLOBALS['post'] = $this->post;
 
 		$this->assertEquals( wp_get_attachment_url( $this->attachment_id ), get_the_post_thumbnail_url() );
+	}
+
+	/**
+	 * @ticket 33070
+	 */
+	function test_get_the_post_thumbnail_url_with_invalid_post() {
+		$post = $this->factory->post->create_and_get();
+
+		set_post_thumbnail( $post, $this->attachment_id );
+
+		$this->assertNotFalse( get_the_post_thumbnail_url( $post->ID ) );
+
+		$deleted = wp_delete_post( $post->ID, true );
+		$this->assertNotEmpty( $deleted );
+
+		$this->assertFalse( get_the_post_thumbnail_url( $post->ID ) );
 	}
 
 	/**
