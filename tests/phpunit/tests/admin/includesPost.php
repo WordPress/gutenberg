@@ -272,8 +272,9 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 30910
+	 * @ticket 18306
 	 */
-	public function test_get_sample_permalink_html_should_use_default_permalink_for_view_post_button_when_pretty_permalinks_are_disabled() {
+	public function test_get_sample_permalink_html_should_use_default_permalink_for_view_post_link_when_pretty_permalinks_are_disabled() {
 		global $wp_rewrite;
 		$old_permalink_structure = get_option( 'permalink_structure' );
 		$wp_rewrite->set_permalink_structure( '' );
@@ -285,7 +286,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$p = $this->factory->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
 
 		$found = get_sample_permalink_html( $p );
-		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/?p=$p'", $found );
+		$this->assertContains( 'href="' . get_option( 'home' ) . '/?p=' . $p . '"', $found );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -293,8 +294,9 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 30910
+	 * @ticket 18306
 	 */
-	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_button_when_pretty_permalinks_are_enabled() {
+	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_link_when_pretty_permalinks_are_enabled() {
 		global $wp_rewrite;
 		$old_permalink_structure = get_option( 'permalink_structure' );
 		$permalink_structure = '%postname%';
@@ -308,7 +310,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink_html( $p );
 		$post = get_post( $p );
-		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/" . $post->post_name . "/'", $found );
+		$this->assertContains( 'href="' . get_option( 'home' ) . "/" . $post->post_name . '/"', $found );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -316,8 +318,9 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 32954
+	 * @ticket 18306
 	 */
-	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_button_when_changing_slug() {
+	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_link_when_changing_slug() {
 		global $wp_rewrite;
 		$old_permalink_structure = get_option( 'permalink_structure' );
 		$permalink_structure = '%postname%';
@@ -331,7 +334,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
-		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/" . $post->post_name . "/'", $found );
+		$message = 'Published post';
+		$this->assertContains( 'href="' . get_option( 'home' ) . "/" . $post->post_name . '/"', $found, $message );
 
 		// Scheduled posts should use published permalink
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
@@ -339,18 +343,20 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
-		$this->assertContains( "span id='view-post-btn'><a href='" . get_option( 'home' ) . "/" . $post->post_name . "/'", $found );
+		$message = 'Scheduled post';
+		$this->assertContains( 'href="' . get_option( 'home' ) . "/" . $post->post_name . '/"', $found, $message );
 
 		// Draft posts should use preview link
 		$p = $this->factory->post->create( array( 'post_status' => 'draft', 'post_name' => 'baz' ) );
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
+		$message = 'Draft post';
 
 		$preview_link = get_permalink( $post->ID );
 		$preview_link = add_query_arg( 'preview', 'true', $preview_link );
 
-		$this->assertContains( "span id='view-post-btn'><a href='" . esc_url( $preview_link ) . "'", $found );
+		$this->assertContains( 'href="' . esc_url( $preview_link ) . '"', $found, $message );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
