@@ -171,4 +171,24 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 
 		$this->assertEquals( 2, get_page_of_comment( $c1, array( 'per_page' => 2 ) ) );
 	}
+
+	/**
+	 * @ticket 34057
+	 */
+	public function test_query_should_be_limited_to_comments_on_the_proper_post() {
+		$posts = $this->factory->post->create_many( 2 );
+
+		$now = time();
+		$comments_0 = $comments_1 = array();
+		for ( $i = 0; $i < 5; $i++ ) {
+			$comments_0[] = $this->factory->comment->create( array( 'comment_post_ID' => $posts[0], 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( $i * 60 ) ) ) );
+			$comments_1[] = $this->factory->comment->create( array( 'comment_post_ID' => $posts[1], 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( $i * 60 ) ) ) );
+		}
+
+		$found_0 = get_page_of_comment( $comments_0[0], array( 'per_page' => 2 ) );
+		$this->assertEquals( 3, $found_0 );
+
+		$found_1 = get_page_of_comment( $comments_1[1], array( 'per_page' => 2 ) );
+		$this->assertEquals( 2, $found_1 );
+	}
 }
