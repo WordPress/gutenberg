@@ -129,4 +129,33 @@ class Tests_Post_Slashes extends WP_UnitTestCase {
 		$this->assertEquals( wp_unslash( $this->slash_6 ), $post->post_excerpt );
 	}
 
+	/**
+	 * @ticket 27550
+	 */
+	function test_wp_trash_untrash() {
+		$post = array(
+			'post_title'   => $this->slash_1,
+			'post_content' => $this->slash_3,
+			'post_excerpt' => $this->slash_5,
+		);
+		$id = wp_insert_post( wp_slash( $post ) );
+
+		$trashed = wp_trash_post( $id );
+		$this->assertNotEmpty( $trashed );
+
+		$post = get_post( $id );
+
+		$this->assertEquals( $this->slash_1, $post->post_title );
+		$this->assertEquals( $this->slash_3, $post->post_content );
+		$this->assertEquals( $this->slash_5, $post->post_excerpt );
+
+		$untrashed = wp_untrash_post( $id );
+		$this->assertNotEmpty( $untrashed );
+
+		$post = get_post( $id );
+
+		$this->assertEquals( $this->slash_1, $post->post_title );
+		$this->assertEquals( $this->slash_3, $post->post_content );
+		$this->assertEquals( $this->slash_5, $post->post_excerpt );
+	}
 }
