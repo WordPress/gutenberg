@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @group template
+ */
 class Tests_Post_Template extends WP_UnitTestCase {
 
 	function test_wp_link_pages() {
@@ -274,5 +277,21 @@ NO;
 
 		$this->go_to( get_permalink( $post_id ) );
 		$this->assertFalse( get_page_template_slug() );
+	}
+
+	/**
+	 * @ticket 11095
+	 */
+	public function test_wp_page_menu_wp_nav_menu_fallback() {
+		$pages = $this->factory->post->create_many( 3, array( 'post_type' => 'page' ) );
+
+		// No menus + wp_nav_menu() falls back to wp_page_menu().
+		$menu = wp_nav_menu( array( 'echo' => false ) );
+
+		// After falling back, the 'before' argument should be set and output as '<ul>'.
+		$this->assertRegExp( '/<div class="menu"><ul>/', $menu );
+
+		// After falling back, the 'after' argument should be set and output as '</ul>'.
+		$this->assertRegExp( '/<\/ul><\/div>/', $menu );
 	}
 }
