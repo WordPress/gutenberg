@@ -141,7 +141,7 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		set_post_thumbnail( $post, $this->attachment_id );
 
-		$this->assertNotFalse( get_the_post_thumbnail_url( $post->ID ) );
+		$this->assertTrue( false !== get_the_post_thumbnail_url( $post->ID ) );
 
 		$deleted = wp_delete_post( $post->ID, true );
 		$this->assertNotEmpty( $deleted );
