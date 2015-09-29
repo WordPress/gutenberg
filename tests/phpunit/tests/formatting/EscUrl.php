@@ -40,41 +40,15 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 	}
 
 	function test_all_url_parts() {
-		$url = 'https://user:pass@host.example.com:1234/path;p=1?query=2&r[]=3#fragment';
+		$url = 'https://user:password@host.example.com:1234/path;p=1?q=2&r=3#fragment';
+		$this->assertEquals( $url, esc_url_raw( $url ) );
 
-		$this->assertEquals( array(
-			'scheme'   => 'https',
-			'host'     => 'host.example.com',
-			'port'     => 1234,
-			'user'     => 'user',
-			'pass'     => 'pass',
-			'path'     => '/path;p=1',
-			'query'    => 'query=2&r[]=3',
-			'fragment' => 'fragment',
-		), parse_url( $url ) );
-		$this->assertEquals( 'https://user:pass@host.example.com:1234/path;p=1?query=2&r%5B%5D=3#fragment', esc_url_raw( $url ) );
-		$this->assertEquals( 'https://user:pass@host.example.com:1234/path;p=1?query=2&#038;r%5B%5D=3#fragment', esc_url( $url ) );
-	}
+		$this->assertEquals( 'https://user:password@host.example.com:1234/path;p=1?q=2&#038;r=3#fragment', esc_url( $url ) );
 
-	function test_all_url_parts_ipv6() {
-		$url = 'https://user:pass@[::FFFF::127.0.0.1]:1234/path;p=1?query=2&r[]=3#fragment';
-
-		$this->assertEquals( array(
-			'scheme'   => 'https',
-			'host'     => '[::FFFF::127.0.0.1]',
-			'port'     => 1234,
-			'user'     => 'user',
-			'pass'     => 'pass',
-			'path'     => '/path;p=1',
-			'query'    => 'query=2&r[]=3',
-			'fragment' => 'fragment',
-		), parse_url( $url ) );
-		$this->assertEquals( 'https://user:pass@[::FFFF::127.0.0.1]:1234/path;p=1?query=2&r%5B%5D=3#fragment', esc_url_raw( $url ) );
-		$this->assertEquals( 'https://user:pass@[::FFFF::127.0.0.1]:1234/path;p=1?query=2&#038;r%5B%5D=3#fragment', esc_url( $url ) );
+		$this->assertEquals( 'http://example.com?foo', esc_url( 'http://example.com?foo' ) );
 	}
 
 	function test_bare() {
-		$this->assertEquals( 'http://example.com?foo', esc_url( 'example.com?foo' ) );
 		$this->assertEquals( 'http://example.com', esc_url( 'example.com' ) );
 		$this->assertEquals( 'http://localhost', esc_url( 'localhost' ) );
 		$this->assertEquals( 'http://example.com/foo', esc_url( 'example.com/foo' ) );
@@ -152,46 +126,6 @@ class Tests_Formatting_EscUrl extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 16859
-	 */
-	function test_square_brackets() {
-		$this->assertEquals( '/example.php?one%5B%5D=two', esc_url( '/example.php?one[]=two' ) );
-		$this->assertEquals( '?foo%5Bbar%5D=baz', esc_url( '?foo[bar]=baz' ) );
-		$this->assertEquals( '//example.com/?foo%5Bbar%5D=baz', esc_url( '//example.com/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com/?foo%5Bbar%5D=baz', esc_url( 'example.com/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://localhost?foo%5Bbar%5D=baz', esc_url( 'localhost?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://user:pass@localhost/?foo%5Bbar%5D=baz', esc_url( 'http://user:pass@localhost/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://localhost?foo%5Bbar%5D=baz', esc_url( 'localhost?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com/?foo%5Bbar%5D=baz', esc_url( 'http://example.com/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com:1234/?foo%5Bbar%5D=baz', esc_url( 'http://example.com:1234/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com/?foo%5Bbar%5D=baz', esc_url( 'http://example.com/?foo%5Bbar%5D=baz' ) );
-		$this->assertEquals( 'http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz', esc_url( 'http://example.com/?baz=bar&foo[bar]=baz' ) );
-		$this->assertEquals( 'http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz', esc_url( 'http://example.com/?baz=bar&#038;foo%5Bbar%5D=baz' ) );
-	}
-
-	/**
-	 * @ticket 16859
-	 */
-	function test_ipv6_hosts() {
-		$this->assertEquals( '//[::127.0.0.1]', esc_url( '//[::127.0.0.1]' ) );
-		$this->assertEquals( 'http://[::FFFF::127.0.0.1]', esc_url( 'http://[::FFFF::127.0.0.1]' ) );
-		$this->assertEquals( 'http://[::127.0.0.1]', esc_url( 'http://[::127.0.0.1]' ) );
-		$this->assertEquals( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]', esc_url( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]' ) );
-
-		// IPv6 with square brackets in the query? Why not.
-		$this->assertEquals( '//[::FFFF::127.0.0.1]/?foo%5Bbar%5D=baz', esc_url( '//[::FFFF::127.0.0.1]/?foo[bar]=baz' ) );
-		$this->assertEquals( 'http://[::FFFF::127.0.0.1]/?foo%5Bbar%5D=baz', esc_url( 'http://[::FFFF::127.0.0.1]/?foo[bar]=baz' ) );
-	}
-
-	/**
-	 * Courtesy of http://blog.lunatech.com/2009/02/03/what-every-web-developer-must-know-about-url-encoding
-	 */
-	function test_reserved_characters() {
-		$url = "http://example.com/:@-._~!$&'()*+,=;:@-._~!$&'()*+,=:@-._~!$&'()*+,==?/?:@-._~!$%27()*+,;=/?:@-._~!$%27()*+,;==#/?:@-._~!$&'()*+,;=";
-		$this->assertEquals( $url, esc_url_raw( $url ) );
-	}
-
-	/**
 	 * @ticket 21974
 	 */
 	function test_protocol_relative_with_colon() {
@@ -241,7 +175,7 @@ EOT;
 	 * @ticket 28015
 	 */
 	function test_invalid_charaters() {
-		$this->assertEmpty( esc_url_raw('"^<>{}`') );
+		$this->assertEmpty( esc_url_raw('"^[]<>{}`') );
 	}
 
 }
