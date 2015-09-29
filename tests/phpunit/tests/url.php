@@ -240,7 +240,6 @@ class Tests_URL extends WP_UnitTestCase {
 		);
 
 		$forced_admin = force_ssl_admin();
-		$forced_login = force_ssl_login();
 		$i = 0;
 		foreach ( $links as $link ) {
 			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'https' ) );
@@ -253,7 +252,6 @@ class Tests_URL extends WP_UnitTestCase {
 			$_SERVER['HTTPS'] = 'off';
 			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link ) );
 
-			force_ssl_login( false );
 			force_ssl_admin( true );
 			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'admin' ) );
 			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'login_post' ) );
@@ -266,17 +264,10 @@ class Tests_URL extends WP_UnitTestCase {
 			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link, 'login' ) );
 			$this->assertEquals( $http_links[ $i ], set_url_scheme( $link, 'rpc' ) );
 
-			force_ssl_login( true );
-			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'admin' ) );
-			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'login_post' ) );
-			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'login' ) );
-			$this->assertEquals( $https_links[ $i ], set_url_scheme( $link, 'rpc' ) );
-
 			$i++;
 		}
 
 		force_ssl_admin( $forced_admin );
-		force_ssl_login( $forced_login );
 	}
 
 	public function test_get_adjacent_post() {
