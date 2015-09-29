@@ -525,4 +525,77 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$wp_rewrite->set_permalink_structure( '' );
 		flush_rewrite_rules();
 	}
+
+	public function test_post_exists_should_match_title() {
+		$p = $this->factory->post->create( array(
+			'post_title' => 'Foo Bar',
+		) );
+
+		$this->assertSame( $p, post_exists( 'Foo Bar' ) );
+	}
+
+	public function test_post_exists_should_not_match_nonexistent_title() {
+		$p = $this->factory->post->create( array(
+			'post_title' => 'Foo Bar',
+		) );
+
+		$this->assertSame( 0, post_exists( 'Foo Bar Baz' ) );
+	}
+
+	public function test_post_exists_should_match_nonempty_content() {
+		$title = 'Foo Bar';
+		$content = 'Foo Bar Baz';
+		$p = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_content' => $content,
+		) );
+
+		$this->assertSame( $p, post_exists( $title, $content ) );
+	}
+
+	public function test_post_exists_should_not_match_when_nonempty_content_doesnt_match() {
+		$title = 'Foo Bar';
+		$content = 'Foo Bar Baz';
+		$p = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_content' => $content . ' Quz',
+		) );
+
+		$this->assertSame( 0, post_exists( $title, $content ) );
+	}
+
+	public function test_post_exists_should_match_nonempty_date() {
+		$title = 'Foo Bar';
+		$date = '2014-05-08 12:00:00';
+		$p = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_date' => $date,
+		) );
+
+		$this->assertSame( $p, post_exists( $title, '', $date ) );
+	}
+
+	public function test_post_exists_should_not_match_when_nonempty_date_doesnt_match() {
+		$title = 'Foo Bar';
+		$date = '2014-05-08 12:00:00';
+		$p = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_date' => '2015-10-10 00:00:00',
+		) );
+
+		$this->assertSame( 0, post_exists( $title, '', $date ) );
+	}
+
+	public function test_post_exists_should_match_nonempty_title_content_and_date() {
+		$title = 'Foo Bar';
+		$content = 'Foo Bar Baz';
+		$date = '2014-05-08 12:00:00';
+		$p = $this->factory->post->create( array(
+			'post_title' => $title,
+			'post_content' => $content,
+			'post_date' => $date,
+		) );
+
+		$this->assertSame( $p, post_exists( $title, $content, $date ) );
+	}
 }
