@@ -121,6 +121,19 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 		wp_old_slug_redirect();
 		$this->assertNull( $this->old_slug_redirect_url );
 		$this->assertQueryTrue( 'is_attachment', 'is_singular', 'is_single' );
+
+		$old_permalink = get_attachment_link( $attachment_id );
+
+		wp_update_post( array(
+			'ID' => $attachment_id,
+			'post_name' => 'the-attachment',
+		) );
+
+		$permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'the-attachment' );
+
+		$this->go_to( $old_permalink );
+		wp_old_slug_redirect();
+		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
 	}
 
 	public function test_old_slug_redirect_paged() {
