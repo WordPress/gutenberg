@@ -501,6 +501,7 @@ VIDEO;
 		$this->assertArrayHasKey( 'test-size', $_wp_additional_image_sizes );
 		$this->assertEquals( 200, $_wp_additional_image_sizes['test-size']['width'] );
 		$this->assertEquals( 600, $_wp_additional_image_sizes['test-size']['height'] );
+		remove_image_size( 'test-size' );
 	}
 
 	/**
@@ -519,6 +520,7 @@ VIDEO;
 	function test_has_image_size() {
 		add_image_size( 'test-size', 200, 600 );
 		$this->assertTrue( has_image_size( 'test-size' ) );
+		remove_image_size( 'test-size' );
 	}
 
 	/**
