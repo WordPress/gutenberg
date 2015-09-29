@@ -88,4 +88,22 @@ EOF;
 EOF;
 		$this->assertEquals( $expected['order_desc'], trim( wp_get_archives( array( 'echo' => false, 'order' => 'DESC' ) ) ) );
 	}
+
+	/**
+	 * @ticket 21596
+	 */
+	function test_wp_get_archives_post_type() {
+		register_post_type( 'taco', array( 'public' => true ) );
+
+		$this->factory->post->create( array(
+			'post_type' => 'taco',
+			'post_author' => '1',
+			'post_date' => '2014-10-23 19:34:42'
+		) );
+
+		$oct_url = esc_url( add_query_arg( 'post_type', 'taco', get_month_link( 2014, 10 ) ) );
+		$expected = "<li><a href='{$oct_url}'>October 2014</a></li>";
+		$archives = wp_get_archives( array( 'echo' => false, 'post_type' => 'taco' ) );
+		$this->assertEquals( $expected, trim( $archives ) );
+	}
 }
