@@ -264,4 +264,47 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 
 		$this->assertContains( '<li class="categories">Categories', $found );
 	}
+
+	/**
+	 * @ticket 12981
+	 */
+	public function test_exclude_tree_should_be_respected() {
+		$c = $this->factory->category->create();
+		$parent = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
+		$child = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
+
+		$args = array( 'echo' => 0, 'hide_empty' => 0, 'exclude_tree' => $parent );
+
+		$actual = wp_list_categories( $args );
+
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $parent . '">', $actual );
+
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $child . '">', $actual );
+	}
+
+	/**
+	 * @ticket 12981
+	 */
+	public function test_exclude_tree_should_be_merged_with_exclude() {
+		$c = $this->factory->category->create();
+		$parent = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
+		$child = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
+		$parent2 = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent2' ) );
+		$child2 = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child2', 'parent' => $parent2 ) );
+
+		$args = array( 'echo' => 0, 'hide_empty' => 0, 'exclude_tree' => $parent );
+
+		$actual = wp_list_categories( array(
+			'echo' => 0,
+			'hide_empty' => 0,
+			'exclude' => $parent,
+			'exclude_tree' => $parent2,
+		) );
+
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $parent . '">', $actual );
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $parent2 . '">', $actual );
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $child . '">', $actual );
+
+		$this->assertNotContains( '<li class="cat-item cat-item-' . $child2 . '">', $actual );
+	}
 }
