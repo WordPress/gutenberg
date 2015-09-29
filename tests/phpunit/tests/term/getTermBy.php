@@ -36,4 +36,27 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		$found = get_term_by( 'slug', 'nas', 'wptests_tax' );
 		$this->assertSame( $t, $found->term_id );
 	}
+
+	/**
+	 * @ticket 30620
+	 */
+	public function test_taxonomy_should_be_ignored_if_matching_by_term_taxonomy_id() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$term = get_term( $t, 'wptests_tax' );
+
+		$new_ttid = $term->term_taxonomy_id + 1;
+
+		// Offset just to be sure.
+		$wpdb->update(
+			$wpdb->term_taxonomy,
+			array( 'term_taxonomy_id' => $new_ttid ),
+			array( 'term_id' => $t )
+		);
+
+		$found = get_term_by( 'term_taxonomy_id', $new_ttid, 'foo' );
+		$this->assertSame( $t, $found->term_id );
+	}
 }
