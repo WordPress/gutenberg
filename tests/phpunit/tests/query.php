@@ -459,4 +459,42 @@ class Tests_Query extends WP_UnitTestCase {
 	public function filter_parse_query_to_modify_queried_post_id( $query ) {
 		$post = get_queried_object();
 	}
+
+	/**
+	 * @ticket 34060
+	 */
+	public function test_offset_0_should_override_page() {
+		$q = new WP_Query( array(
+			'paged' => 2,
+			'posts_per_page' => 5,
+			'offset' => 0,
+		) );
+
+		$this->assertContains( 'LIMIT 0, 5', $q->request );
+	}
+
+	/**
+	 * @ticket 34060
+	 */
+	public function test_offset_should_be_ignored_when_not_set() {
+		$q = new WP_Query( array(
+			'paged' => 2,
+			'posts_per_page' => 5,
+		) );
+
+		$this->assertContains( 'LIMIT 5, 5', $q->request );
+	}
+
+	/**
+	 * @ticket 34060
+	 */
+	public function test_offset_should_be_ignored_when_passed_a_non_numeric_value() {
+		$q = new WP_Query( array(
+			'paged' => 2,
+			'posts_per_page' => 5,
+			'offset' => '',
+		) );
+
+		$this->assertContains( 'LIMIT 5, 5', $q->request );
+	}
 }
