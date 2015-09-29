@@ -395,4 +395,58 @@ class Tests_Link extends WP_UnitTestCase {
 
 		$this->assertEquals( $non_pretty_permalink, get_permalink( $p ) );
 	}
+
+	/**
+	 * @ticket 1914
+	 */
+	public function test_unattached_attachment_has_a_pretty_permalink() {
+		global $wp_rewrite;
+		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+		$wp_rewrite->flush_rules();
+
+		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment',
+			'post_title' => 'An Attachment!',
+			'post_status' => 'inherit',
+		) );
+
+		$attachment = get_post( $attachment_id );
+
+		$this->assertSame( home_url( user_trailingslashit( $attachment->post_name ) ), get_permalink( $attachment_id ) );
+	}
+
+	/**
+	 * @ticket 1914
+	 */
+	public function test_attachment_attached_to_non_existent_post_type_has_a_pretty_permalink() {
+		global $wp_rewrite, $wp_post_types;
+		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+
+		register_post_type( 'not_a_post_type', array( 'public' => true ) );
+
+		$wp_rewrite->flush_rules();
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'not_a_post_type' ) );
+
+		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment',
+			'post_title' => 'An Attachment!',
+			'post_status' => 'inherit',
+		) );
+
+		$attachment = get_post( $attachment_id );
+
+		$this->assertSame( get_permalink( $post_id ) . user_trailingslashit( $attachment->post_name ), get_permalink( $attachment_id ) );
+
+		foreach( $wp_post_types as $id => $pt ) {
+			if ( 'not_a_post_type' === $pt->name ) {
+				unset( $wp_post_types[ $id ] );
+				break;
+			}
+		}
+
+		$this->assertSame( home_url( user_trailingslashit( $attachment->post_name ) ), get_permalink( $attachment_id ) );
+	}
 }
