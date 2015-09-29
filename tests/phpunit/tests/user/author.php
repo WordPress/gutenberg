@@ -1,18 +1,24 @@
 <?php
 
 /**
- * Test functions in wp-includes/author.php, author-template.php
+ * Test functions in wp-includes/author-template.php
  *
  * @group author
  * @group user
  */
-class Tests_User_Author extends WP_UnitTestCase {
-	protected $old_post_id = 0;
+class Tests_User_Author_Template extends WP_UnitTestCase {
 	protected $author_id = 0;
 	protected $post_id = 0;
 
+	private $permalink_structure;
+
 	function setUp() {
 		parent::setUp();
+
+		global $wp_rewrite;
+		$this->permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->flush_rules();
 
 		$this->author_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -36,6 +42,10 @@ class Tests_User_Author extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
+		global $wp_rewrite;
+		$wp_rewrite->set_permalink_structure( $this->permalink_structure );
+		$wp_rewrite->flush_rules();
+
 		wp_reset_postdata();
 		parent::tearDown();
 	}
@@ -99,4 +109,54 @@ class Tests_User_Author extends WP_UnitTestCase {
 
 		_unregister_post_type( 'wptests_pt' );
 	}
+
+	/**
+	 * @ticket 30355
+	 */
+	public function test_get_the_author_posts_link_no_permalinks() {
+		$author = $this->factory->user->create_and_get( array(
+			'display_name'  => 'Foo',
+			'user_nicename' => 'bar'
+		) );
+
+		$GLOBALS['authordata'] = $author->data;
+
+		$link = get_the_author_posts_link();
+
+		$url = sprintf( 'http://%1$s/?author=%2$s', WP_TESTS_DOMAIN, $author->ID );
+
+		$this->assertContains( $url, $link );
+		$this->assertContains( 'Posts by Foo', $link );
+		$this->assertContains( '>Foo</a>', $link );
+
+		unset( $GLOBALS['authordata'] );
+	}
+
+	/**
+	 * @ticket 30355
+	 */
+	public function test_get_the_author_posts_link_with_permalinks() {
+		global $wp_rewrite;
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		$wp_rewrite->flush_rules();
+
+		$author = $this->factory->user->create_and_get( array(
+			'display_name'  => 'Foo',
+			'user_nicename' => 'bar'
+		) );
+
+		$GLOBALS['authordata'] = $author;
+
+		$link = get_the_author_posts_link();
+
+		$url = sprintf( 'http://%1$s/author/%2$s/', WP_TESTS_DOMAIN, $author->user_nicename );
+
+		$this->assertContains( $url, $link );
+		$this->assertContains( 'Posts by Foo', $link );
+		$this->assertContains( '>Foo</a>', $link );
+
+		unset( $GLOBALS['authordata'] );
+	}
+
 }
