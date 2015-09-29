@@ -274,6 +274,66 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $page_1, $page_2, $page_3, $page_4 ), wp_list_pluck( $pages, 'ID' ) );
 	}
 
+	/**
+	 * @ticket 18701
+	 */
+	public function test_get_pages_hierarchical_non_empty_child_of() {
+		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
+		$page_5 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+
+		$pages = get_pages( array( 'child_of' => $page_1 ) ); // Defaults: hierarchical = true, parent = -1.
+
+		/*
+		 * Page tree:
+		 *
+		 * page 1 (parent 0)
+		 * – page 3 (parent 1)
+		 * –– page 4 (parent 3)
+		 * – page 5 (parent 1)
+		 * page 2 (parent 0)
+		 *
+		 * If hierarchical is true (default), and child_of is not empty, pages will be returned
+		 * hierarchically in order of creation: 3, 4, 5.
+		 */
+
+		$this->assertEqualSets( array( $page_3, $page_4, $page_5 ), wp_list_pluck( $pages, 'ID' ) );
+	}
+
+	/**
+	 * @ticket 18701
+	 */
+	public function test_get_pages_non_hierarchical_non_empty_child_of() {
+		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
+		$page_5 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+
+		$pages = get_pages( array( 'hierarchical' => false, 'child_of' => $page_1 ) );
+
+		/*
+		 * Page tree:
+		 *
+		 * page 1 (parent 0)
+		 * – page 3 (parent 1)
+		 * –– page 4 (parent 3)
+		 * – page 5 (parent 1)
+		 * page 2 (parent 0)
+		 *
+		 * If hierarchical is false, and child_of is not empty, pages will (apparently) be returned
+		 * hierarchically anyway in order of creation: 3, 4, 5.
+		 */
+		$this->assertEqualSets( array( $page_3, $page_4, $page_5 ), wp_list_pluck( $pages, 'ID' ) );
+
+		// How it should work.
+		$found_pages = wp_list_filter( $pages, array( 'post_parent' => $page_1 ) );
+		$this->assertEqualSets( array( $page_3, $page_5 ), wp_list_pluck( $found_pages, 'ID' ) );
+
+	}
+
 	function test_wp_list_pages_classes() {
 		$type = 'taco';
 		register_post_type( $type, array( 'hierarchical' => true, 'public' => true ) );
