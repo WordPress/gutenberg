@@ -255,4 +255,27 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertTrue( $result );
 		$this->assertEquals( $date_string, $fetched_post->post_date );
 	}
+
+	/**
+	 * @ticket 16980
+	 */
+	function test_empty_not_null() {
+		$editor_id = $this->make_user_by_role( 'editor' );
+
+		$post_id = $this->factory->post->create( array(
+			'post_title' => 'Title',
+			'post_author' => $editor_id,
+			'tags_input' => 'taco'
+		) );
+
+		$tags1 = get_the_tags( $post_id );
+		$this->assertNotEmpty( $tags1 );
+
+		$this->myxmlrpcserver->mw_editPost( array( $post_id, 'editor', 'editor', array(
+			'mt_keywords' => ''
+		) ) );
+
+		$tags2 = get_the_tags( $post_id );
+		$this->assertEmpty( $tags2 );
+	}
 }
