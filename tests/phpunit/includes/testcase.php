@@ -14,6 +14,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected static $hooks_saved = array();
 	protected static $ignore_files;
 
+	protected $db_version;
+
 	/**
 	 * @var WP_UnitTest_Factory
 	 */
@@ -64,8 +66,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		 *
 		 * See #31130.
 		 */
+		$this->db_version = get_option( 'db_version' );
 		if ( is_multisite() ) {
-			$this->db_version = get_option( 'db_version' );
 			add_filter( 'pre_option_db_version', array( $this, 'db_version' ) );
 		}
 	}
