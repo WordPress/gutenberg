@@ -31,6 +31,63 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
+	/**
+	 * @ticket 16840
+	 */
+	public function test_add_rule() {
+		global $wp_rewrite;
+
+		$pattern  = 'path/to/rewrite/([^/]+)/?$';
+		$redirect = 'index.php?test_var1=$matches[1]&test_var2=1';
+
+		$wp_rewrite->add_rule( $pattern, $redirect );
+
+		$wp_rewrite->flush_rules();
+
+		$rewrite_rules = $wp_rewrite->rewrite_rules();
+
+		$this->assertSame( $redirect, $rewrite_rules[ $pattern ] );
+	}
+
+	/**
+	 * @ticket 16840
+	 */
+	public function test_add_rule_redirect_array() {
+		global $wp_rewrite;
+
+		$pattern  = 'path/to/rewrite/([^/]+)/?$';
+		$redirect = 'index.php?test_var1=$matches[1]&test_var2=1';
+
+		$wp_rewrite->add_rule( $pattern, array(
+			'test_var1' => '$matches[1]',
+			'test_var2' => '1'
+		) );
+
+		$wp_rewrite->flush_rules();
+
+		$rewrite_rules = $wp_rewrite->rewrite_rules();
+
+		$this->assertSame( $redirect, $rewrite_rules[ $pattern ] );
+	}
+
+	/**
+	 * @ticket 16840
+	 */
+	public function test_add_rule_top() {
+		global $wp_rewrite;
+
+		$pattern  = 'path/to/rewrite/([^/]+)/?$';
+		$redirect = 'index.php?test_var1=$matches[1]&test_var2=1';
+
+		$wp_rewrite->add_rule( $pattern, $redirect, 'top' );
+
+		$wp_rewrite->flush_rules();
+
+		$extra_rules_top = $wp_rewrite->extra_rules_top;
+
+		$this->assertContains( $redirect, $extra_rules_top[ $pattern ] );
+	}
+
 	function test_url_to_postid() {
 
 		$id = $this->factory->post->create();
