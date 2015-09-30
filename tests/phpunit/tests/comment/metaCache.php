@@ -121,4 +121,93 @@ class Tests_Comment_Meta_Cache extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	/**
+	 * @group 34047
+	 */
+	public function test_comment_meta_should_be_lazy_loaded_in_comment_feed_queries() {
+		global $wpdb;
+
+		$posts = $this->factory->post->create_many( 2, array( 'post_status' => 'publish' ) );
+
+		$now = time();
+		$comments = array();
+		for ( $i = 0; $i < 5; $i++ ) {
+			$comments[] = $this->factory->comment->create( array(
+				'comment_post_ID' => $posts[0],
+				'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( 60 * $i ) ),
+			) );
+		}
+
+		foreach ( $comments as $c ) {
+			add_comment_meta( $c, 'foo', 'bar' );
+		}
+
+		update_option( 'posts_per_rss', 3 );
+
+		$q = new WP_Query( array(
+			'feed' => true,
+			'withcomments' => true,
+		) );
+
+		// First comment will cause the cache to be primed.
+		$num_queries = $wpdb->num_queries;
+		$this->assertSame( 'bar', get_comment_meta( $comments[0], 'foo', 'bar' ) );
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		// Second comment from the results should not cause more queries.
+		$this->assertSame( 'bar', get_comment_meta( $comments[1], 'foo', 'bar' ) );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		// A comment from outside the results will not be primed.
+		$this->assertSame( 'bar', get_comment_meta( $comments[4], 'foo', 'bar' ) );
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @group 34047
+	 */
+	public function test_comment_meta_should_be_lazy_loaded_in_single_post_comment_feed_queries() {
+		global $wpdb;
+
+		$posts = $this->factory->post->create_many( 2, array( 'post_status' => 'publish' ) );
+
+		$now = time();
+		$comments = array();
+		for ( $i = 0; $i < 5; $i++ ) {
+			$comments[] = $this->factory->comment->create( array(
+				'comment_post_ID' => $posts[0],
+				'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( 60 * $i ) ),
+			) );
+		}
+
+		foreach ( $comments as $c ) {
+			add_comment_meta( $c, 'foo', 'bar' );
+		}
+
+		update_option( 'posts_per_rss', 3 );
+
+		$q = new WP_Query( array(
+			'feed' => true,
+			'withcomments' => true,
+			'p' => $posts[0],
+		) );
+
+		// First comment will cause the cache to be primed.
+		$num_queries = $wpdb->num_queries;
+		$this->assertSame( 'bar', get_comment_meta( $comments[0], 'foo', 'bar' ) );
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		// Second comment from the results should not cause more queries.
+		$this->assertSame( 'bar', get_comment_meta( $comments[1], 'foo', 'bar' ) );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		// A comment from outside the results will not be primed.
+		$this->assertSame( 'bar', get_comment_meta( $comments[4], 'foo', 'bar' ) );
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
 }
