@@ -539,4 +539,81 @@ EOF;
 		$this->assertTrue( has_shortcode( $content_nested, 'gallery' ) );
 		remove_shortcode( 'foo' );
 	}
+
+	/**
+	 * Make sure invalid shortcode names are not allowed.
+	 *
+	 * @dataProvider data_registration_bad
+	 * @expectedIncorrectUsage add_shortcode
+	 */
+	function test_registration_bad( $input, $expected ) {
+		return $this->sub_registration( $input, $expected );
+	}
+	
+	/**
+	 * Make sure valid shortcode names are allowed.
+	 *
+	 * @dataProvider data_registration_good
+	 */
+	function test_registration_good( $input, $expected ) {
+		return $this->sub_registration( $input, $expected );
+	}
+	
+	function sub_registration( $input, $expected ) {
+		add_shortcode( $input, '' );
+		$actual = shortcode_exists( $input );
+		$test = $this->assertEquals( $expected, $actual );
+		if ( $actual ) remove_shortcode( $input );
+		return $test;
+	}
+	
+	function data_registration_bad() {
+		return array(
+			array(
+				'<html>',
+				false,
+			),
+			array(
+				'[shortcode]',
+				false,
+			),
+			array(
+				'bad/',
+				false,
+			),
+			array(
+				'/bad',
+				false,
+			),
+			array(
+				'bad space',
+				false,
+			),
+			array(
+				'&amp;',
+				false,
+			),
+			array(
+				'',
+				false,
+			),
+		);
+	}
+
+	function data_registration_good() {
+		return array(
+			array(
+				'good!',
+				true,
+			),
+			array(
+				'plain',
+				true,
+			),
+			array(
+				'unreserved!#$%()*+,-.;?@^_{|}~chars',
+				true,
+			),
+		);
+	}
 }
