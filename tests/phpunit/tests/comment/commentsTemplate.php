@@ -409,4 +409,159 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		$this->assertSame( array( $comment_1 ), $found_cids );
 	}
+
+	/**
+	 * @ticket 34073
+	 */
+	public function test_comment_permalinks_should_be_correct_when_using_default_display_callback_with_default_comment_page_oldest() {
+		$now = time();
+		$p = $this->factory->post->create();
+		$comment_1 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '1',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 100 ),
+		) );
+		$comment_2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '2',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 200 ),
+		) );
+		$comment_3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '3',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 300 ),
+		) );
+		$comment_4 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '4',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 400 ),
+		) );
+
+		update_option( 'comment_order', 'desc' );
+		update_option( 'default_comments_page', 'oldest' );
+
+		$link_p1 = add_query_arg( array(
+			'comments_per_page' => 2,
+		), get_permalink( $p ) );
+
+		$this->go_to( $link_p1 );
+
+		$found_p1 = get_echo( 'comments_template' );
+
+		// Find the comment permalinks.
+		preg_match_all( '|href="(.*?#comment-([0-9]+))|', $found_p1, $matches );
+
+		// This is the main post page, so we don't expect any cpage param.
+		foreach ( $matches[1] as $m ) {
+			$this->assertNotContains( 'cpage', $m );
+		}
+
+		$link_p2 = add_query_arg( array(
+			'cpage' => 2,
+			'comments_per_page' => 2,
+		), get_permalink( $p ) );
+
+		$this->go_to( $link_p2 );
+
+		$found_p2 = get_echo( 'comments_template' );
+
+		// Find the comment permalinks.
+		preg_match_all( '|href="(.*?#comment-([0-9]+))|', $found_p2, $matches );
+
+		// They should all be on page 2.
+		foreach ( $matches[1] as $m ) {
+			$this->assertContains( 'cpage=2', $m );
+		}
+	}
+
+	/**
+	 * @ticket 34073
+	 */
+	public function test_comment_permalinks_should_be_correct_when_using_default_display_callback_with_default_comment_page_newest() {
+		$now = time();
+		$p = $this->factory->post->create();
+		$comment_1 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '1',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 100 ),
+		) );
+		$comment_2 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '2',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 200 ),
+		) );
+		$comment_3 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '3',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 300 ),
+		) );
+		$comment_4 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '4',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 400 ),
+		) );
+		$comment_5 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '4',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 500 ),
+		) );
+		$comment_6 = $this->factory->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_content' => '4',
+			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 600 ),
+		) );
+
+		update_option( 'comment_order', 'desc' );
+		update_option( 'default_comments_page', 'newest' );
+
+		$link_p0 = add_query_arg( array(
+			'comments_per_page' => 2,
+		), get_permalink( $p ) );
+
+		$this->go_to( $link_p0 );
+
+		$found_p0 = get_echo( 'comments_template' );
+
+		// Find the comment permalinks.
+		preg_match_all( '|href="(.*?#comment-([0-9]+))|', $found_p0, $matches );
+
+		foreach ( $matches[1] as $m ) {
+			$this->assertContains( 'cpage=3', $m );
+		}
+
+		$link_p2 = add_query_arg( array(
+			'cpage' => 2,
+			'comments_per_page' => 2,
+		), get_permalink( $p ) );
+
+		$this->go_to( $link_p2 );
+
+		$found_p2 = get_echo( 'comments_template' );
+
+		// Find the comment permalinks.
+		preg_match_all( '|href="(.*?#comment-([0-9]+))|', $found_p2, $matches );
+
+		// They should all be on page 2.
+		foreach ( $matches[1] as $m ) {
+			$this->assertContains( 'cpage=2', $m );
+		}
+
+		// p1 is the last page (neat!).
+		$link_p1 = add_query_arg( array(
+			'cpage' => 1,
+			'comments_per_page' => 2,
+		), get_permalink( $p ) );
+
+		$this->go_to( $link_p1 );
+
+		$found_p1 = get_echo( 'comments_template' );
+
+		// Find the comment permalinks.
+		preg_match_all( '|href="(.*?#comment-([0-9]+))|', $found_p1, $matches );
+
+		// They should all be on page 2.
+		foreach ( $matches[1] as $m ) {
+			$this->assertContains( 'cpage=1', $m );
+		}
+	}
 }
