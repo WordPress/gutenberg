@@ -6,6 +6,14 @@
  * Testing items that are only testable by grabbing the markup of `comments_template()` from the output buffer.
  */
 class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
+	public function setUp() {
+		parent::setUp();
+
+		global $wp_rewrite;
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+	}
+
 	/**
 	 * @ticket 8071
 	 */
