@@ -5,6 +5,14 @@
  */
 class Tests_Option_SiteTransient extends WP_UnitTestCase {
 
+	public function setUp() {
+		parent::setUp();
+
+		if ( wp_using_ext_object_cache() ) {
+			$this->markTestSkipped( 'Not testable with an external object cache.' );
+		}
+	}
+
 	function test_the_basics() {
 		$key = rand_str();
 		$value = rand_str();
