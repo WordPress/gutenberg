@@ -1218,4 +1218,28 @@ class Tests_Post extends WP_UnitTestCase {
 
 		$this->assertEquals( $this->author_id, get_post( $post_id )->post_author );
 	}
+
+	/**
+	 * @ticket 15946
+	 */
+	function test_wp_insert_post_should_respect_post_date_gmt() {
+		$post = array(
+			'post_author' => $this->author_id,
+			'post_status' => 'publish',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+			'post_date_gmt' => '2014-01-01 12:00:00',
+		);
+
+		// insert a post and make sure the ID is ok
+		$id = wp_insert_post($post);
+
+		$out = get_post($id);
+
+		$this->assertEquals($post['post_content'], $out->post_content);
+		$this->assertEquals($post['post_title'], $out->post_title);
+		$this->assertEquals($post['post_author'], $out->post_author);
+		$this->assertEquals(get_date_from_gmt($post['post_date_gmt']), $out->post_date);
+		$this->assertEquals($post['post_date_gmt'], $out->post_date_gmt);
+	}
 }
