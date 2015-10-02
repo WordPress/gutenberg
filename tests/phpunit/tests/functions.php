@@ -603,6 +603,10 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 28786
 	 */
 	function test_wp_json_encode_non_utf8() {
+		if ( ! function_exists( 'mb_detect_order' ) ) {
+			$this->markTestSkipped( 'mbstring extension not available.' );
+		}
+	
 		$old_charsets = $charsets = mb_detect_order();
 		if ( ! in_array( 'EUC-JP', $charsets ) ) {
 			$charsets[] = 'EUC-JP';
@@ -623,6 +627,10 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 28786
 	 */
 	function test_wp_json_encode_non_utf8_in_array() {
+		if ( ! function_exists( 'mb_detect_order' ) ) {
+			$this->markTestSkipped( 'mbstring extension not available.' );
+		}
+
 		$old_charsets = $charsets = mb_detect_order();
 		if ( ! in_array( 'EUC-JP', $charsets ) ) {
 			$charsets[] = 'EUC-JP';
