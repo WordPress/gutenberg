@@ -549,7 +549,7 @@ EOF;
 	function test_registration_bad( $input, $expected ) {
 		return $this->sub_registration( $input, $expected );
 	}
-	
+
 	/**
 	 * Make sure valid shortcode names are allowed.
 	 *
@@ -558,7 +558,7 @@ EOF;
 	function test_registration_good( $input, $expected ) {
 		return $this->sub_registration( $input, $expected );
 	}
-	
+
 	function sub_registration( $input, $expected ) {
 		add_shortcode( $input, '' );
 		$actual = shortcode_exists( $input );
@@ -566,7 +566,7 @@ EOF;
 		if ( $actual ) remove_shortcode( $input );
 		return $test;
 	}
-	
+
 	function data_registration_bad() {
 		return array(
 			array(
