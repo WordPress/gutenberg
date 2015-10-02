@@ -157,20 +157,104 @@ class Tests_Widgets extends WP_UnitTestCase {
 
 	/**
 	 * @see WP_Widget::get_field_name()
+	 * @dataProvider data_wp_widget_get_field_name
+	 *
 	 */
-	function test_wp_widget_get_field_name() {
+	function test_wp_widget_get_field_name( $expected, $value_to_test ) {
 		$widget = new WP_Widget( 'foo', 'Foo' );
 		$widget->_set( 2 );
-		$this->assertEquals( 'widget-foo[2][title]', $widget->get_field_name( 'title' ) );
+		$this->assertEquals( $expected, $widget->get_field_name( $value_to_test ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * Passes the expected field name and the value to test.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $expected      The expected field id to be returned.
+	 *         @type string $value_to_test The value being passed to the get_field_name method.
+	 *     }
+	 * }
+	 */
+	function data_wp_widget_get_field_name( ) {
+
+		return array(
+			array(
+				'widget-foo[2][title]',
+				'title',
+			),
+			array(
+				'widget-foo[2][posttypes][]',
+				'posttypes[]',
+			),
+			array(
+				'widget-foo[2][posttypes][4]',
+				'posttypes[4]',
+			),
+			array(
+				'widget-foo[2][posttypes][4][]',
+				'posttypes[4][]',
+			),
+			array(
+				'widget-foo[2][posttypes][4][][6]',
+				'posttypes[4][][6]',
+			),
+		);
 	}
 
 	/**
 	 * @see WP_Widget::get_field_id()
+	 * @dataProvider data_wp_widget_get_field_id
+	 *
 	 */
-	function test_wp_widget_get_field_id() {
+	function test_wp_widget_get_field_id( $expected, $value_to_test ) {
 		$widget = new WP_Widget( 'foo', 'Foo' );
 		$widget->_set( 2 );
-		$this->assertEquals( 'widget-foo-2-title', $widget->get_field_id( 'title' ) );
+		$this->assertEquals( $expected, $widget->get_field_id( $value_to_test ) );
+	}
+
+
+	/**
+	 * Data provider.
+	 *
+	 * Passes the expected field id and the value to be used in the tests.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $expected      The expected field id to be returned.
+	 *         @type string $value_to_test The value being passed to the get_field_id method.
+	 *     }
+	 * }
+	 */
+	function data_wp_widget_get_field_id() {
+		return array(
+			array(
+				'widget-foo-2-title',
+				'title',
+			),
+			array(
+				'widget-foo-2-posttypes',
+				'posttypes[]',
+			),
+			array(
+				'widget-foo-2-posttypes-4',
+				'posttypes[4]',
+			),
+			array(
+				'widget-foo-2-posttypes-4',
+				'posttypes[4][]',
+			),
+			array(
+				'widget-foo-2-posttypes-4-6',
+				'posttypes[4][][6]',
+			),
+		);
 	}
 
 	/**
