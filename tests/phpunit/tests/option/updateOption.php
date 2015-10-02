@@ -25,9 +25,9 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		}
 
 		global $wpdb;
-		wp_cache_flush();
+		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value' );
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which includes autoload=yes options.
 		wp_load_alloptions();
@@ -49,9 +49,9 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		}
 
 		global $wpdb;
-		wp_cache_flush();
+		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', 'yes' );
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which includes autoload=yes options.
 		wp_load_alloptions();
@@ -73,9 +73,9 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		}
 
 		global $wpdb;
-		wp_cache_flush();
+		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', 'no' );
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which does not include autoload=no options.
 		wp_load_alloptions();
@@ -98,9 +98,9 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		}
 
 		global $wpdb;
-		wp_cache_flush();
+		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', false );
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which does not include autoload=no options.
 		wp_load_alloptions();
@@ -127,7 +127,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		$updated = update_option( 'foo', 'bar2', true );
 		$this->assertTrue( $updated );
 
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which includes autoload=yes options.
 		wp_load_alloptions();
@@ -152,7 +152,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		$updated = update_option( 'foo', 'bar', false );
 		$this->assertFalse( $updated );
 
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which includes autoload=yes options.
 		wp_load_alloptions();
@@ -180,7 +180,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 		$updated = update_option( 'foo', 'bar2' );
 		$this->assertTrue( $updated );
 
-		wp_cache_flush();
+		$this->flush_cache();
 
 		// Populate the alloptions cache, which includes autoload=yes options.
 		wp_load_alloptions();

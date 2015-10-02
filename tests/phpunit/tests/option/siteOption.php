@@ -137,7 +137,7 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 
 		delete_site_option( $key );
 		$this->assertTrue( update_site_option( $key, $value ) );
-		wp_cache_flush(); // ensure we're getting the value from the DB
+		$this->flush_cache(); // ensure we're getting the value from the DB
 		$this->assertEquals( $value, get_site_option( $key ) );
 	}
 
