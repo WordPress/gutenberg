@@ -114,17 +114,20 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 		$this->assertFalse( delete_site_option( $key ) );
 	}
 
-	function test_serialized_data() {
+	function test_site_option_add_and_get_serialized_array() {
 		$key = rand_str();
 		$value = array( 'foo' => true, 'bar' => true );
-
-		$this->assertTrue( add_site_option( $key, $value ) );
+		add_site_option( $key, $value );
 		$this->assertEquals( $value, get_site_option( $key ) );
+	}
 
-		$value = (object) $value;
-		$this->assertTrue( update_site_option( $key, $value ) );
+	function test_site_option_add_and_get_serialized_object() {
+		$key = rand_str();
+		$value = new stdClass();
+		$value->foo = true;
+		$value->bar = true;
+		add_site_option( $key, $value );
 		$this->assertEquals( $value, get_site_option( $key ) );
-		$this->assertTrue( delete_site_option( $key ) );
 	}
 
 	// #15497 - ensure update_site_option will add options with false-y values
