@@ -419,7 +419,8 @@ function benchmark_pcre_backtracking( $pattern, $subject, $strategy ) {
 			preg_match( $pattern, $subject );
 			break;
 		case 'match_all':
-			preg_match_all( $pattern, $subject );
+			$matches = array();
+			preg_match_all( $pattern, $subject, $matches );
 			break;
 		}
 
