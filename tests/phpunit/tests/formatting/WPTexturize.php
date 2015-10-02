@@ -2048,4 +2048,29 @@ String with a number followed by a single quote !q1!Expendables 3!q1! vestibulum
 			),
 		);
 	}
+
+	/**
+	 * Automated performance testing of the main regex.
+	 *
+	 * @dataProvider data_whole_posts
+	 */
+	function test_pcre_performance( $input ) {
+		global $shortcode_tags;
+
+		// With Shortcodes Disabled
+		$regex = _get_wptexturize_split_regex( );
+		$result = benchmark_pcre_backtracking( $regex, $input, 'split' );
+		$this->assertLessThan( 200, $result );
+
+		// With Shortcodes Enabled
+		$shortcode_regex = _get_wptexturize_shortcode_regex( array_keys( $shortcode_tags ) );
+		$regex = _get_wptexturize_split_regex( $shortcode_regex );
+		$result = benchmark_pcre_backtracking( $regex, $input, 'split' );
+		return $this->assertLessThan( 200, $result );
+	}
+
+	function data_whole_posts() {
+		require_once( DIR_TESTDATA . '/formatting/whole-posts.php' );
+		return data_whole_posts();
+	}
 }
