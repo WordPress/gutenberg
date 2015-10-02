@@ -36,6 +36,41 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 		$this->assertEquals( $new_value, get_site_option( $key ) );
 	}
 
+	function test_get_site_option_does_not_exist_returns_filtered_default_with_no_default_provided() {
+		add_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
+		$site_option = get_site_option( 'doesnotexist' );
+		remove_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
+		$this->assertEquals( 'foo', $site_option );
+	}
+
+	function test_get_site_option_does_not_exist_returns_filtered_default_with_default_provided() {
+		add_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
+		$site_option = get_site_option( 'doesnotexist', 'bar' );
+		remove_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
+		$this->assertEquals( 'foo', $site_option );
+	}
+
+	function test_get_site_option_does_not_exist_returns_provided_default() {
+		$this->assertEquals( 'bar', get_site_option( 'doesnotexist', 'bar' ) );
+	}
+
+	function test_get_site_option_exists_does_not_return_provided_default() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertEquals( $value, get_site_option( $key, 'foo' ) );
+	}
+
+	function test_get_site_option_exists_does_not_return_filtered_default() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		add_filter( 'default_site_option_' . $key , array( $this, '__return_foo' ) );
+		$site_option = get_site_option( $key );
+		remove_filter( 'default_site_option_' . $key, array( $this, '__return_foo' ) );
+		$this->assertEquals( $value, $site_option );
+	}
+
 	function test_add_site_option_returns_true_for_new_option() {
 		$key = rand_str();
 		$value = rand_str();
@@ -77,31 +112,6 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 		add_site_option( $key, $value );
 		delete_site_option( $key );
 		$this->assertFalse( delete_site_option( $key ) );
-	}
-
-	function test_default_filter() {
-		$random = rand_str();
-
-		$this->assertFalse( get_site_option( 'doesnotexist' ) );
-
-		// Default filter overrides $default arg.
-		add_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
-		$this->assertEquals( 'foo', get_site_option( 'doesnotexist', 'bar' ) );
-
-		// Remove the filter and the $default arg is honored.
-		remove_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
-		$this->assertEquals( 'bar', get_site_option( 'doesnotexist', 'bar' ) );
-
-		// Once the option exists, the $default arg and the default filter are ignored.
-		add_site_option( 'doesnotexist', $random );
-		$this->assertEquals( $random, get_site_option( 'doesnotexist', 'foo' ) );
-		add_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
-		$this->assertEquals( $random, get_site_option( 'doesnotexist', 'foo' ) );
-		remove_filter( 'default_site_option_doesnotexist', array( $this, '__return_foo' ) );
-
-		// Cleanup
-		$this->assertTrue( delete_site_option( 'doesnotexist' ) );
-		$this->assertFalse( get_site_option( 'doesnotexist' ) );
 	}
 
 	function test_serialized_data() {
