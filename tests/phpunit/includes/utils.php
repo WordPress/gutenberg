@@ -433,15 +433,16 @@ function benchmark_pcre_backtracking( $pattern, $subject, $strategy ) {
 			continue;
 		case PREG_RECURSION_LIMIT_ERROR:
 			trigger_error('PCRE recursion limit encountered before backtrack limit.');
-			break;
+			return;
 		case PREG_BAD_UTF8_ERROR:
 			trigger_error('UTF-8 error during PCRE benchmark.');
-			break;
+			return;
 		case PREG_INTERNAL_ERROR:
 			trigger_error('Internal error during PCRE benchmark.');
-			break;
+			return;
 		default:
-			trigger_error('Unexpected error during PCRE benchmark.');	
+			trigger_error('Unexpected error during PCRE benchmark.');
+			return;
 		}
 	}
 
