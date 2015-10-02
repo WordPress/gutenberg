@@ -8,29 +8,75 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 		return 'foo';
 	}
 
-	function test_the_basics() {
-		$key = rand_str();
-		$key2 = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
-
+	function test_get_site_option_returns_false_if_option_does_not_exist() {
 		$this->assertFalse( get_site_option( 'doesnotexist' ) );
-		$this->assertTrue( add_site_option( $key, $value ) );
-		$this->assertEquals( $value, get_site_option( $key ) );
-		$this->assertFalse( add_site_option( $key, $value ) );  // Already exists
-		$this->assertFalse( update_site_option( $key, $value ) );  // Value is the same
-		$this->assertTrue( update_site_option( $key, $value2 ) );
-		$this->assertEquals( $value2, get_site_option( $key ) );
-		$this->assertFalse( add_site_option( $key, $value ) );
-		$this->assertEquals( $value2, get_site_option( $key ) );
-		$this->assertTrue( delete_site_option( $key ) );
-		$this->assertFalse( get_site_option( $key ) );
-		$this->assertFalse( delete_site_option( $key ) );
+	}
 
-		$this->assertTrue( update_site_option( $key2, $value2 ) );
-		$this->assertEquals( $value2, get_site_option( $key2 ) );
-		$this->assertTrue( delete_site_option( $key2 ) );
-		$this->assertFalse( get_site_option( $key2 ) );
+	function test_get_site_option_returns_false_after_deletion() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		delete_site_option( $key );
+		$this->assertFalse( get_site_option( $key ) );
+	}
+
+	function test_get_site_option_returns_value() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertEquals( $value, get_site_option( $key ) );
+	}
+
+	function test_get_site_option_returns_updated_value() {
+		$key = rand_str();
+		$value = rand_str();
+		$new_value = rand_str();
+		add_site_option( $key, $value );
+		update_site_option( $key, $new_value );
+		$this->assertEquals( $new_value, get_site_option( $key ) );
+	}
+
+	function test_add_site_option_returns_true_for_new_option() {
+		$key = rand_str();
+		$value = rand_str();
+		$this->assertTrue( add_site_option( $key, $value ) );
+	}
+
+	function test_add_site_option_returns_false_for_existing_option() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertFalse( add_site_option( $key, $value ) );
+	}
+
+	function test_update_site_option_returns_false_for_same_value() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertFalse( update_site_option( $key, $value ) );
+	}
+
+	function test_update_site_option_returns_true_for_new_value() {
+		$key = rand_str();
+		$value = rand_str();
+		$new_value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertTrue( update_site_option( $key, $new_value ) );
+	}
+
+	function test_delete_site_option_returns_true_if_option_exists() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		$this->assertTrue( delete_site_option( $key ) );
+	}
+
+	function test_delete_site_option_returns_false_if_option_does_not_exist() {
+		$key = rand_str();
+		$value = rand_str();
+		add_site_option( $key, $value );
+		delete_site_option( $key );
+		$this->assertFalse( delete_site_option( $key ) );
 	}
 
 	function test_default_filter() {
