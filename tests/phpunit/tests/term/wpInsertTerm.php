@@ -628,6 +628,31 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $found['term_id'], $cached_children[ $t ] ) );
 	}
 
+	/**
+	 * @ticket 33864
+	 */
+	public function test_wp_insert_term_with_and_without_accents() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = $this->factory->term->create( array(
+			'name' => 'Foó',
+			'taxonomy' => 'wptests_tax',
+		) );
+		$t2 = $this->factory->term->create( array(
+			'name' => 'Foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$this->assertInternalType( 'int', $t1 );
+		$this->assertInternalType( 'int', $t2 );
+		$this->assertNotEquals( $t1, $t2 );
+
+		$term_2 = get_term( $t2, 'wptests_tax' );
+		$this->assertSame( $t2, $term_2->term_id );
+		$this->assertSame( 'Foo', $term_2->name );
+
+	}
+
 	/** Helpers **********************************************************/
 
 	public function deleted_term_cb( $term, $tt_id, $taxonomy, $deleted_term ) {
