@@ -251,11 +251,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 30910
 	 */
 	public function test_get_sample_permalink_should_return_pretty_permalink_for_posts_with_post_status_future() {
-		global $wp_rewrite;
-
 		$permalink_structure = '%postname%';
-		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
-		flush_rewrite_rules();
+		$this->set_permalink_structure( "/$permalink_structure/" );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
 		$p = $this->factory->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
@@ -285,10 +282,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 18306
 	 */
 	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_link_when_pretty_permalinks_are_enabled() {
-		global $wp_rewrite;
-		$permalink_structure = '%postname%';
-		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
-		flush_rewrite_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
 
@@ -305,10 +299,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 18306
 	 */
 	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_link_when_changing_slug() {
-		global $wp_rewrite;
-		$permalink_structure = '%postname%';
-		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
-		flush_rewrite_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
 
@@ -346,10 +337,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_year_archives() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '2015',
@@ -363,10 +351,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_allow_yearlike_slugs_if_permastruct_does_not_cause_an_archive_conflict() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '2015',
@@ -380,10 +365,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_month_archives() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '11',
@@ -397,10 +379,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_ignore_potential_month_conflicts_for_invalid_monthnum() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '13',
@@ -414,10 +393,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_day_archives() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '30',
@@ -431,10 +407,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_iterate_slug_suffix_when_a_date_conflict_is_found() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$this->factory->post->create( array(
 			'post_name' => '30-2',
@@ -452,10 +425,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_ignore_potential_day_conflicts_for_invalid_day() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '32',
@@ -469,10 +439,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_allow_daylike_slugs_if_permastruct_does_not_cause_an_archive_conflict() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%month%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%month%/%day%/%postname%/' );
 
 		$p = $this->factory->post->create( array(
 			'post_name' => '30',

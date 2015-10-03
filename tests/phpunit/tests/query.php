@@ -3,15 +3,10 @@
 class Tests_Query extends WP_UnitTestCase {
 
 	function setUp() {
-		global $wp_rewrite;
 		parent::setUp();
 
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-
 		create_initial_taxonomies();
-
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 	}
 
 	/**

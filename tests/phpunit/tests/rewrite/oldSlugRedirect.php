@@ -19,13 +19,12 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 
 		add_filter( 'old_slug_redirect_url', array( $this, 'filter_old_slug_redirect_url' ), 10, 1 );
 
-		global $wp_rewrite;
+		$this->set_permalink_structure( '/%postname%/' );
 
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		add_rewrite_endpoint( 'custom-endpoint', EP_PERMALINK );
 		add_rewrite_endpoint( 'second-endpoint', EP_PERMALINK, 'custom' );
-		$wp_rewrite->flush_rules();
+
+		flush_rewrite_rules();
 	}
 
 	public function tearDown() {

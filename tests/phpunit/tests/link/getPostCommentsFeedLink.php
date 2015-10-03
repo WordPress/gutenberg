@@ -17,10 +17,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_post_pretty_link() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$post_id = $this->factory->post->create();
 
@@ -47,10 +44,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_pretty_link() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$post_id = $this->factory->post->create( array(
 			'post_status' => 'publish'
@@ -70,10 +64,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_no_name_pretty_link() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$post_id = $this->factory->post->create();
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', $post_id, array(
@@ -103,10 +94,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_unattached_pretty_link() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',

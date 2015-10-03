@@ -50,7 +50,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
 			$this->reset_post_statuses();
-			$this->reset_permalinks();
+			$this->set_permalink_structure();
 		}
 
 		$this->start_transaction();
@@ -653,12 +653,14 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 * @since 4.4.0
 	 *
 	 * @global WP_Rewrite $wp_rewrite
+	 *
+	 * @param string $structure Optional. Permalink structure to set. Default empty.
 	 */
-	public function reset_permalinks() {
+	public function set_permalink_structure( $structure = '' ) {
 		global $wp_rewrite;
 
 		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '' );
+		$wp_rewrite->set_permalink_structure( $structure );
 		$wp_rewrite->flush_rules();
 	}
 }

@@ -9,16 +9,11 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	private $home_url;
 
 	function setUp() {
-		global $wp_rewrite;
 		parent::setUp();
-
-		// Need rewrite rules in place to use url_to_postid
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		create_initial_taxonomies();
 
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$this->home_url = get_option( 'home' );
 	}

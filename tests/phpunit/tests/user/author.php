@@ -127,10 +127,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	 * @ticket 30355
 	 */
 	public function test_get_the_author_posts_link_with_permalinks() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$author = $this->factory->user->create_and_get( array(
 			'display_name'  => 'Foo',

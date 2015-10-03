@@ -85,10 +85,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 	}
 
 	public function test_taxonomy_permastruct_with_hierarchical_rewrite_should_put_term_ancestors_in_link() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		register_taxonomy( 'wptests_tax2', 'post', array(
 			'hierarchical' => true,
@@ -97,6 +94,8 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 				'hierarchical' => true,
 			),
 		) );
+
+		flush_rewrite_rules();
 
 		$t1 = $this->factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
@@ -115,10 +114,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 	}
 
 	public function test_taxonomy_permastruct_with_nonhierarchical_rewrite_should_not_put_term_ancestors_in_link() {
-		global $wp_rewrite;
-		$permalink_structure = get_option( 'permalink_structure' );
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		register_taxonomy( 'wptests_tax2', 'post', array(
 			'hierarchical' => true,
@@ -127,6 +123,8 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 				'hierarchical' => false,
 			),
 		) );
+
+		flush_rewrite_rules();
 
 		$t1 = $this->factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',

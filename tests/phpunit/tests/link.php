@@ -20,9 +20,7 @@ class Tests_Link extends WP_UnitTestCase {
 	function test_get_pagenum_link_case_insensitivity() {
 		$old_req_uri = $_SERVER['REQUEST_URI'];
 
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		add_filter( 'home_url', array( $this, '_get_pagenum_link_cb' ) );
 		$_SERVER['REQUEST_URI'] = '/woohoo';
@@ -35,8 +33,6 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_shortlink() {
-		global $wp_rewrite;
-
 		$post_id = $this->factory->post->create();
 		$post_id2 = $this->factory->post->create();
 
@@ -67,8 +63,7 @@ class Tests_Link extends WP_UnitTestCase {
 		$this->assertEquals( '', wp_get_shortlink( 0 ) );
 		$this->assertEquals( '', wp_get_shortlink() );
 
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		// With a permalink structure set, get_permalink() will no longer match.
 		$this->assertNotEquals( get_permalink( $post_id ), wp_get_shortlink( $post_id, 'post' ) );
@@ -88,9 +83,7 @@ class Tests_Link extends WP_UnitTestCase {
 		// Don't test against get_permalink() since it uses ?page_id= for pages.
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( $post_id, 'post' ) );
 
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$this->assertEquals( home_url( '?p=' . $post_id ), wp_get_shortlink( $post_id, 'post' ) );
 	}
@@ -105,10 +98,7 @@ class Tests_Link extends WP_UnitTestCase {
 
 		$this->assertEquals( home_url( '/' ), wp_get_shortlink( $post_id, 'post' ) );
 
-		global $wp_rewrite;
-		$wp_rewrite->permalink_structure = '';
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$this->assertEquals( home_url( '/' ), wp_get_shortlink( $post_id, 'post' ) );
 	}
@@ -396,9 +386,7 @@ class Tests_Link extends WP_UnitTestCase {
 	 * @ticket 1914
 	 */
 	public function test_unattached_attachment_has_a_pretty_permalink() {
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
@@ -416,12 +404,13 @@ class Tests_Link extends WP_UnitTestCase {
 	 * @ticket 1914
 	 */
 	public function test_attachment_attached_to_non_existent_post_type_has_a_pretty_permalink() {
-		global $wp_rewrite, $wp_post_types;
-		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
+		global $wp_post_types;
+
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		register_post_type( 'not_a_post_type', array( 'public' => true ) );
 
-		$wp_rewrite->flush_rules();
+		flush_rewrite_rules();
 
 		$post_id = $this->factory->post->create( array( 'post_type' => 'not_a_post_type' ) );
 

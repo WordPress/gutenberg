@@ -20,10 +20,8 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_year_segment_collision_without_title() {
-		global $wp_rewrite, $wpdb;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		global $wpdb;
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -50,10 +48,8 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_year_segment_collision_without_title() {
-		global $wp_rewrite, $wpdb;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		global $wpdb;
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -78,10 +74,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_year_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -97,10 +90,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_year_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -114,10 +104,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_month_segment_collision_without_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -134,10 +121,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_month_segment_collision_without_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -152,10 +136,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_month_segment_collision_without_title_no_leading_zero() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -172,10 +153,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_month_segment_collision_without_title_no_leading_zero() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -190,10 +168,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_month_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -209,10 +184,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_month_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -226,10 +198,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_month_segment_collision_with_title_no_leading_zero() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -245,10 +214,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_month_segment_collision_with_title_no_leading_zero() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -262,10 +228,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_day_segment_collision_without_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -282,10 +245,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_day_segment_collision_without_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -300,10 +260,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_go_to_day_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -319,10 +276,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_url_to_postid_day_segment_collision_with_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -336,10 +290,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_numeric_slug_permalink_conflicts_should_only_be_resolved_for_the_main_query() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -360,10 +311,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_month_slug_collision_should_resolve_to_date_archive_when_year_does_not_match_post_year() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		// Make sure a post is published in 2013/02, to avoid 404s.
 		$this->factory->post->create( array(
@@ -391,10 +339,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_day_slug_collision_should_resolve_to_date_archive_when_monthnum_does_not_match_post_month() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		// Make sure a post is published on 2015/01/01, to avoid 404s.
 		$this->factory->post->create( array(
@@ -422,10 +367,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_date_slug_collision_should_distinguish_valid_pagination_from_date() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -441,10 +383,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_date_slug_collision_should_distinguish_too_high_pagination_from_date() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -460,10 +399,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_date_slug_collision_should_not_require_pagination_query_var() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
@@ -480,10 +416,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function test_date_slug_collision_should_be_ignored_when_pagination_var_is_present_but_post_does_not_have_multiple_pages() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		$id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,

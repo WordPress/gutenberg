@@ -22,14 +22,9 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		update_option( 'comments_per_page', 5 );
 		update_option( 'posts_per_page', 5 );
 
-		global $wp_rewrite;
-
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-
 		create_initial_taxonomies();
 
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 	}
 
 	function tearDown() {

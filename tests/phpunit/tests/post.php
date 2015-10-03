@@ -415,10 +415,7 @@ class Tests_Post extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_wp_insert_post_should_not_allow_a_bare_numeric_slug_that_might_conflict_with_a_date_archive_when_generating_from_an_empty_post_title() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure( '/%postname%/' );
 
 		$p = wp_insert_post( array(
 			'post_title' => '',
@@ -429,7 +426,7 @@ class Tests_Post extends WP_UnitTestCase {
 
 		$post = get_post( $p );
 
-		$this->reset_permalinks();
+		$this->set_permalink_structure();
 
 		$this->assertEquals( "$p-2", $post->post_name );
 	}
@@ -505,10 +502,7 @@ class Tests_Post extends WP_UnitTestCase {
 		// bug: permalink doesn't work if post title is empty
 		// might only fail if the post ID is greater than four characters
 
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
-		$wp_rewrite->flush_rules();
+		$this->set_permalink_structure('/%year%/%monthnum%/%day%/%postname%/');
 
 		$post = array(
 			'post_author' => $this->author_id,

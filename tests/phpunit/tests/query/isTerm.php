@@ -23,7 +23,6 @@ class Tests_Query_IsTerm extends WP_UnitTestCase {
 	protected $tax;
 
 	function setUp() {
-		global $wp_rewrite;
 		parent::setUp();
 
 		set_current_screen( 'front' );
@@ -31,13 +30,12 @@ class Tests_Query_IsTerm extends WP_UnitTestCase {
 		$GLOBALS['wp_the_query'] = new WP_Query();
 		$GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];
 
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		create_initial_taxonomies();
 		register_taxonomy( 'testtax', 'post', array( 'public' => true ) );
 
-		$wp_rewrite->flush_rules();
+		flush_rewrite_rules();
 
 		$this->tag_id = $this->factory->tag->create( array( 'slug' => 'tag-slug' ) );
 		$this->cat_id = $this->factory->category->create( array( 'slug' => 'cat-slug' ) );
