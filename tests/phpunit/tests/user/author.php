@@ -15,11 +15,6 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		global $wp_rewrite;
-		$this->permalink_structure = get_option( 'permalink_structure' );
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
-
 		$this->author_id = $this->factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_author',
@@ -42,10 +37,6 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	}
 
 	function tearDown() {
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure( $this->permalink_structure );
-		$wp_rewrite->flush_rules();
-
 		wp_reset_postdata();
 		parent::tearDown();
 	}

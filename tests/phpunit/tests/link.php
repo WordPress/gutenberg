@@ -40,10 +40,6 @@ class Tests_Link extends WP_UnitTestCase {
 		$post_id = $this->factory->post->create();
 		$post_id2 = $this->factory->post->create();
 
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
-
 		// Basic case
 		$this->assertEquals( get_permalink( $post_id ), wp_get_shortlink( $post_id, 'post' ) );
 

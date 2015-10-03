@@ -253,7 +253,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_return_pretty_permalink_for_posts_with_post_status_future() {
 		global $wp_rewrite;
 
-		$old_permalink_structure = get_option( 'permalink_structure' );
 		$permalink_structure = '%postname%';
 		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
 		flush_rewrite_rules();
@@ -265,9 +264,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$expected = trailingslashit( home_url( $permalink_structure ) );
 
 		$this->assertSame( $expected, $found[0] );
-
-		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -275,11 +271,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 18306
 	 */
 	public function test_get_sample_permalink_html_should_use_default_permalink_for_view_post_link_when_pretty_permalinks_are_disabled() {
-		global $wp_rewrite;
-		$old_permalink_structure = get_option( 'permalink_structure' );
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
-
 		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
@@ -287,9 +278,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink_html( $p );
 		$this->assertContains( 'href="' . get_option( 'home' ) . '/?p=' . $p . '"', $found );
-
-		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -298,7 +286,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 */
 	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_link_when_pretty_permalinks_are_enabled() {
 		global $wp_rewrite;
-		$old_permalink_structure = get_option( 'permalink_structure' );
 		$permalink_structure = '%postname%';
 		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
 		flush_rewrite_rules();
@@ -311,9 +298,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$found = get_sample_permalink_html( $p );
 		$post = get_post( $p );
 		$this->assertContains( 'href="' . get_option( 'home' ) . "/" . $post->post_name . '/"', $found );
-
-		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -322,7 +306,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 */
 	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_link_when_changing_slug() {
 		global $wp_rewrite;
-		$old_permalink_structure = get_option( 'permalink_structure' );
 		$permalink_structure = '%postname%';
 		$wp_rewrite->set_permalink_structure( "/$permalink_structure/" );
 		flush_rewrite_rules();
@@ -357,9 +340,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$preview_link = add_query_arg( 'preview', 'true', $preview_link );
 
 		$this->assertContains( 'href="' . esc_url( $preview_link ) . '"', $found, $message );
-
-		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -377,9 +357,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '2015-2', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -397,9 +374,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '2015', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -417,9 +391,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '11-2', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -437,9 +408,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '13', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -457,9 +425,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '30-2', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -481,9 +446,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '30-3', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -501,9 +463,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '32', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -521,9 +480,6 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		$found = get_sample_permalink( $p );
 		$this->assertEquals( '30', $found[1] );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	public function test_post_exists_should_match_title() {

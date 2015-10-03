@@ -47,8 +47,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( '2015' ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_year_segment_collision_without_title() {
@@ -77,8 +75,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals( '2015', url_to_postid( get_permalink( '2015' ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_year_segment_collision_with_title() {
@@ -98,8 +94,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_year_segment_collision_with_title() {
@@ -117,8 +111,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_month_segment_collision_without_title() {
@@ -139,8 +131,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_month_segment_collision_without_title() {
@@ -159,8 +149,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_month_segment_collision_without_title_no_leading_zero() {
@@ -181,8 +169,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_month_segment_collision_without_title_no_leading_zero() {
@@ -201,8 +187,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_month_segment_collision_with_title() {
@@ -222,8 +206,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_month_segment_collision_with_title() {
@@ -241,8 +223,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_month_segment_collision_with_title_no_leading_zero() {
@@ -262,8 +242,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_month_segment_collision_with_title_no_leading_zero() {
@@ -281,8 +259,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_day_segment_collision_without_title() {
@@ -303,8 +279,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_day_segment_collision_without_title() {
@@ -323,8 +297,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_go_to_day_segment_collision_with_title() {
@@ -344,8 +316,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->go_to( get_permalink( $id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_url_to_postid_day_segment_collision_with_title() {
@@ -363,8 +333,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		) );
 
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_numeric_slug_permalink_conflicts_should_only_be_resolved_for_the_main_query() {
@@ -389,8 +357,6 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 
 		$this->assertTrue( $q->is_day );
 		$this->assertFalse( $q->is_single );
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	public function test_month_slug_collision_should_resolve_to_date_archive_when_year_does_not_match_post_year() {

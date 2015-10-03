@@ -6,14 +6,6 @@
  * @covers ::get_next_comments_link
  */
 class Tests_Link_GetNextCommentsLink extends WP_UnitTestCase {
-	public function setUp() {
-		global $wp_rewrite;
-
-		parent::setUp();
-
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
-	}
 
 	public function test_page_should_respect_value_of_cpage_query_var() {
 		$p = $this->factory->post->create();

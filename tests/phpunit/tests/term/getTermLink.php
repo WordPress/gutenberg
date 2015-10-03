@@ -4,26 +4,11 @@
  * @group taxonomy
  */
 class Tests_Term_GetTermLink extends WP_UnitTestCase {
-	private $permalink_structure;
 
 	public function setUp() {
 		parent::setUp();
 
-		// Assume no pretty permalinks.
-		global $wp_rewrite;
-		$this->permalink_structure = get_option( 'permalink_structure' );
-		$wp_rewrite->set_permalink_structure( '' );
-		$wp_rewrite->flush_rules();
-
 		register_taxonomy( 'wptests_tax', 'post' );
-	}
-
-	public function tearDown() {
-		global $wp_rewrite;
-		$wp_rewrite->set_permalink_structure( $this->permalink_structure );
-		$wp_rewrite->flush_rules();
-
-		parent::tearDown();
 	}
 
 	public function test_integer_should_be_interpreted_as_term_id() {
@@ -101,7 +86,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 
 	public function test_taxonomy_permastruct_with_hierarchical_rewrite_should_put_term_ancestors_in_link() {
 		global $wp_rewrite;
-		$permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->init();
 		$wp_rewrite->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 		$wp_rewrite->flush_rules();
 
@@ -125,9 +110,6 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 		) );
 
 		$actual = get_term_link( $t2, 'wptests_tax2' );
-
-		$wp_rewrite->set_permalink_structure( $permalink_structure );
-		$wp_rewrite->flush_rules();
 
 		$this->assertContains( '/foo/term1/term2/', $actual );
 	}
@@ -158,9 +140,6 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 		) );
 
 		$actual = get_term_link( $t2, 'wptests_tax2' );
-
-		$wp_rewrite->set_permalink_structure( $permalink_structure );
-		$wp_rewrite->flush_rules();
 
 		$this->assertContains( '/foo/term2/', $actual );
 	}

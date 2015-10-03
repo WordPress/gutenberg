@@ -181,9 +181,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '2015', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '2015-2', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -203,9 +200,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '2015', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '2015-2', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -224,9 +218,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '2015', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '2015', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -245,9 +236,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '11', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '11-2', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -266,9 +254,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '11', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '11', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -287,9 +272,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '13', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '13', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -308,9 +290,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '30', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '30-2', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -329,9 +308,6 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '30', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '30', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 
 	/**
@@ -350,8 +326,5 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 
 		$found = wp_unique_post_slug( '32', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '32', $found );
-
-		$wp_rewrite->set_permalink_structure( '' );
-		flush_rewrite_rules();
 	}
 }

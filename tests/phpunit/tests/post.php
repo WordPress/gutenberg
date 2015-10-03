@@ -429,7 +429,7 @@ class Tests_Post extends WP_UnitTestCase {
 
 		$post = get_post( $p );
 
-		$wp_rewrite->set_permalink_structure( '' );
+		$this->reset_permalinks();
 
 		$this->assertEquals( "$p-2", $post->post_name );
 	}
@@ -525,8 +525,6 @@ class Tests_Post extends WP_UnitTestCase {
 
 		// permalink should include the post ID at the end
 		$this->assertEquals(get_option('siteurl').'/2007/10/31/'.$id.'/', $plink);
-
-		$wp_rewrite->set_permalink_structure('');
 	}
 
 	/**
