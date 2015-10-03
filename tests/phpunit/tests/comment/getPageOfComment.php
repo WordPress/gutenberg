@@ -191,4 +191,39 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 		$found_1 = get_page_of_comment( $comments_1[1], array( 'per_page' => 2 ) );
 		$this->assertEquals( 2, $found_1 );
 	}
+
+	/**
+	 * @ticket 13939
+	 */
+	public function test_only_top_level_comments_should_be_included_in_older_count() {
+		$post = $this->factory->post->create();
+
+		$now = time();
+		$comment_parents = $comment_children = array();
+		for ( $i = 0; $i < 5; $i++ ) {
+			$parent = $this->factory->comment->create( array( 'comment_post_ID' => $post, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( $i * 60 ) ) ) );
+			$comment_parents[ $i ] = $parent;
+
+			$child = $this->factory->comment->create( array( 'comment_post_ID' => $post, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - ( $i * 59 ) ), 'comment_parent' => $parent ) );
+			$comment_children[ $i ] = $child;
+		}
+
+		$page_1_indicies = array( 2, 3, 4 );
+		$page_2_indicies = array( 0, 1 );
+
+		$args = array(
+			'per_page' => 3,
+			'max_depth' => 2,
+		);
+
+		foreach ( $page_1_indicies as $p1i ) {
+			$this->assertSame( 1, (int) get_page_of_comment( $comment_parents[ $p1i ], $args ) );
+			$this->assertSame( 1, (int) get_page_of_comment( $comment_children[ $p1i ], $args ) );
+		}
+
+		foreach ( $page_2_indicies as $p2i ) {
+			$this->assertSame( 2, (int) get_page_of_comment( $comment_parents[ $p2i ], $args ) );
+			$this->assertSame( 2, (int) get_page_of_comment( $comment_children[ $p2i ], $args ) );
+		}
+	}
 }
