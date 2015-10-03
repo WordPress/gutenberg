@@ -42,6 +42,8 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
 
+		self::$default_permalink_structure = get_option( 'permalink_structure' );
+
 		/*
 		 * When running core tests, ensure that post types and taxonomies
 		 * are reset for each test. We skip this step for non-core tests,
@@ -52,6 +54,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
 			$this->reset_post_statuses();
+			$this->reset_permalinks();
 		}
 
 		$this->start_transaction();
@@ -72,10 +75,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( is_multisite() ) {
 			add_filter( 'pre_option_db_version', array( $this, 'db_version' ) );
 		}
-
-		self::$default_permalink_structure = get_option( 'permalink_structure' );
-
-		$this->reset_permalinks();
 	}
 
 	/**
