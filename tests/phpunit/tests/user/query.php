@@ -874,4 +874,26 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( array( $users[2], $users[1] ), $q->results );
 	}
+
+	/**
+	 * @ticket 33449
+	 */
+	public function test_query_vars_should_be_filled_in_after_pre_get_users() {
+		$query_vars = array( 'blog_id', 'role', 'meta_key', 'meta_value', 'meta_compare', 'include', 'exclude', 'search', 'search_columns', 'orderby', 'order', 'offset', 'number', 'paged', 'count_total', 'fields', 'who', 'has_published_posts' );
+
+		add_action( 'pre_get_users', array( $this, 'filter_pre_get_users_args' ) );
+		$q = new WP_User_Query( array_fill_keys( $query_vars, '1' ) );
+		remove_action( 'pre_get_users', array( $this, 'filter_pre_get_users_args' ) );
+
+		foreach ( $query_vars as $query_var ) {
+			$this->assertTrue( array_key_exists( $query_var, $q->query_vars ), "$query_var does not exist." );
+		}
+
+	}
+
+	public function filter_pre_get_users_args( $q ) {
+		foreach ( $q->query_vars as $k => $v ) {
+			unset( $q->query_vars[ $k ] );
+		}
+	}
 }
