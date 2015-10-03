@@ -16,8 +16,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 	protected $db_version;
 
-	public static $default_permalink_structure;
-
 	/**
 	 * @var WP_UnitTest_Factory
 	 */
@@ -41,8 +39,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		ini_set('display_errors', 1 );
 		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
-
-		self::$default_permalink_structure = get_option( 'permalink_structure' );
 
 		/*
 		 * When running core tests, ensure that post types and taxonomies
@@ -104,8 +100,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		remove_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 		$this->_restore_hooks();
 		wp_set_current_user( 0 );
-
-		$this->reset_permalinks( $restore = true );
 	}
 
 	function clean_up_global_scope() {
@@ -656,26 +650,15 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * Utility method that resets permalinks and flushes rewrites.
 	 *
-	 * Collects the current permalink structure and stores it in a class property for use
-	 * by sub-classes.
-	 *
 	 * @since 4.4.0
 	 *
 	 * @global WP_Rewrite $wp_rewrite
-	 *
-	 * @param bool $restore_default Optional. Whether to restore the default permalink structure.
-	 *                              Default false.
 	 */
-	public function reset_permalinks( $restore_default = false ) {
+	public function reset_permalinks() {
 		global $wp_rewrite;
 
-		if ( ! $restore_default ) {
-			$wp_rewrite->init();
-			$wp_rewrite->set_permalink_structure( '' );
-		} else {
-			$wp_rewrite->set_permalink_structure( self::$default_permalink_structure );
-		}
-
+		$wp_rewrite->init();
+		$wp_rewrite->set_permalink_structure( '' );
 		$wp_rewrite->flush_rules();
 	}
 }
