@@ -226,4 +226,20 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 			$this->assertSame( 2, (int) get_page_of_comment( $comment_children[ $p2i ], $args ) );
 		}
 	}
+
+	/**
+	 * @ticket 13939
+	 */
+	public function test_comments_per_page_option_should_be_fallback_when_query_var_is_not_available() {
+		$now = time();
+
+		$p = $this->factory->post->create();
+		$c1 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now ) ) );
+		$c2 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ) ) );
+		$c3 = $this->factory->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ) ) );
+
+		update_option( 'comments_per_page', 2 );
+
+		$this->assertEquals( 2, get_page_of_comment( $c1 ) );
+	}
 }
