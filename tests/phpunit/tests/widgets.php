@@ -6,6 +6,8 @@
  * @group widgets
  */
 class Tests_Widgets extends WP_UnitTestCase {
+	public $sidebar_index;
+	public $valid_sidebar;
 
 	function clean_up_global_scope() {
 		global $wp_widget_factory, $wp_registered_sidebars, $wp_registered_widgets, $wp_registered_widget_controls, $wp_registered_widget_updates;
@@ -22,6 +24,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	function tearDown() {
 		global $wp_customize;
 		$wp_customize = null;
+
 		parent::tearDown();
 	}
 
@@ -41,7 +44,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @see register_sidebars()
+	 * @group sidebar
 	 */
 	function test_register_sidebars_single() {
 
@@ -54,7 +57,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @see register_sidebars()
+	 * @group sidebar
 	 */
 	function test_register_sidebars_multiple() {
 
@@ -77,47 +80,136 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @see register_sidebar
-	 * @see unregister_sidebar
+	 * @group sidebar
 	 */
-	function test_register_and_unregister_sidebar() {
-
+	function test_register_sidebar_with_no_id() {
 		global $wp_registered_sidebars;
 
-		$sidebar_id = 'wp-unit-test';
-		register_sidebar( array( 'id' => $sidebar_id ) );
-		$this->assertArrayHasKey( $sidebar_id, $wp_registered_sidebars );
+		$this->setExpectedIncorrectUsage( 'register_sidebar' );
 
-		unregister_sidebar( $sidebar_id );
-		$this->assertArrayNotHasKey( 'wp-unit-test', $wp_registered_sidebars );
-	}
+		// Incorrectly register a couple of sidebars for fun.
+		register_sidebar();
+		register_sidebar();
 
-	/**
-	 * Utility hook callback used to store a sidebar ID mid-function.
-	 */
-	function retrieve_sidebar_id( $index ) {
-		$this->sidebar_index = $index;
+		$derived_sidebar_id = "sidebar-2"; // Number of sidebars in the global + 1.
+
+		$this->assertArrayHasKey( $derived_sidebar_id, $wp_registered_sidebars );
 	}
 
 	/**
 	 * @group sidebar
 	 */
-	function test_dynamic_sidebar_using_sidebar_registered_with_no_id() {
+	function test_unregister_sidebar_registered_with_no_id() {
 		global $wp_registered_sidebars;
 
 		$this->setExpectedIncorrectUsage( 'register_sidebar' );
 
-		// Register a couple of sidebars for fun.
+		// Incorrectly register a couple of sidebars for fun.
 		register_sidebar();
 		register_sidebar();
 
-		$derived_sidebar_id = "sidebar-3"; // Number of sidebars in the global + 1.
+		$derived_sidebar_id = "sidebar-2"; // Number of sidebars in the global + 1.
 
-		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+		unregister_sidebar( $derived_sidebar_id );
 
-		dynamic_sidebar( 3 );
+		$this->assertArrayNotHasKey( $derived_sidebar_id, $wp_registered_sidebars );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_register_sidebar_with_string_id() {
+
+		global $wp_registered_sidebars;
+
+		$sidebar_id = 'wp-unit-test';
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		$this->assertArrayHasKey( $sidebar_id, $wp_registered_sidebars );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_unregister_sidebar_with_string_id() {
+		global $wp_registered_sidebars;
+
+		$sidebar_id = 'wp-unit-tests';
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		unregister_sidebar( $sidebar_id );
+		$this->assertArrayNotHasKey( $sidebar_id, $wp_registered_sidebars );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_register_sidebar_with_numeric_id() {
+		global $wp_registered_sidebars;
+
+		$sidebar_id = 2;
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		$this->assertArrayHasKey( $sidebar_id, $wp_registered_sidebars );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_unregister_sidebar_with_numeric_id() {
+		global $wp_registered_sidebars;
+
+		$sidebar_id = 2;
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		unregister_sidebar( $sidebar_id );
+		$this->assertArrayNotHasKey( $sidebar_id, $wp_registered_sidebars );
+	}
+
+	/**
+	 * Utility hook callback used to store a sidebar ID mid-function.
+	 */
+	function retrieve_sidebar_id( $index, $valid_sidebar ) {
+		$this->sidebar_index = $index;
+		$this->valid_sidebar = $valid_sidebar;
+	}
+
+	/**
+	 * @group sidebar
+	 * @group drew
+	 */
+	function test_dynamic_sidebar_using_sidebar_registered_with_no_id() {
+		$this->setExpectedIncorrectUsage( 'register_sidebar' );
+
+		// Incorrectly register a couple of sidebars for fun.
+		register_sidebar();
+		register_sidebar();
+
+		$derived_sidebar_id = "sidebar-2"; // Number of sidebars in the global + 1.
+
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ), 10, 2 );
+
+		dynamic_sidebar( 2 );
 
 		$this->assertSame( $derived_sidebar_id, $this->sidebar_index );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_dynamic_sidebar_using_invalid_sidebar_id() {
+		register_sidebar( array( 'id' => 'wp-unit-text' ) );
+
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ), 10, 2 );
+
+		// 5 is a fake sidebar ID.
+		dynamic_sidebar( 5 );
+
+		/*
+		 * If the sidebar ID is invalid, the second argument passed to
+		 * the 'dynamic_sidebar_before' hook will be false.
+		 */
+		$this->assertSame( false, $this->valid_sidebar );
 	}
 
 	/**
@@ -127,7 +219,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$sidebar_id = 2;
 		register_sidebar( array( 'id' => $sidebar_id ) );
 
-		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ), 10, 2 );
 
 		dynamic_sidebar( $sidebar_id );
 
@@ -141,7 +233,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$sidebar_id = 'wp-unit-tests';
 		register_sidebar( array( 'id' => $sidebar_id ) );
 
-		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ), 10, 2 );
 
 		dynamic_sidebar( $sidebar_id );
 
