@@ -93,6 +93,62 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Utility hook callback used to store a sidebar ID mid-function.
+	 */
+	function retrieve_sidebar_id( $index ) {
+		$this->sidebar_index = $index;
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_dynamic_sidebar_using_sidebar_registered_with_no_id() {
+		global $wp_registered_sidebars;
+
+		$this->setExpectedIncorrectUsage( 'register_sidebar' );
+
+		// Register a couple of sidebars for fun.
+		register_sidebar();
+		register_sidebar();
+
+		$derived_sidebar_id = "sidebar-3"; // Number of sidebars in the global + 1.
+
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+
+		dynamic_sidebar( 3 );
+
+		$this->assertSame( $derived_sidebar_id, $this->sidebar_index );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_dynamic_sidebar_numeric_id() {
+		$sidebar_id = 2;
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+
+		dynamic_sidebar( $sidebar_id );
+
+		$this->assertSame( "sidebar-{$sidebar_id}", $this->sidebar_index );
+	}
+
+	/**
+	 * @group sidebar
+	 */
+	function test_dynamic_sidebar_string_id() {
+		$sidebar_id = 'wp-unit-tests';
+		register_sidebar( array( 'id' => $sidebar_id ) );
+
+		add_action( 'dynamic_sidebar_before', array( $this, 'retrieve_sidebar_id' ) );
+
+		dynamic_sidebar( $sidebar_id );
+
+		$this->assertSame( $sidebar_id, $this->sidebar_index );
+	}
+
+	/**
 	 * @see WP_Widget_Search::form()
 	 */
 	function test_wp_widget_search_form() {
