@@ -873,6 +873,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	}
 
 	function test_current_user_can_for_blog() {
+		global $wpdb;
+
 		$user = new WP_User( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
 		$old_uid = get_current_user_id();
 		wp_set_current_user( $user->ID );
@@ -884,7 +886,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			return;
 		}
 
+		$suppress = $wpdb->suppress_errors();
 		$this->assertFalse( current_user_can_for_blog( 12345, 'edit_posts' ) );
+		$wpdb->suppress_errors( $suppress );
 
 		$blog_id = $this->factory->blog->create( array( 'user_id' => $user->ID ) );
 		$this->assertTrue( current_user_can_for_blog( $blog_id, 'edit_posts' ) );

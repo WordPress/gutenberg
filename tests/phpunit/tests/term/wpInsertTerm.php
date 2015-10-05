@@ -468,15 +468,8 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 	 * @ticket 5809
 	 */
 	public function test_wp_insert_term_duplicate_slug_different_taxonomy_before_410_schema_change() {
-
-		// See #31130.
 		$old_db_version = 30055;
-		if ( is_multisite() ) {
-			$_db_version = $this->db_version;
-			$this->db_version = $old_db_version;
-		} else {
-			update_option( 'db_version', $old_db_version );
-		}
+		update_option( 'db_version', $old_db_version );
 
 		register_taxonomy( 'wptests_tax', 'post' );
 		register_taxonomy( 'wptests_tax_2', 'post' );
@@ -502,10 +495,6 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		 */
 		$this->assertSame( 'foo-2', $new_term->slug );
 		$this->assertNotEquals( $new_term->term_id, $term->term_id );
-
-		if ( is_multisite() ) {
-			$this->db_version = $_db_version;
-		}
 
 		_unregister_taxonomy( 'wptests_tax', 'post' );
 	}

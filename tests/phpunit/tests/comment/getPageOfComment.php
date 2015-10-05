@@ -60,11 +60,6 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 	 * @ticket 11334
 	 */
 	public function test_subsequent_calls_should_hit_cache() {
-		// `get_page_of_comment()` calls `get_option()`, which is not properly cached when WP_INSTALLING.
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 
 		$p = $this->factory->post->create();

@@ -14,8 +14,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected static $hooks_saved = array();
 	protected static $ignore_files;
 
-	protected $db_version;
-
 	/**
 	 * @var WP_UnitTest_Factory
 	 */
@@ -58,19 +56,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
 
 		add_filter( 'wp_mail', array( $this, 'set_wp_mail_globals' ) );
-
-		/*
-		 * During multisite tests, WP_INSTALLING forces `get_option()` to miss the cache, which causes problems
-		 * with our query-counting cache tests. As a workaround in the case of tests that require checking
-		 * 'db_version' (such as any test that uses the Term Meta API), we filter 'pre_option_db_version' and
-		 * avoid hitting the database.
-		 *
-		 * See #31130.
-		 */
-		$this->db_version = get_option( 'db_version' );
-		if ( is_multisite() ) {
-			add_filter( 'pre_option_db_version', array( $this, 'db_version' ) );
-		}
 	}
 
 	/**
@@ -632,19 +617,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		} else {
 			return wp_delete_user( $user_id );
 		}
-	}
-
-	/**
-	 * Return the current database version without hitting the database.
-	 *
-	 * This is used to bypass cache problems with some multisite tests. See #31130.
-	 *
-	 * @todo Don't do this anymore once #31130 is fixed.
-	 *
-	 * @since 4.4.0
-	 */
-	public function db_version() {
-		return $this->db_version;
 	}
 
 	/**

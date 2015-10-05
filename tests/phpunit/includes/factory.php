@@ -173,6 +173,10 @@ class WP_UnitTest_Factory_For_Blog extends WP_UnitTest_Factory_For_Thing {
 		$suppress = $wpdb->suppress_errors();
 		$blog = wpmu_create_blog( $args['domain'], $args['path'], $args['title'], $user_id, $meta, $args['site_id'] );
 		$wpdb->suppress_errors( $suppress );
+
+		// Tell WP we're done installing.
+		wp_installing( false );
+
 		return $blog;
 	}
 

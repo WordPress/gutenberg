@@ -20,10 +20,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @ticket 26394
 	 */
 	public function test_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_missing() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value' );
@@ -44,10 +40,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @ticket 26394
 	 */
 	public function test_should_set_autoload_yes_for_nonexistent_option_when_autoload_param_is_yes() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', 'yes' );
@@ -68,10 +60,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @ticket 26394
 	 */
 	public function test_should_set_autoload_no_for_nonexistent_option_when_autoload_param_is_no() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', 'no' );
@@ -93,10 +81,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @ticket 26394
 	 */
 	public function test_should_set_autoload_no_for_nonexistent_option_when_autoload_param_is_false() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		$this->flush_cache();
 		update_option( 'test_update_option_default', 'value', false );
@@ -118,10 +102,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @group 26394
 	 */
 	public function test_autoload_should_be_updated_for_existing_option_when_value_is_changed() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		add_option( 'foo', 'bar', '', 'no' );
 		$updated = update_option( 'foo', 'bar2', true );
@@ -143,10 +123,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @group 26394
 	 */
 	public function test_autoload_should_not_be_updated_for_existing_option_when_value_is_unchanged() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		add_option( 'foo', 'bar', '', 'yes' );
 		$updated = update_option( 'foo', 'bar', false );
@@ -169,10 +145,6 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	 * @group 26394
 	 */
 	public function test_autoload_should_not_be_updated_for_existing_option_when_value_is_changed_but_no_value_of_autoload_is_provided() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Not testable in MS: wpmu_create_blog() defines WP_INSTALLING, which causes cache misses.' );
-		}
-
 		global $wpdb;
 		add_option( 'foo', 'bar', '', 'yes' );
 
