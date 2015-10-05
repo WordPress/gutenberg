@@ -367,6 +367,64 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test setting save method for custom type.
+	 *
+	 * @see WP_Customize_Setting::save()
+	 * @see WP_Customize_Setting::update()
+	 */
+	function test_update_custom_type() {
+		$type = 'custom';
+		$name = 'foo';
+		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type' ) );
+		$this->manager->add_setting( $setting );
+		add_action( 'customize_update_custom', array( $this, 'handle_customize_update_custom_foo_action' ), 10, 2 );
+		add_action( 'customize_save_foo', array( $this, 'handle_customize_save_custom_foo_action' ), 10, 2 );
+
+		// Try saving before value set.
+		$this->assertTrue( 0 === did_action( 'customize_update_custom' ) );
+		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
+		$this->assertFalse( $setting->save() );
+		$this->assertTrue( 0 === did_action( 'customize_update_custom' ) );
+		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
+
+		// Try setting post value without user as admin.
+		$this->manager->set_post_value( $setting->id, 'hello world' );
+		$this->assertFalse( $setting->save() );
+		$this->assertTrue( 0 === did_action( 'customize_update_custom' ) );
+		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
+
+		// Satisfy all requirements for save to happen.
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$this->assertTrue( false !== $setting->save() );
+		$this->assertTrue( 1 === did_action( 'customize_update_custom' ) );
+		$this->assertTrue( 1 === did_action( 'customize_save_foo' ) );
+	}
+
+	/**
+	 * Check customize_update_custom action.
+	 *
+	 * @see Tests_WP_Customize_Setting::test_update_custom_type()
+	 * @param mixed $value
+	 * @param WP_Customize_Setting $setting
+	 */
+	function handle_customize_update_custom_foo_action( $value, $setting = null ) {
+		$this->assertEquals( 'hello world', $value );
+		$this->assertInstanceOf( 'WP_Customize_Setting', $setting );
+	}
+
+	/**
+	 * Check customize_save_foo action.
+	 *
+	 * @see Tests_WP_Customize_Setting::test_update_custom_type()
+	 * @param WP_Customize_Setting $setting
+	 */
+	function handle_customize_save_custom_foo_action( $setting ) {
+		$this->assertInstanceOf( 'WP_Customize_Setting', $setting );
+		$this->assertEquals( 'custom', $setting->type );
+		$this->assertEquals( 'foo', $setting->id );
+	}
+
+	/**
 	 * Ensure that is_current_blog_previewed returns the expected values.
 	 *
 	 * This is applicable to both single and multisite. This doesn't do switch_to_blog()
