@@ -614,7 +614,7 @@ class Tests_User extends WP_UnitTestCase {
 		if ( is_multisite() ) {
 			$this->assertFalse( validate_username( 'JohnDoe' ) );
 		} else {
-			$this->assertTue( validate_username( 'JohnDoe' ) );
+			$this->assertTrue( validate_username( 'JohnDoe' ) );
 		}
 	}
 
