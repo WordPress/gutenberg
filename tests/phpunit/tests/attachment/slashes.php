@@ -25,6 +25,7 @@ class Tests_Attachment_Slashes extends WP_UnitTestCase {
 
 	function tearDown() {
 		wp_set_current_user( $this->old_current_user );
+		wp_delete_user( $this->author_id );
 		parent::tearDown();
 	}
 
