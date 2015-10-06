@@ -896,4 +896,336 @@ class Tests_User_Query extends WP_UnitTestCase {
 			unset( $q->query_vars[ $k ] );
 		}
 	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_single_role_by_user_query() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
+
+		$wp_user_search = new WP_User_Query( array( 'role' => 'subscriber' ) );
+		$users          = $wp_user_search->get_results();
+
+		$this->assertEquals( 2, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_multiple_roles_by_user_query() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
+
+		$wp_user_search = new WP_User_Query( array( 'role__in' => array( 'subscriber', 'editor' ) ) );
+		$users          = $wp_user_search->get_results();
+		$this->assertEquals( 5, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_single_role_by_string() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
+
+		$users = get_users( array(
+			'role' => 'subscriber',
+		) );
+
+		$this->assertEquals( 2, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_single_role_by_array() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
+
+		$users = get_users( array(
+			'role' => array( 'subscriber' ),
+		) );
+
+		$this->assertEquals( 2, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_multiple_roles_should_only_match_users_who_have_each_role() {
+		$subscribers = $this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$this->factory->user->create_many( 2, array(
+			'role' => 'administrator',
+		) );
+
+		$users = new WP_User_Query( array( 'role' => array( 'subscriber', 'editor' ) ) );
+		$users = $users->get_results();
+
+		$this->assertEmpty( $users );
+
+		foreach ( $subscribers as $subscriber ) {
+			$subscriber = get_user_by( 'ID', $subscriber );
+			$subscriber->add_role( 'editor' );
+		}
+
+		$users = new WP_User_Query( array( 'role' => array( 'subscriber', 'editor' ) ) );
+		$users = $users->get_results();
+
+		$this->assertEquals( 2, count( $users ) );
+
+		foreach ( $users as $user ) {
+			$this->assertInstanceOf( 'WP_User', $user );
+		}
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_multiple_roles_or() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$this->factory->user->create_many( 2, array(
+			'role' => 'administrator',
+		) );
+
+		$this->factory->user->create_many( 1, array(
+			'role' => 'contributor',
+		) );
+
+		$users = new WP_User_Query( array( 'role__in' => array( 'subscriber', 'editor', 'administrator' ) ) );
+		$users = $users->get_results();
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 8, count( $users ) );
+		foreach ( $users as $user ) {
+			$this->assertInstanceOf( 'WP_User', $user );
+		}
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_multiple_roles_by_comma_separated_list() {
+		$subscribers = $this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$users = get_users( array(
+			'role' => 'subscriber, editor',
+		) );
+
+		$this->assertEmpty( $users );
+
+		foreach ( $subscribers as $subscriber ) {
+			$subscriber = get_user_by( 'ID', $subscriber );
+			$subscriber->add_role( 'editor' );
+		}
+
+		$users = get_users( array(
+			'role' => 'subscriber, editor',
+		) );
+
+		$this->assertEquals( 2, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_get_multiple_roles_with_meta() {
+		// Create administrator user + meta
+		$administrator_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		update_user_meta( $administrator_id, 'mk1', 1 );
+		update_user_meta( $administrator_id, 'mk2', 1 );
+
+		// Create editor user + meta
+		$editor_id = $this->factory->user->create( array( 'role' => 'editor' ) );
+		update_user_meta( $editor_id, 'mk1', 1 );
+		update_user_meta( $editor_id, 'mk2', 2 );
+
+		// Create subscriber user + meta
+		$subscriber_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		update_user_meta( $subscriber_id, 'mk1', 1 );
+		update_user_meta( $subscriber_id, 'mk2', 1 );
+
+		// Create contributor user + meta
+		$contributor_id = $this->factory->user->create( array( 'role' => 'contributor' ) );
+		update_user_meta( $contributor_id, 'mk1', 1 );
+		update_user_meta( $contributor_id, 'mk2', 2 );
+
+		// Fetch users
+		$users = get_users( array(
+			'role__in'   => array( 'administrator', 'editor', 'subscriber' ),
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key'     => 'mk1',
+					'value'   => '1',
+					'compare' => "=",
+					'type'    => 'numeric',
+				),
+				array(
+					'key'     => 'mk2',
+					'value'   => '2',
+					'compare' => "=",
+					'type'    => 'numeric',
+				),
+			),
+		) );
+
+		// Check results
+		$this->assertEquals( 1, count( $users ) );
+		$this->assertSame( $editor_id, (int) $users[0]->ID );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_role_exclusion() {
+		$this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$users = get_users( array(
+			'role__not_in' => 'subscriber',
+		) );
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 4, count( $users ) );
+
+		$users = get_users( array(
+			'role__not_in' => 'editor',
+		) );
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 3, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_role__in_role__not_in_combined() {
+		$subscribers = $this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		foreach ( $subscribers as $subscriber ) {
+			$subscriber = get_user_by( 'ID', $subscriber );
+			$subscriber->add_role( 'editor' );
+		}
+
+		$users = get_users( array(
+			'role__in'     => 'editor',
+		) );
+
+		$this->assertEquals( 5, count( $users ) );
+
+		$users = get_users( array(
+			'role__in'     => 'editor',
+			'role__not_in' => 'subscriber',
+		) );
+
+		$this->assertEquals( 3, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_role__not_in_role_combined() {
+		$subscribers = $this->factory->user->create_many( 2, array(
+			'role' => 'subscriber',
+		) );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$subscriber = get_user_by( 'ID', $subscribers[0] );
+		$subscriber->add_role( 'editor' );
+
+		$users = get_users( array(
+			'role'         => 'subscriber',
+			'role__not_in' => array( 'editor' ),
+		) );
+
+		$this->assertEquals( 1, count( $users ) );
+	}
+
+	/**
+	 * @ticket 22212
+	 */
+	public function test_role__not_in_user_without_role() {
+		$user_without_rule = $this->factory->user->get_object_by_id( $this->factory->user->create( array(
+			'role' => 'subscriber',
+		) ) );
+
+		$user_without_rule->remove_role( 'subscriber' );
+
+		$this->factory->user->create_many( 3, array(
+			'role' => 'editor',
+		) );
+
+		$users = get_users( array(
+			'role__not_in' => 'subscriber',
+		) );
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 5, count( $users ) );
+
+		$users = get_users( array(
+			'role__not_in' => 'editor',
+		) );
+
+		// +1 for the default user created during installation.
+		$this->assertEquals( 2, count( $users ) );
+	}
 }
