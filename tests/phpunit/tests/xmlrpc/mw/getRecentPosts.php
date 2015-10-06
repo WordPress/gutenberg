@@ -39,7 +39,7 @@ class Tests_XMLRPC_mw_getRecentPosts extends WP_XMLRPC_UnitTestCase {
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 401, $result->code );
 	}
-	
+
 	function test_no_editable_posts() {
 		wp_delete_post( $this->post_id );
 
@@ -100,17 +100,7 @@ class Tests_XMLRPC_mw_getRecentPosts extends WP_XMLRPC_UnitTestCase {
 
 		// create attachment
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
-		$contents = file_get_contents( $filename );
-		$upload = wp_upload_bits( $filename, null, $contents );
-		$this->assertTrue( empty( $upload['error'] ) );
-
-		$attachment = array(
-			'post_title' => 'Post Thumbnail',
-			'post_type' => 'attachment',
-			'post_mime_type' => 'image/jpeg',
-			'guid' => $upload['url']
-		);
-		$attachment_id = wp_insert_attachment( $attachment, $upload['file'], $this->post_id );
+		$attachment_id = $this->factory->attachment->create_upload_object( $filename, $this->post_id );
 		set_post_thumbnail( $this->post_id, $attachment_id );
 
 		$results = $this->myxmlrpcserver->mw_getRecentPosts( array( $this->post_id, 'author', 'author' ) );

@@ -13,7 +13,7 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		$this->post          = $this->factory->post->create_and_get();
 		$file                = DIR_TESTDATA . '/images/canola.jpg';
-		$this->attachment_id = $this->factory->attachment->create_object( $file, $this->post->ID, array(
+		$this->attachment_id = $this->factory->attachment->create_upload_object( $file, $this->post->ID, array(
 			'post_mime_type' => 'image/jpeg',
 		) );
 	}
