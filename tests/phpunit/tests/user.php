@@ -603,9 +603,19 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 24618
 	 */
 	public function test_validate_username_string() {
-		$this->assertTrue( validate_username( rand_str() ) );
-		$this->assertTrue( validate_username( 'JohnDoe' ) );
+		$this->assertTrue( validate_username( 'johndoe' ) );
 		$this->assertTrue( validate_username( 'test@test.com' ) );
+	}
+
+	/**
+	 * @ticket 24618
+	 */
+	public function test_validate_username_contains_uppercase_letters() {
+		if ( is_multisite() ) {
+			$this->assertFalse( validate_username( 'JohnDoe' ) );
+		} else {
+			$this->assertTue( validate_username( 'JohnDoe' ) );
+		}
 	}
 
 	/**
