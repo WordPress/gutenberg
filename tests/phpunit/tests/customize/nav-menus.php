@@ -338,6 +338,9 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
 		$menus->enqueue_scripts();
 		$this->assertTrue( wp_script_is( 'customize-nav-menus' ) );
+
+		wp_dequeue_style( 'customize-nav-menus' );
+		wp_dequeue_script( 'customize-nav-menus' );
 	}
 
 	/**
