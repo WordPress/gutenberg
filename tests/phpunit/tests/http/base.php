@@ -32,7 +32,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			$this->markTestSkipped( 'HTTP timeout' );
 		}
 
-		if ( 'stream_socket_client(): unable to connect to tcp://s.w.org:80 (Connection timed out)' === $response->get_error_message() ){
+		if ( 0 === strpos( $response->get_error_message(), 'stream_socket_client(): unable to connect to tcp://s.w.org:80' ) ) {
 			$this->markTestSkipped( 'HTTP timeout' );
 		}
 
