@@ -600,6 +600,29 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 24618
+	 */
+	public function test_validate_username_string() {
+		$this->assertTrue( validate_username( rand_str() ) );
+		$this->assertTrue( validate_username( 'JohnDoe' ) );
+		$this->assertTrue( validate_username( 'test@test.com' ) );
+	}
+
+	/**
+	 * @ticket 24618
+	 */
+	public function test_validate_username_empty() {
+		$this->assertFalse( validate_username( '' ) );
+	}
+
+	/**
+	 * @ticket 24618
+	 */
+	public function test_validate_username_invalid() {
+		$this->assertFalse( validate_username( '@#&99sd' ) );
+	}
+
+	/**
 	 * @ticket 29696
 	 */
 	public function test_wp_insert_user_should_sanitize_user_nicename_parameter() {
