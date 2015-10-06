@@ -6,19 +6,9 @@
 class Tests_Rewrite_AddRewriteRule extends WP_UnitTestCase {
 
 	public function setUp() {
-		global $wp_rewrite;
 		parent::setUp();
 
-		$wp_rewrite->init();
-		$wp_rewrite->set_permalink_structure( '/%postname%/' );
-		$wp_rewrite->flush_rules();
-	}
-
-	public function tearDown() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-
-		parent::tearDown();
+		$this->set_permalink_structure( '/%postname%/' );
 	}
 
 	/**
