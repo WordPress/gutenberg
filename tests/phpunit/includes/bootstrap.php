@@ -164,6 +164,13 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 		foreach ( $skipped_groups as $group_name => $skipped ) {
 			echo sprintf( 'Not running %1$s tests. To execute these, use --group %1$s.', $group_name ) . PHP_EOL;
 		}
+
+		if ( ! isset( $skipped_groups['external-http'] ) ){
+			echo PHP_EOL;
+			echo 'External HTTP skipped tests can be caused by timeouts.' . PHP_EOL;
+			echo 'If this changeset inclues changes to HTTP, make sure there are no timeouts.' . PHP_EOL;
+			echo PHP_EOL;
+		}
     }
 }
 new WP_PHPUnit_Util_Getopt( $_SERVER['argv'] );

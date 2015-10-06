@@ -17,6 +17,27 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 
 	protected $http_request_args;
 
+	/**
+	 * Mark test as skipped if the HTTP request times out
+	 */
+	function skipTestOnTimeout( $response ) {
+		if( ! is_wp_error( $response ) ){
+			return;
+		}
+		if ( 'connect() timed out!' === $response->get_error_message() ){
+			$this->markTestSkipped( 'HTTP timeout' );
+		}
+
+		if ( 0 === strpos( $response->get_error_message(), 'Operation timed out after' ) ){
+			$this->markTestSkipped( 'HTTP timeout' );
+		}
+
+		if ( 'stream_socket_client(): unable to connect to tcp://s.w.org:80 (Connection timed out)' === $response->get_error_message() ){
+			$this->markTestSkipped( 'HTTP timeout' );
+		}
+
+	}
+
 	function setUp() {
 
 		if ( is_callable( array('WP_Http', '_getTransport') ) ) {
@@ -198,6 +219,8 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			unlink( $res['filename'] );
 		}
 
+		$this->skipTestOnTimeout ($res );
+
 		$this->assertNotWPError( $res );
 		$this->assertEquals( '', $res['body'] ); // The body should be empty.
 		$this->assertEquals( $size, $res['headers']['content-length'] ); // Check the headers are returned (and the size is the same..)
@@ -219,6 +242,8 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			unlink( $res['filename'] );
 		}
 
+		$this->skipTestOnTimeout ($res );
+
 		$this->assertNotWPError( $res );
 		$this->assertEquals( $size, $filesize ); // Check that the file is written to disk correctly without any extra characters
 
@@ -234,6 +259,8 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$size = 10000;
 
 		$res = wp_remote_request( $url, array( 'timeout' => 30, 'limit_response_size' => $size ) );
+
+		$this->skipTestOnTimeout ($res );
 
 		$this->assertNotWPError( $res );
 		$this->assertEquals( $size, strlen( $res['body'] ) );
