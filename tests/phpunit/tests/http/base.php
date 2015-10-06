@@ -219,7 +219,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			unlink( $res['filename'] );
 		}
 
-		$this->skipTestOnTimeout ($res );
+		$this->skipTestOnTimeout( $res );
 
 		$this->assertNotWPError( $res );
 		$this->assertEquals( '', $res['body'] ); // The body should be empty.
@@ -242,7 +242,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			unlink( $res['filename'] );
 		}
 
-		$this->skipTestOnTimeout ($res );
+		$this->skipTestOnTimeout( $res );
 
 		$this->assertNotWPError( $res );
 		$this->assertEquals( $size, $filesize ); // Check that the file is written to disk correctly without any extra characters
@@ -260,7 +260,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 
 		$res = wp_remote_request( $url, array( 'timeout' => 30, 'limit_response_size' => $size ) );
 
-		$this->skipTestOnTimeout ($res );
+		$this->skipTestOnTimeout( $res );
 
 		$this->assertNotWPError( $res );
 		$this->assertEquals( $size, strlen( $res['body'] ) );
