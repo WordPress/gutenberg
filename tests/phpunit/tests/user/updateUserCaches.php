@@ -50,4 +50,21 @@ class Tests_User_UpdateUserCaches extends WP_UnitTestCase {
 
 		$this->assertEquals( 12345, wp_cache_get( 'bar', 'userslugs' ) );
 	}
+
+	/**
+	 * @ticket 24635
+	 */
+	public function test_should_store_raw_data_in_users_bucket_when_passed_a_wp_user_object() {
+		global $wpdb;
+
+		$u = $this->factory->user->create();
+		$raw_userdata = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d", $u ) );
+		$user_object = new WP_User( $u );
+
+		update_user_caches( $user_object );
+
+		$cached = wp_cache_get( $u, 'users' );
+		$this->assertFalse( $cached instanceof WP_User );
+		$this->assertEquals( $raw_userdata, $cached );
+	}
 }
