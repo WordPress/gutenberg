@@ -1000,6 +1000,67 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$blogaddress = get_blogaddress_by_id( 42 );
 		$this->assertEquals( '', $blogaddress );
 	}
+
+	/**
+	 * @ticket 33620
+	 * @dataProvider data_new_blog_url_schemes
+	 */
+	function test_new_blog_url_schemes( $home_scheme, $siteurl_scheme, $force_ssl_admin ) {
+		$current_site = get_current_site();
+
+		$home    = get_option( 'home' );
+		$siteurl = get_site_option( 'siteurl' );
+		$admin   = force_ssl_admin();
+
+		// Setup:
+		update_option( 'home', set_url_scheme( $home, $home_scheme ) );
+		update_site_option( 'siteurl', set_url_scheme( $siteurl, $siteurl_scheme ) );
+		force_ssl_admin( $force_ssl_admin );
+
+		// Install:
+		$new = wpmu_create_blog( $current_site->domain, '/new-blog/', 'New Blog', get_current_user_id() );
+
+		// Reset:
+		update_option( 'home', $home );
+		update_site_option( 'siteurl', $siteurl );
+		force_ssl_admin( $admin );
+
+		// Assert:
+		$this->assertNotWPError( $new );
+		$this->assertSame( $home_scheme, parse_url( get_blog_option( $new, 'home' ), PHP_URL_SCHEME ) );
+		$this->assertSame( $siteurl_scheme, parse_url( get_blog_option( $new, 'siteurl' ), PHP_URL_SCHEME ) );
+	}
+
+	function data_new_blog_url_schemes() {
+		return array(
+			array(
+				'https',
+				'https',
+				false,
+			),
+			array(
+				'http',
+				'https',
+				false,
+			),
+			array(
+				'https',
+				'http',
+				false,
+			),
+			array(
+				'http',
+				'http',
+				false,
+			),
+			array(
+				'http',
+				'http',
+				true,
+			),
+		);
+	}
+
 }
 
 endif;
