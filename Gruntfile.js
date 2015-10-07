@@ -232,7 +232,8 @@ module.exports = function(grunt) {
 					'wp-includes/css/*.css',
 
 					// Exceptions
-					'!wp-includes/css/dashicons.css'
+					'!wp-includes/css/dashicons.css',
+					'!wp-includes/css/wp-oembed-embed.css'
 				]
 			},
 			colors: {
@@ -528,6 +529,10 @@ module.exports = function(grunt) {
 			emoji: {
 				src: BUILD_DIR + 'wp-includes/formatting.php',
 				dest: '.'
+			},
+			oembed: {
+				src: BUILD_DIR + 'wp-includes/oembed-functions.php',
+				dest: '.'
 			}
 		},
 		_watch: {
@@ -637,6 +642,7 @@ module.exports = function(grunt) {
 		'clean:tinymce',
 		'concat:emoji',
 		'includes:emoji',
+		'includes:oembed',
 		'jsvalidate:build'
 	] );
 
