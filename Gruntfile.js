@@ -531,7 +531,7 @@ module.exports = function(grunt) {
 				dest: '.'
 			},
 			oembed: {
-				src: BUILD_DIR + 'wp-includes/oembed-functions.php',
+				src: BUILD_DIR + 'wp-includes/embed-functions.php',
 				dest: '.'
 			}
 		},
