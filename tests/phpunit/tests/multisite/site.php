@@ -11,16 +11,6 @@ if ( is_multisite() ) :
 class Tests_Multisite_Site extends WP_UnitTestCase {
 	protected $suppress = false;
 
-	protected static $space_used;
-	protected static $space_allowed;
-
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		self::$space_allowed = get_space_allowed();
-		self::$space_used = get_space_used();
-	}
-
 	function setUp() {
 		global $wpdb;
 		parent::setUp();
