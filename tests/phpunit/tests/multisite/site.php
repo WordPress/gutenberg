@@ -906,57 +906,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests to handle the possibilities provided for in `get_space_allowed()`,
-	 * which is used when checking for upload quota limits. Originally part of
-	 * ticket #18119.
-	 */
-	function test_get_space_allowed_default() {
-		$this->assertEquals( 100, self::$space_allowed );
-	}
-
-	/**
-	 * When an individual site's option is defined, it is used over the option
-	 * defined at the network level.
-	 */
-	function test_get_space_allowed_from_blog_option() {
-		update_option( 'blog_upload_space', 123 );
-		update_site_option( 'blog_upload_space', 200 );
-		$this->assertEquals( 123, get_space_allowed() );
-	}
-
-	/**
-	 * If an individual site's option is not available, the default network
-	 * level option is used as a fallback.
-	 */
-	function test_get_space_allowed_from_network_option() {
-		update_option( 'blog_upload_space', false );
-		update_site_option( 'blog_upload_space', 200 );
-		$this->assertEquals( 200, get_space_allowed() );
-	}
-
-	/**
-	 * If neither the site or network options are available, 100 is used as
-	 * a hard coded fallback.
-	 */
-	function test_get_space_allowed_no_option_fallback() {
-		update_option( 'blog_upload_space', false );
-		update_site_option( 'blog_upload_space', false );
-		$this->assertEquals( 100, get_space_allowed() );
-	}
-
-	function test_get_space_allowed_negative_blog_option() {
-		update_option( 'blog_upload_space', -1 );
-		update_site_option( 'blog_upload_space', 200 );
-		$this->assertEquals( -1, get_space_allowed() );
-	}
-
-	function test_get_space_allowed_negative_site_option() {
-		update_option( 'blog_upload_space', false );
-		update_site_option( 'blog_upload_space', -1 );
-		$this->assertEquals( -1, get_space_allowed() );
-	}
-
-	/**
 	 * Provide a hardcoded amount for space used when testing upload quota,
 	 * allowed space, and available space.
 	 *
