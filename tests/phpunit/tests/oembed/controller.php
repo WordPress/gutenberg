@@ -182,11 +182,11 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		switch_to_blog( $child );
 
 		$post = $this->factory->post->create_and_get( array(
-			'post_title'  => 'Hello Child Blog',
+			'post_title' => 'Hello Child Blog',
 		) );
 
 		$request = array(
-			'url'	   => get_permalink( $post->ID ),
+			'url'      => get_permalink( $post->ID ),
 			'format'   => 'json',
 			'maxwidth' => 600,
 			'callback' => '',
@@ -207,11 +207,12 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$this->assertEquals( home_url() . '/?oembed=true', get_oembed_endpoint_url( '', 'json' ) );
 		$this->assertEquals( home_url() . '/?oembed=true', get_oembed_endpoint_url( '', 'xml' ) );
 
-		$post_id = $this->factory->post->create();
-		$url     = get_permalink( $post_id );
+		$post_id     = $this->factory->post->create();
+		$url         = get_permalink( $post_id );
+		$url_encoded = urlencode( $url );
 
-		$this->assertEquals( home_url() . '/?oembed=true&url=' . $url, get_oembed_endpoint_url( $url ) );
-		$this->assertEquals( home_url() . '/?oembed=true&url=' . $url . '&format=xml', get_oembed_endpoint_url( $url, 'xml' ) );
+		$this->assertEquals( home_url() . '/?oembed=true&url=' . $url_encoded, get_oembed_endpoint_url( $url ) );
+		$this->assertEquals( home_url() . '/?oembed=true&url=' . $url_encoded . '&format=xml', get_oembed_endpoint_url( $url, 'xml' ) );
 	}
 
 	function test_wp_oembed_ensure_format() {
