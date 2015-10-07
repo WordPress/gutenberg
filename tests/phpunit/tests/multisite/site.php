@@ -1016,55 +1016,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertTrue( upload_is_user_over_quota( false ) );
 	}
 
-	function test_is_upload_space_available_default() {
-		$this->assertTrue( is_upload_space_available() );
-	}
-
-	function test_is_upload_space_available_check_disabled() {
-		update_site_option( 'upload_space_check_disabled', true );
-		$this->assertTrue( is_upload_space_available() );
-	}
-
-	function test_is_upload_space_available_space_used_is_less() {
-		update_site_option( 'upload_space_check_disabled', false );
-		update_site_option( 'blog_upload_space', 350 );
-		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-		$available = is_upload_space_available();
-		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertTrue( is_upload_space_available() );
-		$this->assertEquals(
-			$available,
-			self::$space_used < 350
-		);
-	}
-
-	function test_is_upload_space_available_space_used_is_more() {
-		update_site_option( 'upload_space_check_disabled', false );
-		update_site_option( 'blog_upload_space', 250 );
-		add_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-		$available = is_upload_space_available();
-		$used = get_space_used();
-		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used' ) );
-
-		$this->assertEquals(
-			$available,
-			$used < 250
-		);
-	}
-
-	function test_is_upload_space_available_upload_space_0() {
-		update_site_option( 'upload_space_check_disabled', false );
-		update_site_option( 'blog_upload_space', 0 );
-		$this->assertTrue( is_upload_space_available() );
-	}
-
-	function test_is_upload_space_available_upload_space_negative() {
-		update_site_option( 'upload_space_check_disabled', false );
-		update_site_option( 'blog_upload_space', -1 );
-		$this->assertFalse( is_upload_space_available() );
-	}
-
 	/**
 	 * Test the primary purpose of get_blog_post(), to retrieve a post from
 	 * another site on the network.
