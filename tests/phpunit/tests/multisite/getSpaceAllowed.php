@@ -92,6 +92,7 @@ class Tests_Multisite_Get_Space_Allowed extends WP_UnitTestCase {
 
 			// If neither network or site options are valid, fallback to the default.
 			array( false, false, 100 ),
+			array( 'NAN', 'NAN', 100 ),
 
 			// These are likely unexpected.
 			array( 0,     666,   100 ),
