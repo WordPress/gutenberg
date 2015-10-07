@@ -92,6 +92,36 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( $id, url_to_postid( get_permalink( $id ) ) );
 	}
 
+	function test_url_to_postid_set_url_scheme_https_to_http() {
+		$post_id = $this->factory->post->create();
+		$permalink = get_permalink( $post_id );
+		$this->assertEquals( $post_id, url_to_postid( set_url_scheme( $permalink, 'https' ) ) );
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$permalink = get_permalink( $post_id );
+		$this->assertEquals( $post_id, url_to_postid( set_url_scheme( $permalink, 'https' ) ) );
+	}
+
+	function test_url_to_postid_set_url_scheme_http_to_https() {
+		// Save server data for cleanup
+		$is_ssl = is_ssl();
+		$http_host = $_SERVER['HTTP_HOST'];
+
+		$_SERVER['HTTPS'] = 'on';
+
+		$post_id = $this->factory->post->create();
+		$permalink = get_permalink( $post_id );
+		$this->assertEquals( $post_id, url_to_postid( set_url_scheme( $permalink, 'http' ) ) );
+
+		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$permalink = get_permalink( $post_id );
+		$this->assertEquals( $post_id, url_to_postid( set_url_scheme( $permalink, 'http' ) ) );
+
+		// Cleanup.
+		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
+		$_SERVER['HTTP_HOST'] = $http_host;
+	}
+
 	function test_url_to_postid_custom_post_type() {
 		delete_option( 'rewrite_rules' );
 
