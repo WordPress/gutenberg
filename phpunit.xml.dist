@@ -15,6 +15,7 @@
             <file phpVersion="5.3.0">tests/phpunit/tests/image/editor.php</file>
             <file phpVersion="5.3.0">tests/phpunit/tests/image/editor_gd.php</file>
             <file phpVersion="5.3.0">tests/phpunit/tests/image/editor_imagick.php</file>
+            <file phpVersion="5.3.0">tests/phpunit/tests/oembed/headers.php</file>
         </testsuite>
     </testsuites>
     <groups>
