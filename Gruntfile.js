@@ -545,16 +545,6 @@ module.exports = function(grunt) {
 					interval: 2000
 				}
 			},
-			browserify: {
-				files: [
-					SOURCE_DIR + 'wp-includes/js/media/**/*.js',
-					'!' + SOURCE_DIR + 'wp-includes/js/media/*.manifest.js'
-				],
-				tasks: ['browserify', 'copy:dynamic'],
-				options: {
-					spawn: false
-				}
-			},
 			config: {
 				files: 'Gruntfile.js'
 			},
@@ -686,6 +676,7 @@ module.exports = function(grunt) {
 		}
 
 		src = [ path.relative( SOURCE_DIR, filepath ) ];
+
 		if ( action === 'deleted' ) {
 			grunt.config( [ 'clean', 'dynamic', 'src' ], src );
 		} else {
