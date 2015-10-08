@@ -281,6 +281,7 @@ NO;
 
 	/**
 	 * @ticket 11095
+	 * @ticket 33974
 	 */
 	public function test_wp_page_menu_wp_nav_menu_fallback() {
 		$pages = $this->factory->post->create_many( 3, array( 'post_type' => 'page' ) );
@@ -293,5 +294,14 @@ NO;
 
 		// After falling back, the 'after' argument should be set and output as '</ul>'.
 		$this->assertRegExp( '/<\/ul><\/div>/', $menu );
+
+		// No menus + wp_nav_menu() falls back to wp_page_menu(), this time without a container.
+		$menu = wp_nav_menu( array(
+			'echo'      => false,
+			'container' => false,
+		) );
+
+		// After falling back, the empty 'container' argument should still return a container element.
+		$this->assertRegExp( '/<div class="menu">/', $menu );
 	}
 }
