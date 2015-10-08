@@ -632,4 +632,18 @@ EOF;
 		require_once( DIR_TESTDATA . '/formatting/whole-posts.php' );
 		return data_whole_posts();
 	}
+
+	function test_php_and_js_shortcode_attribute_regexes_match() {
+
+		$file = file_get_contents( ABSPATH . WPINC . '/js/shortcode.js' );
+		$matched = preg_match( '|\s+pattern = (\/.+\/)g;|', $file, $matches );
+		$php = get_shortcode_atts_regex();
+
+		$this->assertSame( 1, $matched );
+
+		$js = str_replace( "\'", "'", $matches[1] );
+		$this->assertSame( $php, $js );
+
+	}
+
 }
