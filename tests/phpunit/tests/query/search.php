@@ -58,4 +58,71 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	function filter_wp_search_stopwords() {
 		return array();
 	}
+
+	/**
+	 * @ticket 33988
+	 */
+	public function test_s_should_exclude_term_prefixed_with_dash() {
+		$p1 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has foo but also bar',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only foo',
+		) );
+
+		$q = new WP_Query( array(
+			's' => 'foo -bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 33988
+	 */
+	public function test_s_should_exclude_first_term_if_prefixed_with_dash() {
+		$p1 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has foo but also bar',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only bar',
+		) );
+
+		$q = new WP_Query( array(
+			's' => '-foo bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 33988
+	 */
+	public function test_s_should_not_exclude_for_dashes_in_the_middle_of_words() {
+		$p1 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has foo but also bar',
+		) );
+		$p2 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only bar',
+		) );
+		$p3 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only foo-bar',
+		) );
+
+		$q = new WP_Query( array(
+			's' => 'foo-bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p3 ), $q->posts );
+	}
 }
