@@ -90,11 +90,13 @@ require_once ABSPATH . '/wp-settings.php';
 _delete_all_posts();
 
 require dirname( __FILE__ ) . '/testcase.php';
+require dirname( __FILE__ ) . '/testcase-rest-api.php';
 require dirname( __FILE__ ) . '/testcase-xmlrpc.php';
 require dirname( __FILE__ ) . '/testcase-ajax.php';
 require dirname( __FILE__ ) . '/testcase-canonical.php';
 require dirname( __FILE__ ) . '/exceptions.php';
 require dirname( __FILE__ ) . '/utils.php';
+require dirname( __FILE__ ) . '/spy-rest-server.php';
 
 /**
  * A child class of the PHP test runner.
