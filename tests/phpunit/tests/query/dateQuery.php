@@ -668,6 +668,25 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
 	}
 
+	/**
+	 * @ticket 34228
+	 */
+	public function test_date_query_hour_should_not_ignore_0() {
+		return;
+		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 00:42:29', ) );
+		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 01:42:29', ) );
+
+		$posts = $this->_get_query_result( array(
+			'year' => 2014,
+			'monthnum' => 10,
+			'day' => 21,
+			'hour' => 0,
+			'minute' => 42,
+		) );
+
+		$this->assertEquals( array( $p1 ), wp_list_pluck( $posts, 'ID' ) );
+	}
+
 	public function test_date_query_minute() {
 		$p1 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:56:29', ) );
 		$p2 = $this->factory->post->create( array( 'post_date' => '2014-10-21 10:42:29', ) );

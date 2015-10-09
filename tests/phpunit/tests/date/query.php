@@ -508,6 +508,17 @@ class Tests_WP_Date_Query extends WP_UnitTestCase {
 		$this->assertFalse( $q->build_time_query( 'post_date', '=' ) );
 	}
 
+	/**
+	 * @ticket 34228
+	 */
+	public function test_build_time_query_should_not_discard_hour_0() {
+		$q = new WP_Date_Query( array() );
+
+		$found = $q->build_time_query( 'post_date', '=', 0, 10 );
+
+		$this->assertContains( '%H', $found );
+	}
+
 	public function test_build_time_query_compare_in() {
 		$q = new WP_Date_Query( array() );
 
