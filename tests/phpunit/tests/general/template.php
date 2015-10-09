@@ -106,12 +106,25 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$this->_remove_site_icon();
 	}
 
+	/**
+	 * Builds and retrieves a custom site icon meta tag.
+	 *
+	 * @since 4.3.0
+	 *
+	 * @param $meta_tags
+	 * @return array
+	 */
 	function _custom_site_icon_meta_tag( $meta_tags ) {
 		$meta_tags[] = sprintf( '<link rel="apple-touch-icon" sizes="150x150" href="%s" />', esc_url( get_site_icon_url( 150 ) ) );
 
 		return $meta_tags;
 	}
 
+	/**
+	 * Sets a site icon in options for testing.
+	 *
+	 * @since 4.3.0
+	 */
 	function _set_site_icon() {
 		if ( ! $this->site_icon_id ) {
 			add_filter( 'intermediate_image_sizes_advanced', array( $this->wp_site_icon, 'additional_sizes' ) );
@@ -122,10 +135,20 @@ class Tests_General_Template extends WP_UnitTestCase {
 		update_option( 'site_icon', $this->site_icon_id );
 	}
 
+	/**
+	 * Removes the site icon from options.
+	 *
+	 * @since 4.3.0
+	 */
 	function _remove_site_icon() {
 		delete_option( 'site_icon' );
 	}
 
+	/**
+	 * Inserts an attachment for testing site icons.
+	 *
+	 * @since 4.3.0
+	 */
 	function _insert_attachment() {
 		$filename = DIR_TESTDATA . '/images/test-image.jpg';
 		$contents = file_get_contents( $filename );
