@@ -27,12 +27,6 @@ class Tests_Multisite_Upload_Is_User_Over_Quota extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
-	/**
-	 * In this scenario, 10 is set as the spaced allowed when 0 is returned
-	 * by `get_space_allowed()` inside `upload_is_user_over_quota()`.
-	 *
-	 * This is likely not expected behavior.
-	 */
 	public function test_upload_is_user_over_quota_allowed_0_used_5() {
 		add_filter( 'get_space_allowed', '__return_zero' );
 		add_filter( 'pre_get_space_used', array( $this, '_filter_space_5' ) );
@@ -40,7 +34,7 @@ class Tests_Multisite_Upload_Is_User_Over_Quota extends WP_UnitTestCase {
 		remove_filter( 'get_space_allowed', '__return_zero' );
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_5' ) );
 
-		$this->assertFalse( $result );
+		$this->assertTrue( $result );
 	}
 
 	public function test_upload_is_user_over_quota_allowed_0_used_0() {
