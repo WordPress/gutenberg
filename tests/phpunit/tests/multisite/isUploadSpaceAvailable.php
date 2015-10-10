@@ -102,7 +102,7 @@ class Tests_Multisite_Is_Upload_Space_Available extends WP_UnitTestCase {
 		$available = is_upload_space_available();
 		remove_filter( 'pre_get_space_used', array( $this, '_filter_space_used_small' ) );
 
-		$this->assertTrue( $available );
+		$this->assertFalse( $available );
 	}
 
 	function test_is_upload_space_available_upload_space_negative() {

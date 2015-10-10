@@ -94,10 +94,10 @@ class Tests_Multisite_Get_Space_Allowed extends WP_UnitTestCase {
 			array( false, false, 100 ),
 			array( 'NAN', 'NAN', 100 ),
 
-			// These are likely unexpected.
-			array( 0,     666,   100 ),
-			array( false, 0,     100 ),
-			array( 'NAN', 0,     100 ),
+			// These effectively disable uploads.
+			array( 0,     666,   0 ),
+			array( false, 0,     0 ),
+			array( 'NAN', 0,     0 ),
 		);
 	}
 
