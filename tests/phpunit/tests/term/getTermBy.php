@@ -59,4 +59,32 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		$found = get_term_by( 'term_taxonomy_id', $new_ttid, 'foo' );
 		$this->assertSame( $t, $found->term_id );
 	}
+
+	/**
+	 * @ticket 14162
+	 */
+	public function test_should_prime_term_cache() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+		) );
+
+		clean_term_cache( $t, 'wptests_tax' );
+
+		$num_queries = $wpdb->num_queries;
+		$found = get_term_by( 'slug', 'foo', 'wptests_tax' );
+		$num_queries++;
+
+		$this->assertTrue( $found instanceof WP_Term );
+		$this->assertSame( $t, $found->term_id );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		// Calls to `get_term()` should now hit cache.
+		$found2 = get_term( $t );
+		$this->assertSame( $t, $found->term_id );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
 }

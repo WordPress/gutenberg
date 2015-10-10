@@ -35,19 +35,6 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 		$this->assertSame( $num_queries, $wpdb->num_queries );
 	}
 
-	public function test_passing_term_object_should_not_skip_database_query_when_filter_property_is_set() {
-		global $wpdb;
-
-		$term = $this->factory->term->create_and_get( array( 'taxonomy' => 'wptests_tax' ) );
-		clean_term_cache( $term->term_id, 'wptests_tax' );
-
-		$num_queries = $wpdb->num_queries;
-
-		$term_a = get_term( $term, 'wptests_tax' );
-
-		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
-	}
-
 	public function test_passing_term_string_that_casts_to_int_0_should_return_null() {
 		$this->assertSame( null, get_term( 'abc', 'wptests_tax' ) );
 	}
@@ -97,5 +84,26 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	public function test_output_should_fall_back_to_object_for_invalid_input() {
 		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$this->assertInternalType( 'object', get_term( $t, 'wptests_tax', 'foo' ) );
+	}
+
+	/**
+	 * @ticket 14162
+	 */
+	public function test_numeric_properties_should_be_cast_to_ints() {
+		global $wpdb;
+
+		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		// Get raw data from the database.
+		$term_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->terms t JOIN $wpdb->term_taxonomy tt ON ( t.term_id = tt.term_id ) WHERE t.term_id = %d", $t ) );
+
+		$found = get_term( $term_data );
+
+		$this->assertTrue( $found instanceof WP_Term );
+		$this->assertInternalType( 'int', $found->term_id );
+		$this->assertInternalType( 'int', $found->term_taxonomy_id );
+		$this->assertInternalType( 'int', $found->parent );
+		$this->assertInternalType( 'int', $found->count );
+		$this->assertInternalType( 'int', $found->term_group );
 	}
 }

@@ -103,10 +103,10 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 		) );
 
 		$term_object = get_term( $term, 'wptests_tax' );
-		wp_cache_delete( $term, 'wptests_tax' );
+		wp_cache_delete( $term, 'terms' );
 
 		// Affirm that the cache is empty.
-		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertEmpty( wp_cache_get( $term, 'terms' ) );
 
 		$num_queries = $wpdb->num_queries;
 
@@ -128,16 +128,16 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		wp_cache_delete( $term, 'wptests_tax' );
+		wp_cache_delete( $term, 'terms' );
 
 		// Affirm that the cache is empty.
-		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertEmpty( wp_cache_get( $term, 'terms' ) );
 
 		$num_queries = $wpdb->num_queries;
 
 		// Prime cache.
 		$term_object = get_term( $term, 'wptests_tax' );
-		$this->assertNotEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertNotEmpty( wp_cache_get( $term, 'terms' ) );
 		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
 
 		$term_object_2 = get_term( $term, 'wptests_tax' );
@@ -155,16 +155,16 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		wp_cache_delete( $term, 'wptests_tax' );
+		wp_cache_delete( $term, 'terms' );
 
 		// Affirm that the cache is empty.
-		$this->assertEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertEmpty( wp_cache_get( $term, 'terms' ) );
 
 		$num_queries = $wpdb->num_queries;
 
 		// Prime cache.
 		$term_object = get_term_by( 'id', $term, 'wptests_tax' );
-		$this->assertNotEmpty( wp_cache_get( $term, 'wptests_tax' ) );
+		$this->assertNotEmpty( wp_cache_get( $term, 'terms' ) );
 		$this->assertSame( $num_queries + 1, $wpdb->num_queries );
 
 		$term_object_2 = get_term( $term, 'wptests_tax' );
