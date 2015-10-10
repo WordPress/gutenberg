@@ -49,6 +49,10 @@ EditorUploader = View.extend({
 
 		this.$document.on( 'dragstart dragend drop', _.bind( function( event ) {
 			this.localDrag = event.type === 'dragstart';
+
+			if ( event.type === 'drop' ) {
+				this.containerDragleave();
+			}
 		}, this ) );
 
 		this.initialized = true;
@@ -128,7 +132,6 @@ EditorUploader = View.extend({
 	drop: function( event ) {
 		var $wrap, uploadView;
 
-		this.containerDragleave( event );
 		this.dropzoneDragleave( event );
 
 		this.files = event.originalEvent.dataTransfer.files;
