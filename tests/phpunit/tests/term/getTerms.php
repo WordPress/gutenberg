@@ -1572,6 +1572,45 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
 	}
 
+	/**
+	 * @ticket 14162
+	 */
+	public function test_should_return_wp_term_objects() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'all',
+		) );
+
+		$this->assertNotEmpty( $found );
+
+		foreach ( $found as $term ) {
+			$this->assertInstanceOf( 'WP_Term', $term );
+		}
+	}
+
+	/**
+	 * @ticket 14162
+	 */
+	public function test_should_prime_individual_term_cache_when_fields_is_all() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'all',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+		$term0 = get_term( $terms[0] );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
