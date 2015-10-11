@@ -132,6 +132,7 @@ EditorUploader = View.extend({
 	drop: function( event ) {
 		var $wrap, uploadView;
 
+		this.containerDragleave( event );
 		this.dropzoneDragleave( event );
 
 		this.files = event.originalEvent.dataTransfer.files;
