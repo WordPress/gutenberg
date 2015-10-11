@@ -15,8 +15,8 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		$option = rand_str();
 		$value = rand_str();
 
-		add_network_option( $option, $value );
-		$this->assertFalse( get_network_option( $option, false, $id ) );
+		add_site_option( $option, $value );
+		$this->assertFalse( get_network_option( $id, $option, false ) );
 	}
 
 	function test_add_network_option_available_on_same_network() {
@@ -24,8 +24,8 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		$option = rand_str();
 		$value = rand_str();
 
-		add_network_option( $option, $value, $id );
-		$this->assertEquals( $value, get_network_option( $option, false, $id ) );
+		add_network_option( $id, $option, $value );
+		$this->assertEquals( $value, get_network_option( $id, $option, false ) );
 	}
 
 	function test_delete_network_option_on_only_one_network() {
@@ -33,10 +33,10 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		$option = rand_str();
 		$value = rand_str();
 
-		add_network_option( $option, $value );
-		add_network_option( $option, $value, $id );
-		delete_network_option( $option );
-		$this->assertEquals( $value, get_network_option( $option, false, $id ) );
+		add_site_option( $option, $value );
+		add_network_option( $id, $option, $value );
+		delete_site_option( $option );
+		$this->assertEquals( $value, get_network_option( $id, $option, false ) );
 	}
 }
 
