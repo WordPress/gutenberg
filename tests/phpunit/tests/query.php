@@ -251,7 +251,7 @@ class Tests_Query extends WP_UnitTestCase {
 		wp_set_object_terms( $p3, $t2->slug, 'post_tag' );
 
 		$url = add_query_arg( array(
-			'tag' => $t1,
+			'tag' => $t1->slug,
 		), '/' );
 
 		$this->go_to( $url );
