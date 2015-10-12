@@ -538,6 +538,44 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 34262
+	 */
+	public function test_get_the_terms_should_not_cache_wp_term_objects() {
+		$p = $this->factory->post->create();
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		wp_set_object_terms( $p, $t, 'wptests_tax' );
+
+		// Prime the cache.
+		$terms = get_the_terms( $p, 'wptests_tax' );
+
+		$cached = get_object_term_cache( $p, 'wptests_tax' );
+
+		$this->assertNotEmpty( $cached );
+		$this->assertSame( $t, (int) $cached[0]->term_id );
+		$this->assertNotInstanceOf( 'WP_Term', $cached[0] );
+	}
+
+	/**
+	 * @ticket 34262
+	 */
+	public function test_get_the_terms_should_return_wp_term_objects_from_cache() {
+		$p = $this->factory->post->create();
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		wp_set_object_terms( $p, $t, 'wptests_tax' );
+
+		// Prime the cache.
+		get_the_terms( $p, 'wptests_tax' );
+
+		$cached = get_the_terms( $p, 'wptests_tax' );
+
+		$this->assertNotEmpty( $cached );
+		$this->assertSame( $t, (int) $cached[0]->term_id );
+		$this->assertInstanceOf( 'WP_Term', $cached[0] );
+	}
+
+	/**
 	 * @ticket 31086
 	 */
 	public function test_get_the_terms_should_return_zero_indexed_array_when_cache_is_empty() {
