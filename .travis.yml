@@ -24,7 +24,6 @@ matrix:
   - php: hhvm
   - php: 7.0
   - php: nightly
-  fast_finish: true
 before_install:
 - WP_CORE_DIR=/tmp/wordpress/
 - |
