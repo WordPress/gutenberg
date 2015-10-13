@@ -607,4 +607,19 @@ class Tests_Widgets extends WP_UnitTestCase {
 			$this->assertContains( $contained, $control );
 		}
 	}
+
+	function test_the_widget_custom_before_title_arg() {
+
+		ob_start();
+		the_widget(
+			'WP_Widget_Text',
+			array( 'title' => 'Notes', 'text' => 'Sample text' ),
+			array( 'before_widget' => '<span class="special %s">', 'after_widget' => '</span>' )
+		);
+		$actual = ob_get_clean();
+
+		$this->assertRegExp( '/<span class="special widget_text">/', $actual );
+
+	}
+
 }
