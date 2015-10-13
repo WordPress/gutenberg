@@ -122,7 +122,10 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 		$orphan_term = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $orphan_term, 'foo', 'bar' );
 
+		// Force results to be cached, even when using extended cache.
+		add_action( 'pre_get_posts', array( $this, 'set_cache_results' ) );
 		$this->go_to( get_permalink( $p ) );
+		remove_action( 'pre_get_posts', array( $this, 'set_cache_results' ) );
 
 		if ( have_posts() ) {
 			while ( have_posts() ) {
@@ -163,9 +166,9 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 			add_term_meta( $t, 'foo', 'bar' );
 		}
 
-		$q0 = new WP_Query( array( 'p' => $posts[0] ) );
-		$q1 = new WP_Query( array( 'p' => $posts[1] ) );
-		$q2 = new WP_Query( array( 'p' => $posts[2] ) );
+		$q0 = new WP_Query( array( 'p' => $posts[0], 'cache_results' => true ) );
+		$q1 = new WP_Query( array( 'p' => $posts[1], 'cache_results' => true ) );
+		$q2 = new WP_Query( array( 'p' => $posts[2], 'cache_results' => true ) );
 
 		/*
 		 * $terms[0] belongs to both $posts[0] and $posts[2], so `get_term_meta( $terms[0] )` should prime
@@ -302,5 +305,9 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 		) );
 
 		$this->assertEqualSets( array( $terms[0] ), $found );
+	}
+
+	public static function set_cache_results( $q ) {
+		$q->set( 'cache_results', true );
 	}
 }
