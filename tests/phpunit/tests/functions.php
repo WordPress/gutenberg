@@ -162,7 +162,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertEquals( "abcdefgh.png", wp_unique_filename( $testdir, 'abcdefg"h.png' ), 'File with quote failed' );
 
 		// test crazy name (useful for regression tests)
-		$this->assertEquals( '12%af34567890@..%^_-qwerty-fghjkl-zx.png', wp_unique_filename( $testdir, '12%af34567890#~!@#$..%^&*()|_+qwerty  fgh`jkl zx<>?:"{}[]="\'/?.png' ), 'Failed crazy file name' );
+		$this->assertEquals( '12af34567890@..^_qwerty-fghjkl-zx.png', wp_unique_filename( $testdir, '12%af34567890#~!@#$..%^&*()|_+qwerty  fgh`jkl zx<>?:"{}[]="\'/?.png' ), 'Failed crazy file name' );
 
 		// test slashes in names
 		$this->assertEquals( 'abcdefg.png', wp_unique_filename( $testdir, 'abcde\fg.png' ), 'Slash not removed' );
@@ -606,7 +606,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		if ( ! function_exists( 'mb_detect_order' ) ) {
 			$this->markTestSkipped( 'mbstring extension not available.' );
 		}
-	
+
 		$old_charsets = $charsets = mb_detect_order();
 		if ( ! in_array( 'EUC-JP', $charsets ) ) {
 			$charsets[] = 'EUC-JP';
