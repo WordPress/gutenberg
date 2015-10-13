@@ -609,6 +609,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 	function test_the_widget_custom_before_title_arg() {
+		register_widget( 'WP_Widget_Text' );
 
 		ob_start();
 		the_widget(
@@ -617,6 +618,8 @@ class Tests_Widgets extends WP_UnitTestCase {
 			array( 'before_widget' => '<span class="special %s">', 'after_widget' => '</span>' )
 		);
 		$actual = ob_get_clean();
+		
+		unregister_widget( 'WP_Widget_Text' );
 
 		$this->assertRegExp( '/<span class="special widget_text">/', $actual );
 
