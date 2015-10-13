@@ -15,11 +15,6 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	 */
 	public function testPluggableFunctionSignaturesMatch( $function ) {
 
-		if ( wp_using_ext_object_cache() ) {
-			// #31491
-			$this->markTestSkipped( 'Pluggable function signatures are not tested when an external object cache is in use.' );
-		}
-
 		$signatures = $this->getPluggableFunctionSignatures();
 
 		$this->assertTrue( function_exists( $function ) );
@@ -91,8 +86,13 @@ class Tests_Pluggable extends WP_UnitTestCase {
 		);
 		$test_files = array(
 			'wp-includes/pluggable.php',
-			'wp-includes/cache.php',
 		);
+
+		// Pluggable function signatures are not tested when an external object cache is in use. #31491
+		if ( ! wp_using_ext_object_cache() ) {
+			$test_files[] = 'wp-includes/cache.php';
+		}
+
 		$data = array();
 
 		foreach ( $test_functions as $function ) {
@@ -122,7 +122,7 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	 */
 	public function getPluggableFunctionSignatures() {
 
-		return array(
+		$signatures = array(
 
 			// wp-includes/pluggable.php:
 			'wp_set_current_user'             => array( 'id', 'name' => '' ),
@@ -165,22 +165,6 @@ class Tests_Pluggable extends WP_UnitTestCase {
 			'get_avatar'                      => array( 'id_or_email', 'size' => 96, 'default' => '', 'alt' => '', 'args' => null ),
 			'wp_text_diff'                    => array( 'left_string', 'right_string', 'args' => null ),
 
-			// wp-includes/cache.php:
-			'wp_cache_add'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
-			'wp_cache_close'                     => array(),
-			'wp_cache_decr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
-			'wp_cache_delete'                    => array( 'key', 'group' => '' ),
-			'wp_cache_flush'                     => array(),
-			'wp_cache_get'                       => array( 'key', 'group' => '', 'force' => false, 'found' => null ),
-			'wp_cache_incr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
-			'wp_cache_init'                      => array(),
-			'wp_cache_replace'                   => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
-			'wp_cache_set'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
-			'wp_cache_switch_to_blog'            => array( 'blog_id' ),
-			'wp_cache_add_global_groups'         => array( 'groups' ),
-			'wp_cache_add_non_persistent_groups' => array( 'groups' ),
-			'wp_cache_reset'                     => array(),
-
 			// wp-admin/includes/schema.php:
 			'install_network'                    => array(),
 
@@ -190,9 +174,31 @@ class Tests_Pluggable extends WP_UnitTestCase {
 			'wp_new_blog_notification'           => array( 'blog_title', 'blog_url', 'user_id', 'password' ),
 			'wp_upgrade'                         => array(),
 			'install_global_terms'               => array(),
-
 		);
 
+		// Pluggable function signatures are not tested when an external object cache is in use. #31491
+		if ( ! wp_using_ext_object_cache() ) {
+			$signatures = array_merge( $signatures, array(
+
+				// wp-includes/cache.php:
+				'wp_cache_add'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+				'wp_cache_close'                     => array(),
+				'wp_cache_decr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
+				'wp_cache_delete'                    => array( 'key', 'group' => '' ),
+				'wp_cache_flush'                     => array(),
+				'wp_cache_get'                       => array( 'key', 'group' => '', 'force' => false, 'found' => null ),
+				'wp_cache_incr'                      => array( 'key', 'offset' => 1, 'group' => '' ),
+				'wp_cache_init'                      => array(),
+				'wp_cache_replace'                   => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+				'wp_cache_set'                       => array( 'key', 'data', 'group' => '', 'expire' => 0 ),
+				'wp_cache_switch_to_blog'            => array( 'blog_id' ),
+				'wp_cache_add_global_groups'         => array( 'groups' ),
+				'wp_cache_add_non_persistent_groups' => array( 'groups' ),
+				'wp_cache_reset'                     => array(),
+			) );
+		}
+
+		return $signatures;
 	}
 
 }
