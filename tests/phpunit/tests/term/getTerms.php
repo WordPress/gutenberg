@@ -1593,6 +1593,38 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 14162
+	 * @ticket 34282
+	 */
+	public function test_should_return_wp_term_objects_when_pulling_from_the_cache() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		// Prime the cache.
+		get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'all',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'all',
+		) );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
+		$this->assertNotEmpty( $found );
+
+		foreach ( $found as $term ) {
+			$this->assertInstanceOf( 'WP_Term', $term );
+		}
+	}
+
+	/**
+	 * @ticket 14162
 	 */
 	public function test_should_prime_individual_term_cache_when_fields_is_all() {
 		global $wpdb;
