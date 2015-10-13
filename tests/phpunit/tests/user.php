@@ -954,4 +954,18 @@ class Tests_User extends WP_UnitTestCase {
 
 		wp_new_user_notification( $user, 'this_is_deprecated' );
 	}
+
+	/**
+	 * @ticket 28435
+	 */
+	function test_wp_update_user_no_change_pwd() {
+		$testuserid = 1;
+		$user = get_userdata( $testuserid );
+		$pwd_before = $user->user_pass;
+		wp_update_user( $user );
+		
+		// Reload the data
+		$pwd_after = get_userdata( $testuserid )->user_pass;
+		$this->assertEquals( $pwd_before, $pwd_after );
+	}
 }
