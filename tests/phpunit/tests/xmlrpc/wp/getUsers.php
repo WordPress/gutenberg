@@ -79,12 +79,12 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 		if ( is_multisite() )
 			grant_super_admin( $administrator_id );
 
-		$this->factory->user->create_many( 13 );
+		$this->factory->user->create_many( 5 );
 
 		$user_ids = get_users( array( 'fields' => 'ID' ) );
 
 		$users_found = array();
-		$page_size = floor( count( $user_ids ) / 3 );
+		$page_size = 2;
 
 		$filter = array( 'number' => $page_size, 'offset' => 0 );
 		do {
