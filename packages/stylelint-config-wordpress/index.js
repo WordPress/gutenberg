@@ -22,6 +22,7 @@ module.exports = {
     "function-calc-no-unspaced-operator": 2,
     "function-comma-space-after": [ 2, "always" ],
     "function-comma-space-before": [ 2, "never" ],
+    "function-linear-gradient-no-nonstandard-direction": 2,
     "function-parentheses-space-inside": [ 2, "never" ],
     "function-space-after": [ 2, "always" ],
     "function-url-quotes": [ 2, "none" ],
