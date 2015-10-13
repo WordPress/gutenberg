@@ -30,7 +30,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->_backup_hooks();
 		}
 
-		global $wpdb;
+		global $wpdb, $wp_rewrite;
 		$wpdb->suppress_errors = false;
 		$wpdb->show_errors = true;
 		$wpdb->db_connect();
@@ -48,7 +48,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
 			$this->reset_post_statuses();
-			$this->set_permalink_structure();
+
+			if ( $wp_rewrite->permalink_structure ) {
+				$this->set_permalink_structure( '' );
+			}
 		}
 
 		$this->start_transaction();
