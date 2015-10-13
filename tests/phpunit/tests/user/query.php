@@ -438,20 +438,24 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @ticket 28631
 	 */
 	function test_number() {
-		$user_ids = $this->factory->user->create_many( 10 );
+		// +1 for the default user created by the test suite.
+		$user_ids = $this->factory->user->create_many( 3 );
 
 		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id() ) );
 		$users = $users->get_results();
-
-		$this->assertEquals( 12, count( $users ) );
+		$this->assertEquals( 4, count( $users ) );
 
 		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'number' => 10 ) );
 		$users = $users->get_results();
-		$this->assertEquals( 10, count( $users ) );
+		$this->assertEquals( 4, count( $users ) );
+
+		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'number' => 2 ) );
+		$users = $users->get_results();
+		$this->assertEquals( 2, count( $users ) );
 
 		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'number' => -1 ) );
 		$users = $users->get_results();
-		$this->assertEquals( 12, count( $users ) );
+		$this->assertEquals( 4, count( $users ) );
 	}
 
 	/**
