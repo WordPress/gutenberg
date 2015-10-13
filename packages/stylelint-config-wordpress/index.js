@@ -16,6 +16,7 @@ module.exports = {
     "declaration-bang-space-before": [ 2, "always" ],
     "declaration-block-semicolon-newline-after": [ 2, "always" ],
     "declaration-block-semicolon-space-before": [ 2, "never" ],
+    "declaration-colon-newline-after": [ 2, "always-multi-line" ],
     "declaration-colon-space-after": [ 2, "always" ],
     "declaration-colon-space-before": [ 2, "never" ],
     "function-calc-no-unspaced-operator": 2,
