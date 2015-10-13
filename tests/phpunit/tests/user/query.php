@@ -958,6 +958,27 @@ class Tests_User_Query extends WP_UnitTestCase {
 	/**
 	 * @ticket 22212
 	 */
+	public function test_get_single_role_by_string_which_is_similar() {
+		$editors = $this->factory->user->create_many( 2, array(
+			'role' => 'editor',
+		) );
+
+		$another_editor = $this->factory->user->create( array(
+			'role' => 'another-editor',
+		) );
+
+		$users = get_users( array(
+			'role' => 'editor',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( $editors, $users );
+	}
+
+
+	/**
+	 * @ticket 22212
+	 */
 	public function test_get_single_role_by_array() {
 		$this->factory->user->create_many( 2, array(
 			'role' => 'subscriber',
