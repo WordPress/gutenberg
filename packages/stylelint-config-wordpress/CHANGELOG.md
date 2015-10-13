@@ -1,6 +1,7 @@
 # #HEAD
 
 * Updated rule: `at-rule-empty-line-before` with option `ignore: ["after-comment"],`
+* Updated rule: `declaration-colon-space-after` with option `always-single-line`
 * Added rule: `declaration-colon-newline-after` with option `always-multi-line`
 * Added rule: `function-linear-gradient-no-nonstandard-direction`
 * Bump Stylelint dependency to `1.2.1` to support new rules and options
