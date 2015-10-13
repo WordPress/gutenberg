@@ -2,6 +2,7 @@ module.exports = {
   "rules": {
     "at-rule-empty-line-before": [ 2, "always", {
       except: ["blockless-group"],
+      ignore: ["after-comment"],
     } ],
     "at-rule-no-vendor-prefix": 2,
     "block-closing-brace-newline-after": [ 2, "always" ],
