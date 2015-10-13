@@ -15,6 +15,11 @@ class Tests_Pluggable extends WP_UnitTestCase {
 	 */
 	public function testPluggableFunctionSignaturesMatch( $function ) {
 
+		if ( wp_using_ext_object_cache() ) {
+			// #31491
+			$this->markTestSkipped( 'Pluggable function signatures are not tested when an external object cache is in use.' );
+		}
+
 		$signatures = $this->getPluggableFunctionSignatures();
 
 		$this->assertTrue( function_exists( $function ) );
