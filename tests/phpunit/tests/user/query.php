@@ -435,6 +435,26 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 28631
+	 */
+	function test_number() {
+		$user_ids = $this->factory->user->create_many( 10 );
+
+		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id() ) );
+		$users = $users->get_results();
+
+		$this->assertEquals( 12, count( $users ) );
+
+		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'number' => 10 ) );
+		$users = $users->get_results();
+		$this->assertEquals( 10, count( $users ) );
+
+		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id(), 'number' => -1 ) );
+		$users = $users->get_results();
+		$this->assertEquals( 12, count( $users ) );
+	}
+
+	/**
 	 * @ticket 21119
 	 */
 	function test_prepare_query() {
@@ -469,6 +489,10 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 		$query->prepare_query();
 		$this->assertEquals( $_query_vars, $query->query_vars );
+
+		$query->prepare_query( array( 'number' => -1 ) );
+		$this->assertNotEquals( 'LIMIT -1', $query->query_limit );
+		$this->assertEmpty( $query->query_limit );
 	}
 
 	public function test_meta_vars_should_be_converted_to_meta_query() {
