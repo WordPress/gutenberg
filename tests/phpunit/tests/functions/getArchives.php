@@ -8,7 +8,7 @@ $defaults = array(
 );
 */
 class Tests_Get_Archives extends WP_UnitTestCase {
-	protected $post_ids;
+	protected static $post_ids;
 	protected $month_url;
 
 	function setUp() {
@@ -16,7 +16,21 @@ class Tests_Get_Archives extends WP_UnitTestCase {
 
 		$this->month_url = get_month_link( date( 'Y' ), date( 'm' ) );
 		$this->year_url = get_year_link( date( 'Y' ) );
-		$this->post_ids = $this->factory->post->create_many( 8, array( 'post_type' => 'post', 'post_author' => '1' ) );
+	}
+
+	public static function setUpBeforeClass() {
+		$factory = new WP_UnitTest_Factory();
+		self::$post_ids = $factory->post->create_many( 8, array( 'post_type' => 'post', 'post_author' => '1' ) );
+
+		self::commit_transaction();
+	}
+
+	public static function tearDownAfterClass() {
+		foreach ( self::$post_ids as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+
+		self::commit_transaction();
 	}
 
 	function test_wp_get_archives_default() {
@@ -30,7 +44,7 @@ class Tests_Get_Archives extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_archives_limit() {
-		$ids = array_slice( array_reverse( $this->post_ids ), 0, 5 );
+		$ids = array_slice( array_reverse( self::$post_ids ), 0, 5 );
 
 		$link1 = get_permalink( $ids[0] );
 		$link2 = get_permalink( $ids[1] );
