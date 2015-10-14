@@ -30,7 +30,7 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			) );
 
 			self::$top[ $i ] = $p;
-			self::$post_ids[] = $p;
+			self::$post_ids[] = $p->ID;
 		}
 
 		// create child pages
@@ -44,7 +44,7 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 				) );
 
 				self::$children[ $top ][ $i ] = $p;
-				self::$post_ids[] = $p;
+				self::$post_ids[] = $p->ID;
 			}
 		}
 
@@ -60,7 +60,7 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 					) );
 
 					self::$grandchildren[ $top ][ $child ][ $i ] = $p;
-					self::$post_ids = $p;
+					self::$post_ids[] = $p->ID;
 				}
 			}
 		}
