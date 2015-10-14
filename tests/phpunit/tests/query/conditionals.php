@@ -251,7 +251,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'page/?([0-9]{1,})/?$' => 'index.php?&paged=$matches[1]',
 	function test_paged() {
-		$this->factory->post->create_many( 15 );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 5 );
 		for ( $i = 2; $i <= 3; $i++ ) {
 			$this->go_to("/page/{$i}/");
 			$this->assertQueryTrue('is_home', 'is_paged');
@@ -304,7 +305,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'search/(.+)/page/?([0-9]{1,})/?$' => 'index.php?s=$matches[1]&paged=$matches[2]',
 	function test_search_paged() {
-		$this->factory->post->create_many( 10, array( 'post_title' => 'test' ) );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 3, array( 'post_title' => 'test' ) );
 		$this->go_to('/search/test/page/2/');
 		$this->assertQueryTrue('is_search', 'is_paged');
 	}
@@ -344,7 +346,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'category/(.+?)/page/?([0-9]{1,})/?$' => 'index.php?category_name=$matches[1]&paged=$matches[2]',
 	function test_category_paged() {
-		$this->factory->post->create_many( 10 );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 3 );
 		$this->go_to('/category/uncategorized/page/2/');
 		$this->assertQueryTrue('is_archive', 'is_category', 'is_paged');
 	}
@@ -377,7 +380,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'tag/(.+?)/page/?([0-9]{1,})/?$' => 'index.php?tag=$matches[1]&paged=$matches[2]',
 	function test_tag_paged() {
-		$post_ids = $this->factory->post->create_many( 10 );
+		update_option( 'posts_per_page', 2 );
+		$post_ids = $this->factory->post->create_many( 3 );
 		foreach ( $post_ids as $post_id )
 			$this->factory->term->add_post_terms( $post_id, 'tag-a', 'post_tag' );
 		$this->go_to('/tag/tag-a/page/2/');
@@ -423,8 +427,9 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// 'author/([^/]+)/page/?([0-9]{1,})/?$' => 'index.php?author_name=$matches[1]&paged=$matches[2]',
 	function test_author_paged() {
+		update_option( 'posts_per_page', 2 );
 		$user_id = $this->factory->user->create( array( 'user_login' => 'user-a' ) );
-		$this->factory->post->create_many( 10, array( 'post_author' => $user_id ) );
+		$this->factory->post->create_many( 3, array( 'post_author' => $user_id ) );
 		$this->go_to('/author/user-a/page/2/');
 		$this->assertQueryTrue('is_archive', 'is_author', 'is_paged');
 	}
@@ -464,7 +469,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// '([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/page/?([0-9]{1,})/?$' => 'index.php?year=$matches[1]&monthnum=$matches[2]&day=$matches[3]&paged=$matches[4]',
 	function test_ymd_paged() {
-		$this->factory->post->create_many( 10, array( 'post_date' => '2007-09-04 00:00:00' ) );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 3, array( 'post_date' => '2007-09-04 00:00:00' ) );
 		$this->go_to('/2007/09/04/page/2/');
 		$this->assertQueryTrue('is_archive', 'is_day', 'is_date', 'is_paged');
 	}
@@ -497,7 +503,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// '([0-9]{4})/([0-9]{1,2})/page/?([0-9]{1,})/?$' => 'index.php?year=$matches[1]&monthnum=$matches[2]&paged=$matches[3]',
 	function test_ym_paged() {
-		$this->factory->post->create_many( 10, array( 'post_date' => '2007-09-04 00:00:00' ) );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 3, array( 'post_date' => '2007-09-04 00:00:00' ) );
 		$this->go_to('/2007/09/page/2/');
 		$this->assertQueryTrue('is_archive', 'is_date', 'is_month', 'is_paged');
 	}
@@ -530,7 +537,8 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	// '([0-9]{4})/page/?([0-9]{1,})/?$' => 'index.php?year=$matches[1]&paged=$matches[2]',
 	function test_y_paged() {
-		$this->factory->post->create_many( 10, array( 'post_date' => '2007-09-04 00:00:00' ) );
+		update_option( 'posts_per_page', 2 );
+		$this->factory->post->create_many( 3, array( 'post_date' => '2007-09-04 00:00:00' ) );
 		$this->go_to('/2007/page/2/');
 		$this->assertQueryTrue('is_archive', 'is_date', 'is_year', 'is_paged');
 	}

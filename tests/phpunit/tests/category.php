@@ -21,17 +21,15 @@ class Tests_Category extends WP_UnitTestCase {
 	 */
 	function test_get_all_category_ids() {
 		// create categories
-		$this->factory->category->create_many(15);
+		$this->factory->category->create_many( 2 );
 
 		// create new taxonomy to ensure not included
 		register_taxonomy( 'test_tax_cat', 'post' );
 		wp_insert_term( "test1", 'test_tax_cat' );
-		wp_insert_term( "test2", 'test_tax_cat' );
-		wp_insert_term( "test3", 'test_tax_cat' );
 
 		// Validate length is 1 + created due to uncategorized
 		$cat_ids = get_all_category_ids();
-		$this->assertEquals( 16, count($cat_ids));
+		$this->assertEquals( 3, count($cat_ids));
 	}
 
 	/**

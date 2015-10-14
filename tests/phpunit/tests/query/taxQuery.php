@@ -840,7 +840,7 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 	public function test_tax_query_relation_or_both_clauses_empty_terms() {
 		// An empty tax query should return an empty array, not all posts.
 
-		$this->factory->post->create_many( 10 );
+		$this->factory->post->create_many( 2 );
 
 		$query = new WP_Query( array(
 			'fields' => 'ids',
@@ -873,7 +873,7 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 	public function test_tax_query_relation_or_one_clause_empty_terms() {
 		// An empty tax query should return an empty array, not all posts.
 
-		$this->factory->post->create_many( 10 );
+		$this->factory->post->create_many( 2 );
 
 		$query = new WP_Query( array(
 			'fields' => 'ids',

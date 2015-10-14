@@ -71,7 +71,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	 */
 	function test_the_posts_filter() {
 		// Create posts and clear their caches.
-		$post_ids = $this->factory->post->create_many( 10 );
+		$post_ids = $this->factory->post->create_many( 4 );
 		foreach ( $post_ids as $post_id )
 			clean_post_cache( $post_id );
 
@@ -79,12 +79,12 @@ class Tests_Post_Query extends WP_UnitTestCase {
 
 		$query = new WP_Query( array(
 			'post_type' => 'post',
-			'posts_per_page' => 5,
+			'posts_per_page' => 3,
 		) );
 
-		// Sixth post added in filter
-		$this->assertEquals( 6, count( $query->posts ) );
-		$this->assertEquals( 6, $query->post_count );
+		// Fourth post added in filter
+		$this->assertEquals( 4, count( $query->posts ) );
+		$this->assertEquals( 4, $query->post_count );
 
 		foreach ( $query->posts as $post ) {
 

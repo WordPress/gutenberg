@@ -16,7 +16,7 @@ class Tests_General_Archives extends WP_UnitTestCase {
 	function test_get_archives_cache() {
 		global $wpdb;
 
-		$this->factory->post->create_many( 15, array( 'post_type' => 'post' ) );
+		$this->factory->post->create_many( 3, array( 'post_type' => 'post' ) );
 		wp_cache_delete( 'last_changed', 'posts' );
 		$this->assertFalse( wp_cache_get( 'last_changed', 'posts' ) );
 

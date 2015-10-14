@@ -16,7 +16,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		$factory = new WP_UnitTest_Factory();
 
 		self::$user = $factory->user->create();
-		self::$posts = $factory->post->create_many( 25, array(
+		self::$posts = $factory->post->create_many( 5, array(
 			'post_author' => self::$user,
 		) );
 

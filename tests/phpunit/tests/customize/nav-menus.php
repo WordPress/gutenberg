@@ -124,7 +124,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		);
 
 		// Create pages.
-		$this->factory->post->create_many( 15, array( 'post_type' => 'page' ) );
+		$this->factory->post->create_many( 12, array( 'post_type' => 'page' ) );
 
 		// Home is included in menu items when page is zero.
 		$items = $menus->load_available_items_query( 'post_type', 'page', 0 );

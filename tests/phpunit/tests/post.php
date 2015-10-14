@@ -804,27 +804,27 @@ class Tests_Post extends WP_UnitTestCase {
 	function test_wp_count_posts_filtered() {
 		$post_type = rand_str(20);
 		register_post_type( $post_type );
-		$this->factory->post->create_many( 10, array(
+		$this->factory->post->create_many( 3, array(
 			'post_type' => $post_type,
 			'post_author' => $this->author_id
 		) );
 		$count1 = wp_count_posts( $post_type, 'readable' );
-		$this->assertEquals( 10, $count1->publish );
+		$this->assertEquals( 3, $count1->publish );
 		add_filter( 'wp_count_posts', array( $this, 'filter_wp_count_posts' ) );
 
 		$count2 = wp_count_posts( $post_type, 'readable' );
-		$this->assertEquals( 7, $count2->publish );
+		$this->assertEquals( 2, $count2->publish );
 
 		remove_filter( 'wp_count_posts', array( $this, 'filter_wp_count_posts' ) );
 	}
 
 	function filter_wp_count_posts( $counts ) {
-		$counts->publish = 7;
+		$counts->publish = 2;
 		return $counts;
 	}
 
 	function test_wp_count_posts_insert_invalidation() {
-		$post_ids = $this->factory->post->create_many( 10 );
+		$post_ids = $this->factory->post->create_many( 3 );
 		$initial_counts = wp_count_posts();
 
 		$key = array_rand( $post_ids );
@@ -837,12 +837,12 @@ class Tests_Post extends WP_UnitTestCase {
 
 		$after_draft_counts = wp_count_posts();
 		$this->assertEquals( 1, $after_draft_counts->draft );
-		$this->assertEquals( 9, $after_draft_counts->publish );
+		$this->assertEquals( 2, $after_draft_counts->publish );
 		$this->assertNotEquals( $initial_counts->publish, $after_draft_counts->publish );
 	}
 
 	function test_wp_count_posts_trash_invalidation() {
-		$post_ids = $this->factory->post->create_many( 10 );
+		$post_ids = $this->factory->post->create_many( 3 );
 		$initial_counts = wp_count_posts();
 
 		$key = array_rand( $post_ids );
@@ -855,7 +855,7 @@ class Tests_Post extends WP_UnitTestCase {
 
 		$after_trash_counts = wp_count_posts();
 		$this->assertEquals( 1, $after_trash_counts->trash );
-		$this->assertEquals( 9, $after_trash_counts->publish );
+		$this->assertEquals( 2, $after_trash_counts->publish );
 		$this->assertNotEquals( $initial_counts->publish, $after_trash_counts->publish );
 	}
 
