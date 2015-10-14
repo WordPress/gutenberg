@@ -6,13 +6,6 @@
 class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	var $post_id;
 
-	function setUp() {
-		parent::setUp();
-
-		$this->post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $this->post_id, 15 );
-	}
-
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getComments( array( 1, 'username', 'password', array() ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
@@ -28,6 +21,9 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_capable_user() {
+		$this->post_id = $this->factory->post->create();
+		$this->factory->comment->create_post_comments( $this->post_id, 2 );
+
 		$this->make_user_by_role( 'editor' );
 
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array() ) );
@@ -40,6 +36,9 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_post_filter() {
+		$this->post_id = $this->factory->post->create();
+		$this->factory->comment->create_post_comments( $this->post_id, 2 );
+
 		$this->make_user_by_role( 'editor' );
 
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array(
@@ -53,6 +52,9 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_number_filter() {
+		$this->post_id = $this->factory->post->create();
+		$this->factory->comment->create_post_comments( $this->post_id, 11 );
+
 		$this->make_user_by_role( 'editor' );
 
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array(
