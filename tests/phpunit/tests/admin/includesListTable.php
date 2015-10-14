@@ -4,49 +4,76 @@
  * @group admin
  */
 class Tests_Admin_includesListTable extends WP_UnitTestCase {
+	protected static $top;
+	protected static $children;
+	protected static $grandchildren;
+	protected static $post_ids;
+
 	function setUp() {
+		parent::setUp();
 		set_current_screen( 'edit-page' );
 		$GLOBALS['hook_suffix'] = '';
 		$this->table = _get_list_table( 'WP_Posts_List_Table' );
+	}
 
-		parent::setUp();
+	public static function setUpBeforeClass() {
+		$factory = new WP_UnitTest_Factory();
 
 		// note that our top/children/grandchildren arrays are 1-indexed
 
 		// create top level pages
 		$num_posts = 5;
 		foreach ( range( 1, $num_posts ) as $i ) {
-			$this->top[$i] = $this->factory->post->create_and_get( array(
+			$p = $factory->post->create_and_get( array(
 				'post_type'  => 'page',
 				'post_title' => sprintf( 'Top Level Page %d', $i ),
 			) );
+
+			self::$top[ $i ] = $p;
+			self::$post_ids[] = $p;
 		}
 
 		// create child pages
 		$num_children = 3;
-		foreach ( $this->top as $top => $top_page ) {
+		foreach ( self::$top as $top => $top_page ) {
 			foreach ( range( 1, $num_children ) as $i ) {
-				$this->children[$top][$i] = $this->factory->post->create_and_get( array(
+				$p = $factory->post->create_and_get( array(
 					'post_type'   => 'page',
 					'post_parent' => $top_page->ID,
 					'post_title'  => sprintf( 'Child %d', $i ),
 				) );
+
+				self::$children[ $top ][ $i ] = $p;
+				self::$post_ids[] = $p;
 			}
 		}
 
 		// create grand-child pages for the third and fourth top-level pages
 		$num_grandchildren = 3;
 		foreach ( range( 3, 4 ) as $top ) {
-			foreach ( $this->children[$top] as $child => $child_page ) {
+			foreach ( self::$children[ $top ] as $child => $child_page ) {
 				foreach ( range( 1, $num_grandchildren ) as $i ) {
-					$this->grandchildren[$top][$child][$i] = $this->factory->post->create_and_get( array(
+					$p = $factory->post->create_and_get( array(
 						'post_type'   => 'page',
 						'post_parent' => $child_page->ID,
 						'post_title'  => sprintf( 'Grandchild %d', $i ),
 					) );
+
+					self::$grandchildren[ $top ][ $child ][ $i ] = $p;
+					self::$post_ids = $p;
 				}
 			}
 		}
+
+		self::commit_transaction();
+	}
+
+	public static function tearDownAfterClass() {
+		foreach ( self::$post_ids as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+
+		self::commit_transaction();
 	}
 
 	/**
@@ -57,8 +84,8 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'paged'          => 1,
 			'posts_per_page' => 2,
 		), array(
-			$this->top[1]->ID,
-			$this->children[1][1]->ID,
+			self::$top[1]->ID,
+			self::$children[1][1]->ID,
 		) );
 	}
 
@@ -70,9 +97,9 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'paged'          => 2,
 			'posts_per_page' => 2,
 		), array(
-			$this->top[1]->ID,
-			$this->children[1][2]->ID,
-			$this->children[1][3]->ID,
+			self::$top[1]->ID,
+			self::$children[1][2]->ID,
+			self::$children[1][3]->ID,
 		) );
 	}
 
@@ -85,8 +112,8 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'posts_per_page' => 2,
 			's'              => 'Child',
 		), array(
-			$this->children[1][1]->ID,
-			$this->children[1][2]->ID,
+			self::$children[1][1]->ID,
+			self::$children[1][2]->ID,
 		) );
 	}
 
@@ -99,8 +126,8 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'posts_per_page' => 2,
 			's'              => 'Top',
 		), array(
-			$this->top[3]->ID,
-			$this->top[4]->ID,
+			self::$top[3]->ID,
+			self::$top[4]->ID,
 		) );
 	}
 
@@ -113,10 +140,10 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'paged'          => 6,
 			'posts_per_page' => 2,
 		), array(
-			$this->top[3]->ID,
-			$this->children[3][1]->ID,
-			$this->grandchildren[3][1][1]->ID,
-			$this->grandchildren[3][1][2]->ID,
+			self::$top[3]->ID,
+			self::$children[3][1]->ID,
+			self::$grandchildren[3][1][1]->ID,
+			self::$grandchildren[3][1][2]->ID,
 		) );
 	}
 
@@ -129,10 +156,10 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 			'paged'          => 7,
 			'posts_per_page' => 2,
 		), array(
-			$this->top[3]->ID,
-			$this->children[3][1]->ID,
-			$this->grandchildren[3][1][3]->ID,
-			$this->children[3][2]->ID,
+			self::$top[3]->ID,
+			self::$children[3][1]->ID,
+			self::$grandchildren[3][1][3]->ID,
+			self::$children[3][2]->ID,
 		) );
 	}
 
