@@ -32,10 +32,23 @@ class Tests_Auth extends WP_UnitTestCase {
 		self::commit_transaction();
 	}
 
+	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
+
+		if ( is_multisite() ) {
+			wpmu_delete_user( self::$user_id );
+		} else {
+			wp_delete_user( self::$user_id );
+		}
+
+		self::commit_transaction();
+	}
+
 	function setUp() {
 		parent::setUp();
 
 		$this->user = clone self::$_user;
+		wp_set_current_user( self::$user_id );
 	}
 
 	function test_auth_cookie_valid() {
