@@ -58,7 +58,7 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 		$parent_id = 0;
 		$children = 0;
 
-		foreach ( range( 1, 99 ) as $i ) {
+		foreach ( range( 1, 9 ) as $i ) {
 			switch ( $step ) {
 			case 1:
 				$parent = wp_insert_term( 'Parent' . $i, $tax );

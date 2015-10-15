@@ -5,50 +5,65 @@
  * @group auth
  */
 class Tests_Auth extends WP_UnitTestCase {
-	var $user_id;
-	var $wp_hasher;
+	protected $user;
+	protected static $_user;
+	protected static $user_id;
+	protected static $wp_hasher;
 
 	/**
 	 * action hook
 	 */
 	protected $nonce_failure_hook = 'wp_verify_nonce_failed';
 
+	static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		$factory = new WP_UnitTest_Factory();
+
+		self::$_user = $factory->user->create_and_get( array(
+			'user_login' => 'password-tests'
+		) );
+
+		self::$user_id = self::$_user->ID;
+
+		require_once( ABSPATH . WPINC . '/class-phpass.php' );
+		self::$wp_hasher = new PasswordHash( 8, true );
+	}
+
 	function setUp() {
 		parent::setUp();
-		$this->user_id = $this->factory->user->create();
 
-		require_once ABSPATH . WPINC . '/class-phpass.php';
-		$this->wp_hasher = new PasswordHash( 8, true );
+		$this->user = clone self::$_user;
 	}
 
 	function test_auth_cookie_valid() {
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() + 3600, 'auth' );
-		$this->assertEquals( $this->user_id, wp_validate_auth_cookie( $cookie, 'auth' ) );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() + 3600, 'auth' );
+		$this->assertEquals( self::$user_id, wp_validate_auth_cookie( $cookie, 'auth' ) );
 	}
 
 	function test_auth_cookie_invalid() {
 		// 3600 or less and +3600 may occur in wp_validate_auth_cookie(),
 		// as an ajax test may have defined DOING_AJAX, failing the test.
 
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() - 7200, 'auth' );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() - 7200, 'auth' );
 		$this->assertEquals( false, wp_validate_auth_cookie( $cookie, 'auth' ), 'expired cookie' );
 
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() + 3600, 'auth' );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() + 3600, 'auth' );
 		$this->assertEquals( false, wp_validate_auth_cookie( $cookie, 'logged_in' ), 'wrong auth scheme' );
 
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() + 3600, 'auth' );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() + 3600, 'auth' );
 		list($a, $b, $c) = explode('|', $cookie);
 		$cookie = $a . '|' . ($b + 1) . '|' . $c;
-		$this->assertEquals( false, wp_validate_auth_cookie( $this->user_id, 'auth' ), 'altered cookie' );
+		$this->assertEquals( false, wp_validate_auth_cookie( self::$user_id, 'auth' ), 'altered cookie' );
 	}
 
 	function test_auth_cookie_scheme() {
 		// arbitrary scheme name
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() + 3600, 'foo' );
-		$this->assertEquals( $this->user_id, wp_validate_auth_cookie( $cookie, 'foo' ) );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() + 3600, 'foo' );
+		$this->assertEquals( self::$user_id, wp_validate_auth_cookie( $cookie, 'foo' ) );
 
 		// wrong scheme name - should fail
-		$cookie = wp_generate_auth_cookie( $this->user_id, time() + 3600, 'foo' );
+		$cookie = wp_generate_auth_cookie( self::$user_id, time() + 3600, 'foo' );
 		$this->assertEquals( false, wp_validate_auth_cookie( $cookie, 'bar' ) );
 	}
 
@@ -56,8 +71,6 @@ class Tests_Auth extends WP_UnitTestCase {
 	 * @ticket 23494
 	 */
 	function test_password_trimming() {
-		$another_user = $this->factory->user->create( array( 'user_login' => 'password-triming-tests' ) );
-
 		$passwords_to_test = array(
 			'a password with no trailing or leading spaces',
 			'a password with trailing spaces ',
@@ -66,11 +79,11 @@ class Tests_Auth extends WP_UnitTestCase {
 		);
 
 		foreach( $passwords_to_test as $password_to_test ) {
-			wp_set_password( $password_to_test, $another_user );
-			$authed_user = wp_authenticate( 'password-triming-tests', $password_to_test );
+			wp_set_password( $password_to_test, $this->user->ID );
+			$authed_user = wp_authenticate( $this->user->user_login, $password_to_test );
 
 			$this->assertInstanceOf( 'WP_User', $authed_user );
-			$this->assertEquals( $another_user, $authed_user->ID );
+			$this->assertEquals( $this->user->ID, $authed_user->ID );
 		}
 	}
 
@@ -140,55 +153,48 @@ class Tests_Auth extends WP_UnitTestCase {
 	}
 
 	function test_password_length_limit() {
-		$passwords = array(
-			str_repeat( 'a', 4095 ), // short
-			str_repeat( 'a', 4096 ), // limit
-			str_repeat( 'a', 4097 ), // long
-		);
+		$limit = str_repeat( 'a', 4096 );
 
-		$user_id = $this->factory->user->create( array( 'user_login' => 'password-length-test' ) );
-
-		wp_set_password( $passwords[1], $user_id );
-		$user = get_user_by( 'id', $user_id );
+		wp_set_password( $limit, self::$user_id );
 		// phpass hashed password
-		$this->assertStringStartsWith( '$P$', $user->data->user_pass );
+		$this->assertStringStartsWith( '$P$', $this->user->data->user_pass );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[0] );
+		$user = wp_authenticate( $this->user->user_login, 'aaaaaaaa' );
 		// Wrong Password
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[1] );
+		$user = wp_authenticate( $this->user->user_login, $limit );
 		$this->assertInstanceOf( 'WP_User', $user );
-		$this->assertEquals( $user_id, $user->ID );
+		$this->assertEquals( self::$user_id, $user->ID );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[2] );
+		// one char too many
+		$user = wp_authenticate( $this->user->user_login, $limit . 'a' );
 		// Wrong Password
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-
-		wp_set_password( $passwords[2], $user_id );
-		$user = get_user_by( 'id', $user_id );
+		wp_set_password( $limit . 'a', self::$user_id );
+		$user = get_user_by( 'id', self::$user_id );
 		// Password broken by setting it to be too long.
 		$this->assertEquals( '*', $user->data->user_pass );
 
-		$user = wp_authenticate( 'password-length-test', '*' );
+		$user = wp_authenticate( $this->user->user_login, '*' );
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', '*0' );
+		$user = wp_authenticate( $this->user->user_login, '*0' );
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', '*1' );
+		$user = wp_authenticate( $this->user->user_login, '*1' );
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[0] );
+		$user = wp_authenticate( $this->user->user_login, 'aaaaaaaa' );
 		// Wrong Password
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[1] );
+		$user = wp_authenticate( $this->user->user_login, $limit );
 		// Wrong Password
 		$this->assertInstanceOf( 'WP_Error', $user );
 
-		$user = wp_authenticate( 'password-length-test', $passwords[2] );
+		$user = wp_authenticate( $this->user->user_login, $limit . 'a' );
 		// Password broken by setting it to be too long.
 		$this->assertInstanceOf( 'WP_Error', $user );
 	}
@@ -200,29 +206,28 @@ class Tests_Auth extends WP_UnitTestCase {
 		global $wpdb;
 
 		$key  = wp_generate_password( 20, false );
-		$user = $this->factory->user->create_and_get();
 		$wpdb->update( $wpdb->users, array(
-			'user_activation_key' => strtotime( '-1 hour' ) . ':' . $this->wp_hasher->HashPassword( $key ),
+			'user_activation_key' => strtotime( '-1 hour' ) . ':' . self::$wp_hasher->HashPassword( $key ),
 		), array(
-			'ID' => $user->ID,
+			'ID' => $this->user->ID,
 		) );
 
 		// A valid key should be accepted
-		$check = check_password_reset_key( $key, $user->user_login );
+		$check = check_password_reset_key( $key, $this->user->user_login );
 		$this->assertInstanceOf( 'WP_User', $check );
-		$this->assertSame( $user->ID, $check->ID );
+		$this->assertSame( $this->user->ID, $check->ID );
 
 		// An invalid key should be rejected
-		$check = check_password_reset_key( 'key', $user->user_login );
+		$check = check_password_reset_key( 'key', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 
 		// An empty key should be rejected
-		$check = check_password_reset_key( '', $user->user_login );
+		$check = check_password_reset_key( '', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 
 		// A truncated key should be rejected
 		$partial = substr( $key, 0, 10 );
-		$check = check_password_reset_key( $partial, $user->user_login );
+		$check = check_password_reset_key( $partial, $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 
@@ -233,15 +238,14 @@ class Tests_Auth extends WP_UnitTestCase {
 		global $wpdb;
 
 		$key  = wp_generate_password( 20, false );
-		$user = $this->factory->user->create_and_get();
 		$wpdb->update( $wpdb->users, array(
-			'user_activation_key' => strtotime( '-48 hours' ) . ':' . $this->wp_hasher->HashPassword( $key ),
+			'user_activation_key' => strtotime( '-48 hours' ) . ':' . self::$wp_hasher->HashPassword( $key ),
 		), array(
-			'ID' => $user->ID,
+			'ID' => $this->user->ID,
 		) );
 
 		// An expired but otherwise valid key should be rejected
-		$check = check_password_reset_key( $key, $user->user_login );
+		$check = check_password_reset_key( $key, $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 
@@ -249,16 +253,12 @@ class Tests_Auth extends WP_UnitTestCase {
 	 * @ticket 32429
 	 */
 	function test_empty_user_activation_key_fails_key_check() {
-		global $wpdb;
-
-		$user = $this->factory->user->create_and_get();
-
 		// An empty user_activation_key should not allow any key to be accepted
-		$check = check_password_reset_key( 'key', $user->user_login );
+		$check = check_password_reset_key( 'key', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 
 		// An empty user_activation_key should not allow an empty key to be accepted
-		$check = check_password_reset_key( '', $user->user_login );
+		$check = check_password_reset_key( '', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 
@@ -271,19 +271,18 @@ class Tests_Auth extends WP_UnitTestCase {
 		// A legacy user_activation_key is one without the `time()` prefix introduced in WordPress 4.3.
 
 		$key  = wp_generate_password( 20, false );
-		$user = $this->factory->user->create_and_get();
 		$wpdb->update( $wpdb->users, array(
-			'user_activation_key' => $this->wp_hasher->HashPassword( $key ),
+			'user_activation_key' => self::$wp_hasher->HashPassword( $key ),
 		), array(
-			'ID' => $user->ID,
+			'ID' => $this->user->ID,
 		) );
 
 		// A legacy user_activation_key should not be accepted
-		$check = check_password_reset_key( $key, $user->user_login );
+		$check = check_password_reset_key( $key, $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 
 		// An empty key with a legacy user_activation_key should be rejected
-		$check = check_password_reset_key( '', $user->user_login );
+		$check = check_password_reset_key( '', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 
@@ -297,19 +296,18 @@ class Tests_Auth extends WP_UnitTestCase {
 		// A plaintext user_activation_key is one stored before hashing was introduced in WordPress 3.7.
 
 		$key  = wp_generate_password( 20, false );
-		$user = $this->factory->user->create_and_get();
 		$wpdb->update( $wpdb->users, array(
 			'user_activation_key' => $key,
 		), array(
-			'ID' => $user->ID,
+			'ID' => $this->user->ID,
 		) );
 
 		// A plaintext user_activation_key should not allow an otherwise valid key to be accepted
-		$check = check_password_reset_key( $key, $user->user_login );
+		$check = check_password_reset_key( $key, $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 
 		// A plaintext user_activation_key should not allow an empty key to be accepted
-		$check = check_password_reset_key( '', $user->user_login );
+		$check = check_password_reset_key( '', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
 }
