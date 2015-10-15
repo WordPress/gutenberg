@@ -51,6 +51,21 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	);
 
 	/**
+	 * Don't preserve the global state when using an external object cache.
+	 *
+	 * Most of the Ajax tests are running in a separate PHP process, and thus PHPUnit attempts
+	 * to preserve the global state from the parent process by serializing all globals.
+	 * But this doesn't work for external object caches so we have to disable this "feature".
+	 */
+	public function run( PHPUnit_Framework_TestResult $result = NULL ) {
+		if ( wp_using_ext_object_cache() ) {
+			$this->setPreserveGlobalState( false );
+		}
+
+		return parent::run( $result );
+	}
+
+	/**
 	 * Set up the test fixture.
 	 * Override wp_die(), pretend to be ajax, and suppres E_WARNINGs
 	 */
