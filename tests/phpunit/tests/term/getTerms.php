@@ -286,12 +286,10 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( 2, $term->count );
 
 		$brie = $this->factory->term->create( array( 'name' => 'Brie', 'parent' => $cheese, 'taxonomy' => $tax ) );
-		$post_ids = $this->factory->post->create_many( 7 );
-		foreach ( $post_ids as $id ) {
-			wp_set_post_terms( $id, $brie, $tax );
-		}
+		$post_id = $this->factory->post->create();
+		wp_set_post_terms( $post_id, $brie, $tax );
 		$term = get_term( $brie, $tax );
-		$this->assertEquals( 7, $term->count );
+		$this->assertEquals( 1, $term->count );
 
 		$crackers = $this->factory->term->create( array( 'name' => 'Crackers', 'taxonomy' => $tax ) );
 
@@ -304,12 +302,12 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( 1, $term->count );
 
 		$multigrain = $this->factory->term->create( array( 'name' => 'Multigrain', 'parent' => $crackers, 'taxonomy' => $tax ) );
-		$post_ids = $this->factory->post->create_many( 3 );
+		$post_ids = $this->factory->post->create_many( 1 );
 		foreach ( $post_ids as $id ) {
 			wp_set_post_terms( $id, $multigrain, $tax );
 		}
 		$term = get_term( $multigrain, $tax );
-		$this->assertEquals( 3, $term->count );
+		$this->assertEquals( 1, $term->count );
 
 		$fruit = $this->factory->term->create( array( 'name' => 'Fruit', 'taxonomy' => $tax ) );
 		$cranberries = $this->factory->term->create( array( 'name' => 'Cranberries', 'parent' => $fruit, 'taxonomy' => $tax ) );

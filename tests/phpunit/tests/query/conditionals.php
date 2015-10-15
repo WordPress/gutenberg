@@ -332,15 +332,15 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		// check the long form
 		$types = array('feed', 'rdf', 'rss', 'rss2', 'atom');
 		foreach ($types as $type) {
-				$this->go_to("/category/cat-a/feed/{$type}");
-				$this->assertQueryTrue('is_archive', 'is_feed', 'is_category');
+			$this->go_to("/category/cat-a/feed/{$type}");
+			$this->assertQueryTrue('is_archive', 'is_feed', 'is_category');
 		}
 
 		// check the short form
 		$types = array('feed', 'rdf', 'rss', 'rss2', 'atom');
 		foreach ($types as $type) {
-				$this->go_to("/category/cat-a/{$type}");
-				$this->assertQueryTrue('is_archive', 'is_feed', 'is_category');
+			$this->go_to("/category/cat-a/{$type}");
+			$this->assertQueryTrue('is_archive', 'is_feed', 'is_category');
 		}
 	}
 
