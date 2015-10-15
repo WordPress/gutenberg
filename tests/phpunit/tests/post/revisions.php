@@ -5,6 +5,26 @@
  * @group revision
  */
 class Tests_Post_Revisions extends WP_UnitTestCase {
+	protected static $admin_user_id;
+	protected static $editor_user_id;
+	protected static $author_user_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$admin_user_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$editor_user_id = $factory->user->create( array( 'role' => 'editor' ) );
+		self::$author_user_id = $factory->user->create( array( 'role' => 'author' ) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		$ids = array( self::$admin_user_id, self::$editor_user_id, self::$author_user_id );
+		foreach ( $ids as $id ) {
+			if ( is_multisite() ) {
+				wpmu_delete_user( $id );
+			} else {
+				wp_delete_user( $id );
+			}
+		}
+	}
 
 	function setUp() {
 		parent::setUp();
@@ -22,37 +42,31 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16215
 	 */
 	function test_revision_restore_updates_edit_last_post_meta() {
-		$admin_user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-
 		//create a post as Author
-		wp_set_current_user( $author_user_id );
+		wp_set_current_user( self::$author_user_id );
 		$post = get_default_post_to_edit( 'post', true );
 		$post_id = $post->ID;
 
 		wp_update_post( array( 'post_status' => 'draft', 'post_content' => 'I cant spel werds.', 'ID' => $post_id ) );
 
 		//update post as Editor
-		wp_set_current_user( $editor_user_id );
+		wp_set_current_user( self::$editor_user_id );
 		wp_update_post( array( 'post_content' => 'The Editor was in fixing your typos.', 'ID' => $post_id ) );
 
 		//restore back as Admin
-		wp_set_current_user( $admin_user_id );
+		wp_set_current_user( self::$admin_user_id );
 		$revisions = wp_get_post_revisions( $post->ID );
 		$this->assertCount( 2, $revisions );
 
 		$lastrevision = end( $revisions );
 		$this->assertEquals( 'I cant spel werds.', $lastrevision->post_content );
 		// #16215
-		$this->assertEquals( $author_user_id , $lastrevision->post_author);
+		$this->assertEquals( self::$author_user_id , $lastrevision->post_author);
 
 		wp_restore_post_revision( $lastrevision->ID );
 
 		//is post_meta correctly set to revision author
-		$this->assertEquals( $admin_user_id, get_post_meta( $post_id, '_edit_last', true ) ); //after restoring user
-
-		wp_set_current_user( 0 );
+		$this->assertEquals( self::$admin_user_id, get_post_meta( $post_id, '_edit_last', true ) ); //after restoring user
 	}
 
 	/**
@@ -134,23 +148,20 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_view_caps_post() {
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 1, $revisions );
-		$this->assertTrue( user_can( $editor_user_id, 'read_post', $post_id ) );
+		$this->assertTrue( user_can( self::$editor_user_id, 'read_post', $post_id ) );
 
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $editor_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$editor_user_id, 'read_post', $revision->ID ) );
 		}
 
 		// Author should be able to view the revisions fine
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $author_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$author_user_id, 'read_post', $revision->ID ) );
 		}
 	}
 
@@ -159,21 +170,18 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_restore_caps_post() {
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 1, $revisions );
 		foreach ( $revisions as $revision ) {
-			 $this->assertTrue( user_can( $editor_user_id, 'edit_post', $revision->post_parent ) );
+			 $this->assertTrue( user_can( self::$editor_user_id, 'edit_post', $revision->post_parent ) );
 		}
 
 		// Author shouldn't be able to restore the revisions
 		foreach ( $revisions as $revision ) {
-			 $this->assertFalse( user_can( $author_user_id, 'edit_post', $revision->post_parent ) );
+			 $this->assertFalse( user_can( self::$author_user_id, 'edit_post', $revision->post_parent ) );
 		}
 	}
 
@@ -182,10 +190,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_diff_caps_post() {
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 		wp_update_post( array( 'post_content' => 'This content is even better', 'ID' => $post_id ) );
 
@@ -193,12 +198,12 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 2, $revisions );
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $editor_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$editor_user_id, 'read_post', $revision->ID ) );
 		}
 
 		// Author should be able to diff the revisions fine
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $author_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$author_user_id, 'read_post', $revision->ID ) );
 		}
 	}
 
@@ -213,23 +218,20 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			'supports' => array( 'revisions' ),
 		) );
 
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 1, $revisions );
-		$this->assertTrue( user_can( $editor_user_id, 'read_post', $post_id ) );
+		$this->assertTrue( user_can( self::$editor_user_id, 'read_post', $post_id ) );
 
 		foreach ( $revisions as $revision ) {
-			 $this->assertTrue( user_can( $editor_user_id, 'read_post', $revision->ID ) );
+			 $this->assertTrue( user_can( self::$editor_user_id, 'read_post', $revision->ID ) );
 		}
 
 		// Author should be able to view the revisions fine
 		foreach ( $revisions as $revision ) {
-			 $this->assertTrue( user_can( $author_user_id, 'read_post', $revision->ID ) );
+			 $this->assertTrue( user_can( self::$author_user_id, 'read_post', $revision->ID ) );
 		}
 	}
 
@@ -244,27 +246,24 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			'supports' => array( 'revisions' ),
 		) );
 
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
 		// The minimum extra caps needed for this test normally you would give the role all the relevant caps.
-		$editor_user = new WP_User( $editor_user_id );
+		$editor_user = new WP_User( self::$editor_user_id );
 		$editor_user->add_cap( 'edit_published_events' );
 
 		//create a post as Editor
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 1, $revisions );
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $editor_user_id, 'edit_post', $revision->post_parent ) );
+			$this->assertTrue( user_can( self::$editor_user_id, 'edit_post', $revision->post_parent ) );
 		}
 
 		// Author shouldn't be able to restore the revisions
-		wp_set_current_user( $author_user_id );
+		wp_set_current_user( self::$author_user_id );
 		foreach ( $revisions as $revision ) {
-			$this->assertFalse( user_can( $author_user_id, 'edit_post', $revision->post_parent ) );
+			$this->assertFalse( user_can( self::$author_user_id, 'edit_post', $revision->post_parent ) );
 		}
 	}
 
@@ -285,7 +284,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		) );
 
 		$old_id = get_current_user_id();
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::$editor_user_id );
 
 		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_status' => 'draft' ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
@@ -319,10 +318,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			'supports' => array( 'revisions' ),
 		) );
 
-		$author_user_id = $this->factory->user->create( array( 'role' => 'author' ) );
-		$editor_user_id = $this->factory->user->create( array( 'role' => 'editor' ) );
-
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => $editor_user_id ) );
+		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 		wp_update_post( array( 'post_content' => 'This content is even better', 'ID' => $post_id ) );
 
@@ -330,12 +326,12 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$revisions = wp_get_post_revisions( $post_id );
 		$this->assertCount( 2, $revisions );
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $editor_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$editor_user_id, 'read_post', $revision->ID ) );
 		}
 
 		// Author should be able to diff the revisions fine
 		foreach ( $revisions as $revision ) {
-			$this->assertTrue( user_can( $author_user_id, 'read_post', $revision->ID ) );
+			$this->assertTrue( user_can( self::$author_user_id, 'read_post', $revision->ID ) );
 		}
 	}
 
@@ -373,8 +369,6 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 26042
 	 */
 	function test_wp_get_post_revisions_should_order_by_ID_when_post_date_matches() {
-		global $wpdb;
-
 		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
 		$post = (array) $post;
