@@ -15,11 +15,7 @@ class Tests_Auth extends WP_UnitTestCase {
 	 */
 	protected $nonce_failure_hook = 'wp_verify_nonce_failed';
 
-	static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$_user = $factory->user->create_and_get( array(
 			'user_login' => 'password-tests'
 		) );
@@ -28,20 +24,14 @@ class Tests_Auth extends WP_UnitTestCase {
 
 		require_once( ABSPATH . WPINC . '/class-phpass.php' );
 		self::$wp_hasher = new PasswordHash( 8, true );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
+	public static function wpTearDownAfterClass() {
 		if ( is_multisite() ) {
 			wpmu_delete_user( self::$user_id );
 		} else {
 			wp_delete_user( self::$user_id );
 		}
-
-		self::commit_transaction();
 	}
 
 	function setUp() {

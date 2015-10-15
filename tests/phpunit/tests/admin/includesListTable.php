@@ -16,9 +16,7 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 		$this->table = _get_list_table( 'WP_Posts_List_Table' );
 	}
 
-	public static function setUpBeforeClass() {
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		// note that our top/children/grandchildren arrays are 1-indexed
 
 		// create top level pages
@@ -64,16 +62,12 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 				}
 			}
 		}
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( self::$post_ids as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	/**

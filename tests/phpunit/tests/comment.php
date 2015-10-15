@@ -7,22 +7,14 @@ class Tests_Comment extends WP_UnitTestCase {
 	protected static $user_id;
 	protected static $post_id;
 
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$user_id = $factory->user->create();
 		self::$post_id = $factory->post->create( array(
 			'post_author' => self::$user_id
 		) );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
+	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$post_id );
 
 		if ( is_multisite() ) {
@@ -30,8 +22,6 @@ class Tests_Comment extends WP_UnitTestCase {
 		} else {
 			wp_delete_user( self::$user_id );
 		}
-
-		self::commit_transaction();
 	}
 
 	function test_wp_update_comment() {

@@ -11,25 +11,21 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public static $editor_privatefoo_post;
 	public static $author_privatefoo_post;
 
-	public static function setUpBeforeClass() {
-		$f = new WP_UnitTest_Factory;
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$editor_user = $factory->user->create( array( 'role' => 'editor' ) );
+		self::$author_user = $factory->user->create( array( 'role' => 'author' ) );
 
-		self::$editor_user = $f->user->create( array( 'role' => 'editor' ) );
-		self::$author_user = $f->user->create( array( 'role' => 'author' ) );
-
-		self::$editor_private_post = $f->post->create( array( 'post_author' => self::$editor_user, 'post_status' => 'private' ) );
-		self::$author_private_post = $f->post->create( array( 'post_author' => self::$author_user, 'post_status' => 'private' ) );
+		self::$editor_private_post = $factory->post->create( array( 'post_author' => self::$editor_user, 'post_status' => 'private' ) );
+		self::$author_private_post = $factory->post->create( array( 'post_author' => self::$author_user, 'post_status' => 'private' ) );
 
 		// Custom status with private=true.
 		register_post_status( 'privatefoo', array( 'private' => true ) );
-		self::$editor_privatefoo_post = $f->post->create( array( 'post_author' => self::$editor_user, 'post_status' => 'privatefoo' ) );
-		self::$author_privatefoo_post = $f->post->create( array( 'post_author' => self::$author_user, 'post_status' => 'privatefoo' ) );
+		self::$editor_privatefoo_post = $factory->post->create( array( 'post_author' => self::$editor_user, 'post_status' => 'privatefoo' ) );
+		self::$author_privatefoo_post = $factory->post->create( array( 'post_author' => self::$author_user, 'post_status' => 'privatefoo' ) );
 		_unregister_post_status( 'privatefoo' );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		if ( is_multisite() ) {
 			wpmu_delete_user( self::$editor_user );
 			wpmu_delete_user( self::$author_user );
@@ -42,8 +38,6 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 		wp_delete_post( self::$author_private_post, true );
 		wp_delete_post( self::$editor_privatefoo_post, true );
 		wp_delete_post( self::$author_privatefoo_post, true );
-
-		self::commit_transaction();
 	}
 
 	public function test_any_should_not_include_statuses_where_exclude_from_search_is_true() {

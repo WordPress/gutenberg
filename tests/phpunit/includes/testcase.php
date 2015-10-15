@@ -19,6 +19,53 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 */
 	protected $factory;
 
+	protected static $static_factory;
+
+	public static function get_called_class() {
+		if ( function_exists( 'get_called_class' ) ) {
+			return get_called_class();
+		}
+
+		// PHP 5.2 only
+		$backtrace = debug_backtrace();
+		// [0] WP_UnitTestCase::get_called_class()
+		// [1] WP_UnitTestCase::setUpBeforeClass()
+		if ( 'call_user_func' ===  $backtrace[2]['function'] ) {
+			return $backtrace[2]['args'][0][0];
+		}
+		return $backtrace[2]['class'];
+	}
+
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		$c = self::get_called_class();
+		if ( ! method_exists( $c, 'wpSetUpBeforeClass' ) ) {
+			return;
+		}
+
+		if ( ! self::$static_factory ) {
+			self::$static_factory = new WP_UnitTest_Factory();
+		}
+
+		call_user_func( array( $c, 'wpSetUpBeforeClass' ), self::$static_factory );
+
+		self::commit_transaction();
+	}
+
+	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
+
+		$c = self::get_called_class();
+		if ( ! method_exists( $c, 'wpTearDownAfterClass' ) ) {
+			return;
+		}
+
+		call_user_func( array( $c, 'wpTearDownAfterClass' ) );
+
+		self::commit_transaction();
+	}
+
 	function setUp() {
 		set_time_limit(0);
 

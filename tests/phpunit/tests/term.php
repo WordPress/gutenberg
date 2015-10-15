@@ -7,22 +7,12 @@ class Tests_Term extends WP_UnitTestCase {
 	protected $taxonomy = 'category';
 	protected static $post_ids = array();
 
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_ids = $factory->post->create_many( 5 );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
+	public static function wpTearDownAfterClass() {
 		array_map( 'wp_delete_post', self::$post_ids );
-
-		self::commit_transaction();
 	}
 
 	/**

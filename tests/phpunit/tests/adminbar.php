@@ -7,19 +7,8 @@
  */
 class Tests_AdminBar extends WP_UnitTestCase {
 
-	static function setUpBeforeClass() {
-		WP_UnitTestCase::setUpBeforeClass();
-		require_once ABSPATH . WPINC . '/class-wp-admin-bar.php';
-	}
-
-	function setUp() {
-		parent::setUp();
-		$this->current_user = get_current_user_id();
-	}
-
-	function tearDown() {
-		wp_set_current_user( $this->current_user );
-		parent::tearDown();
+	public static function setUpBeforeClass() {
+		require_once( ABSPATH . WPINC . '/class-wp-admin-bar.php' );
 	}
 
 	/**

@@ -12,18 +12,14 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 	static $user;
 	static $posts;
 
-	public static function setUpBeforeClass() {
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$user = $factory->user->create();
 		self::$posts = $factory->post->create_many( 5, array(
 			'post_author' => self::$user,
 		) );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		if ( is_multisite() ) {
 			wpmu_delete_user( self::$user );
 		} else {
@@ -33,8 +29,6 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		foreach ( self::$posts as $post ) {
 			wp_delete_post( $post, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	public function setUp() {

@@ -23,9 +23,7 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 		'style'         => 'list',
 		'html'          => true );
 		*/
-	public static function setUpBeforeClass() {
-		$factory = new WP_UnitTest_Factory;
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$users[] = $factory->user->create( array( 'user_login' => 'zack', 'display_name' => 'zack', 'role' => 'author', 'first_name' => 'zack', 'last_name' => 'moon' ) );
 		self::$users[] = $factory->user->create( array( 'user_login' => 'bob', 'display_name' => 'bob', 'role' => 'author', 'first_name' => 'bob', 'last_name' => 'reno' ) );
 		self::$users[] = $factory->user->create( array( 'user_login' => 'paul', 'display_name' => 'paul', 'role' => 'author', 'first_name' => 'paul', 'last_name' => 'norris' ) );
@@ -40,11 +38,9 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 
 			self::$user_urls[] = get_author_posts_url( $userid );
 		}
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( array_merge( self::$users, array( self::$fred_id ) ) as $user_id ) {
 			if ( is_multisite() ) {
 				wpmu_delete_user( $user_id );
@@ -56,8 +52,6 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 		foreach ( self::$posts as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	function test_wp_list_authors_default() {

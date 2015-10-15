@@ -12,7 +12,7 @@ class Tests_Query_Date extends WP_UnitTestCase {
 
 	static $post_ids = array();
 
-	public static function setUpBeforeClass() {
+	public static function wpSetUpBeforeClass( $factory ) {
 		// Be careful modifying this. Tests are coded to expect this exact sample data.
 		$post_dates = array(
 			'1972-05-24 14:53:45',
@@ -40,21 +40,15 @@ class Tests_Query_Date extends WP_UnitTestCase {
 			'2025-05-20 10:13:01',
 		);
 
-		$factory = new WP_UnitTest_Factory;
-
 		foreach ( $post_dates as $post_date ) {
 			self::$post_ids[] = $factory->post->create( array( 'post_date' => $post_date ) );
 		}
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( self::$post_ids as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	public function setUp() {

@@ -8,14 +8,12 @@
 class Tests_Query_Stickies extends WP_UnitTestCase {
 	static $posts = array();
 
-	public static function setUpBeforeClass() {
-		$f = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		// Set post times to get a reliable order.
 		$now = time();
 		for ( $i = 0; $i <= 22; $i++ ) {
 			$post_date = date( 'Y-m-d H:i:s', $now - ( 10 * $i ) );
-			self::$posts[ $i ] = $f->post->create( array(
+			self::$posts[ $i ] = $factory->post->create( array(
 				'post_date' => $post_date,
 			) );
 		}
@@ -23,16 +21,12 @@ class Tests_Query_Stickies extends WP_UnitTestCase {
 		stick_post( self::$posts[2] );
 		stick_post( self::$posts[14] );
 		stick_post( self::$posts[8] );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( self::$posts as $p ) {
 			wp_delete_post( $p, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	public function test_stickies_should_be_ignored_when_is_home_is_false() {

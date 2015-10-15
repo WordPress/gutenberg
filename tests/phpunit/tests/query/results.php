@@ -22,9 +22,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	static $child_three;
 	static $child_four;
 
-	public static function setUpBeforeClass() {
-		$factory = new WP_UnitTest_Factory;
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$cat_ids[] = $cat_a = $factory->term->create( array( 'taxonomy' => 'category', 'name' => 'cat-a' ) );
 		self::$cat_ids[] = $cat_b = $factory->term->create( array( 'taxonomy' => 'category', 'name' => 'cat-b' ) );
 		self::$cat_ids[] = $cat_c = $factory->term->create( array( 'taxonomy' => 'category', 'name' => 'cat-c' ) );
@@ -67,11 +65,9 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		self::$post_ids[] = self::$child_two = $factory->post->create( array( 'post_title' => 'child-two', 'post_parent' => self::$parent_one, 'post_date' => '2007-01-01 00:00:02' ) );
 		self::$post_ids[] = self::$child_three = $factory->post->create( array( 'post_title' => 'child-three', 'post_parent' => self::$parent_two, 'post_date' => '2007-01-01 00:00:03' ) );
 		self::$post_ids[] = self::$child_four = $factory->post->create( array( 'post_title' => 'child-four', 'post_parent' => self::$parent_two, 'post_date' => '2007-01-01 00:00:04' ) );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( self::$cat_ids as $cat_id ) {
 			wp_delete_term( $cat_id, 'category' );
 		}
@@ -83,8 +79,6 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		foreach ( self::$post_ids as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
-
-		self::commit_transaction();
 	}
 
 	function setUp() {

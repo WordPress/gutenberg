@@ -7,23 +7,13 @@
 class Tests_Media extends WP_UnitTestCase {
 	protected static $large_id;
 
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
 		self::$large_id = $factory->attachment->create_upload_object( $filename );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
+	public static function wpTearDownAfterClass() {
 		wp_delete_attachment( self::$large_id );
-
-		self::commit_transaction();
 	}
 
 	function setUp() {

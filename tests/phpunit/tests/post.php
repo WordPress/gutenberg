@@ -9,11 +9,7 @@ class Tests_Post extends WP_UnitTestCase {
 	protected static $editor_id;
 	protected static $grammarian_id;
 
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
-
-		$factory = new WP_UnitTest_Factory();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
 
 		add_role( 'grammarian', 'Grammarian', array(
@@ -24,13 +20,9 @@ class Tests_Post extends WP_UnitTestCase {
 		) );
 
 		self::$grammarian_id = $factory->user->create( array( 'role' => 'grammarian' ) );
-
-		self::commit_transaction();
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
+	public static function wpTearDownAfterClass() {
 		$ids = array( self::$editor_id, self::$grammarian_id );
 		foreach ( $ids as $id ) {
 			if ( is_multisite() ) {
@@ -39,8 +31,6 @@ class Tests_Post extends WP_UnitTestCase {
 				wp_delete_user( $id );
 			}
 		}
-
-		self::commit_transaction();
 	}
 
 	function setUp() {

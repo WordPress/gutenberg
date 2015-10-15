@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname( dirname( __FILE__ ) ) . '/db.php';
-
 /**
  * Test WPDB methods
  *
@@ -17,6 +15,8 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	protected static $_wpdb;
 
 	public static function setUpBeforeClass() {
+		require_once( dirname( dirname( __FILE__ ) ) . '/db.php' );
+		
 		self::$_wpdb = new wpdb_exposed_methods_for_testing();
 	}
 
