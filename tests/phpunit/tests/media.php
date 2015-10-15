@@ -761,7 +761,7 @@ EOF;
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array_no_date_upoads() {
+	function test_wp_get_attachment_image_srcset_array_no_date_uploads() {
 		// Save the current setting for uploads folders
 		$uploads_use_yearmonth_folders = get_option( 'uploads_use_yearmonth_folders' );
 
@@ -848,13 +848,15 @@ EOF;
 		// Filter image_downsize() output.
 		add_filter( 'wp_generate_attachment_metadata', array( $this, '_test_wp_get_attachment_image_srcset_array_no_width_filter' ) );
 
-		// Make our attachment.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-		$srcset = wp_get_attachment_image_srcset_array( $id, 'medium' );
+		$old_meta = get_post_meta( self::$large_id, '_wp_attachment_metadata', true );
+		$file = get_attached_file( self::$large_id );
 
-		// Remove filter.
-		remove_filter( 'wp_generate_attachment_metadata', array( $this, '_test_wp_get_attachment_image_srcset_array_no_width_filter' ) );
+		$data = wp_generate_attachment_metadata( self::$large_id, $file );
+		wp_update_attachment_metadata( self::$large_id, $data );
+
+		$srcset = wp_get_attachment_image_srcset_array( self::$large_id, 'medium' );
+
+		update_post_meta( self::$large_id, '_wp_attachment_metadata', $old_meta );
 
 		// The srcset should be false.
 		$this->assertFalse( $srcset );
@@ -864,6 +866,8 @@ EOF;
 	 * Helper function to filter image_downsize and return zero values for width and height.
 	 */
 	public function _test_wp_get_attachment_image_srcset_array_no_width_filter( $meta ) {
+		remove_filter( 'wp_generate_attachment_metadata', array( $this, __FUNCTION__ ) );
+
 		$meta['sizes']['medium']['width'] = 0;
 		$meta['sizes']['medium']['height'] = 0;
 		return $meta;
