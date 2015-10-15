@@ -6,7 +6,6 @@
  * @subpackage UnitTests
  * @since      3.5.0
  * @group      ajax
- * @runInSeparateProcess
  */
 class Tests_Ajax_Response extends WP_UnitTestCase {
 
@@ -65,6 +64,8 @@ class Tests_Ajax_Response extends WP_UnitTestCase {
 	 * Needs a separate process to get around the headers/output from the
 	 * bootstrapper
 	 * @ticket 19448
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function test_response_charset_in_header() {
 

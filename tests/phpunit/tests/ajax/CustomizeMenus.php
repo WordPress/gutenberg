@@ -6,7 +6,6 @@
  * @subpackage UnitTests
  * @since      4.3.0
  * @group      ajax
- * @runTestsInSeparateProcesses
  */
 class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 
