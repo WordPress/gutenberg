@@ -6,28 +6,20 @@
  * @group query
  */
 class Tests_Canonical_PageOnFront extends WP_Canonical_UnitTestCase {
-	public static function setUpBeforeClass() {
-		self::generate_shared_fixtures();
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::generate_shared_fixtures( $factory );
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		self::delete_shared_fixtures();
 	}
 
 	function setUp() {
 		parent::setUp();
-		global $wp_rewrite;
+
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_for_posts', $this->factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
 		update_option( 'page_on_front', $this->factory->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
-		$wp_rewrite->init();
-		$wp_rewrite->flush_rules();
-	}
-
-	function tearDown() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-		parent::tearDown();
 	}
 
 	/**

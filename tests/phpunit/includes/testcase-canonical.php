@@ -38,11 +38,7 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	 *
 	 * @since 4.1.0
 	 */
-	public static function generate_shared_fixtures() {
-		global $wp_rewrite;
-
-		$factory = new WP_UnitTest_Factory;
-
+	public static function generate_shared_fixtures( $factory ) {
 		self::$old_current_user = get_current_user_id();
 		self::$author_id = $factory->user->create( array( 'user_login' => 'canonical-author' ) );
 
@@ -130,8 +126,6 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 
 		$tag1 = $factory->term->create( array( 'name' => 'post-formats' ) );
 		self::$term_ids[ $tag1 ] = 'post_tag';
-
-		self::commit_transaction();
 	}
 
 	/**
@@ -140,8 +134,6 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	 * @since 4.1.0
 	 */
 	public static function delete_shared_fixtures() {
-		global $wp_rewrite;
-
 		if ( is_multisite() ) {
 			wpmu_delete_user( self::$author_id );
 		} else {
@@ -165,8 +157,6 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 		self::$comment_ids = array();
 		self::$term_ids = array();
 		self::$terms = array();
-
-		self::commit_transaction();
 	}
 
 	/**
