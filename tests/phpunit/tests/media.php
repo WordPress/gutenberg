@@ -5,6 +5,26 @@
  * @group shortcode
  */
 class Tests_Media extends WP_UnitTestCase {
+	protected static $large_id;
+
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		$factory = new WP_UnitTest_Factory();
+
+		$filename = DIR_TESTDATA . '/images/test-image-large.png';
+		self::$large_id = $factory->attachment->create_upload_object( $filename );
+
+		self::commit_transaction();
+	}
+
+	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
+
+		wp_delete_attachment( self::$large_id );
+
+		self::commit_transaction();
+	}
 
 	function setUp() {
 		parent::setUp();
@@ -709,11 +729,8 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset_array() {
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-
 		$year_month = date('Y/m');
-		$image = wp_get_attachment_metadata( $id );
+		$image = wp_get_attachment_metadata( self::$large_id );
 
 		$expected = array(
 			array(
@@ -737,7 +754,7 @@ EOF;
 		$sizes = array( 'medium', 'large', 'full', 'yoav' );
 
 		foreach ( $sizes as $size ) {
-			$this->assertSame( $expected, wp_get_attachment_image_srcset_array( $id, $size ) );
+			$this->assertSame( $expected, wp_get_attachment_image_srcset_array( self::$large_id, $size ) );
 		}
 	}
 
@@ -790,12 +807,9 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset_array_with_edits() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
 		// For this test we're going to mock metadata changes from an edit.
 		// Start by getting the attachment metadata.
-		$meta = wp_get_attachment_metadata( $id );
+		$meta = wp_get_attachment_metadata( self::$large_id );
 
 		// Copy hash generation method used in wp_save_image().
 		$hash = 'e' . time() . rand(100, 999);
@@ -806,13 +820,10 @@ EOF;
 		$meta['sizes']['medium']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $meta['sizes']['medium']['file'] );
 
 		// Save edited metadata.
-		wp_update_attachment_metadata( $id, $meta );
-
-		// Get the edited image and observe that a hash was created.
-		$img_url = wp_get_attachment_url( $id );
+		wp_update_attachment_metadata( self::$large_id, $meta );
 
 		// Calculate a srcset array.
-		$sizes = wp_get_attachment_image_srcset_array( $id, 'medium' );
+		$sizes = wp_get_attachment_image_srcset_array( self::$large_id, 'medium' );
 
 		// Test to confirm all sources in the array include the same edit hash.
 		foreach ( $sizes as $size ) {
@@ -824,9 +835,6 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset_array_false() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
 		$sizes = wp_get_attachment_image_srcset_array( 99999, 'foo' );
 
 		// For canola.jpg we should return
@@ -845,11 +853,11 @@ EOF;
 		$id = $this->factory->attachment->create_upload_object( $filename );
 		$srcset = wp_get_attachment_image_srcset_array( $id, 'medium' );
 
-		// The srcset should be false.
-		$this->assertFalse( $srcset );
-
 		// Remove filter.
 		remove_filter( 'wp_generate_attachment_metadata', array( $this, '_test_wp_get_attachment_image_srcset_array_no_width_filter' ) );
+
+		// The srcset should be false.
+		$this->assertFalse( $srcset );
 	}
 
 	/**
@@ -865,12 +873,9 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-		$sizes = wp_get_attachment_image_srcset( $id, 'full-size' );
+		$sizes = wp_get_attachment_image_srcset( self::$large_id, 'full-size' );
 
-		$image = wp_get_attachment_metadata( $id );
+		$image = wp_get_attachment_metadata( self::$large_id );
 		$year_month = date('Y/m');
 
 		$expected = 'http://example.org/wp-content/uploads/' . $year_month = date('Y/m') . '/'
@@ -886,14 +891,11 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset_single_srcset() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
 		/*
 		 * In our tests, thumbnails will only return a single srcset candidate,
 		 * so we shouldn't return a srcset value in order to avoid unneeded markup.
 		 */
-		$sizes = wp_get_attachment_image_srcset( $id, 'thumbnail' );
+		$sizes = wp_get_attachment_image_srcset( self::$large_id, 'thumbnail' );
 
 		$this->assertFalse( $sizes );
 	}
@@ -902,11 +904,6 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_sizes() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-
-
 		global $content_width;
 
 		// Test sizes against the default WP sizes.
@@ -921,7 +918,7 @@ EOF;
 			}
 
 			$expected = '(max-width: ' . $width . 'px) 100vw, ' . $width . 'px';
-			$sizes = wp_get_attachment_image_sizes( $id, $int );
+			$sizes = wp_get_attachment_image_sizes( self::$large_id, $int );
 
 			$this->assertSame($expected, $sizes);
 		}
@@ -931,11 +928,6 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_sizes_with_args() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-
-
 		$args = array(
 			'sizes' => array(
 				array(
@@ -955,9 +947,9 @@ EOF;
 		);
 
 		$expected = '(min-width: 60em) 10em, (min-width: 30em) 20em, calc(100vm - 30px)';
-		$sizes = wp_get_attachment_image_sizes( $id, 'medium', $args );
+		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium', $args );
 
-		$this->assertSame($expected, $sizes);
+		$this->assertSame( $expected, $sizes );
 	}
 
 	/**
@@ -967,16 +959,12 @@ EOF;
 		// Add our test filter.
 		add_filter( 'wp_image_sizes_args', array( $this, '_test_wp_image_sizes_args' ) );
 
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
+		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium' );
 
-		$sizes = wp_get_attachment_image_sizes($id, 'medium');
+		remove_filter( 'wp_image_sizes_args', array( $this, '_test_wp_image_sizes_args' ) );
 
 		// Evaluate that the sizes returned is what we expected.
 		$this->assertSame( $sizes, '100vm');
-
-		remove_filter( 'wp_image_sizes_args', array( $this, '_test_wp_image_sizes_args' ) );
 	}
 
 	/**
@@ -991,15 +979,11 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_make_content_images_responsive() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-
-		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( $id, 'medium' ) );
-		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( $id, 'medium' ) );
+		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, 'medium' ) );
+		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( self::$large_id, 'medium' ) );
 
 		// Function used to build HTML for the editor.
-		$img = get_image_tag( $id, '', '', '', 'medium' );
+		$img = get_image_tag( self::$large_id, '', '', '', 'medium' );
 		$img_no_size = str_replace( 'size-', '', $img );
 		$img_no_size_id = str_replace( 'wp-image-', 'id-', $img_no_size );
 
@@ -1045,12 +1029,8 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_make_content_images_responsive_with_preexisting_srcset() {
-		// Make an image.
-		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = $this->factory->attachment->create_upload_object( $filename );
-
 		// Generate HTML and add a dummy srcset attribute.
-		$image_html = get_image_tag( $id, '', '', '', 'medium' );
+		$image_html = get_image_tag( self::$large_id, '', '', '', 'medium' );
 		$image_html = preg_replace('|<img ([^>]+) />|', '<img $1 ' . 'srcset="image2x.jpg 2x" />', $image_html );
 
 		// The content filter should return the image unchanged.
