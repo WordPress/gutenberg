@@ -22,11 +22,6 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 		wp_set_current_user( self::$author_id );
 	}
 
-	public function tearDown() {
-		wp_set_current_user( self::$old_current_user );
-		parent::tearDown();
-	}
-
 	/**
 	 * @dataProvider data
 	 */
