@@ -20,6 +20,20 @@ class Tests_Comment extends WP_UnitTestCase {
 		self::commit_transaction();
 	}
 
+	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
+
+		wp_delete_post( self::$post_id );
+
+		if ( is_multisite() ) {
+			wpmu_delete_user( self::$user_id );
+		} else {
+			wp_delete_user( self::$user_id );
+		}
+
+		self::commit_transaction();
+	}
+
 	function test_wp_update_comment() {
 		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post' ) );
 		$post2 = $this->factory->post->create_and_get( array( 'post_title' => 'some-post-2', 'post_type' => 'post' ) );
