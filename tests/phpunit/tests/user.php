@@ -603,6 +603,59 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 27317
+	 */
+	function test_illegal_user_logins_single() {
+		$user_data = array(
+			'user_login' => 'testuser',
+			'user_email' => 'testuser@example.com',
+			'user_pass'  => wp_generate_password(),
+		);
+
+		add_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$response = wp_insert_user( $user_data );
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'illegal_user_login', $response->get_error_code() );
+
+		remove_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$user_id = wp_insert_user( $user_data );
+		$user = get_user_by( 'id', $user_id );
+		$this->assertInstanceOf( 'WP_User', $user );
+	}
+
+	/**
+	 * @ticket 27317
+	 */
+	function test_illegal_user_logins_multisite() {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		$user_data = array(
+			'user_login' => 'testuser',
+			'user_email' => 'testuser@example.com',
+		);
+
+		add_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$response = wpmu_validate_user_signup( $user_data['user_login'], $user_data['user_email'] );
+		$this->assertInstanceOf( 'WP_Error', $response['errors'] );
+		$this->assertEquals( 'user_name', $response['errors']->get_error_code() );
+
+		remove_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$response = wpmu_validate_user_signup( $user_data['user_login'], $user_data['user_email'] );
+		$this->assertInstanceOf( 'WP_Error', $response['errors'] );
+		$this->assertEquals( 0, count( $response['errors']->get_error_codes() ) );
+	}
+
+	function _illegal_user_logins() {
+		return array( 'testuser' );	
+	}
+
+	/**
 	 * @ticket 24618
 	 */
 	public function test_validate_username_string() {
