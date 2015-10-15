@@ -26,6 +26,7 @@ matrix:
   - php: nightly
 before_install:
 - WP_CORE_DIR=/tmp/wordpress/
+- git clone https://github.com/WordPress/twentysixteen.git src/wp-content/themes/twentysixteen
 - |
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
       mysql -e "CREATE DATABASE wordpress_tests;" -uroot
