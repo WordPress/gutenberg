@@ -535,32 +535,34 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	function test_get_comments_for_post() {
+		$limit = 5;
+
 		$post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id, 10 );
+		$this->factory->comment->create_post_comments( $post_id, $limit );
 		$comments = get_comments( array( 'post_id' => $post_id ) );
-		$this->assertEquals( 10, count( $comments ) );
+		$this->assertEquals( $limit, count( $comments ) );
 		foreach ( $comments as $comment ) {
 			$this->assertEquals( $post_id, $comment->comment_post_ID );
 		}
 
 		$post_id2 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id2, 10 );
+		$this->factory->comment->create_post_comments( $post_id2, $limit );
 		$comments = get_comments( array( 'post_id' => $post_id2 ) );
-		$this->assertEquals( 10, count( $comments ) );
+		$this->assertEquals( $limit, count( $comments ) );
 		foreach ( $comments as $comment ) {
 			$this->assertEquals( $post_id2, $comment->comment_post_ID );
 		}
 
 		$post_id3 = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id3, 10, array( 'comment_approved' => '0' ) );
+		$this->factory->comment->create_post_comments( $post_id3, $limit, array( 'comment_approved' => '0' ) );
 		$comments = get_comments( array( 'post_id' => $post_id3 ) );
-		$this->assertEquals( 10, count( $comments ) );
+		$this->assertEquals( $limit, count( $comments ) );
 		foreach ( $comments as $comment ) {
 			$this->assertEquals( $post_id3, $comment->comment_post_ID );
 		}
 
 		$comments = get_comments( array( 'post_id' => $post_id3, 'status' => 'hold' ) );
-		$this->assertEquals( 10, count( $comments ) );
+		$this->assertEquals( $limit, count( $comments ) );
 		foreach ( $comments as $comment ) {
 			$this->assertEquals( $post_id3, $comment->comment_post_ID );
 		}
@@ -568,9 +570,9 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$comments = get_comments( array( 'post_id' => $post_id3, 'status' => 'approve' ) );
 		$this->assertEquals( 0, count( $comments ) );
 
-		$this->factory->comment->create_post_comments( $post_id3, 10, array( 'comment_approved' => '1' ) );
+		$this->factory->comment->create_post_comments( $post_id3, $limit, array( 'comment_approved' => '1' ) );
 		$comments = get_comments( array( 'post_id' => $post_id3 ) );
-		$this->assertEquals( 20, count( $comments ) );
+		$this->assertEquals( $limit * 2, count( $comments ) );
 		foreach ( $comments as $comment ) {
 			$this->assertEquals( $post_id3, $comment->comment_post_ID );
 		}
