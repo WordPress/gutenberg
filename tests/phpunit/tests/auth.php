@@ -28,6 +28,8 @@ class Tests_Auth extends WP_UnitTestCase {
 
 		require_once( ABSPATH . WPINC . '/class-phpass.php' );
 		self::$wp_hasher = new PasswordHash( 8, true );
+
+		self::commit_transaction();
 	}
 
 	function setUp() {
