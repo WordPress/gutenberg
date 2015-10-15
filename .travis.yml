@@ -14,6 +14,9 @@ matrix:
     env: WP_TRAVISCI=travis:phpunit
   - php: 5.6
     env: WP_TRAVISCI=travis:phpunit
+  - php: 5.6
+    env: WP_TRAVISCI=travis:phpunit WP_TRAVIS_OBJECT_CACHE=true
+    services: memcached
   - php: hhvm
     env: WP_TRAVISCI=travis:phpunit
   - php: 7.0
@@ -35,6 +38,11 @@ before_install:
       sed -i "s/yourusernamehere/travis/" wp-tests-config.php
       sed -i "s/yourpasswordhere//" wp-tests-config.php
       svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
+  fi
+- |
+  if [[ "$WP_TRAVIS_OBJECT_CACHE" == "true" ]]; then
+    curl https://raw.githubusercontent.com/tollmanz/wordpress-pecl-memcached-object-cache/master/object-cache.php > src/wp-content/object-cache.php
+    echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   fi
 before_script:
 - npm install -g npm
