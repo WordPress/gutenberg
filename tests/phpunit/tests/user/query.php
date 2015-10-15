@@ -1152,10 +1152,10 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
-		$sites = $this->factory->blog->create_many( 2 );
+		$sites = self::$static_factory->blog->create_many( 2 );
 
-		add_user_to_blog( self::$author_ids[0], self::$author_ids[0], 'author' );
-		add_user_to_blog( self::$author_ids[1], self::$author_ids[1], 'author' );
+		add_user_to_blog( $sites[0], self::$author_ids[0], 'author' );
+		add_user_to_blog( $sites[1], self::$author_ids[1], 'author' );
 
 		$found = get_users( array(
 			'blog_id' => $sites[1],
