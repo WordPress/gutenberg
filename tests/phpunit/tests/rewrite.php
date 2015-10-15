@@ -306,4 +306,36 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_front_page', 'is_page', 'is_singular' );
 		$this->assertFalse( is_home() );
 	}
+
+	/**
+	 * @ticket 21970
+	 */
+	function test_url_to_postid_with_post_slug_that_clashes_with_a_trashed_page() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$page_id = $this->factory->post->create( array( 'post_type' => 'page', 'post_status' => 'trash' ) );
+		$post_id = $this->factory->post->create( array( 'post_title' => get_post( $page_id )->post_title ) );
+		
+		$this->assertEquals( $post_id, url_to_postid( get_permalink( $post_id ) ) );
+
+		$this->set_permalink_structure();
+	}
+
+	/**
+	 * @ticket 21970
+	 */
+	function test_parse_request_with_post_slug_that_clashes_with_a_trashed_page() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$page_id = $this->factory->post->create( array( 'post_type' => 'page', 'post_status' => 'trash' ) );
+		$post_id = $this->factory->post->create( array( 'post_title' => get_post( $page_id )->post_title ) );
+		
+		$this->go_to( get_permalink( $post_id ) );
+
+		$this->assertTrue( is_single() );
+		$this->assertFalse( is_404() );
+
+		$this->set_permalink_structure();
+	}
+
 }
