@@ -42,11 +42,7 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 
 	public static function wpTearDownAfterClass() {
 		foreach ( array_merge( self::$users, array( self::$fred_id ) ) as $user_id ) {
-			if ( is_multisite() ) {
-				wpmu_delete_user( $user_id );
-			} else {
-				wp_delete_user( $user_id );
-			}
+			self::delete_user( $user_id );
 		}
 
 		foreach ( self::$posts as $post_id ) {

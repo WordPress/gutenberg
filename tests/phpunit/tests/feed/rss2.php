@@ -9,22 +9,18 @@
  * @group feed
  */
 class Tests_Feed_RSS2 extends WP_UnitTestCase {
-	static $user;
+	static $user_id;
 	static $posts;
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$user = $factory->user->create();
+		self::$user_id = $factory->user->create();
 		self::$posts = $factory->post->create_many( 5, array(
-			'post_author' => self::$user,
+			'post_author' => self::$user_id,
 		) );
 	}
 
 	public static function wpTearDownAfterClass() {
-		if ( is_multisite() ) {
-			wpmu_delete_user( self::$user );
-		} else {
-			wp_delete_user( self::$user );
-		}
+		self::delete_user( self::$user_id );
 
 		foreach ( self::$posts as $post ) {
 			wp_delete_post( $post, true );

@@ -18,11 +18,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	public static function wpTearDownAfterClass() {
 		$ids = array( self::$admin_user_id, self::$editor_user_id, self::$author_user_id );
 		foreach ( $ids as $id ) {
-			if ( is_multisite() ) {
-				wpmu_delete_user( $id );
-			} else {
-				wp_delete_user( $id );
-			}
+			self::delete_user( $id );
 		}
 	}
 

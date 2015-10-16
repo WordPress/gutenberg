@@ -19,10 +19,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 		$this->assertEquals( array( 1 ), array_keys( $blogs ) );
 
 		// Non-existent users don't have blogs.
-		if ( is_multisite() )
-			wpmu_delete_user( $user_id );
-		else
-			wp_delete_user( $user_id );
+		self::delete_user( $user_id );
 
 		$user = new WP_User( $user_id );
 		$this->assertFalse( $user->exists(), 'WP_User->exists' );

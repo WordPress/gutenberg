@@ -29,11 +29,7 @@ class Tests_User extends WP_UnitTestCase {
 	public static function wpTearDownAfterClass() {
 		$ids = array( self::$test_id, self::$author_id );
 		foreach ( $ids as $id ) {
-			if ( is_multisite() ) {
-				wpmu_delete_user( $id );
-			} else {
-				wp_delete_user( $id );
-			}
+			self::delete_user( $id );
 		}
 	}
 
@@ -595,7 +591,7 @@ class Tests_User extends WP_UnitTestCase {
 				'ID'         => $id2,
 				'user_email' => 'blackburn@battlefield4.com',
 			) );
-			
+
 			if ( ! defined( 'WP_IMPORTING' ) ) {
 				$this->assertWPError( $return );
 			}
@@ -652,7 +648,7 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function _illegal_user_logins() {
-		return array( 'testuser' );	
+		return array( 'testuser' );
 	}
 
 	/**

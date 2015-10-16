@@ -27,11 +27,7 @@ class Tests_Auth extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		if ( is_multisite() ) {
-			wpmu_delete_user( self::$user_id );
-		} else {
-			wp_delete_user( self::$user_id );
-		}
+		self::delete_user( self::$user_id );
 	}
 
 	function setUp() {

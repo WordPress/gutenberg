@@ -34,11 +34,7 @@ class Tests_User_CountUserPosts extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		if ( is_multisite() ) {
-			wpmu_delete_user( self::$user_id );
-		} else {
-			wp_delete_user( self::$user_id );
-		}
+		self::delete_user( self::$user_id );
 
 		foreach ( self::$post_ids as $post_id ) {
 			wp_delete_post( $post_id, true );

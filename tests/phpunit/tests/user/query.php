@@ -46,11 +46,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 		foreach ( $sets as $set ) {
 			foreach ( $set as $id ) {
-				if ( is_multisite() ) {
-					wpmu_delete_user( $id );
-				} else {
-					wp_delete_user( $id );
-				}
+				self::delete_user( $id );
 			}
 		}
 	}
