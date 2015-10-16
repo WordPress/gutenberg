@@ -15,7 +15,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	function test_get_pages_cache() {
 		global $wpdb;
 
-		$this->factory->post->create_many( 3, array( 'post_type' => 'page' ) );
+		self::$factory->post->create_many( 3, array( 'post_type' => 'page' ) );
 		wp_cache_delete( 'last_changed', 'posts' );
 		$this->assertFalse( wp_cache_get( 'last_changed', 'posts' ) );
 
@@ -99,7 +99,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 20376
 	 */
 	function test_get_pages_meta() {
-		$posts = $this->factory->post->create_many( 3, array( 'post_type' => 'page' ) );
+		$posts = self::$factory->post->create_many( 3, array( 'post_type' => 'page' ) );
 		add_post_meta( $posts[0], 'some-meta-key', '0' );
 		add_post_meta( $posts[1], 'some-meta-key', '' );
 		add_post_meta( $posts[2], 'some-meta-key', '1' );
@@ -116,7 +116,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$page_ids = array();
 
 		foreach ( range( 1, 20 ) as $i )
-			$page_ids[] = $this->factory->post->create( array( 'post_type' => 'page' ) );
+			$page_ids[] = self::$factory->post->create( array( 'post_type' => 'page' ) );
 
 		$inc = array_slice( $page_ids, 0, 10 );
 		sort( $inc );
@@ -138,10 +138,10 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 9470
 	 */
 	function test_get_pages_parent() {
-		$page_id1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_id2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
-		$page_id3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id2 ) );
-		$page_id4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+		$page_id1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_id2 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
+		$page_id3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id2 ) );
+		$page_id4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_id1 ) );
 
 		$pages = get_pages( array( 'parent' => 0, 'hierarchical' => false ) );
 		$this->assertEqualSets( array( $page_id1 ), wp_list_pluck( $pages, 'ID' ) );
@@ -166,7 +166,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 22389
 	 */
 	function test_wp_dropdown_pages() {
-		$this->factory->post->create_many( 5, array( 'post_type' => 'page' ) );
+		self::$factory->post->create_many( 5, array( 'post_type' => 'page' ) );
 
 		preg_match_all( '#<option#', wp_dropdown_pages( 'echo=0' ), $matches );
 
@@ -177,8 +177,8 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 22208
 	 */
 	function test_get_chidren_fields_ids() {
-		$post_id = $this->factory->post->create();
-		$child_ids = $this->factory->post->create_many( 5, array( 'post_parent' => $post_id ) );
+		$post_id = self::$factory->post->create();
+		$child_ids = self::$factory->post->create_many( 5, array( 'post_parent' => $post_id ) );
 
 		$post_ids = get_children( array( 'fields' => 'ids', 'post_parent' => $post_id ) );
 		$this->assertEqualSets( $child_ids, $post_ids );
@@ -189,10 +189,10 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 */
 	function test_get_pages_hierarchical_and_no_parent() {
 		global $wpdb;
-		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_2 ) );
+		$page_1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_2 ) );
 
 		$pages = get_pages(); // Defaults: hierarchical = true, parent = -1
 		$pages_default_args = get_pages( array( 'hierarchical' => true, 'parent' => -1 ) );
@@ -218,10 +218,10 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 18701
 	 */
 	public function test_get_pages_hierarchical_empty_child_of() {
-		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
 
 		$pages = get_pages(); // Defaults: hierarchical = true, child_of = '', parent = -1
 		$default_args = get_pages( array(
@@ -252,10 +252,10 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 18701
 	 */
 	public function test_get_pages_non_hierarchical_empty_child_of() {
-		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
 
 		$pages = get_pages( array( 'hierarchical' => false ) ); // child_of = '', parent = -1
 
@@ -278,11 +278,11 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 18701
 	 */
 	public function test_get_pages_hierarchical_non_empty_child_of() {
-		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
-		$page_5 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
+		$page_5 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
 
 		$pages = get_pages( array( 'child_of' => $page_1 ) ); // Defaults: hierarchical = true, parent = -1.
 
@@ -306,11 +306,11 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	 * @ticket 18701
 	 */
 	public function test_get_pages_non_hierarchical_non_empty_child_of() {
-		$page_1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_2 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$page_3 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
-		$page_4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
-		$page_5 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_2 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$page_3 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
+		$page_4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_3 ) );
+		$page_5 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $page_1 ) );
 
 		$pages = get_pages( array( 'hierarchical' => false, 'child_of' => $page_1 ) );
 
@@ -338,7 +338,7 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$type = 'taco';
 		register_post_type( $type, array( 'hierarchical' => true, 'public' => true ) );
 
-		$posts = $this->factory->post->create_many( 2, array( 'post_type' => $type ) );
+		$posts = self::$factory->post->create_many( 2, array( 'post_type' => $type ) );
 		$post_id = reset( $posts );
 
 		$this->go_to( "/?p=$post_id&post_type=$type" );
@@ -360,10 +360,10 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 	}
 
 	function test_exclude_tree() {
-		$post_id1 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$post_id2 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id1 ) );
-		$post_id3 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$post_id4 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id3 ) );
+		$post_id1 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id2 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id1 ) );
+		$post_id3 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id4 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id3 ) );
 
 		$all = get_pages();
 
@@ -384,8 +384,8 @@ class Tests_Post_getPages extends WP_UnitTestCase {
 		$exclude5 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id3 ) ) );
 		$this->assertCount( 0, $exclude5 );
 
-		$post_id5 = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$post_id6 = $this->factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id5 ) );
+		$post_id5 = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id6 = self::$factory->post->create( array( 'post_type' => 'page', 'post_parent' => $post_id5 ) );
 
 		$exclude6 = get_pages( array( 'exclude_tree' => array( $post_id1, $post_id3 ) ) );
 		$this->assertCount( 2, $exclude6 );

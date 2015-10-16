@@ -689,7 +689,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		$actual = ob_get_clean();
 		$this->assertEquals( '', $actual );
 
-		$GLOBALS['post']        = $this->factory->post->create_and_get( array(
+		$GLOBALS['post']        = self::$factory->post->create_and_get( array(
 			'post_date' => '2015-09-16 08:00:00'
 		) );
 

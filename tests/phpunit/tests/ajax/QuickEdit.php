@@ -25,17 +25,17 @@ class Tests_Ajax_QuickEdit extends WP_Ajax_UnitTestCase {
 			'hierarchical' => true,
 		) );
 
-		$t1 = $this->factory->term->create( array(
+		$t1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax_1',
 		) );
-		$t2 = $this->factory->term->create( array(
+		$t2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax_2',
 		) );
 
 		// Become an administrator.
 		$this->_setRole( 'administrator' );
 
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_author' => get_current_user_id(),
 		) );
 

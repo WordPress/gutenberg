@@ -15,7 +15,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->author_id = $this->factory->user->create( array(
+		$this->author_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_author',
 			'description' => 'test_author',
@@ -31,7 +31,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 		);
 
 		// insert a post and make sure the ID is ok
-		$this->post_id = $this->factory->post->create( $post );
+		$this->post_id = self::$factory->post->create( $post );
 
 		setup_postdata( get_post( $this->post_id ) );
 	}
@@ -90,7 +90,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	function test_get_the_author_posts_with_custom_post_type() {
 		register_post_type( 'wptests_pt' );
 
-		$cpt_ids = $this->factory->post->create_many( 2, array(
+		$cpt_ids = self::$factory->post->create_many( 2, array(
 			'post_author' => $this->author_id,
 			'post_type'   => 'wptests_pt',
 		) );
@@ -105,7 +105,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	 * @ticket 30355
 	 */
 	public function test_get_the_author_posts_link_no_permalinks() {
-		$author = $this->factory->user->create_and_get( array(
+		$author = self::$factory->user->create_and_get( array(
 			'display_name'  => 'Foo',
 			'user_nicename' => 'bar'
 		) );
@@ -129,7 +129,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	public function test_get_the_author_posts_link_with_permalinks() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$author = $this->factory->user->create_and_get( array(
+		$author = self::$factory->user->create_and_get( array(
 			'display_name'  => 'Foo',
 			'user_nicename' => 'bar'
 		) );

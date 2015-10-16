@@ -75,7 +75,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 		error_reporting( $this->_error_level & ~E_WARNING );
 
 		// Make some posts
-		$this->factory->post->create_many( 5 );
+		self::$factory->post->create_many( 5 );
 	}
 
 	/**
@@ -148,7 +148,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	 */
 	protected function _setRole( $role ) {
 		$post = $_POST;
-		$user_id = $this->factory->user->create( array( 'role' => $role ) );
+		$user_id = self::$factory->user->create( array( 'role' => $role ) );
 		wp_set_current_user( $user_id );
 		$_POST = array_merge($_POST, $post);
 	}

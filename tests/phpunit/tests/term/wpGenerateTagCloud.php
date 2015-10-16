@@ -3,6 +3,8 @@
  * @group taxonomy
  */
 class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
+	protected $terms = array();
+
 	/**
 	 * Testing when passed $tags array is empty
 	 *
@@ -25,7 +27,11 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 	 * @param $args     Options for `wp_generate_tag_cloud()`.
 	 */
 	function test_empty_tags_list_returned( $expected, $args ) {
-		$this->factory->term->create_many( 4, array( 'taxonomy' => 'post_tag' ) );
+		$term_ids = self::$factory->term->create_many( 4, array( 'taxonomy' => 'post_tag' ) );
+		$this->terms = array();
+		foreach ( $term_ids as $term_id ) {
+			$this->terms[] = get_term( $term_id, 'post_tag' );
+		}
 		$tags = $this->retrieve_terms( array( 'number' => 4 ) );
 		$this->assertSame( $expected, wp_generate_tag_cloud( $tags, $args ) );
 	}
@@ -64,116 +70,114 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 		);
 	}
 
+	function test_hide_empty_false() {
+		$term_id = self::$factory->tag->create();
+		$term = get_term( $term_id, 'post_tag' );
 
-	/**
-	 * Testing the various output for a single link
-	 * in various formats
-	 *
-	 * @dataProvider single_link_data_provider
-	 *
-	 * @param int   $create          How many tags to create.
-	 * @param array $get_terms_args  What args we want to pass to retreve terms.
-	 * @param mixed $expected        Expected output from `wp_generate_tag_cloud()`.
-	 * @param array $args            Options for `wp_generate_tag_cloud()`.
-	 *
-	 */
-	function test_wp_generate_tag_cloud( $create, $get_terms_args, $expected, $args ) {
-		$this->factory->term->create_many( $create, array( 'taxonomy' => 'post_tag' ) );
-		$tags = $this->retrieve_terms( $get_terms_args );
-
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, $args ) );
+		$tags = $this->retrieve_terms( array(
+			'number' => 1,
+			'hide_empty' => false,
+		) );
+		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>{$term->name}</a>";
+		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+			'hide_empty' => false,
+		) ) );
 	}
 
+	function test_hide_empty_false_format_array() {
+		$term_id = self::$factory->tag->create();
+		$term = get_term( $term_id, 'post_tag' );
 
-	function single_link_data_provider() {
-		return array(
-			array(
-				1,
-				array(
-					'number' => 1,
-					'hide_empty' => false,
-				),
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
-				array(
-					'hide_empty' => false,
-				),
-			),
+		$tags = $this->retrieve_terms( array(
+			'number' => 1,
+			'hide_empty' => false,
+			'format'     => 'array',
+		) );
 
-			// Should return an array of links.
-			array(
-				1,
-				array(
-					'number' => 1,
-					'hide_empty' => false,
-				),
-				array(
-					"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>",
-				),
-				array(
-					'hide_empty' => false,
-					'format'     => 'array',
-				),
-			),
+		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>{$term->name}</a>";
+		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+			'hide_empty' => false,
+		) ) );
+	}
 
-			// Should return a string containing a <ul> list of links.
-			array(
-				1,
-				array(
-					'number' => 1,
-					'hide_empty' => false,
-				),
-				"<ul class='wp-tag-cloud'>\n\t<li><a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n</ul>\n",
-				array(
-					'hide_empty' => false,
-					'format'     => 'list',
-				),
-			),
+	function test_hide_empty_false_format_list() {
+		$term_id = self::$factory->tag->create();
+		$term = get_term( $term_id, 'post_tag' );
 
-			array(
-				4,
-				array(
-					'number' => 4,
-					'hide_empty' => false,
-				),
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a>\n".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a>\n".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a>\n".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>",
-				array(
-					'hide_empty' => false,
-				),
-			),
+		$tags = $this->retrieve_terms( array(
+			'number' => 1,
+			'hide_empty' => false,
+		) );
 
-			array(
-				4,
-				array(
-					'number' => 4,
-					'hide_empty' => false,
-				),
-				"<ul class='wp-tag-cloud'>\n\t<li>".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-1' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>Term 1</a></li>\n\t<li>".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-2' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>Term 2</a></li>\n\t<li>".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-3' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>Term 3</a></li>\n\t<li>".
-				"<a href='http://" . WP_TESTS_DOMAIN . "/?tag=term-4' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>Term 4</a>".
-				"</li>\n</ul>\n",
-				array(
-					'hide_empty' => false,
-					'format'     => 'list',
-				),
-			),
-		);
+		$expected = "<ul class='wp-tag-cloud'>\n\t<li><a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>{$term->name}</a></li>\n</ul>\n";
+		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+			'hide_empty' => false,
+			'format'     => 'list',
+		) ) );
+	}
+
+	function test_hide_empty_false_multi() {
+		$term_ids = self::$factory->tag->create_many( 4 );
+		$terms = array();
+		foreach ( $term_ids as $term_id ) {
+			$terms[] = get_term( $term_id, 'post_tag' );
+		}
+
+		$tags = $this->retrieve_terms( array(
+			'number' => 4,
+			'order' => 'id',
+			'hide_empty' => false,
+		) );
+
+		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[0]->slug}' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>{$terms[0]->name}</a>\n".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[1]->slug}' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>{$terms[1]->name}</a>\n".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[2]->slug}' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>{$terms[2]->name}</a>\n".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[3]->slug}' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>{$terms[3]->name}</a>";
+		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+			'hide_empty' => false,
+		) ) );
+	}
+
+	function test_hide_empty_false_multi_format_list() {
+		$term_ids = self::$factory->tag->create_many( 4 );
+		$terms = array();
+		foreach ( $term_ids as $term_id ) {
+			$terms[] = get_term( $term_id, 'post_tag' );
+		}
+
+		$tags = $this->retrieve_terms( array(
+			'number' => 4,
+			'orderby' => 'id',
+			'hide_empty' => false,
+		) );
+
+		$expected = "<ul class='wp-tag-cloud'>\n\t<li>".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[0]->slug}' class='tag-link-0' title='0 topics' style='font-size: 8pt;'>{$terms[0]->name}</a></li>\n\t<li>".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[1]->slug}' class='tag-link-1' title='0 topics' style='font-size: 8pt;'>{$terms[1]->name}</a></li>\n\t<li>".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[2]->slug}' class='tag-link-2' title='0 topics' style='font-size: 8pt;'>{$terms[2]->name}</a></li>\n\t<li>".
+			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[3]->slug}' class='tag-link-3' title='0 topics' style='font-size: 8pt;'>{$terms[3]->name}</a>".
+			"</li>\n</ul>\n";
+
+		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+			'hide_empty' => false,
+			'format'     => 'list',
+		) ) );
 	}
 
 	public function test_topic_count_text() {
 		register_taxonomy( 'wptests_tax', 'post' );
-		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
-		$posts = $this->factory->post->create_many( 2 );
+		$term_ids = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$this->terms = array();
+		foreach ( $term_ids as $term_id ) {
+			$this->terms[] = get_term( $term_id, 'post_tag' );
+		}
+		$posts = self::$factory->post->create_many( 2 );
 
-		wp_set_post_terms( $posts[0], $terms, 'wptests_tax' );
-		wp_set_post_terms( $posts[1], array( $terms[1] ), 'wptests_tax' );
+		wp_set_post_terms( $posts[0], $term_ids, 'wptests_tax' );
+		wp_set_post_terms( $posts[1], array( $term_ids[1] ), 'wptests_tax' );
 
 		$term_objects = $this->retrieve_terms( array(
-			'include' => $terms,
+			'include' => $term_ids,
 		), 'wptests_tax' );
 
 		$actual = wp_generate_tag_cloud( $term_objects, array(
@@ -192,14 +196,18 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 
 	public function test_topic_count_text_callback() {
 		register_taxonomy( 'wptests_tax', 'post' );
-		$terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
-		$posts = $this->factory->post->create_many( 2 );
+		$term_ids = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$this->terms = array();
+		foreach ( $term_ids as $term_id ) {
+			$this->terms[] = get_term( $term_id, 'post_tag' );
+		}
+		$posts = self::$factory->post->create_many( 2 );
 
-		wp_set_post_terms( $posts[0], $terms, 'wptests_tax' );
-		wp_set_post_terms( $posts[1], array( $terms[1] ), 'wptests_tax' );
+		wp_set_post_terms( $posts[0], $term_ids, 'wptests_tax' );
+		wp_set_post_terms( $posts[1], array( $term_ids[1] ), 'wptests_tax' );
 
 		$term_objects = $this->retrieve_terms( array(
-			'include' => $terms,
+			'include' => $term_ids,
 		), 'wptests_tax' );
 
 		$actual = wp_generate_tag_cloud( $term_objects, array(

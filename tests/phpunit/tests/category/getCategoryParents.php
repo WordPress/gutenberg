@@ -10,8 +10,8 @@ class Tests_Category_GetCategoryParents extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->c1 = $this->factory->category->create_and_get();
-		$this->c2 = $this->factory->category->create_and_get( array(
+		$this->c1 = self::$factory->category->create_and_get();
+		$this->c2 = self::$factory->category->create_and_get( array(
 			'parent' => $this->c1->term_id,
 		) );
 	}
@@ -51,10 +51,10 @@ class Tests_Category_GetCategoryParents extends WP_UnitTestCase {
 	}
 
 	public function test_visited() {
-		$c3 = $this->factory->category->create_and_get( array(
+		$c3 = self::$factory->category->create_and_get( array(
 			'parent' => $this->c2->term_id,
 		) );
-		$c4 = $this->factory->category->create_and_get( array(
+		$c4 = self::$factory->category->create_and_get( array(
 			'parent' => $c3->term_id,
 		) );
 

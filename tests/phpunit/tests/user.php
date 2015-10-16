@@ -43,7 +43,7 @@ class Tests_User extends WP_UnitTestCase {
 		// add one of each user role
 		$nusers = array();
 		foreach ( array('administrator', 'editor', 'author', 'contributor', 'subscriber' ) as $role ) {
-			$id = self::$static_factory->user->create( array( 'role' => $role ) );
+			$id = self::$factory->user->create( array( 'role' => $role ) );
 			$nusers[ $id ] = $id;
 		}
 
@@ -244,7 +244,7 @@ class Tests_User extends WP_UnitTestCase {
 		);
 
 		foreach ( $roles as $role => $level ) {
-			$user_id = self::$static_factory->user->create( array( 'role' => $role ) );
+			$user_id = self::$factory->user->create( array( 'role' => $role ) );
 			$user = new WP_User( $user_id );
 
 			$this->assertTrue( isset( $user->user_level ) );
@@ -292,7 +292,7 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function test_get() {
-		$user_id = self::$static_factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_wp_user_get',
 			'user_pass' => 'password',
@@ -310,7 +310,7 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function test_has_prop() {
-		$user_id = self::$static_factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_wp_user_has_prop',
 			'user_pass' => 'password',
@@ -327,7 +327,7 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function test_update_user() {
-		$user_id = self::$static_factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_wp_update_user',
 			'user_pass' => 'password',
@@ -383,7 +383,7 @@ class Tests_User extends WP_UnitTestCase {
 	function test_global_userdata() {
 		global $userdata, $wpdb;
 
-		$user_id = self::$static_factory->user->create( array( 'role' => 'subscriber' ) );
+		$user_id = self::$factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
 
 		$this->assertNotEmpty( $userdata );
@@ -497,11 +497,11 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 21431
 	 */
 	function test_count_many_users_posts() {
-		$user_id_a = self::$static_factory->user->create( array( 'role' => 'author' ) );
-		$user_id_b = self::$static_factory->user->create( array( 'role' => 'author' ) );
-		$post_id_a = $this->factory->post->create( array( 'post_author' => $user_id_a ) );
-		$post_id_b = $this->factory->post->create( array( 'post_author' => $user_id_b ) );
-		$post_id_c = $this->factory->post->create( array( 'post_author' => $user_id_b, 'post_status' => 'private' ) );
+		$user_id_a = self::$factory->user->create( array( 'role' => 'author' ) );
+		$user_id_b = self::$factory->user->create( array( 'role' => 'author' ) );
+		$post_id_a = self::$factory->post->create( array( 'post_author' => $user_id_a ) );
+		$post_id_b = self::$factory->post->create( array( 'post_author' => $user_id_b ) );
+		$post_id_c = self::$factory->post->create( array( 'post_author' => $user_id_b, 'post_status' => 'private' ) );
 
 		wp_set_current_user( $user_id_a );
 		$counts = count_many_users_posts( array( $user_id_a, $user_id_b), 'post', false );
@@ -771,7 +771,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 33793
 	 */
 	public function test_wp_insert_user_should_not_truncate_to_a_duplicate_user_nicename() {
-		$u1 = self::$static_factory->user->create( array(
+		$u1 = self::$factory->user->create( array(
 			'user_nicename' => str_repeat( 'a', 50 ),
 		) );
 
@@ -792,7 +792,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 33793
 	 */
 	public function test_wp_insert_user_should_not_truncate_to_a_duplicate_user_nicename_when_suffix_has_more_than_one_character() {
-		$users = self::$static_factory->user->create_many( 4, array(
+		$users = self::$factory->user->create_many( 4, array(
 			'user_nicename' => str_repeat( 'a', 50 ),
 		) );
 
@@ -876,7 +876,7 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_email_case() {
 		// Create a test user with a lower-case email address.
-		$user_id = self::$static_factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'user_email' => 'test@test.com',
 		) );
 
@@ -895,7 +895,7 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_email_change() {
 		// Create a test user.
-		$user_id = self::$static_factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'user_email' => 'test@test.com',
 		) );
 
@@ -983,7 +983,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @expectedDeprecated wp_new_user_notification
 	 */
 	function test_wp_new_user_notification_old_signature_throws_deprecated_warning() {
-		$user = self::$static_factory->user->create( array(
+		$user = self::$factory->user->create( array(
 			'role'       => 'author',
 			'user_login' => 'test_wp_new_user_notification',
 			'user_pass'  => 'password',

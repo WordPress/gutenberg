@@ -31,8 +31,8 @@ class Tests_Query_Search extends WP_UnitTestCase {
 
 	function test_search_order_title_relevance() {
 		foreach ( range( 1, 7 ) as $i )
-			$this->factory->post->create( array( 'post_content' => $i . rand_str() . ' about', 'post_type' => $this->post_type ) );
-		$post_id = $this->factory->post->create( array( 'post_title' => 'About', 'post_type' => $this->post_type ) );
+			self::$factory->post->create( array( 'post_content' => $i . rand_str() . ' about', 'post_type' => $this->post_type ) );
+		$post_id = self::$factory->post->create( array( 'post_title' => 'About', 'post_type' => $this->post_type ) );
 
 		$posts = $this->get_search_results( 'About' );
 		$this->assertEquals( $post_id, reset( $posts )->ID );
@@ -63,11 +63,11 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	 * @ticket 33988
 	 */
 	public function test_s_should_exclude_term_prefixed_with_dash() {
-		$p1 = $this->factory->post->create( array(
+		$p1 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has foo but also bar',
 		) );
-		$p2 = $this->factory->post->create( array(
+		$p2 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has only foo',
 		) );
@@ -84,11 +84,11 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	 * @ticket 33988
 	 */
 	public function test_s_should_exclude_first_term_if_prefixed_with_dash() {
-		$p1 = $this->factory->post->create( array(
+		$p1 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has foo but also bar',
 		) );
-		$p2 = $this->factory->post->create( array(
+		$p2 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has only bar',
 		) );
@@ -105,15 +105,15 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	 * @ticket 33988
 	 */
 	public function test_s_should_not_exclude_for_dashes_in_the_middle_of_words() {
-		$p1 = $this->factory->post->create( array(
+		$p1 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has foo but also bar',
 		) );
-		$p2 = $this->factory->post->create( array(
+		$p2 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has only bar',
 		) );
-		$p3 = $this->factory->post->create( array(
+		$p3 = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => 'This post has only foo-bar',
 		) );

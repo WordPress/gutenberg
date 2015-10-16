@@ -22,7 +22,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
 		global $wp_customize;
 		$this->wp_customize = new WP_Customize_Manager();
 		$wp_customize = $this->wp_customize;
@@ -65,7 +65,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 			$this->setExpectedException( 'WPAjaxDieStopException' );
 		}
 
-		wp_set_current_user( $this->factory->user->create( array( 'role' => $role ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => $role ) ) );
 
 		$_POST = array(
 			'action'                => 'load-available-menu-items-customizer',
@@ -307,8 +307,8 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		);
 
 		// Create some terms and pages.
-		$this->factory->term->create_many( 5 );
-		$this->factory->post->create_many( 5, array( 'post_type' => 'page' ) );
+		self::$factory->term->create_many( 5 );
+		self::$factory->post->create_many( 5, array( 'post_type' => 'page' ) );
 
 		$_POST = array_merge( array(
 			'action'                => 'load-available-menu-items-customizer',
@@ -396,7 +396,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 			$this->setExpectedException( 'WPAjaxDieStopException' );
 		}
 
-		wp_set_current_user( $this->factory->user->create( array( 'role' => $role ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => $role ) ) );
 
 		$_POST = array(
 			'action'                => 'search-available-menu-items-customizer',
@@ -469,7 +469,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 	 */
 	function test_ajax_search_available_items_results( $post_args, $expected_results ) {
 
-		$this->factory->post->create_many( 5, array( 'post_title' => 'Test Post' ) );
+		self::$factory->post->create_many( 5, array( 'post_title' => 'Test Post' ) );
 
 		$_POST = array_merge( array(
 			'action'                => 'search-available-menu-items-customizer',

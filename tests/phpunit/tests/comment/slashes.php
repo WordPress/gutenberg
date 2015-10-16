@@ -9,7 +9,7 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		// we need an admin user to bypass comment flood protection
-		$this->author_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$this->author_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
 		$this->old_current_user = get_current_user_id();
 		wp_set_current_user( $this->author_id );
 
@@ -34,7 +34,7 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_new_comment() {
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		// not testing comment_author_email or comment_author_url
 		// as slashes are not permitted in that data
@@ -74,8 +74,8 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_edit_comment() {
-		$post_id = $this->factory->post->create();
-		$comment_id = $this->factory->comment->create(array(
+		$post_id = self::$factory->post->create();
+		$comment_id = self::$factory->comment->create(array(
 			'comment_post_ID' => $post_id
 		));
 
@@ -117,7 +117,7 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_insert_comment() {
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$comment_id = wp_insert_comment(array(
 			'comment_post_ID' => $post_id,
@@ -145,8 +145,8 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_update_comment() {
-		$post_id = $this->factory->post->create();
-		$comment_id = $this->factory->comment->create(array(
+		$post_id = self::$factory->post->create();
+		$comment_id = self::$factory->comment->create(array(
 			'comment_post_ID' => $post_id
 		));
 

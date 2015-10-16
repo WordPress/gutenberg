@@ -18,8 +18,8 @@ class Tests_Canonical_PageOnFront extends WP_Canonical_UnitTestCase {
 		parent::setUp();
 
 		update_option( 'show_on_front', 'page' );
-		update_option( 'page_for_posts', $this->factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
-		update_option( 'page_on_front', $this->factory->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
+		update_option( 'page_for_posts', self::$factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
+		update_option( 'page_on_front', self::$factory->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
 	}
 
 	/**

@@ -17,9 +17,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @var WP_UnitTest_Factory
 	 */
-	protected $factory;
-
-	protected static $static_factory;
+	protected static $factory;
 
 	public static function get_called_class() {
 		if ( function_exists( 'get_called_class' ) ) {
@@ -39,16 +37,16 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 
+		if ( ! self::$factory ) {
+			self::$factory = new WP_UnitTest_Factory();
+		}
+
 		$c = self::get_called_class();
 		if ( ! method_exists( $c, 'wpSetUpBeforeClass' ) ) {
 			return;
 		}
 
-		if ( ! self::$static_factory ) {
-			self::$static_factory = new WP_UnitTest_Factory();
-		}
-
-		call_user_func( array( $c, 'wpSetUpBeforeClass' ), self::$static_factory );
+		call_user_func( array( $c, 'wpSetUpBeforeClass' ), self::$factory );
 
 		self::commit_transaction();
 	}
@@ -82,7 +80,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$wpdb->show_errors = true;
 		$wpdb->db_connect();
 		ini_set('display_errors', 1 );
-		$this->factory = new WP_UnitTest_Factory;
 		$this->clean_up_global_scope();
 
 		/*

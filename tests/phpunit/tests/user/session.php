@@ -10,7 +10,7 @@ class Tests_User_Session extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		remove_all_filters( 'session_token_manager' );
-		$user_id = $this->factory->user->create();
+		$user_id = self::$factory->user->create();
 		$this->manager = WP_Session_Tokens::get_instance( $user_id );
 		$this->assertInstanceOf( 'WP_Session_Tokens', $this->manager );
 		$this->assertInstanceOf( 'WP_User_Meta_Session_Tokens', $this->manager );

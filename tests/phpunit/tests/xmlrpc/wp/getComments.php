@@ -21,8 +21,8 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_capable_user() {
-		$this->post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $this->post_id, 2 );
+		$this->post_id = self::$factory->post->create();
+		self::$factory->comment->create_post_comments( $this->post_id, 2 );
 
 		$this->make_user_by_role( 'editor' );
 
@@ -36,8 +36,8 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_post_filter() {
-		$this->post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $this->post_id, 2 );
+		$this->post_id = self::$factory->post->create();
+		self::$factory->comment->create_post_comments( $this->post_id, 2 );
 
 		$this->make_user_by_role( 'editor' );
 
@@ -52,8 +52,8 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_number_filter() {
-		$this->post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $this->post_id, 11 );
+		$this->post_id = self::$factory->post->create();
+		self::$factory->comment->create_post_comments( $this->post_id, 11 );
 
 		$this->make_user_by_role( 'editor' );
 
@@ -76,13 +76,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 	function test_contributor_capabilities() {
 		$this->make_user_by_role( 'contributor' );
 		$author_id = $this->make_user_by_role( 'author' );
-		$author_post_id = $this->factory->post->create( array(
+		$author_post_id = self::$factory->post->create( array(
 			'post_title' => 'Author',
 			'post_author' => $author_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_post_ID' => $author_post_id,
 			'comment_author' => "Commenter 1",
 			'comment_author_url' => "http://example.com/1/",
@@ -90,13 +90,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		) );
 
 		$editor_id = $this->make_user_by_role( 'editor' );
-		$editor_post_id = $this->factory->post->create( array(
+		$editor_post_id = self::$factory->post->create( array(
 			'post_title' => 'Editor',
 			'post_author' => $editor_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_post_ID' => $editor_post_id,
 			'comment_author' => 'Commenter 2',
 			'comment_author_url' => 'http://example.com/2/',
@@ -110,13 +110,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 
 	function test_author_capabilities() {
 		$author_id = $this->make_user_by_role( 'author' );
-		$author_post_id = $this->factory->post->create( array(
+		$author_post_id = self::$factory->post->create( array(
 			'post_title' => 'Author',
 			'post_author' => $author_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_post_ID' => $author_post_id,
 			'comment_author' => 'Commenter 1',
 			'comment_author_url' => 'http://example.com/1/',
@@ -124,13 +124,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		) );
 
 		$editor_id = $this->make_user_by_role( 'editor' );
-		$editor_post_id = $this->factory->post->create( array(
+		$editor_post_id = self::$factory->post->create( array(
 			'post_title' => 'Editor',
 			'post_author' => $editor_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_post_ID' => $editor_post_id,
 			'comment_author' => 'Commenter 2',
 			'comment_author_url' => 'http://example.com/2/',
@@ -166,13 +166,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 
 	function test_editor_capabilities() {
 		$author_id = $this->make_user_by_role( 'author' );
-		$author_post_id = $this->factory->post->create( array(
+		$author_post_id = self::$factory->post->create( array(
 			'post_title' => 'Author',
 			'post_author' => $author_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_post_ID' => $author_post_id,
 			'comment_author' => 'Commenter 1',
 			'comment_author_url' => 'http://example.com/1/',
@@ -180,13 +180,13 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		));
 
 		$editor_id = $this->make_user_by_role( 'editor' );
-		$editor_post_id = $this->factory->post->create( array(
+		$editor_post_id = self::$factory->post->create( array(
 			'post_title' => 'Editor',
 			'post_author' => $editor_id,
 			'post_status' => 'publish'
 		) );
 
-		$this->factory->comment->create(array(
+		self::$factory->comment->create(array(
 			'comment_post_ID' => $editor_post_id,
 			'comment_author' => 'Commenter 2',
 			'comment_author_url' => 'http://example.com/2/',

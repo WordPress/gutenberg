@@ -16,11 +16,11 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_associated_nav_menu_items() {
-		$tag_id = $this->factory->tag->create();
-		$cat_id = $this->factory->category->create();
-		$post_id = $this->factory->post->create();
-		$post_2_id = $this->factory->post->create();
-		$page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$tag_id = self::$factory->tag->create();
+		$cat_id = self::$factory->category->create();
+		$post_id = self::$factory->post->create();
+		$post_2_id = self::$factory->post->create();
+		$page_id = self::$factory->post->create( array( 'post_type' => 'page' ) );
 
 		$tag_insert = wp_update_nav_menu_item( $this->menu_id, 0, array(
 			'menu-item-type' => 'taxonomy',
@@ -107,7 +107,7 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->assertEquals( 'Wordpress.org', $custom_item->title );
 
 		// Update the orphan with an associated nav menu
-		wp_update_nav_menu_item( $this->menu_id, $custom_item_id, array( 
+		wp_update_nav_menu_item( $this->menu_id, $custom_item_id, array(
 			'menu-item-title'     => 'WordPress.org',
 			) );
 		$menu_items = wp_get_nav_menu_items( $this->menu_id );
@@ -119,8 +119,8 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 
 	public function test_wp_get_nav_menu_items_with_taxonomy_term() {
 		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
-		$t = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
-		$child_terms = $this->factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax', 'parent' => $t ) );
+		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$child_terms = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax', 'parent' => $t ) );
 
 		$term_menu_item = wp_update_nav_menu_item( $this->menu_id, 0, array(
 			'menu-item-type' => 'taxonomy',
@@ -140,7 +140,7 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	 * @ticket 29460
 	 */
 	function test_orderby_name_by_default() {
-		// We are going to create a random number of menus (min 2, max 10) 
+		// We are going to create a random number of menus (min 2, max 10)
 		$menus_no = rand( 2, 10 );
 
 		for ( $i = 0; $i <= $menus_no; $i++ ) {
@@ -148,14 +148,14 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		}
 
 		// This is the expected array of menu names
-		$expected_nav_menus_names = wp_list_pluck( 
+		$expected_nav_menus_names = wp_list_pluck(
 			get_terms( 'nav_menu',  array( 'hide_empty' => false, 'orderby' => 'name' ) ),
 			'name'
 		);
 
 		// And this is what we got when calling wp_get_nav_menus()
 		$nav_menus_names = wp_list_pluck( wp_get_nav_menus(), 'name' );
-		
+
 		$this->assertEquals( $nav_menus_names, $expected_nav_menus_names );
 	}
 }

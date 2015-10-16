@@ -34,7 +34,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		wp_cache_set( 'switch-test', $current_blog_id, 'switch-test' );
 		$this->assertEquals( $current_blog_id, wp_cache_get( 'switch-test', 'switch-test' ) );
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$cap_key = wp_get_current_user()->cap_key;
 		switch_to_blog( $blog_id );
@@ -74,7 +74,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_created_site_details() {
 		global $wpdb;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$this->assertInternalType( 'int', $blog_id );
 		$prefix = $wpdb->get_blog_prefix( $blog_id );
@@ -130,7 +130,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * When a site is flagged as 'deleted', its data should be cleared from cache.
 	 */
 	function test_data_in_cache_after_wpmu_delete_blog_drop_false() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
@@ -151,7 +151,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_data_in_tables_after_wpmu_delete_blog_drop_false() {
 		global $wpdb;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		// Delete the site without forcing a table drop.
 		wpmu_delete_blog( $blog_id, false );
@@ -169,7 +169,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * When a site is fully deleted, its data should be cleared from cache.
 	 */
 	function test_data_in_cache_after_wpmu_delete_blog_drop_true() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
@@ -190,7 +190,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_data_in_tables_after_wpmu_delete_blog_drop_true() {
 		global $wpdb;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
@@ -247,7 +247,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * The site count of a network should change when a site is flagged as 'deleted'.
 	 */
 	function test_network_count_after_wpmu_delete_blog_drop_false() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		// Delete the site without forcing a table drop.
 		wpmu_delete_blog( $blog_id, false );
@@ -261,7 +261,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * The site count of a network should change when a site is fully deleted.
 	 */
 	function test_blog_count_after_wpmu_delete_blog_drop_true() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
@@ -283,7 +283,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Upload a file to the main site on the network.
 		$file1 = wp_upload_bits( $filename, null, $contents );
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		switch_to_blog( $blog_id );
 		$file2 = wp_upload_bits( $filename, null, $contents );
@@ -329,7 +329,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_details_when_site_does_not_exist() {
 		// Create an unused site so that we can then assume an invalid site ID.
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		$blog_id++;
 
 		// Prime the cache for an invalid site.
@@ -339,7 +339,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( -1, wp_cache_get( $blog_id, 'blog-details' ) );
 
 		// Create a site in the invalid site's place.
-		$this->factory->blog->create();
+		self::$factory->blog->create();
 
 		// When a new site is created, its cache is cleared through refresh_blog_details.
 		$this->assertFalse( wp_cache_get( $blog_id, 'blog-details' )  );
@@ -370,7 +370,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		update_blog_details( $blog_id, array( 'spam' => 1 ) );
 
 		add_action( 'make_ham_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -394,7 +394,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		add_action( 'make_spam_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'spam', 1 );
@@ -417,7 +417,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		add_action( 'archive_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'archived', 1 );
@@ -440,7 +440,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		update_blog_details( $blog_id, array( 'archived' => 1 ) );
 
 		add_action( 'unarchive_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -463,7 +463,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		add_action( 'make_delete_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'deleted', 1 );
@@ -486,7 +486,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		update_blog_details( $blog_id, array( 'deleted' => 1 ) );
 
 		add_action( 'make_undelete_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -510,7 +510,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		add_action( 'mature_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'mature', 1 );
@@ -533,7 +533,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		update_blog_details( $blog_id, array( 'mature' => 1 ) );
 
 		add_action( 'unmature_blog', array( $this, '_action_counter_cb' ), 10 );
@@ -557,7 +557,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		add_action( 'update_blog_public', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'public', 0 );
@@ -583,7 +583,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * @ticket 14511
 	 */
 	function test_wp_get_sites_with_default_arguments() {
-		$this->factory->blog->create( array( 'site_id' => 2 ) );
+		self::$factory->blog->create( array( 'site_id' => 2 ) );
 
 		$this->assertCount( 1, wp_get_sites() );
 	}
@@ -599,7 +599,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * A network ID of null should query for all public sites on all networks.
 	 */
 	function test_wp_get_sites_with_network_id_null() {
-		$this->factory->blog->create( array( 'site_id' => 2 ) );
+		self::$factory->blog->create( array( 'site_id' => 2 ) );
 
 		$this->assertCount( 2, wp_get_sites( array( 'network_id' => null ) ) );
 	}
@@ -608,7 +608,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Expect only sites on the specified network ID to be returned.
 	 */
 	function test_wp_get_sites_with_specific_network_id() {
-		$this->factory->blog->create( array( 'site_id' => 2 ) );
+		self::$factory->blog->create( array( 'site_id' => 2 ) );
 
 		$this->assertCount( 1, wp_get_sites( array( 'network_id' => 2 ) ) );
 	}
@@ -617,7 +617,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Expect sites from both networks if both network IDs are specified.
 	 */
 	function test_wp_get_sites_with_multiple_network_ids() {
-		$this->factory->blog->create( array( 'site_id' => 2 ) );
+		self::$factory->blog->create( array( 'site_id' => 2 ) );
 
 		$this->assertCount( 2, wp_get_sites( array( 'network_id' => array( 1, 2 ) ) ) );
 	}
@@ -626,7 +626,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Queries for public or non public sites should work across all networks if network ID is null.
 	 */
 	function test_wp_get_sites_with_public_meta_on_all_networks() {
-		$this->factory->blog->create( array( 'site_id' => 2, 'meta' => array( 'public' => 0 ) ) );
+		self::$factory->blog->create( array( 'site_id' => 2, 'meta' => array( 'public' => 0 ) ) );
 
 		$this->assertCount( 1, wp_get_sites( array( 'public' => 1, 'network_id' => null ) ) );
 		$this->assertcount( 1, wp_get_sites( array( 'public' => 0, 'network_id' => null ) ) );
@@ -636,7 +636,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * If a network ID is specified, queries for public sites should be restricted to that network.
 	 */
 	function test_wp_get_sites_with_public_meta_restrict_to_one_network() {
-		$this->factory->blog->create( array( 'site_id' => 1, 'meta' => array( 'public' => 0 ) ) );
+		self::$factory->blog->create( array( 'site_id' => 1, 'meta' => array( 'public' => 0 ) ) );
 
 		$this->assertCount( 1, wp_get_sites( array( 'public' => 1, 'network_id' => 1 ) ) );
 		$this->assertCount( 0, wp_get_sites( array( 'public' => 1, 'network_id' => 2 ) ) );
@@ -647,7 +647,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_wp_get_sites_limit_offset() {
 		// Create 2 more sites (in addition to the default one)
-		$this->factory->blog->create_many( 2 );
+		self::$factory->blog->create_many( 2 );
 
 		// Expect first 2 sites when using limit
 		$this->assertCount( 2, wp_get_sites( array( 'limit' => 2 ) ) );
@@ -670,8 +670,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * @ticket 27952
 	 */
 	function test_posts_count() {
-		$this->factory->post->create();
-		$post2 = $this->factory->post->create();
+		self::$factory->post->create();
+		$post2 = self::$factory->post->create();
 		$this->assertEquals( 2, get_blog_details()->post_count );
 
 		wp_delete_post( $post2 );
@@ -701,7 +701,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		);
 
 		foreach ( $network_ids as &$id ) {
-			$id = $this->factory->network->create( $id );
+			$id = self::$factory->network->create( $id );
 		}
 		unset( $id );
 
@@ -714,7 +714,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		);
 
 		foreach ( $ids as &$id ) {
-			$id = $this->factory->blog->create( $id );
+			$id = self::$factory->blog->create( $id );
 		}
 		unset( $id );
 
@@ -772,7 +772,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * the blog ID is requested through get_blog_id_from_url().
 	 */
 	function test_get_blog_id_from_url() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 
@@ -785,7 +785,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test the case insensitivity of the site lookup.
 	 */
 	function test_get_blog_id_from_url_is_case_insensitive() {
-		$blog_id = $this->factory->blog->create( array( 'domain' => 'example.com', 'path' => '/xyz' ) );
+		$blog_id = self::$factory->blog->create( array( 'domain' => 'example.com', 'path' => '/xyz' ) );
 		$details = get_blog_details( $blog_id, false );
 
 		$this->assertEquals( $blog_id, get_blog_id_from_url( strtoupper( $details->domain ), strtoupper( $details->path ) ) );
@@ -795,7 +795,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test the first and cached responses for a site that does not exist.
 	 */
 	function test_get_blog_id_from_url_that_does_not_exist() {
-		$blog_id = $this->factory->blog->create( array( 'path' => '/xyz' ) );
+		$blog_id = self::$factory->blog->create( array( 'path' => '/xyz' ) );
 		$details = get_blog_details( $blog_id, false );
 
 		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, 'foo' ) );
@@ -807,7 +807,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * behavior would be expected if passing `false` explicitly to `wpmu_delete_blog()`.
 	 */
 	function test_get_blog_id_from_url_with_deleted_flag() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id );
@@ -821,7 +821,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * -1 after an attempt at `get_blog_id_from_url()` is made.
 	 */
 	function test_get_blog_id_from_url_after_dropped() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		$details = get_blog_details( $blog_id, false );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id, true );
@@ -850,7 +850,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test with a site ID other than the main site to ensure a false response.
 	 */
 	function test_is_main_site_is_false_with_other_blog_id() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$this->assertFalse( is_main_site( $blog_id ) );
 	}
@@ -859,7 +859,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * Test with no passed ID after switching to another site ID.
 	 */
 	function test_is_main_site_is_false_after_switch_to_blog() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		switch_to_blog( $blog_id );
 
 		$this->assertFalse( is_main_site() );
@@ -878,7 +878,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( gmstrftime('/%Y/%m'), $info['subdir'] );
 		$this->assertEquals( '', $info['error'] );
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		switch_to_blog( $blog_id );
 		$info = wp_upload_dir();
@@ -900,8 +900,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * another site on the network.
 	 */
 	function test_get_blog_post_from_another_site_on_network() {
-		$blog_id = $this->factory->blog->create();
-		$post_id = $this->factory->post->create(); // Create a post on the primary site, ID 1.
+		$blog_id = self::$factory->blog->create();
+		$post_id = self::$factory->post->create(); // Create a post on the primary site, ID 1.
 		$post = get_post( $post_id );
 		switch_to_blog( $blog_id );
 
@@ -915,7 +915,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * If get_blog_post() is used on the same site, it should still work.
 	 */
 	function test_get_blog_post_from_same_site() {
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$this->assertEquals( get_blog_post( 1, $post_id ), get_post( $post_id ) );
 	}

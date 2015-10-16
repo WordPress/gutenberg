@@ -438,7 +438,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$this->assertEmpty( $wp_customize );
 		$this->assertFalse( $widget->is_preview() );
 
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
 		$wp_customize = new WP_Customize_Manager();
 		$wp_customize->start_previewing_theme();
@@ -618,7 +618,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 			array( 'before_widget' => '<span class="special %s">', 'after_widget' => '</span>' )
 		);
 		$actual = ob_get_clean();
-		
+
 		unregister_widget( 'WP_Widget_Text' );
 
 		$this->assertRegExp( '/<span class="special widget_text">/', $actual );

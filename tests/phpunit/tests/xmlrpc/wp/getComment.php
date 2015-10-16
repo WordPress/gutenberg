@@ -13,7 +13,7 @@ class Tests_XMLRPC_wp_getComment extends WP_XMLRPC_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->post_id = $this->factory->post->create();
+		$this->post_id = self::$factory->post->create();
 
 		$this->parent_comment_data = array(
 			'comment_post_ID' => $this->post_id,

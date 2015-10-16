@@ -29,7 +29,7 @@ class Tests_Admin_includesPlugin extends WP_UnitTestCase {
 
 	function test_menu_page_url() {
 		$current_user = get_current_user_id();
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
 		update_option( 'siteurl', 'http://example.com' );
 
 		// add some pages

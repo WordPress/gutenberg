@@ -32,11 +32,11 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 	 */
 	public function setUp() {
 		parent::setUp();
-		$post_id = $this->factory->post->create();
-		$this->factory->comment->create_post_comments( $post_id, 5 );
+		$post_id = self::$factory->post->create();
+		self::$factory->comment->create_post_comments( $post_id, 5 );
 		$this->_comment_post = get_post( $post_id );
 
-		$post_id = $this->factory->post->create( array( 'post_status' => 'draft' ) );
+		$post_id = self::$factory->post->create( array( 'post_status' => 'draft' ) );
 		$this->_draft_post = get_post( $post_id );
 	}
 

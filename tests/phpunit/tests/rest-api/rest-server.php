@@ -136,7 +136,7 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 			'permission_callback' => '__return_true',
 		) );
 
-		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
+		$editor = self::$factory->user->create( array( 'role' => 'editor' ) );
 
 		$request = new WP_REST_Request( 'GET', '/test-ns/test', array() );
 

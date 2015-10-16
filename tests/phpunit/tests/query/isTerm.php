@@ -37,11 +37,11 @@ class Tests_Query_IsTerm extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$this->tag_id = $this->factory->tag->create( array( 'slug' => 'tag-slug' ) );
-		$this->cat_id = $this->factory->category->create( array( 'slug' => 'cat-slug' ) );
-		$this->tax_id = $this->factory->term->create( array( 'taxonomy' => 'testtax', 'slug' => 'tax-slug' ) );
-		$this->tax_id2 = $this->factory->term->create( array( 'taxonomy' => 'testtax', 'slug' => 'tax-slug2' ) );
-		$this->post_id = $this->factory->post->create();
+		$this->tag_id = self::$factory->tag->create( array( 'slug' => 'tag-slug' ) );
+		$this->cat_id = self::$factory->category->create( array( 'slug' => 'cat-slug' ) );
+		$this->tax_id = self::$factory->term->create( array( 'taxonomy' => 'testtax', 'slug' => 'tax-slug' ) );
+		$this->tax_id2 = self::$factory->term->create( array( 'taxonomy' => 'testtax', 'slug' => 'tax-slug2' ) );
+		$this->post_id = self::$factory->post->create();
 		wp_set_object_terms( $this->post_id, $this->cat_id, 'category' );
 		wp_set_object_terms( $this->post_id, array( $this->tax_id, $this->tax_id2 ), 'testtax' );
 
@@ -245,7 +245,7 @@ class Tests_Query_IsTerm extends WP_UnitTestCase {
 		remove_action( 'pre_get_posts', array( $this, 'pre_get_posts_tax_category_tax_query' ) );
 
 		register_taxonomy( 'testtax2', 'post' );
-		$testtax2_term_id = $this->factory->term->create( array(
+		$testtax2_term_id = self::$factory->term->create( array(
 			'taxonomy' => 'testtax2',
 			'slug' => 'testtax2-slug',
 		) );

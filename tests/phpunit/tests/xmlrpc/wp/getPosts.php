@@ -54,7 +54,7 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 		$post_ids = array();
 		$num_posts = 4;
 		foreach ( range( 1, $num_posts ) as $i ) {
-			$post_ids[] = $this->factory->post->create( array(
+			$post_ids[] = self::$factory->post->create( array(
 				'post_type' => $cpt_name,
 				'post_date' => date( 'Y-m-d H:i:s', time() + $i )
 			) );
@@ -80,7 +80,7 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 		// add comments to some of the posts
 		foreach ( $post_ids as $key => $post_id ) {
 			// Larger post IDs will get more comments.
-			$this->factory->comment->create_post_comments( $post_id, $key );
+			self::$factory->comment->create_post_comments( $post_id, $key );
 		}
 
 		// get results ordered by comment count
@@ -109,7 +109,7 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 
 	function test_fields() {
 		$this->make_user_by_role( 'editor' );
-		$this->factory->post->create();
+		self::$factory->post->create();
 
 		// check default fields
 		$results = $this->myxmlrpcserver->wp_getPosts( array( 1, 'editor', 'editor' ) );
@@ -136,8 +136,8 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 	function test_search() {
 		$this->make_user_by_role( 'editor' );
 
-		$post_ids[] = $this->factory->post->create( array( 'post_title' => 'First: ' . rand_str() ) );
-		$post_ids[] = $this->factory->post->create( array( 'post_title' => 'Second: ' . rand_str() ) );
+		$post_ids[] = self::$factory->post->create( array( 'post_title' => 'First: ' . rand_str() ) );
+		$post_ids[] = self::$factory->post->create( array( 'post_title' => 'Second: ' . rand_str() ) );
 
 		// Search for none of them
 		$filter = array( 's' => rand_str() );

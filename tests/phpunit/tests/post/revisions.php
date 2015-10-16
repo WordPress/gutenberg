@@ -144,7 +144,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_view_caps_post() {
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
@@ -166,7 +166,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_restore_caps_post() {
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
@@ -186,7 +186,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 16847
 	 */
 	function test_revision_diff_caps_post() {
-		$post_id = $this->factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'post', 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 		wp_update_post( array( 'post_content' => 'This content is even better', 'ID' => $post_id ) );
 
@@ -214,7 +214,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			'supports' => array( 'revisions' ),
 		) );
 
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
@@ -247,7 +247,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$editor_user->add_cap( 'edit_published_events' );
 
 		//create a post as Editor
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
@@ -282,7 +282,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$old_id = get_current_user_id();
 		wp_set_current_user( self::$editor_user_id );
 
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_status' => 'draft' ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => $this->post_type, 'post_status' => 'draft' ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 
 		$revisions = wp_get_post_revisions( $post_id );
@@ -314,7 +314,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 			'supports' => array( 'revisions' ),
 		) );
 
-		$post_id = $this->factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => $this->post_type, 'post_author' => self::$editor_user_id ) );
 		wp_update_post( array( 'post_content' => 'This content is much better', 'ID' => $post_id ) );
 		wp_update_post( array( 'post_content' => 'This content is even better', 'ID' => $post_id ) );
 
@@ -337,7 +337,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	function test_wp_get_post_revisions_should_order_by_post_date() {
 		global $wpdb;
 
-		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
+		$post = self::$factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
 		$post = (array) $post;
 		$post_revision_fields = _wp_post_revision_fields( $post );
@@ -365,7 +365,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 	 * @ticket 26042
 	 */
 	function test_wp_get_post_revisions_should_order_by_ID_when_post_date_matches() {
-		$post = $this->factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
+		$post = self::$factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
 		$post = (array) $post;
 		$post_revision_fields = _wp_post_revision_fields( $post );

@@ -34,7 +34,7 @@ class TestFactoryFor extends WP_UnitTestCase {
 	 */
 	public function test_term_factory_create_and_get_should_return_term_object() {
 		register_taxonomy( 'wptests_tax', 'post' );
-		$term = $this->factory->term->create_and_get( array( 'taxonomy' => 'wptests_tax' ) );
+		$term = self::$factory->term->create_and_get( array( 'taxonomy' => 'wptests_tax' ) );
 		$this->assertInternalType( 'object', $term );
 		$this->assertNotEmpty( $term->term_id );
 	}

@@ -11,7 +11,7 @@ class Tests_Term_WpUniqueTermSlug extends WP_UnitTestCase {
 	}
 
 	public function test_unique_slug_should_be_unchanged() {
-		$term = $this->factory->term->create_and_get( array(
+		$term = self::$factory->term->create_and_get( array(
 			'taxonomy' => 'wptests_tax1',
 			'name' => 'foo',
 			'slug' => 'foo',
@@ -22,13 +22,13 @@ class Tests_Term_WpUniqueTermSlug extends WP_UnitTestCase {
 	}
 
 	public function test_nonunique_slug_in_different_taxonomy_should_be_unchanged() {
-		$term1 = $this->factory->term->create( array(
+		$term1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'name' => 'bar',
 			'slug' => 'bar',
 		) );
 
-		$term2 = $this->factory->term->create( array(
+		$term2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax1',
 			'name' => 'foo',
 			'slug' => 'foo',
@@ -40,13 +40,13 @@ class Tests_Term_WpUniqueTermSlug extends WP_UnitTestCase {
 	}
 
 	public function test_nonunique_slug_in_same_nonhierarchical_taxonomy_should_be_changed() {
-		$term1 = $this->factory->term->create( array(
+		$term1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax1',
 			'name' => 'bar',
 			'slug' => 'bar',
 		) );
 
-		$term2 = $this->factory->term->create( array(
+		$term2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax1',
 			'name' => 'foo',
 			'slug' => 'foo',
@@ -58,19 +58,19 @@ class Tests_Term_WpUniqueTermSlug extends WP_UnitTestCase {
 	}
 
 	public function test_nonunique_slug_in_same_hierarchical_taxonomy_with_same_parent_should_be_suffixed_with_parent_slug() {
-		$parent = $this->factory->term->create( array(
+		$parent = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'parent-term',
 		) );
 
-		$term1 = $this->factory->term->create( array(
+		$term1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'name' => 'bar',
 			'slug' => 'bar',
 			'parent' => $parent,
 		) );
 
-		$term2 = $this->factory->term->create( array(
+		$term2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'name' => 'foo',
 			'slug' => 'foo',
@@ -83,19 +83,19 @@ class Tests_Term_WpUniqueTermSlug extends WP_UnitTestCase {
 	}
 
 	public function test_nonunique_slug_in_same_hierarchical_taxonomy_at_different_level_of_hierarchy_should_be_suffixed_with_number() {
-		$parent = $this->factory->term->create( array(
+		$parent = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'parent-term',
 		) );
 
-		$term1 = $this->factory->term->create( array(
+		$term1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'name' => 'bar',
 			'slug' => 'bar',
 			'parent' => $parent,
 		) );
 
-		$term2 = $this->factory->term->create( array(
+		$term2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'name' => 'foo',
 			'slug' => 'foo',

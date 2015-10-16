@@ -12,7 +12,7 @@ class Tests_Canonical_Paged extends WP_Canonical_UnitTestCase {
 			This is a paragraph.';
 		$next = '<!--nextpage-->';
 
-		$post_id = $this->factory->post->create( array(
+		$post_id = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_content' => "{$para}{$next}{$para}{$next}{$para}"
 		) );

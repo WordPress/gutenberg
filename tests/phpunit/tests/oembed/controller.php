@@ -17,10 +17,10 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	}
 
 	function test_request_json() {
-		$user = $this->factory->user->create_and_get( array(
+		$user = self::$factory->user->create_and_get( array(
 			'display_name' => 'John Doe',
 		) );
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_author' => $user->ID,
 			'post_title'  => 'Hello World',
 		) );
@@ -60,10 +60,10 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	}
 
 	function test_request_jsonp() {
-		$user = $this->factory->user->create_and_get( array(
+		$user = self::$factory->user->create_and_get( array(
 			'display_name' => 'John Doe',
 		) );
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_author' => $user->ID,
 			'post_title'  => 'Hello World',
 		) );
@@ -83,10 +83,10 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	}
 
 	function test_request_jsonp_invalid_callback() {
-		$user = $this->factory->user->create_and_get( array(
+		$user = self::$factory->user->create_and_get( array(
 			'display_name' => 'John Doe',
 		) );
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_author' => $user->ID,
 			'post_title'  => 'Hello World',
 		) );
@@ -118,10 +118,10 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	}
 
 	function test_request_xml() {
-		$user = $this->factory->user->create_and_get( array(
+		$user = self::$factory->user->create_and_get( array(
 			'display_name' => 'John Doe',
 		) );
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_author' => $user->ID,
 			'post_title'  => 'Hello World',
 		) );
@@ -177,11 +177,11 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
 		}
 
-		$child = $this->factory->blog->create();
+		$child = self::$factory->blog->create();
 
 		switch_to_blog( $child );
 
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_title' => 'Hello Child Blog',
 		) );
 
@@ -207,7 +207,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$this->assertEquals( home_url() . '/?oembed=true', get_oembed_endpoint_url( '', 'json' ) );
 		$this->assertEquals( home_url() . '/?oembed=true', get_oembed_endpoint_url( '', 'xml' ) );
 
-		$post_id     = $this->factory->post->create();
+		$post_id     = self::$factory->post->create();
 		$url         = get_permalink( $post_id );
 		$url_encoded = urlencode( $url );
 

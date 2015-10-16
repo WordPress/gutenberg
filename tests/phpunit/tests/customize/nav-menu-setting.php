@@ -22,7 +22,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
 
 		global $wp_customize;
 		$this->wp_customize = new WP_Customize_Manager();

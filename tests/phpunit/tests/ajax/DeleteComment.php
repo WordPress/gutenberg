@@ -26,8 +26,8 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 */
 	public function setUp() {
 		parent::setUp();
-		$post_id = $this->factory->post->create();
-		$this->_comments = $this->factory->comment->create_post_comments( $post_id, 15 );
+		$post_id = self::$factory->post->create();
+		$this->_comments = self::$factory->comment->create_post_comments( $post_id, 15 );
 		$this->_comments = array_map( 'get_comment', $this->_comments );
 	}
 

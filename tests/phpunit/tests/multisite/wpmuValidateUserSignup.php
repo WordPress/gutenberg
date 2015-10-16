@@ -63,13 +63,13 @@ class Tests_Multisite_WpmuValidateUserSignup extends WP_UnitTestCase {
 	}
 
 	public function test_should_fail_for_existing_user_name() {
-		$u = $this->factory->user->create( array( 'user_login' => 'foo123' ) );
+		$u = self::$factory->user->create( array( 'user_login' => 'foo123' ) );
 		$v = wpmu_validate_user_signup( 'foo123', 'foo@example.com' );
 		$this->assertContains( 'user_name', $v['errors']->get_error_codes() );
 	}
 
 	public function test_should_fail_for_existing_user_email() {
-		$u = $this->factory->user->create( array( 'user_email' => 'foo@example.com' ) );
+		$u = self::$factory->user->create( array( 'user_email' => 'foo@example.com' ) );
 		$v = wpmu_validate_user_signup( 'foo123', 'foo@example.com' );
 		$this->assertContains( 'user_email', $v['errors']->get_error_codes() );
 	}

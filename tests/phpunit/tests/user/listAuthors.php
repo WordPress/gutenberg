@@ -71,7 +71,7 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 	}
 
 	function test_wp_list_authors_exclude_admin() {
-		$this->factory->post->create( array( 'post_type' => 'post', 'post_author' => 1 ) );
+		self::$factory->post->create( array( 'post_type' => 'post', 'post_author' => 1 ) );
 		$expected['exclude_admin'] = '<li><a href="' . get_author_posts_url( 1 ) . '" title="Posts by admin">admin</a></li><li><a href="' . self::$user_urls[1] . '" title="Posts by bob">bob</a></li><li><a href="' . self::$user_urls[2] . '" title="Posts by paul">paul</a></li><li><a href="' . self::$user_urls[0] . '" title="Posts by zack">zack</a></li>';
 		$this->AssertEquals( $expected['exclude_admin'], wp_list_authors( array( 'echo' => false, 'exclude_admin' => 0 ) ) );
 	}

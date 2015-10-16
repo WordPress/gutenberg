@@ -59,7 +59,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_public_only_true_should_not_allow_any_private_posts_for_loggedin_user(){
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 		wp_set_current_user( $u );
 
 		$maybe_string = get_posts_by_author_sql( 'post', true, $u, true );
@@ -70,7 +70,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_public_only_should_default_to_false(){
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 		wp_set_current_user( $u );
 
 		$this->assertSame( get_posts_by_author_sql( 'post', true, $u, false ), get_posts_by_author_sql( 'post', true, $u ) );
@@ -80,7 +80,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_public_only_false_should_allow_current_user_access_to_own_private_posts_when_current_user_matches_post_author(){
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 		wp_set_current_user( $u );
 
 		$maybe_string = get_posts_by_author_sql( 'post', true, $u, false );
@@ -91,8 +91,8 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_public_only_false_should_not_allow_access_to_private_posts_if_current_user_is_not_post_author(){
 		$current_user = get_current_user_id();
-		$u1 = $this->factory->user->create();
-		$u2 = $this->factory->user->create();
+		$u1 = self::$factory->user->create();
+		$u2 = self::$factory->user->create();
 		wp_set_current_user( $u1 );
 
 		$maybe_string = get_posts_by_author_sql( 'post', true, $u2, false );
@@ -103,7 +103,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_public_only_false_should_allow_current_user_access_to_own_private_posts_when_post_author_is_not_provided(){
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 		wp_set_current_user( $u );
 
 		$maybe_string = get_posts_by_author_sql( 'post', true, $u, false );
@@ -115,7 +115,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 
 	public function test_administrator_should_have_access_to_private_posts_when_public_only_is_false(){
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$u = self::$factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $u );
 
 		$maybe_string = get_posts_by_author_sql( 'post', true, null, false );
@@ -130,7 +130,7 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		register_post_type( 'bar', array( 'capabilities' => array( 'read_private_posts' => 'read_private_bar' ) ) );
 		register_post_type( 'baz', array( 'capabilities' => array( 'read_private_posts' => 'read_private_baz' ) ) );
 		$current_user = get_current_user_id();
-		$u = $this->factory->user->create( array( 'role' => 'editor' ) );
+		$u = self::$factory->user->create( array( 'role' => 'editor' ) );
 		$editor_role = get_role('editor');
 		$editor_role->add_cap( 'read_private_baz' );
 		wp_set_current_user( $u );

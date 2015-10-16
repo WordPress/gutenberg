@@ -25,10 +25,10 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	}
 
 	function test_remove_user_from_blog() {
-		$user1 = $this->factory->user->create_and_get();
-		$user2 = $this->factory->user->create_and_get();
+		$user1 = self::$factory->user->create_and_get();
+		$user2 = self::$factory->user->create_and_get();
 
-		$post_id = $this->factory->post->create( array( 'post_author' => $user1->ID ) );
+		$post_id = self::$factory->post->create( array( 'post_author' => $user1->ID ) );
 
 		remove_user_from_blog( $user1->ID, 1, $user2->ID );
 
@@ -42,10 +42,10 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	 * Test the returned data from get_blogs_of_user()
 	 */
 	function test_get_blogs_of_user() {
-		$user1_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user1_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
 
 		// Maintain a list of 6 total sites and include the primary network site.
-		$blog_ids = $this->factory->blog->create_many( 5, array( 'user_id' => $user1_id ) );
+		$blog_ids = self::$factory->blog->create_many( 5, array( 'user_id' => $user1_id ) );
 		$blog_ids = array_merge( array( 1 ), $blog_ids );
 
 		// All sites are new and not marked as spam, archived, or deleted.
@@ -114,7 +114,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	function test_is_blog_user() {
 		global $wpdb;
 
-		$user1_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user1_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
 
 		$old_current = get_current_user_id();
 		wp_set_current_user( $user1_id );
@@ -124,7 +124,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 
 		$blog_ids = array();
 
-		$blog_ids = $this->factory->blog->create_many( 5 );
+		$blog_ids = self::$factory->blog->create_many( 5 );
 		foreach ( $blog_ids as $blog_id ) {
 			$this->assertInternalType( 'int', $blog_id );
 			$this->assertTrue( is_blog_user( $blog_id ) );
@@ -138,8 +138,8 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	function test_is_user_member_of_blog() {
 		global $wpdb;
 
-		$user1_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
-		$user2_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user1_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$user2_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
 
 		$old_current = get_current_user_id();
 
@@ -156,7 +156,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertTrue( is_user_member_of_blog( $user1_id ) );
 		$this->assertTrue( is_user_member_of_blog( $user1_id, $wpdb->blogid ) );
 
-		$blog_ids = $this->factory->blog->create_many( 5 );
+		$blog_ids = self::$factory->blog->create_many( 5 );
 		foreach ( $blog_ids as $blog_id ) {
 			$this->assertInternalType( 'int', $blog_id );
 
@@ -197,13 +197,13 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	 * @ticket 23192
 	 */
 	function test_is_user_spammy() {
-		$user_id = $this->factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'testuser1',
 		) );
 
 		$spam_username = (string) $user_id;
-		$spam_user_id = $this->factory->user->create( array(
+		$spam_user_id = self::$factory->user->create( array(
 			'role' => 'author',
 			'user_login' => $spam_username,
 		) );
@@ -219,9 +219,9 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	function test_user_member_of_blog() {
 		global $wp_rewrite;
 
-		$this->factory->blog->create();
-		$user_id = $this->factory->user->create();
-		$this->factory->blog->create( array( 'user_id' => $user_id ) );
+		self::$factory->blog->create();
+		$user_id = self::$factory->user->create();
+		self::$factory->blog->create( array( 'user_id' => $user_id ) );
 
 		$blogs = get_blogs_of_user( $user_id );
 		$this->assertCount( 2, $blogs );
@@ -261,7 +261,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 			unset( $GLOBALS['super_admins'] );
 		}
 
-		$user_id = $this->factory->user->create();
+		$user_id = self::$factory->user->create();
 		grant_super_admin( $user_id );
 		revoke_super_admin( $user_id );
 
@@ -278,7 +278,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 			unset( $GLOBALS['super_admins'] );
 		}
 
-		$user_id = $this->factory->user->create();
+		$user_id = self::$factory->user->create();
 		grant_super_admin( $user_id );
 		revoke_super_admin( $user_id );
 		wpmu_delete_user( $user_id );
@@ -297,7 +297,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 			unset( $GLOBALS['super_admins'] );
 		}
 
-		$user_id = $this->factory->user->create();
+		$user_id = self::$factory->user->create();
 		grant_super_admin( $user_id );
 
 		$this->assertFalse( wpmu_delete_user( $user_id ) );
@@ -316,7 +316,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 			unset( $GLOBALS['super_admins'] );
 		}
 
-		$user_id = $this->factory->user->create();
+		$user_id = self::$factory->user->create();
 
 		$this->assertFalse( is_super_admin( $user_id ) );
 		$this->assertFalse( revoke_super_admin( $user_id ) );
@@ -329,7 +329,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertFalse( isset( $GLOBALS['super_admins'] ) );
 
 		// Try with two users.
-		$second_user = $this->factory->user->create();
+		$second_user = self::$factory->user->create();
 		$this->assertTrue( grant_super_admin( $user_id ) );
 		$this->assertTrue( grant_super_admin( $second_user ) );
 		$this->assertTrue( is_super_admin( $second_user ) );
@@ -343,7 +343,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	}
 
 	public function test_numeric_string_user_id() {
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 
 		$u_string = (string) $u;
 		$this->assertTrue( wpmu_delete_user( $u_string ) );
@@ -361,7 +361,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 	 * @ticket 33800
 	 */
 	public function test_should_return_false_for_object_user_id() {
-		$u_obj = $this->factory->user->create_and_get();
+		$u_obj = self::$factory->user->create_and_get();
 		$this->assertFalse( wpmu_delete_user( $u_obj ) );
 		$this->assertEquals( $u_obj->ID, username_exists( $u_obj->user_login ) );
 	}

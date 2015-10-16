@@ -14,7 +14,7 @@ class Tests_Get_Comment_Count extends WP_UnitTestCase {
 	}
 
 	public function test_get_comment_count_approved() {
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_approved' => 1
 		) );
 
@@ -29,7 +29,7 @@ class Tests_Get_Comment_Count extends WP_UnitTestCase {
 	}
 
 	public function test_get_comment_count_awaiting() {
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_approved' => 0
 		) );
 
@@ -44,7 +44,7 @@ class Tests_Get_Comment_Count extends WP_UnitTestCase {
 	}
 
 	public function test_get_comment_count_spam() {
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_approved' => 'spam'
 		) );
 
@@ -59,7 +59,7 @@ class Tests_Get_Comment_Count extends WP_UnitTestCase {
 	}
 
 	public function test_get_comment_count_trash() {
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_approved' => 'trash'
 		) );
 
@@ -74,7 +74,7 @@ class Tests_Get_Comment_Count extends WP_UnitTestCase {
 	}
 
 	public function test_get_comment_count_post_trashed() {
-		$this->factory->comment->create( array(
+		self::$factory->comment->create( array(
 			'comment_approved' => 'post-trashed'
 		) );
 

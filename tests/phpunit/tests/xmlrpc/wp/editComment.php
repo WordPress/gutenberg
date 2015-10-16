@@ -7,7 +7,7 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 
 	function test_author_can_edit_own_comment() {
 		$author_id = $this->make_user_by_role( 'author' );
-		$post_id = $this->factory->post->create( array(
+		$post_id = self::$factory->post->create( array(
 			'post_title' => 'Post test by author',
 			'post_author' => $author_id
 		) );
@@ -29,7 +29,7 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 	function test_author_cannot_edit_others_comment() {
 		$this->make_user_by_role( 'author' );
 		$editor_id = $this->make_user_by_role( 'editor' );
-		$post_id = $this->factory->post->create( array(
+		$post_id = self::$factory->post->create( array(
 			'post_title' => 'Post test by editor',
 			'post_author' => $editor_id
 		) );
@@ -49,7 +49,7 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 
 	function test_trash_comment() {
 		$this->make_user_by_role( 'administrator' );
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$comment_data = array(
 			'comment_post_ID' => $post_id,
@@ -78,7 +78,7 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 		update_option( 'timezone_string', 'America/New_York' );
 
 		$this->make_user_by_role( 'administrator' );
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$comment_data = array(
 			'comment_post_ID' => $post_id,

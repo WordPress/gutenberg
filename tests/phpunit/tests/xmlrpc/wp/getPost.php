@@ -122,8 +122,8 @@ class Tests_XMLRPC_wp_getPost extends WP_XMLRPC_UnitTestCase {
 	function test_valid_page() {
 		$this->make_user_by_role( 'editor' );
 
-		$parent_page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		$child_page_id = $this->factory->post->create( array(
+		$parent_page_id = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$child_page_id = self::$factory->post->create( array(
 			'post_type' => 'page',
 			'post_parent' => $parent_page_id,
 			'menu_order' => 2

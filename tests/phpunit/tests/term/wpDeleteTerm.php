@@ -12,11 +12,11 @@ class Tests_Term_WpDeleteTerm extends WP_UnitTestCase {
 	public function test_count_property_passed_to_filters_should_reflect_pre_deleted_term() {
 		register_taxonomy( 'wptests_tax', 'post' );
 
-		$terms = $this->factory->term->create_many( 2, array(
+		$terms = self::$factory->term->create_many( 2, array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		$p = $this->factory->post->create();
+		$p = self::$factory->post->create();
 
 		wp_set_object_terms( $p, array( $terms[0] ), 'wptests_tax' );
 

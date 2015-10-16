@@ -95,7 +95,7 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 
 		// create attachment
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
-		$attachment_id = $this->factory->attachment->create_upload_object( $filename );
+		$attachment_id = self::$factory->attachment->create_upload_object( $filename );
 
 		set_post_thumbnail( $this->post_id, $attachment_id );
 

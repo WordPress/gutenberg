@@ -456,17 +456,17 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	 * @ticket 16854
 	 */
 	function test_query_author_vars() {
-		$author_1 = $this->factory->user->create( array( 'user_login' => 'admin1', 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_1 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_1, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_1 = self::$factory->user->create( array( 'user_login' => 'admin1', 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_1 = self::$factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_1, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_2 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_2 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_2, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_2 = self::$factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_2 = self::$factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_2, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_3 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_3 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_3, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_3 = self::$factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_3 = self::$factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_3, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_4 = $this->factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_4 = $this->factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_4, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_4 = self::$factory->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
+		$post_4 = self::$factory->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_4, 'post_date' => '2007-01-01 00:00:00' ) );
 
 		$posts = $this->q->query( array(
 			'author' => '',
@@ -623,9 +623,9 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	 * @ticket 20308
 	 */
 	function test_post_password() {
-		$one   = (string) $this->factory->post->create( array( 'post_password' => '' ) );
-		$two   = (string) $this->factory->post->create( array( 'post_password' => 'burrito' ) );
-		$three = (string) $this->factory->post->create( array( 'post_password' => 'burrito' ) );
+		$one   = (string) self::$factory->post->create( array( 'post_password' => '' ) );
+		$two   = (string) self::$factory->post->create( array( 'post_password' => 'burrito' ) );
+		$three = (string) self::$factory->post->create( array( 'post_password' => 'burrito' ) );
 
 		$args = array( 'post__in' => array( $one, $two, $three ), 'fields' => 'ids' );
 
@@ -665,9 +665,9 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	function test_duplicate_slug_in_hierarchical_post_type() {
 		register_post_type( 'handbook', array( 'hierarchical' => true ) );
 
-		$post_1 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_type' => 'handbook' ) );
-		$post_2 = $this->factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
-		$post_3 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_2, 'post_type' => 'handbook' ) );
+		$post_1 = self::$factory->post->create( array( 'post_title' => 'Getting Started', 'post_type' => 'handbook' ) );
+		$post_2 = self::$factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
+		$post_3 = self::$factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_2, 'post_type' => 'handbook' ) );
 
 		$result = $this->q->query( array( 'handbook' => 'getting-started', 'post_type' => 'handbook' ) );
 		$this->assertCount( 1, $result );
@@ -679,8 +679,8 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	function test_child_post_in_hierarchical_post_type_with_default_permalinks() {
 		register_post_type( 'handbook', array( 'hierarchical' => true ) );
 
-		$post_1 = $this->factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
-		$post_2 = $this->factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_1, 'post_type' => 'handbook' ) );
+		$post_1 = self::$factory->post->create( array( 'post_title' => 'Contributing to the WordPress Codex', 'post_type' => 'handbook' ) );
+		$post_2 = self::$factory->post->create( array( 'post_title' => 'Getting Started', 'post_parent' => $post_1, 'post_type' => 'handbook' ) );
 
 		$this->assertContains( 'contributing-to-the-wordpress-codex/getting-started', get_permalink( $post_2 ) );
 
@@ -690,7 +690,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 
 	function test_title() {
 		$title = 'Tacos are Cool';
-		$post_id = $this->factory->post->create( array(
+		$post_id = self::$factory->post->create( array(
 			'post_title' => $title,
 			'post_type' => 'post',
 			'post_status' => 'publish'

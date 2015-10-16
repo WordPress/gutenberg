@@ -9,7 +9,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_term_int_taxonomy_nonempty_term_exists() {
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'post_tag',
 		) );
 
@@ -22,7 +22,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_term_int_taxonomy_nonempty_wrong_taxonomy() {
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'post_tag',
 		) );
 
@@ -30,7 +30,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_term_int_taxonomy_empty_term_exists() {
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'post_tag',
 		) );
 
@@ -43,7 +43,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_unslash_term() {
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'post_tag',
 			'name' => 'I "love" WordPress\'s taxonomy system',
 		) );
@@ -53,7 +53,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	}
 
 	public function test_term_exists_trim_term() {
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'post_tag',
 			'slug' => 'foo',
 		) );
@@ -84,11 +84,11 @@ class Tests_TermExists extends WP_UnitTestCase {
 			'hierarchical' => true,
 		) );
 
-		$parent_term = $this->factory->term->create( array(
+		$parent_term = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 		) );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'parent' => $parent_term,
 			'slug' => 'child-term',
@@ -110,11 +110,11 @@ class Tests_TermExists extends WP_UnitTestCase {
 			'hierarchical' => true,
 		) );
 
-		$parent_term = $this->factory->term->create( array(
+		$parent_term = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 		) );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'parent' => $parent_term,
 			'slug' => 'child-term',
@@ -132,11 +132,11 @@ class Tests_TermExists extends WP_UnitTestCase {
 			'hierarchical' => true,
 		) );
 
-		$parent_term = $this->factory->term->create( array(
+		$parent_term = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 		) );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'parent' => $parent_term,
 			'name' => 'Child Term',
@@ -153,7 +153,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	public function test_term_exists_taxonomy_nonempty_parent_empty_match_slug() {
 		register_taxonomy( 'foo', 'post', array() );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'slug' => 'kewl-dudez',
 		) );
@@ -169,7 +169,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	public function test_term_exists_taxonomy_nonempty_parent_empty_match_name() {
 		register_taxonomy( 'foo', 'post', array() );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'name' => 'Kewl Dudez',
 		) );
@@ -185,7 +185,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	public function test_term_exists_taxonomy_empty_parent_empty_match_slug() {
 		register_taxonomy( 'foo', 'post', array() );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'name' => 'juicy-fruit',
 		) );
@@ -201,7 +201,7 @@ class Tests_TermExists extends WP_UnitTestCase {
 	public function test_term_exists_taxonomy_empty_parent_empty_match_name() {
 		register_taxonomy( 'foo', 'post', array() );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'foo',
 			'name' => 'Juicy Fruit',
 		) );

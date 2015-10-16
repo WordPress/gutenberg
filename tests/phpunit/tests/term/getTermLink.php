@@ -12,11 +12,11 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 	}
 
 	public function test_integer_should_be_interpreted_as_term_id() {
-		$t1 = $this->factory->term->create( array(
+		$t1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 		) );
-		$t2 = $this->factory->term->create( array(
+		$t2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'slug' => $t1,
 		) );
@@ -28,11 +28,11 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 	}
 
 	public function test_numeric_string_should_be_interpreted_as_term_slug() {
-		$t1 = $this->factory->term->create( array(
+		$t1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 		) );
-		$t2 = $this->factory->term->create( array(
+		$t2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'slug' => $t1,
 		) );
@@ -49,7 +49,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 	}
 
 	public function test_category_should_use_cat_query_var_with_term_id() {
-		$c = $this->factory->category->create();
+		$c = self::$factory->category->create();
 
 		$actual = get_term_link( $c, 'category' );
 		$this->assertContains( 'cat=' . $c, $actual );
@@ -60,7 +60,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 			'query_var' => 'foo',
 		) );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'bar',
 		) );
@@ -74,7 +74,7 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 			'query_var' => false,
 		) );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'bar',
 		) );
@@ -97,12 +97,12 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$t1 = $this->factory->term->create( array(
+		$t1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'term1',
 		) );
 
-		$t2 = $this->factory->term->create( array(
+		$t2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'term2',
 			'parent' => $t1,
@@ -126,12 +126,12 @@ class Tests_Term_GetTermLink extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$t1 = $this->factory->term->create( array(
+		$t1 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'term1',
 		) );
 
-		$t2 = $this->factory->term->create( array(
+		$t2 = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax2',
 			'slug' => 'term2',
 			'parent' => $t1,

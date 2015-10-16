@@ -394,7 +394,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
 
 		// Satisfy all requirements for save to happen.
-		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
 		$this->assertTrue( false !== $setting->save() );
 		$this->assertTrue( 1 === did_action( 'customize_update_custom' ) );
 		$this->assertTrue( 1 === did_action( 'customize_save_foo' ) );
@@ -465,7 +465,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$setting->preview();
 		$this->assertTrue( $setting->is_current_blog_previewed() );
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		switch_to_blog( $blog_id );
 		$this->assertFalse( $setting->is_current_blog_previewed() );
 		$this->assertNotEquals( $post_value, $setting->value() );

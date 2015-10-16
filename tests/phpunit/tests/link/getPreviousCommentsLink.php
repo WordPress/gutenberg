@@ -8,7 +8,7 @@
 class Tests_Link_GetPreviousCommentsLink extends WP_UnitTestCase {
 
 	public function test_page_should_respect_value_of_cpage_query_var() {
-		$p = $this->factory->post->create();
+		$p = self::$factory->post->create();
 		$this->go_to( get_permalink( $p ) );
 
 		$cpage = get_query_var( 'cpage' );
@@ -22,7 +22,7 @@ class Tests_Link_GetPreviousCommentsLink extends WP_UnitTestCase {
 	}
 
 	public function test_page_should_default_to_1_when_no_cpage_query_var_is_found() {
-		$p = $this->factory->post->create();
+		$p = self::$factory->post->create();
 		$this->go_to( get_permalink( $p ) );
 
 		$cpage = get_query_var( 'cpage' );

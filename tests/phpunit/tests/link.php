@@ -33,8 +33,8 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_shortlink() {
-		$post_id = $this->factory->post->create();
-		$post_id2 = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
+		$post_id2 = self::$factory->post->create();
 
 		// Basic case
 		$this->assertEquals( get_permalink( $post_id ), wp_get_shortlink( $post_id, 'post' ) );
@@ -77,7 +77,7 @@ class Tests_Link extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_shortlink_with_page() {
-		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'page' ) );
 
 		// Basic case
 		// Don't test against get_permalink() since it uses ?page_id= for pages.
@@ -92,7 +92,7 @@ class Tests_Link extends WP_UnitTestCase {
 	 * @ticket 26871
 	 */
 	function test_wp_get_shortlink_with_home_page() {
-		$post_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'page' ) );
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $post_id );
 
@@ -108,22 +108,22 @@ class Tests_Link extends WP_UnitTestCase {
 	 */
 	function test_get_adjacent_post() {
 		// Need some sample posts to test adjacency
-		$post_one = $this->factory->post->create_and_get( array(
+		$post_one = self::$factory->post->create_and_get( array(
 			'post_title' => 'First',
 			'post_date' => '2012-01-01 12:00:00'
 		) );
 
-		$post_two = $this->factory->post->create_and_get( array(
+		$post_two = self::$factory->post->create_and_get( array(
 			'post_title' => 'Second',
 			'post_date' => '2012-02-01 12:00:00'
 		) );
 
-		$post_three = $this->factory->post->create_and_get( array(
+		$post_three = self::$factory->post->create_and_get( array(
 			'post_title' => 'Third',
 			'post_date' => '2012-03-01 12:00:00'
 		) );
 
-		$post_four = $this->factory->post->create_and_get( array(
+		$post_four = self::$factory->post->create_and_get( array(
 			'post_title' => 'Fourth',
 			'post_date' => '2012-04-01 12:00:00'
 		) );
@@ -183,33 +183,33 @@ class Tests_Link extends WP_UnitTestCase {
 		global $wpdb;
 		$wpdb->insert( $wpdb->term_taxonomy, array( 'taxonomy' => 'foo', 'term_id' => 12345, 'description' => '' ) );
 
-		$include = $this->factory->term->create( array(
+		$include = self::$factory->term->create( array(
 			'taxonomy' => 'category',
 			'name' => 'Include',
 		) );
-		$exclude = $this->factory->category->create();
+		$exclude = self::$factory->category->create();
 
-		$one = $this->factory->post->create_and_get( array(
+		$one = self::$factory->post->create_and_get( array(
 			'post_date' => '2012-01-01 12:00:00',
 			'post_category' => array( $include, $exclude ),
 		) );
 
-		$two = $this->factory->post->create_and_get( array(
+		$two = self::$factory->post->create_and_get( array(
 			'post_date' => '2012-01-02 12:00:00',
 			'post_category' => array(),
 		) );
 
-		$three = $this->factory->post->create_and_get( array(
+		$three = self::$factory->post->create_and_get( array(
 			'post_date' => '2012-01-03 12:00:00',
 			'post_category' => array( $include, $exclude ),
 		) );
 
-		$four = $this->factory->post->create_and_get( array(
+		$four = self::$factory->post->create_and_get( array(
 			'post_date' => '2012-01-04 12:00:00',
 			'post_category' => array( $include ),
 		) );
 
-		$five = $this->factory->post->create_and_get( array(
+		$five = self::$factory->post->create_and_get( array(
 			'post_date' => '2012-01-05 12:00:00',
 			'post_category' => array( $include, $exclude ),
 		) );
@@ -249,13 +249,13 @@ class Tests_Link extends WP_UnitTestCase {
 	public function test_get_adjacent_post_excluded_terms() {
 		register_taxonomy( 'wptests_tax', 'post' );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		$p1 = $this->factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
-		$p2 = $this->factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
-		$p3 = $this->factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
+		$p1 = self::$factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
+		$p2 = self::$factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
+		$p3 = self::$factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
 
 		wp_set_post_terms( $p2, array( $t ), 'wptests_tax' );
 
@@ -281,13 +281,13 @@ class Tests_Link extends WP_UnitTestCase {
 	public function test_get_adjacent_post_excluded_terms_should_not_require_posts_to_have_terms_in_any_taxonomy() {
 		register_taxonomy( 'wptests_tax', 'post' );
 
-		$t = $this->factory->term->create( array(
+		$t = self::$factory->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		$p1 = $this->factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
-		$p2 = $this->factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
-		$p3 = $this->factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
+		$p1 = self::$factory->post->create( array( 'post_date' => '2015-08-27 12:00:00' ) );
+		$p2 = self::$factory->post->create( array( 'post_date' => '2015-08-26 12:00:00' ) );
+		$p3 = self::$factory->post->create( array( 'post_date' => '2015-08-25 12:00:00' ) );
 
 		wp_set_post_terms( $p2, array( $t ), 'wptests_tax' );
 
@@ -348,7 +348,7 @@ class Tests_Link extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$p = $this->factory->post->create( array(
+		$p = self::$factory->post->create( array(
 			'post_status' => 'publish',
 			'post_date'   => strftime( '%Y-%m-%d %H:%M:%S', strtotime( '+1 day' ) )
 		) );
@@ -368,7 +368,7 @@ class Tests_Link extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$p = $this->factory->post->create( array(
+		$p = self::$factory->post->create( array(
 			'post_status' => 'future',
 			'post_type'   => 'wptests_pt',
 			'post_date'   => strftime( '%Y-%m-%d %H:%M:%S', strtotime( '+1 day' ) )
@@ -388,7 +388,7 @@ class Tests_Link extends WP_UnitTestCase {
 	public function test_unattached_attachment_has_a_pretty_permalink() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
-		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', 0, array(
+		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment',
 			'post_title' => 'An Attachment!',
@@ -412,9 +412,9 @@ class Tests_Link extends WP_UnitTestCase {
 
 		flush_rewrite_rules();
 
-		$post_id = $this->factory->post->create( array( 'post_type' => 'not_a_post_type' ) );
+		$post_id = self::$factory->post->create( array( 'post_type' => 'not_a_post_type' ) );
 
-		$attachment_id = $this->factory->attachment->create_object( 'image.jpg', $post_id, array(
+		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment',
 			'post_title' => 'An Attachment!',

@@ -17,25 +17,25 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 		}
 
 		// Setup users
-		$admin = $this->factory->user->create( array(
+		$admin = self::$factory->user->create( array(
 			'role' => 'administrator',
 		) );
-		$editor = $this->factory->user->create( array(
+		$editor = self::$factory->user->create( array(
 			'role' => 'editor',
 		) );
-		$author = $this->factory->user->create( array(
+		$author = self::$factory->user->create( array(
 			'role' => 'author',
 		) );
-		$contributor = $this->factory->user->create( array(
+		$contributor = self::$factory->user->create( array(
 			'role' => 'contributor',
 		) );
-		$subscriber = $this->factory->user->create( array(
+		$subscriber = self::$factory->user->create( array(
 			'role' => 'subscriber',
 		) );
-		$none = $this->factory->user->create( array(
+		$none = self::$factory->user->create( array(
 			'role' => '',
 		) );
-		$nobody = $this->factory->user->create( array(
+		$nobody = self::$factory->user->create( array(
 			'role' => '',
 		) );
 
@@ -67,33 +67,33 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 		}
 
 		// Setup users
-		$admin = $this->factory->user->create( array(
+		$admin = self::$factory->user->create( array(
 			'role' => 'administrator',
 		) );
-		$editor = $this->factory->user->create( array(
+		$editor = self::$factory->user->create( array(
 			'role' => 'editor',
 		) );
-		$author = $this->factory->user->create( array(
+		$author = self::$factory->user->create( array(
 			'role' => 'author',
 		) );
-		$contributor = $this->factory->user->create( array(
+		$contributor = self::$factory->user->create( array(
 			'role' => 'contributor',
 		) );
-		$subscriber = $this->factory->user->create( array(
+		$subscriber = self::$factory->user->create( array(
 			'role' => 'subscriber',
 		) );
-		$none = $this->factory->user->create( array(
+		$none = self::$factory->user->create( array(
 			'role' => '',
 		) );
-		$nobody = $this->factory->user->create( array(
+		$nobody = self::$factory->user->create( array(
 			'role' => '',
 		) );
 
 		// Setup blogs
-		$blog_1 = (int) $this->factory->blog->create( array(
+		$blog_1 = (int) self::$factory->blog->create( array(
 			'user_id' => $editor,
 		) );
-		$blog_2 = (int) $this->factory->blog->create( array(
+		$blog_2 = (int) self::$factory->blog->create( array(
 			'user_id' => $author,
 		) );
 

@@ -272,8 +272,8 @@ class Tests_URL extends WP_UnitTestCase {
 
 	public function test_get_adjacent_post() {
 		$now = time();
-		$post_id = $this->factory->post->create( array( 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
-		$post_id2 = $this->factory->post->create( array( 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
+		$post_id = self::$factory->post->create( array( 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
+		$post_id2 = self::$factory->post->create( array( 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
 
 		if ( ! isset( $GLOBALS['post'] ) )
 			$GLOBALS['post'] = null;
@@ -305,13 +305,13 @@ class Tests_URL extends WP_UnitTestCase {
 	 * @ticket 30287
 	 */
 	public function test_get_adjacent_post_should_return_private_posts_belonging_to_the_current_user() {
-		$u = $this->factory->user->create( array( 'role' => 'author' ) );
+		$u = self::$factory->user->create( array( 'role' => 'author' ) );
 		$old_uid = get_current_user_id();
 		wp_set_current_user( $u );
 
 		$now = time();
-		$p1 = $this->factory->post->create( array( 'post_author' => $u, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
-		$p2 = $this->factory->post->create( array( 'post_author' => $u, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
+		$p1 = self::$factory->post->create( array( 'post_author' => $u, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
+		$p2 = self::$factory->post->create( array( 'post_author' => $u, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
 
 		if ( ! isset( $GLOBALS['post'] ) ) {
 			$GLOBALS['post'] = null;
@@ -331,14 +331,14 @@ class Tests_URL extends WP_UnitTestCase {
 	 * @ticket 30287
 	 */
 	public function test_get_adjacent_post_should_return_private_posts_belonging_to_other_users_if_the_current_user_can_read_private_posts() {
-		$u1 = $this->factory->user->create( array( 'role' => 'author' ) );
-		$u2 = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$u1 = self::$factory->user->create( array( 'role' => 'author' ) );
+		$u2 = self::$factory->user->create( array( 'role' => 'administrator' ) );
 		$old_uid = get_current_user_id();
 		wp_set_current_user( $u2 );
 
 		$now = time();
-		$p1 = $this->factory->post->create( array( 'post_author' => $u1, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
-		$p2 = $this->factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
+		$p1 = self::$factory->post->create( array( 'post_author' => $u1, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
+		$p2 = self::$factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
 
 		if ( ! isset( $GLOBALS['post'] ) ) {
 			$GLOBALS['post'] = null;
@@ -358,15 +358,15 @@ class Tests_URL extends WP_UnitTestCase {
 	 * @ticket 30287
 	 */
 	public function test_get_adjacent_post_should_not_return_private_posts_belonging_to_other_users_if_the_current_user_cannot_read_private_posts() {
-		$u1 = $this->factory->user->create( array( 'role' => 'author' ) );
-		$u2 = $this->factory->user->create( array( 'role' => 'author' ) );
+		$u1 = self::$factory->user->create( array( 'role' => 'author' ) );
+		$u2 = self::$factory->user->create( array( 'role' => 'author' ) );
 		$old_uid = get_current_user_id();
 		wp_set_current_user( $u2 );
 
 		$now = time();
-		$p1 = $this->factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now - 2 ) ) );
-		$p2 = $this->factory->post->create( array( 'post_author' => $u1, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
-		$p3 = $this->factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
+		$p1 = self::$factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now - 2 ) ) );
+		$p2 = self::$factory->post->create( array( 'post_author' => $u1, 'post_status' => 'private', 'post_date' => date( 'Y-m-d H:i:s', $now - 1 ) ) );
+		$p3 = self::$factory->post->create( array( 'post_author' => $u1, 'post_date' => date( 'Y-m-d H:i:s', $now ) ) );
 
 		if ( ! isset( $GLOBALS['post'] ) ) {
 			$GLOBALS['post'] = null;

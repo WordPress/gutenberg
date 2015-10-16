@@ -14,7 +14,7 @@ Shankle pork chop prosciutto ribeye ham hock pastrami. T-bone shank brisket baco
 	}
 
 	public function test_get_comment_excerpt() {
-		$comment_id = $this->factory->comment->create( array(
+		$comment_id = self::$factory->comment->create( array(
 			'comment_content' => self::$bacon_comment
 		) );
 
@@ -24,7 +24,7 @@ Shankle pork chop prosciutto ribeye ham hock pastrami. T-bone shank brisket baco
 	}
 
 	public function test_get_comment_excerpt_filtered() {
-		$comment_id = $this->factory->comment->create( array(
+		$comment_id = self::$factory->comment->create( array(
 			'comment_content' => self::$bacon_comment
 		) );
 

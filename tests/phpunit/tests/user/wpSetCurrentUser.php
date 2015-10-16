@@ -5,7 +5,7 @@
  */
 class Tests_User_WpSetCurrentUser extends WP_UnitTestCase {
 	public function test_set_by_id() {
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 
 		$user = wp_set_current_user( $u );
 
@@ -15,7 +15,7 @@ class Tests_User_WpSetCurrentUser extends WP_UnitTestCase {
 	}
 
 	public function test_name_should_be_ignored_if_id_is_not_null() {
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 
 		$user = wp_set_current_user( $u, 'foo' );
 
@@ -25,11 +25,11 @@ class Tests_User_WpSetCurrentUser extends WP_UnitTestCase {
 	}
 
 	public function test_should_set_by_name_if_id_is_null_and_current_user_is_nonempty() {
-		$u1 = $this->factory->user->create();
+		$u1 = self::$factory->user->create();
 		wp_set_current_user( $u1 );
 		$this->assertSame( $u1, get_current_user_id() );
 
-		$u2 = $this->factory->user->create( array(
+		$u2 = self::$factory->user->create( array(
 			'user_login' => 'foo',
 		) );
 
@@ -49,7 +49,7 @@ class Tests_User_WpSetCurrentUser extends WP_UnitTestCase {
 		wp_set_current_user( 0 );
 		$this->assertSame( 0, get_current_user_id() );
 
-		$u = $this->factory->user->create( array(
+		$u = self::$factory->user->create( array(
 			'user_login' => 'foo',
 		) );
 

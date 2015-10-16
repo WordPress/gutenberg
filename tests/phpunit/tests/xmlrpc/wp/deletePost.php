@@ -21,7 +21,7 @@ class Tests_XMLRPC_wp_deletePost extends WP_XMLRPC_UnitTestCase {
 
 	function test_incapable_user() {
 		$this->make_user_by_role( 'subscriber' );
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$result = $this->myxmlrpcserver->wp_deletePost( array( 1, 'subscriber', 'subscriber', $post_id ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
@@ -30,7 +30,7 @@ class Tests_XMLRPC_wp_deletePost extends WP_XMLRPC_UnitTestCase {
 
 	function test_post_deleted() {
 		$this->make_user_by_role( 'editor' );
-		$post_id = $this->factory->post->create();
+		$post_id = self::$factory->post->create();
 
 		$result = $this->myxmlrpcserver->wp_deletePost( array( 1, 'editor', 'editor', $post_id ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );

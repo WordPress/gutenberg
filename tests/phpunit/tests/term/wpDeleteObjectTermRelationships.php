@@ -9,8 +9,8 @@ class Tests_Term_WpDeleteObjectTermRelationships extends WP_UnitTestCase {
 		register_taxonomy( 'wptests_tax1', 'post' );
 		register_taxonomy( 'wptests_tax2', 'post' );
 
-		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
-		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t1 = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
 
 		$object_id = 567;
 
@@ -33,9 +33,9 @@ class Tests_Term_WpDeleteObjectTermRelationships extends WP_UnitTestCase {
 		register_taxonomy( 'wptests_tax2', 'post' );
 		register_taxonomy( 'wptests_tax3', 'post' );
 
-		$t1 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
-		$t2 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
-		$t3 = $this->factory->term->create( array( 'taxonomy' => 'wptests_tax3' ) );
+		$t1 = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+		$t3 = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax3' ) );
 
 		$object_id = 567;
 

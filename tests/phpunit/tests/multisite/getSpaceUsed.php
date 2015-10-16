@@ -22,7 +22,7 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 	}
 
 	function test_get_space_used_switched_site() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		switch_to_blog( $blog_id );
 
 		// Our comparison of space relies on an initial value of 0. If a previous test has failed or if the
@@ -30,7 +30,7 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 		// will be polluted. We create sites until an empty one is available.
 		while ( 0 != get_space_used() ) {
 			restore_current_blog();
-			$blog_id = $this->factory->blog->create();
+			$blog_id = self::$factory->blog->create();
 			switch_to_blog( $blog_id );
 		}
 
@@ -58,7 +58,7 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 	function test_get_space_used_main_site() {
 		$space_used = get_space_used();
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 		switch_to_blog( $blog_id );
 
 		// We don't rely on an initial value of 0 for space used, but should have a clean space available
@@ -66,7 +66,7 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 		// existing content directories in src.
 		while ( 0 != get_space_used() ) {
 			restore_current_blog();
-			$blog_id = $this->factory->blog->create();
+			$blog_id = self::$factory->blog->create();
 			switch_to_blog( $blog_id );
 		}
 

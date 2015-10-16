@@ -14,7 +14,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 		// Logged out users don't have blogs.
 		$this->assertEquals( array(), get_blogs_of_user( 0 ) );
 
-		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		$user_id = self::$factory->user->create( array( 'role' => 'subscriber' ) );
 		$blogs = get_blogs_of_user( $user_id );
 		$this->assertEquals( array( 1 ), array_keys( $blogs ) );
 
@@ -34,7 +34,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 	function test_is_user_member_of_blog() {
 		$old_current = get_current_user_id();
 
-		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		$user_id = self::$factory->user->create( array( 'role' => 'subscriber' ) );
 		wp_set_current_user( $user_id );
 
 		$this->assertTrue( is_user_member_of_blog() );
@@ -54,7 +54,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 	}
 
 	function test_delete_user() {
-		$user_id = $this->factory->user->create( array( 'role' => 'author' ) );
+		$user_id = self::$factory->user->create( array( 'role' => 'author' ) );
 		$user = new WP_User( $user_id );
 
 		$post = array(
@@ -111,9 +111,9 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 	 * @ticket 20447
 	 */
 	function test_wp_delete_user_reassignment_clears_post_caches() {
-		$user_id   = $this->factory->user->create();
-		$reassign  = $this->factory->user->create();
-		$post_id   = $this->factory->post->create( array( 'post_author' => $user_id ) );
+		$user_id   = self::$factory->user->create();
+		$reassign  = self::$factory->user->create();
+		$post_id   = self::$factory->post->create( array( 'post_author' => $user_id ) );
 
 		get_post( $post_id ); // Ensure this post is in the cache.
 
@@ -128,7 +128,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 			$this->markTestSkipped( 'wp_delete_user() does not delete user records in Multisite.' );
 		}
 
-		$u = $this->factory->user->create();
+		$u = self::$factory->user->create();
 
 		$u_string = (string) $u;
 		$this->assertTrue( wp_delete_user( $u_string ) );
@@ -150,7 +150,7 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 			$this->markTestSkipped( 'wp_delete_user() does not delete user records in Multisite.' );
 		}
 
-		$u_obj = $this->factory->user->create_and_get();
+		$u_obj = self::$factory->user->create_and_get();
 		$this->assertFalse( wp_delete_user( $u_obj ) );
 		$this->assertEquals( $u_obj->ID, username_exists( $u_obj->user_login ) );
 	}

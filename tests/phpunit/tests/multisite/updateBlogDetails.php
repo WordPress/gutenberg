@@ -25,7 +25,7 @@ class Tests_Multisite_Update_Blog_Details extends WP_UnitTestCase {
 	}
 
 	function test_update_blog_details() {
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		$result = update_blog_details( $blog_id, array( 'domain' => 'example.com', 'path' => 'my_path/' ) );
 
@@ -53,7 +53,7 @@ class Tests_Multisite_Update_Blog_Details extends WP_UnitTestCase {
 		global $test_action_counter;
 		$test_action_counter = 0;
 
-		$blog_id = $this->factory->blog->create();
+		$blog_id = self::$factory->blog->create();
 
 		// Set an initial value of '1' for the flag when '0' is the flag value being tested.
 		if ( '0' === $flag_value ) {

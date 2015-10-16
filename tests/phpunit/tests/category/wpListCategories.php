@@ -5,7 +5,7 @@
  */
 class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	public function test_class() {
-		$c = $this->factory->category->create();
+		$c = self::$factory->category->create();
 
 		$found = wp_list_categories( array(
 			'hide_empty' => false,
@@ -16,8 +16,8 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	}
 
 	public function test_class_containing_current_cat() {
-		$c1 = $this->factory->category->create();
-		$c2 = $this->factory->category->create();
+		$c1 = self::$factory->category->create();
+		$c2 = self::$factory->category->create();
 
 		$found = wp_list_categories( array(
 			'hide_empty' => false,
@@ -30,8 +30,8 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	}
 
 	public function test_class_containing_current_cat_parent() {
-		$c1 = $this->factory->category->create();
-		$c2 = $this->factory->category->create( array(
+		$c1 = self::$factory->category->create();
+		$c2 = self::$factory->category->create( array(
 			'parent' => $c1,
 		) );
 
@@ -49,7 +49,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	 * @ticket 33565
 	 */
 	public function test_current_category_should_accept_an_array_of_ids() {
-		$cats = $this->factory->category->create_many( 3 );
+		$cats = self::$factory->category->create_many( 3 );
 
 		$found = wp_list_categories( array(
 			'echo' => false,
@@ -66,10 +66,10 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	 * @ticket 16792
 	 */
 	public function test_should_not_create_element_when_cat_name_is_filtered_to_empty_string() {
-		$c1 = $this->factory->category->create( array(
+		$c1 = self::$factory->category->create( array(
 			'name' => 'Test Cat 1',
 		) );
-		$c2 = $this->factory->category->create( array(
+		$c2 = self::$factory->category->create( array(
 			'name' => 'Test Cat 2',
 		) );
 
@@ -88,7 +88,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	}
 
 	public function test_show_option_all_link_should_go_to_home_page_when_show_on_front_is_false() {
-		$cats = $this->factory->category->create_many( 2 );
+		$cats = self::$factory->category->create_many( 2 );
 
 		$found = wp_list_categories( array(
 			'echo' => false,
@@ -101,8 +101,8 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	}
 
 	public function test_show_option_all_link_should_respect_page_for_posts() {
-		$cats = $this->factory->category->create_many( 2 );
-		$p = $this->factory->post->create( array( 'post_type' => 'page' ) );
+		$cats = self::$factory->category->create_many( 2 );
+		$p = self::$factory->post->create( array( 'post_type' => 'page' ) );
 
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_for_posts', $p );
@@ -125,7 +125,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
 		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
 
-		$terms = $this->factory->term->create_many( 2, array(
+		$terms = self::$factory->term->create_many( 2, array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -149,7 +149,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
 		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
 
-		$terms = $this->factory->term->create_many( 2, array(
+		$terms = self::$factory->term->create_many( 2, array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -170,7 +170,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt2', array( 'has_archive' => true ) );
 		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'post', 'wptests_pt2' ) );
 
-		$terms = $this->factory->term->create_many( 2, array(
+		$terms = self::$factory->term->create_many( 2, array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -191,7 +191,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt2', array( 'has_archive' => false ) );
 		register_taxonomy( 'wptests_tax', array( 'foo', 'wptests_pt', 'wptests_pt2' ) );
 
-		$terms = $this->factory->term->create_many( 2, array(
+		$terms = self::$factory->term->create_many( 2, array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -254,7 +254,7 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	 * @ticket 33460
 	 */
 	public function test_hide_title_if_empty_should_be_ignored_when_category_list_is_not_empty() {
-		$cat = $this->factory->category->create();
+		$cat = self::$factory->category->create();
 
 		$found = wp_list_categories( array(
 			'echo' => false,
@@ -269,9 +269,9 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	 * @ticket 12981
 	 */
 	public function test_exclude_tree_should_be_respected() {
-		$c = $this->factory->category->create();
-		$parent = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
-		$child = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
+		$c = self::$factory->category->create();
+		$parent = self::$factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
+		$child = self::$factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
 
 		$args = array( 'echo' => 0, 'hide_empty' => 0, 'exclude_tree' => $parent );
 
@@ -286,11 +286,11 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	 * @ticket 12981
 	 */
 	public function test_exclude_tree_should_be_merged_with_exclude() {
-		$c = $this->factory->category->create();
-		$parent = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
-		$child = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
-		$parent2 = $this->factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent2' ) );
-		$child2 = $this->factory->category->create( array( 'name' => 'Child', 'slug' => 'child2', 'parent' => $parent2 ) );
+		$c = self::$factory->category->create();
+		$parent = self::$factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
+		$child = self::$factory->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
+		$parent2 = self::$factory->category->create( array( 'name' => 'Parent', 'slug' => 'parent2' ) );
+		$child2 = self::$factory->category->create( array( 'name' => 'Child', 'slug' => 'child2', 'parent' => $parent2 ) );
 
 		$args = array( 'echo' => 0, 'hide_empty' => 0, 'exclude_tree' => $parent );
 

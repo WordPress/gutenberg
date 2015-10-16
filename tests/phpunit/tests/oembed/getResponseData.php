@@ -9,7 +9,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data() {
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_title' => 'Some Post',
 		) );
 
@@ -33,11 +33,11 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	 * Test get_oembed_response_data with an author.
 	 */
 	function test_get_oembed_response_data_author() {
-		$user_id = $this->factory->user->create( array(
+		$user_id = self::$factory->user->create( array(
 			'display_name' => 'John Doe',
 		) );
 
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_title'  => 'Some Post',
 			'post_author' => $user_id,
 		) );
@@ -61,7 +61,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	function test_get_oembed_response_link() {
 		remove_filter( 'oembed_response_data', 'get_oembed_response_data_rich' );
 
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_title' => 'Some Post',
 		) );
 
@@ -81,7 +81,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_with_draft_post() {
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_status' => 'draft',
 		) );
 
@@ -89,7 +89,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_with_scheduled_post() {
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_status' => 'future',
 			'post_date'   => strftime( '%Y-%m-%d %H:%M:%S', strtotime( '+1 day' ) ),
 		) );
@@ -98,7 +98,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_with_private_post() {
-		$post = $this->factory->post->create_and_get( array(
+		$post = self::$factory->post->create_and_get( array(
 			'post_status' => 'private',
 		) );
 
@@ -106,7 +106,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_maxwidth_too_high() {
-		$post = $this->factory->post->create_and_get();
+		$post = self::$factory->post->create_and_get();
 
 		$data = get_oembed_response_data( $post, 1000 );
 
@@ -115,7 +115,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_maxwidth_too_low() {
-		$post = $this->factory->post->create_and_get();
+		$post = self::$factory->post->create_and_get();
 
 		$data = get_oembed_response_data( $post, 100 );
 
@@ -124,7 +124,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_maxwidth_invalid() {
-		$post = $this->factory->post->create_and_get();
+		$post = self::$factory->post->create_and_get();
 
 		$data = get_oembed_response_data( $post, '400;" DROP TABLES' );
 
@@ -138,9 +138,9 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_with_thumbnail() {
-		$post          = $this->factory->post->create_and_get();
+		$post          = self::$factory->post->create_and_get();
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
-		$attachment_id = $this->factory->attachment->create_object( $file, $post->ID, array(
+		$attachment_id = self::$factory->attachment->create_object( $file, $post->ID, array(
 			'post_mime_type' => 'image/jpeg',
 		) );
 		set_post_thumbnail( $post, $attachment_id );
@@ -154,9 +154,9 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 	}
 
 	function test_get_oembed_response_data_for_attachment() {
-		$parent = $this->factory->post->create();
+		$parent = self::$factory->post->create();
 		$file   = DIR_TESTDATA . '/images/canola.jpg';
-		$post   = $this->factory->attachment->create_object( $file, $parent, array(
+		$post   = self::$factory->attachment->create_object( $file, $parent, array(
 			'post_mime_type' => 'image/jpeg',
 		) );
 
