@@ -106,4 +106,12 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', $found->count );
 		$this->assertInternalType( 'int', $found->term_group );
 	}
+
+	/**
+	 * @ticket 34332
+	 */
+	 public function test_should_return_null_when_provided_taxonomy_does_not_match_actual_term_taxonomy() {
+		$term_id = self::$factory->term->create( array( 'taxonomy' => 'post_tag' ) );
+		$this->assertNull( get_term( $term_id, 'category' ) );
+	}
 }
