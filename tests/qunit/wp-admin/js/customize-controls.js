@@ -393,7 +393,7 @@ jQuery( window ).load( function (){
 	panelId = 'mockPanelId';
 	panelTitle = 'Mock Panel Title';
 	panelDescription = 'Mock panel description';
-	panelContent = '<li id="accordion-panel-widgets" class="control-section control-panel accordion-section">';
+	panelContent = '<li id="accordion-panel-mockPanelId" class="accordion-section control-section control-panel control-panel-default"> <h3 class="accordion-section-title" tabindex="0"> Fixture Panel <span class="screen-reader-text">Press return or enter to open this panel</span> </h3> <ul class="accordion-sub-container control-panel-content"> <li class="panel-meta customize-info accordion-section cannot-expand"> <button class="customize-panel-back" tabindex="-1"><span class="screen-reader-text">Back</span></button> <div class="accordion-section-title"> <span class="preview-notice">You are customizing <strong class="panel-title">Fixture Panel</strong></span> <button class="customize-help-toggle dashicons dashicons-editor-help" tabindex="0" aria-expanded="false"><span class="screen-reader-text">Help</span></button> </div> </li> </ul> </li>';
 	panelData = {
 		content: panelContent,
 		title: panelTitle,

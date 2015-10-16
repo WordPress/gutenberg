@@ -64,7 +64,7 @@ window._wpCustomizeSettings.panels.widgets = {
 	'id': 'widgets',
 	'description': 'Widgets are independent sections of content that can be placed into widgetized areas provided by your theme (commonly called sidebars).',
 	'priority': 110,
-	'type': 'default',
+	'type': 'widgets',
 	'title': 'Widgets',
 	'content': '',
 	'active': true,
