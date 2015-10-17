@@ -6,16 +6,37 @@
  * @group admin
  */
 class Tests_AdminBar extends WP_UnitTestCase {
+	protected static $editor_id;
+	protected static $admin_id;
+	protected static $no_role_id;
+	protected static $post_id;
+	protected static $blog_id;
+
+	protected static $user_ids = array();
 
 	public static function setUpBeforeClass() {
 		require_once( ABSPATH . WPINC . '/class-wp-admin-bar.php' );
+
+		parent::setUpBeforeClass();
+	}
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_ids[] = self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
+		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$user_ids[] = self::$no_role_id = $factory->user->create( array( 'role' => '' ) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$user_ids as $id ) {
+			self::delete_user( $id );
+		}
 	}
 
 	/**
 	 * @ticket 21117
 	 */
 	function test_content_post_type() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::$editor_id );
 
 		register_post_type( 'content', array( 'show_in_admin_bar' => true ) );
 
@@ -34,7 +55,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @ticket 21117
 	 */
 	function test_merging_existing_meta_values() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::$editor_id );
 
 		$admin_bar = new WP_Admin_Bar;
 
@@ -42,16 +63,17 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			'id' => 'test-node',
 			'meta' => array( 'class' => 'test-class' ),
 		) );
-		$node = $admin_bar->get_node( 'test-node' );
-		$this->assertEquals( array( 'class' => 'test-class' ), $node->meta );
+
+		$node1 = $admin_bar->get_node( 'test-node' );
+		$this->assertEquals( array( 'class' => 'test-class' ), $node1->meta );
 
 		$admin_bar->add_node( array(
 			'id' => 'test-node',
 			'meta' => array( 'some-meta' => 'value' ),
 		) );
 
-		$node = $admin_bar->get_node( 'test-node' );
-		$this->assertEquals( array( 'class' => 'test-class', 'some-meta' => 'value' ), $node->meta );
+		$node2 = $admin_bar->get_node( 'test-node' );
+		$this->assertEquals( array( 'class' => 'test-class', 'some-meta' => 'value' ), $node2->meta );
 	}
 
 	/**
@@ -62,10 +84,9 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test does not run in multisite' );
 		}
 
-		$nobody = self::factory()->user->create( array( 'role' => '' ) );
-		$this->assertFalse( user_can( $nobody, 'read' ) );
+		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
 
-		wp_set_current_user( $nobody );
+		wp_set_current_user( self::$no_role_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
 
@@ -81,7 +102,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertFalse( $node_my_account->href );
 		$this->assertFalse( $node_user_info->href );
 		$this->assertNull( $node_edit_profile );
-
 	}
 
 	/**
@@ -92,10 +112,9 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test does not run in multisite' );
 		}
 
-		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
-		$this->assertTrue( user_can( $editor, 'read' ) );
+		$this->assertTrue( user_can( self::$editor_id, 'read' ) );
 
-		wp_set_current_user( $editor );
+		wp_set_current_user( self::$editor_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
 
@@ -125,22 +144,19 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test only runs in multisite' );
 		}
 
-		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
-
-		$this->assertTrue( user_can( $admin, 'read' ) );
-		$this->assertTrue( user_can( $editor, 'read' ) );
-
-		$new_blog_id = self::factory()->blog->create( array(
-			'user_id' => $admin,
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => self::$admin_id,
 		) );
 
-		$this->assertTrue( is_user_member_of_blog( $admin, $new_blog_id ) );
-		$this->assertFalse( is_user_member_of_blog( $editor, $new_blog_id ) );
+		$this->assertTrue( user_can( self::$admin_id, 'read' ) );
+		$this->assertTrue( user_can( self::$editor_id, 'read' ) );
 
-		wp_set_current_user( $editor );
+		$this->assertTrue( is_user_member_of_blog( self::$admin_id, $blog_id ) );
+		$this->assertFalse( is_user_member_of_blog( self::$editor_id, $blog_id ) );
 
-		switch_to_blog( $new_blog_id );
+		wp_set_current_user( self::$editor_id );
+
+		switch_to_blog( $blog_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
 
@@ -150,7 +166,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$node_edit_profile = $wp_admin_bar->get_node( 'edit-profile' );
 
 		// get primary blog
-		$primary = get_active_blog_for_user( $editor );
+		$primary = get_active_blog_for_user( self::$editor_id );
 		$this->assertInternalType( 'object', $primary );
 
 		// No Site menu as the user isn't a member of this blog
@@ -167,7 +183,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertEquals( $primary_profile_url, $node_edit_profile->href );
 
 		restore_current_blog();
-
 	}
 
 	/**
@@ -179,29 +194,26 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test only runs in multisite' );
 		}
 
-		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$nobody = self::factory()->user->create( array( 'role' => '' ) );
+		$this->assertTrue( user_can( self::$admin_id, 'read' ) );
+		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
 
-		$this->assertTrue( user_can( $admin, 'read' ) );
-		$this->assertFalse( user_can( $nobody, 'read' ) );
-
-		$new_blog_id = self::factory()->blog->create( array(
-			'user_id' => $admin,
+		$blog_id = self::factory()->blog->create( array(
+			'user_id' => self::$admin_id,
 		) );
 
-		$this->assertTrue( is_user_member_of_blog( $admin, $new_blog_id ) );
-		$this->assertFalse( is_user_member_of_blog( $nobody, $new_blog_id ) );
-		$this->assertTrue( is_user_member_of_blog( $nobody, get_current_blog_id() ) );
+		$this->assertTrue( is_user_member_of_blog( self::$admin_id, $blog_id ) );
+		$this->assertFalse( is_user_member_of_blog( self::$no_role_id, $blog_id ) );
+		$this->assertTrue( is_user_member_of_blog( self::$no_role_id, get_current_blog_id() ) );
 
 		// Remove `$nobody` from the current blog, so they're not a member of any blog
-		$removed = remove_user_from_blog( $nobody, get_current_blog_id() );
+		$removed = remove_user_from_blog( self::$no_role_id, get_current_blog_id() );
 
 		$this->assertTrue( $removed );
-		$this->assertFalse( is_user_member_of_blog( $nobody, get_current_blog_id() ) );
+		$this->assertFalse( is_user_member_of_blog( self::$no_role_id, get_current_blog_id() ) );
 
-		wp_set_current_user( $nobody );
+		wp_set_current_user( self::$no_role_id );
 
-		switch_to_blog( $new_blog_id );
+		switch_to_blog( $blog_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
 
@@ -211,7 +223,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$node_edit_profile = $wp_admin_bar->get_node( 'edit-profile' );
 
 		// get primary blog
-		$primary = get_active_blog_for_user( $nobody );
+		$primary = get_active_blog_for_user( self::$no_role_id );
 		$this->assertNull( $primary );
 
 		// No Site menu as the user isn't a member of this site
@@ -227,7 +239,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertEquals( $user_profile_url, $node_edit_profile->href );
 
 		restore_current_blog();
-
 	}
 
 	protected function get_standard_admin_bar() {

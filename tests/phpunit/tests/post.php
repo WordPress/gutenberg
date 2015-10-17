@@ -508,7 +508,7 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals($future_date, $this->_next_schedule_for_post('publish_future_post', $id));
 
 		// now delete the post and make sure the cron entry is removed
-		wp_delete_post($id);
+		wp_delete_post( $id );
 
 		$this->assertFalse($this->_next_schedule_for_post('publish_future_post', $id));
 	}
