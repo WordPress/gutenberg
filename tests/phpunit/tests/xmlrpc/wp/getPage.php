@@ -23,11 +23,6 @@ class Tests_XMLRPC_wp_getPage extends WP_XMLRPC_UnitTestCase {
 		$this->post_id = wp_insert_post( $this->post_data );
 	}
 
-	function tearDown() {
-		wp_delete_post( $this->post_id );
-		parent::tearDown();
-	}
-
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getPage( array( 1, $this->post_id, 'username', 'password' ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );

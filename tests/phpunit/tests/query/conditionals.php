@@ -27,13 +27,6 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 	}
 
-	function tearDown() {
-		global $wp_rewrite;
-		$wp_rewrite->init();
-
-		parent::tearDown();
-	}
-
 	function test_home() {
 		$this->go_to('/');
 		$this->assertQueryTrue('is_home');

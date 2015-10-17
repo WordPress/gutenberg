@@ -41,15 +41,6 @@ class Tests_Ajax_Autosave extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Tear down the test fixture.
-	 * Reset the current user
-	 */
-	public function tearDown() {
-		wp_set_current_user( 0 );
-		parent::tearDown();
-	}
-
-	/**
 	 * Test autosaving a post
 	 * @return void
 	 */

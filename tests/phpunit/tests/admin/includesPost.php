@@ -5,11 +5,6 @@
  */
 class Tests_Admin_includesPost extends WP_UnitTestCase {
 
-	function tearDown() {
-		wp_set_current_user( 0 );
-		parent::tearDown();
-	}
-
 	function test__wp_translate_postdata_cap_checks_contributor() {
 		$contributor_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
 		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );

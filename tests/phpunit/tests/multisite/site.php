@@ -674,7 +674,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$post2 = self::factory()->post->create();
 		$this->assertEquals( 2, get_blog_details()->post_count );
 
-		wp_delete_post( $post2 );
+		wp_delete_post( $post2, true );
 		$this->assertEquals( 1, get_blog_details()->post_count );
 	}
 

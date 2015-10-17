@@ -23,21 +23,6 @@ class Tests_Query_SetupPostdata extends WP_UnitTestCase {
 		}
 	}
 
-	public function tearDown() {
-		parent::tearDown();
-		return;
-
-		foreach ( $this->global_keys as $global_key ) {
-			if ( ! is_null( $this->global_data[ $global_key ] ) ) {
-				$GLOBALS[ $global_key ] = $this->global_data[ $global_key ];
-			} else {
-				unset( $GLOBALS[ $global_key ] );
-			}
-		}
-
-		$this->global_data = array();
-	}
-
 	public function test_id() {
 		$p = self::factory()->post->create_and_get();
 		setup_postdata( $p );

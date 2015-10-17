@@ -14,7 +14,6 @@ class Tests_User_Settings extends WP_UnitTestCase {
 
 	function tearDown() {
 		unset( $GLOBALS['_updated_user_settings'] );
-		delete_user_option( $this->user_id, 'user-settings' );
 
 		parent::tearDown();
 	}

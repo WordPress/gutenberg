@@ -10,13 +10,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		require_once ABSPATH . WPINC . '/class-phpass.php';
 	}
 
-	function tearDown() {
-		wp_set_current_user( 0 );
-		parent::tearDown();
-	}
-
 	public function test_submitting_comment_to_invalid_post_returns_error() {
-
 		$error = 'comment_id_not_found';
 
 		$this->assertSame( 0, did_action( $error ) );

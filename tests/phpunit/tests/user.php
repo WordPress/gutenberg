@@ -244,7 +244,11 @@ class Tests_User extends WP_UnitTestCase {
 		);
 
 		foreach ( $roles as $role => $level ) {
-			$user_id = self::factory()->user->create( array( 'role' => $role ) );
+			$user_id = self::factory()->user->create( array(
+				'user_email' => 'user_19265_' . $role . '@burritos.com',
+				'user_login' => 'user_19265_' . $role,
+				'role' => $role
+			) );
 			$user = new WP_User( $user_id );
 
 			$this->assertTrue( isset( $user->user_level ) );
@@ -775,6 +779,11 @@ class Tests_User extends WP_UnitTestCase {
 			'user_nicename' => str_repeat( 'a', 50 ),
 		) );
 
+		$user1 = new WP_User( $u1 );
+
+		$expected = str_repeat( 'a', 50 );
+		$this->assertSame( $expected, $user1->user_nicename );
+
 		$user_login = str_repeat( 'a', 55 );
 		$u = wp_insert_user( array(
 			'user_login' => $user_login,
@@ -783,18 +792,28 @@ class Tests_User extends WP_UnitTestCase {
 		) );
 
 		$this->assertNotEmpty( $u );
-		$user = new WP_User( $u );
+		$user2 = new WP_User( $u );
 		$expected = str_repeat( 'a', 48 ) . '-2';
-		$this->assertSame( $expected, $user->user_nicename );
+		$this->assertSame( $expected, $user2->user_nicename );
 	}
 
 	/**
 	 * @ticket 33793
 	 */
 	public function test_wp_insert_user_should_not_truncate_to_a_duplicate_user_nicename_when_suffix_has_more_than_one_character() {
-		$users = self::factory()->user->create_many( 4, array(
+		$user_ids = self::factory()->user->create_many( 4, array(
 			'user_nicename' => str_repeat( 'a', 50 ),
 		) );
+
+		foreach ( $user_ids as $i => $user_id ) {
+			$user = new WP_User( $user_id );
+			if ( 0 === $i ) {
+				$expected = str_repeat( 'a', 50 );
+			} else {
+				$expected = str_repeat( 'a', 48 ) . '-' . ( $i + 1 );
+			}
+			$this->assertSame( $expected, $user->user_nicename );
+		}
 
 		$user_login = str_repeat( 'a', 55 );
 		$u = wp_insert_user( array(

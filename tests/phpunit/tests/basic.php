@@ -5,21 +5,6 @@
  * @group testsuite
  */
 class Tests_Basic extends WP_UnitTestCase {
-	var $val;
-
-	function setUp() {
-		parent::setUp();
-		$this->val = true;
-	}
-
-	function tearDown() {
-		$this->val = false;
-		parent::tearDown();
-	}
-
-	function test_true() {
-		$this->assertTrue($this->val);
-	}
 
 	function test_license() {
 		$license = file_get_contents( ABSPATH . 'license.txt' );

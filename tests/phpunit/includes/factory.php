@@ -401,11 +401,17 @@ abstract class WP_UnitTest_Factory_For_Thing {
 }
 
 class WP_UnitTest_Generator_Sequence {
-	var $next;
-	var $template_string;
+	static $incr = -1;
+	public $next;
+	public $template_string;
 
-	function __construct( $template_string = '%s', $start = 1 ) {
-		$this->next = $start;
+	function __construct( $template_string = '%s', $start = null ) {
+		if ( $start ) {
+			$this->next = $start;
+		} else {
+			self::$incr++;
+			$this->next = self::$incr;
+		}
 		$this->template_string = $template_string;
 	}
 

@@ -29,14 +29,6 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Tear down the test fixture.
-	 */
-	public function tearDown() {
-		wp_set_current_user( 0 );
-		parent::tearDown();
-	}
-
-	/**
 	 * Helper to keep it DRY
 	 *
 	 * @param string $action Action.

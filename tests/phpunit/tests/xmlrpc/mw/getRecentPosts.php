@@ -41,7 +41,7 @@ class Tests_XMLRPC_mw_getRecentPosts extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function test_no_editable_posts() {
-		wp_delete_post( $this->post_id );
+		wp_delete_post( $this->post_id, true );
 
 		$result = $this->myxmlrpcserver->mw_getRecentPosts( array( 1, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );

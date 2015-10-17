@@ -932,6 +932,8 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 */
 	public function test_get_single_role_by_string_which_is_similar() {
 		$another_editor = self::factory()->user->create( array(
+			'user_email' => 'another_editor@another_editor.com',
+			'user_login' => 'another_editor',
 			'role' => 'another-editor',
 		) );
 

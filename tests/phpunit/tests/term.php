@@ -12,7 +12,9 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		array_map( 'wp_delete_post', self::$post_ids );
+		foreach ( self::$post_ids as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
 	}
 
 	/**

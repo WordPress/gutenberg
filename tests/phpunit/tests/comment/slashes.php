@@ -10,7 +10,6 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		parent::setUp();
 		// we need an admin user to bypass comment flood protection
 		$this->author_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$this->old_current_user = get_current_user_id();
 		wp_set_current_user( $this->author_id );
 
 		// it is important to test with both even and odd numbered slashes as
@@ -22,11 +21,6 @@ class Tests_Comment_Slashes extends WP_UnitTestCase {
 		$this->slash_5 = 'String with 5 slashes \\\\\\\\\\';
 		$this->slash_6 = 'String with 6 slashes \\\\\\\\\\\\';
 		$this->slash_7 = 'String with 7 slashes \\\\\\\\\\\\\\';
-	}
-
-	function tearDown() {
-		wp_set_current_user( $this->old_current_user );
-		parent::tearDown();
 	}
 
 	/**

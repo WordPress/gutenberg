@@ -17,9 +17,9 @@ class Tests_XMLRPC_wp_getUser extends WP_XMLRPC_UnitTestCase {
 	}
 
 	function tearDown() {
-		if ( is_multisite() )
+		if ( is_multisite() ) {
 			revoke_super_admin( $this->administrator_id );
-
+		}
 		parent::tearDown();
 	}
 

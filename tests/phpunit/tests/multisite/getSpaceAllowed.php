@@ -18,7 +18,6 @@ class Tests_Multisite_Get_Space_Allowed extends WP_UnitTestCase {
 
 		self::$original_site_blog_upload_space = get_site_option( 'blog_upload_space' );
 		self::$original_blog_upload_space = get_option( 'blog_upload_space' );
-
 	}
 
 	public function setUp() {

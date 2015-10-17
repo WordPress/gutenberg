@@ -32,12 +32,6 @@ class Tests_Post_Meta extends WP_UnitTestCase {
 		$this->post_id_2 = wp_insert_post($post);
 	}
 
-	function tearDown() {
-		wp_delete_post($this->post_id);
-		wp_delete_post($this->post_id_2);
-		parent::tearDown();
-	}
-
 	function test_unique_postmeta() {
 		// Add a unique post meta item
 		$this->assertInternalType( 'integer', add_post_meta($this->post_id, 'unique', 'value', true) );

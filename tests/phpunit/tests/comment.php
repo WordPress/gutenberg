@@ -15,7 +15,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id );
+		wp_delete_post( self::$post_id, true );
 
 		self::delete_user( self::$user_id );
 	}
