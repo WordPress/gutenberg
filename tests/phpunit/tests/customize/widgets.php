@@ -12,6 +12,14 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 	 */
 	protected $manager;
 
+	/**
+	 * Stored global variable in setUp for restoration in tearDown.
+	 *
+	 * @see $wp_registered_sidebars
+	 * @var array
+	 */
+	protected $backup_registered_sidebars;
+
 	function setUp() {
 		parent::setUp();
 		require_once( ABSPATH . WPINC . '/class-wp-customize-manager.php' );
@@ -32,12 +40,15 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 
 		$user_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $user_id );
+
+		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];
 	}
 
 	function tearDown() {
 		$this->manager = null;
 		unset( $GLOBALS['wp_customize'] );
 		unset( $GLOBALS['wp_scripts'] );
+		$GLOBALS['wp_registered_sidebars'] = $this->backup_registered_sidebars;
 		parent::tearDown();
 	}
 
@@ -263,6 +274,21 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'width', $params );
 		$this->assertArrayHasKey( 'height', $params );
 		$this->assertInternalType( 'bool', $params['is_wide'] );
+	}
 
+	/**
+	 * @see WP_Customize_Widgets::is_panel_active()
+	 */
+	function test_is_panel_active() {
+		global $wp_registered_sidebars;
+		$this->do_customize_boot_actions();
+
+		$this->assertNotEmpty( $wp_registered_sidebars );
+		$this->assertTrue( $this->manager->widgets->is_panel_active() );
+		$this->assertTrue( $this->manager->get_panel( 'widgets' )->active() );
+
+		$wp_registered_sidebars = array();
+		$this->assertFalse( $this->manager->widgets->is_panel_active() );
+		$this->assertFalse( $this->manager->get_panel( 'widgets' )->active() );
 	}
 }
