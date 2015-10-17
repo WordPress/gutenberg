@@ -3,17 +3,39 @@
 /**
  * @group admin
  */
-class Tests_Admin_includesPost extends WP_UnitTestCase {
+class Tests_Admin_Includes_Post extends WP_UnitTestCase {
+	protected static $contributor_id;
+	protected static $author_ids;
+	protected static $editor_id;
+	protected static $admin_id;
+	protected static $post_id;
+
+	protected static $user_ids = array();
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_ids = self::$author_ids = $factory->user->create_many( 2, array( 'role' => 'author' ) );
+
+		self::$user_ids[] = self::$contributor_id = $factory->user->create( array( 'role' => 'contributor' ) );
+		self::$user_ids[] = self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
+		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+
+		self::$post_id = $factory->post->create();
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$user_ids as $id ) {
+			self::delete_user( $id );
+		}
+
+		wp_delete_post( self::$post_id, true );
+	}
 
 	function test__wp_translate_postdata_cap_checks_contributor() {
-		$contributor_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
-		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
-
-		wp_set_current_user( $contributor_id );
+		wp_set_current_user( self::$contributor_id );
 
 		// Create New Draft Post
 		$_post_data = array();
-		$_post_data['post_author'] = $contributor_id;
+		$_post_data['post_author'] = self::$contributor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['saveasdraft'] = true;
 
@@ -24,7 +46,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Submit Post for Approval
 		$_post_data = array();
-		$_post_data['post_author'] = $contributor_id;
+		$_post_data['post_author'] = self::$contributor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['publish'] = true;
 
@@ -35,7 +57,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Create New Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_author'] = $editor_id;
+		$_post_data['post_author'] = self::$editor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['saveasdraft'] = true;
 
@@ -46,8 +68,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Edit Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => $editor_id ) );
-		$_post_data['post_author'] = $editor_id;
+		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$_post_data['post_author'] = self::$editor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['post_status'] = 'draft';
 		$_post_data['saveasdraft'] = true;
@@ -59,14 +81,11 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	function test__wp_translate_postdata_cap_checks_editor() {
-		$contributor_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
-		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
-
-		wp_set_current_user( $editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		// Create New Draft Post
 		$_post_data = array();
-		$_post_data['post_author'] = $editor_id;
+		$_post_data['post_author'] = self::$editor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['saveasdraft'] = true;
 
@@ -77,7 +96,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Publish Post
 		$_post_data = array();
-		$_post_data['post_author'] = $editor_id;
+		$_post_data['post_author'] = self::$editor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['publish'] = true;
 
@@ -88,7 +107,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Create New Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_author'] = $contributor_id;
+		$_post_data['post_author'] = self::$contributor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['saveasdraft'] = true;
 
@@ -99,8 +118,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Edit Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => $contributor_id ) );
-		$_post_data['post_author'] = $contributor_id;
+		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => self::$contributor_id ) );
+		$_post_data['post_author'] = self::$contributor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['post_status'] = 'draft';
 		$_post_data['saveasdraft'] = true;
@@ -117,8 +136,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 25272
 	 */
 	function test_edit_post_auto_draft() {
-		$user_id = self::factory()->user->create( array( 'role' => 'editor' ) );
-		wp_set_current_user( $user_id );
+		wp_set_current_user( self::$editor_id );
 		$post = self::factory()->post->create_and_get( array( 'post_status' => 'auto-draft' ) );
 		$this->assertEquals( 'auto-draft', $post->post_status );
 		$post_data = array(
@@ -135,8 +153,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 30615
 	 */
 	public function test_edit_post_should_parse_tax_input_by_name_rather_than_slug_for_nonhierarchical_taxonomies() {
-		$u = self::factory()->user->create( array( 'role' => 'editor' ) );
-		wp_set_current_user( $u );
+		wp_set_current_user( self::$editor_id );
 
 		register_taxonomy( 'wptests_tax', array( 'post' ) );
 		$t1 = self::factory()->term->create( array(
@@ -150,10 +167,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 			'slug' => 'foo',
 		) );
 
-		$p = self::factory()->post->create();
-
 		$post_data = array(
-			'post_ID' => $p,
+			'post_ID' => self::$post_id,
 			'tax_input' => array(
 				'wptests_tax' => 'foo,baz',
 			),
@@ -161,7 +176,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		edit_post( $post_data );
 
-		$found = wp_get_post_terms( $p, 'wptests_tax' );
+		$found = wp_get_post_terms( self::$post_id, 'wptests_tax' );
 
 		// Should contain the term with the name 'foo', not the slug.
 		$this->assertContains( $t1, wp_list_pluck( $found, 'term_id' ) );
@@ -174,20 +189,17 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 30615
 	 */
 	public function test_edit_post_should_not_create_terms_for_an_empty_tag_input_field() {
-		$u = self::factory()->user->create( array( 'role' => 'editor' ) );
-		wp_set_current_user( $u );
+		wp_set_current_user( self::$editor_id );
 
 		register_taxonomy( 'wptests_tax', array( 'post' ) );
-		$t1 = self::factory()->term->create( array(
+		self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 			'slug' => 'bar',
 		) );
 
-		$p = self::factory()->post->create();
-
 		$post_data = array(
-			'post_ID' => $p,
+			'post_ID' => self::$post_id,
 			'tax_input' => array(
 				'wptests_tax' => ' ',
 			),
@@ -195,7 +207,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		edit_post( $post_data );
 
-		$found = wp_get_post_terms( $p, 'wptests_tax' );
+		$found = wp_get_post_terms( self::$post_id, 'wptests_tax' );
 
 		$this->assertEmpty( $found );
 	}
@@ -204,19 +216,17 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 27792
 	 */
 	function test_bulk_edit_posts_stomping() {
-		$admin = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		$users = self::factory()->user->create_many( 2, array( 'role' => 'author' ) );
-		wp_set_current_user( $admin );
+		wp_set_current_user( self::$admin_id );
 
 		$post1 = self::factory()->post->create( array(
-			'post_author'    => $users[0],
+			'post_author'    => self::$author_ids[0],
 			'comment_status' => 'open',
 			'ping_status'    => 'open',
 			'post_status'    => 'publish',
 		) );
 
 		$post2 = self::factory()->post->create( array(
-			'post_author'    => $users[1],
+			'post_author'    => self::$author_ids[1],
 			'comment_status' => 'closed',
 			'ping_status'    => 'closed',
 			'post_status'    => 'draft',
@@ -231,13 +241,13 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 			'post'             => array( $post1, $post2 ),
 		);
 
-		$done = bulk_edit_posts( $request );
+		bulk_edit_posts( $request );
 
 		$post = get_post( $post2 );
 
 		// Check that the first post's values don't stomp the second post.
 		$this->assertEquals( 'draft', $post->post_status );
-		$this->assertEquals( $users[1], $post->post_author );
+		$this->assertEquals( self::$author_ids[1], $post->post_author );
 		$this->assertEquals( 'closed', $post->comment_status );
 		$this->assertEquals( 'closed', $post->ping_status );
 	}
@@ -263,7 +273,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 18306
 	 */
 	public function test_get_sample_permalink_html_should_use_default_permalink_for_view_post_link_when_pretty_permalinks_are_disabled() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
 		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
@@ -279,7 +289,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_link_when_pretty_permalinks_are_enabled() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
 		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
@@ -296,7 +306,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_link_when_changing_slug() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 
 		// Published posts should use published permalink
 		$p = self::factory()->post->create( array( 'post_status' => 'publish', 'post_name' => 'foo' ) );

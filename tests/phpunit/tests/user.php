@@ -244,11 +244,7 @@ class Tests_User extends WP_UnitTestCase {
 		);
 
 		foreach ( $roles as $role => $level ) {
-			$user_id = self::factory()->user->create( array(
-				'user_email' => 'user_19265_' . $role . '@burritos.com',
-				'user_login' => 'user_19265_' . $role,
-				'role' => $role
-			) );
+			$user_id = self::factory()->user->create( array( 'role' => $role ) );
 			$user = new WP_User( $user_id );
 
 			$this->assertTrue( isset( $user->user_level ) );
