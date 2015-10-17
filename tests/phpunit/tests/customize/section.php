@@ -6,6 +6,18 @@
  * @group customize
  */
 class Tests_WP_Customize_Section extends WP_UnitTestCase {
+	protected static $admin_id;
+	protected static $user_ids = array();
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$user_ids as $id ) {
+			self::delete_user( $id );
+		}
+	}
 
 	/**
 	 * @var WP_Customize_Manager
@@ -135,8 +147,7 @@ class Tests_WP_Customize_Section extends WP_UnitTestCase {
 	 * @see WP_Customize_Section::check_capabilities()
 	 */
 	function test_check_capabilities() {
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $user_id );
+		wp_set_current_user( self::$admin_id );
 
 		$section = new WP_Customize_Section( $this->manager, 'foo' );
 		$this->assertTrue( $section->check_capabilities() );
@@ -161,7 +172,7 @@ class Tests_WP_Customize_Section extends WP_UnitTestCase {
 	 * @see WP_Customize_Section::maybe_render()
 	 */
 	function test_maybe_render() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 		$section = new WP_Customize_Section( $this->manager, 'bar' );
 		$customize_render_section_count = did_action( 'customize_render_section' );
 		add_action( 'customize_render_section', array( $this, 'action_customize_render_section_test' ) );
@@ -186,7 +197,7 @@ class Tests_WP_Customize_Section extends WP_UnitTestCase {
 	 * @see WP_Customize_Section::print_template()
 	 */
 	function test_print_templates_standard() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 
 		$section = new WP_Customize_Section( $this->manager, 'baz' );
 		ob_start();
@@ -201,7 +212,7 @@ class Tests_WP_Customize_Section extends WP_UnitTestCase {
 	 * @see WP_Customize_Section::print_template()
 	 */
 	function test_print_templates_custom() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_id );
 
 		$section = new Custom_Section_Test( $this->manager, 'baz' );
 		ob_start();

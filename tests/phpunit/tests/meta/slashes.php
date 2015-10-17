@@ -6,12 +6,26 @@
  * @ticket 21767
  */
 class Tests_Meta_Slashes extends WP_UnitTestCase {
+	protected static $editor_id;
+	protected static $post_id;
+	protected static $comment_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
+		self::$post_id = $factory->post->create();
+		self::$comment_id = $factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$editor_id );
+		wp_delete_comment( self::$comment_id, true );
+		wp_delete_post( self::$post_id, true );
+	}
+
 	function setUp() {
 		parent::setUp();
-		$this->author_id = self::factory()->user->create( array( 'role' => 'editor' ) );
-		$this->post_id = self::factory()->post->create();
 
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$editor_id );
 
 		$this->slash_1 = 'String with 1 slash \\';
 		$this->slash_2 = 'String with 2 slashes \\\\';
@@ -169,7 +183,7 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_add_comment_meta() {
-		$id = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+		$id = self::$comment_id;
 
 		add_comment_meta( $id, 'slash_test_1', $this->slash_1 );
 		add_comment_meta( $id, 'slash_test_2', $this->slash_3 );
@@ -193,7 +207,7 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_update_comment_meta() {
-		$id = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+		$id = self::$comment_id;
 
 		add_comment_meta( $id, 'slash_test_1', 'foo' );
 		add_comment_meta( $id, 'slash_test_2', 'foo' );
@@ -267,5 +281,4 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 		$this->assertEquals( wp_unslash( $this->slash_4 ), get_user_meta( $id, 'slash_test_2', true ) );
 		$this->assertEquals( wp_unslash( $this->slash_6 ), get_user_meta( $id, 'slash_test_3', true ) );
 	}
-
 }
