@@ -6,6 +6,7 @@
  * @group upload
  */
 class Tests_Post_Attachments extends WP_UnitTestCase {
+	protected $ids = array();
 
 	function tearDown() {
 		// Remove all uploads.

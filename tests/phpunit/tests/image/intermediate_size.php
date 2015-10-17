@@ -5,6 +5,8 @@
  * @group upload
  */
 class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
+	protected $ids = array();
+
 	function tearDown() {
 		$this->remove_added_uploads();
 		parent::tearDown();

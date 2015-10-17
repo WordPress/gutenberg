@@ -4,6 +4,8 @@
  * @group post
  */
 class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
+	protected $post_ids = array();
+
 	/**
 	 * @ticket 21013
 	 */
