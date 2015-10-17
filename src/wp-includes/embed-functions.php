@@ -464,20 +464,20 @@ function get_post_embed_html( $post = null, $width, $height ) {
 
 	$output = "<script type='text/javascript'>\n";
 	if ( SCRIPT_DEBUG ) {
-		$output .= file_get_contents( ABSPATH . WPINC . '/js/wp-oembed.js' );
+		$output .= file_get_contents( ABSPATH . WPINC . '/js/wp-embed.js' );
 	} else {
 		/*
 		 * If you're looking at a src version of this file, you'll see an "include"
 		 * statement below. This is used by the `grunt build` process to directly
-		 * include a minified version of wp-oembed.js, instead of using the
+		 * include a minified version of wp-embed.js, instead of using the
 		 * file_get_contents() method from above.
 		 *
 		 * If you're looking at a build version of this file, you'll see a string of
 		 * minified JavaScript. If you need to debug it, please turn on SCRIPT_DEBUG
-		 * and edit wp-oembed.js directly.
+		 * and edit wp-embed.js directly.
 		 */
 		$output .=<<<JS
-		include "js/wp-oembed.min.js"
+		include "js/wp-embed.min.js"
 JS;
 	}
 	$output .= "\n</script>";
@@ -491,7 +491,7 @@ JS;
 	);
 
 	/**
-	 * Filter the oEmbed HTML output.
+	 * Filter the embed HTML output for a given post.
 	 *
 	 * @since 4.4.0
 	 *
@@ -500,7 +500,7 @@ JS;
 	 * @param int     $width  Width of the response.
 	 * @param int     $height Height of the response.
 	 */
-	return apply_filters( 'oembed_html', $output, $post, $width, $height );
+	return apply_filters( 'embed_html', $output, $post, $width, $height );
 }
 
 /**
@@ -748,7 +748,7 @@ function wp_filter_oembed_result( $result, $data, $url ) {
  * @param string $more_string The string shown within the more link.
  * @return string The modified excerpt.
  */
-function wp_oembed_excerpt_more( $more_string ) {
+function wp_embed_excerpt_more( $more_string ) {
 	if ( ! is_embed() ) {
 		return $more_string;
 	}
@@ -793,7 +793,7 @@ function the_excerpt_embed() {
  * @param string $content The current post excerpt.
  * @return string The modified post excerpt.
  */
-function wp_oembed_excerpt_attachment( $content ) {
+function wp_embed_excerpt_attachment( $content ) {
 	if ( is_attachment() ) {
 		return prepend_attachment( '' );
 	}
@@ -806,12 +806,12 @@ function wp_oembed_excerpt_attachment( $content ) {
  *
  * @since 4.4.0
  */
-function print_oembed_embed_styles() {
+function print_embed_styles() {
 	?>
 	<style type="text/css">
 	<?php
 		if ( SCRIPT_DEBUG ) {
-			readfile( ABSPATH . WPINC . "/css/wp-oembed-embed.css" );
+			readfile( ABSPATH . WPINC . "/css/wp-embed-template.css" );
 		} else {
 			/*
 			 * If you're looking at a src version of this file, you'll see an "include"
@@ -821,10 +821,10 @@ function print_oembed_embed_styles() {
 			 *
 			 * If you're looking at a build version of this file, you'll see a string of
 			 * minified CSS. If you need to debug it, please turn on SCRIPT_DEBUG
-			 * and edit wp-oembed-embed.css directly.
+			 * and edit wp-embed-template.css directly.
 			 */
 			?>
-			include "css/wp-oembed-embed.min.css"
+			include "css/wp-embed-template.min.css"
 			<?php
 		}
 	?>
@@ -837,25 +837,25 @@ function print_oembed_embed_styles() {
  *
  * @since 4.4.0
  */
-function print_oembed_embed_scripts() {
+function print_embed_scripts() {
 	?>
 	<script type="text/javascript">
 	<?php
 		if ( SCRIPT_DEBUG ) {
-			readfile( ABSPATH . WPINC . "/js/wp-oembed-embed.js" );
+			readfile( ABSPATH . WPINC . "/js/wp-embed-template.js" );
 		} else {
 			/*
 			 * If you're looking at a src version of this file, you'll see an "include"
 			 * statement below. This is used by the `grunt build` process to directly
-			 * include a minified version of wp-oembed-embed.js, instead of using the
+			 * include a minified version of wp-embed-template.js, instead of using the
 			 * readfile() method from above.
 			 *
 			 * If you're looking at a build version of this file, you'll see a string of
 			 * minified JavaScript. If you need to debug it, please turn on SCRIPT_DEBUG
-			 * and edit wp-oembed-embed.js directly.
+			 * and edit wp-embed-template.js directly.
 			 */
 			?>
-			include "js/wp-oembed-embed.min.js"
+			include "js/wp-embed-template.min.js"
 			<?php
 		}
 	?>

@@ -186,22 +186,22 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
 	}
 
-	function test_wp_oembed_excerpt_more_no_embed() {
+	function test_wp_embed_excerpt_more_no_embed() {
 		$GLOBALS['wp_query'] = new WP_Query();
 
-		$this->assertEquals( 'foo bar', wp_oembed_excerpt_more( 'foo bar' ) );
+		$this->assertEquals( 'foo bar', wp_embed_excerpt_more( 'foo bar' ) );
 	}
 
-	function test_wp_oembed_excerpt_more() {
+	function test_wp_embed_excerpt_more() {
 		$post_id = self::$factory->post->create( array(
 			'post_content' => 'Foo Bar',
 		) );
 
-		$this->assertEquals( '', wp_oembed_excerpt_more( '' ) );
+		$this->assertEquals( '', wp_embed_excerpt_more( '' ) );
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$actual = wp_oembed_excerpt_more( '' );
+		$actual = wp_embed_excerpt_more( '' );
 
 		$expected = sprintf(
 			'&hellip; <a class="wp-embed-more" href="%s" target="_top">Read more</a>',
