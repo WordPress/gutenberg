@@ -5,14 +5,20 @@
  * @group user
  */
 class Tests_User extends WP_UnitTestCase {
-	protected static $test_id;
+	protected static $admin_id;
+	protected static $editor_id;
 	protected static $author_id;
+	protected static $contrib_id;
+	protected static $sub_id;
+
+	protected static $user_ids = array();
+
 	protected static $_author;
 	protected $author;
 	protected $user_data;
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$test_id = $factory->user->create( array(
+		self::$user_ids[] = self::$contrib_id = $factory->user->create( array(
 			'user_login' => 'user1',
 			'user_nicename' => 'userone',
 			'user_pass'  => 'password',
@@ -20,15 +26,28 @@ class Tests_User extends WP_UnitTestCase {
 			'last_name'  => 'Doe',
 			'display_name' => 'John Doe',
 			'user_email' => 'blackburn@battlefield3.com',
-			'user_url' => 'http://tacos.com'
+			'user_url' => 'http://tacos.com',
+			'role' => 'contributor'
 		) );
-		self::$author_id = $factory->user->create( array( 'role' => 'author' ) );
+
+		self::$user_ids[] = self::$author_id = $factory->user->create( array(
+			'user_login' => 'author_login',
+			'user_email' => 'author@email.com',
+			'role' => 'author'
+		) );
+
+		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$user_ids[] = self::$editor_id = $factory->user->create( array(
+			'role' => 'editor',
+			'user_email' => 'test@test.com',
+		) );
+		self::$user_ids[] = self::$sub_id = $factory->user->create( array( 'role' => 'subscriber' ) );
+
 		self::$_author = get_user_by( 'ID', self::$author_id );
 	}
 
 	public static function wpTearDownAfterClass() {
-		$ids = array( self::$test_id, self::$author_id );
-		foreach ( $ids as $id ) {
+		foreach ( self::$user_ids as $id ) {
 			self::delete_user( $id );
 		}
 	}
@@ -41,11 +60,13 @@ class Tests_User extends WP_UnitTestCase {
 
 	function test_get_users_of_blog() {
 		// add one of each user role
-		$nusers = array();
-		foreach ( array('administrator', 'editor', 'author', 'contributor', 'subscriber' ) as $role ) {
-			$id = self::factory()->user->create( array( 'role' => $role ) );
-			$nusers[ $id ] = $id;
-		}
+		$nusers = array(
+			self::$contrib_id,
+			self::$author_id,
+			self::$admin_id,
+			self::$editor_id,
+			self::$sub_id,
+		);
 
 		$user_list = get_users();
 
@@ -53,13 +74,13 @@ class Tests_User extends WP_UnitTestCase {
 		$found = array();
 		foreach ( $user_list as $user ) {
 			// only include the users we just created - there might be some others that existed previously
-			if ( isset( $nusers[$user->ID] ) ) {
-				$found[ $user->ID] = $user->ID;
+			if ( in_array( $user->ID, $nusers ) ) {
+				$found[] = $user->ID;
 			}
 		}
 
 		// make sure every user we created was returned
-		$this->assertEquals($nusers, $found);
+		$this->assertEqualSets( $nusers, $found );
 	}
 
 	// simple get/set tests for user_option functions
@@ -236,15 +257,14 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_user_level_property_back_compat() {
 		$roles = array(
-			'administrator' => 10,
-			'editor' => 7,
-			'author' => 2,
-			'contributor' => 1,
-			'subscriber' => 0,
+			self::$admin_id => 10,
+			self::$editor_id => 7,
+			self::$author_id => 2,
+			self::$contrib_id => 1,
+			self::$sub_id => 0,
 		);
 
-		foreach ( $roles as $role => $level ) {
-			$user_id = self::factory()->user->create( array( 'role' => $role ) );
+		foreach ( $roles as $user_id => $level ) {
 			$user = new WP_User( $user_id );
 
 			$this->assertTrue( isset( $user->user_level ) );
@@ -292,86 +312,63 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function test_get() {
-		$user_id = self::factory()->user->create( array(
-			'role' => 'author',
-			'user_login' => 'test_wp_user_get',
-			'user_pass' => 'password',
-			'user_email' => 'test@test.com',
-		) );
-
-		$user = new WP_User( $user_id );
-		$this->assertEquals( 'test_wp_user_get', $user->get( 'user_login' ) );
-		$this->assertEquals( 'test@test.com', $user->get( 'user_email' ) );
+		$user = new WP_User( self::$author_id );
+		$this->assertEquals( 'author_login', $user->get( 'user_login' ) );
+		$this->assertEquals( 'author@email.com', $user->get( 'user_email' ) );
 		$this->assertEquals( 0, $user->get( 'use_ssl' ) );
 		$this->assertEquals( '', $user->get( 'field_that_does_not_exist' ) );
 
-		update_user_meta( $user_id, 'dashed-key', 'abcdefg' );
+		update_user_meta( self::$author_id, 'dashed-key', 'abcdefg' );
 		$this->assertEquals( 'abcdefg', $user->get( 'dashed-key' ) );
 	}
 
 	function test_has_prop() {
-		$user_id = self::factory()->user->create( array(
-			'role' => 'author',
-			'user_login' => 'test_wp_user_has_prop',
-			'user_pass' => 'password',
-			'user_email' => 'test2@test.com',
-		) );
-
-		$user = new WP_User( $user_id );
+		$user = new WP_User( self::$author_id );
 		$this->assertTrue( $user->has_prop( 'user_email') );
 		$this->assertTrue( $user->has_prop( 'use_ssl' ) );
 		$this->assertFalse( $user->has_prop( 'field_that_does_not_exist' ) );
 
-		update_user_meta( $user_id, 'dashed-key', 'abcdefg' );
+		update_user_meta( self::$author_id, 'dashed-key', 'abcdefg' );
 		$this->assertTrue( $user->has_prop( 'dashed-key' ) );
 	}
 
 	function test_update_user() {
-		$user_id = self::factory()->user->create( array(
-			'role' => 'author',
-			'user_login' => 'test_wp_update_user',
-			'user_pass' => 'password',
-			'user_email' => 'test3@test.com',
-		) );
-		$user = new WP_User( $user_id );
+		$user = new WP_User( self::$author_id );
 
-		update_user_meta( $user_id, 'description', 'about me' );
+		update_user_meta( self::$author_id, 'description', 'about me' );
 		$this->assertEquals( 'about me', $user->get( 'description' ) );
 
-		$user_data = array( 'ID' => $user_id, 'display_name' => 'test user' );
+		$user_data = array( 'ID' => self::$author_id, 'display_name' => 'test user' );
 		wp_update_user( $user_data );
 
-		$user = new WP_User( $user_id );
+		$user = new WP_User( self::$author_id );
 		$this->assertEquals( 'test user', $user->get( 'display_name' ) );
 
 		// Make sure there is no collateral damage to fields not in $user_data
 		$this->assertEquals( 'about me', $user->get( 'description' ) );
 
 		// Pass as stdClass
-		$user_data = array( 'ID' => $user_id, 'display_name' => 'a test user' );
+		$user_data = array( 'ID' => self::$author_id, 'display_name' => 'a test user' );
 		wp_update_user( (object) $user_data );
 
-		$user = new WP_User( $user_id );
+		$user = new WP_User( self::$author_id );
 		$this->assertEquals( 'a test user', $user->get( 'display_name' ) );
 
-		// Pass as WP_User
-		$user = new WP_User( $user_id );
 		$user->display_name = 'some test user';
 		wp_update_user( $user );
 
-		$user = new WP_User( $user_id );
 		$this->assertEquals( 'some test user', $user->get( 'display_name' ) );
 
 		// Test update of fields in _get_additional_user_keys()
 		$user_data = array(
-			'ID' => $user_id, 'use_ssl' => 1, 'show_admin_bar_front' => 1,
+			'ID' => self::$author_id, 'use_ssl' => 1, 'show_admin_bar_front' => 1,
 			'rich_editing' => 1, 'first_name' => 'first', 'last_name' => 'last',
 			'nickname' => 'nick', 'comment_shortcuts' => 'true', 'admin_color' => 'classic',
 			'description' => 'describe'
 		);
 		wp_update_user( $user_data );
 
-		$user = new WP_User( $user_id );
+		$user = new WP_User( self::$author_id );
 		foreach ( $user_data as $key => $value ) {
 			$this->assertEquals( $value, $user->get( $key ), $key );
 		}
@@ -383,12 +380,11 @@ class Tests_User extends WP_UnitTestCase {
 	function test_global_userdata() {
 		global $userdata, $wpdb;
 
-		$user_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
-		wp_set_current_user( $user_id );
+		wp_set_current_user( self::$sub_id );
 
 		$this->assertNotEmpty( $userdata );
 		$this->assertInstanceOf( 'WP_User', $userdata );
-		$this->assertEquals( $userdata->ID, $user_id );
+		$this->assertEquals( $userdata->ID, self::$sub_id );
 		$prefix = $wpdb->get_blog_prefix();
 		$cap_key = $prefix . 'capabilities';
 		$this->assertTrue( isset( $userdata->$cap_key ) );
@@ -497,28 +493,27 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 21431
 	 */
 	function test_count_many_users_posts() {
-		$user_id_a = self::factory()->user->create( array( 'role' => 'author' ) );
 		$user_id_b = self::factory()->user->create( array( 'role' => 'author' ) );
-		$post_id_a = self::factory()->post->create( array( 'post_author' => $user_id_a ) );
+		$post_id_a = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
 		$post_id_b = self::factory()->post->create( array( 'post_author' => $user_id_b ) );
 		$post_id_c = self::factory()->post->create( array( 'post_author' => $user_id_b, 'post_status' => 'private' ) );
 
-		wp_set_current_user( $user_id_a );
-		$counts = count_many_users_posts( array( $user_id_a, $user_id_b), 'post', false );
-		$this->assertEquals( 1, $counts[$user_id_a] );
+		wp_set_current_user( self::$author_id );
+		$counts = count_many_users_posts( array( self::$author_id, $user_id_b ), 'post', false );
+		$this->assertEquals( 1, $counts[self::$author_id] );
 		$this->assertEquals( 1, $counts[$user_id_b] );
 
-		$counts = count_many_users_posts( array( $user_id_a, $user_id_b), 'post', true );
-		$this->assertEquals( 1, $counts[$user_id_a] );
+		$counts = count_many_users_posts( array( self::$author_id, $user_id_b ), 'post', true );
+		$this->assertEquals( 1, $counts[self::$author_id] );
 		$this->assertEquals( 1, $counts[$user_id_b] );
 
 		wp_set_current_user( $user_id_b );
-		$counts = count_many_users_posts( array( $user_id_a, $user_id_b), 'post', false );
-		$this->assertEquals( 1, $counts[$user_id_a] );
+		$counts = count_many_users_posts( array( self::$author_id, $user_id_b ), 'post', false );
+		$this->assertEquals( 1, $counts[self::$author_id] );
 		$this->assertEquals( 2, $counts[$user_id_b] );
 
-		$counts = count_many_users_posts( array( $user_id_a, $user_id_b), 'post', true );
-		$this->assertEquals( 1, $counts[$user_id_a] );
+		$counts = count_many_users_posts( array( self::$author_id, $user_id_b ), 'post', true );
+		$this->assertEquals( 1, $counts[self::$author_id] );
 		$this->assertEquals( 1, $counts[$user_id_b] );
 	}
 
@@ -859,73 +854,63 @@ class Tests_User extends WP_UnitTestCase {
 	public function test_search_users_login() {
 		$users = get_users( array( 'search' => 'user1', 'fields' => 'ID' ) );
 
-		$this->assertTrue( in_array( self::$test_id, $users ) );
+		$this->assertTrue( in_array( self::$contrib_id, $users ) );
 	}
 
 	public function test_search_users_url() {
 		$users = get_users( array( 'search' => '*tacos*', 'fields' => 'ID' ) );
 
-		$this->assertTrue( in_array( self::$test_id, $users ) );
+		$this->assertTrue( in_array( self::$contrib_id, $users ) );
 	}
 
 	public function test_search_users_email() {
 		$users = get_users( array( 'search' => '*battle*', 'fields' => 'ID' ) );
 
-		$this->assertTrue( in_array( self::$test_id, $users ) );
+		$this->assertTrue( in_array( self::$contrib_id, $users ) );
 	}
 
 	public function test_search_users_nicename() {
 		$users = get_users( array( 'search' => '*one*', 'fields' => 'ID' ) );
 
-		$this->assertTrue( in_array( self::$test_id, $users ) );
+		$this->assertTrue( in_array( self::$contrib_id, $users ) );
 	}
 
 	public function test_search_users_display_name() {
 		$users = get_users( array( 'search' => '*Doe*', 'fields' => 'ID' ) );
 
-		$this->assertTrue( in_array( self::$test_id, $users ) );
+		$this->assertTrue( in_array( self::$contrib_id, $users ) );
 	}
 
 	/**
 	 * @ticket 32158
 	 */
 	function test_email_case() {
-		// Create a test user with a lower-case email address.
-		$user_id = self::factory()->user->create( array(
-			'user_email' => 'test@test.com',
-		) );
-
 		// Alter the case of the email address (which stays the same).
 		$userdata = array(
-			'ID' => $user_id,
+			'ID' => self::$editor_id,
 			'user_email' => 'test@TEST.com',
 		);
 		$update = wp_update_user( $userdata );
 
-		$this->assertEquals( $user_id, $update );
+		$this->assertEquals( self::$editor_id, $update );
 	}
 
 	/**
 	 * @ticket 32158
 	 */
 	function test_email_change() {
-		// Create a test user.
-		$user_id = self::factory()->user->create( array(
-			'user_email' => 'test@test.com',
-		) );
-
 		// Change the email address.
 		$userdata = array(
-			'ID' => $user_id,
+			'ID' => self::$editor_id,
 			'user_email' => 'test2@test.com',
 		);
 		$update = wp_update_user( $userdata );
 
 		// Was this successful?
-		$this->assertEquals( $user_id, $update );
+		$this->assertEquals( self::$editor_id, $update );
 
 		// Verify that the email address has been updated.
-		$user = get_userdata( $user_id );
+		$user = get_userdata( self::$editor_id );
 		$this->assertEquals( $user->user_email, 'test2@test.com' );
 	}
 
@@ -941,7 +926,7 @@ class Tests_User extends WP_UnitTestCase {
 		$was_admin_email_sent = false;
 		$was_user_email_sent = false;
 
-		wp_new_user_notification( self::$test_id, null, $notify );
+		wp_new_user_notification( self::$contrib_id, null, $notify );
 
 		/*
 		 * Check to see if a notification email was sent to the
@@ -998,14 +983,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @expectedDeprecated wp_new_user_notification
 	 */
 	function test_wp_new_user_notification_old_signature_throws_deprecated_warning() {
-		$user = self::factory()->user->create( array(
-			'role'       => 'author',
-			'user_login' => 'test_wp_new_user_notification',
-			'user_pass'  => 'password',
-			'user_email' => 'test@test.com',
-		) );
-
-		wp_new_user_notification( $user, 'this_is_deprecated' );
+		wp_new_user_notification( self::$author_id, 'this_is_deprecated' );
 	}
 
 	/**
