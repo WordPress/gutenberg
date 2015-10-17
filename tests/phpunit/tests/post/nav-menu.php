@@ -16,11 +16,11 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	function test_wp_get_associated_nav_menu_items() {
-		$tag_id = self::$factory->tag->create();
-		$cat_id = self::$factory->category->create();
-		$post_id = self::$factory->post->create();
-		$post_2_id = self::$factory->post->create();
-		$page_id = self::$factory->post->create( array( 'post_type' => 'page' ) );
+		$tag_id = self::factory()->tag->create();
+		$cat_id = self::factory()->category->create();
+		$post_id = self::factory()->post->create();
+		$post_2_id = self::factory()->post->create();
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 
 		$tag_insert = wp_update_nav_menu_item( $this->menu_id, 0, array(
 			'menu-item-type' => 'taxonomy',
@@ -119,8 +119,8 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 
 	public function test_wp_get_nav_menu_items_with_taxonomy_term() {
 		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
-		$child_terms = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax', 'parent' => $t ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$child_terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax', 'parent' => $t ) );
 
 		$term_menu_item = wp_update_nav_menu_item( $this->menu_id, 0, array(
 			'menu-item-type' => 'taxonomy',

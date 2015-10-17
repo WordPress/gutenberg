@@ -12,7 +12,7 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->post_id = self::$factory->post->create( array(
+		$this->post_id = self::factory()->post->create( array(
 			'post_title'   => 'Foo Bar',
 			'post_name'   => 'foo-bar',
 		) );
@@ -99,7 +99,7 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 
 	public function test_old_slug_redirect_attachment() {
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
-		$attachment_id = self::$factory->attachment->create_object( $file, $this->post_id, array(
+		$attachment_id = self::factory()->attachment->create_object( $file, $this->post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_name'      => 'my-attachment',
 		) );

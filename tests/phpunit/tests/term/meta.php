@@ -12,33 +12,33 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_add() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		$this->assertNotEmpty( add_term_meta( $t, 'foo', 'bar' ) );
 	}
 
 	public function test_add_unique() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		$this->assertNotEmpty( add_term_meta( $t, 'foo', 'bar' ) );
 		$this->assertFalse( add_term_meta( $t, 'foo', 'bar', true ) );
 	}
 
 	public function test_delete() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $t, 'foo', 'bar' );
 
 		$this->assertTrue( delete_term_meta( $t, 'foo' ) );
 	}
 
 	public function test_delete_with_invalid_meta_key_should_return_false() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		$this->assertFalse( delete_term_meta( $t, 'foo' ) );
 	}
 
 	public function test_delete_should_respect_meta_value() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $t, 'foo', 'bar' );
 		add_term_meta( $t, 'foo', 'baz' );
 
@@ -49,7 +49,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_get_with_no_key_should_fetch_all_keys() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $t, 'foo', 'bar' );
 		add_term_meta( $t, 'foo1', 'baz' );
 
@@ -63,7 +63,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_get_with_key_should_fetch_all_for_key() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $t, 'foo', 'bar' );
 		add_term_meta( $t, 'foo', 'baz' );
 		add_term_meta( $t, 'foo1', 'baz' );
@@ -75,7 +75,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_get_should_respect_single_true() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $t, 'foo', 'bar' );
 		add_term_meta( $t, 'foo', 'baz' );
 
@@ -84,7 +84,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_update_should_pass_to_add_when_no_value_exists_for_key() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		$actual = update_term_meta( $t, 'foo', 'bar' );
 		$this->assertInternalType( 'int', $actual );
@@ -95,7 +95,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_update_should_return_true_when_updating_existing_value_for_key() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		add_term_meta( $t, 'foo', 'bar' );
 
@@ -109,17 +109,17 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	public function test_term_meta_should_be_lazy_loaded_for_all_terms_in_wp_query_loop() {
 		global $wpdb;
 
-		$p = self::$factory->post->create( array( 'post_status' => 'publish' ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'publish' ) );
 
 		register_taxonomy( 'wptests_tax', 'post' );
-		$terms = self::$factory->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
 		wp_set_object_terms( $p, $terms, 'wptests_tax' );
 		foreach ( $terms as $t ) {
 			add_term_meta( $t, 'foo', 'bar' );
 		}
 
 		// Create another term, which should *not* be lazy loaded because it's unattached.
-		$orphan_term = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$orphan_term = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		add_term_meta( $orphan_term, 'foo', 'bar' );
 
 		// Force results to be cached, even when using extended cache.
@@ -154,9 +154,9 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	public function test_term_meta_should_be_lazy_loaded_only_for_the_queries_in_which_the_term_has_posts() {
 		global $wpdb;
 
-		$posts = self::$factory->post->create_many( 3, array( 'post_status' => 'publish' ) );
+		$posts = self::factory()->post->create_many( 3, array( 'post_status' => 'publish' ) );
 		register_taxonomy( 'wptests_tax', 'post' );
-		$terms = self::$factory->term->create_many( 6, array( 'taxonomy' => 'wptests_tax' ) );
+		$terms = self::factory()->term->create_many( 6, array( 'taxonomy' => 'wptests_tax' ) );
 
 		wp_set_object_terms( $posts[0], array( $terms[0], $terms[1] ), 'wptests_tax' );
 		wp_set_object_terms( $posts[1], array( $terms[2], $terms[3] ), 'wptests_tax' );
@@ -201,7 +201,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_adding_term_meta_should_bust_get_terms_cache() {
-		$terms = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
 
 		add_term_meta( $terms[0], 'foo', 'bar' );
 
@@ -236,7 +236,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_updating_term_meta_should_bust_get_terms_cache() {
-		$terms = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
 
 		add_term_meta( $terms[0], 'foo', 'bar' );
 		add_term_meta( $terms[1], 'foo', 'baz' );
@@ -272,7 +272,7 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 	}
 
 	public function test_deleting_term_meta_should_bust_get_terms_cache() {
-		$terms = self::$factory->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
 
 		add_term_meta( $terms[0], 'foo', 'bar' );
 		add_term_meta( $terms[1], 'foo', 'bar' );

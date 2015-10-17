@@ -9,10 +9,10 @@ class Tests_Formatting_WpTrimExcerpt extends WP_UnitTestCase {
 	 * @ticket 25349
 	 */
 	public function test_secondary_loop_respect_more() {
-		$post1 = self::$factory->post->create( array(
+		$post1 = self::factory()->post->create( array(
 			'post_content' => 'Post 1 Page 1<!--more-->Post 1 Page 2',
 		) );
-		$post2 = self::$factory->post->create( array(
+		$post2 = self::factory()->post->create( array(
 			'post_content' => 'Post 2 Page 1<!--more-->Post 2 Page 2',
 		) );
 
@@ -34,10 +34,10 @@ class Tests_Formatting_WpTrimExcerpt extends WP_UnitTestCase {
 	 * @ticket 25349
 	 */
 	public function test_secondary_loop_respect_nextpage() {
-		$post1 = self::$factory->post->create( array(
+		$post1 = self::factory()->post->create( array(
 			'post_content' => 'Post 1 Page 1<!--nextpage-->Post 1 Page 2',
 		) );
-		$post2 = self::$factory->post->create( array(
+		$post2 = self::factory()->post->create( array(
 			'post_content' => 'Post 2 Page 1<!--nextpage-->Post 2 Page 2',
 		) );
 

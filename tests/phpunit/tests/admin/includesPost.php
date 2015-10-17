@@ -11,8 +11,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	function test__wp_translate_postdata_cap_checks_contributor() {
-		$contributor_id = self::$factory->user->create( array( 'role' => 'contributor' ) );
-		$editor_id = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$contributor_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 
 		wp_set_current_user( $contributor_id );
 
@@ -51,7 +51,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Edit Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_ID'] = self::$factory->post->create( array( 'post_author' => $editor_id ) );
+		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => $editor_id ) );
 		$_post_data['post_author'] = $editor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['post_status'] = 'draft';
@@ -64,8 +64,8 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	function test__wp_translate_postdata_cap_checks_editor() {
-		$contributor_id = self::$factory->user->create( array( 'role' => 'contributor' ) );
-		$editor_id = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$contributor_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
+		$editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 
 		wp_set_current_user( $editor_id );
 
@@ -104,7 +104,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Edit Draft Post for another user
 		$_post_data = array();
-		$_post_data['post_ID'] = self::$factory->post->create( array( 'post_author' => $contributor_id ) );
+		$_post_data['post_ID'] = self::factory()->post->create( array( 'post_author' => $contributor_id ) );
 		$_post_data['post_author'] = $contributor_id;
 		$_post_data['post_type'] = 'post';
 		$_post_data['post_status'] = 'draft';
@@ -122,9 +122,9 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 25272
 	 */
 	function test_edit_post_auto_draft() {
-		$user_id = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$user_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 		wp_set_current_user( $user_id );
-		$post = self::$factory->post->create_and_get( array( 'post_status' => 'auto-draft' ) );
+		$post = self::factory()->post->create_and_get( array( 'post_status' => 'auto-draft' ) );
 		$this->assertEquals( 'auto-draft', $post->post_status );
 		$post_data = array(
 			'post_title' => 'Post title',
@@ -140,22 +140,22 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 30615
 	 */
 	public function test_edit_post_should_parse_tax_input_by_name_rather_than_slug_for_nonhierarchical_taxonomies() {
-		$u = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$u = self::factory()->user->create( array( 'role' => 'editor' ) );
 		wp_set_current_user( $u );
 
 		register_taxonomy( 'wptests_tax', array( 'post' ) );
-		$t1 = self::$factory->term->create( array(
+		$t1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 			'slug' => 'bar',
 		) );
-		$t2 = self::$factory->term->create( array(
+		$t2 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'bar',
 			'slug' => 'foo',
 		) );
 
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$post_data = array(
 			'post_ID' => $p,
@@ -179,17 +179,17 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 30615
 	 */
 	public function test_edit_post_should_not_create_terms_for_an_empty_tag_input_field() {
-		$u = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$u = self::factory()->user->create( array( 'role' => 'editor' ) );
 		wp_set_current_user( $u );
 
 		register_taxonomy( 'wptests_tax', array( 'post' ) );
-		$t1 = self::$factory->term->create( array(
+		$t1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 			'slug' => 'bar',
 		) );
 
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$post_data = array(
 			'post_ID' => $p,
@@ -209,18 +209,18 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 27792
 	 */
 	function test_bulk_edit_posts_stomping() {
-		$admin = self::$factory->user->create( array( 'role' => 'administrator' ) );
-		$users = self::$factory->user->create_many( 2, array( 'role' => 'author' ) );
+		$admin = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$users = self::factory()->user->create_many( 2, array( 'role' => 'author' ) );
 		wp_set_current_user( $admin );
 
-		$post1 = self::$factory->post->create( array(
+		$post1 = self::factory()->post->create( array(
 			'post_author'    => $users[0],
 			'comment_status' => 'open',
 			'ping_status'    => 'open',
 			'post_status'    => 'publish',
 		) );
 
-		$post2 = self::$factory->post->create( array(
+		$post2 = self::factory()->post->create( array(
 			'post_author'    => $users[1],
 			'comment_status' => 'closed',
 			'ping_status'    => 'closed',
@@ -255,7 +255,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$this->set_permalink_structure( "/$permalink_structure/" );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
-		$p = self::$factory->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
 
 		$found = get_sample_permalink( $p );
 		$expected = trailingslashit( home_url( $permalink_structure ) );
@@ -268,10 +268,10 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	 * @ticket 18306
 	 */
 	public function test_get_sample_permalink_html_should_use_default_permalink_for_view_post_link_when_pretty_permalinks_are_disabled() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
-		$p = self::$factory->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
 
 		$found = get_sample_permalink_html( $p );
 		$this->assertContains( 'href="' . get_option( 'home' ) . '/?p=' . $p . '"', $found );
@@ -284,10 +284,10 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_html_should_use_pretty_permalink_for_view_post_link_when_pretty_permalinks_are_enabled() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
-		$p = self::$factory->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'foo', 'post_date' => $future_date ) );
 
 		$found = get_sample_permalink_html( $p );
 		$post = get_post( $p );
@@ -301,10 +301,10 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_html_should_use_correct_permalink_for_view_post_link_when_changing_slug() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		// Published posts should use published permalink
-		$p = self::$factory->post->create( array( 'post_status' => 'publish', 'post_name' => 'foo' ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'publish', 'post_name' => 'foo' ) );
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
@@ -313,7 +313,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 
 		// Scheduled posts should use published permalink
 		$future_date = date( 'Y-m-d H:i:s', time() + 100 );
-		$p = self::$factory->post->create( array( 'post_status' => 'future', 'post_name' => 'bar', 'post_date' => $future_date ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'future', 'post_name' => 'bar', 'post_date' => $future_date ) );
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
@@ -321,7 +321,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$this->assertContains( 'href="' . get_option( 'home' ) . "/" . $post->post_name . '/"', $found, $message );
 
 		// Draft posts should use preview link
-		$p = self::$factory->post->create( array( 'post_status' => 'draft', 'post_name' => 'baz' ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'draft', 'post_name' => 'baz' ) );
 
 		$found = get_sample_permalink_html( $p, null, 'new_slug' );
 		$post = get_post( $p );
@@ -339,7 +339,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_year_archives() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '2015',
 		) );
 
@@ -353,7 +353,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_allow_yearlike_slugs_if_permastruct_does_not_cause_an_archive_conflict() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '2015',
 		) );
 
@@ -367,7 +367,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_month_archives() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '11',
 		) );
 
@@ -381,7 +381,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_ignore_potential_month_conflicts_for_invalid_monthnum() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '13',
 		) );
 
@@ -395,7 +395,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_avoid_slugs_that_would_create_clashes_with_day_archives() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '30',
 		) );
 
@@ -409,11 +409,11 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_iterate_slug_suffix_when_a_date_conflict_is_found() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		self::$factory->post->create( array(
+		self::factory()->post->create( array(
 			'post_name' => '30-2',
 		) );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '30',
 		) );
 
@@ -427,7 +427,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_ignore_potential_day_conflicts_for_invalid_day() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '32',
 		) );
 
@@ -441,7 +441,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_get_sample_permalink_should_allow_daylike_slugs_if_permastruct_does_not_cause_an_archive_conflict() {
 		$this->set_permalink_structure( '/%year%/%month%/%day%/%postname%/' );
 
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_name' => '30',
 		) );
 
@@ -450,7 +450,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	public function test_post_exists_should_match_title() {
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => 'Foo Bar',
 		) );
 
@@ -458,7 +458,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	}
 
 	public function test_post_exists_should_not_match_nonexistent_title() {
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => 'Foo Bar',
 		) );
 
@@ -468,7 +468,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_post_exists_should_match_nonempty_content() {
 		$title = 'Foo Bar';
 		$content = 'Foo Bar Baz';
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => $title,
 			'post_content' => $content,
 		) );
@@ -479,7 +479,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_post_exists_should_not_match_when_nonempty_content_doesnt_match() {
 		$title = 'Foo Bar';
 		$content = 'Foo Bar Baz';
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => $title,
 			'post_content' => $content . ' Quz',
 		) );
@@ -490,7 +490,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_post_exists_should_match_nonempty_date() {
 		$title = 'Foo Bar';
 		$date = '2014-05-08 12:00:00';
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => $title,
 			'post_date' => $date,
 		) );
@@ -501,7 +501,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 	public function test_post_exists_should_not_match_when_nonempty_date_doesnt_match() {
 		$title = 'Foo Bar';
 		$date = '2014-05-08 12:00:00';
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => $title,
 			'post_date' => '2015-10-10 00:00:00',
 		) );
@@ -513,7 +513,7 @@ class Tests_Admin_includesPost extends WP_UnitTestCase {
 		$title = 'Foo Bar';
 		$content = 'Foo Bar Baz';
 		$date = '2014-05-08 12:00:00';
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_title' => $title,
 			'post_content' => $content,
 			'post_date' => $date,

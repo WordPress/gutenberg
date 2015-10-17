@@ -10,13 +10,13 @@ class Tests_Link_GetAdjacentPostLink extends WP_UnitTestCase {
 
 	public function setUp(){
 		parent::setUp();
-		$this->cat_id = self::$factory->category->create( array( 'name' => 'other' ) );
+		$this->cat_id = self::factory()->category->create( array( 'name' => 'other' ) );
 		$this->post_ids = array();
-		$this->post_ids[] = self::$factory->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 05:32:29', 'category_id' => 1 ) );
-		$this->post_ids[] = self::$factory->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 04:32:29', 'category_id' => $this->cat_id ) );
-		$this->post_ids[] = self::$factory->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 03:32:29', 'category_id' => 1 ) );
-		$this->post_ids[] = self::$factory->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 02:32:29', 'category_id' => $this->cat_id ) );
-		$this->post_ids[] = self::$factory->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 01:32:29', 'category_id' => 1 ) );
+		$this->post_ids[] = self::factory()->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 05:32:29', 'category_id' => 1 ) );
+		$this->post_ids[] = self::factory()->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 04:32:29', 'category_id' => $this->cat_id ) );
+		$this->post_ids[] = self::factory()->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 03:32:29', 'category_id' => 1 ) );
+		$this->post_ids[] = self::factory()->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 02:32:29', 'category_id' => $this->cat_id ) );
+		$this->post_ids[] = self::factory()->post->create( array( 'post_type' => 'post', 'post_date' => '2014-10-26 01:32:29', 'category_id' => 1 ) );
 
 		//set current post (has 2 on each end)
 		global $GLOBALS;

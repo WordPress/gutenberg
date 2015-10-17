@@ -21,9 +21,9 @@ class Tests_Comment extends WP_UnitTestCase {
 	}
 
 	function test_wp_update_comment() {
-		$post = self::$factory->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post' ) );
-		$post2 = self::$factory->post->create_and_get( array( 'post_title' => 'some-post-2', 'post_type' => 'post' ) );
-		$comments = self::$factory->comment->create_post_comments( $post->ID, 5 );
+		$post = self::factory()->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post' ) );
+		$post2 = self::factory()->post->create_and_get( array( 'post_title' => 'some-post-2', 'post_type' => 'post' ) );
+		$comments = self::factory()->comment->create_post_comments( $post->ID, 5 );
 		$result = wp_update_comment( array( 'comment_ID' => $comments[0], 'comment_parent' => $comments[1] ) );
 		$this->assertEquals( 1, $result );
 		$comment = get_comment( $comments[0] );
@@ -39,7 +39,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 30627
 	 */
 	function test_wp_update_comment_updates_comment_type() {
-		$comment_id = self::$factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id ) );
 
 		wp_update_comment( array( 'comment_ID' => $comment_id, 'comment_type' => 'pingback' ) );
 
@@ -51,7 +51,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 30307
 	 */
 	function test_wp_update_comment_updates_user_id() {
-		$comment_id = self::$factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id ) );
 
 		wp_update_comment( array( 'comment_ID' => $comment_id, 'user_id' => 1 ) );
 
@@ -60,25 +60,25 @@ class Tests_Comment extends WP_UnitTestCase {
 	}
 
 	public function test_get_approved_comments() {
-		$ca1 = self::$factory->comment->create( array(
+		$ca1 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1'
 		) );
-		$ca2 = self::$factory->comment->create( array(
+		$ca2 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1'
 		) );
-		$ca3 = self::$factory->comment->create( array(
+		$ca3 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '0'
 		) );
-		$c2 = self::$factory->comment->create( array(
+		$c2 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_type' => 'pingback'
 		) );
-		$c3 = self::$factory->comment->create( array(
+		$c3 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_type' => 'trackback'
 		) );
-		$c4 = self::$factory->comment->create( array(
+		$c4 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_type' => 'mario'
 		) );
-		$c5 = self::$factory->comment->create( array(
+		$c5 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_type' => 'luigi'
 		) );
 
@@ -92,7 +92,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 30412
 	 */
 	public function test_get_approved_comments_with_post_id_0_should_return_empty_array() {
-		$ca1 = self::$factory->comment->create( array(
+		$ca1 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1'
 		) );
 
@@ -256,11 +256,11 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 32566
 	 */
 	public function test_wp_notify_moderator_should_not_throw_notice_when_post_author_is_0() {
-		$p = self::$factory->post->create( array(
+		$p = self::factory()->post->create( array(
 			'post_author' => 0,
 		) );
 
-		$c = self::$factory->comment->create( array(
+		$c = self::factory()->comment->create( array(
 			'comment_post_ID' => $p,
 		) );
 
@@ -271,7 +271,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 33587
 	 */
 	public function test_wp_new_comment_notify_postauthor_should_not_send_email_when_comment_has_been_marked_as_spam() {
-		$c = self::$factory->comment->create( array(
+		$c = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => 'spam',
 		) );
@@ -284,7 +284,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 12431
 	 */
 	public function test_wp_new_comment_with_meta() {
-		$c = self::$factory->comment->create( array(
+		$c = self::factory()->comment->create( array(
 			'comment_approved' => '1',
 			'comment_meta' => array(
 				'food' => 'taco',
@@ -299,35 +299,35 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @ticket 8071
 	 */
 	public function test_wp_comment_get_children_should_fill_children() {
-		$c1 = self::$factory->comment->create( array(
+		$c1 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 		) );
 
-		$c2 = self::$factory->comment->create( array(
+		$c2 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 			'comment_parent' => $c1,
 		) );
 
-		$c3 = self::$factory->comment->create( array(
+		$c3 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 			'comment_parent' => $c2,
 		) );
 
-		$c4 = self::$factory->comment->create( array(
+		$c4 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 			'comment_parent' => $c1,
 		) );
 
-		$c5 = self::$factory->comment->create( array(
+		$c5 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 		) );
 
-		$c6 = self::$factory->comment->create( array(
+		$c6 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => '1',
 			'comment_parent' => $c5,
@@ -347,7 +347,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	 * @group 27571
 	 */
 	public function test_post_properties_should_be_lazyloaded() {
-		$c = self::$factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
+		$c = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id ) );
 
 		$post = get_post( self::$post_id );
 		$comment = get_comment( $c );

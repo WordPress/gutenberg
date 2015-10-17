@@ -31,7 +31,7 @@ class Tests_Comment_CheckComment extends WP_UnitTestCase {
 	}
 
 	public function test_should_return_true_when_comment_whitelist_is_enabled_and_author_has_approved_comment() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$prev_args = array(
 			'comment_post_ID'      => $post_id,
 			'comment_content'      => 'Can we build it?',
@@ -39,7 +39,7 @@ class Tests_Comment_CheckComment extends WP_UnitTestCase {
 			'comment_author_email' => 'bob@example.com',
 			'comment_author'       => 'BobtheBuilder',
 		);
-		$prev_comment_id = self::$factory->comment->create( $prev_args );
+		$prev_comment_id = self::factory()->comment->create( $prev_args );
 
 		update_option( 'comment_whitelist', 1 );
 

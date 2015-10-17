@@ -27,15 +27,15 @@ class Tests_List_Pages extends WP_UnitTestCase {
 		global $wpdb;
 		$wpdb->query( 'TRUNCATE ' . $wpdb->prefix . 'posts' );
 		$pages = array();
-		self::$factory->user->create();
-		$pages[] = self::$factory->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 1' ) );
-		$pages[] = self::$factory->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 2' ) );
-		$pages[] = self::$factory->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 3', 'post_author' => '2' ) );
+		self::factory()->user->create();
+		$pages[] = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 1' ) );
+		$pages[] = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 2' ) );
+		$pages[] = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Parent 3', 'post_author' => '2' ) );
 
 		foreach ( $pages as $page ) {
-			$this->pages[$page] = self::$factory->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 1' ) );
-			$this->pages[$page] = self::$factory->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 2' ) );
-			$this->pages[$page] = self::$factory->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 3' ) );
+			$this->pages[$page] = self::factory()->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 1' ) );
+			$this->pages[$page] = self::factory()->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 2' ) );
+			$this->pages[$page] = self::factory()->post->create( array( 'post_parent' => $page, 'post_type' => 'page', 'post_title' => 'Child 3' ) );
 		}
 	}
 

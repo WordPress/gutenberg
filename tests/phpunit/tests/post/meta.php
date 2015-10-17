@@ -8,7 +8,7 @@ class Tests_Post_Meta extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->author = new WP_User( self::$factory->user->create( array( 'role' => 'editor' ) ) );
+		$this->author = new WP_User( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
 		$post = array(
 			'post_author' => $this->author->ID,

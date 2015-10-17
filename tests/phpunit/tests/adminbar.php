@@ -15,7 +15,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @ticket 21117
 	 */
 	function test_content_post_type() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
 		register_post_type( 'content', array( 'show_in_admin_bar' => true ) );
 
@@ -34,7 +34,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @ticket 21117
 	 */
 	function test_merging_existing_meta_values() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
 		$admin_bar = new WP_Admin_Bar;
 
@@ -62,7 +62,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test does not run in multisite' );
 		}
 
-		$nobody = self::$factory->user->create( array( 'role' => '' ) );
+		$nobody = self::factory()->user->create( array( 'role' => '' ) );
 		$this->assertFalse( user_can( $nobody, 'read' ) );
 
 		wp_set_current_user( $nobody );
@@ -92,7 +92,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test does not run in multisite' );
 		}
 
-		$editor = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
 		$this->assertTrue( user_can( $editor, 'read' ) );
 
 		wp_set_current_user( $editor );
@@ -125,13 +125,13 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test only runs in multisite' );
 		}
 
-		$admin  = self::$factory->user->create( array( 'role' => 'administrator' ) );
-		$editor = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
 
 		$this->assertTrue( user_can( $admin, 'read' ) );
 		$this->assertTrue( user_can( $editor, 'read' ) );
 
-		$new_blog_id = self::$factory->blog->create( array(
+		$new_blog_id = self::factory()->blog->create( array(
 			'user_id' => $admin,
 		) );
 
@@ -179,13 +179,13 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test only runs in multisite' );
 		}
 
-		$admin  = self::$factory->user->create( array( 'role' => 'administrator' ) );
-		$nobody = self::$factory->user->create( array( 'role' => '' ) );
+		$admin  = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$nobody = self::factory()->user->create( array( 'role' => '' ) );
 
 		$this->assertTrue( user_can( $admin, 'read' ) );
 		$this->assertFalse( user_can( $nobody, 'read' ) );
 
-		$new_blog_id = self::$factory->blog->create( array(
+		$new_blog_id = self::factory()->blog->create( array(
 			'user_id' => $admin,
 		) );
 

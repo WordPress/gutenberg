@@ -106,8 +106,8 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		$cat1 = wp_create_category( 'wp.getTerms_' . rand_str( 16 ) );
 		$cat2 = wp_create_category( 'wp.getTerms_' . rand_str( 16 ) );
 
-		self::$factory->post->create_many( 5, array( 'post_category' => array( $cat1 ) ) );
-		self::$factory->post->create_many( 3, array( 'post_category' => array( $cat2 ) ) );
+		self::factory()->post->create_many( 5, array( 'post_category' => array( $cat1 ) ) );
+		self::factory()->post->create_many( 3, array( 'post_category' => array( $cat2 ) ) );
 
 		$filter = array( 'orderby' => 'count', 'order' => 'DESC' );
 		$results = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'category', $filter ) );

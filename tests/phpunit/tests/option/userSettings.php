@@ -5,7 +5,7 @@ class Tests_User_Settings extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->user_id = self::$factory->user->create( array(
+		$this->user_id = self::factory()->user->create( array(
 			'role' => 'administrator'
 		) );
 

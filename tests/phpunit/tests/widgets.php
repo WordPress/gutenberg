@@ -438,7 +438,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$this->assertEmpty( $wp_customize );
 		$this->assertFalse( $widget->is_preview() );
 
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
 		$wp_customize = new WP_Customize_Manager();
 		$wp_customize->start_previewing_theme();

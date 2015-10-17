@@ -211,7 +211,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_status_should_not_be_shown_to_logged_out_users() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps' ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps' ) );
 
 		$q = new WP_Query( array(
 			'p' => $p,
@@ -223,7 +223,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_and_protected_status_should_not_be_shown_for_user_who_cannot_edit_others_posts() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false, 'protected' => true ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$editor_user_id ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$editor_user_id ) );
 
 		wp_set_current_user( self::$author_user_id );
 
@@ -237,7 +237,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_and_protected_status_should_be_shown_for_user_who_can_edit_others_posts() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false, 'protected' => true ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
 
 		wp_set_current_user( self::$editor_user_id );
 
@@ -251,7 +251,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_and_private_status_should_not_be_shown_for_user_who_cannot_edit_others_posts() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false, 'private' => true ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$editor_user_id ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$editor_user_id ) );
 
 		wp_set_current_user( self::$author_user_id );
 
@@ -265,7 +265,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_and_private_status_should_be_shown_for_user_who_can_edit_others_posts() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false, 'private' => true ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
 
 		wp_set_current_user( self::$editor_user_id );
 
@@ -279,7 +279,7 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	public function test_single_post_with_nonpublic_and_protected_status_should_not_be_shown_for_any_user() {
 		register_post_type( 'foo_pt' );
 		register_post_status( 'foo_ps', array( 'public' => false ) );
-		$p = self::$factory->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
+		$p = self::factory()->post->create( array( 'post_status' => 'foo_ps', 'post_author' => self::$author_user_id ) );
 
 		wp_set_current_user( self::$editor_user_id );
 
@@ -294,8 +294,8 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 	 * @ticket 29167
 	 */
 	public function test_specific_post_should_be_returned_if_trash_is_one_of_the_requested_post_statuses() {
-		$p1 = self::$factory->post->create( array( 'post_status' => 'trash' ) );
-		$p2 = self::$factory->post->create( array( 'post_status' => 'publish' ) );
+		$p1 = self::factory()->post->create( array( 'post_status' => 'trash' ) );
+		$p2 = self::factory()->post->create( array( 'post_status' => 'publish' ) );
 
 		$q = new WP_Query( array(
 			'p' => $p1,

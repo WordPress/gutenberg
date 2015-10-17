@@ -32,11 +32,11 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 	 */
 	public function setUp() {
 		parent::setUp();
-		$post_id = self::$factory->post->create();
-		self::$factory->comment->create_post_comments( $post_id, 5 );
+		$post_id = self::factory()->post->create();
+		self::factory()->comment->create_post_comments( $post_id, 5 );
 		$this->_comment_post = get_post( $post_id );
 
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$this->_no_comment_post = get_post( $post_id );
 
 		unset( $GLOBALS['post_id'] );

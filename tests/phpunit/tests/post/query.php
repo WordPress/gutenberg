@@ -11,9 +11,9 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	function test_category__and_var() {
 		$q = new WP_Query();
 
-		$term_id = self::$factory->category->create( array( 'slug' => 'woo', 'name' => 'WOO!' ) );
-		$term_id2 = self::$factory->category->create( array( 'slug' => 'hoo', 'name' => 'HOO!' ) );
-		$post_id = self::$factory->post->create();
+		$term_id = self::factory()->category->create( array( 'slug' => 'woo', 'name' => 'WOO!' ) );
+		$term_id2 = self::factory()->category->create( array( 'slug' => 'hoo', 'name' => 'HOO!' ) );
+		$post_id = self::factory()->post->create();
 
 		wp_set_post_categories( $post_id, $term_id );
 
@@ -41,8 +41,8 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	 * @group taxonomy
 	 */
 	function test_empty_category__in() {
-		$cat_id = self::$factory->category->create();
-		$post_id = self::$factory->post->create();
+		$cat_id = self::factory()->category->create();
+		$post_id = self::factory()->post->create();
 		wp_set_post_categories( $post_id, $cat_id );
 
 		$q1 = get_posts( array( 'category__in' => array( $cat_id ) ) );
@@ -71,7 +71,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	 */
 	function test_the_posts_filter() {
 		// Create posts and clear their caches.
-		$post_ids = self::$factory->post->create_many( 4 );
+		$post_ids = self::factory()->post->create_many( 4 );
 		foreach ( $post_ids as $post_id )
 			clean_post_cache( $post_id );
 
@@ -115,19 +115,19 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	function test_post__in_ordering() {
-		$post_id1 = self::$factory->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
-		$post_id2 = self::$factory->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
-		$post_id3 = self::$factory->post->create( array(
+		$post_id1 = self::factory()->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
+		$post_id2 = self::factory()->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
+		$post_id3 = self::factory()->post->create( array(
 			'post_type' => 'page',
 			'post_parent' => $post_id2,
 			'menu_order' => rand( 1, 100 )
 		) );
-		$post_id4 = self::$factory->post->create( array(
+		$post_id4 = self::factory()->post->create( array(
 			'post_type' => 'page',
 			'post_parent' => $post_id2,
 			'menu_order' => rand( 1, 100 )
 		) );
-		$post_id5 = self::$factory->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
+		$post_id5 = self::factory()->post->create( array( 'post_type' => 'page', 'menu_order' => rand( 1, 100 ) ) );
 
 		$ordered = array( $post_id2, $post_id4, $post_id3, $post_id1, $post_id5 );
 
@@ -140,26 +140,26 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	function test_post__in_attachment_ordering() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$att_ids = array();
 		$file = DIR_TESTDATA . '/images/canola.jpg';
-		$att_ids[1] = self::$factory->attachment->create_object( $file, $post_id, array(
+		$att_ids[1] = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[2] = self::$factory->attachment->create_object( $file, $post_id, array(
+		$att_ids[2] = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[3] = self::$factory->attachment->create_object( $file, $post_id, array(
+		$att_ids[3] = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[4] = self::$factory->attachment->create_object( $file, $post_id, array(
+		$att_ids[4] = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
-		$att_ids[5] = self::$factory->attachment->create_object( $file, $post_id, array(
+		$att_ids[5] = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'menu_order' => rand( 1, 100 )
 		) );
@@ -311,10 +311,10 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	public function test_post_name__in() {
 		$q = new WP_Query();
 
-		$post_ids[0] = self::$factory->post->create( array( 'post_title' => 'woo', 'post_date' => '2015-07-23 00:00:00' ) );
-		$post_ids[1] = self::$factory->post->create( array( 'post_title' => 'hoo', 'post_date' => '2015-07-23 00:00:00' ) );
-		$post_ids[2] = self::$factory->post->create( array( 'post_title' => 'test', 'post_date' => '2015-07-23 00:00:00' ) );
-		$post_ids[3] = self::$factory->post->create( array( 'post_title' => 'me', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[0] = self::factory()->post->create( array( 'post_title' => 'woo', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[1] = self::factory()->post->create( array( 'post_title' => 'hoo', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[2] = self::factory()->post->create( array( 'post_title' => 'test', 'post_date' => '2015-07-23 00:00:00' ) );
+		$post_ids[3] = self::factory()->post->create( array( 'post_title' => 'me', 'post_date' => '2015-07-23 00:00:00' ) );
 
 		$requested = array( $post_ids[0], $post_ids[3] );
 		$q->query( array(

@@ -251,10 +251,10 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::set_return_url()
 	 */
 	function test_return_url() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'author' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
 		$this->assertEquals( get_admin_url(), $this->manager->get_return_url() );
 
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->assertTrue( current_user_can( 'edit_theme_options' ) );
 		$this->assertEquals( admin_url( 'themes.php' ), $this->manager->get_return_url() );
 
@@ -301,7 +301,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::customize_pane_settings()
 	 */
 	function test_customize_pane_settings() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->manager->register_controls();
 		$this->manager->prepare_controls();
 		$autofocus = array( 'control' => 'blogname' );

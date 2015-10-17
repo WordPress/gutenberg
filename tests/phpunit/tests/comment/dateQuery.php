@@ -22,7 +22,7 @@ class Tests_Comment_DateQuery extends WP_UnitTestCase {
 
 		// Just some dummy posts to use as parents for comments
 		for ( $i = 1; $i <= 2; $i++ ) {
-			$this->posts[$i] = self::$factory->post->create();
+			$this->posts[$i] = self::factory()->post->create();
 		}
 
 		// Be careful modifying this. Tests are coded to expect this exact sample data.
@@ -39,7 +39,7 @@ class Tests_Comment_DateQuery extends WP_UnitTestCase {
 		);
 
 		foreach ( $comment_dates as $comment_date => $comment_parent ) {
-			$result = self::$factory->comment->create( array(
+			$result = self::factory()->comment->create( array(
 				'comment_date'    => $comment_date,
 				'comment_post_ID' => $this->posts[ $comment_parent ],
 			) );

@@ -15,16 +15,16 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 		}
 
 		// Setup users
-		$admin = self::$factory->user->create( array(
+		$admin = self::factory()->user->create( array(
 			'role' => 'administrator',
 		) );
-		$editor = self::$factory->user->create( array(
+		$editor = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
-		$nobody = self::$factory->user->create( array(
+		$nobody = self::factory()->user->create( array(
 			'role' => '',
 		) );
-		$nobody_else = self::$factory->user->create( array(
+		$nobody_else = self::factory()->user->create( array(
 			'role' => '',
 		) );
 
@@ -49,18 +49,18 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 		}
 
 		// Setup users
-		$admin = self::$factory->user->create( array(
+		$admin = self::factory()->user->create( array(
 			'role' => 'administrator',
 		) );
-		$editor = self::$factory->user->create( array(
+		$editor = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
-		$nobody = self::$factory->user->create( array(
+		$nobody = self::factory()->user->create( array(
 			'role' => '',
 		) );
 
 		// Setup blogs
-		$blog_1 = (int) self::$factory->blog->create( array(
+		$blog_1 = (int) self::factory()->blog->create( array(
 			'user_id' => $editor,
 		) );
 

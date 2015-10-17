@@ -49,7 +49,7 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 		wp_set_current_user( self::$author_id );
 
 		// Already created by install defaults:
-		// self::$factory->term->create( array( 'taxonomy' => 'category', 'name' => 'uncategorized' ) );
+		// self::factory()->term->create( array( 'taxonomy' => 'category', 'name' => 'uncategorized' ) );
 
 		self::$post_ids[] = $factory->post->create( array( 'import_id' => 587, 'post_title' => 'post-format-test-audio', 'post_date' => '2008-06-02 00:00:00' ) );
 		self::$post_ids[] = $post_id = $factory->post->create( array( 'post_title' => 'post-format-test-gallery', 'post_date' => '2008-06-10 00:00:00' ) );

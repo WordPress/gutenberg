@@ -31,7 +31,7 @@ EOF;
 no such tag
 EOF;
 
-		$id = self::$factory->post->create( array( 'post_content' => $content ) );
+		$id = self::factory()->post->create( array( 'post_content' => $content ) );
 		$post = get_post($id);
 
 		$this->assertEquals( $expected, $post->post_content );
@@ -48,7 +48,7 @@ EOF;
 <i>italics</i>
 EOF;
 
-		$id = self::$factory->post->create( array( 'post_content' => $content ) );
+		$id = self::factory()->post->create( array( 'post_content' => $content ) );
 		$post = get_post($id);
 
 		$this->assertEquals( $expected, $post->post_content );
@@ -65,7 +65,7 @@ EOF;
 <img src='foo' width='500' />
 EOF;
 
-		$id = self::$factory->post->create( array( 'post_content' => $content ) );
+		$id = self::factory()->post->create( array( 'post_content' => $content ) );
 		$post = get_post($id);
 
 		$this->assertEquals( $expected, $post->post_content );
@@ -84,7 +84,7 @@ EOF;
 <img src='foo' width='500' height='300' />
 EOF;
 
-		$id = self::$factory->post->create( array( 'post_content' => $content ) );
+		$id = self::factory()->post->create( array( 'post_content' => $content ) );
 		$post = get_post($id);
 
 		$this->assertEquals( $expected, $post->post_content );
@@ -104,7 +104,7 @@ that's continued after the jump</em>
 breaks the graf</p>
 EOF;
 
-		$id = self::$factory->post->create( array( 'post_content' => $content ) );
+		$id = self::factory()->post->create( array( 'post_content' => $content ) );
 		$post = get_post($id);
 
 		$this->assertEquals( $content, $post->post_content );

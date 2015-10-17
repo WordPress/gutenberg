@@ -5,7 +5,7 @@
  */
 class Tests_Comment_CommentForm extends WP_UnitTestCase {
 	public function test_default_markup_for_submit_button_and_wrapper() {
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$args = array(
 			'name_submit' => 'foo-name',
@@ -21,7 +21,7 @@ class Tests_Comment_CommentForm extends WP_UnitTestCase {
 	}
 
 	public function test_custom_submit_button() {
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$args = array(
 			'name_submit' => 'foo-name',
@@ -37,7 +37,7 @@ class Tests_Comment_CommentForm extends WP_UnitTestCase {
 	}
 
 	public function test_custom_submit_field() {
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$args = array(
 			'name_submit' => 'foo-name',
@@ -57,7 +57,7 @@ class Tests_Comment_CommentForm extends WP_UnitTestCase {
 	 * @ticket 32312
 	 */
 	public function test_submit_button_and_submit_field_should_fall_back_on_defaults_when_filtered_defaults_do_not_contain_the_keys() {
-		$p = self::$factory->post->create();
+		$p = self::factory()->post->create();
 
 		$args = array(
 			'name_submit' => 'foo-name',

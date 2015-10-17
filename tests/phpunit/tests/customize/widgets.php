@@ -38,7 +38,7 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 
 		remove_action( 'after_setup_theme', 'twentyfifteen_setup' ); // @todo We should not be including a theme anyway
 
-		$user_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $user_id );
 
 		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];

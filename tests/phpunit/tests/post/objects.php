@@ -6,7 +6,7 @@
 class Tests_Post_Objects extends WP_UnitTestCase {
 
 	function test_get_post() {
-		$id = self::$factory->post->create();
+		$id = self::factory()->post->create();
 
 		$post = get_post( $id );
 		$this->assertInstanceOf( 'WP_Post', $post );
@@ -67,9 +67,9 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_post_ancestors() {
-		$parent_id = self::$factory->post->create();
-		$child_id = self::$factory->post->create();
-		$grandchild_id = self::$factory->post->create();
+		$parent_id = self::factory()->post->create();
+		$child_id = self::factory()->post->create();
+		$grandchild_id = self::factory()->post->create();
 		$updated = wp_update_post( array( 'ID' => $child_id, 'post_parent' => $parent_id ) );
 		$this->assertEquals( $updated, $child_id );
 		$updated = wp_update_post( array( 'ID' => $grandchild_id, 'post_parent' => $child_id ) );
@@ -99,7 +99,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_post_category_property() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$post = get_post( $post_id );
 
 		$this->assertInternalType( 'array', $post->post_category );
@@ -118,7 +118,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_tags_input_property() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$post = get_post( $post_id );
 
 		$this->assertInternalType( 'array', $post->tags_input );
@@ -135,7 +135,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_page_template_property() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$post = get_post( $post_id );
 
 		$this->assertInternalType( 'string', $post->page_template );
@@ -155,7 +155,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_post_filter() {
-		$post = get_post( self::$factory->post->create( array(
+		$post = get_post( self::factory()->post->create( array(
 			'post_title' => "Mary's home"
 		) ) );
 
@@ -178,7 +178,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_post_identity() {
-		$post = get_post( self::$factory->post->create() );
+		$post = get_post( self::factory()->post->create() );
 
 		$post->foo = 'bar';
 
@@ -187,7 +187,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	}
 
 	function test_get_post_array() {
-		$id = self::$factory->post->create();
+		$id = self::factory()->post->create();
 
 		$post = get_post( $id, ARRAY_A );
 
@@ -202,7 +202,7 @@ class Tests_Post_Objects extends WP_UnitTestCase {
 	function test_get_post_cache() {
 		global $wpdb;
 
-		$id = self::$factory->post->create();
+		$id = self::factory()->post->create();
 		wp_cache_delete( $id, 'posts' );
 
 		// get_post( stdClass ) should not prime the cache

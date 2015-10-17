@@ -9,7 +9,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->author_id = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$this->author_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 
 		// Override the post/archive slug collision prevention in `wp_unique_post_slug()`.
 		add_filter( 'wp_unique_post_slug', array( $this, 'filter_unique_post_slug' ), 10, 6 );
@@ -23,7 +23,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		global $wpdb;
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -51,7 +51,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		global $wpdb;
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -76,7 +76,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_year_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -92,7 +92,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_year_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -106,7 +106,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_month_segment_collision_without_title() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -123,7 +123,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_month_segment_collision_without_title() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -138,7 +138,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_month_segment_collision_without_title_no_leading_zero() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -155,7 +155,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_month_segment_collision_without_title_no_leading_zero() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -170,7 +170,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_month_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -186,7 +186,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_month_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -200,7 +200,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_month_segment_collision_with_title_no_leading_zero() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -216,7 +216,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_month_segment_collision_with_title_no_leading_zero() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -230,7 +230,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_day_segment_collision_without_title() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -247,7 +247,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_day_segment_collision_without_title() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -262,7 +262,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_go_to_day_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -278,7 +278,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_url_to_postid_day_segment_collision_with_title() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -292,7 +292,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_numeric_slug_permalink_conflicts_should_only_be_resolved_for_the_main_query() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => rand_str(),
@@ -314,7 +314,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
 		// Make sure a post is published in 2013/02, to avoid 404s.
-		self::$factory->post->create( array(
+		self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'foo',
@@ -322,7 +322,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 			'post_date'    => '2013-02-01 01:00:00',
 		) );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'foo',
@@ -342,7 +342,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%postname%/' );
 
 		// Make sure a post is published on 2015/01/01, to avoid 404s.
-		self::$factory->post->create( array(
+		self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'foo',
@@ -350,7 +350,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 			'post_date'    => '2015-01-02 01:00:00',
 		) );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'foo',
@@ -369,7 +369,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_date_slug_collision_should_distinguish_valid_pagination_from_date() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'Page 0<!--nextpage-->Page 1<!--nextpage-->Page 2<!--nextpage-->Page 3',
@@ -385,7 +385,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_date_slug_collision_should_distinguish_too_high_pagination_from_date() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'Page 0<!--nextpage-->Page 1<!--nextpage-->Page 2<!--nextpage-->Page 3',
@@ -401,7 +401,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_date_slug_collision_should_not_require_pagination_query_var() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'Page 0<!--nextpage-->Page 1<!--nextpage-->Page 2<!--nextpage-->Page 3',
@@ -418,7 +418,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	public function test_date_slug_collision_should_be_ignored_when_pagination_var_is_present_but_post_does_not_have_multiple_pages() {
 		$this->set_permalink_structure( '/%year%/%postname%/' );
 
-		$id = self::$factory->post->create( array(
+		$id = self::factory()->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
 			'post_content' => 'This post does not have pagination.',

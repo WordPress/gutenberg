@@ -6,12 +6,12 @@
 class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		register_taxonomy( 'wptests_tax', 'post' );
 	}
 
 	public function test_get_edit_term_link_default() {
-		$term1 = self::$factory->term->create( array(
+		$term1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 		) );
@@ -25,7 +25,7 @@ class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 	 * @ticket 32786
 	 */
 	public function test_get_edit_term_link_invalid_id() {
-		$term1 = self::$factory->term->create( array(
+		$term1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'name' => 'foo',
 		) );

@@ -40,7 +40,7 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 		);
 
 		foreach ( $ids as &$id ) {
-			$id = self::$factory->network->create( $id );
+			$id = self::factory()->network->create( $id );
 		}
 		unset( $id );
 
@@ -88,7 +88,7 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 		);
 
 		foreach ( $ids as &$id ) {
-			$id = self::$factory->blog->create( $id );
+			$id = self::factory()->blog->create( $id );
 		}
 		unset( $id );
 
@@ -169,7 +169,7 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 		);
 
 		foreach ( $network_ids as &$id ) {
-			$id = self::$factory->network->create( $id );
+			$id = self::factory()->network->create( $id );
 		}
 		unset( $id );
 
@@ -182,7 +182,7 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 		);
 
 		foreach ( $ids as &$id ) {
-			$id = self::$factory->blog->create( $id );
+			$id = self::factory()->blog->create( $id );
 		}
 		unset( $id );
 

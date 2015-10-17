@@ -6,7 +6,7 @@
 class Tests_XMLRPC_wp_newComment extends WP_XMLRPC_UnitTestCase {
 	function test_new_comment_post_closed() {
 		$this->make_user_by_role( 'administrator' );
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'comment_status' => 'closed'
 		) );
 

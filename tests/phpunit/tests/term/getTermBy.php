@@ -28,7 +28,7 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		register_taxonomy( 'wptests_tax', 'post' );
 
 		$slug = 'ńaș';
-		$t = self::$factory->term->create( array(
+		$t = self::factory()->term->create( array(
 			'slug' => $slug,
 			'taxonomy' => 'wptests_tax',
 		) );
@@ -44,7 +44,7 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		global $wpdb;
 
 		register_taxonomy( 'wptests_tax', 'post' );
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$term = get_term( $t, 'wptests_tax' );
 
 		$new_ttid = $term->term_taxonomy_id + 1;
@@ -67,7 +67,7 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		global $wpdb;
 
 		register_taxonomy( 'wptests_tax', 'post' );
-		$t = self::$factory->term->create( array(
+		$t = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'slug' => 'foo',
 		) );

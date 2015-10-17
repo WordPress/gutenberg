@@ -509,7 +509,7 @@ class Tests_DB extends WP_UnitTestCase {
 			$this->markTestSkipped( 'procedure could not be created (missing privileges?)' );
 		}
 
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 
 		$this->assertNotEmpty( $wpdb->get_results( 'CALL `test_mysqli_flush_sync_procedure`' ) );
 		$this->assertNotEmpty( $wpdb->get_results( "SELECT ID FROM `{$wpdb->posts}` LIMIT 1" ) );

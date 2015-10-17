@@ -87,7 +87,7 @@ EOF;
 	}
 
 	function test_wp_get_archives_order() {
-		self::$factory->post->create( array( 'post_type' => 'post', 'post_author' => '1', 'post_date' => '2012-10-23 19:34:42' ) );
+		self::factory()->post->create( array( 'post_type' => 'post', 'post_author' => '1', 'post_date' => '2012-10-23 19:34:42' ) );
 
 		$date_full = date( 'F Y' );
 		$oct_url = get_month_link( 2012, 10 );
@@ -110,7 +110,7 @@ EOF;
 	function test_wp_get_archives_post_type() {
 		register_post_type( 'taco', array( 'public' => true ) );
 
-		self::$factory->post->create( array(
+		self::factory()->post->create( array(
 			'post_type' => 'taco',
 			'post_author' => '1',
 			'post_date' => '2014-10-23 19:34:42'

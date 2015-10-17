@@ -5,7 +5,7 @@
 class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 
 	public function test_post_link() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 
 		$link = get_post_comments_feed_link( $post_id );
 		$expected = add_query_arg( array(
@@ -19,7 +19,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	public function test_post_pretty_link() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 
 		$link = get_post_comments_feed_link( $post_id );
 		$expected = get_permalink( $post_id ) . 'feed/';
@@ -28,8 +28,8 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_attachment_link() {
-		$post_id = self::$factory->post->create();
-		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', $post_id, array(
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment'
 		) );
@@ -46,10 +46,10 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	public function test_attachment_pretty_link() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
-		$post_id = self::$factory->post->create( array(
+		$post_id = self::factory()->post->create( array(
 			'post_status' => 'publish'
 		) );
-		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', $post_id, array(
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment',
 			'post_title' => 'Burrito'
@@ -66,8 +66,8 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	public function test_attachment_no_name_pretty_link() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
-		$post_id = self::$factory->post->create();
-		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', $post_id, array(
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment'
 		) );
@@ -79,7 +79,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	}
 
 	public function test_unattached_link() {
-		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', 0, array(
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment'
 		) );
@@ -96,7 +96,7 @@ class Tests_Link_GetPostCommentsFeedLink extends WP_UnitTestCase {
 	public function test_unattached_pretty_link() {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
-		$attachment_id = self::$factory->attachment->create_object( 'image.jpg', 0, array(
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment'
 		) );

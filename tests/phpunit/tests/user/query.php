@@ -245,13 +245,13 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @ticket 31265
 	 */
 	public function test_orderby_clause_key_as_secondary_sort() {
-		$u1 = self::$factory->user->create( array(
+		$u1 = self::factory()->user->create( array(
 			'user_registered' => '2015-01-28 03:00:00',
 		) );
-		$u2 = self::$factory->user->create( array(
+		$u2 = self::factory()->user->create( array(
 			'user_registered' => '2015-01-28 05:00:00',
 		) );
-		$u3 = self::$factory->user->create( array(
+		$u3 = self::factory()->user->create( array(
 			'user_registered' => '2015-01-28 03:00:00',
 		) );
 
@@ -598,7 +598,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
 		}
 
-		$b = self::$factory->blog->create();
+		$b = self::factory()->blog->create();
 
 		add_user_to_blog( $b, self::$author_ids[0], 'author' );
 
@@ -624,7 +624,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
 		}
 
-		$b = self::$factory->blog->create();
+		$b = self::factory()->blog->create();
 		add_user_to_blog( $b, self::$author_ids[0], 'author' );
 
 		$query = new WP_User_Query( array(
@@ -649,7 +649,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
-		$b = self::$factory->blog->create();
+		$b = self::factory()->blog->create();
 
 		add_user_to_blog( $b, self::$author_ids[0], 'subscriber' );
 		add_user_to_blog( $b, self::$author_ids[1], 'author' );
@@ -675,7 +675,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
-		$b = self::$factory->blog->create();
+		$b = self::factory()->blog->create();
 
 		add_user_to_blog( $b, self::$author_ids[0], 'subscriber' );
 		add_user_to_blog( $b, self::$author_ids[1], 'author' );
@@ -707,8 +707,8 @@ class Tests_User_Query extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
 		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
 
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
 
 		$q = new WP_User_Query( array(
 			'has_published_posts' => true,
@@ -727,9 +727,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
 		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
 
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'wptests_pt_public' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'wptests_pt_private' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
 
 		$q = new WP_User_Query( array(
 			'has_published_posts' => array( 'wptests_pt_private', 'post' ),
@@ -748,9 +748,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt_public', array( 'public' => true ) );
 		register_post_type( 'wptests_pt_private', array( 'public' => false ) );
 
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'draft', 'post_type' => 'wptests_pt_public' ) );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'inherit', 'post_type' => 'wptests_pt_private' ) );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'draft', 'post_type' => 'wptests_pt_public' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'inherit', 'post_type' => 'wptests_pt_private' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[2], 'post_status' => 'publish', 'post_type' => 'post' ) );
 
 		$q = new WP_User_Query( array(
 			'has_published_posts' => array( 'wptests_pt_public', 'wptests_pt_private', 'post' ),
@@ -770,7 +770,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
-		$blogs = self::$factory->blog->create_many( 2 );
+		$blogs = self::factory()->blog->create_many( 2 );
 
 		add_user_to_blog( $blogs[0], self::$author_ids[0], 'author' );
 		add_user_to_blog( $blogs[0], self::$author_ids[1], 'author' );
@@ -778,11 +778,11 @@ class Tests_User_Query extends WP_UnitTestCase {
 		add_user_to_blog( $blogs[1], self::$author_ids[1], 'author' );
 
 		switch_to_blog( $blogs[0] );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[0], 'post_status' => 'publish', 'post_type' => 'post' ) );
 		restore_current_blog();
 
 		switch_to_blog( $blogs[1] );
-		self::$factory->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'post' ) );
+		self::factory()->post->create( array( 'post_author' => self::$author_ids[1], 'post_status' => 'publish', 'post_type' => 'post' ) );
 		restore_current_blog();
 
 		$q = new WP_User_Query( array(
@@ -931,7 +931,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @ticket 22212
 	 */
 	public function test_get_single_role_by_string_which_is_similar() {
-		$another_editor = self::$factory->user->create( array(
+		$another_editor = self::factory()->user->create( array(
 			'role' => 'another-editor',
 		) );
 
@@ -1148,7 +1148,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
-		$sites = self::$factory->blog->create_many( 2 );
+		$sites = self::factory()->blog->create_many( 2 );
 
 		add_user_to_blog( $sites[0], self::$author_ids[0], 'author' );
 		add_user_to_blog( $sites[1], self::$author_ids[1], 'author' );

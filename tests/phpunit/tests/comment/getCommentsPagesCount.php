@@ -38,7 +38,7 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 	 */
 	function test_empty() {
 		//setup post and comments
-		$post_id = self::$factory->post->create( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
+		$post_id = self::factory()->post->create( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
 		$this->go_to( '/?p=' . $post_id );
 
 		global $wp_query;
@@ -60,9 +60,9 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 	 */
 	function test_threaded_comments( ) {
 		//setup post and comments
-		$post = self::$factory->post->create_and_get( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
-		$comments = self::$factory->comment->create_post_comments( $post->ID, 15 );
-		self::$factory->comment->create_post_comments( $post->ID, 6, array( 'comment_parent' => $comments[0] ) );
+		$post = self::factory()->post->create_and_get( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
+		$comments = self::factory()->comment->create_post_comments( $post->ID, 15 );
+		self::factory()->comment->create_post_comments( $post->ID, 6, array( 'comment_parent' => $comments[0] ) );
 		$comments = get_comments( array( 'post_id' => $post->ID ) );
 
 		$this->assertEquals( 3, get_comment_pages_count( $comments, 10, false ) );
@@ -76,9 +76,9 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 	function test_option_thread_comments() {
 
 		//setup post and comments
-		$post = self::$factory->post->create_and_get( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
-		$comments = self::$factory->comment->create_post_comments( $post->ID, 15 );
-		self::$factory->comment->create_post_comments( $post->ID, 6, array('comment_parent' => $comments[0] ) );
+		$post = self::factory()->post->create_and_get( array( 'post_title' => 'comment--post', 'post_type' => 'post' ) );
+		$comments = self::factory()->comment->create_post_comments( $post->ID, 15 );
+		self::factory()->comment->create_post_comments( $post->ID, 6, array('comment_parent' => $comments[0] ) );
 		$comments = get_comments( array( 'post_id' => $post->ID ) );
 
 		update_option( 'thread_comments', false );
@@ -104,8 +104,8 @@ class Tests_Comment_GetCommentsPagesCount extends WP_UnitTestCase {
 
 		update_option( 'posts_per_rss', 100 );
 
-		$post = self::$factory->post->create_and_get( array( 'post_title' => 'comment-post', 'post_type' => 'post' ) );
-		$comments = self::$factory->comment->create_post_comments( $post->ID, 25 );
+		$post = self::factory()->post->create_and_get( array( 'post_title' => 'comment-post', 'post_type' => 'post' ) );
+		$comments = self::factory()->comment->create_post_comments( $post->ID, 25 );
 
 		$wp_query = new WP_Query( array( 'p' => $post->ID, 'comments_per_page' => 10, 'feed' =>'comments-' ) );
 

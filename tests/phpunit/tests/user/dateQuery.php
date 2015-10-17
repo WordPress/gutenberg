@@ -9,10 +9,10 @@ class Tests_User_DateQuery extends WP_UnitTestCase {
 	 * @ticket 27283
 	 */
 	public function test_user_registered() {
-		$u1 = self::$factory->user->create( array(
+		$u1 = self::factory()->user->create( array(
 			'user_registered' => '2012-02-14 05:05:05',
 		) );
-		$u2 = self::$factory->user->create( array(
+		$u2 = self::factory()->user->create( array(
 			'user_registered' => '2013-02-14 05:05:05',
 		) );
 
@@ -31,13 +31,13 @@ class Tests_User_DateQuery extends WP_UnitTestCase {
 	 * @ticket 27283
 	 */
 	public function test_user_registered_relation_or() {
-		$u1 = self::$factory->user->create( array(
+		$u1 = self::factory()->user->create( array(
 			'user_registered' => '2012-02-14 05:05:05',
 		) );
-		$u2 = self::$factory->user->create( array(
+		$u2 = self::factory()->user->create( array(
 			'user_registered' => '2013-02-14 05:05:05',
 		) );
-		$u3 = self::$factory->user->create( array(
+		$u3 = self::factory()->user->create( array(
 			'user_registered' => '2014-02-14 05:05:05',
 		) );
 

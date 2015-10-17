@@ -128,7 +128,7 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 
 		// create attachment
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
-		$attachment_id = self::$factory->attachment->create_upload_object( $filename );
+		$attachment_id = self::factory()->attachment->create_upload_object( $filename );
 
 		$post = array( 'post_title' => 'Post Thumbnail Test', 'post_thumbnail' => $attachment_id );
 		$result = $this->myxmlrpcserver->wp_newPost( array( 1, 'author', 'author', $post ) );

@@ -128,7 +128,7 @@ class Tests_WP_Customize_Panel extends WP_UnitTestCase {
 	 * @see WP_Customize_Panel::check_capabilities()
 	 */
 	function test_check_capabilities() {
-		$user_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $user_id );
 
 		$panel = new WP_Customize_Panel( $this->manager, 'foo' );
@@ -154,7 +154,7 @@ class Tests_WP_Customize_Panel extends WP_UnitTestCase {
 	 * @see WP_Customize_Panel::maybe_render()
 	 */
 	function test_maybe_render() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$panel = new WP_Customize_Panel( $this->manager, 'bar' );
 		$customize_render_panel_count = did_action( 'customize_render_panel' );
 		add_action( 'customize_render_panel', array( $this, 'action_customize_render_panel_test' ) );
@@ -179,7 +179,7 @@ class Tests_WP_Customize_Panel extends WP_UnitTestCase {
 	 * @see WP_Customize_Panel::print_template()
 	 */
 	function test_print_templates_standard() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		$panel = new WP_Customize_Panel( $this->manager, 'baz' );
 		ob_start();
@@ -197,7 +197,7 @@ class Tests_WP_Customize_Panel extends WP_UnitTestCase {
 	 * @see WP_Customize_Panel::print_template()
 	 */
 	function test_print_templates_custom() {
-		wp_set_current_user( self::$factory->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		$panel = new Custom_Panel_Test( $this->manager, 'baz' );
 		ob_start();

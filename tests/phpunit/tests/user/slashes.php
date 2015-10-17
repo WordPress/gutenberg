@@ -8,7 +8,7 @@
 class Tests_User_Slashes extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-		$this->author_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$this->author_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		$this->old_current_user = get_current_user_id();
 		wp_set_current_user( $this->author_id );
 
@@ -83,7 +83,7 @@ class Tests_User_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_edit_user() {
-		$id = self::$factory->user->create();
+		$id = self::factory()->user->create();
 
 		$_POST = $_GET = $_REQUEST = array();
 		$_POST['role'] = 'subscriber';
@@ -173,7 +173,7 @@ class Tests_User_Slashes extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_update_user() {
-		$id = self::$factory->user->create();
+		$id = self::factory()->user->create();
 		$id = wp_update_user(array(
 			'ID' => $id,
 			'role' => 'subscriber',

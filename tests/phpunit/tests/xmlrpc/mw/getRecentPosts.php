@@ -100,7 +100,7 @@ class Tests_XMLRPC_mw_getRecentPosts extends WP_XMLRPC_UnitTestCase {
 
 		// create attachment
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
-		$attachment_id = self::$factory->attachment->create_upload_object( $filename, $this->post_id );
+		$attachment_id = self::factory()->attachment->create_upload_object( $filename, $this->post_id );
 		set_post_thumbnail( $this->post_id, $attachment_id );
 
 		$results = $this->myxmlrpcserver->mw_getRecentPosts( array( $this->post_id, 'author', 'author' ) );

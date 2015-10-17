@@ -38,7 +38,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertSame( 0, did_action( $error ) );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'comment_status' => 'closed',
 		) );
 		$data = array(
@@ -58,7 +58,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertSame( 0, did_action( $error ) );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		wp_trash_post( $post );
 		$data = array(
 			'comment_post_ID' => $post->ID,
@@ -77,7 +77,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertSame( 0, did_action( $error ) );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_status' => 'draft',
 		) );
 		$data = array(
@@ -98,7 +98,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertSame( 0, did_action( $error ) );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_date' => date( 'Y-m-d H:i:s', strtotime( '+1 day' ) ),
 		) );
 
@@ -121,7 +121,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertSame( 0, did_action( $error ) );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_password' => 'password',
 		) );
 		$data = array(
@@ -142,7 +142,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$_COOKIE['wp-postpass_' . COOKIEHASH] = $hasher->HashPassword( $password );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_password' => $password,
 		) );
 		$data = array(
@@ -162,13 +162,13 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_submitting_valid_comment_as_logged_in_user_succeeds() {
 
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'user_url' => 'http://user.example.org'
 		) );
 
 		wp_set_current_user( $user->ID );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment',
@@ -187,7 +187,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_submitting_valid_comment_anonymously_succeeds() {
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment',
@@ -214,7 +214,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 	 */
 	public function test_submitting_comment_handles_slashes_correctly_handles_slashes() {
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment with 1 slash: \\',
@@ -236,7 +236,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$error = 'not_logged_in';
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_status' => 'private',
 		) );
 		$data = array(
@@ -252,11 +252,11 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_submitting_comment_to_own_private_post_succeeds() {
 
-		$user = self::$factory->user->create_and_get();
+		$user = self::factory()->user->create_and_get();
 
 		wp_set_current_user( $user->ID );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_status' => 'private',
 			'post_author' => $user->ID,
 		) );
@@ -274,16 +274,16 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_submitting_comment_to_accessible_private_post_succeeds() {
 
-		$author = self::$factory->user->create_and_get( array(
+		$author = self::factory()->user->create_and_get( array(
 			'role' => 'author',
 		) );
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'role' => 'editor',
 		) );
 
 		wp_set_current_user( $user->ID );
 
-		$post = self::$factory->post->create_and_get( array(
+		$post = self::factory()->post->create_and_get( array(
 			'post_status' => 'private',
 			'post_author' => $author->ID,
 		) );
@@ -301,7 +301,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_anonymous_user_cannot_comment_unfiltered_html() {
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment <script>alert(document.cookie);</script>',
@@ -318,14 +318,14 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_unprivileged_user_cannot_comment_unfiltered_html() {
 
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'role' => 'author',
 		) );
 		wp_set_current_user( $user->ID );
 
 		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment <script>alert(document.cookie);</script>',
@@ -340,14 +340,14 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_unprivileged_user_cannot_comment_unfiltered_html_even_with_valid_nonce() {
 
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'role' => 'author',
 		) );
 		wp_set_current_user( $user->ID );
 
 		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
 
-		$post   = self::$factory->post->create_and_get();
+		$post   = self::factory()->post->create_and_get();
 		$action = 'unfiltered-html-comment_' . $post->ID;
 		$nonce  = wp_create_nonce( $action );
 
@@ -370,7 +370,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertFalse( defined( 'DISALLOW_UNFILTERED_HTML' ) );
 
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'role' => 'editor',
 		) );
 
@@ -384,7 +384,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
 
-		$post   = self::$factory->post->create_and_get();
+		$post   = self::factory()->post->create_and_get();
 		$action = 'unfiltered-html-comment_' . $post->ID;
 		$nonce  = wp_create_nonce( $action );
 
@@ -405,7 +405,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_privileged_user_cannot_comment_unfiltered_html_without_valid_nonce() {
 
-		$user = self::$factory->user->create_and_get( array(
+		$user = self::factory()->user->create_and_get( array(
 			'role' => 'editor',
 		) );
 
@@ -419,7 +419,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
 
-		$post   = self::$factory->post->create_and_get();
+		$post   = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment <script>alert(document.cookie);</script>',
@@ -439,7 +439,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$_comment_registration = get_option( 'comment_registration' );
 		update_option( 'comment_registration', '1' );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 		);
@@ -459,7 +459,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$_require_name_email = get_option( 'require_name_email' );
 		update_option( 'require_name_email', '1' );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment',
@@ -481,7 +481,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$_require_name_email = get_option( 'require_name_email' );
 		update_option( 'require_name_email', '1' );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment',
@@ -503,7 +503,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$_require_name_email = get_option( 'require_name_email' );
 		update_option( 'require_name_email', '1' );
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => 'Comment',
@@ -523,7 +523,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$error = 'require_valid_comment';
 
-		$post = self::$factory->post->create_and_get();
+		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
 			'comment'         => '',

@@ -8,7 +8,7 @@ class Tests_Meta extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		$this->author = new WP_User( self::$factory->user->create( array( 'role' => 'author' ) ) );
+		$this->author = new WP_User( self::factory()->user->create( array( 'role' => 'author' ) ) );
 		$this->meta_id = add_metadata( 'user', $this->author->ID, 'meta_key', 'meta_value' );
 		$this->delete_meta_id = add_metadata( 'user', $this->author->ID, 'delete_meta_key', 'delete_meta_value' );
 	}
@@ -194,10 +194,10 @@ class Tests_Meta extends WP_UnitTestCase {
 	 * @ticket 16814
 	 */
 	function test_meta_type_cast() {
-		$post_id1 = self::$factory->post->create();
+		$post_id1 = self::factory()->post->create();
 		add_post_meta( $post_id1, 'num_as_longtext', 123 );
 		add_post_meta( $post_id1, 'num_as_longtext_desc', 10 );
-		$post_id2 = self::$factory->post->create();
+		$post_id2 = self::factory()->post->create();
 		add_post_meta( $post_id2, 'num_as_longtext', 99 );
 		add_post_meta( $post_id2, 'num_as_longtext_desc', 100 );
 
@@ -258,7 +258,7 @@ class Tests_Meta extends WP_UnitTestCase {
 	}
 
 	function test_meta_cache_order_asc() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$colors = array( 'red', 'blue', 'yellow', 'green' );
 		foreach ( $colors as $color )
 			add_post_meta( $post_id, 'color', $color );

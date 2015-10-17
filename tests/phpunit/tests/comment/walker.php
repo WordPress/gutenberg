@@ -8,15 +8,15 @@ class Tests_Comment_Walker extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		$this->post_id = self::$factory->post->create();
+		$this->post_id = self::factory()->post->create();
 	}
 
 	/**
 	 * @ticket 14041
 	 */
 	function test_has_children() {
-		$comment_parent = self::$factory->comment->create( array( 'comment_post_ID' => $this->post_id ) );
-		$comment_child  = self::$factory->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_parent' => $comment_parent ) );
+		$comment_parent = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+		$comment_child  = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_parent' => $comment_parent ) );
 		$comment_parent = get_comment( $comment_parent );
 		$comment_child  = get_comment( $comment_child  );
 

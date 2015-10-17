@@ -37,7 +37,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	 * as the main network ID.
 	 */
 	function test_get_main_network_id_two_networks() {
-		self::$factory->network->create();
+		self::factory()->network->create();
 
 		$this->assertEquals( 1, get_main_network_id() );
 	}
@@ -49,7 +49,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	function test_get_main_network_id_after_network_switch() {
 		global $current_site;
 
-		$id = self::$factory->network->create();
+		$id = self::factory()->network->create();
 
 		$current_site->id = (int) $id;
 
@@ -65,7 +65,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	 */
 	function test_get_main_network_id_after_network_delete() {
 		global $wpdb, $current_site;
-		$id = self::$factory->network->create();
+		$id = self::factory()->network->create();
 
 		$current_site->id = (int) $id;
 		$wpdb->query( "UPDATE {$wpdb->site} SET id=100 WHERE id=1" );
@@ -90,13 +90,13 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$site_count_start = get_blog_count();
 		// false for large networks by default
 		add_filter( 'enable_live_network_counts', '__return_false' );
-		self::$factory->blog->create_many( 4 );
+		self::factory()->blog->create_many( 4 );
 
 		// count only updated when cron runs, so unchanged
 		$this->assertEquals( $site_count_start, (int) get_blog_count() );
 
 		add_filter( 'enable_live_network_counts', '__return_true' );
-		$site_ids = self::$factory->blog->create_many( 4 );
+		$site_ids = self::factory()->blog->create_many( 4 );
 
 		$this->assertEquals( $site_count_start + 9, (int) get_blog_count() );
 
@@ -211,7 +211,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 
 		// Only false for large networks as of 3.7
 		add_filter( 'enable_live_network_counts', '__return_false' );
-		self::$factory->user->create( array( 'role' => 'administrator' ) );
+		self::factory()->user->create( array( 'role' => 'administrator' ) );
 
 		$count = get_user_count(); // No change, cache not refreshed
 		$this->assertEquals( $start_count, $count );
@@ -240,8 +240,8 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$dashboard_blog = get_dashboard_blog();
 		$this->assertEquals( 1, $dashboard_blog->blog_id );
 
-		$user_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
-		$blog_id = self::$factory->blog->create( array( 'user_id' => $user_id ) );
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$blog_id = self::factory()->blog->create( array( 'user_id' => $user_id ) );
 		$this->assertInternalType( 'int', $blog_id );
 
 		// set the dashboard blog to another one

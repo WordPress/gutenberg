@@ -11,33 +11,33 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		parent::setUp();
 
 		$now = time();
-		$this->p = self::$factory->post->create();
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->p = self::factory()->post->create();
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '1',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 100 ),
 		) );
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '2',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 200 ),
 		) );
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '3',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 300 ),
 		) );
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 400 ),
 		) );
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 500 ),
 		) );
-		$this->comments[] = self::$factory->comment->create( array(
+		$this->comments[] = self::factory()->comment->create( array(
 			'comment_post_ID' => $this->p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 600 ),

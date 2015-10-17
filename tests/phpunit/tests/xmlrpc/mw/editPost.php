@@ -126,7 +126,7 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 
 		// create attachment
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
-		$attachment_id = self::$factory->attachment->create_upload_object( $filename, $post_id );
+		$attachment_id = self::factory()->attachment->create_upload_object( $filename, $post_id );
 
 		// add post thumbnail to post that does not have one
 		$post2 = array( 'wp_post_thumbnail' => $attachment_id );
@@ -141,7 +141,7 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( $attachment_id, get_post_meta( $post_id, '_thumbnail_id', true ) );
 
 		// create another attachment
-		$attachment2_id = self::$factory->attachment->create_upload_object( $filename, $post_id );
+		$attachment2_id = self::factory()->attachment->create_upload_object( $filename, $post_id );
 
 		// change the post's post_thumbnail
 		$post4 = array( 'wp_post_thumbnail' => $attachment2_id );
@@ -228,7 +228,7 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 
 		$editor_id = $this->make_user_by_role( 'editor' );
 
-		$post_id = self::$factory->post->create( array(
+		$post_id = self::factory()->post->create( array(
 			'post_author' => $editor_id
 		) );
 
@@ -251,7 +251,7 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 	function test_empty_not_null() {
 		$editor_id = $this->make_user_by_role( 'editor' );
 
-		$post_id = self::$factory->post->create( array(
+		$post_id = self::factory()->post->create( array(
 			'post_title' => 'Title',
 			'post_author' => $editor_id,
 			'tags_input' => 'taco'

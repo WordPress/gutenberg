@@ -7,7 +7,7 @@ class Tests_User_UpdateUserCaches extends WP_UnitTestCase {
 	public function test_should_store_entire_database_row_in_users_bucket() {
 		global $wpdb;
 
-		$u = self::$factory->user->create();
+		$u = self::factory()->user->create();
 		$raw_userdata = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d", $u ) );
 
 		update_user_caches( $raw_userdata );
@@ -57,7 +57,7 @@ class Tests_User_UpdateUserCaches extends WP_UnitTestCase {
 	public function test_should_store_raw_data_in_users_bucket_when_passed_a_wp_user_object() {
 		global $wpdb;
 
-		$u = self::$factory->user->create();
+		$u = self::factory()->user->create();
 		$raw_userdata = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d", $u ) );
 		$user_object = new WP_User( $u );
 

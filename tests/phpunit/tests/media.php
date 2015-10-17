@@ -236,8 +236,8 @@ EOF;
 	 * @ticket 22960
 	 */
 	function test_get_attached_images() {
-		$post_id = self::$factory->post->create();
-		$attachment_id = self::$factory->attachment->create_object( $this->img_name, $post_id, array(
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( $this->img_name, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment'
 		) );
@@ -253,7 +253,7 @@ EOF;
 		$ids1 = array();
 		$ids1_srcs = array();
 		foreach ( range( 1, 3 ) as $i ) {
-			$attachment_id = self::$factory->attachment->create_object( "image$i.jpg", 0, array(
+			$attachment_id = self::factory()->attachment->create_object( "image$i.jpg", 0, array(
 				'post_mime_type' => 'image/jpeg',
 				'post_type' => 'attachment'
 			) );
@@ -266,7 +266,7 @@ EOF;
 		$ids2 = array();
 		$ids2_srcs = array();
 		foreach ( range( 4, 6 ) as $i ) {
-			$attachment_id = self::$factory->attachment->create_object( "image$i.jpg", 0, array(
+			$attachment_id = self::factory()->attachment->create_object( "image$i.jpg", 0, array(
 				'post_mime_type' => 'image/jpeg',
 				'post_type' => 'attachment'
 			) );
@@ -284,7 +284,7 @@ EOF;
 
 [gallery ids="$ids2_joined"]
 BLOB;
-		$post_id = self::$factory->post->create( array( 'post_content' => $blob ) );
+		$post_id = self::factory()->post->create( array( 'post_content' => $blob ) );
 		$srcs = get_post_galleries_images( $post_id );
 		$this->assertEquals( $srcs, array( $ids1_srcs, $ids2_srcs ) );
 	}
@@ -296,7 +296,7 @@ BLOB;
 		$ids1 = array();
 		$ids1_srcs = array();
 		foreach ( range( 1, 3 ) as $i ) {
-			$attachment_id = self::$factory->attachment->create_object( "image$i.jpg", 0, array(
+			$attachment_id = self::factory()->attachment->create_object( "image$i.jpg", 0, array(
 				'post_mime_type' => 'image/jpeg',
 				'post_type' => 'attachment'
 			) );
@@ -309,7 +309,7 @@ BLOB;
 		$ids2 = array();
 		$ids2_srcs = array();
 		foreach ( range( 4, 6 ) as $i ) {
-			$attachment_id = self::$factory->attachment->create_object( "image$i.jpg", 0, array(
+			$attachment_id = self::factory()->attachment->create_object( "image$i.jpg", 0, array(
 				'post_mime_type' => 'image/jpeg',
 				'post_type' => 'attachment'
 			) );
@@ -327,7 +327,7 @@ BLOB;
 
 [gallery ids="$ids2_joined"]
 BLOB;
-		$post_id = self::$factory->post->create( array( 'post_content' => $blob ) );
+		$post_id = self::factory()->post->create( array( 'post_content' => $blob ) );
 		$srcs = get_post_gallery_images( $post_id );
 		$this->assertEquals( $srcs, $ids1_srcs );
 	}
@@ -505,7 +505,7 @@ VIDEO;
 	 */
 	function test_attachment_url_to_postid() {
 		$image_path = '2014/11/' . $this->img_name;
-		$attachment_id = self::$factory->attachment->create_object( $image_path, 0, array(
+		$attachment_id = self::factory()->attachment->create_object( $image_path, 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type'      => 'attachment',
 		) );
@@ -516,7 +516,7 @@ VIDEO;
 
 	function test_attachment_url_to_postid_schemes() {
 		$image_path = '2014/11/' . $this->img_name;
-		$attachment_id = self::$factory->attachment->create_object( $image_path, 0, array(
+		$attachment_id = self::factory()->attachment->create_object( $image_path, 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type'      => 'attachment',
 		) );
@@ -530,7 +530,7 @@ VIDEO;
 
 	function test_attachment_url_to_postid_filtered() {
 		$image_path = '2014/11/' . $this->img_name;
-		$attachment_id = self::$factory->attachment->create_object( $image_path, 0, array(
+		$attachment_id = self::factory()->attachment->create_object( $image_path, 0, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type'      => 'attachment',
 		) );
@@ -704,8 +704,8 @@ EOF;
 	function test_wp_get_attachment_image_url() {
 		$this->assertFalse( wp_get_attachment_image_url( 0 ) );
 
-		$post_id = self::$factory->post->create();
-		$attachment_id = self::$factory->attachment->create_object( $this->img_name, $post_id, array(
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( $this->img_name, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 			'post_type' => 'attachment',
 		) );
@@ -760,7 +760,7 @@ EOF;
 
 		// Make an image.
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
-		$id = self::$factory->attachment->create_upload_object( $filename );
+		$id = self::factory()->attachment->create_upload_object( $filename );
 
 		$image = wp_get_attachment_metadata( $id );
 

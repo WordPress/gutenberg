@@ -24,7 +24,7 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	public function test_passing_term_object_should_skip_database_query_when_filter_property_is_empty() {
 		global $wpdb;
 
-		$term = self::$factory->term->create_and_get( array( 'taxonomy' => 'wptests_tax' ) );
+		$term = self::factory()->term->create_and_get( array( 'taxonomy' => 'wptests_tax' ) );
 		clean_term_cache( $term->term_id, 'wptests_tax' );
 
 		$num_queries = $wpdb->num_queries;
@@ -46,7 +46,7 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	public function test_cache_should_be_populated_by_successful_fetch() {
 		global $wpdb;
 
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		clean_term_cache( $t, 'wptests_tax' );
 
 		// Prime cache.
@@ -60,19 +60,19 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	}
 
 	public function test_output_object() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$this->assertInternalType( 'object', get_term( $t, 'wptests_tax', OBJECT ) );
 	}
 
 	public function test_output_array_a() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$term = get_term( $t, 'wptests_tax', ARRAY_A );
 		$this->assertInternalType( 'array', $term );
 		$this->assertTrue( isset( $term['term_id'] ) );
 	}
 
 	public function test_output_array_n() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$term = get_term( $t, 'wptests_tax', ARRAY_N );
 		$this->assertInternalType( 'array', $term );
 		$this->assertFalse( isset( $term['term_id'] ) );
@@ -82,7 +82,7 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	}
 
 	public function test_output_should_fall_back_to_object_for_invalid_input() {
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		$this->assertInternalType( 'object', get_term( $t, 'wptests_tax', 'foo' ) );
 	}
 
@@ -92,7 +92,7 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	public function test_numeric_properties_should_be_cast_to_ints() {
 		global $wpdb;
 
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 
 		// Get raw data from the database.
 		$term_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->terms t JOIN $wpdb->term_taxonomy tt ON ( t.term_id = tt.term_id ) WHERE t.term_id = %d", $t ) );
@@ -111,7 +111,7 @@ class Tests_Term_GetTerm extends WP_UnitTestCase {
 	 * @ticket 34332
 	 */
 	 public function test_should_return_null_when_provided_taxonomy_does_not_match_actual_term_taxonomy() {
-		$term_id = self::$factory->term->create( array( 'taxonomy' => 'post_tag' ) );
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'post_tag' ) );
 		$this->assertNull( get_term( $term_id, 'category' ) );
 	}
 }

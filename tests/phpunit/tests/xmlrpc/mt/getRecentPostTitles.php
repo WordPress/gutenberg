@@ -22,7 +22,7 @@ class Tests_XMLRPC_mt_getRecentPostTitles extends WP_XMLRPC_UnitTestCase {
 	function test_no_editable_posts() {
 		$this->make_user_by_role( 'author' );
 		$editor = $this->make_user_by_role( 'editor' );
-		self::$factory->post->create( array( 'post_author' => $editor ) );
+		self::factory()->post->create( array( 'post_author' => $editor ) );
 
 		$result = $this->myxmlrpcserver->mt_getRecentPostTitles( array( 1, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
@@ -32,7 +32,7 @@ class Tests_XMLRPC_mt_getRecentPostTitles extends WP_XMLRPC_UnitTestCase {
 	function test_date() {
 		$this->make_user_by_role( 'author' );
 
-		self::$factory->post->create();
+		self::factory()->post->create();
 
 		$results = $this->myxmlrpcserver->mt_getRecentPostTitles( array( 1, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $results );

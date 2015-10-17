@@ -12,7 +12,7 @@ class Tests_oEmbed_Discovery extends WP_UnitTestCase {
 	}
 
 	function test_add_oembed_discovery_links_to_post() {
-		$post_id = self::$factory->post->create();
+		$post_id = self::factory()->post->create();
 		$this->go_to( get_permalink( $post_id ) );
 
 		$this->assertQueryTrue( 'is_single', 'is_singular' );
@@ -28,7 +28,7 @@ class Tests_oEmbed_Discovery extends WP_UnitTestCase {
 	}
 
 	function test_add_oembed_discovery_links_to_page() {
-		$post_id = self::$factory->post->create( array(
+		$post_id = self::factory()->post->create( array(
 			'post_type' => 'page'
 		));
 		$this->go_to( get_permalink( $post_id ) );
@@ -46,9 +46,9 @@ class Tests_oEmbed_Discovery extends WP_UnitTestCase {
 	}
 
 	function test_add_oembed_discovery_links_to_attachment() {
-		$post_id       = self::$factory->post->create();
+		$post_id       = self::factory()->post->create();
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
-		$attachment_id = self::$factory->attachment->create_object( $file, $post_id, array(
+		$attachment_id = self::factory()->attachment->create_object( $file, $post_id, array(
 			'post_mime_type' => 'image/jpeg',
 		) );
 

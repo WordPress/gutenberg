@@ -14,10 +14,23 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected static $hooks_saved = array();
 	protected static $ignore_files;
 
-	/**
-	 * @var WP_UnitTest_Factory
-	 */
-	protected static $factory;
+	function __isset( $name ) {
+		return 'factory' === $name;
+ 	}
+
+	function __get( $name ) {
+		if ( 'factory' === $name ) {
+			return self::factory();
+ 	    }
+ 	}
+
+	protected static function factory() {
+		static $factory = null;
+		if ( ! $factory ) {
+			$factory = new WP_UnitTest_Factory();
+		}
+		return $factory;
+	}
 
 	public static function get_called_class() {
 		if ( function_exists( 'get_called_class' ) ) {
@@ -37,16 +50,12 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
 
-		if ( ! self::$factory ) {
-			self::$factory = new WP_UnitTest_Factory();
-		}
-
 		$c = self::get_called_class();
 		if ( ! method_exists( $c, 'wpSetUpBeforeClass' ) ) {
 			return;
 		}
 
-		call_user_func( array( $c, 'wpSetUpBeforeClass' ), self::$factory );
+		call_user_func( array( $c, 'wpSetUpBeforeClass' ), self::factory() );
 
 		self::commit_transaction();
 	}

@@ -8,7 +8,7 @@
 class Tests_Term_Slashes extends WP_Ajax_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-		$this->author_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$this->author_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		$this->old_current_user = get_current_user_id();
 		wp_set_current_user( $this->author_id );
 
@@ -84,7 +84,7 @@ class Tests_Term_Slashes extends WP_Ajax_UnitTestCase {
 			'post_tag'
 		);
 		foreach ( $taxonomies as $taxonomy ) {
-			$id = self::$factory->term->create(array(
+			$id = self::factory()->term->create(array(
 				'taxonomy' => $taxonomy
 			));
 

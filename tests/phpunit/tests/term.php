@@ -23,11 +23,11 @@ class Tests_Term extends WP_UnitTestCase {
 			'hierarchical' => true,
 		) );
 
-		$parent = self::$factory->term->create( array(
+		$parent = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
-		$child = self::$factory->term->create( array(
+		$child = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 			'parent' => $parent,
 			'slug' => 'foo',
@@ -226,10 +226,10 @@ class Tests_Term extends WP_UnitTestCase {
 	public function test_wp_set_object_terms_append_true() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$p = self::$post_ids[0];
-		$t1 = self::$factory->term->create( array(
+		$t1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
-		$t2 = self::$factory->term->create( array(
+		$t2 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -247,10 +247,10 @@ class Tests_Term extends WP_UnitTestCase {
 	public function test_wp_set_object_terms_append_false() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$p = self::$post_ids[0];
-		$t1 = self::$factory->term->create( array(
+		$t1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
-		$t2 = self::$factory->term->create( array(
+		$t2 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -268,10 +268,10 @@ class Tests_Term extends WP_UnitTestCase {
 	public function test_wp_set_object_terms_append_default_to_false() {
 		register_taxonomy( 'wptests_tax', 'post' );
 		$p = self::$post_ids[0];
-		$t1 = self::$factory->term->create( array(
+		$t1 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
-		$t2 = self::$factory->term->create( array(
+		$t2 = self::factory()->term->create( array(
 			'taxonomy' => 'wptests_tax',
 		) );
 
@@ -364,7 +364,7 @@ class Tests_Term extends WP_UnitTestCase {
 	 */
 	function test_wp_add_remove_object_terms() {
 		$posts = self::$post_ids;
-		$tags = self::$factory->tag->create_many( 5 );
+		$tags = self::factory()->tag->create_many( 5 );
 
 		$tt = wp_add_object_terms( $posts[0], $tags[1], 'post_tag' );
 		$this->assertEquals( 1, count( $tt ) );
@@ -523,7 +523,7 @@ class Tests_Term extends WP_UnitTestCase {
 	 */
 	function test_object_term_cache_when_term_changes() {
 		$post_id = self::$post_ids[0];
-		$tag_id = self::$factory->tag->create( array(
+		$tag_id = self::factory()->tag->create( array(
 			'name' => 'Amaze Tag',
 			'description' => 'My Amazing Tag'
 		) );
@@ -553,7 +553,7 @@ class Tests_Term extends WP_UnitTestCase {
 	public function test_get_the_terms_should_not_cache_wp_term_objects() {
 		$p = self::$post_ids[0];
 		register_taxonomy( 'wptests_tax', 'post' );
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		wp_set_object_terms( $p, $t, 'wptests_tax' );
 
 		// Prime the cache.
@@ -572,7 +572,7 @@ class Tests_Term extends WP_UnitTestCase {
 	public function test_get_the_terms_should_return_wp_term_objects_from_cache() {
 		$p = self::$post_ids[0];
 		register_taxonomy( 'wptests_tax', 'post' );
-		$t = self::$factory->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 		wp_set_object_terms( $p, $t, 'wptests_tax' );
 
 		// Prime the cache.
@@ -618,11 +618,11 @@ class Tests_Term extends WP_UnitTestCase {
 	 * @ticket 19205
 	 */
 	function test_orphan_category() {
-		$cat_id1 = self::$factory->category->create();
+		$cat_id1 = self::factory()->category->create();
 
 		wp_delete_category( $cat_id1 );
 
-		$cat_id2 = self::$factory->category->create( array( 'parent' => $cat_id1 ) );
+		$cat_id2 = self::factory()->category->create( array( 'parent' => $cat_id1 ) );
 		$this->assertWPError( $cat_id2 );
 	}
 }

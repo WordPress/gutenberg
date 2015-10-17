@@ -12,8 +12,8 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 
 		$this->user_ids = array();
 
-		$this->user_id   = self::$factory->user->create( array( 'role' => 'administrator' ) );
-		$this->author_id = self::$factory->user->create( array( 'role' => 'administrator' ) );
+		$this->user_id   = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$this->author_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
 		if ( isset( $GLOBALS['super_admins'] ) )
 			$this->super_admins = $GLOBALS['super_admins'];
@@ -248,8 +248,8 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 	 * @ticket 27020
 	 */
 	function test_authorless_posts_capabilties() {
-		$post_id = self::$factory->post->create( array( 'post_author' => 0, 'post_type' => 'post', 'post_status' => 'publish' ) );
-		$editor = self::$factory->user->create( array( 'role' => 'editor' ) );
+		$post_id = self::factory()->post->create( array( 'post_author' => 0, 'post_type' => 'post', 'post_status' => 'publish' ) );
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
 
 		$this->assertEquals( array( 'edit_others_posts', 'edit_published_posts' ), map_meta_cap( 'edit_post', $editor, $post_id ) );
 		$this->assertEquals( array( 'delete_others_posts', 'delete_published_posts' ), map_meta_cap( 'delete_post', $editor, $post_id ) );
