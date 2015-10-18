@@ -126,7 +126,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function tearDown() {
-		global $wpdb, $wp_query, $post;
+		global $wpdb, $wp_query, $wp, $post;
 		$wpdb->query( 'ROLLBACK' );
 		if ( is_multisite() ) {
 			while ( ms_is_switched() ) {
@@ -134,6 +134,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			}
 		}
 		$wp_query = new WP_Query();
+		$wp = new WP();
 		$post = null;
 		remove_theme_support( 'html5' );
 		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
@@ -419,7 +420,14 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		unset($GLOBALS['wp_query'], $GLOBALS['wp_the_query']);
 		$GLOBALS['wp_the_query'] = new WP_Query();
 		$GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];
+		
+		$public_query_vars  = $GLOBALS['wp']->public_query_vars;
+		$private_query_vars = $GLOBALS['wp']->private_query_vars;
+
 		$GLOBALS['wp'] = new WP();
+		$GLOBALS['wp']->public_query_vars  = $public_query_vars;
+		$GLOBALS['wp']->private_query_vars = $private_query_vars;
+
 		_cleanup_query_vars();
 
 		$GLOBALS['wp']->main($parts['query']);
