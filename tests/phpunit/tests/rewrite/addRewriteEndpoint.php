@@ -17,6 +17,7 @@ class Tests_Rewrite_AddRewriteEndpoint extends WP_UnitTestCase {
 
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$test_page_id, true );
+		wp_delete_post( self::$test_post_id, true );
 	}
 
 	public function setUp() {
