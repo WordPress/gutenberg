@@ -17,7 +17,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		) );
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_single', 'is_singular' );
+		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -43,7 +43,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_single', 'is_singular' );
+		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -60,7 +60,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->go_to( home_url( '/?p=123&embed=true' ) );
 		$GLOBALS['wp_query']->query_vars['embed'] = true;
 
-		$this->assertQueryTrue( 'is_404' );
+		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -83,7 +83,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $attachment_id ) );
 
-		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_attachment' );
+		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_attachment', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -106,7 +106,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_404' );
+		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -128,7 +128,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_404' );
+		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -149,7 +149,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_404' );
+		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );
@@ -174,7 +174,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$this->go_to( get_post_embed_url( $post_id ) );
 
-		$this->assertQueryTrue( 'is_single', 'is_singular' );
+		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
 		include( ABSPATH . WPINC . '/embed-template.php' );

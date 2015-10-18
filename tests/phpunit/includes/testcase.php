@@ -524,10 +524,34 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function assertQueryTrue(/* ... */) {
 		global $wp_query;
 		$all = array(
-			'is_single', 'is_preview', 'is_page', 'is_archive', 'is_date', 'is_year', 'is_month', 'is_day', 'is_time',
-			'is_author', 'is_category', 'is_tag', 'is_tax', 'is_search', 'is_feed', 'is_comment_feed', 'is_trackback',
-			'is_home', 'is_404', 'is_comments_popup', 'is_paged', 'is_admin', 'is_attachment', 'is_singular', 'is_robots',
-			'is_posts_page', 'is_post_type_archive',
+			'is_404',
+			'is_admin',
+			'is_archive',
+			'is_attachment',
+			'is_author',
+			'is_category',
+			'is_comment_feed',
+			'is_comments_popup',
+			'is_date',
+			'is_day',
+			'is_embed',
+			'is_feed',
+			'is_home',
+			'is_month',
+			'is_page',
+			'is_paged',
+			'is_post_type_archive',
+			'is_posts_page',
+			'is_preview',
+			'is_robots',
+			'is_search',
+			'is_single',
+			'is_singular',
+			'is_tag',
+			'is_tax',
+			'is_time',
+			'is_trackback',
+			'is_year',
 		);
 		$true = func_get_args();
 
@@ -550,9 +574,9 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		$message = '';
 		if ( count($not_true) )
-			$message .= implode( $not_true, ', ' ) . ' should be true. ';
+			$message .= implode( $not_true, ', ' ) . ' is expected to be true. ';
 		if ( count($not_false) )
-			$message .= implode( $not_false, ', ' ) . ' should be false.';
+			$message .= implode( $not_false, ', ' ) . ' is expected to be false.';
 		$this->assertTrue( $passed, $message );
 	}
 
