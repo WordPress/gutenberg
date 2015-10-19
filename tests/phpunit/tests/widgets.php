@@ -467,8 +467,8 @@ class Tests_Widgets extends WP_UnitTestCase {
 
 		// Pretend this widget is new.
 		delete_option( 'widget_nav_menu' );
-		$never_used = get_option( 'widget_nav_menu' );
-		$this->assertFalse( $never_used );
+		$never_used = get_option( 'widget_nav_menu', array() );
+		$this->assertEquals( array(), (array) $never_used );
 
 		wp_widgets_init();
 		$wp_widget_search = $wp_registered_widgets['search-2']['callback'][0];
