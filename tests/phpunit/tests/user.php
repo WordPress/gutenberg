@@ -819,6 +819,20 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertSame( $expected, $user->user_nicename );
 	}
 
+	/**
+	 * @ticket 28004
+	 */
+	public function test_wp_insert_user_with_invalid_user_id() {
+		$u = wp_insert_user( array(
+			'ID' => 123,
+			'user_login' => 'whatever',
+			'user_email' => 'whatever@example.com',
+			'user_pass' => 'password',
+		) );
+
+		$this->assertWPError( $u );
+	}
+
 	function test_changing_email_invalidates_password_reset_key() {
 		global $wpdb;
 
