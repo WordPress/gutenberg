@@ -48,7 +48,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_short_circuiting_title() {
 		$this->go_to( '/' );
 
-		add_filter( 'title_tag_pre', array( $this, '_short_circuit_title' ) );
+		add_filter( 'pre_get_document_title', array( $this, '_short_circuit_title' ) );
 
 		$this->expectOutputString( "<title>A Wild Title</title>\n" );
 		_wp_render_title_tag();
@@ -74,7 +74,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_home_title() {
 		$this->go_to( '/' );
 
-		add_filter( 'title_tag_parts', array( $this, '_home_title_parts' ) );
+		add_filter( 'document_title_parts', array( $this, '_home_title_parts' ) );
 
 		$this->expectOutputString( "<title>Test Blog &#8211; Just another WordPress site</title>\n" );
 		_wp_render_title_tag();
@@ -91,7 +91,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_paged_title() {
 		$this->go_to( '?page=4' );
 
-		add_filter( 'title_tag_parts', array( $this, '_paged_title_parts' ) );
+		add_filter( 'document_title_parts', array( $this, '_paged_title_parts' ) );
 
 		$this->expectOutputString( "<title>Test Blog &#8211; Page 4 &#8211; Just another WordPress site</title>\n" );
 		_wp_render_title_tag();
@@ -109,7 +109,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_singular_title() {
 		$this->go_to( '?p=' . $this->post_id );
 
-		add_filter( 'title_tag_parts', array( $this, '_singular_title_parts' ) );
+		add_filter( 'document_title_parts', array( $this, '_singular_title_parts' ) );
 
 		$this->expectOutputString( "<title>test_title &#8211; Test Blog</title>\n" );
 		_wp_render_title_tag();
@@ -212,7 +212,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_rearrange_title_parts() {
 		$this->go_to( '?p=' . $this->post_id );
 
-		add_filter( 'title_tag_parts', array( $this, '_rearrange_title_parts' ) );
+		add_filter( 'document_title_parts', array( $this, '_rearrange_title_parts' ) );
 
 		$this->expectOutputString( "<title>Test Blog &#8211; test_title</title>\n" );
 		_wp_render_title_tag();
@@ -230,7 +230,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_change_title_separator() {
 		$this->go_to( '?p=' . $this->post_id );
 
-		add_filter( 'title_tag_separator', array( $this, '_change_title_separator' ) );
+		add_filter( 'document_title_separator', array( $this, '_change_title_separator' ) );
 
 		$this->expectOutputString( "<title>test_title %% Test Blog</title>\n" );
 		_wp_render_title_tag();
