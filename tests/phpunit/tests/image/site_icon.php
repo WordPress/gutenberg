@@ -127,6 +127,22 @@ class Tests_WP_Site_Icon extends WP_UnitTestCase {
 		$this->assertFalse( get_option( 'site_icon', false ) );
 	}
 
+	/**
+	 * @ticket 34368
+	 */
+	function test_get_post_metadata() {
+		$attachment_id = $this->_insert_attachment();
+		update_option( 'site_icon', $attachment_id );
+
+		$this->wp_site_icon->get_post_metadata( '', $attachment_id, '_some_post_meta', true );
+		$this->assertFalse( has_filter( 'intermediate_image_sizes', array( $this->wp_site_icon, 'intermediate_image_sizes' ) ) );
+
+		$this->wp_site_icon->get_post_metadata( '', $attachment_id, '_wp_attachment_backup_sizes', true );
+		$this->assertSame( 10,  has_filter( 'intermediate_image_sizes', array( $this->wp_site_icon, 'intermediate_image_sizes' ) ) );
+
+		wp_delete_attachment( $attachment_id, true );
+	}
+
 	function _custom_test_sizes( $sizes ) {
 		$sizes[] = 321;
 
