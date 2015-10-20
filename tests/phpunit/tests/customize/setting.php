@@ -472,5 +472,62 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertNotEquals( $post_value, get_option( $name ) );
 		restore_current_blog();
 	}
+
+	/**
+	 * @ticket 33499
+	 */
+	function test_option_autoloading() {
+		global $wpdb;
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$name = 'autoloaded1';
+		$setting = new WP_Customize_Setting( $this->manager, $name, array(
+			'type' => 'option',
+		) );
+		$value = 'value1';
+		$this->manager->set_post_value( $setting->id, $value );
+		$setting->save();
+		$autoload = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $setting->id ) );
+		$this->assertEquals( 'yes', $autoload );
+		$this->assertEquals( $value, get_option( $name ) );
+
+		$name = 'autoloaded2';
+		$setting = new WP_Customize_Setting( $this->manager, $name, array(
+			'type' => 'option',
+			'autoload' => true,
+		) );
+		$value = 'value2';
+		$this->manager->set_post_value( $setting->id, $value );
+		$setting->save();
+		$autoload = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $setting->id ) );
+		$this->assertEquals( 'yes', $autoload );
+		$this->assertEquals( $value, get_option( $name ) );
+
+		$name = 'not-autoloaded1';
+		$setting = new WP_Customize_Setting( $this->manager, $name, array(
+			'type' => 'option',
+			'autoload' => false,
+		) );
+		$value = 'value3';
+		$this->manager->set_post_value( $setting->id, $value );
+		$setting->save();
+		$autoload = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $setting->id ) );
+		$this->assertEquals( 'no', $autoload );
+		$this->assertEquals( $value, get_option( $name ) );
+
+		$id_base = 'multi-not-autoloaded';
+		$setting1 = new WP_Customize_Setting( $this->manager, $id_base . '[foo]', array(
+			'type' => 'option',
+		) );
+		$setting2 = new WP_Customize_Setting( $this->manager, $id_base . '[bar]', array(
+			'type' => 'option',
+			'autoload' => false,
+		) );
+		$this->manager->set_post_value( $setting1->id, 'value1' );
+		$this->manager->set_post_value( $setting2->id, 'value2' );
+		$setting1->save();
+		$autoload = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $id_base ) );
+		$this->assertEquals( 'no', $autoload, 'Even though setting1 did not indicate autoload (thus normally true), since another multidimensional option setting of the base did say autoload=false, it should be autoload=no' );
+	}
 }
 
