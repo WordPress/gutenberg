@@ -92,6 +92,7 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'status' => 'publish',
 			'original_title' => '',
 			'nav_menu_term_id' => 0,
+			'_invalid' => false,
 		);
 		$this->assertEquals( $default, $setting->default );
 
@@ -458,6 +459,7 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'status' => 'forbidden',
 			'original_title' => 'Hi<script>alert(1)</script>',
 			'nav_menu_term_id' => 'heilo',
+			'_invalid' => false,
 		);
 
 		$sanitized = $setting->sanitize( $unsanitized );
@@ -662,6 +664,49 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertNull( $update_result['previous_post_id'] );
 		$this->assertNull( $update_result['error'] );
 		$this->assertEquals( 'deleted', $update_result['status'] );
+	}
+
+	/**
+	 * @ticket 33665
+	 */
+	function test_invalid_nav_menu_item() {
+		$menu_id = wp_create_nav_menu( 'Primary' );
+		register_post_type( 'poem', array(
+			'public' => true,
+		) );
+
+		$post_id = self::factory()->post->create( array( 'post_type' => 'poem', 'post_title' => 'Code is poetry.' ) );
+		$post = get_post( $post_id );
+		$item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'poem',
+			'menu-item-object-id' => $post_id,
+			'menu-item-title' => $post->post_title,
+			'menu-item-status' => 'publish',
+			'menu-item-position' => 1,
+		) );
+		$setting_id = "nav_menu_item[$item_id]";
+
+		do_action( 'customize_register', $this->wp_customize );
+		$setting = $this->wp_customize->get_setting( $setting_id );
+		$this->assertNotEmpty( $setting );
+		$value = $setting->value();
+		$this->assertFalse( $value['_invalid'] );
+		$value_object = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertFalse( $value_object->_invalid );
+
+		$setting = new WP_Customize_Nav_Menu_Item_Setting( $this->wp_customize, $setting_id );
+		$value = $setting->value();
+		$this->assertFalse( $value['_invalid'] );
+		$value_object = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertFalse( $value_object->_invalid );
+
+		_unregister_post_type( 'poem' );
+		$setting = new WP_Customize_Nav_Menu_Item_Setting( $this->wp_customize, $setting_id );
+		$value = $setting->value();
+		$this->assertTrue( $value['_invalid'] );
+		$value_object = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertTrue( $value_object->_invalid );
 	}
 
 }
