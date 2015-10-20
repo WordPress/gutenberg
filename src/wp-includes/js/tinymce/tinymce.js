@@ -1,4 +1,4 @@
-// 4.2.5 (2015-08-31)
+// 4.2.6 (2015-09-28)
 
 /**
  * Compiled inline version. (Library mode)
@@ -3489,6 +3489,7 @@ define("tinymce/dom/DomQuery", [
 	var doc = document, push = Array.prototype.push, slice = Array.prototype.slice;
 	var rquickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
 	var Event = EventUtils.Event, undef;
+	var skipUniques = Tools.makeMap('children,contents,next,prev');
 
 	function isDefined(obj) {
 		return typeof obj !== 'undefined';
@@ -4817,7 +4818,9 @@ define("tinymce/dom/DomQuery", [
 
 			// If traversing on multiple elements we might get the same elements twice
 			if (this.length > 1) {
-				result = DomQuery.unique(result);
+				if (!skipUniques[name]) {
+					result = DomQuery.unique(result);
+				}
 
 				if (name.indexOf('parents') === 0) {
 					result = result.reverse();
@@ -6819,6 +6822,18 @@ define("tinymce/dom/DOMUtils", [
 		return attrHooks;
 	}
 
+	function updateInternalStyleAttr(domUtils, $elm) {
+		var value = $elm.attr('style');
+
+		value = domUtils.serializeStyle(domUtils.parseStyle(value), $elm[0].nodeName);
+
+		if (!value) {
+			value = null;
+		}
+
+		$elm.attr('data-mce-style', value);
+	}
+
 	/**
 	 * Constructs a new DOMUtils instance. Consult the Wiki for more details on settings etc for this class.
 	 *
@@ -7359,7 +7374,7 @@ define("tinymce/dom/DOMUtils", [
 		 * or the CSS style name like background-color.
 		 *
 		 * @method setStyle
-		 * @param {String/Element/Array} n HTML element/Element ID or Array of elements/ids to set CSS style value on.
+		 * @param {String/Element/Array} n HTML element/Array of elements to set CSS style value on.
 		 * @param {String} na Name of the style value to set.
 		 * @param {String} v Value to set on the style.
 		 * @example
@@ -7373,7 +7388,7 @@ define("tinymce/dom/DOMUtils", [
 			elm = this.$$(elm).css(name, value);
 
 			if (this.settings.update_styles) {
-				elm.attr('data-mce-style', null);
+				updateInternalStyleAttr(this, elm);
 			}
 		},
 
@@ -7422,7 +7437,7 @@ define("tinymce/dom/DOMUtils", [
 			elm = this.$$(elm).css(styles);
 
 			if (this.settings.update_styles) {
-				elm.attr('data-mce-style', null);
+				updateInternalStyleAttr(this, elm);
 			}
 		},
 
@@ -12994,6 +13009,33 @@ define("tinymce/dom/Serializer", [
 	var DOM = DOMUtils.DOM;
 
 	/**
+	 * IE 11 has a fantastic bug where it will produce two trailing BR elements to iframe bodies when
+	 * the iframe is hidden by display: none on a parent container. The DOM is actually out of sync
+	 * with innerHTML in this case. It's like IE adds shadow DOM BR elements that appears on innerHTML
+	 * but not as the lastChild of the body. So this fix simply removes the last two
+	 * BR elements at the end of the document.
+	 *
+	 * Example of what happens: <body>text</body> becomes <body>text<br><br></body>
+	 */
+	function trimTrailingBr(rootNode) {
+		var brNode1, brNode2;
+
+		function isBr(node) {
+			return node && node.name === 'br';
+		}
+
+		brNode1 = rootNode.lastChild;
+		if (isBr(brNode1)) {
+			brNode2 = brNode1.prev;
+
+			if (isBr(brNode2)) {
+				brNode1.remove();
+				brNode2.remove();
+			}
+		}
+	}
+
+	/**
 	 * Constructs a new DOM serializer class.
 	 *
 	 * @constructor
@@ -13250,7 +13292,7 @@ define("tinymce/dom/Serializer", [
 			 * @param {Object} args Arguments option that gets passed to event handlers.
 			 */
 			serialize: function(node, args) {
-				var self = this, impl, doc, oldDoc, htmlSerializer, content;
+				var self = this, impl, doc, oldDoc, htmlSerializer, content, rootNode;
 
 				// Explorer won't clone contents of script and style and the
 				// selected index of select elements are cleared on a clone operation.
@@ -13300,13 +13342,13 @@ define("tinymce/dom/Serializer", [
 					self.onPreProcess(args);
 				}
 
-				// Setup serializer
-				htmlSerializer = new Serializer(settings, schema);
+				// Parse HTML
+				rootNode = htmlParser.parse(trim(args.getInner ? node.innerHTML : dom.getOuterHTML(node)), args);
+				trimTrailingBr(rootNode);
 
-				// Parse and serialize HTML
-				args.content = htmlSerializer.serialize(
-					htmlParser.parse(trim(args.getInner ? node.innerHTML : dom.getOuterHTML(node)), args)
-				);
+				// Serialize HTML
+				htmlSerializer = new Serializer(settings, schema);
+				args.content = htmlSerializer.serialize(rootNode);
 
 				// Replace all BOM characters for now until we can find a better solution
 				if (!args.cleanup) {
@@ -14495,7 +14537,7 @@ define("tinymce/dom/ControlSelection", [
 				}
 			});
 
-			editor.on('hide', hideResizeRect);
+			editor.on('hide blur', hideResizeRect);
 
 			// Hide rect on focusout since it would float on top of windows otherwise
 			//editor.on('focusout', hideResizeRect);
@@ -18640,7 +18682,7 @@ define("tinymce/UndoManager", [
 			}
 		});
 
-		editor.on('ObjectResizeStart', function() {
+		editor.on('ObjectResizeStart Cut', function() {
 			self.beforeChange();
 		});
 
@@ -18649,6 +18691,12 @@ define("tinymce/UndoManager", [
 
 		editor.on('KeyUp', function(e) {
 			var keyCode = e.keyCode;
+
+			// If key is prevented then don't add undo level
+			// This would happen on keyboard shortcuts for example
+			if (e.isDefaultPrevented()) {
+				return;
+			}
 
 			if ((keyCode >= 33 && keyCode <= 36) || (keyCode >= 37 && keyCode <= 40) || keyCode == 45 || keyCode == 13 || e.ctrlKey) {
 				addNonTypingUndoLevel();
@@ -18679,6 +18727,12 @@ define("tinymce/UndoManager", [
 
 		editor.on('KeyDown', function(e) {
 			var keyCode = e.keyCode;
+
+			// If key is prevented then don't add undo level
+			// This would happen on keyboard shortcuts for example
+			if (e.isDefaultPrevented()) {
+				return;
+			}
 
 			// Is caracter positon keys left,right,up,down,home,end,pgdown,pgup,enter
 			if ((keyCode >= 33 && keyCode <= 36) || (keyCode >= 37 && keyCode <= 40) || keyCode == 45) {
@@ -19112,6 +19166,11 @@ define("tinymce/EnterKey", [
 				if (forcedRootBlockName && forcedRootBlockName.toLowerCase() === node.tagName.toLowerCase()) {
 					dom.setAttribs(node, settings.forced_root_block_attrs);
 				}
+			}
+
+			function emptyBlock(elm) {
+				// BR is needed in empty blocks on non IE browsers
+				elm.innerHTML = !isIE ? '<br data-mce-bogus="1">' : '';
 			}
 
 			// Creates a new block element by cloning the current one or creating a new one if the name is specified
@@ -19548,6 +19607,10 @@ define("tinymce/EnterKey", [
 				dom.insertAfter(fragment, parentBlock);
 				trimInlineElementsOnLeftSideOfBlock(newBlock);
 				addBrToBlockIfNeeded(parentBlock);
+
+				if (dom.isEmpty(parentBlock)) {
+					emptyBlock(parentBlock);
+				}
 
 				// New block might become empty if it's <p><b>a |</b></p>
 				if (dom.isEmpty(newBlock)) {
@@ -28065,6 +28128,11 @@ define("tinymce/util/Quirks", [
 				if (!isDefaultPrevented(e) && (isForward || e.keyCode == BACKSPACE)) {
 					var rng = editor.selection.getRng(), container = rng.startContainer, offset = rng.startOffset;
 
+					// Shift+Delete is cut
+					if (isForward && e.shiftKey) {
+						return;
+					}
+
 					// Ignore non meta delete in the where there is text before/after the caret
 					if (!isMetaOrCtrl && rng.collapsed && container.nodeType == 3) {
 						if (isForward ? offset < container.data.length : offset > 0) {
@@ -28918,8 +28986,15 @@ define("tinymce/util/Quirks", [
 			if (!editor.inline) {
 				editor.contentStyles.push('body {min-height: 150px}');
 				editor.on('click', function(e) {
+					var rng;
+
 					if (e.target.nodeName == 'HTML') {
-						var rng;
+						// Edge seems to only need focus if we set the range
+						// the caret will become invisible and moved out of the iframe!!
+						if (Env.ie > 11) {
+							editor.getBody().focus();
+							return;
+						}
 
 						// Need to store away non collapsed ranges since the focus call will mess that up see #7382
 						rng = editor.selection.getRng();
@@ -28952,25 +29027,6 @@ define("tinymce/util/Quirks", [
 		 */
 		function disableAutoUrlDetect() {
 			setEditorCommandState("AutoUrlDetect", false);
-		}
-
-		/**
-		 * IE 11 has a fantastic bug where it will produce two trailing BR elements to iframe bodies when
-		 * the iframe is hidden by display: none on a parent container. The DOM is actually out of sync
-		 * with innerHTML in this case. It's like IE adds shadow DOM BR elements that appears on innerHTML
-		 * but not as the lastChild of the body. However is we add a BR element to the body then remove it
-		 * it doesn't seem to add these BR elements makes sence right?!
-		 *
-		 * Example of what happens: <body>text</body> becomes <body>text<br><br></body>
-		 */
-		function doubleTrailingBrElements() {
-			if (!editor.inline) {
-				editor.on('focus blur beforegetcontent', function() {
-					var br = editor.dom.create('br');
-					editor.getBody().appendChild(br);
-					br.parentNode.removeChild(br);
-				}, true);
-			}
 		}
 
 		/**
@@ -29146,7 +29202,6 @@ define("tinymce/util/Quirks", [
 
 		if (Env.ie >= 11) {
 			bodyHeight();
-			doubleTrailingBrElements();
 			disableBackspaceIntoATable();
 		}
 
@@ -30299,6 +30354,16 @@ define("tinymce/EditorUpload", [
 	return function(editor) {
 		var blobCache = new BlobCache(), uploader, imageScanner;
 
+		function aliveGuard(callback) {
+			return function(result) {
+				if (editor.selection) {
+					return callback(result);
+				}
+
+				return [];
+			};
+		}
+
 		// Replaces strings without regexps to avoid FF regexp to big issue
 		function replaceString(content, search, replace) {
 			var index = 0;
@@ -30338,14 +30403,14 @@ define("tinymce/EditorUpload", [
 				});
 			}
 
-			return scanForImages().then(function(imageInfos) {
+			return scanForImages().then(aliveGuard(function(imageInfos) {
 				var blobInfos;
 
 				blobInfos = Arr.map(imageInfos, function(imageInfo) {
 					return imageInfo.blobInfo;
 				});
 
-				return uploader.upload(blobInfos).then(function(result) {
+				return uploader.upload(blobInfos).then(aliveGuard(function(result) {
 					result = Arr.map(result, function(uploadInfo, index) {
 						var image = imageInfos[index].image;
 
@@ -30367,8 +30432,14 @@ define("tinymce/EditorUpload", [
 					}
 
 					return result;
-				});
-			});
+				}));
+			}));
+		}
+
+		function uploadImagesAuto(callback) {
+			if (editor.settings.automatic_uploads !== false) {
+				return uploadImages(callback);
+			}
 		}
 
 		function scanForImages() {
@@ -30376,14 +30447,14 @@ define("tinymce/EditorUpload", [
 				imageScanner = new ImageScanner(blobCache);
 			}
 
-			return imageScanner.findAll(editor.getBody()).then(function(result) {
+			return imageScanner.findAll(editor.getBody()).then(aliveGuard(function(result) {
 				Arr.each(result, function(resultItem) {
 					replaceUrlInUndoStack(resultItem.image.src, resultItem.blobInfo.blobUri());
 					resultItem.image.src = resultItem.blobInfo.blobUri();
 				});
 
 				return result;
-			});
+			}));
 		}
 
 		function destroy() {
@@ -30405,11 +30476,17 @@ define("tinymce/EditorUpload", [
 					return 'src="data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64() + '"';
 				}
 
-				return match[0];
+				return match;
 			});
 		}
 
-		editor.on('setContent paste', scanForImages);
+		editor.on('setContent', function() {
+			if (editor.settings.automatic_uploads !== false) {
+				uploadImagesAuto();
+			} else {
+				scanForImages();
+			}
+		});
 
 		editor.on('RawSaveContent', function(e) {
 			e.content = replaceBlobWithBase64(e.content);
@@ -30426,6 +30503,7 @@ define("tinymce/EditorUpload", [
 		return {
 			blobCache: blobCache,
 			uploadImages: uploadImages,
+			uploadImagesAuto: uploadImagesAuto,
 			scanForImages: scanForImages,
 			destroy: destroy
 		};
@@ -31096,7 +31174,10 @@ define("tinymce/Editor", [
 
 			// Domain relaxing is required since the user has messed around with document.domain
 			if (document.domain != location.hostname) {
-				url = domainRelaxUrl;
+				// Edge seems to be able to handle domain relaxing
+				if (Env.ie && Env.ie < 12) {
+					url = domainRelaxUrl;
+				}
 			}
 
 			// Create iframe
@@ -33065,7 +33146,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.5',
+		minorVersion: '2.6',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -33073,7 +33154,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-08-31',
+		releaseDate: '2015-09-28',
 
 		/**
 		 * Collection of editor instances.
@@ -33796,6 +33877,12 @@ define("tinymce/util/XHR", [
 
 				if (settings.content_type) {
 					xhr.setRequestHeader('Content-Type', settings.content_type);
+				}
+
+				if (settings.requestheaders) {
+					Tools.each(settings.requestheaders, function(header) {
+						xhr.setRequestHeader(header.key, header.value);
+					});
 				}
 
 				xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
