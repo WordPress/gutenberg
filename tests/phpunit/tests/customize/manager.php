@@ -327,4 +327,65 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
 	}
+
+	/**
+	 * @ticket 33552
+	 */
+	function test_customize_loaded_components_filter() {
+		$manager = new WP_Customize_Manager();
+		$this->assertInstanceOf( 'WP_Customize_Widgets', $manager->widgets );
+		$this->assertInstanceOf( 'WP_Customize_Nav_Menus', $manager->nav_menus );
+
+		add_filter( 'customize_loaded_components', array( $this, 'return_array_containing_widgets' ), 10, 2 );
+		$manager = new WP_Customize_Manager();
+		$this->assertInstanceOf( 'WP_Customize_Widgets', $manager->widgets );
+		$this->assertEmpty( $manager->nav_menus );
+		remove_all_filters( 'customize_loaded_components' );
+
+		add_filter( 'customize_loaded_components', array( $this, 'return_array_containing_nav_menus' ), 10, 2 );
+		$manager = new WP_Customize_Manager();
+		$this->assertInstanceOf( 'WP_Customize_Nav_Menus', $manager->nav_menus );
+		$this->assertEmpty( $manager->widgets );
+		remove_all_filters( 'customize_loaded_components' );
+
+		add_filter( 'customize_loaded_components', '__return_empty_array' );
+		$manager = new WP_Customize_Manager();
+		$this->assertEmpty( $manager->widgets );
+		$this->assertEmpty( $manager->nav_menus );
+		remove_all_filters( 'customize_loaded_components' );
+	}
+
+	/**
+	 * @see Tests_WP_Customize_Manager::test_customize_loaded_components_filter()
+	 *
+	 * @param array                $components         Components.
+	 * @param WP_Customize_Manager $customize_manager  Manager.
+	 *
+	 * @return array Components.
+	 */
+	function return_array_containing_widgets( $components, $customize_manager ) {
+		$this->assertInternalType( 'array', $components );
+		$this->assertContains( 'widgets', $components );
+		$this->assertContains( 'nav_menus', $components );
+		$this->assertInternalType( 'array', $components );
+		$this->assertInstanceOf( 'WP_Customize_Manager', $customize_manager );
+		return array( 'widgets' );
+	}
+
+	/**
+	 * @see Tests_WP_Customize_Manager::test_customize_loaded_components_filter()
+	 *
+	 * @param array                $components         Components.
+	 * @param WP_Customize_Manager $customize_manager  Manager.
+	 *
+	 * @return array Components.
+	 */
+	function return_array_containing_nav_menus( $components, $customize_manager ) {
+		$this->assertInternalType( 'array', $components );
+		$this->assertContains( 'widgets', $components );
+		$this->assertContains( 'nav_menus', $components );
+		$this->assertInternalType( 'array', $components );
+		$this->assertInstanceOf( 'WP_Customize_Manager', $customize_manager );
+		return array( 'nav_menus' );
+	}
 }
