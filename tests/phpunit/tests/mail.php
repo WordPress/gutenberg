@@ -188,7 +188,7 @@ class Tests_Mail extends WP_UnitTestCase {
 		$subject  = "Testing";
 		$message  = "Test Message";
 		$headers  = "From: ";
-		$expected = "From: WordPress <wordpress@example.com>";
+		$expected = "From: WordPress <wordpress@" . WP_TESTS_DOMAIN . ">";
 
 		wp_mail( $to, $subject, $message, $headers );
 

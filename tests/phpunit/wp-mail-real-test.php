@@ -72,7 +72,6 @@ $message = "My RFC822 Test Message";
 $headers[] = "From: {$from}";
 $headers[] = "CC: {$cc}";
 
-$_SERVER['SERVER_NAME'] = 'example.com';
 wp_mail( $to, $subject, $message, $headers );
 
 $headers = array();

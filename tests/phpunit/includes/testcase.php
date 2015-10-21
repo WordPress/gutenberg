@@ -110,8 +110,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->start_transaction();
 		$this->expectDeprecated();
 		add_filter( 'wp_die_handler', array( $this, 'get_wp_die_handler' ) );
-
-		add_filter( 'wp_mail', array( $this, 'set_wp_mail_globals' ) );
 	}
 
 	/**
@@ -666,32 +664,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected function _microtime_to_float($microtime ){
 		$time_array = explode( ' ', $microtime );
 		return array_sum( $time_array );
-	}
-
-	/**
-	 * When `wp_mail()` is called, make sure `$_SERVER['SERVER_NAME']` is faked.
-	 *
-	 * @since 4.3.0
-	 *
-	 * @param array $args `wp_mail()` arguments.
-	 * @return array $args
-	 */
-	public function set_wp_mail_globals( $args ) {
-		if ( ! isset( $_SERVER['SERVER_NAME'] ) ) {
-			$_SERVER['SERVER_NAME'] = 'example.com';
-			add_action( 'phpmailer_init', array( $this, 'tear_down_wp_mail_globals' ) );
-		}
-
-		return $args;
-	}
-
-	/**
-	 * Tear down the faked `$_SERVER['SERVER_NAME']` global used in `wp_mail()`.
-	 *
-	 * @since 4.3.0
-	 */
-	public function tear_down_wp_mail_globals() {
-		unset( $_SERVER['SERVER_NAME'] );
 	}
 
 	/**

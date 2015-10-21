@@ -380,12 +380,6 @@ class Tests_Comment extends WP_UnitTestCase {
 	 */
 	public function setup_notify_comment(){
 		/**
-		 * Mock some server variables.
-		 */
-		$_SERVER['SERVER_NAME'] = 'phpunit.wordpress.dev';
-		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-
-		/**
 		 * Prevent flood alert from firing.
 		 */
 		add_filter( 'comment_flood_filter', '__return_false' );
