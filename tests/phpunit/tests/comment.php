@@ -514,7 +514,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		// Check to see if a notification email was sent to the moderator `admin@example.org`.
 		if ( isset( $GLOBALS['phpmailer']->mock_sent )
 			&& ! empty( $GLOBALS['phpmailer']->mock_sent )
-			&& 'admin@example.org' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]
+			&& WP_TESTS_EMAIL == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]
 		) {
 			$email_sent_when_comment_added = true;
 			unset( $GLOBALS['phpmailer']->mock_sent );
