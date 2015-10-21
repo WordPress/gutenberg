@@ -15,56 +15,12 @@ require_once( ABSPATH . 'wp-admin/includes/ajax-actions.php' );
 class Tests_Ajax_MediaEdit extends WP_Ajax_UnitTestCase {
 
 	/**
-	 * List of media thumbnail ids
-	 * @var array
-	 */
-	protected $_ids = array();
-
-	/**
-	 * Set up the test fixture.
-	 */
-	public function setUp() {
-		parent::setUp();
-	}
-
-	/**
 	 * Tear down the test fixture.
 	 */
 	public function tearDown() {
 		// Cleanup
-		foreach ( $this->_ids as $id ) {
-			wp_delete_attachment( $id, true );
-		}
-
+		$this->remove_added_uploads();
 		parent::tearDown();
-	}
-
-	/**
-	 * Function snagged from ./tests/post/attachments.php
-	 */
-	function _make_attachment($upload, $parent_post_id = 0) {
-		$type = '';
-		if ( !empty($upload['type']) ) {
-			$type = $upload['type'];
-		} else {
-			$mime = wp_check_filetype( $upload['file'] );
-			if ($mime)
-				$type = $mime['type'];
-		}
-
-		$attachment = array(
-			'post_title' => basename( $upload['file'] ),
-			'post_content' => '',
-			'post_type' => 'attachment',
-			'post_parent' => $parent_post_id,
-			'post_mime_type' => $type,
-			'guid' => $upload[ 'url' ],
-		);
-
-		// Save the data
-		$id = wp_insert_attachment( $attachment, $upload[ 'file' ], $parent_post_id );
-		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-		return $this->_ids[] = $id;
 	}
 
 	/**

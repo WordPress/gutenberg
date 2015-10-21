@@ -154,27 +154,11 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$contents = file_get_contents( $filename );
 
 		$upload = wp_upload_bits( basename( $filename ), null, $contents );
-		$type   = '';
-		if ( ! empty( $upload['type'] ) ) {
-			$type = $upload['type'];
-		} else {
-			$mime = wp_check_filetype( $upload['file'] );
-			if ( $mime ) {
-				$type = $mime['type'];
-			}
-		}
+		$this->site_icon_url = $upload['url'];
 
-		$attachment = array(
-			'post_title'     => basename( $upload['file'] ),
-			'post_content'   => $upload['url'],
-			'post_type'      => 'attachment',
-			'post_mime_type' => $type,
-			'guid'           => $upload['url'],
-		);
 
 		// Save the data
-		$this->site_icon_url = $upload['url'];
-		$this->site_icon_id  = wp_insert_attachment( $attachment, $upload['file'] );
-		wp_update_attachment_metadata( $this->site_icon_id, wp_generate_attachment_metadata( $this->site_icon_id, $upload['file'] ) );
+		$this->site_icon_id = $this->_make_attachment( $upload );
+		return $this->site_icon_id;
 	}
 }

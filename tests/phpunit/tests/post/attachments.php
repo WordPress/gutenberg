@@ -6,7 +6,6 @@
  * @group upload
  */
 class Tests_Post_Attachments extends WP_UnitTestCase {
-	protected $ids = array();
 
 	function tearDown() {
 		// Remove all uploads.
@@ -14,42 +13,12 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
-	function _make_attachment( $upload, $parent_post_id = 0 ) {
-
-		$type = '';
-		if ( !empty($upload['type']) ) {
-			$type = $upload['type'];
-		} else {
-			$mime = wp_check_filetype( $upload['file'] );
-			if ($mime)
-				$type = $mime['type'];
-		}
-
-		$attachment = array(
-			'post_title' => basename( $upload['file'] ),
-			'post_content' => '',
-			'post_type' => 'attachment',
-			'post_parent' => $parent_post_id,
-			'post_mime_type' => $type,
-			'guid' => $upload[ 'url' ],
-		);
-
-		// Save the data
-		$id = wp_insert_attachment( $attachment, $upload[ 'file' ], $parent_post_id );
-		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-
-		return $this->ids[] = $id;
-
-	}
-
 	function test_insert_bogus_image() {
-		$filename = rand_str().'.jpg';
+		$filename = rand_str() . '.jpg';
 		$contents = rand_str();
 
-		$upload = wp_upload_bits($filename, null, $contents);
+		$upload = wp_upload_bits( $filename, null, $contents );
 		$this->assertTrue( empty($upload['error']) );
-
-		$id = $this->_make_attachment($upload);
 	}
 
 	function test_insert_image_no_thumb() {

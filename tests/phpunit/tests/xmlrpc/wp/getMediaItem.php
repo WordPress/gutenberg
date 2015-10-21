@@ -22,25 +22,17 @@ class Tests_XMLRPC_wp_getMediaItem extends WP_XMLRPC_UnitTestCase {
 		$filename = ( DIR_TESTDATA.'/images/waffles.jpg' );
 		$contents = file_get_contents( $filename );
 		$upload = wp_upload_bits(basename($filename), null, $contents);
-		$mime = wp_check_filetype( $filename );
-		$this->attachment_data = array(
-			'post_title' => basename( $upload['file'] ),
-			'post_content' => '',
-			'post_type' => 'attachment',
-			'post_parent' => $this->post_id,
-			'post_mime_type' => $mime['type'],
-			'guid' => $upload[ 'url' ]
-		);
 
-		$id = wp_insert_attachment( $this->attachment_data, $upload[ 'file' ], $this->post_id );
-		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-		$this->attachment_id = $id;
+		$this->attachment_id = $this->_make_attachment( $upload, $this->post_id );
+		$this->attachment_data = get_post( $this->attachment_id, ARRAY_A );
 
 		set_post_thumbnail( $this->post_id, $this->attachment_id );
 	}
 
 	function tearDown() {
 		remove_theme_support( 'post-thumbnails' );
+
+		$this->remove_added_uploads();
 
 		parent::tearDown();
 	}

@@ -104,8 +104,6 @@ class Tests_Image_Header extends WP_UnitTestCase {
 	}
 
 	function test_create_attachment_object() {
-		global $custom_image_header;
-
 		$id = wp_insert_attachment( array(
 			'post_status' => 'publish',
 			'post_title' => 'foo.png',
@@ -123,8 +121,6 @@ class Tests_Image_Header extends WP_UnitTestCase {
 	}
 
 	function test_insert_cropped_attachment() {
-		global $custom_image_header;
-
 		$id = wp_insert_attachment( array(
 			'post_status' => 'publish',
 			'post_title' => 'foo.png',

@@ -158,28 +158,8 @@ class Tests_WP_Site_Icon extends WP_UnitTestCase {
 		$contents = file_get_contents( $filename );
 
 		$upload = wp_upload_bits( basename( $filename ), null, $contents );
-		$type   = '';
-		if ( ! empty( $upload['type'] ) ) {
-			$type = $upload['type'];
-		} else {
-			$mime = wp_check_filetype( $upload['file'] );
-			if ( $mime ) {
-				$type = $mime['type'];
-			}
-		}
 
-		$attachment = array(
-			'post_title'     => basename( $upload['file'] ),
-			'post_content'   => $upload['url'],
-			'post_type'      => 'attachment',
-			'post_mime_type' => $type,
-			'guid'           => $upload['url'],
-		);
-
-		// Save the data
-		$this->attachment_id  = wp_insert_attachment( $attachment, $upload['file'] );
-		wp_update_attachment_metadata( $this->attachment_id, wp_generate_attachment_metadata( $this->attachment_id, $upload['file'] ) );
-
+		$this->attachment_id = $this->_make_attachment( $upload );
 		return $this->attachment_id;
 	}
 }

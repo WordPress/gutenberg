@@ -420,7 +420,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		unset($GLOBALS['wp_query'], $GLOBALS['wp_the_query']);
 		$GLOBALS['wp_the_query'] = new WP_Query();
 		$GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];
-		
+
 		$public_query_vars  = $GLOBALS['wp']->public_query_vars;
 		$private_query_vars = $GLOBALS['wp']->private_query_vars;
 
@@ -722,5 +722,30 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$wp_rewrite->init();
 		$wp_rewrite->set_permalink_structure( $structure );
 		$wp_rewrite->flush_rules();
+	}
+
+	function _make_attachment($upload, $parent_post_id = 0) {
+		$type = '';
+		if ( !empty($upload['type']) ) {
+			$type = $upload['type'];
+		} else {
+			$mime = wp_check_filetype( $upload['file'] );
+			if ($mime)
+				$type = $mime['type'];
+		}
+
+		$attachment = array(
+			'post_title' => basename( $upload['file'] ),
+			'post_content' => '',
+			'post_type' => 'attachment',
+			'post_parent' => $parent_post_id,
+			'post_mime_type' => $type,
+			'guid' => $upload[ 'url' ],
+		);
+
+		// Save the data
+		$id = wp_insert_attachment( $attachment, $upload[ 'file' ], $parent_post_id );
+		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
+		return $id;
 	}
 }

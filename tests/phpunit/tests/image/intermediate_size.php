@@ -5,45 +5,16 @@
  * @group upload
  */
 class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
-	protected $ids = array();
-
 	function tearDown() {
 		$this->remove_added_uploads();
 		parent::tearDown();
 	}
 
-	/**
-	 * Upload files and create attachements for testing
-	 */
-	private function _make_attachment( $file, $parent_post_id = 0 ) {
+	public function _make_attachment( $file, $parent_post_id = 0 ) {
 		$contents = file_get_contents( $file );
 		$upload = wp_upload_bits( basename( $file ), null, $contents );
 
-		$type = '';
-		if ( ! empty( $upload['type'] ) ) {
-			$type = $upload['type'];
-		} else {
-			$mime = wp_check_filetype( $upload['file'] );
-			if ( $mime ) {
-				$type = $mime['type'];
-			}
-		}
-
-		$attachment = array(
-			'post_title' => basename( $upload['file'] ),
-			'post_content' => '',
-			'post_type' => 'attachment',
-			'post_parent' => $parent_post_id,
-			'post_mime_type' => $type,
-			'guid' => $upload['url'],
-		);
-
-		// Save the data
-		$id = wp_insert_attachment( $attachment, $upload[ 'file' ], $parent_post_id );
-		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
-
-		$this->ids[] = $id;
-		return $id;
+		return parent::_make_attachment( $upload, $parent_post_id );
 	}
 
 	function test_make_intermediate_size_no_size() {
