@@ -5,14 +5,6 @@
  * @group upload
  */
 class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
-
-	function setUp() {
-		parent::setUp();
-		if ( ! extension_loaded( 'imagick' ) ) {
-			$this->fail( 'The Imagick extension is not installed.' );
-		}
-	}
-
 	function tearDown() {
 		$this->remove_added_uploads();
 		parent::tearDown();
