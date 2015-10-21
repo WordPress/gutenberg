@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	var path = require('path'),
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
-		autoprefixer = require('autoprefixer-core'),
+		autoprefixer = require('autoprefixer'),
 		mediaConfig = {},
 		mediaBuilds = ['audiovideo', 'grid', 'models', 'views'];
 
