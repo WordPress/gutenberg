@@ -6,7 +6,7 @@
  * @group template
  * @group document-title
  */
-class Tests_Document_Title extends WP_UnitTestCase {
+class Tests_General_DocumentTitle extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
@@ -65,7 +65,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		$this->go_to( '/' );
 
-		$this->expectOutputString( "<title>front-page &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>front-page &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 
 		update_option( 'show_on_front', 'posts' );
@@ -76,7 +76,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'document_title_parts', array( $this, '_home_title_parts' ) );
 
-		$this->expectOutputString( "<title>Test Blog &#8211; Just another WordPress site</title>\n" );
+		$this->expectOutputString( "<title>" . get_option( 'blogname' ) . " &#8211; Just another WordPress site</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -93,7 +93,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'document_title_parts', array( $this, '_paged_title_parts' ) );
 
-		$this->expectOutputString( "<title>Test Blog &#8211; Page 4 &#8211; Just another WordPress site</title>\n" );
+		$this->expectOutputString( "<title>" . get_option( 'blogname' ) . " &#8211; Page 4 &#8211; Just another WordPress site</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -111,7 +111,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'document_title_parts', array( $this, '_singular_title_parts' ) );
 
-		$this->expectOutputString( "<title>test_title &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_title &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -126,21 +126,21 @@ class Tests_Document_Title extends WP_UnitTestCase {
 	function test_category_title() {
 		$this->go_to( '?cat=' . $this->category_id );
 
-		$this->expectOutputString( "<title>test_category &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_category &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_search_title() {
 		$this->go_to( '?s=test_title' );
 
-		$this->expectOutputString( "<title>Search Results for &#8220;test_title&#8221; &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>Search Results for &#8220;test_title&#8221; &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_author_title() {
 		$this->go_to( '?author=' . $this->author_id );
 
-		$this->expectOutputString( "<title>test_author &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_author &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -159,35 +159,35 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		$this->go_to( '?post_type=cpt' );
 
-		$this->expectOutputString( "<title>test_cpt &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_cpt &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_year_title() {
 		$this->go_to( '?year=2015' );
 
-		$this->expectOutputString( "<title>2015 &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>2015 &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_month_title() {
 		$this->go_to( '?monthnum=09' );
 
-		$this->expectOutputString( "<title>September 2015 &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>September 2015 &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_day_title() {
 		$this->go_to( '?day=22' );
 
-		$this->expectOutputString( "<title>September 22, 2015 &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>September 22, 2015 &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
 	function test_404_title() {
 		$this->go_to( '?m=404' );
 
-		$this->expectOutputString( "<title>Page not found &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>Page not found &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -196,7 +196,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'title_tag_parts', array( $this, '_paged_post_title_parts' ) );
 
-		$this->expectOutputString( "<title>test_title &#8211; Page 4 &#8211; Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_title &#8211; Page 4 &#8211; " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -214,7 +214,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'document_title_parts', array( $this, '_rearrange_title_parts' ) );
 
-		$this->expectOutputString( "<title>Test Blog &#8211; test_title</title>\n" );
+		$this->expectOutputString( "<title>" . get_option( 'blogname' ) . " &#8211; test_title</title>\n" );
 		_wp_render_title_tag();
 	}
 
@@ -232,7 +232,7 @@ class Tests_Document_Title extends WP_UnitTestCase {
 
 		add_filter( 'document_title_separator', array( $this, '_change_title_separator' ) );
 
-		$this->expectOutputString( "<title>test_title %% Test Blog</title>\n" );
+		$this->expectOutputString( "<title>test_title %% " . get_option( 'blogname' ) . "</title>\n" );
 		_wp_render_title_tag();
 	}
 
