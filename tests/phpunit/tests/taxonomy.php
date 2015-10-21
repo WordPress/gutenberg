@@ -466,6 +466,41 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	/**
 	 * @ticket 21949
 	 */
+	public function test_it_should_be_possible_to_register_a_query_var_that_matches_the_name_of_a_nonpublic_taxonomy() {
+		global $wp;
+
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+		) );
+		$t = $this->factory->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		add_filter( 'do_parse_request', array( $this, 'register_query_var' ) );
+		$this->go_to( '/?wptests_tax=foo' );
+		remove_filter( 'do_parse_request', array( $this, 'register_query_var' ) );
+
+		// Not a taxonomy...
+		$this->assertFalse( is_tax( 'wptests_tax' ) );
+
+		// ...but query var works.
+		$this->assertSame( 'foo', $wp->query_vars['wptests_tax'] );
+	}
+
+	public static function register_query_var( $r ) {
+		global $wp;
+
+		$wp->add_query_var( 'wptests_tax' );
+
+		return $r;
+	}
+
+	/**
+	 * @ticket 21949
+	 */
 	public function test_nonpublic_taxonomy_should_not_be_queryable_using_taxonomy_and_term_vars() {
 		register_taxonomy( 'wptests_tax', 'post', array(
 			'public' => false,

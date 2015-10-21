@@ -357,7 +357,7 @@ function _cleanup_query_vars() {
 		unset( $GLOBALS[$v] );
 
 	foreach ( get_taxonomies( array() , 'objects' ) as $t ) {
-		if ( ! empty( $t->query_var ) )
+		if ( $t->public && ! empty( $t->query_var ) )
 			$GLOBALS['wp']->add_query_var( $t->query_var );
 	}
 
