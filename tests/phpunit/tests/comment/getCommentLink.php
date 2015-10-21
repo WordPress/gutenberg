@@ -48,6 +48,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 	 * @ticket 34068
 	 */
 	public function test_default_comments_page_newest_default_page_should_have_cpage() {
+		update_option( 'page_comments', 1 );
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
@@ -60,6 +61,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 	 * @ticket 34068
 	 */
 	public function test_default_comments_page_newest_middle_page_should_have_cpage() {
+		update_option( 'page_comments', 1 );
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
@@ -72,6 +74,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 	 * @ticket 34068
 	 */
 	public function test_default_comments_page_newest_last_page_should_have_cpage() {
+		update_option( 'page_comments', 1 );
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
@@ -96,6 +99,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 	 * @ticket 34068
 	 */
 	public function test_default_comments_page_oldest_middle_page_should_have_cpage() {
+		update_option( 'page_comments', 1 );
 		update_option( 'default_comments_page', 'oldest' );
 		update_option( 'comments_per_page', 2 );
 
@@ -108,6 +112,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 	 * @ticket 34068
 	 */
 	public function test_default_comments_page_oldest_last_page_should_have_cpage() {
+		update_option( 'page_comments', 1 );
 		update_option( 'default_comments_page', 'oldest' );
 		update_option( 'comments_per_page', 2 );
 

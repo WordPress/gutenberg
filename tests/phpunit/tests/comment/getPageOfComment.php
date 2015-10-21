@@ -233,6 +233,7 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 		$c2 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ) ) );
 		$c3 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ) ) );
 
+		update_option( 'page_comments', 1 );
 		update_option( 'comments_per_page', 2 );
 
 		$this->assertEquals( 2, get_page_of_comment( $c1 ) );

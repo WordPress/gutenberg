@@ -166,6 +166,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'asc' );
 		update_option( 'default_comments_page', 'newest' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 2,
@@ -221,6 +222,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'desc' );
 		update_option( 'default_comments_page', 'newest' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 2,
@@ -266,6 +268,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'asc' );
 		update_option( 'default_comments_page', 'oldest' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 2,
@@ -311,6 +314,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'desc' );
 		update_option( 'default_comments_page', 'oldest' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 2,
@@ -353,6 +357,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comment_order', 'desc' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 1,
@@ -395,6 +400,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comment_order', 'desc' );
+		update_option( 'page_comments', '1' );
 
 		$link = add_query_arg( array(
 			'cpage' => 2,
@@ -440,6 +446,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'desc' );
 		update_option( 'default_comments_page', 'oldest' );
+		update_option( 'page_comments', '1' );
 
 		$link_p1 = add_query_arg( array(
 			'comments_per_page' => 2,
@@ -514,6 +521,7 @@ class Tests_Comment_CommentsTemplate extends WP_UnitTestCase {
 
 		update_option( 'comment_order', 'desc' );
 		update_option( 'default_comments_page', 'newest' );
+		update_option( 'page_comments', '1' );
 
 		$link_p0 = add_query_arg( array(
 			'comments_per_page' => 2,
