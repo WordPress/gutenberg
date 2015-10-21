@@ -19,16 +19,35 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * List of comments
 	 * @var array
 	 */
-	protected $_comments = array();
+	protected static $comments = array();
 
-	/**
-	 * Set up the test fixture
-	 */
-	public function setUp() {
-		parent::setUp();
-		$post_id = self::factory()->post->create();
-		$this->_comments = self::factory()->comment->create_post_comments( $post_id, 15 );
-		$this->_comments = array_map( 'get_comment', $this->_comments );
+	protected static $admin_id = 0;
+	protected static $editor_id = 0;
+	protected static $post;
+	protected static $post_id;
+	protected static $user_ids = array();
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$user_ids[] = self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
+
+		self::$post_id = $factory->post->create();
+		self::$post = get_post( self::$post_id );
+
+		$comment_ids = $factory->comment->create_post_comments( self::$post_id, 8 );
+		self::$comments = array_map( 'get_comment', $comment_ids );
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$user_ids as $user_id ) {
+			self::delete_user( $user_id );
+		}
+
+		wp_delete_post( self::$post_id, true );
+
+		foreach ( self::$comments as $c ) {
+			wp_delete_comment( $c->ID, true );
+		}
 	}
 
 	/**
@@ -66,7 +85,7 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		$_POST['id']          = $comment->comment_ID;
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'delete-comment_' . $comment->comment_ID );
 		$_POST[$action]       = 1;
-		$_POST['_total']      = count( $this->_comments );
+		$_POST['_total']      = count( self::$comments );
 		$_POST['_per_page']   = 100;
 		$_POST['_page']       = 1;
 		$_POST['_url']        = admin_url( 'edit-comments.php' );
@@ -124,7 +143,7 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		$_POST['id']          = $comment->comment_ID;
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'delete-comment_' . $comment->comment_ID );
 		$_POST[$action]       = 1;
-		$_POST['_total']      = count( $this->_comments );
+		$_POST['_total']      = count( self::$comments );
 		$_POST['_per_page']   = 100;
 		$_POST['_page']       = 1;
 		$_POST['_url']        = admin_url( 'edit-comments.php' );
@@ -154,7 +173,7 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		$_POST['id']          = $comment->comment_ID;
 		$_POST['_ajax_nonce'] = wp_create_nonce( uniqid() );
 		$_POST[$action]       = 1;
-		$_POST['_total']      = count( $this->_comments );
+		$_POST['_total']      = count( self::$comments );
 		$_POST['_per_page']   = 100;
 		$_POST['_page']       = 1;
 		$_POST['_url']        = admin_url( 'edit-comments.php' );
@@ -183,7 +202,7 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		$_POST['id']          = 12346789;
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'delete-comment_12346789' );
 		$_POST[$action]       = 1;
-		$_POST['_total']      = count( $this->_comments );
+		$_POST['_total']      = count( self::$comments );
 		$_POST['_per_page']   = 100;
 		$_POST['_page']       = 1;
 		$_POST['_url']        = admin_url( 'edit-comments.php' );
@@ -219,7 +238,7 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		$_POST['id']          = $comment->comment_ID;
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'delete-comment_' . $comment->comment_ID );
 		$_POST[$action]       = 1;
-		$_POST['_total']      = count( $this->_comments );
+		$_POST['_total']      = count( self::$comments );
 		$_POST['_per_page']   = 100;
 		$_POST['_page']       = 1;
 		$_POST['_url']        = admin_url( 'edit-comments.php' );
@@ -254,20 +273,16 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_ajax_comment_trash_actions_as_administrator() {
-
 		// Test trash/untrash
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'trash' );
-		$this->_test_as_admin( $comment, 'untrash' );
+		$this->_test_as_admin( self::$comments[0], 'trash' );
+		$this->_test_as_admin( self::$comments[0], 'untrash' );
 
 		// Test spam/unspam
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'spam' );
-		$this->_test_as_admin( $comment, 'unspam' );
+		$this->_test_as_admin( self::$comments[1], 'spam' );
+		$this->_test_as_admin( self::$comments[1], 'unspam' );
 
 		// Test delete
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'delete' );
+		$this->_test_as_admin( self::$comments[2], 'delete' );
 	}
 
 	/**
@@ -275,20 +290,16 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_ajax_comment_trash_actions_as_subscriber() {
-
 		// Test trash/untrash
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_subscriber( $comment, 'trash' );
-		$this->_test_as_subscriber( $comment, 'untrash' );
+		$this->_test_as_subscriber( self::$comments[0], 'trash' );
+		$this->_test_as_subscriber( self::$comments[0], 'untrash' );
 
 		// Test spam/unspam
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_subscriber( $comment, 'spam' );
-		$this->_test_as_subscriber( $comment, 'unspam' );
+		$this->_test_as_subscriber( self::$comments[1], 'spam' );
+		$this->_test_as_subscriber( self::$comments[1], 'unspam' );
 
 		// Test delete
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_subscriber( $comment, 'delete' );
+		$this->_test_as_subscriber( self::$comments[2], 'delete' );
 	}
 
 	/**
@@ -296,20 +307,16 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_ajax_trash_comment_no_id() {
-
 		// Test trash/untrash
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'trash' );
-		$this->_test_as_admin( $comment, 'untrash' );
+		$this->_test_as_admin( self::$comments[0], 'trash' );
+		$this->_test_as_admin( self::$comments[0], 'untrash' );
 
 		// Test spam/unspam
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'spam' );
-		$this->_test_as_admin( $comment, 'unspam' );
+		$this->_test_as_admin( self::$comments[1], 'spam' );
+		$this->_test_as_admin( self::$comments[1], 'unspam' );
 
 		// Test delete
-		$comment = array_pop( $this->_comments );
-		$this->_test_as_admin( $comment, 'delete' );
+		$this->_test_as_admin( self::$comments[2], 'delete' );
 	}
 
 	/**
@@ -317,20 +324,16 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_ajax_trash_comment_bad_nonce() {
-
 		// Test trash/untrash
-		$comment = array_pop( $this->_comments );
-		$this->_test_with_bad_nonce( $comment, 'trash' );
-		$this->_test_with_bad_nonce( $comment, 'untrash' );
+		$this->_test_with_bad_nonce( self::$comments[0], 'trash' );
+		$this->_test_with_bad_nonce( self::$comments[0], 'untrash' );
 
 		// Test spam/unspam
-		$comment = array_pop( $this->_comments );
-		$this->_test_with_bad_nonce( $comment, 'spam' );
-		$this->_test_with_bad_nonce( $comment, 'unspam' );
+		$this->_test_with_bad_nonce( self::$comments[1], 'spam' );
+		$this->_test_with_bad_nonce( self::$comments[1], 'unspam' );
 
 		// Test delete
-		$comment = array_pop( $this->_comments );
-		$this->_test_with_bad_nonce( $comment, 'delete' );
+		$this->_test_with_bad_nonce( self::$comments[2], 'delete' );
 	}
 
 	/**
@@ -338,19 +341,15 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_ajax_trash_double_action() {
-
 		// Test trash/untrash
-		$comment = array_pop( $this->_comments );
-		$this->_test_double_action( $comment, 'trash' );
-		$this->_test_double_action( $comment, 'untrash' );
+		$this->_test_double_action( self::$comments[0], 'trash' );
+		$this->_test_double_action( self::$comments[0], 'untrash' );
 
 		// Test spam/unspam
-		$comment = array_pop( $this->_comments );
-		$this->_test_double_action( $comment, 'spam' );
-		$this->_test_double_action( $comment, 'unspam' );
+		$this->_test_double_action( self::$comments[1], 'spam' );
+		$this->_test_double_action( self::$comments[1], 'unspam' );
 
 		// Test delete
-		$comment = array_pop( $this->_comments );
-		$this->_test_double_action( $comment, 'delete' );
+		$this->_test_double_action( self::$comments[2], 'delete' );
 	}
 }

@@ -26,7 +26,10 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	 * List of ajax actions called via POST
 	 * @var type
 	 */
-	protected $_core_actions_get = array( 'fetch-list', 'ajax-tag-search', 'wp-compression-test', 'imgedit-preview', 'oembed_cache' );
+	protected static $_core_actions_get = array(
+		'fetch-list', 'ajax-tag-search', 'wp-compression-test', 'imgedit-preview', 'oembed-cache',
+		'autocomplete-user', 'dashboard-widgets', 'logged-in',
+	);
 
 	/**
 	 * Saved error reporting level
@@ -38,7 +41,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	 * List of ajax actions called via GET
 	 * @var type
 	 */
-	protected $_core_actions_post = array(
+	protected static $_core_actions_post = array(
 		'oembed_cache', 'image-editor', 'delete-comment', 'delete-tag', 'delete-link',
 		'delete-meta', 'delete-post', 'trash-post', 'untrash-post', 'delete-page', 'dim-comment',
 		'add-link-category', 'add-tag', 'get-tagcloud', 'get-comments', 'replyto-comment',
@@ -47,8 +50,30 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 		'menu-locations-save', 'menu-quick-search', 'meta-box-order', 'get-permalink',
 		'sample-permalink', 'inline-save', 'inline-save-tax', 'find_posts', 'widgets-order',
 		'save-widget', 'set-post-thumbnail', 'date_format', 'time_format', 'wp-fullscreen-save-post',
-		'wp-remove-post-lock', 'dismiss-wp-pointer', 'heartbeat', 'nopriv_heartbeat',
+		'wp-remove-post-lock', 'dismiss-wp-pointer', 'heartbeat', 'nopriv_heartbeat', 'get-revision-diffs',
+		'save-user-color-scheme', 'update-widget', 'query-themes', 'parse-embed', 'set-attachment-thumbnail',
+		'parse-media-shortcode', 'destroy-sessions', 'install-plugin', 'update-plugin', 'press-this-save-post',
+		'press-this-add-category', 'crop-image', 'generate-password',
 	);
+
+	public static function setUpBeforeClass() {
+		if ( ! defined( 'DOING_AJAX' ) ) {
+			define( 'DOING_AJAX', true );
+		}
+
+		remove_action( 'admin_init', '_maybe_update_core' );
+		remove_action( 'admin_init', '_maybe_update_plugins' );
+		remove_action( 'admin_init', '_maybe_update_themes' );
+
+		// Register the core actions
+		foreach ( array_merge( self::$_core_actions_get, self::$_core_actions_post ) as $action ) {
+			if ( function_exists( 'wp_ajax_' . str_replace( '-', '_', $action ) ) ) {
+				add_action( 'wp_ajax_' . $action, 'wp_ajax_' . str_replace( '-', '_', $action ), 1 );
+			}
+		}
+
+		parent::setUpBeforeClass();
+	}
 
 	/**
 	 * Set up the test fixture.
@@ -57,14 +82,8 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		// Register the core actions
-		foreach ( array_merge( $this->_core_actions_get, $this->_core_actions_post ) as $action )
-			if ( function_exists( 'wp_ajax_' . str_replace( '-', '_', $action ) ) )
-				add_action( 'wp_ajax_' . $action, 'wp_ajax_' . str_replace( '-', '_', $action ), 1 );
-
 		add_filter( 'wp_die_ajax_handler', array( $this, 'getDieHandler' ), 1, 1 );
-		if ( !defined( 'DOING_AJAX' ) )
-			define( 'DOING_AJAX', true );
+
 		set_current_screen( 'ajax' );
 
 		// Clear logout cookies

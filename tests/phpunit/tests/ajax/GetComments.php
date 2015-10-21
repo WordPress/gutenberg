@@ -19,27 +19,29 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 	 * A post with at least one comment
 	 * @var mixed
 	 */
-	protected $_comment_post = null;
+	protected static $comment_post = null;
 
 	/**
 	 * A post with no comments
 	 * @var mixed
 	 */
-	protected $_no_comment_post = null;
+	protected static $no_comment_post = null;
 
-	/**
-	 * Set up the test fixture
-	 */
-	public function setUp() {
-		parent::setUp();
-		$post_id = self::factory()->post->create();
-		self::factory()->comment->create_post_comments( $post_id, 5 );
-		$this->_comment_post = get_post( $post_id );
+	protected static $comment_ids = array();
 
-		$post_id = self::factory()->post->create();
-		$this->_no_comment_post = get_post( $post_id );
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$comment_post = $factory->post->create_and_get();
+		self::$comment_ids = $factory->comment->create_post_comments( self::$comment_post->ID, 5 );
+		self::$no_comment_post = $factory->post->create_and_get();
+	}
 
-		unset( $GLOBALS['post_id'] );
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$comment_ids as $comment_id ) {
+			wp_delete_comment( $comment_id, true );
+		}
+
+		wp_delete_post( self::$comment_post->ID, true );
+		wp_delete_post( self::$no_comment_post->ID, true );
 	}
 
 	/**
@@ -55,7 +57,7 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 		// Set up a default request
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'get-comments' );
 		$_POST['action']      = 'get-comments';
-		$_POST['p']           = $this->_comment_post->ID;
+		$_POST['p']           = self::$comment_post->ID;
 
 		// Make the request
 		try {
@@ -92,7 +94,7 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 		// Set up a default request
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'get-comments' );
 		$_POST['action']      = 'get-comments';
-		$_POST['p']           = $this->_comment_post->ID;
+		$_POST['p']           = self::$comment_post->ID;
 
 		// Make the request
 		$this->setExpectedException( 'WPAjaxDieStopException', '-1' );
@@ -112,7 +114,7 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 		// Set up a default request
 		$_POST['_ajax_nonce'] = wp_create_nonce( uniqid() );
 		$_POST['action']      = 'get-comments';
-		$_POST['p']           = $this->_comment_post->ID;
+		$_POST['p']           = self::$comment_post->ID;
 
 		// Make the request
 		$this->setExpectedException( 'WPAjaxDieStopException', '-1' );
@@ -152,7 +154,7 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 		// Set up a default request
 		$_POST['_ajax_nonce'] = wp_create_nonce( 'get-comments' );
 		$_POST['action']      = 'get-comments';
-		$_POST['p']           = $this->_no_comment_post->ID;
+		$_POST['p']           = self::$no_comment_post->ID;
 
 		// Make the request
 		$this->setExpectedException( 'WPAjaxDieStopException', '1' );

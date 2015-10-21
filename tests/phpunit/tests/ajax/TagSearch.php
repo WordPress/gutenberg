@@ -19,19 +19,22 @@ class Tests_Ajax_TagSearch extends WP_Ajax_UnitTestCase {
 	 * List of terms to insert on setup
 	 * @var array
 	 */
-	private $_terms = array(
+	private static $terms = array(
 		'chattels', 'depo', 'energumen', 'figuriste', 'habergeon', 'impropriation'
 	);
 
-	/**
-	 * Setup
-	 * @todo use a term factory
-	 */
-	public function setUp() {
-		parent::setUp();
+	private static $term_ids = array();
 
-		foreach ( $this->_terms as $term )
-			wp_insert_term( $term, 'post_tag' );
+	public static function wpSetUpBeforeClass() {
+		foreach ( self::$terms as $t ) {
+			self::$term_ids[] = wp_insert_term( $t, 'post_tag' );
+		}
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$term_ids as $t ) {
+			wp_delete_term( $t, 'post_tag' );
+		}
 	}
 
 	/**
