@@ -7,8 +7,19 @@ class Tests_Comment extends WP_UnitTestCase {
 	protected static $user_id;
 	protected static $post_id;
 
+	public function setUp() {
+		parent::setUp();
+		unset( $GLOBALS['phpmailer']->mock_sent );
+	}
+
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$user_id = $factory->user->create();
+		self::$user_id = $factory->user->create( array(
+			'role'       => 'author',
+			'user_login' => 'test_wp_user_get',
+			'user_pass'  => 'password',
+			'user_email' => 'test@test.com',
+		) );
+
 		self::$post_id = $factory->post->create( array(
 			'post_author' => self::$user_id
 		) );
@@ -358,5 +369,208 @@ class Tests_Comment extends WP_UnitTestCase {
 			$this->assertTrue( isset( $comment->$pf ), $pf );
 			$this->assertSame( $post->$pf, $comment->$pf, $pf );
 		}
+	}
+
+
+	/**
+	 * Helper function to set up comment for 761 tests.
+	 *
+	 * @since 4.4.0
+	 * @access public
+	 */
+	public function setup_notify_comment(){
+		/**
+		 * Mock some server variables.
+		 */
+		$_SERVER['SERVER_NAME'] = 'phpunit.wordpress.dev';
+		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+		/**
+		 * Prevent flood alert from firing.
+		 */
+		add_filter( 'comment_flood_filter', '__return_false' );
+
+		/**
+		 * Set up a comment for testing.
+		 */
+		$post = $this->factory->post->create( array(
+			'post_author' => self::$user_id,
+		) );
+
+		$comment = $this->factory->comment->create( array(
+			'comment_post_ID' => $post,
+		) );
+
+		return array(
+			'post'    => $post,
+			'comment' => $comment,
+		);
+	}
+
+	/**
+	 * @ticket 761
+	 */
+	public function test_wp_notify_moderator_filter_moderation_notify_option_true_filter_false() {
+		$comment_data = $this->setup_notify_comment();
+
+		/**
+		 * Test with moderator notification setting on, filter set to off.
+		 * Should not send a notification.
+		 */
+		update_option( 'moderation_notify', 1 );
+		add_filter( 'notify_moderator', '__return_false' );
+
+		$notification_sent = $this->try_sending_moderator_notification( $comment_data['comment'], $comment_data['post'] );
+
+		$this->assertFalse( $notification_sent, 'Moderator notification setting on, filter set to off' );
+
+		remove_filter( 'notify_moderator', '__return_false' );
+
+	}
+
+	/**
+	 * @ticket 761
+	 */
+	public function test_wp_notify_moderator_filter_moderation_notify_option_false_filter_true() {
+		$comment_data = $this->setup_notify_comment();
+
+		/**
+		 * Test with moderator notification setting off, filter set to on.
+		 * Should send a notification.
+		 */
+		update_option( 'moderation_notify', 0 );
+		add_filter( 'notify_moderator', '__return_true' );
+
+		$notification_sent = $this->try_sending_moderator_notification( $comment_data['comment'], $comment_data['post'] );
+
+		$this->assertTrue( $notification_sent, 'Moderator notification setting off, filter set to on' );
+
+		remove_filter( 'notify_moderator', '__return_true' );
+	}
+
+	/**
+	 * @ticket 761
+	 */
+	public function test_wp_notify_post_author_filter_comments_notify_option_true_filter_false() {
+
+		$comment_data = $this->setup_notify_comment();
+
+		/**
+		 * Test with author notification setting on, filter set to off.
+		 * Should not send a notification.
+		 */
+		update_option( 'comments_notify', 1 );
+		add_filter( 'notify_post_author', '__return_false' );
+
+		$notification_sent = $this->try_sending_author_notification( $comment_data['comment'], $comment_data['post'] );
+
+		$this->assertFalse( $notification_sent, 'Test with author notification setting on, filter set to off' );
+
+		remove_filter( 'notify_post_author', '__return_false' );
+	}
+
+	/**
+	 * @ticket 761
+	 */
+	public function test_wp_notify_post_author_filter_comments_notify_option_false_filter_true() {
+		$comment_data = $this->setup_notify_comment();
+
+		/**
+		 * Test with author notification setting off, filter set to on.
+		 * Should send a notification.
+		 */
+		update_option( 'comments_notify', 0 );
+		add_filter( 'notify_post_author', '__return_true' );
+
+		$notification_sent = $this->try_sending_author_notification( $comment_data['comment'], $comment_data['post'] );
+
+		$this->assertTrue( $notification_sent, 'Test with author notification setting off, filter set to on' );
+
+		remove_filter( 'notify_post_author', '__return_true' );
+	}
+
+	/**
+	 * Helper function to test moderator notifications.
+	 *
+	 * @since 4.4.0
+	 * @access public
+	 */
+	public function try_sending_moderator_notification( $comment, $post ) {
+
+		// Don't approve comments, triggering notifications.
+		add_filter( 'pre_comment_approved', '__return_false' );
+
+		// Moderators are notified when a new comment is added.
+		$data = array(
+			'comment_post_ID'      => $post,
+			'comment_author'       => rand_str(),
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+		wp_new_comment( $data );
+
+		// Check to see if a notification email was sent to the moderator `admin@example.org`.
+		if ( isset( $GLOBALS['phpmailer']->mock_sent )
+			&& ! empty( $GLOBALS['phpmailer']->mock_sent )
+			&& 'admin@example.org' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]
+		) {
+			$email_sent_when_comment_added = true;
+			unset( $GLOBALS['phpmailer']->mock_sent );
+		} else {
+			$email_sent_when_comment_added = false;
+		}
+
+		return $email_sent_when_comment_added;
+	}
+
+	/**
+	 * Helper function to test sending author notifications.
+	 *
+	 * @since 4.4.0
+	 * @access public
+	 */
+	public function try_sending_author_notification( $comment, $post ) {
+
+		// Approve comments, triggering notifications.
+		add_filter( 'pre_comment_approved', '__return_true' );
+
+		// Post authors possibly notified when a comment is approved on their post.
+		wp_set_comment_status( $comment, 'approve' );
+
+		// Check to see if a notification email was sent to the post author `test@test.com`.
+		if ( isset( $GLOBALS['phpmailer']->mock_sent )
+			&& ! empty( $GLOBALS['phpmailer']->mock_sent )
+			&& 'test@test.com' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]
+		) {
+			$email_sent_when_comment_approved = true;
+		} else {
+			$email_sent_when_comment_approved = false;
+		}
+		unset( $GLOBALS['phpmailer']->mock_sent );
+
+		// Post authors are notified when a new comment is added to their post.
+		$data = array(
+			'comment_post_ID'      => $post,
+			'comment_author'       => rand_str(),
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+		wp_new_comment( $data );
+
+		// Check to see if a notification email was sent to the post author `test@test.com`.
+		if ( isset( $GLOBALS['phpmailer']->mock_sent ) &&
+		     ! empty( $GLOBALS['phpmailer']->mock_sent ) &&
+		     'test@test.com' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] ) {
+			$email_sent_when_comment_added = true;
+			unset( $GLOBALS['phpmailer']->mock_sent );
+		} else {
+			$email_sent_when_comment_added = false;
+		}
+
+		return $email_sent_when_comment_approved || $email_sent_when_comment_added;
 	}
 }
