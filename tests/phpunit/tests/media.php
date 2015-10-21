@@ -724,17 +724,17 @@ EOF;
 
 		$expected = array(
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $year_month . '/' . $image['sizes']['medium']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image['sizes']['medium']['file'],
 				'descriptor' => 'w',
 				'value'      => $image['sizes']['medium']['width'],
 			),
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $year_month . '/' . $image['sizes']['large']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image['sizes']['large']['file'],
 				'descriptor' => 'w',
 				'value'      => $image['sizes']['large']['width'],
 			),
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $image['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'],
 				'descriptor' => 'w',
 				'value'      => $image['width'],
 			),
@@ -766,17 +766,17 @@ EOF;
 
 		$expected = array(
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $image['sizes']['medium']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['sizes']['medium']['file'],
 				'descriptor' => 'w',
 				'value'      => $image['sizes']['medium']['width'],
 			),
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $image['sizes']['large']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['sizes']['large']['file'],
 				'descriptor' => 'w',
 				'value'      => $image['sizes']['large']['width'],
 			),
 			array(
-				'url'        => 'http://example.org/wp-content/uploads/' . $image['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'],
 				'descriptor' => 'w',
 				'value'      => $image['width'],
 			),
@@ -872,11 +872,11 @@ EOF;
 		$image = wp_get_attachment_metadata( self::$large_id );
 		$year_month = date('Y/m');
 
-		$expected = 'http://example.org/wp-content/uploads/' . $year_month = date('Y/m') . '/'
+		$expected = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
 			. $image['sizes']['medium']['file'] . ' ' . $image['sizes']['medium']['width'] . 'w, ';
-		$expected .= 'http://example.org/wp-content/uploads/' . $year_month = date('Y/m') . '/'
+		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
 			. $image['sizes']['large']['file'] . ' ' . $image['sizes']['large']['width'] . 'w, ';
-		$expected .= 'http://example.org/wp-content/uploads/' . $image['file'] . ' ' . $image['width'] .'w';
+		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'] . ' ' . $image['width'] .'w';
 
 		$this->assertSame( $expected, $sizes );
 	}
