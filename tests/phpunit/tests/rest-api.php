@@ -253,5 +253,55 @@ class Tests_REST_API extends WP_UnitTestCase {
 		$this->assertEquals( 'http://' . WP_TESTS_DOMAIN . '/?rest_route=/', get_rest_url() );
 
 	}
+	/**
+	 * @ticket 34299
+	 */
+	public function test_rest_url_scheme() {
+		if ( isset( $_SERVER['HTTPS'] ) ) {
+			$_https = $_SERVER['HTTPS'];
+		}
+		$_name = $_SERVER['SERVER_NAME'];
+		$_SERVER['SERVER_NAME'] = parse_url( home_url(), PHP_URL_HOST );
+		$_siteurl = get_option( 'siteurl' );
+
+		set_current_screen( 'edit.php' );
+		$this->assertTrue( is_admin() );
+
+		// Test an HTTP URL
+		unset( $_SERVER['HTTPS'] );
+		$url = get_rest_url();
+		$this->assertSame( 'http', parse_url( $url, PHP_URL_SCHEME ) );
+
+		// Test an HTTPS URL
+		$_SERVER['HTTPS'] = 'on';
+		$url = get_rest_url();
+		$this->assertSame( 'https', parse_url( $url, PHP_URL_SCHEME ) );
+
+		// Switch to an admin request on a different domain name
+		$_SERVER['SERVER_NAME'] = 'admin.example.org';
+		update_option( 'siteurl', 'http://admin.example.org' );
+		$this->assertNotEquals( $_SERVER['SERVER_NAME'], parse_url( home_url(), PHP_URL_HOST ) );
+
+		// // Test an HTTP URL
+		unset( $_SERVER['HTTPS'] );
+		$url = get_rest_url();
+		$this->assertSame( 'http', parse_url( $url, PHP_URL_SCHEME ) );
+
+		// // Test an HTTPS URL
+		$_SERVER['HTTPS'] = 'on';
+		$url = get_rest_url();
+		$this->assertSame( 'http', parse_url( $url, PHP_URL_SCHEME ) );
+
+		// Reset
+		if ( isset( $_https ) ) {
+			$_SERVER['HTTPS'] = $_https;
+		} else {
+			unset( $_SERVER['HTTPS'] );
+		}
+		$_SERVER['SERVER_NAME'] = $_name;
+		update_option( 'siteurl', $_siteurl );
+		set_current_screen( 'front' );
+
+	}
 
 }
