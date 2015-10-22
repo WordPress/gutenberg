@@ -164,9 +164,9 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	function test_request_xml_invalid_data() {
 		$legacy_controller = new WP_oEmbed_Controller();
 
-		$this->assertEquals( 'Not implemented',  $legacy_controller->xml_response( null ) );
-		$this->assertEquals( 'Not implemented',  $legacy_controller->xml_response( 123 ) );
-		$this->assertEquals( 'Not implemented',  $legacy_controller->xml_response( array() ) );
+		$this->assertEquals( get_status_header_desc( 501 ),  $legacy_controller->xml_response( null ) );
+		$this->assertEquals( get_status_header_desc( 501 ),  $legacy_controller->xml_response( 123 ) );
+		$this->assertEquals( get_status_header_desc( 501 ),  $legacy_controller->xml_response( array() ) );
 	}
 
 	/**
