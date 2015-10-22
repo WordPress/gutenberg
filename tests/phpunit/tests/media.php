@@ -898,18 +898,11 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_sizes() {
-		global $content_width;
-
 		// Test sizes against the default WP sizes.
 		$intermediates = array('thumbnail', 'medium', 'large');
 
 		foreach( $intermediates as $int ) {
 			$width = get_option( $int . '_size_w' );
-
-			// The sizes width gets constrained to $content_width by default.
-			if ( $content_width > 0 ) {
-				$width = ( $width > $content_width ) ? $content_width : $width;
-			}
 
 			$expected = '(max-width: ' . $width . 'px) 100vw, ' . $width . 'px';
 			$sizes = wp_get_attachment_image_sizes( self::$large_id, $int );
@@ -921,52 +914,13 @@ EOF;
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_sizes_with_args() {
-		$args = array(
-			'sizes' => array(
-				array(
-					'size_value' 	=> '10em',
-					'mq_value'		=> '60em',
-					'mq_name'			=> 'min-width'
-				),
-				array(
-					'size_value' 	=> '20em',
-					'mq_value'		=> '30em',
-					'mq_name'			=> 'min-width'
-				),
-				array(
-					'size_value'	=> 'calc(100vm - 30px)'
-				),
-			)
-		);
+	function test_wp_get_attachment_image_sizes_with_width() {
+		$width = 350;
 
-		$expected = '(min-width: 60em) 10em, (min-width: 30em) 20em, calc(100vm - 30px)';
-		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium', $args );
+		$expected = '(max-width: 350px) 100vw, 350px';
+		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium', $width );
 
 		$this->assertSame( $expected, $sizes );
-	}
-
-	/**
-	 * @ticket 33641
-	 */
-	function test_wp_get_attachment_image_sizes_with_filtered_args() {
-		// Add our test filter.
-		add_filter( 'wp_image_sizes_args', array( $this, '_test_wp_image_sizes_args' ) );
-
-		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium' );
-
-		remove_filter( 'wp_image_sizes_args', array( $this, '_test_wp_image_sizes_args' ) );
-
-		// Evaluate that the sizes returned is what we expected.
-		$this->assertSame( $sizes, '100vm');
-	}
-
-	/**
-	 * A simple test filter for wp_get_attachment_image_sizes().
-	 */
-	function _test_wp_image_sizes_args( $args ) {
-		$args['sizes'] = "100vm";
-		return $args;
 	}
 
 	/**
