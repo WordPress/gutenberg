@@ -11,13 +11,11 @@ class WP_XMLRPC_UnitTestCase extends WP_UnitTestCase {
 
 		add_filter( 'pre_option_enable_xmlrpc', '__return_true' );
 
-		$this->myxmlrpcserver = new WP_XMLRPC_Server_UnitTestable();
+		$this->myxmlrpcserver = new wp_xmlrpc_server();
 	}
 
 	function tearDown() {
 		remove_filter( 'pre_option_enable_xmlrpc', '__return_true' );
-
-		 $this->myxmlrpcserver->reset_failed_auth();
 
 		$this->remove_added_uploads();
 
@@ -31,10 +29,5 @@ class WP_XMLRPC_UnitTestCase extends WP_UnitTestCase {
 			'role'       => $role
 		));
 	}
-}
 
-class WP_XMLRPC_Server_UnitTestable extends wp_xmlrpc_server {
-	public function reset_failed_auth() {
-		$this->auth_failed = false;
-	}
 }
