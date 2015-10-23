@@ -210,4 +210,18 @@ EOT;
 		$this->assertEmpty( esc_url_raw('"^<>{}`') );
 	}
 
+	/** 
+	 * @ticket 34202
+	 */
+	function test_ipv6_hosts() {
+		$this->assertEquals( '//[::127.0.0.1]', esc_url( '//[::127.0.0.1]' ) );
+		$this->assertEquals( 'http://[::FFFF::127.0.0.1]', esc_url( 'http://[::FFFF::127.0.0.1]' ) );
+		$this->assertEquals( 'http://[::127.0.0.1]', esc_url( 'http://[::127.0.0.1]' ) );
+		$this->assertEquals( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]', esc_url( 'http://[::DEAD:BEEF:DEAD:BEEF:DEAD:BEEF:DEAD:BEEF]' ) );
+
+		// IPv6 with square brackets in the query? Why not.
+		$this->assertEquals( '//[::FFFF::127.0.0.1]/?foo%5Bbar%5D=baz', esc_url( '//[::FFFF::127.0.0.1]/?foo[bar]=baz' ) );
+		$this->assertEquals( 'http://[::FFFF::127.0.0.1]/?foo%5Bbar%5D=baz', esc_url( 'http://[::FFFF::127.0.0.1]/?foo[bar]=baz' ) );
+	}
+
 }
