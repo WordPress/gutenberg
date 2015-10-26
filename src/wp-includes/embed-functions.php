@@ -466,6 +466,7 @@ function get_post_embed_html( $post = null, $width, $height ) {
 	$embed_url = get_post_embed_url( $post );
 
 	$output = "<script type='text/javascript'>\n";
+	$output .= "<!--//--><![CDATA[//><!--\n";
 	if ( SCRIPT_DEBUG ) {
 		$output .= file_get_contents( ABSPATH . WPINC . '/js/wp-embed.js' );
 	} else {
@@ -483,6 +484,7 @@ function get_post_embed_html( $post = null, $width, $height ) {
 		include "js/wp-embed.min.js"
 JS;
 	}
+	$output .= "\n//--><!]]>";
 	$output .= "\n</script>";
 
 	$output .= sprintf(
