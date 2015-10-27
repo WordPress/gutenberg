@@ -13,7 +13,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 
 		$legacy_controller = new WP_oEmbed_Controller();
 
-		$this->assertEquals( 'Invalid URL.', $legacy_controller->dispatch( $request ) );
+		$this->assertEquals( get_status_header_desc( 404 ), $legacy_controller->dispatch( $request ) );
 	}
 
 	function test_request_json() {
@@ -27,7 +27,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 
 		// WP_Query arguments.
 		$request = array(
-			'url'	  => get_permalink( $post->ID ),
+			'url'      => get_permalink( $post->ID ),
 			'format'   => 'json',
 			'maxwidth' => 400,
 			'callback' => '',
@@ -69,7 +69,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		) );
 
 		$request = array(
-			'url'	  => get_permalink( $post->ID ),
+			'url'      => get_permalink( $post->ID ),
 			'format'   => 'json',
 			'maxwidth' => 600,
 			'callback' => 'mycallback',
@@ -92,7 +92,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		) );
 
 		$request = array(
-			'url'	  => get_permalink( $post->ID ),
+			'url'      => get_permalink( $post->ID ),
 			'format'   => 'json',
 			'maxwidth' => 600,
 			'callback' => array( 'foo', 'bar' ),
@@ -112,9 +112,9 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 
 		$legacy_controller = new WP_oEmbed_Controller();
 
-		$this->assertEquals( 'Not implemented',  $legacy_controller->json_response( null, $request ) );
-		$this->assertEquals( 'Not implemented',  $legacy_controller->json_response( 123, $request ) );
-		$this->assertEquals( 'Not implemented',  $legacy_controller->json_response( array(), $request ) );
+		$this->assertEquals( get_status_header_desc( 501 ), $legacy_controller->json_response( null, $request ) );
+		$this->assertEquals( get_status_header_desc( 501 ), $legacy_controller->json_response( 123, $request ) );
+		$this->assertEquals( get_status_header_desc( 501 ), $legacy_controller->json_response( array(), $request ) );
 	}
 
 	function test_request_xml() {
