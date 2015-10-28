@@ -716,27 +716,45 @@ EOF;
 	}
 
 	/**
+	 * Helper function to get image size array from size "name"
+	 */
+	function _get_image_size_array_from_name( $size_name ) {
+		switch ( $size_name ) {
+			case 'thumbnail':
+				return array( 150, 150 );
+			case 'medium':
+				return array( 300, 225 );
+			case 'large':
+				return array( 1024, 768 );
+			case 'full':
+				return array( 1600, 1200 ); // actual size of ../data/images/test-image-large.png
+			default:
+				return array( 800, 600 ); // soft-resized image
+		}
+	}
+
+	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array() {
+	function test_wp_calculate_image_srcset() {
 		$year_month = date('Y/m');
-		$image = wp_get_attachment_metadata( self::$large_id );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
 
 		$expected = array(
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image['sizes']['medium']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image_meta['sizes']['medium']['file'],
 				'descriptor' => 'w',
-				'value'      => $image['sizes']['medium']['width'],
+				'value'      => $image_meta['sizes']['medium']['width'],
 			),
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image['sizes']['large']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image_meta['sizes']['large']['file'],
 				'descriptor' => 'w',
-				'value'      => $image['sizes']['large']['width'],
+				'value'      => $image_meta['sizes']['large']['width'],
 			),
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'],
 				'descriptor' => 'w',
-				'value'      => $image['width'],
+				'value'      => $image_meta['width'],
 			),
 		);
 
@@ -744,14 +762,16 @@ EOF;
 		$sizes = array( 'medium', 'large', 'full', 'yoav' );
 
 		foreach ( $sizes as $size ) {
-			$this->assertSame( $expected, wp_get_attachment_image_srcset_array( self::$large_id, $size ) );
+			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
+			$size_array = $this->_get_image_size_array_from_name( $size );
+			$this->assertSame( $expected, wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
 		}
 	}
 
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array_no_date_uploads() {
+	function test_wp_calculate_image_srcset_no_date_uploads() {
 		// Save the current setting for uploads folders
 		$uploads_use_yearmonth_folders = get_option( 'uploads_use_yearmonth_folders' );
 
@@ -762,23 +782,23 @@ EOF;
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
 		$id = self::factory()->attachment->create_upload_object( $filename );
 
-		$image = wp_get_attachment_metadata( $id );
+		$image_meta = wp_get_attachment_metadata( $id );
 
 		$expected = array(
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['sizes']['medium']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['medium']['file'],
 				'descriptor' => 'w',
-				'value'      => $image['sizes']['medium']['width'],
+				'value'      => $image_meta['sizes']['medium']['width'],
 			),
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['sizes']['large']['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['large']['file'],
 				'descriptor' => 'w',
-				'value'      => $image['sizes']['large']['width'],
+				'value'      => $image_meta['sizes']['large']['width'],
 			),
 			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'],
+				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'],
 				'descriptor' => 'w',
-				'value'      => $image['width'],
+				'value'      => $image_meta['width'],
 			),
 		);
 
@@ -786,7 +806,9 @@ EOF;
 		$sizes = array( 'medium', 'large', 'full', 'yoav' );
 
 		foreach ( $sizes as $size ) {
-			$this->assertSame( $expected, wp_get_attachment_image_srcset_array( $id, $size ) );
+			$size_array = $this->_get_image_size_array_from_name( $size );
+			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
+			$this->assertSame( $expected, wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
 		}
 
 		// Leave the uploads option the way you found it.
@@ -796,24 +818,24 @@ EOF;
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array_with_edits() {
+	function test_wp_calculate_image_srcset_with_edits() {
 		// For this test we're going to mock metadata changes from an edit.
 		// Start by getting the attachment metadata.
-		$meta = wp_get_attachment_metadata( self::$large_id );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$image_url = wp_get_attachment_image_url( self::$large_id );
+		$size_array = $this->_get_image_size_array_from_name( 'medium' );
 
 		// Copy hash generation method used in wp_save_image().
 		$hash = 'e' . time() . rand(100, 999);
 
 		// Replace file paths for full and medium sizes with hashed versions.
-		$filename_base = basename( $meta['file'], '.png' );
-		$meta['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $meta['file'] );
-		$meta['sizes']['medium']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $meta['sizes']['medium']['file'] );
-
-		// Save edited metadata.
-		wp_update_attachment_metadata( self::$large_id, $meta );
+		$filename_base = basename( $image_meta['file'], '.png' );
+		$image_meta['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['file'] );
+		$image_meta['sizes']['medium']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['medium']['file'] );
+		$image_meta['sizes']['large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['large']['file'] );
 
 		// Calculate a srcset array.
-		$sizes = wp_get_attachment_image_srcset_array( self::$large_id, 'medium' );
+		$sizes = wp_calculate_image_srcset( $image_url, $size_array, $image_meta );
 
 		// Test to confirm all sources in the array include the same edit hash.
 		foreach ( $sizes as $size ) {
@@ -824,8 +846,8 @@ EOF;
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array_false() {
-		$sizes = wp_get_attachment_image_srcset_array( 99999, 'foo' );
+	function test_wp_calculate_image_srcset_false() {
+		$sizes = wp_calculate_image_srcset( 'file.png', array( 400, 300 ), array() );
 
 		// For canola.jpg we should return
 		$this->assertFalse( $sizes );
@@ -834,49 +856,35 @@ EOF;
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_srcset_array_no_width() {
-		// Filter image_downsize() output.
-		add_filter( 'wp_generate_attachment_metadata', array( $this, '_test_wp_get_attachment_image_srcset_array_no_width_filter' ) );
-
-		$old_meta = get_post_meta( self::$large_id, '_wp_attachment_metadata', true );
+	function test_wp_calculate_image_srcset_no_width() {
 		$file = get_attached_file( self::$large_id );
+		$image_url = wp_get_attachment_image_url( self::$large_id, 'medium' );
+		$image_meta = wp_generate_attachment_metadata( self::$large_id, $file );
 
-		$data = wp_generate_attachment_metadata( self::$large_id, $file );
-		wp_update_attachment_metadata( self::$large_id, $data );
+		$size_array = array(0, 0);
 
-		$srcset = wp_get_attachment_image_srcset_array( self::$large_id, 'medium' );
-
-		update_post_meta( self::$large_id, '_wp_attachment_metadata', $old_meta );
+		$srcset = wp_calculate_image_srcset( $image_url, $size_array, $image_meta );
 
 		// The srcset should be false.
 		$this->assertFalse( $srcset );
 	}
 
 	/**
-	 * Helper function to filter image_downsize and return zero values for width and height.
-	 */
-	public function _test_wp_get_attachment_image_srcset_array_no_width_filter( $meta ) {
-		remove_filter( 'wp_generate_attachment_metadata', array( $this, __FUNCTION__ ) );
-
-		$meta['sizes']['medium']['width'] = 0;
-		$meta['sizes']['medium']['height'] = 0;
-		return $meta;
-	}
-
-	/**
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset() {
-		$sizes = wp_get_attachment_image_srcset( self::$large_id, 'full-size' );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$size_array = array( 1600, 1200 ); // full size
 
-		$image = wp_get_attachment_metadata( self::$large_id );
+		$sizes = wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta );
+
 		$year_month = date('Y/m');
 
 		$expected = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
-			. $image['sizes']['medium']['file'] . ' ' . $image['sizes']['medium']['width'] . 'w, ';
+			. $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ';
 		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
-			. $image['sizes']['large']['file'] . ' ' . $image['sizes']['large']['width'] . 'w, ';
-		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image['file'] . ' ' . $image['width'] .'w';
+			. $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ';
+		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
 
 		$this->assertSame( $expected, $sizes );
 	}
@@ -885,11 +893,13 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset_single_srcset() {
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$size_array = array( 150, 150 );
 		/*
 		 * In our tests, thumbnails will only return a single srcset candidate,
 		 * so we shouldn't return a srcset value in order to avoid unneeded markup.
 		 */
-		$sizes = wp_get_attachment_image_srcset( self::$large_id, 'thumbnail' );
+		$sizes = wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta );
 
 		$this->assertFalse( $sizes );
 	}
@@ -899,76 +909,57 @@ EOF;
 	 */
 	function test_wp_get_attachment_image_sizes() {
 		// Test sizes against the default WP sizes.
-		$intermediates = array('thumbnail', 'medium', 'large');
+		$intermediates = array( 'thumbnail', 'medium', 'large' );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
 
-		foreach( $intermediates as $int ) {
-			$width = get_option( $int . '_size_w' );
+		foreach( $intermediates as $int_size ) {
+			$size_array = $this->_get_image_size_array_from_name( $int_size );
+			list( $width, $height ) = $size_array;
 
 			$expected = '(max-width: ' . $width . 'px) 100vw, ' . $width . 'px';
-			$sizes = wp_get_attachment_image_sizes( self::$large_id, $int );
+			$sizes = wp_get_attachment_image_sizes( $size_array, $image_meta );
 
-			$this->assertSame($expected, $sizes);
+			$this->assertSame( $expected, $sizes );
 		}
 	}
 
 	/**
 	 * @ticket 33641
 	 */
-	function test_wp_get_attachment_image_sizes_with_width() {
-		$width = 350;
-
-		$expected = '(max-width: 350px) 100vw, 350px';
-		$sizes = wp_get_attachment_image_sizes( self::$large_id, 'medium', $width );
-
-		$this->assertSame( $expected, $sizes );
-	}
-
-	/**
-	 * @ticket 33641
-	 */
 	function test_wp_make_content_images_responsive() {
-		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, 'medium' ) );
-		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( self::$large_id, 'medium' ) );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$size_array = $this->_get_image_size_array_from_name( 'medium' );
+
+		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta ) );
+		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( $size_array, $image_meta, self::$large_id ) );
 
 		// Function used to build HTML for the editor.
 		$img = get_image_tag( self::$large_id, '', '', '', 'medium' );
-		$img_no_size = str_replace( 'size-', '', $img );
-		$img_no_size_id = str_replace( 'wp-image-', 'id-', $img_no_size );
+		$img_no_size_in_class = str_replace( 'size-', '', $img );
+		$img_no_width_height = str_replace( ' width="' . $size_array[0] . '"', '', $img );
+		$img_no_width_height = str_replace( ' height="' . $size_array[1] . '"', '', $img_no_width_height );
+		$img_no_size_id = str_replace( 'wp-image-', 'id-', $img );
 
 		// Manually add srcset and sizes to the markup from get_image_tag();
-		$respimg = preg_replace('|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img);
-		$respimg_no_size = preg_replace('|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_size);
+		$respimg = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img );
+		$respimg_no_size_in_class = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_size_in_class );
+		$respimg_no_width_height = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_width_height );
 
-		$content = '<p>Welcome to WordPress!  This post contains important information.  After you read it, you can make it private to hide it from visitors but still have the information handy for future reference.</p>
-			<p>First things first:</p>
-
+		$content = '
+			<p>Image, standard. Should have srcset and sizes.</p>
 			%1$s
 
-			<ul>
-			<li><a href="http://wordpress.org" title="Subscribe to the WordPress mailing list for Release Notifications">Subscribe to the WordPress mailing list for release notifications</a></li>
-			</ul>
-
+			<p>Image, no size class. Should have srcset and sizes.</p>
 			%2$s
 
-			<p>As a subscriber, you will receive an email every time an update is available (and only then).  This will make it easier to keep your site up to date, and secure from evildoers.<br />
-			When a new version is released, <a href="http://wordpress.org" title="If you are already logged in, this will take you directly to the Dashboard">log in to the Dashboard</a> and follow the instructions.<br />
-			Upgrading is a couple of clicks!</p>
-
+			<p>Image, no width and height attributes. Should have srcset and sizes (from matching the file name).</p>
 			%3$s
 
-			<p>Then you can start enjoying the WordPress experience:</p>
-			<ul>
-			<li>Edit your personal information at <a href="http://wordpress.org" title="Edit settings like your password, your display name and your contact information">Users &#8250; Your Profile</a></li>
-			<li>Start publishing at <a href="http://wordpress.org" title="Create a new post">Posts &#8250; Add New</a> and at <a href="http://wordpress.org" title="Create a new page">Pages &#8250; Add New</a></li>
-			<li>Browse and install plugins at <a href="http://wordpress.org" title="Browse and install plugins at the official WordPress repository directly from your Dashboard">Plugins &#8250; Add New</a></li>
-			<li>Browse and install themes at <a href="http://wordpress.org" title="Browse and install themes at the official WordPress repository directly from your Dashboard">Appearance &#8250; Add New Themes</a></li>
-			<li>Modify and prettify your website&#8217;s links at <a href="http://wordpress.org" title="For example, select a link structure like: http://example.com/1999/12/post-name">Settings &#8250; Permalinks</a></li>
-			<li>Import content from another system or WordPress site at <a href="http://wordpress.org" title="WordPress comes with importers for the most common publishing systems">Tools &#8250; Import</a></li>
-			<li>Find answers to your questions at the <a href="http://wordpress.orgs" title="The official WordPress documentation, maintained by the WordPress community">WordPress Codex</a></li>
-			</ul>';
+			<p>Image, no attachment ID class. Should NOT have srcset and sizes.</p>
+			%4$s';
 
-		$content_unfiltered = sprintf( $content, $img, $img_no_size, $img_no_size_id );
-		$content_filtered = sprintf( $content, $respimg, $respimg_no_size, $img_no_size_id );
+		$content_unfiltered = sprintf( $content, $img, $img_no_size_in_class, $img_no_width_height, $img_no_size_id );
+		$content_filtered = sprintf( $content, $respimg, $respimg_no_size_in_class, $respimg_no_width_height, $img_no_size_id );
 
 		$this->assertSame( $content_filtered, wp_make_content_images_responsive( $content_unfiltered ) );
 	}
