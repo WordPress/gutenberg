@@ -78,4 +78,18 @@ EOD;
 		$this->assertFalse( wp_filter_oembed_result( false, (object) array( 'type' => 'rich' ), '' ) );
 		$this->assertFalse( wp_filter_oembed_result( '', (object) array( 'type' => 'rich' ), '' ) );
 	}
+
+	function test_filter_oembed_result_blockquote_adds_style_to_iframe() {
+		$html   = '<blockquote></blockquote><iframe></iframe>';
+		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
+
+		$this->assertEquals( '<blockquote></blockquote><iframe sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+	}
+
+	function test_filter_oembed_result_allowed_html() {
+		$html   = '<blockquote><strong><a href="" target=""></a></strong></blockquote><iframe></iframe>';
+		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
+
+		$this->assertEquals( '<blockquote><a href=""></a></blockquote><iframe sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+	}
 }

@@ -461,7 +461,9 @@ function get_post_embed_html( $post = null, $width, $height ) {
 
 	$embed_url = get_post_embed_url( $post );
 
-	$output = "<script type='text/javascript'>\n";
+	$output = '<blockquote><a href="' . get_permalink( $post ) . '">' . get_the_title( $post ) . "</a></blockquote>\n";
+
+	$output .= "<script type='text/javascript'>\n";
 	$output .= "<!--//--><![CDATA[//><!--\n";
 	if ( SCRIPT_DEBUG ) {
 		$output .= file_get_contents( ABSPATH . WPINC . '/js/wp-embed.js' );
@@ -752,7 +754,11 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 	}
 
 	$allowed_html = array(
-		'iframe' => array(
+		'a'          => array(
+			        'href' => true,
+		),
+		'blockquote' => array(),
+		'iframe'     => array(
 			'src'          => true,
 			'width'        => true,
 			'height'       => true,
@@ -766,13 +772,20 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 	);
 
 	$html = wp_kses( $result, $allowed_html );
-	preg_match( '|^.*(<iframe.*?></iframe>).*$|m', $html, $iframes );
 
-	if ( empty( $iframes ) ) {
+	preg_match( '|(<blockquote>.*?</blockquote>)?.*(<iframe.*?></iframe>)|ms', $html, $content );
+	// We require at least the iframe to exist.
+	if ( empty( $content[2] ) ) {
 		return false;
 	}
+	$html = $content[1] . $content[2];
 
-	$html = str_replace( '<iframe', '<iframe sandbox="allow-scripts" security="restricted"', $iframes[1] );
+	if ( ! empty( $content[1] ) ) {
+		// We have a blockquote to fall back on. Hide the iframe by default.
+		$html = str_replace( '<iframe', '<iframe style="display:none;"', $html );
+	}
+
+	$html = str_replace( '<iframe', '<iframe sandbox="allow-scripts" security="restricted"', $html );
 
 	preg_match( '/ src=[\'"]([^\'"]*)[\'"]/', $html, $results );
 
@@ -782,6 +795,7 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 		$url = esc_url( "{$results[1]}#?secret=$secret" );
 
 		$html = str_replace( $results[0], " src=\"$url\" data-secret=\"$secret\"", $html );
+		$html = str_replace( '<blockquote', "<blockquote data-secret=\"$secret\"", $html );
 	}
 
 	return $html;
@@ -909,4 +923,17 @@ function print_embed_scripts() {
 	?>
 	</script>
 	<?php
+}
+
+/**
+ * Prepare the oembed HTML to be displayed in an RSS feed.
+ *
+ * @since 4.4.0
+ * @access private
+ *
+ * @param string $content The content to filter.
+ * @return string The filtered content.
+ */
+function _oembed_filter_feed_content( $content ) {
+	return str_replace( '<iframe sandbox="allow-scripts" security="restricted" style="display:none;"', '<iframe sandbox="allow-scripts" security="restricted"', $content );
 }
