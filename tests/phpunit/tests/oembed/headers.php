@@ -7,57 +7,24 @@
  * @group oembed-headers
  */
 class Tests_oEmbed_HTTP_Headers extends WP_UnitTestCase {
-	function test_request_json_response_headers() {
+	function test_rest_pre_serve_request_headers() {
 		if ( ! function_exists( 'xdebug_get_headers' ) ) {
 			$this->markTestSkipped( 'xdebug is required for this test' );
 		}
 
-		$post = self::factory()->post->create_and_get( array(
+		$post = $this->factory()->post->create_and_get( array(
 			'post_title'  => 'Hello World',
 		) );
 
-		$request = array(
-			'url'      => get_permalink( $post->ID ),
-			'format'   => 'json',
-			'maxwidth' => 600,
-			'callback' => '',
-		);
+		$request = new WP_REST_Request( 'GET', '/oembed/1.0/embed' );
+		$request->set_param( 'url', get_permalink( $post->ID ) );
+		$request->set_param( 'format', 'xml' );
 
-		$legacy_controller = new WP_oEmbed_Controller();
-		$legacy_controller->dispatch( $request );
+		$server   = new WP_REST_Server();
+		$response = $server->dispatch( $request );
+		$output   = get_echo( '_oembed_rest_pre_serve_request', array( true, $response, $request, $server ) );
 
-		$headers = xdebug_get_headers();
-
-		$this->assertTrue( in_array( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ), $headers ) );
-		$this->assertTrue( in_array( 'X-Content-Type-Options: nosniff', $headers ) );
-
-		$request['callback'] = 'foobar';
-
-		$legacy_controller->dispatch( $request );
-
-		$headers = xdebug_get_headers();
-
-		$this->assertTrue( in_array( 'Content-Type: application/javascript; charset=' . get_option( 'blog_charset' ), $headers ) );
-		$this->assertTrue( in_array( 'X-Content-Type-Options: nosniff', $headers ) );
-	}
-
-	function test_request_xml_response_headers() {
-		if ( ! function_exists( 'xdebug_get_headers' ) ) {
-			$this->markTestSkipped( 'xdebug is required for this test' );
-		}
-
-		$post = self::factory()->post->create_and_get( array(
-			'post_title'  => 'Hello World',
-		) );
-
-		$request = array(
-			'url'      => get_permalink( $post->ID ),
-			'format'   => 'xml',
-			'maxwidth' => 600,
-		);
-
-		$legacy_controller = new WP_oEmbed_Controller();
-		$legacy_controller->dispatch( $request );
+		$this->assertNotEmpty( $output );
 
 		$headers = xdebug_get_headers();
 

@@ -249,9 +249,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 	}
 
 	function test_add_host_js() {
-		ob_start();
 		wp_oembed_add_host_js();
-		ob_end_clean();
 
 		$this->assertTrue( wp_script_is( 'wp-embed' ) );
 	}
