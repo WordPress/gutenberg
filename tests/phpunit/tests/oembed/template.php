@@ -194,7 +194,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 	function test_wp_embed_excerpt_more() {
 		$post_id = self::factory()->post->create( array(
-			'post_content' => 'Foo Bar',
+			'post_title'   => 'Foo Bar',
+			'post_content' => 'Bar Baz',
 		) );
 
 		$this->assertEquals( '', wp_embed_excerpt_more( '' ) );
@@ -204,7 +205,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$actual = wp_embed_excerpt_more( '' );
 
 		$expected = sprintf(
-			'&hellip; <a class="wp-embed-more" href="%s" target="_top">Read more</a>',
+			' &hellip; <a href="%s" class="wp-embed-more" target="_top">Continue reading <span class="screen-reader-text">Foo Bar</span></a>',
 			get_the_permalink()
 		);
 
