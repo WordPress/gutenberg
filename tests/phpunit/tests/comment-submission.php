@@ -176,6 +176,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$this->assertSame( $user->display_name, $comment->comment_author );
 		$this->assertSame( $user->user_email, $comment->comment_author_email );
 		$this->assertSame( $user->user_url, $comment->comment_author_url );
+		$this->assertSame( $user->ID, intval( $comment->user_id ) );
 
 	}
 
@@ -198,6 +199,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$this->assertSame( 'Comment Author', $comment->comment_author );
 		$this->assertSame( 'comment@example.org', $comment->comment_author_email );
 		$this->assertSame( 'http://user.example.org', $comment->comment_author_url );
+		$this->assertSame( '0', $comment->user_id );
 
 	}
 
