@@ -739,24 +739,11 @@ EOF;
 	function test_wp_calculate_image_srcset() {
 		$year_month = date('Y/m');
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$uploads_dir_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/';
 
-		$expected = array(
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image_meta['sizes']['medium']['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['sizes']['medium']['width'],
-			),
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month . '/' . $image_meta['sizes']['large']['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['sizes']['large']['width'],
-			),
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['width'],
-			),
-		);
+		$expected = $uploads_dir_url . $year_month . '/' . $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ' .
+				$uploads_dir_url . $year_month . '/' . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
+				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
 		// Set up test cases for all expected size names and a random one.
 		$sizes = array( 'medium', 'large', 'full', 'yoav' );
@@ -783,24 +770,11 @@ EOF;
 		$id = self::factory()->attachment->create_upload_object( $filename );
 
 		$image_meta = wp_get_attachment_metadata( $id );
+		$uploads_dir_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/';
 
-		$expected = array(
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['medium']['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['sizes']['medium']['width'],
-			),
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['large']['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['sizes']['large']['width'],
-			),
-			array(
-				'url'        => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'],
-				'descriptor' => 'w',
-				'value'      => $image_meta['width'],
-			),
-		);
+		$expected = $uploads_dir_url . $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ' .
+				$uploads_dir_url . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
+				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
 		// Set up test cases for all expected size names and a random one.
 		$sizes = array( 'medium', 'large', 'full', 'yoav' );
@@ -835,11 +809,11 @@ EOF;
 		$image_meta['sizes']['large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['large']['file'] );
 
 		// Calculate a srcset array.
-		$sizes = wp_calculate_image_srcset( $image_url, $size_array, $image_meta );
+		$sizes = explode( ', ', wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
 
 		// Test to confirm all sources in the array include the same edit hash.
 		foreach ( $sizes as $size ) {
-			$this->assertTrue( false !== strpos( $size['url'], $hash ) );
+			$this->assertTrue( false !== strpos( $size, $hash ) );
 		}
 	}
 
