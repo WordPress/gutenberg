@@ -1002,6 +1002,39 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 14867
+	 */
+	function test_get_blogaddress_by_id_scheme_reflects_blog_scheme() {
+		$blog = self::factory()->blog->create();
+
+		$this->assertSame( 'http', parse_url( get_blogaddress_by_id( $blog ), PHP_URL_SCHEME ) );
+
+		update_blog_option( $blog, 'home', set_url_scheme( get_blog_option( $blog, 'home' ), 'https' ) );
+
+		$this->assertSame( 'https', parse_url( get_blogaddress_by_id( $blog ), PHP_URL_SCHEME ) );
+	}
+
+	/**
+	 * @ticket 14867
+	 */
+	function test_get_blogaddress_by_id_scheme_is_unaffected_by_request() {
+		$blog = self::factory()->blog->create();
+
+		$this->assertFalse( is_ssl() );
+		$this->assertSame( 'http', parse_url( get_blogaddress_by_id( $blog ), PHP_URL_SCHEME ) );
+
+		$_SERVER['HTTPS'] = 'on';
+
+		$is_ssl  = is_ssl();
+		$address = parse_url( get_blogaddress_by_id( $blog ), PHP_URL_SCHEME );
+
+		unset( $_SERVER['HTTPS'] );
+
+		$this->assertTrue( $is_ssl );
+		$this->assertSame( 'http', $address );
+	}
+
+	/**
 	 * @ticket 33620
 	 * @dataProvider data_new_blog_url_schemes
 	 */
