@@ -724,6 +724,8 @@ EOF;
 				return array( 150, 150 );
 			case 'medium':
 				return array( 300, 225 );
+			case 'medium_large':
+				return array( 768, 576 );
 			case 'large':
 				return array( 1024, 768 );
 			case 'full':
@@ -742,11 +744,12 @@ EOF;
 		$uploads_dir_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/';
 
 		$expected = $uploads_dir_url . $year_month . '/' . $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ' .
+				$uploads_dir_url . $year_month . '/' . $image_meta['sizes']['medium_large']['file'] . ' ' . $image_meta['sizes']['medium_large']['width'] . 'w, ' .
 				$uploads_dir_url . $year_month . '/' . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
 				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
 		// Set up test cases for all expected size names and a random one.
-		$sizes = array( 'medium', 'large', 'full', 'yoav' );
+		$sizes = array( 'medium', 'medium_large', 'large', 'full', 'yoav' );
 
 		foreach ( $sizes as $size ) {
 			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
@@ -773,11 +776,12 @@ EOF;
 		$uploads_dir_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/';
 
 		$expected = $uploads_dir_url . $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ' .
+				$uploads_dir_url . $image_meta['sizes']['medium_large']['file'] . ' ' . $image_meta['sizes']['medium_large']['width'] . 'w, ' .
 				$uploads_dir_url . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
 				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
 		// Set up test cases for all expected size names and a random one.
-		$sizes = array( 'medium', 'large', 'full', 'yoav' );
+		$sizes = array( 'medium', 'medium_large', 'large', 'full', 'yoav' );
 
 		foreach ( $sizes as $size ) {
 			$size_array = $this->_get_image_size_array_from_name( $size );
@@ -806,6 +810,7 @@ EOF;
 		$filename_base = basename( $image_meta['file'], '.png' );
 		$image_meta['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['file'] );
 		$image_meta['sizes']['medium']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['medium']['file'] );
+		$image_meta['sizes']['medium_large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['medium_large']['file'] );
 		$image_meta['sizes']['large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['large']['file'] );
 
 		// Calculate a srcset array.
@@ -857,6 +862,8 @@ EOF;
 		$expected = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
 			. $image_meta['sizes']['medium']['file'] . ' ' . $image_meta['sizes']['medium']['width'] . 'w, ';
 		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
+			. $image_meta['sizes']['medium_large']['file'] . ' ' . $image_meta['sizes']['medium_large']['width'] . 'w, ';
+		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year_month = date('Y/m') . '/'
 			. $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ';
 		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
 
@@ -883,7 +890,7 @@ EOF;
 	 */
 	function test_wp_get_attachment_image_sizes() {
 		// Test sizes against the default WP sizes.
-		$intermediates = array( 'thumbnail', 'medium', 'large' );
+		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
 
 		foreach( $intermediates as $int_size ) {
