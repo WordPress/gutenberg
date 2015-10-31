@@ -236,8 +236,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 	}
 
 	function test_get_post_embed_html_non_existent_post() {
-		$this->assertFalse( get_post_embed_html( 0, 200, 200 ) );
-		$this->assertFalse( get_post_embed_html( null, 200, 200 ) );
+		$this->assertFalse( get_post_embed_html( 200, 200, 0 ) );
+		$this->assertFalse( get_post_embed_html( 200, 200 ) );
 	}
 
 	function test_get_post_embed_html() {
@@ -245,7 +245,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$expected = '<iframe sandbox="allow-scripts" security="restricted" src="' . esc_url( get_post_embed_url( $post_id ) ) . '" width="200" height="200" title="Embedded WordPress Post" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" class="wp-embedded-content"></iframe>';
 
-		$this->assertStringEndsWith( $expected, get_post_embed_html( $post_id, 200, 200 ) );
+		$this->assertStringEndsWith( $expected, get_post_embed_html( 200, 200, $post_id ) );
 	}
 
 	function test_add_host_js() {

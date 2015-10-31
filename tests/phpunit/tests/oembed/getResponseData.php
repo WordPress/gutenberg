@@ -25,7 +25,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 			'type'          => 'rich',
 			'width'         => 400,
 			'height'        => 225,
-			'html'          => get_post_embed_html( $post, 400, 225 ),
+			'html'          => get_post_embed_html( 400, 225, $post ),
 		), $data );
 	}
 
@@ -54,7 +54,7 @@ class Tests_oEmbed_Response_Data extends WP_UnitTestCase {
 			'type'          => 'rich',
 			'width'         => 400,
 			'height'        => 225,
-			'html'          => get_post_embed_html( $post, 400, 225 ),
+			'html'          => get_post_embed_html( 400, 225, $post ),
 		), $data );
 	}
 
