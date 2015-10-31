@@ -233,7 +233,8 @@ module.exports = function(grunt) {
 
 					// Exceptions
 					'!wp-includes/css/dashicons.css',
-					'!wp-includes/css/wp-embed-template.css'
+					'!wp-includes/css/wp-embed-template.css',
+					'!wp-includes/css/wp-embed-template-ie.css'
 				]
 			},
 			colors: {

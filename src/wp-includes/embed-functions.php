@@ -372,7 +372,6 @@ function wp_oembed_add_host_js() {
 	wp_enqueue_script( 'wp-embed' );
 }
 
-
 /**
  * Retrieves the URL to embed a specific post in an iframe.
  *
@@ -861,6 +860,28 @@ function wp_embed_excerpt_attachment( $content ) {
 	}
 
 	return $content;
+}
+
+/**
+ * Enqueue embed iframe default CSS and JS & fire do_action('enqueue_embed_scripts')
+ *
+ * Enqueue PNG fallback CSS for embed iframe for legacy versions of IE.
+ *
+ * Allows plugins to queue scripts for the embed iframe end using wp_enqueue_script().
+ * Runs first in oembed_head().
+ *
+ * @since 4.4.0
+ */
+function enqueue_embed_scripts() {
+	wp_enqueue_style( 'open-sans' );
+	wp_enqueue_style( 'wp-embed-template-ie' );
+
+	/**
+	 * Fires when scripts and styles are enqueued for the embed iframe.
+	 *
+	 * @since 4.4.0
+	 */
+	do_action( 'enqueue_embed_scripts' );
 }
 
 /**
