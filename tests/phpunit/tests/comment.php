@@ -567,4 +567,26 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		return $email_sent_when_comment_approved || $email_sent_when_comment_added;
 	}
+
+	public function test_close_comments_for_old_post() {
+		update_option( 'close_comments_for_old_posts', true );
+		// Close comments more than one day old.
+		update_option( 'close_comments_days_old', 1 );
+
+		$old_date = strtotime( '-25 hours' );
+		$old_post_id = self::factory()->post->create( array( 'post_date' => strftime( '%Y-%m-%d %H:%M:%S', $old_date ) ) );
+
+		$old_post_comment_status = _close_comments_for_old_post( true, $old_post_id );
+		$this->assertFalse( $old_post_comment_status );
+
+		$new_post_comment_status = _close_comments_for_old_post( true, self::$post_id );
+		$this->assertTrue( $new_post_comment_status );
+	}
+
+	public function test_close_comments_for_old_post_undated_draft() {
+		$draft_id = self::factory()->post->create( array( 'post_status' => 'draft', 'post_type' => 'post' ) );
+		$draft_comment_status = _close_comments_for_old_post( true, $draft_id );
+
+		$this->assertTrue( $draft_comment_status );
+	}
 }
