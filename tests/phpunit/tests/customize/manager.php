@@ -252,14 +252,23 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 */
 	function test_return_url() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
-		$this->assertEquals( get_admin_url(), $this->manager->get_return_url() );
+		$this->assertEquals( home_url( '/' ), $this->manager->get_return_url() );
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->assertTrue( current_user_can( 'edit_theme_options' ) );
-		$this->assertEquals( admin_url( 'themes.php' ), $this->manager->get_return_url() );
+		$this->assertEquals( home_url( '/' ), $this->manager->get_return_url() );
 
 		$preview_url = home_url( '/foo/' );
 		$this->manager->set_preview_url( $preview_url );
+		$this->assertEquals( $preview_url, $this->manager->get_return_url() );
+
+		$url = home_url( '/referred/' );
+		$_SERVER['HTTP_REFERER'] = wp_slash( $url );
+		$this->assertEquals( $url, $this->manager->get_return_url() );
+
+		$url = 'http://badreferer.example.com/';
+		$_SERVER['HTTP_REFERER'] = wp_slash( $url );
+		$this->assertNotEquals( $url, $this->manager->get_return_url() );
 		$this->assertEquals( $preview_url, $this->manager->get_return_url() );
 
 		$this->manager->set_return_url( admin_url( 'edit.php?trashed=1' ) );
