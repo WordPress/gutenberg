@@ -25,6 +25,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 
 		global $wpdb;
 
+		// Forcing MyISAM, because InnoDB only started supporting FULLTEXT indexes in MySQL 5.7.
 		$wpdb->query(
 			"
 			CREATE TABLE {$wpdb->prefix}dbdelta_test (
@@ -32,8 +33,9 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
-			)
+				KEY compoud_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
 			"
 		);
 
@@ -248,7 +250,30 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		$this->assertTableRowHasValue( 'column_1', 'wcphilly2015',  $wpdb->prefix . 'dbdelta_test' );
 
 	}
-	
+
+	/**
+	 * Test that FULLTEXT indexes are detected.
+	 * @ticket 14445
+	 */
+	public function test_fulltext_index() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compoud_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			)
+			", false
+		);
+
+		$this->assertEmpty( $updates );
+	}
+
 	//
 	// Assertions.
 	//
