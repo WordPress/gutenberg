@@ -2147,4 +2147,49 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertTrue( isset( $q->comments[0]->post_name ) );
 		$this->assertSame( $num_queries, $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 34138
+	 */
+	public function test_comment_objects_should_be_filled_from_cache() {
+		global $wpdb;
+
+		$comments = self::factory()->comment->create_many( 3, array( 'comment_post_ID' => $this->post_id ) );
+		clean_comment_cache( $comments );
+
+		$num_queries = $wpdb->num_queries;
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'no_found_rows' => true,
+			'update_comment_post_cache' => false,
+			'update_comment_meta_cache' => false,
+		) );
+
+		// 2 queries should have been fired: one for IDs, one to prime comment caches.
+		$num_queries += 2;
+
+		$found = wp_list_pluck( $q->comments, 'comment_ID' );
+		$this->assertEqualSets( $comments, $found );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 34138
+	 */
+	public function test_comment_objects_should_be_fetched_from_database_when_suspend_cache_addition() {
+		$suspend = wp_suspend_cache_addition();
+		wp_suspend_cache_addition( true );
+
+		$c = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id ) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+		) );
+
+		wp_suspend_cache_addition( $suspend );
+
+		$found = wp_list_pluck( $q->comments, 'comment_ID' );
+		$this->assertEqualSets( array( $c ), $found );
+	}
 }
