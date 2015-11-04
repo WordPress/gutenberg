@@ -48,6 +48,7 @@ class Tests_Ajax_QuickEdit extends WP_Ajax_UnitTestCase {
 		$_POST['_status'] = $post->post_status;
 		$_POST['post_status'] = $post->post_status;
 		$_POST['screen'] = 'post';
+		$_POST['post_view'] = 'excerpt';
 		$_POST['tax_input'] = array(
 			'wptests_tax_1' => array( $t1 ),
 			'wptests_tax_2' => array( $t2 ),
