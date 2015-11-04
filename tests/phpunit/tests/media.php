@@ -963,4 +963,43 @@ EOF;
 		// The content filter should return the image unchanged.
 		$this->assertSame( $image_html, wp_make_content_images_responsive( $image_html ) );
 	}
+
+	/**
+	 * @ticket 33641
+	 * @ticket 34528
+	 */
+	function test_wp_calculate_image_srcset_animated_gifs() {
+		// Mock meta for an animated gif.
+		$image_meta = array(
+			'width' => 1200,
+			'height' => 600,
+			'file' => 'animated.gif',
+			'sizes' => array(
+				'thumbnail' => array(
+					'file' => 'animated-150x150.gif',
+					'width' => 150,
+					'height' => 150,
+					'mime-type' => 'image/gif'
+				),
+				'medium' => array(
+					'file' => 'animated-300x150.gif',
+					'width' => 300,
+					'height' => 150,
+					'mime-type' => 'image/gif'
+				),
+				'large' => array(
+					'file' => 'animated-1024x512.gif',
+					'width' => 1024,
+					'height' => 512,
+					'mime-type' => 'image/gif'
+				),
+			)
+		);
+
+		$image_src = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'];
+		// Test with soft resized size array.
+		$size_array = array(900, 450);
+
+		$this->assertFalse( wp_calculate_image_srcset( $image_src, $size_array, $image_meta ) );
+	}
 }
