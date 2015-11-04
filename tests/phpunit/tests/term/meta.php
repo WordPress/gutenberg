@@ -307,6 +307,80 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $terms[0] ), $found );
 	}
 
+	/**
+	 * @ticket 34544
+	 */
+	public function test_add_term_meta_should_return_error_when_term_id_is_shared() {
+		global $wpdb;
+
+		update_option( 'finished_splitting_shared_terms', false );
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+		register_taxonomy( 'wptests_tax_3', 'post' );
+
+		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
+		$t3 = wp_insert_term( 'Foo', 'wptests_tax_3' );
+
+		// Manually modify because shared terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t3['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$found = add_term_meta( $t1['term_id'], 'bar', 'baz' );
+		$this->assertWPError( $found );
+		$this->assertSame( 'ambiguous_term_id', $found->get_error_code() );
+	}
+
+	/**
+	 * @ticket 34544
+	 */
+	public function test_update_term_meta_should_return_error_when_term_id_is_shared() {
+		global $wpdb;
+
+		update_option( 'finished_splitting_shared_terms', false );
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t1 = wp_insert_term( 'Foo', 'wptests_tax' );
+		add_term_meta( $t1, 'foo', 'bar' );
+
+		register_taxonomy( 'wptests_tax_2', 'post' );
+		register_taxonomy( 'wptests_tax_3', 'post' );
+
+		$t2 = wp_insert_term( 'Foo', 'wptests_tax_2' );
+		$t3 = wp_insert_term( 'Foo', 'wptests_tax_3' );
+
+		// Manually modify because shared terms shouldn't naturally occur.
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t2['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$wpdb->update( $wpdb->term_taxonomy,
+			array( 'term_id' => $t1['term_id'] ),
+			array( 'term_taxonomy_id' => $t3['term_taxonomy_id'] ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$found = update_term_meta( $t1['term_id'], 'foo', 'baz' );
+		$this->assertWPError( $found );
+		$this->assertSame( 'ambiguous_term_id', $found->get_error_code() );
+	}
+
 	public static function set_cache_results( $q ) {
 		$q->set( 'cache_results', true );
 	}
