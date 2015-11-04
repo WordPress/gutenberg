@@ -29,6 +29,6 @@
     "grunt-postcss": "~0.6.0",
     "grunt-rtlcss": "~1.6.0",
     "grunt-sass": "~1.0.0",
-    "matchdep": "~0.3.0"
+    "matchdep": "~1.0.0"
   }
 }
