@@ -785,9 +785,12 @@ EOF;
 
 		foreach ( $sizes as $size ) {
 			$size_array = $this->_get_image_size_array_from_name( $size );
-			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
+			$image_url = wp_get_attachment_image_url( $id, $size );
 			$this->assertSame( $expected, wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
 		}
+
+		// Remove the attachment
+		wp_delete_attachment( $id );
 
 		// Leave the uploads option the way you found it.
 		update_option( 'uploads_use_yearmonth_folders', $uploads_use_yearmonth_folders );
@@ -800,14 +803,18 @@ EOF;
 		// For this test we're going to mock metadata changes from an edit.
 		// Start by getting the attachment metadata.
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
-		$image_url = wp_get_attachment_image_url( self::$large_id );
+		$image_url = wp_get_attachment_image_url( self::$large_id, 'medium' );
 		$size_array = $this->_get_image_size_array_from_name( 'medium' );
 
 		// Copy hash generation method used in wp_save_image().
 		$hash = 'e' . time() . rand(100, 999);
 
-		// Replace file paths for full and medium sizes with hashed versions.
 		$filename_base = basename( $image_meta['file'], '.png' );
+
+		// Add the hash to the image URL
+		$image_url = str_replace( $filename_base, $filename_base . '-' . $hash, $image_url );
+
+		// Replace file paths for full and medium sizes with hashed versions.
 		$image_meta['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['file'] );
 		$image_meta['sizes']['medium']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['medium']['file'] );
 		$image_meta['sizes']['medium_large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['medium_large']['file'] );
