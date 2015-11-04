@@ -102,8 +102,7 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 		$xml = xml_to_array($feed);
 
 		// get all the rss -> channel -> item elements
-		$items = xml_find($xml, 'rss', 'channel', 'item');
-		$posts = get_posts('numberposts='.$this->post_count);
+		$items = xml_find( $xml, 'rss', 'channel', 'item' );
 
 		// check each of the items against the known post data
 		foreach ( $items as $key => $item ) {
@@ -177,5 +176,37 @@ class Tests_Feed_RSS2 extends WP_UnitTestCase {
 			$comment_rss = xml_find( $items[$key]['child'], 'wfw:commentRss' );
 			$this->assertEquals( html_entity_decode( get_post_comments_feed_link( $post->ID) ), $comment_rss[0]['content'] );
 		}
+	}
+
+	/**
+	 * @ticket 9134
+	 */
+	function test_items_comments_closed() {
+		add_filter( 'comments_open', '__return_false' );
+
+		$this->go_to( '/?feed=rss2' );
+		$feed = $this->do_rss2();
+		$xml = xml_to_array($feed);
+
+		// get all the rss -> channel -> item elements
+		$items = xml_find( $xml, 'rss', 'channel', 'item' );
+
+		// check each of the items against the known post data
+		foreach ( $items as $key => $item ) {
+			// Get post for comparison
+			$guid = xml_find( $items[$key]['child'], 'guid' );
+			preg_match( '/\?p=(\d+)/', $guid[0]['content'], $matches );
+			$post = get_post( $matches[1] );
+
+			// comment link
+			$comments_link = xml_find( $items[ $key ]['child'], 'comments' );
+			$this->assertEmpty( $comments_link );
+
+			// comment rss
+			$comment_rss = xml_find( $items[ $key ]['child'], 'wfw:commentRss' );
+			$this->assertEmpty( $comment_rss );
+		}
+
+		remove_filter( 'comments_open', '__return_false' );
 	}
 }
