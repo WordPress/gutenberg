@@ -397,4 +397,38 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Customize_Manager', $customize_manager );
 		return array( 'nav_menus' );
 	}
+
+	/**
+	 * @ticket 30225
+	 * @ticket 34594
+	 */
+	function test_prepare_controls_stable_sorting() {
+		$manager = new WP_Customize_Manager();
+		$manager->register_controls();
+		$section_id = 'foo-section';
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$manager->add_section( $section_id, array(
+			'title'      => 'Section',
+			'priority'   => 1,
+		) );
+
+		$added_control_ids = array();
+		$count = 9;
+		for ( $i = 0; $i < $count; $i += 1 ) {
+			$id = 'sort-test-' . $i;
+			$added_control_ids[] = $id;
+			$manager->add_setting( $id );
+			$control = new WP_Customize_Control( $manager, $id, array(
+				'section' => $section_id,
+				'priority' => 1,
+				'setting' => $id,
+			) );
+			$manager->add_control( $control );
+		}
+
+		$manager->prepare_controls();
+
+		$sorted_control_ids = wp_list_pluck( $manager->get_section( $section_id )->controls, 'id' );
+		$this->assertEquals( $added_control_ids, $sorted_control_ids );
+	}
 }
