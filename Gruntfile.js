@@ -451,7 +451,8 @@ module.exports = function(grunt) {
 			},
 			jqueryui: {
 				options: {
-					preserveComments: 'some'
+					// Preserve comments that start with a bang.
+					preserveComments: /^!/
 				},
 				expand: true,
 				cwd: SOURCE_DIR,
