@@ -748,8 +748,8 @@ EOF;
 				$uploads_dir_url . $year_month . '/' . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
 				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
-		// Set up test cases for all expected size names and a random one.
-		$sizes = array( 'medium', 'medium_large', 'large', 'full', 'yoav' );
+		// Set up test cases for all expected size names.
+		$sizes = array( 'medium', 'medium_large', 'large', 'full' );
 
 		foreach ( $sizes as $size ) {
 			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
@@ -780,8 +780,8 @@ EOF;
 				$uploads_dir_url . $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ' .
 				$uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] . 'w';
 
-		// Set up test cases for all expected size names and a random one.
-		$sizes = array( 'medium', 'medium_large', 'large', 'full', 'yoav' );
+		// Set up test cases for all expected size names.
+		$sizes = array( 'medium', 'medium_large', 'large', 'full' );
 
 		foreach ( $sizes as $size ) {
 			$size_array = $this->_get_image_size_array_from_name( $size );
@@ -862,7 +862,7 @@ EOF;
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
 		$size_array = array( 1600, 1200 ); // full size
 
-		$sizes = wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta );
+		$srcset = wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta );
 
 		$year_month = date('Y/m');
 
@@ -874,7 +874,7 @@ EOF;
 			. $image_meta['sizes']['large']['file'] . ' ' . $image_meta['sizes']['large']['width'] . 'w, ';
 		$expected .= 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
 
-		$this->assertSame( $expected, $sizes );
+		$this->assertSame( $expected, $srcset );
 	}
 
 	/**
@@ -890,6 +890,22 @@ EOF;
 		$sizes = wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta );
 
 		$this->assertFalse( $sizes );
+	}
+
+	/**
+	 * @ticket 33641
+	 */
+	function test_wp_get_attachment_image_srcset_invalidsize() {
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$invalid_size = 'nailthumb';
+		$original_size = array( 1600, 1200 );
+
+		$srcset = wp_get_attachment_image_srcset( self::$large_id, $invalid_size, $image_meta );
+
+		// Expect a srcset for the original full size image to be returned.
+		$expected = wp_get_attachment_image_srcset( self::$large_id, $original_size, $image_meta );
+
+		$this->assertSame( $expected, $srcset );
 	}
 
 	/**
