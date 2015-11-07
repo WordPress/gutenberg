@@ -754,7 +754,7 @@ EOF;
 		foreach ( $sizes as $size ) {
 			$image_url = wp_get_attachment_image_url( self::$large_id, $size );
 			$size_array = $this->_get_image_size_array_from_name( $size );
-			$this->assertSame( $expected, wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
+			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
 		}
 	}
 
@@ -786,7 +786,7 @@ EOF;
 		foreach ( $sizes as $size ) {
 			$size_array = $this->_get_image_size_array_from_name( $size );
 			$image_url = wp_get_attachment_image_url( $id, $size );
-			$this->assertSame( $expected, wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
+			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
 		}
 
 		// Remove the attachment
@@ -821,7 +821,7 @@ EOF;
 		$image_meta['sizes']['large']['file'] = str_replace( $filename_base, $filename_base . '-' . $hash, $image_meta['sizes']['large']['file'] );
 
 		// Calculate a srcset array.
-		$sizes = explode( ', ', wp_calculate_image_srcset( $image_url, $size_array, $image_meta ) );
+		$sizes = explode( ', ', wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
 
 		// Test to confirm all sources in the array include the same edit hash.
 		foreach ( $sizes as $size ) {
@@ -833,7 +833,7 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_calculate_image_srcset_false() {
-		$sizes = wp_calculate_image_srcset( 'file.png', array( 400, 300 ), array() );
+		$sizes = wp_calculate_image_srcset( array( 400, 300 ), 'file.png', array() );
 
 		// For canola.jpg we should return
 		$this->assertFalse( $sizes );
@@ -849,7 +849,7 @@ EOF;
 
 		$size_array = array(0, 0);
 
-		$srcset = wp_calculate_image_srcset( $image_url, $size_array, $image_meta );
+		$srcset = wp_calculate_image_srcset( $size_array, $image_url, $image_meta );
 
 		// The srcset should be false.
 		$this->assertFalse( $srcset );
@@ -914,14 +914,32 @@ EOF;
 	function test_wp_get_attachment_image_sizes() {
 		// Test sizes against the default WP sizes.
 		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
+
+		foreach( $intermediates as $int_size ) {
+			$image = wp_get_attachment_image_src( self::$large_id, $int_size );
+
+			$expected = '(max-width: ' . $image[1] . 'px) 100vw, ' . $image[1] . 'px';
+			$sizes = wp_get_attachment_image_sizes( self::$large_id, $int_size );
+
+			$this->assertSame( $expected, $sizes );
+		}
+	}
+
+	/**
+	 * @ticket 33641
+	 */
+	function test_wp_calculate_image_sizes() {
+		// Test sizes against the default WP sizes.
+		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
 
 		foreach( $intermediates as $int_size ) {
 			$size_array = $this->_get_image_size_array_from_name( $int_size );
+			$image_src = $image_meta['sizes'][$int_size]['file'];
 			list( $width, $height ) = $size_array;
 
 			$expected = '(max-width: ' . $width . 'px) 100vw, ' . $width . 'px';
-			$sizes = wp_get_attachment_image_sizes( $size_array, $image_meta );
+			$sizes = wp_calculate_image_sizes( $size_array, $image_src, $image_meta );
 
 			$this->assertSame( $expected, $sizes );
 		}
@@ -935,7 +953,7 @@ EOF;
 		$size_array = $this->_get_image_size_array_from_name( 'medium' );
 
 		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta ) );
-		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( $size_array, $image_meta, self::$large_id ) );
+		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( self::$large_id, $size_array, $image_meta ) );
 
 		// Function used to build HTML for the editor.
 		$img = get_image_tag( self::$large_id, '', '', '', 'medium' );
@@ -1019,8 +1037,8 @@ EOF;
 		$size_array = array(900, 450);
 
 		// Full size GIFs should not return a srcset.
-		$this->assertFalse( wp_calculate_image_srcset( $full_src, $size_array, $image_meta ) );
+		$this->assertFalse( wp_calculate_image_srcset( $size_array, $full_src, $image_meta ) );
 		// Intermediate sized GIFs should not include the full size in the srcset.
-		$this->assertFalse( strpos( wp_calculate_image_srcset( $large_src, $size_array, $image_meta ), $full_src ) );
+		$this->assertFalse( strpos( wp_calculate_image_srcset( $size_array, $large_src, $image_meta ), $full_src ) );
 	}
 }
