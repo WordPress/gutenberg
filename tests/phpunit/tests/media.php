@@ -1012,10 +1012,15 @@ EOF;
 			)
 		);
 
-		$image_src = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'];
+		$full_src  = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['file'];
+		$large_src = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['large']['file'];
+
 		// Test with soft resized size array.
 		$size_array = array(900, 450);
 
-		$this->assertFalse( wp_calculate_image_srcset( $image_src, $size_array, $image_meta ) );
+		// Full size GIFs should not return a srcset.
+		$this->assertFalse( wp_calculate_image_srcset( $full_src, $size_array, $image_meta ) );
+		// Intermediate sized GIFs should not include the full size in the srcset.
+		$this->assertFalse( strpos( wp_calculate_image_srcset( $large_src, $size_array, $image_meta ), $full_src ) );
 	}
 }
