@@ -58,6 +58,37 @@ class Tests_General_Template extends WP_UnitTestCase {
 	}
 
 	/**
+ 	 * @group site_icon
+	 * @group multisite
+	 */
+	function test_has_site_icon_returns_true_when_called_for_other_site_with_site_icon_set() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite.' );
+		}
+
+		$blog_id = $this->factory->blog->create();
+		switch_to_blog( $blog_id );
+		$this->_set_site_icon();
+		restore_current_blog();
+
+		$this->assertTrue( has_site_icon( $blog_id ) );
+	}
+
+	/**
+	 * @group site_icon
+	 * @group multisite
+	 */
+	function test_has_site_icon_returns_false_when_called_for_other_site_without_site_icon_set() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite.' );
+		}
+
+		$blog_id = $this->factory->blog->create();
+
+		$this->assertFalse( has_site_icon( $blog_id ) );
+	}
+
+	/**
 	 * @group site_icon
 	 */
 	function test_wp_site_icon() {
