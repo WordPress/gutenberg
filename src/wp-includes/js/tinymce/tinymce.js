@@ -1,4 +1,4 @@
-// 4.2.6 (2015-09-28)
+// 4.2.7 (2015-10-27)
 
 /**
  * Compiled inline version. (Library mode)
@@ -6392,7 +6392,7 @@ define("tinymce/html/Entities", [
 
 	var Entities = {
 		/**
-		 * Encodes the specified string using raw entities. This means only the required XML base entities will be endoded.
+		 * Encodes the specified string using raw entities. This means only the required XML base entities will be encoded.
 		 *
 		 * @method encodeRaw
 		 * @param {String} text Text to encode.
@@ -6832,6 +6832,27 @@ define("tinymce/dom/DOMUtils", [
 		}
 
 		$elm.attr('data-mce-style', value);
+	}
+
+	function nodeIndex(node, normalized) {
+		var idx = 0, lastNodeType, nodeType;
+
+		if (node) {
+			for (lastNodeType = node.nodeType, node = node.previousSibling; node; node = node.previousSibling) {
+				nodeType = node.nodeType;
+
+				// Normalize text nodes
+				if (normalized && nodeType == 3) {
+					if (nodeType == lastNodeType || !node.nodeValue.length) {
+						continue;
+					}
+				}
+				idx++;
+				lastNodeType = nodeType;
+			}
+		}
+
+		return idx;
 	}
 
 	/**
@@ -8250,26 +8271,7 @@ define("tinymce/dom/DOMUtils", [
 		 * @param {boolean} normalized Optional true/false state if the index is what it would be after a normalization.
 		 * @return {Number} Index of the specified node.
 		 */
-		nodeIndex: function(node, normalized) {
-			var idx = 0, lastNodeType, nodeType;
-
-			if (node) {
-				for (lastNodeType = node.nodeType, node = node.previousSibling; node; node = node.previousSibling) {
-					nodeType = node.nodeType;
-
-					// Normalize text nodes
-					if (normalized && nodeType == 3) {
-						if (nodeType == lastNodeType || !node.nodeValue.length) {
-							continue;
-						}
-					}
-					idx++;
-					lastNodeType = nodeType;
-				}
-			}
-
-			return idx;
-		},
+		nodeIndex: nodeIndex,
 
 		/**
 		 * Splits an element into two new elements and places the specified split
@@ -8578,6 +8580,7 @@ define("tinymce/dom/DOMUtils", [
 	 * tinymce.DOM.addClass('someid', 'someclass');
 	 */
 	DOMUtils.DOM = new DOMUtils(document);
+	DOMUtils.nodeIndex = nodeIndex;
 
 	return DOMUtils;
 });
@@ -9381,6 +9384,10 @@ define("tinymce/dom/RangeUtils", [
 				var container, offset, walker, body = dom.getRoot(), node, nonEmptyElementsMap;
 				var directionLeft, isAfterNode;
 
+				function isTableCell(node) {
+					return node && /^(TD|TH|CAPTION)$/.test(node.nodeName);
+				}
+
 				function hasBrBeforeAfter(node, left) {
 					var walker = new TreeWalker(node, dom.getParent(node.parentNode, dom.isBlock) || body);
 
@@ -9494,7 +9501,7 @@ define("tinymce/dom/RangeUtils", [
 								}
 
 								// Found a BR/IMG element that we can place the caret before
-								if (nonEmptyElementsMap[node.nodeName.toLowerCase()]) {
+								if (nonEmptyElementsMap[node.nodeName.toLowerCase()] && !isTableCell(node)) {
 									offset = dom.nodeIndex(node);
 									container = node.parentNode;
 
@@ -12926,27 +12933,29 @@ define("tinymce/html/Serializer", [
 						sortedAttrs.map = {};
 
 						elementRule = schema.getElementRule(node.name);
-						for (i = 0, l = elementRule.attributesOrder.length; i < l; i++) {
-							attrName = elementRule.attributesOrder[i];
+						if (elementRule) {
+							for (i = 0, l = elementRule.attributesOrder.length; i < l; i++) {
+								attrName = elementRule.attributesOrder[i];
 
-							if (attrName in attrs.map) {
-								attrValue = attrs.map[attrName];
-								sortedAttrs.map[attrName] = attrValue;
-								sortedAttrs.push({name: attrName, value: attrValue});
+								if (attrName in attrs.map) {
+									attrValue = attrs.map[attrName];
+									sortedAttrs.map[attrName] = attrValue;
+									sortedAttrs.push({name: attrName, value: attrValue});
+								}
 							}
-						}
 
-						for (i = 0, l = attrs.length; i < l; i++) {
-							attrName = attrs[i].name;
+							for (i = 0, l = attrs.length; i < l; i++) {
+								attrName = attrs[i].name;
 
-							if (!(attrName in sortedAttrs.map)) {
-								attrValue = attrs.map[attrName];
-								sortedAttrs.map[attrName] = attrValue;
-								sortedAttrs.push({name: attrName, value: attrValue});
+								if (!(attrName in sortedAttrs.map)) {
+									attrValue = attrs.map[attrName];
+									sortedAttrs.map[attrName] = attrValue;
+									sortedAttrs.push({name: attrName, value: attrValue});
+								}
 							}
-						}
 
-						attrs = sortedAttrs;
+							attrs = sortedAttrs;
+						}
 					}
 
 					writer.start(node.name, attrs, isEmpty);
@@ -14058,6 +14067,10 @@ define("tinymce/dom/ControlSelection", [
 			}
 
 			if (elm.getAttribute('data-mce-resize') === 'false') {
+				return false;
+			}
+
+			if (elm == editor.getBody()) {
 				return false;
 			}
 
@@ -18502,9 +18515,13 @@ define("tinymce/Formatter", [
 
 					removeCaretContainer();
 
-					// Remove caret container on keydown and it's a backspace, enter or left/right arrow keys
-					// Backspace key needs to check if the range is collapsed due to bug #6780
-					if ((keyCode == 8 && selection.isCollapsed()) || keyCode == 37 || keyCode == 39) {
+					// Remove caret container if it's empty
+					if (keyCode == 8 && selection.isCollapsed() && selection.getStart().innerHTML == INVISIBLE_CHAR) {
+						removeCaretContainer(getParentCaretContainer(selection.getStart()));
+					}
+
+					// Remove caret container on keydown and it's left/right arrow keys
+					if (keyCode == 37 || keyCode == 39) {
 						removeCaretContainer(getParentCaretContainer(selection.getStart()));
 					}
 
@@ -19018,6 +19035,10 @@ define("tinymce/EnterKey", [
 					dom.getContentEditable(node) !== "true";
 			}
 
+			function isTableCell(node) {
+				return node && /^(TD|TH|CAPTION)$/.test(node.nodeName);
+			}
+
 			// Renders empty block on IE
 			function renderBlockOnIE(block) {
 				var oldRng;
@@ -19284,9 +19305,14 @@ define("tinymce/EnterKey", [
 
 				// Not in a block element or in a table cell or caption
 				parentBlock = dom.getParent(container, dom.isBlock);
-				rootBlockName = editor.getBody().nodeName.toLowerCase();
 				if (!parentBlock || !canSplitBlock(parentBlock)) {
 					parentBlock = parentBlock || editableRoot;
+
+					if (parentBlock == editor.getBody() || isTableCell(parentBlock)) {
+						rootBlockName = parentBlock.nodeName.toLowerCase();
+					} else {
+						rootBlockName = parentBlock.parentNode.nodeName.toLowerCase();
+					}
 
 					if (!parentBlock.hasChildNodes()) {
 						newBlock = dom.create(blockName);
@@ -19356,6 +19382,10 @@ define("tinymce/EnterKey", [
 					}
 
 					return containerBlock;
+				}
+
+				if (containerBlock == editor.getBody()) {
+					return;
 				}
 
 				// Check if we are in an nested list
@@ -20321,7 +20351,9 @@ define("tinymce/EditorCommands", [
 
 				// Setup parser and serializer
 				parser = editor.parser;
-				serializer = new Serializer({}, editor.schema);
+				serializer = new Serializer({
+					validate: settings.validate
+				}, editor.schema);
 				bookmarkHtml = '<span id="mce_marker" data-mce-type="bookmark">&#xFEFF;&#x200B;</span>';
 
 				// Run beforeSetContent handlers on the HTML to be inserted
@@ -27637,6 +27669,59 @@ define("tinymce/WindowManager", [
 	};
 });
 
+// Included from: js/tinymce/classes/dom/NodePath.js
+
+/**
+ * NodePath.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * Handles paths of nodes within an element.
+ *
+ * @private
+ * @class tinymce.dom.NodePath
+ */
+define("tinymce/dom/NodePath", [
+	"tinymce/dom/DOMUtils"
+], function(DOMUtils) {
+	function create(rootNode, targetNode, normalized) {
+		var path = [];
+
+		for (; targetNode && targetNode != rootNode; targetNode = targetNode.parentNode) {
+			path.push(DOMUtils.nodeIndex(targetNode, normalized));
+		}
+
+		return path;
+	}
+
+	function resolve(rootNode, path) {
+		var i, node, children;
+
+		for (node = rootNode, i = path.length - 1; i >= 0; i--) {
+			children = node.childNodes;
+
+			if (path[i] > children.length - 1) {
+				return null;
+			}
+
+			node = children[path[i]];
+		}
+
+		return node;
+	}
+
+	return {
+		create: create,
+		resolve: resolve
+	};
+});
+
 // Included from: js/tinymce/classes/util/Quirks.js
 
 /**
@@ -27661,11 +27746,12 @@ define("tinymce/util/Quirks", [
 	"tinymce/util/VK",
 	"tinymce/dom/RangeUtils",
 	"tinymce/dom/TreeWalker",
+	"tinymce/dom/NodePath",
 	"tinymce/html/Node",
 	"tinymce/html/Entities",
 	"tinymce/Env",
 	"tinymce/util/Tools"
-], function(VK, RangeUtils, TreeWalker, Node, Entities, Env, Tools) {
+], function(VK, RangeUtils, TreeWalker, NodePath, Node, Entities, Env, Tools) {
 	return function(editor) {
 		var each = Tools.each, $ = editor.$;
 		var BACKSPACE = VK.BACKSPACE, DELETE = VK.DELETE, dom = editor.dom, selection = editor.selection,
@@ -28044,6 +28130,111 @@ define("tinymce/util/Quirks", [
 				}
 			}
 
+			/**
+			 * This retains the formatting if the last character is to be deleted.
+			 *
+			 * Backspace on this: <p><b><i>a|</i></b></p> would become <p>|</p> in WebKit.
+			 * With this patch: <p><b><i>|<br></i></b></p>
+			 */
+			function handleLastBlockCharacterDelete(isForward, rng) {
+				var path, blockElm, newBlockElm, clonedBlockElm, sibling,
+					container, offset, br, currentFormatNodes;
+
+				function cloneTextBlockWithFormats(blockElm, node) {
+					currentFormatNodes = $(node).parents().filter(function(idx, node) {
+						return !!editor.schema.getTextInlineElements()[node.nodeName];
+					});
+
+					newBlockElm = blockElm.cloneNode(false);
+
+					currentFormatNodes = Tools.map(currentFormatNodes, function(formatNode) {
+						formatNode = formatNode.cloneNode(false);
+
+						if (newBlockElm.hasChildNodes()) {
+							formatNode.appendChild(newBlockElm.firstChild);
+							newBlockElm.appendChild(formatNode);
+						} else {
+							newBlockElm.appendChild(formatNode);
+						}
+
+						newBlockElm.appendChild(formatNode);
+
+						return formatNode;
+					});
+
+					if (currentFormatNodes.length) {
+						br = dom.create('br');
+						currentFormatNodes[0].appendChild(br);
+						dom.replace(newBlockElm, blockElm);
+
+						rng.setStartBefore(br);
+						rng.setEndBefore(br);
+						editor.selection.setRng(rng);
+
+						return br;
+					}
+
+					return null;
+				}
+
+				function isTextBlock(node) {
+					return node && editor.schema.getTextBlockElements()[node.tagName];
+				}
+
+				if (!rng.collapsed) {
+					return;
+				}
+
+				container = rng.startContainer;
+				offset = rng.startOffset;
+				blockElm = dom.getParent(container, dom.isBlock);
+				if (!isTextBlock(blockElm)) {
+					return;
+				}
+
+				if (container.nodeType == 1) {
+					container = container.childNodes[offset];
+					if (container && container.tagName != 'BR') {
+						return;
+					}
+
+					if (isForward) {
+						sibling = blockElm.nextSibling;
+					} else {
+						sibling = blockElm.previousSibling;
+					}
+
+					if (dom.isEmpty(blockElm) && isTextBlock(sibling) && dom.isEmpty(sibling)) {
+						if (cloneTextBlockWithFormats(blockElm, container)) {
+							dom.remove(sibling);
+							return true;
+						}
+					}
+				} else if (container.nodeType == 3) {
+					path = NodePath.create(blockElm, container);
+					clonedBlockElm = blockElm.cloneNode(true);
+					container = NodePath.resolve(clonedBlockElm, path);
+
+					if (isForward) {
+						if (offset >= container.data.length) {
+							return;
+						}
+
+						container.deleteData(offset, 1);
+					} else {
+						if (offset <= 0) {
+							return;
+						}
+
+						container.deleteData(offset - 1, 1);
+					}
+
+					if (dom.isEmpty(clonedBlockElm)) {
+						return cloneTextBlockWithFormats(blockElm, container);
+					}
+				}
+			}
+
 			function customDelete(isForward) {
 				var mutationObserver, rng, caretElement;
 
@@ -28133,6 +28324,11 @@ define("tinymce/util/Quirks", [
 						return;
 					}
 
+					if (handleLastBlockCharacterDelete(isForward, rng)) {
+						e.preventDefault();
+						return;
+					}
+
 					// Ignore non meta delete in the where there is text before/after the caret
 					if (!isMetaOrCtrl && rng.collapsed && container.nodeType == 3) {
 						if (isForward ? offset < container.data.length : offset > 0) {
@@ -28152,7 +28348,7 @@ define("tinymce/util/Quirks", [
 
 			// Handle case where text is deleted by typing over
 			editor.on('keypress', function(e) {
-				if (!isDefaultPrevented(e) && !selection.isCollapsed() && e.charCode && !VK.metaKeyPressed(e)) {
+				if (!isDefaultPrevented(e) && !selection.isCollapsed() && e.charCode > 31 && !VK.metaKeyPressed(e)) {
 					var rng, currentFormatNodes, fragmentNode, blockParent, caretNode, charText;
 
 					rng = editor.selection.getRng();
@@ -31371,11 +31567,14 @@ define("tinymce/Editor", [
 
 			// Keep scripts from executing
 			self.parser.addNodeFilter('script', function(nodes) {
-				var i = nodes.length, node;
+				var i = nodes.length, node, type;
 
 				while (i--) {
 					node = nodes[i];
-					node.attr('type', 'mce-' + (node.attr('type') || 'no/type'));
+					type = node.attr('type') || 'no/type';
+					if (type.indexOf('mce-') !== 0) {
+						node.attr('type', 'mce-' + type);
+					}
 				}
 			});
 
@@ -32178,7 +32377,7 @@ define("tinymce/Editor", [
 		 * tinymce.activeEditor.setContent('[b]some[/b] html', {format: 'bbcode'});
 		 */
 		setContent: function(content, args) {
-			var self = this, body = self.getBody(), forcedRootBlockName;
+			var self = this, body = self.getBody(), forcedRootBlockName, padd;
 
 			// Setup args object
 			args = args || {};
@@ -32196,14 +32395,24 @@ define("tinymce/Editor", [
 			// Padd empty content in Gecko and Safari. Commands will otherwise fail on the content
 			// It will also be impossible to place the caret in the editor unless there is a BR element present
 			if (content.length === 0 || /^\s+$/.test(content)) {
+				padd = ie && ie < 11 ? '' : '<br data-mce-bogus="1">';
+
+				// Todo: There is a lot more root elements that need special padding
+				// so separate this and add all of them at some point.
+				if (body.nodeName == 'TABLE') {
+					content = '<tr><td>' + padd + '</td></tr>';
+				} else if (/^(UL|OL)$/.test(body.nodeName)) {
+					content = '<li>' + padd + '</li>';
+				}
+
 				forcedRootBlockName = self.settings.forced_root_block;
 
 				// Check if forcedRootBlock is configured and that the block is a valid child of the body
 				if (forcedRootBlockName && self.schema.isValidChild(body.nodeName.toLowerCase(), forcedRootBlockName.toLowerCase())) {
 					// Padd with bogus BR elements on modern browsers and IE 7 and 8 since they don't render empty P tags properly
-					content = ie && ie < 11 ? '' : '<br data-mce-bogus="1">';
+					content = padd;
 					content = self.dom.createHTML(forcedRootBlockName, self.settings.forced_root_block_attrs, content);
-				} else if (!ie) {
+				} else if (!ie && !content) {
 					// We need to add a BR when forced_root_block is disabled on non IE browsers to place the caret
 					content = '<br data-mce-bogus="1">';
 				}
@@ -32214,7 +32423,9 @@ define("tinymce/Editor", [
 			} else {
 				// Parse and serialize the html
 				if (args.format !== 'raw') {
-					content = new Serializer({}, self.schema).serialize(
+					content = new Serializer({
+						validate: self.validate
+					}, self.schema).serialize(
 						self.parser.parse(content, {isRootContent: true})
 					);
 				}
@@ -33146,7 +33357,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.6',
+		minorVersion: '2.7',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -33154,7 +33365,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-09-28',
+		releaseDate: '2015-10-27',
 
 		/**
 		 * Collection of editor instances.
@@ -37558,6 +37769,23 @@ define("tinymce/ui/FormatControls", [
 
 		formatMenu = createFormatMenu();
 
+		function initOnPostRender() {
+			var self = this;
+
+			// TODO: Fix this
+			if (editor.formatter) {
+				editor.formatter.formatChanged(name, function(state) {
+					self.active(state);
+				});
+			} else {
+				editor.on('init', function() {
+					editor.formatter.formatChanged(name, function(state) {
+						self.active(state);
+					});
+				});
+			}
+		}
+
 		// Simple format controls <control/format>:<UI text>
 		each({
 			bold: 'Bold',
@@ -37570,20 +37798,7 @@ define("tinymce/ui/FormatControls", [
 			editor.addButton(name, {
 				tooltip: text,
 				onPostRender: function() {
-					var self = this;
-
-					// TODO: Fix this
-					if (editor.formatter) {
-						editor.formatter.formatChanged(name, function(state) {
-							self.active(state);
-						});
-					} else {
-						editor.on('init', function() {
-							editor.formatter.formatChanged(name, function(state) {
-								self.active(state);
-							});
-						});
-					}
+					initOnPostRender();
 				},
 				onclick: function() {
 					toggleFormat(name);
@@ -37627,20 +37842,7 @@ define("tinymce/ui/FormatControls", [
 				tooltip: item[0],
 				cmd: item[1],
 				onPostRender: function() {
-					var self = this;
-
-					// TODO: Fix this
-					if (editor.formatter) {
-						editor.formatter.formatChanged(name, function(state) {
-							self.active(state);
-						});
-					} else {
-						editor.on('init', function() {
-							editor.formatter.formatChanged(name, function(state) {
-								self.active(state);
-							});
-						});
-					}
+					initOnPostRender();
 				}
 			});
 		});
