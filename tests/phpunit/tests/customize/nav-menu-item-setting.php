@@ -438,6 +438,8 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 	 */
 	function test_sanitize() {
 		do_action( 'customize_register', $this->wp_customize );
+
+		$menu_id = wp_create_nav_menu( 'Primary' );
 		$setting = new WP_Customize_Nav_Menu_Item_Setting( $this->wp_customize, 'nav_menu_item[123]' );
 
 		$this->assertNull( $setting->sanitize( 'not an array' ) );
@@ -449,37 +451,76 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'menu_item_parent' => 'asdasd',
 			'position' => -123,
 			'type' => 'custom<b>',
-			'title' => 'Hi<script>alert(1)</script>',
+			'title' => 'Hi<script>unfilteredHtml()</script>',
 			'url' => 'javascript:alert(1)',
 			'target' => '" onclick="',
-			'attr_title' => '<b>evil</b>',
-			'description' => '<b>Hello world</b>',
+			'attr_title' => '<b>bolded</b><script>unfilteredHtml()</script>',
+			'description' => '<b>Hello world</b><script>unfilteredHtml()</script>',
 			'classes' => 'hello " inject="',
 			'xfn' => 'hello " inject="',
 			'status' => 'forbidden',
-			'original_title' => 'Hi<script>alert(1)</script>',
+			'original_title' => 'Hi<script>unfilteredHtml()</script>',
 			'nav_menu_term_id' => 'heilo',
 			'_invalid' => false,
+		);
+
+		$expected_sanitized = array(
+			'object_id' => 0,
+			'object' => 'bhellob',
+			'menu_item_parent' => 0,
+			'position' => -123,
+			'type' => 'customb',
+			'title' => current_user_can( 'unfiltered_html' ) ? 'Hi<script>unfilteredHtml()</script>' : 'HiunfilteredHtml()',
+			'url' => '',
+			'target' => 'onclick',
+			'attr_title' => current_user_can( 'unfiltered_html' ) ? '<b>bolded</b><script>unfilteredHtml()</script>' : '<b>bolded</b>unfilteredHtml()',
+			'description' => current_user_can( 'unfiltered_html' ) ? '<b>Hello world</b><script>unfilteredHtml()</script>' : '<b>Hello world</b>unfilteredHtml()',
+			'classes' => 'hello  inject',
+			'xfn' => 'hello  inject',
+			'status' => 'draft',
+			'original_title' => 'Hi',
+			'nav_menu_term_id' => 0,
 		);
 
 		$sanitized = $setting->sanitize( $unsanitized );
 		$this->assertEqualSets( array_keys( $unsanitized ), array_keys( $sanitized ) );
 
-		$this->assertEquals( 0, $sanitized['object_id'] );
-		$this->assertEquals( 'bhellob', $sanitized['object'] );
-		$this->assertEquals( 0, $sanitized['menu_item_parent'] );
-		$this->assertEquals( 0, $sanitized['position'] );
-		$this->assertEquals( 'customb', $sanitized['type'] );
-		$this->assertEquals( 'Hi', $sanitized['title'] );
-		$this->assertEquals( '', $sanitized['url'] );
-		$this->assertEquals( 'onclick', $sanitized['target'] );
-		$this->assertEquals( 'evil', $sanitized['attr_title'] );
-		$this->assertEquals( 'Hello world', $sanitized['description'] );
-		$this->assertEquals( 'hello  inject', $sanitized['classes'] );
-		$this->assertEquals( 'hello  inject', $sanitized['xfn'] );
-		$this->assertEquals( 'publish', $sanitized['status'] );
-		$this->assertEquals( 'Hi', $sanitized['original_title'] );
-		$this->assertEquals( 0, $sanitized['nav_menu_term_id'] );
+		foreach ( $expected_sanitized as $key => $value ) {
+			$this->assertEquals( $value, $sanitized[ $key ], "Expected $key to be sanitized." );
+		}
+
+		$nav_menu_item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-object-id' => $unsanitized['object_id'],
+			'menu-item-object' => $unsanitized['object'],
+			'menu-item-parent-id' => $unsanitized['menu_item_parent'],
+			'menu-item-position' => $unsanitized['position'],
+			'menu-item-type' => $unsanitized['type'],
+			'menu-item-title' => $unsanitized['title'],
+			'menu-item-url' => $unsanitized['url'],
+			'menu-item-description' => $unsanitized['description'],
+			'menu-item-attr-title' => $unsanitized['attr_title'],
+			'menu-item-target' => $unsanitized['target'],
+			'menu-item-classes' => $unsanitized['classes'],
+			'menu-item-xfn' => $unsanitized['xfn'],
+			'menu-item-status' => $unsanitized['status'],
+		) );
+
+		$post = get_post( $nav_menu_item_id );
+		$nav_menu_item = wp_setup_nav_menu_item( clone $post );
+
+		$this->assertEquals( $expected_sanitized['object_id'], $nav_menu_item->object_id );
+		$this->assertEquals( $expected_sanitized['object'], $nav_menu_item->object );
+		$this->assertEquals( $expected_sanitized['menu_item_parent'], $nav_menu_item->menu_item_parent );
+		$this->assertEquals( $expected_sanitized['position'], $post->menu_order );
+		$this->assertEquals( $expected_sanitized['type'], $nav_menu_item->type );
+		$this->assertEquals( $expected_sanitized['title'], $post->post_title );
+		$this->assertEquals( $expected_sanitized['url'], $nav_menu_item->url );
+		$this->assertEquals( $expected_sanitized['description'], $post->post_content );
+		$this->assertEquals( $expected_sanitized['attr_title'], $post->post_excerpt );
+		$this->assertEquals( $expected_sanitized['target'], $nav_menu_item->target );
+		$this->assertEquals( $expected_sanitized['classes'], implode( ' ', $nav_menu_item->classes ) );
+		$this->assertEquals( $expected_sanitized['xfn'], $nav_menu_item->xfn );
+		$this->assertEquals( $expected_sanitized['status'], $post->post_status );
 	}
 
 	/**
@@ -709,4 +750,53 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertTrue( $value_object->_invalid );
 	}
 
+	/**
+	 * Test WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item().
+	 *
+	 * @see WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item()
+	 */
+	function test_value_as_wp_post_nav_menu_item() {
+		$post_id = self::factory()->post->create();
+
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[123]'
+		);
+		$post_value = array(
+			'object_id'        => $post_id,
+			'object'           => 'post',
+			'menu_item_parent' => 0,
+			'position'         => 2,
+			'type'             => 'post_type',
+			'title'            => 'Hello World',
+			'url'              => '',
+			'target'           => '',
+			'attr_title'       => '">attempted <b>baddie</b>',
+			'description'      => 'Attempted <b>markup</b>',
+			'classes'          => '',
+			'xfn'              => '',
+			'status'           => 'publish',
+			'original_title'   => '',
+			'nav_menu_term_id' => 0,
+			'_invalid'         => false,
+		);
+		$this->wp_customize->set_post_value( $setting->id, $post_value );
+
+		$setting->preview();
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+
+		$this->assertObjectNotHasAttribute( 'nav_menu_term_id', $nav_menu_item );
+		$this->assertObjectNotHasAttribute( 'status', $nav_menu_item );
+		$this->assertEquals( 'publish', $nav_menu_item->post_status );
+		$this->assertEquals( 'nav_menu_item', $nav_menu_item->post_type );
+		$this->assertObjectNotHasAttribute( 'position', $nav_menu_item );
+		$this->assertEquals( $post_value['position'], $nav_menu_item->menu_order );
+		$this->assertEquals( $post_value['title'], $nav_menu_item->post_title );
+		$this->assertEquals( 123, $nav_menu_item->ID );
+		$this->assertEquals( 123, $nav_menu_item->db_id );
+		$this->assertEquals( wp_get_current_user()->ID, $nav_menu_item->post_author );
+		$this->assertObjectHasAttribute( 'type_label', $nav_menu_item );
+		$this->assertEquals( '&#8220;>attempted baddie', $nav_menu_item->attr_title );
+		$this->assertEquals( 'Attempted markup', $nav_menu_item->description );
+	}
 }
