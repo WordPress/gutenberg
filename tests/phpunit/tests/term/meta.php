@@ -381,6 +381,24 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 		$this->assertSame( 'ambiguous_term_id', $found->get_error_code() );
 	}
 
+	/**
+	 * @ticket 34626
+	 */
+	public function test_term_meta_should_be_deleted_when_term_is_deleted() {
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		add_term_meta( $t, 'foo', 'bar' );
+		add_term_meta( $t, 'foo1', 'bar' );
+
+		$this->assertSame( 'bar', get_term_meta( $t, 'foo', true ) );
+		$this->assertSame( 'bar', get_term_meta( $t, 'foo1', true ) );
+
+		$this->assertTrue( wp_delete_term( $t, 'wptests_tax' ) );
+
+		$this->assertSame( '', get_term_meta( $t, 'foo', true ) );
+		$this->assertSame( '', get_term_meta( $t, 'foo1', true ) );
+	}
+
 	public static function set_cache_results( $q ) {
 		$q->set( 'cache_results', true );
 	}
