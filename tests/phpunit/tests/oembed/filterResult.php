@@ -28,7 +28,7 @@ class Tests_Filter_oEmbed_Result extends WP_UnitTestCase {
 		$html   = '<div><iframe></iframe><iframe></iframe><p></p></div>';
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<iframe sandbox="allow-scripts" security="restricted"></iframe>', $actual );
+		$this->assertEquals( '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted"></iframe>', $actual );
 	}
 
 	function test_filter_oembed_result_with_newlines() {
@@ -41,7 +41,7 @@ EOD;
 
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<iframe sandbox="allow-scripts" security="restricted"></iframe>', $actual );
+		$this->assertEquals( '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted"></iframe>', $actual );
 	}
 
 	function test_filter_oembed_result_without_iframe() {
@@ -83,13 +83,23 @@ EOD;
 		$html   = '<blockquote></blockquote><iframe></iframe>';
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<blockquote></blockquote><iframe sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+		$this->assertEquals( '<blockquote class="wp-embedded-content"></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
 	}
 
 	function test_filter_oembed_result_allowed_html() {
-		$html   = '<blockquote><strong><a href="" target=""></a></strong></blockquote><iframe></iframe>';
+		$html   = '<blockquote class="foo" id="bar"><strong><a href="" target=""></a></strong></blockquote><iframe></iframe>';
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<blockquote><a href=""></a></blockquote><iframe sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+		$this->assertEquals( '<blockquote class="wp-embedded-content"><a href=""></a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+	}
+
+	/**
+	 * @group feed
+	 */
+	function test_filter_feed_content() {
+		$html   = '<blockquote></blockquote><iframe></iframe>';
+		$actual = _oembed_filter_feed_content( wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' ) );
+
+		$this->assertEquals( '<blockquote class="wp-embedded-content"></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted"></iframe>', $actual );
 	}
 }

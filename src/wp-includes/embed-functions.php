@@ -460,7 +460,7 @@ function get_post_embed_html( $width, $height, $post = null ) {
 
 	$embed_url = get_post_embed_url( $post );
 
-	$output = '<blockquote><a href="' . get_permalink( $post ) . '">' . get_the_title( $post ) . "</a></blockquote>\n";
+	$output = '<blockquote class="wp-embedded-content"><a href="' . esc_url( get_permalink( $post ) ) . '">' . get_the_title( $post ) . "</a></blockquote>\n";
 
 	$output .= "<script type='text/javascript'>\n";
 	$output .= "<!--//--><![CDATA[//><!--\n";
@@ -754,7 +754,7 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 
 	$allowed_html = array(
 		'a'          => array(
-			        'href' => true,
+			'href'         => true,
 		),
 		'blockquote' => array(),
 		'iframe'     => array(
@@ -766,7 +766,6 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 			'marginheight' => true,
 			'scrolling'    => true,
 			'title'        => true,
-			'class'        => true,
 		),
 	);
 
@@ -782,9 +781,10 @@ function wp_filter_oembed_result( $result, $data, $url ) {
 	if ( ! empty( $content[1] ) ) {
 		// We have a blockquote to fall back on. Hide the iframe by default.
 		$html = str_replace( '<iframe', '<iframe style="display:none;"', $html );
+		$html = str_replace( '<blockquote', '<blockquote class="wp-embedded-content"', $html );
 	}
 
-	$html = str_replace( '<iframe', '<iframe sandbox="allow-scripts" security="restricted"', $html );
+	$html = str_replace( '<iframe', '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted"', $html );
 
 	preg_match( '/ src=[\'"]([^\'"]*)[\'"]/', $html, $results );
 
@@ -956,5 +956,5 @@ function print_embed_scripts() {
  * @return string The filtered content.
  */
 function _oembed_filter_feed_content( $content ) {
-	return str_replace( '<iframe sandbox="allow-scripts" security="restricted" style="display:none;"', '<iframe sandbox="allow-scripts" security="restricted"', $content );
+	return str_replace( '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="display:none;"', '<iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted"', $content );
 }
