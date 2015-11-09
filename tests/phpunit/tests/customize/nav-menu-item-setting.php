@@ -796,7 +796,7 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertEquals( 123, $nav_menu_item->db_id );
 		$this->assertEquals( wp_get_current_user()->ID, $nav_menu_item->post_author );
 		$this->assertObjectHasAttribute( 'type_label', $nav_menu_item );
-		$this->assertEquals( '&#8220;>attempted baddie', $nav_menu_item->attr_title );
+		$this->assertEquals( apply_filters( 'nav_menu_attr_title', apply_filters( 'excerpt_save_pre', $post_value['attr_title'] ) ), $nav_menu_item->attr_title );
 		$this->assertEquals( 'Attempted markup', $nav_menu_item->description );
 	}
 }
