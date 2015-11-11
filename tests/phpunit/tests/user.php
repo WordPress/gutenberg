@@ -1013,4 +1013,26 @@ class Tests_User extends WP_UnitTestCase {
 		$pwd_after = get_userdata( $testuserid )->user_pass;
 		$this->assertEquals( $pwd_before, $pwd_after );
 	}
+
+ 	/**
+	 * @ticket 29880
+	 */
+	function test_wp_insert_user() {
+		$user_details = array(
+			'user_login' => rand_str(),
+			'user_pass' => 'password',
+			'user_email' => rand_str() . '@example.com',
+		);
+		$id1 = wp_insert_user( $user_details );
+		$this->assertEquals( $id1, email_exists( $user_details['user_email'] ) );
+
+		// Check that providing an empty password doesn't remove a user's password.
+		// See ticket #29880
+		$user_details['ID'] = $id1;
+		$user_details['user_pass'] = '';
+		$id1 = wp_insert_user( $user_details );
+		$user = WP_User::get_data_by( 'id', $id1 );
+		$this->assertNotEmpty( $user->user_pass );
+	}
+
 }
