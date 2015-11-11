@@ -254,4 +254,38 @@ class Tests_Mail extends WP_UnitTestCase {
 
 		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
 	}
+
+	function wp_mail_quoted_printable( $mailer ) {
+		$mailer->Encoding = 'quoted-printable';
+	}
+
+	function wp_mail_set_text_message( $mailer ) {
+		$mailer->AltBody = 'Wörld';
+	}
+
+	/**
+	 * > If an entity is of type "multipart" the Content-Transfer-Encoding is
+	 * > not permitted to have any value other than "7bit", "8bit" or
+	 * > "binary".
+	 * http://tools.ietf.org/html/rfc2045#section-6.4
+	 *
+	 * > "Content-Transfer-Encoding: 7BIT" is assumed if the
+	 * > Content-Transfer-Encoding header field is not present.
+	 * http://tools.ietf.org/html/rfc2045#section-6.1
+	 *
+	 * @ticket 28039
+	 */
+	function test_wp_mail_content_transfer_encoding_in_quoted_printable_multipart() {
+		add_action( 'phpmailer_init', array( $this, 'wp_mail_quoted_printable' ) );
+		add_action( 'phpmailer_init', array( $this, 'wp_mail_set_text_message' ) );
+
+		wp_mail(
+			'user@example.com',
+			'Hello',
+			'<p><strong>Wörld</strong></p>',
+			'Content-Type: text/html'
+		);
+
+		$this->assertNotContains( 'quoted-printable', $GLOBALS['phpmailer']->mock_sent[0]['header'] );
+	}
 }
