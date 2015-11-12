@@ -595,10 +595,11 @@ class Tests_User extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27317
+	 * @dataProvider _illegal_user_logins_data
 	 */
-	function test_illegal_user_logins_single() {
+	function test_illegal_user_logins_single( $user_login ) {
 		$user_data = array(
-			'user_login' => 'testuser',
+			'user_login' => $user_login,
 			'user_email' => 'testuser@example.com',
 			'user_pass'  => wp_generate_password(),
 		);
@@ -618,14 +619,15 @@ class Tests_User extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27317
+	 * @dataProvider _illegal_user_logins_data
 	 */
-	function test_illegal_user_logins_multisite() {
+	function test_illegal_user_logins_multisite( $user_login ) {
 		if ( ! is_multisite() ) {
 			return;
 		}
 
 		$user_data = array(
-			'user_login' => 'testuser',
+			'user_login' => $user_login,
 			'user_email' => 'testuser@example.com',
 		);
 
@@ -640,6 +642,13 @@ class Tests_User extends WP_UnitTestCase {
 		$response = wpmu_validate_user_signup( $user_data['user_login'], $user_data['user_email'] );
 		$this->assertInstanceOf( 'WP_Error', $response['errors'] );
 		$this->assertEquals( 0, count( $response['errors']->get_error_codes() ) );
+	}
+
+	function _illegal_user_logins_data() {
+		return array(
+			array( 'testuser' ),
+			array( 'TestUser' ),
+		);
 	}
 
 	function _illegal_user_logins() {
