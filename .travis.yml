@@ -25,7 +25,6 @@ matrix:
     env: WP_TRAVISCI=travis:phpunit
   allow_failures:
   - php: hhvm
-  - php: 7.0
   - php: nightly
 before_install:
 - WP_CORE_DIR=/tmp/wordpress/
