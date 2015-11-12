@@ -619,15 +619,14 @@ class Tests_User extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 27317
-	 * @dataProvider _illegal_user_logins_data
 	 */
-	function test_illegal_user_logins_multisite( $user_login ) {
+	function test_illegal_user_logins_multisite() {
 		if ( ! is_multisite() ) {
 			return;
 		}
 
 		$user_data = array(
-			'user_login' => $user_login,
+			'user_login' => 'testuser',
 			'user_email' => 'testuser@example.com',
 		);
 
