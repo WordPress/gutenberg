@@ -7,6 +7,7 @@
 	"expr": true,
 	"immed": true,
 	"noarg": true,
+	"nonbsp": true,
 	"onevar": true,
 	"quotmark": "single",
 	"trailing": true,
