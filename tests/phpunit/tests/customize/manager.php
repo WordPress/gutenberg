@@ -262,6 +262,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->manager->set_preview_url( $preview_url );
 		$this->assertEquals( $preview_url, $this->manager->get_return_url() );
 
+		$_SERVER['HTTP_REFERER'] = wp_slash( admin_url( 'customize.php' ) );
+		$this->assertEquals( $preview_url, $this->manager->get_return_url() );
+
 		$url = home_url( '/referred/' );
 		$_SERVER['HTTP_REFERER'] = wp_slash( $url );
 		$this->assertEquals( $url, $this->manager->get_return_url() );
