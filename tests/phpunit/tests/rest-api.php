@@ -149,6 +149,34 @@ class Tests_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that we reject routes without namespaces
+	 *
+	 * @expectedIncorrectUsage register_rest_route
+	 */
+	public function test_route_reject_empty_namespace() {
+		register_rest_route( '', '/test-empty-namespace', array(
+			'methods'      => array( 'POST' ),
+			'callback'     => '__return_null',
+		), true );
+		$endpoints = $GLOBALS['wp_rest_server']->get_routes();
+		$this->assertFalse( isset( $endpoints['/test-empty-namespace'] ) );
+	}
+
+	/**
+	 * Test that we reject empty routes
+	 *
+	 * @expectedIncorrectUsage register_rest_route
+	 */
+	public function test_route_reject_empty_route() {
+		register_rest_route( '/test-empty-route', '', array(
+			'methods'      => array( 'POST' ),
+			'callback'     => '__return_null',
+		), true );
+		$endpoints = $GLOBALS['wp_rest_server']->get_routes();
+		$this->assertFalse( isset( $endpoints['/test-empty-route'] ) );
+	}
+
+	/**
 	 * The rest_route query variable should be registered.
 	 */
 	function test_rest_route_query_var() {
