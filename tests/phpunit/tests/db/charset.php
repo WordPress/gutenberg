@@ -865,4 +865,26 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 
 		$this->assertEquals( $safe_query, $stripped_query );
 	}
+
+	/**
+	 * @ticket 34708
+	 */
+	function test_no_db_charset_defined() {
+		$tablename = 'test_cp1251_query_' . rand_str( 5 );
+		if ( ! self::$_wpdb->query( "CREATE TABLE $tablename ( a VARCHAR(50) ) DEFAULT CHARSET 'cp1251'" ) ) {
+			$this->markTestSkipped( "Test requires the 'cp1251' charset" );
+		}
+
+		$charset = self::$_wpdb->charset;
+		self::$_wpdb->charset = '';
+
+		$safe_query = "INSERT INTO $tablename( `a` ) VALUES( 'safe data' )";
+		$stripped_query = self::$_wpdb->strip_invalid_text_from_query( $safe_query );
+
+		self::$_wpdb->query( "DROP TABLE $tablename" );
+
+		self::$_wpdb->charset = $charset;
+
+		$this->assertEquals( $safe_query, $stripped_query );
+	}
 }
