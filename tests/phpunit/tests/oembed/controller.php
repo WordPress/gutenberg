@@ -94,7 +94,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 'rest_no_route', $data[0]['code'] );
+		$this->assertEquals( 'rest_no_route', $data['code'] );
 	}
 
 	function test_request_without_url_param() {
@@ -103,8 +103,8 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 'rest_missing_callback_param', $data[0]['code'] );
-		$this->assertEquals( 'url', $data[0]['data']['params'][0] );
+		$this->assertEquals( 'rest_missing_callback_param', $data['code'] );
+		$this->assertEquals( 'url', $data['data']['params'][0] );
 	}
 
 	function test_request_with_bad_url() {
@@ -114,7 +114,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$response = $this->server->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 'oembed_invalid_url', $data[0]['code'] );
+		$this->assertEquals( 'oembed_invalid_url', $data['code'] );
 	}
 
 	function test_request_invalid_format() {

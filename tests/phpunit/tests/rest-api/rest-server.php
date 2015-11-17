@@ -246,10 +246,9 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 500, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertCount( 1, $data );
 
-		$this->assertEquals( $code,    $data[0]['code'] );
-		$this->assertEquals( $message, $data[0]['message'] );
+		$this->assertEquals( $code,    $data['code'] );
+		$this->assertEquals( $message, $data['message'] );
 	}
 
 	public function test_error_to_response_with_status() {
@@ -263,18 +262,15 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 400, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertCount( 1, $data );
 
-		$this->assertEquals( $code,    $data[0]['code'] );
-		$this->assertEquals( $message, $data[0]['message'] );
+		$this->assertEquals( $code,    $data['code'] );
+		$this->assertEquals( $message, $data['message'] );
 	}
 
 	public function test_rest_error() {
 		$data = array(
-			array(
-				'code'    => 'wp-api-test-error',
-				'message' => 'Message text',
-			),
+			'code'    => 'wp-api-test-error',
+			'message' => 'Message text',
 		);
 		$expected = wp_json_encode( $data );
 		$response = $this->server->json_error( 'wp-api-test-error', 'Message text' );
@@ -292,10 +288,8 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		     ->with( $this->equalTo( 400 ) );
 
 		$data = array(
-			array(
-				'code'    => 'wp-api-test-error',
-				'message' => 'Message text',
-			),
+			'code'    => 'wp-api-test-error',
+			'message' => 'Message text',
 		);
 		$expected = wp_json_encode( $data );
 
@@ -417,9 +411,9 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertCount( 1, $up );
 
 		$up_data = $up[0];
-		$this->assertEquals( 'wp-api-test-error', $up_data[0]['code'] );
-		$this->assertEquals( 'Test message',      $up_data[0]['message'] );
-		$this->assertEquals( 403, $up_data[0]['data']['status'] );
+		$this->assertEquals( 'wp-api-test-error', $up_data['code'] );
+		$this->assertEquals( 'Test message',      $up_data['message'] );
+		$this->assertEquals( 403, $up_data['data']['status'] );
 	}
 
 	/**
