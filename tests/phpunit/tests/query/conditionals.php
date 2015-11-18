@@ -760,6 +760,32 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertFalse( $q->is_single( $p2 ) );
 	}
 
+	/**
+	 * @ticket 24612
+	 */
+	public function test_is_single_with_slug_that_clashes_with_attachment() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$attachment_id = $this->factory->post->create( array(
+			'post_type'  => 'attachment',
+		) );
+
+		$post_id = $this->factory->post->create( array(
+			'post_title' => get_post( $attachment_id )->post_title
+		) );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( $q->is_single() );
+		$this->assertTrue( $q->is_single( $post_id ) );
+		$this->assertFalse( $q->is_attachment() );
+		$this->assertFalse( $q->is_404() );
+
+		$this->set_permalink_structure();
+	}
+
 	function test_is_page() {
 		$post_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$this->go_to( "/?page_id=$post_id" );
