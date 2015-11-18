@@ -961,11 +961,13 @@ EOF;
 		$img_no_width_height = str_replace( ' width="' . $size_array[0] . '"', '', $img );
 		$img_no_width_height = str_replace( ' height="' . $size_array[1] . '"', '', $img_no_width_height );
 		$img_no_size_id = str_replace( 'wp-image-', 'id-', $img );
+		$img_with_sizes_attr = str_replace( '<img ', '<img sizes="99vw" ', $img );
 
 		// Manually add srcset and sizes to the markup from get_image_tag();
 		$respimg = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img );
 		$respimg_no_size_in_class = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_size_in_class );
 		$respimg_no_width_height = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_width_height );
+		$respimg_with_sizes_attr = preg_replace('|<img ([^>]+) />|', '<img $1 ' . $srcset . ' />', $img_with_sizes_attr );
 
 		$content = '
 			<p>Image, standard. Should have srcset and sizes.</p>
@@ -978,10 +980,13 @@ EOF;
 			%3$s
 
 			<p>Image, no attachment ID class. Should NOT have srcset and sizes.</p>
-			%4$s';
+			%4$s
 
-		$content_unfiltered = sprintf( $content, $img, $img_no_size_in_class, $img_no_width_height, $img_no_size_id );
-		$content_filtered = sprintf( $content, $respimg, $respimg_no_size_in_class, $respimg_no_width_height, $img_no_size_id );
+			<p>Image, with sizes attribute. Should NOT have two sizes attributes.</p>
+			%5$s';
+
+		$content_unfiltered = sprintf( $content, $img, $img_no_size_in_class, $img_no_width_height, $img_no_size_id, $img_with_sizes_attr );
+		$content_filtered = sprintf( $content, $respimg, $respimg_no_size_in_class, $respimg_no_width_height, $img_no_size_id, $respimg_with_sizes_attr );
 
 		$this->assertSame( $content_filtered, wp_make_content_images_responsive( $content_unfiltered ) );
 	}
