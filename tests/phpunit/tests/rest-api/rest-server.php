@@ -282,6 +282,27 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( $message, $data['message'] );
 	}
 
+	public function test_error_to_response_to_error() {
+		$code     = 'wp-api-test-error';
+		$message  = 'Test error message for the API';
+		$code2    = 'wp-api-test-error-2';
+		$message2 = 'Another test message';
+		$error   = new WP_Error( $code, $message, array( 'status' => 400 ) );
+		$error->add( $code2, $message2, array( 'status' => 403 ) );
+
+		$response = $this->server->error_to_response( $error );
+		$this->assertInstanceOf( 'WP_REST_Response', $response );
+
+		$this->assertEquals( 400, $response->get_status() );
+
+		$error = $response->as_error();
+		$this->assertInstanceOf( 'WP_Error', $error );
+		$this->assertEquals( $code, $error->get_error_code() );
+		$this->assertEquals( $message, $error->get_error_message() );
+		$this->assertEquals( $message2, $error->errors[ $code2 ][0] );
+		$this->assertEquals( array( 'status' => 403 ), $error->error_data[ $code2 ] );
+	}
+
 	public function test_rest_error() {
 		$data = array(
 			'code'    => 'wp-api-test-error',
