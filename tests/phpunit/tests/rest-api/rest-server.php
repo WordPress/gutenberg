@@ -106,6 +106,21 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'foo', (array) $request );
 	}
 
+	public function test_no_zero_param() {
+		register_rest_route( 'no-zero', '/test', array(
+			'methods'  => array( 'GET' ),
+			'callback' => '__return_null',
+			'args'     => array(
+				'foo'  => array(
+					'default'    => 'bar',
+				),
+			),
+		) );
+		$request = new WP_REST_Request( 'GET', '/no-zero/test' );
+		$this->server->dispatch( $request );
+		$this->assertEquals( array( 'foo' => 'bar' ), $request->get_params() );
+	}
+
 	/**
 	 * Pass a capability which the user does not have, this should
 	 * result in a 403 error.
