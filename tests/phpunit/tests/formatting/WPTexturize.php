@@ -1267,12 +1267,12 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 				'[caption &#8211; is it wise to <a title="allow user content ] here? hmm"> maybe </a> ]',
 			),
 			array(
-				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a> ]',
-				'[ photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a> ]',
+				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy & that guy </a> ]',
+				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy &#038; that guy </a> ]',
 			),
 			array(
-				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy </a>]',
-				'[photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy </a>]',
+				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy & that guy </a>]',
+				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy &#038; that guy </a>]',
 			),
 			array(
 				'[gallery ...]',
