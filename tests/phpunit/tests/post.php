@@ -27,6 +27,7 @@ class Tests_Post extends WP_UnitTestCase {
 		foreach ( $ids as $id ) {
 			self::delete_user( $id );
 		}
+		remove_role( 'grammarian' );
 	}
 
 	function setUp() {
