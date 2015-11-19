@@ -435,8 +435,21 @@ module.exports = function(grunt) {
 					'!wp-includes/js/masonry.min.js',
 					'!wp-includes/js/swfobject.js',
 					'!wp-includes/js/underscore.*',
-					'!wp-includes/js/zxcvbn.min.js'
+					'!wp-includes/js/zxcvbn.min.js',
+					'!wp-includes/js/wp-embed.js' // We have extra options for this, see uglify:embed
 				]
+			},
+			embed: {
+				options: {
+					compress: {
+						conditionals: false
+					}
+				},
+				expand: true,
+				cwd: SOURCE_DIR,
+				dest: BUILD_DIR,
+				ext: '.min.js',
+				src: ['wp-includes/js/wp-embed.js']
 			},
 			media: {
 				expand: true,
@@ -647,6 +660,7 @@ module.exports = function(grunt) {
 		'cssmin:rtl',
 		'cssmin:colors',
 		'uglify:core',
+		'uglify:embed',
 		'uglify:jqueryui',
 		'concat:tinymce',
 		'compress:tinymce',
