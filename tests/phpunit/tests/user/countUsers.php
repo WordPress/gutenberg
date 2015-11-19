@@ -140,6 +140,41 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 34495
+	 *
+	 * @dataProvider data_count_users_strategies
+	 */
+	public function test_count_users_is_accurate_with_multiple_roles( $strategy ) {
+
+		// Setup users
+		$admin = self::factory()->user->create( array(
+			'role' => 'administrator',
+		) );
+		$editor = self::factory()->user->create( array(
+			'role' => 'editor',
+		) );
+
+		get_userdata( $editor )->add_role( 'author' );
+
+		$this->assertEquals( array(
+			'editor',
+			'author'
+		), get_userdata( $editor )->roles );
+
+		// Test user counts
+		$count = count_users( $strategy );
+
+		$this->assertEquals( 3, $count['total_users'] );
+		$this->assertEquals( array(
+			'administrator' => 2,
+			'editor'        => 1,
+			'author'        => 1,
+			'none'          => 0,
+		), $count['avail_roles'] );
+
+	}
+
 	function data_count_users_strategies() {
 		return array(
 			array(
