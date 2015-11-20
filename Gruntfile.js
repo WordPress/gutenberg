@@ -555,7 +555,7 @@ module.exports = function(grunt) {
 				dest: '.'
 			},
 			embed: {
-				src: BUILD_DIR + 'wp-includes/embed-functions.php',
+				src: BUILD_DIR + 'wp-includes/embed.php',
 				dest: '.'
 			}
 		},
