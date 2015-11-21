@@ -291,4 +291,57 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		$this->assertFalse( $this->manager->widgets->is_panel_active() );
 		$this->assertFalse( $this->manager->get_panel( 'widgets' )->active() );
 	}
+
+	/**
+	 * @ticket 34738
+	 * @see WP_Customize_Widgets::call_widget_update()
+	 */
+	function test_call_widget_update() {
+
+		$widget_number = 2;
+		$widget_id = "search-{$widget_number}";
+		$setting_id = "widget_search[{$widget_number}]";
+		$instance = array(
+			'title' => 'Buscar',
+		);
+
+		$_POST = wp_slash( array(
+			'action' => 'update-widget',
+			'wp_customize' => 'on',
+			'nonce' => wp_create_nonce( 'update-widget' ),
+			'theme' => $this->manager->get_stylesheet(),
+			'customized' => '{}',
+			'widget-search' => array(
+				2 => $instance,
+			),
+			'widget-id' => $widget_id,
+			'id_base' => 'search',
+			'widget-width' => '250',
+			'widget-height' => '200',
+			'widget_number' => strval( $widget_number ),
+			'multi_number' => '',
+			'add_new' => '',
+		) );
+
+		$this->do_customize_boot_actions();
+
+		$this->assertArrayNotHasKey( $setting_id, $this->manager->unsanitized_post_values() );
+		$result = $this->manager->widgets->call_widget_update( $widget_id );
+
+		$this->assertInternalType( 'array', $result );
+		$this->assertArrayHasKey( 'instance', $result );
+		$this->assertArrayHasKey( 'form', $result );
+		$this->assertEquals( $instance, $result['instance'] );
+		$this->assertContains( sprintf( 'value="%s"', esc_attr( $instance['title'] ) ), $result['form'] );
+
+		$post_values = $this->manager->unsanitized_post_values();
+		$this->assertArrayHasKey( $setting_id, $post_values );
+		$post_value = $post_values[ $setting_id ];
+		$this->assertInternalType( 'array', $post_value );
+		$this->assertArrayHasKey( 'title', $post_value );
+		$this->assertArrayHasKey( 'encoded_serialized_instance', $post_value );
+		$this->assertArrayHasKey( 'instance_hash_key', $post_value );
+		$this->assertArrayHasKey( 'is_widget_customizer_js_value', $post_value );
+		$this->assertEquals( $post_value, $this->manager->widgets->sanitize_widget_js_instance( $instance ) );
+	}
 }
