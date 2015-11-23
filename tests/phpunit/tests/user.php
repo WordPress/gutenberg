@@ -531,6 +531,20 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 28435
+	 */
+	function test_wp_update_user_should_not_change_password_when_passed_WP_User_instance() {
+		$testuserid = 1;
+		$user = get_userdata( $testuserid );
+		$pwd_before = $user->user_pass;
+		wp_update_user( $user );
+
+		// Reload the data
+		$pwd_after = get_userdata( $testuserid )->user_pass;
+		$this->assertEquals( $pwd_before, $pwd_after );
+	}
+
+	/**
 	 * @ticket 28315
 	 */
 	function test_user_meta_error() {
@@ -685,6 +699,28 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	public function test_validate_username_invalid() {
 		$this->assertFalse( validate_username( '@#&99sd' ) );
+	}
+
+ 	/**
+	 * @ticket 29880
+	 */
+	public function test_wp_insert_user_should_not_wipe_existing_password() {
+		$user_details = array(
+			'user_login' => rand_str(),
+			'user_pass' => 'password',
+			'user_email' => rand_str() . '@example.com',
+		);
+
+		$user_id = wp_insert_user( $user_details );
+		$this->assertEquals( $user_id, email_exists( $user_details['user_email'] ) );
+
+		// Check that providing an empty password doesn't remove a user's password.
+		$user_details['ID'] = $user_id;
+		$user_details['user_pass'] = '';
+
+		$user_id = wp_insert_user( $user_details );
+		$user = WP_User::get_data_by( 'id', $user_id );
+		$this->assertNotEmpty( $user->user_pass );
 	}
 
 	/**
@@ -1006,41 +1042,6 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_wp_new_user_notification_old_signature_throws_deprecated_warning() {
 		wp_new_user_notification( self::$author_id, 'this_is_deprecated' );
-	}
-
-	/**
-	 * @ticket 28435
-	 */
-	function test_wp_update_user_no_change_pwd() {
-		$testuserid = 1;
-		$user = get_userdata( $testuserid );
-		$pwd_before = $user->user_pass;
-		wp_update_user( $user );
-
-		// Reload the data
-		$pwd_after = get_userdata( $testuserid )->user_pass;
-		$this->assertEquals( $pwd_before, $pwd_after );
-	}
-
- 	/**
-	 * @ticket 29880
-	 */
-	function test_wp_insert_user() {
-		$user_details = array(
-			'user_login' => rand_str(),
-			'user_pass' => 'password',
-			'user_email' => rand_str() . '@example.com',
-		);
-		$id1 = wp_insert_user( $user_details );
-		$this->assertEquals( $id1, email_exists( $user_details['user_email'] ) );
-
-		// Check that providing an empty password doesn't remove a user's password.
-		// See ticket #29880
-		$user_details['ID'] = $id1;
-		$user_details['user_pass'] = '';
-		$id1 = wp_insert_user( $user_details );
-		$user = WP_User::get_data_by( 'id', $id1 );
-		$this->assertNotEmpty( $user->user_pass );
 	}
 
 }
