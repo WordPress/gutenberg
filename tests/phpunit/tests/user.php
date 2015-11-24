@@ -1040,8 +1040,48 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 33654
 	 * @expectedDeprecated wp_new_user_notification
 	 */
-	function test_wp_new_user_notification_old_signature_throws_deprecated_warning() {
-		wp_new_user_notification( self::$author_id, 'this_is_deprecated' );
+	function test_wp_new_user_notification_old_signature_throws_deprecated_warning_but_sends() {
+		unset( $GLOBALS['phpmailer']->mock_sent );
+
+		$was_admin_email_sent = false;
+		$was_user_email_sent = false;
+		wp_new_user_notification( self::$contrib_id, 'this_is_a_test_password' );
+
+		/*
+		 * Check to see if a notification email was sent to the
+		 * post author `blackburn@battlefield3.com` and and site admin `admin@example.org`.
+		 */
+		if ( ! empty( $GLOBALS['phpmailer']->mock_sent ) ) {
+			$was_admin_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[0] ) && WP_TESTS_EMAIL == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] );
+			$was_user_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[1] ) && 'blackburn@battlefield3.com' == $GLOBALS['phpmailer']->mock_sent[1]['to'][0][0] );
+		}
+
+		$this->assertTrue( $was_admin_email_sent );
+		$this->assertTrue( $was_user_email_sent );
 	}
 
+	/**
+	 * Set up a user and try sending a notification using `wp_new_user_notification( $user );`.
+	 *
+	 * @ticket 34377
+	 */
+	function test_wp_new_user_notification_old_signature_no_password() {
+		unset( $GLOBALS['phpmailer']->mock_sent );
+
+		$was_admin_email_sent = false;
+		$was_user_email_sent = false;
+		wp_new_user_notification( self::$contrib_id );
+
+		/*
+		 * Check to see if a notification email was sent to the
+		 * post author `blackburn@battlefield3.com` and and site admin `admin@example.org`.
+		 */
+		if ( ! empty( $GLOBALS['phpmailer']->mock_sent ) ) {
+			$was_admin_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[0] ) && WP_TESTS_EMAIL == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] );
+			$was_user_email_sent = ( isset( $GLOBALS['phpmailer']->mock_sent[1] ) && 'blackburn@battlefield3.com' == $GLOBALS['phpmailer']->mock_sent[1]['to'][0][0] );
+		}
+
+		$this->assertTrue( $was_admin_email_sent );
+		$this->assertFalse( $was_user_email_sent );
+	}
 }
