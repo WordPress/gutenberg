@@ -80,7 +80,7 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 	 * @ticket 33711
 	 */
 	function test_get_response_cookies() {
-		$url = 'https://wordpress.org/wp-login.php';
+		$url = 'https://login.wordpress.org/wp-login.php';
 
 		$response = wp_remote_head( $url );
 		$cookies  = wp_remote_retrieve_cookies( $response );
