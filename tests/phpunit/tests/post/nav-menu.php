@@ -15,6 +15,28 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->menu_id = wp_create_nav_menu( rand_str() );
 	}
 
+	/**
+	 * @ticket 32464
+	 */
+	public function test_wp_nav_menu_empty_container() {
+		$tag_id = self::factory()->tag->create();
+
+		wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'post_tag',
+			'menu-item-object-id' => $tag_id,
+			'menu-item-status' => 'publish'
+		) );
+
+		$menu = wp_nav_menu( array(
+			'echo' => false,
+			'container' => '',
+			'menu' => $this->menu_id
+		) );
+
+		$this->assertEquals( 0, strpos( $menu, '<ul' ) );
+	}
+
 	function test_wp_get_associated_nav_menu_items() {
 		$tag_id = self::factory()->tag->create();
 		$cat_id = self::factory()->category->create();
