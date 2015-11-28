@@ -230,7 +230,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 	public function test_submitting_comment_anonymously_to_private_post_returns_error() {
 
-		$error = 'not_logged_in';
+		$error = 'comment_id_not_found';
 
 		$post = self::factory()->post->create_and_get( array(
 			'post_status' => 'private',
@@ -241,6 +241,63 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$comment = wp_handle_comment_submission( $data );
 
 		$this->assertFalse( is_user_logged_in() );
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+
+	}
+
+	public function test_submitting_comment_as_logged_in_user_to_inaccessible_private_post_returns_error() {
+
+		$error  = 'comment_id_not_found';
+
+		$author = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+		$user   = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( $user->ID );
+
+		$post = self::factory()->post->create_and_get( array(
+			'post_status' => 'private',
+			'post_author' => $author->ID,
+		) );
+		$data = array(
+			'comment_post_ID' => $post->ID,
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertFalse( current_user_can( 'read_post', $post->ID ) );
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+
+	}
+
+	public function test_submitting_comment_to_private_post_with_closed_comments_returns_correct_error() {
+
+		$error  = 'comment_id_not_found';
+
+		$author = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+		$user   = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( $user->ID );
+
+		$post = self::factory()->post->create_and_get( array(
+			'post_status'    => 'private',
+			'post_author'    => $author->ID,
+			'comment_status' => 'closed',
+		) );
+		$data = array(
+			'comment_post_ID' => $post->ID,
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertFalse( current_user_can( 'read_post', $post->ID ) );
 		$this->assertWPError( $comment );
 		$this->assertSame( $error, $comment->get_error_code() );
 
