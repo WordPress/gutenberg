@@ -981,6 +981,40 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertTrue( current_user_can( 'edit_user', $user->ID ) );
 	}
 
+	/**
+	 * @ticket 33694
+	 */
+	function test_contributor_cannot_edit_scheduled_post() {
+
+		// Add a contributor
+		$contributor = $this->factory->user->create_and_get( array(
+			'role' => 'contributor',
+		) );
+
+		// Give them a scheduled post
+		$post = $this->factory->post->create_and_get( array(
+			'post_author' => $contributor->ID,
+			'post_status' => 'future',
+		) );
+
+		// Ensure contributor can't edit or trash the post
+		$this->assertFalse( user_can( $contributor->ID, 'edit_post', $post->ID ) );
+		$this->assertFalse( user_can( $contributor->ID, 'delete_post', $post->ID ) );
+
+		// Test the tests
+		$this->assertTrue( defined( 'EMPTY_TRASH_DAYS' ) );
+		$this->assertNotEmpty( EMPTY_TRASH_DAYS );
+
+		// Trash it
+		$trashed = wp_trash_post( $post->ID );
+		$this->assertNotEmpty( $trashed );
+
+		// Ensure contributor can't edit, un-trash, or delete the post
+		$this->assertFalse( user_can( $contributor->ID, 'edit_post', $post->ID ) );
+		$this->assertFalse( user_can( $contributor->ID, 'delete_post', $post->ID ) );
+
+	}
+
 	function test_multisite_administrator_with_manage_network_users_can_edit_users() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Test only runs in multisite' );
