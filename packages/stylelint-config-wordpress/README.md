@@ -1,5 +1,5 @@
 # stylelint-config-wordpress
-[![NPM version](http://img.shields.io/npm/v/stylelint-config-wordpress.svg)](https://www.npmjs.org/package/stylelint-config-wordpress) [![Travis Build Status](https://img.shields.io/travis/stylelint/stylelint-config-wordpress/master.svg?label=unix%20build)](https://travis-ci.org/stylelint/stylelint-config-wordpress) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jeddy3/stylelint-config-wordpress/master.svg?label=windows%20build)](https://ci.appveyor.com/project/jeddy3/stylelint-config-wordpress)
+[![NPM version](http://img.shields.io/npm/v/stylelint-config-wordpress.svg)](https://www.npmjs.org/package/stylelint-config-wordpress) [![Travis Build Status](https://img.shields.io/travis/stylelint/stylelint-config-wordpress/master.svg?label=unix%20build)](https://travis-ci.org/stylelint/stylelint-config-wordpress) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/stylelint/stylelint-config-wordpress/master.svg?label=windows%20build)](https://ci.appveyor.com/project/stylelint/stylelint-config-wordpress)
 
 > WordPress shareable config for stylelint.
 
