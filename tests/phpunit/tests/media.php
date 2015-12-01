@@ -1019,12 +1019,16 @@ EOF;
 		$img_no_width_height = str_replace( ' height="' . $size_array[1] . '"', '', $img_no_width_height );
 		$img_no_size_id = str_replace( 'wp-image-', 'id-', $img );
 		$img_with_sizes_attr = str_replace( '<img ', '<img sizes="99vw" ', $img );
+		$img_xhtml = str_replace( ' />', '/>', $img );
+		$img_html5 = str_replace( ' />', '>', $img );
 
 		// Manually add srcset and sizes to the markup from get_image_tag();
 		$respimg = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img );
 		$respimg_no_size_in_class = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_size_in_class );
 		$respimg_no_width_height = preg_replace( '|<img ([^>]+) />|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_no_width_height );
 		$respimg_with_sizes_attr = preg_replace('|<img ([^>]+) />|', '<img $1 ' . $srcset . ' />', $img_with_sizes_attr );
+		$respimg_xhtml = preg_replace( '|<img ([^>]+)/>|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_xhtml );
+		$respimg_html5 = preg_replace( '|<img ([^>]+)>|', '<img $1 ' . $srcset . ' ' . $sizes . ' />', $img_html5 );
 
 		$content = '
 			<p>Image, standard. Should have srcset and sizes.</p>
@@ -1040,10 +1044,16 @@ EOF;
 			%4$s
 
 			<p>Image, with sizes attribute. Should NOT have two sizes attributes.</p>
-			%5$s';
+			%5$s
 
-		$content_unfiltered = sprintf( $content, $img, $img_no_size_in_class, $img_no_width_height, $img_no_size_id, $img_with_sizes_attr );
-		$content_filtered = sprintf( $content, $respimg, $respimg_no_size_in_class, $respimg_no_width_height, $img_no_size_id, $respimg_with_sizes_attr );
+			<p>Image, XHTML 1.0 style (no space before the closing slash). Should have srcset and sizes.</p>
+			%6$s
+
+			<p>Image, HTML 5.0 style. Should have srcset and sizes.</p>
+			%7$s';
+
+		$content_unfiltered = sprintf( $content, $img, $img_no_size_in_class, $img_no_width_height, $img_no_size_id, $img_with_sizes_attr, $img_xhtml, $img_html5 );
+		$content_filtered = sprintf( $content, $respimg, $respimg_no_size_in_class, $respimg_no_width_height, $img_no_size_id, $respimg_with_sizes_attr, $respimg_xhtml, $respimg_html5 );
 
 		$this->assertSame( $content_filtered, wp_make_content_images_responsive( $content_unfiltered ) );
 	}
