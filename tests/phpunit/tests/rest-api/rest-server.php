@@ -121,6 +121,16 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( array( 'foo' => 'bar' ), $request->get_params() );
 	}
 
+	public function test_head_request_handled_by_get() {
+		register_rest_route( 'head-request', '/test', array(
+			'methods'  => array( 'GET' ),
+			'callback' => '__return_true',
+		) );
+		$request = new WP_REST_Request( 'HEAD', '/head-request/test' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
 	/**
 	 * Pass a capability which the user does not have, this should
 	 * result in a 403 error.
