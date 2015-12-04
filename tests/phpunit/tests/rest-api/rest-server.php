@@ -619,4 +619,30 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertContains( 'test/example', $namespaces );
 		$this->assertContains( 'test/another', $namespaces );
 	}
+
+	public function test_nocache_headers_on_authenticated_requests() {
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$request = new WP_REST_Request( 'GET', '/', array() );
+		wp_set_current_user( $editor );
+
+		$result = $this->server->serve_request('/');
+		$headers = $this->server->sent_headers;
+
+		foreach ( wp_get_nocache_headers() as $header => $value ) {
+			$this->assertTrue( isset( $headers[ $header ] ), sprintf( 'Header %s is not present in the response.', $header ) );
+			$this->assertEquals( $value, $headers[ $header ] );
+		}
+	}
+
+	public function test_no_nocache_headers_on_unauthenticated_requests() {
+		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$request = new WP_REST_Request( 'GET', '/', array() );
+
+		$result = $this->server->serve_request('/');
+		$headers = $this->server->sent_headers;
+
+		foreach ( wp_get_nocache_headers() as $header => $value ) {
+			$this->assertFalse( isset( $headers[ $header ] ) && $headers[ $header ] === $value, sprintf( 'Header %s is set to nocache.', $header ) );
+		}
+	}
 }
