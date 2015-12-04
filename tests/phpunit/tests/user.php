@@ -622,12 +622,32 @@ class Tests_User extends WP_UnitTestCase {
 
 		$response = wp_insert_user( $user_data );
 		$this->assertInstanceOf( 'WP_Error', $response );
-		$this->assertEquals( 'illegal_user_login', $response->get_error_code() );
+		$this->assertEquals( 'invalid_username', $response->get_error_code() );
 
 		remove_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
 
 		$user_id = wp_insert_user( $user_data );
 		$user = get_user_by( 'id', $user_id );
+		$this->assertInstanceOf( 'WP_User', $user );
+	}
+
+	/**
+	 * @ticket 27317
+	 * @dataProvider _illegal_user_logins_data
+	 */
+	function test_illegal_user_logins_single_wp_create_user( $user_login ) {
+		$user_email = 'testuser-' . $user_login . '@example.com';
+
+		add_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$response = register_new_user( $user_login, $user_email );
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'invalid_username', $response->get_error_code() );
+
+		remove_filter( 'illegal_user_logins', array( $this, '_illegal_user_logins' ) );
+
+		$response = register_new_user( $user_login, $user_email );
+		$user = get_user_by( 'id', $response );
 		$this->assertInstanceOf( 'WP_User', $user );
 	}
 
@@ -658,10 +678,15 @@ class Tests_User extends WP_UnitTestCase {
 	}
 
 	function _illegal_user_logins_data() {
-		return array(
-			array( 'testuser' ),
-			array( 'TestUser' ),
+		$data = array(
+			array( 'testuser' )
 		);
+
+		// Multisite doesn't allow mixed case logins ever
+		if ( ! is_multisite() ) {
+			$data[] = array( 'TestUser' );
+		}
+		return $data;
 	}
 
 	function _illegal_user_logins() {
