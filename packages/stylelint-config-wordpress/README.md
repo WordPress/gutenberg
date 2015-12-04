@@ -13,24 +13,29 @@ $ npm install stylelint-config-wordpress
 
 ## Usage
 
-Require the config and use it for stylelint's option. For example, using the JS API approach:
+Set your stylelint config to:
 
-```js
-var fs = require("fs")
-var postcss = require("postcss")
-var reporter = require("postcss-reporter")
-var stylelint = require("stylelint")
-var configWordPress = require("stylelint-config-wordpress")
+```json
+{
+  "extends": "stylelint-config-wordpress"
+}
+```
 
-// css to be processed
-var css = fs.readFileSync("input.css", "utf8")
+### Extending the config
 
-postcss([
-  stylelint(configWordPress), // use stylelint-config-wordpress
-  reporter(),
- ])
-.process(css, { from: "input.css" })
-.then()
+Simply add a `"rules"` key to your config and add your overrides there.
+
+For example, to change the `indentation` to four spaces and turn off the `number-leading-zero` rule:
+
+
+```json
+{
+  "extends": "stylelint-config-wordpress",
+  "rules": {
+    "indentation": [2, 4],
+    "number-leading-zero": 0
+  }
+}
 ```
 
 ## [Changelog](CHANGELOG.md)
