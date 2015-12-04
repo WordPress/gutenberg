@@ -19,17 +19,27 @@
     "index.js"
   ],
   "devDependencies": {
-    "babel": "^5.8.20",
-    "babel-tape-runner": "^1.2.0",
-    "eslint": "^1.0.0",
+    "babel": "^6.1.18",
+    "babel-preset-es2015": "^6.1.18",
+    "babel-tape-runner": "^1.3.0",
+    "eslint": "^1.10.3",
     "eslint-config-stylelint": "^0.1.0",
-    "postcss": "^5.0.4",
-    "stylelint": "^1.2.1",
-    "tape": "^4.0.2"
+    "stylelint": "^2.3.5",
+    "tape": "^4.2.2"
   },
   "scripts": {
     "lint": "eslint . --ignore-path .gitignore",
     "tape": "babel-tape-runner \"__tests__/**/*.js\"",
     "test": "npm run lint && npm run tape"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "stylelint"
+    ]
   }
 }
