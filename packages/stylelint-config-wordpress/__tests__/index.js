@@ -1,5 +1,4 @@
 import config from "../"
-import postcss from "postcss"
 import stylelint from "stylelint"
 import test from "tape"
 
@@ -19,19 +18,22 @@ const css = (
 
 `)
 
-postcss()
-  .use(stylelint(config))
-  .process(css)
-  .then(checkResult)
-  .catch(e => console.log(e.stack))
+stylelint.lint({
+  code: css,
+  config: config,
+})
+.then(checkResult)
+.catch(function (err) {
+  console.error(err.stack)
+})
 
-function checkResult(result) {
-  const { messages } = result
+function checkResult(data) {
+  const { errored, results } = data
+  const { warnings } = results[0]
   test("expected warnings", t => {
-    t.equal(messages.length, 1, "flags one warning")
-    t.ok(messages.every(m => m.type === "warning"), "message of type warning")
-    t.ok(messages.every(m => m.plugin === "stylelint"), "message of plugin stylelint")
-    t.equal(messages[0].text, "Expected a leading zero (number-leading-zero)", "correct warning text")
+    t.ok(errored, "errored")
+    t.equal(warnings.length, 1, "flags one warning")
+    t.equal(warnings[0].text, "Expected a leading zero (number-leading-zero)", "correct warning text")
     t.end()
   })
 }
