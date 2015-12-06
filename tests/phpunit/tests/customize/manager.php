@@ -492,4 +492,113 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$sorted_control_ids = wp_list_pluck( $manager->get_section( $section_id )->controls, 'id' );
 		$this->assertEquals( $added_control_ids, $sorted_control_ids );
 	}
+
+	/**
+	 * @ticket 34596
+	 */
+	function test_add_section_return_instance() {
+		$manager = new WP_Customize_Manager();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$section_id = 'foo-section';
+		$result_section = $manager->add_section( $section_id, array(
+			'title'    => 'Section',
+			'priority' => 1,
+		) );
+
+		$this->assertInstanceOf( 'WP_Customize_Section', $result_section );
+		$this->assertEquals( $section_id, $result_section->id );
+
+		$section = new WP_Customize_Section( $manager, $section_id, array(
+			'title'    => 'Section 2',
+			'priority' => 2,
+		) );
+		$result_section = $manager->add_section( $section );
+
+		$this->assertInstanceOf( 'WP_Customize_Section', $result_section );
+		$this->assertEquals( $section_id, $result_section->id );
+		$this->assertEquals( $section, $result_section );
+	}
+
+	/**
+	 * @ticket 34596
+	 */
+	function test_add_setting_return_instance() {
+		$manager = new WP_Customize_Manager();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$setting_id = 'foo-setting';
+		$result_setting = $manager->add_setting( $setting_id );
+
+		$this->assertInstanceOf( 'WP_Customize_Setting', $result_setting );
+		$this->assertEquals( $setting_id, $result_setting->id );
+
+		$setting = new WP_Customize_Setting( $manager, $setting_id );
+		$result_setting = $manager->add_setting( $setting );
+
+		$this->assertInstanceOf( 'WP_Customize_Setting', $result_setting );
+		$this->assertEquals( $setting, $result_setting );
+		$this->assertEquals( $setting_id, $result_setting->id );
+	}
+
+	/**
+	 * @ticket 34596
+	 */
+	function test_add_panel_return_instance() {
+		$manager = new WP_Customize_Manager();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$panel_id = 'foo-panel';
+		$result_panel = $manager->add_panel( $panel_id, array(
+			'title'    => 'Test Panel',
+			'priority' => 2,
+		) );
+
+		$this->assertInstanceOf( 'WP_Customize_Panel', $result_panel );
+		$this->assertEquals( $panel_id, $result_panel->id );
+
+		$panel = new WP_Customize_Panel( $manager, $panel_id, array(
+			'title' => 'Test Panel 2',
+		) );
+		$result_panel = $manager->add_panel( $panel );
+
+		$this->assertInstanceOf( 'WP_Customize_Panel', $result_panel );
+		$this->assertEquals( $panel, $result_panel );
+		$this->assertEquals( $panel_id, $result_panel->id );
+	}
+
+	/**
+	 * @ticket 34596
+	 */
+	function test_add_control_return_instance() {
+		$manager = new WP_Customize_Manager();
+		$section_id = 'foo-section';
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$manager->add_section( $section_id, array(
+			'title'    => 'Section',
+			'priority' => 1,
+		) );
+
+		$control_id = 'foo-control';
+		$manager->add_setting( $control_id );
+
+		$result_control = $manager->add_control( $control_id, array(
+			'section'  => $section_id,
+			'priority' => 1,
+			'setting'  => $control_id,
+		) );
+		$this->assertInstanceOf( 'WP_Customize_Control', $result_control );
+		$this->assertEquals( $control_id, $result_control->id );
+
+		$control = new WP_Customize_Control( $manager, $control_id, array(
+			'section'  => $section_id,
+			'priority' => 1,
+			'setting'  => $control_id,
+		) );
+		$result_control = $manager->add_control( $control );
+
+		$this->assertInstanceOf( 'WP_Customize_Control', $result_control );
+		$this->assertEquals( $control, $result_control );
+		$this->assertEquals( $control_id, $result_control->id );
+	}
 }
