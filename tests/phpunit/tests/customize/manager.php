@@ -245,7 +245,6 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @return array
 	 */
 	function filter_customize_dynamic_setting_args_for_test_dynamic_settings( $setting_args, $setting_id ) {
-		$this->assertEquals( false, $setting_args, 'Expected $setting_args to be false by default.' );
 		$this->assertInternalType( 'string', $setting_id );
 		if ( in_array( $setting_id, array( 'foo', 'bar' ) ) ) {
 			$setting_args = array( 'default' => "dynamic_{$setting_id}_default" );
@@ -542,6 +541,56 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 34597
+	 */
+	function test_add_setting_honoring_dynamic() {
+		$manager = new WP_Customize_Manager();
+
+		$setting_id = 'dynamic';
+		$setting = $manager->add_setting( $setting_id );
+		$this->assertEquals( 'WP_Customize_Setting', get_class( $setting ) );
+		$this->assertObjectNotHasAttribute( 'custom', $setting );
+		$manager->remove_setting( $setting_id );
+
+		add_filter( 'customize_dynamic_setting_class', array( $this, 'return_dynamic_customize_setting_class' ), 10, 3 );
+		add_filter( 'customize_dynamic_setting_args', array( $this, 'return_dynamic_customize_setting_args' ), 10, 2 );
+		$setting = $manager->add_setting( $setting_id );
+		$this->assertEquals( 'Test_Dynamic_Customize_Setting', get_class( $setting ) );
+		$this->assertObjectHasAttribute( 'custom', $setting );
+		$this->assertEquals( 'foo', $setting->custom );
+	}
+
+	/**
+	 * Return 'Test_Dynamic_Customize_Setting' in 'customize_dynamic_setting_class.
+	 *
+	 * @param string $class Setting class.
+	 * @param array  $args  Setting args.
+	 * @param string $id    Setting ID.
+	 * @return string       Setting class.
+	 */
+	function return_dynamic_customize_setting_class( $class, $id, $args ) {
+		unset( $args );
+		if ( 0 === strpos( $id, 'dynamic' ) ) {
+			$class = 'Test_Dynamic_Customize_Setting';
+		}
+		return $class;
+	}
+
+	/**
+	 * Return 'Test_Dynamic_Customize_Setting' in 'customize_dynamic_setting_class.
+	 *
+	 * @param array  $args Setting args.
+	 * @param string $id   Setting ID.
+	 * @return string      Setting args.
+	 */
+	function return_dynamic_customize_setting_args( $args, $id ) {
+		if ( 0 === strpos( $id, 'dynamic' ) ) {
+			$args['custom'] = 'foo';
+		}
+		return $args;
+	}
+
+	/**
 	 * @ticket 34596
 	 */
 	function test_add_panel_return_instance() {
@@ -601,4 +650,16 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $control, $result_control );
 		$this->assertEquals( $control_id, $result_control->id );
 	}
+}
+
+require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
+
+/**
+ * Class Test_Dynamic_Customize_Setting
+ *
+ * @see Tests_WP_Customize_Manager::test_add_setting_honoring_dynamic()
+ */
+class Test_Dynamic_Customize_Setting extends WP_Customize_Setting {
+	public $type = 'dynamic';
+	public $custom;
 }
