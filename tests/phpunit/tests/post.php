@@ -1189,6 +1189,30 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * If a post is updated without providing a post_name param,
+	 * a new slug should not be generated.
+	 *
+	 * @ticket 34865
+	 */
+	function test_post_updates_without_slug_provided() {
+		$post_id = self::factory()->post->create( array(
+			'post_title'   => 'Stuff',
+			'post_status'  => 'publish'
+		) );
+
+		$data = array(
+			'ID'         => $post_id,
+			'post_title' => 'Stuff and Things'
+		);
+
+		wp_insert_post( $data );
+
+		$updated_post = get_post( $post_id );
+		// Ensure changing the post_title didn't modify the post_name.
+		$this->assertEquals('stuff', $updated_post->post_name);
+	}
+
+	/**
 	 * @ticket 32585
 	 */
 	public function test_wp_insert_post_author_zero() {
