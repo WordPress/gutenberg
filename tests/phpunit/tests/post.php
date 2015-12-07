@@ -1253,4 +1253,16 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals(get_date_from_gmt($post['post_date_gmt']), $out->post_date);
 		$this->assertEquals($post['post_date_gmt'], $out->post_date_gmt);
 	}
+
+	function test_wp_delete_post_reassign_hierarchical_post_type() {
+		$grandparent_page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$parent_page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_parent' => $grandparent_page_id ) );
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_parent' => $parent_page_id ) );
+		$this->assertEquals( $parent_page_id, get_post( $page_id )->post_parent );
+		wp_delete_post( $parent_page_id, true );
+		$this->assertEquals( $grandparent_page_id, get_post( $page_id )->post_parent );
+		wp_delete_post( $grandparent_page_id, true );
+		$this->assertEquals( 0, get_post( $page_id )->post_parent );
+	}
+
 }
