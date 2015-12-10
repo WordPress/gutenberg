@@ -272,12 +272,6 @@ class Tests_Theme extends WP_UnitTestCase {
 				$this->assertEquals(get_single_template(), get_query_template('single'));
 				$this->assertEquals(get_attachment_template(), get_query_template('attachment'));
 
-				// this one doesn't behave like the others
-				if (get_query_template('comments-popup'))
-					$this->assertEquals(get_comments_popup_template(), get_query_template('comments-popup'));
-				else
-					$this->assertEquals(get_comments_popup_template(), ABSPATH.'wp-includes/theme-compat/comments-popup.php');
-
 				$this->assertEquals(get_tag_template(), get_query_template('tag'));
 
 				// nb: this probably doesn't run because WP_INSTALLING is defined

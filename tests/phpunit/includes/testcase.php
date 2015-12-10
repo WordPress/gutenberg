@@ -537,7 +537,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			'is_author',
 			'is_category',
 			'is_comment_feed',
-			'is_comments_popup',
 			'is_date',
 			'is_day',
 			'is_embed',
