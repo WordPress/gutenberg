@@ -70,6 +70,21 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertEquals( 1, $comment->user_id );
 	}
 
+	/**
+	 * @ticket 34954
+	 */
+	function test_wp_update_comment_with_no_post_id() {
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => 0 ) );
+
+		$updated_comment_text = 'I should be able to update a comment with a Post ID of zero';
+
+		$update = wp_update_comment( array( 'comment_ID' => $comment_id, 'comment_content' => $updated_comment_text, 'comment_post_ID' => 0 ) );
+		$this->assertSame( 1, $update );
+
+		$comment = get_comment( $comment_id );
+		$this->assertEquals( $updated_comment_text, $comment->comment_content );
+	}
+
 	public function test_get_approved_comments() {
 		$ca1 = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id, 'comment_approved' => '1'
