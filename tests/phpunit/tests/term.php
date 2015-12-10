@@ -627,4 +627,13 @@ class Tests_Term extends WP_UnitTestCase {
 		$cat_id2 = self::factory()->category->create( array( 'parent' => $cat_id1 ) );
 		$this->assertWPError( $cat_id2 );
 	}
+
+	/**
+	 * @ticket 34723
+	 */
+	function test_get_the_terms_should_return_wp_error_when_taxonomy_is_unregistered() {
+		$p = self::$post_ids[0];
+		$terms = get_the_terms( $p, 'this-taxonomy-does-not-exist' );
+		$this->assertTrue( is_wp_error( $terms ) );
+	}
 }
