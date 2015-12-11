@@ -231,6 +231,44 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
 	}
 
+	// test the tests
+	function test_all_caps_of_users_are_being_tested() {
+		$users = array(
+			'administrator' => self::factory()->user->create_and_get( array( 'role' => 'administrator' ) ),
+			'editor'        => self::factory()->user->create_and_get( array( 'role' => 'editor' ) ),
+			'author'        => self::factory()->user->create_and_get( array( 'role' => 'author' ) ),
+			'contributor'   => self::factory()->user->create_and_get( array( 'role' => 'contributor' ) ),
+			'subscriber'    => self::factory()->user->create_and_get( array( 'role' => 'subscriber' ) ),
+		);
+		$caps = $this->getCapsAndRoles();
+
+		// `manage_links` is a special case
+		$this->assertSame( '0', get_option( 'link_manager_enabled' ) );
+		// `unfiltered_upload` is a special case
+		$this->assertFalse( defined( 'ALLOW_UNFILTERED_UPLOADS' ) );
+
+		foreach ( $users as $role => $user ) {
+
+			// make sure the user is valid
+			$this->assertTrue( $user->exists(), "User with {$role} role does not exist" );
+
+			$user_caps = $user->allcaps;
+
+			unset(
+				// `manage_links` is a special case
+				$user_caps['manage_links'],
+				// `unfiltered_upload` is a special case
+				$user_caps['unfiltered_upload']
+			);
+
+			$diff = array_diff( array_keys( $user_caps ), array_keys( $caps ) );
+
+			$this->assertEquals( array(), $diff, "User with {$role} role has capabilities that aren't being tested" );
+
+		}
+
+	}
+
 	// test the default roles and caps
 	function test_all_roles_and_caps() {
 		$users = array(
