@@ -1,4 +1,4 @@
-# HEAD
+# 1.0.0
 
 * Removed: `stylelint < 3.0.0` compatibility.
   * Changed: renamed the `function-space-after` rule to `function-whitespace-after`.
