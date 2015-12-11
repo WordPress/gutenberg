@@ -310,6 +310,26 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	}
 
+	// special case for unfiltered uploads
+	function test_unfiltered_upload_caps() {
+		$users = array(
+			'administrator' => self::factory()->user->create_and_get( array( 'role' => 'administrator' ) ),
+			'editor'        => self::factory()->user->create_and_get( array( 'role' => 'editor' ) ),
+			'author'        => self::factory()->user->create_and_get( array( 'role' => 'author' ) ),
+			'contributor'   => self::factory()->user->create_and_get( array( 'role' => 'contributor' ) ),
+			'subscriber'    => self::factory()->user->create_and_get( array( 'role' => 'subscriber' ) ),
+		);
+
+		$this->assertFalse( defined( 'ALLOW_UNFILTERED_UPLOADS' ) );
+
+		// no-one should have this cap
+		foreach ( $users as $role => $user ) {
+			$this->assertFalse( $user->has_cap( 'unfiltered_upload' ), "User with the {$role} role should not have the unfiltered_upload capability" );
+			$this->assertFalse( user_can( $user, 'unfiltered_upload' ), "User with the {$role} role should not have the unfiltered_upload capability" );
+		}
+
+	}
+
 	function test_super_admin_caps() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( 'Test only runs in multisite' );
@@ -329,6 +349,10 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertFalse( $user->has_cap( 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
 		$this->assertFalse( user_can( $user, 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
+
+		$this->assertFalse( defined( 'ALLOW_UNFILTERED_UPLOADS' ) );
+		$this->assertFalse( $user->has_cap( 'unfiltered_upload' ), 'Super Admins should not have the unfiltered_upload capability' );
+		$this->assertFalse( user_can( $user, 'unfiltered_upload' ), 'Super Admins should not have the unfiltered_upload capability' );
 	}
 
 	// a role that doesn't exist
