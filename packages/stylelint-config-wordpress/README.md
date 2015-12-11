@@ -32,8 +32,8 @@ For example, to change the `indentation` to four spaces and turn off the `number
 {
   "extends": "stylelint-config-wordpress",
   "rules": {
-    "indentation": [2, 4],
-    "number-leading-zero": 0
+    "indentation": 4,
+    "number-leading-zero": null
   }
 }
 ```
