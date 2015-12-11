@@ -1,10 +1,11 @@
 # HEAD
 
-* Removed: compatibility with stylelint < `2.0.0`.
-* Updated rule: `at-rule-empty-line-before` with option `ignore: ["after-comment"],`.
-* Updated rule: `declaration-colon-space-after` with option `always-single-line`.
-* Added rule: `declaration-colon-newline-after` with option `always-multi-line`.
-* Added rule: `function-linear-gradient-no-nonstandard-direction`.
+* Removed: `stylelint < 3.0.0` compatibility.
+  * Changed: renamed the `function-space-after` rule to `function-whitespace-after`.
+* Changed: `at-rule-empty-line-before` with option `ignore: ["after-comment"],`.
+* Changed: `declaration-colon-space-after` with option `always-single-line`.
+* Added: `declaration-colon-newline-after` with option `always-multi-line`.
+* Added: `function-linear-gradient-no-nonstandard-direction`.
 
 # 0.2.0
 

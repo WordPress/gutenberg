@@ -24,7 +24,7 @@
     "babel-tape-runner": "^1.3.0",
     "eslint": "^1.10.3",
     "eslint-config-stylelint": "^0.1.0",
-    "stylelint": "^2.3.5",
+    "stylelint": "^3.0.2",
     "tape": "^4.2.2"
   },
   "scripts": {
