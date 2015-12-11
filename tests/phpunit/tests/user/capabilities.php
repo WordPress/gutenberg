@@ -117,6 +117,12 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'level_1'                => array( 'administrator', 'editor', 'author', 'contributor' ),
 			'level_0'                => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
 
+			'administrator'          => array( 'administrator' ),
+			'editor'                 => array( 'editor' ),
+			'author'                 => array( 'author' ),
+			'contributor'            => array( 'contributor' ),
+			'subscriber'             => array( 'subscriber' ),
+
 		);
 
 	}
@@ -199,6 +205,12 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'level_2'                => array( 'administrator', 'editor', 'author' ),
 			'level_1'                => array( 'administrator', 'editor', 'author', 'contributor' ),
 			'level_0'                => array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ),
+
+			'administrator'          => array( 'administrator' ),
+			'editor'                 => array( 'editor' ),
+			'author'                 => array( 'author' ),
+			'contributor'            => array( 'contributor' ),
+			'subscriber'             => array( 'subscriber' ),
 
 		);
 
