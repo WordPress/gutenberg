@@ -4,44 +4,52 @@
  * @group comment
  */
 class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
-	protected $p;
-	protected $comments = array();
+	protected static $p;
+	protected static $comments = array();
 
-	public function setUp() {
-		parent::setUp();
-
+	public static function wpSetUpBeforeClass( $factory ) {
 		$now = time();
-		$this->p = self::factory()->post->create();
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$p = self::factory()->post->create();
+
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '1',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 100 ),
 		) );
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '2',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 200 ),
 		) );
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '3',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 300 ),
 		) );
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 400 ),
 		) );
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 500 ),
 		) );
-		$this->comments[] = self::factory()->comment->create( array(
-			'comment_post_ID' => $this->p,
+		self::$comments[] = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$p,
 			'comment_content' => '4',
 			'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 600 ),
 		) );
+
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$comments as $c ) {
+			wp_delete_comment( $c, true );
+		}
+
+		wp_delete_post( self::$p );
 	}
 
 	/**
@@ -52,7 +60,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[1] );
+		$found = get_comment_link( self::$comments[1] );
 
 		$this->assertContains( 'cpage=3', $found );
 	}
@@ -65,7 +73,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[3] );
+		$found = get_comment_link( self::$comments[3] );
 
 		$this->assertContains( 'cpage=2', $found );
 	}
@@ -78,7 +86,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'newest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[5] );
+		$found = get_comment_link( self::$comments[5] );
 
 		$this->assertContains( 'cpage=1', $found );
 	}
@@ -90,7 +98,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'oldest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[5] );
+		$found = get_comment_link( self::$comments[5] );
 
 		$this->assertNotContains( 'cpage', $found );
 	}
@@ -103,7 +111,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'oldest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[3] );
+		$found = get_comment_link( self::$comments[3] );
 
 		$this->assertContains( 'cpage=2', $found );
 	}
@@ -116,7 +124,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 		update_option( 'default_comments_page', 'oldest' );
 		update_option( 'comments_per_page', 2 );
 
-		$found = get_comment_link( $this->comments[1] );
+		$found = get_comment_link( self::$comments[1] );
 
 		$this->assertContains( 'cpage=3', $found );
 	}
