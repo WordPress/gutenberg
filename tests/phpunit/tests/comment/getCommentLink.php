@@ -49,7 +49,7 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 			wp_delete_comment( $c, true );
 		}
 
-		wp_delete_post( self::$p );
+		wp_delete_post( self::$p, true );
 	}
 
 	/**
