@@ -391,4 +391,33 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'someinteger', $data['params'] );
 		$this->assertArrayHasKey( 'someotherinteger', $data['params'] );
 	}
+
+	public function test_invalid_params_error_response_format() {
+		$this->request->set_url_params( array(
+			'someinteger' => '123',
+			'someotherparams' => '123',
+		));
+
+		$this->request->set_attributes( array(
+			'args' => array(
+				'someinteger' => array(
+					'validate_callback' => '__return_false',
+				),
+				'someotherparams' => array(
+					'validate_callback' => array( $this, '_return_wp_error_on_validate_callback' ),
+				),
+			),
+		));
+
+		$valid = $this->request->has_valid_params();
+		$this->assertWPError( $valid );
+		$error_data = $valid->get_error_data();
+
+		$this->assertEquals( array( 'someinteger', 'someotherparams' ), array_keys( $error_data['params'] ) );
+		$this->assertEquals( 'This is not valid!', $error_data['params']['someotherparams'] );
+	}
+
+	public function _return_wp_error_on_validate_callback() {
+		return new WP_Error( 'some-error', 'This is not valid!' );
+	}
 }

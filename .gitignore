@@ -1,5 +1,5 @@
 # gitignore file for WordPress Core
-
+.svn
 # Configuration files with possibly sensitive information
 wp-config.php
 wp-tests-config.php
