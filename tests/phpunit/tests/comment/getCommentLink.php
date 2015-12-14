@@ -128,4 +128,16 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 
 		$this->assertContains( 'cpage=3', $found );
 	}
+
+	/**
+	 * @ticket 34946
+	 */
+	public function test_should_not_contain_comment_page_1_when_pagination_is_disabled() {
+		$this->set_permalink_structure( '/%postname%/' );
+		update_option( 'page_comments', 0 );
+
+		$found = get_comment_link( self::$comments[1] );
+
+		$this->assertNotContains( 'comment-page-1', $found );
+	}
 }
