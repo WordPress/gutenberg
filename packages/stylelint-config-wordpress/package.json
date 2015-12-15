@@ -21,7 +21,7 @@
   "devDependencies": {
     "babel": "^6.1.18",
     "babel-preset-es2015": "^6.1.18",
-    "babel-tape-runner": "^1.3.0",
+    "babel-tape-runner": "^2.0.0",
     "eslint": "^1.10.3",
     "eslint-config-stylelint": "^0.1.0",
     "stylelint": "^3.0.2",
