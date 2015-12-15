@@ -110,6 +110,19 @@ class Tests_Functions_ListFilter extends WP_UnitTestCase {
 		$this->assertEquals( array( 'f' => 'foo', 'b' => 'bar', 'z' => 'baz' ), $list );
 	}
 
+	/**
+	 * When not being passed an array, the function should throw a warning.
+	 *
+	 * @ticket 35087
+	 * @expectedException PHPUnit_Framework_Error_Warning
+	 */
+	function test_wp_list_pluck_non_array() {
+		$object      = new stdClass();
+		$object->foo = 'abc';
+		$object->bar = 'def';
+		wp_list_pluck( $object, 'test' );
+	}
+
 	function test_filter_object_list_nested_array_and() {
 		$list = wp_filter_object_list( $this->object_list, array( 'field4' => array( 'blue' ) ), 'AND' );
 		$this->assertEquals( 1, count( $list ) );
