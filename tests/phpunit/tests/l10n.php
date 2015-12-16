@@ -16,4 +16,14 @@ class Tests_L10n extends WP_UnitTestCase {
 		$this->assertTrue( unload_textdomain( 'wp-tests-domain' ) );
 		$this->assertFalse( is_textdomain_loaded( 'wp-tests-domain' ) );
 	}
+
+	/**
+	 * @ticket 35073
+	 */
+	function test_before_last_bar() {
+		$this->assertEquals( 'no-bar-at-all', before_last_bar( 'no-bar-at-all' ) );
+		$this->assertEquals( 'before-last-bar', before_last_bar( 'before-last-bar|after-bar' ) );
+		$this->assertEquals( 'first-before-bar|second-before-bar', before_last_bar( 'first-before-bar|second-before-bar|after-last-bar' ) );
+	}
+
 }
