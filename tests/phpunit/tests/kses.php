@@ -653,4 +653,15 @@ EOF;
 
 		$this->assertEquals( $input, wp_kses( $input, $allowedposttags ) );
 	}
+
+	/**
+	 * @ticket 35079
+	 */
+	function test_ol_reversed() {
+		global $allowedposttags;
+
+		$input = '<ol reversed="reversed"><li>Item 1</li><li>Item 2</li><li>Item 3</li></ol>';
+
+		$this->assertEquals( $input, wp_kses( $input, $allowedposttags ) );
+	}
 }
