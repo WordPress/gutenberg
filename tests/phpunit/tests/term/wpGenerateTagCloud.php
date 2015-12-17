@@ -78,10 +78,12 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'number' => 1,
 			'hide_empty' => false,
 		) );
-		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0 tag-link-position-1' title='0 topics' style='font-size: 8pt;'>{$term->name}</a>";
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+
+		$found = wp_generate_tag_cloud( $tags, array(
 			'hide_empty' => false,
-		) ) );
+		) );
+
+		$this->assertContains( '>' . $tags[0]->name . '<', $found );
 	}
 
 	function test_hide_empty_false_format_array() {
@@ -94,10 +96,13 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'format'     => 'array',
 		) );
 
-		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0 tag-link-position-1' title='0 topics' style='font-size: 8pt;'>{$term->name}</a>";
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+		$found = wp_generate_tag_cloud( $tags, array(
 			'hide_empty' => false,
-		) ) );
+			'format' => 'array',
+		) );
+
+		$this->assertInternalType( 'array', $found );
+		$this->assertContains( '>' . $tags[0]->name . '<', $found[0] );
 	}
 
 	function test_hide_empty_false_format_list() {
@@ -109,11 +114,14 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'hide_empty' => false,
 		) );
 
-		$expected = "<ul class='wp-tag-cloud'>\n\t<li><a href='http://" . WP_TESTS_DOMAIN . "/?tag={$term->slug}' class='tag-link-0 tag-link-position-1' title='0 topics' style='font-size: 8pt;'>{$term->name}</a></li>\n</ul>\n";
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+		$found = wp_generate_tag_cloud( $tags, array(
 			'hide_empty' => false,
 			'format'     => 'list',
-		) ) );
+		) );
+
+		$this->assertRegExp( "|^<ul class='wp-tag-cloud'>|", $found );
+		$this->assertRegExp( "|</ul>\n|", $found );
+		$this->assertContains( '>' . $tags[0]->name . '<', $found );
 	}
 
 	function test_hide_empty_false_multi() {
@@ -129,13 +137,13 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'hide_empty' => false,
 		) );
 
-		$expected = "<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[0]->slug}' class='tag-link-0 tag-link-position-1' title='0 topics' style='font-size: 8pt;'>{$terms[0]->name}</a>\n".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[1]->slug}' class='tag-link-1 tag-link-position-2' title='0 topics' style='font-size: 8pt;'>{$terms[1]->name}</a>\n".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[2]->slug}' class='tag-link-2 tag-link-position-3' title='0 topics' style='font-size: 8pt;'>{$terms[2]->name}</a>\n".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[3]->slug}' class='tag-link-3 tag-link-position-4' title='0 topics' style='font-size: 8pt;'>{$terms[3]->name}</a>";
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+		$found = wp_generate_tag_cloud( $tags, array(
 			'hide_empty' => false,
-		) ) );
+		) );
+
+		foreach ( $tags as $tag ) {
+			$this->assertContains( '>' . $tag->name . '<', $found );
+		}
 	}
 
 	function test_hide_empty_false_multi_format_list() {
@@ -151,17 +159,17 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'hide_empty' => false,
 		) );
 
-		$expected = "<ul class='wp-tag-cloud'>\n\t<li>".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[0]->slug}' class='tag-link-0 tag-link-position-1' title='0 topics' style='font-size: 8pt;'>{$terms[0]->name}</a></li>\n\t<li>".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[1]->slug}' class='tag-link-1 tag-link-position-2' title='0 topics' style='font-size: 8pt;'>{$terms[1]->name}</a></li>\n\t<li>".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[2]->slug}' class='tag-link-2 tag-link-position-3' title='0 topics' style='font-size: 8pt;'>{$terms[2]->name}</a></li>\n\t<li>".
-			"<a href='http://" . WP_TESTS_DOMAIN . "/?tag={$terms[3]->slug}' class='tag-link-3 tag-link-position-4' title='0 topics' style='font-size: 8pt;'>{$terms[3]->name}</a>".
-			"</li>\n</ul>\n";
-
-		$this->assertEquals( $expected, wp_generate_tag_cloud( $tags, array(
+		$found = wp_generate_tag_cloud( $tags, array(
 			'hide_empty' => false,
 			'format'     => 'list',
-		) ) );
+		) );
+
+		$this->assertRegExp( "|^<ul class='wp-tag-cloud'>|", $found );
+		$this->assertRegExp( "|</ul>\n|", $found );
+
+		foreach ( $tags as $tag ) {
+			$this->assertContains( '>' . $tag->name . '<', $found );
+		}
 	}
 
 	public function test_topic_count_text() {
