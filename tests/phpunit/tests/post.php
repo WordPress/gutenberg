@@ -984,23 +984,16 @@ class Tests_Post extends WP_UnitTestCase {
 			'link' => 'edit'
 		) );
 
+		preg_match_all( "|href='([^']+)'|", $wp_tag_cloud, $matches );
+		$this->assertSame( 1, count( $matches[1] ) );
+
 		$terms = get_terms( $tax );
 		$term = reset( $terms );
-		$url = sprintf( '%s?action=edit&#038;taxonomy=%s&#038;tag_ID=%d&#038;post_type=%s',
-			admin_url( 'edit-tags.php' ),
-			$tax,
-			$term->term_id,
-			$post_type
-		);
-		$expected_wp_tag_cloud = sprintf( "<a href='%s' class='tag-link-%d' title='1 topic' style='font-size: 8pt;'>%s</a>",
-			$url,
-			$term->term_id,
-			$term->name
-		);
-		$this->assertEquals( $expected_wp_tag_cloud, $wp_tag_cloud );
 
-		_unregister_post_type( $post_type );
-		_unregister_taxonomy( $tax );
+		foreach ( $matches[1] as $url ) {
+			$this->assertContains( 'tag_ID=' . $term->term_id, $url );
+			$this->assertContains( 'post_type=new_post_type', $url );
+		}
 	}
 
 	/**
