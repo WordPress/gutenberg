@@ -1571,6 +1571,30 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35137
+	 */
+	public function test_meta_query_should_not_return_duplicates() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 1, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[0], 'foo', 'ber' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'value' => 'bur',
+					'compare' => '!=',
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[0] ), $found );
+	}
+
+	/**
 	 * @ticket 14162
 	 */
 	public function test_should_return_wp_term_objects() {
