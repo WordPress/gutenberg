@@ -381,4 +381,25 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 		$this->assertNotContains( '<li class="cat-item cat-item-' . $child3 . '">', $actual );
 		$this->assertNotContains( '<li class="cat-item cat-item-' . $child4 . '">', $actual );
 	}
+
+	/**
+	 * @ticket 10676
+	 */
+	public function test_class_containing_current_cat_ancestor() {
+		$parent = self::factory()->category->create( array( 'name' => 'Parent', 'slug' => 'parent' ) );
+		$child = self::factory()->category->create( array( 'name' => 'Child', 'slug' => 'child', 'parent' => $parent ) );
+		$child2 = self::factory()->category->create( array( 'name' => 'Child 2', 'slug' => 'child2', 'parent' => $parent ) );
+		$grandchild = self::factory()->category->create( array( 'name' => 'Grand Child', 'slug' => 'child', 'parent' => $child ) );
+
+		$actual = wp_list_categories( array(
+			'echo'             => 0,
+			'hide_empty'       => false,
+			'current_category' => $grandchild,
+		) );
+
+		$this->assertRegExp( '/class="[^"]*cat-item-' . $parent . '[^"]*current-cat-ancestor[^"]*"/', $actual );
+		$this->assertRegExp( '/class="[^"]*cat-item-' . $child . '[^"]*current-cat-ancestor[^"]*"/', $actual );
+		$this->assertNotRegExp( '/class="[^"]*cat-item-' . $grandchild . '[^"]*current-cat-ancestor[^"]*"/', $actual );
+		$this->assertNotRegExp( '/class="[^"]*cat-item-' . $child2 . '[^"]*current-cat-ancestor[^"]*"/', $actual );
+	}
 }
