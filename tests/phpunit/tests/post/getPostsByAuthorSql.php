@@ -136,6 +136,9 @@ class Tests_Post_GetPostsByAuthorSql extends WP_UnitTestCase {
 		wp_set_current_user( $u );
 
 		$maybe_string = get_posts_by_author_sql( array( 'foo', 'bar', 'baz' ) );
+
+		$editor_role->remove_cap( 'read_private_baz' );
+
 		$this->assertNotContains( "post_type = 'foo' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
 		$this->assertNotContains( "post_type = 'bar' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
 		$this->assertContains( "post_type = 'baz' AND ( post_status = 'publish' OR post_status = 'private' )", $maybe_string );
