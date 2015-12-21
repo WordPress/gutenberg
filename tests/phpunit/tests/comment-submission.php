@@ -5,6 +5,8 @@
  */
 class Tests_Comment_Submission extends WP_UnitTestCase {
 
+	protected $preprocess_comment_data = array();
+
 	function setUp() {
 		parent::setUp();
 		require_once ABSPATH . WPINC . '/class-phpass.php';
@@ -588,6 +590,48 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$this->assertWPError( $comment );
 		$this->assertSame( $error, $comment->get_error_code() );
 
+	}
+
+	/**
+	 * @ticket 34997
+	 */
+	public function test_comment_submission_sends_all_expected_parameters_to_preprocess_comment_filter() {
+
+		$user = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+		wp_set_current_user( $user->ID );
+
+		$post = self::factory()->post->create_and_get();
+		$data = array(
+			'comment_post_ID' => $post->ID,
+			'comment'         => 'Comment',
+		);
+
+		add_filter( 'preprocess_comment', array( $this, 'filter_preprocess_comment' ) );
+
+		$comment = wp_handle_comment_submission( $data );
+
+		remove_filter( 'preprocess_comment', array( $this, 'filter_preprocess_comment' ) );
+
+		$this->assertNotWPError( $comment );
+		$this->assertEquals( array(
+			'comment_post_ID'      => $post->ID,
+			'comment_author'       => $user->display_name,
+			'comment_author_email' => $user->user_email,
+			'comment_author_url'   => $user->user_url,
+			'comment_content'      => $data['comment'],
+			'comment_type'         => '',
+			'comment_parent'       => '0',
+			'user_ID'              => $user->ID,
+			'user_id'              => $user->ID,
+		), $this->preprocess_comment_data );
+
+	}
+
+	public function filter_preprocess_comment( $commentdata ) {
+		$this->preprocess_comment_data = $commentdata;
+		return $commentdata;
 	}
 
 }
