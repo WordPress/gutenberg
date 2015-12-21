@@ -10,14 +10,14 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 	}
 
 	function test_disable() {
-		$this->assertEquals('<pre>---</pre>', wptexturize('<pre>---</pre>'));
-		$this->assertEquals('<pre><code></code>--</pre>', wptexturize('<pre><code></code>--</pre>'));
+		$this->assertEquals('<pre>---&</pre>', wptexturize('<pre>---&</pre>'));
+		$this->assertEquals('<pre><code></code>--&</pre>', wptexturize('<pre><code></code>--&</pre>'));
 
-		$this->assertEquals( '<code>---</code>',     wptexturize( '<code>---</code>'     ) );
-		$this->assertEquals( '<kbd>---</kbd>',       wptexturize( '<kbd>---</kbd>'       ) );
-		$this->assertEquals( '<style>---</style>',   wptexturize( '<style>---</style>'   ) );
-		$this->assertEquals( '<script>---</script>', wptexturize( '<script>---</script>' ) );
-		$this->assertEquals( '<tt>---</tt>',         wptexturize( '<tt>---</tt>'         ) );
+		$this->assertEquals( '<code>---&</code>',     wptexturize( '<code>---&</code>'     ) );
+		$this->assertEquals( '<kbd>---&</kbd>',       wptexturize( '<kbd>---&</kbd>'       ) );
+		$this->assertEquals( '<style>---&</style>',   wptexturize( '<style>---&</style>'   ) );
+		$this->assertEquals( '<script>---&</script>', wptexturize( '<script>---&</script>' ) );
+		$this->assertEquals( '<tt>---&</tt>',         wptexturize( '<tt>---&</tt>'         ) );
 
 		$this->assertEquals('<code>href="baba"</code> &#8220;baba&#8221;', wptexturize('<code>href="baba"</code> "baba"'));
 
@@ -1268,11 +1268,15 @@ class Tests_Formatting_WPTexturize extends WP_UnitTestCase {
 			),
 			array(
 				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy & that guy </a> ]',
-				'[ photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy &#038; that guy </a> ]',
+				'[ photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy &#038; that guy </a> ]',
 			),
 			array(
 				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy & that guy </a>]',
-				'[photos by <a href="http://example.com/?a[]=1&a[]=2"> this guy &#038; that guy </a>]',
+				'[photos by <a href="http://example.com/?a[]=1&#038;a[]=2"> this guy &#038; that guy </a>]',
+			),
+			array(
+				'& <script>&&</script>',
+				'&#038; <script>&&</script>'
 			),
 			array(
 				'[gallery ...]',
