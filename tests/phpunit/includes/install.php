@@ -31,7 +31,15 @@ global $phpmailer;
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
 $phpmailer = new MockPHPMailer();
 
-$wpdb->query( 'SET storage_engine = INNODB' );
+/*
+ * default_storage_engine and storage_engine are the same option, but storage_engine
+ * was deprecated in MySQL (and MariaDB) 5.5.3, and removed in 5.7.
+ */
+if ( version_compare( $wpdb->db_version(), '5.5.3', '>=' ) ) {
+	$wpdb->query( 'SET default_storage_engine = InnoDB' );
+} else {
+	$wpdb->query( 'SET storage_engine = InnoDB' );
+}
 $wpdb->select( DB_NAME, $wpdb->dbh );
 
 echo "Installing..." . PHP_EOL;
