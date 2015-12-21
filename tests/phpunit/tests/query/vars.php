@@ -12,6 +12,10 @@ class Tests_Query_Vars extends WP_UnitTestCase {
 	 */
 	public function testPublicQueryVarsAreAsExpected() {
 		global $wp;
+
+		// Re-initialise any dynamically-added public query vars:
+		do_action( 'init' );
+
 		$this->assertEquals( array(
 
 			// Static public query vars:
