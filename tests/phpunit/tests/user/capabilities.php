@@ -20,6 +20,12 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		);
 	}
 
+	public static function wpTearDownAfterClass() {
+		foreach ( self::$users as $role => $user ) {
+			self::delete_user( $user->ID );
+		}
+	}
+
 	function setUp() {
 		parent::setUp();
 		// keep track of users we create
