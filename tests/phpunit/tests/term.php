@@ -617,6 +617,26 @@ class Tests_Term extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35180
+	 * @ticket 28922
+	 */
+	public function test_get_the_terms_should_return_results_ordered_by_name_when_pulling_from_cache() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$p = self::$post_ids[0];
+
+		$t1 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => 'fff' ) );
+		$t2 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => 'aaa' ) );
+		$t3 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax', 'name' => 'zzz' ) );
+
+		wp_set_object_terms( $p, array( $t1, $t2, $t3 ), 'wptests_tax' );
+		update_object_term_cache( $p, 'post' );
+
+		$found = get_the_terms( $p, 'wptests_tax' );
+
+		$this->assertSame( array( $t2, $t1, $t3 ), wp_list_pluck( $found, 'term_id' ) );
+	}
+
+	/**
 	 * @ticket 19205
 	 */
 	function test_orphan_category() {
