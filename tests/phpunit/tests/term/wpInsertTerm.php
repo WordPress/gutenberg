@@ -37,9 +37,9 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$this->assertTrue( term_exists($t['term_id']) > 0 );
 
 		// now delete it
-		add_filter( 'delete_term', array( $this, 'deleted_term_cb' ), 10, 4 );
+		add_filter( 'delete_term', array( $this, 'deleted_term_cb' ), 10, 5 );
 		$this->assertTrue( wp_delete_term( $t['term_id'], $taxonomy ) );
-		remove_filter( 'delete_term', array( $this, 'deleted_term_cb' ), 10, 4 );
+		remove_filter( 'delete_term', array( $this, 'deleted_term_cb' ), 10, 5 );
 		$this->assertNull( term_exists($term) );
 		$this->assertNull( term_exists($t['term_id']) );
 		$this->assertEquals( $initial_count, wp_count_terms( $taxonomy ) );
@@ -644,13 +644,15 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 
 	/** Helpers **********************************************************/
 
-	public function deleted_term_cb( $term, $tt_id, $taxonomy, $deleted_term ) {
+	public function deleted_term_cb( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
 		$this->assertInternalType( 'object', $deleted_term );
 		$this->assertInternalType( 'int', $term );
+		$this->assertInternalType( 'array', $object_ids );
 		// Pesky string $this->assertInternalType( 'int', $tt_id );
 		$this->assertEquals( $term, $deleted_term->term_id );
 		$this->assertEquals( $taxonomy, $deleted_term->taxonomy );
 		$this->assertEquals( $tt_id, $deleted_term->term_taxonomy_id );
+		$this->assertEmpty( $object_ids );
 	}
 
 	public function _pre_insert_term_callback() {
