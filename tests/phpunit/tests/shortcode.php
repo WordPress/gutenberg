@@ -647,4 +647,14 @@ EOF;
 
 	}
 
+	/**
+	 * @ticket 34939
+	 *
+	 * Test the (not recommended) [shortcode=XXX] format
+	 */
+	function test_unnamed_attribute() {
+		$out = do_shortcode('[dumptag=https://wordpress.org/]');
+		$expected = "0 = =https://wordpress.org\n";
+		$this->assertEquals($expected, $out);
+	}
 }
