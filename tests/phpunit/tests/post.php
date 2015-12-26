@@ -674,8 +674,8 @@ class Tests_Post extends WP_UnitTestCase {
 		// try the child normally
 		$this->assertEquals( 'parent/child', get_page_uri( $child_id ) );
 
-		// now delete the parent and check
-		wp_delete_post( $parent_id );
+		// now delete the parent from the database and check
+		wp_delete_post( $parent_id, true );
 		$this->assertEquals( 'child', get_page_uri( $child_id ) );
 	}
 
