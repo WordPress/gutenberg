@@ -198,16 +198,16 @@ class Tests_Shortcode extends WP_UnitTestCase {
 	}
 
 	function test_positional_atts_mixed() {
-		$out = do_shortcode('[test-shortcode-tag 123 http://wordpress.com/ 0 "foo" bar]');
+		$out = do_shortcode('[test-shortcode-tag 123 https://wordpress.org/ 0 "foo" bar]');
 		$this->assertEquals( '', $out );
-		$this->assertEquals( array(0=>'123', 1=>'http://wordpress.com/', 2=>'0', 3=>'foo', 4=>'bar'), $this->atts );
+		$this->assertEquals( array(0=>'123', 1=>'https://wordpress.org/', 2=>'0', 3=>'foo', 4=>'bar'), $this->atts );
 		$this->assertEquals( 'test-shortcode-tag', $this->tagname );
 	}
 
 	function test_positional_and_named_atts() {
-		$out = do_shortcode('[test-shortcode-tag 123 url=http://wordpress.com/ foo bar="baz"]');
+		$out = do_shortcode('[test-shortcode-tag 123 url=https://wordpress.org/ foo bar="baz"]');
 		$this->assertEquals( '', $out );
-		$this->assertEquals( array(0=>'123', 'url' => 'http://wordpress.com/', 1=>'foo', 'bar' => 'baz'), $this->atts );
+		$this->assertEquals( array(0=>'123', 'url' => 'https://wordpress.org/', 1=>'foo', 'bar' => 'baz'), $this->atts );
 		$this->assertEquals( 'test-shortcode-tag', $this->tagname );
 	}
 
@@ -223,8 +223,8 @@ class Tests_Shortcode extends WP_UnitTestCase {
 	}
 
 	function test_nested_tags() {
-		$out = do_shortcode('[baztag][dumptag abc="foo" def=123 http://wordpress.com/][/baztag]');
-		$expected = "content = abc = foo\ndef = 123\n0 = http://wordpress.com\n";
+		$out = do_shortcode('[baztag][dumptag abc="foo" def=123 https://wordpress.org/][/baztag]');
+		$expected = "content = abc = foo\ndef = 123\n0 = https://wordpress.org\n";
 		$this->assertEquals($expected, $out);
 	}
 
