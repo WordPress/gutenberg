@@ -94,6 +94,30 @@ class Tests_Formatting_MapDeep extends WP_UnitTestCase {
 		), array( $this, 'append_baba' ) ) );
 	}
 
+	/**
+	 * @ticket 35058
+	 */
+	public function test_map_deep_should_map_object_properties_passed_by_reference() {
+		$object_a = (object) array( 'var0' => 'a' );
+		$object_b = (object) array( 'var0' => &$object_a->var0, 'var1' => 'x' );
+		$this->assertEquals( (object) array(
+			'var0' => 'ababa',
+			'var1' => 'xbaba',
+		), map_deep( $object_b, array( $this, 'append_baba' ) ) );
+	}
+
+	/**
+	 * @ticket 35058
+	 */
+	public function test_map_deep_should_map_array_elements_passed_by_reference() {
+		$array_a = array( 'var0' => 'a' );
+		$array_b = array( 'var0' => &$array_a['var0'], 'var1' => 'x' );
+		$this->assertEquals( array(
+			'var0' => 'ababa',
+			'var1' => 'xbaba',
+		), map_deep( $array_b, array( $this, 'append_baba' ) ) );
+	}
+
 	public function append_baba( $value ) {
 		return $value . 'baba';
 	}
