@@ -517,4 +517,17 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 
 		$this->assertFalse( is_tax( 'wptests_tax' ) );
 	}
+
+	/**
+	 * @ticket 35089
+	 */
+	public function test_query_var_should_be_forced_to_false_for_non_public_taxonomy() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+			'query_var' => true,
+		) );
+
+		$tax = get_taxonomy( 'wptests_tax' );
+		$this->assertFalse( $tax->query_var );
+	}
 }
