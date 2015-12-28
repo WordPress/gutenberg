@@ -78,4 +78,19 @@ class Tests_Post_GetBodyClass extends WP_UnitTestCase {
 		$this->assertContains( "term-$term_id3", get_body_class() );
 	}
 
+	/**
+	 * @ticket 35164
+	 */
+	public function test_singular_body_classes() {
+		$post_id = self::factory()->post->create();
+		$this->go_to( get_permalink( $post_id ) );
+
+		$class = get_body_class();
+		$this->assertContains( "single-post", $class );
+		$this->assertContains( "postid-{$post_id}", $class );
+		$this->assertContains( "single-format-standard", $class );
+		$this->assertContains( "singular", $class );
+
+	}
+
 }
