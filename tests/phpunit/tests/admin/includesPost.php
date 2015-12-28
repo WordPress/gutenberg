@@ -481,6 +481,20 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		$this->assertSame( $p, post_exists( $title, $content ) );
 	}
 
+	/**
+	 * @ticket 35246
+	 */
+	public function test_post_exists_should_match_content_with_no_title() {
+		$title = '';
+		$content = 'Foo Bar Baz';
+		$p = self::factory()->post->create( array(
+			'post_title' => $title,
+			'post_content' => $content,
+		) );
+
+		$this->assertSame( $p, post_exists( $title, $content ) );
+	}
+
 	public function test_post_exists_should_not_match_when_nonempty_content_doesnt_match() {
 		$title = 'Foo Bar';
 		$content = 'Foo Bar Baz';
