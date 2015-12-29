@@ -359,6 +359,10 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			$new_charset = $data[0]['charset'];
 		}
 
+		if ( 'utf8mb4' === $new_charset && ! self::$_wpdb->has_cap( 'utf8mb4' ) ) {
+			$this->markTestSkipped( "The current MySQL server doesn't support the utf8mb4 character set." );
+		}
+
 		self::$_wpdb->charset = $new_charset;
 		self::$_wpdb->set_charset( self::$_wpdb->dbh, $new_charset );
 
