@@ -38,12 +38,12 @@ class Tests_Formatting_MapDeep extends WP_UnitTestCase {
 		$this->assertEquals( array(
 			'var0' => 'ababa',
 			'var1' => (object) array(
-				'xbaba',
+				'var0' => 'xbaba',
 			),
 		), map_deep( array(
 			'var0' => 'a',
 			'var1' => (object) array(
-				'x',
+				'var0' => 'x',
 			),
 		), array( $this, 'append_baba' ) ) );
 	}
@@ -84,12 +84,12 @@ class Tests_Formatting_MapDeep extends WP_UnitTestCase {
 		$this->assertEquals( (object) array(
 			'var0' => 'ababa',
 			'var1' => (object) array(
-				'xbaba',
+				'var0' => 'xbaba',
 			),
 		), map_deep( (object) array(
 			'var0' => 'a',
 			'var1' => (object) array(
-				'x',
+				'var0' => 'x',
 			),
 		), array( $this, 'append_baba' ) ) );
 	}
