@@ -293,6 +293,25 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertTrue( wp_notify_moderator( $c ) );
 	}
 
+	public function test_wp_new_comment_notify_postauthor_should_send_email_when_comment_is_approved() {
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+		) );
+
+		$sent = wp_new_comment_notify_postauthor( $c );
+		$this->assertTrue( $sent );
+	}
+
+	public function test_wp_new_comment_notify_postauthor_should_not_send_email_when_comment_is_unapproved() {
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '0',
+		) );
+
+		$sent = wp_new_comment_notify_postauthor( $c );
+		$this->assertFalse( $sent );
+	}
+
 	/**
 	 * @ticket 33587
 	 */
@@ -300,6 +319,19 @@ class Tests_Comment extends WP_UnitTestCase {
 		$c = self::factory()->comment->create( array(
 			'comment_post_ID' => self::$post_id,
 			'comment_approved' => 'spam',
+		) );
+
+		$sent = wp_new_comment_notify_postauthor( $c );
+		$this->assertFalse( $sent );
+	}
+
+	/**
+	 * @ticket 35006
+	 */
+	public function test_wp_new_comment_notify_postauthor_should_not_send_email_when_comment_has_been_trashed() {
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => 'trash',
 		) );
 
 		$sent = wp_new_comment_notify_postauthor( $c );
