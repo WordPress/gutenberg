@@ -866,6 +866,48 @@ EOF;
 	}
 
 	/**
+	 * @ticket 35106
+	 */
+	function test_wp_calculate_image_srcset_with_absolute_path_in_meta() {
+		global $_wp_additional_image_sizes;
+
+		$year_month = date('Y/m');
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$uploads_dir_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/';
+
+		// Set up test cases for all expected size names.
+		$intermediates = array( 'medium', 'medium_large', 'large', 'full' );
+
+		// Add any soft crop intermediate sizes.
+		foreach ( $_wp_additional_image_sizes as $name => $additional_size ) {
+			if ( ! $_wp_additional_image_sizes[$name]['crop'] || 0 === $_wp_additional_image_sizes[$name]['height'] ) {
+				$intermediates[] = $name;
+			}
+		}
+
+		$expected = '';
+
+		foreach( $image_meta['sizes'] as $name => $size ) {
+			// Whitelist the sizes that should be included so we pick up 'medium_large' in 4.4.
+			if ( in_array( $name, $intermediates ) ) {
+				$expected .= $uploads_dir_url . $year_month . '/' . $size['file'] . ' ' . $size['width'] . 'w, ';
+			}
+		}
+
+		// Add the full size width at the end.
+		$expected .= $uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
+
+		// Prepend an absolute path to simulate a pre-2.7 upload
+		$image_meta['file'] = 'H:\home\wordpress\trunk/wp-content/uploads/' . $image_meta['file'];
+
+		foreach ( $intermediates as $int ) {
+			$image_url = wp_get_attachment_image_url( self::$large_id, $int );
+			$size_array = $this->_get_image_size_array_from_name( $int );
+ 			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
+ 		}
+	}
+
+	/**
 	 * @ticket 33641
 	 */
 	function test_wp_calculate_image_srcset_false() {
