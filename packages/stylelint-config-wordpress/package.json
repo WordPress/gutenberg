@@ -3,8 +3,11 @@
   "version": "1.0.1",
   "description": "WordPress shareable config for stylelint",
   "keywords": [
+    "css",
     "stylelint",
-    "stylelint-config"
+    "stylelint-config",
+    "wordpress",
+    "WordPress"
   ],
   "author": "Stylelint",
   "license": "MIT",
@@ -12,6 +15,8 @@
     "type": "git",
     "url": "https://github.com/stylelint/stylelint-config-wordpress.git"
   },
+  "homepage": "https://github.com/stylelint/stylelint-config-wordpress",
+  "bugs": "https://github.com/stylelint/stylelint-config-wordpress/issues",
   "main": "index.js",
   "files": [
     "CHANGELOG.md",
