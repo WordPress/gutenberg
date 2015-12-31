@@ -150,6 +150,31 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
 	}
 
+	/**
+	 * @ticket 35031
+	 */
+	public function test_old_slug_doesnt_redirect_when_reused() {
+		$old_permalink = user_trailingslashit( get_permalink( $this->post_id ) );
+
+		wp_update_post( array(
+			'ID' => $this->post_id,
+			'post_name' => 'bar-baz',
+		) );
+
+		$new_post_id = self::factory()->post->create( array(
+			'post_title'   => 'Foo Bar',
+			'post_name'   => 'foo-bar',
+		) );
+
+		$permalink = user_trailingslashit( get_permalink( $new_post_id ) );
+
+		$this->assertEquals( $old_permalink, $permalink );
+
+		$this->go_to( $old_permalink );
+		wp_old_slug_redirect();
+		$this->assertNull( $this->old_slug_redirect_url );
+	}
+
 	public function filter_old_slug_redirect_url( $url ) {
 		$this->old_slug_redirect_url = $url;
 		return false;
