@@ -57,6 +57,13 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertQueryTrue('is_feed', 'is_single', 'is_singular', 'is_comment_feed');
 	}
 
+	function test_attachment_comments_feed() {
+		$attachment_id = self::factory()->post->create( array( 'post_type' => 'attachment' ) );
+		self::factory()->comment->create_post_comments( $attachment_id, 2 );
+		$this->go_to( get_post_comments_feed_link( $attachment_id ) );
+		$this->assertQueryTrue( 'is_feed', 'is_attachment', 'is_single', 'is_singular', 'is_comment_feed' );
+	}
+
 	function test_page() {
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'about' ) );
 		$this->go_to( get_permalink( $page_id ) );

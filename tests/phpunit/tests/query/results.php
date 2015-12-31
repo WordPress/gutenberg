@@ -703,4 +703,19 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$result2 = $this->q->query( array( 'title' => 'Tacos', 'fields' => 'ids' ) );
 		$this->assertCount( 0, $result2 );
 	}
+
+	/**
+	 * @ticket 15610
+	 */
+	public function test_main_comments_feed_includes_attachment_comments() {
+		$attachment_id = self::factory()->post->create( array( 'post_type' => 'attachment' ) );
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $attachment_id, 'comment_approved' => '1' ) );
+
+		$this->q->query( array( 'withcomments' => 1, 'feed' => 'feed' ) );
+
+		$this->assertTrue( $this->q->have_comments() );
+
+		$feed_comment = $this->q->next_comment();
+		$this->assertEquals( $comment_id, $feed_comment->comment_ID );
+	}
 }
