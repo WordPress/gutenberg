@@ -69,36 +69,4 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 
 		$this->assertEquals( 'trash', get_comment( $comment_id )->comment_approved );
 	}
-
-	/**
-	 * @ticket 30429
-	 */
-	function test_post_date_timezone_conversion() {
-		$tz = get_option( 'timezone_string' );
-		update_option( 'timezone_string', 'America/New_York' );
-
-		$this->make_user_by_role( 'administrator' );
-		$post_id = self::factory()->post->create();
-
-		$comment_data = array(
-			'comment_post_ID' => $post_id,
-			'comment_author' => 'Test commenter',
-			'comment_author_url' => 'http://example.com/',
-			'comment_author_email' => 'example@example.com',
-			'comment_content' => rand_str( 100 ),
-			'comment_approved' => '1',
-		);
-		$comment_id = wp_insert_comment( $comment_data );
-
-		$date_string = '1984-01-11 05:00:00';
-		$result = $this->myxmlrpcserver->wp_editComment( array( 1, 'administrator', 'administrator', $comment_id, array(
-			'date_created_gmt' => new IXR_Date( mysql2date( 'Ymd\TH:i:s', $date_string, false ) )
-		) ) );
-		$fetched_comment = get_comment( $comment_id );
-
-		update_option( 'timezone_string', $tz );
-
-		$this->assertTrue( $result );
-		$this->assertEquals( $date_string, $fetched_comment->comment_date );
-	}
 }

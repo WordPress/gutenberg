@@ -220,32 +220,6 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 30429
-	 */
-	function test_post_date_timezone_conversion() {
-		$tz = get_option( 'timezone_string' );
-		update_option( 'timezone_string', 'America/New_York' );
-
-		$editor_id = $this->make_user_by_role( 'editor' );
-
-		$post_id = self::factory()->post->create( array(
-			'post_author' => $editor_id
-		) );
-
-		$date_string = '1984-01-11 05:00:00';
-		$result = $this->myxmlrpcserver->mw_editPost( array( $post_id, 'editor', 'editor', array(
-			'dateCreated' => new IXR_Date( mysql2date( 'Ymd\TH:i:s', $date_string, false ) ),
-		) ) );
-
-		$fetched_post = get_post( $post_id );
-
-		update_option( 'timezone_string', $tz );
-
-		$this->assertTrue( $result );
-		$this->assertEquals( $date_string, $fetched_post->post_date );
-	}
-
-	/**
 	 * @ticket 16980
 	 */
 	function test_empty_not_null() {

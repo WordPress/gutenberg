@@ -170,27 +170,4 @@ class Tests_XMLRPC_mw_newPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( 'draft', $out->post_status );
 		$this->assertEquals( '0000-00-00 00:00:00', $out->post_date_gmt );
 	}
-
-	/**
-	 * @ticket 30429
-	 */
-	function test_post_date_timezone_conversion() {
-		$tz = get_option( 'timezone_string' );
-		update_option( 'timezone_string', 'America/New_York' );
-
-		$this->make_user_by_role( 'editor' );
-		$date_string = '1984-01-11 05:00:00';
-		$post = array(
-			'title' => 'test',
-			'post_content' => 'test',
-			'dateCreated' => new IXR_Date( mysql2date( 'Ymd\TH:i:s', $date_string, false ) )
-		);
-		$result = $this->myxmlrpcserver->mw_newPost( array( 1, 'editor', 'editor', $post ) );
-		$fetched_post = get_post( $result );
-
-		update_option( 'timezone_string', $tz );
-
-		$this->assertStringMatchesFormat( '%d', $result );
-		$this->assertEquals( $date_string , $fetched_post->post_date );
-	}
 }
