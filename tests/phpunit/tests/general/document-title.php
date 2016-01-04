@@ -79,30 +79,34 @@ class Tests_General_DocumentTitle extends WP_UnitTestCase {
 
 	function test_front_page_title() {
 		update_option( 'show_on_front', 'page' );
-		update_option( 'page_for_posts', $this->factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
 		update_option( 'page_on_front', $this->factory->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
+		add_filter( 'document_title_parts', array( $this, '_front_page_title_parts' ) );
 
 		$this->go_to( '/' );
-
-		$this->assertEquals( sprintf( 'front-page &#8211; %s', $this->blog_name ), wp_get_document_title() );
+		$this->assertEquals( sprintf( '%s &#8211; Just another WordPress site', $this->blog_name ), wp_get_document_title() );
 
 		update_option( 'show_on_front', 'posts' );
-	}
 
-	function test_home_title() {
 		$this->go_to( '/' );
-
-		add_filter( 'document_title_parts', array( $this, '_home_title_parts' ) );
-
 		$this->assertEquals( sprintf( '%s &#8211; Just another WordPress site', $this->blog_name ), wp_get_document_title() );
 	}
 
-	function _home_title_parts( $parts ) {
+	function _front_page_title_parts( $parts ) {
 		$this->assertArrayHasKey( 'title', $parts );
 		$this->assertArrayHasKey( 'tagline', $parts );
 		$this->assertArrayNotHasKey( 'site', $parts );
 
 		return $parts;
+	}
+
+	function test_home_title() {
+		$blog_page_id = $this->factory->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) );
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_for_posts', $blog_page_id );
+
+		// Show page name on home page if it's not the front page.
+		$this->go_to( get_permalink( $blog_page_id ) );
+		$this->assertEquals( sprintf( 'blog-page &#8211; %s', $this->blog_name ), wp_get_document_title() );
 	}
 
 	function test_paged_title() {
