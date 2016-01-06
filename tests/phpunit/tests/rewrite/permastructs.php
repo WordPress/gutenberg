@@ -15,7 +15,7 @@ class Tests_Rewrite_Permastructs extends WP_UnitTestCase {
 		global $wp_rewrite;
 
 		add_permastruct( 'foo', 'bar/%foo%' );
-		$this->assertEqualSets( array(
+		$this->assertEqualSetsWithIndex( array(
 			'with_front'  => true,
 			'ep_mask'     => EP_NONE,
 			'paged'       => true,
