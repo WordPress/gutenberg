@@ -636,4 +636,40 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertTrue( $draft_comment_status );
 	}
+
+	/**
+	 * @ticket 35276
+	 */
+	public function test_wp_update_comment_author_id_and_agent() {
+
+		$default_data = array(
+			'comment_post_ID'      => self::$post_id,
+			'comment_author'       => rand_str(),
+			'comment_author_IP'    => '192.168.0.1',
+			'comment_agent'        => 'WRONG_AGENT',
+			'comment_author_url'   => '',
+			'comment_author_email' => '',
+			'comment_type'         => '',
+			'comment_content'      => rand_str(),
+		);
+
+		$comment_id = wp_new_comment( $default_data );
+
+		// Confirm that the IP and Agent are correct on initial save.
+		$save = get_comment( $comment_id );
+		$this->assertSame( $default_data['comment_author_IP'], $save->comment_author_IP );
+		$this->assertSame( $default_data['comment_agent'], $save->comment_agent );
+
+		// Update the comment.
+		wp_update_comment( array(
+			'comment_ID'        => $comment_id,
+			'comment_author_IP' => '111.111.1.1',
+			'comment_agent'     => 'SHIELD_AGENT',
+		) );
+
+		// Retrieve and check the new values.
+		$updated = get_comment( $comment_id );
+		$this->assertSame( '111.111.1.1', $updated->comment_author_IP );
+		$this->assertSame( 'SHIELD_AGENT', $updated->comment_agent );
+	}
 }
