@@ -642,6 +642,23 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 35321
+	 */
+	public function test_wp_insert_term_with_null_description() {
+
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$term = wp_insert_term( 'foo', 'wptests_tax', array(
+			'description' => null
+		) );
+
+		$term_object = get_term( $term['term_id'] );
+
+		$this->assertInstanceOf( 'WP_Term', $term_object );
+		$this->assertSame( '', $term_object->description );
+	}
+
 	/** Helpers **********************************************************/
 
 	public function deleted_term_cb( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
