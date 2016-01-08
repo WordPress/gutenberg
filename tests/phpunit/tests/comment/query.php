@@ -805,6 +805,23 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35377
+	 */
+	public function test_get_comments_by_author_url() {
+		$c1 = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_author' => 'bar', 'comment_author_email' => 'bar@example.com', 'comment_author_url' => 'http://foo.bar' ) );
+		$c2 = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_author' => 'bar', 'comment_author_email' => 'bar@example.com', 'comment_author_url' => 'http://foo.bar' ) );
+		$c3 = self::factory()->comment->create( array( 'comment_post_ID' => $this->post_id, 'comment_author' => 'bar', 'comment_author_email' => 'bar@example.com', 'comment_author_url' => 'http://foo.bar/baz' ) );
+
+		$comments = get_comments( array(
+			'author_url' => 'http://foo.bar',
+		) );
+
+		$this->assertCount( 2, $comments );
+		$this->assertSame( $c1, (int) $comments[0]->comment_ID );
+		$this->assertSame( $c2, (int) $comments[1]->comment_ID );
+	}
+
+	/**
 	 * @ticket 28434
 	 */
 	function test_fields_ids_query() {
