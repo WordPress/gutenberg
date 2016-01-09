@@ -530,4 +530,106 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$tax = get_taxonomy( 'wptests_tax' );
 		$this->assertFalse( $tax->query_var );
 	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_unknown_taxonomy() {
+		$this->assertWPError( unregister_taxonomy( 'foo' ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_twice() {
+		register_taxonomy( 'foo', 'post' );
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+		$this->assertWPError( unregister_taxonomy( 'foo' ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_disallow_builtin_taxonomy() {
+		$this->assertWPError( unregister_taxonomy( 'post_tag' ) );
+		$this->assertWPError( unregister_taxonomy( 'category' ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_removes_query_vars() {
+		global $wp;
+
+		register_taxonomy( 'foo', 'post', array( 'query_var' => 'bar' ) );
+
+		$this->assertInternalType( 'int', array_search( 'bar', $wp->public_query_vars ) );
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+		$this->assertFalse( array_search( 'bar', $wp->public_query_vars ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_removes_permastruct() {
+		$this->set_permalink_structure( '/%postname%' );
+
+		global $wp_rewrite;
+
+		register_taxonomy( 'foo', 'post', array( 'query_var' => 'bar', 'rewrite' => true ) );
+
+		$this->assertInternalType( 'array', $wp_rewrite->extra_permastructs['foo'] );
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+		$this->assertFalse( isset($wp_rewrite->extra_permastructs['foo'] ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_removes_rewrite_rules() {
+		$this->set_permalink_structure( '/%postname%' );
+
+		global $wp_rewrite;
+
+		register_taxonomy( 'foo', 'post', array( 'query_var' => 'bar' ) );
+
+		$count_before = count( $wp_rewrite->rewritereplace );
+
+		$this->assertContains( '%foo%', $wp_rewrite->rewritecode );
+		$this->assertContains( 'bar=', $wp_rewrite->queryreplace );
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+		$this->assertNotContains( '%foo%', $wp_rewrite->rewritecode );
+		$this->assertNotContains( 'bar=', $wp_rewrite->queryreplace );
+		$this->assertSame( --$count_before, count( $wp_rewrite->rewritereplace ) ); // Array was reduced by one value.
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_removes_taxonomy_from_global() {
+		global $wp_taxonomies;
+
+		register_taxonomy( 'foo', 'post' );
+
+		$this->assertInternalType( 'object', $wp_taxonomies['foo'] );
+		$this->assertInternalType( 'object', get_taxonomy( 'foo' ) );
+
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+
+		$this->assertFalse( isset( $wp_taxonomies['foo'] ) );
+		$this->assertFalse( get_taxonomy( 'foo' ) );
+	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_unregister_taxonomy_removes_meta_box_callback() {
+		global $wp_filter;
+
+		register_taxonomy( 'foo', 'post' );
+
+		$this->assertSame( 1, count( $wp_filter['wp_ajax_add-foo'] ) );
+		$this->assertTrue( unregister_taxonomy( 'foo' ) );
+		$this->assertSame( array(), $wp_filter['wp_ajax_add-foo'] );
+	}
 }

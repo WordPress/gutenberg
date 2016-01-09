@@ -334,7 +334,7 @@ function _unregister_post_type( $cpt_name ) {
 }
 
 function _unregister_taxonomy( $taxonomy_name ) {
-	unset( $GLOBALS['wp_taxonomies'][$taxonomy_name] );
+	unregister_taxonomy( $taxonomy_name );
 }
 
 /**
