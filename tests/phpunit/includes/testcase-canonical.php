@@ -172,8 +172,7 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 			$this->knownWPBug( $ticket );
 
 		$ticket_ref = ($ticket > 0) ? 'Ticket #' . $ticket : null;
-global $wpdb;
-//print_r( $wpdb->get_results( "SELECT * FROM $wpdb->terms" ) );
+
 		if ( is_string($expected) )
 			$expected = array('url' => $expected);
 		elseif ( is_array($expected) && !isset($expected['url']) && !isset($expected['qv']) )
