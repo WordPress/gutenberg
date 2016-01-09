@@ -418,6 +418,116 @@ VIDEO;
 	}
 
 	/**
+	 * @ticket 35367
+	 */
+	function test_wp_audio_shortcode_with_empty_params() {
+		$this->assertNull( wp_audio_shortcode( array() ) );
+	}
+
+	/**
+	 * @ticket 35367
+	 */
+	function test_wp_audio_shortcode_with_bad_attr() {
+		$this->assertSame(
+			'<a class="wp-embedded-audio" href="https://example.com/foo.php">https://example.com/foo.php</a>',
+			wp_audio_shortcode( array(
+				'src' => 'https://example.com/foo.php',
+			) )
+		);
+	}
+
+	/**
+	 * @ticket 35367
+	 */
+	function test_wp_audio_shortcode_attributes() {
+		$actual = wp_audio_shortcode( array(
+			'src' => 'https://example.com/foo.mp3',
+		) );
+
+		$this->assertContains( 'src="https://example.com/foo.mp3', $actual );
+		$this->assertNotContains( 'loop', $actual );
+		$this->assertNotContains( 'autoplay', $actual );
+		$this->assertContains( 'preload="none"', $actual );
+		$this->assertContains( 'class="wp-audio-shortcode"', $actual );
+		$this->assertContains( 'style="width: 100%; visibility: hidden;"', $actual );
+
+		$actual = wp_audio_shortcode( array(
+			'src'      => 'https://example.com/foo.mp3',
+			'loop'     => true,
+			'autoplay' => true,
+			'preload'  => true,
+			'class'    => 'foobar',
+			'style'    => 'padding:0;',
+		) );
+
+		$this->assertContains( 'src="https://example.com/foo.mp3', $actual );
+		$this->assertContains( 'loop="1"', $actual );
+		$this->assertContains( 'autoplay="1"', $actual );
+		$this->assertContains( 'preload="1"', $actual );
+		$this->assertContains( 'class="foobar"', $actual );
+		$this->assertContains( 'style="padding:0;"', $actual );
+	}
+
+	/**
+	 * @ticket  35367
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_with_empty_params() {
+		$this->assertNull( wp_video_shortcode( array() ) );
+	}
+
+	/**
+	 * @ticket  35367
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_with_bad_attr() {
+		$this->assertSame(
+			'<a class="wp-embedded-video" href="https://example.com/foo.php">https://example.com/foo.php</a>',
+			wp_video_shortcode( array(
+				'src' => 'https://example.com/foo.php',
+			) )
+		);
+	}
+
+	/**
+	 * @ticket  35367
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_attributes() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'https://example.com/foo.mp4',
+		) );
+
+		$this->assertContains( 'src="https://example.com/foo.mp4', $actual );
+		$this->assertNotContains( 'loop', $actual );
+		$this->assertNotContains( 'autoplay', $actual );
+		$this->assertContains( 'preload="metadata"', $actual );
+		$this->assertContains( 'width="640"', $actual );
+		$this->assertContains( 'height="360"', $actual );
+		$this->assertContains( 'class="wp-video-shortcode"', $actual );
+
+		$actual = wp_video_shortcode( array(
+			'src'      => 'https://example.com/foo.mp4',
+			'poster'   => 'https://example.com/foo.png',
+			'loop'     => true,
+			'autoplay' => true,
+			'preload'  => true,
+			'width'    => 123,
+			'height'   => 456,
+			'class'    => 'foobar',
+		) );
+
+		$this->assertContains( 'src="https://example.com/foo.mp4', $actual );
+		$this->assertContains( 'poster="https://example.com/foo.png', $actual );
+		$this->assertContains( 'loop="1"', $actual );
+		$this->assertContains( 'autoplay="1"', $actual );
+		$this->assertContains( 'preload="1"', $actual );
+		$this->assertContains( 'width="123"', $actual );
+		$this->assertContains( 'height="456"', $actual );
+		$this->assertContains( 'class="foobar"', $actual );
+	}
+
+	/**
 	 * Test [video] shortcode processing
 	 *
 	 */
