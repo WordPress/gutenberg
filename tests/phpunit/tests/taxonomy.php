@@ -632,4 +632,15 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertTrue( unregister_taxonomy( 'foo' ) );
 		$this->assertSame( array(), $wp_filter['wp_ajax_add-foo'] );
 	}
+
+	/**
+	 * @ticket 35227
+	 */
+	public function test_taxonomy_does_not_exist_after_unregister_taxonomy() {
+		register_taxonomy( 'foo', 'post' );
+		$this->assertTrue( taxonomy_exists( 'foo' ) );
+		unregister_taxonomy( 'foo' );
+		$this->assertFalse( taxonomy_exists( 'foo' ) );
+	}
+
 }
