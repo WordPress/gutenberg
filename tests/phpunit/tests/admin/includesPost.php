@@ -454,6 +454,29 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		$this->assertEquals( '30', $found[1] );
 	}
 
+	/**
+	 * @ticket 35368
+	 */
+	public function test_get_sample_permalink_should_respect_hierarchy_of_draft_pages() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$parent = self::factory()->post->create( array(
+			'post_type'  => 'page',
+			'post_title' => 'Parent Page',
+		) );
+
+		$child = self::factory()->post->create( array(
+			'post_type'   => 'page',
+			'post_title'  => 'Child Page',
+			'post_parent' => $parent,
+			'post_status' => 'draft',
+		) );
+
+		$actual = get_sample_permalink( $child );
+		$this->assertSame( home_url() . '/parent-page/%pagename%/', $actual[0] );
+		$this->assertSame( 'child-page', $actual[1] );
+	}
+
 	public function test_post_exists_should_match_title() {
 		$p = self::factory()->post->create( array(
 			'post_title' => 'Foo Bar',
