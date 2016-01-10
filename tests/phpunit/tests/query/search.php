@@ -125,4 +125,16 @@ class Tests_Query_Search extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $p3 ), $q->posts );
 	}
+
+	/**
+	 * @ticket 35361
+	 */
+	public function test_search_orderby_should_be_empty_when_search_string_is_longer_than_6_words_and_exclusion_operator_is_used() {
+		$q = new WP_Query( array(
+			's' => 'foo1 foo2 foo3 foo4 foo5 foo6 foo7 -bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertNotRegExp( '|ORDER BY \(CASE[^\)]+\)|', $q->request );
+	}
 }
