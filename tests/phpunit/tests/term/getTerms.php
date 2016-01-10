@@ -1665,6 +1665,25 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 35382
+	 */
+	public function test_indexes_should_not_be_reset_when_number_of_matched_terms_is_greater_than_number() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'fields' => 'id=>parent',
+			'number' => 2,
+			'orderby' => 'id',
+			'order' => 'ASC',
+			'hierarchical' => true,
+		) );
+
+		$this->assertSame( array( $terms[0], $terms[1] ), array_keys( $found ) );
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
