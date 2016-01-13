@@ -110,4 +110,40 @@ class Tests_Comment_WpListComments extends WP_UnitTestCase {
 		preg_match_all( '|id="comment\-([0-9]+)"|', $found2, $matches );
 		$this->assertSame( array( $comments[1], $comments[0] ), array_map( 'intval', $matches[1] ) );
 	}
+
+	/**
+	 * @ticket 35356
+	 * @ticket 35175
+	 */
+	public function test_comments_param_should_be_respected_when_custom_pagination_params_are_passed() {
+		$p = self::factory()->post->create();
+
+		$comments = array();
+		$now = time();
+		for ( $i = 0; $i <= 5; $i++ ) {
+			$comments[] = self::factory()->comment->create( array(
+				'comment_post_ID' => $p,
+				'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - $i ),
+				'comment_author' => 'Commenter ' . $i,
+			) );
+		}
+
+		update_option( 'page_comments', true );
+		update_option( 'comments_per_page', 2 );
+
+		$_comments = array( get_comment( $comments[1] ), get_comment( $comments[3] ) );
+
+		// Populate `$wp_query->comments` in order to show that it doesn't override `$_comments`.
+		$this->go_to( get_permalink( $p ) );
+		get_echo( 'comments_template' );
+
+		$found = wp_list_comments( array(
+			'echo' => false,
+			'per_page' => 1,
+			'page' => 2,
+		), $_comments );
+
+		preg_match_all( '|id="comment\-([0-9]+)"|', $found, $matches );
+		$this->assertSame( array( $comments[3] ), array_map( 'intval', $matches[1] ) );
+	}
 }
