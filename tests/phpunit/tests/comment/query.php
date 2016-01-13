@@ -814,11 +814,10 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 
 		$comments = get_comments( array(
 			'author_url' => 'http://foo.bar',
+			'fields' => 'ids',
 		) );
 
-		$this->assertCount( 2, $comments );
-		$this->assertSame( $c1, (int) $comments[0]->comment_ID );
-		$this->assertSame( $c2, (int) $comments[1]->comment_ID );
+		$this->assertEqualSets( array( $c1, $c2 ), $comments );
 	}
 
 	/**
