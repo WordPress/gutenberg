@@ -137,4 +137,26 @@ class Tests_Query_Search extends WP_UnitTestCase {
 
 		$this->assertNotRegExp( '|ORDER BY \(CASE[^\)]+\)|', $q->request );
 	}
+
+	/**
+	 * @ticket 31025
+	 */
+	public function test_s_zero() {
+		$p1 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_title' => '1',
+		) );
+
+		$p2 = $this->factory->post->create( array(
+			'post_status' => 'publish',
+			'post_title' => '0',
+		) );
+
+		$q = new WP_Query( array(
+			's' => '0',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
 }
