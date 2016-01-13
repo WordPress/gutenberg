@@ -593,6 +593,86 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 10377
+	 */
+	public function test_submitting_comment_with_content_too_long_returns_error() {
+		$error = 'comment_content_column_length';
+
+		$post = self::factory()->post->create_and_get();
+
+		$data = array(
+			'comment_post_ID' => $post->ID,
+			'comment'         => rand_long_str( 65536 ),
+			'author'          => 'Comment Author',
+			'email'           => 'comment@example.org',
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+	}
+
+	/**
+	 * @ticket 10377
+	 */
+	public function test_submitting_comment_with_author_too_long_returns_error() {
+		$error = 'comment_author_column_length';
+
+		$post = self::factory()->post->create_and_get();
+
+		$data = array(
+			'comment_post_ID' => $post->ID,
+			'comment'         => rand_str(),
+			'author'          => rand_long_str( 255 ),
+			'email'           => 'comment@example.org',
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+	}
+
+	/**
+	 * @ticket 10377
+	 */
+	public function test_submitting_comment_with_email_too_long_returns_error() {
+		$error = 'comment_author_email_column_length';
+
+		$post = self::factory()->post->create_and_get();
+
+		$data = array(
+			'comment_post_ID' => $post->ID,
+			'comment'         => rand_str(),
+			'author'          => 'Comment Author',
+			'email'           => rand_long_str( 90 ) . '@example.com',
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+	}
+
+	/**
+	 * @ticket 10377
+	 */
+	public function test_submitting_comment_with_url_too_long_returns_error() {
+		$error = 'comment_author_url_column_length';
+
+		$post = self::factory()->post->create_and_get();
+		$data = array(
+			'comment_post_ID' => $post->ID,
+			'comment'         => rand_str(),
+			'author'          => 'Comment Author',
+			'email'           => 'comment@example.org',
+			'url'             => rand_long_str( 201 ),
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+	}
+
+	/**
 	 * @ticket 34997
 	 */
 	public function test_comment_submission_sends_all_expected_parameters_to_preprocess_comment_filter() {

@@ -6,6 +6,18 @@ function rand_str($len=32) {
 	return substr(md5(uniqid(rand())), 0, $len);
 }
 
+function rand_long_str( $length ) {
+	$chars = 'abcdefghijklmnopqrstuvwxyz';
+	$string = '';
+
+	for ( $i = 0; $i < $length; $i++ ) {
+		$rand = rand( 0, strlen( $chars ) - 1 );
+		$string .= substr( $chars, $rand, 1 );
+	}
+
+	return $string;
+}
+
 // strip leading and trailing whitespace from each line in the string
 function strip_ws($txt) {
 	$lines = explode("\n", $txt);
