@@ -2129,6 +2129,97 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35192
+	 */
+	public function test_comment_clauses_prepend_callback_should_be_respected_when_filling_descendants() {
+		$top_level_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$child1_of_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$child2_of_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$top_level_comments = self::factory()->comment->create_many( 3, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$this->to_exclude = array( $child2_of_0, $top_level_comments[1] );
+
+		add_filter( 'comments_clauses', array( $this, 'prepend_exclusions' ) );
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'hierarchical' => 'flat',
+		) );
+		remove_filter( 'comments_clauses', array( $this, 'prepend_exclusions' ) );
+
+		unset( $this->to_exclude );
+
+		$this->assertEqualSets( array( $top_level_0, $child1_of_0, $top_level_comments[0], $top_level_comments[2] ), wp_list_pluck( $q->comments, 'comment_ID' ) );
+	}
+
+	public function prepend_exclusions( $clauses ) {
+		global $wpdb;
+		$clauses['where'] = $wpdb->prepare( 'comment_ID != %d AND comment_ID != %d AND ', $this->to_exclude[0], $this->to_exclude[1] ) . $clauses['where'];
+		return $clauses;
+	}
+
+	/**
+	 * @ticket 35192
+	 */
+	public function test_comment_clauses_append_callback_should_be_respected_when_filling_descendants() {
+		$top_level_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$child1_of_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$child2_of_0 = self::factory()->comment->create( array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+			'comment_parent' => $top_level_0,
+		) );
+
+		$top_level_comments = self::factory()->comment->create_many( 3, array(
+			'comment_post_ID' => $this->post_id,
+			'comment_approved' => '1',
+		) );
+
+		$this->to_exclude = array( $child2_of_0, $top_level_comments[1] );
+
+		add_filter( 'comments_clauses', array( $this, 'append_exclusions' ) );
+		$q = new WP_Comment_Query( array(
+			'post_id' => $this->post_id,
+			'hierarchical' => 'flat',
+		) );
+		remove_filter( 'comments_clauses', array( $this, 'append_exclusions' ) );
+
+		unset( $this->to_exclude );
+
+		$this->assertEqualSets( array( $top_level_0, $child1_of_0, $top_level_comments[0], $top_level_comments[2] ), wp_list_pluck( $q->comments, 'comment_ID' ) );
+	}
+
+	public function append_exclusions( $clauses ) {
+		global $wpdb;
+		$clauses['where'] .= $wpdb->prepare( ' AND comment_ID != %d AND comment_ID != %d', $this->to_exclude[0], $this->to_exclude[1] );
+		return $clauses;
+	}
+	/**
 	 * @ticket 27571
 	 */
 	public function test_update_comment_post_cache_should_be_disabled_by_default() {
