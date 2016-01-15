@@ -672,4 +672,22 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertSame( '111.111.1.1', $updated->comment_author_IP );
 		$this->assertSame( 'SHIELD_AGENT', $updated->comment_agent );
 	}
+
+	public function test_wp_get_comment_column_max_length() {
+		$columns = array(
+			'comment_author' => 245,
+			'comment_author_email' => 100,
+			'comment_author_url' => 200,
+			'comment_author_IP' => 100,
+			'comment_content' => 65525,
+			'comment_approved' => 20,
+			'comment_agent' => 255,
+			'comment_type' => 20,
+		);
+
+		foreach ( $columns as $column => $expected ) {
+			$max_length = wp_get_comment_column_max_length( $column );
+			$this->assertSame( $expected, $max_length );
+		}
+	}
 }
