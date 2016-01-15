@@ -17,7 +17,7 @@ class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 		) );
 
 		$actual = get_edit_term_link( $term1, 'wptests_tax' );
-		$expected = 'http://' . WP_TESTS_DOMAIN . '/wp-admin/edit-tags.php?action=edit&taxonomy=wptests_tax&tag_ID=' . $term1 . '&post_type=post';
+		$expected = 'http://' . WP_TESTS_DOMAIN . '/wp-admin/term.php?taxonomy=wptests_tax&term_id=' . $term1 . '&post_type=post';
 		$this->assertEquals( $expected, $actual );
 	}
 
