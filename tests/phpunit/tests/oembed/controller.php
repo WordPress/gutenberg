@@ -169,6 +169,49 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 		$this->assertTrue( $data['width'] <= $request['maxwidth'] );
 	}
 
+	/**
+	 * @ticket 34971
+	 */
+	function test_request_static_front_page() {
+		$post = self::factory()->post->create_and_get( array(
+			'post_title' => 'Front page',
+			'post_type'  => 'page',
+		) );
+
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $post->ID );
+
+		$request = new WP_REST_Request( 'GET', '/oembed/1.0/embed' );
+		$request->set_param( 'url', home_url() );
+		$request->set_param( 'maxwidth', 400 );
+
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertInternalType( 'array', $data );
+		$this->assertNotEmpty( $data );
+
+		$this->assertArrayHasKey( 'version', $data );
+		$this->assertArrayHasKey( 'provider_name', $data );
+		$this->assertArrayHasKey( 'provider_url', $data );
+		$this->assertArrayHasKey( 'author_name', $data );
+		$this->assertArrayHasKey( 'author_url', $data );
+		$this->assertArrayHasKey( 'title', $data );
+		$this->assertArrayHasKey( 'type', $data );
+		$this->assertArrayHasKey( 'width', $data );
+
+		$this->assertEquals( '1.0', $data['version'] );
+		$this->assertEquals( get_bloginfo( 'name' ), $data['provider_name'] );
+		$this->assertEquals( get_home_url(), $data['provider_url'] );
+		$this->assertEquals( get_bloginfo( 'name' ), $data['author_name'] );
+		$this->assertEquals( get_home_url(), $data['author_url'] );
+		$this->assertEquals( $post->post_title, $data['title'] );
+		$this->assertEquals( 'rich', $data['type'] );
+		$this->assertTrue( $data['width'] <= $request['maxwidth'] );
+
+		update_option( 'show_on_front', 'posts' );
+	}
+
 	function test_request_xml() {
 		$user = self::factory()->user->create_and_get( array(
 			'display_name' => 'John Doe',

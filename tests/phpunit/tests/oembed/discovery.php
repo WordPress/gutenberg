@@ -9,17 +9,25 @@ class Tests_oEmbed_Discovery extends WP_UnitTestCase {
 	}
 
 	function test_add_oembed_discovery_links_front_page() {
-		$this->go_to( home_url('/') );
+		$this->go_to( home_url() );
 		$this->assertSame( '', get_echo( 'wp_oembed_add_discovery_links' ) );
+		$this->assertSame( 0, url_to_postid( home_url() ) );
 	}
 
+	/**
+	 * @ticket 34971
+	 */
 	function test_add_oembed_discovery_links_static_front_page() {
 		update_option( 'show_on_front', 'page' );
-		update_option( 'page_for_posts', self::factory()->post->create( array( 'post_title' => 'blog-page', 'post_type' => 'page' ) ) );
 		update_option( 'page_on_front', self::factory()->post->create( array( 'post_title' => 'front-page', 'post_type' => 'page' ) ) );
 
-		$this->go_to( home_url('/') );
-		$this->assertSame( '', get_echo( 'wp_oembed_add_discovery_links' ) );
+		$this->go_to( home_url() );
+		$this->assertQueryTrue( 'is_front_page', 'is_singular', 'is_page' );
+
+		$expected = '<link rel="alternate" type="application/json+oembed" href="' . esc_url( get_oembed_endpoint_url( get_permalink() ) ) . '" />' . "\n";
+		$expected .= '<link rel="alternate" type="text/xml+oembed" href="' . esc_url( get_oembed_endpoint_url( get_permalink(), 'xml' ) ) . '" />' . "\n";
+
+		$this->assertSame( $expected, get_echo( 'wp_oembed_add_discovery_links' ) );
 
 		update_option( 'show_on_front', 'posts' );
 	}

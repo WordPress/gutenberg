@@ -302,4 +302,49 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 		$found = wp_unique_post_slug( '32', $p, 'publish', 'post', 0 );
 		$this->assertEquals( '32', $found );
 	}
+
+	/**
+	 * @ticket 34971
+	 */
+	public function test_embed_slug_should_be_suffixed_for_posts() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$p = self::factory()->post->create( array(
+			'post_type' => 'post',
+			'post_name' => 'embed',
+		) );
+
+		$found = wp_unique_post_slug( 'embed', $p, 'publish', 'post', 0 );
+		$this->assertSame( 'embed-2', $found );
+	}
+
+	/**
+	 * @ticket 34971
+	 */
+	public function test_embed_slug_should_be_suffixed_for_pages() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$p = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'embed',
+		) );
+
+		$found = wp_unique_post_slug( 'embed', $p, 'publish', 'paage', 0 );
+		$this->assertSame( 'embed-2', $found );
+	}
+
+	/**
+	 * @ticket 34971
+	 */
+	public function test_embed_slug_should_be_suffixed_for_attachments() {
+		$this->set_permalink_structure( '/%postname%/' );
+
+		$p = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+			'post_name' => 'embed',
+		) );
+
+		$found = wp_unique_post_slug( 'embed', $p, 'publish', 'attachment', 0 );
+		$this->assertSame( 'embed-2', $found );
+	}
 }
