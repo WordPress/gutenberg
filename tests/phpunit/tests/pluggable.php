@@ -127,7 +127,6 @@ class Tests_Pluggable extends WP_UnitTestCase {
 			// wp-includes/pluggable.php:
 			'wp_set_current_user'             => array( 'id', 'name' => '' ),
 			'wp_get_current_user'             => array(),
-			'get_currentuserinfo'             => array(),
 			'get_userdata'                    => array( 'user_id' ),
 			'get_user_by'                     => array( 'field', 'value' ),
 			'cache_users'                     => array( 'user_ids' ),
