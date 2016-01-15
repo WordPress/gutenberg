@@ -534,6 +534,43 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $c1, $c2 ), $found );
 	}
 
+	/**
+	 * @ticket 35478
+	 */
+	public function test_multiple_post_fields_should_all_be_respected() {
+		$posts = array();
+
+		$posts[] = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_author' => 3,
+		) );
+
+		$posts[] = self::factory()->post->create( array(
+			'post_status' => 'draft',
+			'post_author' => 4,
+		) );
+
+		$posts[] = self::factory()->post->create( array(
+			'post_status' => 'draft',
+			'post_author' => 3,
+		) );
+
+		$comments = array();
+		foreach ( $posts as $post ) {
+			$comments[] = self::factory()->comment->create( array(
+				'comment_post_ID' => $post,
+			) );
+		}
+
+		$q = new WP_Comment_Query( array(
+			'post_status' => 'draft',
+			'post_author' => 3,
+			'fields' => 'ids',
+		) );
+
+		$this->assertSame( array( $comments[2] ), $q->comments );
+	}
+
 	function test_get_comments_for_post() {
 		$limit = 5;
 
