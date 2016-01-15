@@ -200,4 +200,23 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'wptests_tax' );
 	}
+
+	/**
+	 * @ticket 35462
+	 */
+	public function test_term_objects_should_not_be_modified_by_update_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$p = self::factory()->post->create();
+
+		wp_set_object_terms( $p, $t, 'wptests_tax' );
+
+		$terms = wp_get_object_terms( $p, 'wptests_tax', array( 'fields' => 'all_with_object_id' ) );
+
+		update_term_cache( $terms );
+
+		foreach ( $terms as $term ) {
+			$this->assertSame( $p, $term->object_id );
+		}
+	}
 }
