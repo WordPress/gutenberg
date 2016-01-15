@@ -108,8 +108,8 @@ module.exports = function(grunt) {
 						return src.replace( /^\$wp_version = '(.+?)';/m, function( str, version ) {
 							version = version.replace( /-src$/, '' );
 
-							// If the version includes an SVN commit (-12345), it's not a released alpha/beta. Append a date.
-							version = version.replace( /-[\d]{5}$/, '-' + grunt.template.today( 'yyyymmdd' ) );
+							// If the version includes an SVN commit (-12345), it's not a released alpha/beta. Append a timestamp.
+							version = version.replace( /-[\d]{5}$/, '-' + new Date().getTime() );
 
 							/* jshint quotmark: true */
 							return "$wp_version = '" + version + "';";
