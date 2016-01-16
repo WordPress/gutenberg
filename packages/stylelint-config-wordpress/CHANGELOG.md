@@ -1,3 +1,7 @@
+# HEAD
+
+* Added: `selector-pseudo-element-colon-notation` with option `single`
+
 # 1.0.1
 
 * Changed: config syntax.
