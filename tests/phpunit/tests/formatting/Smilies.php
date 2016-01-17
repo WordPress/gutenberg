@@ -20,7 +20,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				'<strong>Welcome to the jungle!</strong> We got fun n games! :) We got everything you want 8-) <em>Honey we know the names :)</em>',
-				"<strong>Welcome to the jungle!</strong> We got fun n games! <img src=\"${includes_path}simple-smile.png\" alt=\":)\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> We got everything you want \xf0\x9f\x98\x8e <em>Honey we know the names <img src=\"${includes_path}simple-smile.png\" alt=\":)\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /></em>"
+				"<strong>Welcome to the jungle!</strong> We got fun n games! \xf0\x9f\x99\x82 We got everything you want \xf0\x9f\x98\x8e <em>Honey we know the names \xf0\x9f\x99\x82</em>"
 			),
 			array (
 				"<strong;)>a little bit of this\na little bit:other: of that :D\n:D a little bit of good\nyeah with a little bit of bad8O",
@@ -169,7 +169,7 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 		return array (
 			array (
 				'8-O :-(',
-				"\xf0\x9f\x98\xaf <img src=\"{$includes_path}frownie.png\" alt=\":-(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
+				"\xf0\x9f\x98\xaf \xf0\x9f\x99\x81"
 			),
 			array (
 				'8-) 8-O',
@@ -181,15 +181,15 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 			),
 			array (
 				'8-) :-(',
-				"\xf0\x9f\x98\x8e <img src=\"{$includes_path}frownie.png\" alt=\":-(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
+				"\xf0\x9f\x98\x8e \xf0\x9f\x99\x81"
 			),
 			array (
 				'8-) :twisted:',
 				"\xf0\x9f\x98\x8e \xf0\x9f\x98\x88"
 			),
 			array (
-				'8O :twisted: :( :? :(',
-				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 <img src=\"{$includes_path}frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" /> \xf0\x9f\x98\x95 <img src=\"{$includes_path}frownie.png\" alt=\":(\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
+				'8O :twisted: :( :? :roll:',
+				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 \xf0\x9f\x99\x81 \xf0\x9f\x98\x95 <img src=\"{$includes_path}rolleyes.png\" alt=\":roll:\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 		);
 	}
@@ -272,6 +272,25 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 		$wpsmiliestrans = $orig_trans; // reset original translations array
 	}
 
+	public function get_spaces_around_smilies() {
+		$nbsp = "\xC2\xA0";
+
+		return array(
+			array(
+				'test :) smile',
+				"test \xf0\x9f\x99\x82 smile"
+			),
+			array(
+				'test &nbsp;:)&nbsp;smile',
+				"test &nbsp;\xf0\x9f\x99\x82&nbsp;smile"
+			),
+			array(
+				"test {$nbsp}:){$nbsp}smile",
+				"test {$nbsp}\xf0\x9f\x99\x82{$nbsp}smile"
+			)
+		);
+	}
+
 	/**
 	 * Check that $wp_smiliessearch pattern will match smilies
 	 * between spaces, but never capture those spaces.
@@ -280,35 +299,15 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 	 * or added when replacing the text with an image.
 	 *
 	 * @ticket 22692
+	 * @dataProvider get_spaces_around_smilies
 	 */
-	function test_spaces_around_smilies() {
-		$nbsp = "\xC2\xA0";
-
+	function test_spaces_around_smilies( $in_txt, $converted_txt ) {
 		// standard smilies, use_smilies: ON
 		update_option( 'use_smilies', 1 );
+
 		smilies_init();
 
-		$input  = array();
-		$output = array();
-
-		$input[]  = 'My test :) smile';
-		$output[] = array('test <img ', 'alt=":)"', ' /> smile');
-
-		$input[]  = 'My test &nbsp;:)&nbsp;smile';
-		$output[] = array('test &nbsp;<img ', 'alt=":)"', ' />&nbsp;smile');
-
-		$input[]  = "My test {$nbsp}:){$nbsp}smile";
-		$output[] = array("test {$nbsp}<img ", 'alt=":)"', " />{$nbsp}smile");
-
-		foreach($input as $key => $in) {
-			$result = convert_smilies( $in );
-			foreach($output[$key] as $out) {
-
-				// Each output element must appear in the results.
-				$this->assertContains( $out, $result );
-
-			}
-		}
+		$this->assertEquals( $converted_txt, convert_smilies( $in_txt ) );
 
 		// standard smilies, use_smilies: OFF
 		update_option( 'use_smilies', 0 );
