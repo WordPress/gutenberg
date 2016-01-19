@@ -1179,6 +1179,61 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $c1, $c2, $c3, $c4, $c5 ), $found );
 	}
 
+	/**
+	 * @ticket 35513
+	 */
+	public function test_search_false_should_be_ignored() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'search' => false,
+		) );
+		$this->assertNotContains( "comment_author LIKE", $q->request );
+	}
+
+	/**
+	 * @ticket 35513
+	 */
+	public function test_search_null_should_be_ignored() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'search' => null,
+		) );
+		$this->assertNotContains( "comment_author LIKE", $q->request );
+	}
+
+	/**
+	 * @ticket 35513
+	 */
+	public function test_search_empty_string_should_be_ignored() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'search' => false,
+		) );
+		$this->assertNotContains( "comment_author LIKE", $q->request );
+	}
+
+	/**
+	 * @ticket 35513
+	 */
+	public function test_search_int_0_should_not_be_ignored() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'search' => 0,
+		) );
+		$this->assertContains( "comment_author LIKE '%0%'", $q->request );
+	}
+
+	/**
+	 * @ticket 35513
+	 */
+	public function test_search_string_0_should_not_be_ignored() {
+		$q = new WP_Comment_Query();
+		$q->query( array(
+			'search' => '0',
+		) );
+		$this->assertContains( "comment_author LIKE '%0%'", $q->request );
+	}
+
 	public function test_orderby_default() {
 		global $wpdb;
 
