@@ -44,7 +44,9 @@ module.exports = {
     "property-no-vendor-prefix": true,
     "rule-no-shorthand-property-overrides": true,
     "rule-nested-empty-line-before": "always",
-    "rule-non-nested-empty-line-before": "always",
+    "rule-non-nested-empty-line-before": [ "always", {
+      ignore: ["after-comment"],
+    } ],
     "rule-trailing-semicolon": "always",
     "selector-combinator-space-after": "always",
     "selector-combinator-space-before": "always",

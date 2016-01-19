@@ -1,3 +1,6 @@
+# HEAD
+* Changed: `rule-non-nested-empty-line-before` with option `ignore: ["after-comment"],`.
+
 # 1.1.0
 
 * Added: `selector-pseudo-element-colon-notation` with option `single`
