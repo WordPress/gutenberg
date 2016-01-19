@@ -1,4 +1,5 @@
-# HEAD
+# 1.1.1
+
 * Changed: `rule-non-nested-empty-line-before` with option `ignore: ["after-comment"],`.
 
 # 1.1.0
