@@ -1,9 +1,114 @@
-( function( $, QUnit, tinymce, _type, setTimeout ) {
+( function( $, QUnit, tinymce, setTimeout ) {
 	var editor,
 		count = 0;
 
 	if ( tinymce.Env.ie && tinymce.Env.ie < 9 ) {
 		return;
+	}
+
+	function mceType(chr) {
+		var editor = tinymce.activeEditor, keyCode, charCode, evt, startElm, rng, startContainer, startOffset, textNode;
+
+		function charCodeToKeyCode(charCode) {
+			var lookup = {
+				'0': 48, '1': 49, '2': 50, '3': 51, '4': 52, '5': 53, '6': 54, '7': 55, '8': 56, '9': 57,'a': 65, 'b': 66, 'c': 67,
+				'd': 68, 'e': 69, 'f': 70, 'g': 71, 'h': 72, 'i': 73, 'j': 74, 'k': 75, 'l': 76, 'm': 77, 'n': 78, 'o': 79, 'p': 80, 'q': 81,
+				'r': 82, 's': 83, 't': 84, 'u': 85,	'v': 86, 'w': 87, 'x': 88, 'y': 89, ' ': 32, ',': 188, '-': 189, '.': 190, '/': 191, '\\': 220,
+				'[': 219, ']': 221, '\'': 222, ';': 186, '=': 187, ')': 41
+			};
+
+			return lookup[String.fromCharCode(charCode)];
+		}
+
+		function fakeEvent(target, type, evt) {
+			editor.dom.fire(target, type, evt);
+		}
+
+		// Numeric keyCode
+		if (typeof(chr) === 'number') {
+			charCode = chr;
+			keyCode = charCodeToKeyCode(charCode);
+		} else if (typeof(chr) === 'string') {
+			// String value
+			if (chr === '\b') {
+				keyCode = 8;
+				charCode = chr.charCodeAt(0);
+			} else if (chr === '\n') {
+				keyCode = 13;
+				charCode = chr.charCodeAt(0);
+			} else {
+				charCode = chr.charCodeAt(0);
+				keyCode = charCodeToKeyCode(charCode);
+			}
+		} else {
+			evt = chr;
+
+			if (evt.charCode) {
+				chr = String.fromCharCode(evt.charCode);
+			}
+
+			if (evt.keyCode) {
+				keyCode = evt.keyCode;
+			}
+		}
+
+		evt = evt || {keyCode: keyCode, charCode: charCode};
+
+		startElm = editor.selection.getStart();
+		fakeEvent(startElm, 'keydown', evt);
+		fakeEvent(startElm, 'keypress', evt);
+
+		if (!evt.isDefaultPrevented()) {
+			if (keyCode === 8) {
+				if (editor.getDoc().selection) {
+					rng = editor.getDoc().selection.createRange();
+
+					if (rng.text.length === 0) {
+						rng.moveStart('character', -1);
+						rng.select();
+					}
+
+					rng.execCommand('Delete', false, null);
+				} else {
+					rng = editor.selection.getRng();
+					startContainer = rng.startContainer;
+
+					if (startContainer.nodeType === 1 && rng.collapsed) {
+						var nodes = rng.startContainer.childNodes;
+						startContainer = nodes[nodes.length - 1];
+					}
+
+					// If caret is at <p>abc|</p> and after the abc text node then move it to the end of the text node
+					// Expand the range to include the last char <p>ab[c]</p> since IE 11 doesn't delete otherwise
+					if ( rng.collapsed && startContainer && startContainer.nodeType === 3 && startContainer.data.length > 0) {
+						rng.setStart(startContainer, startContainer.data.length - 1);
+						rng.setEnd(startContainer, startContainer.data.length);
+						editor.selection.setRng(rng);
+					}
+
+					editor.getDoc().execCommand('Delete', false, null);
+				}
+			} else if (typeof(chr) === 'string') {
+				rng = editor.selection.getRng(true);
+
+				if (rng.startContainer.nodeType === 3 && rng.collapsed) {
+					// `insertData` may alter the range.
+					startContainer = rng.startContainer;
+					startOffset = rng.startOffset;
+					rng.startContainer.insertData( rng.startOffset, chr );
+					rng.setStart( startContainer, startOffset + 1 );
+				} else {
+					textNode = editor.getDoc().createTextNode(chr);
+					rng.insertNode(textNode);
+					rng.setStart(textNode, 1);
+				}
+
+				rng.collapse(true);
+				editor.selection.setRng(rng);
+			}
+		}
+
+		fakeEvent(startElm, 'keyup', evt);
 	}
 
 	function type() {
@@ -17,7 +122,7 @@
 			if ( typeof args[0] === 'function' ) {
 				args[0]();
 			} else {
-				_type( args[0].shift() );
+				mceType( args[0].shift() );
 			}
 
 			if ( ! args[0].length ) {
@@ -172,4 +277,4 @@
 			assert.equal( editor.getContent(), '<p>###&nbsp;</p>\n<p>&nbsp;</p>' );
 		}, assert.async() );
 	} );
-} )( window.jQuery, window.QUnit, window.tinymce, window.Utils.type, window.setTimeout );
+} )( window.jQuery, window.QUnit, window.tinymce, window.setTimeout );

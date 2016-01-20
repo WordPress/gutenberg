@@ -10,13 +10,13 @@ module("tinymce.plugins.Lists", {
 					QUnit.started = true;
 				}
 			} else {
-				setTimeout(wait, 0);
+				tinymce.util.Delay.setTimeout(wait, 0);
 			}
 		}
 
 		tinymce.init({
 			selector: '#elm1',
-			plugins: wpPlugins,
+			plugins: "lists",
 			add_unload_trigger: false,
 			skin: false,
 			indent: false,

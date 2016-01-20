@@ -5,7 +5,6 @@ module("tinymce.Editor", {
 
 		tinymce.init({
 			selector: "#elm1",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,
@@ -27,7 +26,6 @@ module("tinymce.Editor", {
 
 		tinymce.init({
 			selector: "#elm2",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,
@@ -309,7 +307,6 @@ asyncTest('remove editor', function() {
 
 	tinymce.init({
 		selector: "#elmx",
-		plugins: wpPlugins,
 		add_unload_trigger: false,
 		disable_nodechange: true,
 		skin: false,
@@ -404,18 +401,20 @@ test('addQueryStateHandler', function() {
 });
 
 test('Block script execution', function() {
-	editor.setContent('<script></script><script type="x"></script><script type="mce-x"></script>');
+	editor.setContent('<script></script><script type="x"></script><script type="mce-x"></script><p>x</p>');
 	equal(
 		Utils.cleanHtml(editor.getBody().innerHTML),
 		'<script type="mce-no/type"></script>' +
 		'<script type="mce-x"></script>' +
-		'<script type="mce-x"></script>'
+		'<script type="mce-x"></script>' +
+		'<p>x</p>'
 	);
 	equal(
 		editor.getContent(),
 		'<script></script>' +
 		'<script type="x"></script>' +
-		'<script type="x"></script>'
+		'<script type="x"></script>' +
+		'<p>x</p>'
 	);
 });
 
@@ -437,4 +436,50 @@ test('addQueryValueHandler', function() {
 	currentValue = "b";
 	ok(editor.queryCommandValue("CustomCommand2"), "b");
 	ok(lastScope === editor, "Scope is not editor");
+});
+
+test('setDirty/isDirty', function() {
+	var lastArgs = null;
+
+	editor.on('dirty', function(e) {
+		lastArgs = e;
+	});
+
+	editor.setDirty(false);
+	strictEqual(lastArgs, null);
+	strictEqual(editor.isDirty(), false);
+
+	editor.setDirty(true);
+	strictEqual(lastArgs.type, 'dirty');
+	strictEqual(editor.isDirty(), true);
+
+	lastArgs = null;
+	editor.setDirty(true);
+	strictEqual(lastArgs, null);
+	strictEqual(editor.isDirty(), true);
+
+	editor.setDirty(false);
+	strictEqual(lastArgs, null);
+	strictEqual(editor.isDirty(), false);
+});
+
+test('setMode', function() {
+	var clickCount = 0;
+
+	editor.on('click', function() {
+		clickCount++;
+	});
+
+	editor.dom.fire(editor.getBody(), 'click');
+	equal(clickCount, 1);
+
+	editor.setMode('readonly');
+	equal(editor.theme.panel.find('button:last')[2].disabled(), true);
+	editor.dom.fire(editor.getBody(), 'click');
+	equal(clickCount, 1);
+
+	editor.setMode('design');
+	editor.dom.fire(editor.getBody(), 'click');
+	equal(editor.theme.panel.find('button:last')[2].disabled(), false);
+	equal(clickCount, 2);
 });

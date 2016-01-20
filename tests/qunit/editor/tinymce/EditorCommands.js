@@ -4,7 +4,6 @@ module("tinymce.EditorCommands", {
 
 		tinymce.init({
 			selector: "textarea",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			indent: false,
@@ -249,7 +248,7 @@ test('mceInsertContent - forced root block', function() {
 
 	// Forced root block
 	editor.getBody().innerHTML = '';
-	editor.execCommand('mceInsertContent', false, 'test<strong>123</strong><!-- a -->'); // WP: use <strong> instead of <b>
+	editor.execCommand('mceInsertContent', false, 'test<b>123</b><!-- a -->');
 	// Opera adds an extra paragraph since it adds a BR at the end of the contents pass though this for now since it's an minority browser
 	equal(editor.getContent().replace(/<p>\u00a0<\/p>/g, ''), '<p>test<strong>123</strong></p><!-- a -->');
 });
@@ -260,7 +259,7 @@ test('mceInsertContent - mixed inline content inside td', function() {
 	// Forced root block
 	editor.getBody().innerHTML = '<table><tr><td>X</td></tr></table>';
 	Utils.setSelection('td', 0, 'td', 0);
-	editor.execCommand('mceInsertContent', false, 'test<strong>123</strong><!-- a -->'); // WP: use <strong> instead of <b>
+	editor.execCommand('mceInsertContent', false, 'test<b>123</b><!-- a -->');
 	equal(editor.getContent(), '<table><tbody><tr><td>test<strong>123</strong><!-- a -->X</td></tr></tbody></table>');
 });
 
@@ -480,18 +479,18 @@ test('Formatting commands (alignInline)', function() {
 
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
-	editor.execCommand('JustifyLeft'); // WP use classes
-	equal(editor.getContent(), '<p><img class="alignleft" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	editor.execCommand('JustifyLeft');
+	equal(editor.getContent(), '<p><img style="float: left;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
 
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
-	editor.execCommand('JustifyCenter'); // WP use classes
-	equal(editor.getContent(), '<p><img class="aligncenter" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	editor.execCommand('JustifyCenter');
+	equal(editor.getContent(), '<p><img style="margin-right: auto; margin-left: auto; display: block;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
 
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
-	editor.execCommand('JustifyRight'); // WP use classes
-	equal(editor.getContent(), '<p><img class="alignright" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	editor.execCommand('JustifyRight');
+	equal(editor.getContent(), '<p><img style="float: right;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
 });
 
 test('mceBlockQuote', function() {

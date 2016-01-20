@@ -1,17 +1,7 @@
-// Edited for WordPress
-(function() {
-	var baseURL;
+// Edited for WordPres
+document.write('<script src="../../../src/wp-includes/js/tinymce/tinymce.js"></script>');
 
-	// Get base where the tinymce script is located
-	var scripts = document.getElementsByTagName('script');
-	for ( var i = 0; i < scripts.length; i++ ) {
-		var src = scripts[i].src;
+var wpPlugins = 'charmap colorpicker hr lists media paste tabfocus textcolor ' +
+			'fullscreen wordpress wpautoresize wpeditimage wpgallery wplink wpdialogs wpview';
 
-		if ( /tinymce_loader\.js/.test( src ) ) {
-			baseURL = src.substring( 0, src.indexOf('/tests/qunit/') );
-			break;
-		}
-	}
-
-	document.write('<script src="' + baseURL + '/src/wp-includes/js/tinymce/tinymce.min.js"></script>');
-})();
+getUserSetting = setUserSetting = function() {}

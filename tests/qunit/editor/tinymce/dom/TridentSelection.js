@@ -10,7 +10,6 @@ module("tinymce.dom.TridentSelection", {
 		tinymce.init({
 			selector: "textarea",
 			elements: "elm1",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,

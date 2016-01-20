@@ -4,7 +4,6 @@ module("tinymce.Shortcuts", {
 
 		tinymce.init({
 			selector: "textarea",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			indent: false,

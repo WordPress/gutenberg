@@ -5,7 +5,6 @@ module("tinymce.Formatter - Check", {
 
 		tinymce.init({
 			selector: "#elm1",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			extended_valid_elements: 'b,i,span[style|contenteditable]',
 			skin: false,
@@ -24,7 +23,6 @@ module("tinymce.Formatter - Check", {
 
 		tinymce.init({
 			selector: "#elm2",
-			plugins: wpPlugins,
 			inline: true,
 			add_unload_trigger: false,
 			indent: false,

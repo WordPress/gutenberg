@@ -4,7 +4,6 @@ module("tinymce.EditorManager", {
 
 		tinymce.init({
 			selector: "textarea",
-			plugins: wpPlugins,
 			add_unload_trigger: false,
 			disable_nodechange: true,
 			skin: false,
@@ -56,7 +55,7 @@ asyncTest('Externally destroyed editor', function() {
 	tinymce.init({
 		selector: "textarea",
 		init_instance_callback: function(editor1) {
-			setTimeout(function() {
+			tinymce.util.Delay.setTimeout(function() {
 				// Destroy the editor by setting innerHTML common ajax pattern
 				document.getElementById('view').innerHTML = '<textarea id="' + editor1.id + '"></textarea>';
 
@@ -83,7 +82,7 @@ asyncTest('Init/remove on same id', function() {
 	tinymce.init({
 		selector: "#view textarea",
 		init_instance_callback: function() {
-			window.setTimeout(function() {
+			tinymce.util.Delay.setTimeout(function() {
 				QUnit.start();
 
 				strictEqual(tinymce.get().length, 2);

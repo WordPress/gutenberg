@@ -7,8 +7,7 @@ module("tinymce.plugins.Paste", {
 			add_unload_trigger: false,
 			skin: false,
 			indent: false,
-			plugins: wpPlugins,
-			wp_paste_filters: false,
+			plugins: 'paste',
 			setup: function(ed) {
 				ed.on('NodeChange', false);
 			},
@@ -311,7 +310,7 @@ test("Paste Word retain bold/italic styles to elements", function() {
 		)
 	});
 
-	equal(editor.getContent(), '<p><b>bold</b><i>italic</i><b><i>bold + italic</i></b><b><span style="color: red;">bold + color</span></b></p>');
+	equal(editor.getContent(), '<p><strong>bold</strong><em>italic</em><strong><em>bold + italic</em></strong><strong><span style="color: red;">bold + color</span></strong></p>');
 });
 
 test('paste track changes comment', function() {
@@ -713,14 +712,14 @@ if (tinymce.Env.webkit) {
 		editor.execCommand('mceInsertClipboardContent', false, {content: '<span style="font-size:42px; text-indent: 10px">Test</span>'});
 		equal(editor.getContent(), '<p><span style="font-size: 42px;">Test</span></p>');
 	});
-/* WP set to always remove font-family on WebKit with a filtering callback.
+
 	test('paste webkit remove runtime styles (font-family)', function() {
 		editor.settings.paste_webkit_styles = 'font-family';
 		editor.setContent('');
 		editor.execCommand('mceInsertClipboardContent', false, {content: '<span style="font-family:Arial; text-indent: 10px">Test</span>'});
 		equal(editor.getContent(), '<p><span style="font-family: Arial;">Test</span></p>');
 	});
-WP end */
+
 	test('paste webkit remove runtime styles font-family allowed but not specified', function() {
 		editor.settings.paste_webkit_styles = 'font-family';
 		editor.setContent('');
