@@ -1,6 +1,6 @@
 <?php
 
-/* Path to the WordPress codebase you'd like to test. Add a backslash in the end. */
+/* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
 define( 'ABSPATH', dirname( __FILE__ ) . '/src/' );
 
 // Test with multisite enabled.
