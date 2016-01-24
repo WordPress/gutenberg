@@ -14,4 +14,5 @@ function call_some_i18n_methods() {
 	esc_html_e( 'HTML' );
 	esc_attr_x( 'Attribute', 'Testing' );
 	esc_html_x( 'HTML', 'Testing' );
+	translate_nooped_plural( 'Plural Noop', 2 );
 }

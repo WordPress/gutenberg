@@ -20,6 +20,7 @@ class AddTextdomain {
 	function __construct() {
 		$makepot = new MakePOT;
 		$this->funcs = array_keys( $makepot->rules );
+		$this->funcs[] = 'translate_nooped_plural';
 	}
 
 	/**
