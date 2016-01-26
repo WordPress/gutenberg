@@ -492,4 +492,34 @@ class Tests_Query extends WP_UnitTestCase {
 
 		$this->assertContains( 'LIMIT 5, 5', $q->request );
 	}
+
+	/**
+	 * @ticket 35601
+	 */
+	public function test_comment_status() {
+		$p1 = self::factory()->post->create( array( 'comment_status' => 'open' ) );
+		$p2 = self::factory()->post->create( array( 'comment_status' => 'closed' ) );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'comment_status' => 'closed',
+		) );
+
+		$this->assertSame( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 35601
+	 */
+	public function test_ping_status() {
+		$p1 = self::factory()->post->create( array( 'ping_status' => 'open' ) );
+		$p2 = self::factory()->post->create( array( 'ping_status' => 'closed' ) );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'ping_status' => 'closed',
+		) );
+
+		$this->assertSame( array( $p2 ), $q->posts );
+	}
 }
