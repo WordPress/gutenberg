@@ -369,6 +369,36 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test get_nonces() method.
+	 *
+	 * @see WP_Customize_Manager::get_nonces()
+	 */
+	function test_nonces() {
+		$nonces = $this->manager->get_nonces();
+		$this->assertInternalType( 'array', $nonces );
+		$this->assertArrayHasKey( 'save', $nonces );
+		$this->assertArrayHasKey( 'preview', $nonces );
+
+		add_filter( 'customize_refresh_nonces', array( $this, 'filter_customize_refresh_nonces' ), 10, 2 );
+		$nonces = $this->manager->get_nonces();
+		$this->assertArrayHasKey( 'foo', $nonces );
+		$this->assertEquals( wp_create_nonce( 'foo' ), $nonces['foo'] );
+	}
+
+	/**
+	 * Filter for customize_refresh_nonces.
+	 *
+	 * @param array                $nonces  Nonces.
+	 * @param WP_Customize_Manager $manager Manager.
+	 * @return array Nonces.
+	 */
+	function filter_customize_refresh_nonces( $nonces, $manager ) {
+		$this->assertInstanceOf( 'WP_Customize_Manager', $manager );
+		$nonces['foo'] = wp_create_nonce( 'foo' );
+		return $nonces;
+	}
+
+	/**
 	 * Test customize_pane_settings() method.
 	 *
 	 * @see WP_Customize_Manager::customize_pane_settings()
@@ -399,6 +429,38 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $autofocus, $data['autofocus'] );
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
+	}
+
+	/**
+	 * Test customize_preview_settings() method.
+	 *
+	 * @see WP_Customize_Manager::customize_preview_settings()
+	 */
+	function test_customize_preview_settings() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->manager->register_controls();
+		$this->manager->prepare_controls();
+		$this->manager->set_post_value( 'foo', 'bar' );
+		$_POST['customize_messenger_channel'] = 'preview-0';
+
+		ob_start();
+		$this->manager->customize_preview_settings();
+		$content = ob_get_clean();
+
+		$this->assertEquals( 1, preg_match( '/var _wpCustomizeSettings = ({.+});/', $content, $matches ) );
+		$settings = json_decode( $matches[1], true );
+
+		$this->assertArrayHasKey( 'theme', $settings );
+		$this->assertArrayHasKey( 'url', $settings );
+		$this->assertArrayHasKey( 'channel', $settings );
+		$this->assertArrayHasKey( 'activePanels', $settings );
+		$this->assertArrayHasKey( 'activeSections', $settings );
+		$this->assertArrayHasKey( 'activeControls', $settings );
+		$this->assertArrayHasKey( 'nonce', $settings );
+		$this->assertArrayHasKey( '_dirty', $settings );
+
+		$this->assertArrayHasKey( 'preview', $settings['nonce'] );
+		$this->assertEquals( array( 'foo' ), $settings['_dirty'] );
 	}
 
 	/**

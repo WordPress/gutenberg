@@ -647,12 +647,6 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$this->assertContains( 'renderQueryVar', $data );
 		$this->assertContains( 'renderNonceValue', $data );
 		$this->assertContains( 'renderNoncePostKey', $data );
-		$this->assertContains( 'requestUri', $data );
-		$this->assertContains( 'theme', $data );
-		$this->assertContains( 'previewCustomizeNonce', $data );
 		$this->assertContains( 'navMenuInstanceArgs', $data );
-		$this->assertContains( 'requestUri', $data );
-
 	}
-
 }
