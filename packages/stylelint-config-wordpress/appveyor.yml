@@ -9,7 +9,6 @@ environment:
 version: "{build}"
 build: off
 deploy: off
-cache: [node_modules]
 
 install:
   - ps: Install-Product node $env:nodejs_version
@@ -18,5 +17,4 @@ install:
 test_script:
   - node --version
   - npm --version
-  - ps: "npm test # PowerShell"
   - cmd: "npm test"

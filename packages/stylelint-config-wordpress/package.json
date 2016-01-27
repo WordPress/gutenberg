@@ -24,21 +24,18 @@
     "index.js"
   ],
   "devDependencies": {
-    "babel": "^6.1.18",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-tape-runner": "^2.0.0",
+    "ava": "^0.11.0",
     "eslint": "^1.10.3",
     "eslint-config-stylelint": "^0.1.0",
-    "github-release-from-changelog": "^1.1.1",
-    "npmpub": "^2.0.0",
-    "stylelint": "^3.0.2",
-    "tape": "^4.2.2"
+    "npmpub": "^3.0.1",
+    "stylelint": "^4.1.0"
   },
   "scripts": {
+    "ava": "ava --verbose \"__tests__/**/*.js\"",
     "lint": "eslint . --ignore-path .gitignore",
-    "release": "npmpublish && github-release-from-changelog",
-    "tape": "babel-tape-runner \"__tests__/**/*.js\"",
-    "test": "npm run lint && npm run tape"
+    "pretest": "npm run lint",
+    "release": "npmpub",
+    "test": "npm run ava"
   },
   "babel": {
     "presets": [
