@@ -1686,6 +1686,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	public function test_post_type_array() {
 		register_post_type( 'post-type-1' );
 		register_post_type( 'post-type-2' );
+		register_post_type( 'post-type-3' );
 
 		$p1 = self::factory()->post->create( array( 'post_type' => 'post-type-1' ) );
 		$p2 = self::factory()->post->create( array( 'post_type' => 'post-type-2' ) );
@@ -1702,9 +1703,6 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		) );
 
 		$this->assertEqualSets( array_merge( $c1, $c3 ), $found );
-
-		_unregister_post_type( 'post-type-1' );
-		_unregister_post_type( 'post-type-2' );
 	}
 
 	public function test_post_name_single_value() {
