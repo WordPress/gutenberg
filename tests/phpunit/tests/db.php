@@ -941,4 +941,20 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$this->assertNull( $row );
 	}
+
+	/**
+	 * @ticket 34903
+	 */
+	function test_close() {
+		global $wpdb;
+
+		$this->assertTrue( $wpdb->close() );
+		$this->assertFalse( $wpdb->close() );
+
+		$wpdb->check_connection();
+
+		$this->assertTrue( $wpdb->close() );
+
+		$wpdb->check_connection();
+	}
 }
