@@ -902,6 +902,23 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertWPError( $u );
 	}
 
+	/**
+	 * @ticket 35750
+	 */
+	public function test_wp_update_user_should_delete_userslugs_cache() {
+		$u = self::factory()->user->create();
+		$user = get_userdata( $u );
+
+		wp_update_user( array(
+			'ID' => $u,
+			'user_nicename' => 'newusernicename',
+		) );
+		$updated_user = get_userdata( $u );
+
+		$this->assertFalse( wp_cache_get( $user->user_nicename, 'userslugs' ) );
+		$this->assertEquals( $u, wp_cache_get( $updated_user->user_nicename, 'userslugs' ) );
+	}
+
 	function test_changing_email_invalidates_password_reset_key() {
 		global $wpdb;
 
