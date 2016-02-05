@@ -1865,6 +1865,44 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35677
+	 */
+	public function test_cache_should_be_sensitive_to_parent__in() {
+		global $wpdb;
+
+		$q1 = new WP_Comment_Query( array(
+			'parent__in' => array( 1, 2, 3 ),
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q2 = new WP_Comment_Query( array(
+			'parent__in' => array( 4, 5, 6 ),
+		) );
+
+		$this->assertNotEquals( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 35677
+	 */
+	public function test_cache_should_be_sensitive_to_parent__not_in() {
+		global $wpdb;
+
+		$q1 = new WP_Comment_Query( array(
+			'parent__not_in' => array( 1, 2, 3 ),
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q2 = new WP_Comment_Query( array(
+			'parent__not_in' => array( 4, 5, 6 ),
+		) );
+
+		$this->assertNotEquals( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
 	 * @ticket 32762
 	 */
 	public function test_it_should_be_possible_to_modify_meta_query_using_pre_get_comments_action() {
