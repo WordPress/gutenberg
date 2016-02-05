@@ -60,12 +60,7 @@ class Tests_DB extends WP_UnitTestCase {
 		$var = $wpdb->get_var( "SELECT ID FROM $wpdb->users LIMIT 1" );
 		$this->assertGreaterThan( 0, $var );
 
-		if ( $wpdb->use_mysqli ) {
-			mysqli_close( $wpdb->dbh );
-		} else {
-			mysql_close( $wpdb->dbh );
-		}
-		unset( $wpdb->dbh );
+		$wpdb->close();
 
 		$var = $wpdb->get_var( "SELECT ID FROM $wpdb->users LIMIT 1" );
 		$this->assertGreaterThan( 0, $var );
