@@ -522,4 +522,44 @@ class Tests_Query extends WP_UnitTestCase {
 
 		$this->assertSame( array( $p2 ), $q->posts );
 	}
+
+	/**
+	 * @ticket 35619
+	 */
+	public function test_get_queried_object_should_return_first_of_multiple_terms() {
+		register_taxonomy( 'tax1', 'post' );
+		register_taxonomy( 'tax2', 'post' );
+
+		$term1 = $this->factory->term->create( array( 'taxonomy' => 'tax1', 'name' => 'term1' ) );
+		$term2 = $this->factory->term->create( array( 'taxonomy' => 'tax2', 'name' => 'term2' ) );
+		$post_id = $this->factory->post->create();
+		wp_set_object_terms( $post_id, 'term1', 'tax1' );
+		wp_set_object_terms( $post_id, 'term2', 'tax2' );
+
+		$this->go_to( home_url( '?tax1=term1&tax2=term2' ) );
+		$queried_object = get_queried_object();
+
+		$this->assertSame( 'tax1', $queried_object->taxonomy );
+		$this->assertSame( 'term1', $queried_object->slug );
+	}
+
+	/**
+	 * @ticket 35619
+	 */
+	public function test_query_vars_should_match_first_of_multiple_terms() {
+		register_taxonomy( 'tax1', 'post' );
+		register_taxonomy( 'tax2', 'post' );
+
+		$term1 = $this->factory->term->create( array( 'taxonomy' => 'tax1', 'name' => 'term1' ) );
+		$term2 = $this->factory->term->create( array( 'taxonomy' => 'tax2', 'name' => 'term2' ) );
+		$post_id = $this->factory->post->create();
+		wp_set_object_terms( $post_id, 'term1', 'tax1' );
+		wp_set_object_terms( $post_id, 'term2', 'tax2' );
+
+		$this->go_to( home_url( '?tax1=term1&tax2=term2' ) );
+		$queried_object = get_queried_object();
+
+		$this->assertSame( 'tax1', get_query_var( 'taxonomy' ) );
+		$this->assertSame( 'term1', get_query_var( 'term' ) );
+	}
 }
