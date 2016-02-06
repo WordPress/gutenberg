@@ -1233,6 +1233,337 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertEquals( array( $t1, $t2, $t3 ), $found );
 	}
 
+	/**
+	 * @ticket 34996
+	 */
+	public function test_orderby_meta_value() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'zzz' );
+		add_term_meta( $terms[0], 'fee', 'ber' );
+		add_term_meta( $terms[1], 'foo', 'aaa' );
+		add_term_meta( $terms[1], 'fee', 'ber' );
+		add_term_meta( $terms[2], 'foo', 'jjj' );
+		add_term_meta( $terms[2], 'fee', 'ber' );
+
+		// Matches the first meta query clause.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+	}
+
+	/**
+	 * @ticket 34996
+	 */
+	public function test_orderby_meta_value_num() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', '999' );
+		add_term_meta( $terms[0], 'fee', 'ber' );
+		add_term_meta( $terms[1], 'foo', '111' );
+		add_term_meta( $terms[1], 'fee', 'ber' );
+		add_term_meta( $terms[2], 'foo', '555' );
+		add_term_meta( $terms[2], 'fee', 'ber' );
+
+		// Matches the first meta query clause.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'meta_value_num',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+	}
+
+	/**
+	 * @ticket 34996
+	 */
+	public function test_orderby_meta_value_with_meta_key() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[0], 'fee', 'zzz' );
+		add_term_meta( $terms[0], 'faa', 'jjj' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'fee', 'aaa' );
+		add_term_meta( $terms[1], 'faa', 'aaa' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'fee', 'jjj' );
+		add_term_meta( $terms[2], 'faa', 'zzz' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		// Matches the first meta query clause.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		// Matches the meta query clause corresponding to the 'meta_key' param.
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'faa',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[0], $terms[2] ), $found );
+	}
+
+	/**
+	 * @ticket 34996
+	 */
+	public function test_orderby_meta_value_num_with_meta_key() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[0], 'fee', '999' );
+		add_term_meta( $terms[0], 'faa', '555' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'fee', '111' );
+		add_term_meta( $terms[1], 'faa', '111' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'fee', '555' );
+		add_term_meta( $terms[2], 'faa', '999' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'fee',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'meta_key' => 'faa',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[0], $terms[2] ), $found );
+	}
+
+	/**
+	 * @ticket 34996
+	 */
+	public function test_orderby_clause_key() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'zzz' );
+		add_term_meta( $terms[0], 'fee', 'jjj' );
+		add_term_meta( $terms[1], 'foo', 'aaa' );
+		add_term_meta( $terms[1], 'fee', 'aaa' );
+		add_term_meta( $terms[2], 'foo', 'jjj' );
+		add_term_meta( $terms[2], 'fee', 'zzz' );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'fee_key' => array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'foo_key',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[2], $terms[0] ), $found );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'fee_key' => array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'fee_key',
+			'order' => 'ASC',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $terms[1], $terms[0], $terms[2] ), $found );
+
+		$expected = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'fee_key' => array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'fields' => 'ids',
+		) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'hide_empty' => false,
+			'meta_query' => array(
+				'relation' => 'AND',
+				'foo_key' => array(
+					'key' => 'foo',
+					'compare' => 'EXISTS',
+				),
+				'fee_key' => array(
+					'key' => 'fee',
+					'compare' => 'EXISTS',
+				),
+			),
+			'orderby' => 'faa_key',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
 	public function test_hierarchical_false_with_parent() {
 		$initial_terms = $this->create_hierarchical_terms();
 
