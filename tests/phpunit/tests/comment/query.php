@@ -1750,6 +1750,84 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35512
+	 */
+	public function test_post_type_any_should_override_other_post_types() {
+		register_post_type( 'post-type-1', array( 'exclude_from_search' => false ) );
+		register_post_type( 'post-type-2', array( 'exclude_from_search' => false ) );
+
+		$p1 = self::factory()->post->create( array( 'post_type' => 'post-type-1' ) );
+		$p2 = self::factory()->post->create( array( 'post_type' => 'post-type-2' ) );
+
+		$c1 = self::factory()->comment->create_post_comments( $p1, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_type' => array( 'any', 'post-type-1' ),
+		) );
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 35512
+	 */
+	public function test_post_type_any_as_part_of_an_array_of_post_types() {
+		register_post_type( 'post-type-1', array( 'exclude_from_search' => false ) );
+		register_post_type( 'post-type-2', array( 'exclude_from_search' => false ) );
+
+		$p1 = self::factory()->post->create( array( 'post_type' => 'post-type-1' ) );
+		$p2 = self::factory()->post->create( array( 'post_type' => 'post-type-2' ) );
+
+		$c1 = self::factory()->comment->create_post_comments( $p1, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_type' => array( 'any' ),
+		) );
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 35512
+	 */
+	public function test_post_status_any_should_override_other_post_statuses() {
+		$p1 = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+		$p2 = self::factory()->post->create( array( 'post_status' => 'draft' ) );
+
+		$c1 = self::factory()->comment->create_post_comments( $p1, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_status' => array( 'any', 'draft' ),
+		) );
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $found );
+	}
+
+	/**
+	 * @ticket 35512
+	 */
+	public function test_post_status_any_as_part_of_an_array_of_post_statuses() {
+		$p1 = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+		$p2 = self::factory()->post->create( array( 'post_status' => 'draft' ) );
+
+		$c1 = self::factory()->comment->create_post_comments( $p1, 1 );
+		$c2 = self::factory()->comment->create_post_comments( $p2, 1 );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'post_status' => array( 'any' ),
+		) );
+		$this->assertEqualSets( array_merge( $c1, $c2 ), $found );
+	}
+
+	/**
 	 * @ticket 24826
 	 */
 	public function test_comment_query_object() {
