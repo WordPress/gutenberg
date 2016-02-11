@@ -40,6 +40,11 @@ input[type="text"] {
 	/* Your selectors */
 }
 
+@media all and ( max-width: 699px ) and ( min-width: 520px ) {
+
+	/* Your selectors */
+}
+
 /**
 * #.# Section title
 *

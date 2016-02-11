@@ -1,3 +1,7 @@
+#HEAD
+
+* Removed `media-query-parentheses-space-inside` rule.
+
 # 1.1.1
 
 * Changed: `rule-non-nested-empty-line-before` with option `ignore: ["after-comment"],`.
