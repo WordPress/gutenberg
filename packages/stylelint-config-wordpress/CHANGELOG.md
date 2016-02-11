@@ -1,6 +1,3 @@
-# 2.0.0
-* Removed: `stylelint < 4.1.0` compatibility.
-
 # 1.1.1
 
 * Changed: `rule-non-nested-empty-line-before` with option `ignore: ["after-comment"],`.
