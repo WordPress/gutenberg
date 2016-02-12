@@ -145,11 +145,13 @@ class Tests_Query_Search extends WP_UnitTestCase {
 		$p1 = $this->factory->post->create( array(
 			'post_status' => 'publish',
 			'post_title' => '1',
+			'post_content' => '',
 		) );
 
 		$p2 = $this->factory->post->create( array(
 			'post_status' => 'publish',
 			'post_title' => '0',
+			'post_content' => '',
 		) );
 
 		$q = new WP_Query( array(
