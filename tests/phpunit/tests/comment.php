@@ -673,4 +673,18 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertSame( 'SHIELD_AGENT', $updated->comment_agent );
 	}
 
+	public function test_wp_get_comment_fields_max_lengths() {
+		$expected = array(
+			'comment_author'       => 245,
+			'comment_author_email' => 100,
+			'comment_author_url'   => 200,
+			'comment_content'      => 65525,
+		);
+
+		$lengths = wp_get_comment_fields_max_lengths();
+
+		foreach ( $lengths as $field => $length ) {
+			$this->assertSame( $expected[ $field ], $length );
+		}
+	}
 }
