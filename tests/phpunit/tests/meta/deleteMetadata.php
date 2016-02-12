@@ -97,4 +97,49 @@ class Tests_Meta_DeleteMetadata extends WP_UnitTestCase {
 		$m = get_metadata( 'post', 12345, 'foo', false );
 		$this->assertEqualSets( array(), $m );
 	}
+
+	/**
+	 * @ticket 35797
+	 */
+	public function test_delete_all_should_only_invalidate_cache_for_objects_matching_meta_value() {
+		$p1 = 1234;
+		$p2 = 5678;
+
+		add_metadata( 'post', $p1, 'foo', 'value1' );
+		add_metadata( 'post', $p2, 'foo', 'value2' );
+
+		// Prime caches.
+		update_meta_cache( 'post', array( $p1, $p2 ) );
+
+		$deleted = delete_metadata( 'post', 5, 'foo', 'value1', true );
+
+		$p1_cache = wp_cache_get( $p1, 'post_meta' );
+		$this->assertFalse( $p1_cache );
+
+		// Should not have been touched.
+		$p2_cache = wp_cache_get( $p2, 'post_meta' );
+		$this->assertNotEmpty( $p2_cache );
+	}
+
+	/**
+	 * @ticket 35797
+	 */
+	public function test_delete_all_should_invalidate_cache_for_all_objects_with_meta_key_when_meta_value_is_not_provided() {
+		$p1 = 1234;
+		$p2 = 5678;
+
+		add_metadata( 'post', $p1, 'foo', 'value1' );
+		add_metadata( 'post', $p2, 'foo', 'value2' );
+
+		// Prime caches.
+		update_meta_cache( 'post', array( $p1, $p2 ) );
+
+		$deleted = delete_metadata( 'post', 5, 'foo', false, true );
+
+		$p1_cache = wp_cache_get( $p1, 'post_meta' );
+		$this->assertFalse( $p1_cache );
+
+		$p2_cache = wp_cache_get( $p2, 'post_meta' );
+		$this->assertFalse( $p2_cache );
+	}
 }
