@@ -446,9 +446,9 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	/**
 	 * @ticket 21949
 	 */
-	public function test_nonpublic_taxonomy_should_not_be_queryable_using_taxname_query_var() {
+	public function test_nonpublicly_queryable_taxonomy_should_not_be_queryable_using_taxname_query_var() {
 		register_taxonomy( 'wptests_tax', 'post', array(
-			'public' => false,
+			'publicly_queryable' => false,
 		) );
 
 		$t = self::factory()->term->create_and_get( array(
@@ -466,11 +466,11 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	/**
 	 * @ticket 21949
 	 */
-	public function test_it_should_be_possible_to_register_a_query_var_that_matches_the_name_of_a_nonpublic_taxonomy() {
+	public function test_it_should_be_possible_to_register_a_query_var_that_matches_the_name_of_a_nonpublicly_queryable_taxonomy() {
 		global $wp;
 
 		register_taxonomy( 'wptests_tax', 'post', array(
-			'public' => false,
+			'publicly_queryable' => false,
 		) );
 		$t = $this->factory->term->create_and_get( array(
 			'taxonomy' => 'wptests_tax',
@@ -501,9 +501,9 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	/**
 	 * @ticket 21949
 	 */
-	public function test_nonpublic_taxonomy_should_not_be_queryable_using_taxonomy_and_term_vars() {
+	public function test_nonpublicly_queryable_taxonomy_should_not_be_queryable_using_taxonomy_and_term_vars() {
 		register_taxonomy( 'wptests_tax', 'post', array(
-			'public' => false,
+			'publicly_queryable' => false,
 		) );
 
 		$t = self::factory()->term->create_and_get( array(
@@ -516,6 +516,73 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->go_to( '/?taxonomy=wptests_tax&term=' . $t->slug );
 
 		$this->assertFalse( is_tax( 'wptests_tax' ) );
+	}
+
+	/**
+	 * @ticket 34491
+	 */
+	public function test_public_taxonomy_should_be_publicly_queryable() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => true,
+		) );
+
+		$this->assertContains( 'wptests_tax', get_taxonomies( array( 'publicly_queryable' => true ) ) );
+
+		$t = self::factory()->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		$this->go_to( '/?wptests_tax=' . $t->slug );
+
+		$this->assertTrue( is_tax( 'wptests_tax' ) );
+	}
+
+	/**
+	 * @ticket 34491
+	 */
+	public function test_private_taxonomy_should_not_be_publicly_queryable() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+		) );
+
+		$this->assertContains( 'wptests_tax', get_taxonomies( array( 'publicly_queryable' => false ) ) );
+
+		$t = self::factory()->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		$this->go_to( '/?wptests_tax=' . $t->slug );
+
+		$this->assertFalse( is_tax( 'wptests_tax' ) );
+	}
+
+	/**
+	 * @ticket 34491
+	 */
+	public function test_private_taxonomy_should_be_overridden_by_publicly_queryable() {
+		register_taxonomy( 'wptests_tax', 'post', array(
+			'public' => false,
+			'publicly_queryable' => true,
+		) );
+
+		$this->assertContains( 'wptests_tax', get_taxonomies( array( 'publicly_queryable' => true ) ) );
+
+		$t = self::factory()->term->create_and_get( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $t->slug, 'wptests_tax' );
+
+		$this->go_to( '/?wptests_tax=' . $t->slug );
+
+		$this->assertTrue( is_tax( 'wptests_tax' ) );
 	}
 
 	/**
