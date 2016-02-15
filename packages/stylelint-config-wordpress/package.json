@@ -13,10 +13,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stylelint/stylelint-config-wordpress.git"
+    "url": "https://github.com/ntwb/stylelint-config-wordpress.git"
   },
-  "homepage": "https://github.com/stylelint/stylelint-config-wordpress",
-  "bugs": "https://github.com/stylelint/stylelint-config-wordpress/issues",
+  "homepage": "https://github.com/ntwb/stylelint-config-wordpress",
+  "bugs": "https://github.com/ntwb/stylelint-config-wordpress/issues",
   "main": "index.js",
   "files": [
     "CHANGELOG.md",
