@@ -13,13 +13,18 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 	public function setUp() {
 		parent::setUp();
 
-		/** @var WP_REST_Server $wp_rest_server */
-		global $wp_rest_server;
-
-		unset( $wp_rest_server );
+		// Reset REST server to ensure only our routes are registered
+		$GLOBALS['wp_rest_server'] = null;
 		add_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
 		$this->server = rest_get_server();
 		remove_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
+	}
+
+	public function tearDown() {
+		// Remove our temporary spy server
+		$GLOBALS['wp_rest_server'] = null;
+
+		parent::tearDown();
 	}
 
 	public function test_envelope() {
