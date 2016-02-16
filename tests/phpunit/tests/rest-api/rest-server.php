@@ -15,9 +15,11 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
-		$this->server = $wp_rest_server = new Spy_REST_Server();
 
-		do_action( 'rest_api_init', $this->server );
+		unset( $wp_rest_server );
+		add_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
+		$this->server = rest_get_server();
+		remove_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
 	}
 
 	public function test_envelope() {
@@ -644,5 +646,9 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		foreach ( wp_get_nocache_headers() as $header => $value ) {
 			$this->assertFalse( isset( $headers[ $header ] ) && $headers[ $header ] === $value, sprintf( 'Header %s is set to nocache.', $header ) );
 		}
+	}
+
+	public function filter_wp_rest_server_class() {
+		return 'Spy_REST_Server';
 	}
 }
