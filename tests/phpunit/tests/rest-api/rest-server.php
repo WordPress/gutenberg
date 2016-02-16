@@ -400,6 +400,45 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'embed', $alternate[1]['parameters']['context'] );
 	}
 
+	public function test_link_curies() {
+		$response = new WP_REST_Response();
+		$response->add_link( 'https://api.w.org/term', 'http://example.com/' );
+
+		$data = $this->server->response_to_data( $response, false );
+		$links = $data['_links'];
+
+		$this->assertArrayHasKey( 'wp:term', $links );
+		$this->assertArrayHasKey( 'curies', $links );
+	}
+
+	public function test_custom_curie_link() {
+		$response = new WP_REST_Response();
+		$response->add_link( 'http://mysite.com/contact.html', 'http://example.com/' );
+
+		add_filter( 'rest_response_link_curies', array( $this, 'add_custom_curie' ) );
+
+		$data = $this->server->response_to_data( $response, false );
+		$links = $data['_links'];
+
+		$this->assertArrayHasKey( 'my_site:contact', $links );
+		$this->assertArrayHasKey( 'curies', $links );
+	}
+
+	/**
+	 * Helper callback to add a new custom curie via a filter.
+	 *
+	 * @param array $curies
+	 * @return array
+	 */
+	public function add_custom_curie( $curies ) {
+		$curies[] = array(
+			'name'      => 'my_site',
+			'href'      => 'http://mysite.com/{rel}.html',
+			'templated' => true,
+		);
+		return $curies;
+	}
+
 	/**
 	 * @depends test_link_embedding
 	 */
