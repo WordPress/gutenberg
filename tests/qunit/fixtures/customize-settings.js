@@ -130,6 +130,18 @@ window._wpCustomizeSettings = {
 		'login': 'http://example.org/wp-login.php?interim-login=1&customize-login=1',
 		'parent': 'http://example.org/wp-admin/',
 		'preview': 'http://example.org/'
+	},
+	'previewableDevices': {
+		'desktop': {
+			'label': 'Enter desktop preview mode',
+			'default': true
+		},
+		'tablet': {
+			'label': 'Enter tablet preview mode'
+		},
+		'mobile': {
+			'label': 'Enter mobile preview mode'
+		}
 	}
 };
 window._wpCustomizeControlsL10n = {};

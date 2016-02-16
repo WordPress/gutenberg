@@ -76,6 +76,11 @@ jQuery( window ).load( function (){
 
 	};
 
+	module( 'Customizer Previewed Device' );
+	test( 'Previewed device defaults to desktop.', function () {
+		equal( wp.customize.previewedDevice.get(), 'desktop' );
+	} );
+
 	module( 'Customizer Setting in Fixture' );
 	test( 'Setting has fixture value', function () {
 		equal( wp.customize( 'fixture-setting' )(), 'Lorem Ipsum' );

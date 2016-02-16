@@ -425,7 +425,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$data = json_decode( $json, true );
 		$this->assertNotEmpty( $data );
 
-		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl' ), array_keys( $data ) );
+		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl', 'previewableDevices' ), array_keys( $data ) );
 		$this->assertEquals( $autofocus, $data['autofocus'] );
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
@@ -715,6 +715,69 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Customize_Control', $result_control );
 		$this->assertEquals( $control, $result_control );
 		$this->assertEquals( $control_id, $result_control->id );
+	}
+
+
+	/**
+	 * Testing the return values both with and without filter.
+	 *
+	 * @ticket 31195
+	 */
+	function test_get_previewable_devices() {
+
+		// Setup the instance.
+		$manager = new WP_Customize_Manager();
+
+		// The default devices list.
+		$default_devices = array(
+			'desktop' => array(
+				'label'   => __( 'Enter desktop preview mode' ),
+				'default' => true,
+			),
+			'tablet'  => array(
+				'label' => __( 'Enter tablet preview mode' ),
+			),
+			'mobile'  => array(
+				'label' => __( 'Enter mobile preview mode' ),
+			),
+		);
+
+		// Control test.
+		$devices = $manager->get_previewable_devices();
+		$this->assertSame( $default_devices, $devices );
+
+		// Adding the filter.
+		add_filter( 'customize_previewable_devices', array( $this, 'filter_customize_previewable_devices' ) );
+		$devices = $manager->get_previewable_devices();
+		$this->assertSame( $this->filtered_device_list(), $devices );
+
+		// Clean up.
+		remove_filter( 'customize_previewable_devices', array( $this, 'filter_customize_previewable_devices' ) );
+	}
+
+	/**
+	 * Helper method for test_get_previewable_devices.
+	 *
+	 * @return array
+	 */
+	function filtered_device_list() {
+		return array(
+			'custom-device' => array(
+				'label' => __( 'Enter custom-device preview mode' ),
+				'default' => true,
+			),
+		);
+	}
+
+	/**
+	 * Callback for the customize_previewable_devices filter.
+	 *
+	 * @param array $devices The list of devices.
+	 *
+	 * @return array
+	 */
+	function filter_customize_previewable_devices( $devices ) {
+		return $this->filtered_device_list();
 	}
 }
 
