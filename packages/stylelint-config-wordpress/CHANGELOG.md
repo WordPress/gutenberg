@@ -1,7 +1,7 @@
-#HEAD
+# 2.0.0
 
 * Removed `media-query-parentheses-space-inside` rule.
-* Removed: `stylelint < 4.3.0` compatibility.
+* Removed: `stylelint < 4.3.4` compatibility.
 * Added: `font-family-name-quotes` rule with double quotes where recommended option.
 * Added: `media-feature-no-missing-punctuation` rule.
 * Added: `no-invalid-double-slash-comments` rule.
