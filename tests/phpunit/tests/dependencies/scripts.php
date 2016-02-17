@@ -182,4 +182,21 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
 	}
 
+	/**
+	 * @ticket 35643
+	 */
+	function test_wp_enqueue_script_footer_alias() {
+		wp_register_script( 'foo', false, array( 'bar', 'baz' ), '1.0', true );
+		wp_register_script( 'bar', home_url( 'bar.js' ), array(), '1.0', true );
+		wp_register_script( 'baz', home_url( 'baz.js' ), array(), '1.0', true );
+
+		wp_enqueue_script( 'foo' );
+
+		$header = get_echo( 'wp_print_head_scripts' );
+		$footer = get_echo( 'wp_print_footer_scripts' );
+
+		$this->assertEmpty( $header );
+		$this->assertContains( home_url( 'bar.js' ), $footer );
+		$this->assertContains( home_url( 'baz.js' ), $footer );
+	}
 }
