@@ -1,3 +1,7 @@
+# 2.0.2
+
+* Fixed another npmjs.com release issue
+
 # 2.0.1
 
 * Fixed npmjs.com release
