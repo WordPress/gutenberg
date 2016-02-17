@@ -1,3 +1,7 @@
+# 2.0.1
+
+* Fixed npmjs.com release
+
 # 2.0.0
 
 * Removed `media-query-parentheses-space-inside` rule.
