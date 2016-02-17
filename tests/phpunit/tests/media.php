@@ -895,11 +895,8 @@ EOF;
 	function test_wp_calculate_image_srcset_no_date_uploads() {
 		global $_wp_additional_image_sizes;
 
-		// Save the current setting for uploads folders
-		$uploads_use_yearmonth_folders = get_option( 'uploads_use_yearmonth_folders' );
-
 		// Disable date organized uploads
-		update_option( 'uploads_use_yearmonth_folders', 0 );
+		add_filter( 'upload_dir', '_upload_dir_no_subdir' );
 
 		// Make an image.
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
@@ -937,9 +934,7 @@ EOF;
 
 		// Remove the attachment
 		wp_delete_attachment( $id );
-
-		// Leave the uploads option the way you found it.
-		update_option( 'uploads_use_yearmonth_folders', $uploads_use_yearmonth_folders );
+		remove_filter( 'upload_dir', '_upload_dir_no_subdir' );
 	}
 
 	/**

@@ -115,3 +115,26 @@ function _wp_die_handler_txt( $message, $title, $args ) {
 function _set_default_permalink_structure_for_tests() {
 	update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 }
+
+/**
+ * Helper used with the `upload_dir` filter to remove the /year/month sub directories from the uploads path and URL.
+ */
+function _upload_dir_no_subdir( $uploads ) {
+	$subdir = $uploads['subdir'];
+
+	$uploads['subdir'] = '';
+	$uploads['path'] = str_replace( $subdir, '', $uploads['path'] );
+	$uploads['url'] = str_replace( $subdir, '', $uploads['url'] );
+
+	return $uploads;
+}
+
+/**
+ * Helper used with the `upload_dir` filter to set https upload URL.
+ */ 
+function _upload_dir_https( $uploads ) {
+	$uploads['url'] = str_replace( 'http://', 'https://', $uploads['url'] );
+	$uploads['baseurl'] = str_replace( 'http://', 'https://', $uploads['baseurl'] );
+
+	return $uploads;
+}

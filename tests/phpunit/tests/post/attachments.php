@@ -441,9 +441,8 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 	 * @ticket 15928
 	 */
 	public function test_wp_get_attachment_url_should_force_https_when_administering_over_https_and_siteurl_is_https() {
-		// Must set the upload_url_path to fake out `wp_upload_dir()`.
-		$siteurl = get_option( 'siteurl' );
-		update_option( 'upload_url_path', set_url_scheme( $siteurl, 'https' ) . '/uploads' );
+		// Set https upload URL 
+		add_filter( 'upload_dir', '_upload_dir_https' );
 
 		$filename = ( DIR_TESTDATA . '/images/test-image.jpg' );
 		$contents = file_get_contents( $filename );
@@ -463,6 +462,7 @@ class Tests_Post_Attachments extends WP_UnitTestCase {
 		// Cleanup.
 		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
 		set_current_screen( 'front' );
+		remove_filter( 'upload_dir', '_upload_dir_https' );
 
 		$this->assertSame( set_url_scheme( $url, 'https' ), $url );
 	}
