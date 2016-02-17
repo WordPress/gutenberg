@@ -33,7 +33,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1),
+				KEY compound_key (id,column_1),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -105,7 +105,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
+				KEY compound_key (id,column_1)
 			)
 			"
 		);
@@ -128,7 +128,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
+				KEY compound_key (id,column_1)
 			)
 			"
 		);
@@ -157,7 +157,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				extra_col longtext,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
+				KEY compound_key (id,column_1)
 			)
 			"
 		);
@@ -171,6 +171,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		);
 
 		$this->assertTableHasColumn( 'column_1', $wpdb->prefix . 'dbdelta_test' );
+		$this->assertTableHasPrimaryKey( 'id' , $wpdb->prefix . 'dbdelta_test' );
 	}
 
 	/**
@@ -189,7 +190,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
+				KEY compound_key (id,column_1)
 			)
 			"
 		);
@@ -215,7 +216,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				extra_col longtext,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1)
+				KEY compound_key (id,column_1)
 			)
 			"
 			, false // Don't execute.
@@ -265,7 +266,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
-				KEY compoud_key (id,column_1),
+				KEY compound_key (id,column_1),
 				FULLTEXT KEY fulltext_key (column_1)
 			)
 			", false
@@ -286,7 +287,6 @@ class Tests_dbDelta extends WP_UnitTestCase {
 	 * @param string $table  The database table name.
 	 */
 	protected function assertTableRowHasValue( $column, $value, $table ) {
-
 		global $wpdb;
 
 		$table_row = $wpdb->get_row( "select $column from {$table} where $column = '$value'" );
@@ -305,12 +305,27 @@ class Tests_dbDelta extends WP_UnitTestCase {
 	 * @param string $table  The database table name.
 	 */
 	protected function assertTableHasColumn( $column, $table ) {
-
 		global $wpdb;
 
 		$table_fields = $wpdb->get_results( "DESCRIBE {$table}" );
 
 		$this->assertCount( 1, wp_list_filter( $table_fields, array( 'Field' => $column ) ) );
+	}
+
+	/**
+	 * Assert that a table has a primary key.
+	 *
+	 * Checks for single-column primary keys. May not work for multi-column primary keys.
+	 *
+	 * @param string $column The column for the primary key.
+	 * @param string $table  The database table name.
+	 */
+	protected function assertTableHasPrimaryKey( $column , $table ) {
+		global $wpdb;
+
+		$table_indices = $wpdb->get_results( "SHOW INDEX FROM {$table}" );
+
+		$this->assertCount( 1, wp_list_filter( $table_indices, array( 'Key_name' => 'PRIMARY' , 'Column_name' => $column ) , 'AND' ) );
 	}
 
 	/**
