@@ -166,4 +166,20 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		$this->assertFalse( wp_register_script( 'duplicate-handler', 'http://example.com' ) );
 	}
 
+	/**
+	 * @ticket 35229
+	 */
+	function test_wp_register_script_with_handle_without_source() {
+		$expected  = "<script type='text/javascript' src='http://example.com?ver=1'></script>\n";
+		$expected .= "<script type='text/javascript' src='http://example.com?ver=2'></script>\n";
+
+		wp_register_script( 'handle-one', 'http://example.com', array(), 1 );
+		wp_register_script( 'handle-two', 'http://example.com', array(), 2 );
+		wp_register_script( 'handle-three', false, array( 'handle-one', 'handle-two' ) );
+
+		wp_enqueue_script( 'handle-three' );
+
+		$this->assertEquals( $expected, get_echo( 'wp_print_scripts' ) );
+	}
+
 }

@@ -234,9 +234,31 @@ CSS;
 	 *
 	 * @ticket 31126
 	 */
-	function test_wp_register_style(){
+	function test_wp_register_style() {
 		$this->assertTrue( wp_register_style( 'duplicate-handler', 'http://example.com' ) );
 		$this->assertFalse( wp_register_style( 'duplicate-handler', 'http://example.com' ) );
+	}
+
+	/**
+	 * @ticket 35229
+	 */
+	function test_wp_add_inline_style_for_handle_without_source() {
+		$style  = "a { color: blue; }";
+
+		$expected  = "<link rel='stylesheet' id='handle-one-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "<link rel='stylesheet' id='handle-two-css'  href='http://example.com?ver=1' type='text/css' media='all' />\n";
+		$expected .= "<style id='handle-three-inline-css' type='text/css'>\n";
+		$expected .= "$style\n";
+		$expected .= "</style>\n";
+
+		wp_register_style( 'handle-one', 'http://example.com', array(), 1 );
+		wp_register_style( 'handle-two', 'http://example.com', array(), 1 );
+		wp_register_style( 'handle-three', false, array( 'handle-one', 'handle-two' ) );
+
+		wp_enqueue_style( 'handle-three' );
+		wp_add_inline_style( 'handle-three', $style );
+
+		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
 	}
 
 }
