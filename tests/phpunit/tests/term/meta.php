@@ -134,105 +134,20 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 				// First request will hit the database.
 				$num_queries = $wpdb->num_queries;
 				$this->assertSame( 'bar', get_term_meta( $terms[0], 'foo', true ) );
-				$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+				$num_queries++;
+				$this->assertSame( $num_queries, $wpdb->num_queries );
 
 				// Second and third requests should be in cache.
 				$this->assertSame( 'bar', get_term_meta( $terms[1], 'foo', true ) );
 				$this->assertSame( 'bar', get_term_meta( $terms[2], 'foo', true ) );
-				$this->assertSame( $num_queries + 1, $wpdb->num_queries );
+				$this->assertSame( $num_queries, $wpdb->num_queries );
 
 				// Querying a term not primed should result in a hit.
+				$num_queries++;
 				$this->assertSame( 'bar', get_term_meta( $orphan_term, 'foo', true ) );
-				$this->assertSame( $num_queries + 2, $wpdb->num_queries );
+				$this->assertSame( $num_queries, $wpdb->num_queries );
 			}
 		}
-	}
-
-	/**
-	 * @ticket 34073
-	 */
-	public function test_term_meta_should_be_lazy_loaded_only_for_the_queries_in_which_the_term_has_posts() {
-		global $wpdb;
-
-		$posts = self::factory()->post->create_many( 3, array( 'post_status' => 'publish' ) );
-		register_taxonomy( 'wptests_tax', 'post' );
-		$terms = self::factory()->term->create_many( 6, array( 'taxonomy' => 'wptests_tax' ) );
-
-		wp_set_object_terms( $posts[0], array( $terms[0], $terms[1] ), 'wptests_tax' );
-		wp_set_object_terms( $posts[1], array( $terms[2], $terms[3] ), 'wptests_tax' );
-		wp_set_object_terms( $posts[2], array( $terms[0], $terms[4], $terms[5] ), 'wptests_tax' );
-
-		foreach ( $terms as $t ) {
-			add_term_meta( $t, 'foo', 'bar' );
-		}
-
-		$q0 = new WP_Query( array( 'p' => $posts[0], 'cache_results' => true ) );
-		$q1 = new WP_Query( array( 'p' => $posts[1], 'cache_results' => true ) );
-		$q2 = new WP_Query( array( 'p' => $posts[2], 'cache_results' => true ) );
-
-		/*
-		 * $terms[0] belongs to both $posts[0] and $posts[2], so `get_term_meta( $terms[0] )` should prime
-		 * the cache for term matched by $q0 and $q2.
-		 */
-
-		// First request will hit the database.
-		$num_queries = $wpdb->num_queries;
-
-		// Prime caches.
-		$this->assertSame( 'bar', get_term_meta( $terms[0], 'foo', true ) );
-
-		// Two queries: one for $q0 and one for $q2.
-		$num_queries += 2;
-		$this->assertSame( $num_queries, $wpdb->num_queries );
-
-		// Next requests should be in cache.
-		$this->assertSame( 'bar', get_term_meta( $terms[1], 'foo', true ) );
-		$this->assertSame( 'bar', get_term_meta( $terms[4], 'foo', true ) );
-		$this->assertSame( 'bar', get_term_meta( $terms[5], 'foo', true ) );
-		$this->assertSame( $num_queries, $wpdb->num_queries );
-
-		// Querying for $terms[2] will prime $terms[3] as well.
-		$this->assertSame( 'bar', get_term_meta( $terms[2], 'foo', true ) );
-		$num_queries++;
-		$this->assertSame( $num_queries, $wpdb->num_queries );
-
-		$this->assertSame( 'bar', get_term_meta( $terms[3], 'foo', true ) );
-		$this->assertSame( $num_queries, $wpdb->num_queries );
-	}
-
-	public function test_adding_term_meta_should_bust_get_terms_cache() {
-		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
-
-		add_term_meta( $terms[0], 'foo', 'bar' );
-
-		// Prime cache.
-		$found = get_terms( 'wptests_tax', array(
-			'hide_empty' => false,
-			'fields' => 'ids',
-			'meta_query' => array(
-				array(
-					'key' => 'foo',
-					'value' => 'bar',
-				),
-			),
-		) );
-
-		$this->assertEqualSets( array( $terms[0] ), $found );
-
-		add_term_meta( $terms[1], 'foo', 'bar' );
-
-		$found = get_terms( 'wptests_tax', array(
-			'hide_empty' => false,
-			'fields' => 'ids',
-			'meta_query' => array(
-				array(
-					'key' => 'foo',
-					'value' => 'bar',
-				),
-			),
-		) );
-
-		$this->assertEqualSets( array( $terms[0], $terms[1] ), $found );
 	}
 
 	public function test_updating_term_meta_should_bust_get_terms_cache() {
