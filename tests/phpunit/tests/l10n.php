@@ -46,4 +46,26 @@ class Tests_L10n extends WP_UnitTestCase {
 		__( 'just some string', 'wp-tests-domain' );
 		$this->assertFalse( is_textdomain_loaded( 'wp-tests-domain' ) );
 	}
+
+	/**
+	 * @ticket 35284
+	 */
+	function test_wp_get_installed_translations_for_core() {
+		$installed_translations = wp_get_installed_translations( 'core' );
+		$this->assertInternalType( 'array', $installed_translations );
+		$textdomains_expected = array( 'admin', 'admin-network', 'continents-cities', 'default' );
+		$this->assertEqualSets( $textdomains_expected, array_keys( $installed_translations ) );
+
+		$this->assertNotEmpty( $installed_translations['default']['en_GB'] );
+		$data_en_GB = $installed_translations['default']['en_GB'];
+		$this->assertEquals( '2016-01-14 21:14:29+0000', $data_en_GB['PO-Revision-Date'] );
+		$this->assertEquals( 'Development (4.4.x)', $data_en_GB['Project-Id-Version'] );
+		$this->assertEquals( 'GlotPress/1.0-alpha-1100', $data_en_GB['X-Generator'] );
+
+		$this->assertNotEmpty( $installed_translations['admin']['es_ES'] );
+		$data_es_ES = $installed_translations['admin']['es_ES'];
+		$this->assertEquals( '2015-12-22 20:26:46+0000', $data_es_ES['PO-Revision-Date'] );
+		$this->assertEquals( 'Administration', $data_es_ES['Project-Id-Version'] );
+		$this->assertEquals( 'GlotPress/1.0-alpha-1100', $data_es_ES['X-Generator'] );
+	}
 }

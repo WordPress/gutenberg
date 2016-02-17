@@ -1,0 +1,32 @@
+# Translation of Network Admin in English (UK)
+# This file is distributed under the same license as the Network Admin package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2015-11-26 00:00:19+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
+"Project-Id-Version: Network Admin\n"
+
+#: wp-admin/network/site-users.php:329 wp-admin/network/user-new.php:106
+msgid "A password reset link will be sent to the user via email."
+msgstr "A password reset link will be sent to the user via email."
+
+#. translators: 1: NOBLOGREDIRECT 2: wp-config.php
+#: wp-admin/network/settings.php:142
+msgid "If registration is disabled, please set %1$s in %2$s to a URL you will redirect visitors to if they visit a non-existent site."
+msgstr "If registration is disabled, please set %1$s in %2$s to a URL you will redirect visitors to if they visit a non-existent site."
+
+#: wp-admin/network/site-users.php:42
+msgid "Site users list"
+msgstr "Site users list"
+
+#: wp-admin/network/site-users.php:41
+msgid "Site users list navigation"
+msgstr "Site users list navigation"
+
+#: wp-admin/network/sites.php:51
+msgid "Sites list"
+msgstr "Sites list"

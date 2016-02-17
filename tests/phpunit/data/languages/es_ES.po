@@ -1,0 +1,37 @@
+# Translation of Development (4.4.x) in Spanish (Spain)
+# This file is distributed under the same license as the Development (4.4.x) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2016-01-07 18:35:45+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
+"Project-Id-Version: Development (4.4.x)\n"
+
+#. translators: 'rtl' or 'ltr'. This sets the text direction for WordPress.
+#: wp-includes/locale.php:201
+msgctxt "text direction"
+msgid "ltr"
+msgstr "ltr"
+
+#: wp-includes/user.php:2132
+msgid "<strong>ERROR</strong>: Sorry, that username is not allowed."
+msgstr "<strong>ERROR</strong>: Lo siento, ese nombre de usuario no está permitido."
+
+#: wp-includes/rest-api/class-wp-rest-request.php:850
+msgid "Invalid parameter."
+msgstr "Parámetro no válido. "
+
+#. translators: %s: menu name
+#: wp-includes/customize/class-wp-customize-nav-menu-control.php:76
+msgctxt "menu location"
+msgid "(Current: %s)"
+msgstr "(Actual: %s)"
+
+#. translators: %s: menu location slug
+#: wp-includes/class-wp-customize-nav-menus.php:340
+msgctxt "menu"
+msgid "(Currently set to: %s)"
+msgstr "(Actualmente fijado en: %s)"

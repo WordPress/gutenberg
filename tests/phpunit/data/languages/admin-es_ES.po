@@ -1,0 +1,34 @@
+# Translation of Administration in Spanish (Spain)
+# This file is distributed under the same license as the Administration package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2015-12-22 20:26:46+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
+"Project-Id-Version: Administration\n"
+
+#: wp-admin/about.php:42 wp-admin/credits.php:23 wp-admin/freedoms.php:22
+msgid "Thank you for updating! WordPress %s makes your site more connected and responsive."
+msgstr "¡Gracias por actualizar! WordPress %s hace que tu sitio esté más conectado y sea más adaptable."
+
+#. translators: 1: WP_Term class name, WP_Comment class name, WP_Network class
+#. name
+#: wp-admin/about.php:185
+msgid "New %1$s, %2$s, and %3$s objects make interacting with terms, comments, and networks more predictable and intuitive in code."
+msgstr "Ahora los objetos %1$s, %2$s y %3$s hacen que interactuar con términos, comentarios y redes sea más predecible y que el código sea más intuitivo."
+
+#. translators: WP_Comment_Query class name
+#: wp-admin/about.php:178
+msgid "Comment queries now have cache handling to improve performance. New arguments in %s make crafting robust comment queries simpler."
+msgstr "Las consultas de comentarios ahora tiene una caché que mejora el rendimiento. Nuevos argumentos en %s hacen que sea más fácil crear consultas robustas."
+
+#: wp-admin/about.php:182
+msgid "Term, comment, and network objects"
+msgstr "Objetos de término, comentario y red"
+
+#: wp-admin/about.php:175
+msgid "Comment query improvements"
+msgstr "Mejoras en las consultas de comentarios"

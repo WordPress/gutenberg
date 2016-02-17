@@ -26,6 +26,8 @@ require_once $config_file_path;
 define( 'WP_TESTS_TABLE_PREFIX', $table_prefix );
 define( 'DIR_TESTDATA', dirname( __FILE__ ) . '/../data' );
 
+define( 'WP_LANG_DIR', DIR_TESTDATA . '/languages' );
+
 if ( ! defined( 'WP_TESTS_FORCE_KNOWN_BUGS' ) )
 	define( 'WP_TESTS_FORCE_KNOWN_BUGS', false );
 

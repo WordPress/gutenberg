@@ -1,0 +1,31 @@
+# Translation of Continents & Cities in Spanish (Spain)
+# This file is distributed under the same license as the Continents & Cities package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2015-12-29 10:06:29+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
+"Project-Id-Version: Continents & Cities\n"
+
+#: wp-admin/includes/continents-cities.php:140
+msgid "Vincennes"
+msgstr "Vincennes"
+
+#: wp-admin/includes/continents-cities.php:141
+msgid "Winamac"
+msgstr "Winamac"
+
+#: wp-admin/includes/continents-cities.php:142
+msgid "Inuvik"
+msgstr "Inuvik"
+
+#: wp-admin/includes/continents-cities.php:143
+msgid "Iqaluit"
+msgstr "Iqaluit"
+
+#: wp-admin/includes/continents-cities.php:144
+msgid "Jamaica"
+msgstr "Jamaica"
