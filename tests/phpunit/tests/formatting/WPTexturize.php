@@ -2073,6 +2073,15 @@ String with a number followed by a single quote !q1!Expendables 3!q1! vestibulum
 		return $this->assertLessThan( 200, $result );
 	}
 
+	/**
+	 * Ensure that a trailing less-than symbol doesn't cause a PHP warning.
+	 *
+	 * @ticket 35864
+	 */
+	function test_trailing_less_than() {
+		$this->assertEquals( 'F&#8211;oo<', wptexturize( 'F--oo<', true ) );
+	}
+
 	function data_whole_posts() {
 		require_once( DIR_TESTDATA . '/formatting/whole-posts.php' );
 		return data_whole_posts();
