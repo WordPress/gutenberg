@@ -102,6 +102,10 @@ window._wpCustomizeNavMenusSettings = {
 		'taxonomyTermLabel': 'Taxonomy',
 		'unnamed': '(unnamed)',
 		'untitled': '(no label)'
+	},
+	'locationSlugMappedToName': {
+		'main-footer': 'Main Footer',
+		'main-header': 'Main Header'
 	}
 };
 window._wpCustomizeSettings.panels.nav_menus = {
