@@ -2,7 +2,7 @@
 window._wpCustomizeNavMenusSettings = {
 	'nonce': 'yo',
 	'phpIntMax': '2147483647',
-	'menuItemTransport': 'postMessage',
+	'settingTransport': 'postMessage',
 	'allMenus': [{
 		'term_id': '2',
 		'name': 'Social Menu',
