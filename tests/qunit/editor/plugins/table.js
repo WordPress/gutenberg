@@ -31,6 +31,8 @@
 			delete editor.settings.table_cell_class_list;
 			delete editor.settings.table_row_class_list;
 			delete editor.settings.table_style_by_css;
+
+			editor.off('newcell newrow');
 		}
 	});
 
@@ -511,7 +513,7 @@
 	});
 
 	test("mceTableMergeCells command with cell selection", function() {
-		editor.getBody().innerHTML = '<table><tr><td class="mce-item-selected">1</td><td class="mce-item-selected">2</td></tr></table>';
+		editor.getBody().innerHTML = '<table><tr><td data-mce-selected="1">1</td><td data-mce-selected="1">2</td></tr></table>';
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableMergeCells');
 		equal(cleanTableHtml(editor.getContent()), '<table><tbody><tr><td colspan="2">12</td></tr></tbody></table>');
@@ -554,8 +556,8 @@
 	test("Delete selected cells", function() {
 		editor.getBody().innerHTML = (
 			'<table><tbody>' +
-			'<tr><td class="mce-item-selected">A1</td><td>A2</td></tr>' +
-			'<tr><td class="mce-item-selected">B1</td><td>B2</td></tr>' +
+			'<tr><td data-mce-selected="1">A1</td><td>A2</td></tr>' +
+			'<tr><td data-mce-selected="1">B1</td><td>B2</td></tr>' +
 			'</tbody></table>' +
 			'<p>x</p>'
 		);
@@ -572,8 +574,8 @@
 	test("Delete all cells", function() {
 		editor.getBody().innerHTML = (
 			'<table><tbody>' +
-			'<tr><td class="mce-item-selected">A1</td><td class="mce-item-selected">A2</td></tr>' +
-			'<tr><td class="mce-item-selected">B1</td><td class="mce-item-selected">B2</td></tr>' +
+			'<tr><td data-mce-selected="1">A1</td><td data-mce-selected="1">A2</td></tr>' +
+			'<tr><td data-mce-selected="1">B1</td><td data-mce-selected="1">B2</td></tr>' +
 			'</tbody></table>' +
 			'<p>x</p>'
 		);
@@ -997,5 +999,27 @@
 			'</tbody>' +
 			'</table>');
 
+	});
+
+	test("Table newcell/newrow events", function() {
+		var cells = [], rows = [], counter = 0;
+
+		editor.on('newcell', function(e) {
+			cells.push(e.node);
+			e.node.setAttribute('data-counter', counter++);
+		});
+
+		editor.on('newrow', function(e) {
+			rows.push(e.node);
+			e.node.setAttribute('data-counter', counter++);
+		});
+
+		editor.plugins.table.insertTable(2, 3);
+
+		equal(cells.length, 6);
+		equal(rows.length, 3);
+
+		equal(cells[cells.length - 1].getAttribute('data-counter'), "8");
+		equal(rows[rows.length - 1].getAttribute('data-counter'), "6");
 	});
 })();
