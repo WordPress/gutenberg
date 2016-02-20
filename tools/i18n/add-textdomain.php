@@ -93,7 +93,7 @@ class AddTextdomain {
 // wasn't included
 $included_files = get_included_files();
 if ($included_files[0] == __FILE__) {
-	$adddomain = new AddTextdomain;
+	$adddomain = new AddTextdomain();
 
 	if (!isset($argv[1]) || !isset($argv[2])) {
 		$adddomain->usage();
@@ -106,7 +106,15 @@ if ($included_files[0] == __FILE__) {
 		array_shift($argv);
 	}
 
-	$adddomain->process_file($argv[1], $argv[2], $inplace);
+	if ( is_dir( $argv[2] ) ) {
+		$directory = new RecursiveDirectoryIterator( $argv[2], RecursiveDirectoryIterator::SKIP_DOTS );
+		$files = new RecursiveIteratorIterator( $directory );
+		foreach ( $files as $file ) {
+			if ( 'php' === $file->getExtension() ) {
+				$adddomain->process_file( $argv[1], $file->getPathname(), $inplace );
+			}
+		}
+	} else {
+		$adddomain->process_file( $argv[1], $argv[2], $inplace );
+	}
 }
-
-?>
