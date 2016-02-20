@@ -199,4 +199,71 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 		$this->assertContains( home_url( 'bar.js' ), $footer );
 		$this->assertContains( home_url( 'baz.js' ), $footer );
 	}
+
+	/**
+	 * Test mismatch of groups in dependencies outputs all scripts in right order.
+	 *
+	 * @ticket 35873
+	 */
+	public function test_group_mismatch_in_deps() {
+		$scripts = new WP_Scripts;
+		$scripts->add( 'one', 'one', array(), 'v1', 1 );
+		$scripts->add( 'two', 'two', array( 'one' ) );
+		$scripts->add( 'three', 'three', array( 'two' ), 'v1', 1 );
+
+		$scripts->enqueue( array( 'three' ) );
+
+		$this->expectOutputRegex( '/^(?:<script[^>]+><\/script>\\n){7}$/' );
+
+		$scripts->do_items( false, 0 );
+		$this->assertContains( 'one', $scripts->done );
+		$this->assertContains( 'two', $scripts->done );
+		$this->assertNotContains( 'three', $scripts->done );
+
+		$scripts->do_items( false, 1 );
+		$this->assertContains( 'one', $scripts->done );
+		$this->assertContains( 'two', $scripts->done );
+		$this->assertContains( 'three', $scripts->done );
+
+		$scripts = new WP_Scripts;
+		$scripts->add( 'one', 'one', array(), 'v1', 1 );
+		$scripts->add( 'two', 'two', array( 'one' ), 'v1', 1 );
+		$scripts->add( 'three', 'three', array( 'one' ) );
+		$scripts->add( 'four', 'four', array( 'two', 'three' ), 'v1', 1 );
+
+		$scripts->enqueue( array( 'four' ) );
+
+		$scripts->do_items( false, 0 );
+		$this->assertContains( 'one', $scripts->done );
+		$this->assertNotContains( 'two', $scripts->done );
+		$this->assertContains( 'three', $scripts->done );
+		$this->assertNotContains( 'four', $scripts->done );
+
+		$scripts->do_items( false, 1 );
+		$this->assertContains( 'one', $scripts->done );
+		$this->assertContains( 'two', $scripts->done );
+		$this->assertContains( 'three', $scripts->done );
+		$this->assertContains( 'four', $scripts->done );
+	}
+
+	/**
+	 * @ticket 35873
+	 */
+	function test_wp_register_script_with_dependencies_in_head_and_footer() {
+		wp_register_script( 'parent', '/parent.js', array( 'child' ), '1', true ); // in footer
+		wp_register_script( 'child', '/child.js', array( 'grandchild' ), '1', false ); // in head
+		wp_register_script( 'grandchild', '/grandchild.js', array(), '1', true ); // in footer
+
+		wp_enqueue_script( 'parent' );
+
+		$header = get_echo( 'wp_print_head_scripts' );
+		$footer = get_echo( 'wp_print_footer_scripts' );
+
+		$expected_header  = "<script type='text/javascript' src='/grandchild.js?ver=1'></script>\n";
+		$expected_header .= "<script type='text/javascript' src='/child.js?ver=1'></script>\n";
+		$expected_footer  = "<script type='text/javascript' src='/parent.js?ver=1'></script>\n";
+
+		$this->assertEquals( $expected_header, $header );
+		$this->assertEquals( $expected_footer, $footer );
+	}
 }
