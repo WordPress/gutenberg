@@ -71,24 +71,26 @@ class Tests_Mail extends WP_UnitTestCase {
 		$body .= '------=_Part_4892_25692638.1192452070893--' . "\n";
 		$body .= "\n";
 
-		wp_mail($to, $subject, $body, $headers);
+		wp_mail( $to, $subject, $body, $headers );
+
+		$mailer = tests_retrieve_phpmailer_instance();
 
 		// We need some better assertions here but these catch the failure for now.
-		$this->assertEquals($body, $GLOBALS['phpmailer']->mock_sent[0]['body']);
-		$this->assertTrue(strpos($GLOBALS['phpmailer']->mock_sent[0]['header'], 'boundary="----=_Part_4892_25692638.1192452070893"') > 0);
-		$this->assertTrue(strpos($GLOBALS['phpmailer']->mock_sent[0]['header'], 'charset=') > 0);
+		$this->assertEquals( $body, $mailer->get_sent()->body );
+		$this->assertTrue( strpos( $mailer->get_sent()->header, 'boundary="----=_Part_4892_25692638.1192452070893"' ) > 0 );
+		$this->assertTrue( strpos( $mailer->get_sent()->header, 'charset=' ) > 0 );
 	}
 
 	/**
 	 * @ticket 17305
 	 */
 	function test_wp_mail_rfc2822_addresses() {
-		$to = "Name <address@tld.com>";
-		$from = "Another Name <another_address@different-tld.com>";
-		$cc = "The Carbon Guy <cc@cc.com>";
-		$bcc = "The Blind Carbon Guy <bcc@bcc.com>";
-		$subject = "RFC2822 Testing";
-		$message = "My RFC822 Test Message";
+		$to        = 'Name <address@tld.com>';
+		$from      = 'Another Name <another_address@different-tld.com>';
+		$cc        = 'The Carbon Guy <cc@cc.com>';
+		$bcc       = 'The Blind Carbon Guy <bcc@bcc.com>';
+		$subject   = 'RFC2822 Testing';
+		$message   = 'My RFC822 Test Message';
 		$headers[] = "From: {$from}";
 		$headers[] = "CC: {$cc}";
 		$headers[] = "BCC: {$bcc}";
@@ -97,58 +99,64 @@ class Tests_Mail extends WP_UnitTestCase {
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
 		// Earlier versions of PHPMailer were not touchy about the formatting of these arguments.
-		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-		$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
-		$this->assertEquals('cc@cc.com', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][0]);
-		$this->assertEquals('The Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['cc'][0][1]);
-		$this->assertEquals('bcc@bcc.com', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][0]);
-		$this->assertEquals('The Blind Carbon Guy', $GLOBALS['phpmailer']->mock_sent[0]['bcc'][0][1]);
-		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
+
+		//retrieve the mailer instance
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertEquals( 'address@tld.com',      $mailer->get_recipient( 'to' )->address );
+		$this->assertEquals( 'Name',                 $mailer->get_recipient( 'to' )->name );
+		$this->assertEquals( 'cc@cc.com',            $mailer->get_recipient( 'cc' )->address );
+		$this->assertEquals( 'The Carbon Guy',       $mailer->get_recipient( 'cc' )->name );
+		$this->assertEquals( 'bcc@bcc.com',          $mailer->get_recipient( 'bcc' )->address );
+		$this->assertEquals( 'The Blind Carbon Guy', $mailer->get_recipient( 'bcc' )->name );
+		$this->assertEquals( $message . "\n",        $mailer->get_sent()->body );
 	}
 
 	/**
 	 * @ticket 17305
 	 */
 	function test_wp_mail_multiple_rfc2822_to_addresses() {
-		$to = "Name <address@tld.com>, Another Name <another_address@different-tld.com>";
-		$subject = "RFC2822 Testing";
-		$message = "My RFC822 Test Message";
+		$to      = 'Name <address@tld.com>, Another Name <another_address@different-tld.com>';
+		$subject = 'RFC2822 Testing';
+		$message = 'My RFC822 Test Message';
 
 		wp_mail( $to, $subject, $message );
 
 		// WordPress 3.2 and later correctly split the address into the two parts and send them seperately to PHPMailer
 		// Earlier versions of PHPMailer were not touchy about the formatting of these arguments.
-		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-		$this->assertEquals('Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][1]);
-		$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
-		$this->assertEquals('Another Name', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][1]);
-		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertEquals( 'address@tld.com',                   $mailer->get_recipient( 'to' )->address );
+		$this->assertEquals( 'Name',                              $mailer->get_recipient( 'to' )->name );
+		$this->assertEquals( 'another_address@different-tld.com', $mailer->get_recipient( 'to', 0, 1 )->address );
+		$this->assertEquals( 'Another Name',                      $mailer->get_recipient( 'to', 0, 1 )->name );
+		$this->assertEquals( $message . "\n",                     $mailer->get_sent()->body );
 	}
 
 	function test_wp_mail_multiple_to_addresses() {
-		$to = "address@tld.com, another_address@different-tld.com";
-		$subject = "RFC2822 Testing";
-		$message = "My RFC822 Test Message";
+		$to      = 'address@tld.com, another_address@different-tld.com';
+		$subject = 'RFC2822 Testing';
+		$message = 'My RFC822 Test Message';
 
 		wp_mail( $to, $subject, $message );
 
-		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-		$this->assertEquals('another_address@different-tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][1][0]);
-		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertEquals( 'address@tld.com',                   $mailer->get_recipient( 'to' )->address );
+		$this->assertEquals( 'another_address@different-tld.com', $mailer->get_recipient( 'to', 0, 1 )->address );
+		$this->assertEquals( $message . "\n",                     $mailer->get_sent()->body );
 	}
 
 	/**
 	 * @ticket 18463
 	 */
 	function test_wp_mail_to_address_no_name() {
-		$to = "<address@tld.com>";
-		$subject = "RFC2822 Testing";
-		$message = "My RFC822 Test Message";
+		$to      = '<address@tld.com>';
+		$subject = 'RFC2822 Testing';
+		$message = 'My RFC822 Test Message';
 
 		wp_mail( $to, $subject, $message );
 
-		$this->assertEquals('address@tld.com', $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]);
-		$this->assertEquals($message . "\n", $GLOBALS['phpmailer']->mock_sent[0]['body']);
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertEquals( 'address@tld.com', $mailer->get_recipient( 'to' )->address );
+		$this->assertEquals( $message . "\n",    $mailer->get_sent()->body );
 	}
 
 	/**
@@ -169,90 +177,96 @@ class Tests_Mail extends WP_UnitTestCase {
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_valid_from_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "From: Foo <bar@example.com>";
-		$expected = "From: Foo <bar@example.com>";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'From: Foo <bar@example.com>';
+		$expected = 'From: Foo <bar@example.com>';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	/**
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_empty_from_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "From: ";
-		$expected = "From: WordPress <wordpress@" . WP_TESTS_DOMAIN . ">";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'From: ';
+		$expected = 'From: WordPress <wordpress@' . WP_TESTS_DOMAIN . '>';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	/**
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_empty_from_name_for_the_from_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "From: <wordpress@example.com>";
-		$expected = "From: WordPress <wordpress@example.com>";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'From: <wordpress@example.com>';
+		$expected = 'From: WordPress <wordpress@example.com>';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	/**
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_valid_content_type_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "Content-Type: text/html; charset=iso-8859-1";
-		$expected = "Content-Type: text/html; charset=iso-8859-1";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'Content-Type: text/html; charset=iso-8859-1';
+		$expected = 'Content-Type: text/html; charset=iso-8859-1';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	/**
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_empty_content_type_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "Content-Type: ";
-		$expected = "Content-Type: text/plain; charset=UTF-8";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'Content-Type: ';
+		$expected = 'Content-Type: text/plain; charset=UTF-8';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	/**
 	 * @ticket 30266
 	 */
 	public function test_wp_mail_with_empty_charset_for_the_content_type_header() {
-		$to       = "address@tld.com";
-		$subject  = "Testing";
-		$message  = "Test Message";
-		$headers  = "Content-Type: text/plain;";
-		$expected = "Content-Type: text/plain; charset=UTF-8";
+		$to       = 'address@tld.com';
+		$subject  = 'Testing';
+		$message  = 'Test Message';
+		$headers  = 'Content-Type: text/plain;';
+		$expected = 'Content-Type: text/plain; charset=UTF-8';
 
 		wp_mail( $to, $subject, $message, $headers );
 
-		$this->assertTrue( strpos( $GLOBALS['phpmailer']->mock_sent[0]['header'], $expected ) > 0 );
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( strpos( $mailer->get_sent()->header, $expected ) > 0 );
 	}
 
 	function wp_mail_quoted_printable( $mailer ) {
