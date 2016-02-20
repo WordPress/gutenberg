@@ -81,4 +81,36 @@ class Tests_Dependencies_jQuery extends WP_UnitTestCase {
 
 		unset( $GLOBALS['wp_scripts'] );
 	}
+
+	/**
+	 * Test placing of jQuery in footer.
+	 *
+	 * @ticket 25247
+	 */
+	function test_jquery_in_footer() {
+		$scripts = new WP_Scripts;
+		$scripts->add( 'jquery', false, array( 'jquery-core', 'jquery-migrate' ) );
+		$scripts->add( 'jquery-core', '/jquery.js', array() );
+		$scripts->add( 'jquery-migrate', '/jquery-migrate.js', array() );
+
+		$scripts->enqueue( 'jquery' );
+
+		$jquery = $scripts->query( 'jquery' );
+		$jquery->add_data( 'group', 1 );
+		foreach( $jquery->deps as $dep ) {
+			$scripts->add_data( $dep, 'group', 1 );
+		}
+
+		$this->expectOutputRegex( '/^(?:<script[^>]+><\/script>\\n){2}$/' );
+
+		$scripts->do_items( false, 0 );
+		$this->assertNotContains( 'jquery', $scripts->done );
+		$this->assertNotContains( 'jquery-core', $scripts->done, 'jquery-core should be in footer but is in head' );
+		$this->assertNotContains( 'jquery-migrate', $scripts->done, 'jquery-migrate should be in footer but is in head' );
+
+		$scripts->do_items( false, 1 );
+		$this->assertContains( 'jquery', $scripts->done );
+		$this->assertContains( 'jquery-core', $scripts->done, 'jquery-core in footer' );
+		$this->assertContains( 'jquery-migrate', $scripts->done, 'jquery-migrate in footer' );
+	}
 }
