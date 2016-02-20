@@ -15,19 +15,12 @@ class AddTextdomain {
 	var $funcs;
 
 	/**
-	 * PHP5 constructor.
+	 * Constructor.
 	 */
 	function __construct() {
 		$makepot = new MakePOT;
 		$this->funcs = array_keys( $makepot->rules );
 		$this->funcs[] = 'translate_nooped_plural';
-	}
-
-	/**
-	 * PHP4 constructor.
-	 */
-	public function AddTextdomain() {
-		_deprecated_constructor( 'AddTextdomain' , '4.3'  );
 	}
 
 	function usage() {
@@ -110,7 +103,7 @@ if ($included_files[0] == __FILE__) {
 	if ('-i' == $argv[1]) {
 		$inplace = true;
 		if (!isset($argv[3])) $adddomain->usage();
-		array_shift($argv);	
+		array_shift($argv);
 	}
 
 	$adddomain->process_file($argv[1], $argv[2], $inplace);
