@@ -12,6 +12,43 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35495
+	 */
+	public function test_should_accept_an_args_array_containing_taxonomy_for_first_parameter() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( array(
+			'taxonomy' => 'wptests_tax',
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'update_term_meta_cache' => false,
+		) );
+
+		$this->assertEqualSets( array( $term ), $found );
+	}
+
+	/**
+	 * @ticket 35495
+	 */
+	public function test_excluding_taxonomy_arg_should_return_terms_from_all_taxonomies() {
+		register_taxonomy( 'wptests_tax1', 'post' );
+		register_taxonomy( 'wptests_tax2', 'post' );
+		$t1 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax1' ) );
+		$t2 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax2' ) );
+
+		$found = get_terms( array(
+			'hide_empty' => false,
+			'fields' => 'ids',
+			'update_term_meta_cache' => false,
+		) );
+
+		// There may be other terms lying around, so don't do an exact match.
+		$this->assertContains( $t1, $found );
+		$this->assertContains( $t2, $found );
+	}
+
+	/**
 	 * @ticket 23326
 	 */
 	public function test_get_terms_cache() {
