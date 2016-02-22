@@ -311,4 +311,21 @@ class Tests_Auth extends WP_UnitTestCase {
 		$check = check_password_reset_key( '', $this->user->user_login );
 		$this->assertInstanceOf( 'WP_Error', $check );
 	}
+
+	/**
+	 * Ensure users can log in using both their username and their email address.
+	 *
+	 * @ticket 9568
+	 */
+	function test_log_in_using_email() {
+		$user_args = array(
+			'user_login' => 'johndoe',
+			'user_email' => 'mail@example.com',
+			'user_pass'  => 'password',
+		);
+		$this->factory->user->create( $user_args );
+
+		$this->assertInstanceOf( 'WP_User', wp_authenticate( $user_args['user_email'], $user_args['user_pass'] ) );
+		$this->assertInstanceOf( 'WP_User', wp_authenticate( $user_args['user_login'], $user_args['user_pass'] ) );
+	}
 }
