@@ -23,6 +23,9 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		require_once( ABSPATH . WPINC . '/class-wp-customize-manager.php' );
+
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
 		$GLOBALS['wp_customize'] = new WP_Customize_Manager();
 		$this->manager = $GLOBALS['wp_customize'];
 
@@ -40,9 +43,6 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		remove_action( 'after_setup_theme', 'twentyfifteen_setup' );
 		remove_action( 'after_setup_theme', 'twentysixteen_setup' );
 		remove_action( 'customize_register', 'twentysixteen_customize_register', 11 );
-
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $user_id );
 
 		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];
 	}
