@@ -767,11 +767,11 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'menu_item_parent' => 0,
 			'position'         => 2,
 			'type'             => 'post_type',
-			'title'            => 'Hello World',
+			'title'            => 'Hello \o/ o\'o World',
 			'url'              => '',
 			'target'           => '',
-			'attr_title'       => '">attempted <b>baddie</b>',
-			'description'      => 'Attempted <b>markup</b>',
+			'attr_title'       => '">att \o/ o\'o empted <b>baddie</b>',
+			'description'      => 'Attempted \o/ o\'o <b>markup</b>',
 			'classes'          => '',
 			'xfn'              => '',
 			'status'           => 'publish',
@@ -795,7 +795,8 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->assertEquals( 123, $nav_menu_item->db_id );
 		$this->assertEquals( wp_get_current_user()->ID, $nav_menu_item->post_author );
 		$this->assertObjectHasAttribute( 'type_label', $nav_menu_item );
-		$this->assertEquals( apply_filters( 'nav_menu_attr_title', apply_filters( 'excerpt_save_pre', $post_value['attr_title'] ) ), $nav_menu_item->attr_title );
-		$this->assertEquals( 'Attempted markup', $nav_menu_item->description );
+		$expected = apply_filters( 'nav_menu_attr_title', wp_unslash( apply_filters( 'excerpt_save_pre', wp_slash( $post_value['attr_title'] ) ) ) );
+		$this->assertEquals( $expected, $nav_menu_item->attr_title );
+		$this->assertEquals( 'Attempted \o/ o&#8217;o markup', $nav_menu_item->description );
 	}
 }
