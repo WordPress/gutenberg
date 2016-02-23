@@ -261,4 +261,41 @@ CSS;
 		$this->assertEquals( $expected, get_echo( 'wp_print_styles' ) );
 	}
 
+	/**
+	 * @ticket 35921
+	 * @dataProvider data_styles_with_media
+	 */
+	function test_wp_enqueue_style_with_media( $expected, $media ) {
+		wp_enqueue_style( 'handle', 'http://example.com', array(), 1, $media );
+		$this->assertContains( $expected, get_echo( 'wp_print_styles' ) );
+	}
+
+	function data_styles_with_media() {
+		return array(
+			array(
+				"media='all'",
+				'all'
+			),
+			array(
+				"media='(orientation: portrait)'",
+				'(orientation: portrait)'
+			),
+			array(
+				"media='(max-width: 640px)'",
+				'(max-width: 640px)'
+			),
+			array(
+				"media='print and (min-width: 25cm)'",
+				'print and (min-width: 25cm)'
+			),
+			array(
+				"media='screen and (color), projection and (color)'",
+				'screen and (color), projection and (color)'
+			),
+			array(
+				"media='not screen and (color)'",
+				'not screen and (color)'
+			),
+		);
+	}
 }
