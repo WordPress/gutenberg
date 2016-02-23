@@ -1017,4 +1017,252 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->assertFalse( is_page_template( array( 'test.php' ) ) );
 		$this->assertTrue( is_page_template( array('test.php', 'example.php') ) );
 	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_attachment_should_not_match_numeric_id_to_post_title_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+			'post_title' => "$p1 Foo",
+			'post_name' => 'foo-2',
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_attachment( $p2 ) );
+		$this->assertFalse( is_attachment( $p1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_attachment_should_not_match_numeric_id_to_post_name_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+			'post_title' => 'Foo',
+			'post_name' => "$p1-foo",
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_attachment( $p2 ) );
+		$this->assertFalse( is_attachment( $p1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_author_should_not_match_numeric_id_to_nickname_beginning_with_id() {
+		$u1 = self::factory()->user->create( array(
+			'nickname' => 'Foo',
+			'user_nicename' => 'foo',
+		) );
+		$u2 = self::factory()->user->create( array(
+			'nickname' => "$u1 Foo",
+			'user_nicename' => 'foo-2',
+		) );
+
+		$this->go_to( get_author_posts_url( $u2 ) );
+
+		$this->assertTrue( is_author( $u2 ) );
+		$this->assertFalse( is_author( $u1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_author_should_not_match_numeric_id_to_user_nicename_beginning_with_id() {
+		$u1 = self::factory()->user->create( array(
+			'nickname' => 'Foo',
+			'user_nicename' => 'foo',
+		) );
+		$u2 = self::factory()->user->create( array(
+			'nickname' => 'Foo',
+			'user_nicename' => "$u1-foo",
+		) );
+
+		$this->go_to( get_author_posts_url( $u2 ) );
+
+		$this->assertTrue( is_author( $u2 ) );
+		$this->assertFalse( is_author( $u1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_category_should_not_match_numeric_id_to_name_beginning_with_id() {
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => 'foo',
+			'name' => 'foo',
+		) );
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => "$t1-foo",
+			'name' => 'foo 2',
+		) );
+
+		$this->go_to( get_term_link( $t2 ) );
+
+		$this->assertTrue( is_category( $t2 ) );
+		$this->assertFalse( is_category( $t1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_category_should_not_match_numeric_id_to_slug_beginning_with_id() {
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => 'foo',
+			'name' => 'foo',
+		) );
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'category',
+			'slug' => 'foo-2',
+			'name' => "$t1 foo",
+		) );
+
+		$this->go_to( get_term_link( $t2 ) );
+
+		$this->assertTrue( is_category( $t2 ) );
+		$this->assertFalse( is_category( $t1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_tag_should_not_match_numeric_id_to_name_beginning_with_id() {
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'post_tag',
+			'slug' => 'foo',
+			'name' => 'foo',
+		) );
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'post_tag',
+			'slug' => "$t1-foo",
+			'name' => 'foo 2',
+		) );
+
+		$this->go_to( get_term_link( $t2 ) );
+
+		$this->assertTrue( is_tag( $t2 ) );
+		$this->assertFalse( is_tag( $t1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_tag_should_not_match_numeric_id_to_slug_beginning_with_id() {
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'post_tag',
+			'slug' => 'foo',
+			'name' => 'foo',
+		) );
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'post_tag',
+			'slug' => 'foo-2',
+			'name' => "$t1 foo",
+		) );
+
+		$this->go_to( get_term_link( $t2 ) );
+
+		$this->assertTrue( is_tag( $t2 ) );
+		$this->assertFalse( is_tag( $t1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_page_should_not_match_numeric_id_to_post_title_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_title' => "$p1 Foo",
+			'post_name' => 'foo-2',
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_page( $p2 ) );
+		$this->assertFalse( is_page( $p1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_page_should_not_match_numeric_id_to_post_name_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_title' => 'Foo',
+			'post_name' => "$p1-foo",
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_page( $p2 ) );
+		$this->assertFalse( is_page( $p1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_single_should_not_match_numeric_id_to_post_title_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'post',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'post',
+			'post_title' => "$p1 Foo",
+			'post_name' => 'foo-2',
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_single( $p2 ) );
+		$this->assertFalse( is_single( $p1 ) );
+	}
+
+	/**
+	 * @ticket 35902
+	 */
+	public function test_is_single_should_not_match_numeric_id_to_post_name_beginning_with_id() {
+		$p1 = self::factory()->post->create( array(
+			'post_type' => 'post',
+			'post_title' => 'Foo',
+			'post_name' => 'foo',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_type' => 'post',
+			'post_title' => 'Foo',
+			'post_name' => "$p1-foo",
+		) );
+
+		$this->go_to( get_permalink( $p2 ) );
+
+		$this->assertTrue( is_single( $p2 ) );
+		$this->assertFalse( is_single( $p1 ) );
+	}
 }
