@@ -50,5 +50,38 @@ class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 		$this->assertNull( $actual );
 	}
 
+	/**
+	 * @ticket 35922
+	 */
+	public function test_taxonomy_should_not_be_required() {
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'foo',
+		) );
 
+		$actual = get_edit_term_link( $t );
+		$this->assertNotNull( $actual );
+	}
+
+	/**
+	 * @ticket 35922
+	 */
+	public function test_cap_check_should_use_correct_taxonomy_when_taxonomy_is_not_specified() {
+		register_taxonomy( 'wptests_tax_subscriber', 'post', array(
+			'manage_terms' => 'read',
+		) );
+
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => 'foo',
+		) );
+
+		$u = self::factory()->user->create( array(
+			'role' => 'subscriber',
+		) );
+		wp_set_current_user( $u );
+
+		$actual = get_edit_term_link( $t );
+		$this->assertNull( $actual );
+	}
 }
