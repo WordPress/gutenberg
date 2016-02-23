@@ -198,6 +198,8 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 	 */
 	function test_handle_render_partials_request_for_non_rendering_partial() {
 		$this->setup_valid_render_partials_request_environment();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->wp_customize->add_setting( 'home' );
 		$this->wp_customize->selective_refresh->add_partial( 'foo', array( 'settings' => array( 'home' ) ) );
 		$context_data = array();
 		$placements = array( $context_data );
@@ -222,6 +224,61 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 		$this->assertEquals( $count_customize_render_partials_after + 1, has_action( 'customize_render_partials_after' ) );
 		$output = json_decode( ob_get_clean(), true );
 		$this->assertEquals( array( false ), $output['data']['contents']['foo'] );
+	}
+
+	/**
+	 * Test WP_Customize_Selective_Refresh::handle_render_partials_request() for a partial the user doesn't have the capability to edit.
+	 *
+	 * @see WP_Customize_Selective_Refresh::handle_render_partials_request()
+	 */
+	function test_handle_rendering_disallowed_partial() {
+		$this->setup_valid_render_partials_request_environment();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->wp_customize->add_setting( 'secret_message', array(
+			'capability' => 'top_secret_clearance',
+		) );
+		$this->wp_customize->selective_refresh->add_partial( 'secret_message', array( 'settings' => 'secret_message' ) );
+
+		$context_data = array();
+		$placements = array( $context_data );
+		$_POST['partials'] = wp_slash( wp_json_encode( array(
+			'secret_message' => $placements,
+		) ) );
+
+		ob_start();
+		try {
+			$this->selective_refresh->handle_render_partials_request();
+		} catch ( WPDieException $e ) {
+			$this->assertEquals( '', $e->getMessage() );
+		}
+		$output = json_decode( ob_get_clean(), true );
+		$this->assertNull( $output['data']['contents']['secret_message'] );
+	}
+
+	/**
+	 * Test WP_Customize_Selective_Refresh::handle_render_partials_request() for a partial for which an associated setting does not exist.
+	 *
+	 * @see WP_Customize_Selective_Refresh::handle_render_partials_request()
+	 */
+	function test_handle_rendering_partial_with_missing_settings() {
+		$this->setup_valid_render_partials_request_environment();
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->wp_customize->selective_refresh->add_partial( 'bar', array( 'settings' => 'bar' ) );
+
+		$context_data = array();
+		$placements = array( $context_data );
+		$_POST['partials'] = wp_slash( wp_json_encode( array(
+			'bar' => $placements,
+		) ) );
+
+		ob_start();
+		try {
+			$this->selective_refresh->handle_render_partials_request();
+		} catch ( WPDieException $e ) {
+			$this->assertEquals( '', $e->getMessage() );
+		}
+		$output = json_decode( ob_get_clean(), true );
+		$this->assertNull( $output['data']['contents']['bar'] );
 	}
 
 	/**
