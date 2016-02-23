@@ -379,4 +379,53 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 		$this->assertFalse( post_type_exists( 'foo' ) );
 	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_single_feature() {
+		$this->assertContains( 'post', get_post_types_by_support( 'title' ) );
+		$this->assertContains( 'page', get_post_types_by_support( 'title' ) );
+		$this->assertContains( 'attachment', get_post_types_by_support( 'title' ) );
+		$this->assertContains( 'nav_menu_item', get_post_types_by_support( 'title' ) );
+	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_multiple_features() {
+		$this->assertContains( 'post', get_post_types_by_support( array( 'thumbnail', 'author' ) ) );
+		$this->assertContains( 'page', get_post_types_by_support( array( 'thumbnail', 'author' ) ) );
+	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_or_operator() {
+		$this->assertContains( 'post', get_post_types_by_support( array( 'post-formats', 'page-attributes' ), 'or' ) );
+		$this->assertContains( 'page', get_post_types_by_support( array( 'post-formats', 'page-attributes' ), 'or' ) );
+	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_not_operator() {
+		$this->assertContains( 'attachment', get_post_types_by_support( array( 'thumbnail' ), 'not' ) );
+		$this->assertContains( 'revision', get_post_types_by_support( array( 'thumbnail' ), 'not' ) );
+		$this->assertContains( 'nav_menu_item', get_post_types_by_support( array( 'thumbnail' ), 'not' ) );
+	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_excluding_features() {
+		$this->assertEqualSets( array(), get_post_types_by_support( array( 'post-formats', 'page-attributes' ) ) );
+	}
+
+	/**
+	 * @ticket 34010
+	 */
+	public function test_get_post_types_by_support_non_existant_feature() {
+		$this->assertEqualSets( array(), get_post_types_by_support( 'somefeature' ) );
+	}
 }
