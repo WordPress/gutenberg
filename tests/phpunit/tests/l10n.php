@@ -68,4 +68,46 @@ class Tests_L10n extends WP_UnitTestCase {
 		$this->assertEquals( 'Administration', $data_es_ES['Project-Id-Version'] );
 		$this->assertEquals( 'GlotPress/1.0-alpha-1100', $data_es_ES['X-Generator'] );
 	}
+
+	/**
+	 * @ticket 35294
+	 */
+	function test_wp_dropdown_languages() {
+		$args = array(
+			'id'           => 'foo',
+			'name'         => 'bar',
+			'languages'    => array( 'de_DE' ),
+			'translations' => $this->wp_dropdown_languages_filter(),
+			'selected'     => 'de_DE',
+			'echo'         => false,
+		);
+		$actual = wp_dropdown_languages( $args );
+
+		$this->assertContains( 'id="foo"', $actual );
+		$this->assertContains( 'name="bar"', $actual );
+		$this->assertContains( '<option value="" lang="en" data-installed="1">English (United States)</option>', $actual );
+		$this->assertContains( '<option value="de_DE" lang="de" selected=\'selected\' data-installed="1">Deutsch</option>', $actual );
+		$this->assertContains( '<option value="it_IT" lang="it">Italiano</option>', $actual );
+	}
+
+	/**
+	 * We don't want to call the API when testing.
+	 *
+	 * @return array
+	 */
+	function wp_dropdown_languages_filter() {
+		return array(
+			'de_DE' => array(
+				'language'    => 'de_DE',
+				'native_name' => 'Deutsch',
+				'iso'         => array( 'de' ),
+			),
+			'it_IT' => array(
+				'language'    => 'it_IT',
+				'native_name' => 'Italiano',
+				'iso'         => array( 'it', 'ita' ),
+			),
+		);
+	}
+
 }
