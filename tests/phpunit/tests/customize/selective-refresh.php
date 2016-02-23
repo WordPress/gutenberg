@@ -137,8 +137,19 @@ class Test_WP_Customize_Selective_Refresh extends WP_UnitTestCase {
 	 * @see WP_Customize_Selective_Refresh::export_preview_data()
 	 */
 	function test_export_preview_data() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+		$user = new WP_User( $user_id );
+		do_action( 'customize_register', $this->wp_customize );
+		$user->remove_cap( 'top_secret_clearance' );
+		$this->wp_customize->add_setting( 'top_secret_message', array(
+			'capability' => 'top_secret_clearance', // The administrator role lacks this.
+		) );
 		$this->selective_refresh->add_partial( 'blogname', array(
 			'selector' => '#site-title',
+		) );
+		$this->selective_refresh->add_partial( 'top_secret_message', array(
+			'settings' => array( 'top_secret_message' ),
 		) );
 		ob_start();
 		$this->selective_refresh->export_preview_data();
@@ -149,6 +160,7 @@ class Test_WP_Customize_Selective_Refresh extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'partials', $exported_data );
 		$this->assertInternalType( 'array', $exported_data['partials'] );
 		$this->assertArrayHasKey( 'blogname', $exported_data['partials'] );
+		$this->assertArrayNotHasKey( 'top_secret_message', $exported_data['partials'] );
 		$this->assertEquals( '#site-title', $exported_data['partials']['blogname']['selector'] );
 		$this->assertArrayHasKey( 'renderQueryVar', $exported_data );
 		$this->assertArrayHasKey( 'l10n', $exported_data );

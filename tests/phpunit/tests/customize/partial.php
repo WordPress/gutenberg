@@ -273,7 +273,7 @@ class Test_WP_Customize_Partial extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test WP_Customize_Partial::json() default.
+	 * Test WP_Customize_Partial::json().
 	 *
 	 * @see WP_Customize_Partial::json()
 	 */
@@ -298,6 +298,33 @@ class Test_WP_Customize_Partial extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'type', $exported );
 		$this->assertArrayHasKey( 'fallbackRefresh', $exported );
 		$this->assertArrayHasKey( 'containerInclusive', $exported );
+	}
+
+	/**
+	 * Test WP_Customize_Partial::check_capabilities().
+	 *
+	 * @see WP_Customize_Partial::check_capabilities()
+	 */
+	function test_check_capabilities() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		do_action( 'customize_register', $this->wp_customize );
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'blogname', array(
+			'settings' => array( 'blogname' ),
+		) );
+		$this->assertTrue( $partial->check_capabilities() );
+
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'blogname', array(
+			'settings' => array( 'blogname', 'non_existing' ),
+		) );
+		$this->assertFalse( $partial->check_capabilities() );
+
+		$this->wp_customize->add_setting( 'top_secret_message', array(
+			'capability' => 'top_secret_clearance',
+		) );
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'blogname', array(
+			'settings' => array( 'blogname', 'top_secret_clearance' ),
+		) );
+		$this->assertFalse( $partial->check_capabilities() );
 	}
 
 	/**
