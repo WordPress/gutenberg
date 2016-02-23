@@ -178,6 +178,81 @@ class Tests_Query_Search extends WP_UnitTestCase {
 		$this->assertNotContains( 'posts_search', $q->request );
 	}
 
+	/**
+	 * @ticket 35762
+	 */
+	public function test_search_post_excerpt() {
+		$p1 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has foo but also bar',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => '',
+			'post_excerpt' => 'This post has bar and baz',
+		) );
+		$p3 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => '',
+			'post_excerpt' => 'This post has only foo',
+		) );
+
+		$q = new WP_Query( array(
+			's' => 'foo',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p1, $p3 ), $q->posts );
+
+		$q = new WP_Query( array(
+			's' => 'bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p1, $p2 ), $q->posts );
+
+		$q = new WP_Query( array(
+			's' => 'baz',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p2 ), $q->posts );
+	}
+
+	/**
+	 * @ticket 35762
+	 */
+	public function test_search_order_title_before_excerpt_and_content() {
+		$p1 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_title'  => 'This post has foo',
+			'post_content' => '',
+			'post_excerpt' => '',
+		) );
+
+		$p2 = self::factory()->post->create( array(
+			'post_status'  => 'publish',
+			'post_title' => '',
+			'post_content' => 'This post has foo',
+			'post_excerpt' => '',
+		) );
+
+		$p3 = self::factory()->post->create( array(
+			'post_status'  => 'publish',
+			'post_title' => '',
+			'post_content' => '',
+			'post_excerpt' => 'This post has foo',
+		) );
+
+		$q = new WP_Query( array(
+			's'      => 'this post has foo',
+			'fields' => 'ids',
+			'orderby' => false,
+		) );
+
+		$this->assertSame( array( $p1, $p3, $p2 ), $q->posts );
+	}
+
 	public function filter_posts_search( $sql ) {
 		return $sql . ' /* posts_search */';
 	}
