@@ -304,6 +304,39 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35692
+	 */
+	public function test_orderby_rand_with_seed() {
+		$q = new WP_Query( array(
+			'orderby' => 'RAND(5)',
+		) );
+
+		$this->assertContains( 'ORDER BY RAND(5)', $q->request );
+	}
+
+	/**
+	 * @ticket 35692
+	 */
+	public function test_orderby_rand_should_ignore_invalid_seed() {
+		$q = new WP_Query( array(
+			'orderby' => 'RAND(foo)',
+		) );
+
+		$this->assertNotContains( 'ORDER BY RAND', $q->request );
+	}
+
+	/**
+	 * @ticket 35692
+	 */
+	public function test_orderby_rand_with_seed_should_be_case_insensitive() {
+		$q = new WP_Query( array(
+			'orderby' => 'rand(5)',
+		) );
+
+		$this->assertContains( 'ORDER BY RAND(5)', $q->request );
+	}
+
+	/**
 	 * Tests the post_name__in attribute of WP_Query.
 	 *
 	 * @ticket 33065
