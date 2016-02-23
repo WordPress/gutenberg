@@ -67,14 +67,14 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	}
 
 	public $post_data_overrides = array(
-		'unset_option_overridden' => 'unset_option_post_override_value',
-		'unset_theme_mod_overridden' => 'unset_theme_mod_post_override_value',
-		'set_option_overridden' => 'set_option_post_override_value',
-		'set_theme_mod_overridden' => 'set_theme_mod_post_override_value',
-		'unset_option_multi_overridden[foo]' => 'unset_option_multi_overridden[foo]_post_override_value',
-		'unset_theme_mod_multi_overridden[foo]' => 'unset_theme_mod_multi_overridden[foo]_post_override_value',
-		'set_option_multi_overridden[foo]' => 'set_option_multi_overridden[foo]_post_override_value',
-		'set_theme_mod_multi_overridden[foo]' => 'set_theme_mod_multi_overridden[foo]_post_override_value',
+		'unset_option_overridden' => 'unset_option_post_override_value\\o/',
+		'unset_theme_mod_overridden' => 'unset_theme_mod_post_override_value\\o/',
+		'set_option_overridden' => 'set_option_post_override_value\\o/',
+		'set_theme_mod_overridden' => 'set_theme_mod_post_override_value\\o/',
+		'unset_option_multi_overridden[foo]' => 'unset_option_multi_overridden[foo]_post_override_value\\o/',
+		'unset_theme_mod_multi_overridden[foo]' => 'unset_theme_mod_multi_overridden[foo]_post_override_value\\o/',
+		'set_option_multi_overridden[foo]' => 'set_option_multi_overridden[foo]_post_override_value\\o/',
+		'set_theme_mod_multi_overridden[foo]' => 'set_theme_mod_multi_overridden[foo]_post_override_value\\o/',
 	);
 
 	public $standard_type_configs = array(
@@ -299,8 +299,8 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	function test_preview_custom_type() {
 		$type = 'custom_type';
 		$post_data_overrides = array(
-			"unset_{$type}_with_post_value" => "unset_{$type}_without_post_value",
-			"set_{$type}_with_post_value" => "set_{$type}_without_post_value",
+			"unset_{$type}_with_post_value" => "unset_{$type}_without_post_value\\o/",
+			"set_{$type}_with_post_value" => "set_{$type}_without_post_value\\o/",
 		);
 		$_POST['customized'] = wp_slash( wp_json_encode( $post_data_overrides ) );
 
@@ -417,7 +417,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
 
 		// Try setting post value without user as admin.
-		$this->manager->set_post_value( $setting->id, 'hello world' );
+		$this->manager->set_post_value( $setting->id, 'hello world \\o/' );
 		$this->assertFalse( $setting->save() );
 		$this->assertTrue( 0 === did_action( 'customize_update_custom' ) );
 		$this->assertTrue( 0 === did_action( 'customize_save_foo' ) );
@@ -437,7 +437,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @param WP_Customize_Setting $setting
 	 */
 	function handle_customize_update_custom_foo_action( $value, $setting = null ) {
-		$this->assertEquals( 'hello world', $value );
+		$this->assertEquals( 'hello world \\o/', $value );
 		$this->assertInstanceOf( 'WP_Customize_Setting', $setting );
 	}
 

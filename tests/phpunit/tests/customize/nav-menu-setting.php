@@ -114,8 +114,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_construct_placeholder() {
 		do_action( 'customize_register', $this->wp_customize );
 		$default = array(
-			'name' => 'Lorem',
-			'description' => 'ipsum',
+			'name' => 'Lorem \\o/',
+			'description' => 'ipsum \\o/',
 			'parent' => 123,
 		);
 		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, 'nav_menu[-5]', compact( 'default' ) );
@@ -131,14 +131,14 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_value() {
 		do_action( 'customize_register', $this->wp_customize );
 
-		$menu_name = 'Test 123';
-		$parent_menu_id = wp_create_nav_menu( "Parent $menu_name" );
-		$description = 'Hello my world.';
-		$menu_id = wp_update_nav_menu_object( 0, array(
+		$menu_name = 'Test 123 \\o/';
+		$parent_menu_id = wp_create_nav_menu( wp_slash( "Parent $menu_name" ) );
+		$description = 'Hello my world \\o/.';
+		$menu_id = wp_update_nav_menu_object( 0, wp_slash( array(
 			'menu-name' => $menu_name,
 			'parent' => $parent_menu_id,
 			'description' => $description,
-		) );
+		) ) );
 
 		$setting_id = "nav_menu[$menu_id]";
 		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, $setting_id );
@@ -153,7 +153,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertEquals( $parent_menu_id, $value['parent'] );
 
 		$new_menu_name = 'Foo';
-		wp_update_nav_menu_object( $menu_id, array( 'menu-name' => $new_menu_name ) );
+		wp_update_nav_menu_object( $menu_id, wp_slash( array( 'menu-name' => $new_menu_name ) ) );
 		$updated_value = $setting->value();
 		$this->assertEquals( $new_menu_name, $updated_value['name'] );
 	}
@@ -166,11 +166,11 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_preview_updated() {
 		do_action( 'customize_register', $this->wp_customize );
 
-		$menu_id = wp_update_nav_menu_object( 0, array(
-			'menu-name' => 'Name 1',
-			'description' => 'Description 1',
+		$menu_id = wp_update_nav_menu_object( 0, wp_slash( array(
+			'menu-name' => 'Name 1 \\o/',
+			'description' => 'Description 1 \\o/',
 			'parent' => 0,
-		) );
+		) ) );
 		$setting_id = "nav_menu[$menu_id]";
 		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, $setting_id );
 
@@ -178,16 +178,16 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertNotContains( $menu_id, $nav_menu_options['auto_add'] );
 
 		$post_value = array(
-			'name' => 'Name 2',
-			'description' => 'Description 2',
+			'name' => 'Name 2 \\o/',
+			'description' => 'Description 2 \\o/',
 			'parent' => 1,
 			'auto_add' => true,
 		);
 		$this->wp_customize->set_post_value( $setting_id, $post_value );
 
 		$value = $setting->value();
-		$this->assertEquals( 'Name 1', $value['name'] );
-		$this->assertEquals( 'Description 1', $value['description'] );
+		$this->assertEquals( 'Name 1 \\o/', $value['name'] );
+		$this->assertEquals( 'Description 1 \\o/', $value['description'] );
 		$this->assertEquals( 0, $value['parent'] );
 
 		$term = (array) wp_get_nav_menu_object( $menu_id );
@@ -199,8 +199,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$setting->preview();
 		$value = $setting->value();
-		$this->assertEquals( 'Name 2', $value['name'] );
-		$this->assertEquals( 'Description 2', $value['description'] );
+		$this->assertEquals( 'Name 2 \\o/', $value['name'] );
+		$this->assertEquals( 'Description 2 \\o/', $value['description'] );
 		$this->assertEquals( 1, $value['parent'] );
 		$term = (array) wp_get_nav_menu_object( $menu_id );
 		$this->assertEqualSets( $value, wp_array_slice_assoc( $term, array_keys( $value ) ) );
@@ -217,7 +217,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$i = array_search( $menu_id, $menus_ids );
 		$this->assertInternalType( 'int', $i, 'Update-previewed menu does not appear in wp_get_nav_menus()' );
 		$filtered_menu = $menus[ $i ];
-		$this->assertEquals( 'Name 2', $filtered_menu->name );
+		$this->assertEquals( 'Name 2 \\o/', $filtered_menu->name );
 	}
 
 	/**
@@ -230,8 +230,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$menu_id = -123;
 		$post_value = array(
-			'name' => 'New Menu Name 1',
-			'description' => 'New Menu Description 1',
+			'name' => 'New Menu Name 1 \\o/',
+			'description' => 'New Menu Description 1 \\o/',
 			'parent' => 0,
 			'auto_add' => false,
 		);
@@ -262,7 +262,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$i = array_search( $menu_id, $menus_ids );
 		$this->assertInternalType( 'int', $i, 'Insert-previewed menu was not injected into wp_get_nav_menus()' );
 		$filtered_menu = $menus[ $i ];
-		$this->assertEquals( 'New Menu Name 1', $filtered_menu->name );
+		$this->assertEquals( 'New Menu Name 1 \\o/', $filtered_menu->name );
 	}
 
 	/**
@@ -273,11 +273,11 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_preview_deleted() {
 		do_action( 'customize_register', $this->wp_customize );
 
-		$menu_id = wp_update_nav_menu_object( 0, array(
-			'menu-name' => 'Name 1',
-			'description' => 'Description 1',
+		$menu_id = wp_update_nav_menu_object( 0, wp_slash( array(
+			'menu-name' => 'Name 1 \\o/',
+			'description' => 'Description 1 \\o/',
 			'parent' => 0,
-		) );
+		) ) );
 		$setting_id = "nav_menu[$menu_id]";
 		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, $setting_id );
 		$nav_menu_options = $this->get_nav_menu_items_option();
@@ -312,15 +312,15 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$this->assertNull( $setting->sanitize( 123 ) );
 
 		$value = array(
-			'name' => ' Hello <b>world</b> ',
-			'description' => "New\nline",
+			'name' => ' Hello \\o/ <b>world</b> ',
+			'description' => "New\nline \\o/",
 			'parent' => -12,
 			'auto_add' => true,
 			'extra' => 'ignored',
 		);
 		$sanitized = $setting->sanitize( $value );
-		$this->assertEquals( 'Hello &lt;b&gt;world&lt;/b&gt;', $sanitized['name'] );
-		$this->assertEquals( 'New line', $sanitized['description'] );
+		$this->assertEquals( 'Hello \\o/ &lt;b&gt;world&lt;/b&gt;', $sanitized['name'] );
+		$this->assertEquals( 'New line \\o/', $sanitized['description'] );
 		$this->assertEquals( 0, $sanitized['parent'] );
 		$this->assertEquals( true, $sanitized['auto_add'] );
 		$this->assertEqualSets( array( 'name', 'description', 'parent', 'auto_add' ), array_keys( $sanitized ) );
@@ -338,11 +338,11 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_save_updated() {
 		do_action( 'customize_register', $this->wp_customize );
 
-		$menu_id = wp_update_nav_menu_object( 0, array(
-			'menu-name' => 'Name 1',
-			'description' => 'Description 1',
+		$menu_id = wp_update_nav_menu_object( 0, wp_slash( array(
+			'menu-name' => 'Name 1 \\o/',
+			'description' => 'Description 1 \\o/',
 			'parent' => 0,
-		) );
+		) ) );
 		$nav_menu_options = $this->get_nav_menu_items_option();
 		$nav_menu_options['auto_add'][] = $menu_id;
 		update_option( 'nav_menu_options', $nav_menu_options );
@@ -352,8 +352,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$auto_add = false;
 		$new_value = array(
-			'name' => 'Name 2',
-			'description' => 'Description 2',
+			'name' => 'Name 2 \\o/',
+			'description' => 'Description 2 \\o/',
 			'parent' => 1,
 			'auto_add' => $auto_add,
 		);
@@ -400,8 +400,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 
 		$menu_id = -123;
 		$post_value = array(
-			'name' => 'New Menu Name 1',
-			'description' => 'New Menu Description 1',
+			'name' => 'New Menu Name 1 \\o/',
+			'description' => 'New Menu Description 1 \\o/',
 			'parent' => 0,
 			'auto_add' => true,
 		);
@@ -448,7 +448,7 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		do_action( 'customize_register', $this->wp_customize );
 
 		$menu_name = 'Foo';
-		wp_update_nav_menu_object( 0, array( 'menu-name' => $menu_name ) );
+		wp_update_nav_menu_object( 0, wp_slash( array( 'menu-name' => $menu_name ) ) );
 
 		$menu_id = -123;
 		$setting_id = "nav_menu[$menu_id]";
@@ -472,8 +472,8 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 	function test_save_deleted() {
 		do_action( 'customize_register', $this->wp_customize );
 
-		$menu_name = 'Lorem Ipsum';
-		$menu_id = wp_create_nav_menu( $menu_name );
+		$menu_name = 'Lorem Ipsum \\o/';
+		$menu_id = wp_create_nav_menu( wp_slash( $menu_name ) );
 		$setting_id = "nav_menu[$menu_id]";
 		$setting = new WP_Customize_Nav_Menu_Setting( $this->wp_customize, $setting_id );
 		$nav_menu_options = $this->get_nav_menu_items_option();
@@ -506,5 +506,4 @@ class Test_WP_Customize_Nav_Menu_Setting extends WP_UnitTestCase {
 		$nav_menu_options = $this->get_nav_menu_items_option();
 		$this->assertNotContains( $menu_id, $nav_menu_options['auto_add'] );
 	}
-
 }
