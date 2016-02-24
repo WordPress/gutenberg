@@ -277,22 +277,22 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	function test_search_available_items_query() {
 		$menus = new WP_Customize_Nav_Menus( $this->wp_customize );
 
-		// Create posts
+		// Create posts.
 		$post_ids = array();
 		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'Search & Test' ) );
 		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'Some Other Title' ) );
 
-		// Create terms
+		// Create terms.
 		$term_ids = array();
 		$term_ids[] = self::factory()->category->create( array( 'name' => 'Dogs Are Cool' ) );
 		$term_ids[] = self::factory()->category->create( array( 'name' => 'Cats Drool' ) );
 
-		// Test empty results
+		// Test empty results.
 		$expected = array();
 		$results = $menus->search_available_items_query( array( 'pagenum' => 1, 's' => 'This Does NOT Exist' ) );
 		$this->assertEquals( $expected, $results );
 
-		// Test posts
+		// Test posts.
 		foreach ( $post_ids as $post_id ) {
 			$expected = array(
 				'id'         => 'post-' . $post_id,
@@ -310,7 +310,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			$this->assertEquals( $expected, $results[0] );
 		}
 
-		// Test terms
+		// Test terms.
 		foreach ( $term_ids as $term_id ) {
 			$term = get_term_by( 'id', $term_id, 'category' );
 			$expected = array(
@@ -326,6 +326,56 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			$results = $menus->search_available_items_query( array( 'pagenum' => 1, 's' => $s ) );
 			$this->assertEquals( $expected, $results[0] );
 		}
+
+		// Test filtered results.
+		$results = $menus->search_available_items_query( array( 'pagenum' => 1, 's' => 'cat' ) );
+		$this->assertEquals( 1, count( $results ) );
+		$count = $this->filter_count_customize_nav_menu_searched_items;
+		add_filter( 'customize_nav_menu_searched_items', array( $this, 'filter_search' ), 10, 2 );
+		$results = $menus->search_available_items_query( array( 'pagenum' => 1, 's' => 'cat' ) );
+		$this->assertEquals( $count + 1, $this->filter_count_customize_nav_menu_searched_items );
+		$this->assertInternalType( 'array', $results );
+		$this->assertEquals( 2, count( $results ) );
+		remove_filter( 'customize_nav_menu_searched_items', array( $this, 'filter_search' ), 10 );
+	}
+
+	/**
+	 * Count for number of times customize_nav_menu_searched_items filtered.
+	 *
+	 * @var int
+	 */
+	protected $filter_count_customize_nav_menu_searched_items = 0;
+
+	/**
+	 * Filter to search menu items.
+	 *
+	 * @param array $items Items.
+	 * @param array $args {
+	 *     Search args.
+	 *
+	 *     @type int    $pagenum Page number.
+	 *     @type string $s       Search string.
+	 * }
+	 * @return array Items.
+	 */
+	function filter_search( $items, $args ) {
+		$this->assertInternalType( 'array', $items );
+		$this->assertInternalType( 'array', $args );
+		$this->assertArrayHasKey( 's', $args );
+		$this->assertArrayHasKey( 'pagenum', $args );
+		$this->filter_count_customize_nav_menu_searched_items += 1;
+
+		if ( 'cat' === $args['s'] ) {
+			array_unshift( $items, array(
+				'id'         => 'home',
+				'title'      => 'COOL CAT!',
+				'type'       => 'custom',
+				'type_label' => __( 'Custom Link' ),
+				'object'     => '',
+				'url'        => home_url( '/cool-cat' ),
+			) );
+		}
+		return $items;
 	}
 
 	/**
