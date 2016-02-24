@@ -100,6 +100,20 @@ jQuery( window ).load( function (){
 		equal( control.section(), 'fixture-section' );
 	} );
 
+	module( 'Customizer control without associated settings' );
+	test( 'Control can be created without settings', function() {
+		var control = new wp.customize.Control( 'settingless', {
+			params: {
+				content: jQuery( '<li class="settingless">Hello World</li>' ),
+				section: 'fixture-section'
+			}
+		} );
+		wp.customize.control.add( control.id, control );
+		equal( control.deferred.embedded.state(), 'resolved' );
+		ok( null === control.setting );
+		ok( jQuery.isEmptyObject( control.settings ) );
+	} );
+
 	// Begin sections.
 	module( 'Customizer Section in Fixture' );
 	test( 'Fixture section exists', function () {

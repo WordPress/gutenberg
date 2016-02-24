@@ -394,11 +394,6 @@ window._wpCustomizeSettings.controls.new_menu_name = {
 	'description': '',
 	'instanceNumber': 46
 };
-window._wpCustomizeSettings.settings.new_menu_name = {
-	'value': '',
-	'transport': 'postMessage',
-	'dirty': false
-};
 
 // From nav-menu.js
 window.wpNavMenu = {

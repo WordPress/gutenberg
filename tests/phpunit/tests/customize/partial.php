@@ -325,6 +325,23 @@ class Test_WP_Customize_Partial extends WP_UnitTestCase {
 			'settings' => array( 'blogname', 'top_secret_clearance' ),
 		) );
 		$this->assertFalse( $partial->check_capabilities() );
+
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'no_setting', array(
+			'settings' => array(),
+		) );
+		$this->assertTrue( $partial->check_capabilities() );
+
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'no_setting', array(
+			'settings' => array(),
+			'capability' => 'top_secret_clearance',
+		) );
+		$this->assertFalse( $partial->check_capabilities() );
+
+		$partial = new WP_Customize_Partial( $this->selective_refresh, 'no_setting', array(
+			'settings' => array(),
+			'capability' => 'edit_theme_options',
+		) );
+		$this->assertTrue( $partial->check_capabilities() );
 	}
 
 	/**
