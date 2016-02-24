@@ -17,8 +17,8 @@ var Button = wp.media.view.Button,
 DeleteSelectedPermanently = DeleteSelected.extend({
 	initialize: function() {
 		DeleteSelected.prototype.initialize.apply( this, arguments );
-		this.listenTo( this.controller, 'select:activate', this.selectActivate );
-		this.listenTo( this.controller, 'select:deactivate', this.selectDeactivate );
+		this.controller.on( 'select:activate', this.selectActivate, this );
+		this.controller.on( 'select:deactivate', this.selectDeactivate, this );
 	},
 
 	filterChange: function( model ) {

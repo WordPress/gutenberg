@@ -17,9 +17,9 @@ DeleteSelected = Button.extend({
 	initialize: function() {
 		Button.prototype.initialize.apply( this, arguments );
 		if ( this.options.filters ) {
-			this.listenTo( this.options.filters.model, 'change', this.filterChange );
+			this.options.filters.model.on( 'change', this.filterChange, this );
 		}
-		this.listenTo( this.controller, 'selection:toggle', this.toggleDisabled );
+		this.controller.on( 'selection:toggle', this.toggleDisabled, this );
 	},
 
 	filterChange: function( model ) {

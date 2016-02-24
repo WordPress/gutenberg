@@ -18,8 +18,8 @@ SelectModeToggle = Button.extend({
 		} );
 
 		Button.prototype.initialize.apply( this, arguments );
-		this.listenTo( this.controller, 'select:activate select:deactivate', this.toggleBulkEditHandler );
-		this.listenTo( this.controller, 'selection:action:done', this.back );
+		this.controller.on( 'select:activate select:deactivate', this.toggleBulkEditHandler, this );
+		this.controller.on( 'selection:action:done', this.back, this );
 	},
 
 	back: function () {
