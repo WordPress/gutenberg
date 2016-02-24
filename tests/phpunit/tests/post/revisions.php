@@ -340,7 +340,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$post = self::factory()->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
 		$post = (array) $post;
-		$post_revision_fields = _wp_post_revision_fields( $post );
+		$post_revision_fields = _wp_post_revision_data( $post );
 		$post_revision_fields = wp_slash( $post_revision_fields );
 
 		$revision_ids = array();
@@ -368,7 +368,7 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		$post = self::factory()->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post', 'post_content' => 'some_content' ) );
 
 		$post = (array) $post;
-		$post_revision_fields = _wp_post_revision_fields( $post );
+		$post_revision_fields = _wp_post_revision_data( $post );
 		$post_revision_fields = wp_slash( $post_revision_fields );
 
 		$revision_ids = array();
