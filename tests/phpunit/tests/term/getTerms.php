@@ -2078,6 +2078,80 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		$this->assertSame( array( $terms[0], $terms[1] ), array_keys( $found ) );
 	}
 
+	/**
+	 * @ticket 35935
+	 */
+	public function test_hierarchical_offset_0_with_number_greater_than_total_available_count() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'number'     => 3,
+			'offset'     => 0,
+			'hide_empty' => false,
+			'fields'     => 'ids',
+		) );
+		$this->assertEqualSets( $terms, $found );
+	}
+
+	/**
+	 * @ticket 35935
+	 */
+	public function test_hierarchical_offset_plus_number() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'number'     => 1,
+			'offset'     => 1,
+			'hide_empty' => false,
+			'fields'     => 'ids',
+			'orderby'    => 'term_id',
+			'order'      => 'ASC',
+		) );
+		$this->assertEqualSets( array( $terms[1] ), $found );
+	}
+
+	/**
+	 * @ticket 35935
+	 */
+	public function test_hierarchical_offset_plus_number_exceeds_available_count() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'number'     => 2,
+			'offset'     => 1,
+			'hide_empty' => false,
+			'fields'     => 'ids',
+			'orderby'    => 'term_id',
+			'order'      => 'ASC',
+		) );
+		$this->assertEqualSets( array( $terms[1] ), $found );
+	}
+
+	/**
+	 * @ticket 35935
+	 */
+	public function test_hierarchical_offset_exceeds_available_count() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', array(
+			'number'     => 100,
+			'offset'     => 3,
+			'hide_empty' => false,
+			'fields'     => 'ids',
+			'orderby'    => 'term_id',
+			'order'      => 'ASC',
+		) );
+		$this->assertEqualSets( array(), $found );
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
