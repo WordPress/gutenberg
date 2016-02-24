@@ -20,12 +20,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false === strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false === strpos( $actual, 'That embed can&#8217;t be found.' ) );
 		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
 	}
 
@@ -46,12 +46,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertFalse( strpos( $actual, 'Page not found' ) );
+		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
 		$this->assertTrue( false !== strpos( $actual, 'canola.jpg' ) );
 	}
@@ -63,12 +63,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_attachment() {
@@ -86,12 +86,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_attachment', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertFalse( strpos( $actual, 'Page not found' ) );
+		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
 		$this->assertTrue( false !== strpos( $actual, 'canola.jpg' ) );
 	}
@@ -109,12 +109,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_scheduled_post() {
@@ -131,12 +131,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_private_post() {
@@ -152,12 +152,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_404', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_private_post_with_permissions() {
@@ -177,12 +177,12 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$this->assertQueryTrue( 'is_single', 'is_singular', 'is_embed' );
 
 		ob_start();
-		include( ABSPATH . WPINC . '/embed-template.php' );
+		include( ABSPATH . WPINC . '/theme-compat/embed.php' );
 		$actual = ob_get_clean();
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false === strpos( $actual, 'Page not found' ) );
+		$this->assertTrue( false === strpos( $actual, 'That embed can&#8217;t be found.' ) );
 		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
 	}
 
