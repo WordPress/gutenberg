@@ -492,7 +492,9 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		) );
 
 		$response = new WP_REST_Response();
-		$response->add_link( 'alternate', rest_url( '/test/embeddable?parsed_params=yes' ), array( 'embeddable' => true ) );
+		$url = rest_url( '/test/embeddable' );
+		$url = add_query_arg( 'parsed_params', 'yes', $url );
+		$response->add_link( 'alternate', $url, array( 'embeddable' => true ) );
 
 		$data = $this->server->response_to_data( $response, true );
 
@@ -514,7 +516,9 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		) );
 
 		$response = new WP_REST_Response();
-		$response->add_link( 'up', rest_url( '/test/embeddable?error=1' ), array( 'embeddable' => true ) );
+		$url = rest_url( '/test/embeddable' );
+		$url = add_query_arg( 'error', '1', $url );
+		$response->add_link( 'up', $url, array( 'embeddable' => true ) );
 
 		$data = $this->server->response_to_data( $response, true );
 
