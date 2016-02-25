@@ -83,14 +83,14 @@ EOD;
 		$html   = '<blockquote></blockquote><iframe></iframe>';
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<blockquote class="wp-embedded-content"></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+		$this->assertEquals( '<blockquote class="wp-embedded-content"></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="position: absolute; clip: rect(1px, 1px, 1px, 1px);"></iframe>', $actual );
 	}
 
 	function test_filter_oembed_result_allowed_html() {
 		$html   = '<blockquote class="foo" id="bar"><strong><a href="" target=""></a></strong></blockquote><iframe></iframe>';
 		$actual = wp_filter_oembed_result( $html, (object) array( 'type' => 'rich' ), '' );
 
-		$this->assertEquals( '<blockquote class="wp-embedded-content"><a href=""></a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="display:none;"></iframe>', $actual );
+		$this->assertEquals( '<blockquote class="wp-embedded-content"><a href=""></a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="position: absolute; clip: rect(1px, 1px, 1px, 1px);"></iframe>', $actual );
 	}
 
 	/**
