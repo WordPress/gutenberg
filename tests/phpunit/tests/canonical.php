@@ -23,9 +23,9 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data
+	 * @dataProvider data_canonical
 	 */
-	function test( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
+	function test_canonical( $test_url, $expected, $ticket = 0, $expected_doing_it_wrong = array() ) {
 
 		if ( false !== strpos( $test_url, '%d' ) ) {
 			if ( false !== strpos( $test_url, '/?author=%d' ) )
@@ -37,14 +37,15 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 		$this->assertCanonical( $test_url, $expected, $ticket, $expected_doing_it_wrong );
 	}
 
-	function data() {
+	function data_canonical() {
 		/* Data format:
-		 * [0]: $test_url,
+		 * [0]: Test URL.
 		 * [1]: expected results: Any of the following can be used
 		 *      array( 'url': expected redirection location, 'qv': expected query vars to be set via the rewrite AND $_GET );
 		 *      array( expected query vars to be set, same as 'qv' above )
 		 *      (string) expected redirect location
 		 * [2]: (optional) The ticket the test refers to, Can be skipped if unknown.
+		 * [3]: (optional) Array of class/function names expected to throw `_doing_it_wrong()` notices.
 		 */
 
 		// Please Note: A few test cases are commented out below, Look at the test case following it, in most cases it's simply showing 2 options for the "proper" redirect.
