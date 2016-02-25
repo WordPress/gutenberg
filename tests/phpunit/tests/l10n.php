@@ -110,4 +110,30 @@ class Tests_L10n extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @ticket 35284
+	 */
+	function test_wp_get_pomo_file_data() {
+		$file  = DIR_TESTDATA . '/pomo/empty.po';
+		$array = wp_get_pomo_file_data( $file );
+		$this->assertArrayHasKey( 'POT-Creation-Date', $array );
+		$this->assertArrayHasKey( 'PO-Revision-Date', $array );
+		$this->assertArrayHasKey( 'Project-Id-Version', $array );
+		$this->assertArrayHasKey( 'X-Generator', $array );
+
+		$file  = DIR_TESTDATA . '/pomo/mo.pot';
+		$array = wp_get_pomo_file_data( $file );
+		$this->assertNotEmpty( $array['POT-Creation-Date'] );
+		$this->assertNotEmpty( $array['PO-Revision-Date'] );
+		$this->assertNotEmpty( $array['Project-Id-Version'] );
+		$this->assertArrayHasKey( 'X-Generator', $array );
+
+		$file  = DIR_TESTDATA . '/languages/es_ES.po';
+		$array = wp_get_pomo_file_data( $file );
+		$this->assertArrayHasKey( 'POT-Creation-Date', $array );
+		$this->assertNotEmpty( $array['PO-Revision-Date'] );
+		$this->assertNotEmpty( $array['Project-Id-Version'] );
+		$this->assertNotEmpty( $array['X-Generator'] );
+	}
+
 }
