@@ -13,11 +13,7 @@ define( 'WP_INSTALLING', true );
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';
 
-$_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
-$_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
-$_SERVER['SERVER_NAME'] = WP_TESTS_DOMAIN;
-$_SERVER['REQUEST_METHOD'] = 'GET';
-$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+tests_reset_SERVER();
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 

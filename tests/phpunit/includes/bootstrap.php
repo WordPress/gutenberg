@@ -22,6 +22,9 @@ if ( !is_readable( $config_file_path ) ) {
 	die( "ERROR: wp-tests-config.php is missing! Please use wp-tests-config-sample.php to create a config file.\n" );
 }
 require_once $config_file_path;
+require_once dirname( __FILE__ ) . '/functions.php';
+
+tests_reset_SERVER();
 
 define( 'WP_TESTS_TABLE_PREFIX', $table_prefix );
 define( 'DIR_TESTDATA', dirname( __FILE__ ) . '/../data' );
@@ -36,12 +39,6 @@ define( 'DISABLE_WP_CRON', true );
 
 define( 'WP_MEMORY_LIMIT', -1 );
 define( 'WP_MAX_MEMORY_LIMIT', -1 );
-
-$_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
-$_SERVER['HTTP_HOST'] = WP_TESTS_DOMAIN;
-$_SERVER['SERVER_NAME'] = WP_TESTS_DOMAIN;
-$_SERVER['REQUEST_METHOD'] = 'GET';
-$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
@@ -67,8 +64,6 @@ if ( $multisite ) {
 	echo "Running as single site... To run multisite, use -c tests/phpunit/multisite.xml" . PHP_EOL;
 }
 unset( $multisite );
-
-require_once dirname( __FILE__ ) . '/functions.php';
 
 $GLOBALS['_wp_die_disabled'] = false;
 // Allow tests to override wp_die

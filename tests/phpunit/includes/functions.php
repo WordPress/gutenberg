@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * Resets various `$_SERVER` variables that can get altered during tests.
+ */
+function tests_reset_SERVER() {
+	$_SERVER['HTTP_HOST']       = WP_TESTS_DOMAIN;
+	$_SERVER['REMOTE_ADDR']     = '127.0.0.1';
+	$_SERVER['REQUEST_METHOD']  = 'GET';
+	$_SERVER['SERVER_NAME']     = WP_TESTS_DOMAIN;
+	$_SERVER['SERVER_PORT']     = '80';
+	$_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+
+	unset( $_SERVER['HTTP_REFERER'] );
+	unset( $_SERVER['HTTPS'] );
+}
+
 // For adding hooks before loading WP
 function tests_add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1) {
 	global $wp_filter, $merged_filters;
