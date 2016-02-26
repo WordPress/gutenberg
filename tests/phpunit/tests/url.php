@@ -5,132 +5,196 @@
  * @group url
  */
 class Tests_URL extends WP_UnitTestCase {
-	var $_old_server;
+
 	function setUp() {
 		parent::setUp();
-		$this->_old_server = $_SERVER;
 		$GLOBALS['pagenow'] = '';
 	}
 
-	function tearDown() {
-		$_SERVER = $this->_old_server;
-		parent::tearDown();
+	/**
+	 * @dataProvider data_is_ssl
+	 */
+	function test_is_ssl( $value, $expected ) {
+		$_SERVER['HTTPS'] = $value;
+
+		$is_ssl = is_ssl();
+		$this->assertSame( $expected, $is_ssl );
 	}
 
-	function test_is_ssl_positive() {
-		$_SERVER['HTTPS'] = 'on';
-		$this->assertTrue( is_ssl() );
+	function data_is_ssl() {
+		return array(
+			array(
+				'on',
+				true,
+			),
+			array(
+				'ON',
+				true,
+			),
+			array(
+				'1',
+				true,
+			),
+			array(
+				'off',
+				false,
+			),
+			array(
+				'OFF',
+				false,
+			),
+		);
+	}
 
-		$_SERVER['HTTPS'] = 'ON';
-		$this->assertTrue( is_ssl() );
-
-		$_SERVER['HTTPS'] = '1';
-		$this->assertTrue( is_ssl() );
-
+	function test_is_ssl_by_port() {
 		unset( $_SERVER['HTTPS'] );
 		$_SERVER['SERVER_PORT'] = '443';
-		$this->assertTrue( is_ssl() );
+
+		$is_ssl = is_ssl();
+		$this->assertTrue( $is_ssl );
 	}
 
-	function test_is_ssl_negative() {
-		$_SERVER['HTTPS'] = 'off';
-		$this->assertFalse( is_ssl() );
+	function test_is_ssl_with_no_value() {
+		unset( $_SERVER['HTTPS'] );
 
-		$_SERVER['HTTPS'] = 'OFF';
-		$this->assertFalse( is_ssl() );
-
-		unset($_SERVER['HTTPS']);
-		$this->assertFalse( is_ssl() );
+		$is_ssl = is_ssl();
+		$this->assertFalse( $is_ssl );
 	}
 
-	function test_admin_url_valid() {
-		$paths = array(
-			'' => "/wp-admin/",
-			'foo' => "/wp-admin/foo",
-			'/foo' => "/wp-admin/foo",
-			'/foo/' => "/wp-admin/foo/",
-			'foo.php' => "/wp-admin/foo.php",
-			'/foo.php' => "/wp-admin/foo.php",
-			'/foo.php?bar=1' => "/wp-admin/foo.php?bar=1",
+	/**
+	 * @dataProvider data_admin_urls
+	 *
+	 * @param string $url      Test URL.
+	 * @param string $expected Expected result.
+	 */
+	function test_admin_url( $url, $expected ) {
+		$siteurl_http   = get_option( 'siteurl' );
+		$admin_url_http = admin_url( $url );
+
+		$_SERVER['HTTPS'] = 'on';
+
+		$siteurl_https   = set_url_scheme( $siteurl_http, 'https' );
+		$admin_url_https = admin_url( $url );
+
+		$this->assertEquals( $siteurl_http . $expected, $admin_url_http );
+		$this->assertEquals( $siteurl_https . $expected, $admin_url_https );
+	}
+
+	function data_admin_urls() {
+		return array(
+			array(
+				null,
+				'/wp-admin/'
+			),
+			array(
+				0,
+				'/wp-admin/'
+			),
+			array(
+				-1,
+				'/wp-admin/'
+			),
+			array(
+				'///',
+				'/wp-admin/'
+			),
+			array(
+				'',
+				'/wp-admin/',
+			),
+			array(
+				'foo',
+				'/wp-admin/foo',
+			),
+			array(
+				'/foo',
+				'/wp-admin/foo',
+			),
+			array(
+				'/foo/',
+				'/wp-admin/foo/',
+			),
+			array(
+				'foo.php',
+				'/wp-admin/foo.php',
+			),
+			array(
+				'/foo.php',
+				'/wp-admin/foo.php',
+			),
+			array(
+				'/foo.php?bar=1',
+				'/wp-admin/foo.php?bar=1',
+			),
 		);
-		$https = array('on', 'off');
-
-		foreach ($https as $val) {
-			$_SERVER['HTTPS'] = $val;
-			$siteurl = get_option('siteurl');
-			if ( $val == 'on' )
-				$siteurl = str_replace('http://', 'https://', $siteurl);
-
-			foreach ($paths as $in => $out) {
-				$this->assertEquals( $siteurl.$out, admin_url($in), "admin_url('{$in}') should equal '{$siteurl}{$out}'");
-			}
-		}
 	}
 
-	function test_admin_url_invalid() {
-		$paths = array(
-			null => "/wp-admin/",
-			0 => "/wp-admin/",
-			-1 => "/wp-admin/",
-			'///' => "/wp-admin/",
-		);
-		$https = array('on', 'off');
+	/**
+	 * @dataProvider data_home_urls
+	 *
+	 * @param string $url      Test URL.
+	 * @param string $expected Expected result.
+	 */
+	function test_home_url( $url, $expected ) {
+		$homeurl_http  = get_option( 'home' );
+		$home_url_http = home_url( $url );
 
-		foreach ($https as $val) {
-			$_SERVER['HTTPS'] = $val;
-			$siteurl = get_option('siteurl');
-			if ( $val == 'on' )
-				$siteurl = str_replace('http://', 'https://', $siteurl);
+		$_SERVER['HTTPS'] = 'on';
 
-			foreach ($paths as $in => $out) {
-				$this->assertEquals( $siteurl.$out, admin_url($in), "admin_url('{$in}') should equal '{$siteurl}{$out}'");
-			}
-		}
+		$homeurl_https  = set_url_scheme( $homeurl_http, 'https' );
+		$home_url_https = home_url( $url );
+
+		$this->assertEquals( $homeurl_http . $expected, $home_url_http );
+		$this->assertEquals( $homeurl_https . $expected, $home_url_https );
 	}
 
-	function test_home_url_valid() {
-		$paths = array(
-			'' => "",
-			'foo' => "/foo",
-			'/foo' => "/foo",
-			'/foo/' => "/foo/",
-			'foo.php' => "/foo.php",
-			'/foo.php' => "/foo.php",
-			'/foo.php?bar=1' => "/foo.php?bar=1",
+	function data_home_urls() {
+		return array(
+			array(
+				null,
+				"",
+			),
+			array(
+				0,
+				"",
+			),
+			array(
+				-1,
+				"",
+			),
+			array(
+				'///',
+				"/",
+			),
+			array(
+				'',
+				"",
+			),
+			array(
+				'foo',
+				"/foo",
+			),
+			array(
+				'/foo',
+				"/foo",
+			),
+			array(
+				'/foo/',
+				"/foo/",
+			),
+			array(
+				'foo.php',
+				"/foo.php",
+			),
+			array(
+				'/foo.php',
+				"/foo.php",
+			),
+			array(
+				'/foo.php?bar=1',
+				"/foo.php?bar=1",
+			),
 		);
-		$https = array('on', 'off');
-
-		foreach ($https as $val) {
-			$_SERVER['HTTPS'] = $val;
-			$home = get_option('home');
-			if ( $val == 'on' )
-				$home = str_replace('http://', 'https://', $home);
-
-			foreach ($paths as $in => $out) {
-				$this->assertEquals( $home.$out, home_url($in), "home_url('{$in}') should equal '{$home}{$out}'");
-			}
-		}
-	}
-
-	function test_home_url_invalid() {
-		$paths = array(
-			null => "",
-			0 => "",
-			-1 => "",
-			'///' => "/",
-		);
-		$https = array('on', 'off');
-
-		foreach ($https as $val) {
-			$_SERVER['HTTPS'] = $val;
-			$home = get_option('home');
-			if ( $val == 'on' )
-				$home = str_replace('http://', 'https://', $home);
-
-			foreach ($paths as $in => $out) {
-				$this->assertEquals( $home.$out, home_url($in), "home_url('{$in}') should equal '{$home}{$out}'");
-			}
-		}
 	}
 
 	function test_home_url_from_admin() {
