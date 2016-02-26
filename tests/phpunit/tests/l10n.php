@@ -48,6 +48,20 @@ class Tests_L10n extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35950
+	 */
+	function test_get_available_languages() {
+		$array = get_available_languages();
+		$this->assertInternalType( 'array', $array );
+
+		$array = get_available_languages( '.' );
+		$this->assertEmpty( $array );
+
+		$array = get_available_languages( DIR_TESTDATA . '/languages/' );
+		$this->assertEquals( array( 'en_GB', 'es_ES' ), $array );
+	}
+
+	/**
 	 * @ticket 35284
 	 */
 	function test_wp_get_installed_translations_for_core() {
