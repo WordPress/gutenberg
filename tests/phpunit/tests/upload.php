@@ -82,14 +82,14 @@ class Tests_Upload extends WP_UnitTestCase {
 	}
 
 	function test_upload_path_absolute() {
-		update_option( 'upload_url_path', 'http://example.org/asdf' );
+		update_option( 'upload_url_path', 'http://' . WP_TESTS_DOMAIN . '/asdf' );
 
 		// Use `_wp_upload_dir()` directly to bypass caching and work with the changed options.
 		// It doesn't create the /year/month directories.
 		$info = _wp_upload_dir();
 		$subdir = gmstrftime('/%Y/%m');
 
-		$this->assertEquals( 'http://example.org/asdf' . $subdir, $info['url'] );
+		$this->assertEquals( 'http://' . WP_TESTS_DOMAIN . '/asdf' . $subdir, $info['url'] );
 		$this->assertEquals( ABSPATH . 'wp-content/uploads' . $subdir, $info['path'] );
 		$this->assertEquals( $subdir, $info['subdir'] );
 		$this->assertEquals( false, $info['error'] );

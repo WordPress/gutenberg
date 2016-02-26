@@ -37,7 +37,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 			$wpdb->posts,
 			array(
 				'ID'   => '2015',
-				'guid' => 'http://example.org/?p=2015'
+				'guid' => 'http://' . WP_TESTS_DOMAIN . '/?p=2015'
 			),
 			array( 'ID' => $id )
 		);
@@ -65,7 +65,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 			$wpdb->posts,
 			array(
 				'ID'   => '2015',
-				'guid' => 'http://example.org/?p=2015'
+				'guid' => 'http://' . WP_TESTS_DOMAIN . '/?p=2015'
 			),
 			array( 'ID' => $id )
 		);
