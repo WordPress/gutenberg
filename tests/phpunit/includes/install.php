@@ -13,7 +13,7 @@ define( 'WP_INSTALLING', true );
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';
 
-tests_reset_SERVER();
+tests_reset__SERVER();
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 

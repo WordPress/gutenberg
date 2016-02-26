@@ -1028,8 +1028,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$is_ssl  = is_ssl();
 		$address = parse_url( get_blogaddress_by_id( $blog ), PHP_URL_SCHEME );
 
-		unset( $_SERVER['HTTPS'] );
-
 		$this->assertTrue( $is_ssl );
 		$this->assertSame( 'http', $address );
 	}

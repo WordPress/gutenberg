@@ -101,6 +101,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$this->reset_post_types();
 			$this->reset_taxonomies();
 			$this->reset_post_statuses();
+			$this->reset__SERVER();
 
 			if ( $wp_rewrite->permalink_structure ) {
 				$this->set_permalink_structure( '' );
@@ -183,6 +184,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( get_post_stati( array( '_builtin' => false ) ) as $post_status ) {
 			_unregister_post_status( $post_status );
 		}
+	}
+
+	/**
+	 * Reset `$_SERVER` variables
+	 */
+	protected function reset__SERVER() {
+		tests_reset__SERVER();
 	}
 
 	/**

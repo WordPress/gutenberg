@@ -285,10 +285,6 @@ class Tests_REST_API extends WP_UnitTestCase {
 	 * @ticket 34299
 	 */
 	public function test_rest_url_scheme() {
-		if ( isset( $_SERVER['HTTPS'] ) ) {
-			$_https = $_SERVER['HTTPS'];
-		}
-		$_name = $_SERVER['SERVER_NAME'];
 		$_SERVER['SERVER_NAME'] = parse_url( home_url(), PHP_URL_HOST );
 		$_siteurl = get_option( 'siteurl' );
 
@@ -321,12 +317,6 @@ class Tests_REST_API extends WP_UnitTestCase {
 		$this->assertSame( 'http', parse_url( $url, PHP_URL_SCHEME ) );
 
 		// Reset
-		if ( isset( $_https ) ) {
-			$_SERVER['HTTPS'] = $_https;
-		} else {
-			unset( $_SERVER['HTTPS'] );
-		}
-		$_SERVER['SERVER_NAME'] = $_name;
 		update_option( 'siteurl', $_siteurl );
 		set_current_screen( 'front' );
 

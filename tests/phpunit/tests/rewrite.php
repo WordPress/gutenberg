@@ -103,9 +103,6 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	}
 
 	function test_url_to_postid_set_url_scheme_http_to_https() {
-		// Save server data for cleanup
-		$is_ssl = is_ssl();
-
 		$_SERVER['HTTPS'] = 'on';
 
 		$post_id        = self::factory()->post->create();
@@ -115,9 +112,6 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$page_id        = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$page_permalink = get_permalink( $page_id );
 		$page_url_to_id = url_to_postid( set_url_scheme( $page_permalink, 'http' ) );
-
-		// Cleanup.
-		$_SERVER['HTTPS'] = $is_ssl ? 'on' : 'off';
 
 		$this->assertEquals( $post_id, $post_url_to_id );
 		$this->assertEquals( $page_id, $page_url_to_id );
