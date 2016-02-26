@@ -18,13 +18,13 @@ class Tests_L10n_GetLocale extends WP_UnitTestCase {
 	}
 
 	public function test_local_option_should_take_precedence_on_multisite() {
-		global $locale;
-		$old_locale = $locale;
-		$locale = null;
-
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' requires Multisite' );
 		}
+
+		global $locale;
+		$old_locale = $locale;
+		$locale = null;
 
 		update_option( 'WPLANG', 'en_GB' );
 		update_site_option( 'WPLANG', 'es_ES' );
@@ -36,13 +36,13 @@ class Tests_L10n_GetLocale extends WP_UnitTestCase {
 	}
 
 	public function test_network_option_should_be_fallback_on_multisite() {
-		global $locale;
-		$old_locale = $locale;
-		$locale = null;
-
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' requires Multisite' );
 		}
+
+		global $locale;
+		$old_locale = $locale;
+		$locale = null;
 
 		update_site_option( 'WPLANG', 'es_ES' );
 
@@ -53,13 +53,13 @@ class Tests_L10n_GetLocale extends WP_UnitTestCase {
 	}
 
 	public function test_option_should_be_respected_on_nonmultisite() {
-		global $locale;
-		$old_locale = $locale;
-		$locale = null;
-
 		if ( is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' does not apply to Multisite' );
 		}
+
+		global $locale;
+		$old_locale = $locale;
+		$locale = null;
 
 		update_option( 'WPLANG', 'es_ES' );
 
