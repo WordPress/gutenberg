@@ -306,8 +306,14 @@
 	} );
 
 	QUnit.test( 'Inline: no change.', function( assert ) {
-		type( '******', function() {
-			assert.equal( editor.getContent(), '<p>******</p>' );
+		type( 'test ******', function() {
+			assert.equal( editor.getContent(), '<p>test ******</p>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Horizontal Rule', function( assert ) {
+		type( '   ---   \n', function() {
+			assert.equal( editor.getContent(), '<hr />\n<p>&nbsp;</p>' );
 		}, assert.async() );
 	} );
 } )( window.jQuery, window.QUnit, window.tinymce, window.setTimeout );
