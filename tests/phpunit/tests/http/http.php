@@ -102,4 +102,20 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 		  - ://example.com - assumed path in PHP >= 5.4.7, fails in <5.4.7
 		*/
 	}
+
+	/**
+	 * @ticket 35426
+	 */
+	public function test_http_response_code_constants() {
+		global $wp_header_to_desc;
+
+		$ref = new ReflectionClass( 'WP_Http' );
+		$constants = $ref->getConstants();
+
+		// This primes the `$wp_header_to_desc` global:
+		get_status_header_desc( 200 );
+
+		$this->assertEquals( array_keys( $wp_header_to_desc ), array_values( $constants ) );
+
+	}
 }
