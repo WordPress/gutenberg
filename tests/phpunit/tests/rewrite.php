@@ -117,6 +117,60 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$this->assertEquals( $page_id, $page_url_to_id );
 	}
 
+	/**
+	 * @ticket 35531
+	 * @group multisite
+	 */
+	function test_url_to_postid_of_http_site_when_current_site_uses_https() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite' );
+		}
+
+		$_SERVER['HTTPS'] = 'on';
+
+		$network_home = home_url();
+		$this->blog_id_35531 = self::factory()->blog->create();
+
+		add_filter( 'home_url', array( $this, '_filter_http_home_url' ), 10, 4 );
+
+		switch_to_blog( $this->blog_id_35531 );
+
+		$post_id       = self::factory()->post->create();
+		$permalink     = get_permalink( $post_id );
+		$url_to_postid = url_to_postid( $permalink );
+
+		restore_current_blog();
+
+		// Cleanup.
+		remove_filter( 'home_url', array( $this, '_filter_http_home_url' ), 10 );
+
+		// Test the tests:
+		$this->assertSame( 'http', parse_url( $permalink, PHP_URL_SCHEME ) );
+		$this->assertSame( 'https', parse_url( $network_home, PHP_URL_SCHEME ) );
+
+		// Test that the url_to_postid() call matched:
+		$this->assertEquals( $post_id, $url_to_postid );
+	}
+
+	/**
+	 * Enforce an `http` scheme for our target site.
+	 *
+	 * @param string      $url         The complete home URL including scheme and path.
+	 * @param string      $path        Path relative to the home URL. Blank string if no path is specified.
+	 * @param string|null $orig_scheme Scheme to give the home URL context.
+	 * @param int|null    $blog_id     Site ID, or null for the current site.
+	 * @return string                  The complete home URL including scheme and path.
+	 */
+	function _filter_http_home_url( $url, $path, $orig_scheme, $_blog_id ) {
+		global $blog_id;
+
+		if ( $this->blog_id_35531 === $blog_id ) {
+			return set_url_scheme( $url, 'http' );
+		}
+
+		return $url;
+	}
+
 	function test_url_to_postid_custom_post_type() {
 		delete_option( 'rewrite_rules' );
 
