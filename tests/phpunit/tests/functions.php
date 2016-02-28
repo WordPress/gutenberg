@@ -73,6 +73,15 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertFalse(size_format(array()));
 	}
 
+	/**
+	 * @ticket 35972
+	 */
+	function test_bool_from_yn() {
+		$this->assertTrue( bool_from_yn( 'Y' ) );
+		$this->assertTrue( bool_from_yn( 'y' ) );
+		$this->assertFalse( bool_from_yn( 'n' ) );
+	}
+
 	function test_path_is_absolute() {
 		if ( !is_callable('path_is_absolute') )
 			$this->markTestSkipped();
