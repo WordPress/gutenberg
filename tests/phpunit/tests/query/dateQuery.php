@@ -672,7 +672,6 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 	 * @ticket 34228
 	 */
 	public function test_date_query_hour_should_not_ignore_0() {
-		return;
 		$p1 = self::factory()->post->create( array( 'post_date' => '2014-10-21 00:42:29', ) );
 		$p2 = self::factory()->post->create( array( 'post_date' => '2014-10-21 01:42:29', ) );
 
