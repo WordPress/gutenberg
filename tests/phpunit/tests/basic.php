@@ -91,13 +91,18 @@ EOF;
 		$this->assertEquals($expected, mask_input_value($in));
 	}
 
+	/**
+	 * @ticket 17884
+	 */
 	function test_setting_nonexistent_arrays() {
 		$page = 1;
 		$field = 'settings';
 
 		$empty_array[$page][$field] = 'foo';
 
+		// Assertion not strictly needed; we mainly want to show that a notice is not thrown.
 		unset( $empty_array[$page]['bar']['baz'] );
+		$this->assertFalse( isset( $empty_array[ $page ]['bar']['baz'] ) );
 	}
 
 	function test_magic_getter() {
