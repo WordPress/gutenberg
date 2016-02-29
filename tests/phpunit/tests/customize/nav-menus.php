@@ -691,16 +691,6 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test WP_Customize_Nav_Menus::export_preview_data() method.
-	 *
-	 * @see WP_Customize_Nav_Menus::export_preview_data()
-	 */
-	function test_export_preview_data() {
-		$this->setExpectedDeprecated( 'WP_Customize_Nav_Menus::export_preview_data' );
-		$this->wp_customize->nav_menus->export_preview_data();
-	}
-
-	/**
 	 * Test WP_Customize_Nav_Menus::render_nav_menu_partial() method.
 	 *
 	 * @see WP_Customize_Nav_Menus::render_nav_menu_partial()
