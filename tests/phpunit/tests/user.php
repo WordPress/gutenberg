@@ -658,7 +658,7 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_illegal_user_logins_multisite() {
 		if ( ! is_multisite() ) {
-			return;
+			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
 		}
 
 		$user_data = array(
