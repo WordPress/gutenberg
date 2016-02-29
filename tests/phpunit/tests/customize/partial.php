@@ -215,12 +215,12 @@ class Test_WP_Customize_Partial extends WP_UnitTestCase {
 	 *
 	 * @see WP_Customize_Partial::render()
 	 */
-	function test_render_bad_callback() {
+	function test_render_with_bad_callback_should_give_preference_to_return_value() {
 		$partial = new WP_Customize_Partial( $this->selective_refresh, 'foo', array(
 			'render_callback' => array( $this, 'render_echo_and_return' ),
 		) );
 		$this->setExpectedIncorrectUsage( 'render' );
-		$partial->render();
+		$this->assertSame( 'bar', $partial->render() );
 	}
 
 	/**
