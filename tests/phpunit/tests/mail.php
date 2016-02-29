@@ -20,7 +20,7 @@ class Tests_Mail extends WP_UnitTestCase {
 	 */
 	function test_wp_mail_break_it() {
 		$content = str_repeat( 'A', 1000 );
-		wp_mail( WP_TESTS_EMAIL, 'Looong line testing', $content);
+		$this->assertTrue( wp_mail( WP_TESTS_EMAIL, 'Looong line testing', $content ) );
 	}
 
 	function test_wp_mail_custom_boundaries() {
