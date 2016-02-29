@@ -172,7 +172,7 @@ class StringExtractor {
 			if ( T_COMMENT == $id ) {
 				$text = preg_replace( '%^\s+\*\s%m', '', $text );
 				$text = str_replace( array( "\r\n", "\n" ), ' ', $text );;
-				$text = trim( preg_replace( '%^/\*|//%', '', preg_replace( '%\*/$%', '', $text ) ) );
+				$text = trim( preg_replace( '%^(/\*|//)%', '', preg_replace( '%\*/$%', '', $text ) ) );
 				if ( 0 === stripos( $text, $this->comment_prefix ) ) {
 					$latest_comment = $text;
 				}
