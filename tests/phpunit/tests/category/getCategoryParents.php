@@ -50,7 +50,7 @@ class Tests_Category_GetCategoryParents extends WP_UnitTestCase {
 		$this->assertSame( $expected, $found );
 	}
 
-	public function test_visited() {
+	public function test_visited_should_also_exclude_children_of_visited_categories() {
 		$c3 = self::factory()->category->create_and_get( array(
 			'parent' => $this->c2->term_id,
 		) );
@@ -58,7 +58,8 @@ class Tests_Category_GetCategoryParents extends WP_UnitTestCase {
 			'parent' => $c3->term_id,
 		) );
 
-		$expected = $this->c1->name . '/'. $this->c2->name . '/' . $c4->name . '/';
+		$expected = $this->c1->name . '/'. $this->c2->name . '/';
 		$found = get_category_parents( $this->c2->term_id, false, '/', false, array( $c3->term_id ) );
+		$this->assertSame( $expected, $found );
 	}
 }
