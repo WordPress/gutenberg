@@ -1,3 +1,7 @@
+# HEAD
+
+* Added: `max-empty-lines` rule, limits the number of adjacent empty lines to 2.
+
 # 2.0.2
 
 * Fixed another npmjs.com release issue

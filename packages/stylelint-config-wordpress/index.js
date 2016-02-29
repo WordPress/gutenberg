@@ -28,6 +28,7 @@ module.exports = {
     "function-url-quotes": "none",
     "function-whitespace-after": "always",
     "indentation": "tab",
+    "max-empty-lines": 2,
     "media-feature-colon-space-after": "always",
     "media-feature-colon-space-before": "never",
     "media-feature-name-no-vendor-prefix": true,
