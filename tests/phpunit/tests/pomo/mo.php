@@ -127,13 +127,13 @@ class Tests_POMO_MO extends WP_UnitTestCase {
 	}
 
 	function test_overloaded_mb_functions() {
-		// skipIf() method skips the whole test case, not only this method
-		// that's why we are skipping it the stupid way
-		if ((ini_get("mbstring.func_overload") & 2) != 0) {
-			$mo = new MO();
-			$mo->import_from_file(DIR_TESTDATA . '/pomo/overload.mo');
-			$this->assertEquals(array('Табло'), $mo->entries['Dashboard']->translations);
+		if ((ini_get("mbstring.func_overload") & 2) == 0) {
+			$this->markTestSkipped( __METHOD__ . ' only runs when mbstring.func_overload is enabled.' );
 		}
+
+		$mo = new MO();
+		$mo->import_from_file(DIR_TESTDATA . '/pomo/overload.mo');
+		$this->assertEquals(array('Табло'), $mo->entries['Dashboard']->translations);
 	}
 
 	function test_load_pot_file() {
