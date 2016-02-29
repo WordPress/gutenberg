@@ -181,7 +181,8 @@ module.exports = function(grunt) {
 				src: [
 					'wp-admin/css/*.css',
 					'!wp-admin/css/wp-admin*.css',
-					'wp-includes/css/*.css'
+					'wp-includes/css/*.css',
+					'wp-includes/js/mediaelement/wp-mediaelement.css'
 				]
 			},
 			rtl: {
@@ -323,6 +324,7 @@ module.exports = function(grunt) {
 					// WordPress scripts inside directories
 					'wp-includes/js/jquery/jquery.table-hotkeys.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
+					'wp-includes/js/mediaelement/wp-playlist.js',
 					'wp-includes/js/plupload/handlers.js',
 					'wp-includes/js/plupload/wp-plupload.js',
 					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
@@ -439,6 +441,8 @@ module.exports = function(grunt) {
 				src: [
 					'wp-admin/js/*.js',
 					'wp-includes/js/*.js',
+					'wp-includes/js/mediaelement/wp-mediaelement.js',
+					'wp-includes/js/mediaelement/wp-playlist.js',
 					'wp-includes/js/plupload/handlers.js',
 					'wp-includes/js/plupload/wp-plupload.js',
 					'wp-includes/js/tinymce/plugins/wordpress/plugin.js',
