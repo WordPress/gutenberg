@@ -214,7 +214,9 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_user_unset_lowercase_id( $user ) {
 		// Test 'id' (lowercase)
+		$id = $user->id;
 		unset( $user->id );
+		$this->assertSame( $id, $user->id );
 		return $user;
 	}
 
