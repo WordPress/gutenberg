@@ -46,7 +46,9 @@ module.exports = {
     "number-zero-length-no-unit": true,
     "property-no-vendor-prefix": true,
     "rule-no-shorthand-property-overrides": true,
-    "rule-nested-empty-line-before": "always",
+    "rule-nested-empty-line-before": [ "always", {
+      ignore: ["after-comment"],
+    } ],
     "rule-non-nested-empty-line-before": [ "always", {
       ignore: ["after-comment"],
     } ],

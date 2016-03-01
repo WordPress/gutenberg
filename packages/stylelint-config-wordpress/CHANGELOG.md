@@ -1,6 +1,7 @@
 # HEAD
 
 * Added: `max-empty-lines` rule, limits the number of adjacent empty lines to 2.
+* Updated `rule-nested-empty-line-before` rule with option `ignore: ["after-comment"]`.
 
 # 2.0.2
 
