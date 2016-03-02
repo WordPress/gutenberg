@@ -268,8 +268,8 @@ class Test_WP_Customize_Partial extends WP_UnitTestCase {
 	 */
 	function test_render_callback_default() {
 		$partial = new WP_Customize_Partial( $this->selective_refresh, 'foo' );
-		$this->assertFalse( $partial->render_callback() );
-		$this->assertFalse( call_user_func( $partial->render_callback ) );
+		$this->assertFalse( $partial->render_callback( $partial, array() ) );
+		$this->assertFalse( call_user_func( $partial->render_callback, $partial, array() ) );
 	}
 
 	/**
