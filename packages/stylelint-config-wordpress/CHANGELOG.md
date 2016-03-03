@@ -2,6 +2,12 @@
 
 * Added: `max-empty-lines` rule, limits the number of adjacent empty lines to 2.
 * Updated `rule-nested-empty-line-before` rule with option `ignore: ["after-comment"]`.
+* Removed all vendor prefixes, lets autoprefixer handle vendor prefixes:
+ * Removed `at-rule-no-vendor-prefix`
+ * Removed `media-feature-name-no-vendor-prefix`
+ * Removed `property-no-vendor-prefix`
+ * Removed `selector-no-vendor-prefix`
+ * Removed `value-no-vendor-prefix`
 
 # 2.0.2
 
