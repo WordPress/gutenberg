@@ -245,11 +245,11 @@ class Tests_REST_API extends WP_UnitTestCase {
 
 		$request = new WP_REST_Request( 'OPTIONS', '/test-ns/test' );
 		$response = rest_handle_options_request( null, $GLOBALS['wp_rest_server'], $request );
-
+		$response = rest_send_allow_header( $response, $GLOBALS['wp_rest_server'], $request );
 		$headers = $response->get_headers();
-		$this->assertArrayHasKey( 'Accept', $headers );
+		$this->assertArrayHasKey( 'Allow', $headers );
 
-		$this->assertEquals( 'GET, POST', $headers['Accept'] );
+		$this->assertEquals( 'GET, POST', $headers['Allow'] );
 	}
 
 	/**
