@@ -285,6 +285,29 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( $sent_headers['Allow'], 'POST' );
 	}
 
+	public function test_allow_header_sent_on_options_request() {
+		register_rest_route( 'test-ns', '/test', array(
+			array(
+				'methods'  => array( 'GET' ),
+				'callback' => '__return_null',
+			),
+			array(
+				'methods'  => array( 'POST' ),
+				'callback' => '__return_null',
+				'permission_callback' => '__return_null',
+			),
+		) );
+
+		$request = new WP_REST_Request( 'OPTIONS', '/test-ns/test' );
+		$response = $this->server->dispatch( $request );
+
+		$result = apply_filters( 'rest_post_dispatch', rest_ensure_response( $response ), $this->server, $request );
+
+		$headers = $result->get_headers();
+
+		$this->assertEquals( 'GET', $headers['Allow'] );
+	}
+
 	public function permission_denied() {
 		return new WP_Error( 'forbidden', 'You are not allowed to do this', array( 'status' => 403 ) );
 	}
