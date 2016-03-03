@@ -786,4 +786,27 @@ class Tests_Functions extends WP_UnitTestCase {
 		the_date( 'Y', 'before ', ' after', false );
 		$this->assertEquals( '', ob_get_clean() );
 	}
+
+	/**
+	 * @ticket 36054
+	 * @dataProvider datetime_provider
+	 */
+	function test_mysql_to_rfc3339( $expected, $actual ) {
+		$date_return = mysql_to_rfc3339( $actual );
+
+		$this->assertTrue( is_string( $date_return ), 'The date return must be a string' );
+		$this->assertNotEmpty( $date_return, 'The date return could not be an empty string' );
+		$this->assertEquals( $expected, $date_return, 'The date does not match' );
+		$this->assertEquals( new DateTime( $expected ), new DateTime( $date_return ), 'The date is not the same after the call method' );
+	}
+
+	function datetime_provider() {
+		return array(
+			array( '2016-03-15T18:54:46', '15-03-2016 18:54:46' ),
+			array( '2016-03-02T19:13:25', '2016-03-02 19:13:25' ),
+			array( '2016-03-02T19:13:00', '2016-03-02 19:13' ),
+			array( '2016-03-02T19:13:00', '16-03-02 19:13' ),
+			array( '2016-03-02T19:13:00', '16-03-02 19:13' )
+		);
+	}
 }
