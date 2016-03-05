@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * A factory for making WordPress data with a cross-object type API.
+ *
+ * Tests should use this factory to generate test fixtures.
+ */
 class WP_UnitTest_Factory {
 
 	/**

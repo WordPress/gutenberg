@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * An abstract class that serves as a basis for all WordPress object-type factory classes.
+ */
 abstract class WP_UnitTest_Factory_For_Thing {
 
 	var $default_generation_definitions;
