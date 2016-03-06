@@ -272,18 +272,70 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 	 * @ticket 35873
 	 */
 	function test_wp_register_script_with_dependencies_in_head_and_footer() {
-		wp_register_script( 'parent', '/parent.js', array( 'child' ), '1', true ); // in footer
-		wp_register_script( 'child', '/child.js', array( 'grandchild' ), '1', false ); // in head
-		wp_register_script( 'grandchild', '/grandchild.js', array(), '1', true ); // in footer
+		wp_register_script( 'parent', '/parent.js', array( 'child-head' ), null, true ); // in footer
+		wp_register_script( 'child-head', '/child-head.js', array( 'child-footer' ), null, false ); // in head
+		wp_register_script( 'child-footer', '/child-footer.js', array(), null, true ); // in footer
 
 		wp_enqueue_script( 'parent' );
 
 		$header = get_echo( 'wp_print_head_scripts' );
 		$footer = get_echo( 'wp_print_footer_scripts' );
 
-		$expected_header  = "<script type='text/javascript' src='/grandchild.js?ver=1'></script>\n";
-		$expected_header .= "<script type='text/javascript' src='/child.js?ver=1'></script>\n";
-		$expected_footer  = "<script type='text/javascript' src='/parent.js?ver=1'></script>\n";
+		$expected_header  = "<script type='text/javascript' src='/child-footer.js'></script>\n";
+		$expected_header .= "<script type='text/javascript' src='/child-head.js'></script>\n";
+		$expected_footer  = "<script type='text/javascript' src='/parent.js'></script>\n";
+
+		$this->assertEquals( $expected_header, $header );
+		$this->assertEquals( $expected_footer, $footer );
+	}
+
+	/**
+	 * @ticket 35956
+	 */
+	function test_wp_register_script_with_dependencies_in_head_and_footer_in_reversed_order() {
+		wp_register_script( 'child-head', '/child-head.js', array(), null, false ); // in head
+		wp_register_script( 'child-footer', '/child-footer.js', array(), null, true ); // in footer
+		wp_register_script( 'parent', '/parent.js', array( 'child-head', 'child-footer' ), null, true ); // in footer
+
+		wp_enqueue_script( 'parent' );
+
+		$header = get_echo( 'wp_print_head_scripts' );
+		$footer = get_echo( 'wp_print_footer_scripts' );
+
+		$expected_header  = "<script type='text/javascript' src='/child-head.js'></script>\n";
+		$expected_footer  = "<script type='text/javascript' src='/child-footer.js'></script>\n";
+		$expected_footer .= "<script type='text/javascript' src='/parent.js'></script>\n";
+
+		$this->assertEquals( $expected_header, $header );
+		$this->assertEquals( $expected_footer, $footer );
+	}
+
+	/**
+	 * @ticket 35956
+	 */
+	function test_wp_register_script_with_dependencies_in_head_and_footer_in_reversed_order_and_two_parent_scripts() {
+		wp_register_script( 'grandchild-head', '/grandchild-head.js', array(), null, false ); // in head
+		wp_register_script( 'child-head', '/child-head.js', array(), null, false ); // in head
+		wp_register_script( 'child-footer', '/child-footer.js', array( 'grandchild-head' ), null, true ); // in footer
+		wp_register_script( 'child2-head', '/child2-head.js', array(), null, false ); // in head
+		wp_register_script( 'child2-footer', '/child2-footer.js', array(), null, true ); // in footer
+		wp_register_script( 'parent-footer', '/parent-footer.js', array( 'child-head', 'child-footer', 'child2-head', 'child2-footer' ), null, true ); // in footer
+		wp_register_script( 'parent-header', '/parent-header.js', array( 'child-head' ), null, false ); // in head
+
+		wp_enqueue_script( 'parent-footer' );
+		wp_enqueue_script( 'parent-header' );
+
+		$header = get_echo( 'wp_print_head_scripts' );
+		$footer = get_echo( 'wp_print_footer_scripts' );
+
+		$expected_header  = "<script type='text/javascript' src='/child-head.js'></script>\n";
+		$expected_header .= "<script type='text/javascript' src='/grandchild-head.js'></script>\n";
+		$expected_header .= "<script type='text/javascript' src='/child2-head.js'></script>\n";
+		$expected_header .= "<script type='text/javascript' src='/parent-header.js'></script>\n";
+
+		$expected_footer  = "<script type='text/javascript' src='/child-footer.js'></script>\n";
+		$expected_footer .= "<script type='text/javascript' src='/child2-footer.js'></script>\n";
+		$expected_footer .= "<script type='text/javascript' src='/parent-footer.js'></script>\n";
 
 		$this->assertEquals( $expected_header, $header );
 		$this->assertEquals( $expected_footer, $footer );
@@ -382,7 +434,7 @@ class Tests_Dependencies_Scripts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 14853-2
+	 * @ticket 14853
 	 */
 	public function test_wp_add_inline_script_before_with_concat() {
 		global $wp_scripts;
