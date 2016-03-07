@@ -991,7 +991,7 @@ class Tests_Post extends WP_UnitTestCase {
 		$term = reset( $terms );
 
 		foreach ( $matches[1] as $url ) {
-			$this->assertContains( 'term_id=' . $term->term_id, $url );
+			$this->assertContains( 'tag_ID=' . $term->term_id, $url );
 			$this->assertContains( 'post_type=new_post_type', $url );
 		}
 	}
