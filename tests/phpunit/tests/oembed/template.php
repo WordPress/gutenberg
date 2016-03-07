@@ -242,8 +242,15 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 	function test_get_post_embed_html() {
 		$post_id = self::factory()->post->create();
+		$title = esc_attr(
+			sprintf(
+				__( '&#8220;%1$s&#8221; &#8212; %2$s' ),
+				get_the_title( $post_id ),
+				get_bloginfo( 'name' )
+			)
+		);
 
-		$expected = '<iframe sandbox="allow-scripts" security="restricted" src="' . esc_url( get_post_embed_url( $post_id ) ) . '" width="200" height="200" title="Embedded WordPress Post" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" class="wp-embedded-content"></iframe>';
+		$expected = '<iframe sandbox="allow-scripts" security="restricted" src="' . esc_url( get_post_embed_url( $post_id ) ) . '" width="200" height="200" title="' . $title . '" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" class="wp-embedded-content"></iframe>';
 
 		$this->assertStringEndsWith( $expected, get_post_embed_html( 200, 200, $post_id ) );
 	}
