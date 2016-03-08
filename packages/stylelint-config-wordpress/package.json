@@ -28,7 +28,7 @@
     "eslint": "^2.2.0",
     "eslint-config-stylelint": "^1.0.0",
     "npmpub": "^3.0.3",
-    "stylelint": "^4.4.0"
+    "stylelint": "^4.5.0"
   },
   "scripts": {
     "ava": "ava --verbose \"__tests__/**/*.js\"",
