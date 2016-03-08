@@ -258,4 +258,21 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->assertEquals( $post_type_slug , $post_type_archive_item->title );
 		$this->assertEquals( $menu_item_description , $post_type_archive_item->description );
 	}
+
+	/**
+	 * @ticket 35324
+	 */
+	function test_wp_setup_nav_menu_item_for_unknown_post_type_archive_no_description() {
+
+		$post_type_slug = rand_str( 12 );
+
+		$post_type_archive_item_id = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type'   => 'post_type_archive',
+			'menu-item-object' => $post_type_slug,
+			'menu-item-status' => 'publish'
+		) );
+		$post_type_archive_item = wp_setup_nav_menu_item( get_post( $post_type_archive_item_id ) );
+
+		$this->assertEmpty( $post_type_archive_item->description );
+	}
 }
