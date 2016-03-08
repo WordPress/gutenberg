@@ -175,4 +175,26 @@ class Tests_File extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider data_wp_normalize_path
+	 */
+	function test_wp_normalize_path( $path, $expected ) {
+		$this->assertEquals( $expected, wp_normalize_path( $path ) );
+	}
+	function data_wp_normalize_path() {
+		return array(
+			// Windows paths
+			array( 'C:\\www\\path\\', 'C:/www/path/' ),
+			array( 'C:\\www\\\\path\\', 'C:/www/path/' ),
+			array( 'c:/www/path', 'C:/www/path' ),
+			array( 'c:\\www\\path\\', 'C:/www/path/' ), // uppercase drive letter
+			array( '\\\\Domain\\DFSRoots\\share\\path\\', '//Domain/DFSRoots/share/path/' ),
+			array( '\\\\Server\\share\\path', '//Server/share/path' ),
+
+			// Linux paths
+			array( '/www/path/', '/www/path/' ),
+			array( '/www/path/////', '/www/path/' ),
+			array( '/www/path', '/www/path' ),
+		);
+	}
 }
