@@ -1,4 +1,4 @@
-# Head
+# 3.0.0
 
 * Removed: `stylelint < 4.5.0` compatibility.
 * Deprecated: `rule-no-shorthand-property-overrides` rule. Use the new `declaration-block-no-shorthand-property-overrides` rule instead.
