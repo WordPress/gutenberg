@@ -124,26 +124,31 @@ class Tests_Functions extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 33265
+	 * @ticket 35996
+	 * @group dd32
+	 *
+	 * @dataProvider data_wp_normalize_path
 	 */
-	function test_wp_normalize_path() {
-		$paths = array(
-			'/WINDOWS' => '/WINDOWS',
-			'C:/' => 'C:/',
-			'C:/WINDOWS' => 'C:/WINDOWS',
-			'C:/WINDOWS/system32' => 'C:/WINDOWS/system32',
-			'\\WINDOWS' => '/WINDOWS',
-			'C:\\' => 'C:/',
-			'C:\\WINDOWS' => 'C:/WINDOWS',
-			'C:\\\\WINDOWS' => 'C:/WINDOWS',
-			'C:\\WINDOWS\\system32' => 'C:/WINDOWS/system32',
-			'\\\\sambashare\\foo' => '/sambashare/foo',
-			'c:/windows' => 'C:/windows',
-			'c:\\windows' => 'C:/windows',
-		);
+	function test_wp_normalize_path( $path, $expected ) {
+		$this->assertEquals( $expected, wp_normalize_path( $path ) );
+	}
+	function data_wp_normalize_path() {
+		return array(
+			// Windows paths
+			array( 'C:\\www\\path\\', 'C:/www/path/' ),
+			array( 'C:\\www\\\\path\\', 'C:/www/path/' ),
+			array( 'c:/www/path', 'C:/www/path' ),
+			array( 'c:\\www\\path\\', 'C:/www/path/' ), // uppercase drive letter
+			array( 'c:\\\\www\\path\\', 'C:/www/path/' ),
+			array( '\\\\Domain\\DFSRoots\\share\\path\\', '//Domain/DFSRoots/share/path/' ),
+			array( '\\\\Server\\share\\path', '//Server/share/path' ),
+			array( '\\\\Server\\share', '//Server/share' ),
 
-		foreach ($paths as $original => $expected) {
-			$this->assertEquals( $expected, wp_normalize_path( $original ) );
-		}
+			// Linux paths
+			array( '/www/path/', '/www/path/' ),
+			array( '/www/path/////', '/www/path/' ),
+			array( '/www/path', '/www/path' ),
+		);
 	}
 
 	function test_wp_unique_filename() {
