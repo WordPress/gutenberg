@@ -125,7 +125,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	/**
 	 * @ticket 33265
 	 * @ticket 35996
-	 * @group dd32
 	 *
 	 * @dataProvider data_wp_normalize_path
 	 */
