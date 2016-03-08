@@ -13,11 +13,19 @@ $ npm install stylelint-config-wordpress
 
 ## Usage
 
-Set your stylelint config to:
+If you've installed `stylelint-config-wordpress` locally within your project, just set your `stylelint` config to:
 
 ```json
 {
   "extends": "stylelint-config-wordpress"
+}
+```
+
+If you've globally installed `stylelint-config-wordpress` using the `-g` flag, then you'll need to use the absolute path to `stylelint-config-wordpress` in your config:
+
+```json
+{
+  "extends": "/absolute/path/to/stylelint-config-wordpress"
 }
 ```
 

@@ -1,13 +1,23 @@
+# Head
+
+* Removed: `stylelint < 4.5.0` compatibility.
+* Deprecated: `rule-no-shorthand-property-overrides` rule. Use the new `declaration-block-no-shorthand-property-overrides` rule instead.
+* Deprecated: `rule-trailing-semicolon` rule. Use the new `declaration-block-trailing-semicolon` rule instead.
+* Added: `color-named` rule.
+* Added: `declaration-block-no-shorthand-property-overrides` rule.
+* Added: `declaration-block-trailing-semicolon` rule.
+* Added: `string-no-newline` rule.
+
 # 2.1.0
 
 * Added: `max-empty-lines` rule, limits the number of adjacent empty lines to 2.
-* Changed `rule-nested-empty-line-before` rule option `ignore: ["after-comment"]`.
+* Changed: `rule-nested-empty-line-before` rule option `ignore: ["after-comment"]`.
 * Removed all vendor prefixes, lets autoprefixer handle vendor prefixes:
-  * Removed `at-rule-no-vendor-prefix`
-  * Removed `media-feature-name-no-vendor-prefix`
-  * Removed `property-no-vendor-prefix`
-  * Removed `selector-no-vendor-prefix`
-  * Removed `value-no-vendor-prefix`
+  * Removed: `at-rule-no-vendor-prefix`
+  * Removed: `media-feature-name-no-vendor-prefix`
+  * Removed: `property-no-vendor-prefix`
+  * Removed: `selector-no-vendor-prefix`
+  * Removed: `value-no-vendor-prefix`
 
 # 2.0.2
 
@@ -19,7 +29,7 @@
 
 # 2.0.0
 
-* Removed `media-query-parentheses-space-inside` rule.
+* Removed: `media-query-parentheses-space-inside` rule.
 * Removed: `stylelint < 4.3.4` compatibility.
 * Added: `font-family-name-quotes` rule with double quotes where recommended option.
 * Added: `media-feature-no-missing-punctuation` rule.
