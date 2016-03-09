@@ -1,6 +1,7 @@
 /* jshint node:true */
 module.exports = function(grunt) {
 	var path = require('path'),
+		gitorsvn = require('git-or-svn'),
 		SOURCE_DIR = 'src/',
 		BUILD_DIR = 'build/',
 		autoprefixer = require('autoprefixer'),
@@ -658,14 +659,78 @@ module.exports = function(grunt) {
 		grunt.task.run( '_' + this.nameArgs );
 	} );
 
-	grunt.registerTask( 'precommit', 'Runs front-end dev/test tasks in preparation for a commit.', [
-		'postcss:core',
-		'imagemin:core',
+	grunt.registerTask( 'precommit:core', [
+		'imagemin:core'
+	] );
+
+	grunt.registerTask( 'precommit:js', [
 		'browserify',
 		'jshint:corejs',
 		'uglify:bookmarklet',
 		'qunit:compiled'
 	] );
+
+	grunt.registerTask( 'precommit:css', [
+		'postcss:core'
+	] );
+
+	grunt.registerTask( 'precommit:php', [
+		'phpunit'
+	] );
+
+	grunt.registerTask( 'precommit', 'Runs test and build tasks in preparation for a commit', function() {
+		var done = this.async();
+
+		// Figure out what tasks to run based on what files have been modified.
+		function enqueueTestingTasksForModifiedFiles( filesModified ) {
+			var taskList = ['precommit:core'];
+			if ( /.*\.js/.test( filesModified ) ) {
+				grunt.log.write( 'JavaScript source files modified, will run JavaScript tests.\n');
+				taskList = taskList.concat( ['precommit:js'] );
+			}
+			if ( /src.*\.css/.test( filesModified ) ) {
+				grunt.log.write( 'CSS source files modified, will run CSS tests.\n');
+				taskList = taskList.concat( ['postcss:core'] );
+			}
+			if ( /.*\.php/.test( filesModified ) ) {
+				grunt.log.write( 'PHP source files modified, will run PHP tests.\n');
+				taskList = taskList.concat( ['precommit:php'] );
+			}
+			grunt.task.run( taskList );
+			done();
+		}
+		gitorsvn( __dirname, function(gitorsvn) {
+			if ( gitorsvn === 'svn' ) {
+				grunt.util.spawn(
+					{
+						cmd: 'svn',
+						args: ['status']
+					},
+					function(error, result, code) {
+						if ( code !== 0 ) {
+							grunt.fail.warn( 'The `svn status` command returned a non-zero exit code.', code );
+						}
+						enqueueTestingTasksForModifiedFiles( result.stdout );
+					}
+				);
+			} else if ( gitorsvn === 'git' ) {
+				grunt.util.spawn(
+					{
+						cmd: 'git',
+						args: ['diff', '--name-only']
+					},
+					function(error, result, code) {
+						if ( code !== 0 ) {
+							grunt.fail.warn( 'The `git diff --name-only` command returned a non-zero exit code.', code );
+						}
+						enqueueTestingTasksForModifiedFiles( result.stdout );
+					}
+				);
+			} else {
+				grunt.log.write( 'This WordPress install is not under version control, no tests will be run.' );
+			}
+		});
+	});
 
 	grunt.registerTask( 'copy:all', [
 		'copy:files',
