@@ -244,7 +244,10 @@ class Tests_General_Template extends WP_UnitTestCase {
 		the_custom_logo();
 
 		$this->_set_custom_logo();
-		$this->expectOutputString( '<a href="http://example.org/" class="custom-logo-link" rel="home" itemprop="url"><img width="50" height="50" src="' . $this->custom_logo_url . '" class="custom-logo attachment-" alt="' . basename( $this->custom_logo_url ) . '" data-size="" itemprop="logo" /></a>' );
+		$size     = get_theme_support( 'custom-logo', 'size' );
+		$expected = sprintf( '<a href="http://example.org/" class="custom-logo-link" rel="home" itemprop="url"><img width="50" height="50" src="%1$s" class="custom-logo attachment-%2$s" alt="%3$s" data-size="%2$s" itemprop="logo" /></a>', $this->custom_logo_url, $size, basename( $this->custom_logo_url ) );
+
+		$this->expectOutputString( $expected );
 		the_custom_logo();
 	}
 
