@@ -617,15 +617,17 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 	function test_filter_wp_nav_menu_args() {
 		do_action( 'customize_register', $this->wp_customize );
 		$menus = $this->wp_customize->nav_menus;
+		$menu_id = wp_create_nav_menu( 'Foo' );
 
 		$results = $menus->filter_wp_nav_menu_args( array(
 			'echo'            => true,
 			'fallback_cb'     => 'wp_page_menu',
 			'walker'          => '',
-			'menu'            => wp_create_nav_menu( 'Foo' ),
+			'menu'            => $menu_id,
 			'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 		) );
 		$this->assertArrayHasKey( 'customize_preview_nav_menus_args', $results );
+		$this->assertTrue( $results['can_partial_refresh'] );
 
 		$results = $menus->filter_wp_nav_menu_args( array(
 			'echo'            => false,
@@ -633,7 +635,8 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			'walker'          => new Walker_Nav_Menu(),
 			'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 		) );
-		$this->assertArrayNotHasKey( 'customize_preview_nav_menus_args', $results );
+		$this->assertFalse( $results['can_partial_refresh'] );
+		$this->assertArrayHasKey( 'customize_preview_nav_menus_args', $results );
 		$this->assertEquals( 'wp_page_menu', $results['fallback_cb'] );
 
 		$nav_menu_term = get_term( wp_create_nav_menu( 'Bar' ) );
@@ -644,8 +647,39 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 			'menu'            => $nav_menu_term,
 			'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 		) );
+		$this->assertTrue( $results['can_partial_refresh'] );
 		$this->assertArrayHasKey( 'customize_preview_nav_menus_args', $results );
 		$this->assertEquals( $nav_menu_term->term_id, $results['customize_preview_nav_menus_args']['menu'] );
+
+		$results = $menus->filter_wp_nav_menu_args( array(
+			'echo'            => true,
+			'fallback_cb'     => 'wp_page_menu',
+			'walker'          => '',
+			'menu'            => $menu_id,
+			'container'       => 'div',
+			'items_wrap'      => '%3$s',
+		) );
+		$this->assertTrue( $results['can_partial_refresh'] );
+
+		$results = $menus->filter_wp_nav_menu_args( array(
+			'echo'            => true,
+			'fallback_cb'     => 'wp_page_menu',
+			'walker'          => '',
+			'menu'            => $menu_id,
+			'container'       => false,
+			'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+		) );
+		$this->assertTrue( $results['can_partial_refresh'] );
+
+		$results = $menus->filter_wp_nav_menu_args( array(
+			'echo'            => true,
+			'fallback_cb'     => 'wp_page_menu',
+			'walker'          => '',
+			'menu'            => $menu_id,
+			'container'       => false,
+			'items_wrap'      => '%3$s',
+		) );
+		$this->assertFalse( $results['can_partial_refresh'] );
 	}
 
 	/**
@@ -688,6 +722,20 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$menus->customize_preview_enqueue_deps();
 
 		$this->assertTrue( wp_script_is( 'customize-preview-nav-menus' ) );
+	}
+
+	/**
+	 * Test WP_Customize_Nav_Menus::export_preview_data() method.
+	 *
+	 * @see WP_Customize_Nav_Menus::export_preview_data()
+	 */
+	function test_export_preview_data() {
+		ob_start();
+		$this->wp_customize->nav_menus->export_preview_data();
+		$html = ob_get_clean();
+		$this->assertTrue( (bool) preg_match( '/_wpCustomizePreviewNavMenusExports = ({.+})/s', $html, $matches ) );
+		$exported_data = json_decode( $matches[1], true );
+		$this->assertArrayHasKey( 'navMenuInstanceArgs', $exported_data );
 	}
 
 	/**
