@@ -310,7 +310,7 @@ class Tests_General_Template extends WP_UnitTestCase {
 			'itemprop'  => 'logo',
 		) );
 
-		$this->expectOutputString( '<a href="http://example.org/" class="custom-logo-link" rel="home" itemprop="url">' . $image . '</a>' );
+		$this->expectOutputString( '<a href="http://' . WP_TESTS_DOMAIN . '/" class="custom-logo-link" rel="home" itemprop="url">' . $image . '</a>' );
 		the_custom_logo();
 	}
 
