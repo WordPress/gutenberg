@@ -685,15 +685,15 @@ module.exports = function(grunt) {
 		function enqueueTestingTasksForModifiedFiles( filesModified ) {
 			var taskList = ['precommit:core'];
 			if ( /.*\.js/.test( filesModified ) ) {
-				grunt.log.write( 'JavaScript source files modified, will run JavaScript tests.\n');
+				grunt.log.write( 'JavaScript source files modified. JavaScript tests will be run.\n');
 				taskList = taskList.concat( ['precommit:js'] );
 			}
 			if ( /src.*\.css/.test( filesModified ) ) {
-				grunt.log.write( 'CSS source files modified, will run CSS tests.\n');
+				grunt.log.write( 'CSS source files modified. CSS tests will be run.\n');
 				taskList = taskList.concat( ['postcss:core'] );
 			}
 			if ( /.*\.php/.test( filesModified ) ) {
-				grunt.log.write( 'PHP source files modified, will run PHP tests.\n');
+				grunt.log.write( 'PHP source files modified. PHP tests will be run.\n');
 				taskList = taskList.concat( ['precommit:php'] );
 			}
 			grunt.task.run( taskList );
@@ -727,7 +727,7 @@ module.exports = function(grunt) {
 					}
 				);
 			} else {
-				grunt.log.write( 'This WordPress install is not under version control, no tests will be run.' );
+				grunt.log.write( 'This WordPress install is not under version control. No tests will be run.' );
 			}
 		});
 	});
