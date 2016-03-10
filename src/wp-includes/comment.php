@@ -1021,7 +1021,7 @@ function wp_get_comment_fields_max_lengths() {
 	 *
 	 * @since 4.5.0
 	 *
-	 * @param array  $lengths Associative array 'field_name' => 'maximum length'.
+	 * @param array $lengths Associative array `'field_name' => 'maximum length'`.
 	 */
 	return apply_filters( 'wp_get_comment_fields_max_lengths', $lengths );
 }
