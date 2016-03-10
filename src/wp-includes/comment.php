@@ -972,7 +972,7 @@ function get_page_of_comment( $comment_ID, $args = array() ) {
 }
 
 /**
- * Get the maximum character lengths for the comment form fields.
+ * Retrieves the maximum character lengths for the comment form fields.
  *
  * @since 4.5.0
  *
