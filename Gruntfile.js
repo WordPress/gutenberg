@@ -210,14 +210,14 @@ module.exports = function(grunt) {
 		rtlcss: {
 			options: {
 				// rtlcss options
-				config: {
-					swapLeftRightInUrl: false,
-					swapLtrRtlInUrl: false,
-					autoRename: false,
-					preserveDirectives: true,
+				opts: {
+					clean: false,
+					processUrls: { atrule: true, decl: false },
 					stringMap: [
 						{
 							name: 'import-rtl-stylesheet',
+							priority: 10,
+							exclusive: true,
 							search: [ '.css' ],
 							replace: [ '-rtl.css' ],
 							options: {
@@ -227,29 +227,38 @@ module.exports = function(grunt) {
 						}
 					]
 				},
-				properties : [
+				saveUnmodified: false,
+				plugins: [
 					{
 						name: 'swap-dashicons-left-right-arrows',
-						expr: /content/im,
-						action: function( prop, value ) {
-							if ( value === '"\\f141"' ) { // dashicons-arrow-left
-								value = '"\\f139"';
-							} else if ( value === '"\\f340"' ) { // dashicons-arrow-left-alt
-								value = '"\\f344"';
-							} else if ( value === '"\\f341"' ) { // dashicons-arrow-left-alt2
-								value = '"\\f345"';
-							} else if ( value === '"\\f139"' ) { // dashicons-arrow-right
-								value = '"\\f141"';
-							} else if ( value === '"\\f344"' ) { // dashicons-arrow-right-alt
-								value = '"\\f340"';
-							} else if ( value === '"\\f345"' ) { // dashicons-arrow-right-alt2
-								value = '"\\f341"';
+						priority: 10,
+						directives: {
+							control: {},
+							value: []
+						},
+						processors: [
+							{
+								expr: /content/im,
+								action: function( prop, value ) {
+									if ( value === '"\\f141"' ) { // dashicons-arrow-left
+										value = '"\\f139"';
+									} else if ( value === '"\\f340"' ) { // dashicons-arrow-left-alt
+										value = '"\\f344"';
+									} else if ( value === '"\\f341"' ) { // dashicons-arrow-left-alt2
+										value = '"\\f345"';
+									} else if ( value === '"\\f139"' ) { // dashicons-arrow-right
+										value = '"\\f141"';
+									} else if ( value === '"\\f344"' ) { // dashicons-arrow-right-alt
+										value = '"\\f340"';
+									} else if ( value === '"\\f345"' ) { // dashicons-arrow-right-alt2
+										value = '"\\f341"';
+									}
+									return { prop: prop, value: value };
+								}
 							}
-							return { prop: prop, value: value };
-						}
+						]
 					}
-				],
-				saveUnmodified: false
+				]
 			},
 			core: {
 				expand: true,
