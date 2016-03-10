@@ -759,6 +759,14 @@ module.exports = function(grunt) {
 		'jsvalidate:build'
 	] );
 
+	grunt.registerTask( 'prerelease', [
+		'precommit:php',
+		'precommit:js',
+		'precommit:css',
+		'precommit:core',
+		'build'
+	] );
+
 	// Testing tasks.
 	grunt.registerMultiTask('phpunit', 'Runs PHPUnit tests, including the ajax, external-http, and multisite tests.', function() {
 		grunt.util.spawn({
