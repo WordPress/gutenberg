@@ -2570,7 +2570,7 @@ function clean_comment_cache($ids) {
 		wp_cache_delete( $id, 'comment' );
 
 		/**
-		 * Fires after a comment has been removed from the object cache.
+		 * Fires immediately after a comment has been removed from the object cache.
 		 *
 		 * @since 4.5.0
 		 *
