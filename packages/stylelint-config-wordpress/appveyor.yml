@@ -9,6 +9,11 @@ environment:
 version: "{build}"
 build: off
 deploy: off
+branches:
+    only:
+      - master
+clone_depth: 1
+skip_tags: true
 
 install:
   - ps: Install-Product node $env:nodejs_version
