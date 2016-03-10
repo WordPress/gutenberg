@@ -1,3 +1,7 @@
+# 3.0.1
+
+* Add `stylelint` version `^4.5.0` as a peer dependency to `peerDependencies` in `package.json`
+
 # 3.0.0
 
 * Removed: `stylelint < 4.5.0` compatibility.
