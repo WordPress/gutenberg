@@ -469,7 +469,7 @@ function update_comment_meta($comment_id, $meta_key, $meta_value, $prev_value = 
 }
 
 /**
- * Queue comments for metadata lazyloading.
+ * Queues comments for metadata lazy-loading.
  *
  * @since 4.5.0
  *
