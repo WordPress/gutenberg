@@ -668,7 +668,7 @@ module.exports = function(grunt) {
 		grunt.task.run( '_' + this.nameArgs );
 	} );
 
-	grunt.registerTask( 'precommit:core', [
+	grunt.registerTask( 'precommit:base', [
 		'imagemin:core'
 	] );
 
@@ -692,7 +692,7 @@ module.exports = function(grunt) {
 
 		// Figure out what tasks to run based on what files have been modified.
 		function enqueueTestingTasksForModifiedFiles( filesModified ) {
-			var taskList = ['precommit:core'];
+			var taskList = ['precommit:base'];
 			if ( /.*\.js/.test( filesModified ) ) {
 				grunt.log.write( 'JavaScript source files modified. JavaScript tests will be run.\n');
 				taskList = taskList.concat( ['precommit:js'] );
@@ -772,7 +772,7 @@ module.exports = function(grunt) {
 		'precommit:php',
 		'precommit:js',
 		'precommit:css',
-		'precommit:core',
+		'precommit:base',
 		'build'
 	] );
 
