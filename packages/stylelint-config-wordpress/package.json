@@ -30,6 +30,9 @@
     "npmpub": "^3.0.3",
     "stylelint": "^4.5.0"
   },
+  "peerDependencies": {
+    "stylelint": "^4.5.0"
+  },
   "scripts": {
     "ava": "ava --verbose \"__tests__/**/*.js\"",
     "lint": "eslint . --ignore-path .gitignore",
