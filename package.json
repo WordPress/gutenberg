@@ -12,7 +12,7 @@
     "autoprefixer": "~6.3.3",
     "git-or-svn": "~0.1.0",
     "grunt": "~0.4.5",
-    "grunt-browserify": "~4.0.1",
+    "grunt-browserify": "~5.0.0",
     "grunt-contrib-clean": "~1.0.0",
     "grunt-contrib-compress": "~1.1.0",
     "grunt-contrib-concat": "~1.0.0",
