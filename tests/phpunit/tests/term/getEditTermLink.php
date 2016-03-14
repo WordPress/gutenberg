@@ -68,11 +68,13 @@ class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 	 */
 	public function test_cap_check_should_use_correct_taxonomy_when_taxonomy_is_not_specified() {
 		register_taxonomy( 'wptests_tax_subscriber', 'post', array(
-			'manage_terms' => 'read',
+			'capabilities' => array(
+				'edit_terms' => 'read',
+			),
 		) );
 
 		$t = self::factory()->term->create( array(
-			'taxonomy' => 'wptests_tax',
+			'taxonomy' => 'wptests_tax_subscriber',
 			'name' => 'foo',
 		) );
 
@@ -82,6 +84,6 @@ class Tests_Term_GetEditTermLink extends WP_UnitTestCase {
 		wp_set_current_user( $u );
 
 		$actual = get_edit_term_link( $t );
-		$this->assertNull( $actual );
+		$this->assertNotNull( $actual );
 	}
 }
