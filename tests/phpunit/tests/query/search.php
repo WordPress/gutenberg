@@ -127,6 +127,31 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36195
+	 */
+	public function test_s_should_not_exclude_for_dashes_between_words() {
+		$p1 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has foo but also bar',
+		) );
+		$p2 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only bar',
+		) );
+		$p3 = self::factory()->post->create( array(
+			'post_status' => 'publish',
+			'post_content' => 'This post has only foo - bar',
+		) );
+
+		$q = new WP_Query( array(
+			's' => 'foo - bar',
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $p1, $p3 ), $q->posts );
+	}
+
+	/**
 	 * @ticket 35361
 	 */
 	public function test_search_orderby_should_be_empty_when_search_string_is_longer_than_6_words_and_exclusion_operator_is_used() {
