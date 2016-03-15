@@ -512,7 +512,7 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 	 *
 	 * @ticket 30596
 	 */
-	public function test_image_peserves_alpha_on_rotate() {
+	public function test_image_preserves_alpha_on_rotate() {
 		$file = DIR_TESTDATA . '/images/transparent.png';
 
 		$pre_rotate_editor = new Imagick( $file );
