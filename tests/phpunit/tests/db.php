@@ -946,6 +946,9 @@ class Tests_DB extends WP_UnitTestCase {
 		$this->assertTrue( $wpdb->close() );
 		$this->assertFalse( $wpdb->close() );
 
+		$this->assertFalse( $wpdb->ready );
+		$this->assertFalse( $wpdb->has_connected );
+
 		$wpdb->check_connection();
 
 		$this->assertTrue( $wpdb->close() );
