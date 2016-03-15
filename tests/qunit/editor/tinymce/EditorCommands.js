@@ -60,6 +60,32 @@ test('mceInsertContent before HR', function() {
 	equal(getContent(), '<p>x</p><hr />');
 });
 
+test('mceInsertContent HR at end of H1', function() {
+	editor.setContent('<h1>abc</h1>');
+	Utils.setSelection('h1', 3);
+	editor.execCommand('mceInsertContent', false, '<hr>');
+	equal(editor.selection.getNode(), editor.getBody().lastChild);
+	equal(editor.selection.getNode().nodeName, 'H1');
+	equal(getContent(), '<h1>abc</h1><hr /><h1>\u00a0</h1>');
+});
+
+test('mceInsertContent HR at end of H1 with P sibling', function() {
+	editor.setContent('<h1>abc</h1><p>def</p>');
+	Utils.setSelection('h1', 3);
+	editor.execCommand('mceInsertContent', false, '<hr>');
+	equal(editor.selection.getNode(), editor.getBody().lastChild);
+	equal(editor.selection.getNode().nodeName, 'P');
+	equal(getContent(), '<h1>abc</h1><hr /><p>def</p>');
+});
+
+test('mceInsertContent HR at end of H1 with P sibling', function() {
+	editor.setContent('<h1>abc</h1><p>def</p>');
+	Utils.setSelection('h1', 3);
+	editor.execCommand('mceInsertContent', false, '<table><tr><td></td></tr></table>');
+	equal(editor.selection.getNode().nodeName, 'TD');
+	equal(getContent(), '<h1>abc</h1><table><tbody><tr><td>\u00a0</td></tr></tbody></table><p>def</p>');
+});
+
 test('mceInsertContent - p inside whole p', function() {
 	var rng;
 
@@ -211,7 +237,7 @@ test('mceInsertContent - image inside p', function() {
 	rng.setEnd(editor.dom.select('p')[0].firstChild, 1);
 	editor.selection.setRng(rng);
 	editor.execCommand('mceInsertContent', false, '<img src="about:blank" />');
-	equal(editor.getContent(), '<p><img src="about:blank" alt="" /></p>');
+	equal(editor.getContent(), '<p><img src="about:blank" /></p>');
 	rng = Utils.normalizeRng(editor.selection.getRng(true));
 	ok(rng.collapsed);
 	equal(rng.startContainer.nodeName, 'P');
@@ -418,12 +444,12 @@ test('Formatting commands (xhtmlTextStyles)', function() {
 
 	editor.setContent('test 123');
 	editor.execCommand('SelectAll');
-	editor.execCommand('FontName',false,'Arial');
+	editor.execCommand('FontName', false, 'Arial');
 	equal(editor.getContent(), '<p><span style="font-family: ' + Utils.fontFace('Arial') + ';">test 123</span></p>');
 
 	editor.setContent('test 123');
 	editor.execCommand('SelectAll');
-	editor.execCommand('FontSize',false,'7');
+	editor.execCommand('FontSize', false, '7');
 	equal(editor.getContent(), '<p><span style="font-size: xx-large;">test 123</span></p>');
 
 	editor.setContent('test 123');
@@ -493,17 +519,17 @@ test('Formatting commands (alignInline)', function() {
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
 	editor.execCommand('JustifyLeft');
-	equal(editor.getContent(), '<p><img style="float: left;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	equal(editor.getContent(), '<p><img style="float: left;" src="tinymce/ui/img/raster.gif" /></p>');
 
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
 	editor.execCommand('JustifyCenter');
-	equal(editor.getContent(), '<p><img style="margin-right: auto; margin-left: auto; display: block;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	equal(editor.getContent(), '<p><img style="margin-right: auto; margin-left: auto; display: block;" src="tinymce/ui/img/raster.gif" /></p>');
 
 	editor.setContent('<img src="tinymce/ui/img/raster.gif" />');
 	editor.selection.select(editor.dom.select('img')[0]);
 	editor.execCommand('JustifyRight');
-	equal(editor.getContent(), '<p><img style="float: right;" src="tinymce/ui/img/raster.gif" alt="" /></p>');
+	equal(editor.getContent(), '<p><img style="float: right;" src="tinymce/ui/img/raster.gif" /></p>');
 });
 
 test('mceBlockQuote', function() {
@@ -619,7 +645,7 @@ test('mceInsertLink (link floated img)', function() {
 	editor.setContent('<p><img style="float: right;" src="about:blank" /></p>');
 	editor.execCommand('SelectAll');
 	editor.execCommand('mceInsertLink', false, 'link');
-	equal(editor.getContent(), '<p><a href="link"><img style="float: right;" src="about:blank" alt="" /></a></p>');
+	equal(editor.getContent(), '<p><a href="link"><img style="float: right;" src="about:blank" /></a></p>');
 });
 
 test('mceInsertLink (link adjacent text)', function() {
@@ -797,5 +823,5 @@ test('InsertLineBreak', function() {
 	editor.setContent('<p>123</p>');
 	Utils.setSelection('p', 3);
 	editor.execCommand('InsertLineBreak');
-	equal(Utils.cleanHtml(editor.getBody().innerHTML), (tinymce.isIE && tinymce.Env.ie < 11) ? '<p>123<br></p>': '<p>123<br><br></p>');
+	equal(Utils.cleanHtml(editor.getBody().innerHTML), (tinymce.isIE && tinymce.Env.ie < 11) ? '<p>123<br></p>' : '<p>123<br><br></p>');
 });
