@@ -22,7 +22,7 @@
     "grunt-contrib-jshint": "~1.0.0",
     "grunt-contrib-qunit": "~0.7.0",
     "grunt-contrib-uglify": "~0.10.0",
-    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-watch": "~1.0.0",
     "grunt-includes": "~0.5.1",
     "grunt-jsvalidate": "~0.2.2",
     "grunt-legacy-util": "^0.2.0",
