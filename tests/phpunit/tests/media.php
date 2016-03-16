@@ -1129,6 +1129,74 @@ EOF;
 	}
 
 	/**
+	 * @ticket 35480
+	 */
+	function test_wp_calculate_image_srcset_corrupted_image_meta() {
+		$size_array = array( 300, 150 );
+		$image_src = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-300x150.png';
+		$image_meta = array(
+			'width' => 1600,
+			'height' => 800,
+			'file' => '2015/12/test.png',
+			'sizes' => array(
+				'thumbnail' => array(
+					'file' => 'test-150x150.png',
+					'width' => 150,
+					'height' => 150,
+					'mime-type' => 'image/png',
+				),
+				'medium' => array(
+					'file' => 'test-300x150.png',
+					'width' => 300,
+					'height' => 150,
+					'mime-type' => 'image/png',
+				),
+				'medium_large' => array(
+					'file' => 'test-768x384.png',
+					'width' => 768,
+					'height' => 384,
+					'mime-type' => 'image/png',
+				),
+				'large' => array(
+					'file' => 'test-1024x512.png',
+					'width' => 1024,
+					'height' => 512,
+					'mime-type' => 'image/png',
+				),
+			),
+		);
+
+		$srcset = array(
+			300  => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-300x150.png 300w',
+			768  => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-768x384.png 768w',
+			1024 => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-1024x512.png 1024w',
+			1600 => 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test.png 1600w',
+		);
+
+		// No sizes array
+		$image_meta1 = $image_meta;
+		unset( $image_meta1['sizes'] );
+		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta1 ) );
+
+		// Sizes is string instead of array; only full size available means no srcset.
+		$image_meta2 = $image_meta;
+		$image_meta2['sizes'] = '';
+		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta2 ) );
+
+		// File name is incorrect
+		$image_meta4 = $image_meta;
+		$image_meta4['file'] = '/';
+		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta4 ) );
+
+		// Intermediate size is string instead of array.
+		$image_meta3 = $image_meta;
+		$image_meta3['sizes']['medium_large'] = '';
+		unset( $srcset[768] );
+		$expected_srcset = implode( ', ', $srcset );
+		$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_src, $image_meta3 ) );
+	}
+
+	/**
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset() {
