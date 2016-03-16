@@ -1480,5 +1480,46 @@ EOF;
 		$actual     = wp_make_content_images_responsive( $unfiltered );
 
 		$this->assertSame( $expected, $actual );
+}
+
+	/**
+	 * @ticket 34945
+	 * @ticket 33641
+	 */
+	function test_wp_get_attachment_image_with_https_on() {
+		// Mock meta for the image.
+		$image_meta = array(
+			'width'  => 1200,
+			'height' => 600,
+			'file'   => 'test.jpg',
+			'sizes'  => array(
+				'thumbnail' => array(
+					'file'   => 'test-150x150.jpg',
+					'width'  => 150,
+					'height' => 150,
+				),
+				'medium'    => array(
+					'file'   => 'test-300x150.jpg',
+					'width'  => 300,
+					'height' => 150,
+				),
+				'large'     => array(
+					'file'   => 'test-1024x512.jpg',
+					'width'  => 1024,
+					'height' => 512,
+				),
+			)
+		);
+
+		// Test using the large file size.
+		$size_array = array( 1024, 512 );
+		$image_url  = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $image_meta['sizes']['large']['file'];
+
+		$_SERVER['HTTPS'] = 'on';
+
+		$expected = 'https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-300x150.jpg 300w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-1024x512.jpg 1024w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test.jpg 1200w';
+		$actual   = wp_calculate_image_srcset( $size_array, $image_url, $image_meta );
+
+		$this->assertSame( $expected, $actual );
 	}
 }
