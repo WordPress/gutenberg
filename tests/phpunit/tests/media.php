@@ -1184,16 +1184,21 @@ EOF;
 		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta2 ) );
 
 		// File name is incorrect
+		$image_meta3 = $image_meta;
+		$image_meta3['file'] = '/';
+		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta3 ) );
+
+		// File name is incorrect
 		$image_meta4 = $image_meta;
-		$image_meta4['file'] = '/';
+		unset( $image_meta4['file'] );
 		$this->assertFalse( wp_calculate_image_srcset( $size_array, $image_src, $image_meta4 ) );
 
 		// Intermediate size is string instead of array.
-		$image_meta3 = $image_meta;
-		$image_meta3['sizes']['medium_large'] = '';
+		$image_meta5 = $image_meta;
+		$image_meta5['sizes']['medium_large'] = '';
 		unset( $srcset[768] );
 		$expected_srcset = implode( ', ', $srcset );
-		$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_src, $image_meta3 ) );
+		$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_src, $image_meta5 ) );
 	}
 
 	/**
