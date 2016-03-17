@@ -279,40 +279,8 @@
 		}, assert.async() );
 	} );
 
-	QUnit.test( 'Inline: single.', function( assert ) {
-		type( '*test*', function() {
-			assert.equal( editor.getContent(), '<p><em>test</em></p>' );
-			assert.equal( editor.selection.getRng().startOffset, 1 );
-		}, assert.async() );
-	} );
-
-	QUnit.test( 'Inline: double.', function( assert ) {
-		type( '**test**', function() {
-			assert.equal( editor.getContent(), '<p><strong>test</strong></p>' );
-			assert.equal( editor.selection.getRng().startOffset, 1 );
-		}, assert.async() );
-	} );
-
-	QUnit.test( 'Inline: after typing.', function( assert ) {
-		editor.setContent( '<p>test test test</p>' );
-		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 5 );
-
-		type( '**', function() {
-			editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 11 );
-		}, '**', function() {
-			assert.equal( editor.getContent(), '<p>test <strong>test</strong> test</p>' );
-			assert.equal( editor.selection.getRng().startOffset, 1 );
-		}, assert.async() );
-	} );
-
-	QUnit.test( 'Inline: no change.', function( assert ) {
-		type( 'test ******', function() {
-			assert.equal( editor.getContent(), '<p>test ******</p>' );
-		}, assert.async() );
-	} );
-
 	QUnit.test( 'Horizontal Rule', function( assert ) {
-		type( '   ---   \n', function() {
+		type( '---\n', function() {
 			assert.equal( editor.getContent(), '<hr />\n<p>&nbsp;</p>' );
 		}, assert.async() );
 	} );
