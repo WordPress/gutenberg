@@ -833,21 +833,33 @@ EOF;
 	/**
 	 * Helper function to get image size array from size "name"
 	 */
-	function _get_image_size_array_from_name( $size_name ) {
-		switch ( $size_name ) {
-			case 'thumbnail':
-				return array( 150, 150 );
-			case 'medium':
-				return array( 300, 225 );
-			case 'medium_large':
-				return array( 768, 576 );
-			case 'large':
-				return array( 1024, 768 );
-			case 'full':
-				return array( 1600, 1200 ); // actual size of ../data/images/test-image-large.png
-			default:
-				return array( 800, 600 ); // soft-resized image
+	function _get_image_size_array_from_meta( $image_meta, $size_name ) {
+		$array = false;
+
+		if ( is_array( $image_meta ) ) {
+			if ( 'full' === $size_name && isset( $image_meta['width'] ) && isset( $image_meta['height'] ) ) {
+				$array = array( $image_meta['width'], $image_meta['height'] );
+			} elseif ( isset( $image_meta['sizes'][ $size_name ]['width'] ) && isset( $image_meta['sizes'][ $size_name ]['height'] ) ) {
+				$array = array( $image_meta['sizes'][ $size_name ]['width'], $image_meta['sizes'][ $size_name ]['height'] );
+			}
 		}
+
+		return $array;
+	}
+
+	/**
+	 * Helper function to move the src image to the first position in the expected srcset string.
+	 */
+	function _src_first( $srcset, $src_url, $src_width ) {
+		$src_string = $src_url . ' ' . $src_width . 'w';
+		$src_not_first = ', ' . $src_string;
+
+		if ( strpos( $srcset, $src_not_first ) ) {
+			$srcset = str_replace( $src_not_first, '', $srcset );
+			$srcset = $src_string . ', ' . $srcset;
+		}
+
+		return $srcset;
 	}
 
 	/**
@@ -870,9 +882,9 @@ EOF;
 			}
 		}
 
-		$expected = "";
+		$expected = '';
 
-		foreach( $image_meta['sizes'] as $name => $size ) {
+		foreach ( $image_meta['sizes'] as $name => $size ) {
 			// Whitelist the sizes that should be included so we pick up 'medium_large' in 4.4.
 			if ( in_array( $name, $intermediates ) ) {
 				$expected .= $uploads_dir_url . $year_month . '/' . $size['file'] . ' ' . $size['width'] . 'w, ';
@@ -884,9 +896,10 @@ EOF;
 
 		foreach ( $intermediates as $int ) {
 			$image_url = wp_get_attachment_image_url( self::$large_id, $int );
-			$size_array = $this->_get_image_size_array_from_name( $int );
- 			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
- 		}
+			$size_array = $this->_get_image_size_array_from_meta( $image_meta, $int );
+			$expected_srcset = $this->_src_first( $expected, $image_url, $size_array[0] );
+			$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
+		}
 	}
 
 	/**
@@ -914,9 +927,9 @@ EOF;
 			}
 		}
 
-		$expected = "";
+		$expected = '';
 
-		foreach( $image_meta['sizes'] as $name => $size ) {
+		foreach ( $image_meta['sizes'] as $name => $size ) {
 			// Whitelist the sizes that should be included so we pick up 'medium_large' in 4.4.
 			if ( in_array( $name, $intermediates ) ) {
 				$expected .= $uploads_dir_url . $size['file'] . ' ' . $size['width'] . 'w, ';
@@ -927,10 +940,11 @@ EOF;
 		$expected .= $uploads_dir_url . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
 
 		foreach ( $intermediates as $int ) {
-			$size_array = $this->_get_image_size_array_from_name( $int );
+			$size_array = $this->_get_image_size_array_from_meta( $image_meta, $int );
 			$image_url = wp_get_attachment_image_url( $id, $int );
- 			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
- 		}
+			$expected_srcset = $this->_src_first( $expected, $image_url, $size_array[0] );
+			$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
+		}
 
 		// Remove the attachment
 		wp_delete_attachment( $id );
@@ -945,7 +959,7 @@ EOF;
 		// Start by getting the attachment metadata.
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
 		$image_url = wp_get_attachment_image_url( self::$large_id, 'medium' );
-		$size_array = $this->_get_image_size_array_from_name( 'medium' );
+		$size_array = $this->_get_image_size_array_from_meta( $image_meta, 'medium' );
 
 		// Copy hash generation method used in wp_save_image().
 		$hash = 'e' . time() . rand(100, 999);
@@ -1007,9 +1021,10 @@ EOF;
 
 		foreach ( $intermediates as $int ) {
 			$image_url = wp_get_attachment_image_url( self::$large_id, $int );
-			$size_array = $this->_get_image_size_array_from_name( $int );
- 			$this->assertSame( $expected, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
- 		}
+			$size_array = $this->_get_image_size_array_from_meta( $image_meta, $int );
+			$expected_srcset = $this->_src_first( $expected, $image_url, $size_array[0] );
+			$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_url, $image_meta ) );
+		}
 	}
 
 	/**
@@ -1123,7 +1138,7 @@ EOF;
 			),
 		);
 
-		$expected_srcset = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-300x150.png 300w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-768x384.png 768w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-1024x512.png 1024w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test.png 2000w';
+		$expected_srcset = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test.png 2000w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-300x150.png 300w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-768x384.png 768w, http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/2015/12/test-1024x512.png 1024w';
 
 		$this->assertSame( $expected_srcset, wp_calculate_image_srcset( $size_array, $image_src, $image_meta ) );
 	}
@@ -1226,7 +1241,7 @@ EOF;
 
 		$expected = "";
 
-		foreach( $image_meta['sizes'] as $name => $size ) {
+		foreach ( $image_meta['sizes'] as $name => $size ) {
 			// Whitelist the sizes that should be included so we pick up 'medium_large' in 4.4.
 			if ( in_array( $name, $intermediates ) ) {
 				$expected .= $uploads_dir . $year_month . '/' . $size['file'] . ' ' . $size['width'] . 'w, ';
@@ -1235,7 +1250,9 @@ EOF;
 
 		$expected .= $uploads_dir . $image_meta['file'] . ' ' . $image_meta['width'] .'w';
 
- 		$this->assertSame( $expected, $srcset );
+		$expected_srcset = $this->_src_first( $expected, $uploads_dir . $image_meta['file'], $size_array[0] );
+
+		$this->assertSame( $expected_srcset, $srcset );
 	}
 
 	/**
@@ -1273,14 +1290,14 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_sizes() {
- 		// Test sizes against the default WP sizes.
- 		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
+		// Test sizes against the default WP sizes.
+		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
 
 		// Make sure themes aren't filtering the sizes array.
 		remove_all_filters( 'wp_calculate_image_sizes' );
 
- 		foreach( $intermediates as $int_size ) {
- 			$image = wp_get_attachment_image_src( self::$large_id, $int_size );
+		foreach( $intermediates as $int_size ) {
+			$image = wp_get_attachment_image_src( self::$large_id, $int_size );
 
 			$expected = '(max-width: ' . $image[1] . 'px) 100vw, ' . $image[1] . 'px';
 			$sizes = wp_get_attachment_image_sizes( self::$large_id, $int_size );
@@ -1294,15 +1311,15 @@ EOF;
 	 */
 	function test_wp_calculate_image_sizes() {
 		// Test sizes against the default WP sizes.
- 		$intermediates = array('thumbnail', 'medium', 'medium_large', 'large');
- 		$image_meta = wp_get_attachment_metadata( self::$large_id );
+		$intermediates = array( 'thumbnail', 'medium', 'medium_large', 'large' );
+		$image_meta = wp_get_attachment_metadata( self::$large_id );
 
 		// Make sure themes aren't filtering the sizes array.
 		remove_all_filters( 'wp_calculate_image_sizes' );
 
- 		foreach( $intermediates as $int_size ) {
- 			$size_array = $this->_get_image_size_array_from_name( $int_size );
-			$image_src = $image_meta['sizes'][$int_size]['file'];
+		foreach ( $intermediates as $int_size ) {
+			$size_array = $this->_get_image_size_array_from_meta( $image_meta, $int_size );
+			$image_src = $image_meta['sizes'][ $int_size ]['file'];
 			list( $width, $height ) = $size_array;
 
 			$expected = '(max-width: ' . $width . 'px) 100vw, ' . $width . 'px';
@@ -1317,7 +1334,7 @@ EOF;
 	 */
 	function test_wp_make_content_images_responsive() {
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
-		$size_array = $this->_get_image_size_array_from_name( 'medium' );
+		$size_array = $this->_get_image_size_array_from_meta( $image_meta, 'medium' );
 
 		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta ) );
 		$sizes = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( self::$large_id, $size_array, $image_meta ) );
@@ -1450,7 +1467,7 @@ EOF;
 	 */
 	function test_wp_make_content_images_responsive_schemes() {
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
-		$size_array = $this->_get_image_size_array_from_name( 'medium' );
+		$size_array = $this->_get_image_size_array_from_meta( $image_meta, 'medium' );
 
 		$srcset = sprintf( 'srcset="%s"', wp_get_attachment_image_srcset( self::$large_id, $size_array, $image_meta ) );
 		$sizes  = sprintf( 'sizes="%s"', wp_get_attachment_image_sizes( self::$large_id, $size_array, $image_meta ) );
@@ -1480,7 +1497,7 @@ EOF;
 		$actual     = wp_make_content_images_responsive( $unfiltered );
 
 		$this->assertSame( $expected, $actual );
-}
+	}
 
 	/**
 	 * @ticket 34945
@@ -1517,7 +1534,7 @@ EOF;
 
 		$_SERVER['HTTPS'] = 'on';
 
-		$expected = 'https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-300x150.jpg 300w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-1024x512.jpg 1024w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test.jpg 1200w';
+		$expected = 'https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-1024x512.jpg 1024w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test-300x150.jpg 300w, https://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test.jpg 1200w';
 		$actual   = wp_calculate_image_srcset( $size_array, $image_url, $image_meta );
 
 		$this->assertSame( $expected, $actual );
