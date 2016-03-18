@@ -1539,4 +1539,71 @@ EOF;
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * @ticket 36084
+	 */
+	function test_get_image_send_to_editor_defaults() {
+		$id      = self::$large_id;
+		$caption = '';
+		$title   = 'A test title value.';
+		$align   = 'left';
+
+		// Calculate attachment data (default is medium).
+		$attachment = wp_get_attachment_image_src( $id, 'medium' );
+
+		$html = '<img src="%1$s" alt="" width="%2$d" height="%3$d" class="align%4$s size-medium wp-image-%5$d" />';
+		$expected = sprintf( $html, $attachment[0], $attachment[1], $attachment[2], $align, $id );
+
+		$this->assertSame( $expected, get_image_send_to_editor( $id, $caption, $title, $align ) );
+
+		$this->assertSame( $expected, get_image_send_to_editor( $id, $caption, $title, $align ) );
+	}
+
+	/**
+	 * @ticket 36084
+	 */
+	function test_get_image_send_to_editor_defaults_with_optional_params() {
+		$id      = self::$large_id;
+		$caption = 'A test caption.';
+		$title   = 'A test title value.';
+		$align   = 'left';
+		$url     = get_permalink( $id );
+		$rel     = true;
+		$size    = 'thumbnail';
+		$alt     = 'An example alt value.';
+
+		// Calculate attachment data.
+		$attachment = wp_get_attachment_image_src( $id, $size );
+
+		$html = '<a href="%1$s" rel="%2$s"><img src="%3$s" alt="%4$s" width="%5$d" height="%6$d" class="size-%8$s wp-image-%9$d" /></a>';
+		$html = '[caption id="attachment_%9$d" align="align%7$s" width="%5$d"]' . $html . ' %10$s[/caption]';
+
+		$expected = sprintf( $html, $url, 'attachment wp-att-' . $id, $attachment[0], $alt, $attachment[1], $attachment[2], $align, $size, $id, $caption );
+
+		$this->assertSame( $expected, get_image_send_to_editor( $id, $caption, $title, $align, $url, $rel, $size, $alt ) );
+	}
+
+	/**
+	 * @ticket 36084
+	 */
+	function test_get_image_send_to_editor_defaults_no_caption_no_rel() {
+		$id      = self::$large_id;
+		$caption = '';
+		$title   = 'A test title value.';
+		$align   = 'left';
+		$url     = get_permalink( $id );
+		$rel     = '';
+		$size    = 'thumbnail';
+		$alt     = 'An example alt value.';
+
+		// Calculate attachment data.
+		$attachment = wp_get_attachment_image_src( $id, $size );
+
+		$html = '<a href="%1$s"><img src="%2$s" alt="%3$s" width="%4$d" height="%5$d" class="align%6$s size-%7$s wp-image-%8$d" /></a>';
+
+		$expected = sprintf( $html, $url, $attachment[0], $alt, $attachment[1], $attachment[2], $align, $size, $id );
+
+		$this->assertSame( $expected, get_image_send_to_editor( $id, $caption, $title, $align, $url, $rel, $size, $alt ) );
+	}
 }
