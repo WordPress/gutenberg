@@ -1,5 +1,8 @@
 sudo: false
 language: php
+cache:
+  directories:
+    - node_modules
 matrix:
   include:
   - php: 5.5
