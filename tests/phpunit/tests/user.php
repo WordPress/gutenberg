@@ -1132,4 +1132,71 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertTrue( $was_admin_email_sent );
 		$this->assertFalse( $was_user_email_sent );
 	}
+
+	/**
+	 * Checks that calling edit_user() with no password returns an error when adding, and doesn't when updating.
+	 *
+	 * @ticket 35715
+	 */
+	function test_edit_user_blank_pw() {
+		$_POST = $_GET = $_REQUEST = array();
+		$_POST['role'] = 'subscriber';
+		$_POST['email'] = 'user1@example.com';
+		$_POST['user_login'] = 'user_login1';
+		$_POST['first_name'] = 'first_name1';
+		$_POST['last_name'] = 'last_name1';
+		$_POST['nickname'] = 'nickname1';
+		$_POST['display_name'] = 'display_name1';
+
+		// Check new user with missing password.
+		$response = edit_user();
+
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'pass', $response->get_error_code() );
+
+		// Check new user with password set.
+		$_POST['pass1'] = $_POST['pass2'] = 'password';
+
+		$user_id = edit_user();
+		$user = get_user_by( 'ID', $user_id );
+
+		$this->assertInternalType( 'int', $user_id );
+		$this->assertInstanceOf( 'WP_User', $user );
+		$this->assertEquals( 'nickname1', $user->nickname );
+
+		// Check updating user with empty password.
+		$_POST['nickname'] = 'nickname_updated';
+		$_POST['pass1'] = $_POST['pass2'] = '';
+
+		$user_id = edit_user( $user_id );
+
+		$this->assertInternalType( 'int', $user_id );
+		$this->assertEquals( 'nickname_updated', $user->nickname );
+
+		// Check updating user with missing second password.
+		$_POST['nickname'] = 'nickname_updated2';
+		$_POST['pass1'] = 'blank_pass2';
+		$_POST['pass2'] = '';
+
+		$response = edit_user( $user_id );
+
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'pass', $response->get_error_code() );
+		$this->assertEquals( 'nickname_updated', $user->nickname );
+
+		// Check updating user with empty password via `check_passwords` action.
+		add_action( 'check_passwords', array( $this, 'action_check_passwords_blank_pw' ), 10, 2 );
+		$user_id = edit_user( $user_id );
+		remove_action( 'check_passwords', array( $this, 'action_check_passwords_blank_pw' ) );
+
+		$this->assertInternalType( 'int', $user_id );
+		$this->assertEquals( 'nickname_updated2', $user->nickname );
+	}
+
+	/**
+	 * Check passwords action for test_edit_user_blank_pw().
+	 */
+	function action_check_passwords_blank_pw( $user_login, &$pass1 ) {
+		$pass1 = '';
+	}
 }
