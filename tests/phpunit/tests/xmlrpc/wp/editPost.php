@@ -401,4 +401,40 @@ class Tests_XMLRPC_wp_editPost extends WP_XMLRPC_UnitTestCase {
 		// Check that the old enclosure is in the enclosure meta
 		$this->assertTrue( in_array( $enclosure_string, get_post_meta( $post_id, 'enclosure' ) ) );
 	}
+
+	/**
+	 * @ticket 35874
+	 */
+	function test_draft_not_prematurely_published() {
+		$editor_id = $this->make_user_by_role( 'editor' );
+
+		/**
+		 * We have to use wp_newPost method, rather than the factory
+		 * post->create method to create the database conditions that exhibit
+		 * the bug.
+		 */
+		$post = array(
+			'post_title'  => 'Test',
+			'post_status' => 'draft',
+		);
+		$post_id = $this->myxmlrpcserver->wp_newPost( array( 1, 'editor', 'editor', $post ) );
+
+		// Change the post's status to publish and date to future.
+		$future_time = strtotime( '+1 day' );
+		$future_date = new IXR_Date( $future_time );
+		$new_post_content = array(
+			'ID'          => $post_id,
+			'post_title'  => 'Updated',
+			'post_status' => 'publish',
+			'post_date'   => $future_date,
+		);
+
+		$this->myxmlrpcserver->wp_editPost( array( 1, 'editor', 'editor', $post_id, $new_post_content ) );
+
+		$after = get_post( $post_id );
+		$this->assertEquals( 'future', $after->post_status );
+
+		$future_date_string = strftime( '%Y-%m-%d %H:%M:%S', $future_time );
+		$this->assertEquals( $future_date_string, $after->post_date );
+	}
 }

@@ -241,4 +241,41 @@ class Tests_XMLRPC_mw_editPost extends WP_XMLRPC_UnitTestCase {
 		$tags2 = get_the_tags( $post_id );
 		$this->assertEmpty( $tags2 );
 	}
+
+	/**
+	 * @ticket 35874
+	 */
+	function test_draft_not_prematurely_published() {
+		$editor_id = $this->make_user_by_role( 'editor' );
+
+		$post = array(
+			'title' => 'Title',
+		);
+
+		/**
+		 * We have to use wp_newPost method, rather than the factory
+		 * post->create method to create the database conditions that exhibit
+		 * the bug.
+		 */
+		$post_id = $this->myxmlrpcserver->mw_newPost( array( 1, 'editor', 'editor', $post ) );
+
+		// Change the post's status to publish and date to future.
+		$future_time = strtotime( '+1 day' );
+		$future_date = new IXR_Date( $future_time );
+		$this->myxmlrpcserver->mw_editPost( array(
+			$post_id,
+			'editor',
+			'editor',
+			array(
+				'dateCreated' => $future_date,
+				'post_status' => 'publish',
+			),
+		) );
+
+		$after = get_post( $post_id );
+		$this->assertEquals( 'future', $after->post_status );
+
+		$future_date_string = strftime( '%Y-%m-%d %H:%M:%S', $future_time );
+		$this->assertEquals( $future_date_string, $after->post_date );
+	}
 }
