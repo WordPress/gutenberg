@@ -50,53 +50,6 @@ class Tests_Rewrite_OldSlugRedirect extends WP_UnitTestCase {
 		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
 	}
 
-	public function test_old_slug_redirect_endpoint() {
-		$old_permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'custom-endpoint' );
-
-		wp_update_post( array(
-			'ID' => $this->post_id,
-			'post_name' => 'bar-baz',
-		) );
-
-		$permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'custom-endpoint' );
-
-		$this->go_to( $old_permalink );
-		$GLOBALS['wp_query']->query_vars['custom-endpoint'] = true;
-		wp_old_slug_redirect();
-		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
-	}
-
-	public function test_old_slug_redirect_endpoint_custom_query_var() {
-		$old_permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'second-endpoint' );
-
-		wp_update_post( array(
-			'ID' => $this->post_id,
-			'post_name' => 'bar-baz',
-		) );
-
-		$permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'second-endpoint' );
-
-		$this->go_to( $old_permalink );
-		$GLOBALS['wp_query']->query_vars['custom'] = true;
-		wp_old_slug_redirect();
-		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
-	}
-
-	public function test_old_slug_redirect_feed() {
-		$old_permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'feed' );
-
-		wp_update_post( array(
-			'ID' => $this->post_id,
-			'post_name' => 'bar-baz',
-		) );
-
-		$permalink = user_trailingslashit( trailingslashit( get_permalink( $this->post_id ) ) . 'feed' );
-
-		$this->go_to( $old_permalink );
-		wp_old_slug_redirect();
-		$this->assertEquals( $permalink, $this->old_slug_redirect_url );
-	}
-
 	public function test_old_slug_redirect_attachment() {
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id = self::factory()->attachment->create_object( $file, $this->post_id, array(
