@@ -204,4 +204,12 @@ class Tests_TestHelpers extends WP_UnitTestCase {
 		_doing_it_wrong( __METHOD__, __( 'Incorrect usage test' ), '2.5' );
 		return true;
 	}
+
+	/**
+	 * @ticket 36166
+	 * @expectedException WPDieException
+	 */
+	public function test_die_handler_should_handle_wp_error() {
+		wp_die( new WP_Error( 'test', 'test' ) );
+	}
 }

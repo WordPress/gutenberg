@@ -292,6 +292,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	function wp_die_handler( $message ) {
+		if ( ! is_scalar( $message ) ) {
+			$message = '0';
+		}
+
 		throw new WPDieException( $message );
 	}
 
