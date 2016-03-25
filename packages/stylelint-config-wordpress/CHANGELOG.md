@@ -1,4 +1,4 @@
-# HEAD
+# 4.0.0
 
 * Removed: `stylelint < 5.2.0` compatibility.
 * Added: `at-rule-semicolon-newline-after` rule.
