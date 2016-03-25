@@ -1,3 +1,9 @@
+# HEAD
+
+* Removed: `stylelint < 5.2.0` compatibility.
+* Added: `at-rule-semicolon-newline-after` rule.
+* Added: `selector-type-case` rule.
+
 # 3.0.1
 
 * Add `stylelint` version `^4.5.0` as a peer dependency to `peerDependencies` in `package.json`
