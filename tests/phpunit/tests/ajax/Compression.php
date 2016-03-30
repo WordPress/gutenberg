@@ -143,7 +143,20 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 			unset( $e );
 		}
 
-		// Check the site option
+		// Check the site option is not changed due to lack of nonce
+		$this->assertEquals( 0, get_site_option( 'can_compress_scripts' ) );
+
+		// Add a nonce
+		$_GET['_ajax_nonce'] = wp_create_nonce( 'update_can_compress_scripts' );
+
+		// Retry the request
+		try {
+			$this->_handleAjax( 'wp-compression-test' );
+		} catch ( WPAjaxDieStopException $e ) {
+			unset( $e );
+		}
+
+		// Check the site option is changed
 		$this->assertEquals( 1, get_site_option( 'can_compress_scripts' ) );
 	}
 
@@ -168,7 +181,20 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 			unset( $e );
 		}
 
-		// Check the site option
+		// Check the site option is not changed due to lack of nonce
+		$this->assertEquals( 1, get_site_option( 'can_compress_scripts' ) );
+
+		// Add a nonce
+		$_GET['_ajax_nonce'] = wp_create_nonce( 'update_can_compress_scripts' );
+
+		// Retry the request
+		try {
+			$this->_handleAjax( 'wp-compression-test' );
+		} catch ( WPAjaxDieStopException $e ) {
+			unset( $e );
+		}
+
+		// Check the site option is changed
 		$this->assertEquals( 0, get_site_option( 'can_compress_scripts' ) );
 	}
 
