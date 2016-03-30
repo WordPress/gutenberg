@@ -279,11 +279,8 @@ class Tests_General_Template extends WP_UnitTestCase {
 
 		$this->_set_custom_logo();
 		$home_url = get_home_url( $blog_id, '/' );
-		$size     = get_theme_support( 'custom-logo', 'size' );
-		$size     = $size ? $size : 'full';
-		$image    = wp_get_attachment_image( $this->custom_logo_id, $size, false, array(
-			'class'     => "custom-logo attachment-$size",
-			'data-size' => $size,
+		$image    = wp_get_attachment_image( $this->custom_logo_id, 'full', false, array(
+			'class'     => 'custom-logo',
 			'itemprop'  => 'logo',
 		) );
 		restore_current_blog();
@@ -302,11 +299,8 @@ class Tests_General_Template extends WP_UnitTestCase {
 		the_custom_logo();
 
 		$this->_set_custom_logo();
-		$size  = get_theme_support( 'custom-logo', 'size' );
-		$size  = $size ? $size : 'full';
-		$image = wp_get_attachment_image( $this->custom_logo_id, $size, false, array(
-			'class'     => "custom-logo attachment-$size",
-			'data-size' => $size,
+		$image = wp_get_attachment_image( $this->custom_logo_id, 'full', false, array(
+			'class'     => 'custom-logo',
 			'itemprop'  => 'logo',
 		) );
 
