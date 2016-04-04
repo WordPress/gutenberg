@@ -59,6 +59,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 			'unfiltered_html'        => array( 'administrator', 'editor' ),
 
+			'create_sites'           => array(),
+			'delete_sites'           => array(),
 			'manage_network'         => array(),
 			'manage_sites'           => array(),
 			'manage_network_users'   => array(),
@@ -148,6 +150,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 			'unfiltered_html'        => array(),
 
+			'create_sites'           => array(),
+			'delete_sites'           => array(),
 			'manage_network'         => array(),
 			'manage_sites'           => array(),
 			'manage_network_users'   => array(),
