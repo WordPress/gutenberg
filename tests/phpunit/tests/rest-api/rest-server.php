@@ -743,6 +743,133 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		}
 	}
 
+	public function test_serve_request_url_params_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test/(?P<data>.*)', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		$result = $this->server->serve_request( '/test/data\\with\\slashes' );
+		$url_params = $this->server->last_request->get_url_params();
+		$this->assertEquals( 'data\\with\\slashes', $url_params['data'] );
+	}
+
+	public function test_serve_request_query_params_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		// WordPress internally will slash the superglobals on bootstrap
+		$_GET = wp_slash( array(
+			'data' => 'data\\with\\slashes',
+		) );
+
+		$result = $this->server->serve_request( '/test' );
+		$query_params = $this->server->last_request->get_query_params();
+		$this->assertEquals( 'data\\with\\slashes', $query_params['data'] );
+	}
+
+	public function test_serve_request_body_params_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		// WordPress internally will slash the superglobals on bootstrap
+		$_POST = wp_slash( array(
+			'data' => 'data\\with\\slashes',
+		) );
+
+		$result = $this->server->serve_request( '/test/data' );
+
+		$body_params = $this->server->last_request->get_body_params();
+		$this->assertEquals( 'data\\with\\slashes', $body_params['data'] );
+	}
+
+	public function test_serve_request_json_params_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		$_SERVER['HTTP_CONTENT_TYPE'] = 'application/json';
+		$GLOBALS['HTTP_RAW_POST_DATA'] = json_encode( array(
+			'data' => 'data\\with\\slashes',
+		) );
+
+		$result = $this->server->serve_request( '/test' );
+		$json_params = $this->server->last_request->get_json_params();
+		$this->assertEquals( 'data\\with\\slashes', $json_params['data'] );
+	}
+
+	public function test_serve_request_file_params_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		// WordPress internally will slash the superglobals on bootstrap
+		$_FILES = array(
+			'data' => array(
+				'name' => 'data\\with\\slashes',
+			),
+		);
+
+		$result = $this->server->serve_request( '/test/data\\with\\slashes' );
+		$file_params = $this->server->last_request->get_file_params();
+		$this->assertEquals( 'data\\with\\slashes', $file_params['data']['name'] );
+	}
+
+	public function test_serve_request_headers_are_unslashed() {
+
+		$this->server->register_route( 'test', '/test', array(
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => '__return_false',
+				'args'     => array(
+					'data' => array(),
+				),
+			),
+		) );
+
+		// WordPress internally will slash the superglobals on bootstrap
+		$_SERVER['HTTP_X_MY_HEADER'] = wp_slash( 'data\\with\\slashes' );
+
+		$result = $this->server->serve_request( '/test/data\\with\\slashes' );
+		$this->assertEquals( 'data\\with\\slashes', $this->server->last_request->get_header( 'x_my_header') );
+	}
+
 	public function filter_wp_rest_server_class() {
 		return 'Spy_REST_Server';
 	}

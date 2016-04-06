@@ -4,6 +4,7 @@ class Spy_REST_Server extends WP_REST_Server {
 
 	public $sent_headers = array();
 	public $sent_body = '';
+	public $last_request = null;
 
 	/**
 	 * Get the raw $endpoints data from the server
@@ -27,6 +28,17 @@ class Spy_REST_Server extends WP_REST_Server {
 
 	public function send_header( $header, $value ) {
 		$this->sent_headers[ $header ] = $value;
+	}
+
+	/**
+	 * Override the dispatch method so we can get a handle on the request object.
+	 *
+	 * @param  WP_REST_Request $request
+	 * @return WP_REST_Response Response returned by the callback.
+	 */
+	public function dispatch( $request ) {
+		$this->last_request = $request;
+		return parent::dispatch( $request );
 	}
 
 	public function serve_request( $path = null ) {
