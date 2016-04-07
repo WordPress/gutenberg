@@ -15,7 +15,21 @@ class Tests_WPInsertPost extends WP_UnitTestCase {
 			'post_status' => 'publish'
 		) );
 		wp_trash_post( $trashed_about_page_id );
-		$this->assertEquals( 'about-%trashed%', get_post( $trashed_about_page_id )->post_name );
+		$this->assertEquals( 'about__trashed', get_post( $trashed_about_page_id )->post_name );
+	}
+
+	/**
+	 * @ticket 11863
+	 */
+	public function test_trashed_suffix_should_be_added_to_post_with__trashed_in_slug() {
+		$trashed_about_page_id = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_title' => 'About',
+			'post_status' => 'publish',
+			'post_name' => 'foo__trashed__foo',
+		) );
+		wp_trash_post( $trashed_about_page_id );
+		$this->assertEquals( 'foo__trashed__foo__trashed', get_post( $trashed_about_page_id )->post_name );
 	}
 
 	/**
@@ -49,7 +63,7 @@ class Tests_WPInsertPost extends WP_UnitTestCase {
 			'post_status' => 'publish'
 		) );
 
-		$this->assertEquals( 'about-%trashed%', get_post( $trashed_about_page_id )->post_name );
+		$this->assertEquals( 'about__trashed', get_post( $trashed_about_page_id )->post_name );
 		$this->assertEquals( 'about', get_post( $about_page_id )->post_name );
 	}
 
