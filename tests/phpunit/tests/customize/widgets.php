@@ -46,6 +46,9 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		remove_action( 'customize_register', 'twentysixteen_customize_register', 11 );
 
 		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];
+
+		// Reset protected static var on class.
+		WP_Customize_Setting::reset_aggregated_multidimensionals();
 	}
 
 	function clean_up_global_scope() {
@@ -70,6 +73,11 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 
 	function set_customized_post_data( $customized ) {
 		$_POST['customized'] = wp_slash( wp_json_encode( $customized ) );
+		if ( $this->manager ) {
+			foreach ( $customized as $id => $value ) {
+				$this->manager->set_post_value( $id, $value );
+			}
+		}
 	}
 
 	function do_customize_boot_actions() {
@@ -150,11 +158,13 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test WP_Customize_Widgets::register_settings()
+	 * Test WP_Customize_Widgets::register_settings() with selective refresh enabled.
 	 *
 	 * @ticket 30988
+	 * @ticket 36389
 	 */
 	function test_register_settings() {
+		add_theme_support( 'customize-selective-refresh-widgets' );
 
 		$raw_widget_customized = array(
 			'widget_categories[2]' => array(
@@ -176,12 +186,56 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		$this->do_customize_boot_actions();
 		$this->assertTrue( is_customize_preview() );
 
-		$this->assertNotEmpty( $this->manager->get_setting( 'widget_categories[2]' ), 'Expected setting for pre-existing widget category-2, being customized.' );
-		$this->assertNotEmpty( $this->manager->get_setting( 'widget_search[2]' ), 'Expected setting for pre-existing widget search-2, not being customized.' );
-		$this->assertNotEmpty( $this->manager->get_setting( 'widget_search[3]' ), 'Expected dynamic setting for non-existing widget search-3, being customized.' );
+		if ( current_theme_supports( 'customize-selective-refresh-widgets' ) ) {
+			$expected_transport = 'postMessage';
+			$this->assertNotEmpty( $this->manager->widgets->get_selective_refreshable_widgets() );
+		} else {
+			$expected_transport = 'refresh';
+			$this->assertEmpty( $this->manager->widgets->get_selective_refreshable_widgets() );
+		}
+
+		$setting = $this->manager->get_setting( 'widget_categories[2]' );
+		$this->assertNotEmpty( $setting, 'Expected setting for pre-existing widget category-2, being customized.' );
+		$this->assertEquals( $expected_transport, $setting->transport );
+
+		$setting = $this->manager->get_setting( 'widget_search[2]' );
+		$this->assertNotEmpty( $setting, 'Expected setting for pre-existing widget search-2, not being customized.' );
+		$this->assertEquals( $expected_transport, $setting->transport );
+
+		$setting = $this->manager->get_setting( 'widget_search[3]' );
+		$this->assertNotEmpty( $setting, 'Expected dynamic setting for non-existing widget search-3, being customized.' );
+		$this->assertEquals( $expected_transport, $setting->transport );
 
 		$widget_categories = get_option( 'widget_categories' );
 		$this->assertEquals( $raw_widget_customized['widget_categories[2]'], $widget_categories[2], 'Expected $wp_customize->get_setting(widget_categories[2])->preview() to have been called.' );
+	}
+
+	/**
+	 * Test registering settings without selective refresh enabled.
+	 *
+	 * @ticket 36389
+	 */
+	function test_register_settings_without_selective_refresh() {
+		remove_theme_support( 'customize-selective-refresh-widgets' );
+		$this->test_register_settings();
+	}
+
+	/**
+	 * Test registering settings with selective refresh enabled at a late after_setup_theme action.
+	 *
+	 * @ticket 36389
+	 */
+	function test_register_settings_with_late_theme_support_added() {
+		remove_theme_support( 'customize-selective-refresh-widgets' );
+		add_action( 'after_setup_theme', array( $this, 'add_customize_selective_refresh_theme_support' ), 100 );
+		$this->test_register_settings();
+	}
+
+	/**
+	 * Add customize-selective-refresh-widgets theme support.
+	 */
+	function add_customize_selective_refresh_theme_support() {
+		add_theme_support( 'customize-selective-refresh-widgets' );
 	}
 
 	/**
