@@ -813,4 +813,39 @@ class Tests_Functions extends WP_UnitTestCase {
 			array( '2016-03-02T19:13:00', '16-03-02 19:13' )
 		);
 	}
+
+	/**
+	 * @ticket 35987
+	 */
+	public function test_wp_get_ext_types() {
+		$extensions = wp_get_ext_types();
+
+		$this->assertInternalType( 'array', $extensions );
+		$this->assertNotEmpty( $extensions );
+
+		add_filter( 'ext2type', '__return_empty_array' );
+		$extensions = wp_get_ext_types();
+		$this->assertSame( array(), $extensions );
+
+		remove_filter( 'ext2type', '__return_empty_array' );
+		$extensions = wp_get_ext_types();
+		$this->assertInternalType( 'array', $extensions );
+		$this->assertNotEmpty( $extensions );
+	}
+
+	/**
+	 * @ticket 35987
+	 */
+	public function test_wp_ext2type() {
+		$extensions = wp_get_ext_types();
+
+		foreach ( $extensions as $type => $extensionList ) {
+			foreach ( $extensionList as $extension ) {
+				$this->assertEquals( $type, wp_ext2type( $extension ) );
+				$this->assertEquals( $type, wp_ext2type( strtoupper( $extension ) ) );
+			}
+		}
+
+		$this->assertNull( wp_ext2type( 'unknown_format' ) );
+	}
 }
