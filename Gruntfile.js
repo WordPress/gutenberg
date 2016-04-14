@@ -769,8 +769,7 @@ module.exports = function(grunt) {
 		'precommit:php',
 		'precommit:js',
 		'precommit:css',
-		'precommit:base',
-		'build'
+		'precommit:base'
 	] );
 
 	// Testing tasks.
