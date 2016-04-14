@@ -175,10 +175,10 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 	/**
 	 * Mimic the ajax handling of admin-ajax.php
 	 * Capture the output via output buffering, and if there is any, store
-	 * it in $this->_last_message.
+	 * it in $this->_last_response.
 	 * @param string $action
 	 */
-	protected function _handleAjax($action) {
+	protected function _handleAjax( $action ) {
 
 		// Start output buffering
 		ini_set( 'implicit_flush', false );
