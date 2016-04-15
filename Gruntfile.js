@@ -668,7 +668,7 @@ module.exports = function(grunt) {
 		grunt.task.run( '_' + this.nameArgs );
 	} );
 
-	grunt.registerTask( 'precommit:base', [
+	grunt.registerTask( 'precommit:image', [
 		'imagemin:core'
 	] );
 
@@ -714,15 +714,23 @@ module.exports = function(grunt) {
 
 		function run( type ) {
 			var command = map[ type ].split( ' ' );
-			var taskList = [ 'precommit:base' ];
 
 			grunt.util.spawn( {
 				cmd: command.shift(),
 				args: command
 			}, function( error, result, code ) {
+				var taskList = [];
+
 				if ( code !== 0 ) {
 					grunt.fatal( 'The `' +  map[ type ] + '` command returned a non-zero exit code.', code );
 				}
+
+				[ 'png', 'jpg', 'gif', 'jpeg' ].forEach( function( extension ) {
+					if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
+						grunt.log.writeln( 'Image files modified. Minifying.');
+						taskList.push( 'precommit:image' );
+					}
+				} );
 
 				[ 'js', 'css', 'php' ].forEach( function( extension ) {
 					if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
@@ -769,7 +777,7 @@ module.exports = function(grunt) {
 		'precommit:php',
 		'precommit:js',
 		'precommit:css',
-		'precommit:base'
+		'precommit:image'
 	] );
 
 	// Testing tasks.
