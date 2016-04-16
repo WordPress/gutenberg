@@ -41,4 +41,20 @@ class Tests_Option_SiteTransient extends WP_UnitTestCase {
 		$this->assertEquals( $value, get_site_transient( $key ) );
 		$this->assertTrue( delete_site_transient( $key ) );
 	}
+
+	/**
+	 * @ticket 22846
+	 */
+	public function test_set_site_transient_is_not_stored_as_autoload_option() {
+		$key = rand_str();
+
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Does not apply when used in multisite.' );
+		}
+		set_site_transient( $key, 'Not an autoload option' );
+
+		$options = wp_load_alloptions();
+
+		$this->assertFalse( isset( $options[ '_site_transient_' . $key ] ) );
+	}
 }
