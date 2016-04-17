@@ -1,10 +1,10 @@
 <?php
 
+/**
+ * @group query
+ * @group post
+ */
 class Tests_Post_Query extends WP_UnitTestCase {
-	function setUp() {
-		parent::setUp();
-	}
-
 	/**
 	 * @group taxonomy
 	 */
