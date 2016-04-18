@@ -86,27 +86,61 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	/**
 	 * @ticket 22917
 	 */
-	function test_enable_live_network_site_counts_filter() {
+	public function test_get_blog_count_no_filter_applied() {
+		wp_update_network_counts();
 		$site_count_start = get_blog_count();
-		// false for large networks by default
-		add_filter( 'enable_live_network_counts', '__return_false' );
-		self::factory()->blog->create_many( 4 );
 
-		// count only updated when cron runs, so unchanged
-		$this->assertEquals( $site_count_start, (int) get_blog_count() );
+		$site_ids = self::factory()->blog->create_many( 1 );
+		$actual = (int) get_blog_count(); // count only updated when cron runs, so unchanged
 
-		add_filter( 'enable_live_network_counts', '__return_true' );
-		$site_ids = self::factory()->blog->create_many( 4 );
-
-		$this->assertEquals( $site_count_start + 9, (int) get_blog_count() );
-
-		//clean up
-		remove_filter( 'enable_live_network_counts', '__return_false' );
-		remove_filter( 'enable_live_network_counts', '__return_true' );
 		foreach ( $site_ids as $site_id ) {
 			wpmu_delete_blog( $site_id, true );
 		}
+		wp_update_network_counts();
+
+		$this->assertEquals( $site_count_start + 1, $actual );
 	}
+
+	/**
+	 * @ticket 22917
+	 */
+	public function test_get_blog_count_enable_live_network_counts_false() {
+		wp_update_network_counts();
+		$site_count_start = get_blog_count();
+
+		add_filter( 'enable_live_network_counts', '__return_false' );
+		$site_ids = self::factory()->blog->create_many( 1 );
+		$actual = (int) get_blog_count(); // count only updated when cron runs, so unchanged
+		remove_filter( 'enable_live_network_counts', '__return_false' );
+
+		foreach ( $site_ids as $site_id ) {
+			wpmu_delete_blog( $site_id, true );
+		}
+		wp_update_network_counts();
+
+		$this->assertEquals( $site_count_start, $actual );
+	}
+
+	/**
+	 * @ticket 22917
+	 */
+	public function test_get_blog_count_enabled_live_network_counts_true() {
+		wp_update_network_counts();
+		$site_count_start = get_blog_count();
+
+		add_filter( 'enable_live_network_counts', '__return_true' );
+		$site_ids = self::factory()->blog->create_many( 1 );
+		$actual = get_blog_count();
+		remove_filter( 'enable_live_network_counts', '__return_true' );
+
+		foreach ( $site_ids as $site_id ) {
+			wpmu_delete_blog( $site_id, true );
+		}
+		wp_update_network_counts();
+
+		$this->assertEquals( $site_count_start + 1, $actual );
+	}
+
 	/**
 	 * @ticket 22917
 	 */
