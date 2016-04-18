@@ -187,6 +187,32 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 27884
+	 */
+	public function test_multisite_bootstrap_additional_path_segments() {
+		global $current_blog;
+
+		$expected = array(
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'site_id'    => self::$site_ids['wordpress.org/foo/bar/'],
+		);
+		add_filter( 'site_by_path_segments_count', array( $this, 'filter_path_segments_to_two' ) );
+		$this->_setup_host_request( 'wordpress.org', '/foo/bar/' );
+		$actual = array(
+			'network_id' => $current_blog->site_id,
+			'site_id' => $current_blog->blog_id,
+		);
+		remove_filter( 'site_by_path_segments_count', array( $this, 'filter_path_segments_to_two' ) );
+		$this->_setup_host_request( WP_TESTS_DOMAIN, '/' );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function filter_path_segments_to_two() {
+		return 2;
+	}
+
+	/**
 	 * Reset various globals required for a 'clean' multisite boot.
 	 *
 	 * The $wpdb and $table_prefix globals are required for ms-settings.php to
