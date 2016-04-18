@@ -86,71 +86,54 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * @ticket 27003
 	 * @ticket 27927
+	 * @dataProvider data_get_site_by_path
+	 *
+	 * @param string $expected_key The array key associated with expected data for the test.
+	 * @param string $domain       The requested domain.
+	 * @param string $path         The requested path.
+	 * @param int    $segments     Optional. Number of segments to use in `get_site_by_path()`.
 	 */
-	function test_get_site_by_path() {
-		$this->assertEquals( self::$site_ids['wordpress.org/'],
-			get_site_by_path( 'wordpress.org', '/notapath/' )->blog_id );
+	public function test_get_site_by_path( $expected_key, $domain, $path, $segments = null ) {
+		$site = get_site_by_path( $domain, $path, $segments );
 
-		$this->assertEquals( self::$site_ids['wordpress.org/'],
-			get_site_by_path( 'www.wordpress.org', '/notapath/' )->blog_id );
+		if ( $expected_key ) {
+			$this->assertEquals( self::$site_ids[ $expected_key ], $site->blog_id );
+		} else {
+			$this->assertFalse( $site );
+		}
+	}
 
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'wordpress.org', '/foo/bar/baz/' )->blog_id );
+	public function data_get_site_by_path() {
+		return array(
+			array( 'wordpress.org/',          'wordpress.org',          '/notapath/' ),
+			array( 'wordpress.org/',          'www.wordpress.org',      '/notapath/' ),
+			array( 'wordpress.org/foo/bar/',  'wordpress.org',          '/foo/bar/baz/' ),
+			array( 'wordpress.org/foo/bar/',  'www.wordpress.org',      '/foo/bar/baz/' ),
+			array( 'wordpress.org/foo/bar/',  'wordpress.org',          '/foo/bar/baz/',     3 ),
+			array( 'wordpress.org/foo/bar/',  'www.wordpress.org',      '/foo/bar/baz/',     3 ),
+			array( 'wordpress.org/foo/bar/',  'wordpress.org',          '/foo/bar/baz/',     2 ),
+			array( 'wordpress.org/foo/bar/',  'www.wordpress.org',      '/foo/bar/baz/',     2 ),
+			array( 'wordpress.org/foo/',      'wordpress.org',          '/foo/bar/baz/',     1 ),
+			array( 'wordpress.org/foo/',      'www.wordpress.org',      '/foo/bar/baz/',     1 ),
+			array( 'wordpress.org/',          'wordpress.org',          '/',                 0 ),
+			array( 'wordpress.org/',          'www.wordpress.org',      '/',                 0 ),
+			array( 'make.wordpress.org/foo/', 'make.wordpress.org',     '/foo/bar/baz/quz/', 4 ),
+			array( 'make.wordpress.org/foo/', 'www.make.wordpress.org', '/foo/bar/baz/quz/', 4 ),
+			array( 'www.w.org/',              'www.w.org',              '/',                 0 ),
+			array( 'www.w.org/',              'www.w.org',              '/notapath' ),
+			array( 'www.w.org/foo/bar/',      'www.w.org',              '/foo/bar/baz/' ),
+			array( 'www.w.org/foo/',          'www.w.org',              '/foo/bar/baz/',     1 ),
 
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/' )->blog_id );
+			// A site installed with www will not be found by the root domain.
+			array( false, 'w.org', '/' ),
+			array( false, 'w.org', '/notapath/' ),
+			array( false, 'w.org', '/foo/bar/baz/' ),
+			array( false, 'w.org', '/foo/bar/baz/', 1 ),
 
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 3 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 3 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 2 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/bar/'],
-			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 2 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/'],
-			get_site_by_path( 'wordpress.org', '/foo/bar/baz/', 1 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/foo/'],
-			get_site_by_path( 'www.wordpress.org', '/foo/bar/baz/', 1 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/'],
-			get_site_by_path( 'wordpress.org', '/', 0 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['wordpress.org/'],
-			get_site_by_path( 'www.wordpress.org', '/', 0 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['make.wordpress.org/foo/'],
-			get_site_by_path( 'make.wordpress.org', '/foo/bar/baz/qux/', 4 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['make.wordpress.org/foo/'],
-			get_site_by_path( 'www.make.wordpress.org', '/foo/bar/baz/qux/', 4 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['www.w.org/'],
-			get_site_by_path( 'www.w.org', '/', 0 )->blog_id );
-
-		$this->assertEquals( self::$site_ids['www.w.org/'],
-			get_site_by_path( 'www.w.org', '/notapath/' )->blog_id );
-
-		$this->assertEquals( self::$site_ids['www.w.org/foo/bar/'],
-			get_site_by_path( 'www.w.org', '/foo/bar/baz/' )->blog_id );
-
-		$this->assertEquals( self::$site_ids['www.w.org/foo/'],
-			get_site_by_path( 'www.w.org', '/foo/bar/baz/', 1 )->blog_id );
-
-		// A site installed with www will not be found by the root domain.
-		$this->assertFalse( get_site_by_path( 'w.org', '/' ) );
-		$this->assertFalse( get_site_by_path( 'w.org', '/notapath/' ) );
-		$this->assertFalse( get_site_by_path( 'w.org', '/foo/bar/baz/' ) );
-		$this->assertFalse( get_site_by_path( 'w.org', '/foo/bar/baz/', 1 ) );
-
-		// A site will not be found by its root domain when an invalid subdomain is requested.
-		$this->assertFalse( get_site_by_path( 'invalid.wordpress.org', '/' ) );
-		$this->assertFalse( get_site_by_path( 'invalid.wordpress.org', '/foo/bar/' ) );
+			// A site will not be found by its root domain when an invalid subdomain is requested.
+			array( false, 'invalid.wordpress.org', '/' ),
+			array( false, 'invalid.wordpress.org', '/foo/bar/' ),
+		);
 	}
 
 	/**
