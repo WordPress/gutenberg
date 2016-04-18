@@ -63,9 +63,14 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * @ticket 27003
 	 * @dataProvider data_get_network_by_path
+	 *
+	 * @param string $expected_key The array key associated with expected data for the test.
+	 * @param string $domain       The requested domain.
+	 * @param string $path         The requested path.
+	 * @param string $message      The message to pass for failed tests.
 	 */
-	function test_get_network_by_path( $expected_key, $request_domain, $request_path, $message ) {
-		$network = get_network_by_path( $request_domain, $request_path );
+	function test_get_network_by_path( $expected_key, $domain, $path, $message ) {
+		$network = get_network_by_path( $domain, $path );
 		$this->assertEquals( self::$network_ids[ $expected_key ], $network->id, $message );
 	}
 
@@ -139,6 +144,11 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * @ticket 27884
 	 * @dataProvider data_multisite_bootstrap
+	 *
+	 * @param string $site_key    The array key associated with the expected site for the test.
+	 * @param string $network_key The array key associated with the expected network for the test.
+	 * @param string $domain      The requested domain.
+	 * @param string $path        The requested path.
 	 */
 	function test_multisite_bootstrap( $site_key, $network_key, $domain, $path ) {
 		global $current_blog;
