@@ -9,20 +9,20 @@ class Tests_Canonical_Category extends WP_Canonical_UnitTestCase {
 	public static $posts = array();
 	public static $cats = array();
 
-	public static function setUpBeforeClass() {
+	public static function wpSetUpBeforeClass( $factory ) {
 
-		self::$posts[0] = self::factory()->post->create( array( 'post_name' => 'post0' ) );
-		self::$posts[1] = self::factory()->post->create( array( 'post_name' => 'post1' ) );
-		self::$cats[0] = self::factory()->category->create( array( 'slug' => 'cat0' ) );
-		self::$cats[1] = self::factory()->category->create( array( 'slug' => 'cat1' ) );
-		self::$cats[2] = self::factory()->category->create( array( 'slug' => 'cat2' ) );
+		self::$posts[0] = $factory->post->create( array( 'post_name' => 'post0' ) );
+		self::$posts[1] = $factory->post->create( array( 'post_name' => 'post1' ) );
+		self::$cats[0] = $factory->category->create( array( 'slug' => 'cat0' ) );
+		self::$cats[1] = $factory->category->create( array( 'slug' => 'cat1' ) );
+		self::$cats[2] = $factory->category->create( array( 'slug' => 'cat2' ) );
 
 		wp_set_post_categories( self::$posts[0], self::$cats[2] );
 		wp_set_post_categories( self::$posts[0], self::$cats[0] );
 		wp_set_post_categories( self::$posts[1], self::$cats[1] );
 	}
 
-	public static function tearDownAfterClass() {
+	public static function wpTearDownAfterClass() {
 		foreach ( self::$posts as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
