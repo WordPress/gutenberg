@@ -42,12 +42,10 @@ define( 'WP_MAX_MEMORY_LIMIT', -1 );
 
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
-if ( "1" == getenv( 'WP_MULTISITE' ) ||
-	( defined( 'WP_TESTS_MULTISITE') && WP_TESTS_MULTISITE ) ) {
-	$multisite = true;
-} else {
-	$multisite = false;
-}
+// Should we run in multisite mode?
+$multisite = '1' == getenv( 'WP_MULTISITE' );
+$multisite = $multisite || ( defined( 'WP_TESTS_MULTISITE') && WP_TESTS_MULTISITE );
+$multisite = $multisite || ( defined( 'MULTISITE' ) && MULTISITE );
 
 // Override the PHPMailer
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
@@ -57,8 +55,8 @@ system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.ph
 
 if ( $multisite ) {
 	echo "Running as multisite..." . PHP_EOL;
-	define( 'MULTISITE', true );
-	define( 'SUBDOMAIN_INSTALL', false );
+	defined( 'MULTISITE' ) or define( 'MULTISITE', true );
+	defined( 'SUBDOMAIN_INSTALL' ) or define( 'SUBDOMAIN_INSTALL', false );
 	$GLOBALS['base'] = '/';
 } else {
 	echo "Running as single site... To run multisite, use -c tests/phpunit/multisite.xml" . PHP_EOL;
