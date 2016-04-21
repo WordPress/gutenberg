@@ -1021,6 +1021,7 @@ class Tests_User extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_wp_new_user_notifications
 	 * @ticket 33654
+	 * @ticket 36009
 	 */
 	function test_wp_new_user_notification( $notify, $admin_email_sent_expected, $user_email_sent_expected ) {
 		unset( $GLOBALS['phpmailer']->mock_sent );
@@ -1036,11 +1037,16 @@ class Tests_User extends WP_UnitTestCase {
 		 * Check to see if a notification email was sent to the
 		 * post author `blackburn@battlefield3.com` and and site admin `admin@example.org`.
 		 */
-		$admin_email = $mailer->get_recipient( 'to' );
-		$was_admin_email_sent = $admin_email && WP_TESTS_EMAIL === $admin_email->address;
+		$first_recipient = $mailer->get_recipient( 'to' );
+		if ( $first_recipient ) {
+			$was_admin_email_sent = WP_TESTS_EMAIL === $first_recipient->address;
+			$was_user_email_sent = 'blackburn@battlefield3.com' === $first_recipient->address;
+		}
 
-		$user_email = $mailer->get_recipient( 'to', 1 );
-		$was_user_email_sent = $user_email && 'blackburn@battlefield3.com' == $user_email->address;
+		$second_recipient = $mailer->get_recipient( 'to', 1 );
+		if ( $second_recipient ) {
+			$was_user_email_sent = 'blackburn@battlefield3.com' === $second_recipient->address;
+		}
 
 
 		$this->assertSame( $admin_email_sent_expected, $was_admin_email_sent, 'Admin email result was not as expected in test_wp_new_user_notification' );
@@ -1072,6 +1078,11 @@ class Tests_User extends WP_UnitTestCase {
 				'admin',
 				true,
 				false,
+			),
+			array(
+				'user',
+				false,
+				true,
 			),
 			array(
 				'both',
