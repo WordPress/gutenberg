@@ -10,6 +10,7 @@ $defaults = array(
 class Tests_Get_Archives extends WP_UnitTestCase {
 	protected static $post_ids;
 	protected $month_url;
+	protected $year_url;
 
 	function setUp() {
 		parent::setUp();
