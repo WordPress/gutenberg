@@ -50,7 +50,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 		'menu-locations-save', 'menu-quick-search', 'meta-box-order', 'get-permalink',
 		'sample-permalink', 'inline-save', 'inline-save-tax', 'find_posts', 'widgets-order',
 		'save-widget', 'set-post-thumbnail', 'date_format', 'time_format', 'wp-fullscreen-save-post',
-		'wp-remove-post-lock', 'dismiss-wp-pointer', 'heartbeat', 'nopriv_heartbeat', 'get-revision-diffs',
+		'wp-remove-post-lock', 'dismiss-wp-pointer', 'send-attachment-to-editor', 'heartbeat', 'nopriv_heartbeat', 'get-revision-diffs',
 		'save-user-color-scheme', 'update-widget', 'query-themes', 'parse-embed', 'set-attachment-thumbnail',
 		'parse-media-shortcode', 'destroy-sessions', 'install-plugin', 'update-plugin', 'press-this-save-post',
 		'press-this-add-category', 'crop-image', 'generate-password',
