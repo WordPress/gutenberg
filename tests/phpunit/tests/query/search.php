@@ -170,13 +170,15 @@ class Tests_Query_Search extends WP_UnitTestCase {
 		$p1 = $this->factory->post->create( array(
 			'post_status' => 'publish',
 			'post_title' => '1',
-			'post_content' => '',
+			'post_content' => 'this post contains no zeroes',
+			'post_excerpt' => 'this post contains no zeroes',
 		) );
 
 		$p2 = $this->factory->post->create( array(
 			'post_status' => 'publish',
 			'post_title' => '0',
-			'post_content' => '',
+			'post_content' => 'this post contains zeroes',
+			'post_excerpt' => 'this post containts zeroes',
 		) );
 
 		$q = new WP_Query( array(
