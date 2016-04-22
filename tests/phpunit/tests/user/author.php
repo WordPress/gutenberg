@@ -140,6 +140,8 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 
 		$url = sprintf( 'http://%1$s/author/%2$s/', WP_TESTS_DOMAIN, $author->user_nicename );
 
+		$this->set_permalink_structure( '' );
+
 		$this->assertContains( $url, $link );
 		$this->assertContains( 'Posts by Foo', $link );
 		$this->assertContains( '>Foo</a>', $link );
