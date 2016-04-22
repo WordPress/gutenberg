@@ -188,8 +188,8 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 				"\xf0\x9f\x98\x8e \xf0\x9f\x98\x88"
 			),
 			array (
-				'8O :twisted: :( :? :roll:',
-				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 \xf0\x9f\x99\x81 \xf0\x9f\x98\x95 <img src=\"{$includes_path}rolleyes.png\" alt=\":roll:\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
+				'8O :twisted: :( :? :roll: :mrgreen:',
+				"\xf0\x9f\x98\xaf \xf0\x9f\x98\x88 \xf0\x9f\x99\x81 \xf0\x9f\x98\x95 \xf0\x9f\x99\x84 <img src=\"{$includes_path}mrgreen.png\" alt=\":mrgreen:\" class=\"wp-smiley\" style=\"height: 1em; max-height: 1em;\" />"
 			),
 		);
 	}
