@@ -4,7 +4,7 @@
  */
 class Tests_Shortcode extends WP_UnitTestCase {
 
-	protected $shortcodes = array( 'test-shortcode-tag', 'footag', 'bartag', 'baztag', 'dumptag', 'hyphen', 'hyphen-foo', 'hyphen-foo-bar', 'url' );
+	protected $shortcodes = array( 'test-shortcode-tag', 'footag', 'bartag', 'baztag', 'dumptag', 'hyphen', 'hyphen-foo', 'hyphen-foo-bar', 'url', 'img' );
 
 	function setUp() {
 		parent::setUp();
@@ -76,6 +76,16 @@ class Tests_Shortcode extends WP_UnitTestCase {
 
 	function _shortcode_url() {
 		return 'http://www.wordpress.org/';
+	}
+
+	function _shortcode_img( $atts ) {
+		$out = '<img';
+		foreach ( $atts as $k => $v ) {
+			$out .= " $k=\"$v\"";
+		}
+		$out .= ' />';
+
+		return $out;
 	}
 
 	function test_noatts() {
@@ -656,5 +666,14 @@ EOF;
 		$out = do_shortcode('[dumptag=https://wordpress.org/]');
 		$expected = "0 = =https://wordpress.org\n";
 		$this->assertEquals($expected, $out);
+	}
+
+	/**
+	 * @ticket 36306
+	 */
+	function test_smilies_arent_converted() {
+		$out = apply_filters( 'the_content', '[img alt="Hello :-) World"]' );
+		$expected = "<img alt=\"Hello :-) World\" />\n";
+		$this->assertEquals( $expected, $out );
 	}
 }
