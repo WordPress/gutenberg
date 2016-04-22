@@ -65,12 +65,16 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	 */
 	function test_get_main_network_id_after_network_delete() {
 		global $wpdb, $current_site;
+
 		$id = self::factory()->network->create();
+		$temp_id = $id + 1;
 
 		$current_site->id = (int) $id;
-		$wpdb->query( "UPDATE {$wpdb->site} SET id=100 WHERE id=1" );
-		$this->assertEquals( $id, get_main_network_id() );
-		$wpdb->query( "UPDATE {$wpdb->site} SET id=1 WHERE id=100" );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->site} SET id=%d WHERE id=1", $temp_id ) );
+		$main_network_id = get_main_network_id();
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->site} SET id=1 WHERE id=%d", $temp_id ) );
+
+		$this->assertEquals( $id, $main_network_id );
 	}
 
 	function test_get_main_network_id_filtered() {
