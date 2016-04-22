@@ -62,19 +62,25 @@ abstract class WP_UnitTest_Factory_For_Thing {
 		if ( is_null( $generation_definitions ) )
 			$generation_definitions = $this->default_generation_definitions;
 
+		// Use the same incrementor for all fields belonging to this object.
+		$gen  = new WP_UnitTest_Generator_Sequence();
+		$incr = $gen->get_incr();
+
 		foreach( array_keys( $generation_definitions ) as $field_name ) {
 			if ( !isset( $args[$field_name] ) ) {
 				$generator = $generation_definitions[$field_name];
-				if ( is_scalar( $generator ) )
+				if ( is_scalar( $generator ) ) {
 					$args[$field_name] = $generator;
-				elseif ( is_object( $generator ) && method_exists( $generator, 'call' ) ) {
+				} elseif ( is_object( $generator ) && method_exists( $generator, 'call' ) ) {
 					$callbacks[$field_name] = $generator;
-				} elseif ( is_object( $generator ) )
-					$args[$field_name] = $generator->next();
-				else
+				} elseif ( is_object( $generator ) ) {
+					$args[ $field_name ] = sprintf( $generator->get_template_string(), $incr );
+				} else {
 					return new WP_Error( 'invalid_argument', 'Factory default value should be either a scalar or an generator object.' );
+				}
 			}
 		}
+
 		return $args;
 	}
 
