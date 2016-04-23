@@ -9,6 +9,11 @@ class Tests_Mail extends WP_UnitTestCase {
 		unset( $GLOBALS['phpmailer']->mock_sent );
 	}
 
+	function tearDown() {
+		unset( $GLOBALS['phpmailer']->mock_sent );
+		parent::tearDown();
+	}
+
 	/**
 	 * Send a mail with a 1000 char long line.
 	 *
