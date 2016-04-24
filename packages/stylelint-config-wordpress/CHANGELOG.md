@@ -1,4 +1,4 @@
-# HEAD
+# 5.0.0
 
 * Added: `at-rule-name-case` rule.
 * Added: `declaration-block-no-duplicate-properties` rule.
