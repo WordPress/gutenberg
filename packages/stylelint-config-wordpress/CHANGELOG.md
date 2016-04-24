@@ -1,3 +1,18 @@
+# HEAD
+
+* Added: `at-rule-name-case` rule.
+* Added: `declaration-block-no-duplicate-properties` rule.
+* Added: `function-max-empty-lines` rule.
+* Added: `function-name-case` rule.
+* Added: `property-case` rule.
+* Added: `selector-attribute-brackets-space-inside` rule.
+* Added: `selector-pseudo-class-case` rule.
+* Added: `selector-pseudo-class-parentheses-space-inside` rule.
+* Added: `selector-pseudo-element-case` rule.
+* Added: `shorthand-property-no-redundant-values` rule.
+* Added: `unit-case` rule.
+* Added: `unit-no-unknown` rule.
+
 # 4.0.0
 
 * Removed: `stylelint < 5.2.0` compatibility.
