@@ -52,6 +52,23 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
 	}
 
+	/**
+	 * @ticket 22080
+	 */
+	public function test_post_thumbnails_mixed_args() {
+		add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );
+		add_theme_support( 'post-thumbnails', array( 'page' ) );
+		$this->assertTrue( current_theme_support( 'post-thumbnails', 'post' ) );
+		$this->assertFalse( current_theme_supports( 'post-thumbnails', 'book' ) );
+		$this->assertEquals(
+			array( 0 => array( 'post', 'page' ) ),
+			get_theme_support( 'post-thumbnails' )
+		);
+
+		add_theme_support( 'post-thumbnails' );
+		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'book' ) );
+	}
+
 	public function test_post_thumbnails_types_true() {
 		// array of arguments, with the key of 'types' holding the post types.
 		add_theme_support( 'post-thumbnails', array( 'types' => true ) );
