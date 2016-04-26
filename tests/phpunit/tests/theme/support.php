@@ -44,8 +44,9 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 	}
 
 	public function test_post_thumbnails_flat_array_of_post_types() {
+		remove_theme_support( 'post-thumbnails' );
+
 		add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );
-		$this->assertTrue( current_theme_supports( 'post-thumbnails' ) );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'post' ) );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails', 'book' ) );
 		remove_theme_support( 'post-thumbnails' );
@@ -67,6 +68,10 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 
 		add_theme_support( 'post-thumbnails' );
 		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'book' ) );
+
+		// Reset post-thumbnails theme support.
+		remove_theme_support( 'post-thumbnails' );
+		$this->assertFalse( current_theme_supports( 'post-thumbnails' ) );
 	}
 
 	public function test_post_thumbnails_types_true() {
