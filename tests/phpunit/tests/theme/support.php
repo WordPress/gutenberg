@@ -58,7 +58,7 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 	public function test_post_thumbnails_mixed_args() {
 		add_theme_support( 'post-thumbnails', array( 'post', 'page' ) );
 		add_theme_support( 'post-thumbnails', array( 'page' ) );
-		$this->assertTrue( current_theme_support( 'post-thumbnails', 'post' ) );
+		$this->assertTrue( current_theme_supports( 'post-thumbnails', 'post' ) );
 		$this->assertFalse( current_theme_supports( 'post-thumbnails', 'book' ) );
 		$this->assertEquals(
 			array( 0 => array( 'post', 'page' ) ),
