@@ -124,7 +124,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 
 		$blog_ids = array();
 
-		$blog_ids = self::factory()->blog->create_many( 5 );
+		$blog_ids = self::factory()->blog->create_many( 1 );
 		foreach ( $blog_ids as $blog_id ) {
 			$this->assertInternalType( 'int', $blog_id );
 			$this->assertTrue( is_blog_user( $blog_id ) );
@@ -156,7 +156,7 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertTrue( is_user_member_of_blog( $user1_id ) );
 		$this->assertTrue( is_user_member_of_blog( $user1_id, $wpdb->blogid ) );
 
-		$blog_ids = self::factory()->blog->create_many( 5 );
+		$blog_ids = self::factory()->blog->create_many( 1 );
 		foreach ( $blog_ids as $blog_id ) {
 			$this->assertInternalType( 'int', $blog_id );
 
