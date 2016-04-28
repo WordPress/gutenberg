@@ -16,7 +16,7 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 
 	public static function setUpBeforeClass() {
 		require_once( dirname( dirname( __FILE__ ) ) . '/db.php' );
-		
+
 		self::$_wpdb = new wpdb_exposed_methods_for_testing();
 	}
 
@@ -890,5 +890,20 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		self::$_wpdb->charset = $charset;
 
 		$this->assertEquals( $safe_query, $stripped_query );
+	}
+
+	/**
+	 * @ticket 36649
+	 */
+	function test_set_charset_changes_the_connection_collation() {
+		self::$_wpdb->set_charset( self::$_wpdb->dbh, 'utf8', 'utf8_general_ci' );
+		$results = self::$_wpdb->get_results( "SHOW VARIABLES WHERE Variable_name='collation_connection'" );
+		$this->assertEquals( 'utf8_general_ci', $results[0]->Value );
+
+		self::$_wpdb->set_charset( self::$_wpdb->dbh, 'utf8mb4', 'utf8mb4_unicode_ci' );
+		$results = self::$_wpdb->get_results( "SHOW VARIABLES WHERE Variable_name='collation_connection'" );
+		$this->assertEquals( 'utf8mb4_unicode_ci', $results[0]->Value );
+
+		self::$_wpdb->set_charset( self::$_wpdb->dbh );
 	}
 }
