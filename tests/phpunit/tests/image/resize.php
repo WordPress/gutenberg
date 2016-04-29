@@ -10,6 +10,22 @@ require_once( dirname( __FILE__ ) . '/base.php' );
 
 abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase {
 
+	public function setUp() {
+		parent::setUp();
+
+		add_filter( 'wp_image_editors', array( $this, 'wp_image_editors' ) );
+	}
+
+	public function tearDown() {
+		remove_filter( 'wp_image_editors', array( $this, 'wp_image_editors' ) );
+
+		parent::tearDown();
+	}
+
+	public function wp_image_editors() {
+		return array( $this->editor_engine );
+	}
+
 	function test_resize_jpg() {
 		$image = $this->resize_helper( DIR_TESTDATA.'/images/test-image.jpg', 25, 25 );
 
