@@ -258,6 +258,18 @@ class Tests_Query_Date extends WP_UnitTestCase {
 		$this->assertEquals( $expected_dates, wp_list_pluck( $posts, 'post_date' ) );
 	}
 
+	/**
+	 * @ticket 36718
+	 */
+	public function test_non_scalar_m_should_be_discarded() {
+		$expected = $this->_get_query_result( );
+		$posts    = $this->_get_query_result( array(
+			'm' => array( '1234' ), // ignored
+		) );
+
+		$this->assertEquals( $expected, $posts );
+	}
+
 	public function test_simple_monthnum_expecting_results() {
 		$posts = $this->_get_query_result( array(
 			'monthnum' => 5,
