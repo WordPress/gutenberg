@@ -7,6 +7,11 @@
 class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 	function tearDown() {
 		$this->remove_added_uploads();
+
+		remove_image_size( 'test-size' );
+		remove_image_size( 'false-height' );
+		remove_image_size( 'false-width' );
+		remove_image_size( 'off-by-one' );
 		parent::tearDown();
 	}
 
@@ -69,12 +74,12 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// look for a size by name
 		$image = image_get_intermediate_size( $id, 'test-size' );
 
+		// cleanup
+		remove_image_size( 'test-size' );
+
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
 		$this->assertTrue( strpos( $image['file'], '330x220' ) > 0 );
-
-		// cleanup
-		remove_image_size( 'test-size' );
 	}
 
 	/**
@@ -96,11 +101,6 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
 		$this->assertTrue( strpos( $image['file'], '330x220' ) > 0 );
-
-		// cleanup
-		remove_image_size( 'test-size' );
-		remove_image_size( 'false-height' );
-		remove_image_size( 'false-width' );
 	}
 
 	/**
@@ -123,11 +123,6 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// you have to test for the string because the image will by definition
 		// return with the correct height and width attributes
 		$this->assertTrue( strpos( $image['file'], '450x300' ) > 0 );
-
-		// cleanup
-		remove_image_size( 'test-size' );
-		remove_image_size( 'false-height' );
-		remove_image_size( 'false-width' );
 	}
 
 	/**
@@ -149,10 +144,6 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// you have to test for the string because the image will by definition
 		// return with the correct height and width attributes
 		$this->assertFalse( $image );
-
-		// cleanup
-		remove_image_size( 'false-height' );
-		remove_image_size( 'false-width' );
 	}
 
 	/**
@@ -180,10 +171,6 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
 		$this->assertTrue( strpos( $image['file'], $image_w . 'x' . $image_h ) > 0 );
-
-		// cleanup
-		remove_image_size( 'test-size' );
-		remove_image_size( 'false-height' );
 	}
 
 	/**
@@ -212,10 +199,6 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		// test for the expected string because the array will by definition
 		// return with the correct height and width attributes
 		$this->assertTrue( strpos( $image['file'], $image_w . 'x' . $image_h ) > 0 );
-
-		// cleanup
-		remove_image_size( 'test-size' );
-		remove_image_size( 'false-height' );
 	}
 
 	/**
@@ -240,8 +223,5 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 		$image = image_get_intermediate_size( $id, array( 0, $height ) );
 
 		$this->assertTrue( strpos( $image['file'], $width . 'x' . $height ) > 0 );
-
-		// cleanup
-		remove_image_size( 'off-by-one' );
 	}
 }

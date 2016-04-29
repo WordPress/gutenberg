@@ -584,14 +584,19 @@ VIDEO;
 			$_wp_additional_image_sizes = array();
 		}
 
+		remove_image_size( 'test-size' );
+
 		$this->assertArrayNotHasKey( 'test-size', $_wp_additional_image_sizes );
 		add_image_size( 'test-size', 200, 600 );
-		$this->assertArrayHasKey( 'test-size', $_wp_additional_image_sizes );
-		$this->assertEquals( 200, $_wp_additional_image_sizes['test-size']['width'] );
-		$this->assertEquals( 600, $_wp_additional_image_sizes['test-size']['height'] );
+
+		$sizes = $_wp_additional_image_sizes;
 
 		// Clean up
 		remove_image_size( 'test-size' );
+
+		$this->assertArrayHasKey( 'test-size', $sizes );
+		$this->assertEquals( 200, $sizes['test-size']['width'] );
+		$this->assertEquals( 600, $sizes['test-size']['height'] );
 	}
 
 	/**
