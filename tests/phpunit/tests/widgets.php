@@ -78,7 +78,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$widget_better_search->widget_options['classname'] = 'widget_' . $widget_better_search->id_base;
 		$widget_better_search->control_options['id_base'] = $widget_better_search->id_base;
 		register_widget( $widget_better_search );
-		$this->assertArrayHasKey( spl_object_hash( $widget_better_search ), $wp_widget_factory->widgets );
+		$this->assertContains( $widget_better_search, $wp_widget_factory->widgets );
 
 		$widget_best_search = new WP_Widget_Search();
 		$widget_best_search->id_base = 'best_search';
@@ -87,12 +87,12 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$widget_best_search->widget_options['classname'] = 'widget_' . $widget_best_search->id_base;
 		$widget_best_search->control_options['id_base'] = $widget_best_search->id_base;
 		register_widget( $widget_best_search );
-		$this->assertArrayHasKey( spl_object_hash( $widget_best_search ), $wp_widget_factory->widgets );
+		$this->assertContains( $widget_best_search, $wp_widget_factory->widgets );
 
 		$this->assertCount( 3, $wp_widget_factory->widgets );
 		$this->assertArrayHasKey( 'WP_Widget_Search', $wp_widget_factory->widgets );
-		$this->assertArrayHasKey( spl_object_hash( $widget_better_search ), $wp_widget_factory->widgets );
-		$this->assertArrayHasKey( spl_object_hash( $widget_best_search ), $wp_widget_factory->widgets );
+		$this->assertContains( $widget_better_search, $wp_widget_factory->widgets );
+		$this->assertContains( $widget_best_search, $wp_widget_factory->widgets );
 
 		$wp_widget_factory->_register_widgets();
 
@@ -103,14 +103,14 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$this->assertSame( $widget_better_search, $wp_registered_widgets['better_search-3']['callback'][0] );
 		$this->assertSame( $widget_best_search, $wp_registered_widgets['best_search-4']['callback'][0] );
 
-		$this->assertArrayHasKey( spl_object_hash( $widget_better_search ), $wp_widget_factory->widgets );
-		$this->assertArrayHasKey( spl_object_hash( $widget_best_search ), $wp_widget_factory->widgets );
+		$this->assertContains( $widget_better_search, $wp_widget_factory->widgets );
+		$this->assertContains( $widget_best_search, $wp_widget_factory->widgets );
 		$this->assertArrayHasKey( 'WP_Widget_Search', $wp_widget_factory->widgets );
 		unregister_widget( 'WP_Widget_Search' );
 		unregister_widget( $widget_better_search );
 		unregister_widget( $widget_best_search );
-		$this->assertArrayNotHasKey( spl_object_hash( $widget_better_search ), $wp_widget_factory->widgets );
-		$this->assertArrayNotHasKey( spl_object_hash( $widget_best_search ), $wp_widget_factory->widgets );
+		$this->assertNotContains( $widget_better_search, $wp_widget_factory->widgets );
+		$this->assertNotContains( $widget_best_search, $wp_widget_factory->widgets );
 		$this->assertArrayNotHasKey( 'WP_Widget_Search', $wp_widget_factory->widgets );
 	}
 
