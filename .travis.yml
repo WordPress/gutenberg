@@ -50,6 +50,7 @@ before_script:
 - npm install -g npm
 - npm install -g grunt-cli
 - npm install
+- npm prune
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
