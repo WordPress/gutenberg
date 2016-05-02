@@ -99,6 +99,21 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test registering sidebars without an extant sidebars_widgets option.
+	 *
+	 * @see WP_Customize_Widgets::customize_register()
+	 * @see WP_Customize_Widgets::preview_sidebars_widgets()
+	 * @ticket 36660
+	 */
+	function test_customize_register_with_deleted_sidebars() {
+		$sidebar_id = 'sidebar-1';
+		delete_option( 'sidebars_widgets' );
+		register_sidebar( array( 'id' => $sidebar_id ) );
+		$this->manager->widgets->customize_register();
+		$this->assertEquals( array_fill_keys( array( 'wp_inactive_widgets', $sidebar_id ), array() ), wp_get_sidebars_widgets() );
+	}
+
+	/**
 	 * Tests WP_Customize_Widgets::get_selective_refreshable_widgets().
 	 *
 	 * @see WP_Customize_Widgets::get_selective_refreshable_widgets()
