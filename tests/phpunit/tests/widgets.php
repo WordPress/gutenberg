@@ -247,7 +247,6 @@ class Tests_Widgets extends WP_UnitTestCase {
 
 	/**
 	 * @group sidebar
-	 * @group drew
 	 */
 	function test_dynamic_sidebar_using_sidebar_registered_with_no_id() {
 		$this->setExpectedIncorrectUsage( 'register_sidebar' );
