@@ -277,8 +277,19 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->custom_type_data_saved[ $name ] = $value;
 	}
 
-	function custom_type_value_filter( $default ) {
+	/**
+	 * Filter for `customize_value_{$id_base}`.
+	 *
+	 * @param mixed $default
+	 * @param WP_Customize_Setting $setting
+	 *
+	 * @return mixed|null
+	 */
+	function custom_type_value_filter( $default, $setting = null ) {
 		$name = preg_replace( '/^customize_value_/', '', current_filter() );
+		$this->assertInstanceOf( 'WP_Customize_Setting', $setting );
+		$id_data = $setting->id_data();
+		$this->assertEquals( $name, $id_data['base'] );
 		return $this->custom_type_getter( $name, $default );
 	}
 
@@ -314,7 +325,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$default = "default_value_{$name}";
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type', 'default' ) );
 		// Note: #29316 will allow us to have one filter for all settings of a given type, which is what we need.
-		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ) );
+		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ), 10, 2 );
 		$this->assertEquals( $this->undefined, $this->custom_type_getter( $name, $this->undefined ) );
 		$this->assertEquals( $default, $setting->value() );
 		$this->assertTrue( $setting->preview() );
@@ -330,7 +341,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->custom_type_setter( $name, $initial_value );
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type', 'default' ) );
 		// Note: #29316 will allow us to have one filter for all settings of a given type, which is what we need.
-		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ) );
+		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ), 10, 2 );
 		$this->assertEquals( $initial_value, $this->custom_type_getter( $name, $this->undefined ) );
 		$this->assertEquals( $initial_value, $setting->value() );
 		$this->assertFalse( $setting->preview(), "Preview for $setting->id should not apply because existing type without an override." );
@@ -350,7 +361,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$default = "default_value_{$name}";
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type', 'default' ) );
 		// Note: #29316 will allow us to have one filter for all settings of a given type, which is what we need.
-		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ) );
+		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ), 10, 2 );
 		$this->assertEquals( $this->undefined, $this->custom_type_getter( $name, $this->undefined ) );
 		$this->assertEquals( $default, $setting->value() );
 		$this->assertTrue( $setting->preview() );
@@ -366,7 +377,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->custom_type_setter( $name, $initial_value );
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type', 'default' ) );
 		// Note: #29316 will allow us to have one filter for all settings of a given type, which is what we need.
-		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ) );
+		add_filter( "customize_value_{$name}", array( $this, 'custom_type_value_filter' ), 10, 2 );
 		$this->assertEquals( $initial_value, $this->custom_type_getter( $name, $this->undefined ) );
 		$this->assertEquals( $initial_value, $setting->value() );
 		$this->assertTrue( $setting->preview() );
