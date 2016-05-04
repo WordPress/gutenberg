@@ -703,6 +703,37 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36724
+	 */
+	public function test_who_authors_should_work_alongside_meta_params() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
+		}
+
+		$b = self::factory()->blog->create();
+
+		add_user_to_blog( $b, self::$author_ids[0], 'subscriber' );
+		add_user_to_blog( $b, self::$author_ids[1], 'author' );
+		add_user_to_blog( $b, self::$author_ids[2], 'editor' );
+
+		add_user_meta( self::$author_ids[1], 'foo', 'bar' );
+		add_user_meta( self::$author_ids[2], 'foo', 'baz' );
+
+		$q = new WP_User_Query( array(
+			'who' => 'authors',
+			'blog_id' => $b,
+			'meta_key' => 'foo',
+			'meta_value' => 'bar',
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+
+		$this->assertNotContains( self::$author_ids[0], $found );
+		$this->assertContains( self::$author_ids[1], $found );
+		$this->assertNotContains( self::$author_ids[2], $found );
+	}
+
+	/**
 	 * @ticket 32250
 	 */
 	public function test_has_published_posts_with_value_true_should_show_authors_of_posts_in_public_post_types() {
