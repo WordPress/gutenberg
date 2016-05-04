@@ -877,7 +877,6 @@ function wp_embed_excerpt_attachment( $content ) {
  * @since 4.4.0
  */
 function enqueue_embed_scripts() {
-	wp_enqueue_style( 'open-sans' );
 	wp_enqueue_style( 'wp-embed-template-ie' );
 
 	/**
