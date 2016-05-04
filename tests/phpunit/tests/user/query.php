@@ -688,8 +688,10 @@ class Tests_User_Query extends WP_UnitTestCase {
 			'who' => 'authors',
 			'blog_id' => $b,
 			'meta_query' => array(
-				'key' => 'foo',
-				'value' => 'bar',
+				array(
+					'key' => 'foo',
+					'value' => 'bar',
+				)
 			),
 		) );
 
