@@ -217,6 +217,45 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_is_serialized_string
+	 */
+	public function test_is_serialized_string( $value, $result ) {
+		$this->assertSame( is_serialized_string( $value ), $result );
+	}
+
+	public function data_is_serialized_string() {
+		return array(
+			// Not a string.
+			array( 0, false ),
+
+			// Too short when trimmed.
+			array( 's:3   ', false ),
+
+			// Too short.
+			array( 's:3', false ),
+
+			// No colon in second position.
+			array( 's!3:"foo";', false ),
+
+			// No trailing semicolon.
+			array( 's:3:"foo"', false ),
+
+			// Wrong type.
+			array( 'a:3:"foo";', false ),
+
+			// No closing quote.
+			array( 'a:3:"foo;', false ),
+
+			// Wrong number of characters is close enough for is_serialized_string().
+			array( 's:12:"foo";', true ),
+
+			// Okay.
+			array( 's:3:"foo";', true ),
+
+		);
+	}
+
+	/**
 	 * @group add_query_arg
 	 */
 	function test_add_query_arg() {
