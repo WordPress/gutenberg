@@ -9,7 +9,7 @@ class Tests_Comment extends WP_UnitTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 	}
 
 	public static function wpSetUpBeforeClass( $factory ) {
@@ -558,7 +558,7 @@ class Tests_Comment extends WP_UnitTestCase {
 			&& WP_TESTS_EMAIL == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0]
 		) {
 			$email_sent_when_comment_added = true;
-			unset( $GLOBALS['phpmailer']->mock_sent );
+			reset_phpmailer_instance();
 		} else {
 			$email_sent_when_comment_added = false;
 		}
@@ -589,7 +589,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		} else {
 			$email_sent_when_comment_approved = false;
 		}
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 
 		// Post authors are notified when a new comment is added to their post.
 		$data = array(
@@ -607,7 +607,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		     ! empty( $GLOBALS['phpmailer']->mock_sent ) &&
 		     'test@test.com' == $GLOBALS['phpmailer']->mock_sent[0]['to'][0][0] ) {
 			$email_sent_when_comment_added = true;
-			unset( $GLOBALS['phpmailer']->mock_sent );
+			reset_phpmailer_instance();
 		} else {
 			$email_sent_when_comment_added = false;
 		}

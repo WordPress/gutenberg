@@ -6,11 +6,11 @@
 class Tests_Mail extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 	}
 
 	function tearDown() {
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 		parent::tearDown();
 	}
 

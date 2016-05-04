@@ -1024,7 +1024,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 36009
 	 */
 	function test_wp_new_user_notification( $notify, $admin_email_sent_expected, $user_email_sent_expected ) {
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 
 		$was_admin_email_sent = false;
 		$was_user_email_sent = false;
@@ -1100,7 +1100,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @expectedDeprecated wp_new_user_notification
 	 */
 	function test_wp_new_user_notification_old_signature_throws_deprecated_warning_but_sends() {
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 
 		$was_admin_email_sent = false;
 		$was_user_email_sent = false;
@@ -1125,7 +1125,7 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 34377
 	 */
 	function test_wp_new_user_notification_old_signature_no_password() {
-		unset( $GLOBALS['phpmailer']->mock_sent );
+		reset_phpmailer_instance();
 
 		$was_admin_email_sent = false;
 		$was_user_email_sent = false;
