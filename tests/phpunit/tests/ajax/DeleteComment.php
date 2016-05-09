@@ -21,28 +21,20 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 	 */
 	protected static $comments = array();
 
-	protected static $admin_id = 0;
-	protected static $editor_id = 0;
-	protected static $post;
+	/**
+	 * ID of a post.
+	 * @var int
+	 */
 	protected static $post_id;
-	protected static $user_ids = array();
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
-		self::$user_ids[] = self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
-
 		self::$post_id = $factory->post->create();
-		self::$post = get_post( self::$post_id );
 
 		$comment_ids = $factory->comment->create_post_comments( self::$post_id, 8 );
 		self::$comments = array_map( 'get_comment', $comment_ids );
 	}
 
 	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $user_id ) {
-			self::delete_user( $user_id );
-		}
-
 		wp_delete_post( self::$post_id, true );
 
 		foreach ( self::$comments as $c ) {
