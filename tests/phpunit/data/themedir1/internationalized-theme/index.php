@@ -1,0 +1,4 @@
+<?php
+/**
+ * Dummy theme.
+ */
