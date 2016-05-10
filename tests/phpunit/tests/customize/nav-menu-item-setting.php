@@ -766,7 +766,7 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 			'object'           => 'post',
 			'menu_item_parent' => 0,
 			'position'         => 2,
-			'type'             => 'post_type',
+			'type'             => 'custom_type',
 			'title'            => 'Hello \o/ o\'o World',
 			'url'              => '',
 			'target'           => '',
@@ -782,7 +782,12 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$this->wp_customize->set_post_value( $setting->id, $post_value );
 
 		$setting->preview();
+
 		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( 'Custom Link', $nav_menu_item->type_label );
+		add_filter( 'wp_setup_nav_menu_item', array( $this, 'filter_type_label' ) );
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( 'Custom Label', $nav_menu_item->type_label );
 
 		$this->assertObjectNotHasAttribute( 'nav_menu_term_id', $nav_menu_item );
 		$this->assertObjectNotHasAttribute( 'status', $nav_menu_item );
