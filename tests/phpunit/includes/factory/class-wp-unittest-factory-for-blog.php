@@ -15,7 +15,7 @@ class WP_UnitTest_Factory_For_Blog extends WP_UnitTest_Factory_For_Thing {
 
 	function create_object( $args ) {
 		global $wpdb;
-		$meta = isset( $args['meta'] ) ? $args['meta'] : array();
+		$meta = isset( $args['meta'] ) ? $args['meta'] : array( 'public' => 1 );
 		$user_id = isset( $args['user_id'] ) ? $args['user_id'] : get_current_user_id();
 		// temp tables will trigger db errors when we attempt to reference them as new temp tables
 		$suppress = $wpdb->suppress_errors();
