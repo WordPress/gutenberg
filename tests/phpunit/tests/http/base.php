@@ -289,10 +289,6 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		// Test 303 - POST to GET
 		$res = wp_remote_post( add_query_arg( 'response_code', 303, $url ), array( 'timeout' => 30 ) );
 		$this->assertEquals( 'GET', wp_remote_retrieve_body( $res ) );
-
-		// Test 304 - POST to POST
-		$res = wp_remote_post( add_query_arg( 'response_code', 304, $url ), array( 'timeout' => 30 ) );
-		$this->assertEquals( 'POST', wp_remote_retrieve_body( $res ) );
 	}
 
 	/**

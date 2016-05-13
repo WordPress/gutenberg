@@ -19,7 +19,6 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$response = wp_remote_head( $url );
 		$headers = wp_remote_retrieve_headers( $response );
 
-		$this->assertInternalType( 'array', $headers, "Reply wasn't array." );
 		$this->assertEquals( 'image/jpeg', $headers['content-type'] );
 		$this->assertEquals( '40148', $headers['content-length'] );
 		$this->assertEquals( '200', wp_remote_retrieve_response_code( $response ) );
@@ -36,7 +35,6 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$url = 'https://asdftestblog1.files.wordpress.com/2007/09/awefasdfawef.jpg';
 		$headers = wp_remote_head( $url );
 
-		$this->assertInternalType( 'array', $headers, "Reply wasn't array." );
 		$this->assertEquals( '404', wp_remote_retrieve_response_code( $headers ) );
 	}
 
@@ -47,7 +45,6 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$headers = wp_remote_retrieve_headers( $response );
 
 		// should return the same headers as a head request
-		$this->assertInternalType( 'array', $headers, "Reply wasn't array." );
 		$this->assertEquals( 'image/jpeg', $headers['content-type'] );
 		$this->assertEquals( '40148', $headers['content-length'] );
 		$this->assertEquals( '200', wp_remote_retrieve_response_code( $response ) );
@@ -61,7 +58,6 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$headers = wp_remote_retrieve_headers( $response );
 
 		// should return the same headers as a head request
-		$this->assertInternalType( 'array', $headers, "Reply wasn't array." );
 		$this->assertEquals( 'image/jpeg', $headers['content-type'] );
 		$this->assertEquals( '40148', $headers['content-length'] );
 		$this->assertEquals( '200', wp_remote_retrieve_response_code( $response ) );
@@ -85,7 +81,6 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$response = wp_remote_head( $url );
 		$cookies  = wp_remote_retrieve_cookies( $response );
 
-		$this->assertInternalType( 'array', $cookies );
 		$this->assertNotEmpty( $cookies );
 
 		$cookie = wp_remote_retrieve_cookie( $response, 'wordpress_test_cookie' );
