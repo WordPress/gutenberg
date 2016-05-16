@@ -58,6 +58,7 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 		$expected_output             = i18n_plugin_test();
 		$is_textdomain_loaded_after  = is_textdomain_loaded( 'internationalized-plugin' );
 
+		unload_textdomain( 'internationalized-plugin' );
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
 
 		$this->assertFalse( $is_textdomain_loaded_before );
@@ -79,10 +80,24 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 		$expected_output             = i18n_theme_test();
 		$is_textdomain_loaded_after  = is_textdomain_loaded( 'internationalized-theme' );
 
+		unload_textdomain( 'internationalized-theme' );
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
 
 		$this->assertFalse( $is_textdomain_loaded_before );
 		$this->assertSame( 'Das ist ein Dummy Theme', $expected_output );
 		$this->assertTrue( $is_textdomain_loaded_after );
+	}
+
+	/**
+	 * @ticket 341142
+	 */
+	public function test_get_translations_for_domain_does_not_return_null_if_override_load_textdomain_is_used() {
+		add_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+		add_filter( 'override_load_textdomain', '__return_true' );
+		$translations = get_translations_for_domain( 'internationalized-plugin' );
+		remove_filter( 'override_load_textdomain', '__return_true' );
+		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+
+		$this->assertTrue( $translations instanceof NOOP_Translations );
 	}
 }
