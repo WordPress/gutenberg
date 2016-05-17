@@ -3,9 +3,16 @@
   "version": "6.0.0",
   "description": "WordPress shareable config for stylelint",
   "keywords": [
+    "code",
+    "code style",
     "css",
+    "lint",
+    "linter",
+    "linting",
     "stylelint",
     "stylelint-config",
+    "stylelint-config-wordpress",
+    "validate",
     "wordpress",
     "WordPress"
   ],
