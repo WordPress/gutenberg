@@ -2,7 +2,7 @@
 
 /**
  * @group  comment
- * @covers wp_update_comment_count_now
+ * @covers ::wp_update_comment_count_now
  */
 class Tests_Update_Comment_Count_Now extends WP_UnitTestCase {
 	public function _return_100() {
