@@ -1,3 +1,11 @@
+# HEAD
+
+* Added: `at-rule-name-space-after` rule.
+* Added: `no-extra-semicolons` rule.
+* Added: `selector-attribute-operator-space-after` rule.
+* Added: `selector-attribute-operator-space-before` rule.
+* Added: `selector-max-empty-liness` rule.
+
 # 5.0.0
 
 * Added: `at-rule-name-case` rule.
