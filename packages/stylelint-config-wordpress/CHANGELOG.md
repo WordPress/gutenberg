@@ -1,4 +1,4 @@
-# HEAD
+# 6.0.0
 
 * Added: `at-rule-name-space-after` rule.
 * Added: `no-extra-semicolons` rule.
