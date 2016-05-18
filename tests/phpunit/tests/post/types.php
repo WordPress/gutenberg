@@ -61,7 +61,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_exclude_from_search_should_default_to_opposite_value_of_public() {
 		/*
@@ -75,7 +75,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_publicly_queryable_should_default_to_value_of_public() {
 		/*
@@ -89,7 +89,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_show_ui_should_default_to_value_of_public() {
 		/*
@@ -103,7 +103,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_show_in_menu_should_default_to_value_of_show_ui() {
 		/*
@@ -122,7 +122,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_show_in_nav_menus_should_default_to_value_of_public() {
 		/*
@@ -136,7 +136,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35985
-	 * @covers register_post_type()
+	 * @covers ::register_post_type()
 	 */
 	function test_register_post_type_show_in_admin_bar_should_default_to_value_of_show_in_menu() {
 		/*
