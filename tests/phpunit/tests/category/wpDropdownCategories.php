@@ -153,4 +153,72 @@ class Tests_Category_WpDropdownCategories extends WP_UnitTestCase {
 			$this->assertNotContains( 'value="' . $_cat->slug . '" selected="selected"', $found );
 		}
 	}
+
+	/**
+	 * @ticket 31909
+	 */
+	public function test_required_true_should_add_required_attribute() {
+		// Create a test category.
+		$cat_id = self::factory()->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		$args = array(
+			'show_option_none'  => __( 'Select one', 'text-domain' ),
+			'option_none_value' => "",
+			'required'          => true,
+			'hide_empty'        => 0,
+			'echo'              => 0,
+		);
+		$dropdown_categories = wp_dropdown_categories( $args );
+
+		// Test to see if it contains the "required" attribute.
+		$this->assertRegExp( '/<select[^>]+required/', $dropdown_categories );
+	}
+
+	/**
+	 * @ticket 31909
+	 */
+	public function test_required_false_should_omit_required_attribute() {
+		// Create a test category.
+		$cat_id = self::factory()->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		$args = array(
+			'show_option_none'  => __( 'Select one', 'text-domain' ),
+			'option_none_value' => "",
+			'required'          => false,
+			'hide_empty'        => 0,
+			'echo'              => 0,
+		);
+		$dropdown_categories = wp_dropdown_categories( $args );
+
+		// Test to see if it contains the "required" attribute.
+		$this->assertNotRegExp( '/<select[^>]+required/', $dropdown_categories );
+	}
+
+	/**
+	 * @ticket 31909
+	 */
+	public function test_required_should_default_to_false() {
+		// Create a test category.
+		$cat_id = self::factory()->category->create( array(
+			'name' => 'Test Category',
+			'slug' => 'test_category',
+		) );
+
+		$args = array(
+			'show_option_none'  => __( 'Select one', 'text-domain' ),
+			'option_none_value' => "",
+			'hide_empty'        => 0,
+			'echo'              => 0,
+		);
+		$dropdown_categories = wp_dropdown_categories( $args );
+
+		// Test to see if it contains the "required" attribute.
+		$this->assertNotRegExp( '/<select[^>]+required/', $dropdown_categories );
+	}
 }
