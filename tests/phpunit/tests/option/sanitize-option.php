@@ -103,7 +103,7 @@ class Tests_Sanitize_Option extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket #36122
+	 * @ticket 36122
 	 */
 	public function test_emoji_in_blogname_and_description() {
 		global $wpdb;
