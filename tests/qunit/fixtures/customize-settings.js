@@ -112,6 +112,11 @@ window._wpCustomizeSettings = {
 		'fixture-setting': {
 			'transport': 'postMessage',
 			'value': 'Lorem Ipsum'
+		},
+		'fixture-setting-abbr': {
+			'transport': 'postMessage',
+			'value': 'NASA',
+			'type': 'abbreviation'
 		}
 	},
 	'theme': {

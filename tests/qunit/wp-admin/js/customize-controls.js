@@ -1,4 +1,10 @@
-/* global wp */
+/* global wp, test, ok, equal, module */
+
+wp.customize.settingConstructor.abbreviation = wp.customize.Setting.extend({
+	validate: function( value ) {
+		return value.toUpperCase();
+	}
+});
 
 jQuery( window ).load( function (){
 	'use strict';
@@ -85,6 +91,20 @@ jQuery( window ).load( function (){
 	test( 'Setting has fixture value', function () {
 		equal( wp.customize( 'fixture-setting' )(), 'Lorem Ipsum' );
 	} );
+	test( 'Setting has notifications', function () {
+		var setting = wp.customize( 'fixture-setting' );
+		ok( setting.notifications.extended( wp.customize.Values ) );
+		equal( wp.customize.Notification, setting.notifications.prototype.constructor.defaultConstructor );
+	} );
+	test( 'Setting constructor object exists', function( assert ) {
+		assert.ok( _.isObject( wp.customize.settingConstructor ) );
+	} );
+	test( 'Custom setting constructor is used', function( assert ) {
+		var setting = wp.customize( 'fixture-setting-abbr' );
+		assert.ok( setting.extended( wp.customize.settingConstructor.abbreviation ) );
+		setting.set( 'usa' );
+		assert.equal( 'USA', setting.get() );
+	} );
 
 	module( 'Customizer Control in Fixture' );
 	test( 'Control exists', function () {
@@ -98,6 +118,53 @@ jQuery( window ).load( function (){
 	test( 'Control has the section fixture section ID', function () {
 		var control = wp.customize.control( 'fixture-control' );
 		equal( control.section(), 'fixture-section' );
+	} );
+	test( 'Control has notifications', function ( assert ) {
+		var control = wp.customize.control( 'fixture-control' ), settingNotification, controlOnlyNotification, doneEmbedded;
+		assert.ok( control.notifications.extended( wp.customize.Values ) );
+		assert.equal( wp.customize.Notification, control.notifications.prototype.constructor.defaultConstructor );
+		assert.ok( _.isFunction( control.getNotificationsContainerElement ) );
+		assert.ok( _.isFunction( control.renderNotifications ) );
+
+		doneEmbedded = assert.async();
+		control.deferred.embedded.done( function() {
+			var notificationContainerElement;
+
+			assert.equal( 0, _.size( control.notifications._value ) );
+			assert.equal( 0, _.size( control.settings['default'].notifications._value ) );
+
+			notificationContainerElement = control.getNotificationsContainerElement();
+			assert.equal( 1, notificationContainerElement.length );
+			assert.ok( notificationContainerElement.is( '.customize-control-notifications-container' ) );
+			assert.equal( 0, notificationContainerElement.find( '> ul > li' ).length );
+			assert.equal( 'none', notificationContainerElement.css( 'display' ) );
+
+			settingNotification = new wp.customize.Notification( 'setting_invalidity', 'Invalid setting' );
+			controlOnlyNotification = new wp.customize.Notification( 'control_invalidity', 'Invalid control' );
+			control.settings['default'].notifications.add( settingNotification.code, settingNotification );
+			control.notifications.add( controlOnlyNotification.code, controlOnlyNotification );
+
+			// Note that renderNotifications is being called manually here since rendering normally happens asynchronously.
+			control.renderNotifications();
+
+			assert.equal( 2, notificationContainerElement.find( '> ul > li' ).length );
+			assert.notEqual( 'none', notificationContainerElement.css( 'display' ) );
+			assert.equal( 2, _.size( control.notifications._value ) );
+			assert.equal( 1, _.size( control.settings['default'].notifications._value ) );
+
+			control.notifications.remove( controlOnlyNotification.code );
+			control.renderNotifications();
+			assert.equal( 1, notificationContainerElement.find( '> ul > li' ).length );
+			assert.notEqual( 'none', notificationContainerElement.css( 'display' ) );
+
+			control.settings['default'].notifications.remove( settingNotification.code );
+			control.renderNotifications();
+			assert.equal( 0, notificationContainerElement.find( '> ul > li' ).length );
+			assert.ok( notificationContainerElement.is( ':animated' ) ); // It is being slid down.
+			notificationContainerElement.stop().hide(); // Clean up.
+
+			doneEmbedded();
+		} );
 	} );
 
 	module( 'Customizer control without associated settings' );

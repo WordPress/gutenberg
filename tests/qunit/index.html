@@ -11,6 +11,7 @@
 		<script src="../../src/wp-includes/js/wp-backbone.js"></script>
 		<script src="../../src/wp-includes/js/zxcvbn.min.js"></script>
 		<script src="../../src/wp-includes/js/wp-util.js"></script>
+		<script src="../../src/wp-includes/js/wp-a11y.js"></script>
 
 		<!-- QUnit -->
 		<link rel="stylesheet" href="vendor/qunit.css" type="text/css" media="screen" />
@@ -125,6 +126,13 @@
 					</div>
 				<# } #>
 			</li>
+		</script>
+		<script type="text/html" id="tmpl-customize-control-notifications">
+			<ul>
+				<# _.each( data.notifications, function( notification ) { #>
+					<li data-code="{{ notification.code }}" data-type="{{ notification.type }}">{{ notification.message || notification.code }}</li>
+				<# } ); #>
+			</ul>
 		</script>
 
 		<!-- Templates for Customizer Menus -->

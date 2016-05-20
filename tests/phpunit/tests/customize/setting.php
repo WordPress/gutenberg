@@ -42,6 +42,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertEquals( 'refresh', $setting->transport );
 		$this->assertEquals( '', $setting->sanitize_callback );
 		$this->assertEquals( '', $setting->sanitize_js_callback );
+		$this->assertFalse( has_filter( "customize_validate_{$setting->id}" ) );
 		$this->assertFalse( has_filter( "customize_sanitize_{$setting->id}" ) );
 		$this->assertFalse( has_filter( "customize_sanitize_js_{$setting->id}" ) );
 		$this->assertEquals( false, $setting->dirty );
@@ -54,6 +55,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			'theme_supports' => 'widgets',
 			'default' => 'barbar',
 			'transport' => 'postMessage',
+			'validate_callback' => create_function( '$value', 'return $value . ":validate_callback";' ),
 			'sanitize_callback' => create_function( '$value', 'return $value . ":sanitize_callback";' ),
 			'sanitize_js_callback' => create_function( '$value', 'return $value . ":sanitize_js_callback";' ),
 		);
@@ -62,6 +64,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		foreach ( $args as $key => $value ) {
 			$this->assertEquals( $value, $setting->$key );
 		}
+		$this->assertEquals( 10, has_filter( "customize_validate_{$setting->id}", $args['validate_callback'] ) );
 		$this->assertEquals( 10, has_filter( "customize_sanitize_{$setting->id}", $args['sanitize_callback'] ) );
 		$this->assertEquals( 10, has_filter( "customize_sanitize_js_{$setting->id}" ), $args['sanitize_js_callback'] );
 	}
@@ -90,6 +93,8 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 
 	/**
 	 * Run assertions on non-multidimensional standard settings.
+	 *
+	 * @see WP_Customize_Setting::value()
 	 */
 	function test_preview_standard_types_non_multidimensional() {
 		$_POST['customized'] = wp_slash( wp_json_encode( $this->post_data_overrides ) );
@@ -167,6 +172,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * Run assertions on multidimensional standard settings.
 	 *
 	 * @see WP_Customize_Setting::preview()
+	 * @see WP_Customize_Setting::value()
 	 */
 	function test_preview_standard_types_multidimensional() {
 		$_POST['customized'] = wp_slash( wp_json_encode( $this->post_data_overrides ) );
@@ -568,6 +574,71 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$setting1->save();
 		$autoload = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM $wpdb->options WHERE option_name = %s", $id_base ) );
 		$this->assertEquals( 'no', $autoload, 'Even though setting1 did not indicate autoload (thus normally true), since another multidimensional option setting of the base did say autoload=false, it should be autoload=no' );
+	}
+
+	/**
+	 * Test js_value and json methods.
+	 *
+	 * @see WP_Customize_Setting::js_value()
+	 * @see WP_Customize_Setting::json()
+	 */
+	public function test_js_value() {
+		$default = "\x00";
+		$args = array(
+			'type' => 'binary',
+			'default' => $default,
+			'transport' => 'postMessage',
+			'dirty' => true,
+			'sanitize_js_callback' => create_function( '$value', 'return base64_encode( $value );' ),
+		);
+		$setting = new WP_Customize_Setting( $this->manager, 'name', $args );
+
+		$this->assertEquals( $default, $setting->value() );
+		$this->assertEquals( base64_encode( $default ), $setting->js_value() );
+
+		$exported = $setting->json();
+		$this->assertArrayHasKey( 'type', $exported );
+		$this->assertArrayHasKey( 'value', $exported );
+		$this->assertArrayHasKey( 'transport', $exported );
+		$this->assertArrayHasKey( 'dirty', $exported );
+		$this->assertEquals( $setting->js_value(), $exported['value'] );
+		$this->assertEquals( $args['type'], $setting->type );
+		$this->assertEquals( $args['transport'], $setting->transport );
+		$this->assertEquals( $args['dirty'], $setting->dirty );
+	}
+
+	/**
+	 * Test validate.
+	 *
+	 * @see WP_Customize_Setting::validate()
+	 */
+	public function test_validate() {
+		$setting = new WP_Customize_Setting( $this->manager, 'name', array(
+			'type' => 'key',
+			'validate_callback' => array( $this, 'filter_validate_for_test_validate' ),
+		) );
+		$validity = $setting->validate( 'BAD!' );
+		$this->assertInstanceOf( 'WP_Error', $validity );
+		$this->assertEquals( 'invalid_key', $validity->get_error_code() );
+	}
+
+	/**
+	 * Validate callback.
+	 *
+	 * @see Tests_WP_Customize_Setting::test_validate()
+	 *
+	 * @param WP_Error $validity Validity.
+	 * @param string   $value    Value.
+	 *
+	 * @return WP_Error
+	 */
+	public function filter_validate_for_test_validate( $validity, $value ) {
+		$this->assertInstanceOf( 'WP_Error', $validity );
+		$this->assertInternalType( 'string', $value );
+		if ( sanitize_key( $value ) !== $value ) {
+			$validity->add( 'invalid_key', 'Invalid key' );
+		}
+		return $validity;
 	}
 }
 
