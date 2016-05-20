@@ -158,12 +158,12 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 			'site_id' => self::$site_ids[ $site_key ],
 		);
 
-		$this->_setup_host_request( $domain, $path );
+		ms_load_current_site_and_network( $domain, $path );
 		$actual = array(
 			'network_id' => $current_blog->site_id,
 			'site_id' => $current_blog->blog_id,
 		);
-		$this->_setup_host_request( WP_TESTS_DOMAIN, '/' );
+		ms_load_current_site_and_network( WP_TESTS_DOMAIN, '/' );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
@@ -197,39 +197,19 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 			'site_id'    => self::$site_ids['wordpress.org/foo/bar/'],
 		);
 		add_filter( 'site_by_path_segments_count', array( $this, 'filter_path_segments_to_two' ) );
-		$this->_setup_host_request( 'wordpress.org', '/foo/bar/' );
+		ms_load_current_site_and_network( 'wordpress.org', '/foo/bar/' );
 		$actual = array(
 			'network_id' => $current_blog->site_id,
 			'site_id' => $current_blog->blog_id,
 		);
 		remove_filter( 'site_by_path_segments_count', array( $this, 'filter_path_segments_to_two' ) );
-		$this->_setup_host_request( WP_TESTS_DOMAIN, '/' );
+		ms_load_current_site_and_network( WP_TESTS_DOMAIN, '/' );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	public function filter_path_segments_to_two() {
 		return 2;
-	}
-
-	/**
-	 * Reset various globals required for a 'clean' multisite boot.
-	 *
-	 * The $wpdb and $table_prefix globals are required for ms-settings.php to
-	 * load properly.
-	 *
-	 * @param string $domain HTTP_HOST of the bootstrap request.
-	 * @param string $path   REQUEST_URI of the boot strap request.
-	 */
-	function _setup_host_request( $domain, $path ) {
-		global $current_site, $current_blog, $table_prefix, $wpdb;
-
-		$table_prefix = WP_TESTS_TABLE_PREFIX;
-		$current_site = $current_blog = null;
-		$_SERVER['HTTP_HOST'] = $domain;
-		$_SERVER['REQUEST_URI'] = $path;
-
-		include ABSPATH . '/wp-includes/ms-settings.php';
 	}
 }
 
