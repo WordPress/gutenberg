@@ -102,4 +102,21 @@ class Tests_Sanitize_Option extends WP_UnitTestCase {
 		$this->assertSame( $expected, sanitize_option( 'upload_path', $provided ) );
 	}
 
+	/**
+	 * @ticket #36122
+	 */
+	public function test_emoji_in_blogname_and_description() {
+		global $wpdb;
+
+		$value = "whee\xf0\x9f\x98\x88";
+
+		if ( 'utf8mb4' === $wpdb->get_col_charset( $wpdb->options, 'option_value' ) ) {
+			$expected = $value;
+		} else {
+			$expected = 'whee&#x1f608;';
+		}
+
+		$this->assertSame( $expected, sanitize_option( 'blogname', $value ) );
+		$this->assertSame( $expected, sanitize_option( 'blogdescription', $value ) );
+	}
 }
