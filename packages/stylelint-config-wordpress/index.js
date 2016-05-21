@@ -15,6 +15,9 @@ module.exports = {
     "color-hex-length": "short",
     "color-named": "never",
     "color-no-invalid-hex": true,
+    "comment-empty-line-before": [ "always", {
+      ignore: ["stylelint-commands"],
+    } ],
     "declaration-bang-space-after": "never",
     "declaration-bang-space-before": "always",
     "declaration-block-no-duplicate-properties": [ true, {

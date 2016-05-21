@@ -1,3 +1,7 @@
+# HEAD
+
+* Added: `comment-empty-line-before` rule.
+
 # 7.0.0
 
 * Added: `keyframe-declaration-no-important` rule.
