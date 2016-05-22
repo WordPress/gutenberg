@@ -378,7 +378,7 @@ Incorrect:
 }
 ```
 
-### Best Practices - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#best-practices) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/best-practices.js)
+### Best Practices - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#best-practices)
 
 Stylesheets tend to get long in length. Focus slowly gets lost whilst intended goals start repeating and overlapping. Writing smart code from the outset helps us retain the overview whilst remaining flexible throughout change.
 
@@ -387,15 +387,6 @@ Stylesheets tend to get long in length. Focus slowly gets lost whilst intended g
 - DOM will change over time, target the element you want to use as opposed to “finding it” through its parents. Example: Use `.highlight` on the element as opposed to `.highlight a` (where the selector is on the parent)
 - Know when to use the height property. It should be used when you are including outside elements (such as images). Otherwise use line-height for more flexibility.
 - Do not restate default property & value combinations (for instance `display: block;` on block-level elements).
-
-Correct:
-```css
-
-```
-Incorrect:
-```css
-
-```
 
 ## [Changelog](CHANGELOG.md)
 
