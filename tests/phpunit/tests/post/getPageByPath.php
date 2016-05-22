@@ -242,4 +242,30 @@ class Tests_Post_GetPageByPath extends WP_UnitTestCase {
 		$num_queries++;
 		$this->assertSame( $num_queries, $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 37611
+	 */
+	public function test_output_param_should_be_obeyed_for_cached_value() {
+		$page = self::factory()->post->create( array(
+			'post_type' => 'page',
+			'post_name' => 'foo',
+		) );
+
+		// Prime cache.
+		$found = get_page_by_path( 'foo' );
+		$this->assertSame( $page, $found->ID );
+
+		$object = get_page_by_path( 'foo', OBJECT );
+		$this->assertInternalType( 'object', $object );
+		$this->assertSame( $page, $object->ID );
+
+		$array_n = get_page_by_path( 'foo', ARRAY_N );
+		$this->assertInternalType( 'array', $array_n );
+		$this->assertSame( $page, $array_n[0] );
+
+		$array_a = get_page_by_path( 'foo', ARRAY_A );
+		$this->assertInternalType( 'array', $array_a );
+		$this->assertSame( $page, $array_a['ID'] );
+	}
 }
