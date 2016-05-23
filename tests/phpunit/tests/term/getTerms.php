@@ -267,6 +267,7 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	function test_get_terms_search() {
 		$term_id1 = self::factory()->tag->create( array( 'slug' => 'burrito' ) );
 		$term_id2 = self::factory()->tag->create( array( 'name' => 'Wilbur' ) );
+		$term_id3 = self::factory()->tag->create( array( 'name' => 'Foo' ) );
 
 		$terms = get_terms( 'post_tag', array( 'hide_empty' => false, 'search' => 'bur', 'fields' => 'ids' ) );
 		$this->assertEqualSets( array( $term_id1, $term_id2 ), $terms );
