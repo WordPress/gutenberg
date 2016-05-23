@@ -464,4 +464,28 @@ class Tests_dbDelta extends WP_UnitTestCase {
 					=> "Changed type of {$wpdb->prefix}dbdelta_test.column_3 from blob to mediumblob"
 			), $result );
 	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_query_with_backticks_does_not_throw_an_undefined_index_warning() {
+		global $wpdb;
+
+		$schema = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test2 (
+				`id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`column_1` varchar(255) NOT NULL,
+				PRIMARY KEY  (id),
+				KEY compound_key (id,column_1)
+			)
+		";
+
+		$wpdb->query( $schema );
+
+		$updates = dbDelta( $schema, false );
+
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}dbdelta_test2" );
+
+		$this->assertEmpty( $updates );
+	}
 }
