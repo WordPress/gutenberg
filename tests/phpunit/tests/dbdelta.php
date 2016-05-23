@@ -31,6 +31,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 			CREATE TABLE {$wpdb->prefix}dbdelta_test (
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
 				PRIMARY KEY  (id),
 				KEY key_1 (column_1),
 				KEY compound_key (id,column_1),
@@ -361,5 +363,105 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		$actual = dbDelta( $create, false );
 
 		$this->assertSame( array(), $actual );
+	}
+
+	/**
+	 * @ticket 36748
+	 */
+	function test_dont_downsize_text_fields() {
+		global $wpdb;
+
+		$result = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 tinytext,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertSame( array(), $result );
+	}
+
+	/**
+	 * @ticket 36748
+	 */
+	function test_dont_downsize_blob_fields() {
+		global $wpdb;
+
+		$result = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 tinyblob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertSame( array(), $result );
+	}
+
+	/**
+	 * @ticket 36748
+	 */
+	function test_upsize_text_fields() {
+		global $wpdb;
+
+		$result = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 bigtext,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertSame(
+			array(
+				"{$wpdb->prefix}dbdelta_test.column_2"
+					=> "Changed type of {$wpdb->prefix}dbdelta_test.column_2 from text to bigtext"
+			), $result );
+	}
+
+	/**
+	 * @ticket 36748
+	 */
+	function test_upsize_blob_fields() {
+		global $wpdb;
+
+		$result = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 mediumblob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertSame(
+			array(
+				"{$wpdb->prefix}dbdelta_test.column_3"
+					=> "Changed type of {$wpdb->prefix}dbdelta_test.column_3 from blob to mediumblob"
+			), $result );
 	}
 }
