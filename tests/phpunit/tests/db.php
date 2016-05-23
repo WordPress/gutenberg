@@ -955,4 +955,25 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$wpdb->check_connection();
 	}
+
+	/**
+	 * @ticket 32405
+	 */
+	function test_non_unicode_collations() {
+		global $wpdb;
+
+		if ( ! $wpdb->has_cap( 'utf8mb4' ) ) {
+			$this->markTestSkipped( 'This test requires utf8mb4 support' );
+		}
+
+		$charset = $wpdb->charset;
+		$collate = $wpdb->collate;
+
+		$wpdb->init_charset( 'utf8', 'utf8_swedish_ci' );
+
+		$this->assertSame( 'utf8mb4', $wpdb->charset );
+		$this->assertSame( 'utf8mb4_swedish_ci', $wpdb->collate );
+
+		$wpdb->init_charset( $charset, $collate );
+	}
 }
