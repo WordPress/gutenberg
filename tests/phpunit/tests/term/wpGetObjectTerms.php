@@ -473,6 +473,64 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36932
+	 */
+	public function test_termmeta_cache_should_be_primed_when_fields_is_all_with_object_id() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $terms, 'wptests_tax' );
+
+		$found = wp_get_object_terms( $p, 'wptests_tax', array(
+			'update_term_meta_cache' => true,
+			'fields' => 'all_with_object_id',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		foreach ( $terms as $t ) {
+			$this->assertSame( 'bar', get_term_meta( $t, 'foo', true ) );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 36932
+	 */
+	public function test_termmeta_cache_should_be_primed_when_fields_is_ids() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		add_term_meta( $terms[0], 'foo', 'bar' );
+		add_term_meta( $terms[1], 'foo', 'bar' );
+		add_term_meta( $terms[2], 'foo', 'bar' );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $terms, 'wptests_tax' );
+
+		$found = wp_get_object_terms( $p, 'wptests_tax', array(
+			'update_term_meta_cache' => true,
+			'fields' => 'ids',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		foreach ( $terms as $t ) {
+			$this->assertSame( 'bar', get_term_meta( $t, 'foo', true ) );
+		}
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
 	 * @ticket 10142
 	 */
 	public function test_meta_query() {
