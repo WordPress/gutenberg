@@ -1,43 +1,47 @@
 sudo: false
 language: php
 cache:
+  apt: true
   directories:
     - node_modules
+env:
+  global:
+    - WP_TRAVISCI=travis:phpunit
 matrix:
   include:
-  - php: 5.5
+  - php: 7
     env: WP_TRAVISCI=travis:js
   - php: 5.2
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.3
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.4
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.5
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.6
-    env: WP_TRAVISCI=travis:phpunit
   - php: 5.6
-    env: WP_TRAVISCI=travis:phpunit WP_TRAVIS_OBJECT_CACHE=true
+    env: WP_TRAVIS_OBJECT_CACHE=true
     services: memcached
   - php: hhvm
-    env: WP_TRAVISCI=travis:phpunit
+    sudo: required
+    dist: trusty
+    group: edge
+    addons:
+      apt:
+        packages:
+        - mysql-server-5.6
+        - mysql-client-core-5.6
+        - mysql-client-5.6
   - php: 7.0
-    env: WP_TRAVISCI=travis:phpunit
   - php: nightly
-    env: WP_TRAVISCI=travis:phpunit
   allow_failures:
   - php: hhvm
   - php: nightly
 before_install:
-- WP_CORE_DIR=/tmp/wordpress/
 - git clone https://github.com/WordPress/twentysixteen.git src/wp-content/themes/twentysixteen
 - |
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
-      mysql -e "CREATE DATABASE wordpress_tests;" -uroot
+      mysql -u root -e "CREATE DATABASE wordpress_tests;"
       cp wp-tests-config-sample.php wp-tests-config.php
       sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
-      sed -i "s/yourusernamehere/travis/" wp-tests-config.php
+      sed -i "s/yourusernamehere/root/" wp-tests-config.php
       sed -i "s/yourpasswordhere//" wp-tests-config.php
       svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
   fi
@@ -51,6 +55,8 @@ before_script:
 - npm install -g grunt-cli
 - npm install
 - npm prune
+- mysql --version
+- phpenv versions
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
