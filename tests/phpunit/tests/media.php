@@ -449,7 +449,7 @@ VIDEO;
 		$this->assertNotContains( 'autoplay', $actual );
 		$this->assertContains( 'preload="none"', $actual );
 		$this->assertContains( 'class="wp-audio-shortcode"', $actual );
-		$this->assertContains( 'style="width: 100%; visibility: hidden;"', $actual );
+		$this->assertContains( 'style="width: 100%;"', $actual );
 
 		$actual = wp_audio_shortcode( array(
 			'src'      => 'https://example.com/foo.mp3',
