@@ -47,4 +47,27 @@ class Tests_Bookmark_GetBookmarks extends WP_UnitTestCase {
 		$this->assertEqualSets( $bookmarks, wp_list_pluck( $found2, 'link_id' ) );
 		$this->assertTrue( $num_queries < $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 18356
+	 */
+	public function test_orderby_rand_should_not_be_cached() {
+		global $wpdb;
+
+		$bookmarks = self::factory()->bookmark->create_many( 2 );
+
+		$found1 = get_bookmarks( array(
+			'orderby' => 'rand',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$found2 = get_bookmarks( array(
+			'orderby' => 'rand',
+		) );
+
+		// equal sets != same order
+		$this->assertEqualSets( $found1, $found2 );
+		$this->assertTrue( $num_queries < $wpdb->num_queries );
+	}
 }
