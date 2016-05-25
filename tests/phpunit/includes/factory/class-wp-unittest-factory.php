@@ -43,6 +43,12 @@ class WP_UnitTest_Factory {
 	public $tag;
 
 	/**
+	 * @since 4.6.0
+	 * @var WP_UnitTest_Factory_For_Bookmark
+	 */
+	public $bookmark;
+
+	/**
 	 * @var WP_UnitTest_Factory_For_Blog
 	 */
 	public $blog;
@@ -60,6 +66,7 @@ class WP_UnitTest_Factory {
 		$this->term = new WP_UnitTest_Factory_For_Term( $this );
 		$this->category = new WP_UnitTest_Factory_For_Term( $this, 'category' );
 		$this->tag = new WP_UnitTest_Factory_For_Term( $this, 'post_tag' );
+		$this->bookmark = new WP_UnitTest_Factory_For_Bookmark( $this );
 		if ( is_multisite() ) {
 			$this->blog = new WP_UnitTest_Factory_For_Blog( $this );
 			$this->network = new WP_UnitTest_Factory_For_Network( $this );
