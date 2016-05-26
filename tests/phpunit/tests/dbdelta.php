@@ -488,4 +488,52 @@ class Tests_dbDelta extends WP_UnitTestCase {
 
 		$this->assertEmpty( $updates );
 	}
+
+	/**
+	 * @ticket 36948
+	 */
+	function test_spatial_indices() {
+		global $wpdb;
+
+		if ( version_compare( $wpdb->db_version(), '5.4', '<' ) ) {
+			$this->markTestSkipped( 'Spatial indices require MySQL 5.4 and above.' );
+		}
+
+		$schema =
+			"
+			CREATE TABLE {$wpdb->prefix}spatial_index_test (
+				non_spatial bigint(20) unsigned NOT NULL,
+				spatial_value geometrycollection NOT NULL,
+				KEY non_spatial (non_spatial),
+				SPATIAL KEY spatial_key (spatial_value)
+			) ENGINE=MyISAM;
+			";
+
+		$wpdb->query( $schema );
+
+		$updates = dbDelta( $schema, false );
+
+		$this->assertEmpty( $updates );
+
+		$schema =
+			"
+			CREATE TABLE {$wpdb->prefix}spatial_index_test (
+				non_spatial bigint(20) unsigned NOT NULL,
+				spatial_value geometrycollection NOT NULL,
+				spatial_value2 geometrycollection NOT NULL,
+				KEY non_spatial (non_spatial),
+				SPATIAL KEY spatial_key (spatial_value)
+				SPATIAL KEY spatial_key2 (spatial_value2)
+			) ENGINE=MyISAM;
+			";
+
+		$updates = dbDelta( $schema, false );
+
+		$this->assertSame( array(
+			"{$wpdb->prefix}spatial_index_test.spatial_value2" => "Added column {$wpdb->prefix}spatial_index_test.spatial_value2",
+			"Added index {$wpdb->prefix}spatial_index_test SPATIAL KEY spatial_key2 (spatial_value2)"
+			), $updates );
+
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}spatial_index_test" );
+	}
 }
