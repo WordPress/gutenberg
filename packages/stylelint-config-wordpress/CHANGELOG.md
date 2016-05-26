@@ -1,6 +1,6 @@
 # HEAD
 
-* Changed: Improved tests and documentation
+* Changed: Improved tests and documentation.
 * Added: `comment-empty-line-before` rule.
 
 # 7.0.0
