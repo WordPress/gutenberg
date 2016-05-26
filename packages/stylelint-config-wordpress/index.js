@@ -38,7 +38,7 @@ module.exports = {
     "function-max-empty-lines": 1,
     "function-name-case": "lower",
     "function-parentheses-space-inside": "never",
-    "function-url-quotes": "none",
+    "function-url-quotes": "never",
     "function-whitespace-after": "always",
     "indentation": "tab",
     "keyframe-declaration-no-important": true,
