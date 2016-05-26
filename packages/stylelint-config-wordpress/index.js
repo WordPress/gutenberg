@@ -30,7 +30,7 @@ module.exports = {
     "declaration-colon-newline-after": "always-multi-line",
     "declaration-colon-space-after": "always-single-line",
     "declaration-colon-space-before": "never",
-    "font-family-name-quotes": "double-where-recommended",
+    "font-family-name-quotes": "always-where-recommended",
     "function-calc-no-unspaced-operator": true,
     "function-comma-space-after": "always",
     "function-comma-space-before": "never",

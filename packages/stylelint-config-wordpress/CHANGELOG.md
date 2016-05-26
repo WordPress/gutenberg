@@ -1,5 +1,6 @@
 # HEAD
 
+* Fixed: Updated `font-family-name-quotes` rule deprecated option `double-where-recommended` to new `always-where-recommended` option.
 * Removed: `stylelint < 6.5.1` compatibility.
 * Changed: Improved tests and documentation.
 * Added: `comment-empty-line-before` rule.
