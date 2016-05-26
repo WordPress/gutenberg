@@ -78,25 +78,6 @@ class Tests_Term_GetTheTerms extends WP_UnitTestCase {
 	/**
 	 * @ticket 34262
 	 */
-	public function test_get_the_terms_should_not_cache_wp_term_objects() {
-		$p = self::$post_ids[0];
-		register_taxonomy( 'wptests_tax', 'post' );
-		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
-		wp_set_object_terms( $p, $t, 'wptests_tax' );
-
-		// Prime the cache.
-		$terms = get_the_terms( $p, 'wptests_tax' );
-
-		$cached = get_object_term_cache( $p, 'wptests_tax' );
-
-		$this->assertNotEmpty( $cached );
-		$this->assertSame( $t, (int) $cached[0]->term_id );
-		$this->assertNotInstanceOf( 'WP_Term', $cached[0] );
-	}
-
-	/**
-	 * @ticket 34262
-	 */
 	public function test_get_the_terms_should_return_wp_term_objects_from_cache() {
 		$p = self::$post_ids[0];
 		register_taxonomy( 'wptests_tax', 'post' );
@@ -169,5 +150,51 @@ class Tests_Term_GetTheTerms extends WP_UnitTestCase {
 		$p = self::$post_ids[0];
 		$terms = get_the_terms( $p, 'this-taxonomy-does-not-exist' );
 		$this->assertTrue( is_wp_error( $terms ) );
+	}
+
+	/**
+	 * @ticket 36814
+	 */
+	public function test_count_should_not_be_improperly_cached() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		wp_set_object_terms( self::$post_ids[0], $t, 'wptests_tax' );
+
+		$terms = get_the_terms( self::$post_ids[0], 'wptests_tax' );
+		$this->assertSame( 1, $terms[0]->count );
+
+		wp_set_object_terms( self::$post_ids[1], $t, 'wptests_tax' );
+
+		$terms = get_the_terms( self::$post_ids[0], 'wptests_tax' );
+		$this->assertSame( 2, $terms[0]->count );
+	}
+
+	/**
+	 * @ticket 36814
+	 */
+	public function test_uncached_terms_should_be_primed_with_a_single_query() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		wp_set_object_terms( self::$post_ids[0], $terms, 'wptests_tax' );
+
+		get_the_terms( self::$post_ids[0], 'wptests_tax' );
+
+		// Clean cache for two of the terms.
+		clean_term_cache( array( $terms[0], $terms[1] ), 'wptests_tax', false );
+
+		$num_queries = $wpdb->num_queries;
+		$found = get_the_terms( self::$post_ids[0], 'wptests_tax' );
+
+		$this->assertEqualSets( $terms, wp_list_pluck( $found, 'term_id' ) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+
 	}
 }
