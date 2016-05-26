@@ -36,10 +36,10 @@
     "eslint-plugin-ava": "^2.2.1",
     "eslint-config-stylelint": "^2.0.0",
     "npmpub": "^3.0.3",
-    "stylelint": "^6.4.2"
+    "stylelint": "^6.5.1"
   },
   "peerDependencies": {
-    "stylelint": "^6.4.2"
+    "stylelint": "^6.5.1"
   },
   "scripts": {
     "ava": "ava --verbose \"__tests__/**/*.js\"",

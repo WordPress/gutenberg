@@ -1,5 +1,6 @@
 # HEAD
 
+* Removed: `stylelint < 6.5.1` compatibility.
 * Changed: Improved tests and documentation.
 * Added: `comment-empty-line-before` rule.
 
