@@ -328,6 +328,69 @@ class Tests_Actions extends WP_UnitTestCase {
 		$this->assertFalse( doing_filter( 'testing' ) ); // No longer doing this filter
 	}
 
+	/**
+	 * @ticket 36819
+	 */
+	function test_backup_plugin_globals_returns_filters() {
+		$backup = _backup_plugin_globals();
+		$this->assertArrayHasKey( 'backup_wp_filter',         $backup );
+		$this->assertArrayHasKey( 'backup_wp_actions',        $backup );
+		$this->assertArrayHasKey( 'backup_wp_current_filter', $backup );
+		$this->assertArrayHasKey( 'backup_merged_filters', $backup );
+	}
+
+	/**
+	 * @ticket 36819
+	 */
+	function test_backup_plugin_globals_returns_filters_from_first_time_called() {
+		$backup = _backup_plugin_globals();
+
+		$a = new MockAction();
+		$tag = rand_str();
+
+		add_action($tag, array(&$a, 'action'));
+
+		$new_backup = _backup_plugin_globals();
+		$this->assertEquals( $backup, $new_backup );
+	}
+
+	/**
+	 * @ticket 36819
+	 */
+	function test_restore_plugin_globals_from_stomp() {
+		global $wp_actions;
+		$original_actions = $wp_actions;
+
+		_backup_plugin_globals();
+
+		$wp_actions = array();
+		
+		$this->assertEmpty( $wp_actions );
+		_restore_plugin_globals();
+
+		$this->assertEquals( $GLOBALS['wp_actions'], $original_actions );
+	}
+
+	/**
+	 * @ticket 36819
+	 */
+	function test_restore_plugin_globals_includes_additions() {
+		global $wp_filter;
+		$original_filter = $wp_filter;
+
+		$backup = _backup_plugin_globals();
+
+		$a = new MockAction();
+		$tag = rand_str();
+		add_action($tag, array(&$a, 'action'));
+		
+		$this->assertNotEquals( $GLOBALS['wp_filter'], $original_filter );
+
+		_restore_plugin_globals();
+
+		$this->assertNotEquals( $GLOBALS['wp_filter'], $original_filter );
+	}
+
 	function apply_testing_filter() {
 		$this->apply_testing_filter = true;
 
