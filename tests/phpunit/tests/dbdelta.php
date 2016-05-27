@@ -531,9 +531,274 @@ class Tests_dbDelta extends WP_UnitTestCase {
 
 		$this->assertSame( array(
 			"{$wpdb->prefix}spatial_index_test.spatial_value2" => "Added column {$wpdb->prefix}spatial_index_test.spatial_value2",
-			"Added index {$wpdb->prefix}spatial_index_test SPATIAL KEY spatial_key2 (spatial_value2)"
+			"Added index {$wpdb->prefix}spatial_index_test SPATIAL KEY `spatial_key2` (`spatial_value2`)"
 			), $updates );
 
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}spatial_index_test" );
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_query_with_backticks_does_not_cause_a_query_to_alter_all_columns_and_indices_to_run_even_if_none_have_changed() {
+		global $wpdb;
+
+		$schema = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test2 (
+				`id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`references` varchar(255) NOT NULL,
+				PRIMARY KEY  (`id`),
+				KEY `compound_key` (`id`,`references`)
+			)
+		";
+
+		$wpdb->query( $schema );
+
+		$updates = dbDelta( $schema );
+
+		$table_indices = $wpdb->get_results( "SHOW INDEX FROM {$wpdb->prefix}dbdelta_test2" );
+		$compound_key_index = wp_list_filter( $table_indices, array( 'Key_name' => 'compound_key' ) );
+
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}dbdelta_test2" );
+
+		$this->assertCount( 2, $compound_key_index );
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_index_with_a_reserved_keyword_can_be_created() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				`references` varchar(255) NOT NULL,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id , column_1),
+				KEY compound_key2 (id,`references`),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$table_indices = $wpdb->get_results( "SHOW INDEX FROM {$wpdb->prefix}dbdelta_test" );
+
+		$this->assertCount( 2, wp_list_filter( $table_indices, array( 'Key_name' => 'compound_key2' ) , 'AND' ) );
+
+		$this->assertSame(
+			array(
+				"{$wpdb->prefix}dbdelta_test.references" => "Added column {$wpdb->prefix}dbdelta_test.references",
+				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `compound_key2` (`id`,`references`)",
+			),
+			$updates
+		);
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_wp_get_db_schema_does_no_alter_queries_on_existing_install() {
+		$updates = dbDelta( wp_get_db_schema() );
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_key_and_index_and_fulltext_key_and_fulltext_index_and_unique_key_and_unique_index_indicies() {
+		global $wpdb;
+
+		$schema = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1),
+				INDEX key_2 (column_1),
+				UNIQUE KEY key_3 (column_1),
+				UNIQUE INDEX key_4 (column_1),
+				FULLTEXT INDEX key_5 (column_1),
+			) ENGINE=MyISAM
+		";
+
+		$creates = dbDelta( $schema );
+		$this->assertSame(
+			array(
+				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `key_2` (`column_1`)",
+				1 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_3` (`column_1`)",
+				2 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_4` (`column_1`)",
+				3 => "Added index {$wpdb->prefix}dbdelta_test FULLTEXT KEY `key_5` (`column_1`)",
+			),
+			$creates
+		);
+
+		$updates = dbDelta( $schema );
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_index_and_key_are_synonyms_and_do_not_recreate_indices() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				INDEX key_1 (column_1),
+				INDEX compound_key (id,column_1),
+				FULLTEXT INDEX fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 20263
+	 */
+	function test_indices_with_prefix_limits_are_created_and_do_not_recreate_indices() {
+		global $wpdb;
+
+		$schema = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1),
+				KEY key_2 (column_1(10)),
+				KEY key_3 (column_2(100),column_1(10)),
+			) ENGINE=MyISAM
+		";
+
+		$creates = dbDelta( $schema );
+		$this->assertSame(
+			array(
+				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `key_2` (`column_1`(10))",
+				1 => "Added index {$wpdb->prefix}dbdelta_test KEY `key_3` (`column_2`(100),`column_1`(10))",
+			),
+			$creates
+		);
+
+		$updates = dbDelta( $schema );
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 34959
+	 */
+	function test_index_col_names_with_order_do_not_recreate_indices() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1 DESC),
+				KEY compound_key (id,column_1 ASC),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 34873
+	 */
+	function test_primary_key_with_single_space_does_not_recreate_index() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 34869
+	 */
+	function test_index_definitions_with_spaces_do_not_recreate_indices() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1        (         column_1),
+				KEY compound_key (id,      column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 34871
+	 */
+	function test_index_types_are_not_case_sensitive_and_do_not_recreate_indices() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				key key_1 (column_1),
+				key compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			"
+		);
+
+		$this->assertEmpty( $updates );
 	}
 }
