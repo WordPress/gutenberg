@@ -150,6 +150,61 @@ class Tests_Term_Meta extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 36593
+	 */
+	public function test_lazy_load_term_meta_should_fall_back_on_update_post_term_cache() {
+		$q = new WP_Query( array(
+			'update_post_term_cache' => true,
+		) );
+
+		$this->assertTrue( $q->get( 'lazy_load_term_meta' ) );
+
+		$q = new WP_Query( array(
+			'update_post_term_cache' => false,
+		) );
+
+		$this->assertFalse( $q->get( 'lazy_load_term_meta' ) );
+	}
+
+	/**
+	 * @ticket 36593
+	 */
+	public function test_lazy_load_term_meta_false() {
+		global $wpdb;
+
+		$p = self::factory()->post->create( array( 'post_status' => 'publish' ) );
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+		wp_set_object_terms( $p, $terms, 'wptests_tax' );
+		foreach ( $terms as $t ) {
+			add_term_meta( $t, 'foo', 'bar' );
+		}
+
+		$q = new WP_Query( array(
+			'cache_results' => true,
+			'update_post_term_cache' => true,
+			'lazy_load_term_meta' => false,
+		) );
+
+		if ( $q->have_posts() ) {
+			while ( $q->have_posts() ) {
+				$q->the_post();
+
+				// Requests will hit the database.
+				$num_queries = $wpdb->num_queries;
+				$this->assertSame( 'bar', get_term_meta( $terms[0], 'foo', true ) );
+				$num_queries++;
+				$this->assertSame( $num_queries, $wpdb->num_queries );
+
+				$this->assertSame( 'bar', get_term_meta( $terms[1], 'foo', true ) );
+				$num_queries++;
+				$this->assertSame( $num_queries, $wpdb->num_queries );
+			}
+		}
+	}
+
 	public function test_adding_term_meta_should_bust_get_terms_cache() {
 		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
 
