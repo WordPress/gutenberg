@@ -493,7 +493,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 		) );
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertEquals( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) = ''" ) );
+		$this->assertEquals( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value = ''" ) );
 	}
 
 	/**
@@ -601,7 +601,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertSame( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) = ''" ) );
+		$this->assertSame( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value = ''" ) );
 	}
 
 	public function test_get_sql_convert_lowercase_compare_to_uppercase() {
@@ -632,7 +632,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertSame( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) IN" ) );
+		$this->assertSame( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value IN" ) );
 	}
 
 	public function test_get_sql_empty_meta_compare_with_non_array_value() {
@@ -647,7 +647,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertSame( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) =" ) );
+		$this->assertSame( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value =" ) );
 	}
 
 	public function test_get_sql_invalid_meta_compare() {
@@ -663,7 +663,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertSame( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) =" ) );
+		$this->assertSame( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value =" ) );
 	}
 
 	/**
@@ -760,7 +760,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 
 		$sql = $query->get_sql( 'post', $wpdb->posts, 'ID', $this );
 
-		$this->assertSame( 1, substr_count( $sql['where'], "CAST($wpdb->postmeta.meta_value AS CHAR) = 'bar'" ) );
+		$this->assertSame( 1, substr_count( $sql['where'], "$wpdb->postmeta.meta_value = 'bar'" ) );
 	}
 
 	public function test_not_exists() {
