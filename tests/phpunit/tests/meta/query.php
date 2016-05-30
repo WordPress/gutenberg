@@ -808,7 +808,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 32592
+	 * @ticket 32592
 	 */
 	public function test_has_or_relation_should_return_false() {
 		$q = new WP_Meta_Query( array(
@@ -834,7 +834,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 32592
+	 * @ticket 32592
 	 */
 	public function test_has_or_relation_should_return_true_for_top_level_or() {
 		$q = new WP_Meta_Query( array(
@@ -860,7 +860,7 @@ class Tests_Meta_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 32592
+	 * @ticket 32592
 	 */
 	public function test_has_or_relation_should_return_true_for_nested_or() {
 		$q = new WP_Meta_Query( array(
