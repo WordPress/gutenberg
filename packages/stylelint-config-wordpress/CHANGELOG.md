@@ -1,4 +1,4 @@
-# HEAD
+# 7.1.0
 
 * Fixed: Updated `font-family-name-quotes` rule deprecated option `double-where-recommended` to new `always-where-recommended` option.
 * Fixed: Updated `function-url-quotes` rule deprecated option `none` to new `never` option.
