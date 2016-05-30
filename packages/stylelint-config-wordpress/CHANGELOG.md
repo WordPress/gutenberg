@@ -1,3 +1,7 @@
+# 7.1.1
+
+* Fixed: Re-releasing failed npmjs.com 7.0.0 release as 7.1.1.
+
 # 7.1.0
 
 * Fixed: Updated `font-family-name-quotes` rule deprecated option `double-where-recommended` to new `always-where-recommended` option.
