@@ -488,40 +488,6 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', $found['term_taxonomy_id'] );
 	}
 
-	public function test_wp_update_term_should_clean_object_term_cache() {
-		register_taxonomy( 'wptests_tax_for_post', 'post' );
-		register_taxonomy( 'wptests_tax_for_page', 'page' );
-		$post = self::factory()->post->create();
-		$page = self::factory()->post->create( array(
-			'post_type' => 'page',
-		) );
-
-		$t_for_post = self::factory()->term->create( array(
-			'taxonomy' => 'wptests_tax_for_post',
-		) );
-		$t_for_page = self::factory()->term->create( array(
-			'taxonomy' => 'wptests_tax_for_page',
-		) );
-
-		wp_set_post_terms( $post, array( $t_for_post ), 'wptests_tax_for_post' );
-		wp_set_post_terms( $page, array( $t_for_page ), 'wptests_tax_for_page' );
-
-		// Prime caches and verify.
-		update_object_term_cache( array( $post ), 'post' );
-		update_object_term_cache( array( $page ), 'page' );
-		$this->assertNotEmpty( wp_cache_get( $post, 'wptests_tax_for_post_relationships' ) );
-		$this->assertNotEmpty( wp_cache_get( $page, 'wptests_tax_for_page_relationships' ) );
-
-		// Update a term in just one of the taxonomies.
-		$found = wp_update_term( $t_for_post, 'wptests_tax_for_post', array(
-			'slug' => 'foo',
-		) );
-
-		// Only the relevant cache should have been cleared.
-		$this->assertFalse( wp_cache_get( $post, 'wptests_tax_for_post_relationships' ) );
-		$this->assertNotEmpty( wp_cache_get( $page, 'wptests_tax_for_page_relationships' ) );
-	}
-
 	public function test_wp_update_term_should_clean_term_cache() {
 		register_taxonomy( 'wptests_tax', 'post', array(
 			'hierarchical' => true,
