@@ -30,6 +30,32 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 35495
+	 * @ticket 35381
+	 */
+	public function test_legacy_params_as_query_string_should_be_properly_parsed() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'wptests_tax', 'hide_empty=0&fields=ids&update_term_meta_cache=0' );
+
+		$this->assertEqualSets( array( $term ), $found );
+	}
+
+	/**
+	 * @ticket 35495
+	 * @ticket 35381
+	 */
+	public function test_new_params_as_query_string_should_be_properly_parsed() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$term = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		$found = get_terms( 'taxonomy=wptests_tax&hide_empty=0&fields=ids&update_term_meta_cache=0' );
+
+		$this->assertEqualSets( array( $term ), $found );
+	}
+
+	/**
+	 * @ticket 35495
 	 */
 	public function test_excluding_taxonomy_arg_should_return_terms_from_all_taxonomies() {
 		register_taxonomy( 'wptests_tax1', 'post' );
