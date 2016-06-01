@@ -1012,8 +1012,8 @@ class Tests_DB extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 32405
 	 * @ticket 36917
-	 * @ticket 37522
 	 */
 	function test_non_unicode_collations() {
 		global $wpdb;
