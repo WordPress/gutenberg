@@ -2511,4 +2511,216 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$found = wp_list_pluck( $q->comments, 'comment_ID' );
 		$this->assertEqualSets( array( $c ), $found );
 	}
+
+	public function test_comment_query_should_be_cached() {
+		global $wpdb;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$c = wp_insert_comment( array(
+			'comment_author' => 'Foo',
+			'comment_author_email' => 'foo@example.com',
+			'comment_post_ID' => self::$post_id,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+	}
+
+	public function test_created_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array( $c ), $q->comments );
+	}
+
+	public function test_updated_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_update_comment( array(
+			'comment_ID' => $c,
+			'comment_author' => 'Foo',
+			'comment_author_email' => 'foo@example.com',
+			'comment_post_ID' => self::$post_id,
+		) );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array( $c ), $q->comments );
+	}
+
+	public function test_deleted_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_delete_comment( $c );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array(), $q->comments );
+	}
+
+	public function test_trashed_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_trash_comment( $c );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array(), $q->comments );
+	}
+
+	public function test_untrashed_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		wp_trash_comment( $c );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_untrash_comment( $c );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array( $c ), $q->comments );
+	}
+
+	public function test_spammed_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_spam_comment( $c );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array(), $q->comments );
+	}
+
+	public function test_unspammed_comment_should_invalidate_query_cache() {
+		global $wpdb;
+
+		$c = self::factory()->comment->create( array(
+			'comment_post_ID' => self::$post_id,
+			'comment_approved' => '1',
+		) );
+
+		wp_spam_comment( $c );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		wp_unspam_comment( $c );
+
+		$num_queries = $wpdb->num_queries;
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'fields' => 'ids',
+		) );
+
+		$num_queries++;
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertEqualSets( array( $c ), $q->comments );
+	}
 }
