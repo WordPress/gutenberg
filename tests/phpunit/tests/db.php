@@ -955,4 +955,78 @@ class Tests_DB extends WP_UnitTestCase {
 
 		$wpdb->check_connection();
 	}
+
+	/**
+	 * @ticket 36917
+	 */
+	function test_charset_not_determined_when_disconnected() {
+		global $wpdb;
+
+		$charset = 'utf8';
+		$collate = 'this_isnt_a_collation';
+
+		$wpdb->close();
+
+		$result = $wpdb->determine_charset( $charset, $collate );
+
+		$this->assertSame( compact( 'charset', 'collate' ), $result );
+
+		$wpdb->check_connection();
+	}
+
+	/**
+	 * @ticket 36917
+	 */
+	function test_charset_switched_to_utf8mb4() {
+		global $wpdb;
+
+		if ( ! $wpdb->has_cap( 'utf8mb4' ) ) {
+			$this->markTestSkipped( 'This test requires utf8mb4 support.' );
+		}
+
+		$charset = 'utf8';
+		$collate = 'utf8_general_ci';
+
+		$result = $wpdb->determine_charset( $charset, $collate );
+
+		$this->assertSame( 'utf8mb4', $result['charset'] );
+	}
+
+	/**
+	 * @ticket 32105
+	 * @ticket 36917
+	 */
+	function test_collate_switched_to_utf8mb4_520() {
+		global $wpdb;
+
+		if ( ! $wpdb->has_cap( 'utf8mb4_520' ) ) {
+			$this->markTestSkipped( 'This test requires utf8mb4_520 support.' );
+		}
+
+		$charset = 'utf8';
+		$collate = 'utf8_general_ci';
+
+		$result = $wpdb->determine_charset( $charset, $collate );
+
+		$this->assertSame( 'utf8mb4_unicode_520_ci', $result['collate'] );
+	}
+
+	/**
+	 * @ticket 36917
+	 * @ticket 37522
+	 */
+	function test_non_unicode_collations() {
+		global $wpdb;
+
+		if ( ! $wpdb->has_cap( 'utf8mb4' ) ) {
+			$this->markTestSkipped( 'This test requires utf8mb4 support.' );
+		}
+
+		$charset = 'utf8';
+		$collate = 'utf8_swedish_ci';
+
+		$result = $wpdb->determine_charset( $charset, $collate );
+
+		$this->assertSame( 'utf8mb4_swedish_ci', $result['collate'] );
+	}
 }
