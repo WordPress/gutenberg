@@ -2430,6 +2430,51 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		$clauses['where'] .= $wpdb->prepare( ' AND comment_ID != %d AND comment_ID != %d', $this->to_exclude[0], $this->to_exclude[1] );
 		return $clauses;
 	}
+
+	/**
+	 * @ticket 36487
+	 */
+	public function test_cache_should_be_hit_when_querying_descendants() {
+		global $wpdb;
+
+		$p = self::factory()->post->create();
+		$comment_1 = self::factory()->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+		) );
+		$comment_2 = self::factory()->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $comment_1,
+		) );
+		$comment_3 = self::factory()->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $comment_1,
+		) );
+		$comment_4 = self::factory()->comment->create( array(
+			'comment_post_ID' => $p,
+			'comment_approved' => '1',
+			'comment_parent' => $comment_2,
+		) );
+
+		$q1 = new WP_Comment_Query( array(
+			'post_id' => $p,
+			'hierarchical' => true,
+		) );
+		$q1_ids = wp_list_pluck( $q1->comments, 'comment_ID' );
+
+		$num_queries = $wpdb->num_queries;
+		$q2 = new WP_Comment_Query( array(
+			'post_id' => $p,
+			'hierarchical' => true,
+		) );
+		$q2_ids = wp_list_pluck( $q2->comments, 'comment_ID' );
+
+		$this->assertEqualSets( $q1_ids, $q2_ids );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
 	/**
 	 * @ticket 27571
 	 */
