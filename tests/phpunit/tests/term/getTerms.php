@@ -2183,12 +2183,12 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	 * @ticket 36992
 	 * @ticket 35381
 	 */
-	public function test_count_should_pass_through_main_get_terms_filter() {
+	public function test_count_should_not_pass_through_main_get_terms_filter() {
 		add_filter( 'get_terms', array( __CLASS__, 'maybe_filter_count' ) );
 
 		$found = get_terms( array(
 			'hide_empty' => 0,
-			'count' => true,
+			'fields' => 'count',
 		) );
 
 		remove_filter( 'get_terms', array( __CLASS__, 'maybe_filter_count' ) );
