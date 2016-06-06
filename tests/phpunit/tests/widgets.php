@@ -336,7 +336,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	 * @see WP_Widget::form()
 	 */
 	function test_wp_widget_form() {
-		$widget = new WP_Widget_Mock( 'foo', 'Foo' );
+		$widget = new WP_Widget( 'foo', 'Foo' );
 		ob_start();
 		$retval = $widget->form( array() );
 		$output = ob_get_clean();
@@ -350,7 +350,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	function test_wp_widget_constructor() {
 		$id_base = 'foo';
 		$name = 'Foo';
-		$foo_widget = new WP_Widget_Mock( $id_base, $name );
+		$foo_widget = new WP_Widget( $id_base, $name );
 
 		$this->assertEquals( $id_base, $foo_widget->id_base );
 		$this->assertEquals( $name, $foo_widget->name );
@@ -368,7 +368,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 		$control_options = array(
 			'id_base' => 'bar_id_base',
 		);
-		$bar_widget = new WP_Widget_Mock( $id_base, $name, $widget_options, $control_options );
+		$bar_widget = new WP_Widget( $id_base, $name, $widget_options, $control_options );
 		$this->assertEquals( $widget_options['classname'], $bar_widget->widget_options['classname'] );
 		$this->assertEquals( $control_options['id_base'], $bar_widget->control_options['id_base'] );
 	}
@@ -379,7 +379,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_widget_get_field_name( $expected, $value_to_test ) {
-		$widget = new WP_Widget_Mock( 'foo', 'Foo' );
+		$widget = new WP_Widget( 'foo', 'Foo' );
 		$widget->_set( 2 );
 		$this->assertEquals( $expected, $widget->get_field_name( $value_to_test ) );
 	}
@@ -430,7 +430,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	 *
 	 */
 	function test_wp_widget_get_field_id( $expected, $value_to_test ) {
-		$widget = new WP_Widget_Mock( 'foo', 'Foo' );
+		$widget = new WP_Widget( 'foo', 'Foo' );
 		$widget->_set( 2 );
 		$this->assertEquals( $expected, $widget->get_field_id( $value_to_test ) );
 	}
@@ -503,7 +503,7 @@ class Tests_Widgets extends WP_UnitTestCase {
 	function test_wp_widget_is_preview() {
 		global $wp_customize;
 
-		$widget = new WP_Widget_Mock( 'foo', 'Foo' );
+		$widget = new WP_Widget( 'foo', 'Foo' );
 
 		$this->assertEmpty( $wp_customize );
 		$this->assertFalse( $widget->is_preview() );
@@ -679,14 +679,3 @@ class Tests_Widgets extends WP_UnitTestCase {
 	}
 
 }
-
-/**
- * Mock of WP_Widget.
- *
- * @since 4.6.0
- */
-class WP_Widget_Mock extends WP_Widget {
-	public function widget( $args, $instance ) {
-		return;
-	}
-};
