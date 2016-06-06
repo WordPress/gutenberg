@@ -643,6 +643,26 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37009
+	 */
+	public function test_term_whose_slug_matches_existing_term_but_name_does_not_should_get_suffixed_slug() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = self::factory()->term->create( array(
+			'name' => 'Foo#bar',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$created = wp_insert_term( 'Foo$bar', 'wptests_tax' );
+
+		$this->assertArrayHasKey( 'term_id', $created );
+
+		$created_term = get_term( $created['term_id'] );
+		$this->assertSame( 'Foo$bar', $created_term->name );
+		$this->assertSame( 'foobar-2', $created_term->slug );
+	}
+
+	/**
 	 * @ticket 35321
 	 */
 	public function test_wp_insert_term_with_null_description() {
