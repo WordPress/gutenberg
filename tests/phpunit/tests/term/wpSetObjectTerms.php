@@ -318,7 +318,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'foo', 'wptests_tax' );
 
 		$this->assertNotEmpty( $tt_ids );
-		$term = get_term( $tt_ids[0] );
+		$term = get_term_by( 'term_taxonomy_id', $tt_ids[0] );
 		$this->assertInstanceOf( 'WP_Term', $term );
 		$this->assertSame( 'foo', $term->slug );
 	}
@@ -335,7 +335,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'foo', 'wptests_tax' );
 
 		$this->assertNotEmpty( $tt_ids );
-		$term = get_term( $tt_ids[0] );
+		$term = get_term_by( 'term_taxonomy_id', $tt_ids[0] );
 		$this->assertInstanceOf( 'WP_Term', $term );
 		$this->assertSame( $t, $term->term_id );
 	}
@@ -352,7 +352,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'Bar', 'wptests_tax' );
 
 		$this->assertNotEmpty( $tt_ids );
-		$term = get_term( $tt_ids[0] );
+		$term = get_term_by( 'term_taxonomy_id', $tt_ids[0] );
 		$this->assertInstanceOf( 'WP_Term', $term );
 		$this->assertSame( $t, $term->term_id );
 	}
@@ -375,7 +375,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'Bar', 'wptests_tax' );
 
 		$this->assertNotEmpty( $tt_ids );
-		$term = get_term( $tt_ids[0] );
+		$term = get_term_by( 'term_taxonomy_id', $tt_ids[0] );
 		$this->assertInstanceOf( 'WP_Term', $term );
 		$this->assertSame( $t2, $term->term_id );
 	}
