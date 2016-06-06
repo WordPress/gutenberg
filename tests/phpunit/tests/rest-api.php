@@ -322,4 +322,29 @@ class Tests_REST_API extends WP_UnitTestCase {
 
 	}
 
+	public function jsonp_callback_provider() {
+		return array(
+			// Standard names
+			array( 'Springfield', true ),
+			array( 'shelby.ville', true ),
+			array( 'cypress_creek', true ),
+			array( 'KampKrusty1', true ),
+
+			// Invalid names
+			array( 'ogden-ville', false ),
+			array( 'north haverbrook', false ),
+			array( "Terror['Lake']", false ),
+			array( 'Cape[Feare]', false ),
+			array( '"NewHorrorfield"', false ),
+			array( 'Scream\\ville', false ),
+		);
+	}
+
+	/**
+	 * @dataProvider jsonp_callback_provider
+	 */
+	public function test_jsonp_callback_check( $callback, $valid ) {
+		$this->assertEquals( $valid, wp_check_jsonp_callback( $callback ) );
+	}
+
 }
