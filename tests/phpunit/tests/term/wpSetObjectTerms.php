@@ -309,4 +309,82 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$this->assertEquals( $tt_1[1], $tt_2[0] );
 
 	}
+
+	public function test_should_create_term_that_does_not_exist() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$this->assertFalse( get_term_by( 'slug', 'foo', 'wptests_tax' ) );
+
+		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'foo', 'wptests_tax' );
+
+		$this->assertNotEmpty( $tt_ids );
+		$term = get_term( $tt_ids[0] );
+		$this->assertInstanceOf( 'WP_Term', $term );
+		$this->assertSame( 'foo', $term->slug );
+	}
+
+	public function test_should_find_existing_term_by_slug_match() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+			'name' => 'Bar',
+		) );
+
+		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'foo', 'wptests_tax' );
+
+		$this->assertNotEmpty( $tt_ids );
+		$term = get_term( $tt_ids[0] );
+		$this->assertInstanceOf( 'WP_Term', $term );
+		$this->assertSame( $t, $term->term_id );
+	}
+
+	public function test_should_find_existing_term_by_name_match() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+			'name' => 'Bar',
+		) );
+
+		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'Bar', 'wptests_tax' );
+
+		$this->assertNotEmpty( $tt_ids );
+		$term = get_term( $tt_ids[0] );
+		$this->assertInstanceOf( 'WP_Term', $term );
+		$this->assertSame( $t, $term->term_id );
+	}
+
+	public function test_should_give_precedence_to_slug_match_over_name_match() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t1 = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'foo',
+			'name' => 'Bar',
+		) );
+
+		$t2 = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'slug' => 'bar',
+			'name' => 'Foo',
+		) );
+
+		$tt_ids = wp_set_object_terms( self::$post_ids[0], 'Bar', 'wptests_tax' );
+
+		$this->assertNotEmpty( $tt_ids );
+		$term = get_term( $tt_ids[0] );
+		$this->assertInstanceOf( 'WP_Term', $term );
+		$this->assertSame( $t2, $term->term_id );
+	}
+
+	public function test_non_existent_integers_should_be_ignored() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$tt_ids = wp_set_object_terms( self::$post_ids[0], 12345, 'wptests_tax' );
+
+		$this->assertSame( array(), $tt_ids );
+	}
 }
