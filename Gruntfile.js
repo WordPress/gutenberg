@@ -725,19 +725,26 @@ module.exports = function(grunt) {
 					grunt.fatal( 'The `' +  map[ type ] + '` command returned a non-zero exit code.', code );
 				}
 
-				[ 'png', 'jpg', 'gif', 'jpeg' ].forEach( function( extension ) {
-					if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
-						grunt.log.writeln( 'Image files modified. Minifying.');
+				if ( [ 'package.json', 'Gruntfile.js' ].some( function( path ) {
+					return ( result.stdout + '\n' ).indexOf( ' ' + path + '\n' ) !== -1;
+				} ) ) {
+					grunt.log.writeln( 'Configuration files modified. Running `prerelease`.' );
+					taskList.push( 'prerelease' );
+				} else {
+					if ( [ 'png', 'jpg', 'gif', 'jpeg' ].some( function( extension ) {
+						return ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1;
+					} ) ) {
+						grunt.log.writeln( 'Image files modified. Minifying.' );
 						taskList.push( 'precommit:image' );
 					}
-				} );
 
-				[ 'js', 'css', 'php' ].forEach( function( extension ) {
-					if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
-						grunt.log.writeln( extension.toUpperCase() + ' files modified. ' + extension.toUpperCase() + ' tests will be run.');
-						taskList.push( 'precommit:' + extension );
-					}
-				} );
+					[ 'js', 'css', 'php' ].forEach( function( extension ) {
+						if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
+							grunt.log.writeln( extension.toUpperCase() + ' files modified. ' + extension.toUpperCase() + ' tests will be run.' );
+							taskList.push( 'precommit:' + extension );
+						}
+					} );
+				}
 
 				grunt.task.run( taskList );
 
