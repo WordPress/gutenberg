@@ -40,6 +40,7 @@ $wpdb->select( DB_NAME, $wpdb->dbh );
 
 echo "Installing..." . PHP_EOL;
 
+$wpdb->query( "SET foreign_key_checks = 0" );
 foreach ( $wpdb->tables() as $table => $prefixed_table ) {
 	$wpdb->query( "DROP TABLE IF EXISTS $prefixed_table" );
 }
@@ -51,6 +52,7 @@ foreach ( $wpdb->tables( 'ms_global' ) as $table => $prefixed_table ) {
 	if ( $multisite )
 		$wpdb->$table = $prefixed_table;
 }
+$wpdb->query( "SET foreign_key_checks = 1" );
 
 // Prefill a permalink structure so that WP doesn't try to determine one itself.
 add_action( 'populate_options', '_set_default_permalink_structure_for_tests' );
