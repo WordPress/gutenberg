@@ -581,6 +581,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * public sites from the current network.
 	 *
 	 * @ticket 14511
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_default_arguments() {
 		self::factory()->blog->create( array( 'site_id' => 2 ) );
@@ -590,6 +591,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * No sites should match a query that specifies an invalid network ID.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_invalid_network_id() {
 		$this->assertcount( 0, wp_get_sites( array( 'network_id' => 999 ) ) );
@@ -597,6 +600,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * A network ID of null should query for all public sites on all networks.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_network_id_null() {
 		self::factory()->blog->create( array( 'site_id' => 2 ) );
@@ -606,6 +611,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * Expect only sites on the specified network ID to be returned.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_specific_network_id() {
 		self::factory()->blog->create( array( 'site_id' => 2 ) );
@@ -615,6 +622,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * Expect sites from both networks if both network IDs are specified.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_multiple_network_ids() {
 		self::factory()->blog->create( array( 'site_id' => 2 ) );
@@ -624,6 +633,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * Queries for public or non public sites should work across all networks if network ID is null.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_public_meta_on_all_networks() {
 		self::factory()->blog->create( array( 'site_id' => 2, 'meta' => array( 'public' => 0 ) ) );
@@ -634,6 +645,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * If a network ID is specified, queries for public sites should be restricted to that network.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_with_public_meta_restrict_to_one_network() {
 		self::factory()->blog->create( array( 'site_id' => 1, 'meta' => array( 'public' => 0 ) ) );
@@ -644,6 +657,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * Test the limit and offset arguments for wp_get_sites when multiple sites are available.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_limit_offset() {
 		// Create 2 more sites (in addition to the default one)
@@ -661,6 +676,8 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 	/**
 	 * Expect 0 sites when using an offset larger than the total number of sites.
+	 *
+	 * @expectedDeprecated wp_get_sites
 	 */
 	function test_wp_get_sites_offset_greater_than_available_sites() {
 		$this->assertCount( 0, wp_get_sites( array( 'offset' => 20 ) ) );
