@@ -3,6 +3,7 @@
 if ( is_multisite() ) :
 
 /**
+ * @group wp-get-site
  * @group ms-site
  * @group multisite
  */
@@ -29,6 +30,32 @@ class Tests_Multisite_WP_Get_Sites extends WP_UnitTestCase {
 		}
 
 		wp_update_network_site_counts();
+	}
+
+	/**
+	 * @expectedDeprecated wp_get_sites
+	 */
+	public function test_wp_get_sites_site_is_expected_array() {
+
+		$keys = array(
+			'blog_id',
+			'site_id',
+			'domain',
+			'path',
+			'registered',
+			'last_updated',
+			'public',
+			'archived',
+			'mature',
+			'spam',
+			'deleted',
+			'lang_id'
+		);
+		$sites = wp_get_sites();
+
+		$missing_keys = array_diff_key( array_flip( $keys ), $sites[0] );
+
+		$this->assertEquals( array(), $missing_keys, 'Keys are missing from site arrays.' );
 	}
 
 	/**
