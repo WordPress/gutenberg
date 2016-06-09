@@ -7,112 +7,61 @@ if ( is_multisite() ) :
  * @group multisite
  */
 class Tests_Multisite_WP_Get_Sites extends WP_UnitTestCase {
+	protected static $site_ids;
 
-	/**
-	 * Test the default arguments for wp_get_sites, which should return only
-	 * public sites from the current network.
-	 *
-	 * @ticket 14511
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_with_default_arguments() {
-		self::factory()->blog->create( array( 'site_id' => 2 ) );
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$site_ids = array(
+			'w.org/'      => array( 'domain' => 'w.org',  'path' => '/',     'site_id' => 2 ),
+			'wp.org/'     => array( 'domain' => 'wp.org', 'path' => '/',     'site_id' => 2, 'meta' => array( 'public' => 0 ) ),
+			'wp.org/foo/' => array( 'domain' => 'wp.org', 'path' => '/foo/', 'site_id' => 1, 'meta' => array( 'public' => 0 ) ),
+			'wp.org/oof/' => array( 'domain' => 'wp.org', 'path' => '/oof/' ),
+		);
 
-		$this->assertCount( 1, wp_get_sites() );
+		foreach ( self::$site_ids as &$id ) {
+			$id = $factory->blog->create( $id );
+		}
+		unset( $id );
+	}
+
+	public static function wpTearDownAfterClass() {
+		foreach( self::$site_ids as $id ) {
+			wpmu_delete_blog( $id, true );
+		}
+
+		wp_update_network_site_counts();
 	}
 
 	/**
-	 * No sites should match a query that specifies an invalid network ID.
-	 *
 	 * @expectedDeprecated wp_get_sites
+	 * @dataProvider data_wp_get_sites
+	 *
+	 * @param $expected
+	 * @param $args
+	 * @param $error
 	 */
-	function test_wp_get_sites_with_invalid_network_id() {
-		$this->assertcount( 0, wp_get_sites( array( 'network_id' => 999 ) ) );
+	public function test_wp_get_sites( $expected, $args, $error ) {
+		$this->assertCount( $expected, wp_get_sites( $args ), $error );
 	}
 
 	/**
-	 * A network ID of null should query for all public sites on all networks.
-	 *
-	 * @expectedDeprecated wp_get_sites
+	 * @return array
 	 */
-	function test_wp_get_sites_with_network_id_null() {
-		self::factory()->blog->create( array( 'site_id' => 2 ) );
-
-		$this->assertCount( 2, wp_get_sites( array( 'network_id' => null ) ) );
-	}
-
-	/**
-	 * Expect only sites on the specified network ID to be returned.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_with_specific_network_id() {
-		self::factory()->blog->create( array( 'site_id' => 2 ) );
-
-		$this->assertCount( 1, wp_get_sites( array( 'network_id' => 2 ) ) );
-	}
-
-	/**
-	 * Expect sites from both networks if both network IDs are specified.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_with_multiple_network_ids() {
-		self::factory()->blog->create( array( 'site_id' => 2 ) );
-
-		$this->assertCount( 2, wp_get_sites( array( 'network_id' => array( 1, 2 ) ) ) );
-	}
-
-	/**
-	 * Queries for public or non public sites should work across all networks if network ID is null.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_with_public_meta_on_all_networks() {
-		self::factory()->blog->create( array( 'site_id' => 2, 'meta' => array( 'public' => 0 ) ) );
-
-		$this->assertCount( 1, wp_get_sites( array( 'public' => 1, 'network_id' => null ) ) );
-		$this->assertcount( 1, wp_get_sites( array( 'public' => 0, 'network_id' => null ) ) );
-	}
-
-	/**
-	 * If a network ID is specified, queries for public sites should be restricted to that network.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_with_public_meta_restrict_to_one_network() {
-		self::factory()->blog->create( array( 'site_id' => 1, 'meta' => array( 'public' => 0 ) ) );
-
-		$this->assertCount( 1, wp_get_sites( array( 'public' => 1, 'network_id' => 1 ) ) );
-		$this->assertCount( 0, wp_get_sites( array( 'public' => 1, 'network_id' => 2 ) ) );
-	}
-
-	/**
-	 * Test the limit and offset arguments for wp_get_sites when multiple sites are available.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_limit_offset() {
-		// Create 2 more sites (in addition to the default one)
-		self::factory()->blog->create_many( 2 );
-
-		// Expect first 2 sites when using limit
-		$this->assertCount( 2, wp_get_sites( array( 'limit' => 2 ) ) );
-
-		// Expect only the last 2 sites when using offset of 1 (limit will default to 100)
-		$this->assertCount( 2, wp_get_sites( array( 'offset' => 1 ) ) );
-
-		// Expect only the last 1 site when using offset of 2 and limit of 2
-		$this->assertCount( 1, wp_get_sites( array( 'limit' => 2, 'offset' => 2 ) ) );
-	}
-
-	/**
-	 * Expect 0 sites when using an offset larger than the total number of sites.
-	 *
-	 * @expectedDeprecated wp_get_sites
-	 */
-	function test_wp_get_sites_offset_greater_than_available_sites() {
-		$this->assertCount( 0, wp_get_sites( array( 'offset' => 20 ) ) );
+	public function data_wp_get_sites() {
+		return array(
+			array( 3, array(), 'Default arguments should return all sites from the current network.' ),
+			array( 0, array( 'network_id' => 999 ), 'No sites should match a query with an invalid network ID.' ),
+			array( 5, array( 'network_id' => null ), 'A network ID of null should return all sites on all networks.' ),
+			array( 2, array( 'network_id' => 2 ), 'Only sites on a specified network ID should be returned.' ),
+			array( 5, array( 'network_id' => array( 1, 2 ) ), 'If multiple network IDs are specified, sites from both should be returned.' ),
+			array( 3, array( 'public' => 1, 'network_id' => null ), 'Public sites on all networks.' ),
+			array( 2, array( 'public' => 0, 'network_id' => null ), 'Non public sites on all networks.' ),
+			array( 2, array( 'public' => 1, 'network_id' => 1 ), 'Public sites on a single network.' ),
+			array( 1, array( 'public' => 1, 'network_id' => 2 ), 'Public sites on a second network.' ),
+			array( 2, array( 'limit' => 2 ), 'Provide only a limit argument.' ),
+			array( 1, array( 'limit' => 2, 'offset' => 2 ), 'Provide both limit and offset arguments.' ),
+			array( 2, array( 'offset' => 1 ), 'Provide only an offset argument.' ),
+			array( 0, array( 'offset' => 20 ), 'Expect 0 sites when using an offset larger than the total number of sites.' ),
+		);
 	}
 }
 
