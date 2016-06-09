@@ -3,83 +3,118 @@
 if ( is_multisite() ) :
 
 /**
+ * @ticket 29845
  * @group ms-site
  * @group multisite
  */
 class Tests_Multisite_Get_Blog_Details extends WP_UnitTestCase {
-	/**
-	 * @ticket 29845
-	 */
-	public function test_get_blog_details() {
-		$network_ids = array(
-			'wordpress.org/'         => array( 'domain' => 'wordpress.org', 'path' => '/' ),
-			'make.wordpress.org/'    => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
+	protected static $network_ids;
+	protected static $site_ids;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$site_ids = array(
+			WP_TESTS_DOMAIN . '/foo/'      => array( 'domain' => WP_TESTS_DOMAIN,          'path' => '/foo/'),
+			'foo.' . WP_TESTS_DOMAIN . '/' => array( 'domain' => 'foo.' . WP_TESTS_DOMAIN, 'path' => '/' ),
+			'wordpress.org/'               => array( 'domain' => 'wordpress.org',          'path' => '/' ),
 		);
 
-		foreach ( $network_ids as &$id ) {
-			$id = self::factory()->network->create( $id );
+		foreach ( self::$site_ids as &$id ) {
+			$id = $factory->blog->create( $id );
 		}
 		unset( $id );
+	}
 
-		$ids = array(
-			'wordpress.org/'              => array( 'domain' => 'wordpress.org',      'path' => '/',         'title' => 'Test 1', 'site_id' => $network_ids['wordpress.org/'] ),
-			'wordpress.org/foo/'          => array( 'domain' => 'wordpress.org',      'path' => '/foo/',     'title' => 'Test 2', 'site_id' => $network_ids['wordpress.org/'] ),
-			'wordpress.org/foo/bar/'      => array( 'domain' => 'wordpress.org',      'path' => '/foo/bar/', 'title' => 'Test 3', 'site_id' => $network_ids['wordpress.org/'] ),
-			'make.wordpress.org/'         => array( 'domain' => 'make.wordpress.org', 'path' => '/',         'title' => 'Test 4', 'site_id' => $network_ids['make.wordpress.org/'] ),
-			'make.wordpress.org/foo/'     => array( 'domain' => 'make.wordpress.org', 'path' => '/foo/',     'title' => 'Test 5', 'site_id' => $network_ids['make.wordpress.org/'] ),
-		);
-
-		foreach ( $ids as &$id ) {
-			$id = self::factory()->blog->create( $id );
+	public static function wpTearDownAfterClass() {
+		foreach( self::$site_ids as $id ) {
+			wpmu_delete_blog( $id, true );
 		}
-		unset( $id );
 
-		// Retrieve site details by passing only a blog ID.
-		$site = get_blog_details( $ids['wordpress.org/'] );
-		$this->assertEquals( $ids['wordpress.org/'], $site->blog_id );
-		$this->assertEquals( 'Test 1', $site->blogname );
+		wp_update_network_site_counts();
+	}
 
-		$site = get_blog_details( $ids['wordpress.org/foo/'] );
-		$this->assertEquals( $ids['wordpress.org/foo/'], $site->blog_id );
-		$this->assertEquals( 'Test 2', $site->blogname );
+	public function test_get_blog_details_with_no_arguments_returns_current_site() {
+		$site = get_blog_details();
+		$this->assertEquals( get_current_blog_id(), $site->blog_id );
+	}
 
-		$site = get_blog_details( 999 );
+	public function test_get_blog_details_with_site_name_string_subdirectory() {
+		if ( is_subdomain_install() ) {
+			$this->markTestSkipped( 'This test is only valid in a subdirectory configuration.' );
+		}
+
+		$site = get_blog_details( 'foo' );
+		$this->assertEquals( self::$site_ids[ WP_TESTS_DOMAIN . '/foo/'], $site->blog_id );
+	}
+
+	public function test_get_blog_details_with_site_name_string_subdomain() {
+		if ( ! is_subdomain_install() ) {
+			$this->markTestSkipped( 'This test is only valid in a subdomain configuration.' );
+		}
+
+		$site = get_blog_details( 'foo' );
+		$this->assertEquals( self::$site_ids[ 'foo.' . WP_TESTS_DOMAIN . '/' ], $site->blog_id );
+	}
+
+	public function test_get_blog_details_with_invalid_site_name_string() {
+		$site = get_blog_details( 'invalid' );
 		$this->assertFalse( $site );
+	}
 
-		// Retrieve site details by passing an array containing blog_id.
-		$site = get_blog_details( array( 'blog_id' => $ids['wordpress.org/foo/bar/'] ) );
-		$this->assertEquals( $ids['wordpress.org/foo/bar/'], $site->blog_id );
-		$this->assertEquals( 'Test 3', $site->blogname );
+	public function test_get_blog_details_with_site_id_int() {
+		$site = get_blog_details( self::$site_ids['wordpress.org/'] );
+		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
+	}
 
-		$site = get_blog_details( array( 'blog_id' => $ids['make.wordpress.org/'] ) );
-		$this->assertEquals( $ids['make.wordpress.org/'], $site->blog_id );
-		$this->assertEquals( 'Test 4', $site->blogname );
-
-		$site = get_blog_details( array( 'blog_id' => 999 ) );
+	public function test_get_blog_details_with_invalid_site_id_int() {
+		$site = get_blog_details( 99999 );
 		$this->assertFalse( $site );
+	}
 
-		// Retrieve site details by passing an array containing domain and path.
+	public function test_get_blog_details_with_blog_id_in_fields() {
+		$site = get_blog_details( array( 'blog_id' => self::$site_ids['wordpress.org/'] ) );
+		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
+	}
+
+	public function test_get_blog_details_with_invalid_blog_id_in_fields() {
+		$site = get_blog_details( array( 'blog_id' => 88888 ) );
+		$this->assertFalse( $site );
+	}
+
+	public function test_get_blog_details_with_domain_and_path_in_fields() {
 		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/' ) );
-		$this->assertEquals( $ids['wordpress.org/'], $site->blog_id );
-		$this->assertEquals( 'Test 1', $site->blogname );
+		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
+	}
 
-		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/foo/' ) );
-		$this->assertEquals( $ids['wordpress.org/foo/'], $site->blog_id );
-		$this->assertEquals( 'Test 2', $site->blogname );
-
-		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/foo/bar/' ) );
-		$this->assertEquals( $ids['wordpress.org/foo/bar/'], $site->blog_id );
-		$this->assertEquals( 'Test 3', $site->blogname );
-
-		$site = get_blog_details( array( 'domain' => 'make.wordpress.org', 'path' => '/' ) );
-		$this->assertEquals( $ids['make.wordpress.org/'], $site->blog_id );
-		$this->assertEquals( 'Test 4', $site->blogname );
-
-		$site = get_blog_details( array( 'domain' => 'make.wordpress.org', 'path' => '/foo/' ) );
-		$this->assertEquals( $ids['make.wordpress.org/foo/'], $site->blog_id );
-		$this->assertEquals( 'Test 5', $site->blogname );
-
+	public function test_get_blog_details_with_domain_and_invalid_path_in_fields() {
 		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/zxy/' ) );
+		$this->assertFalse( $site );
+	}
+
+	public function test_get_blog_details_with_path_and_invalid_domain_in_fields() {
+		$site = get_blog_details( array( 'domain' => 'invalid.org', 'path' => '/foo/' ) );
+		$this->assertFalse( $site );
+	}
+
+	public function test_get_blog_details_with_only_domain_in_fields_subdomain() {
+		if ( ! is_subdomain_install() ) {
+			$this->markTestSkipped( 'This test is only valid in a subdomain configuration.' );
+		}
+
+		$site = get_blog_details( array( 'domain' => 'wordpress.org' ) );
+		$this->assertEquals( self::$site_ids['wordpress.org/'], $site->blog_id );
+	}
+
+	public function test_get_blog_details_with_only_domain_in_fields_subdirectory() {
+		if ( is_subdomain_install() ) {
+			$this->markTestSkipped( 'This test is only valid in a subdirectory configuration.' );
+		}
+
+		$site = get_blog_details( array( 'domain' => 'wordpress.org' ) );
+		$this->assertFalse( $site );
+	}
+
+	public function test_get_blog_details_with_only_path_in_fields() {
+		$site = get_blog_details( array( 'path' => '/foo/' ) );
 		$this->assertFalse( $site );
 	}
 }
