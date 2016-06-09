@@ -6,7 +6,7 @@
 		return;
 	}
 
-	function mceType(chr) {
+	function mceType( chr, noKeyUp ) {
 		var editor = tinymce.activeEditor, keyCode, charCode, evt, startElm, rng, startContainer, startOffset, textNode;
 
 		function charCodeToKeyCode(charCode) {
@@ -109,12 +109,17 @@
 			}
 		}
 
-		fakeEvent(startElm, 'keyup', evt);
+		if ( ! noKeyUp ) {
+			fakeEvent(startElm, 'keyup', evt);
+		}
 	}
 
 	function type() {
 		var args = arguments;
 
+		// Wait once for conversions to be triggered,
+		// and once for the `canUndo` flag to be set.
+		setTimeout( function() {
 		setTimeout( function() {
 			if ( typeof args[0] === 'string' ) {
 				args[0] = args[0].split( '' );
@@ -133,6 +138,7 @@
 			if ( args.length ) {
 				type.apply( null, args );
 			}
+		} );
 		} );
 	}
 
@@ -173,6 +179,14 @@
 
 	QUnit.test( 'Unordered list.', function( assert ) {
 		type( '* a', function() {
+			assert.equal( editor.getContent(), '<ul>\n<li>a</li>\n</ul>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Unordered list. (fast)', function( assert ) {
+		type( '*', function() {
+			mceType( ' ', true );
+		}, 'a', function() {
 			assert.equal( editor.getContent(), '<ul>\n<li>a</li>\n</ul>' );
 		}, assert.async() );
 	} );
