@@ -6,7 +6,7 @@
  * @package wordpress-i18n
  * @subpackage tools
  */
-// see: http://php.net/tokenizer
+// see: https://secure.php.net/tokenizer
 if ( ! defined( 'T_ML_COMMENT' ) )
 	    define( 'T_ML_COMMENT', T_COMMENT );
 else
