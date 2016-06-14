@@ -60,7 +60,7 @@ class Tests_Functions extends WP_UnitTestCase {
 		// test if boundaries are correct
 		$this->assertEquals('1 GB', size_format($gb, 0));
 		$this->assertEquals('1 MB', size_format($mb, 0));
-		$this->assertEquals('1 kB', size_format($kb, 0));
+		$this->assertEquals('1 KB', size_format($kb, 0));
 		$this->assertEquals('1 B',  size_format($b, 0));
 		// now some values around
 		// add some bytes to make sure the result isn't 1.4999999
