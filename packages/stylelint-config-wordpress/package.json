@@ -45,7 +45,7 @@
     "ava": "ava --verbose \"__tests__/**/*.js\"",
     "lint": "eslint . --ignore-path .gitignore",
     "pretest": "npm run lint",
-    "release": "npmpub",
+    "release": "npmpub --verbose",
     "test": "npm run ava"
   },
   "babel": {
