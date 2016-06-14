@@ -1,6 +1,8 @@
 # HEAD
 
 * Removed: `stylelint < 6.6.0` compatibility.
+* Removed: `number-zero-length-no-unit` rule.
+* Added: `length-zero-no-unit` rule.
 
 # 7.1.1
 

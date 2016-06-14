@@ -42,6 +42,7 @@ module.exports = {
     "function-whitespace-after": "always",
     "indentation": "tab",
     "keyframe-declaration-no-important": true,
+    "length-zero-no-unit": true,
     "max-empty-lines": 2,
     "media-feature-colon-space-after": "always",
     "media-feature-colon-space-before": "never",
@@ -57,7 +58,6 @@ module.exports = {
     "no-missing-eof-newline": true,
     "number-leading-zero": "always",
     "number-no-trailing-zeros": true,
-    "number-zero-length-no-unit": true,
     "property-case": "lower",
     "rule-nested-empty-line-before": [ "always", {
       ignore: ["after-comment"],
