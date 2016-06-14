@@ -1,3 +1,7 @@
+# HEAD
+
+* Removed: `stylelint < 6.6.0` compatibility.
+
 # 7.1.1
 
 * Fixed: Re-releasing failed npmjs.com 7.0.0 release as 7.1.1.

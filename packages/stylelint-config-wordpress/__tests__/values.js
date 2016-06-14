@@ -52,7 +52,7 @@ test("There are warnings with invalid values CSS", t => {
     t.truthy(errored, "errored")
     t.is(warnings.length, 6, "flags eight warnings")
     t.is(warnings[0].text, "Expected a trailing semicolon (declaration-block-trailing-semicolon)", "correct warning text")
-    t.is(warnings[1].text, "Expected single space after \":\" with a single-line value (declaration-colon-space-after)", "correct warning text")
+    t.is(warnings[1].text, "Expected single space after \":\" with a single-line declaration (declaration-colon-space-after)", "correct warning text")
     t.is(warnings[2].text, "Unexpected unit on zero length number (number-zero-length-no-unit)", "correct warning text")
     t.is(warnings[3].text, "Unexpected unit on zero length number (number-zero-length-no-unit)", "correct warning text")
     t.is(warnings[4].text, "Unexpected unit on zero length number (number-zero-length-no-unit)", "correct warning text")
