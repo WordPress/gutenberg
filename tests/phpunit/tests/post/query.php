@@ -388,4 +388,28 @@ class Tests_Post_Query extends WP_UnitTestCase {
 		$actual_posts = $q->get_posts();
 		$this->assertEqualSets( $requested, $actual_posts );
 	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_posts_pre_query_filter_should_bypass_database_query() {
+		global $wpdb;
+
+		add_filter( 'posts_pre_query', array( __CLASS__, 'filter_posts_pre_query' ) );
+
+		$num_queries = $wpdb->num_queries;
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'no_found_rows' => true,
+		) );
+
+		remove_filter( 'posts_pre_query', array( __CLASS__, 'filter_posts_pre_query' ) );
+
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+		$this->assertSame( array( 12345 ), $q->posts );
+	}
+
+	public static function filter_posts_pre_query( $posts ) {
+		return array( 12345 );
+	}
 }
