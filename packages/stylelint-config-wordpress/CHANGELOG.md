@@ -1,4 +1,4 @@
-# HEAD
+# 8.0.0
 
 * Removed: `stylelint < 6.6.0` compatibility.
 * Removed: `number-zero-length-no-unit` rule.
