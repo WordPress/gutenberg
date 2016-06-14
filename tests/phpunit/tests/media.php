@@ -273,12 +273,12 @@ https://w.org</a>'
 		$this->assertEquals( '1TB', wp_convert_bytes_to_hr( $tb ) );
 		$this->assertEquals( '1GB', wp_convert_bytes_to_hr( $gb ) );
 		$this->assertEquals( '1MB', wp_convert_bytes_to_hr( $mb ) );
-		$this->assertEquals( '1kB', wp_convert_bytes_to_hr( $kb ) );
+		$this->assertEquals( '1KB', wp_convert_bytes_to_hr( $kb ) );
 
 		$this->assertEquals( '1 TB', size_format( $tb ) );
 		$this->assertEquals( '1 GB', size_format( $gb ) );
 		$this->assertEquals( '1 MB', size_format( $mb ) );
-		$this->assertEquals( '1 kB', size_format( $kb ) );
+		$this->assertEquals( '1 KB', size_format( $kb ) );
 
 		// now some values around
 		$hr = wp_convert_bytes_to_hr( $tb + $tb / 2 + $mb );
