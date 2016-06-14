@@ -344,6 +344,7 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 		$this->assertEquals( $count_customize_render_partials_after + 1, has_action( 'customize_render_partials_after' ) );
 		$output = json_decode( ob_get_clean(), true );
 		$this->assertEquals( array( get_bloginfo( 'name', 'display' ) ), $output['data']['contents']['test_blogname'] );
+		$this->assertArrayHasKey( 'setting_validities', $output['data'] );
 	}
 
 	/**

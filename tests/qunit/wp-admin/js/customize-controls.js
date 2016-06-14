@@ -96,6 +96,13 @@ jQuery( window ).load( function (){
 		ok( setting.notifications.extended( wp.customize.Values ) );
 		equal( wp.customize.Notification, setting.notifications.prototype.constructor.defaultConstructor );
 	} );
+	test( 'Setting has findControls method', function() {
+		var controls, setting = wp.customize( 'fixture-setting' );
+		equal( 'function', typeof setting.findControls );
+		controls = setting.findControls();
+		equal( 1, controls.length );
+		equal( 'fixture-control', controls[0].id );
+	} );
 	test( 'Setting constructor object exists', function( assert ) {
 		assert.ok( _.isObject( wp.customize.settingConstructor ) );
 	} );
@@ -505,4 +512,16 @@ jQuery( window ).load( function (){
 	test( 'Panel instance is not contextuallyActive', function () {
 		equal( mockPanel.isContextuallyActive(), false );
 	});
+
+	module( 'Test wp.customize.findControlsForSettings' );
+	test( 'findControlsForSettings(blogname)', function() {
+		var controlsForSettings, settingId = 'fixture-setting', controlId = 'fixture-control';
+		ok( wp.customize.control.has( controlId ) );
+		ok( wp.customize.has( settingId ) );
+		controlsForSettings = wp.customize.findControlsForSettings( [ settingId ] );
+		ok( _.isObject( controlsForSettings ), 'Response is object' );
+		ok( _.isArray( controlsForSettings['fixture-setting'] ), 'Response has a fixture-setting array' );
+		equal( 1, controlsForSettings['fixture-setting'].length );
+		equal( wp.customize.control( controlId ), controlsForSettings['fixture-setting'][0] );
+	} );
 });
