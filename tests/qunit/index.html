@@ -10,6 +10,13 @@
 		<script src="../../src/wp-includes/js/backbone.min.js"></script>
 		<script src="../../src/wp-includes/js/wp-backbone.js"></script>
 		<script src="../../src/wp-includes/js/zxcvbn.min.js"></script>
+		<script>
+			window._wpUtilSettings = {
+				'ajax': {
+					'url': '\/wp-admin\/admin-ajax.php'
+				}
+			};
+		</script>
 		<script src="../../src/wp-includes/js/wp-util.js"></script>
 		<script src="../../src/wp-includes/js/wp-a11y.js"></script>
 
@@ -482,5 +489,42 @@
 		<script src="../../src/wp-includes/js/tinymce/tinymce.js"></script>
 		<script src="editor/js/utils.js"></script>
 		<script src="wp-includes/js/tinymce/plugins/wptextpattern/plugin.js"></script>
+
+		<!-- Updates templates and HTML fixtures -->
+		<script id="tmpl-wp-updates-admin-notice" type="text/html">
+			<div <# if ( data.id ) { #>id="{{ data.id }}"<# } #> class="notice {{ data.className }}"><p>{{{ data.message }}}</p></div>
+		</script>
+		<div hidden>
+			<li id="wp-admin-bar-updates">
+				<a class="ab-item" href="wp-admin/update-core.php" title="2 Plugin Updates">
+					<span class="ab-icon"></span>
+					<span class="ab-label">2</span>
+					<span class="screen-reader-text">2 Plugin Updates</span>
+				</a>
+			</li>
+			<li class="wp-has-submenu wp-not-current-submenu menu-top menu-icon-plugins" id="menu-plugins">
+				<a href="plugins.php" class="wp-has-submenu wp-not-current-submenu menu-top menu-icon-plugins" aria-haspopup="true">
+					<div class="wp-menu-arrow"><div></div></div>
+					<div class="wp-menu-image dashicons-before dashicons-admin-plugins"><br></div>
+					<div class="wp-menu-name">Plugins
+				<span class="update-plugins count-2">
+					<span class="plugin-count">2</span>
+				</span>
+					</div>
+				</a>
+				<ul class="wp-submenu wp-submenu-wrap">
+					<li class="wp-submenu-head" aria-hidden="true">Plugins
+				<span class="update-plugins count-2">
+					<span class="plugin-count">2</span>
+				</span>
+					</li>
+					<li class="wp-first-item">
+						<a href="plugins.php" class="wp-first-item">Installed Plugins</a></li><li><a href="plugin-install.php">Add New</a>
+				</li><li>
+					<a href="plugin-editor.php">Editor</a>
+				</li>
+				</ul>
+			</li>
+		</div>
 	</body>
 </html>
