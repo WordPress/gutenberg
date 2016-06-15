@@ -412,4 +412,39 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	public static function filter_posts_pre_query( $posts ) {
 		return array( 12345 );
 	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_posts_pre_query_filter_should_respect_set_found_posts() {
+		global $wpdb;
+
+		$this->post_id = self::factory()->post->create();
+
+		// Prevent the DB query
+		add_filter( 'posts_request', '__return_empty_string' );
+		add_filter( 'found_posts_query', '__return_empty_string' );
+
+		// Add the post and found_posts
+		add_filter( 'the_posts', array( $this, 'filter_the_posts' ) );
+		add_filter( 'found_posts', array( $this, 'filter_found_posts' ) );
+
+		$q = new WP_Query( array( 'suppress_filters' => false ) );
+
+		remove_filter( 'posts_request', '__return_empty_string' );
+		remove_filter( 'found_posts_query', '__return_empty_string' );
+		remove_filter( 'the_posts', array( $this, 'filter_the_posts' ) );
+		remove_filter( 'found_posts', array( $this, 'filter_found_posts' ) );
+
+		$this->assertSame( array( $this->post_id ), wp_list_pluck( $q->posts, 'ID' ) );
+		$this->assertSame( 1, $q->found_posts );
+	}
+
+	public function filter_the_posts() {
+		return array( get_post( $this->post_id ) );
+	}
+
+	public function filter_found_posts( $posts ) {
+		return 1;
+	}
 }
