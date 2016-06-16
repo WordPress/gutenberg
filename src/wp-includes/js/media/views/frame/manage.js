@@ -189,6 +189,10 @@ Manage = MediaFrame.extend({
 	addNewClickHandler: function( event ) {
 		event.preventDefault();
 		this.trigger( 'toggle:upload:attachment' );
+
+		if ( this.uploader ) {
+			this.uploader.refresh();
+		}
 	},
 
 	/**
