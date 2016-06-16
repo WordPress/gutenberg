@@ -447,4 +447,92 @@ class Tests_Post_Query extends WP_UnitTestCase {
 	public function filter_found_posts( $posts ) {
 		return 1;
 	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_set_found_posts_fields_ids() {
+		register_post_type( 'wptests_pt' );
+
+		$posts = self::factory()->post->create_many( 2, array( 'post_type' => 'wptests_pt' ) );
+
+		foreach ( $posts as $p ) {
+			clean_post_cache( $p );
+		}
+
+		$q = new WP_Query( array(
+			'post_type' => 'wptests_pt',
+			'posts_per_page' => 1,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEquals( 2, $q->found_posts );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_set_found_posts_fields_idparent() {
+		register_post_type( 'wptests_pt' );
+
+		$posts = self::factory()->post->create_many( 2, array( 'post_type' => 'wptests_pt' ) );
+		foreach ( $posts as $p ) {
+			clean_post_cache( $p );
+		}
+
+		$q = new WP_Query( array(
+			'post_type' => 'wptests_pt',
+			'posts_per_page' => 1,
+			'fields' => 'id=>parent',
+		) );
+
+		$this->assertEquals( 2, $q->found_posts );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_set_found_posts_fields_split_the_query() {
+		register_post_type( 'wptests_pt' );
+
+		$posts = self::factory()->post->create_many( 2, array( 'post_type' => 'wptests_pt' ) );
+		foreach ( $posts as $p ) {
+			clean_post_cache( $p );
+		}
+
+		add_filter( 'split_the_query', '__return_true' );
+		$q = new WP_Query( array(
+			'post_type' => 'wptests_pt',
+			'posts_per_page' => 1,
+		) );
+		remove_filter( 'split_the_query', '__return_true' );
+
+		$this->assertEquals( 2, $q->found_posts );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
+
+	/**
+	 * @ticket 36687
+	 */
+	public function test_set_found_posts_fields_not_split_the_query() {
+		register_post_type( 'wptests_pt' );
+
+		$posts = self::factory()->post->create_many( 2, array( 'post_type' => 'wptests_pt' ) );
+		foreach ( $posts as $p ) {
+			clean_post_cache( $p );
+		}
+
+		// ! $split_the_query
+		add_filter( 'split_the_query', '__return_false' );
+		$q = new WP_Query( array(
+			'post_type' => 'wptests_pt',
+			'posts_per_page' => 1,
+		) );
+		remove_filter( 'split_the_query', '__return_false' );
+
+		$this->assertEquals( 2, $q->found_posts );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
 }
