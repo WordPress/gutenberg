@@ -24,7 +24,8 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		// If this is not null, the oEmbed result has been filtered before any HTTP requests were made.
 		$this->pre_oembed_result_filtered = $result;
 
-		return $result;
+		// Return false to prevent HTTP requests during tests.
+		return $result ? $result : false;
 	}
 
 	public function test_wp_filter_pre_oembed_result_prevents_http_request_for_internal_permalinks() {
@@ -52,5 +53,20 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 
 		$this->assertTrue( false !== $this->pre_oembed_result_filtered );
 		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
+	}
+
+	public function test_wp_filter_pre_oembed_result_non_existent_post() {
+		$post_id   = self::factory()->post->create();
+		$permalink = get_permalink( $post_id );
+
+		$this->go_to( $permalink );
+		$this->assertQueryTrue( 'is_single', 'is_singular' );
+
+		add_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+		$actual = $this->oembed->get_html( 'https://example.com/' );
+		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
+
+		$this->assertTrue( false !== $this->pre_oembed_result_filtered );
+		$this->assertFalse( $actual );
 	}
 }
