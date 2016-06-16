@@ -470,6 +470,84 @@ class Tests_Multisite_Site_Query extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $found );
 	}
+
+	public function test_wp_site_query_by_search_with_text_in_path_exclude_domain_from_search() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'search' => 'make',
+			'search_columns' => array( 'path' ),
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+		);
+
+		$this->assertEquals( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_search_with_text_in_domain_exclude_path_from_search() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'search' => 'make',
+			'search_columns' => array( 'domain' ),
+		) );
+
+		$expected = array(
+			self::$site_ids['make.wordpress.org/'],
+			self::$site_ids['make.wordpress.org/foo/'],
+		);
+
+		$this->assertEquals( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_search_with_wildcard_in_text() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields'       => 'ids',
+			'search'       => 'm*ke',
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+			self::$site_ids['make.wordpress.org/'],
+			self::$site_ids['make.wordpress.org/foo/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_search_with_wildcard_in_text_exclude_path_from_search() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'search' => 'm*ke',
+			'search_columns' => array( 'domain' ),
+		) );
+
+		$expected = array(
+			self::$site_ids['make.wordpress.org/'],
+			self::$site_ids['make.wordpress.org/foo/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_search_with_wildcard_in_text_exclude_domain_from_search() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'search' => 'm*ke',
+			'search_columns' => array( 'path' ),
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
 }
 
 endif;
