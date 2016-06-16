@@ -717,6 +717,15 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertContains( 'test/another', $namespaces );
 	}
 
+	public function test_x_robot_tag_header_on_requests() {
+		$request = new WP_REST_Request( 'GET', '/', array() );
+
+		$result = $this->server->serve_request('/');
+		$headers = $this->server->sent_headers;
+
+		$this->assertEquals( 'noindex', $headers['X-Robots-Tag'] );
+	}
+
 	public function test_nocache_headers_on_authenticated_requests() {
 		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
 		$request = new WP_REST_Request( 'GET', '/', array() );
