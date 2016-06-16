@@ -57,6 +57,8 @@ before_script:
 - npm prune
 - mysql --version
 - phpenv versions
+- npm --version
+- node --version
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
