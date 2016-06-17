@@ -73,8 +73,11 @@ class Tests_WP_MS_Sites_List_Table extends WP_UnitTestCase {
 
 		$expected = array(
 			self::$site_ids['wordpress.org/foo/'],
+			self::$site_ids['wordpress.org/foo/bar/'],
+			self::$site_ids['wordpress.org/afoo/'],
 			self::$site_ids['make.wordpress.org/foo/'],
 			self::$site_ids['www.w.org/foo/'],
+			self::$site_ids['www.w.org/foo/bar/'],
 		);
 
 		$this->assertEqualSets( $expected, $items );
@@ -131,6 +134,9 @@ class Tests_WP_MS_Sites_List_Table extends WP_UnitTestCase {
 
 		$expected = array(
 			self::$site_ids['test.example.org/'],
+			self::$site_ids['test2.example.org/'],
+			self::$site_ids['test3.example.org/zig/'],
+			self::$site_ids['atest.example.org/'],
 		);
 
 		$this->assertEqualSets( $expected, $items );
@@ -154,6 +160,7 @@ class Tests_WP_MS_Sites_List_Table extends WP_UnitTestCase {
 			self::$site_ids['test.example.org/'],
 			self::$site_ids['test2.example.org/'],
 			self::$site_ids['test3.example.org/zig/'],
+			self::$site_ids['atest.example.org/'],
 		);
 
 		$this->assertEqualSets( $expected, $items );
@@ -176,6 +183,7 @@ class Tests_WP_MS_Sites_List_Table extends WP_UnitTestCase {
 		$expected = array(
 			self::$site_ids['wordpress.org/foo/'],
 			self::$site_ids['wordpress.org/foo/bar/'],
+			self::$site_ids['wordpress.org/afoo/'],
 			self::$site_ids['make.wordpress.org/foo/'],
 			self::$site_ids['www.w.org/foo/'],
 			self::$site_ids['www.w.org/foo/bar/'],
