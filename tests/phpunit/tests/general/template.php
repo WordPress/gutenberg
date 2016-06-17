@@ -345,4 +345,46 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$this->custom_logo_id  = $this->_make_attachment( $upload );
 		return $this->custom_logo_id;
 	}
+
+	/**
+	 * Test get_the_modified_time
+	 *
+	 * @ticket 37059
+	 *
+	 * @since 4.6.0
+	 */
+	function test_get_the_modified_time_default() {
+		$details = array(
+				'post_date' => '2016-01-21 15:34:36',
+				'post_date_gmt' => '2016-01-21 15:34:36',
+		);
+		$post_id = $this->factory->post->create( $details );
+		$post = get_post( $post_id );
+
+		$GLOBALS['post'] = $post;
+
+		$expected = '1453390476';
+		$d = 'G';
+		$actual = get_the_modified_time( $d );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * Test get_the_modified_time with post_id parameter.
+	 *
+	 * @ticket 37059
+	 *
+	 * @since 4.6.0
+	 */
+	function test_get_the_modified_time_with_post_id() {
+		$details = array(
+				'post_date' => '2016-01-21 15:34:36',
+				'post_date_gmt' => '2016-01-21 15:34:36',
+		);
+		$post_id = $this->factory->post->create( $details );
+		$d = 'G';
+		$expected = '1453390476';
+		$actual = get_the_modified_time( $d, $post_id );
+		$this->assertEquals( $expected, $actual );
+	}
 }
