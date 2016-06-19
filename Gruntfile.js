@@ -725,21 +725,29 @@ module.exports = function(grunt) {
 					grunt.fatal( 'The `' +  map[ type ] + '` command returned a non-zero exit code.', code );
 				}
 
-				if ( [ 'package.json', 'Gruntfile.js' ].some( function( path ) {
-					return ( result.stdout + '\n' ).indexOf( ' ' + path + '\n' ) !== -1;
-				} ) ) {
+				// Callback for finding modified paths.
+				function testPath( path ) {
+					var regex = new RegExp( ' ' + path + '$', 'm' );
+					return regex.test( result.stdout );
+				}
+
+				// Callback for finding modified files by extension.
+				function testExtension( extension ) {
+					var regex = new RegExp( '\.' + extension + '$', 'm' );
+					return regex.test( result.stdout );
+				}
+
+				if ( [ 'package.json', 'Gruntfile.js' ].some( testPath ) ) {
 					grunt.log.writeln( 'Configuration files modified. Running `prerelease`.' );
 					taskList.push( 'prerelease' );
 				} else {
-					if ( [ 'png', 'jpg', 'gif', 'jpeg' ].some( function( extension ) {
-						return ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1;
-					} ) ) {
+					if ( [ 'png', 'jpg', 'gif', 'jpeg' ].some( testExtension ) ) {
 						grunt.log.writeln( 'Image files modified. Minifying.' );
 						taskList.push( 'precommit:image' );
 					}
 
 					[ 'js', 'css', 'php' ].forEach( function( extension ) {
-						if ( ( result.stdout + '\n' ).indexOf( '.' + extension + '\n' ) !== -1 ) {
+						if ( testExtension( extension ) ) {
 							grunt.log.writeln( extension.toUpperCase() + ' files modified. ' + extension.toUpperCase() + ' tests will be run.' );
 							taskList.push( 'precommit:' + extension );
 						}
