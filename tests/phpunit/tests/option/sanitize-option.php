@@ -119,4 +119,42 @@ class Tests_Sanitize_Option extends WP_UnitTestCase {
 		$this->assertSame( $expected, sanitize_option( 'blogname', $value ) );
 		$this->assertSame( $expected, sanitize_option( 'blogdescription', $value ) );
 	}
+
+	/**
+	 * @dataProvider permalink_structure_provider
+	 */
+	public function test_sanitize_permalink_structure( $provided, $expected, $valid ) {
+		global $wp_settings_errors;
+
+		$old_wp_settings_errors = (array) $wp_settings_errors;
+
+		$actual = sanitize_option( 'permalink_structure', $provided);
+		$errors = get_settings_errors( 'permalink_structure' );
+
+		// Clear errors.
+		$wp_settings_errors = $old_wp_settings_errors;
+
+		if ( $valid ) {
+			$this->assertEmpty( $errors );
+		} else {
+			$this->assertNotEmpty( $errors );
+			$this->assertEquals( 'invalid_permalink_structure', $errors[0]['code'] );
+		}
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	public function permalink_structure_provider() {
+		return array(
+			array( '', '', true ),
+			array( '%postname', false, false ),
+			array( '%/%', false, false ),
+			array( '%%%', false, false ),
+			array( '%a%', '%a%', true ),
+			array( '%postname%', '%postname%', true ),
+			array( '/%postname%/', '/%postname%/', true ),
+			array( '/%year%/%monthnum%/%day%/%postname%/', '/%year%/%monthnum%/%day%/%postname%/', true ),
+			array( '/%year/%postname%/', '/%year/%postname%/', true ),
+		);
+	}
 }
