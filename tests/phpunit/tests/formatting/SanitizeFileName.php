@@ -56,4 +56,15 @@ class Tests_Formatting_SanitizeFileName extends WP_UnitTestCase {
 	function test_replaces_percent_sign() {
 		$this->assertEquals( 'a22b.jpg', sanitize_file_name( 'a%22b.jpg' ) );
 	}
+
+	function test_replaces_unnammed_file_extensions() {
+		// Test filenames with both supported and unsupported extensions.
+		$this->assertEquals( 'unnamed-file.exe', sanitize_file_name( '_.exe' ) );
+		$this->assertEquals( 'unnamed-file.jpg', sanitize_file_name( '_.jpg' ) );
+	}
+
+	function test_replaces_unnammed_file_extensionless() {
+		// Test a filenames that becomes extensionless.
+		$this->assertEquals( 'no-extension', sanitize_file_name( '_.no-extension' ) );
+	}
 }
