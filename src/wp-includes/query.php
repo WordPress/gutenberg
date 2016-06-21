@@ -3550,7 +3550,7 @@ class WP_Query {
 			 *
 			 * @since 2.0.0
 			 *
-			 * @param array    $request The complete SQL query.
+			 * @param string   $request The complete SQL query.
 			 * @param WP_Query &$this   The WP_Query instance (passed by reference).
 			 */
 			$this->request = apply_filters_ref_array( 'posts_request', array( $this->request, &$this ) );
