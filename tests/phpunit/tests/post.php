@@ -1182,6 +1182,33 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that hooks are fired when post gets stuck and unstuck.
+	 *
+	 * @ticket 35600
+	 */
+	function test_hooks_fire_when_post_gets_stuck_and_unstuck() {
+		$post_id = self::factory()->post->create();
+		$a1 = new MockAction();
+		$a2 = new MockAction();
+
+		$this->assertFalse( is_sticky( $post_id ) );
+
+		add_action( 'post_stuck', array( $a1, 'action' ) );
+		add_action( 'post_unstuck', array( $a2, 'action' ) );
+
+		stick_post( $post_id );
+		$this->assertTrue( is_sticky( $post_id ) );
+		unstick_post( $post_id );
+		$this->assertFalse( is_sticky( $post_id ) );
+
+		remove_action( 'post_stuck', array( $a1, 'action' ) );
+		remove_action( 'post_unstuck', array( $a2, 'action' ) );
+
+		$this->assertEquals( 1, $a1->get_call_count() );
+		$this->assertEquals( 1, $a2->get_call_count() );
+	}
+
+	/**
 	 * If a post is updated without providing a post_name param,
 	 * a new slug should not be generated.
 	 *
