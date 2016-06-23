@@ -1484,8 +1484,14 @@ function utf8_uri_encode( $utf8_string, $length = 0 ) {
  * | U+00C5   | Å     | Aa          | Latin capital letter A with ring above  |
  * | U+00E5   | å     | aa          | Latin small letter a with ring above    |
  *
+ * Catalan (`ca`) locale:
+ *
+ * |   Code   | Glyph | Replacement |               Description               |
+ * | -------- | ----- | ----------- | --------------------------------------- |
+ * | U+00B7   | l·l   | ll          | Flown dot (between two Ls)              |
+ *
  * @since 1.2.1
- * @since 4.6.0 Locale support was added for `de_CH` and `de_CH_informal`.
+ * @since 4.6.0 Locale support was added for `de_CH`, `de_CH_informal`, and `ca`.
  *
  * @param string $string Text that might have accent characters
  * @return string Filtered string with replaced "nice" characters.
@@ -1689,6 +1695,8 @@ function remove_accents( $string ) {
 			$chars[ chr(195).chr(184) ] = 'oe';
 			$chars[ chr(195).chr(133) ] = 'Aa';
 			$chars[ chr(195).chr(165) ] = 'aa';
+		} elseif ( 'ca' === $locale ) {
+			$chars[ chr(108).chr(194).chr(183).chr(108) ] = 'll';
 		}
 
 		$string = strtr($string, $chars);

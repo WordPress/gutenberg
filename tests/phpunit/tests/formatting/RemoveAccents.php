@@ -110,4 +110,20 @@ class Tests_Formatting_RemoveAccents extends WP_UnitTestCase {
 		remove_filter( 'locale', array( $this, '_set_locale_to_danish' ) );
 	}
 
+	public function _set_locale_to_catalan() {
+		return 'ca';
+	}
+
+	/**
+	* @ticket 37086
+	*/
+	public function test_remove_catalan_middot() {
+		add_filter( 'locale', array( $this, '_set_locale_to_catalan' ) );
+
+		$this->assertEquals( 'allallalla', remove_accents( 'al·lallaŀla' ) );
+		
+		remove_filter( 'locale', array( $this, '_set_locale_to_catalan' ) );
+		
+		$this->assertEquals( 'al·lallalla', remove_accents( 'al·lallaŀla' ) );
+	}
 }
