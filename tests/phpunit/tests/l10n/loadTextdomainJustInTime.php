@@ -22,6 +22,8 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 		add_filter( 'template_root', array( $this, 'filter_theme_root' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+
+		unset( $GLOBALS['l10n_unloaded'] );
 	}
 
 	function tearDown() {
@@ -89,7 +91,7 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 341142
+	 * @ticket 34114
 	 */
 	public function test_get_translations_for_domain_does_not_return_null_if_override_load_textdomain_is_used() {
 		add_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
@@ -99,5 +101,44 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
 
 		$this->assertTrue( $translations instanceof NOOP_Translations );
+	}
+
+	/**
+	 * @ticket 37113
+	 */
+	public function test_should_allow_unloading_of_text_domain() {
+		add_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+
+		require_once DIR_TESTDATA . '/plugins/internationalized-plugin.php';
+
+		$expected_output_before      = i18n_plugin_test();
+		$is_textdomain_loaded_before = is_textdomain_loaded( 'internationalized-plugin' );
+
+		unload_textdomain( 'internationalized-plugin' );
+		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+
+		$expected_output_after      = i18n_plugin_test();
+		$is_textdomain_loaded_after = is_textdomain_loaded( 'internationalized-plugin' );
+
+		add_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+		load_textdomain( 'internationalized-plugin', WP_LANG_DIR . '/plugins/internationalized-plugin-de_DE.mo' );
+
+		$expected_output_final      = i18n_plugin_test();
+		$is_textdomain_loaded_final = is_textdomain_loaded( 'internationalized-plugin' );
+
+		unload_textdomain( 'internationalized-plugin' );
+		remove_filter( 'locale', array( $this, 'filter_set_locale_to_german' ) );
+
+		// Text domain loaded just in time.
+		$this->assertSame( 'Das ist ein Dummy Plugin', $expected_output_before );
+		$this->assertTrue( $is_textdomain_loaded_before );
+
+		// Text domain unloaded.
+		$this->assertSame( 'This is a dummy plugin', $expected_output_after );
+		$this->assertFalse( $is_textdomain_loaded_after );
+
+		// Text domain loaded manually again.
+		$this->assertSame( 'Das ist ein Dummy Plugin', $expected_output_final );
+		$this->assertTrue( $is_textdomain_loaded_final );
 	}
 }
