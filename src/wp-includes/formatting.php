@@ -4624,18 +4624,21 @@ function wp_strip_all_tags($string, $remove_breaks = false) {
 }
 
 /**
- * Sanitize a string from user input or from the db
+ * Sanitizes a string from user input or from the database.
  *
- * check for invalid UTF-8,
- * Convert single < characters to entity,
- * strip all tags,
- * remove line breaks, tabs and extra white space,
- * strip octets.
+ * - Checks for invalid UTF-8,
+ * - Converts single `<` characters to entities
+ * - Strips all tags
+ * - Removes line breaks, tabs, and extra whitespace
+ * - Strips octets
  *
  * @since 2.9.0
  *
- * @param string $str
- * @return string
+ * @see wp_check_invalid_utf8()
+ * @see wp_strip_all_tags()
+ *
+ * @param string $str String to sanitize.
+ * @return string Sanitized string.
  */
 function sanitize_text_field( $str ) {
 	$filtered = wp_check_invalid_utf8( $str );
