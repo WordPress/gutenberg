@@ -61,4 +61,28 @@ class Tests_Term_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $terms[0], $terms[2] ), $q->terms );
 	}
+
+	/**
+	 * @ticket 37151
+	 */
+	public function test_order_by_meta_value_num() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$terms = self::factory()->term->create_many( 3, array( 'taxonomy' => 'wptests_tax' ) );
+
+		add_term_meta( $terms[0], 'foo', 10 );
+		add_term_meta( $terms[1], 'foo', 1 );
+		add_term_meta( $terms[2], 'foo', 100 );
+
+		$q = new WP_Term_Query( array(
+			'taxonomy' => array( 'wptests_tax' ),
+			'fields' => 'ids',
+			'hide_empty' => false,
+			'meta_key' => 'foo',
+			'orderby' => 'meta_value_num',
+		) );
+
+		$found = array_map( 'intval', $q->terms );
+		$this->assertSame( array( $terms[1], $terms[0], $terms[2] ), $found );
+	}
 }
