@@ -88,6 +88,17 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37050
+	 */
+	function test_wp_network_object_id_property_is_int() {
+		$id = self::factory()->network->create();
+
+		$network = WP_Network::get_instance( $id );
+
+		$this->assertSame( (int) $id, $network->id );
+	}
+
+	/**
 	 * @ticket 22917
 	 */
 	public function test_get_blog_count_no_filter_applied() {
