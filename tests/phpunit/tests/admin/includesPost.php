@@ -64,7 +64,7 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		$_results = _wp_translate_postdata( false, $_post_data );
 		$this->assertInstanceOf( 'WP_Error', $_results );
 		$this->assertEquals( 'edit_others_posts', $_results->get_error_code() );
-		$this->assertEquals( 'You are not allowed to create posts as this user.', $_results->get_error_message() );
+		$this->assertEquals( 'Sorry, you are not allowed to create posts as this user.', $_results->get_error_message() );
 
 		// Edit Draft Post for another user
 		$_post_data = array();
@@ -77,7 +77,7 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		$_results = _wp_translate_postdata( true, $_post_data );
 		$this->assertInstanceOf( 'WP_Error', $_results );
 		$this->assertEquals( 'edit_others_posts', $_results->get_error_code() );
-		$this->assertEquals( 'You are not allowed to edit posts as this user.', $_results->get_error_message() );
+		$this->assertEquals( 'Sorry, you are not allowed to edit posts as this user.', $_results->get_error_message() );
 	}
 
 	function test__wp_translate_postdata_cap_checks_editor() {

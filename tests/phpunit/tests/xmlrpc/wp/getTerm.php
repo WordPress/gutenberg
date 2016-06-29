@@ -43,7 +43,7 @@ class Tests_XMLRPC_wp_getTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_getTerm( array( 1, 'subscriber', 'subscriber', 'category', $this->term['term_id'] ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 401, $result->code );
-		$this->assertEquals( __( 'You are not allowed to assign terms in this taxonomy.' ), $result->message );
+		$this->assertEquals( __( 'Sorry, you are not allowed to assign terms in this taxonomy.' ), $result->message );
 	}
 
 

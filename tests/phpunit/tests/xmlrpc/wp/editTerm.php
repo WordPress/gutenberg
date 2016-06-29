@@ -49,7 +49,7 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_editTerm( array( 1, 'subscriber', 'subscriber', $this->parent_term['term_id'], array( 'taxonomy' => 'category' ) ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 401, $result->code );
-		$this->assertEquals( __( 'You are not allowed to edit terms in this taxonomy.' ), $result->message );
+		$this->assertEquals( __( 'Sorry, you are not allowed to edit terms in this taxonomy.' ), $result->message );
 	}
 
 	function test_term_not_exists() {
