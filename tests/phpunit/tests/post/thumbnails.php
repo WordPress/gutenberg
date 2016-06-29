@@ -74,6 +74,63 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$this->assertTrue( $WP_Query->thumbnails_cached );
 	}
 
+	/**
+	 * @ticket 12235
+	 */
+	function test_get_the_post_thumbnail_caption() {
+		$this->assertEquals( '', get_the_post_thumbnail_caption() );
+
+		$caption = 'This is a caption.';
+
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+			'post_excerpt'   => $caption,
+		) );
+
+		set_post_thumbnail( $post_id, $attachment_id );
+
+		$this->assertEquals( $caption, get_the_post_thumbnail_caption( $post_id ) );
+	}
+
+	/**
+	 * @ticket 12235
+	 */
+	function test_get_the_post_thumbnail_caption_empty() {
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+			'post_excerpt'   => '',
+		) );
+
+		set_post_thumbnail( $post_id, $attachment_id );
+
+		$this->assertEquals( '', get_the_post_thumbnail_caption( $post_id ) );
+	}
+
+	/**
+	 * @ticket 12235
+	 */
+	function test_the_post_thumbnail_caption() {
+		$caption = 'This is a caption.';
+
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+			'post_excerpt'   => $caption,
+		) );
+
+		set_post_thumbnail( $post_id, $attachment_id );
+
+		ob_start();
+		the_post_thumbnail_caption( $post_id );
+
+		$this->assertEquals( $caption, ob_get_clean() );
+	}
+
 	function test_get_the_post_thumbnail() {
 		$this->assertEquals( '', get_the_post_thumbnail() );
 		$this->assertEquals( '', get_the_post_thumbnail( self::$post ) );

@@ -902,6 +902,40 @@ EOF;
 	}
 
 	/**
+	 * @ticket 12235
+	 */
+	function test_wp_get_attachment_caption() {
+		$this->assertFalse( wp_get_attachment_caption( 0 ) );
+
+		$caption = 'This is a caption.';
+
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( $this->img_name, $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+			'post_excerpt'   => $caption,
+		) );
+
+		$this->assertFalse( wp_get_attachment_caption( $post_id ) );
+
+		$this->assertEquals( $caption, wp_get_attachment_caption( $attachment_id ) );
+	}
+
+	/**
+	 * @ticket 12235
+	 */
+	function test_wp_get_attachment_caption_empty() {
+		$post_id = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object( $this->img_name, $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type'      => 'attachment',
+			'post_excerpt'   => '',
+		) );
+
+		$this->assertEquals( '', wp_get_attachment_caption( $attachment_id ) );
+	}
+
+	/**
 	 * Helper function to get image size array from size "name"
 	 */
 	function _get_image_size_array_from_meta( $image_meta, $size_name ) {
