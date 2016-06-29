@@ -726,6 +726,17 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'noindex', $headers['X-Robots-Tag'] );
 	}
 
+	public function test_link_header_on_requests() {
+		$api_root = get_rest_url();
+
+		$request = new WP_REST_Request( 'GET', '/', array() );
+
+		$result = $this->server->serve_request('/');
+		$headers = $this->server->sent_headers;
+
+		$this->assertEquals( '<' . esc_url_raw( $api_root ) . '>; rel="https://api.w.org/"', $headers['Link'] );
+	}
+
 	public function test_nocache_headers_on_authenticated_requests() {
 		$editor = self::factory()->user->create( array( 'role' => 'editor' ) );
 		$request = new WP_REST_Request( 'GET', '/', array() );
