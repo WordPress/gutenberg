@@ -359,4 +359,13 @@ class Tests_Filters extends WP_UnitTestCase {
 
 		return $p1;
 	}
+
+	/**
+	 * @ticket 10441
+	 */
+	public function test_apply_filters_deprecated_without_filter() {
+		$val = 'Foobar';
+
+		$this->assertSame( $val, apply_filters_deprecated( 'tests_apply_filters_deprecated', array( $val ), '4.6' ) );
+	}
 }
