@@ -23,6 +23,7 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 	public function tearDown() {
 		// Remove our temporary spy server
 		$GLOBALS['wp_rest_server'] = null;
+		unset( $_REQUEST['_wpnonce'] );
 
 		parent::tearDown();
 	}
@@ -892,5 +893,93 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 
 	public function filter_wp_rest_server_class() {
 		return 'Spy_REST_Server';
+	}
+
+	/**
+	 * Refreshed nonce should not be present in header when an invalid nonce is passed for logged in user.
+	 *
+	 * @ticket 35662
+	 */
+	public function test_rest_send_refreshed_nonce_invalid_nonce() {
+		$this->helper_setup_user_for_rest_send_refreshed_nonce_tests();
+
+		$_REQUEST['_wpnonce'] = 'random invalid nonce';
+
+		$headers = $this->helper_make_request_and_return_headers_for_rest_send_refreshed_nonce_tests();
+
+		$this->assertArrayNotHasKey( 'X-WP-Nonce', $headers );
+	}
+
+	/**
+	 * Refreshed nonce should be present in header when a valid nonce is
+	 * passed for logged in/anonymous user and not present when nonce is not
+	 * passed.
+	 *
+	 * @ticket 35662
+	 *
+	 * @dataProvider data_rest_send_refreshed_nonce
+	 *
+	 * @param bool $has_logged_in_user Will there be a logged in user for this test.
+	 * @param bool $has_nonce          Are we passing the nonce.
+	 */
+	public function test_rest_send_refreshed_nonce( $has_logged_in_user, $has_nonce ) {
+		if ( true === $has_logged_in_user ) {
+			$this->helper_setup_user_for_rest_send_refreshed_nonce_tests();
+		}
+
+		if ( $has_nonce ) {
+			$_REQUEST['_wpnonce'] = wp_create_nonce( 'wp_rest' );
+		}
+
+		$headers = $this->helper_make_request_and_return_headers_for_rest_send_refreshed_nonce_tests();
+
+		if ( $has_nonce ) {
+			$this->assertArrayHasKey( 'X-WP-Nonce', $headers );
+		} else {
+			$this->assertArrayNotHasKey( 'X-WP-Nonce', $headers );
+		}
+	}
+
+	/**
+	 * @return array {
+	 *     @type array {
+	 *         @type bool $has_logged_in_user Are we registering a user for the test.
+	 *         @type bool $has_nonce          Is the nonce passed.
+	 *     }
+	 * }
+	 */
+	function data_rest_send_refreshed_nonce() {
+		return array(
+			array( true, true ),
+			array( true, false ),
+			array( false, true ),
+			array( false, false ),
+		);
+	}
+
+	/**
+	 * Helper to setup a users and auth cookie global for the
+	 * rest_send_refreshed_nonce related tests.
+	 */
+	protected function helper_setup_user_for_rest_send_refreshed_nonce_tests() {
+		$author = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $author );
+
+		global $wp_rest_auth_cookie;
+
+		$wp_rest_auth_cookie = true;
+	}
+
+	/**
+	 * Helper to make the request and get the headers for the
+	 * rest_send_refreshed_nonce related tests.
+	 *
+	 * @return array
+	 */
+	protected function helper_make_request_and_return_headers_for_rest_send_refreshed_nonce_tests() {
+		$request = new WP_REST_Request( 'GET', '/', array() );
+		$result  = $this->server->serve_request( '/' );
+
+		return $this->server->sent_headers;
 	}
 }
