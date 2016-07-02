@@ -941,6 +941,51 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Make sure that a sanitization that transforms the argument type will not
+	 * cause the validation to fail.
+	 *
+	 * @ticket 37192
+	 */
+	public function test_rest_validate_before_sanitization() {
+		register_rest_route( 'test-ns', '/test', array(
+			'methods'  => array( 'GET' ),
+			'callback' => '__return_null',
+			'args' => array(
+				'someinteger' => array(
+					'validate_callback' => array( $this, '_validate_as_integer_123' ),
+					'sanitize_callback' => 'absint',
+				),
+				'somestring'  => array(
+					'validate_callback' => array( $this, '_validate_as_string_foo' ),
+					'sanitize_callback' => 'absint',
+				),
+			),
+		) );
+
+		$request = new WP_REST_Request( 'GET', '/test-ns/test' );
+		$request->set_query_params( array( 'someinteger' => 123, 'somestring' => 'foo' ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function _validate_as_integer_123( $value, $request, $key ) {
+		if ( ! is_int( $value ) ) {
+			return new WP_Error( 'some-error', 'This is not valid!' );
+		}
+
+		return true;
+	}
+
+	public function _validate_as_string_foo( $value, $request, $key ) {
+		if ( ! is_string( $value ) ) {
+			return new WP_Error( 'some-error', 'This is not valid!' );
+		}
+
+		return true;
+	}
+
+	/**
 	 * @return array {
 	 *     @type array {
 	 *         @type bool $has_logged_in_user Are we registering a user for the test.
