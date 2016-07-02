@@ -191,6 +191,50 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the WP_Customize_Manager::post_value() method to make sure that the validation and sanitization are done in the right order.
+	 *
+	 * @ticket 37247
+	 */
+	function test_post_value_validation_sanitization_order() {
+		$default_value = '0';
+		$setting = $this->manager->add_setting( 'numeric', array(
+			'validate_callback' => array( $this, 'filter_customize_validate_numeric' ),
+			'sanitize_callback' => array( $this, 'filter_customize_sanitize_numeric' ),
+		) );
+		$this->assertEquals( $default_value, $this->manager->post_value( $setting, $default_value ) );
+		$this->assertEquals( $default_value, $setting->post_value( $default_value ) );
+
+		$post_value = '42';
+		$this->manager->set_post_value( 'numeric', $post_value );
+		$this->assertEquals( $post_value, $this->manager->post_value( $setting, $default_value ) );
+		$this->assertEquals( $post_value, $setting->post_value( $default_value ) );
+	}
+
+	/**
+	 * Filter customize_validate callback for a numeric value.
+	 *
+	 * @param mixed $value Value.
+	 * @return string|WP_Error
+	 */
+	function filter_customize_sanitize_numeric( $value ) {
+		return absint( $value );
+	}
+
+	/**
+	 * Filter customize_validate callback for a numeric value.
+	 *
+	 * @param WP_Error $validity Validity.
+	 * @param mixed    $value    Value.
+	 * @return WP_Error
+	 */
+	function filter_customize_validate_numeric( $validity, $value ) {
+		if ( ! is_string( $value ) || ! is_numeric( $value ) ) {
+			$validity->add( 'invalid_value_in_validate', __( 'Invalid value.' ), array( 'source' => 'filter_customize_validate_numeric' ) );
+		}
+		return $validity;
+	}
+
+	/**
 	 * Test WP_Customize_Manager::validate_setting_values().
 	 *
 	 * @see WP_Customize_Manager::validate_setting_values()
@@ -232,6 +276,23 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$error = $invalid_settings[ $setting->id ];
 		$this->assertEquals( 'invalid_value_in_validate', $error->get_error_code() );
 		$this->assertEquals( array( 'source' => 'filter_customize_validate_foo' ), $error->get_error_data() );
+	}
+
+	/**
+	 * Test the WP_Customize_Manager::validate_setting_values() method to make sure that the validation and sanitization are done in the right order.
+	 *
+	 * @ticket 37247
+	 */
+	function test_validate_setting_values_validation_sanitization_order() {
+		$setting = $this->manager->add_setting( 'numeric', array(
+			'validate_callback' => array( $this, 'filter_customize_validate_numeric' ),
+			'sanitize_callback' => array( $this, 'filter_customize_sanitize_numeric' ),
+		) );
+		$post_value = '42';
+		$this->manager->set_post_value( 'numeric', $post_value );
+		$validities = $this->manager->validate_setting_values( $this->manager->unsanitized_post_values() );
+		$this->assertCount( 1, $validities );
+		$this->assertEquals( array( 'numeric' => true ), $validities );
 	}
 
 	/**
