@@ -50,7 +50,7 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 27238
+	 * @ticket 27238
 	 */
 	public function test_get_the_taxonomies_term_template() {
 		$post_id = self::factory()->post->create();
@@ -76,7 +76,7 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 27238
+	 * @ticket 27238
 	 */
 	function test_the_taxonomies_term_template() {
 		$post_id = self::factory()->post->create();

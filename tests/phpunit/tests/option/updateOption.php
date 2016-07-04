@@ -99,7 +99,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 26394
+	 * @ticket 26394
 	 */
 	public function test_autoload_should_be_updated_for_existing_option_when_value_is_changed() {
 		global $wpdb;
@@ -120,7 +120,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 26394
+	 * @ticket 26394
 	 */
 	public function test_autoload_should_not_be_updated_for_existing_option_when_value_is_unchanged() {
 		global $wpdb;
@@ -142,7 +142,7 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 26394
+	 * @ticket 26394
 	 */
 	public function test_autoload_should_not_be_updated_for_existing_option_when_value_is_changed_but_no_value_of_autoload_is_provided() {
 		global $wpdb;

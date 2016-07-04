@@ -180,7 +180,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 21327
+	 * @ticket 21327
 	 */
 	function test_wp_cache_decr() {
 		$key = rand_str();

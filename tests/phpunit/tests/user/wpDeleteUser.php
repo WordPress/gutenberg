@@ -136,14 +136,14 @@ class Tests_User_WpDeleteUser extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 33800
+	 * @ticket 33800
 	 */
 	public function test_should_return_false_for_non_numeric_string_user_id() {
 		$this->assertFalse( wp_delete_user( 'abcde' ) );
 	}
 
 	/**
-	 * @group 33800
+	 * @ticket 33800
 	 */
 	public function test_should_return_false_for_object_user_id() {
 		if ( is_multisite() ) {

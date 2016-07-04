@@ -402,7 +402,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 27571
+	 * @ticket 27571
 	 */
 	public function test_post_properties_should_be_lazyloaded() {
 		$c = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id ) );

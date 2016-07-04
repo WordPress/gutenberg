@@ -768,7 +768,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 32081
+	 * @ticket 32081
 	 */
 	public function test_meta_query_should_work_with_comment__in() {
 		$comments = self::factory()->comment->create_many( 3 );
@@ -792,7 +792,7 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group 32081
+	 * @ticket 32081
 	 */
 	public function test_meta_query_should_work_with_comment__not_in() {
 		$comments = self::factory()->comment->create_many( 3 );

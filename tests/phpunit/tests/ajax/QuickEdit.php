@@ -13,7 +13,7 @@ require_once( ABSPATH . 'wp-admin/includes/ajax-actions.php' );
 class Tests_Ajax_QuickEdit extends WP_Ajax_UnitTestCase {
 
 	/**
-	 * @group 26948
+	 * @ticket 26948
 	 */
 	public function test_dont_process_terms_if_taxonomy_does_not_allow_show_on_quick_edit() {
 		register_taxonomy( 'wptests_tax_1', 'post', array(
