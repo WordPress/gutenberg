@@ -161,10 +161,9 @@ class Tests_Ajax_DimComment extends WP_Ajax_UnitTestCase {
 	/**
 	 * Test with a bad id
 	 * Expects test to fail
-	 * @param mixed $comment Comment object
 	 * @return void
 	 */
-	public function test_with_bad_id( $comment ) {
+	public function test_with_bad_id() {
 
 		// Reset request
 		$this->_clear_post_action();
