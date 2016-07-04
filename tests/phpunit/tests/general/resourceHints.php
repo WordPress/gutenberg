@@ -109,9 +109,6 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 		return $hints;
 	}
 
-	/**
-	 * @group foo
-	 */
 	function test_dns_prefetch_styles() {
 		$expected = "<link rel='dns-prefetch' href='http://fonts.googleapis.com'>\r\n" .
 					"<link rel='preconnect' href='http://s.w.org'>\r\n";
