@@ -93,4 +93,17 @@ class Tests_XMLRPC_Basic extends WP_XMLRPC_UnitTestCase {
 		$this->assertArrayHasKey( 'faultCode', $result[2] );
 
 	}
+
+	/**
+	 * @ticket 36586
+	 */
+	function test_isStruct_on_non_numerically_indexed_array() {
+		$value  = new IXR_Value( array( '0.0' => 100 ) );
+
+		$return  = "<struct>\n";
+		$return .= "  <member><name>0.0</name><value><int>100</int></value></member>\n";
+		$return .= "</struct>";
+
+		$this->assertXmlStringEqualsXmlString( $return, $value->getXML() );
+	}
 }
