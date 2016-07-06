@@ -24,6 +24,15 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$this->assertEquals( '200', wp_remote_retrieve_response_code( $response ) );
 	}
 
+	/**
+	 * @depends test_head_request
+	 */
+	function test_returns_array() {
+		$url = 'https://asdftestblog1.files.wordpress.com/2007/09/2007-06-30-dsc_4700-1.jpg';
+		$response = wp_remote_head( $url );
+		$this->assertInternalType( 'array', $response );
+	}
+
 	function test_head_redirect() {
 		// this url will 301 redirect
 		$url = 'https://asdftestblog1.wordpress.com/files/2007/09/2007-06-30-dsc_4700-1.jpg';
