@@ -640,5 +640,29 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		}
 		return $validity;
 	}
+
+	/**
+	 * Ensure that WP_Customize_Setting::value() can return a previewed value for aggregated multidimensionals.
+	 *
+	 * @ticket 37294
+	 */
+	public function test_multidimensional_value_when_previewed() {
+		WP_Customize_Setting::reset_aggregated_multidimensionals();
+
+		$initial_value = 456;
+		set_theme_mod( 'nav_menu_locations', array(
+			'primary' => $initial_value,
+		) );
+		$setting_id = 'nav_menu_locations[primary]';
+
+		$setting = new WP_Customize_Setting( $this->manager, $setting_id );
+		$this->assertEquals( $initial_value, $setting->value() );
+
+		$override_value = -123456;
+		$this->manager->set_post_value( $setting_id, $override_value );
+		$setting->preview();
+
+		$this->assertEquals( $override_value, $setting->value() );
+	}
 }
 
