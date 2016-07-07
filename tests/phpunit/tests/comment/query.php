@@ -2152,6 +2152,29 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37184
+	 */
+	public function test_found_rows_should_be_fetched_from_the_cache() {
+		$comments = self::factory()->comment->create_many( 3, array( 'comment_post_ID' => self::$post_id ) );
+
+		// Prime cache.
+		new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'number' => 2,
+			'no_found_rows' => false,
+		) );
+
+		$q = new WP_Comment_Query( array(
+			'post_id' => self::$post_id,
+			'number' => 2,
+			'no_found_rows' => false,
+		) );
+
+		$this->assertEquals( 3, $q->found_comments );
+		$this->assertEquals( 2, $q->max_num_pages );
+	}
+
+	/**
 	 * @ticket 8071
 	 */
 	public function test_hierarchical_should_skip_child_comments_in_offset() {
