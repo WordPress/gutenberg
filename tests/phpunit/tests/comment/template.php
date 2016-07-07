@@ -78,6 +78,17 @@ class Tests_Comment_Template extends WP_UnitTestCase {
 		return $translation;
 	}
 
+	/**
+	 * Data provider for test_get_comments_number_text_declension_with_custom_args().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type int    $comments_number The number of comments passed to get_comments_number_text().
+	 *         @type string $input           Custom text for comments number, e.g. '%s Comments'.
+	 *         @type string $output          The expected output with the correct plural form of '%s Comments'.
+	 *     }
+	 * }
+	 */
 	function data_get_comments_number_text_declension() {
 		return array(
 			array(
