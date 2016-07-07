@@ -894,8 +894,11 @@ class Tests_User extends WP_UnitTestCase {
 	 * @ticket 28004
 	 */
 	public function test_wp_insert_user_with_invalid_user_id() {
+		global $wpdb;
+		$max_user = $wpdb->get_var( "SELECT MAX(ID) FROM $wpdb->users" );
+
 		$u = wp_insert_user( array(
-			'ID' => 123,
+			'ID' => $max_user + 1,
 			'user_login' => 'whatever',
 			'user_email' => 'whatever@example.com',
 			'user_pass' => 'password',
