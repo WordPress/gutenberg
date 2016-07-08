@@ -478,12 +478,12 @@ class Tests_Functions extends WP_UnitTestCase {
 				'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25',
 				true,
 			),
-			// Android 2.2, Android Webkit Browser 
+			// Android 2.2, Android Webkit Browser
 			array(
 				'Mozilla/5.0 (Android 2.2; Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4',
 				true,
 			),
-			// BlackBerry 9900, BlackBerry browser 
+			// BlackBerry 9900, BlackBerry browser
 			array(
 				'Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.1.0.346 Mobile Safari/534.11+',
 				true,
@@ -864,5 +864,19 @@ class Tests_Functions extends WP_UnitTestCase {
 		}
 
 		$this->assertNull( wp_ext2type( 'unknown_format' ) );
+	}
+
+	/**
+	 * Tests raising the memory limit.
+	 *
+	 * Unfortunately as the default for 'WP_MAX_MEMORY_LIMIT' in the
+	 * test suite is -1, we can not test the memory limit negotiations.
+	 *
+	 * @ticket 32075
+	 */
+	function test_wp_raise_memory_limit() {
+		ini_set( 'memory_limit', '40M' );
+		$this->assertSame( -1, wp_raise_memory_limit() );
+		$this->assertEquals( '-1', ini_get( 'memory_limit' ) );
 	}
 }
