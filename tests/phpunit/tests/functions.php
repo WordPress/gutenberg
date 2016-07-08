@@ -875,8 +875,16 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 32075
 	 */
 	function test_wp_raise_memory_limit() {
-		ini_set( 'memory_limit', '40M' );
-		$this->assertSame( -1, wp_raise_memory_limit() );
-		$this->assertEquals( '-1', ini_get( 'memory_limit' ) );
+		if ( -1 !== WP_MAX_MEMORY_LIMIT ) {
+			$this->markTestSkipped( 'WP_MAX_MEMORY_LIMIT should be set to -1' );
+		}
+
+		$ini_limit_before = ini_get( 'memory_limit' );
+		$raised_limit = wp_raise_memory_limit();
+		$ini_limit_after = ini_get( 'memory_limit' );
+
+		$this->assertSame( $ini_limit_before, $ini_limit_after );
+		$this->assertSame( false, $raised_limit );
+		$this->assertEquals( WP_MAX_MEMORY_LIMIT, $ini_limit_after );
 	}
 }
