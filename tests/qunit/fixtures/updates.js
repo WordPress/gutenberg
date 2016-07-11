@@ -39,7 +39,9 @@ window._wpUpdatesSettings = {
 		'activatePlugin': 'Activate',
 		'activateTheme': 'Activate',
 		'activateImporter': 'Activate importer',
-		'unknownError': 'An unknown error occured'
+		'unknownError': 'An unknown error occured',
+		'pluginsFound': 'Number of plugins found: %d',
+		'noPluginsFound': 'No plugins found. Try a different search.'
 	}
 };
 window._wpUpdatesItemCounts = {
