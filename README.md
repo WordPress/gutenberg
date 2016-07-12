@@ -25,5 +25,5 @@ To make the `wp.a11y.speak` functionality more universally available, we've deci
 ```JS
 var A11ySpeak = require("A11ySpeak");
 
-AllySpeak( "The message you want to send to the ARIA live region", "polite" );
+A11ySpeak( "The message you want to send to the ARIA live region", "polite" );
 ```
