@@ -26,8 +26,8 @@ To make the `wp.a11y.speak` functionality more universally available, we've deci
 var A11ySpeak = require("A11ySpeak");
 
 // For polite messages that shouldn't interrupt what screen readers are currently announcing.
-AllySpeak( "The message you want to send to the ARIA live region" );
+A11ySpeak( "The message you want to send to the ARIA live region" );
 
 // For assertive messages that should interrupt what screen readers are currently announcing.
-AllySpeak( "The message you want to send to the ARIA live region", "assertive" );
+A11ySpeak( "The message you want to send to the ARIA live region", "assertive" );
 ```
