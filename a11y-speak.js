@@ -13,7 +13,11 @@ var addContainer = function( ariaLive ) {
 
 	var container = document.createElement( "div" );
 	container.id = "a11y-speak-" + ariaLive;
-	container.className = "screen-reader-text a11y-speak-region";
+	container.className = "a11y-speak-region";
+
+	var screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden;";
+	container.setAttribute( "style", screenReaderTextStyle );
+
 	container.setAttribute( "aria-live", ariaLive );
 	container.setAttribute( "aria-relevant", "additions text" );
 	container.setAttribute( "aria-atomic", "true" );
