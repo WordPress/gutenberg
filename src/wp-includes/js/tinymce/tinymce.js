@@ -1,4 +1,4 @@
-// 4.3.13 (2016-06-08)
+// 4.4.0 (2016-06-30)
 
 /**
  * Compiled inline version. (Library mode)
@@ -10580,6 +10580,11 @@ define("tinymce/dom/RangeUtils", [
 						container = container.childNodes[offset];
 						offset = 0;
 
+						// Don't normalize non collapsed selections like <p>[a</p><table></table>]
+						if (!collapsed && container === body.lastChild && container.nodeName === 'TABLE') {
+							return;
+						}
+
 						if (hasContentEditableFalseParent(container) || isCaretContainer(container)) {
 							return;
 						}
@@ -17356,8 +17361,9 @@ define("tinymce/dom/Selection", [
 	"tinymce/dom/BookmarkManager",
 	"tinymce/dom/NodeType",
 	"tinymce/Env",
-	"tinymce/util/Tools"
-], function(TreeWalker, TridentSelection, ControlSelection, RangeUtils, BookmarkManager, NodeType, Env, Tools) {
+	"tinymce/util/Tools",
+	"tinymce/caret/CaretPosition"
+], function(TreeWalker, TridentSelection, ControlSelection, RangeUtils, BookmarkManager, NodeType, Env, Tools, CaretPosition) {
 	var each = Tools.each, trim = Tools.trim;
 	var isIE = Env.ie;
 
@@ -18331,6 +18337,11 @@ define("tinymce/dom/Selection", [
 					rng.setEnd(root, root.childNodes.length);
 				}
 			}
+		},
+
+		getBoundingClientRect:  function() {
+			var rng = this.getRng();
+			return rng.collapsed ? CaretPosition.fromRangeStart(rng).getClientRects()[0] : rng.getBoundingClientRect();
 		},
 
 		destroy: function() {
@@ -21420,6 +21431,7 @@ define("tinymce/UndoManager", [
 				data = [];
 				index = 0;
 				self.typing = false;
+				self.data = data;
 				editor.fire('ClearUndos');
 			},
 
@@ -21445,13 +21457,14 @@ define("tinymce/UndoManager", [
 			},
 
 			/**
-			 * Executes the specified function in an undo translation. The selection
+			 * Executes the specified mutator function as an undo transaction. The selection
 			 * before the modification will be stored to the undo stack and if the DOM changes
 			 * it will add a new undo level. Any methods within the translation that adds undo levels will
 			 * be ignored. So a translation can include calls to execCommand or editor.insertContent.
 			 *
 			 * @method transact
-			 * @param {function} callback Function to execute dom manipulation logic in.
+			 * @param {function} callback Function that gets executed and has dom manipulation logic in it.
+			 * @return {Object} Undo level that got added or null it a level wasn't needed.
 			 */
 			transact: function(callback) {
 				self.beforeChange();
@@ -21463,7 +21476,31 @@ define("tinymce/UndoManager", [
 					locks--;
 				}
 
-				self.add();
+				return self.add();
+			},
+
+			/**
+			 * Adds an extra "hidden" undo level by first applying the first mutation and store that to the undo stack
+			 * then roll back that change and do the second mutation on top of the stack. This will produce an extra
+			 * undo level that the user doesn't see until they undo.
+			 *
+			 * @method extra
+			 * @param {function} callback1 Function that does mutation but gets stored as a "hidden" extra undo level.
+			 * @param {function} callback2 Function that does mutation but gets displayed to the user.
+			 */
+			extra: function (callback1, callback2) {
+				var lastLevel, bookmark;
+
+				if (self.transact(callback1)) {
+					bookmark = data[index].bookmark;
+					lastLevel = data[index - 1];
+					editor.setContent(lastLevel.content, {format: 'raw'});
+					editor.selection.moveToBookmark(lastLevel.beforeBookmark);
+
+					if (self.transact(callback2)) {
+						data[index - 1].beforeBookmark = bookmark;
+					}
+				}
 			}
 		};
 
@@ -23050,9 +23087,9 @@ define("tinymce/InsertContent", [
 ], function(Env, Tools, Serializer, CaretWalker, CaretPosition, ElementUtils, NodeType, InsertList) {
 	var isTableCell = NodeType.matchNodeNames('td th');
 
-	var insertAtCaret = function(editor, value) {
+	var insertHtmlAtCaret = function(editor, value, details) {
 		var parser, serializer, parentNode, rootNode, fragment, args;
-		var marker, rng, node, node2, bookmarkHtml, merge, data;
+		var marker, rng, node, node2, bookmarkHtml, merge;
 		var textInlineElements = editor.schema.getTextInlineElements();
 		var selection = editor.selection, dom = editor.dom;
 
@@ -23109,25 +23146,13 @@ define("tinymce/InsertContent", [
 			}
 		}
 
-		function markInlineFormatElements(fragment) {
-			if (merge) {
-				for (node = fragment.firstChild; node; node = node.walk(true)) {
-					if (textInlineElements[node.name]) {
-						node.attr('data-mce-new', "true");
-					}
-				}
-			}
-		}
-
 		function reduceInlineTextElements() {
 			if (merge) {
 				var root = editor.getBody(), elementUtils = new ElementUtils(dom);
 
-				Tools.each(dom.select('*[data-mce-new]'), function(node) {
-					node.removeAttribute('data-mce-new');
-
+				Tools.each(dom.select('*[data-mce-fragment]'), function(node) {
 					for (var testNode = node.parentNode; testNode && testNode != root; testNode = testNode.parentNode) {
-						if (elementUtils.compare(testNode, node)) {
+						if (textInlineElements[node.nodeName.toLowerCase()] && elementUtils.compare(testNode, node)) {
 							dom.remove(node, true);
 						}
 					}
@@ -23241,12 +23266,6 @@ define("tinymce/InsertContent", [
 			selection.setRng(rng);
 		}
 
-		if (typeof value != 'string') {
-			merge = value.merge;
-			data = value.data;
-			value = value.content;
-		}
-
 		// Check for whitespace before/after value
 		if (/^ | $/.test(value)) {
 			value = trimOrPaddLeftRight(value);
@@ -23254,6 +23273,8 @@ define("tinymce/InsertContent", [
 
 		// Setup parser and serializer
 		parser = editor.parser;
+		merge = details.merge;
+
 		serializer = new Serializer({
 			validate: editor.settings.validate
 		}, editor.schema);
@@ -23297,7 +23318,7 @@ define("tinymce/InsertContent", [
 		parentNode = selection.getNode();
 
 		// Parse the fragment within the context of the parent node
-		var parserArgs = {context: parentNode.nodeName.toLowerCase(), data: data};
+		var parserArgs = {context: parentNode.nodeName.toLowerCase(), data: details.data};
 		fragment = parser.parse(value, parserArgs);
 
 		// Custom handling of lists
@@ -23309,7 +23330,6 @@ define("tinymce/InsertContent", [
 		}
 
 		markFragmentElements(fragment);
-		markInlineFormatElements(fragment);
 
 		// Move the caret to a more suitable location
 		node = fragment.lastChild;
@@ -23386,6 +23406,34 @@ define("tinymce/InsertContent", [
 		umarkFragmentElements(editor.getBody());
 		editor.fire('SetContent', args);
 		editor.addVisual();
+	};
+
+	var processValue = function (value) {
+		var details;
+
+		if (typeof value !== 'string') {
+			details = Tools.extend({
+				paste: value.paste,
+				data: {
+					paste: value.paste
+				}
+			}, value);
+
+			return {
+				content: value.content,
+				details: details
+			};
+		}
+
+		return {
+			content: value,
+			details: {}
+		};
+	};
+
+	var insertAtCaret = function (editor, value) {
+		var result = processValue(value);
+		insertHtmlAtCaret(editor, result.content, result.details);
 	};
 
 	return {
@@ -31802,8 +31850,10 @@ define("tinymce/util/Quirks", [
 	"tinymce/Env",
 	"tinymce/util/Tools",
 	"tinymce/util/Delay",
-	"tinymce/caret/CaretContainer"
-], function(VK, RangeUtils, TreeWalker, NodePath, Node, Entities, Env, Tools, Delay, CaretContainer) {
+	"tinymce/caret/CaretContainer",
+	"tinymce/caret/CaretPosition",
+	"tinymce/caret/CaretWalker"
+], function(VK, RangeUtils, TreeWalker, NodePath, Node, Entities, Env, Tools, Delay, CaretContainer, CaretPosition, CaretWalker) {
 	return function(editor) {
 		var each = Tools.each, $ = editor.$;
 		var BACKSPACE = VK.BACKSPACE, DELETE = VK.DELETE, dom = editor.dom, selection = editor.selection,
@@ -33435,6 +33485,46 @@ define("tinymce/util/Quirks", [
 			return (!sel || !sel.rangeCount || sel.rangeCount === 0);
 		}
 
+		/**
+		 * Properly empties the editor if all contents is selected and deleted this to
+		 * prevent empty paragraphs from being produced at beginning/end of contents.
+		 */
+		function emptyEditorOnDeleteEverything() {
+			function isEverythingSelected(editor) {
+				var caretWalker = new CaretWalker(editor.getBody());
+				var rng = editor.selection.getRng();
+				var startCaretPos = CaretPosition.fromRangeStart(rng);
+				var endCaretPos = CaretPosition.fromRangeEnd(rng);
+
+				return !editor.selection.isCollapsed() && !caretWalker.prev(startCaretPos) && !caretWalker.next(endCaretPos);
+			}
+
+			// Type over case delete and insert this won't cover typeover with a IME but at least it covers the common case
+			editor.on('keypress', function (e) {
+				if (!isDefaultPrevented(e) && !selection.isCollapsed() && e.charCode > 31 && !VK.metaKeyPressed(e)) {
+					if (isEverythingSelected(editor)) {
+						e.preventDefault();
+						editor.setContent(String.fromCharCode(e.charCode));
+						editor.selection.select(editor.getBody(), true);
+						editor.selection.collapse(false);
+						editor.nodeChanged();
+					}
+				}
+			});
+
+			editor.on('keydown', function (e) {
+				var keyCode = e.keyCode;
+
+				if (!isDefaultPrevented(e) && (keyCode == DELETE || keyCode == BACKSPACE)) {
+					if (isEverythingSelected(editor)) {
+						e.preventDefault();
+						editor.setContent('');
+						editor.nodeChanged();
+					}
+				}
+			});
+		}
+
 		// All browsers
 		removeBlockQuoteOnBackSpace();
 		emptyEditorWhenDeleting();
@@ -33447,6 +33537,7 @@ define("tinymce/util/Quirks", [
 
 		// WebKit
 		if (isWebKit) {
+			emptyEditorOnDeleteEverything();
 			cleanupStylesWhenDeleting();
 			inputMethodFocus();
 			selectControlElements();
@@ -33454,6 +33545,7 @@ define("tinymce/util/Quirks", [
 			blockFormSubmitInsideEditor();
 			disableBackspaceIntoATable();
 			removeAppleInterchangeBrs();
+
 			//touchClickEvent();
 
 			// iOS
@@ -33491,6 +33583,7 @@ define("tinymce/util/Quirks", [
 
 		// Gecko
 		if (isGecko) {
+			emptyEditorOnDeleteEverything();
 			removeHrOnBackspace();
 			focusBody();
 			removeStylesWhenDeletingAcrossBlockElements();
@@ -35584,6 +35677,7 @@ define("tinymce/DragDropOverrides", [
 			}
 
 			if (state.dragging) {
+				editor._selectionOverrides.hideFakeCaret();
 				editor.selection.placeCaretAt(e.clientX, e.clientY);
 
 				clientX = state.clientX + deltaX - state.relX;
@@ -35612,8 +35706,8 @@ define("tinymce/DragDropOverrides", [
 			}
 		}
 
-		function drop() {
-			var evt;
+		function drop(evt) {
+			var dropEvt;
 
 			if (state.dragging) {
 				// Hack for IE since it doesn't sync W3C Range with IE Specific range
@@ -35622,12 +35716,18 @@ define("tinymce/DragDropOverrides", [
 				if (isValidDropTarget(editor.selection.getNode())) {
 					var targetClone = state.element;
 
-					evt = editor.fire('drop', {targetClone: targetClone});
-					if (evt.isDefaultPrevented()) {
+					// Pass along clientX, clientY if we have them
+					dropEvt = editor.fire('drop', {
+						targetClone: targetClone,
+						clientX: evt.clientX,
+						clientY: evt.clientY
+					});
+
+					if (dropEvt.isDefaultPrevented()) {
 						return;
 					}
 
-					targetClone = evt.targetClone;
+					targetClone = dropEvt.targetClone;
 
 					editor.undoManager.transact(function() {
 						editor.insertContent(dom.getOuterHTML(targetClone));
@@ -35693,7 +35793,8 @@ define("tinymce/DragDropOverrides", [
 
 		// Blocks drop inside cE=false on IE
 		editor.on('drop', function(e) {
-			var realTarget = editor.getDoc().elementFromPoint(e.clientX, e.clientY);
+			// FF doesn't pass out clientX/clientY for drop since this is for IE we just use null instead
+			var realTarget = typeof e.clientX !== 'undefined' ? editor.getDoc().elementFromPoint(e.clientX, e.clientY) : null;
 
 			if (isContentEditableFalse(realTarget) || isContentEditableFalse(editor.dom.getContentEditableParent(realTarget))) {
 				e.preventDefault();
@@ -36169,8 +36270,8 @@ define("tinymce/SelectionOverrides", [
 			return toCaretPosition.toRange();
 		}
 
-		function backspaceDelete(direction, beforeFn, range) {
-			var node, caretPosition, peekCaretPosition;
+		function backspaceDelete(direction, beforeFn, afterFn, range) {
+			var node, caretPosition, peekCaretPosition, newCaretPosition;
 
 			if (!range.collapsed) {
 				node = getSelectedNode(range);
@@ -36180,6 +36281,11 @@ define("tinymce/SelectionOverrides", [
 			}
 
 			caretPosition = getNormalizedRangeEndPoint(direction, range);
+
+			if (afterFn(caretPosition) && CaretContainer.isCaretContainerBlock(range.startContainer)) {
+				newCaretPosition = direction == -1 ? caretWalker.prev(caretPosition) : caretWalker.next(caretPosition);
+				return newCaretPosition ? renderRangeCaret(newCaretPosition.toRange()) : range;
+			}
 
 			if (beforeFn(caretPosition)) {
 				return renderRangeCaret(deleteContentEditableNode(caretPosition.getNode(direction == -1)));
@@ -36198,8 +36304,8 @@ define("tinymce/SelectionOverrides", [
 		function registerEvents() {
 			var right = curry(moveH, 1, getNextVisualCaretPosition, isBeforeContentEditableFalse);
 			var left = curry(moveH, -1, getPrevVisualCaretPosition, isAfterContentEditableFalse);
-			var deleteForward = curry(backspaceDelete, 1, isBeforeContentEditableFalse);
-			var backspace = curry(backspaceDelete, -1, isAfterContentEditableFalse);
+			var deleteForward = curry(backspaceDelete, 1, isBeforeContentEditableFalse, isAfterContentEditableFalse);
+			var backspace = curry(backspaceDelete, -1, isAfterContentEditableFalse, isBeforeContentEditableFalse);
 			var up = curry(moveV, -1, LineWalker.upUntil);
 			var down = curry(moveV, 1, LineWalker.downUntil);
 
@@ -36562,7 +36668,6 @@ define("tinymce/SelectionOverrides", [
 				top: dom.getPos(node, editor.getBody()).y
 			});
 
-			editor.getBody().focus();
 			$realSelectionContainer[0].focus();
 			sel = editor.selection.getSel();
 			sel.removeAllRanges();
@@ -36588,6 +36693,10 @@ define("tinymce/SelectionOverrides", [
 			selectedContentEditableNode = null;
 		}
 
+		function hideFakeCaret() {
+			fakeCaret.hide();
+		}
+
 		if (Env.ceFalse) {
 			registerEvents();
 			addCss();
@@ -36595,11 +36704,51 @@ define("tinymce/SelectionOverrides", [
 
 		return {
 			showBlockCaretContainer: showBlockCaretContainer,
+			hideFakeCaret: hideFakeCaret,
 			destroy: destroy
 		};
 	}
 
 	return SelectionOverrides;
+});
+
+// Included from: js/tinymce/classes/util/Uuid.js
+
+/**
+ * Uuid.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2016 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * Generates unique ids.
+ *
+ * @class tinymce.util.Uuid
+ * @private
+ */
+define("tinymce/util/Uuid", [
+], function() {
+	var count = 0;
+
+	var seed = function () {
+		var rnd = function () {
+			return Math.round(Math.random() * 0xFFFFFFFF).toString(36);
+		};
+
+		return 's' + Date.now().toString(36) + rnd() + rnd() + rnd();
+	};
+
+	var uuid = function (prefix) {
+		return prefix + (count++) + seed();
+	};
+
+	return {
+		uuid: uuid
+	};
 });
 
 // Included from: js/tinymce/classes/Editor.js
@@ -36675,13 +36824,14 @@ define("tinymce/Editor", [
 	"tinymce/Mode",
 	"tinymce/Shortcuts",
 	"tinymce/EditorUpload",
-	"tinymce/SelectionOverrides"
+	"tinymce/SelectionOverrides",
+	"tinymce/util/Uuid"
 ], function(
 	DOMUtils, DomQuery, AddOnManager, NodeChange, Node, DomSerializer, Serializer,
 	Selection, Formatter, UndoManager, EnterKey, ForceBlocks, EditorCommands,
 	URI, ScriptLoader, EventUtils, WindowManager, NotificationManager,
 	Schema, DomParser, Quirks, Env, Tools, Delay, EditorObservable, Mode, Shortcuts, EditorUpload,
-	SelectionOverrides
+	SelectionOverrides, Uuid
 ) {
 	// Shorten these names
 	var DOM = DOMUtils.DOM, ThemeManager = AddOnManager.ThemeManager, PluginManager = AddOnManager.PluginManager;
@@ -36857,6 +37007,7 @@ define("tinymce/Editor", [
 		self.suffix = editorManager.suffix;
 		self.editorManager = editorManager;
 		self.inline = settings.inline;
+		self.settings.content_editable = self.inline;
 
 		if (settings.cache_suffix) {
 			Env.cacheSuffix = settings.cache_suffix.replace(/^[\?\&]+/, '');
@@ -37974,6 +38125,7 @@ define("tinymce/Editor", [
 			}
 
 			self.contextToolbars.push({
+				id: Uuid.uuid('mcet'),
 				predicate: predicate,
 				items: items
 			});
@@ -39149,9 +39301,9 @@ define("tinymce/FocusManager", [
 			// Gecko doesn't have the "selectionchange" event we need to do this. Fixes: #6843
 			if (editor.inline && !documentMouseUpHandler) {
 				documentMouseUpHandler = function(e) {
-					var activeEditor = editorManager.activeEditor;
+					var activeEditor = editorManager.activeEditor, dom = activeEditor.dom;
 
-					if (activeEditor.inline && !activeEditor.dom.isChildOf(e.target, activeEditor.getBody())) {
+					if (activeEditor.inline && dom && !dom.isChildOf(e.target, activeEditor.getBody())) {
 						var rng = activeEditor.selection.getRng();
 
 						if (!rng.collapsed) {
@@ -39318,7 +39470,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '3.13',
+		minorVersion: '4.0',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -39326,7 +39478,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2016-06-08',
+		releaseDate: '2016-06-30',
 
 		/**
 		 * Collection of editor instances.
@@ -39491,7 +39643,24 @@ define("tinymce/EditorManager", [
 		 * });
 		 */
 		init: function(settings) {
-			var self = this, result;
+			var self = this, result, invalidInlineTargets;
+
+			invalidInlineTargets = Tools.makeMap(
+				'area base basefont br col frame hr img input isindex link meta param embed source wbr track ' +
+				'colgroup option tbody tfoot thead tr script noscript style textarea video audio iframe object menu',
+				' '
+			);
+
+			function isInvalidInlineTarget(settings, elm) {
+				return settings.inline && elm.tagName.toLowerCase() in invalidInlineTargets;
+			}
+
+			function report(msg, elm) {
+				// Log in a non test environment
+				if (window.console && !window.test) {
+					window.console.log(msg, elm);
+				}
+			}
 
 			function createId(elm) {
 				var id = elm.id;
@@ -39637,7 +39806,11 @@ define("tinymce/EditorManager", [
 				});
 
 				each(targets, function(elm) {
-					createEditor(createId(elm), settings, elm);
+					if (isInvalidInlineTarget(settings, elm)) {
+						report('Could not initialize inline editor on invalid inline target element', elm);
+					} else {
+						createEditor(createId(elm), settings, elm);
+					}
 				});
 			}
 

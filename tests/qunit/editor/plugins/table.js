@@ -505,6 +505,157 @@
 		equal(cleanTableHtml(editor.getContent()), '<table><tbody><tr><td>1</td><td>2</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>');
 	});
 
+	test("mceTableInsertRowAfter command on merged cells", function() {
+		editor.setContent(
+			'<table>' +
+				'<tr><td>1</td><td>2</td><td>3</td></tr>' +
+				'<tr><td>4</td><td colspan="2" rowspan="2">5</td></tr>' +
+				'<tr><td>6</td></tr>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTableInsertRowAfter');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td><td>3</td></tr>' +
+					'<tr><td>4</td><td colspan="2" rowspan="3">5</td></tr>' +
+					'<tr><td>&nbsp;</td></tr>' +
+					'<tr><td>6</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+	});
+
+	test("mceTablePasteRowBefore command", function() {
+		editor.setContent(
+			'<table>' +
+				'<tr><td>1</td><td>2</td></tr>' +
+				'<tr><td>2</td><td>3</td></tr>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(1) td', 0);
+		editor.execCommand('mceTableCopyRow');
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTablePasteRowBefore');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>2</td><td>3</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTablePasteRowBefore');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>2</td><td>3</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+	});
+
+	test("mceTablePasteRowAfter command", function() {
+		editor.setContent(
+			'<table>' +
+				'<tr><td>1</td><td>2</td></tr>' +
+				'<tr><td>2</td><td>3</td></tr>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(1) td', 0);
+		editor.execCommand('mceTableCopyRow');
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTablePasteRowAfter');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>2</td><td>3</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTablePasteRowAfter');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>2</td><td>3</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+	});
+
+	test("row clipboard api", function() {
+		var clipboardRows;
+
+		editor.setContent(
+			'<table>' +
+				'<tr><td>1</td><td>2</td></tr>' +
+				'<tr><td>2</td><td>3</td></tr>' +
+			'</table>'
+		);
+
+		Utils.setSelection('tr:nth-child(1) td', 0);
+		editor.execCommand('mceTableCopyRow');
+
+		clipboardRows = editor.plugins.table.getClipboardRows();
+
+		equal(clipboardRows.length, 1);
+		equal(clipboardRows[0].tagName, 'TR');
+
+		editor.plugins.table.setClipboardRows(clipboardRows.concat([
+			editor.dom.create('tr', {}, '<td>a</td><td>b</td>'),
+			editor.dom.create('tr', {}, '<td>c</td><td>d</td>')
+		]));
+
+		Utils.setSelection('tr:nth-child(2) td', 0);
+		editor.execCommand('mceTablePasteRowAfter');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>2</td><td>3</td></tr>' +
+					'<tr><td>1</td><td>2</td></tr>' +
+					'<tr><td>a</td><td>b</td></tr>' +
+					'<tr><td>c</td><td>d</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+	});
+
 	test("mceTableInsertRowBefore command", function() {
 		editor.setContent('<table><tr><td>1</td><td>2</td></tr></table>');
 		Utils.setSelection('td', 0);
@@ -516,7 +667,55 @@
 		editor.getBody().innerHTML = '<table><tr><td data-mce-selected="1">1</td><td data-mce-selected="1">2</td></tr></table>';
 		Utils.setSelection('td', 0);
 		editor.execCommand('mceTableMergeCells');
-		equal(cleanTableHtml(editor.getContent()), '<table><tbody><tr><td colspan="2">12</td></tr></tbody></table>');
+		equal(cleanTableHtml(editor.getContent()), '<table><tbody><tr><td>12</td></tr></tbody></table>');
+	});
+
+	test("mceTableMergeCells command with all cells selected", function() {
+		editor.getBody().innerHTML = (
+			'<table>' +
+				'<tbody>' +
+					'<tr><td data-mce-selected="1">1</td><td data-mce-selected="1">2</td></tr>' +
+					'<tr><td data-mce-selected="1">3</td><td data-mce-selected="1">4</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+
+		Utils.setSelection('td', 0);
+		editor.execCommand('mceTableMergeCells');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+			'<table>' +
+				'<tbody>' +
+					'<tr><td>1234</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+	});
+
+	test("mceTableMergeCells command with whole rows selected", function() {
+		editor.getBody().innerHTML = (
+			'<table>' +
+				'<tbody>' +
+					'<tr><td data-mce-selected="1">1</td><td data-mce-selected="1">2</td></tr>' +
+					'<tr><td data-mce-selected="1">3</td><td data-mce-selected="1">4</td></tr>' +
+					'<tr><td>5</td><td>6</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
+
+		Utils.setSelection('td', 0);
+		editor.execCommand('mceTableMergeCells');
+
+		equal(
+			cleanTableHtml(editor.getContent()),
+			'<table>' +
+				'<tbody>' +
+					'<tr><td colspan="2">1234</td></tr>' +
+					'<tr><td>5</td><td>6</td></tr>' +
+				'</tbody>' +
+			'</table>'
+		);
 	});
 
 	test("mceTableSplitCells command", function() {
@@ -1021,5 +1220,68 @@
 
 		equal(cells[cells.length - 1].getAttribute('data-counter'), "8");
 		equal(rows[rows.length - 1].getAttribute('data-counter'), "6");
+	});
+
+	function assertTableSelection(tableHtml, selectCells, cellContents) {
+		function selectRangeXY(table, startTd, endTd) {
+			editor.fire('mousedown', {target: startTd});
+			editor.fire('mouseover', {target: endTd});
+			editor.fire('mouseup', {target: endTd});
+		}
+
+		function getCells(table) {
+			return editor.$(table).find('td').toArray();
+		}
+
+		function getSelectedCells(table) {
+			return editor.$(table).find('td[data-mce-selected]').toArray();
+		}
+
+		editor.setContent(tableHtml);
+
+		var table = editor.$('table')[0];
+		var cells = getCells(table);
+
+		var startTd = tinymce.grep(cells, function(elm) {
+			return elm.innerHTML === selectCells[0];
+		})[0];
+
+		var endTd = tinymce.grep(cells, function(elm) {
+			return elm.innerHTML === selectCells[1];
+		})[0];
+
+		selectRangeXY(table, startTd, endTd);
+
+		var selection = getSelectedCells(table);
+		selection = tinymce.map(selection, function(elm) {
+			return elm.innerHTML;
+		});
+
+		deepEqual(selection, cellContents);
+	}
+
+	test("Table grid selection", function() {
+		assertTableSelection('<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>', ['1', '2'], ['1', '2']);
+		assertTableSelection('<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>', ['1', '3'], ['1', '3']);
+		assertTableSelection('<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>', ['1', '4'], ['1', '2', '3', '4']);
+		assertTableSelection('<table><tr><td colspan="2" rowspan="2">1</td><td>3</td></tr><tr><td>6</td></tr></table>', ['1', '6'], ['1', '3', '6']);
+		assertTableSelection(
+			'<table>' +
+				'<tr>' +
+					'<td>1</td>' +
+					'<td>2</td>' +
+					'<td>3</td>' +
+				'</tr>' +
+				'<tr>' +
+					'<td colspan="2" rowspan="2">4</td>' +
+					'<td>5</td>' +
+				'</tr>' +
+				'<tr>' +
+					'<td>6</td>' +
+				'</tr>' +
+			'</table>',
+			['2', '6'],
+			['2', '3', '4', '5', '6']
+		);
 	});
 })();
