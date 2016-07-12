@@ -56,9 +56,9 @@ var A11ySpeak = function( message, ariaLive ) {
 	clear();
 
 	if ( containerAssertive && "assertive" === ariaLive ) {
-		containerAssertive.text( message );
+		containerAssertive.textContent = message;
 	} else if ( containerPolite ) {
-		containerPolite.text( message );
+		containerPolite.textContent = message;
 	}
 };
 
