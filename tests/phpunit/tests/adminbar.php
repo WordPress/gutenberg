@@ -132,7 +132,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertEquals( $profile_url, $node_my_account->href );
 		$this->assertEquals( $profile_url, $node_user_info->href );
 		$this->assertEquals( $profile_url, $node_edit_profile->href );
-
 	}
 
 	/**
@@ -254,4 +253,96 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		return $wp_admin_bar;
 	}
 
+	/**
+	 * @ticket 32495
+	 *
+	 * @dataProvider data_admin_bar_nodes_with_tabindex_meta
+	 *
+	 * @param array  $node_data     The data for a node, passed to `WP_Admin_Bar::add_node()`.
+	 * @param string $expected_html The expected HTML when admin menu is rendered.
+	 */
+	public function test_admin_bar_with_tabindex_meta( $node_data, $expected_html ) {
+		$admin_bar = new WP_Admin_Bar();
+		$admin_bar->add_node( $node_data );
+		$admin_bar_html = get_echo( array( $admin_bar, 'render' ) );
+		$this->assertContains( $expected_html, $admin_bar_html );
+	}
+
+	/**
+	 * Data provider for test_admin_bar_with_tabindex_meta().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type array  $node_data     The data for a node, passed to `WP_Admin_Bar::add_node()`.
+	 *         @type string $expected_html The expected HTML when admin bar is rendered.
+	 *     }
+	 * }
+	 */
+	public function data_admin_bar_nodes_with_tabindex_meta() {
+		return array(
+			array(
+				// No tabindex.
+				array(
+					'id' => 'test-node',
+				),
+				'<div class="ab-item ab-empty-item">',
+			),
+			array(
+				// Empty string.
+				array(
+					'id' => 'test-node',
+					'meta' => array( 'tabindex' => '' ),
+				),
+				'<div class="ab-item ab-empty-item">',
+			),
+			array(
+				// Integer 1 as string.
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => '1' ),
+				),
+				'<div class="ab-item ab-empty-item" tabindex="1">',
+			),
+			array(
+				// Integer -1 as string.
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => '-1' ),
+				),
+				'<div class="ab-item ab-empty-item" tabindex="-1">',
+			),
+			array(
+				// Integer 0 as string.
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => '0' ),
+				),
+				'<div class="ab-item ab-empty-item" tabindex="0">',
+			),
+			array(
+				// Integer, 0.
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => 0 ),
+				),
+				'<div class="ab-item ab-empty-item" tabindex="0">',
+			),
+			array(
+				// Integer, 2.
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => 2 ),
+				),
+				'<div class="ab-item ab-empty-item" tabindex="2">',
+			),
+			array(
+				// Boolean, false
+				array(
+					'id'   => 'test-node',
+					'meta' => array( 'tabindex' => false ),
+				),
+				'<div class="ab-item ab-empty-item">',
+			),
+		);
+	}
 }
