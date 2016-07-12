@@ -1,0 +1,4 @@
+extends: yoast
+
+rules:
+  complexity: [1, 6]
