@@ -7,6 +7,7 @@ const validCss = (`
 .class { /* Correct usage of quotes */
 	background-image: url(images/bg.png);
 	font-family: "Helvetica Neue", sans-serif;
+	font-weight: 700;
 }
 
 .class { /* Correct usage of zero values */
@@ -24,6 +25,11 @@ const invalidCss = (`
 
 .class { /* Avoid adding a unit on a zero value */
 	margin: 0px 0px 20px 0px;
+}
+
+.class {
+	font-family: Times New Roman, serif; /* Quote font names when required */
+	font-weight: bold; /* Avoid named font weights */
 }
 `)
 /* eslint-enable */
@@ -50,12 +56,13 @@ test("There are warnings with invalid values CSS", t => {
     const { errored, results } = data
     const { warnings } = results[0]
     t.truthy(errored, "errored")
-    t.is(warnings.length, 6, "flags eight warnings")
+    t.is(warnings.length, 8, "flags eight warnings")
     t.is(warnings[0].text, "Expected a trailing semicolon (declaration-block-trailing-semicolon)", "correct warning text")
     t.is(warnings[1].text, "Expected single space after \":\" with a single-line declaration (declaration-colon-space-after)", "correct warning text")
-    t.is(warnings[2].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-    t.is(warnings[3].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
+    t.is(warnings[2].text, "Expected  quotes around font-family name \"Times New Roman\" (font-family-name-quotes)", "correct warning text")
+    t.is(warnings[3].text, "Expected numeric font-weight notation (font-weight-notation)", "correct warning text")
     t.is(warnings[4].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-    t.is(warnings[5].text, "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)", "correct warning text")
-  })
+    t.is(warnings[5].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
+    t.is(warnings[6].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
+    t.is(warnings[7].text, "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)", "correct warning text")  })
 })

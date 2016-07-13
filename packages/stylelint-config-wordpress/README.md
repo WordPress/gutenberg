@@ -231,7 +231,8 @@ There are numerous ways to input values for properties. Follow the guidelines be
 - Do not pad parentheses with spaces
 - Always end in a semicolon
 - Use double quotes rather than single quotes, and only when needed, such as when a font name has a space.
-0 values should not have units unless necessary, such as with transition-duration.
+- Font weights should be defined using numeric values (e.g. `400` instead of `normal`, `700` rather than `bold`).
+- 0 values should not have units unless necessary, such as with transition-duration.
 - Line height should also be unit-less, unless necessary to be defined as a specific pixel value. This is more than just a style convention, but is worth mentioning here. More information: http://meyerweb.com/eric/thoughts/2006/02/08/unitless-line-heights/
 - Use a leading zero for decimal values, including in rgba().
 - Multiple comma-separated values for one property should be separated by either a space or a newline, including within rgba(). Newlines should be used for lengthier multi-part values such as those for shorthand properties like box-shadow and text-shadow. Each subsequent value after the first should then be on a new line, indented to the same level as the selector and then spaced over to left-align with the previous value.
@@ -241,6 +242,7 @@ Correct:
 .class { /* Correct usage of quotes */
     background-image: url(images/bg.png);
     font-family: "Helvetica Neue", sans-serif;
+    font-weight: 700;
 }
  
 .class { /* Correct usage of zero values */
@@ -257,6 +259,11 @@ Incorrect:
  
 .class { /* Avoid adding a unit on a zero value */
     margin: 0px 0px 20px 0px;
+}
+
+.class {
+    font-family: Times New Roman, serif; /* Quote font names when required */
+    font-weight: bold; /* Avoid named font weights */
 }
 ```
 

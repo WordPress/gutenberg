@@ -2,6 +2,7 @@
 
 * Removed: `stylelint < 6.9.0` compatibility.
 * Added: `selector-attribute-quotes` rule.
+* Added: `font-weight-notation` rule.
 
 # 8.0.0
 
