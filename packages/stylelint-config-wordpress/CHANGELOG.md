@@ -1,3 +1,7 @@
+# HEAD
+
+* Removed: `stylelint < 6.9.0` compatibility.
+
 # 8.0.0
 
 * Removed: `stylelint < 6.6.0` compatibility.
