@@ -22,9 +22,12 @@ window._wpUpdatesSettings = {
 		'installed': 'Installed!',
 		'installFailedShort': 'Install Failed!',
 		'installFailed': 'Installation failed: %s',
-		'installingLabel': 'Installing %s...', // No ellipsis
-		'installedLabel': '%s installed!',
-		'installFailedLabel': '%s installation failed',
+		'pluginInstallingLabel': 'Installing %s...', // No ellipsis
+		'themeInstallingLabel': 'Installing %s...', // No ellipsis
+		'pluginInstalledLabel': '%s installed!',
+		'themeInstalledLabel': '%s installed!',
+		'pluginInstallFailedLabel': '%s installation failed',
+		'themeInstallFailedLabel': '%s installation failed',
 		'installingMsg': 'Installing... please wait.',
 		'installedMsg': 'Installation completed successfully.',
 		'importerInstalledMsg': 'Importer installed successfully. <a href="%s">Activate plugin &#38; run importer</a>',
@@ -37,9 +40,11 @@ window._wpUpdatesSettings = {
 		'deleted': 'Deleted!',
 		'livePreview': 'Live Preview',
 		'activatePlugin': 'Activate',
-		'activateTheme': 'Activate',
+		'activateTheme':       'Activate',
+		'activatePluginLabel': 'Activate %s',
+		'activateThemeLabel':  'Activate %s',
 		'activateImporter': 'Activate importer',
-		'unknownError': 'An unknown error occured',
+		'unknownError': 'An unknown error occurred',
 		'pluginsFound': 'Number of plugins found: %d',
 		'noPluginsFound': 'No plugins found. Try a different search.'
 	}
