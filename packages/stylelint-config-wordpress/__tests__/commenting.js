@@ -31,6 +31,8 @@ const validCss = (`
 	position: absolute;
 	top: 0 !important; /* I should explain why this is so !important */
 }
+
+/* Long comments should manually break the line length at 80 characters. */
 `)
 
 const invalidCss = (`
@@ -56,6 +58,8 @@ const invalidCss = (`
 	position: absolute;
 	top: 0 !important; /* I should explain why this is so !important */
 }
+
+/* Comments shouldn't have a line length greater than 80 characters, they should manually break the line length at 80 characters */
 `)
 /* eslint-enable */
 
@@ -81,8 +85,9 @@ test("There are warnings with invalid commenting CSS", t => {
     const { errored, results } = data
     const { warnings } = results[0]
     t.truthy(errored, "errored")
-    t.is(warnings.length, 2, "flags eight warnings")
+    t.is(warnings.length, 3, "flags three warnings")
     t.is(warnings[0].text, "Expected empty line before comment (comment-empty-line-before)", "correct warning text")
     t.is(warnings[1].text, "Expected empty line before comment (comment-empty-line-before)", "correct warning text")
+    t.is(warnings[2].text, "Expected line length to be no more than 80 characters (max-line-length)", "correct warning text")
   })
 })

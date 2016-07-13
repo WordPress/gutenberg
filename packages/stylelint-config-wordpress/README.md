@@ -358,6 +358,8 @@ Correct:
   position: absolute;
   top: 0 !important; /* I should explain why this is so !important */
 }
+
+/* Long comments should manually break the line length at 80 characters. */
 ```
 Incorrect:
 ```css
@@ -383,6 +385,8 @@ Incorrect:
   position: absolute;
   top: 0 !important; /* I should explain why this is so !important */
 }
+
+/* Comments shouldn't have a line length greater than 80 characters, they should manually break the line length at 80 characters */
 ```
 
 ### Best Practices - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#best-practices)
