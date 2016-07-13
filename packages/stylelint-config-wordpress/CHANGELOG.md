@@ -1,6 +1,7 @@
 # HEAD
 
 * Removed: `stylelint < 6.9.0` compatibility.
+* Added: `selector-attribute-quotes` rule.
 
 # 8.0.0
 

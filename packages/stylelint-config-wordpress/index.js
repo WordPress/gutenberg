@@ -68,6 +68,7 @@ module.exports = {
     "selector-attribute-brackets-space-inside": "never",
     "selector-attribute-operator-space-after": "never",
     "selector-attribute-operator-space-before": "never",
+    "selector-attribute-quotes": "always",
     "selector-combinator-space-after": "always",
     "selector-combinator-space-before": "always",
     "selector-list-comma-newline-after": "always",
