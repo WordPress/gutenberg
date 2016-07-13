@@ -20,6 +20,9 @@ class Tests_WP_Blacklist_Check extends WP_UnitTestCase {
 		$this->assertTrue( $result );
 	}
 
+	/**
+	 * @ticket 37208
+	 */
 	public function test_should_return_true_when_content_with_html_matches_blacklist_keys() {
 		$author       = 'Sting';
 		$author_email = 'sting@example.com';
@@ -59,6 +62,24 @@ class Tests_WP_Blacklist_Check extends WP_UnitTestCase {
 		$user_agent   = '';
 
 		update_option( 'blacklist_keys',"example\nfoo" );
+
+		$result = wp_blacklist_check( $author, $author_email, $author_url, $comment, $author_ip, $user_agent );
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * @ticket 37208
+	 */
+	public function test_should_return_true_when_link_matches_blacklist_keys() {
+		$author       = 'Rainier Wolfcastle';
+		$author_email = 'rainier@wolfcastle.com';
+		$author_url   = 'http://example.com';
+		$comment      = 'We go on TV and sing, <a href="http://example.com/spam/>sing</a>, sing.';
+		$author_ip    = '192.168.0.1';
+		$user_agent   = '';
+
+		update_option( 'blacklist_keys',"/spam/" );
 
 		$result = wp_blacklist_check( $author, $author_email, $author_url, $comment, $author_ip, $user_agent );
 
