@@ -307,4 +307,39 @@ class Tests_Mail extends WP_UnitTestCase {
 
 		$this->assertNotContains( 'quoted-printable', $GLOBALS['phpmailer']->mock_sent[0]['header'] );
 	}
+
+	/**
+	 * @ticket 21659
+	 */
+	public function test_wp_mail_addresses_arent_encoded() {
+		$to      = 'Lukáš To <to@example.org>';
+		$subject = 'Testing #21659';
+		$message = 'Only the name should be encoded, not the address.';
+
+		$headers = array(
+			'From'     => 'From: Lukáš From <from@example.org>',
+			'Cc'       => 'Cc: Lukáš CC <cc@example.org>',
+			'Bcc'      => 'Bcc: Lukáš BCC <bcc@example.org>',
+			'Reply-To' => 'Reply-To: Lukáš Reply-To <reply_to@example.org>',
+		);
+
+		$expected = array(
+			'To'       => 'To: =?UTF-8?B?THVrw6HFoSBUbw==?= <to@example.org>',
+			'From'     => 'From: =?UTF-8?Q?Luk=C3=A1=C5=A1_From?= <from@example.org>',
+			'Cc'       => 'Cc: =?UTF-8?B?THVrw6HFoSBDQw==?= <cc@example.org>',
+			'Bcc'      => 'Bcc: =?UTF-8?B?THVrw6HFoSBCQ0M=?= <bcc@example.org>',
+			'Reply-To' => 'Reply-To: =?UTF-8?Q?Luk=C3=A1=C5=A1_Reply-To?= <reply_to@example.org>',
+		);
+
+		wp_mail( $to, $subject, $message, array_values( $headers ) );
+
+		$mailer        = tests_retrieve_phpmailer_instance();
+		$sent_headers  = preg_split( "/\r\n|\n|\r/", $mailer->get_sent()->header );
+		$headers['To'] = "To: $to";
+
+		foreach ( $headers as $header => $value ) {
+			$target_headers = preg_grep( "/^$header:/", $sent_headers );
+			$this->assertEquals( $expected[ $header ], array_pop( $target_headers ) );
+		}
+	}
 }

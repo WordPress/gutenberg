@@ -17,7 +17,7 @@ class MockPHPMailer extends PHPMailer {
 			'to'      => $this->to,
 			'cc'      => $this->cc,
 			'bcc'     => $this->bcc,
-			'header'  => $this->MIMEHeader,
+			'header'  => $this->MIMEHeader . $this->mailHeader,
 			'subject' => $this->Subject,
 			'body'    => $this->MIMEBody,
 		);
