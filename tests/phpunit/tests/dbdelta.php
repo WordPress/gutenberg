@@ -801,4 +801,36 @@ class Tests_dbDelta extends WP_UnitTestCase {
 
 		$this->assertEmpty( $updates );
 	}
+
+	/**
+	 * @ticket 31679
+	 */
+	function test_column_type_change_with_hyphens_in_name() {
+		global $wpdb;
+
+		$schema = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test2 (
+				`foo-bar` varchar(255) DEFAULT NULL
+			)
+		";
+
+		$wpdb->query( $schema );
+
+		$schema_update = "
+			CREATE TABLE {$wpdb->prefix}dbdelta_test2 (
+				`foo-bar` text DEFAULT NULL
+			)
+		";
+
+		$updates = dbDelta( $schema_update );
+
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}dbdelta_test2" );
+
+		$this->assertSame(
+			array(
+				"{$wpdb->prefix}dbdelta_test2.foo-bar" => "Changed type of {$wpdb->prefix}dbdelta_test2.foo-bar from varchar(255) to text",
+			),
+			$updates
+		);
+	}
 }
