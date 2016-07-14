@@ -131,7 +131,6 @@ class Tests_Canonical extends WP_Canonical_UnitTestCase {
 			// Feeds (per-post)
 			array( '/2008/03/03/comment-test/?feed=comments-atom', '/2008/03/03/comment-test/feed/atom/'),
 			array( '/?p=149&feed=comments-atom', '/2008/03/03/comment-test/feed/atom/'),
-			array( '/2008/03/03/comment-test/?feed=comments-atom', '/2008/03/03/comment-test/feed/atom/' ),
 
 			// Index
 			array( '/?paged=1', '/' ),
