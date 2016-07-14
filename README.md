@@ -31,3 +31,7 @@ A11ySpeak( "The message you want to send to the ARIA live region" );
 // For assertive messages that should interrupt what screen readers are currently announcing.
 A11ySpeak( "The message you want to send to the ARIA live region", "assertive" );
 ```
+
+## Browser support
+
+IE9+ and all modern browsers.
