@@ -20,6 +20,7 @@ node_js:
 before_install:
   # remove outdated deps, assists with cache maintenance
   - npm prune
+  - npm update
 
 notifications:
   slack:
