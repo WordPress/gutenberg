@@ -30,6 +30,9 @@
     "LICENSE",
     "index.js"
   ],
+  "engines": {
+    "node": ">=4.2.1"
+  },
   "devDependencies": {
     "ava": "^0.15.2",
     "eslint": "^2.4.0",
