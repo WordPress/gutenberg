@@ -163,6 +163,33 @@ class Tests_Multisite_Site_Query extends WP_UnitTestCase {
 		$this->assertEqualSets( $expected, $found );
 	}
 
+	public function test_wp_site_query_by_network_id_with_order() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'ASC',
+		) );
+
+		$expected = array(
+			self::$site_ids['wordpress.org/'],
+			self::$site_ids['wordpress.org/foo/'],
+			self::$site_ids['wordpress.org/foo/bar/'],
+		);
+
+		$this->assertEquals( $expected, $found );
+
+		$found = $q->query( array(
+			'fields'     => 'ids',
+			'network_id' => self::$network_ids['wordpress.org/'],
+			'number'     => 3,
+			'order'      => 'DESC',
+		) );
+
+		$this->assertEquals( array_reverse( $expected ), $found );
+	}
+
 	public function test_wp_site_query_by_network_id_with_existing_sites() {
 		$q = new WP_Site_Query();
 		$found = $q->query( array(
