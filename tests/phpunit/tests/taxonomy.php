@@ -254,7 +254,7 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	public function test_get_objects_in_term_should_return_invalid_taxonomy_error() {
 		$terms = get_objects_in_term( 1, 'invalid_taxonomy' );
 		$this->assertInstanceOf( 'WP_Error', $terms );
-		$this->assertEquals( 'Invalid taxonomy', $terms->get_error_message() );
+		$this->assertEquals( 'invalid_taxonomy', $terms->get_error_code() );
 	}
 
 	public function test_get_objects_in_term_should_return_empty_array() {

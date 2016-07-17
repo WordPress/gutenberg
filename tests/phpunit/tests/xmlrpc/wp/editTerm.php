@@ -31,7 +31,7 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_editTerm( array( 1, 'subscriber', 'subscriber', '', array( 'taxonomy' => '' ) ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
-		$this->assertEquals( __( 'Invalid taxonomy' ), $result->message );
+		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
 
 	function test_invalid_taxonomy() {
@@ -40,7 +40,7 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_editTerm( array( 1, 'subscriber', 'subscriber', $this->parent_term['term_id'], array( 'taxonomy' => 'not_existing' ) ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
-		$this->assertEquals( __( 'Invalid taxonomy' ), $result->message );
+		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
 
 	function test_incapable_user() {
@@ -58,7 +58,7 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_editTerm( array( 1, 'editor', 'editor', 9999, array( 'taxonomy' => 'category' ) ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 404, $result->code );
-		$this->assertEquals(  __( 'Invalid term ID' ), $result->message );
+		$this->assertEquals(  __( 'Invalid term ID.' ), $result->message );
 	}
 
 	function test_empty_term() {

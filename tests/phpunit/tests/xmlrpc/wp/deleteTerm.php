@@ -25,7 +25,7 @@ class Tests_XMLRPC_wp_deleteTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_deleteTerm( array( 1, 'subscriber', 'subscriber', '', 0 ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
-		$this->assertEquals( __( 'Invalid taxonomy' ), $result->message );
+		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
 
 	function test_invalid_taxonomy() {
@@ -34,7 +34,7 @@ class Tests_XMLRPC_wp_deleteTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_deleteTerm( array( 1, 'subscriber', 'subscriber', 'not_existing', 0 ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
-		$this->assertEquals( __( 'Invalid taxonomy' ), $result->message );
+		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
 
 	function test_incapable_user() {
@@ -61,7 +61,7 @@ class Tests_XMLRPC_wp_deleteTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_deleteTerm( array( 1, 'editor', 'editor', 'category', 9999 ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 404, $result->code );
-		$this->assertEquals( __('Invalid term ID'), $result->message );
+		$this->assertEquals( __( 'Invalid term ID.' ), $result->message );
 	}
 
 	function test_term_deleted() {
