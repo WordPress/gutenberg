@@ -30,7 +30,7 @@ window._wpUpdatesSettings = {
 		'themeInstallFailedLabel': '%s installation failed',
 		'installingMsg': 'Installing... please wait.',
 		'installedMsg': 'Installation completed successfully.',
-		'importerInstalledMsg': 'Importer installed successfully. <a href="%s">Activate plugin &#38; run importer</a>',
+		'importerInstalledMsg': 'Importer installed successfully. <a href="%s">Run importer</a>',
 		'aysDelete': 'Are you sure you want to delete %s?',
 		'aysDeleteUninstall': 'Are you sure you want to delete %s and its data?',
 		'aysBulkDelete': 'Are you sure you want to delete the selected plugins and their data?',
@@ -43,7 +43,7 @@ window._wpUpdatesSettings = {
 		'activateTheme':       'Activate',
 		'activatePluginLabel': 'Activate %s',
 		'activateThemeLabel':  'Activate %s',
-		'activateImporter': 'Activate importer',
+		'activateImporter': 'Run Importer',
 		'unknownError': 'An unknown error occurred',
 		'pluginsFound': 'Number of plugins found: %d',
 		'noPluginsFound': 'No plugins found. Try a different search.'
