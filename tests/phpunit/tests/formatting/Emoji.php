@@ -8,8 +8,8 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 	 * @ticket 36525
 	 */
 	public function test_unfiltered_emoji_cdns() {
-		$png_cdn = 'https://s.w.org/images/core/emoji/72x72/';
-		$svn_cdn = 'https://s.w.org/images/core/emoji/svg/';
+		$png_cdn = 'https://s.w.org/images/core/emoji/2/72x72/';
+		$svn_cdn = 'https://s.w.org/images/core/emoji/2/svg/';
 
 		$output = get_echo( '_print_emoji_detection_script' );
 
@@ -25,8 +25,8 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 	 * @ticket 36525
 	 */
 	public function test_filtered_emoji_svn_cdn() {
-		$png_cdn = 'https://s.w.org/images/core/emoji/72x72/';
-		$svn_cdn = 'https://s.w.org/images/core/emoji/svg/';
+		$png_cdn = 'https://s.w.org/images/core/emoji/2/72x72/';
+		$svn_cdn = 'https://s.w.org/images/core/emoji/2/svg/';
 
 		$filtered_svn_cdn = $this->_filtered_emoji_svn_cdn();
 
@@ -49,8 +49,8 @@ class Tests_Formatting_Emoji extends WP_UnitTestCase {
 	 * @ticket 36525
 	 */
 	public function test_filtered_emoji_png_cdn() {
-		$png_cdn = 'https://s.w.org/images/core/emoji/72x72/';
-		$svn_cdn = 'https://s.w.org/images/core/emoji/svg/';
+		$png_cdn = 'https://s.w.org/images/core/emoji/2/72x72/';
+		$svn_cdn = 'https://s.w.org/images/core/emoji/2/svg/';
 
 		$filtered_png_cdn = $this->_filtered_emoji_png_cdn();
 
