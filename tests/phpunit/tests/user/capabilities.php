@@ -1183,4 +1183,16 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	}
 
+	public function testNonLoggedInUsersHaveNoCapabilities() {
+
+		$this->assertFalse( is_user_logged_in() );
+
+		$caps = $this->getCapsAndRoles();
+
+		foreach ( $caps as $cap => $roles ) {
+			$this->assertFalse( current_user_can( $cap ), "Non-logged-in user should not have the {$cap} capability" );
+		}		
+
+	}
+
 }
