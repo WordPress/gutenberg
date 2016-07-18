@@ -224,4 +224,38 @@ class Tests_Image_Intermediate_Size extends WP_UnitTestCase {
 
 		$this->assertTrue( strpos( $image['file'], $width . 'x' . $height ) > 0 );
 	}
+
+	/**
+	 * @ticket 34384
+	 */
+	public function test_get_intermediate_size_with_small_size_array() {
+		// Add a hard cropped size that matches the aspect ratio we're going to test.
+		add_image_size( 'test-size', 200, 100, true );
+
+		$file = DIR_TESTDATA . '/images/waffles.jpg';
+		$id = $this->_make_attachment( $file, 0 );
+
+		// Request a size by array that doesn't exist and is smaller than the 'thumbnail'
+		$image = image_get_intermediate_size( $id, array( 50, 25 ) );
+
+		// We should get the 'test-size' file and not the thumbnail.
+		$this->assertTrue( strpos( $image['file'], '200x100' ) > 0 );
+	}
+
+	/**
+	 * @ticket 34384
+	 */
+	public function test_get_intermediate_size_with_small_size_array_fallback() {
+		$file = DIR_TESTDATA . '/images/waffles.jpg';
+		$id = $this->_make_attachment( $file, 0 );
+
+		$original = wp_get_attachment_metadata( $id );
+		$thumbnail_file = $original['sizes']['thumbnail']['file'];
+
+		// Request a size by array that doesn't exist and is smaller than the 'thumbnail'
+		$image = image_get_intermediate_size( $id, array( 50, 25 ) );
+
+		// We should get the 'thumbnail' file as a fallback.
+		$this->assertSame( $image['file'], $thumbnail_file );
+	}
 }
