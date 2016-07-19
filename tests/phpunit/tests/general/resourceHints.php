@@ -150,4 +150,17 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $actual );
 	}
 
+	function test_dns_prefetch_scripts_does_not_included_registered_only() {
+		$expected = "<link rel='preconnect' href='http://s.w.org'>\n";
+		$unexpected = "<link rel='dns-prefetch' href='//wordpress.org'>\n";
+
+		wp_register_script( 'jquery-elsewhere', 'https://wordpress.org/wp-includes/js/jquery/jquery.js' );
+
+		$actual = get_echo( 'wp_resource_hints' );
+
+		wp_deregister_script( 'jquery-elsewhere' );
+
+		$this->assertEquals( $expected, $actual );
+		$this->assertNotContains( $unexpected, $actual );
+	}
 }
