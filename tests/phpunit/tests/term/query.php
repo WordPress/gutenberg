@@ -85,4 +85,26 @@ class Tests_Term_Query extends WP_UnitTestCase {
 		$found = array_map( 'intval', $q->terms );
 		$this->assertSame( array( $terms[1], $terms[0], $terms[2] ), $found );
 	}
+
+	/**
+	 * @ticket 37378
+	 */
+	public function test_order_by_keyword_should_not_be_duplicated_when_filtered() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		add_filter( 'terms_clauses', array( $this, 'filter_terms_clauses' ) );
+		$q = new WP_Term_Query( array(
+			'taxonomy' => array( 'wptests_tax' ),
+			'orderby' => 'name',
+		) );
+		remove_filter( 'terms_clauses', array( $this, 'filter_terms_clauses' ) );
+
+		$this->assertContains( 'ORDER BY tt.term_id', $q->request );
+		$this->assertNotContains( 'ORDER BY ORDER BY', $q->request );
+	}
+
+	public function filter_terms_clauses( $clauses ) {
+		$clauses['orderby'] = 'ORDER BY tt.term_id';
+		return $clauses;
+	}
 }
