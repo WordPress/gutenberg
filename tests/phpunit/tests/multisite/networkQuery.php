@@ -59,6 +59,27 @@ class Tests_Multisite_Network_Query extends WP_UnitTestCase {
 		$this->assertEquals( 3, count( $found ) );
 	}
 
+	public function test_wp_network_query_by_network__in_with_order() {
+		$expected = array( self::$network_ids['wordpress.org/'], self::$network_ids['make.wordpress.org/'] );
+
+		$q = new WP_Network_Query();
+		$found = $q->query( array(
+			'fields'      => 'ids',
+			'network__in' => $expected,
+			'order'       => 'ASC',
+		) );
+
+		$this->assertEquals( $expected, $found );
+
+		$found = $q->query( array(
+			'fields'      => 'ids',
+			'network__in' => $expected,
+			'order'       => 'DESC',
+		) );
+
+		$this->assertEquals( array_reverse( $expected ), $found );
+	}
+
 	public function test_wp_network_query_by_network__in_with_single_id() {
 		$expected = array( self::$network_ids['wordpress.org/'] );
 
