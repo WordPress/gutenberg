@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @group comment
+ */
 class Tests_Comment_CheckComment extends WP_UnitTestCase {
 	public function test_should_return_true_when_comment_whitelist_is_disabled() {
 		$author       = 'BobtheBuilder';
