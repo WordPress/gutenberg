@@ -2,6 +2,7 @@ window._wpUpdatesSettings = {
 	'ajax_nonce': '719b10f05d',
 	'l10n': {
 		'searchResults': 'Search results for &#8220;%s&#8221;',
+		'searchResultsLabel': 'Search Results',
 		'noPlugins': 'You do not appear to have any plugins available at this time.',
 		'noItemsSelected': 'Please select at least one item to perform this action on.',
 		'updating': 'Updating...',
