@@ -63,6 +63,7 @@ module.exports = {
     "number-leading-zero": "always",
     "number-no-trailing-zeros": true,
     "property-case": "lower",
+    "property-no-unknown": true,
     "rule-nested-empty-line-before": [ "always", {
       ignore: ["after-comment"],
     } ],
