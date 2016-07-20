@@ -5,6 +5,7 @@
 * Added: `selector-attribute-quotes` rule.
 * Added: `font-weight-notation` rule.
 * Added: `max-line-length` rule.
+* Deprecated `no-missing-eof-newline` rule. Use the new `no-missing-end-of-source-newline` rule instead.
 
 # 8.0.0
 
