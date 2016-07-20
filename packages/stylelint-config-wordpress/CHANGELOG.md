@@ -1,6 +1,6 @@
 # HEAD
 
-* Removed: `stylelint < 6.9.0` compatibility.
+* Removed: `stylelint < 7.0.0` compatibility.
 * Removed: NodeJS 0.12.x support, `stylelint` and `stylelint-config-wordpress` now require NodeJS > 4.2.1 LTS or greater
 * Added: `selector-attribute-quotes` rule.
 * Added: `font-weight-notation` rule.
