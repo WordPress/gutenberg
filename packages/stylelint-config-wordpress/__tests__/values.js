@@ -59,7 +59,7 @@ test("There are warnings with invalid values CSS", t => {
     t.is(warnings.length, 8, "flags eight warnings")
     t.is(warnings[0].text, "Expected a trailing semicolon (declaration-block-trailing-semicolon)", "correct warning text")
     t.is(warnings[1].text, "Expected single space after \":\" with a single-line declaration (declaration-colon-space-after)", "correct warning text")
-    t.is(warnings[2].text, "Expected  quotes around font-family name \"Times New Roman\" (font-family-name-quotes)", "correct warning text")
+    t.is(warnings[2].text, "Expected quotes around \"Times New Roman\" (font-family-name-quotes)", "correct warning text")
     t.is(warnings[3].text, "Expected numeric font-weight notation (font-weight-notation)", "correct warning text")
     t.is(warnings[4].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
     t.is(warnings[5].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
