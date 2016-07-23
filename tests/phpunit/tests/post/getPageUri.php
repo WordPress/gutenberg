@@ -47,6 +47,18 @@ class Tests_Post_getPageUri extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36174
+	 */
+	function test_get_page_uri_with_a_draft_parent_with_empty_slug() {
+		$parent_id = self::factory()->post->create( array( 'post_name' => 'parent' ) );
+		$child_id = self::factory()->post->create( array( 'post_name' => 'child', 'post_parent' => $parent_id ) );
+
+		wp_update_post( array( 'ID' => $parent_id, 'post_name' => '', 'post_status' => 'draft' ) );
+
+		$this->assertEquals( 'child', get_page_uri( $child_id ) );
+	}
+
+	/**
 	 * @ticket 26284
 	 */
 	function test_get_page_uri_without_argument() {
