@@ -46,6 +46,9 @@ class Tests_Post_getPageUri extends WP_UnitTestCase {
 		$this->assertEquals( 'child', get_page_uri( $child_id ) );
 	}
 
+	/**
+	 * @ticket 26284
+	 */
 	function test_get_page_uri_without_argument() {
 		$post_id = self::factory()->post->create(array(
 			'post_title' => 'Blood Orange announces summer tour dates',
