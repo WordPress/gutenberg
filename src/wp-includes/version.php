@@ -18,7 +18,7 @@ $wp_db_version = 37965;
  *
  * @global string $tinymce_version
  */
-$tinymce_version = '4400-20160711';
+$tinymce_version = '4401-20160726';
 
 /**
  * Holds the required PHP version
