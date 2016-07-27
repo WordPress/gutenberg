@@ -18,13 +18,13 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 
 	/**
 	 * Last AJAX response.  This is set via echo -or- wp_die.
-	 * @var type
+	 * @var string
 	 */
 	protected $_last_response = '';
 
 	/**
 	 * List of ajax actions called via POST
-	 * @var type
+	 * @var array
 	 */
 	protected static $_core_actions_get = array(
 		'fetch-list', 'ajax-tag-search', 'wp-compression-test', 'imgedit-preview', 'oembed-cache',
@@ -39,7 +39,7 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 
 	/**
 	 * List of ajax actions called via GET
-	 * @var type
+	 * @var array
 	 */
 	protected static $_core_actions_post = array(
 		'oembed_cache', 'image-editor', 'delete-comment', 'delete-tag', 'delete-link',
@@ -53,7 +53,9 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 		'wp-remove-post-lock', 'dismiss-wp-pointer', 'send-attachment-to-editor', 'heartbeat', 'nopriv_heartbeat', 'get-revision-diffs',
 		'save-user-color-scheme', 'update-widget', 'query-themes', 'parse-embed', 'set-attachment-thumbnail',
 		'parse-media-shortcode', 'destroy-sessions', 'install-plugin', 'update-plugin', 'press-this-save-post',
-		'press-this-add-category', 'crop-image', 'generate-password',
+		'press-this-add-category', 'crop-image', 'generate-password', 'save-wporg-username', 'delete-plugin',
+		'search-plugins', 'search-install-plugins', 'activate-plugin', 'update-theme', 'delete-theme',
+		'install-theme', 'get-post-thumbnail-html',
 	);
 
 	public static function setUpBeforeClass() {
