@@ -27,6 +27,32 @@ var addContainer = function( ariaLive ) {
 };
 
 /**
+ * Specify a function to execute when the DOM is fully loaded.
+ *
+ * @param {Function} callback A function to execute after the DOM is ready.
+ */
+var domReady = function( callback ) {
+	if ( document.readyState === "complete" || ( document.readyState !== "loading" && ! document.documentElement.doScroll ) ) {
+		callback();
+	} else {
+		document.addEventListener( "DOMContentLoaded", callback );
+	}
+};
+
+/**
+ * Create the live regions when the DOM is fully loaded.
+ */
+domReady( function() {
+	if ( containerPolite === null ) {
+		containerPolite = addContainer( "polite" );
+	}
+
+	if ( containerAssertive === null ) {
+		containerAssertive = addContainer( "assertive" );
+	}
+});
+
+/**
  * Clear the live regions.
  */
 var clear = function() {
@@ -44,14 +70,6 @@ var clear = function() {
  *                          polite or assertive. Default polite.
  */
 var A11ySpeak = function( message, ariaLive ) {
-	if ( containerPolite === null ) {
-		containerPolite = addContainer( "polite" );
-	}
-
-	if ( containerAssertive === null ) {
-		containerAssertive = addContainer( "assertive" );
-	}
-
 	// Clear previous messages to allow repeated strings being read out.
 	clear();
 
