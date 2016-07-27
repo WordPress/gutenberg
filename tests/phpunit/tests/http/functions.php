@@ -107,4 +107,45 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$this->assertSame( '', $no_cookie );
 	}
 
+	/**
+	 * @ticket 37437
+	 */
+	function test_get_response_cookies_with_wp_http_cookie_object() {
+		$url = 'http://example.org';
+
+		$response = wp_remote_get( $url, array(
+			'cookies' => array(
+				new WP_Http_Cookie( array( 'name' => 'test', 'value' => 'foo' ) ),
+			),
+		) );
+		$cookies  = wp_remote_retrieve_cookies( $response );
+
+		$this->assertNotEmpty( $cookies );
+
+		$cookie = wp_remote_retrieve_cookie( $response, 'test' );
+		$this->assertInstanceOf( 'WP_Http_Cookie', $cookie );
+		$this->assertSame( 'test', $cookie->name );
+		$this->assertSame( 'foo', $cookie->value );
+	}
+
+	/**
+	 * @ticket 37437
+	 */
+	function test_get_response_cookies_with_name_value_array() {
+		$url = 'http://example.org';
+
+		$response = wp_remote_get( $url, array(
+			'cookies' => array(
+				'test' => 'foo',
+			),
+		) );
+		$cookies  = wp_remote_retrieve_cookies( $response );
+
+		$this->assertNotEmpty( $cookies );
+
+		$cookie = wp_remote_retrieve_cookie( $response, 'test' );
+		$this->assertInstanceOf( 'WP_Http_Cookie', $cookie );
+		$this->assertSame( 'test', $cookie->name );
+		$this->assertSame( 'foo', $cookie->value );
+	}
 }
