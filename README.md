@@ -1,5 +1,5 @@
 # a11y-speak
-JS module inspired by wp-a11y.js
+Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions. This module is inspired by wp-a11y.js
 
 For context I'll quote [this article on WordPress.org](https://make.wordpress.org/accessibility/2015/04/15/let-wordpress-speak-new-in-wordpress-4-2/) by [@joedolson](https://github.com/joedolson):
 
