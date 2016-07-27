@@ -1,5 +1,4 @@
-var containerPolite = null;
-var containerAssertive = null;
+var containerPolite, containerAssertive;
 
 /**
  * Build the live regions markup.
@@ -43,11 +42,11 @@ var domReady = function( callback ) {
  * Create the live regions when the DOM is fully loaded.
  */
 domReady( function() {
-	if ( containerPolite === null ) {
+	if ( containerPolite = document.getElementById('a11y-speak-polite') === null ) {
 		containerPolite = addContainer( "polite" );
 	}
 
-	if ( containerAssertive === null ) {
+	if ( containerAssertive = document.getElementById('a11y-speak-assertive') === null ) {
 		containerAssertive = addContainer( "assertive" );
 	}
 });
