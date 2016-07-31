@@ -163,4 +163,17 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $actual );
 		$this->assertNotContains( $unexpected, $actual );
 	}
+
+	/**
+	 * @ticket 37502
+	 */
+	function test_deregistered_scripts_are_ignored() {
+		$expected = "<link rel='dns-prefetch' href='//s.w.org'>\n";
+
+		wp_enqueue_script( 'test-script', 'http://example.org/script.js' );
+		wp_deregister_script( 'test-script' );
+
+		$actual = get_echo( 'wp_resource_hints' );
+		$this->assertEquals( $expected, $actual );
+	}
 }
