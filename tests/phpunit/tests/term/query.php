@@ -5,6 +5,41 @@
  */
 class Tests_Term_Query extends WP_UnitTestCase {
 	/**
+	 * @ticket 37545
+	 */
+	public function test_taxonomy_should_accept_single_taxonomy_as_string() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$term_1 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+		$term_2 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_2' ) );
+
+		$q = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_2',
+			'fields' => 'ids',
+			'hide_empty' => false,
+		) );
+
+		$this->assertEqualSets( array( $term_2 ), $q->terms );
+	}
+
+	public function test_taxonomy_should_accept_taxonomy_array() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		$term_1 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+		$term_2 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_2' ) );
+
+		$q = new WP_Term_Query( array(
+			'taxonomy' => array( 'wptests_tax_2' ),
+			'fields' => 'ids',
+			'hide_empty' => false,
+		) );
+
+		$this->assertEqualSets( array( $term_2 ), $q->terms );
+	}
+
+	/**
 	 * @ticket 37074
 	 */
 	public function test_term_taxonomy_id_single() {
