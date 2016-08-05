@@ -46,6 +46,8 @@ window._wpUpdatesSettings = {
 		'activateThemeLabel':  'Activate %s',
 		'activateImporter': 'Run Importer',
 		'unknownError': 'An unknown error occurred',
+		'connectionError': 'Connection lost or the server is busy. Please try again later.',
+		'nonceError': 'An error has occurred. Please reload the page and try again.',
 		'pluginsFound': 'Number of plugins found: %d',
 		'noPluginsFound': 'No plugins found. Try a different search.'
 	}
