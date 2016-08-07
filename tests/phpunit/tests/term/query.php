@@ -142,4 +142,27 @@ class Tests_Term_Query extends WP_UnitTestCase {
 		$clauses['orderby'] = 'ORDER BY tt.term_id';
 		return $clauses;
 	}
+
+	/**
+	 * @ticket 37591
+	 */
+	public function test_terms_is_set() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		$q1 = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'hide_empty' => false
+		) );
+
+		$this->assertNotEmpty( $q1->terms );
+
+		$q2 = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'hide_empty' => false
+		) );
+
+		$this->assertNotEmpty( $q2->terms );
+	}
 }
