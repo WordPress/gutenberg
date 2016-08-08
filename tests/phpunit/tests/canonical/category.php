@@ -62,6 +62,9 @@ class Tests_Canonical_Category extends WP_Canonical_UnitTestCase {
 
 			// Nonexistent category will redirect to correct one.
 			array( '/foo/post0/', array( 'url' => '/cat0/post0/', 'qv' => array( 'category_name' => 'cat0', 'name' => 'post0', 'page' => '' ) ) ),
+
+			// Embed URLs should not redirect to post permalinks.
+			array( '/cat0/post0/embed/', array( 'url' => '/cat0/post0/embed/', 'qv' => array( 'category_name' => 'cat0', 'name' => 'post0', 'embed' => 'true' ) ) ),
 		);
 	}
 }
