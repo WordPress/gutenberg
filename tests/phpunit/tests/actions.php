@@ -332,7 +332,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	 * @ticket 36819
 	 */
 	function test_backup_plugin_globals_returns_filters() {
-		$backup = _backup_plugin_globals();
+		$backup = _backup_plugin_globals( true );
 		$this->assertArrayHasKey( 'backup_wp_filter',         $backup );
 		$this->assertArrayHasKey( 'backup_wp_actions',        $backup );
 		$this->assertArrayHasKey( 'backup_wp_current_filter', $backup );
@@ -343,14 +343,14 @@ class Tests_Actions extends WP_UnitTestCase {
 	 * @ticket 36819
 	 */
 	function test_backup_plugin_globals_returns_filters_from_first_time_called() {
-		$backup = _backup_plugin_globals();
+		$backup = _backup_plugin_globals( true );
 
 		$a = new MockAction();
 		$tag = rand_str();
 
 		add_action($tag, array(&$a, 'action'));
 
-		$new_backup = _backup_plugin_globals();
+		$new_backup = _backup_plugin_globals( false );
 		$this->assertEquals( $backup, $new_backup );
 	}
 
@@ -361,7 +361,7 @@ class Tests_Actions extends WP_UnitTestCase {
 		global $wp_actions;
 		$original_actions = $wp_actions;
 
-		_backup_plugin_globals();
+		_backup_plugin_globals( true );
 
 		$wp_actions = array();
 
@@ -378,7 +378,7 @@ class Tests_Actions extends WP_UnitTestCase {
 		global $wp_filter;
 		$original_filter = $wp_filter;
 
-		$backup = _backup_plugin_globals();
+		$backup = _backup_plugin_globals( true );
 
 		$a = new MockAction();
 		$tag = rand_str();
@@ -389,6 +389,26 @@ class Tests_Actions extends WP_UnitTestCase {
 		_restore_plugin_globals();
 
 		$this->assertNotEquals( $GLOBALS['wp_filter'], $original_filter );
+	}
+
+	/**
+	 * @ticket 36819
+	 */
+	function test_applied_actions_are_counted_after_restore() {
+		global $wp_actions;
+
+		$action_name = 'this_is_a_fake_action_name';
+		$this->assertArrayNotHasKey( $action_name, $wp_actions );
+
+		do_action( $action_name );
+
+		$this->assertEquals( 1, $wp_actions[ $action_name ] );
+
+		_backup_plugin_globals( true );
+		do_action( $action_name );
+		_restore_plugin_globals();
+
+		$this->assertEquals( 2, $wp_actions[ $action_name ] );
 	}
 
 	function apply_testing_filter() {
