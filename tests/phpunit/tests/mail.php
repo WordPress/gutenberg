@@ -286,11 +286,11 @@ class Tests_Mail extends WP_UnitTestCase {
 	 * > If an entity is of type "multipart" the Content-Transfer-Encoding is
 	 * > not permitted to have any value other than "7bit", "8bit" or
 	 * > "binary".
-	 * http://tools.ietf.org/html/rfc2045#section-6.4
+	 * https://tools.ietf.org/html/rfc2045#section-6.4
 	 *
 	 * > "Content-Transfer-Encoding: 7BIT" is assumed if the
 	 * > Content-Transfer-Encoding header field is not present.
-	 * http://tools.ietf.org/html/rfc2045#section-6.1
+	 * https://tools.ietf.org/html/rfc2045#section-6.1
 	 *
 	 * @ticket 28039
 	 */
