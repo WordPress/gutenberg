@@ -66,6 +66,37 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 		return $hints;
 	}
 
+	/**
+	 * @ticket 37652
+	 */
+	function test_preconnect() {
+		$expected = "<link rel='dns-prefetch' href='//s.w.org'>\n" .
+		            "<link rel='preconnect' href='//wordpress.org'>\n" .
+		            "<link rel='preconnect' href='https://make.wordpress.org'>\n" .
+		            "<link rel='preconnect' href='http://google.com'>\n" .
+		            "<link rel='preconnect' href='http://w.org'>\n";
+
+		add_filter( 'wp_resource_hints', array( $this, '_add_preconnect_domains' ), 10, 2 );
+
+		$actual = get_echo( 'wp_resource_hints' );
+
+		remove_filter( 'wp_resource_hints', array( $this, '_add_preconnect_domains' ) );
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function _add_preconnect_domains( $hints, $method ) {
+		if ( 'preconnect' === $method ) {
+			$hints[] = '//wordpress.org';
+			$hints[] = 'https://make.wordpress.org';
+			$hints[] = 'htps://example.com'; // Invalid URLs should be skipped.
+			$hints[] = 'http://google.com';
+			$hints[] = 'w.org';
+		}
+
+		return $hints;
+	}
+
 	function test_prerender() {
 		$expected = "<link rel='dns-prefetch' href='//s.w.org'>\n" .
 					"<link rel='prerender' href='https://make.wordpress.org/great-again'>\n" .
@@ -175,5 +206,40 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 
 		$actual = get_echo( 'wp_resource_hints' );
 		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * @ticket 37652
+	 */
+	function test_malformed_urls() {
+		$expected = "<link rel='dns-prefetch' href='//s.w.org'>\n";
+
+		// Errant colon.
+		add_filter( 'wp_resource_hints', array( $this, '_add_malformed_url_errant_colon' ), 10, 2 );
+		$actual = get_echo( 'wp_resource_hints' );
+		remove_filter( 'wp_resource_hints', array( $this, '_add_malformed_url_errant_colon' ) );
+		$this->assertEquals( $expected, $actual );
+
+		// Unsupported Scheme.
+		add_filter( 'wp_resource_hints', array( $this, '_add_malformed_url_unsupported_scheme' ), 10, 2 );
+		$actual = get_echo( 'wp_resource_hints' );
+		remove_filter( 'wp_resource_hints', array( $this, '_add_malformed_url_unsupported_scheme' ) );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function _add_malformed_url_errant_colon( $hints, $method ) {
+		if ( 'preconnect' === $method ) {
+			$hints[] = '://core.trac.wordpress.org/ticket/37652';
+		}
+
+		return $hints;
+	}
+
+	function _add_malformed_url_unsupported_scheme( $hints, $method ) {
+		if ( 'preconnect' === $method ) {
+			$hints[] = 'git://develop.git.wordpress.org/';
+		}
+
+		return $hints;
 	}
 }
