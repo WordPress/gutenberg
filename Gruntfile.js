@@ -521,7 +521,7 @@ module.exports = function(grunt) {
 					preserveComments: /^!/
 				},
 				src: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.js',
-				dest: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.min.js',
+				dest: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.min.js'
 			}
 		},
 
