@@ -146,4 +146,11 @@ class Tests_IsObjectInTerm extends WP_UnitTestCase {
 		$num_queries++;
 		$this->assertSame( $num_queries, $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 37721
+	 */
+	public function test_invalid_taxonomy_should_return_wp_error_object() {
+		$this->assertWPError( is_object_in_term( 12345, 'foo', 'bar' ) );
+	}
 }
