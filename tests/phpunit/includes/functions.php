@@ -58,36 +58,6 @@ function _delete_all_posts() {
 	}
 }
 
-class Basic_Object {
-	private $foo = 'bar';
-
-	public function __get( $name ) {
-		return $this->$name;
-	}
-
-	public function __set( $name, $value ) {
-		return $this->$name = $value;
-	}
-
-	public function __isset( $name ) {
-		return isset( $this->$name );
-	}
-
-	public function __unset( $name ) {
-		unset( $this->$name );
-	}
-
-	public function __call( $name, $arguments ) {
-		return call_user_func_array( array( $this, $name ), $arguments );
-	}
-
-	private function callMe() {
-		return 'maybe';
-	}
-}
-
-class Basic_Subclass extends Basic_Object {}
-
 function _wp_die_handler( $message, $title = '', $args = array() ) {
 	if ( !$GLOBALS['_wp_die_disabled'] ) {
 		_wp_die_handler_txt( $message, $title, $args);
@@ -147,7 +117,7 @@ function _upload_dir_no_subdir( $uploads ) {
 
 /**
  * Helper used with the `upload_dir` filter to set https upload URL.
- */ 
+ */
 function _upload_dir_https( $uploads ) {
 	$uploads['url'] = str_replace( 'http://', 'https://', $uploads['url'] );
 	$uploads['baseurl'] = str_replace( 'http://', 'https://', $uploads['baseurl'] );

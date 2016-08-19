@@ -1,4 +1,8 @@
 <?php
+
+require_once dirname( dirname( __FILE__ ) ) . '/includes/class-basic-object.php';
+require_once dirname( dirname( __FILE__ ) ) . '/includes/class-basic-subclass.php';
+
 /**
  * just make sure the test framework is working
  *
