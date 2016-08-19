@@ -249,5 +249,24 @@ class Tests_Import_Import extends WP_Import_UnitTestCase {
 		$wp_importers = $_wp_importers; // Restore global state
 	}
 
+	/**
+	 * @ticket 21007
+	 */
+	public function test_slashes_should_not_be_stripped() {
+		global $wpdb;
+
+		$authors = array( 'admin' => false );
+		$this->_import_wp( DIR_TESTDATA . '/export/slashes.xml', $authors );
+
+		$alpha = get_term_by( 'slug', 'alpha', 'category' );
+		$this->assertSame( 'a \"great\" category', $alpha->name );
+
+		$tag1 = get_term_by( 'slug', 'tag1', 'post_tag' );
+		$this->assertSame( "foo\'bar", $tag1->name );
+
+		$posts = get_posts( array( 'post_type' => 'any', 'post_status' => 'any' ) );
+		$this->assertSame( 'Slashes aren\\\'t \"cool\"', $posts[0]->post_content );
+	}
+
 	// function test_menu_import
 }
