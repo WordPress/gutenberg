@@ -1755,6 +1755,38 @@ EOF;
 
 		$this->assertSame( $expected, get_image_send_to_editor( $id, $caption, $title, $align, $url, $rel, $size, $alt ) );
 	}
+
+	/**
+	 * Tests if wp_get_attachment_image() uses wp_get_attachment_metadata().
+	 *
+	 * In this way, the meta data can be filtered using the filter
+	 * `wp_get_attachment_metadata`.
+	 *
+	 * The test checks if the image size that is added in the filter is
+	 * used in the output of `wp_get_attachment_image()`.
+	 *
+	 * @ticket 36246
+	 */
+	function test_wp_get_attachment_image_should_use_wp_get_attachment_metadata() {
+		add_filter( 'wp_get_attachment_metadata', array( $this, '_filter_36246' ), 10, 2 );
+
+		$actual = wp_get_attachment_image( self::$large_id, 'testsize' );
+		$expected = '<img width="999" height="999" src="http://example.org/wp-content/uploads/2016/03/test-image-testsize-999x999.png" class="attachment-testsize size-testsize" alt="test-image-large.png" srcset="http://example.org/wp-content/uploads/2016/03/test-image-large-150x150.png 150w, http://example.org/wp-content/uploads/2016/03/test-image-testsize-999x999.png 999w" sizes="(max-width: 999px) 100vw, 999px" />';
+
+		remove_filter( 'wp_get_attachment_metadata', array( $this, '_filter_36246' ) );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	function _filter_36246( $data, $attachment_id ) {
+		$data['sizes']['testsize'] = array(
+			'file' => 'test-image-testsize-999x999.png',
+			'width' => 999,
+			'height' => 999,
+			'mime-type' => 'image/png',
+		);
+		return $data;
+	}
 }
 
 /**
