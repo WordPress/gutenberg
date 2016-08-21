@@ -25,8 +25,8 @@ Configuration rules to ensure your CSS is compliant with the [WordPress CSS Codi
 
 ## Installation
 
-```console
-$ npm install stylelint-config-wordpress
+```bash
+$ npm install stylelint-config-wordpress --save-dev
 ```
 
 ## Usage
