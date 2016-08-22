@@ -6,14 +6,20 @@
  */
 class Tests_Media extends WP_UnitTestCase {
 	protected static $large_id;
+	protected static $_sizes;
 
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$_sizes = $GLOBALS['_wp_additional_image_sizes'];
+		$GLOBALS['_wp_additional_image_sizes'] = array();
+
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
 		self::$large_id = $factory->attachment->create_upload_object( $filename );
 	}
 
 	public static function wpTearDownAfterClass() {
 		wp_delete_attachment( self::$large_id );
+
+		$GLOBALS['_wp_additional_image_sizes'] = self::$_sizes;
 	}
 
 	function setUp() {
@@ -1770,8 +1776,17 @@ EOF;
 	function test_wp_get_attachment_image_should_use_wp_get_attachment_metadata() {
 		add_filter( 'wp_get_attachment_metadata', array( $this, '_filter_36246' ), 10, 2 );
 
+		remove_all_filters( 'wp_calculate_image_sizes' );
+
 		$actual = wp_get_attachment_image( self::$large_id, 'testsize' );
-		$expected = '<img width="999" height="999" src="http://example.org/wp-content/uploads/2016/03/test-image-testsize-999x999.png" class="attachment-testsize size-testsize" alt="test-image-large.png" srcset="http://example.org/wp-content/uploads/2016/03/test-image-large-150x150.png 150w, http://example.org/wp-content/uploads/2016/03/test-image-testsize-999x999.png 999w" sizes="(max-width: 999px) 100vw, 999px" />';
+		$year = date( 'Y' );
+		$month = date( 'm' );
+
+		$expected = '<img width="999" height="999" src="http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png"' .
+			' class="attachment-testsize size-testsize" alt="test-image-large.png"' .
+			' srcset="http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png 999w,' .
+				' http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-large-150x150.png 150w"' .
+				' sizes="(max-width: 999px) 100vw, 999px" />';
 
 		remove_filter( 'wp_get_attachment_metadata', array( $this, '_filter_36246' ) );
 
