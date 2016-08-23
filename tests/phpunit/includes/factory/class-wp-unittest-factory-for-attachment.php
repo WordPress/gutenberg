@@ -2,8 +2,33 @@
 
 class WP_UnitTest_Factory_For_Attachment extends WP_UnitTest_Factory_For_Post {
 
-	function create_object( $file, $parent = 0, $args = array() ) {
-		return wp_insert_attachment( $args, $file, $parent );
+	/**
+	 * Create an attachment fixture.
+	 *
+	 * @param array $args {
+	 *     Array of arguments. Accepts all arguments that can be passed to
+	 *     wp_insert_attachment(), in addition to the following:
+	 *     @type int    $post_parent ID of the post to which the attachment belongs.
+	 *     @type string $file        Path of the attached file.
+	 * }
+	 * @param int   $legacy_parent Deprecated.
+	 * @param array $legacy_args   Deprecated
+	 */
+	function create_object( $args, $legacy_parent = 0, $legacy_args = array() ) {
+		// Backward compatibility for legacy argument format.
+		if ( is_string( $args ) ) {
+			$file = $args;
+			$args = $legacy_args;
+			$args['post_parent'] = $legacy_parent;
+			$args['file'] = $file;
+		}
+
+		$r = array_merge( array(
+			'file' => '',
+			'parent' => 0,
+		), $args );
+
+		return wp_insert_attachment( $r, $r['file'], $r['post_parent'] );
 	}
 
 	function create_upload_object( $file, $parent = 0 ) {
