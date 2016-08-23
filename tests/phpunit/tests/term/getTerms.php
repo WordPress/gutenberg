@@ -12,6 +12,29 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37568
+	 */
+	public function test_meta_query_args_only() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$term1 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$term2 = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+
+		$post = self::factory()->post->create( array( 'post_type' => 'post' ) );
+
+		update_term_meta( $term1, 'somekey', 'thevalue' );
+
+		wp_set_post_terms( $post, array( $term1, $term2 ), 'wptests_tax' );
+
+		$found = get_terms( array(
+			'meta_key' => 'somekey',
+			'meta_value' => 'thevalue',
+		) );
+
+		$this->assertEqualSets( array( $term1 ), wp_list_pluck( $found, 'term_id' ) );
+	}
+
+	/**
 	 * @ticket 35495
 	 */
 	public function test_should_accept_an_args_array_containing_taxonomy_for_first_parameter() {
