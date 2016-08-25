@@ -1,25 +1,31 @@
 <?php
-
 /**
  * Tests for the WP_Site_Icon class.
  *
  * @group site_icon
  */
+
+require_once( ABSPATH . 'wp-admin/includes/class-wp-site-icon.php' );
+
 class Tests_WP_Site_Icon extends WP_UnitTestCase {
-	public $wp_site_icon;
+	protected $wp_site_icon;
+
 	public $attachment_id = 0;
 
 	function setUp() {
 		parent::setUp();
 
-		require_once ABSPATH . 'wp-admin/includes/class-wp-site-icon.php';
-		$this->wp_site_icon = $GLOBALS['wp_site_icon'];
+		$this->wp_site_icon = new WP_Site_Icon();
 	}
 
 	function tearDown() {
-		$this->site_icon = null;
+		$this->_remove_custom_logo();
 		$this->remove_added_uploads();
 		parent::tearDown();
+	}
+
+	function _remove_custom_logo() {
+		remove_theme_mod( 'custom_logo' );
 	}
 
 	function test_intermediate_image_sizes() {

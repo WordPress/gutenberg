@@ -1,13 +1,15 @@
 <?php
-
 /**
  * A set of unit tests for functions in wp-includes/general-template.php
  *
  * @group template
+ * @group site_icon
  */
-class Tests_General_Template extends WP_UnitTestCase {
 
-	public $wp_site_icon;
+require_once( ABSPATH . 'wp-admin/includes/class-wp-site-icon.php' );
+
+class Tests_General_Template extends WP_UnitTestCase {
+	protected $wp_site_icon;
 	public $site_icon_id;
 	public $site_icon_url;
 
@@ -17,8 +19,7 @@ class Tests_General_Template extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		require_once ABSPATH . 'wp-admin/includes/class-wp-site-icon.php';
-		$this->wp_site_icon = $GLOBALS['wp_site_icon'];
+		$this->wp_site_icon = new WP_Site_Icon();
 	}
 
 	function tearDown() {
