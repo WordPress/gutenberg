@@ -1,5 +1,4 @@
-var containerPolite = null;
-var containerAssertive = null;
+var containerPolite, containerAssertive;
 
 /**
  * Build the live regions markup.
@@ -30,27 +29,31 @@ var addContainer = function( ariaLive ) {
  * Specify a function to execute when the DOM is fully loaded.
  *
  * @param {Function} callback A function to execute after the DOM is ready.
+ *
+ * @returns {void}
  */
 var domReady = function( callback ) {
-	if ( document.readyState === "complete" || ( document.readyState !== "loading" && ! document.documentElement.doScroll ) ) {
-		callback();
-	} else {
-		document.addEventListener( "DOMContentLoaded", callback );
+	if ( document.readyState === "complete" || ( document.readyState !== "loading" && !document.documentElement.doScroll ) ) {
+		return callback();
 	}
+
+	document.addEventListener( "DOMContentLoaded", callback );
 };
 
 /**
  * Create the live regions when the DOM is fully loaded.
  */
 domReady( function() {
+	containerPolite = document.getElementById( "a11y-speak-polite" );
+	containerAssertive = document.getElementById( "a11y-speak-assertive" );
+
 	if ( containerPolite === null ) {
 		containerPolite = addContainer( "polite" );
 	}
-
 	if ( containerAssertive === null ) {
 		containerAssertive = addContainer( "assertive" );
 	}
-});
+} );
 
 /**
  * Clear the live regions.
