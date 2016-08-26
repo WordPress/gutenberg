@@ -1,0 +1,47 @@
+{
+	"name": "wordpress/wordpress",
+	"description": "WordPress is web software you can use to create a beautiful website or blog.",
+	"keywords": [
+		"blog",
+		"cms"
+	],
+	"type": "wordpress-core",
+	"homepage": "https://wordpress.org/",
+	"license": "GPL-2.0+",
+	"authors": [
+		{
+			"name": "WordPress Community",
+			"homepage": "https://wordpress.org/about/"
+		}
+	],
+	"support": {
+		"issues": "https://core.trac.wordpress.org/",
+		"forum": "https://wordpress.org/support/",
+		"wiki": "https://codex.wordpress.org/",
+		"irc": "irc://irc.freenode.net/wordpress",
+		"source": "https://core.trac.wordpress.org/browser"
+	},
+	"require": {
+		"xrstf/composer-php52": "1.*"
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"xrstf\\Composer52\\Generator::onPostInstallCmd"
+		],
+		"post-update-cmd": [
+			"xrstf\\Composer52\\Generator::onPostInstallCmd"
+		],
+		"post-autoload-dump": [
+			"xrstf\\Composer52\\Generator::onPostInstallCmd"
+		]
+	},
+	"autoload": {
+		"classmap": [
+			"src/wp-includes/",
+			"src/wp-admin/"
+		]
+	},
+	"config": {
+		"vendor-dir": "src/vendor"
+	}
+}
