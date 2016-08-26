@@ -14,9 +14,9 @@ class Tests_Option_Transient extends WP_UnitTestCase {
 	}
 
 	function test_the_basics() {
-		$key = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
+		$key = 'key1';
+		$value = 'value1';
+		$value2 = 'value2';
 
 		$this->assertFalse( get_transient( 'doesnotexist' ) );
 		$this->assertTrue( set_transient( $key, $value ) );

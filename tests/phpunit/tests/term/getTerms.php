@@ -2314,8 +2314,8 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 
 	protected function set_up_three_posts_and_tags() {
 		$posts = self::factory()->post->create_many( 3, array( 'post_type' => 'post' ) );
-		foreach ( $posts as $post ) {
-			wp_set_object_terms( $post, rand_str(), 'post_tag' );
+		foreach ( $posts as $i => $post ) {
+			wp_set_object_terms( $post, "term_{$i}", 'post_tag' );
 		}
 
 		wp_cache_delete( 'last_changed', 'terms' );

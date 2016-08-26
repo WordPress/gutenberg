@@ -186,7 +186,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 	 * @ticket 19828
 	 */
 	function test_help_tabs_priority() {
-		$tab_1      = rand_str();
+		$tab_1      = 'tab1';
 		$tab_1_args = array(
 			'title'    => 'Help!',
 			'id'       => $tab_1,
@@ -195,7 +195,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 			'priority' => 10,
 		);
 
-		$tab_2      = rand_str();
+		$tab_2      = 'tab2';
 		$tab_2_args = array(
 			'title'    => 'Help!',
 			'id'       => $tab_2,
@@ -203,7 +203,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 			'callback' => false,
 			'priority' => 2,
 		);
-		$tab_3      = rand_str();
+		$tab_3      = 'tab3';
 		$tab_3_args = array(
 			'title'    => 'help!',
 			'id'       => $tab_3,
@@ -211,7 +211,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 			'callback' => false,
 			'priority' => 40,
 		);
-		$tab_4      = rand_str();
+		$tab_4      = 'tab4';
 		$tab_4_args = array(
 			'title'    => 'help!',
 			'id'       => $tab_4,

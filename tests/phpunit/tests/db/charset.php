@@ -543,8 +543,8 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		$table_name = 'test_get_table_charset';
 
 		$vars = array();
-		foreach( $this->table_and_column_defs as $value ) {
-			$this_table_name = $table_name . '_' . rand_str( 5 );
+		foreach( $this->table_and_column_defs as $i => $value ) {
+			$this_table_name = $table_name . '_' . $i;
 			$drop = "DROP TABLE IF EXISTS $this_table_name";
 			$create = "CREATE TABLE $this_table_name {$value['definition']}";
 			$vars[] = array( $drop, $create, $this_table_name, $value['table_expected'] );
@@ -583,8 +583,8 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 		$table_name = 'test_get_column_charset';
 
 		$vars = array();
-		foreach( $this->table_and_column_defs as $value ) {
-			$this_table_name = $table_name . '_' . rand_str( 5 );
+		foreach( $this->table_and_column_defs as $i => $value ) {
+			$this_table_name = $table_name . '_' . $i;
 			$drop = "DROP TABLE IF EXISTS $this_table_name";
 			$create = "CREATE TABLE $this_table_name {$value['definition']}";
 			$vars[] = array( $drop, $create, $this_table_name, $value['column_expected'] );
@@ -687,8 +687,8 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			),
 		);
 
-		foreach( $data as &$value ) {
-			$this_table_name = $table_name . '_' . rand_str( 5 );
+		foreach( $data as $i => &$value ) {
+			$this_table_name = $table_name . '_' . $i;
 
 			$value[0] = "CREATE TABLE $this_table_name {$value[0]}";
 			$value[1] = "INSERT INTO $this_table_name VALUES {$value[1]}";
@@ -801,8 +801,8 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 			),
 		);
 
-		foreach( $data as &$value ) {
-			$this_table_name = $table_name . '_' . rand_str( 5 );
+		foreach( $data as $i => &$value ) {
+			$this_table_name = $table_name . '_' . $i;
 
 			$value[0] = "CREATE TABLE $this_table_name {$value[0]}";
 			$value[2] = "SELECT * FROM $this_table_name WHERE a='\xf0\x9f\x98\x88'";

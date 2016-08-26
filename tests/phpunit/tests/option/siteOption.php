@@ -92,9 +92,9 @@ class Tests_Option_SiteOption extends WP_UnitTestCase {
 	}
 
 	function test_update_site_option_returns_true_for_new_value() {
-		$key = rand_str();
-		$value = rand_str();
-		$new_value = rand_str();
+		$key = 'key';
+		$value = 'value1';
+		$new_value = 'value2';
 		add_site_option( $key, $value );
 		$this->assertTrue( update_site_option( $key, $new_value ) );
 	}

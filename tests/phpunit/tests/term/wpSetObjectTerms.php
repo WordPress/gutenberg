@@ -110,7 +110,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 
 		$terms = array();
 		for ($i=0; $i<3; $i++ ) {
-			$term = rand_str();
+			$term = "term_{$i}";
 			$result = wp_insert_term( $term, $this->taxonomy );
 			$this->assertInternalType( 'array', $result );
 			$term_id[$term] = $result['term_id'];
@@ -245,7 +245,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		// first set: 3 terms
 		$terms_1 = array();
 		for ($i=0; $i<3; $i++ ) {
-			$term = rand_str();
+			$term = "term_{$i}";
 			$result = wp_insert_term( $term, $this->taxonomy );
 			$this->assertInternalType( 'array', $result );
 			$terms_1[$i] = $result['term_id'];
@@ -255,7 +255,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 		$terms_2 = array();
 		$terms_2[0] = $terms_1[1];
 
-		$term = rand_str();
+		$term = 'term';
 		$result = wp_insert_term( $term, $this->taxonomy );
 		$terms_2[1] = $result['term_id'];
 

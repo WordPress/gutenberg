@@ -144,8 +144,8 @@ class Tests_Actions extends WP_UnitTestCase {
 	}
 
 	function test_did_action() {
-		$tag1 = rand_str();
-		$tag2 = rand_str();
+		$tag1 = 'action1';
+		$tag2 = 'action2';
 
 		// do action tag1 but not tag2
 		do_action($tag1);

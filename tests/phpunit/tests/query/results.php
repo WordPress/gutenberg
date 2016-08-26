@@ -456,17 +456,17 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	 * @ticket 16854
 	 */
 	function test_query_author_vars() {
-		$author_1 = self::factory()->user->create( array( 'user_login' => 'admin1', 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_1 = self::factory()->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_1, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_1 = self::factory()->user->create( array( 'user_login' => 'author1', 'role' => 'author' ) );
+		$post_1 = self::factory()->post->create( array( 'post_title' => 'Post 1', 'post_author' => $author_1, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_2 = self::factory()->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_2 = self::factory()->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_2, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_2 = self::factory()->user->create( array( 'user_login' => 'author2', 'role' => 'author' ) );
+		$post_2 = self::factory()->post->create( array( 'post_title' => 'Post 2', 'post_author' => $author_2, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_3 = self::factory()->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_3 = self::factory()->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_3, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_3 = self::factory()->user->create( array( 'user_login' => 'author3', 'role' => 'author' ) );
+		$post_3 = self::factory()->post->create( array( 'post_title' => 'Post 3', 'post_author' => $author_3, 'post_date' => '2007-01-01 00:00:00' ) );
 
-		$author_4 = self::factory()->user->create( array( 'user_login' => rand_str(), 'user_pass' => rand_str(), 'role' => 'author' ) );
-		$post_4 = self::factory()->post->create( array( 'post_title' => rand_str(), 'post_author' => $author_4, 'post_date' => '2007-01-01 00:00:00' ) );
+		$author_4 = self::factory()->user->create( array( 'user_login' => 'author4', 'role' => 'author' ) );
+		$post_4 = self::factory()->post->create( array( 'post_title' => 'Post 4', 'post_author' => $author_4, 'post_date' => '2007-01-01 00:00:00' ) );
 
 		$posts = $this->q->query( array(
 			'author' => '',
@@ -549,7 +549,7 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		$this->assertEqualSets( array( $author_3, $author_4 ), $author_ids );
 
 		$posts = $this->q->query( array(
-			'author_name' => 'admin1',
+			'author_name' => 'author1',
 			'post__in' => array( $post_1, $post_2, $post_3, $post_4 )
 		) );
 		$author_ids = array_unique( wp_list_pluck( $posts, 'post_author' ) );

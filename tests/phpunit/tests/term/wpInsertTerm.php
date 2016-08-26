@@ -10,7 +10,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		_clean_term_filters();
 		// insert one term into every post taxonomy
 		// otherwise term_ids and term_taxonomy_ids might be identical, which could mask bugs
-		$term = rand_str();
+		$term = 'seed_term';
 		foreach(get_object_taxonomies('post') as $tax)
 			wp_insert_term( $term, $tax );
 	}
@@ -20,7 +20,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		register_taxonomy( $taxonomy, 'post' );
 
 		// a new unused term
-		$term = rand_str();
+		$term = 'term';
 		$this->assertNull( term_exists($term) );
 
 		$initial_count = wp_count_terms( $taxonomy );

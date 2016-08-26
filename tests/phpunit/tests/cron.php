@@ -39,16 +39,16 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_schedule_event_single_args() {
 		// schedule an event with arguments and make sure it's returned by wp_next_scheduled
-		$hook = rand_str();
+		$hook = 'event';
 		$timestamp = strtotime('+1 hour');
-		$args = array(rand_str());
+		$args = array('foo');
 
 		wp_schedule_single_event( $timestamp, $hook, $args );
 		// this returns the timestamp only if we provide matching args
 		$this->assertEquals( $timestamp, wp_next_scheduled($hook, $args) );
 		// these don't match so return nothing
 		$this->assertEquals( false, wp_next_scheduled($hook) );
-		$this->assertEquals( false, wp_next_scheduled($hook, array(rand_str())) );
+		$this->assertEquals( false, wp_next_scheduled($hook, array('bar')) );
 
 		// it's a non recurring event
 		$this->assertEquals( '', wp_get_schedule($hook, $args) );
@@ -69,17 +69,17 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_schedule_event_args() {
 		// schedule an event and make sure it's returned by wp_next_scheduled
-		$hook = rand_str();
+		$hook = 'event';
 		$timestamp = strtotime('+1 hour');
 		$recur = 'hourly';
-		$args = array(rand_str());
+		$args = array('foo');
 
 		wp_schedule_event( $timestamp, 'hourly', $hook, $args );
 		// this returns the timestamp only if we provide matching args
 		$this->assertEquals( $timestamp, wp_next_scheduled($hook, $args) );
 		// these don't match so return nothing
 		$this->assertEquals( false, wp_next_scheduled($hook) );
-		$this->assertEquals( false, wp_next_scheduled($hook, array(rand_str())) );
+		$this->assertEquals( false, wp_next_scheduled($hook, array('bar')) );
 
 		$this->assertEquals( $recur, wp_get_schedule($hook, $args) );
 

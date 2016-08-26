@@ -103,8 +103,8 @@ class Tests_User extends WP_UnitTestCase {
 
 	// simple tests for usermeta functions
 	function test_usermeta() {
-		$key = rand_str();
-		$val = rand_str();
+		$key = 'key';
+		$val = 'value1';
 
 		// get a meta key that doesn't exist
 		$this->assertEquals( '', get_user_meta( self::$author_id, $key, true ) );
@@ -114,7 +114,7 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertEquals( $val, get_user_meta( self::$author_id, $key, true ) );
 
 		// change and get again
-		$val2 = rand_str();
+		$val2 = 'value2';
 		update_user_meta( self::$author_id, $key, $val2 );
 		$this->assertEquals( $val2, get_user_meta( self::$author_id, $key, true ) );
 
@@ -581,14 +581,14 @@ class Tests_User extends WP_UnitTestCase {
 	 */
 	function test_user_update_email_error() {
 		$id1 = wp_insert_user( array(
-			'user_login' => rand_str(),
+			'user_login' => 'blackburn',
 			'user_pass'  => 'password',
 			'user_email' => 'blackburn@battlefield4.com',
 		) );
 		$this->assertEquals( $id1, email_exists( 'blackburn@battlefield4.com' ) );
 
 		$id2 = wp_insert_user( array(
-			'user_login' => rand_str(),
+			'user_login' => 'miller',
 			'user_pass'  => 'password',
 			'user_email' => 'miller@battlefield4.com',
 		) );

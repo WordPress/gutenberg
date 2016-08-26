@@ -233,11 +233,11 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 	function test_terms() {
 		$this->make_user_by_role( 'editor' );
 
-		$tag1 = wp_create_tag ( rand_str( 30 ) );
+		$tag1 = wp_create_tag( 'tag1' );
 		$this->assertInternalType( 'array', $tag1 );
-		$tag2 = wp_create_tag ( rand_str( 30 ) );
+		$tag2 = wp_create_tag( 'tag2' );
 		$this->assertInternalType( 'array', $tag2 );
-		$tag3 = wp_create_tag ( rand_str( 30 ) );
+		$tag3 = wp_create_tag( 'tag3' );
 		$this->assertInternalType( 'array', $tag3 );
 
 		$post = array(
@@ -258,13 +258,13 @@ class Tests_XMLRPC_wp_newPost extends WP_XMLRPC_UnitTestCase {
 	function test_terms_names() {
 		$this->make_user_by_role( 'editor' );
 
-		$ambiguous_name = rand_str( 30 );
+		$ambiguous_name = 'foo';
 		$parent_cat = wp_create_category( $ambiguous_name );
 		$child_cat = wp_create_category( $ambiguous_name, $parent_cat );
 
-		$cat1_name = rand_str( 30 );
+		$cat1_name = 'cat1';
 		$cat1 = wp_create_category( $cat1_name, $parent_cat );
-		$cat2_name = rand_str( 30 );
+		$cat2_name = 'cat2';
 
 		// first a post with valid categories; one that already exists and one to be created
 		$post = array(

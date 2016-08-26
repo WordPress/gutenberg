@@ -136,11 +136,11 @@ class Tests_XMLRPC_wp_getPosts extends WP_XMLRPC_UnitTestCase {
 	function test_search() {
 		$this->make_user_by_role( 'editor' );
 
-		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'First: ' . rand_str() ) );
-		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'Second: ' . rand_str() ) );
+		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'First: Hello, World!' ) );
+		$post_ids[] = self::factory()->post->create( array( 'post_title' => 'Second: Hello, World!' ) );
 
 		// Search for none of them
-		$filter = array( 's' => rand_str() );
+		$filter = array( 's' => 'Third' );
 		$results = $this->myxmlrpcserver->wp_getPosts( array( 1, 'editor', 'editor', $filter ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $results );
 		$this->assertEquals( 0, count( $results ) );

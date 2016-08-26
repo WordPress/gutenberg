@@ -10,10 +10,10 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	}
 
 	function test_the_basics() {
-		$key = rand_str();
-		$key2 = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
+		$key = 'key1';
+		$key2 = 'key2';
+		$value = 'value1';
+		$value2 = 'value2';
 
 		$this->assertFalse( get_option( 'doesnotexist' ) );
 		$this->assertTrue( add_option( $key, $value ) );
@@ -35,7 +35,7 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	}
 
 	function test_default_filter() {
-		$random = rand_str();
+		$value = 'value';
 
 		$this->assertFalse( get_option( 'doesnotexist' ) );
 
@@ -48,10 +48,10 @@ class Tests_Option_Option extends WP_UnitTestCase {
 		$this->assertEquals( 'bar', get_option( 'doesnotexist', 'bar' ) );
 
 		// Once the option exists, the $default arg and the default filter are ignored.
-		add_option( 'doesnotexist', $random );
-		$this->assertEquals( $random, get_option( 'doesnotexist', 'foo' ) );
+		add_option( 'doesnotexist', $value );
+		$this->assertEquals( $value, get_option( 'doesnotexist', 'foo' ) );
 		add_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
-		$this->assertEquals( $random, get_option( 'doesnotexist', 'foo' ) );
+		$this->assertEquals( $value, get_option( 'doesnotexist', 'foo' ) );
 		remove_filter( 'default_option_doesnotexist', array( $this, '__return_foo' ) );
 
 		// Cleanup
