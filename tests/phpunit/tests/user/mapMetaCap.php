@@ -255,4 +255,40 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 		$this->assertEquals( array( 'delete_others_posts', 'delete_published_posts' ), map_meta_cap( 'delete_post', $editor, $post_id ) );
 
 	}
+
+	/**
+	 * Test deleting front page.
+	 *
+	 * @ticket 37580
+	 */
+	function test_only_users_who_can_manage_options_can_delete_page_on_front() {
+		$post_id = self::factory()->post->create( array(
+			'post_type'   => 'page',
+			'post_status' => 'publish',
+		) );
+
+		update_option( 'page_on_front', $post_id );
+		$caps = map_meta_cap( 'delete_page', $this->user_id, $post_id );
+		delete_option( 'page_on_front' );
+
+		$this->assertEquals( array( 'manage_options' ), $caps );
+	}
+
+	/**
+	 * Test deleting posts page.
+	 *
+	 * @ticket 37580
+	 */
+	function test_only_users_who_can_manage_options_can_delete_page_for_posts() {
+		$post_id = self::factory()->post->create( array(
+			'post_type'   => 'page',
+			'post_status' => 'publish',
+		) );
+
+		update_option( 'page_for_posts', $post_id );
+		$caps = map_meta_cap( 'delete_page', $this->user_id, $post_id );
+		delete_option( 'page_for_posts' );
+
+		$this->assertEquals( array( 'manage_options' ), $caps );
+	}
 }
