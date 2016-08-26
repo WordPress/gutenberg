@@ -9,7 +9,7 @@ class Tests_Media extends WP_UnitTestCase {
 	protected static $_sizes;
 
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$_sizes = $GLOBALS['_wp_additional_image_sizes'];
+		self::$_sizes = wp_get_additional_image_sizes();
 		$GLOBALS['_wp_additional_image_sizes'] = array();
 
 		$filename = DIR_TESTDATA . '/images/test-image-large.png';
@@ -650,18 +650,14 @@ VIDEO;
 	 * @ticket 26768
 	 */
 	function test_add_image_size() {
-		global $_wp_additional_image_sizes;
-
-		if ( ! isset( $_wp_additional_image_sizes ) ) {
-			$_wp_additional_image_sizes = array();
-		}
+		$_wp_additional_image_sizes = wp_get_additional_image_sizes();
 
 		remove_image_size( 'test-size' );
 
 		$this->assertArrayNotHasKey( 'test-size', $_wp_additional_image_sizes );
 		add_image_size( 'test-size', 200, 600 );
 
-		$sizes = $_wp_additional_image_sizes;
+		$sizes = wp_get_additional_image_sizes();
 
 		// Clean up
 		remove_image_size( 'test-size' );
@@ -977,7 +973,7 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_calculate_image_srcset() {
-		global $_wp_additional_image_sizes;
+		$_wp_additional_image_sizes = wp_get_additional_image_sizes();
 
 		$year_month = date('Y/m');
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
@@ -1017,7 +1013,7 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_calculate_image_srcset_no_date_uploads() {
-		global $_wp_additional_image_sizes;
+		$_wp_additional_image_sizes = wp_get_additional_image_sizes();
 
 		// Disable date organized uploads
 		add_filter( 'upload_dir', '_upload_dir_no_subdir' );
@@ -1099,7 +1095,7 @@ EOF;
 	 * @ticket 35106
 	 */
 	function test_wp_calculate_image_srcset_with_absolute_path_in_meta() {
-		global $_wp_additional_image_sizes;
+		$_wp_additional_image_sizes = wp_get_additional_image_sizes();
 
 		$year_month = date('Y/m');
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
@@ -1375,7 +1371,7 @@ EOF;
 	 * @ticket 33641
 	 */
 	function test_wp_get_attachment_image_srcset() {
-		global $_wp_additional_image_sizes;
+		$_wp_additional_image_sizes = wp_get_additional_image_sizes();
 
 		$image_meta = wp_get_attachment_metadata( self::$large_id );
 		$size_array = array( 1600, 1200 ); // full size
