@@ -1,7 +1,5 @@
 <?php
-include_once(ABSPATH . 'wp-admin/includes/admin.php');
-include_once(ABSPATH . WPINC . '/class-IXR.php');
-include_once(ABSPATH . WPINC . '/class-wp-xmlrpc-server.php');
+include_once( ABSPATH . 'wp-admin/includes/admin.php' );
 
 class WP_XMLRPC_UnitTestCase extends WP_UnitTestCase {
 	protected $myxmlrpcserver;
