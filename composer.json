@@ -22,7 +22,7 @@
 		"source": "https://core.trac.wordpress.org/browser"
 	},
 	"require": {
-		"xrstf/composer-php52": "1.*"
+		"xrstf/composer-php52": "^1.0"
 	},
 	"scripts": {
 		"post-install-cmd": [
@@ -57,6 +57,6 @@
 		]
 	},
 	"config": {
-		"vendor-dir": "src/vendor"
+		"vendor-dir": "src/wp-vendor"
 	}
 }
