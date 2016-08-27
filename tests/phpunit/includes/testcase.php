@@ -577,6 +577,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			'is_day',
 			'is_embed',
 			'is_feed',
+			'is_front_page',
 			'is_home',
 			'is_month',
 			'is_page',
@@ -595,6 +596,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			'is_year',
 		);
 		$true = func_get_args();
+
+		foreach ( $true as $true_thing ) {
+			$this->assertContains( $true_thing, $all, "{$true_thing}() is not handled by assertQueryTrue()." );
+		}
 
 		$passed = true;
 		$not_false = $not_true = array(); // properties that were not set to expected values

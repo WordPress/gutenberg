@@ -29,7 +29,7 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 
 	function test_home() {
 		$this->go_to('/');
-		$this->assertQueryTrue('is_home');
+		$this->assertQueryTrue( 'is_home', 'is_front_page' );
 	}
 
 	function test_404() {
@@ -255,7 +255,7 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		self::factory()->post->create_many( 5 );
 		for ( $i = 2; $i <= 3; $i++ ) {
 			$this->go_to("/page/{$i}/");
-			$this->assertQueryTrue('is_home', 'is_paged');
+			$this->assertQueryTrue( 'is_home', 'is_front_page', 'is_paged' );
 		}
 	}
 
