@@ -44,16 +44,21 @@
 			"src/wp-admin/includes/deprecated.php",
 			"src/wp-includes/atomlib.php",
 			"src/wp-includes/cache.php",
+			"src/wp-includes/class-json.php",
+			"src/wp-includes/class-phpmailer.php",
+			"src/wp-includes/class-requests.php",
+			"src/wp-includes/class-simplepie.php",
+			"src/wp-includes/class-snoopy.php",
 			"src/wp-includes/compat.php",
 			"src/wp-includes/pluggable-deprecated.php",
 			"src/wp-includes/rss.php",
-			"src/wp-includes/class-snoopy.php",
-			"src/wp-includes/pomo/",
 			"src/wp-includes/ID3/",
+			"src/wp-includes/pomo/",
 			"src/wp-includes/random_compat/error_polyfill.php",
 			"src/wp-includes/Requests/",
 			"src/wp-includes/SimplePie/",
-			"src/wp-includes/Text/"
+			"src/wp-includes/Text/",
+			"src/wp-includes/widgets/"
 		]
 	},
 	"config": {
