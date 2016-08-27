@@ -15,7 +15,13 @@ wp-tests-config.php
 /npm-debug.log
 /build
 /tests/phpunit/build
-/wp-cli.local.yml 
+/wp-cli.local.yml
+
+# Composer-generated files that do not pass the 5.2 linter
+src/wp-vendor/autoload.php
+src/wp-vendor/composer/autoload_real.php
+src/wp-vendor/composer/autoload_static.php
+src/wp-vendor/composer/ClassLoader.php
 
 # Files and folders that get created in wp-content
 /src/wp-content/blogs.dir
