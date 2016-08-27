@@ -9,13 +9,6 @@
  * @group query
  */
 class Tests_Canonical extends WP_Canonical_UnitTestCase {
-	public static function wpSetUpBeforeClass( $factory ) {
-		self::generate_shared_fixtures( $factory );
-	}
-
-	public static function wpTearDownAfterClass() {
-		self::delete_shared_fixtures();
-	}
 
 	public function setUp() {
 		parent::setUp();

@@ -35,15 +35,6 @@ class Tests_Ajax_GetComments extends WP_Ajax_UnitTestCase {
 		self::$no_comment_post = $factory->post->create_and_get();
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$comment_ids as $comment_id ) {
-			wp_delete_comment( $comment_id, true );
-		}
-
-		wp_delete_post( self::$comment_post->ID, true );
-		wp_delete_post( self::$no_comment_post->ID, true );
-	}
-
 	/**
 	 * Get comments as a privilged user (administrator)
 	 * Expects test to pass

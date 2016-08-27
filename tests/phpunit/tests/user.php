@@ -46,12 +46,6 @@ class Tests_User extends WP_UnitTestCase {
 		self::$_author = get_user_by( 'ID', self::$author_id );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $id ) {
-			self::delete_user( $id );
-		}
-	}
-
 	function setUp() {
 		parent::setUp();
 

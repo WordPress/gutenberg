@@ -13,12 +13,6 @@ class Tests_Comment_GetCommentAuthorUrlLink extends WP_UnitTestCase {
 		self::$comments = array_map( 'get_comment', $comment_ids );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$comments as $comment ) {
-			wp_delete_comment( $comment, true );
-		}
-	}
-
 	protected function parseCommentAuthorUrl( $comment, $linktext = '' ) {
 		if ( empty( $linktext ) ) {
 			$linktext = rtrim( preg_replace( '#http://(www\.)?#', '', $comment->comment_author_url ), '/' );

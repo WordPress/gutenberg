@@ -22,11 +22,6 @@ class Tests_Term_WpComment extends WP_UnitTestCase {
 		self::$comment_id = self::factory()->comment->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_comment( 1, true );
-		wp_delete_comment( self::$comment_id, true );
-	}
-
 	/**
 	 * @ticket 37738
 	 */

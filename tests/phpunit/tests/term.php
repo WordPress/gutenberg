@@ -11,12 +11,6 @@ class Tests_Term extends WP_UnitTestCase {
 		self::$post_ids = $factory->post->create_many( 5 );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-	}
-
 	/**
 	 * @ticket 29911
 	 */

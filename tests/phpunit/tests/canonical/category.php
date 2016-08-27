@@ -22,16 +22,6 @@ class Tests_Canonical_Category extends WP_Canonical_UnitTestCase {
 		wp_set_post_categories( self::$posts[1], self::$cats[1] );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$posts as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-
-		foreach ( self::$cats as $cat ) {
-			wp_delete_term( $cat, 'category' );
-		}
-	}
-
 	/**
 	 * @dataProvider data_canonical_category
 	 */

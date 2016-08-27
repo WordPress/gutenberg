@@ -35,22 +35,6 @@ class Tests_User_Query extends WP_UnitTestCase {
 		) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		$sets = array(
-			self::$author_ids,
-			self::$sub_ids,
-			self::$editor_ids,
-			array( self::$contrib_id ),
-			self::$admin_ids
-		);
-
-		foreach ( $sets as $set ) {
-			foreach ( $set as $id ) {
-				self::delete_user( $id );
-			}
-		}
-	}
-
 	function test_get_and_set() {
 		$users = new WP_User_Query();
 

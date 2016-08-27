@@ -44,22 +44,6 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Destroy the user we created and related posts.
-	 */
-	public static function wpTearDownAfterClass() {
-		// Delete our user
-		self::delete_user( self::$user_id );
-
-		// Delete all of our posts
-		foreach ( self::$posts as $post ) {
-			wp_delete_post( $post, true );
-		}
-
-		// Delete our taxonomy
-		wp_delete_category( self::$category->term_id );
-	}
-
-	/**
 	 * Setup.
 	 */
 	public function setUp() {

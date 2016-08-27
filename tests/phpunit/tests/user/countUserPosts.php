@@ -27,19 +27,11 @@ class Tests_User_CountUserPosts extends WP_UnitTestCase {
 			'post_author' => 12345,
 			'post_type'   => 'wptests_pt',
 		) ) );
-		
+
 		self::$post_ids[] = $factory->post->create( array(
 			'post_author' => 12345,
 			'post_type'   => 'wptests_pt',
 		) );
-	}
-
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$user_id );
-
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
 	}
 
 	public function setUp() {

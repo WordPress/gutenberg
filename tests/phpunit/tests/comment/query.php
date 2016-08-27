@@ -13,10 +13,6 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 		self::$post_id = $factory->post->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id, true );
-	}
-
 	function setUp() {
 		parent::setUp();
 	}

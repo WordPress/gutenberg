@@ -26,12 +26,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		self::$user_ids[] = self::$no_role_id = $factory->user->create( array( 'role' => '' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $id ) {
-			self::delete_user( $id );
-		}
-	}
-
 	/**
 	 * @ticket 21117
 	 */

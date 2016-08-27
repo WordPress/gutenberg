@@ -42,17 +42,6 @@ class Tests_Admin_IncludesComment extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Delete the post and comments for the tests.
-	 */
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$comment_ids as $comment_id ) {
-			wp_delete_comment( $comment_id, true );
-		}
-
-		wp_delete_post( self::$post_id, true );
-	}
-
-	/**
 	 * Verify that both the comment date and author must match for a comment to exist.
 	 */
 	public function test_must_match_date_and_author() {

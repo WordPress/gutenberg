@@ -16,11 +16,6 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post->ID, true );
-		wp_delete_attachment( self::$attachment_id, true );
-	}
-
 	function test_has_post_thumbnail() {
 		$this->assertFalse( has_post_thumbnail( self::$post ) );
 		$this->assertFalse( has_post_thumbnail( self::$post->ID ) );

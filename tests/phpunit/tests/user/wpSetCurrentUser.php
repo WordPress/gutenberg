@@ -13,12 +13,6 @@ class Tests_User_WpSetCurrentUser extends WP_UnitTestCase {
 		self::$user_ids[] = self::$user_id2 = $factory->user->create( array( 'user_login' => 'foo', ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $id ) {
-			self::delete_user( $id );
-		}
-	}
-
 	public function test_set_by_id() {
 		$user = wp_set_current_user( self::$user_id );
 

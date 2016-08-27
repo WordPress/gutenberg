@@ -9,10 +9,6 @@ class Tests_Meta_Register_Meta extends WP_UnitTestCase {
 		self::$post_id = $factory->post->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id, true );
-	}
-
 	public function _old_sanitize_meta_cb( $meta_value, $meta_key, $meta_type ) {
 		return $meta_key . ' old sanitized';
 	}

@@ -6,10 +6,6 @@
  */
 class Tests_Admin_includesFile extends WP_UnitTestCase {
 
-	function setUp() {
-		parent::setUp();
-	}
-
 	/**
 	 * @ticket 20449
 	 */

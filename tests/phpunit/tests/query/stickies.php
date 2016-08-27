@@ -23,12 +23,6 @@ class Tests_Query_Stickies extends WP_UnitTestCase {
 		stick_post( self::$posts[8] );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$posts as $p ) {
-			wp_delete_post( $p, true );
-		}
-	}
-
 	public function test_stickies_should_be_ignored_when_is_home_is_false() {
 		$q = new WP_Query( array(
 			'year' => date( 'Y' ),

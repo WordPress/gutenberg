@@ -17,8 +17,6 @@ class Tests_Media extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		wp_delete_attachment( self::$large_id );
-
 		$GLOBALS['_wp_additional_image_sizes'] = self::$_sizes;
 	}
 

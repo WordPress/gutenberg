@@ -44,14 +44,6 @@ class Tests_Comment_GetCommentLink extends WP_UnitTestCase {
 
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$comments as $c ) {
-			wp_delete_comment( $c, true );
-		}
-
-		wp_delete_post( self::$p, true );
-	}
-
 	/**
 	 * @ticket 34068
 	 */

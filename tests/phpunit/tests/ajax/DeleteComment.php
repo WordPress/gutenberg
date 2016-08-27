@@ -34,14 +34,6 @@ class Tests_Ajax_DeleteComment extends WP_Ajax_UnitTestCase {
 		self::$comments = array_map( 'get_comment', $comment_ids );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id, true );
-
-		foreach ( self::$comments as $c ) {
-			wp_delete_comment( $c->ID, true );
-		}
-	}
-
 	/**
 	 * Clear the POST actions in between requests
 	 */

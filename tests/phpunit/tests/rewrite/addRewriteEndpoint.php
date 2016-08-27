@@ -15,11 +15,6 @@ class Tests_Rewrite_AddRewriteEndpoint extends WP_UnitTestCase {
 		self::$test_post_id = $factory->post->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$test_page_id, true );
-		wp_delete_post( self::$test_post_id, true );
-	}
-
 	public function setUp() {
 		parent::setUp();
 

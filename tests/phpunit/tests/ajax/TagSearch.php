@@ -31,12 +31,6 @@ class Tests_Ajax_TagSearch extends WP_Ajax_UnitTestCase {
 		}
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$term_ids as $t ) {
-			wp_delete_term( $t, 'post_tag' );
-		}
-	}
-
 	/**
 	 * Test as an admin
 	 */

@@ -35,15 +35,6 @@ class Tests_Ajax_ReplytoComment extends WP_Ajax_UnitTestCase {
 		self::$draft_post = $factory->post->create_and_get( array( 'post_status' => 'draft' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$comment_ids as $comment_id ) {
-			wp_delete_comment( $comment_id, true );
-		}
-
-		wp_delete_post( self::$comment_post->ID, true );
-		wp_delete_post( self::$draft_post->ID, true );
-	}
-
 	public function tearDown() {
 		remove_filter( 'query', array( $this, '_block_comments' ) );
 		parent::tearDown();

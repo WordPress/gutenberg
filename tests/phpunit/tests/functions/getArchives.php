@@ -23,12 +23,6 @@ class Tests_Get_Archives extends WP_UnitTestCase {
 		self::$post_ids = $factory->post->create_many( 8, array( 'post_type' => 'post', 'post_author' => '1' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-	}
-
 	function test_wp_get_archives_default() {
 		$expected['default'] = "<li><a href='" . $this->month_url . "'>" . date( 'F Y' ) . "</a></li>";
 		$this->assertEquals( $expected['default'], trim( wp_get_archives( array( 'echo' => false ) ) ) );

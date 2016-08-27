@@ -13,12 +13,6 @@ class Tests_WP_Customize_Section extends WP_UnitTestCase {
 		self::$user_ids[] = self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $id ) {
-			self::delete_user( $id );
-		}
-	}
-
 	/**
 	 * @var WP_Customize_Manager
 	 */

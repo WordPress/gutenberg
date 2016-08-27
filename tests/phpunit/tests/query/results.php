@@ -67,20 +67,6 @@ class Tests_Query_Results extends WP_UnitTestCase {
 		self::$post_ids[] = self::$child_four = $factory->post->create( array( 'post_title' => 'child-four', 'post_parent' => self::$parent_two, 'post_date' => '2007-01-01 00:00:04' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$cat_ids as $cat_id ) {
-			wp_delete_term( $cat_id, 'category' );
-		}
-
-		foreach ( self::$tag_ids as $tag_id ) {
-			wp_delete_term( $tag_id, 'post_tag' );
-		}
-
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-	}
-
 	function setUp() {
 		parent::setUp();
 

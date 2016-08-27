@@ -20,11 +20,6 @@ class Tests_Post_WpPost extends WP_UnitTestCase {
 		self::$post_id = self::factory()->post->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( 1, true );
-		wp_delete_post( self::$post_id, true );
-	}
-
 	/**
 	 * @ticket 37738
 	 */

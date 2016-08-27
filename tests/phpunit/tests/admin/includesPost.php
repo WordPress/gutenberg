@@ -22,14 +22,6 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 		self::$post_id = $factory->post->create();
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $id ) {
-			self::delete_user( $id );
-		}
-
-		wp_delete_post( self::$post_id, true );
-	}
-
 	function test__wp_translate_postdata_cap_checks_contributor() {
 		wp_set_current_user( self::$contributor_id );
 

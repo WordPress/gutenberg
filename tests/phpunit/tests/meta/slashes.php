@@ -16,12 +16,6 @@ class Tests_Meta_Slashes extends WP_UnitTestCase {
 		self::$comment_id = $factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$editor_id );
-		wp_delete_comment( self::$comment_id, true );
-		wp_delete_post( self::$post_id, true );
-	}
-
 	function setUp() {
 		parent::setUp();
 

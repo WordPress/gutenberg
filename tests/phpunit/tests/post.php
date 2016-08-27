@@ -23,10 +23,6 @@ class Tests_Post extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		$ids = array( self::$editor_id, self::$grammarian_id );
-		foreach ( $ids as $id ) {
-			self::delete_user( $id );
-		}
 		remove_role( 'grammarian' );
 	}
 

@@ -28,10 +28,6 @@ class Tests_Comment_GetCommentAuthorEmailLink extends WP_UnitTestCase {
 		) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_comment( self::$comment->comment_ID, true );
-	}
-
 	public function test_global_comment_with_default_parameters() {
 		$expected = '<a href="mailto:foo@example.org">foo@example.org</a>';
 

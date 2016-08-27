@@ -40,18 +40,6 @@ class Tests_User_ListAuthors extends WP_UnitTestCase {
 		}
 	}
 
-	public static function wpTearDownAfterClass() {
-		self::$user_ids[] = self::$fred_id;
-
-		foreach ( self::$user_ids as $user_id ) {
-			self::delete_user( $user_id );
-		}
-
-		foreach ( self::$posts as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-	}
-
 	function test_wp_list_authors_default() {
 		$expected['default'] = '<li><a href="' . self::$user_urls[1] . '" title="Posts by bob">bob</a></li><li><a href="' . self::$user_urls[2] . '" title="Posts by paul">paul</a></li><li><a href="' . self::$user_urls[0] . '" title="Posts by zack">zack</a></li>';
 		$this->AssertEquals( $expected['default'], wp_list_authors( array( 'echo' => false ) ) );

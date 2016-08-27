@@ -25,18 +25,6 @@ class Tests_Query_PostStatus extends WP_UnitTestCase {
 		_unregister_post_status( 'privatefoo' );
 	}
 
-	public static function wpTearDownAfterClass() {
-		$ids = array( self::$editor_user_id, self::$author_user_id );
-		foreach ( $ids as $id ) {
-			self::delete_user( $id );
-		}
-
-		wp_delete_post( self::$editor_private_post, true );
-		wp_delete_post( self::$author_private_post, true );
-		wp_delete_post( self::$editor_privatefoo_post, true );
-		wp_delete_post( self::$author_privatefoo_post, true );
-	}
-
 	public function test_any_should_not_include_statuses_where_exclude_from_search_is_true() {
 		register_post_status( 'foo', array( 'exclude_from_search' => true ) );
 

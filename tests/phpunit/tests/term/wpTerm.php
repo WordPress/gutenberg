@@ -33,11 +33,6 @@ class Tests_Term_WpTerm extends WP_UnitTestCase {
 		self::$term_id = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_term( 1, 'wptests_tax' );
-		wp_delete_term( self::$term_id, 'wptests_tax' );
-	}
-
 	/**
 	 * @ticket 37738
 	 */

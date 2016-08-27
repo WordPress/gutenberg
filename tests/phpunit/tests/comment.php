@@ -25,12 +25,6 @@ class Tests_Comment extends WP_UnitTestCase {
 		) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id, true );
-
-		self::delete_user( self::$user_id );
-	}
-
 	function test_wp_update_comment() {
 		$post = self::factory()->post->create_and_get( array( 'post_title' => 'some-post', 'post_type' => 'post' ) );
 		$post2 = self::factory()->post->create_and_get( array( 'post_title' => 'some-post-2', 'post_type' => 'post' ) );

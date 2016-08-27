@@ -15,6 +15,14 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	 */
 	public $structure = '/%year%/%monthnum%/%day%/%postname%/';
 
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::generate_shared_fixtures( $factory );
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_shared_fixtures();
+	}
+
 	public function setUp() {
 		parent::setUp();
 
@@ -134,20 +142,6 @@ class WP_Canonical_UnitTestCase extends WP_UnitTestCase {
 	 * @since 4.1.0
 	 */
 	public static function delete_shared_fixtures() {
-		self::delete_user( self::$author_id );
-
-		foreach ( self::$post_ids as $pid ) {
-			wp_delete_post( $pid, true );
-		}
-
-		foreach ( self::$comment_ids as $cid ) {
-			wp_delete_comment( $cid, true );
-		}
-
-		foreach ( self::$term_ids as $tid => $tax ) {
-			wp_delete_term( $tid, $tax );
-		}
-
 		self::$author_id = null;
 		self::$post_ids = array();
 		self::$comment_ids = array();

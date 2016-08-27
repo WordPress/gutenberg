@@ -4,10 +4,10 @@
  * @group admin
  */
 class Tests_Admin_includesListTable extends WP_UnitTestCase {
-	protected static $top;
-	protected static $children;
-	protected static $grandchildren;
-	protected static $post_ids;
+	protected static $top = array();
+	protected static $children = array();
+	protected static $grandchildren = array();
+	protected static $post_ids = array();
 
 	function setUp() {
 		parent::setUp();
@@ -61,12 +61,6 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 					self::$post_ids[] = $p->ID;
 				}
 			}
-		}
-	}
-
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
 		}
 	}
 

@@ -35,14 +35,6 @@ class Tests_Ajax_Autosave extends WP_Ajax_UnitTestCase {
 		self::$post = get_post( self::$post_id );
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$user_ids as $user_id ) {
-			self::delete_user( $user_id );
-		}
-
-		wp_delete_post( self::$post_id, true );
-	}
-
 	/**
 	 * Set up the test fixture
 	 */

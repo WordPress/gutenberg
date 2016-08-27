@@ -14,10 +14,6 @@ class Tests_WpGetCanonicalURL extends WP_UnitTestCase {
 		) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post_id, true );
-	}
-
 	/**
 	 * Test for a non existing post.
 	 */

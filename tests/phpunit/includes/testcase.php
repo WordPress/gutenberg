@@ -61,6 +61,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		$c = self::get_called_class();
 		if ( ! method_exists( $c, 'wpSetUpBeforeClass' ) ) {
+			self::commit_transaction();
 			return;
 		}
 
@@ -72,8 +73,12 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
 
+		_delete_all_data();
+		self::flush_cache();
+
 		$c = self::get_called_class();
 		if ( ! method_exists( $c, 'wpTearDownAfterClass' ) ) {
+			self::commit_transaction();
 			return;
 		}
 
@@ -158,7 +163,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	function clean_up_global_scope() {
 		$_GET = array();
 		$_POST = array();
-		$this->flush_cache();
+		self::flush_cache();
 	}
 
 	/**
@@ -243,7 +248,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	function flush_cache() {
+	static function flush_cache() {
 		global $wp_object_cache;
 		$wp_object_cache->group_ops = array();
 		$wp_object_cache->stats = array();
@@ -445,7 +450,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$_SERVER['REQUEST_URI'] = $req;
 		unset($_SERVER['PATH_INFO']);
 
-		$this->flush_cache();
+		self::flush_cache();
 		unset($GLOBALS['wp_query'], $GLOBALS['wp_the_query']);
 		$GLOBALS['wp_the_query'] = new WP_Query();
 		$GLOBALS['wp_query'] = $GLOBALS['wp_the_query'];

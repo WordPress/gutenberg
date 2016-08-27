@@ -15,13 +15,6 @@ class Tests_Post_Revisions extends WP_UnitTestCase {
 		self::$author_user_id = $factory->user->create( array( 'role' => 'author' ) );
 	}
 
-	public static function wpTearDownAfterClass() {
-		$ids = array( self::$admin_user_id, self::$editor_user_id, self::$author_user_id );
-		foreach ( $ids as $id ) {
-			self::delete_user( $id );
-		}
-	}
-
 	function setUp() {
 		parent::setUp();
 		$this->post_type = rand_str( 20 );

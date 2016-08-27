@@ -45,12 +45,6 @@ class Tests_Query_Date extends WP_UnitTestCase {
 		}
 	}
 
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$post_ids as $post_id ) {
-			wp_delete_post( $post_id, true );
-		}
-	}
-
 	public function setUp() {
 		parent::setUp();
 		unset( $this->q );

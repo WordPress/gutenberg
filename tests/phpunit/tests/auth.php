@@ -26,10 +26,6 @@ class Tests_Auth extends WP_UnitTestCase {
 		self::$wp_hasher = new PasswordHash( 8, true );
 	}
 
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$user_id );
-	}
-
 	function setUp() {
 		parent::setUp();
 
