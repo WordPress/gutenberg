@@ -1796,6 +1796,25 @@ EOF;
 		);
 		return $data;
 	}
+
+	/**
+	 * @ticket 37813
+	 */
+	public function test_return_type_when_inserting_attachment_with_error_in_data() {
+		$data = array(
+			'post_status'  => 'public',
+			'post_content' => 'Attachment content',
+			'post_title'   => 'Attachment Title',
+			'post_date'    => '2012-02-30 00:00:00',
+		);
+
+		$attachment_id = wp_insert_attachment( $data, '', 0, true );
+		$this->assertWPError( $attachment_id );
+		$this->assertEquals( 'invalid_date', $attachment_id->get_error_code() );
+
+		$attachment_id = wp_insert_attachment( $data, '', 0 );
+		$this->assertSame( 0, $attachment_id );
+	}
 }
 
 /**
