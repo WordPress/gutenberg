@@ -275,4 +275,91 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 
 		$this->assertEmpty( $post_type_archive_item->description );
 	}
+
+	/**
+	 * Confirm `wp_nav_menu()` and `Walker_Nav_Menu` passes an $args object to filters.
+	 *
+	 * `wp_nav_menu()` is unique in that it uses an $args object rather than an array.
+	 * This has been the case for some time and should be maintained for reasons of
+	 * backward compatibility.
+	 *
+	 * @ticket 24587
+	 */
+	function test_wp_nav_menu_filters_are_passed_args_object() {
+		$tag_id = self::factory()->tag->create();
+
+		$tag_insert = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'post_tag',
+			'menu-item-object-id' => $tag_id,
+			'menu-item-status' => 'publish',
+		) );
+
+		/*
+		 * The tests take place in a range of filters to ensure the passed
+		 * arguments are an object.
+		 */
+		// In function.
+		add_filter( 'pre_wp_nav_menu',          array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+		add_filter( 'wp_nav_menu_objects',      array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+		add_filter( 'wp_nav_menu_items',        array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+
+		// In walker.
+		add_filter( 'nav_menu_item_args',       array( $this, '_confirm_nav_menu_item_args_object' ) );
+
+		add_filter( 'nav_menu_css_class',       array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		add_filter( 'nav_menu_item_id',         array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		add_filter( 'nav_menu_link_attributes', array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		add_filter( 'nav_menu_item_title',      array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+
+		add_filter( 'walker_nav_menu_start_el', array( $this, '_confirm_forth_param_args_object' ), 10, 4 );
+
+		wp_nav_menu( array(
+			'echo' => false,
+			'menu' => $this->menu_id,
+		) );
+		wp_delete_term( $tag_id, 'post_tag' );
+
+		/*
+		 * Remove test filters.
+		 */
+		// In function.
+		remove_filter( 'pre_wp_nav_menu',          array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+		remove_filter( 'wp_nav_menu_objects',      array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+		remove_filter( 'wp_nav_menu_items',        array( $this, '_confirm_second_param_args_object' ), 10, 2 );
+
+		// In walker.
+		remove_filter( 'nav_menu_item_args',       array( $this, '_confirm_nav_menu_item_args_object' ) );
+
+		remove_filter( 'nav_menu_css_class',       array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		remove_filter( 'nav_menu_item_id',         array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		remove_filter( 'nav_menu_link_attributes', array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+		remove_filter( 'nav_menu_item_title',      array( $this, '_confirm_third_param_args_object' ), 10, 3 );
+
+		remove_filter( 'walker_nav_menu_start_el', array( $this, '_confirm_forth_param_args_object' ), 10, 4 );
+
+	}
+
+	/**
+	 * Run tests required to confrim Walker_Nav_Menu receives an $args object.
+	 */
+	function _confirm_nav_menu_item_args_object( $args ) {
+		$this->assertTrue( is_object( $args ) );
+		return $args;
+	}
+
+	function _confirm_second_param_args_object( $ignored_1, $args ) {
+		$this->assertTrue( is_object( $args ) );
+		return $ignored_1;
+	}
+
+	function _confirm_third_param_args_object( $ignored_1, $ignored_2, $args ) {
+		$this->assertTrue( is_object( $args ) );
+		return $ignored_1;
+	}
+
+	function _confirm_forth_param_args_object( $ignored_1, $ignored_2, $ignored_3, $args ) {
+		$this->assertTrue( is_object( $args ) );
+		return $ignored_1;
+	}
 }
