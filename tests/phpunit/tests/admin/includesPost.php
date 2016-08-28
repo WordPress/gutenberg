@@ -462,7 +462,7 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 	 * @ticket 5305
 	 */
 	public function test_get_sample_permalink_should_allow_daylike_slugs_if_permastruct_does_not_cause_an_archive_conflict() {
-		$this->set_permalink_structure( '/%year%/%month%/%day%/%postname%/' );
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		$p = self::factory()->post->create( array(
 			'post_name' => '30',
