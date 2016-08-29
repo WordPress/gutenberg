@@ -376,5 +376,18 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 		$this->assertTrue( ! is_wp_error( $res ), print_r( $res, true ) );
 	}
 
+	/**
+	 * @ticket 37733
+	 */
+	function test_url_with_double_slashes_path() {
+		$url = $this->redirection_script . '?rt=' . 0;
+
+		$path = parse_url( $url, PHP_URL_PATH );
+		$url = str_replace( $path, '/' . $path, $url );
+
+		$res = wp_remote_request( $url );
+		$this->assertNotWPError( $res );
+	}
+
 
 }
