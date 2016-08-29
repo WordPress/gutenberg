@@ -118,4 +118,35 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 		$this->assertEquals( array_keys( $wp_header_to_desc ), array_values( $constants ) );
 
 	}
+
+	/**
+	 * @ticket 37768
+	 */
+	public function test_normalize_cookies_scalar_values() {
+		$http = _wp_http_get_object();
+
+		$cookies = array(
+			'x'   => 'foo',
+			'y'   => 2,
+			'z'   => 0.45,
+			'foo' => array( 'bar' ),
+		);
+
+		$cookie_jar = $http->normalize_cookies( array(
+			'x'   => 'foo',
+			'y'   => 2,
+			'z'   => 0.45,
+			'foo' => array( 'bar' ),
+		) );
+
+		$this->assertInstanceOf( 'Requests_Cookie_Jar', $cookie_jar );
+
+		foreach( array_keys( $cookies ) as $cookie ) {
+			if ( 'foo' === $cookie ) {
+				$this->assertFalse( isset( $cookie_jar[ $cookie ] ) );
+			} else {
+				$this->assertInstanceOf( 'Requests_Cookie', $cookie_jar[ $cookie ] );
+			}
+		}
+	}
 }
