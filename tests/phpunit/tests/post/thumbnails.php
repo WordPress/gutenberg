@@ -237,16 +237,41 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 
 		$GLOBALS['post'] = self::$post;
 		$_REQUEST['_thumbnail_id'] = self::$attachment_id;
+		$_REQUEST['preview_id'] = self::$post->ID;
 
 		$result = _wp_preview_post_thumbnail_filter( '', self::$post->ID, '_thumbnail_id' );
-		$this->assertEquals( self::$attachment_id, $result );
 
+		// Clean up.
+		$GLOBALS['post'] = $old_post;
 		unset( $_REQUEST['_thumbnail_id'] );
-		if ( null === $old_post ) {
-			unset( $GLOBALS['post'] );
-		} else {
-			$GLOBALS['post'] = $old_post;
-		}
+		unset( $_REQUEST['preview_id'] );
+
+		$this->assertEquals( self::$attachment_id, $result );
+	}
+
+	/**
+	 * @ticket 37697
+	 */
+	function test__wp_preview_post_thumbnail_filter_secondary_post() {
+		$old_post = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
+
+		$secondary_post = self::factory()->post->create( array(
+				'post_stauts' => 'publish',
+			)
+		);
+
+		$GLOBALS['post'] = self::$post;
+		$_REQUEST['_thumbnail_id'] = self::$attachment_id;
+		$_REQUEST['preview_id'] = $secondary_post;
+
+		$result = _wp_preview_post_thumbnail_filter( '', self::$post->ID, '_thumbnail_id' );
+
+		// Clean up.
+		$GLOBALS['post'] = $old_post;
+		unset( $_REQUEST['_thumbnail_id'] );
+		unset( $_REQUEST['preview_id'] );
+
+		$this->assertEmpty( $result );
 	}
 
 	/**
