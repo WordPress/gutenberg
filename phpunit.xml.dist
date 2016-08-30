@@ -24,6 +24,7 @@
             <group>ajax</group>
             <group>ms-files</group>
             <group>external-http</group>
+            <group>external-oembed</group>
         </exclude>
     </groups>
     <logging>

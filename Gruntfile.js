@@ -438,6 +438,11 @@ module.exports = function(grunt) {
 				cmd: 'phpunit',
 				args: ['-c', 'phpunit.xml.dist', '--group', 'external-http']
 			}
+			//,
+			//'external-oembed': {
+			//	cmd: 'phpunit',
+			//	args: ['-c', 'phpunit.xml.dist', '--group', 'external-oembed']
+			//}
 		},
 		uglify: {
 			options: {
