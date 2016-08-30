@@ -117,27 +117,34 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 36356
+	 */
+	function test_wp_parse_url_with_default_component() {
+		$actual = wp_parse_url( self::$full_test_url, -1 );
+		$this->assertEquals( array(
+			'scheme'   => 'http',
+			'host'     => 'host.name',
+			'port'     => 9090,
+			'user'     => 'username',
+			'pass'     => 'password',
+			'path'     => '/path',
+			'query'    => 'arg1=value1&arg2=value2',
+			'fragment' => 'anchor',
+		), $actual );
+	}
+
+	/**
+	 * @ticket 36356
 	 *
 	 * @dataProvider parse_url_component_testcases
 	 */
 	function test_wp_parse_url_with_component( $url, $component, $expected ) {
 		$actual = wp_parse_url( $url, $component );
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	function parse_url_component_testcases() {
 		// 0: The URL, 1: The requested component, 2: The expected resulting component.
 		return array(
-			array( self::$full_test_url, -1, array(
-				'scheme'   => 'http',
-				'host'     => 'host.name',
-				'port'     => 9090,
-				'user'     => 'username',
-				'pass'     => 'password',
-				'path'     => '/path',
-				'query'    => 'arg1=value1&arg2=value2',
-				'fragment' => 'anchor',
-			) ),
 			array( self::$full_test_url, PHP_URL_SCHEME, 'http' ),
 			array( self::$full_test_url, PHP_URL_USER, 'username' ),
 			array( self::$full_test_url, PHP_URL_PASS, 'password' ),
