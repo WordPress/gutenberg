@@ -6,6 +6,8 @@
  */
 class Tests_HTTP_HTTP extends WP_UnitTestCase {
 
+	protected static $full_test_url = 'http://username:password@host.name:9090/path?arg1=value1&arg2=value2#anchor';
+
 	/**
 	 * @dataProvider make_absolute_url_testcases
 	 */
@@ -16,7 +18,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 		}
 
 		$actual = WP_Http::make_absolute_url( $relative_url, $absolute_url );
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	function make_absolute_url_testcases() {
@@ -72,12 +74,22 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 	 */
 	function test_wp_parse_url( $url, $expected ) {
 		$actual = wp_parse_url( $url );
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	function parse_url_testcases() {
 		// 0: The URL, 1: The expected resulting structure
 		return array(
+			array( self::$full_test_url, array(
+				'scheme'   => 'http',
+				'host'     => 'host.name',
+				'port'     => 9090,
+				'user'     => 'username',
+				'pass'     => 'password',
+				'path'     => '/path',
+				'query'    => 'arg1=value1&arg2=value2',
+				'fragment' => 'anchor',
+			) ),
 			array( 'http://example.com/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/' ) ),
 
 			// < PHP 5.4.7: Schemeless URL
@@ -85,7 +97,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			array( '//example.com/', array( 'host' => 'example.com', 'path' => '/' ) ),
 			array( 'http://example.com//path/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '//path/' ) ),
 
-			// < PHP 5.4.7: Scheme seperator in the URL
+			// < PHP 5.4.7: Scheme separator in the URL
 			array( 'http://example.com/http://example.net/', array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/http://example.net/' ) ),
 			array( '/path/http://example.net/', array( 'path' => '/path/http://example.net/' ) ),
 
@@ -101,6 +113,62 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 		  - ///example.com - Fails in PHP >= 5.4.7, assumed path in <5.4.7
 		  - ://example.com - assumed path in PHP >= 5.4.7, fails in <5.4.7
 		*/
+	}
+
+	/**
+	 * @ticket 36356
+	 *
+	 * @dataProvider parse_url_component_testcases
+	 */
+	function test_wp_parse_url_with_component( $url, $component, $expected ) {
+		$actual = wp_parse_url( $url, $component );
+		$this->assertSame( $expected, $actual );
+	}
+
+	function parse_url_component_testcases() {
+		// 0: The URL, 1: The requested component, 2: The expected resulting component.
+		return array(
+			array( self::$full_test_url, -1, array(
+				'scheme'   => 'http',
+				'host'     => 'host.name',
+				'port'     => 9090,
+				'user'     => 'username',
+				'pass'     => 'password',
+				'path'     => '/path',
+				'query'    => 'arg1=value1&arg2=value2',
+				'fragment' => 'anchor',
+			) ),
+			array( self::$full_test_url, PHP_URL_SCHEME, 'http' ),
+			array( self::$full_test_url, PHP_URL_USER, 'username' ),
+			array( self::$full_test_url, PHP_URL_PASS, 'password' ),
+			array( self::$full_test_url, PHP_URL_HOST, 'host.name' ),
+			array( self::$full_test_url, PHP_URL_PORT, 9090 ),
+			array( self::$full_test_url, PHP_URL_PATH, '/path' ),
+			array( self::$full_test_url, PHP_URL_QUERY, 'arg1=value1&arg2=value2' ),
+			array( self::$full_test_url, PHP_URL_FRAGMENT, 'anchor' ),
+
+			// < PHP 5.4.7: Schemeless URL
+			array( '//example.com/path/', PHP_URL_HOST, 'example.com' ),
+			array( '//example.com/path/', PHP_URL_PATH, '/path/' ),
+			array( '//example.com/', PHP_URL_HOST, 'example.com' ),
+			array( '//example.com/', PHP_URL_PATH, '/' ),
+			array( 'http://example.com//path/', PHP_URL_HOST, 'example.com' ),
+			array( 'http://example.com//path/', PHP_URL_PATH, '//path/' ),
+
+			// < PHP 5.4.7: Scheme separator in the URL
+			array( 'http://example.com/http://example.net/', PHP_URL_HOST, 'example.com' ),
+			array( 'http://example.com/http://example.net/', PHP_URL_PATH, '/http://example.net/' ),
+			array( '/path/http://example.net/', PHP_URL_HOST, null ),
+			array( '/path/http://example.net/', PHP_URL_PATH, '/path/http://example.net/' ),
+
+			// < PHP 5.4.7: IPv6 literals in schemeless URLs are handled incorrectly.
+			array( '//[::FFFF::127.0.0.1]/', PHP_URL_HOST, '[::FFFF::127.0.0.1]' ),
+			array( '//[::FFFF::127.0.0.1]/', PHP_URL_PATH, '/' ),
+
+			// PHP's parse_url() calls this an invalid URL, we handle it as a path
+			array( '/://example.com/', PHP_URL_PATH, '/://example.com/' ),
+
+		);
 	}
 
 	/**
