@@ -18,7 +18,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 		}
 
 		$actual = WP_Http::make_absolute_url( $relative_url, $absolute_url );
-		$this->assertSame( $expected, $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	function make_absolute_url_testcases() {
@@ -74,7 +74,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 	 */
 	function test_wp_parse_url( $url, $expected ) {
 		$actual = wp_parse_url( $url );
-		$this->assertSame( $expected, $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	function parse_url_testcases() {
@@ -122,7 +122,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 	 */
 	function test_wp_parse_url_with_component( $url, $component, $expected ) {
 		$actual = wp_parse_url( $url, $component );
-		$this->assertSame( $expected, $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	function parse_url_component_testcases() {
