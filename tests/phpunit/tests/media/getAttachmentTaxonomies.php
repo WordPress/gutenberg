@@ -98,4 +98,24 @@ class Tests_Media_GetAttachmentTaxonomies extends WP_UnitTestCase {
 		$this->assertInternalType( 'object', $found['wptests_tax2'] );
 		$this->assertSame( 'wptests_tax2', $found['wptests_tax2']->name );
 	}
+
+
+	/**
+	 * @ticket 37368
+	 */
+	public function test_should_return_unique_taxonomies_for_output_objects() {
+		register_taxonomy( 'wptests_tax2', array( 'attachment:image', 'attachment:image/jpeg' ) );
+
+		$a = self::factory()->attachment->create_object( 'image.jpg', 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment'
+		) );
+		$attachment = get_post( $a );
+
+		$found = get_attachment_taxonomies( $attachment, 'objects' );
+
+		$this->assertSame( array( 'wptests_tax2' ), array_keys( $found ) );
+		$this->assertInternalType( 'object', $found['wptests_tax2'] );
+		$this->assertSame( 'wptests_tax2', $found['wptests_tax2']->name );
+	}
 }
