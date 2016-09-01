@@ -165,4 +165,24 @@ class Tests_Term_Query extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $q2->terms );
 	}
+
+	/**
+	 * @ticket 23261
+	 * @ticket 37904
+	 */
+	public function test_orderby_include_with_comma_separated_list() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$t1 = self::factory()->term->create_and_get( array( 'taxonomy' => 'wptests_tax_1' ) );
+		$t2 = self::factory()->term->create_and_get( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		$query = new WP_Term_Query( array(
+			'include' => "{$t1->term_id},{$t2->term_id}",
+			'orderby' => 'include',
+			'hide_empty' => false,
+		) );
+		$terms = $query->get_terms();
+
+		$this->assertEquals( array( $t1, $t2 ), $terms );
+	}
 }
