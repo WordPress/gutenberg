@@ -312,4 +312,46 @@ class Tests_Formatting_Smilies extends WP_UnitTestCase {
 		// standard smilies, use_smilies: OFF
 		update_option( 'use_smilies', 0 );
 	}
+
+	/**
+	 * Test to ensure smilies can be removed with a filter
+	 *
+	 * @ticket 35905
+	 */
+	public function test_smilies_filter_removes_smilies() {
+		add_filter( 'smilies', array( $this, '_filter_remove_smilies' ) );
+		smilies_init();
+		remove_filter( 'smilies', array( $this, '_filter_remove_smilies' ) );
+
+		$txt = ':oops: I did it again';
+
+		$this->assertEquals( $txt, convert_smilies( $txt ) );
+	}
+
+	/**
+	 * Test to ensure smilies can be added with a filter
+	 *
+	 * @ticket 35905
+	 */
+	public function test_smilies_filter_adds_smilies() {
+		add_filter( 'smilies', array( $this, '_filter_add_smilies' ) );
+		smilies_init();
+		remove_filter( 'smilies', array( $this, '_filter_add_smilies' ) );
+
+		$txt = 'You played with my <3';
+		$expected_txt = 'You played with my \xe2\x9d\xa4';
+
+		$this->assertEquals( $expected_txt, convert_smilies( $txt ) );
+	}
+
+
+	 public function _filter_remove_smilies( $wpsmiliestrans ) {
+		unset( $wpsmiliestrans[':oops:'] );
+		return $wpsmiliestrans;
+	 }
+
+	 public function _filter_add_smilies( $wpsmiliestrans ) {
+		$wpsmiliestrans['<3'] = '\xe2\x9d\xa4';
+		return $wpsmiliestrans;
+	 }
 }
