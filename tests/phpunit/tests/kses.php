@@ -360,6 +360,20 @@ EOF;
 		$this->assertEquals( $allowedtags, wp_kses_allowed_html( 'data' ) );
 	}
 
+	function test_hyphenated_tag() {
+		$string = "<hyphenated-tag attribute=\"value\" otherattribute=\"value2\">Alot of hyphens.</hyphenated-tag>";
+		$custom_tags = array(
+			'hyphenated-tag' => array(
+				'attribute' => true,
+			),
+		);
+		$expect_stripped_string = 'Alot of hyphens.';
+
+		$expect_valid_string = "<hyphenated-tag attribute=\"value\">Alot of hyphens.</hyphenated-tag>";
+		$this->assertEquals( $expect_stripped_string, wp_kses_post( $string ) );
+		$this->assertEquals( $expect_valid_string, wp_kses( $string, $custom_tags ) );
+	}
+
 	/**
 	 * @ticket 26290
 	 */
