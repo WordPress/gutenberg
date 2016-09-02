@@ -303,8 +303,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function test_prepare_setting_validity_for_js() {
 		$this->assertTrue( $this->manager->prepare_setting_validity_for_js( true ) );
 		$error = new WP_Error();
-		$error->add( 'bad_letter', 'Bad letter' );
-		$error->add( 'bad_letter', 'Bad letra' );
+		$error->add( 'bad_letter', 'Bad letter', 'A' );
+		$error->add( 'bad_letter', 'Bad letra', 123 );
 		$error->add( 'bad_number', 'Bad number', array( 'number' => 123 ) );
 		$validity = $this->manager->prepare_setting_validity_for_js( $error );
 		$this->assertInternalType( 'array', $validity );
@@ -313,7 +313,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			$this->assertInternalType( 'array', $validity[ $code ] );
 			$this->assertEquals( join( ' ', $messages ), $validity[ $code ]['message'] );
 			$this->assertArrayHasKey( 'data', $validity[ $code ] );
-			$this->assertArrayHasKey( 'from_server', $validity[ $code ]['data'] );
+			$this->assertEquals( $validity[ $code ]['data'], $error->get_error_data( $code ) );
 		}
 		$this->assertArrayHasKey( 'number', $validity['bad_number']['data'] );
 		$this->assertEquals( 123, $validity['bad_number']['data']['number'] );

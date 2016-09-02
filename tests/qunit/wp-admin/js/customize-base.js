@@ -164,12 +164,16 @@ jQuery( function( $ ) {
 		var notification = new wp.customize.Notification( 'mycode', {
 			'message': 'Hello World',
 			'type': 'update',
+			'setting': 'blogname',
+			'fromServer': true,
 			'data': { 'foo': 'bar' }
 		} );
 
 		assert.equal( 'mycode', notification.code );
 		assert.equal( 'Hello World', notification.message );
 		assert.equal( 'update', notification.type );
+		assert.equal( 'blogname', notification.setting );
+		assert.equal( true, notification.fromServer );
 		assert.deepEqual( { 'foo': 'bar' }, notification.data );
 
 		notification = new wp.customize.Notification( 'mycode2', {
