@@ -676,4 +676,71 @@ EOF;
 		$expected = "<img alt=\"Hello :-) World\" />\n";
 		$this->assertEquals( $expected, $out );
 	}
+
+	/**
+	 * @ticket 37906
+	 */
+	public function test_pre_do_shortcode_tag() {
+		// does nothing if no filters are set up
+		$str = 'pre_do_shortcode_tag';
+		add_shortcode( $str, array( $this, '_shortcode_pre_do_shortcode_tag' ) );
+		$result_nofilter = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'foo', $result_nofilter );
+
+		// short-circuit with filter
+		add_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_bar' ) );
+		$result_filter = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'bar', $result_filter );
+
+		// respect priority
+		add_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_p11' ), 11 );
+		$result_priority = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'p11', $result_priority );
+
+		// pass arguments
+		$arr = array(
+			'return'	=> 'p11',
+			'key'			=> $str,
+			'atts' 		=> array( 'a'=>'b', 'c'=>'d' ),
+			'm'				=> array(
+				"[{$str} a='b' c='d']",
+				"",
+				$str,
+				" a='b' c='d'",
+				"",
+				"",
+				"",
+			),
+		);
+		add_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_attr' ), 12, 4 );
+		$result_atts = do_shortcode( "[{$str} a='b' c='d']" );
+		$this->assertSame( wp_json_encode( $arr ), $result_atts );
+
+		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_attr' ), 12, 4 );
+		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_p11' ), 11 );
+		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_bar' ) );
+		remove_shortcode( $str, array( $this, '_shortcode_pre_do_shortcode_tag' ) );
+	}
+
+	public function _shortcode_pre_do_shortcode_tag( $atts = array(), $content = '' ) {
+		return 'foo';
+	}
+
+	public function _filter_pre_do_shortcode_tag_bar() {
+		return 'bar';
+	}
+
+	public function _filter_pre_do_shortcode_tag_p11() {
+		return 'p11';
+	}
+
+	public function _filter_pre_do_shortcode_tag_attr( $return, $key, $atts, $m ){
+		$arr = array(
+			'return' => $return,
+			'key'    => $key,
+			'atts'   => $atts,
+			'm'      => $m,
+		);
+		return wp_json_encode( $arr );
+	}
 }
