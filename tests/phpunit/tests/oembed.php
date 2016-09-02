@@ -92,7 +92,9 @@ class Tests_oEmbed extends WP_UnitTestCase {
 				$this->fail( sprintf( "%s (%s)\n%s", $r->get_error_message(), $r->get_error_code(), $msg ) );
 			}
 
-			$this->assertSame( 200, wp_remote_retrieve_response_code( $r ), $msg );
+			$http_code    = wp_remote_retrieve_response_code( $r );
+			$http_message = wp_remote_retrieve_response_message( $r );
+			$this->assertSame( 200, $http_code, "{$msg}\n- HTTP response code: {$http_code} {$http_message}" );
 
 		}
 
@@ -134,7 +136,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 			$provider = self::$oembed->get_provider( $url, array(
 				'discover' => false,
 			) );
-			$this->assertNotFalse( $provider, $msg );
+			$this->assertNotFalse( $provider, "{$msg}\n- No oEmbed provider found." );
 
 			$data = self::$oembed->fetch( $provider, $url, $args );
 
@@ -166,7 +168,9 @@ class Tests_oEmbed extends WP_UnitTestCase {
 				$this->fail( sprintf( "%s (%s)\n%s", $error_message, $r['response']->get_error_code(), $msg ) );
 			}
 
-			$this->assertSame( 200, wp_remote_retrieve_response_code( $r['response'] ), $msg );
+			$http_code    = wp_remote_retrieve_response_code( $r['response'] );
+			$http_message = wp_remote_retrieve_response_message( $r['response'] );
+			$this->assertSame( 200, $http_code, "{$msg}\n- HTTP response code: {$http_code} {$http_message}" );
 
 			// Test response
 			$this->assertNotFalse( $data, $msg );
@@ -342,7 +346,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 		$provider = self::$oembed->get_provider( $url, array(
 			'discover' => false,
 		) );
-		$this->assertNotFalse( $provider, $msg );
+		$this->assertNotFalse( $provider, "{$msg}\n- No oEmbed provider found." );
 		$data = self::$oembed->fetch( $provider, $url, $args );
 
 		$r = $this->http_response;
@@ -369,11 +373,13 @@ class Tests_oEmbed extends WP_UnitTestCase {
 			$this->fail( sprintf( "%s (%s)\n%s", $error_message, $r['response']->get_error_code(), $msg ) );
 		}
 
-		$this->assertTrue( in_array( wp_remote_retrieve_response_code( $r['response'] ), array(
+		$http_code    = wp_remote_retrieve_response_code( $r['response'] );
+		$http_message = wp_remote_retrieve_response_message( $r['response'] );
+		$this->assertContains( $http_code, array(
 			200,
 			400,
 			404,
-		), true ), $msg );
+		), "{$msg}\n- HTTP response code: {$http_code} {$http_message}" );
 
 		if ( false === $data ) {
 			// For an erroneous request, it's valid to return no data (or no JSON/XML, which evaluates to false) and
@@ -579,7 +585,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 			array(
 				$providers['twitter-timeline'],
 				array(
-					'https://twitter.com/wordpress',
+					'https://twitter.com/TwitterDev/timelines/539487832448843776',
 				),
 			),
 			array(
