@@ -562,6 +562,8 @@ class Tests_DB extends WP_UnitTestCase {
 			"DELETE QUICK $table",
 			"DELETE IGNORE $table",
 			"DELETE LOW_PRIORITY FROM $table",
+			"DELETE a FROM $table a",
+			"DELETE `a` FROM $table a",
 
 			// STATUS
 			"SHOW TABLE STATUS LIKE '$table'",
