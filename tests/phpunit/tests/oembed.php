@@ -3,57 +3,55 @@
 class Tests_oEmbed extends WP_UnitTestCase {
 	protected static $oembed;
 	protected static $provider_map = array(
-		'youtube' => '#https?://((m|www)\.)?youtube\.com/watch.*#i',
-		'youtube-playlist' => '#https?://((m|www)\.)?youtube\.com/playlist.*#i',
-		'youtube-shorturl' => '#https?://youtu\.be/.*#i',
-		'vimeo' => '#https?://(.+\.)?vimeo\.com/.*#i',
-		'dailymotion' => '#https?://(www\.)?dailymotion\.com/.*#i',
+		'youtube'              => '#https?://((m|www)\.)?youtube\.com/watch.*#i',
+		'youtube-playlist'     => '#https?://((m|www)\.)?youtube\.com/playlist.*#i',
+		'youtube-shorturl'     => '#https?://youtu\.be/.*#i',
+		'vimeo'                => '#https?://(.+\.)?vimeo\.com/.*#i',
+		'dailymotion'          => '#https?://(www\.)?dailymotion\.com/.*#i',
 		'dailymotion-shorturl' => '#https?://dai.ly/.*#i',
-		'flickr' => '#https?://(www\.)?flickr\.com/.*#i',
-		'flickr-shorturl' => '#https?://flic\.kr/.*#i',
-		'smugmug' => '#https?://(.+\.)?smugmug\.com/.*#i',
-		'hulu' => '#https?://(www\.)?hulu\.com/watch/.*#i',
-		'photobucket-album' => 'http://i*.photobucket.com/albums/*',
-		'photobucket-group' => 'http://gi*.photobucket.com/groups/*',
-		'scribd' => '#https?://(www\.)?scribd\.com/doc/.*#i',
-		'wordpress-tv' => '#https?://wordpress.tv/.*#i',
-		'polldaddy' => '#https?://(.+\.)?polldaddy\.com/.*#i',
-		'polldaddy-shorturl' => '#https?://poll\.fm/.*#i',
-		'funnyordie' => '#https?://(www\.)?funnyordie\.com/videos/.*#i',
-		'twitter' => '#https?://(www\.)?twitter\.com/.+?/status(es)?/.*#i',
-		'twitter-timeline' => '#https?://(www\.)?twitter\.com/.+?/timelines/.*#i',
-		'twitter-moment' => '#https?://(www\.)?twitter\.com/i/moments/.*#i',
-		'vine' => '#https?://vine.co/v/.*#i',
-		'soundcloud' => '#https?://(www\.)?soundcloud\.com/.*#i',
-		'slideshare' => '#https?://(.+?\.)?slideshare\.net/.*#i',
-		'instagram' => '#https?://(www\.)?instagr(\.am|am\.com)/p/.*#i',
-		'spotify' => '#https?://(open|play)\.spotify\.com/.*#i',
-		'imgur' => '#https?://(.+\.)?imgur\.com/.*#i',
-		'meetup' => '#https?://(www\.)?meetu(\.ps|p\.com)/.*#i',
-		'issuu' => '#https?://(www\.)?issuu\.com/.+/docs/.+#i',
-		'collegehumor' => '#https?://(www\.)?collegehumor\.com/video/.*#i',
-		'mixcloud' => '#https?://(www\.)?mixcloud\.com/.*#i',
-		'ted' => '#https?://(www\.|embed\.)?ted\.com/talks/.*#i',
-		'animoto' => '#https?://(www\.)?(animoto|video214)\.com/play/.*#i',
-		'tumblr' => '#https?://(.+)\.tumblr\.com/post/.*#i',
-		'kickstarter' => '#https?://(www\.)?kickstarter\.com/projects/.*#i',
+		'flickr'               => '#https?://(www\.)?flickr\.com/.*#i',
+		'flickr-shorturl'      => '#https?://flic\.kr/.*#i',
+		'smugmug'              => '#https?://(.+\.)?smugmug\.com/.*#i',
+		'hulu'                 => '#https?://(www\.)?hulu\.com/watch/.*#i',
+		'photobucket-album'    => 'http://i*.photobucket.com/albums/*',
+		'photobucket-group'    => 'http://gi*.photobucket.com/groups/*',
+		'scribd'               => '#https?://(www\.)?scribd\.com/doc/.*#i',
+		'wordpress-tv'         => '#https?://wordpress.tv/.*#i',
+		'polldaddy'            => '#https?://(.+\.)?polldaddy\.com/.*#i',
+		'polldaddy-shorturl'   => '#https?://poll\.fm/.*#i',
+		'funnyordie'           => '#https?://(www\.)?funnyordie\.com/videos/.*#i',
+		'twitter'              => '#https?://(www\.)?twitter\.com/.+?/status(es)?/.*#i',
+		'twitter-timeline'     => '#https?://(www\.)?twitter\.com/.+?/timelines/.*#i',
+		'twitter-moment'       => '#https?://(www\.)?twitter\.com/i/moments/.*#i',
+		'vine'                 => '#https?://vine.co/v/.*#i',
+		'soundcloud'           => '#https?://(www\.)?soundcloud\.com/.*#i',
+		'slideshare'           => '#https?://(.+?\.)?slideshare\.net/.*#i',
+		'instagram'            => '#https?://(www\.)?instagr(\.am|am\.com)/p/.*#i',
+		'spotify'              => '#https?://(open|play)\.spotify\.com/.*#i',
+		'imgur'                => '#https?://(.+\.)?imgur\.com/.*#i',
+		'meetup'               => '#https?://(www\.)?meetu(\.ps|p\.com)/.*#i',
+		'issuu'                => '#https?://(www\.)?issuu\.com/.+/docs/.+#i',
+		'collegehumor'         => '#https?://(www\.)?collegehumor\.com/video/.*#i',
+		'mixcloud'             => '#https?://(www\.)?mixcloud\.com/.*#i',
+		'ted'                  => '#https?://(www\.|embed\.)?ted\.com/talks/.*#i',
+		'animoto'              => '#https?://(www\.)?(animoto|video214)\.com/play/.*#i',
+		'tumblr'               => '#https?://(.+)\.tumblr\.com/post/.*#i',
+		'kickstarter'          => '#https?://(www\.)?kickstarter\.com/projects/.*#i',
 		'kickstarter-shorturl' => '#https?://kck\.st/.*#i',
-		'cloudup' => '#https?://cloudup\.com/.*#i',
-		'reverbnation' => '#https?://(www\.)?reverbnation\.com/.*#i',
-		'videopress' => '#https?://videopress.com/v/.*#',
-		'reddit-comments' => '#https?://(www\.)?reddit\.com/r/[^/]+/comments/.*#i',
-		'speakerdeck' => '#https?://(www\.)?speakerdeck\.com/.*#i',
-		'facebook-post' => '#https?://www\.facebook\.com/.*/posts/.*#i',
-		'facebook-photo' => '#https?://www\.facebook\.com/photo(s/|\.php).*#i',
-		'facebook-permalink' => '#https?://www\.facebook\.com/permalink\.php.*#i',
-		'facebook-media' => '#https?://www\.facebook\.com/media/.*#i',
-		'facebook-notes' => '#https?://www\.facebook\.com/notes/.*#i',
-		'facebook-video' => '#https?://www\.facebook\.com/.*/videos/.*#i',
-		'facebook-videophp' => '#https?://www\.facebook\.com/video\.php.*#i',
-		// I can't find URLs in this format
-		//'facebook-activity' => '#https?://www\.facebook\.com/.*/activity/.*#i',
-		// Questions has been RIP since 2012, URLs (if you can find them) should still work
-		//'facebook-questions' => '#https?://www\.facebook\.com/questions/.*#i',
+		'cloudup'              => '#https?://cloudup\.com/.*#i',
+		'reverbnation'         => '#https?://(www\.)?reverbnation\.com/.*#i',
+		'videopress'           => '#https?://videopress.com/v/.*#',
+		'reddit-comments'      => '#https?://(www\.)?reddit\.com/r/[^/]+/comments/.*#i',
+		'speakerdeck'          => '#https?://(www\.)?speakerdeck\.com/.*#i',
+		'facebook-post'        => '#https?://www\.facebook\.com/.*/posts/.*#i',
+		'facebook-activity'    => '#https?://www\.facebook\.com/.*/activity/.*#i',
+		'facebook-photo'       => '#https?://www\.facebook\.com/photo(s/|\.php).*#i',
+		'facebook-permalink'   => '#https?://www\.facebook\.com/permalink\.php.*#i',
+		'facebook-media'       => '#https?://www\.facebook\.com/media/.*#i',
+		'facebook-questions'   => '#https?://www\.facebook\.com/questions/.*#i',
+		'facebook-notes'       => '#https?://www\.facebook\.com/notes/.*#i',
+		'facebook-video'       => '#https?://www\.facebook\.com/.*/videos/.*#i',
+		'facebook-videophp'    => '#https?://www\.facebook\.com/video\.php.*#i',
 	);
 
 	/**
@@ -76,7 +74,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	 *
 	 * @dataProvider oEmbedProviderData
 	 */
-	public function testOembedTestURLsResolve( $match, array $urls, $supports_https ) {
+	public function testOembedTestURLsResolve( $match, array $urls ) {
 
 		if ( empty( $urls ) ) {
 			$this->markTestIncomplete();
@@ -108,7 +106,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	 *
 	 * @dataProvider oEmbedProviderData
 	 */
-	public function testOembedProviderReturnsExpectedResponse( $match, array $urls, $supports_https ) {
+	public function testOembedProviderReturnsExpectedResponse( $match, array $urls ) {
 
 		if ( empty( $urls ) ) {
 			$this->markTestIncomplete();
@@ -120,10 +118,11 @@ class Tests_oEmbed extends WP_UnitTestCase {
 			'width'  => 500,
 			'height' => 500,
 		);
-		$test_urls = $urls;
+		$supports_https = ( 0 === strpos( $match, '#https?' ) );
 
-		if ( $supports_https ) {
-			foreach ( $urls as $url ) {
+		foreach ( $urls as $url ) {
+			$test_urls[] = set_url_scheme( $url, 'http' );
+			if ( $supports_https ) {
 				$test_urls[] = set_url_scheme( $url, 'https' );
 			}
 		}
@@ -319,7 +318,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	 *
 	 * @dataProvider oEmbedProviderData
 	 */
-	public function testOembedProviderHandlesInvalidData( $match, array $urls, $supports_https ) {
+	public function testOembedProviderHandlesInvalidData( $match, array $urls ) {
 
 		if ( empty( $urls ) ) {
 			$this->markTestIncomplete();
@@ -415,7 +414,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	public function testOembedTestsCoverAllProviders() {
 
 		$tests     = wp_list_pluck( $this->oEmbedProviderData(), 0 );
-		$providers = array_values( self::$provider_map );
+		$providers = array_keys( self::$oembed->providers );
 		$missing   = array_diff( $providers, $tests );
 
 		$this->assertEmpty( $missing, sprintf( "These oEmbed providers are not tested:\n- %s", implode( "\n- ", $missing ) ) );
@@ -440,6 +439,22 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the tests
+	 *
+	 * @group oembed
+	 * @ticket 32360
+	 *
+	 */
+	public function testOembedTestProvidersMatchActualProviders() {
+
+		$providers    = array_keys( self::$oembed->providers );
+		$provider_map = array_values( self::$provider_map );
+
+		$this->assertEquals( $providers, $provider_map );
+
+	}
+
+	/**
 	 * Data provider for our oEmbed tests
 	 *
 	 * @return array
@@ -448,220 +463,167 @@ class Tests_oEmbed extends WP_UnitTestCase {
 		$providers = self::$provider_map;
 
 		return array(
-			// YouTube without www
 			array(
 				$providers['youtube'],
 				array(
 					'http://youtube.com/watch?v=zdtD19tXX30',
 					'http://m.youtube.com/watch?v=QkP_rOCBrpY',
+					'http://www.youtube.com/watch?v=bDRQRdFaFEo',
 				),
-				false, // HTTPS handled by different endpoints
 			),
-			// YouTube with www
-			array(
-				$providers['youtube'],
-				array(
-					'https://www.youtube.com/watch?v=bDRQRdFaFEo',
-					'https://m.youtube.com/watch?v=yfUflij74P4',
-				),
-				false, // HTTPS handled by different endpoints
-			),
-			// YouTube Playlist without www
 			array(
 				$providers['youtube-playlist'],
 				array(
-					'https://youtube.com/playlist?list=PL93B9F6B77FBB0160',
-					'https://m.youtube.com/playlist?list=PL1AC02C68F976A10F',
-				),
-				false, // HTTPS handled by different endpoints
-			),
-			// YouTube Playlist with www
-			array(
-				$providers['youtube-playlist'],
-				array(
+					'http://youtube.com/playlist?list=PL93B9F6B77FBB0160',
+					'http://m.youtube.com/playlist?list=PL1AC02C68F976A10F',
 					'http://www.youtube.com/playlist?list=PLC7D2959C96B8D27B',
-					'http://m.youtube.com/playlist?list=PLEC422D53B7588DC7',
 				),
-				false, // HTTPS handled by different endpoints
 			),
-			// YouTube HTTP Short Url
 			array(
 				$providers['youtube-shorturl'],
 				array(
 					'http://youtu.be/nfWlot6h_JM?list=PLirAqAtl_h2r5g8xGajEwdXd3x1sZh8hC',
+					'http://youtu.be/U8SYRUYfs_I',
 				),
-				false, // HTTPS handled by different endpoints
-			),
-			// YouTube HTTPS Short Url
-			array(
-				$providers['youtube-shorturl'],
-				array(
-					'https://youtu.be/U8SYRUYfs_I',
-				),
-				false, // HTTPS handled by different endpoints
 			),
 			array(
 				$providers['vimeo'],
 				array(
 					'http://vimeo.com/12339198',
 				),
-				true,
 			),
 			array(
 				$providers['dailymotion'],
 				array(
 					'http://www.dailymotion.com/video/x27bwvb_how-to-wake-up-better_news',
 				),
-				true,
 			),
 			array(
 				$providers['dailymotion-shorturl'],
 				array(
 					'http://dai.ly/x33exze',
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['flickr'],
 				array(
 					'http://www.flickr.com/photos/bon/14004280667/',
 				),
-				true,
 			),
 			array(
 				$providers['flickr-shorturl'],
 				array(
 					'http://flic.kr/p/6BFrbQ',
 				),
-				true,
 			),
 			array(
 				$providers['smugmug'],
 				array(
 					'http://fotoeffects.smugmug.com/Daily-shots-for-the-dailies/Dailies/6928550_9gMRmv/476011624_WhGWpts#!i=476011624&k=WhGWpts',
 				),
-				true,
 			),
 			array(
 				$providers['hulu'],
 				array(
 					'http://www.hulu.com/watch/807443',
 				),
-				true,
 			),
 			array(
 				$providers['photobucket-album'],
 				array(
 					'http://i415.photobucket.com/albums/pp236/Keefers_/Keffers%20Animals/funny-cats-a10.jpg',
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['photobucket-group'],
 				array(
 					// ??
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['scribd'],
 				array(
 					'http://www.scribd.com/doc/110799637/Synthesis-of-Knowledge-Effects-of-Fire-and-Thinning-Treatments-on-Understory-Vegetation-in-Dry-U-S-Forests',
 				),
-				true,
 			),
 			array(
 				$providers['wordpress-tv'],
 				array(
 					'http://wordpress.tv/2015/08/18/billie/',
 				),
-				true,
 			),
 			array(
 				$providers['polldaddy'],
 				array(
 					'http://polldaddy.com/poll/9066794/',
 				),
-				true,
 			),
 			array(
 				$providers['polldaddy-shorturl'],
 				array(
 					'http://poll.fm/5ebze',
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['funnyordie'],
 				array(
 					'http://www.funnyordie.com/videos/e5ef40bf2a/cute-overload',
 				),
-				true,
 			),
 			array(
 				$providers['twitter'],
 				array(
 					'http://twitter.com/WordPress/status/633718182335922177',
 				),
-				true,
 			),
 			array(
 				$providers['twitter-timeline'],
 				array(
 					'https://twitter.com/wordpress',
 				),
-				true,
 			),
 			array(
 				$providers['twitter-moment'],
 				array(
 					'https://twitter.com/i/moments/770661957397573633',
 				),
-				true,
 			),
 			array(
 				$providers['reddit-comments'],
 				array(
 					'https://www.reddit.com/r/Wordpress/comments/3xerq8/list_of_useful_wordpress_functions/'
 				),
-				true,
 			),
 			array(
 				$providers['vine'],
 				array(
 					'http://vine.co/v/OjiLun5LuQ6',
 				),
-				true,
 			),
 			array(
 				$providers['soundcloud'],
 				array(
 					'http://soundcloud.com/steveaoki/kid-cudi-pursuit-of-happiness',
 				),
-				true,
 			),
 			array(
 				$providers['slideshare'],
 				array(
 					'http://www.slideshare.net/haraldf/business-quotes-for-2011',
 				),
-				true,
 			),
 			array(
 				$providers['instagram'],
 				array(
 					'http://instagram.com/p/68WqXbTcfl/',
-					'https://instagram.com/p/68WqXbTcfl/',
 					'http://instagr.am/p/MRM3HQy6kh/',
 				),
-				false, // No HTTPS support on instagr.am
 			),
 			array(
 				$providers['spotify'],
 				array(
 					'http://open.spotify.com/track/2i1KmyEXN3pNLwdxAWSGcg',
 				),
-				true,
 			),
 			array(
 				$providers['imgur'],
@@ -669,7 +631,6 @@ class Tests_oEmbed extends WP_UnitTestCase {
 					'http://imgur.com/a/WdJim',
 					'http://i.imgur.com/mbOPX2L.png',
 				),
-				true,
 			),
 			array(
 				$providers['meetup'],
@@ -677,35 +638,30 @@ class Tests_oEmbed extends WP_UnitTestCase {
 					'http://www.meetup.com/WordPress-Amsterdam/events/224346396/',
 					'http://meetu.ps/2L533w',
 				),
-				true,
 			),
 			array(
 				$providers['issuu'],
 				array(
 					'http://issuu.com/vmagazine/docs/v87',
 				),
-				true,
 			),
 			array(
 				$providers['collegehumor'],
 				array(
 					'http://www.collegehumor.com/video/2862877/jake-and-amir-math',
 				),
-				true,
 			),
 			array(
 				$providers['mixcloud'],
 				array(
 					'http://www.mixcloud.com/8_8s/disclosurefriends/',
 				),
-				true,
 			),
 			array(
 				$providers['ted'],
 				array(
 					'http://www.ted.com/talks/rodney_mullen_pop_an_ollie_and_innovate',
 				),
-				true,
 			),
 			array(
 				$providers['animoto'],
@@ -713,35 +669,30 @@ class Tests_oEmbed extends WP_UnitTestCase {
 					'http://animoto.com/play/MlRRgXHhoT8gOZyHanM6TA',
 					'http://video214.com/play/MlRRgXHhoT8gOZyHanM6TA',
 				),
-				true,
 			),
 			array(
 				$providers['tumblr'],
 				array(
 					'http://yahoo.tumblr.com/post/50902111638/tumblr-yahoo',
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['kickstarter'],
 				array(
 					'http://www.kickstarter.com/projects/zackdangerbrown/potato-salad',
 				),
-				true,
 			),
 			array(
 				$providers['kickstarter-shorturl'],
 				array(
 					'http://kck.st/1ukxHcx',
 				),
-				false, // No HTTPS support
 			),
 			array(
 				$providers['cloudup'],
 				array(
 					'http://cloudup.com/cWX2Bi5DmfJ',
 				),
-				true,
 			),
 			array(
 				$providers['reverbnation'],
@@ -749,77 +700,66 @@ class Tests_oEmbed extends WP_UnitTestCase {
 					'http://www.reverbnation.com/enemyplanes/song/16729753-we-want-blood',
 					'http://www.reverbnation.com/enemyplanes',
 				),
-				true,
 			),
 			array(
 				$providers['videopress'],
 				array(
 					'https://videopress.com/v/kUJmAcSf',
 				),
-				true,
 			),
 			array(
 				$providers['speakerdeck'],
 				array(
 					'https://speakerdeck.com/tollmanz/scaling-wordpress'
 				),
-				true
 			),
 			array(
 				$providers['facebook-post'],
 				array(
 					'https://www.facebook.com/WordPress/posts/10154220015487911'
 				),
-				true
 			),
-//			array(
-//				$providers['facebook-activity'],
-//				array(
-//					''
-//				),
-//				true
-//			),
+			array(
+				$providers['facebook-activity'],
+				array(
+					// ??
+				),
+			),
 			array(
 				$providers['facebook-photo'],
 				array(
 					'https://www.facebook.com/WordPress/photos/a.111006762910.97747.6427302910/10153207719422911/'
 				),
-				true
 			),
 			array(
 				$providers['facebook-permalink'],
 				array(
 					'https://www.facebook.com/permalink.php?story_fbid=10154220015487911'
 				),
-				true
 			),
 			array(
 				$providers['facebook-media'],
 				array(
 					'https://www.facebook.com/media/set/?set=a.164630483698579.1073741878.150601778434783&type=1&l=6c3a7725d5'
 				),
-				true
 			),
-//			array(
-//				$providers['facebook-questions'],
-//				array(
-//					''
-//				),
-//				true
-//			),
+			array(
+				$providers['facebook-questions'],
+				array(
+					// ??
+				),
+			),
 			array(
 				$providers['facebook-notes'],
 				array(
 					'https://www.facebook.com/notes/facebook/searching-for-answers-ask-facebook-questions/411795942130/'
 				),
-				true
 			),
 			array(
 				$providers['facebook-video'],
 				array(
 					'https://www.facebook.com/WordPress/videos/317622575398/'
 				),
-				true
 			),
 			array(
 				$providers['facebook-videophp'],
@@ -827,7 +767,6 @@ class Tests_oEmbed extends WP_UnitTestCase {
 					'https://www.facebook.com/video.php?v=317622575398',
 					'https://www.facebook.com/video.php?id=317622575398',
 				),
-				true
 			),
 		);
 	}
