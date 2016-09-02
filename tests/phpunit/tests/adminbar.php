@@ -339,4 +339,45 @@ class Tests_AdminBar extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * @ticket 22247
+	 */
+	public function test_admin_bar_has_edit_link_for_existing_posts() {
+		wp_set_current_user( self::$editor_id );
+
+		$post = array(
+			'post_author' => self::$editor_id,
+			'post_status' => 'publish',
+			'post_content' => rand_str(),
+			'post_title' => rand_str(),
+		);
+		$id = wp_insert_post( $post );
+
+		// Set queried object to the newly created post.
+		global $wp_the_query;
+		$wp_the_query->queried_object = (object) array( 'ID' => $id, 'post_type' => 'post' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+
+		$node_edit = $wp_admin_bar->get_node( 'edit' );
+		$this->assertNotNull( $node_edit );
+	}
+
+	/**
+	 * @ticket 22247
+	 */
+	public function test_admin_bar_has_no_edit_link_for_non_existing_posts() {
+		wp_set_current_user( self::$editor_id );
+
+		// Set queried object to a non-existing post.
+		global $wp_the_query;
+		$wp_the_query->queried_object = (object) array( 'ID' => 0, 'post_type' => 'post' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+
+		$node_edit = $wp_admin_bar->get_node( 'edit' );
+		$this->assertNull( $node_edit );
+	}
+
 }
