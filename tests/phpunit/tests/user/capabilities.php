@@ -918,6 +918,75 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider dataTaxonomies
+	 *
+	 * @ticket 35614
+	 */
+	public function test_taxonomy_capabilities_are_correct( $taxonomy ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			register_taxonomy( $taxonomy, 'post' );
+		}
+
+		$tax  = get_taxonomy( $taxonomy );
+		$user = self::$users['administrator'];
+
+		// Primitive capabilities for all taxonomies should match this:
+		$expected = array(
+			'manage_terms' => 'manage_categories',
+			'edit_terms'   => 'manage_categories',
+			'delete_terms' => 'manage_categories',
+			'assign_terms' => 'edit_posts',
+		);
+
+		foreach ( $expected as $meta_cap => $primitive_cap ) {
+			$caps = map_meta_cap( $tax->cap->$meta_cap, $user->ID );
+			$this->assertEquals( array(
+				$primitive_cap,
+			), $caps, "Meta cap: {$meta_cap}" );
+		}
+	}
+
+	public function dataTaxonomies() {
+		return array(
+			array(
+				'post_tag',
+			),
+			array(
+				'category',
+			),
+			array(
+				'standard_custom_taxo',
+			),
+		);
+	}
+
+	/**
+	 * @ticket 35614
+	 */
+	public function test_taxonomy_capabilities_with_custom_caps_are_correct() {
+		$expected = array(
+			'manage_terms' => 'one',
+			'edit_terms'   => 'two',
+			'delete_terms' => 'three',
+			'assign_terms' => 'four',
+		);
+		$taxonomy = 'custom_cap_taxo';
+		register_taxonomy( $taxonomy, 'post', array(
+			'capabilities' => $expected,
+		) );
+
+		$tax  = get_taxonomy( $taxonomy );
+		$user = self::$users['administrator'];
+
+		foreach ( $expected as $meta_cap => $primitive_cap ) {
+			$caps = map_meta_cap( $tax->cap->$meta_cap, $user->ID );
+			$this->assertEquals( array(
+				$primitive_cap,
+			), $caps, "Meta cap: {$meta_cap}" );
+		}
+	}
+
+	/**
 	 * @ticket 21786
 	 */
 	function test_negative_caps() {
