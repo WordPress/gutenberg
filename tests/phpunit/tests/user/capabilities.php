@@ -236,8 +236,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	final private function _getMultiSiteMetaCaps() {
 		return array(
-			'upload_plugins'         => array( 'administrator' ),
-			'upload_themes'          => array( 'administrator' ),
+			'upload_plugins'         => array(),
+			'upload_themes'          => array(),
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
