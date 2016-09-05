@@ -48,7 +48,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		return $meta_value;
 	}
 
-	protected function _getSingleSiteCaps() {
+	final private function _getSingleSitePrimitiveCaps() {
 		return array(
 
 			'unfiltered_html'        => array( 'administrator', 'editor' ),
@@ -73,19 +73,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'edit_users'             => array( 'administrator' ),
 			'install_plugins'        => array( 'administrator' ),
 			'install_themes'         => array( 'administrator' ),
-			'upload_plugins'         => array( 'administrator' ),
-			'upload_themes'          => array( 'administrator' ),
 			'update_core'            => array( 'administrator' ),
 			'update_plugins'         => array( 'administrator' ),
 			'update_themes'          => array( 'administrator' ),
 			'edit_theme_options'     => array( 'administrator' ),
-			'customize'              => array( 'administrator' ),
 			'export'                 => array( 'administrator' ),
 			'import'                 => array( 'administrator' ),
 			'list_users'             => array( 'administrator' ),
 			'manage_options'         => array( 'administrator' ),
-			'delete_site'            => array( 'administrator' ),
-			'add_users'              => array( 'administrator' ),
 			'promote_users'          => array( 'administrator' ),
 			'remove_users'           => array( 'administrator' ),
 			'switch_themes'          => array( 'administrator' ),
@@ -141,7 +136,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	}
 
-	protected function _getMultiSiteCaps() {
+	final private function _getMultiSitePrimitiveCaps() {
 		return array(
 
 			'unfiltered_html'        => array(),
@@ -165,20 +160,15 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'edit_users'             => array(),
 			'install_plugins'        => array(),
 			'install_themes'         => array(),
-			'upload_plugins'         => array(),
-			'upload_themes'          => array(),
 			'update_core'            => array(),
 			'update_plugins'         => array(),
 			'update_themes'          => array(),
 
 			'edit_theme_options'     => array( 'administrator' ),
-			'customize'              => array( 'administrator' ),
 			'export'                 => array( 'administrator' ),
 			'import'                 => array( 'administrator' ),
 			'list_users'             => array( 'administrator' ),
 			'manage_options'         => array( 'administrator' ),
-			'delete_site'            => array( 'administrator' ),
-			'add_users'              => array( 'administrator' ),
 			'promote_users'          => array( 'administrator' ),
 			'remove_users'           => array( 'administrator' ),
 			'switch_themes'          => array( 'administrator' ),
@@ -234,24 +224,60 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	}
 
-	protected function getCapsAndRoles() {
+	final private function _getSingleSiteMetaCaps() {
+		return array(
+			'upload_plugins'         => array( 'administrator' ),
+			'upload_themes'          => array( 'administrator' ),
+			'customize'              => array( 'administrator' ),
+			'delete_site'            => array( 'administrator' ),
+			'add_users'              => array( 'administrator' ),
+		);
+	}
+
+	final private function _getMultiSiteMetaCaps() {
+		return array(
+			'upload_plugins'         => array( 'administrator' ),
+			'upload_themes'          => array( 'administrator' ),
+			'customize'              => array( 'administrator' ),
+			'delete_site'            => array( 'administrator' ),
+			'add_users'              => array( 'administrator' ),
+		);
+	}
+
+	protected function getAllCapsAndRoles() {
+		return $this->getPrimitiveCapsAndRoles() + $this->getMetaCapsAndRoles();
+	}
+
+	protected function getPrimitiveCapsAndRoles() {
 		if ( is_multisite() ) {
-			return $this->_getMultiSiteCaps();
+			return $this->_getMultiSitePrimitiveCaps();
 		} else {
-			return $this->_getSingleSiteCaps();
+			return $this->_getSingleSitePrimitiveCaps();
+		}
+	}
+
+	protected function getMetaCapsAndRoles() {
+		if ( is_multisite() ) {
+			return $this->_getMultiSiteMetaCaps();
+		} else {
+			return $this->_getSingleSiteMetaCaps();
 		}
 	}
 
 	// test the tests
 	function test_single_and_multisite_cap_tests_match() {
-		$single = $this->_getSingleSiteCaps();
-		$multi  = $this->_getMultiSiteCaps();
+		$single = $this->_getSingleSitePrimitiveCaps();
+		$multi  = $this->_getMultiSitePrimitiveCaps();
+		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
+
+		$single = $this->_getSingleSiteMetaCaps();
+		$multi  = $this->_getMultiSiteMetaCaps();
 		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
 	}
 
 	// test the tests
 	function test_all_caps_of_users_are_being_tested() {
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getPrimitiveCapsAndRoles();
 
 		// `manage_links` is a special case
 		$this->assertSame( '0', get_option( 'link_manager_enabled' ) );
@@ -282,7 +308,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	// test the default roles and caps
 	function test_all_roles_and_caps() {
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		foreach ( self::$users as $role => $user ) {
 
@@ -362,7 +388,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Test only runs in multisite' );
 			return;
 		}
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		$user = self::$users['administrator'];
 		grant_super_admin( $user->ID );
@@ -392,7 +418,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// make sure the role name is correct
 		$this->assertEquals( array(), $user->roles, "User should not have any roles" );
 
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		foreach ( $caps as $cap => $roles ) {
 			$this->assertFalse( $user->has_cap( $cap ), "User with an invalid role should not have the {$cap} capability" );
@@ -412,7 +438,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// user should have two roles now
 		$this->assertEquals( array( 'subscriber', 'contributor' ), $user->roles );
 
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		foreach ( $caps as $cap => $roles ) {
 			if ( array_intersect( $user->roles, $roles ) ) {
@@ -448,7 +474,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// make sure the role name is correct
 		$this->assertEquals( array( $role_name ), $user->roles );
 
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		foreach ( $caps as $cap => $roles ) {
 			$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
@@ -485,7 +511,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// make sure the role name is correct
 		$this->assertEquals( array( $role_name ), $user->roles );
 
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getPrimitiveCapsAndRoles();
 
 		foreach ( $caps as $cap => $roles ) {
 			// the user should have all the above caps
@@ -1254,7 +1280,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertFalse( is_user_logged_in() );
 
-		$caps = $this->getCapsAndRoles();
+		$caps = $this->getAllCapsAndRoles();
 
 		foreach ( $caps as $cap => $roles ) {
 			$this->assertFalse( current_user_can( $cap ), "Non-logged-in user should not have the {$cap} capability" );
