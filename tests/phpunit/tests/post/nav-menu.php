@@ -277,6 +277,68 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 35206
+	 */
+	function test_wp_nav_menu_whitespace_options() {
+		$post_id1 = self::factory()->post->create();
+		$post_id2 = self::factory()->post->create();
+		$post_id3 = self::factory()->post->create();
+		$post_id4 = self::factory()->post->create();
+
+		$post_insert = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'post',
+			'menu-item-object-id' => $post_id1,
+			'menu-item-status' => 'publish'
+		) );
+
+		$post_inser2 = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'post',
+			'menu-item-object-id' => $post_id2,
+			'menu-item-status' => 'publish'
+		) );
+
+		$post_insert3 = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'post',
+			'menu-item-parent-id' => $post_insert,
+			'menu-item-object-id' => $post_id3,
+			'menu-item-status' => 'publish'
+		) );
+
+		$post_insert4 = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'post',
+			'menu-item-parent-id' => $post_insert,
+			'menu-item-object-id' => $post_id4,
+			'menu-item-status' => 'publish'
+		) );
+
+		// No whitespace suppression.
+		$menu = wp_nav_menu( array(
+			'echo' => false,
+			'menu' => $this->menu_id,
+		) );
+
+		// The markup should include whitespace between <li>s
+		$this->assertRegExp( '/\s<li.*>|<\/li>\s/U', $menu );
+		$this->assertNotRegExp( '/<\/li><li.*>/U', $menu );
+
+
+		// Whitepsace suppressed.
+		$menu = wp_nav_menu( array(
+			'echo'         => false,
+			'item_spacing' => 'discard',
+			'menu'         => $this->menu_id,
+		) );
+
+		// The markup should not include whitespace around <li>s
+		$this->assertNotRegExp( '/\s<li.*>|<\/li>\s/U', $menu );
+		$this->assertRegExp( '/><li.*>|<\/li></U', $menu );
+	}
+
+	/*
 	 * Confirm `wp_nav_menu()` and `Walker_Nav_Menu` passes an $args object to filters.
 	 *
 	 * `wp_nav_menu()` is unique in that it uses an $args object rather than an array.

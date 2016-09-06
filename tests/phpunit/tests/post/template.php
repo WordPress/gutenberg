@@ -299,6 +299,10 @@ NO;
 		// After falling back, the 'after' argument should be set and output as '</ul>'.
 		$this->assertRegExp( '/<\/ul><\/div>/', $menu );
 
+		// After falling back, the markup should include whitespace around <li>s
+		$this->assertRegExp( '/\s<li.*>|<\/li>\s/U', $menu );
+		$this->assertNotRegExp( '/><li.*>|<\/li></U', $menu );
+
 		// No menus + wp_nav_menu() falls back to wp_page_menu(), this time without a container.
 		$menu = wp_nav_menu( array(
 			'echo'      => false,
@@ -307,5 +311,16 @@ NO;
 
 		// After falling back, the empty 'container' argument should still return a container element.
 		$this->assertRegExp( '/<div class="menu">/', $menu );
+
+		// No menus + wp_nav_menu() falls back to wp_page_menu(), this time without white-space.
+		$menu = wp_nav_menu( array(
+			'echo'         => false,
+			'item_spacing' => 'discard',
+		) );
+
+		// After falling back, the markup should not include whitespace around <li>s
+		$this->assertNotRegExp( '/\s<li.*>|<\/li>\s/U', $menu );
+		$this->assertRegExp( '/><li.*>|<\/li></U', $menu );
+
 	}
 }

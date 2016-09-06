@@ -17,6 +17,7 @@ class Tests_List_Pages extends WP_UnitTestCase {
 		'link_before' => '',
 		'link_after' => '',
 		'walker' => '',
+		'item_spacing' => 'preserve',
 		'include'      => '',
 		'post_type'    => 'page',
 		'post_status'  => 'publish',
@@ -341,5 +342,15 @@ class Tests_List_Pages extends WP_UnitTestCase {
 </ul></li>';
 		$actual = wp_list_pages( $args );
 		$this->AssertEquals( $expected['exclude'], $actual );
+	}
+
+	function test_wp_list_pages_discarded_whitespace() {
+		$args = array(
+			'echo' => false,
+			'item_spacing' => 'discard',
+		);
+		$expected['default'] = '<li class="pagenav">Pages<ul><li class="page_item page-item-1 page_item_has_children"><a href="' . get_permalink( 1 ) . '">Parent 1</a><ul class=\'children\'><li class="page_item page-item-4"><a href="' . get_permalink( 4 ) . '">Child 1</a></li><li class="page_item page-item-5"><a href="' . get_permalink( 5 ) . '">Child 2</a></li><li class="page_item page-item-6"><a href="' . get_permalink( 6 ) . '">Child 3</a></li></ul></li><li class="page_item page-item-2 page_item_has_children"><a href="' . get_permalink( 2 ) . '">Parent 2</a><ul class=\'children\'><li class="page_item page-item-7"><a href="' . get_permalink( 7 ) . '">Child 1</a></li><li class="page_item page-item-8"><a href="' . get_permalink( 8 ) . '">Child 2</a></li><li class="page_item page-item-9"><a href="' . get_permalink( 9 ) . '">Child 3</a></li></ul></li><li class="page_item page-item-3 page_item_has_children"><a href="' . get_permalink( 3 ) . '">Parent 3</a><ul class=\'children\'><li class="page_item page-item-10"><a href="' . get_permalink( 10 ) . '">Child 1</a></li><li class="page_item page-item-11"><a href="' . get_permalink( 11 ) . '">Child 2</a></li><li class="page_item page-item-12"><a href="' . get_permalink( 12 ) . '">Child 3</a></li></ul></li></ul></li>';
+		$actual = wp_list_pages( $args );
+		$this->AssertEquals( $expected['default'], $actual );
 	}
 }
