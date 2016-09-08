@@ -697,7 +697,7 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 
 		$this->assertSame( 1, count( $wp_filter['wp_ajax_add-foo'] ) );
 		$this->assertTrue( unregister_taxonomy( 'foo' ) );
-		$this->assertSame( array(), $wp_filter['wp_ajax_add-foo'] );
+		$this->assertArrayNotHasKey( 'wp_ajax_add-foo', $wp_filter );
 	}
 
 	/**

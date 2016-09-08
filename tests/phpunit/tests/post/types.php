@@ -446,7 +446,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 		$this->assertSame( 1, count( $wp_filter['future_foo'] ) );
 		$this->assertTrue( unregister_post_type( 'foo' ) );
-		$this->assertSame( array(), $wp_filter['future_foo'] );
+		$this->assertArrayNotHasKey( 'future_foo', $wp_filter );
 	}
 
 	/**
@@ -462,7 +462,7 @@ class Tests_Post_Types extends WP_UnitTestCase {
 
 		$this->assertSame( 1, count( $wp_filter['add_meta_boxes_foo'] ) );
 		$this->assertTrue( unregister_post_type( 'foo' ) );
-		$this->assertSame( array(), $wp_filter['add_meta_boxes_foo'] );
+		$this->assertArrayNotHasKey( 'add_meta_boxes_foo', $wp_filter );
 	}
 
 	/**

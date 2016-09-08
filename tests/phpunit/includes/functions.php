@@ -21,18 +21,14 @@ function tests_reset__SERVER() {
 
 // For adding hooks before loading WP
 function tests_add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1) {
-	global $wp_filter, $merged_filters;
+	global $wp_filter;
 
 	$idx = _test_filter_build_unique_id($tag, $function_to_add, $priority);
 	$wp_filter[$tag][$priority][$idx] = array('function' => $function_to_add, 'accepted_args' => $accepted_args);
-	unset( $merged_filters[ $tag ] );
 	return true;
 }
 
 function _test_filter_build_unique_id($tag, $function, $priority) {
-	global $wp_filter;
-	static $filter_id_count = 0;
-
 	if ( is_string($function) )
 		return $function;
 
