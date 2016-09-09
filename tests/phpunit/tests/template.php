@@ -16,23 +16,23 @@ class Tests_Template extends WP_UnitTestCase {
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$page_on_front = $factory->post->create_and_get( array(
 			'post_type' => 'page',
-			'post_name' => 'page-on-front',
+			'post_name' => 'page-on-front-😀',
 		) );
 
 		self::$page_for_posts = $factory->post->create_and_get( array(
 			'post_type' => 'page',
-			'post_name' => 'page-for-posts',
+			'post_name' => 'page-for-posts-😀',
 		) );
 
 		self::$page = $factory->post->create_and_get( array(
 			'post_type' => 'page',
-			'post_name' => 'page-name',
+			'post_name' => 'page-name-😀',
 		) );
 		add_post_meta( self::$page->ID, '_wp_page_template', 'templates/page.php' );
 
 		self::$post = $factory->post->create_and_get( array(
 			'post_type' => 'post',
-			'post_name' => 'post-name',
+			'post_name' => 'post-name-😀',
 			'post_date' => '1984-02-25 12:34:56',
 		) );
 		set_post_format( self::$post, 'quote' );
@@ -84,11 +84,12 @@ class Tests_Template extends WP_UnitTestCase {
 	public function test_category_template_hierarchy() {
 		$term = self::factory()->term->create_and_get( array(
 			'taxonomy' => 'category',
-			'slug'     => 'foo',
+			'slug'     => 'foo-😀',
 		) );
 
 		$this->assertTemplateHierarchy( get_term_link( $term ), array(
-			'category-foo.php',
+			'category-foo-😀.php',
+			'category-foo-%f0%9f%98%80.php',
 			"category-{$term->term_id}.php",
 			'category.php',
 			'archive.php',
@@ -98,11 +99,12 @@ class Tests_Template extends WP_UnitTestCase {
 	public function test_tag_template_hierarchy() {
 		$term = self::factory()->term->create_and_get( array(
 			'taxonomy' => 'post_tag',
-			'slug'     => 'foo',
+			'slug'     => 'foo-😀',
 		) );
 
 		$this->assertTemplateHierarchy( get_term_link( $term ), array(
-			'tag-foo.php',
+			'tag-foo-😀.php',
+			'tag-foo-%f0%9f%98%80.php',
 			"tag-{$term->term_id}.php",
 			'tag.php',
 			'archive.php',
@@ -112,11 +114,12 @@ class Tests_Template extends WP_UnitTestCase {
 	public function test_taxonomy_template_hierarchy() {
 		$term = self::factory()->term->create_and_get( array(
 			'taxonomy' => 'taxo',
-			'slug'     => 'foo',
+			'slug'     => 'foo-😀',
 		) );
 
 		$this->assertTemplateHierarchy( get_term_link( $term ), array(
-			'taxonomy-taxo-foo.php',
+			'taxonomy-taxo-foo-😀.php',
+			'taxonomy-taxo-foo-%f0%9f%98%80.php',
 			'taxonomy-taxo.php',
 			'taxonomy.php',
 			'archive.php',
@@ -170,7 +173,8 @@ class Tests_Template extends WP_UnitTestCase {
 
 		$this->assertTemplateHierarchy( home_url(), array(
 			'front-page.php',
-			'page-page-on-front.php',
+			'page-page-on-front-😀.php',
+			'page-page-on-front-%f0%9f%98%80.php',
 			'page-' . self::$page_on_front->ID . '.php',
 			'page.php',
 			'singular.php',
@@ -191,7 +195,8 @@ class Tests_Template extends WP_UnitTestCase {
 	public function test_page_template_hierarchy() {
 		$this->assertTemplateHierarchy( get_permalink( self::$page ), array(
 			'templates/page.php',
-			'page-page-name.php',
+			'page-page-name-😀.php',
+			'page-page-name-%f0%9f%98%80.php',
 			'page-' . self::$page->ID . '.php',
 			'page.php',
 			'singular.php',
@@ -200,7 +205,8 @@ class Tests_Template extends WP_UnitTestCase {
 
 	public function test_single_template_hierarchy_for_post() {
 		$this->assertTemplateHierarchy( get_permalink( self::$post ), array(
-			'single-post-post-name.php',
+			'single-post-post-name-😀.php',
+			'single-post-post-name-%f0%9f%98%80.php',
 			'single-post.php',
 			'single.php',
 			'singular.php',
@@ -210,11 +216,12 @@ class Tests_Template extends WP_UnitTestCase {
 	public function test_single_template_hierarchy_for_custom_post_type() {
 		$cpt = self::factory()->post->create_and_get( array(
 			'post_type' => 'cpt',
-			'post_name' => 'cpt-name',
+			'post_name' => 'cpt-name-😀',
 		) );
 
 		$this->assertTemplateHierarchy( get_permalink( $cpt ), array(
-			'single-cpt-cpt-name.php',
+			'single-cpt-cpt-name-😀.php',
+			'single-cpt-cpt-name-%f0%9f%98%80.php',
 			'single-cpt.php',
 			'single.php',
 			'singular.php',
@@ -223,7 +230,7 @@ class Tests_Template extends WP_UnitTestCase {
 
 	public function test_attachment_template_hierarchy() {
 		$attachment = self::factory()->attachment->create_and_get( array(
-			'post_name'      => 'attachment-name',
+			'post_name'      => 'attachment-name-😀',
 			'file'           => 'image.jpg',
 			'post_mime_type' => 'image/jpeg',
 		) );
@@ -232,7 +239,8 @@ class Tests_Template extends WP_UnitTestCase {
 			'jpeg.php',
 			'image.php',
 			'attachment.php',
-			'single-attachment-attachment-name.php',
+			'single-attachment-attachment-name-😀.php',
+			'single-attachment-attachment-name-%f0%9f%98%80.php',
 			'single-attachment.php',
 			'single.php',
 			'singular.php',
@@ -244,7 +252,8 @@ class Tests_Template extends WP_UnitTestCase {
 			'embed-post-quote.php',
 			'embed-post.php',
 			'embed.php',
-			'single-post-post-name.php',
+			'single-post-post-name-😀.php',
+			'single-post-post-name-%f0%9f%98%80.php',
 			'single-post.php',
 			'single.php',
 			'singular.php',
@@ -256,7 +265,8 @@ class Tests_Template extends WP_UnitTestCase {
 			'embed-page.php',
 			'embed.php',
 			'templates/page.php',
-			'page-page-name.php',
+			'page-page-name-😀.php',
+			'page-page-name-%f0%9f%98%80.php',
 			'page-' . self::$page->ID . '.php',
 			'page.php',
 			'singular.php',
