@@ -118,6 +118,25 @@ class Tests_Query extends WP_UnitTestCase {
 		unset( $q->query_vars['wptests_tax'] );
 	}
 
+	/**
+	 * @ticket 37962
+	 */
+	public function test_get_queried_object_should_return_null_for_not_exists_tax_query() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$q = new WP_Query( array(
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax',
+					'operator' => 'NOT EXISTS',
+				),
+			),
+		) );
+
+		$queried_object = $q->get_queried_object();
+		$this->assertNull( $queried_object );
+	}
+
 	public function test_orderby_space_separated() {
 		global $wpdb;
 
