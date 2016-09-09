@@ -23,8 +23,12 @@ function tests_reset__SERVER() {
 function tests_add_filter($tag, $function_to_add, $priority = 10, $accepted_args = 1) {
 	global $wp_filter;
 
-	$idx = _test_filter_build_unique_id($tag, $function_to_add, $priority);
-	$wp_filter[$tag][$priority][$idx] = array('function' => $function_to_add, 'accepted_args' => $accepted_args);
+	if ( function_exists( 'add_filter' ) ) {
+		add_filter( $tag, $function_to_add, $priority, $accepted_args );
+	} else {
+		$idx = _test_filter_build_unique_id($tag, $function_to_add, $priority);
+		$wp_filter[$tag][$priority][$idx] = array('function' => $function_to_add, 'accepted_args' => $accepted_args);
+	}
 	return true;
 }
 
