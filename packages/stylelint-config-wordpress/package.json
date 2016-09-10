@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "ava": "^0.16.0",
-    "eslint": "^2.4.0",
+    "eslint": "^3.0.0",
     "eslint-plugin-ava": "^2.2.1",
     "eslint-config-stylelint": "^4.0.0",
     "npmpub": "^3.0.3",
