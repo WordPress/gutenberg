@@ -33,6 +33,14 @@ div#comment_form { /* Avoid over-qualification. */
 input[type='text'] { /* Should be [type="text"] */
 	line-height: 110% /* Also doubly incorrect */
 }
+
+#Selector {
+	color: #000;
+}
+
+.selectorA {
+	color: #000;
+}
 `)
 /* eslint-enable */
 
@@ -58,7 +66,8 @@ test("There are warnings with invalid selectors CSS", t => {
     const { errored, results } = data
     const { warnings } = results[0]
     t.truthy(errored, "errored")
-    t.is(warnings.length, 1, "flags eight warnings")
-    t.is(warnings[0].text, "Expected double quotes (string-quotes)", "correct warning text")
+    t.is(warnings.length, 2, "flags eight warnings")
+    t.is(warnings[0].text, "Selector should use lowercase and separate words with hyphens (selector-id-pattern)", "correct warning text")
+    t.is(warnings[1].text, "Expected double quotes (string-quotes)", "correct warning text")
   })
 })

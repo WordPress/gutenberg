@@ -75,6 +75,18 @@ module.exports = {
     "selector-attribute-operator-space-after": "never",
     "selector-attribute-operator-space-before": "never",
     "selector-attribute-quotes": "always",
+    "selector-class-pattern": [
+      "^[a-z]+(-[a-z]+)*",
+      {
+        "message": "Selector should use lowercase and separate words with hyphens (selector-class-pattern)",
+      },
+    ],
+    "selector-id-pattern": [
+      "^[a-z]+(-[a-z]+)*",
+      {
+        "message": "Selector should use lowercase and separate words with hyphens (selector-id-pattern)",
+      },
+    ],
     "selector-combinator-space-after": "always",
     "selector-combinator-space-before": "always",
     "selector-list-comma-newline-after": "always",

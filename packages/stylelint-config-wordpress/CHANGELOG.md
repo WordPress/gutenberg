@@ -7,6 +7,8 @@
 * Added: `font-weight-notation` rule.
 * Added: `max-line-length` rule.
 * Added: `property-no-unknown` rule.
+* Added: `selector-class-pattern` rule.
+* Added: `selector-id-pattern` rule.
 * Deprecated `no-missing-eof-newline` rule. Use the new `no-missing-end-of-source-newline` rule instead.
 * Fixed `font-family-name-quotes` test warning message in `values.js`.
 
