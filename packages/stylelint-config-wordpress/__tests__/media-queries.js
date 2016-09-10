@@ -44,6 +44,11 @@ const invalidCss = (`
 	/* Your selectors */
 }
 
+@mdia all and (max-width>= 699px) {
+
+	/* Your selectors */
+}
+
 @media screen and (color), projection and (color) {}
 
 @media screen and (color) ,
@@ -73,15 +78,16 @@ test("There are warnings with invalid media queries CSS", t => {
     const { errored, results } = data
     const { warnings } = results[0]
     t.truthy(errored, "errored")
-    t.is(warnings.length, 9, "flags eight warnings")
-    t.is(warnings[0].text, "Expected single space after \":\" (media-feature-colon-space-after)", "correct warning text")
+    t.is(warnings.length, 10, "flags ten warnings")
+    t.is(warnings[0].text, "Unexpected unknown at-rule \"@mdia\" (at-rule-no-unknown)", "correct warning text")
     t.is(warnings[1].text, "Expected single space after \":\" (media-feature-colon-space-after)", "correct warning text")
-    t.is(warnings[2].text, "Unexpected whitespace before \":\" (media-feature-colon-space-before)", "correct warning text")
-    t.is(warnings[3].text, "Unexpected missing punctuation (media-feature-no-missing-punctuation)", "correct warning text")
-    t.is(warnings[4].text, "Expected single space after range operator (media-feature-range-operator-space-after)", "correct warning text")
+    t.is(warnings[2].text, "Expected single space after \":\" (media-feature-colon-space-after)", "correct warning text")
+    t.is(warnings[3].text, "Unexpected whitespace before \":\" (media-feature-colon-space-before)", "correct warning text")
+    t.is(warnings[4].text, "Unexpected missing punctuation (media-feature-no-missing-punctuation)", "correct warning text")
     t.is(warnings[5].text, "Expected single space after range operator (media-feature-range-operator-space-after)", "correct warning text")
-    t.is(warnings[6].text, "Expected single space before range operator (media-feature-range-operator-space-before)", "correct warning text")
+    t.is(warnings[6].text, "Expected single space after range operator (media-feature-range-operator-space-after)", "correct warning text")
     t.is(warnings[7].text, "Expected single space before range operator (media-feature-range-operator-space-before)", "correct warning text")
-    t.is(warnings[8].text, "Unexpected whitespace before \",\" (media-query-list-comma-space-before)", "correct warning text")
+    t.is(warnings[8].text, "Expected single space before range operator (media-feature-range-operator-space-before)", "correct warning text")
+    t.is(warnings[9].text, "Unexpected whitespace before \",\" (media-query-list-comma-space-before)", "correct warning text")
   })
 })

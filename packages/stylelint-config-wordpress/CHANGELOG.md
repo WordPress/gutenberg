@@ -2,6 +2,7 @@
 
 * Removed: `stylelint < 7.2.0` compatibility.
 * Removed: NodeJS 0.12.x support, `stylelint` and `stylelint-config-wordpress` now require NodeJS > 4.2.1 LTS or greater
+* Added: `at-rule-no-unknown` rule.
 * Added: `selector-attribute-quotes` rule.
 * Added: `font-weight-notation` rule.
 * Added: `max-line-length` rule.

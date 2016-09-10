@@ -6,6 +6,7 @@ module.exports = {
     } ],
     "at-rule-name-case": "lower",
     "at-rule-name-space-after": "always-single-line",
+    "at-rule-no-unknown": true,
     "at-rule-semicolon-newline-after": "always",
     "block-closing-brace-newline-after": "always",
     "block-closing-brace-newline-before": "always",
