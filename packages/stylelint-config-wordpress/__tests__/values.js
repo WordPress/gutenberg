@@ -64,5 +64,5 @@ test("There are warnings with invalid values CSS", t => {
     t.is(warnings[4].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
     t.is(warnings[5].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
     t.is(warnings[6].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-    t.is(warnings[7].text, "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)", "correct warning text")  })
+    t.is(warnings[7].text, "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)", "correct warning text") })
 })
