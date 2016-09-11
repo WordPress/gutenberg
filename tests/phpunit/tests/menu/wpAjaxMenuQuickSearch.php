@@ -55,7 +55,7 @@ class Tests_Menu_WpAjaxMenuQuickSeach extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that search only returns results for publihed posts.
+	 * Test that search only returns results for published posts.
 	 *
 	 * @ticket 33742
 	 */
