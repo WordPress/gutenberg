@@ -524,4 +524,14 @@ line 2<br/>
 		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
 	}
 
+
+	/**
+	 * @ticket 4857
+	 */
+	function test_that_text_before_blocks_is_peed() {
+		$content = 'a<div>b</div>';
+		$expected = "<p>a</p>\n<div>b</div>";
+
+		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
+	}
 }
