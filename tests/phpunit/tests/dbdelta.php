@@ -803,6 +803,29 @@ class Tests_dbDelta extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 34874
+	 */
+	function test_key_names_are_not_case_sensitive_and_do_not_recreate_indices() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY KEY_1 (column_1),
+				KEY compOUND_key (id,column_1),
+				FULLTEXT KEY FULLtext_kEY (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
 	 * @ticket 31679
 	 */
 	function test_column_type_change_with_hyphens_in_name() {
