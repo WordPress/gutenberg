@@ -630,7 +630,7 @@ VIDEO;
 
 		$content = apply_filters( 'the_content', $video );
 
-		$expected = '<div style="width: ' . $width . 'px; " class="wp-video">' .
+		$expected = '<div style="width: ' . $width . 'px;" class="wp-video">' .
 			"<!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n" .
 			'<video class="wp-video-shortcode" id="video-' . $post_id . '-1" width="' . $width . '" height="' . $h . '" preload="metadata" controls="controls">' .
 			'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4?_=1" />' .
