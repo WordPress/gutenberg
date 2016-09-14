@@ -309,6 +309,27 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertEquals( 0, $this->request->get_param( 'somestring' ) );
 	}
 
+	public function test_sanitize_params_error() {
+		$this->request->set_url_params( array(
+			'successparam' => '123',
+			'failparam'    => '123',
+		));
+		$this->request->set_attributes( array(
+			'args' => array(
+				'successparam' => array(
+					'sanitize_callback' => 'absint',
+				),
+				'failparam' => array(
+					'sanitize_callback' => array( $this, '_return_wp_error_on_validate_callback' ),
+				),
+			),
+		));
+
+		$valid = $this->request->sanitize_params();
+		$this->assertWPError( $valid );
+		$this->assertEquals( 'rest_invalid_param', $valid->get_error_code() );
+	}
+
 	public function test_has_valid_params_required_flag() {
 		$this->request->set_attributes( array(
 			'args' => array(
