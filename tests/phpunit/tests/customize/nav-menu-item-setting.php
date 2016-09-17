@@ -185,6 +185,34 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test value method with post without nav menu item title (label).
+	 *
+	 * @see WP_Customize_Nav_Menu_Item_Setting::value()
+	 */
+	function test_value_type_post_type_without_label() {
+		do_action( 'customize_register', $this->wp_customize );
+
+		$original_title = 'Hello World';
+		$post_id = self::factory()->post->create( array( 'post_title' => $original_title ) );
+
+		$menu_id = wp_create_nav_menu( 'Menu' );
+		$item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'post',
+			'menu-item-object-id' => $post_id,
+			'menu-item-title' => '',
+			'menu-item-status' => 'publish',
+		) );
+
+		$setting_id = "nav_menu_item[$item_id]";
+		$setting = new WP_Customize_Nav_Menu_Item_Setting( $this->wp_customize, $setting_id );
+
+		$value = $setting->value();
+		$this->assertEquals( '', $value['title'] );
+		$this->assertEquals( $original_title, $value['original_title'] );
+	}
+
+	/**
 	 * Test value method with taxonomy.
 	 *
 	 * @see WP_Customize_Nav_Menu_Item_Setting::value()
@@ -803,5 +831,38 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$expected = apply_filters( 'nav_menu_attr_title', wp_unslash( apply_filters( 'excerpt_save_pre', wp_slash( $post_value['attr_title'] ) ) ) );
 		$this->assertEquals( $expected, $nav_menu_item->attr_title );
 		$this->assertEquals( 'Attempted \o/ o&#8217;o markup', $nav_menu_item->description );
+	}
+
+	/**
+	 * Test WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item() where title is empty.
+	 *
+	 * @ticket 38015
+	 * @see WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item()
+	 */
+	function test_value_as_wp_post_nav_menu_item_with_empty_title() {
+		$original_title = 'The Original Title';
+		$post_id = self::factory()->post->create( array( 'post_title' => $original_title ) );
+
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[123]'
+		);
+
+		$post_value = array_merge(
+			$setting->default,
+			array(
+				'object_id'        => $post_id,
+				'object'           => 'post',
+				'type'             => 'post_type',
+				'status'           => 'publish',
+				'nav_menu_term_id' => 0,
+			)
+		);
+		$this->wp_customize->set_post_value( $setting->id, $post_value );
+
+		$setting->preview();
+
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( $original_title, $nav_menu_item->title );
 	}
 }
