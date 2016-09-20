@@ -380,4 +380,31 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertNull( $node_edit );
 	}
 
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_contains_view_archive_link() {
+		set_current_screen( 'edit-post' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+
+		$this->assertNotNull( $node );
+	}
+
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_has_no_archives_link_for_post_types_without_archive() {
+		set_current_screen( 'edit-page' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+
+		$this->assertNull( $node );
+	}
 }
