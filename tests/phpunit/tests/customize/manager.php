@@ -399,6 +399,48 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test WP_Customize_Manager::has_published_pages().
+	 *
+	 * @ticket 38013
+	 * @covers WP_Customize_Manager::has_published_pages()
+	 */
+	function test_has_published_pages() {
+		foreach ( get_pages() as $page ) {
+			wp_delete_post( $page->ID, true );
+		}
+		$this->assertFalse( $this->manager->has_published_pages() );
+
+		$this->factory()->post->create( array( 'post_type' => 'page', 'post_status' => 'private' ) );
+		$this->assertFalse( $this->manager->has_published_pages() );
+
+		$this->factory()->post->create( array( 'post_type' => 'page', 'post_status' => 'publish' ) );
+		$this->assertTrue( $this->manager->has_published_pages() );
+	}
+
+	/**
+	 * Ensure that page stubs created via nav menus will cause has_published_pages to return true.
+	 *
+	 * @ticket 38013
+	 * @covers WP_Customize_Manager::has_published_pages()
+	 */
+	function test_has_published_pages_when_nav_menus_created_posts() {
+		foreach ( get_pages() as $page ) {
+			wp_delete_post( $page->ID, true );
+		}
+		$this->assertFalse( $this->manager->has_published_pages() );
+
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'editor' ) ) );
+		$this->manager->nav_menus->customize_register();
+		$setting_id = 'nav_menus_created_posts';
+		$setting = $this->manager->get_setting( $setting_id );
+		$this->assertInstanceOf( 'WP_Customize_Filter_Setting', $setting );
+		$auto_draft_page = $this->factory()->post->create( array( 'post_type' => 'page', 'post_status' => 'auto-draft' ) );
+		$this->manager->set_post_value( $setting_id, array( $auto_draft_page ) );
+		$setting->preview();
+		$this->assertTrue( $this->manager->has_published_pages() );
+	}
+
+	/**
 	 * Test the WP_Customize_Manager::register_dynamic_settings() method.
 	 *
 	 * This is similar to test_add_dynamic_settings, except the settings are passed via $_POST['customized'].
