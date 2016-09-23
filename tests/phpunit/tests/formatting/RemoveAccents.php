@@ -115,8 +115,8 @@ class Tests_Formatting_RemoveAccents extends WP_UnitTestCase {
 	}
 
 	/**
-	* @ticket 37086
-	*/
+	 * @ticket 37086
+	 */
 	public function test_remove_catalan_middot() {
 		add_filter( 'locale', array( $this, '_set_locale_to_catalan' ) );
 
@@ -125,5 +125,22 @@ class Tests_Formatting_RemoveAccents extends WP_UnitTestCase {
 		remove_filter( 'locale', array( $this, '_set_locale_to_catalan' ) );
 		
 		$this->assertEquals( 'al·lallalla', remove_accents( 'al·lallaŀla' ) );
+	}
+
+	public function _set_locale_to_serbian() {
+		return 'sr_RS';
+	}
+
+	/**
+	 * @ticket 38078
+	 */
+	public function test_transcribe_serbian_crossed_d() {
+		add_filter( 'locale', array( $this, '_set_locale_to_serbian' ) );
+
+		$this->assertEquals( 'DJdj', remove_accents( 'Đđ' ) );
+		
+		remove_filter( 'locale', array( $this, '_set_locale_to_serbian' ) );
+		
+		$this->assertEquals( 'Dd', remove_accents( 'Đđ' ) );
 	}
 }
