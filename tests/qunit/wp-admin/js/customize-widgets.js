@@ -58,12 +58,12 @@ jQuery( window ).load( function() {
 		ok( panel.extended( api.Widgets.WidgetsPanel ) );
 
 		panel.deferred.embedded.done( function() {
-			ok( 1 === panel.container.find( '.no-widget-areas-rendered-notice' ).length );
-			ok( panel.container.find( '.no-widget-areas-rendered-notice' ).is( ':visible' ) );
+			ok( 1 === panel.contentContainer.find( '.no-widget-areas-rendered-notice' ).length );
+			ok( panel.contentContainer.find( '.no-widget-areas-rendered-notice' ).is( ':visible' ) );
 			api.section( 'sidebar-widgets-sidebar-1' ).active( true );
 			api.control( 'sidebars_widgets[sidebar-1]' ).active( true );
 			api.trigger( 'pane-contents-reflowed' );
-			ok( ! panel.container.find( '.no-widget-areas-rendered-notice' ).is( ':visible' ) );
+			ok( ! panel.contentContainer.find( '.no-widget-areas-rendered-notice' ).is( ':visible' ) );
 		} );
 
 		expect( 4 );

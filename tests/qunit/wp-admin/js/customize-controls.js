@@ -211,9 +211,14 @@ jQuery( window ).load( function (){
 		section = wp.customize.section( id );
 		ok( ! section.params.content );
 		ok( !! section.container );
-		ok( section.container.is( '.control-section.control-section-default' ) );
-		ok( 1 === section.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === section.container.find( '> .accordion-section-content' ).length );
+		ok( !! section.headContainer );
+		ok( !! section.contentContainer );
+		ok( section.container.has( section.headContainer ) );
+		ok( section.container.has( section.contentContainer ) );
+		ok( section.headContainer.is( '.control-section.control-section-default' ) );
+		ok( 1 === section.headContainer.find( '> .accordion-section-title' ).length );
+		ok( section.contentContainer.is( '.accordion-section-content' ) );
+		equal( section.headContainer.attr( 'aria-owns' ), section.contentContainer.attr( 'id' ) );
 	} );
 
 	module( 'Customizer Custom Type (titleless) Section with Template in Fixture' );
@@ -225,9 +230,14 @@ jQuery( window ).load( function (){
 		section = wp.customize.section( id );
 		ok( ! section.params.content );
 		ok( !! section.container );
+		ok( !! section.headContainer );
+		ok( !! section.contentContainer );
+		ok( section.container.has( section.headContainer ) );
+		ok( section.container.has( section.contentContainer ) );
 		ok( section.container.is( '.control-section.control-section-titleless' ) );
-		ok( 0 === section.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === section.container.find( '> .accordion-section-content' ).length );
+		ok( 0 === section.headContainer.find( '> .accordion-section-title' ).length );
+		ok( section.contentContainer.is( '.accordion-section-content' ) );
+		equal( section.headContainer.attr( 'aria-owns' ), section.contentContainer.attr( 'id' ) );
 	} );
 	module( 'Customizer Custom Type Section Lacking Specific Template' );
 	test( 'Fixture section has expected content', function () {
@@ -235,9 +245,14 @@ jQuery( window ).load( function (){
 		section = wp.customize.section( id );
 		ok( ! section.params.content );
 		ok( !! section.container );
-		ok( section.container.is( '.control-section.control-section-' + section.params.type ) );
-		ok( 1 === section.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === section.container.find( '> .accordion-section-content' ).length );
+		ok( !! section.headContainer );
+		ok( !! section.contentContainer );
+		ok( section.container.has( section.headContainer ) );
+		ok( section.container.has( section.contentContainer ) );
+		ok( section.headContainer.is( '.control-section.control-section-' + section.params.type ) );
+		ok( 1 === section.headContainer.find( '> .accordion-section-title' ).length );
+		ok( section.contentContainer.is( '.accordion-section-content' ) );
+		equal( section.headContainer.attr( 'aria-owns' ), section.contentContainer.attr( 'id' ) );
 	} );
 	module( 'Customizer Section lacking any params' );
 	test( 'Fixture section has default params supplied', function () {
@@ -270,6 +285,10 @@ jQuery( window ).load( function (){
 		var panel = wp.customize.panel( 'fixture-panel' );
 		ok( !! panel.params.content );
 		ok( !! panel.container );
+		ok( !! panel.headContainer );
+		ok( !! panel.contentContainer );
+		ok( panel.container.has( panel.headContainer ) );
+		ok( panel.container.has( panel.contentContainer ) );
 	} );
 	test( 'Fixture panel has section among its sections()', function () {
 		var panel = wp.customize.panel( 'fixture-panel' );
@@ -304,9 +323,14 @@ jQuery( window ).load( function (){
 		panel = wp.customize.panel( id );
 		ok( ! panel.params.content );
 		ok( !! panel.container );
-		ok( panel.container.is( '.control-panel.control-panel-default' ) );
-		ok( 1 === panel.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === panel.container.find( '> .control-panel-content' ).length );
+		ok( !! panel.headContainer );
+		ok( !! panel.contentContainer );
+		ok( panel.container.has( panel.headContainer ) );
+		ok( panel.container.has( panel.contentContainer ) );
+		ok( panel.headContainer.is( '.control-panel.control-panel-default' ) );
+		ok( 1 === panel.headContainer.find( '> .accordion-section-title' ).length );
+		ok( panel.contentContainer.is( '.control-panel-content' ) );
+		equal( panel.headContainer.attr( 'aria-owns' ), panel.contentContainer.attr( 'id' ) );
 	} );
 
 	module( 'Customizer Custom Type Panel (titleless) with Template in Fixture' );
@@ -318,9 +342,14 @@ jQuery( window ).load( function (){
 		panel = wp.customize.panel( id );
 		ok( ! panel.params.content );
 		ok( !! panel.container );
-		ok( panel.container.is( '.control-panel.control-panel-titleless' ) );
-		ok( 0 === panel.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === panel.container.find( '> .control-panel-content' ).length );
+		ok( !! panel.headContainer );
+		ok( !! panel.contentContainer );
+		ok( panel.container.has( panel.headContainer ) );
+		ok( panel.container.has( panel.contentContainer ) );
+		ok( panel.headContainer.is( '.control-panel.control-panel-titleless' ) );
+		ok( 0 === panel.headContainer.find( '> .accordion-section-title' ).length );
+		ok( panel.contentContainer.is( '.control-panel-content' ) );
+		equal( panel.headContainer.attr( 'aria-owns' ), panel.contentContainer.attr( 'id' ) );
 	} );
 
 	module( 'Customizer Custom Type Panel Lacking Specific Template' );
@@ -329,9 +358,14 @@ jQuery( window ).load( function (){
 		panel = wp.customize.panel( id );
 		ok( ! panel.params.content );
 		ok( !! panel.container );
-		ok( panel.container.is( '.control-panel.control-panel-' + panel.params.type ) );
-		ok( 1 === panel.container.find( '> .accordion-section-title' ).length );
-		ok( 1 === panel.container.find( '> .control-panel-content' ).length );
+		ok( !! panel.headContainer );
+		ok( !! panel.contentContainer );
+		ok( panel.container.has( panel.headContainer ) );
+		ok( panel.container.has( panel.contentContainer ) );
+		ok( panel.headContainer.is( '.control-panel.control-panel-' + panel.params.type ) );
+		ok( 1 === panel.headContainer.find( '> .accordion-section-title' ).length );
+		ok( panel.contentContainer.is( '.control-panel-content' ) );
+		equal( panel.headContainer.attr( 'aria-owns' ), panel.contentContainer.attr( 'id' ) );
 	} );
 	module( 'Customizer Panel lacking any params' );
 	test( 'Fixture panel has default params supplied', function () {
