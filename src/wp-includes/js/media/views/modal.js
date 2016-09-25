@@ -24,6 +24,8 @@ Modal = wp.media.View.extend({
 		'keydown': 'keydown'
 	},
 
+	clickedOpenerEl: null,
+
 	initialize: function() {
 		_.defaults( this.options, {
 			container: document.body,
@@ -91,6 +93,8 @@ Modal = wp.media.View.extend({
 			return this;
 		}
 
+		this.clickedOpenerEl = document.activeElement;
+
 		if ( ! this.views.attached ) {
 			this.attach();
 		}
@@ -141,8 +145,12 @@ Modal = wp.media.View.extend({
 		// Hide modal and remove restricted media modal tab focus once it's closed
 		this.$el.hide().undelegate( 'keydown' );
 
-		// Put focus back in useful location once modal is closed
-		$('#wpbody-content').focus();
+		// Put focus back in useful location once modal is closed.
+		if ( null !== this.clickedOpenerEl ) {
+			this.clickedOpenerEl.focus();
+		} else {
+			$( '#wpbody-content' ).focus();
+		}
 
 		this.propagate('close');
 
