@@ -926,6 +926,52 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @ticket 36918
+	 */
+	function test_new_blog_locale() {
+		$current_site = get_current_site();
+
+		add_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10, 3 );
+		update_site_option( 'WPLANG', 'de_DE' );
+		remove_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10 );
+
+		// No locale, use default locale.
+		add_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10, 3 );
+		$blog_id = wpmu_create_blog( $current_site->domain, '/de-de/', 'New Blog', get_current_user_id() );
+		remove_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10 );
+
+		$this->assertNotWPError( $blog_id );
+		$this->assertSame( 'de_DE', get_blog_option( $blog_id, 'WPLANG' ) );
+
+		// Custom locale.
+		add_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10, 3 );
+		$blog_id = wpmu_create_blog( $current_site->domain, '/es-es/', 'New Blog', get_current_user_id(), array( 'WPLANG' => 'es_ES' ) );
+		remove_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10 );
+
+		$this->assertNotWPError( $blog_id );
+		$this->assertSame( 'es_ES', get_blog_option( $blog_id, 'WPLANG' ) );
+
+		// en_US locale.
+		add_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10, 3 );
+		$blog_id = wpmu_create_blog( $current_site->domain, '/en-us/', 'New Blog', get_current_user_id(), array( 'WPLANG' => '' ) );
+		remove_filter( 'sanitize_option_WPLANG', array( $this, 'filter_allow_unavailable_languages' ), 10 );
+
+		$this->assertNotWPError( $blog_id );
+		$this->assertSame( '', get_blog_option( $blog_id, 'WPLANG' ) );
+	}
+
+	/**
+	 * Allows to set the WPLANG option to any language.
+	 *
+	 * @param string $value          The sanitized option value.
+	 * @param string $option         The option name.
+	 * @param string $original_value The original value passed to the function.
+	 * @return string The orginal value.
+	 */
+	function filter_allow_unavailable_languages( $value, $option, $original_value ) {
+		return $original_value;
+	}
 }
 
 endif;
