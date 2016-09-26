@@ -5,8 +5,8 @@ class Tests_Query extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		create_initial_taxonomies();
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		create_initial_taxonomies();
 	}
 
 	/**

@@ -10,8 +10,7 @@ class Tests_Query_VerbosePageRules extends Tests_Query_Conditionals {
 	function setUp() {
 		parent::setUp();
 
-		create_initial_taxonomies();
-
 		$this->set_permalink_structure( '/%category%/%year%/%postname%/' );
+		create_initial_taxonomies();
 	}
 }

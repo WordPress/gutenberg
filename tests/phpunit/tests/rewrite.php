@@ -11,9 +11,8 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 
-		create_initial_taxonomies();
-
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		create_initial_taxonomies();
 
 		$this->home_url = get_option( 'home' );
 	}
@@ -348,8 +347,6 @@ class Tests_Rewrite extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create( array( 'post_title' => get_post( $page_id )->post_title ) );
 
 		$this->assertEquals( $post_id, url_to_postid( get_permalink( $post_id ) ) );
-
-		$this->set_permalink_structure();
 	}
 
 	/**
@@ -385,15 +382,13 @@ class Tests_Rewrite extends WP_UnitTestCase {
 
 		$this->assertTrue( is_single() );
 		$this->assertFalse( is_404() );
-
-		$this->set_permalink_structure();
 	}
 
 	/**
 	 * @ticket 29107
 	 */
 	public function test_flush_rules_does_not_delete_option() {
-		$this->set_permalink_structure();
+		$this->set_permalink_structure( '' );
 
 		$rewrite_rules = get_option( 'rewrite_rules' );
 		$this->assertSame( '', $rewrite_rules );
