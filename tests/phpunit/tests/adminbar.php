@@ -411,7 +411,27 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 37949
 	 */
-	public function test_admin_bar_does_not_add_about_page_url() {
+	public function test_admin_bar_contains_correct_about_link_for_users_with_role() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test does not run in multisite' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$wp_logo_node = $wp_admin_bar->get_node( 'wp-logo' );
+		$about_node   = $wp_admin_bar->get_node( 'about' );
+
+		$this->assertNotNull( $wp_logo_node );
+		$this->assertSame( admin_url( 'about.php' ), $wp_logo_node->href );
+		$this->assertArrayNotHasKey( 'tabindex', $wp_logo_node->meta );
+		$this->assertNotNull( $about_node );
+	}
+
+	/**
+	 * @ticket 37949
+	 */
+	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role() {
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'Test does not run in multisite' );
 		}
@@ -419,20 +439,37 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		wp_set_current_user( self::$no_role_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
-		$node         = $wp_admin_bar->get_node( 'wp-logo' );
+		$wp_logo_node = $wp_admin_bar->get_node( 'wp-logo' );
+		$about_node   = $wp_admin_bar->get_node( 'about' );
 
-		$this->assertNotNull( $node );
-		$this->assertSame( false, $node->href );
-		$this->assertArrayHasKey( 'tabindex', $node->meta );
-		$this->assertSame( 0, $node->meta['tabindex'] );
+		$this->assertNotNull( $wp_logo_node );
+		$this->assertSame( false, $wp_logo_node->href );
+		$this->assertArrayHasKey( 'tabindex', $wp_logo_node->meta );
+		$this->assertSame( 0, $wp_logo_node->meta['tabindex'] );
+		$this->assertNull( $about_node );
+	}
 
-		wp_set_current_user( self::$editor_id );
+	/**
+	 * @ticket 37949
+	 * @group multisite
+	 */
+	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role_in_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		// User is not a member of a site.
+		remove_user_from_blog( self::$no_role_id, get_current_blog_id() );
+
+		wp_set_current_user( self::$no_role_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
-		$node         = $wp_admin_bar->get_node( 'wp-logo' );
+		$wp_logo_node = $wp_admin_bar->get_node( 'wp-logo' );
+		$about_node   = $wp_admin_bar->get_node( 'about' );
 
-		$this->assertNotNull( $node );
-		$this->assertSame( admin_url( 'about.php' ), $node->href );
-		$this->assertArrayNotHasKey( 'tabindex', $node->meta );
+		$this->assertNotNull( $wp_logo_node );
+		$this->assertSame( user_admin_url( 'about.php' ), $wp_logo_node->href );
+		$this->assertArrayNotHasKey( 'tabindex', $wp_logo_node->meta );
+		$this->assertNotNull( $about_node );
 	}
 }
