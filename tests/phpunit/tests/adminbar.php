@@ -407,4 +407,28 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 		$this->assertNull( $node );
 	}
+
+	/**
+	 * @ticket 37949
+	 */
+	public function test_admin_bar_does_not_add_about_page_url() {
+		wp_set_current_user( self::$no_role_id );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'wp-logo' );
+
+		$this->assertNotNull( $node );
+		$this->assertSame( false, $node->href );
+		$this->assertArrayHasKey( 'tabindex', $node->meta );
+		$this->assertSame( 0, $node->meta['tabindex'] );
+
+		wp_set_current_user( self::$editor_id );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'wp-logo' );
+
+		$this->assertNotNull( $node );
+		$this->assertSame( admin_url( 'about.php' ), $node->href );
+		$this->assertArrayNotHasKey( 'tabindex', $node->meta );
+	}
 }
