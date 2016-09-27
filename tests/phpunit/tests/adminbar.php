@@ -412,6 +412,10 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @ticket 37949
 	 */
 	public function test_admin_bar_does_not_add_about_page_url() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test does not run in multisite' );
+		}
+
 		wp_set_current_user( self::$no_role_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
