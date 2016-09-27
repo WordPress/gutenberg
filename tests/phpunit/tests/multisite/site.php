@@ -87,10 +87,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		$this->assertEquals( $details, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 
-		// get_id_from_blogname(), see #20950
-		$this->assertEquals( $blog_id, get_id_from_blogname( $details->path ) );
-		$this->assertEquals( $blog_id, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
-
 		// get_blogaddress_by_name()
 		$this->assertEquals( 'http://' . $details->domain . $details->path, get_blogaddress_by_name( trim( $details->path, '/' ) ) );
 
@@ -138,7 +134,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site without forcing a table drop.
 		wpmu_delete_blog( $blog_id, false );
 
-		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
@@ -177,7 +172,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
 
-		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
@@ -216,7 +210,6 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		// Delete the site and force a table drop.
 		wpmu_delete_blog( $blog_id, true );
 
-		$this->assertEquals( false, wp_cache_get( 'get_id_from_blogname_' . trim( $details->path, '/' ), 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id, 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $blog_id . 'short', 'blog-details' ) );
 		$this->assertEquals( false, wp_cache_get( $key, 'blog-lookup' ) );
