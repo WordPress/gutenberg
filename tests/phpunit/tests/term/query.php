@@ -144,6 +144,24 @@ class Tests_Term_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37198
+	 */
+	public function test_order_by_term_order_should_fall_back_on_term_id_when_relationship_table_is_not_being_joined() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax' ) );
+		sort( $terms );
+
+		$q = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax',
+			'orderby' => 'term_order',
+			'fields' => 'ids',
+			'hide_empty' => false,
+		) );
+
+		$this->assertSame( $terms, $q->get_terms() );
+	}
+
+	/**
 	 * @ticket 37591
 	 */
 	public function test_terms_is_set() {
@@ -184,5 +202,124 @@ class Tests_Term_Query extends WP_UnitTestCase {
 		$terms = $query->get_terms();
 
 		$this->assertEquals( array( $t1, $t2 ), $terms );
+	}
+
+	/**
+	 * @ticket 37198
+	 */
+	public function test_object_ids_single() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$p = self::factory()->post->create();
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		wp_set_object_terms( $p, array( $t ), 'wptests_tax_1' );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => $p,
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $t ), $query->terms );
+	}
+
+	/**
+	 * @ticket 37198
+	 */
+	public function test_object_ids_array() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$p = self::factory()->post->create();
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		wp_set_object_terms( $p, array( $t ), 'wptests_tax_1' );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => array( $p ),
+			'fields' => 'ids',
+		) );
+
+		$this->assertEqualSets( array( $t ), $query->terms );
+	}
+
+	/**
+	 * @ticket 37198
+	 */
+	public function test_duplicates_should_be_removed_for_fields_all() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+		$posts = self::factory()->post->create_many( 2 );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		foreach ( $posts as $p ) {
+			wp_set_object_terms( $p, array( $t ), 'wptests_tax_1' );
+		}
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => $posts,
+			'fields' => 'all',
+		) );
+
+		$this->assertSame( 1, count( $query->terms ) );
+		$this->assertSame( $t, reset( $query->terms )->term_id );
+	}
+
+	/**
+	 * @ticket 37198
+	 */
+	public function test_duplicates_should_not_be_removed_for_fields_all_with_object_id() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+		$posts = self::factory()->post->create_many( 2 );
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		foreach ( $posts as $p ) {
+			wp_set_object_terms( $p, array( $t ), 'wptests_tax_1' );
+		}
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => $posts,
+			'fields' => 'all_with_object_id',
+		) );
+
+		$this->assertSame( 2, count( $query->terms ) );
+		foreach ( $query->terms as $term ) {
+			$this->assertSame( $t, $term->term_id );
+		}
+	}
+
+	/**
+	 * @ticket 37198
+	 * @group cache
+	 */
+	public function test_object_ids_cache_should_be_invalidated_by_term_relationship_change() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$p = self::factory()->post->create();
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		wp_set_object_terms( $p, array( $terms[0] ), 'wptests_tax_1' );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => $p,
+			'fields' => 'ids',
+		) );
+		$found = $query->get_terms();
+
+		$this->assertEqualSets( array( $terms[0] ), $found );
+
+		wp_set_object_terms( $p, array( $terms[1] ), 'wptests_tax_1' );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'object_ids' => $p,
+			'fields' => 'ids',
+		) );
+		$found = $query->get_terms();
+
+		$this->assertEqualSets( array( $terms[1] ), $found );
 	}
 }

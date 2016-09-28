@@ -23,7 +23,7 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 		$this->assertEquals( 3, count($tt_1) );
 
 		// make sure they're correct
-		$terms = wp_get_object_terms($post_id, $this->taxonomy, array('fields' => 'slugs', 'orderby' => 't.term_id'));
+		$terms = wp_get_object_terms($post_id, $this->taxonomy, array('fields' => 'slugs', 'orderby' => 'term_id'));
 		$this->assertEquals( $terms_1_slugs, $terms );
 	}
 
@@ -360,26 +360,30 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 	 * @ticket 15675
 	 */
 	public function test_parent() {
+		register_taxonomy( 'wptests_tax2', 'post', array(
+			'hierarchical' => true,
+		) );
+
 		$t1 = self::factory()->term->create( array(
-			'taxonomy' => $this->taxonomy,
+			'taxonomy' => 'wptests_tax2',
 		) );
 		$t2 = self::factory()->term->create( array(
-			'taxonomy' => $this->taxonomy,
+			'taxonomy' => 'wptests_tax2',
 		) );
 		$t3 = self::factory()->term->create( array(
-			'taxonomy' => $this->taxonomy,
+			'taxonomy' => 'wptests_tax2',
 			'parent' => $t1,
 		) );
 		$t4 = self::factory()->term->create( array(
-			'taxonomy' => $this->taxonomy,
+			'taxonomy' => 'wptests_tax2',
 			'parent' => $t2,
 		) );
 
 		$p = self::factory()->post->create();
 
-		wp_set_object_terms( $p, array( $t1, $t2, $t3, $t3 ), $this->taxonomy );
+		wp_set_object_terms( $p, array( $t1, $t2, $t3, $t3 ), 'wptests_tax2' );
 
-		$found = wp_get_object_terms( $p, $this->taxonomy, array(
+		$found = wp_get_object_terms( $p, 'wptests_tax2', array(
 			'parent' => $t1,
 			'fields' => 'ids',
 		) );
