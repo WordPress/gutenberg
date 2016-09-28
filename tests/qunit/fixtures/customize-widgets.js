@@ -56,7 +56,7 @@ window._wpCustomizeWidgetsSettings = {
 	},
 	'tpl': {
 		'widgetReorderNav': '<div class="widget-reorder-nav"><span class="move-widget" tabindex="0">Move to another area&hellip;</span><span class="move-widget-down" tabindex="0">Move down</span><span class="move-widget-up" tabindex="0">Move up</span></div>',
-		'moveWidgetArea': '<div class="move-widget-area"> <p class="description">Select an area to move this widget into:</p> <ul class="widget-area-select"> <% _.each( sidebars, function ( sidebar ){ %> <li class="" data-id="<%- sidebar.id %>" title="<%- sidebar.description %>" tabindex="0"><%- sidebar.name %></li> <% }); %> </ul> <div class="move-widget-actions"> <button class="move-widget-btn button-secondary" type="button">Move</button> </div> </div>'
+		'moveWidgetArea': '<div class="move-widget-area"> <p class="description">Select an area to move this widget into:</p> <ul class="widget-area-select"> <% _.each( sidebars, function ( sidebar ){ %> <li class="" data-id="<%- sidebar.id %>" title="<%- sidebar.description %>" tabindex="0"><%- sidebar.name %></li> <% }); %> </ul> <div class="move-widget-actions"> <button class="move-widget-btn button" type="button">Move</button> </div> </div>'
 	}
 };
 
@@ -130,7 +130,7 @@ window._wpCustomizeSettings.controls['sidebars_widgets[sidebar-1]'] = {
 	'priority': 99,
 	'active': true,
 	'section': 'sidebar-widgets-sidebar-1',
-	'content': '<li id="customize-control-sidebars_widgets-sidebar-1" class="customize-control customize-control-sidebar_widgets"> <span class="button-secondary add-new-widget" tabindex="0">    Add a Widget  <\/span> <span class="reorder-toggle" tabindex="0"> <span class="reorder">Reorder<\/span> <span class="reorder-done">Done<\/span> <\/span> <\/li>',
+	'content': '<li id="customize-control-sidebars_widgets-sidebar-1" class="customize-control customize-control-sidebar_widgets"> <span class="button add-new-widget" tabindex="0">    Add a Widget  <\/span> <span class="reorder-toggle" tabindex="0"> <span class="reorder">Reorder<\/span> <span class="reorder-done">Done<\/span> <\/span> <\/li>',
 	'label': '',
 	'description': '',
 	'instanceNumber': 1,
