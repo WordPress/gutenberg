@@ -9,7 +9,7 @@
   "author": "The WordPress Contributors",
   "license": "GPL-2.0+",
   "devDependencies": {
-    "autoprefixer": "~6.3.3",
+    "autoprefixer": "^6.5.0",
     "grunt": "~0.4.5",
     "grunt-browserify": "~5.0.0",
     "grunt-contrib-clean": "~1.0.0",
