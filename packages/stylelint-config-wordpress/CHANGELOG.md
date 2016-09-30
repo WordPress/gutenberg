@@ -1,3 +1,7 @@
+# 9.1.1
+
+-   Fixed:  Re-releasing failed npmjs.com 9.1.0 release as 9.1.1.
+
 # 9.1.0
 
 -   Added:  `stylelint-config-wordpress/scss` preset.
