@@ -223,6 +223,15 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
+
+			'edit_categories'        => array( 'administrator', 'editor' ),
+			'delete_categories'      => array( 'administrator', 'editor' ),
+			'manage_post_tags'       => array( 'administrator', 'editor' ),
+			'edit_post_tags'         => array( 'administrator', 'editor' ),
+			'delete_post_tags'       => array( 'administrator', 'editor' ),
+
+			'assign_categories'      => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'assign_post_tags'       => array( 'administrator', 'editor', 'author', 'contributor' ),
 		);
 	}
 
@@ -242,6 +251,15 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
+
+			'edit_categories'        => array( 'administrator', 'editor' ),
+			'delete_categories'      => array( 'administrator', 'editor' ),
+			'manage_post_tags'       => array( 'administrator', 'editor' ),
+			'edit_post_tags'         => array( 'administrator', 'editor' ),
+			'delete_post_tags'       => array( 'administrator', 'editor' ),
+
+			'assign_categories'      => array( 'administrator', 'editor', 'author', 'contributor' ),
+			'assign_post_tags'       => array( 'administrator', 'editor', 'author', 'contributor' ),
 		);
 	}
 
@@ -399,6 +417,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$expected['delete_post_meta'],
 			$expected['add_post_meta'],
 			$expected['edit_comment'],
+			$expected['edit_term'],
+			$expected['delete_term'],
+			$expected['assign_term'],
 			$expected['delete_user']
 		);
 
@@ -1076,6 +1097,63 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 				$primitive_cap,
 			), $caps, "Meta cap: {$meta_cap}" );
 		}
+	}
+
+	/**
+	 * @dataProvider dataTaxonomies
+	 *
+	 * @ticket 35614
+	 */
+	public function test_default_taxonomy_term_cannot_be_deleted( $taxonomy ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			register_taxonomy( $taxonomy, 'post' );
+		}
+
+		$tax  = get_taxonomy( $taxonomy );
+		$user = self::$users['administrator'];
+		$term = self::factory()->term->create_and_get( array(
+			'taxonomy' => $taxonomy,
+		) );
+
+		update_option( "default_{$taxonomy}", $term->term_id );
+
+		$this->assertTrue( user_can( $user->ID, $tax->cap->delete_terms ) );
+		$this->assertFalse( user_can( $user->ID, 'delete_term', $term->term_id ) );
+	}
+
+	/**
+	 * @dataProvider dataTaxonomies
+	 *
+	 * @ticket 35614
+	 */
+	public function test_taxonomy_caps_map_correctly_to_their_meta_cap( $taxonomy ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			register_taxonomy( $taxonomy, 'post' );
+		}
+
+		$tax  = get_taxonomy( $taxonomy );
+		$term = self::factory()->term->create_and_get( array(
+			'taxonomy' => $taxonomy,
+		) );
+
+		foreach ( self::$users as $role => $user ) {
+			$this->assertSame(
+				user_can( $user->ID, 'edit_term', $term->term_id ),
+				user_can( $user->ID, $tax->cap->edit_terms ),
+				"Role: {$role}"
+			);
+			$this->assertSame(
+				user_can( $user->ID, 'delete_term', $term->term_id ),
+				user_can( $user->ID, $tax->cap->delete_terms ),
+				"Role: {$role}"
+			);
+			$this->assertSame(
+				user_can( $user->ID, 'assign_term', $term->term_id ),
+				user_can( $user->ID, $tax->cap->assign_terms ),
+				"Role: {$role}"
+			);
+		}
+
 	}
 
 	public function dataTaxonomies() {

@@ -43,7 +43,7 @@ class Tests_XMLRPC_wp_deleteTerm extends WP_XMLRPC_UnitTestCase {
 		$result = $this->myxmlrpcserver->wp_deleteTerm( array( 1, 'subscriber', 'subscriber', 'category', $this->term['term_id'] ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 401, $result->code );
-		$this->assertEquals( __( 'Sorry, you are not allowed to delete terms in this taxonomy.' ), $result->message );
+		$this->assertEquals( __( 'Sorry, you are not allowed to delete this term.' ), $result->message );
 	}
 
 	function test_empty_term() {
