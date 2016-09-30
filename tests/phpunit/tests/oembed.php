@@ -43,8 +43,9 @@ class Tests_oEmbed extends WP_UnitTestCase {
 		'videopress'           => '#https?://videopress\.com/v/.*#',
 		'reddit-comments'      => '#https?://(www\.)?reddit\.com/r/[^/]+/comments/.*#i',
 		'speakerdeck'          => '#https?://(www\.)?speakerdeck\.com/.*#i',
-		'facebook-post'        => '#https?://www\.facebook\.com/.*/posts/.*#i',
-		'facebook-activity'    => '#https?://www\.facebook\.com/.*/activity/.*#i',
+		'facebook-u-post'      => '#https?://www\.facebook\.com/.*/posts/.*#i',
+		'facebook-u-activity'  => '#https?://www\.facebook\.com/.*/activity/.*#i',
+		'facebook-u-photo'     => '#https?://www\.facebook\.com/.*/photos/.*#i',
 		'facebook-photo'       => '#https?://www\.facebook\.com/photo(s/|\.php).*#i',
 		'facebook-permalink'   => '#https?://www\.facebook\.com/permalink\.php.*#i',
 		'facebook-media'       => '#https?://www\.facebook\.com/media/.*#i',
@@ -501,7 +502,7 @@ class Tests_oEmbed extends WP_UnitTestCase {
 			array(
 				$providers['dailymotion'],
 				array(
-					'http://www.dailymotion.com/video/x27bwvb_how-to-wake-up-better_news',
+					'http://www.dailymotion.com/video/x33exze_time-lapse-beautiful-meteor-shower-outside-las-vegas_fun',
 				),
 			),
 			array(
@@ -720,27 +721,33 @@ class Tests_oEmbed extends WP_UnitTestCase {
 				),
 			),
 			array(
-				$providers['facebook-post'],
+				$providers['facebook-u-post'],
 				array(
 					'https://www.facebook.com/WordPress/posts/10154220015487911'
 				),
 			),
 			array(
-				$providers['facebook-activity'],
+				$providers['facebook-u-activity'],
 				array(
 					// ??
 				),
 			),
 			array(
-				$providers['facebook-photo'],
+				$providers['facebook-u-photo'],
 				array(
 					'https://www.facebook.com/WordPress/photos/a.111006762910.97747.6427302910/10153207719422911/'
 				),
 			),
 			array(
+				$providers['facebook-photo'],
+				array(
+					// ??
+				),
+			),
+			array(
 				$providers['facebook-permalink'],
 				array(
-					'https://www.facebook.com/permalink.php?story_fbid=10154220015487911'
+					// ??
 				),
 			),
 			array(
@@ -771,7 +778,6 @@ class Tests_oEmbed extends WP_UnitTestCase {
 				$providers['facebook-videophp'],
 				array(
 					'https://www.facebook.com/video.php?v=317622575398',
-					'https://www.facebook.com/video.php?id=317622575398',
 				),
 			),
 		);
