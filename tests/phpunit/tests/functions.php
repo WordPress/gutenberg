@@ -502,13 +502,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 19354
-	 */
-	function test_data_is_not_an_allowed_protocol() {
-		$this->assertNotContains( 'data', wp_allowed_protocols() );
-	}
-
-	/**
 	 * @ticket 9064
 	 */
 	function test_wp_extract_urls() {
