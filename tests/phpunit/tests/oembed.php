@@ -20,8 +20,11 @@ class Tests_oEmbed extends WP_UnitTestCase {
 		'polldaddy'            => '#https?://(.+\.)?polldaddy\.com/.*#i',
 		'polldaddy-shorturl'   => '#https?://poll\.fm/.*#i',
 		'funnyordie'           => '#https?://(www\.)?funnyordie\.com/videos/.*#i',
-		'twitter'              => '#https?://(www\.)?twitter\.com/.+?/status(es)?/.*#i',
-		'twitter-timeline'     => '#https?://(www\.)?twitter\.com/.+?/timelines/.*#i',
+		'twitter'              => '#https?://(www\.)?twitter\.com/\w{1,15}/status(es)?/.*#i',
+		'twitter-user'         => '#https?://(www\.)?twitter\.com/\w{1,15}$#i',
+		'twitter-likes'        => '#https?://(www\.)?twitter\.com/\w{1,15}/likes$#i',
+		'twitter-list'         => '#https?://(www\.)?twitter\.com/\w{1,15}/lists/.*#i',
+		'twitter-timeline'     => '#https?://(www\.)?twitter\.com/\w{1,15}/timelines/.*#i',
 		'twitter-moment'       => '#https?://(www\.)?twitter\.com/i/moments/.*#i',
 		'vine'                 => '#https?://vine\.co/v/.*#i',
 		'soundcloud'           => '#https?://(www\.)?soundcloud\.com/.*#i',
@@ -581,6 +584,24 @@ class Tests_oEmbed extends WP_UnitTestCase {
 				$providers['twitter'],
 				array(
 					'http://twitter.com/WordPress/status/633718182335922177',
+				),
+			),
+			array(
+				$providers['twitter-user'],
+				array(
+					'https://twitter.com/WordPress',
+				),
+			),
+			array(
+				$providers['twitter-likes'],
+				array(
+					'https://twitter.com/WordPress/likes',
+				),
+			),
+			array(
+				$providers['twitter-list'],
+				array(
+					'https://twitter.com/TwitterDev/lists/national-parks',
 				),
 			),
 			array(
