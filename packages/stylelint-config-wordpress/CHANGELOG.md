@@ -1,3 +1,7 @@
+# 9.1.0
+
+-   Added:  `stylelint-config-wordpress/scss` preset.
+
 # 9.0.0
 
 -   Removed:  `stylelint < 7.2.0` compatibility.
