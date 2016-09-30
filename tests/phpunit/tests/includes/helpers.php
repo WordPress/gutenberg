@@ -212,4 +212,27 @@ class Tests_TestHelpers extends WP_UnitTestCase {
 	public function test_die_handler_should_handle_wp_error() {
 		wp_die( new WP_Error( 'test', 'test' ) );
 	}
+
+	/**
+	 * This test is just a setup for the one that follows.
+	 *
+	 * @ticket 38196
+	 */
+	public function test_setup_postdata_globals_should_be_reset_on_teardown__setup() {
+		$post = self::factory()->post->create_and_get();
+		$GLOBALS['wp_query'] = new WP_Query();
+		$GLOBALS['wp_query']->setup_postdata( $post );
+		$this->assertNotEmpty( $post );
+	}
+
+	/**
+	 * @ticket 38196
+	 */
+	public function test_setup_postdata_globals_should_be_reset_on_teardown() {
+		$globals = array( 'post', 'id', 'authordata', 'currentday', 'currentmonth', 'page', 'pages', 'multipage', 'more', 'numpages' );
+
+		foreach ( $globals as $global ) {
+			$this->assertTrue( ! isset( $GLOBALS[ $global ] ), $global );
+		}
+	}
 }

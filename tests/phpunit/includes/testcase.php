@@ -142,7 +142,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 * After a test method runs, reset any state in WordPress the test method might have changed.
 	 */
 	function tearDown() {
-		global $wpdb, $wp_query, $wp, $post;
+		global $wpdb, $wp_query, $wp;
 		$wpdb->query( 'ROLLBACK' );
 		if ( is_multisite() ) {
 			while ( ms_is_switched() ) {
@@ -151,7 +151,13 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		}
 		$wp_query = new WP_Query();
 		$wp = new WP();
-		$post = null;
+
+		// Reset globals related to the post loop and `setup_postdata()`.
+		$post_globals = array( 'post', 'id', 'authordata', 'currentday', 'currentmonth', 'page', 'pages', 'multipage', 'more', 'numpages' );
+		foreach ( $post_globals as $global ) {
+			$GLOBALS[ $global ] = null;
+		}
+
 		remove_theme_support( 'html5' );
 		remove_filter( 'query', array( $this, '_create_temporary_tables' ) );
 		remove_filter( 'query', array( $this, '_drop_temporary_tables' ) );
