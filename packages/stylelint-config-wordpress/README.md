@@ -9,6 +9,7 @@ Configuration rules to ensure your CSS is compliant with the [WordPress CSS Codi
 
 -   [Installation](#installation)
 -   [Usage](#usage)
+-   [Presets](#presets)
 -   [Extending the config](#extending-the-config)
 -   [Style Guide](#style-guide)
     -   [Structure](#structure)
@@ -44,6 +45,20 @@ If you've globally installed `stylelint-config-wordpress` using the `-g` flag, t
 ```json
 {
   "extends": "/absolute/path/to/stylelint-config-wordpress"
+}
+```
+
+## Presets
+
+In addition to the default preset, there are also specific presets. All presets extend the default one.
+
+### SCSS
+
+```json
+{
+  "extends": [
+    "stylelint-config-wordpress/scss"
+  ]
 }
 ```
 

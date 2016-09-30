@@ -28,7 +28,9 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "index.js"
+    "README.md",
+    "index.js",
+    "scss.js"
   ],
   "engines": {
     "node": ">=4.2.1"
@@ -76,5 +78,8 @@
       "lint-recommended",
       "lint-consistent"
     ]
+  },
+  "dependencies": {
+    "stylelint-scss": "^1.3.4"
   }
 }
