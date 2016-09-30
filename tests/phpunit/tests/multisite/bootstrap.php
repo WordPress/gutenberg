@@ -208,8 +208,31 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	/**
+	 * @ticket 37053
+	 */
+	public function test_get_site_by_path_returns_wp_site() {
+		add_filter( 'pre_get_site_by_path', array( $this, 'filter_pre_get_site_by_path' ), 10, 3 );
+
+		$site = get_site_by_path( 'example.com', '/foo/' );
+
+		remove_filter( 'pre_get_site_by_path', array( $this, 'filter_pre_get_site_by_path' ), 10 );
+
+		$this->assertInstanceOf( 'WP_Site', $site );
+	}
+
 	public function filter_path_segments_to_two() {
 		return 2;
+	}
+
+	public function filter_pre_get_site_by_path( $site, $domain, $path ) {
+		$site = new stdClass();
+		$site->blog_id = 100;
+		$site->domain = $domain;
+		$site->path = $path;
+		$site->site_id = 1;
+
+		return $site;
 	}
 }
 
