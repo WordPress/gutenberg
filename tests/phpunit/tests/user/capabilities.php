@@ -307,6 +307,111 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * Test the tests. The administrator role has all primitive capabilities, therefore the
+	 * primitive capabilitity tests can be tested by checking that the list of tested
+	 * capabilities matches those of the administrator role.
+	 *
+	 * @group capTestTests
+	 */
+	public function testPrimitiveCapsTestsAreCorrect() {
+		$actual   = $this->getPrimitiveCapsAndRoles();
+		$admin    = get_role( 'administrator' );
+		$expected = $admin->capabilities;
+
+		unset(
+			// Role names as capabilities are a special case:
+			$actual['administrator'],
+			$actual['editor'],
+			$actual['author'],
+			$actual['subscriber'],
+			$actual['contributor']
+		);
+
+		unset(
+			// `manage_links` is a special case in the caps tests:
+			$expected['manage_links'],
+			// `unfiltered_upload` is a special case in the caps tests:
+			$expected['unfiltered_upload']
+		);
+
+		$expected = array_keys( $expected );
+		$actual   = array_keys( $actual );
+
+		$missing_primitive_cap_checks = array_diff( $expected, $actual );
+		$this->assertSame( array(), $missing_primitive_cap_checks, 'These primitive capabilities are not tested' );
+
+		$incorrect_primitive_cap_checks = array_diff( $actual, $expected );
+		$this->assertSame( array(), $incorrect_primitive_cap_checks, 'These capabilities are not primitive' );
+	}
+
+	/**
+	 * Test the tests. All meta capabilities should have a condition in the `map_meta_cap()`
+	 * function that handles the capability.
+	 *
+	 * @group capTestTests
+	 */
+	public function testMetaCapsTestsAreCorrect() {
+		$actual = $this->getMetaCapsAndRoles();
+		$file   = file_get_contents( ABSPATH . WPINC . '/capabilities.php' );
+
+		$matched = preg_match( '/^function map_meta_cap\((.*?)^\}/ms', $file, $function );
+		$this->assertSame( 1, $matched );
+		$this->assertNotEmpty( $function );
+
+		$matched = preg_match_all( '/^[\t]case \'([^\']+)/m', $function[0], $cases );
+		$this->assertNotEmpty( $matched );
+		$this->assertNotEmpty( $cases );
+
+		$expected = array_flip( $cases[1] );
+
+		unset(
+			// These primitive capabilities have a 'case' in `map_meta_cap()` but aren't meta capabilities:
+			$expected['unfiltered_upload'],
+			$expected['unfiltered_html'],
+			$expected['edit_files'],
+			$expected['edit_plugins'],
+			$expected['edit_themes'],
+			$expected['update_plugins'],
+			$expected['delete_plugins'],
+			$expected['install_plugins'],
+			$expected['update_themes'],
+			$expected['delete_themes'],
+			$expected['install_themes'],
+			$expected['update_core'],
+			$expected['activate_plugins'],
+			$expected['edit_users'],
+			$expected['delete_users'],
+			$expected['create_users'],
+			$expected['manage_links'],
+			// Singular object meta capabilities (where an object ID is passed) are not tested:
+			$expected['remove_user'],
+			$expected['promote_user'],
+			$expected['edit_user'],
+			$expected['delete_post'],
+			$expected['delete_page'],
+			$expected['edit_post'],
+			$expected['edit_page'],
+			$expected['read_post'],
+			$expected['read_page'],
+			$expected['publish_post'],
+			$expected['edit_post_meta'],
+			$expected['delete_post_meta'],
+			$expected['add_post_meta'],
+			$expected['edit_comment'],
+			$expected['delete_user']
+		);
+
+		$expected = array_keys( $expected );
+		$actual   = array_keys( $actual );
+
+		$missing_meta_cap_checks = array_diff( $expected, $actual );
+		$this->assertSame( array(), $missing_meta_cap_checks, 'These meta capabilities are not tested' );
+
+		$incorrect_meta_cap_checks = array_diff( $actual, $expected );
+		$this->assertSame( array(), $incorrect_meta_cap_checks, 'These capabilities are not meta' );
+	}
+
 	// test the default roles and caps
 	function test_all_roles_and_caps() {
 		$caps = $this->getAllCapsAndRoles();
