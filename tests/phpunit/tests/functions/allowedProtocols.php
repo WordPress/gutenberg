@@ -56,6 +56,7 @@ class Tests_Functions_AllowedProtocols extends WP_UnitTestCase {
 			array( 'fax', 'fax:+123.456.78910' ), // RFC2806/RFC3966
 			array( 'xmpp', 'xmpp://guest@example.com' ), // RFC5122
 			array( 'webcal', 'webcal://example.com/calendar.ics' ),
+			array( 'urn', 'urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66' ), // RFC2141
 		);
 	}
 }
