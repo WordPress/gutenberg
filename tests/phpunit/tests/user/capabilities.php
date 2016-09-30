@@ -53,15 +53,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 			'unfiltered_html'        => array( 'administrator', 'editor' ),
 
-			'create_sites'           => array(),
-			'delete_sites'           => array(),
-			'manage_network'         => array(),
-			'manage_sites'           => array(),
-			'manage_network_users'   => array(),
-			'manage_network_plugins' => array(),
-			'manage_network_themes'  => array(),
-			'manage_network_options' => array(),
-
 			'activate_plugins'       => array( 'administrator' ),
 			'create_users'           => array( 'administrator' ),
 			'delete_plugins'         => array( 'administrator' ),
@@ -141,14 +132,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 			'unfiltered_html'        => array(),
 
-			'create_sites'           => array(),
-			'delete_sites'           => array(),
-			'manage_network'         => array(),
-			'manage_sites'           => array(),
-			'manage_network_users'   => array(),
-			'manage_network_plugins' => array(),
-			'manage_network_themes'  => array(),
-			'manage_network_options' => array(),
 			'activate_plugins'       => array(),
 			'create_users'           => array(),
 			'delete_plugins'         => array(),
@@ -226,6 +209,15 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	final private function _getSingleSiteMetaCaps() {
 		return array(
+			'create_sites'           => array(),
+			'delete_sites'           => array(),
+			'manage_network'         => array(),
+			'manage_sites'           => array(),
+			'manage_network_users'   => array(),
+			'manage_network_plugins' => array(),
+			'manage_network_themes'  => array(),
+			'manage_network_options' => array(),
+
 			'upload_plugins'         => array( 'administrator' ),
 			'upload_themes'          => array( 'administrator' ),
 			'customize'              => array( 'administrator' ),
@@ -236,8 +228,17 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	final private function _getMultiSiteMetaCaps() {
 		return array(
+			'create_sites'           => array(),
+			'delete_sites'           => array(),
+			'manage_network'         => array(),
+			'manage_sites'           => array(),
+			'manage_network_users'   => array(),
+			'manage_network_plugins' => array(),
+			'manage_network_themes'  => array(),
+			'manage_network_options' => array(),
 			'upload_plugins'         => array(),
 			'upload_themes'          => array(),
+
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
