@@ -293,6 +293,44 @@ class Tests_Meta extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37746
+	 */
+	function test_negative_meta_id() {
+		$negative_mid = $this->meta_id * -1;
+
+		$this->assertTrue( $negative_mid < 0 );
+		$this->assertFalse( get_metadata_by_mid( 'user', $negative_mid ) );
+		$this->assertFalse( update_metadata_by_mid( 'user', $negative_mid, 'meta_new_value' ) );
+		$this->assertFalse( delete_metadata_by_mid( 'user', $negative_mid ) );
+	}
+
+	/**
+	 * @ticket 37746
+	 */
+	function test_floating_meta_id() {
+		$floating_mid = $this->meta_id + 0.1337;
+
+		$this->assertTrue( floor( $floating_mid ) !== $floating_mid );
+		$this->assertFalse( get_metadata_by_mid( 'user', $floating_mid ) );
+		$this->assertFalse( update_metadata_by_mid( 'user', $floating_mid, 'meta_new_value' ) );
+		$this->assertFalse( delete_metadata_by_mid( 'user', $floating_mid ) );
+	}
+
+	/**
+	 * @ticket 37746
+	 */
+	function test_string_point_zero_meta_id() {
+		$meta_id = add_metadata( 'user', $this->author->ID, 'meta_key', 'meta_value_2' );
+
+		$string_mid = "{$meta_id}.0";
+
+		$this->assertTrue( floor( $string_mid ) == $string_mid );
+		$this->assertNotEquals( false, get_metadata_by_mid( 'user', $string_mid ) );
+		$this->assertNotEquals( false, update_metadata_by_mid( 'user', $string_mid, 'meta_new_value_2' ) );
+		$this->assertNotEquals( false, delete_metadata_by_mid( 'user', $string_mid ) );
+	}
+
+	/**
 	 * @ticket 15030
 	 */
 	public function test_get_metadata_with_empty_key_array_value() {
