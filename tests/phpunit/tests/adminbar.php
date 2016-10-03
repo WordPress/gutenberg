@@ -383,7 +383,22 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 34113
 	 */
-	public function test_admin_bar_contains_view_archive_link() {
+	public function test_admin_bar_has_no_archives_link_if_no_static_front_page() {
+		set_current_screen( 'edit-post' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+
+		$this->assertNull( $node );
+	}
+
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_contains_view_archive_link_if_static_front_page() {
+		update_option( 'show_on_front', 'page' );
 		set_current_screen( 'edit-post' );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
@@ -397,7 +412,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 34113
 	 */
-	public function test_admin_bar_has_no_archives_link_for_post_types_without_archive() {
+	public function test_admin_bar_has_no_archives_link_for_pages() {
 		set_current_screen( 'edit-page' );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
@@ -471,5 +486,68 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertSame( user_admin_url( 'about.php' ), $wp_logo_node->href );
 		$this->assertArrayNotHasKey( 'tabindex', $wp_logo_node->meta );
 		$this->assertNotNull( $about_node );
+	}
+
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_has_no_archives_link_for_non_public_cpt() {
+		register_post_type( 'foo-non-public', array(
+			'public'            => false,
+			'has_archive'       => true,
+			'show_in_admin_bar' => true,
+		) );
+
+		set_current_screen( 'edit-foo-non-public' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+		unregister_post_type( 'foo-non-public' );
+
+		$this->assertNull( $node );
+	}
+
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_has_no_archives_link_for_cpt_without_archive() {
+		register_post_type( 'foo-non-public', array(
+			'public'            => true,
+			'has_archive'       => false,
+			'show_in_admin_bar' => true,
+		) );
+
+		set_current_screen( 'edit-foo-non-public' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+		unregister_post_type( 'foo-non-public' );
+
+		$this->assertNull( $node );
+	}
+
+	/**
+	 * @ticket 34113
+	 */
+	public function test_admin_bar_has_no_archives_link_for_cpt_not_shown_in_admin_bar() {
+		register_post_type( 'foo-non-public', array(
+			'public'            => true,
+			'has_archive'       => true,
+			'show_in_admin_bar' => false,
+		) );
+
+		set_current_screen( 'edit-foo-non-public' );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'archive' );
+
+		set_current_screen( 'front' );
+		unregister_post_type( 'foo-non-public' );
+
+		$this->assertNull( $node );
 	}
 }
