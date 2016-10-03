@@ -160,6 +160,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 			'Page Template Theme', // theme with page templates for other test code
 			'Theme with Spaces in the Directory',
 			'Internationalized Theme',
+			'camelCase',
 		);
 
 		sort($theme_names);
