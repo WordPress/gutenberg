@@ -878,6 +878,193 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36624
+	 */
+	public function test_nicename_returns_user_with_nicename() {
+		wp_update_user( array(
+			'ID' => self::$author_ids[0],
+			'user_nicename' => 'peter'
+		) );
+
+		$q = new WP_User_Query( array (
+			'nicename' => 'peter'
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[0] );
+
+		$this->assertContains( "AND user_nicename = 'peter'", $q->query_where);
+		$this->assertEqualSets( $expected, $found);
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_nicename__in_returns_users_with_included_nicenames() {
+		wp_update_user( array(
+			'ID' => self::$author_ids[0],
+			'user_nicename' => 'peter'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[1],
+			'user_nicename' => 'paul'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[2],
+			'user_nicename' => 'mary'
+		) );
+
+		$q = new WP_User_Query( array (
+			'nicename__in' => array( 'peter', 'paul', 'mary' )
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[0], self::$author_ids[1], self::$author_ids[2] );
+
+		$this->assertContains( "AND user_nicename IN ( 'peter','paul','mary' )", $q->query_where);
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_nicename__not_in_returns_users_without_included_nicenames() {
+		wp_update_user( array(
+			'ID' => self::$author_ids[0],
+			'user_nicename' => 'peter'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[1],
+			'user_nicename' => 'paul'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[2],
+			'user_nicename' => 'mary'
+		) );
+
+		$q = new WP_User_Query( array (
+			'nicename__not_in' => array( 'peter', 'paul', 'mary' )
+		) );
+
+		$foundCount = count($q->get_results());
+		$expectedCount = 10; // 13 total users minus 3 from query
+
+		$this->assertContains( "AND user_nicename NOT IN ( 'peter','paul','mary' )", $q->query_where);
+		$this->assertEquals( $expectedCount, $foundCount );
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_orderby_nicename__in() {
+		wp_update_user( array(
+			'ID' => self::$author_ids[0],
+			'user_nicename' => 'peter'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[1],
+			'user_nicename' => 'paul'
+		) );
+
+		wp_update_user( array(
+			'ID' => self::$author_ids[2],
+			'user_nicename' => 'mary'
+		) );
+
+		$q = new WP_User_Query( array (
+			'nicename__in' => array( 'mary', 'peter', 'paul' ),
+			'orderby' => 'nicename__in'
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[2], self::$author_ids[0], self::$author_ids[1] );
+
+		$this->assertContains( "FIELD( user_nicename, 'mary','peter','paul' )", $q->query_orderby);
+		$this->assertSame( $expected, $found );
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_login_returns_user_with_login() {
+
+		$user_login = get_userdata( self::$author_ids[0] )->user_login;
+
+		$q = new WP_User_Query( array (
+			'login' => $user_login
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[0] );
+
+		$this->assertContains( "AND user_login = '$user_login'", $q->query_where);
+		$this->assertEqualSets( $expected, $found);
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_login__in_returns_users_with_included_logins() {
+		$user_login1 = get_userdata( self::$author_ids[0] )->user_login;
+		$user_login2 = get_userdata( self::$author_ids[1] )->user_login;
+		$user_login3 = get_userdata( self::$author_ids[2] )->user_login;
+
+		$q = new WP_User_Query( array (
+			'login__in' => array( $user_login1, $user_login2, $user_login3 )
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[0], self::$author_ids[1], self::$author_ids[2] );
+
+		$this->assertContains( "AND user_login IN ( '$user_login1','$user_login2','$user_login3' )", $q->query_where);
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_login__not_in_returns_users_without_included_logins() {
+		$user_login1 = get_userdata( self::$author_ids[0] )->user_login;
+		$user_login2 = get_userdata( self::$author_ids[1] )->user_login;
+		$user_login3 = get_userdata( self::$author_ids[2] )->user_login;
+
+		$q = new WP_User_Query( array (
+			'login__not_in' => array( $user_login1, $user_login2, $user_login3 )
+		) );
+
+		$foundCount = count($q->get_results());
+		$expectedCount = 10; // 13 total users minus 3 from query
+
+		$this->assertContains( "AND user_login NOT IN ( '$user_login1','$user_login2','$user_login3' )", $q->query_where);
+		$this->assertEquals( $expectedCount, $foundCount );
+	}
+
+	/**
+	 * @ticket 36624
+	 */
+	public function test_orderby_login__in() {
+		$user_login1 = get_userdata( self::$author_ids[0] )->user_login;
+		$user_login2 = get_userdata( self::$author_ids[1] )->user_login;
+		$user_login3 = get_userdata( self::$author_ids[2] )->user_login;
+
+		$q = new WP_User_Query( array (
+			'login__in' => array( $user_login2, $user_login3, $user_login1 ),
+			'orderby' => 'login__in'
+		) );
+
+		$found = wp_list_pluck( $q->get_results(), 'ID' );
+		$expected = array( self::$author_ids[1], self::$author_ids[2], self::$author_ids[0] );
+
+		$this->assertContains( "FIELD( user_login, '$user_login2','$user_login3','$user_login1' )", $q->query_orderby);
+		$this->assertSame( $expected, $found );
+	}
+
+	/**
 	 * @ticket 25145
 	 */
 	public function test_paged() {
