@@ -719,7 +719,7 @@ EOF;
 		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_attr' ), 12, 4 );
 		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_p11' ), 11 );
 		remove_filter( 'pre_do_shortcode_tag', array( $this, '_filter_pre_do_shortcode_tag_bar' ) );
-		remove_shortcode( $str, array( $this, '_shortcode_pre_do_shortcode_tag' ) );
+		remove_shortcode( $str );
 	}
 
 	public function _shortcode_pre_do_shortcode_tag( $atts = array(), $content = '' ) {
@@ -735,6 +735,73 @@ EOF;
 	}
 
 	public function _filter_pre_do_shortcode_tag_attr( $return, $key, $atts, $m ){
+		$arr = array(
+			'return' => $return,
+			'key'    => $key,
+			'atts'   => $atts,
+			'm'      => $m,
+		);
+		return wp_json_encode( $arr );
+	}
+
+	/**
+	 * @ticket 32790
+	 */
+	public function test_do_shortcode_tag_filter() {
+		// does nothing if no filters are set up
+		$str = 'do_shortcode_tag';
+		add_shortcode( $str, array( $this, '_shortcode_do_shortcode_tag' ) );
+		$result_nofilter = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'foo', $result_nofilter );
+
+		// modify output with filter
+		add_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_replace' ) );
+		$result_filter = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'fee', $result_filter );
+
+		// respect priority
+		add_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_generate' ), 11 );
+		$result_priority = do_shortcode( "[{$str}]" );
+		$this->assertSame( 'foobar', $result_priority );
+
+		// pass arguments
+		$arr = array(
+			'return' => 'foobar',
+			'key'    => $str,
+			'atts'   => array( 'a' => 'b', 'c' => 'd' ),
+			'm'      => array(
+				"[{$str} a='b' c='d']",
+				"",
+				$str,
+				" a='b' c='d'",
+				"",
+				"",
+				"",
+			),
+		);
+		add_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_attr' ), 12, 4 );
+		$result_atts = do_shortcode( "[{$str} a='b' c='d']" );
+		$this->assertSame( wp_json_encode( $arr ), $result_atts );
+
+		remove_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_attr' ), 12 );
+		remove_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_generate' ), 11 );
+		remove_filter( 'do_shortcode_tag', array( $this, '_filter_do_shortcode_tag_replace' ) );
+		remove_shortcode( $str );
+	}
+
+	public function _shortcode_do_shortcode_tag( $atts = array(), $content = '' ) {
+		return 'foo';
+	}
+
+	public function _filter_do_shortcode_tag_replace( $return ) {
+		return str_replace( 'oo', 'ee', $return );
+	}
+
+	public function _filter_do_shortcode_tag_generate( $return ) {
+		return 'foobar';
+	}
+
+	public function _filter_do_shortcode_tag_attr( $return, $key, $atts, $m ){
 		$arr = array(
 			'return' => $return,
 			'key'    => $key,
