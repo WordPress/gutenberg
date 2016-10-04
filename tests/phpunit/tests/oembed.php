@@ -859,8 +859,6 @@ class Tests_oEmbed extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function dataShouldNotMatchOembedRegex() {
-		$providers = self::$provider_map;
-
 		return array(
 			array( 'http://dairly/something' ),
 			array( 'https://daisly/' ),
