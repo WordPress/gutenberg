@@ -107,6 +107,29 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			// PHP's parse_url() calls this an invalid url, we handle it as a path
 			array( '/://example.com/', array( 'path' => '/://example.com/' ) ),
 
+			// Schemeless URL containing colons cause parse errors in PHP 7+.
+			array(
+				'//fonts.googleapis.com/css?family=Open+Sans:400&subset=latin',
+				array(
+					'host'  => 'fonts.googleapis.com',
+					'path'  => '/css',
+					'query' => 'family=Open+Sans:400&subset=latin',
+				),
+			),
+			array(
+				'//fonts.googleapis.com/css?family=Open+Sans:400',
+				array(
+					'host'  => 'fonts.googleapis.com',
+					'path'  => '/css',
+					'query' => 'family=Open+Sans:400',
+				),
+			),
+
+			array( 'filenamefound', array( 'path' => 'filenamefound' ) ),
+
+			// Empty string or non-string passed in.
+			array( '', array( 'path' => '' ) ),
+			array( 123, array( 'path' => '123' ) ),
 		);
 		/*
 		Untestable edge cases in various PHP:
@@ -117,7 +140,7 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 36356
-     */
+	 */
 	function test_wp_parse_url_with_default_component() {
 		$actual = wp_parse_url( self::FULL_TEST_URL, -1 );
 		$this->assertEquals( array(
@@ -175,6 +198,21 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			// PHP's parse_url() calls this an invalid URL, we handle it as a path.
 			array( '/://example.com/', PHP_URL_PATH, '/://example.com/' ),
 
+			// Schemeless URL containing colons cause parse errors in PHP 7+.
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400&subset=latin', PHP_URL_HOST, 'fonts.googleapis.com' ),
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400&subset=latin', PHP_URL_PORT, null ),
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400&subset=latin', PHP_URL_PATH, '/css' ),
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400&subset=latin', PHP_URL_QUERY, 'family=Open+Sans:400&subset=latin' ),
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400', PHP_URL_HOST, 'fonts.googleapis.com' ), // 25
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400', PHP_URL_PORT, null ),
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400', PHP_URL_PATH, '/css' ), //27
+			array( '//fonts.googleapis.com/css?family=Open+Sans:400', PHP_URL_QUERY, 'family=Open+Sans:400' ), //28
+
+			// Empty string or non-string passed in.
+			array( '', PHP_URL_PATH, '' ),
+			array( '', PHP_URL_QUERY, null ),
+			array( 123, PHP_URL_PORT, null ),
+			array( 123, PHP_URL_PATH, '123' ),
 		);
 	}
 
@@ -224,4 +262,56 @@ class Tests_HTTP_HTTP extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	/**
+	 * @ticket 36356
+	 *
+	 * @dataProvider get_component_from_parsed_url_array_testcases
+	 */
+	function test_get_component_from_parsed_url_array( $url, $component, $expected ) {
+		$parts  = wp_parse_url( $url );
+		$actual = _get_component_from_parsed_url_array( $parts, $component );
+		$this->assertSame( $expected, $actual );
+	}
+
+	function get_component_from_parsed_url_array_testcases() {
+		// 0: A URL, 1: PHP URL constant, 2: The expected result.
+		return array(
+			array( 'http://example.com/', -1, array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/' ) ),
+			array( 'http://example.com/', -1, array( 'scheme' => 'http', 'host' => 'example.com', 'path' => '/' ) ),
+			array( 'http://example.com/', PHP_URL_HOST, 'example.com' ),
+			array( 'http://example.com/', PHP_URL_USER, null ),
+			array( 'http:///example.com', -1, false ), // Malformed.
+			array( 'http:///example.com', PHP_URL_HOST, null ), // Malformed.
+		);
+	}
+
+	/**
+	 * @ticket 36356
+	 *
+	 * @dataProvider wp_translate_php_url_constant_to_key_testcases
+	 */
+	function test_wp_translate_php_url_constant_to_key( $input, $expected ) {
+		$actual = _wp_translate_php_url_constant_to_key( $input );
+		$this->assertSame( $expected, $actual );
+	}
+
+	function wp_translate_php_url_constant_to_key_testcases() {
+		// 0: PHP URL constant, 1: The expected result.
+		return array(
+			array( PHP_URL_SCHEME, 'scheme' ),
+			array( PHP_URL_HOST, 'host' ),
+			array( PHP_URL_PORT, 'port' ),
+			array( PHP_URL_USER, 'user' ),
+			array( PHP_URL_PASS, 'pass' ),
+			array( PHP_URL_PATH, 'path' ),
+			array( PHP_URL_QUERY, 'query' ),
+			array( PHP_URL_FRAGMENT, 'fragment' ),
+
+			// Test with non-PHP_URL_CONSTANT parameter.
+			array( 'something', false ),
+			array( ABSPATH, false ),
+		);
+	}
+
 }
