@@ -384,6 +384,97 @@ class Tests_Query_Search extends WP_UnitTestCase {
 		$this->assertNotEquals( array( $attachment ), $q->posts );
 	}
 
+	/**
+	 * @ticket 22744
+	 */
+	public function test_include_file_names_in_attachment_search_with_meta_query() {
+		$attachment = self::factory()->post->create( array(
+			'post_type'    => 'attachment',
+			'post_status'  => 'publish',
+			'post_title'   => 'bar foo',
+			'post_content' => 'foo bar',
+			'post_excerpt' => 'This post has foo',
+		) );
+
+		add_post_meta( $attachment, '_wp_attached_file', 'some-image4.png', true );
+		add_post_meta( $attachment, '_test_meta_key', 'value', true );
+		add_filter( 'posts_clauses', '_filter_query_attachment_filenames' );
+
+		// Pass post_type a string value.
+		$q = new WP_Query( array(
+			's'           => 'image4',
+			'fields'      => 'ids',
+			'post_type'   => 'attachment',
+			'post_status' => 'inherit',
+			'meta_query'  => array(
+				array(
+					'key'     => '_test_meta_key',
+					'value'   => 'value',
+					'compare' => '=',
+				),
+			),
+		) );
+
+		$this->assertSame( array( $attachment ), $q->posts );
+	}
+
+	/**
+	 * @ticket 22744
+	 */
+	public function test_include_file_names_in_attachment_search_with_tax_query() {
+		$attachment = self::factory()->post->create( array(
+			'post_type'    => 'attachment',
+			'post_status'  => 'publish',
+			'post_title'   => 'bar foo',
+			'post_content' => 'foo bar',
+			'post_excerpt' => 'This post has foo',
+		) );
+
+		// Add a tag to the post.
+		wp_set_post_terms( $attachment, 'test', 'post_tag' );
+
+		add_post_meta( $attachment, '_wp_attached_file', 'some-image5.png', true );
+		add_filter( 'posts_clauses', '_filter_query_attachment_filenames' );
+
+		// Pass post_type a string value.
+		$q = new WP_Query( array(
+			's'           => 'image5',
+			'fields'      => 'ids',
+			'post_type'   => 'attachment',
+			'post_status' => 'inherit',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'post_tag',
+					'field'    => 'slug',
+					'terms'    => 'test',
+				),
+			),
+		) );
+
+		$this->assertSame( array( $attachment ), $q->posts );
+	}
+
+	/**
+	 * @ticket 22744
+	 */
+	public function test_filter_query_attachment_filenames_unhooks_itself() {
+		add_filter( 'posts_clauses', '_filter_query_attachment_filenames' );
+
+		apply_filters( 'posts_clauses', array(
+			'where'    => '',
+			'groupby'  => '',
+			'join'     => '',
+			'orderby'  => '',
+			'distinct' => '',
+			'fields'   => '',
+			'limit'    => '',
+		) );
+
+		$result = has_filter( 'posts_clauses', '_filter_query_attachment_filenames' );
+
+		$this->assertFalse( $result );
+	}
+
 	public function filter_posts_search( $sql ) {
 		return $sql . ' /* posts_search */';
 	}
