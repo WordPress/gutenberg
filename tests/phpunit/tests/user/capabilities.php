@@ -974,17 +974,15 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	 * @ticket 16714
 	 */
 	function test_create_posts_caps() {
-		$author = new WP_User( self::factory()->user->create( array( 'role' => 'author' ) ) );
-		$admin = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		$author_2 = new WP_User( self::factory()->user->create( array( 'role' => 'author' ) ) );
-		$editor = new WP_User( self::factory()->user->create( array( 'role' => 'editor' ) ) );
-		$contributor = new WP_User( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+		$admin       = self::$users['administrator'];
+		$author      = self::$users['author'];
+		$editor      = self::$users['editor'];
+		$contributor = self::$users['contributor'];
 
 		// create_posts isn't a real cap.
 		$this->assertFalse($admin->has_cap('create_posts'));
 		$this->assertFalse($author->has_cap('create_posts'));
 		$this->assertFalse($editor->has_cap('create_posts'));
-		$this->assertFalse($author_2->has_cap('create_posts'));
 		$this->assertFalse($contributor->has_cap('create_posts'));
 
 		register_post_type( 'foobar' );
@@ -993,11 +991,8 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertEquals( 'edit_posts', $cap->create_posts );
 
 		$this->assertTrue($admin->has_cap( $cap->create_posts ));
-
-		$this->assertTrue($admin->has_cap( $cap->create_posts ));
 		$this->assertTrue($author->has_cap( $cap->create_posts ));
 		$this->assertTrue($editor->has_cap( $cap->create_posts ));
-		$this->assertTrue($author_2->has_cap( $cap->create_posts ));
 		$this->assertTrue($contributor->has_cap( $cap->create_posts ));
 
 		_unregister_post_type( 'foobar' );
@@ -1011,7 +1006,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse($admin->has_cap( $cap->create_posts ));
 		$this->assertFalse($author->has_cap( $cap->create_posts ));
 		$this->assertFalse($editor->has_cap( $cap->create_posts ));
-		$this->assertFalse($author_2->has_cap( $cap->create_posts ));
 		$this->assertFalse($contributor->has_cap( $cap->create_posts ));
 
 		// Add edit_foobars primitive cap to a user.
@@ -1020,8 +1014,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertTrue($admin->has_cap( $cap->create_posts ));
 		$this->assertFalse($author->has_cap( $cap->create_posts ));
 		$this->assertFalse($editor->has_cap( $cap->create_posts ));
-		$this->assertFalse($author_2->has_cap( $cap->create_posts ));
 		$this->assertFalse($contributor->has_cap( $cap->create_posts ));
+
+		$admin->remove_cap( 'edit_foobars' );
 
 		_unregister_post_type( 'foobar' );
 
@@ -1200,7 +1195,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	 * @ticket 21786
 	 */
 	function test_negative_caps() {
-		$author = new WP_User( self::factory()->user->create( array( 'role' => 'author' ) ) );
+		$author = self::$users['author'];
 		$author->add_cap( 'foo', false );
 		$this->assertTrue ( isset( $author->caps['foo'] ) );
 		$author->remove_cap( 'foo' );
@@ -1211,7 +1206,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	 * @ticket 18932
 	 */
 	function test_set_role_same_role() {
-		$user = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$user = self::$users['administrator'];
 		$caps = $user->caps;
 		$this->assertNotEmpty( $user->caps );
 		$user->set_role( 'administrator' );
@@ -1222,7 +1217,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	function test_current_user_can_for_blog() {
 		global $wpdb;
 
-		$user = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$user = self::$users['administrator'];
 		$old_uid = get_current_user_id();
 		wp_set_current_user( $user->ID );
 
