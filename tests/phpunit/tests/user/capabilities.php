@@ -683,10 +683,12 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertTrue($user->has_cap('sweep_floor'));
 
 		// shouldn't have any other caps
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('edit_published_posts'));
-		$this->assertFalse($user->has_cap('upload_files'));
-		$this->assertFalse($user->has_cap('level_4'));
+		$caps = $this->getAllCapsAndRoles();
+		foreach ( $caps as $cap => $roles ) {
+			if ( 'level_1' !== $cap ) {
+				$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
+			}
+		}
 
 		// clean up
 		remove_role($role_name);
@@ -757,13 +759,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse($user_2->has_cap('publish_posts'));
 
 		// make sure the other caps didn't get messed up
-		$this->assertTrue($user_1->has_cap('edit_posts'));
-		$this->assertTrue($user_1->has_cap('read'));
-		$this->assertTrue($user_1->has_cap('level_1'));
-		$this->assertTrue($user_1->has_cap('level_0'));
-		$this->assertFalse($user_1->has_cap('upload_files'));
-		$this->assertFalse($user_1->has_cap('edit_published_posts'));
-		$this->assertFalse($user_1->has_cap('level_2'));
+		$caps = $this->getAllCapsAndRoles();
+		foreach ( $caps as $cap => $roles ) {
+			if ( in_array( 'contributor', $roles, true ) || 'publish_posts' === $cap ) {
+				$this->assertTrue( $user_1->has_cap( $cap ), "User should have the {$cap} capability" );
+			} else {
+				$this->assertFalse( $user_1->has_cap( $cap ), "User should not have the {$cap} capability" );
+			}
+		}
 
 	}
 
@@ -847,11 +850,10 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$user = new WP_User($id);
 		$this->assertTrue($user->exists(), "Problem getting user $id");
 
-		// capabilities for the author role should be gone
-#		$this->assertFalse($user->has_cap('edit_posts'));
-#		$this->assertFalse($user->has_cap('edit_published_posts'));
-#		$this->assertFalse($user->has_cap('upload_files'));
-#		$this->assertFalse($user->has_cap('level_2'));
+		// all capabilities for the user should be gone
+		foreach ( $this->getAllCapsAndRoles() as $cap => $roles ) {
+			$this->assertFalse( $user->has_cap( $cap ), "User should not have the {$cap} capability" );
+		}
 
 		// the extra capabilities should be gone
 		$this->assertFalse($user->has_cap('make_coffee'));
@@ -959,12 +961,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$editor = self::$users['editor'];
 		$contributor = self::$users['contributor'];
 
-		// editor can edit, view, and trash
+		// editor can publish, edit, view, and trash
+		$this->assertTrue( $editor->has_cap( 'publish_post', $post ) );
 		$this->assertTrue( $editor->has_cap( 'edit_post', $post ) );
 		$this->assertTrue( $editor->has_cap( 'delete_post', $post ) );
 		$this->assertTrue( $editor->has_cap( 'read_post', $post ) );
 
 		// a contributor cannot (except read a published post)
+		$this->assertFalse( $contributor->has_cap( 'publish_post', $post ) );
 		$this->assertFalse( $contributor->has_cap( 'edit_post', $post ) );
 		$this->assertFalse( $contributor->has_cap( 'delete_post', $post ) );
 		$this->assertEquals( $status === 'publish', $contributor->has_cap( 'read_post', $post ) );
@@ -978,12 +982,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$author      = self::$users['author'];
 		$editor      = self::$users['editor'];
 		$contributor = self::$users['contributor'];
+		$subscriber  = self::$users['subscriber'];
 
 		// create_posts isn't a real cap.
 		$this->assertFalse($admin->has_cap('create_posts'));
 		$this->assertFalse($author->has_cap('create_posts'));
 		$this->assertFalse($editor->has_cap('create_posts'));
 		$this->assertFalse($contributor->has_cap('create_posts'));
+		$this->assertFalse($subscriber->has_cap('create_posts'));
 
 		register_post_type( 'foobar' );
 		$cap = get_post_type_object( 'foobar' )->cap;
@@ -994,6 +1000,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertTrue($author->has_cap( $cap->create_posts ));
 		$this->assertTrue($editor->has_cap( $cap->create_posts ));
 		$this->assertTrue($contributor->has_cap( $cap->create_posts ));
+		$this->assertFalse($subscriber->has_cap( $cap->create_posts ));
 
 		_unregister_post_type( 'foobar' );
 
@@ -1007,6 +1014,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse($author->has_cap( $cap->create_posts ));
 		$this->assertFalse($editor->has_cap( $cap->create_posts ));
 		$this->assertFalse($contributor->has_cap( $cap->create_posts ));
+		$this->assertFalse($subscriber->has_cap( $cap->create_posts ));
 
 		// Add edit_foobars primitive cap to a user.
 		$admin->add_cap( 'edit_foobars', true );
@@ -1015,6 +1023,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse($author->has_cap( $cap->create_posts ));
 		$this->assertFalse($editor->has_cap( $cap->create_posts ));
 		$this->assertFalse($contributor->has_cap( $cap->create_posts ));
+		$this->assertFalse($subscriber->has_cap( $cap->create_posts ));
 
 		$admin->remove_cap( 'edit_foobars' );
 
@@ -1028,6 +1037,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertTrue( $author->has_cap( $cap->edit_posts ) );
 		$this->assertTrue( $contributor->has_cap( $cap->edit_posts ) );
 		$this->assertFalse( $contributor->has_cap( $cap->create_posts ) );
+		$this->assertFalse( $subscriber->has_cap( $cap->create_posts ) );
 	}
 
 	function test_page_meta_caps() {
@@ -1196,10 +1206,14 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	 */
 	function test_negative_caps() {
 		$author = self::$users['author'];
+
 		$author->add_cap( 'foo', false );
 		$this->assertTrue ( isset( $author->caps['foo'] ) );
+		$this->assertFalse( user_can( $author->ID, 'foo' ) );
+
 		$author->remove_cap( 'foo' );
 		$this->assertFalse ( isset( $author->caps['foo'] ) );
+		$this->assertFalse( user_can( $author->ID, 'foo' ) );
 	}
 
 	/**
@@ -1363,7 +1377,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$user = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$user->add_cap( 'manage_network_users' );
-		$other_user = new WP_User( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$other_user = self::$users['subscriber'];
 
 		wp_set_current_user( $user->ID );
 
@@ -1465,6 +1479,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertFalse( current_user_can( $cap ), "Non-logged-in user should not have the {$cap} capability" );
 		}
 
+		$this->assertFalse( current_user_can( 'do_not_allow' ), "Non-logged-in user should not have the do_not_allow capability" );
 	}
 
 }
