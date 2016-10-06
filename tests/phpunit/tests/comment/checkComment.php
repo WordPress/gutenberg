@@ -127,4 +127,47 @@ class Tests_Comment_CheckComment extends WP_UnitTestCase {
 		$results = check_comment( $author, $author_email, $author_url, $comment, $author_ip, $user_agent, $comment_type );
 		$this->assertTrue( $results );
 	}
+
+	/**
+	 * @ticket 28603
+	 */
+	public function test_should_return_true_when_comment_whitelist_is_enabled_and_user_has_previously_approved_comments_with_different_email() {
+		$subscriber_id = $this->factory()->user->create( array(
+			'role' => 'subscriber',
+			'email' => 'sub@example.com',
+		) );
+
+		// Make sure comment author has an approved comment.
+		$this->factory->comment->create( array( 'user_id' => $subscriber_id, 'comment_approved' => '1', 'comment_author' => 'foo', 'comment_author_email' => 'sub@example.com' ) );
+
+		$subscriber_user = new WP_User( $subscriber_id );
+		$subscriber_user->user_email = 'newsub@example.com';
+
+		wp_update_user( $subscriber_user );
+
+		update_option( 'comment_whitelist', 1 );
+
+		$results = check_comment( 'foo', 'newsub@example.com', 'http://example.com', 'This is a comment.', '66.155.40.249', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:35.0) Gecko/20100101 Firefox/35.0', 'comment', 4 );
+		$this->assertTrue( $results );
+	}
+
+	/**
+	 * @ticket 28603
+	 */
+	public function test_should_return_false_when_comment_whitelist_is_enabled_and_user_does_not_have_a_previously_approved_comment_with_any_email() {
+		$subscriber_id = $this->factory()->user->create( array(
+			'role' => 'subscriber',
+			'email' => 'zig@example.com',
+		) );
+
+		$subscriber_user = new WP_User( $subscriber_id );
+		$subscriber_user->user_email = 'zag@example.com';
+
+		wp_update_user( $subscriber_user );
+
+		update_option( 'comment_whitelist', 1 );
+
+		$results = check_comment( 'bar', 'zag@example.com', 'http://example.com', 'This is my first comment.', '66.155.40.249', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:35.0) Gecko/20100101 Firefox/35.0', 'comment', 4 );
+		$this->assertFalse( $results );
+	}
 }
