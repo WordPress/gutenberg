@@ -269,26 +269,40 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	/**
 	 * Test POST redirection methods
 	 *
+	 * @dataProvider data_post_redirect_to_method_300
+	 *
 	 * @ticket 17588
 	 */
-	function test_post_redirect_to_method_300() {
+	function test_post_redirect_to_method_300( $response_code, $method ) {
 		$url = 'http://api.wordpress.org/core/tests/1.0/redirection.php?post-redirect-to-method=1';
 
-		// Test 300 - POST to POST
-		$res = wp_remote_post( add_query_arg( 'response_code', 300, $url ), array( 'timeout' => 30 ) );
-		$this->assertEquals( 'POST', wp_remote_retrieve_body( $res ) );
+		$res = wp_remote_post( add_query_arg( 'response_code', $response_code, $url ), array( 'timeout' => 30 ) );
+		$this->assertEquals( $method, wp_remote_retrieve_body( $res ) );
+	}
 
-		// Test 301 - POST to POST
-		$res = wp_remote_post( add_query_arg( 'response_code', 301, $url ), array( 'timeout' => 30 ) );
-		$this->assertEquals( 'POST', wp_remote_retrieve_body( $res ) );
-
-		// Test 302 - POST to GET
-		$res = wp_remote_post( add_query_arg( 'response_code', 302, $url ), array( 'timeout' => 30 ) );
-		$this->assertEquals( 'GET', wp_remote_retrieve_body( $res ) );
-
-		// Test 303 - POST to GET
-		$res = wp_remote_post( add_query_arg( 'response_code', 303, $url ), array( 'timeout' => 30 ) );
-		$this->assertEquals( 'GET', wp_remote_retrieve_body( $res ) );
+	public function data_post_redirect_to_method_300() {
+		return array(
+			// Test 300 - POST to POST
+			array(
+				300,
+				'POST',
+			),
+			// Test 301 - POST to POST
+			array(
+				301,
+				'POST',
+			),
+			// Test 302 - POST to GET
+			array(
+				302,
+				'GET',
+			),
+			// Test 303 - POST to GET
+			array(
+				303,
+				'GET',
+			),
+		);
 	}
 
 	/**
