@@ -19,18 +19,11 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$response = wp_remote_head( $url );
 		$headers = wp_remote_retrieve_headers( $response );
 
+		$this->assertInternalType( 'array', $response );
+		
 		$this->assertEquals( 'image/jpeg', $headers['content-type'] );
 		$this->assertEquals( '40148', $headers['content-length'] );
 		$this->assertEquals( '200', wp_remote_retrieve_response_code( $response ) );
-	}
-
-	/**
-	 * @depends test_head_request
-	 */
-	function test_returns_array() {
-		$url = 'https://asdftestblog1.files.wordpress.com/2007/09/2007-06-30-dsc_4700-1.jpg';
-		$response = wp_remote_head( $url );
-		$this->assertInternalType( 'array', $response );
 	}
 
 	function test_head_redirect() {
@@ -53,6 +46,8 @@ class Tests_HTTP_Functions extends WP_UnitTestCase {
 		$response = wp_remote_get( $url );
 		$headers = wp_remote_retrieve_headers( $response );
 
+		$this->assertInternalType( 'array', $response );
+	
 		// should return the same headers as a head request
 		$this->assertEquals( 'image/jpeg', $headers['content-type'] );
 		$this->assertEquals( '40148', $headers['content-length'] );
