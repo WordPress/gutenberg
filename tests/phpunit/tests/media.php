@@ -1807,10 +1807,10 @@ EOF;
 		$year = date( 'Y' );
 		$month = date( 'm' );
 
-		$expected = '<img width="999" height="999" src="http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png"' .
+		$expected = '<img width="999" height="999" src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png"' .
 			' class="attachment-testsize size-testsize" alt="test-image-large.png"' .
-			' srcset="http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png 999w,' .
-				' http://example.org/wp-content/uploads/' . $year . '/' . $month . '/test-image-large-150x150.png 150w"' .
+			' srcset="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png 999w,' .
+				' http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-large-150x150.png 150w"' .
 				' sizes="(max-width: 999px) 100vw, 999px" />';
 
 		remove_filter( 'wp_get_attachment_metadata', array( $this, '_filter_36246' ) );
