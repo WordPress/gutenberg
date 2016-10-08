@@ -3,15 +3,10 @@
 /**
  * @group http
  * @group external-http
+ *
+ * @requires extension openssl
  */
 class Tests_HTTP_Functions extends WP_UnitTestCase {
-	public function setUp() {
-		if ( ! extension_loaded( 'openssl' ) ) {
-			$this->markTestSkipped( 'Tests_HTTP_Functions requires openssl.' );
-		}
-
-		parent::setUp();
-	}
 
 	function test_head_request() {
 		// this url give a direct 200 response
