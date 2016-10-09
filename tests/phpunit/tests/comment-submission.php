@@ -622,7 +622,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$data = array(
 			'comment_post_ID' => $post->ID,
-			'comment'         => rand_str(),
+			'comment'         => 'Comment',
 			'author'          => rand_long_str( 255 ),
 			'email'           => 'comment@example.org',
 		);
@@ -642,7 +642,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 
 		$data = array(
 			'comment_post_ID' => $post->ID,
-			'comment'         => rand_str(),
+			'comment'         => 'Comment',
 			'author'          => 'Comment Author',
 			'email'           => rand_long_str( 90 ) . '@example.com',
 		);
@@ -661,7 +661,7 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$post = self::factory()->post->create_and_get();
 		$data = array(
 			'comment_post_ID' => $post->ID,
-			'comment'         => rand_str(),
+			'comment'         => 'Comment',
 			'author'          => 'Comment Author',
 			'email'           => 'comment@example.org',
 			'url'             => rand_long_str( 201 ),

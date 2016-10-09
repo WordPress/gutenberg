@@ -154,7 +154,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 	}
 
 	function test_help_tabs() {
-		$tab = rand_str();
+		$tab = __FUNCTION__;
 		$tab_args = array(
 			'id' => $tab,
 			'title' => 'Help!',
@@ -278,7 +278,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 	 * @ticket 25799
 	 */
 	function test_options() {
-		$option = rand_str();
+		$option = __FUNCTION__;
 		$option_args = array(
 			'label'   => 'Option',
 			'default' => 10,

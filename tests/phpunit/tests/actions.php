@@ -9,7 +9,7 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_simple_action() {
 		$a = new MockAction();
-		$tag = 'test_action';
+		$tag = __FUNCTION__;
 
 		add_action($tag, array(&$a, 'action'));
 		do_action($tag);
@@ -26,7 +26,7 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_remove_action() {
 		$a = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array(&$a, 'action'));
 		do_action($tag);
@@ -44,8 +44,8 @@ class Tests_Actions extends WP_UnitTestCase {
 	}
 
 	function test_has_action() {
-		$tag = rand_str();
-		$func = rand_str();
+		$tag = __FUNCTION__;
+		$func = __FUNCTION__ . '_func';
 
 		$this->assertFalse( has_action($tag, $func) );
 		$this->assertFalse( has_action($tag) );
@@ -61,7 +61,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	function test_multiple_actions() {
 		$a1 = new MockAction();
 		$a2 = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		// add both actions to the hook
 		add_action($tag, array(&$a1, 'action'));
@@ -76,8 +76,8 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_action_args_1() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		add_action($tag, array(&$a, 'action'));
 		// call the action with a single argument
@@ -92,9 +92,9 @@ class Tests_Actions extends WP_UnitTestCase {
 	function test_action_args_2() {
 		$a1 = new MockAction();
 		$a2 = new MockAction();
-		$tag = rand_str();
-		$val1 = rand_str();
-		$val2 = rand_str();
+		$tag = __FUNCTION__;
+		$val1 = __FUNCTION__ . '_val1';
+		$val2 = __FUNCTION__ . '_val2';
 
 		// a1 accepts two arguments, a2 doesn't
 		add_action($tag, array(&$a1, 'action'), 10, 2);
@@ -125,9 +125,9 @@ class Tests_Actions extends WP_UnitTestCase {
 		$a1 = new MockAction();
 		$a2 = new MockAction();
 		$a3 = new MockAction();
-		$tag = rand_str();
-		$val1 = rand_str();
-		$val2 = rand_str();
+		$tag = __FUNCTION__;
+		$val1 = __FUNCTION__ . '_val1';
+		$val2 = __FUNCTION__ . '_val2';
 
 		// a1 accepts two arguments, a2 doesn't, a3 accepts two arguments
 		add_action( $tag, array( &$a1, 'action' ), 10, 2 );
@@ -155,7 +155,7 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_action_priority() {
 		$a = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array(&$a, 'action'), 10);
 		add_action($tag, array(&$a, 'action2'), 9);
@@ -204,8 +204,8 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_all_action() {
 		$a = new MockAction();
-		$tag1 = rand_str();
-		$tag2 = rand_str();
+		$tag1 = __FUNCTION__ . '_1';
+		$tag2 = __FUNCTION__ . '_2';
 
 		// add an 'all' action
 		add_action('all', array(&$a, 'action'));
@@ -228,7 +228,7 @@ class Tests_Actions extends WP_UnitTestCase {
 
 	function test_remove_all_action() {
 		$a = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action('all', array(&$a, 'action'));
 		$this->assertEquals(10, has_filter('all', array(&$a, 'action')));
@@ -249,7 +249,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	function test_action_ref_array() {
 		$obj = new stdClass();
 		$a = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array(&$a, 'action'));
 
@@ -268,17 +268,17 @@ class Tests_Actions extends WP_UnitTestCase {
 	function test_action_keyed_array() {
 		$a = new MockAction();
 
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array(&$a, 'action'));
 
-		$context = array( rand_str() => rand_str() );
+		$context = array( 'key1' => 'val1' );
 		do_action($tag, $context);
 
 		$args = $a->get_args();
 		$this->assertSame($args[0][0], $context);
 
-		$context2 = array( rand_str() => rand_str(), rand_str() => rand_str() );
+		$context2 = array( 'key2' => 'val2', 'key3' => 'val3' );
 		do_action($tag, $context2);
 
 		$args = $a->get_args();
@@ -300,7 +300,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	 * @ticket 17817
 	 */
 	function test_action_recursion() {
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$a = new MockAction();
 		$b = new MockAction();
 
@@ -327,7 +327,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	 * @ticket 17817
 	 */
 	function test_action_callback_manipulation_while_running() {
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$a = new MockAction();
 		$b = new MockAction();
 		$c = new MockAction();
@@ -362,7 +362,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	 * https://core.trac.wordpress.org/ticket/17817#comment:52
 	 */
 	function test_remove_anonymous_callback() {
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$a = new MockAction();
 		add_action( $tag, array( $a, 'action' ), 12, 1 );
 		$this->assertTrue( has_action( $tag ) );
@@ -396,7 +396,7 @@ class Tests_Actions extends WP_UnitTestCase {
 	 */
 	function test_array_access_of_wp_filter_global() {
 		global $wp_filter;
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action( $tag, '__return_null', 11, 1 );
 

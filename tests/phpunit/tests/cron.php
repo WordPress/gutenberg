@@ -20,13 +20,13 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_wp_get_schedule_empty() {
 		// nothing scheduled
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$this->assertFalse(wp_get_schedule($hook));
 	}
 
 	function test_schedule_event_single() {
 		// schedule an event and make sure it's returned by wp_next_scheduled
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$timestamp = strtotime('+1 hour');
 
 		wp_schedule_single_event( $timestamp, $hook );
@@ -56,7 +56,7 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_schedule_event() {
 		// schedule an event and make sure it's returned by wp_next_scheduled
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$recur = 'hourly';
 		$timestamp = strtotime('+1 hour');
 
@@ -87,7 +87,7 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_unschedule_event() {
 		// schedule an event and make sure it's returned by wp_next_scheduled
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$timestamp = strtotime('+1 hour');
 
 		wp_schedule_single_event( $timestamp, $hook );
@@ -99,8 +99,8 @@ class Tests_Cron extends WP_UnitTestCase {
 	}
 
 	function test_clear_schedule() {
-		$hook = rand_str();
-		$args = array(rand_str());
+		$hook = __FUNCTION__;
+		$args = array( 'arg1' );
 
 		// schedule several events with and without arguments
 		wp_schedule_single_event( strtotime('+1 hour'), $hook );
@@ -125,8 +125,8 @@ class Tests_Cron extends WP_UnitTestCase {
 	}
 
 	function test_clear_schedule_multiple_args() {
-		$hook = rand_str();
-		$args = array(rand_str(), rand_str());
+		$hook = __FUNCTION__;
+		$args = array( 'arg1', 'arg2' );
 
 		// schedule several events with and without arguments
 		wp_schedule_single_event( strtotime('+1 hour'), $hook );
@@ -154,10 +154,10 @@ class Tests_Cron extends WP_UnitTestCase {
 	 * @ticket 10468
 	 */
 	function test_clear_schedule_new_args() {
-		$hook = rand_str();
-		$args = array(rand_str());
-		$multi_hook = rand_str();
-		$multi_args = array(rand_str(), rand_str());
+		$hook = __FUNCTION__;
+		$args = array( 'arg1' );
+		$multi_hook = __FUNCTION__ . '_multi';
+		$multi_args = array( 'arg2', 'arg3' );
 
 		// schedule several events with and without arguments
 		wp_schedule_single_event( strtotime('+1 hour'), $hook );
@@ -194,8 +194,8 @@ class Tests_Cron extends WP_UnitTestCase {
 	 */
 	function test_duplicate_event() {
 		// duplicate events close together should be skipped
-		$hook = rand_str();
-		$args = array(rand_str());
+		$hook = __FUNCTION__;
+		$args = array( 'arg1' );
 		$ts1 = strtotime('+5 minutes');
 		$ts2 = strtotime('+3 minutes');
 
@@ -213,8 +213,8 @@ class Tests_Cron extends WP_UnitTestCase {
 	 */
 	function test_not_duplicate_event() {
 		// duplicate events far apart should work normally
-		$hook = rand_str();
-		$args = array( rand_str() );
+		$hook = __FUNCTION__;
+		$args = array( 'arg1' );
 		$ts1 = strtotime( '+30 minutes' );
 		$ts2 = strtotime( '+3 minutes' );
 
@@ -232,8 +232,8 @@ class Tests_Cron extends WP_UnitTestCase {
 
 	function test_not_duplicate_event_reversed() {
 		// duplicate events far apart should work normally regardless of order
-		$hook = rand_str();
-		$args = array( rand_str() );
+		$hook = __FUNCTION__;
+		$args = array( 'arg1' );
 		$ts1 = strtotime( '+3 minutes' );
 		$ts2 = strtotime( '+30 minutes' );
 
@@ -274,7 +274,7 @@ class WPTestCronRunning extends _WPEmptyBlog {
 
 	function test_run_schedule_single() {
 		// schedule an event, run it, and make sure the hook is called
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$args = array(rand_str());
 		$timestamp = strtotime('-1 second');
 
@@ -300,7 +300,7 @@ class WPTestCronRunning extends _WPEmptyBlog {
 
 	function test_run_schedule_recurring() {
 		// schedule a recurring event, run it, and make sure the hook is called
-		$hook = rand_str();
+		$hook = __FUNCTION__;
 		$args = array(rand_str());
 		$timestamp = strtotime('-1 second');
 		$recur = 'hourly';

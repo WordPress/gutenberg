@@ -40,9 +40,9 @@ class Tests_Comment_GetCommentAuthorEmailLink extends WP_UnitTestCase {
 	public function test_all_parameters() {
 		unset( $GLOBALS['comment'] );
 
-		$linktext = rand_str( 10 );
-		$before   = rand_str( 5 );
-		$after    = rand_str( 6 );
+		$linktext = 'linktext';
+		$before   = 'before';
+		$after    = 'after';
 		$comment  = self::factory()->comment->create_and_get( array(
 			'comment_author_email' => $email = 'baz@example.org'
 		) );
@@ -53,9 +53,9 @@ class Tests_Comment_GetCommentAuthorEmailLink extends WP_UnitTestCase {
 	}
 
 	public function test_all_parameters_with_global_comment() {
-		$linktext = rand_str( 10 );
-		$before   = rand_str( 5 );
-		$after    = rand_str( 6 );
+		$linktext = 'linktext';
+		$before   = 'before';
+		$after    = 'after';
 
 		$expected = sprintf( '%1$s<a href="mailto:foo@example.org">%2$s</a>%3$s', $before, $linktext, $after );
 
@@ -63,19 +63,19 @@ class Tests_Comment_GetCommentAuthorEmailLink extends WP_UnitTestCase {
 	}
 
 	public function test_linktext() {
-		$expected = sprintf( '<a href="mailto:foo@example.org">%1$s</a>', $linktext = rand_str( 12 ) );
+		$expected = sprintf( '<a href="mailto:foo@example.org">%1$s</a>', $linktext = 'linktext' );
 
 		$this->assertEquals( $expected, get_comment_author_email_link( $linktext ) );
 	}
 
 	public function test_before() {
-		$expected = sprintf( '%1$s<a href="mailto:foo@example.org">foo@example.org</a>', $before = rand_str( 5 ) );
+		$expected = sprintf( '%1$s<a href="mailto:foo@example.org">foo@example.org</a>', $before = 'before' );
 
 		$this->assertEquals( $expected, get_comment_author_email_link( '', $before ) );
 	}
 
 	public function test_after() {
-		$expected = sprintf( '<a href="mailto:foo@example.org">foo@example.org</a>%1$s', $after = rand_str( 5 ) );
+		$expected = sprintf( '<a href="mailto:foo@example.org">foo@example.org</a>%1$s', $after = 'after' );
 
 		$this->assertEquals( $expected, get_comment_author_email_link( '', '', $after ) );
 	}

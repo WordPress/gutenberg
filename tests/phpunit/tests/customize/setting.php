@@ -480,7 +480,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	function test_is_current_blog_previewed() {
 		$type = 'option';
 		$name = 'blogname';
-		$post_value = rand_str();
+		$post_value = __FUNCTION__;
 		$this->manager->set_post_value( $name, $post_value );
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type' ) );
 		$this->assertFalse( $setting->is_current_blog_previewed() );
@@ -504,7 +504,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 
 		$type = 'option';
 		$name = 'blogdescription';
-		$post_value = rand_str();
+		$post_value = __FUNCTION__;
 		$this->manager->set_post_value( $name, $post_value );
 		$setting = new WP_Customize_Setting( $this->manager, $name, compact( 'type' ) );
 		$this->assertFalse( $setting->is_current_blog_previewed() );

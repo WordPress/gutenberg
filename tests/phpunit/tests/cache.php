@@ -27,19 +27,19 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_miss() {
-		$this->assertEquals(NULL, $this->cache->get(rand_str()));
+		$this->assertEquals( NULL, $this->cache->get( 'test_miss' ) );
 	}
 
 	function test_add_get() {
-		$key = rand_str();
-		$val = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val';
 
 		$this->cache->add($key, $val);
 		$this->assertEquals($val, $this->cache->get($key));
 	}
 
 	function test_add_get_0() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 		$val = 0;
 
 		// you can store zero in the cache
@@ -48,7 +48,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_add_get_null() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 		$val = null;
 
 		$this->assertTrue( $this->cache->add($key, $val) );
@@ -57,9 +57,9 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_add() {
-		$key = rand_str();
-		$val1 = rand_str();
-		$val2 = rand_str();
+		$key = __FUNCTION__;
+		$val1 = 'val1';
+		$val2 = 'val2';
 
 		// add $key to the cache
 		$this->assertTrue($this->cache->add($key, $val1));
@@ -70,9 +70,9 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_replace() {
-		$key = rand_str();
-		$val = rand_str();
-		$val2 = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val1';
+		$val2 = 'val2';
 
 		// memcached rejects replace() if the key does not exist
 		$this->assertFalse($this->cache->replace($key, $val));
@@ -84,9 +84,9 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_set() {
-		$key = rand_str();
-		$val1 = rand_str();
-		$val2 = rand_str();
+		$key = __FUNCTION__;
+		$val1 = 'val1';
+		$val2 = 'val2';
 
 		// memcached accepts set() if the key does not exist
 		$this->assertTrue($this->cache->set($key, $val1));
@@ -102,8 +102,8 @@ class Tests_Cache extends WP_UnitTestCase {
 		if ( $_wp_using_ext_object_cache )
 			return;
 
-		$key = rand_str();
-		$val = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val';
 
 		$this->cache->add($key, $val);
 		// item is visible to both cache objects
@@ -115,7 +115,7 @@ class Tests_Cache extends WP_UnitTestCase {
 
 	// Make sure objects are cloned going to and from the cache
 	function test_object_refs() {
-		$key = rand_str();
+		$key = __FUNCTION__ . '_1';
 		$object_a = new stdClass;
 		$object_a->foo = 'alpha';
 		$this->cache->set( $key, $object_a );
@@ -125,7 +125,7 @@ class Tests_Cache extends WP_UnitTestCase {
 		$object_b->foo = 'charlie';
 		$this->assertEquals( 'bravo', $object_a->foo );
 
-		$key = rand_str();
+		$key = __FUNCTION__ . '_2';
 		$object_a = new stdClass;
 		$object_a->foo = 'alpha';
 		$this->cache->add( $key, $object_a );
@@ -137,7 +137,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_incr() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		$this->assertFalse( $this->cache->incr( $key ) );
 
@@ -150,7 +150,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_wp_cache_incr() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		$this->assertFalse( wp_cache_incr( $key ) );
 
@@ -163,7 +163,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_decr() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		$this->assertFalse( $this->cache->decr( $key ) );
 
@@ -183,7 +183,7 @@ class Tests_Cache extends WP_UnitTestCase {
 	 * @ticket 21327
 	 */
 	function test_wp_cache_decr() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		$this->assertFalse( wp_cache_decr( $key ) );
 
@@ -200,8 +200,8 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_delete() {
-		$key = rand_str();
-		$val = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val';
 
 		// Verify set
 		$this->assertTrue( $this->cache->set( $key, $val ) );
@@ -215,8 +215,8 @@ class Tests_Cache extends WP_UnitTestCase {
 	}
 
 	function test_wp_cache_delete() {
-		$key = rand_str();
-		$val = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val';
 
 		// Verify set
 		$this->assertTrue( wp_cache_set( $key, $val ) );
@@ -237,9 +237,9 @@ class Tests_Cache extends WP_UnitTestCase {
 		if ( ! method_exists( $this->cache, 'switch_to_blog' ) )
 			return;
 
-		$key = rand_str();
-		$val = rand_str();
-		$val2 = rand_str();
+		$key = __FUNCTION__;
+		$val = 'val1';
+		$val2 = 'val2';
 
 		if ( ! is_multisite() ) {
 			// Single site ingnores switch_to_blog().

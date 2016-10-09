@@ -17,7 +17,7 @@ class Tests_Actions_Closures extends WP_UnitTestCase {
 
 		$this->assertSame( 10, has_action($tag, $closure) );
 
-		$context = array( rand_str(), rand_str() );
+		$context = array( 'val1', 'val2' );
 		do_action($tag, $context[0], $context[1]);
 
 		$this->assertSame($GLOBALS[$context[0]], $context[1]);
