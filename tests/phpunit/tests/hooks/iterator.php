@@ -11,7 +11,7 @@ class Tests_WP_Hook_Iterator extends WP_UnitTestCase {
 		$callback_one = '__return_null';
 		$callback_two = '__return_false';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 

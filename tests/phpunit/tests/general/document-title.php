@@ -28,7 +28,6 @@ class Tests_General_DocumentTitle extends WP_UnitTestCase {
 		$this->post_id = $this->factory->post->create( array(
 			'post_author'  => $this->author_id,
 			'post_status'  => 'publish',
-			'post_content' => rand_str(),
 			'post_title'   => 'test_title',
 			'post_type'    => 'post',
 			'post_date'    => '2015-09-22 18:52:17',

@@ -10,7 +10,7 @@ class Tests_WP_Hook_Remove_All_Filters extends WP_UnitTestCase {
 	public function test_remove_all_filters() {
 		$callback = '__return_null';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -25,7 +25,7 @@ class Tests_WP_Hook_Remove_All_Filters extends WP_UnitTestCase {
 		$callback_one = '__return_null';
 		$callback_two = '__return_false';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 

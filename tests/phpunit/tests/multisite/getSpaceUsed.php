@@ -35,8 +35,8 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 		}
 
 		// Upload a file to the new site.
-		$filename = rand_str().'.jpg';
-		$contents = rand_str();
+		$filename = __FUNCTION__ . '.jpg';
+		$contents = __FUNCTION__ . '_contents';
 		$file = wp_upload_bits( $filename, null, $contents );
 
 		// get_space_used() is measures in MB, get the size of the new file in MB.
@@ -71,8 +71,8 @@ class Tests_Multisite_Get_Space_Used extends WP_UnitTestCase {
 		}
 
 		// Upload a file to the new site.
-		$filename = rand_str().'.jpg';
-		$contents = rand_str();
+		$filename = __FUNCTION__ . '.jpg';
+		$contents = __FUNCTION__ . '_contents';
 		wp_upload_bits( $filename, null, $contents );
 
 		restore_current_blog();

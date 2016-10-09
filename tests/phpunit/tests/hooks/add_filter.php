@@ -13,7 +13,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 	public function test_add_filter_with_function() {
 		$callback = '__return_null';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -28,7 +28,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 		$a = new MockAction();
 		$callback = array( $a, 'action' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -42,7 +42,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 	public function test_add_filter_with_static_method() {
 		$callback = array( 'MockAction', 'action' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -57,7 +57,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 		$callback_one = '__return_null';
 		$callback_two = '__return_false';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -72,7 +72,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 		$callback_one = '__return_null';
 		$callback_two = '__return_false';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -87,7 +87,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 	public function test_readd_filter() {
 		$callback = '__return_null';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -101,7 +101,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 	public function test_readd_filter_with_different_priority() {
 		$callback = '__return_null';
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
 
@@ -118,7 +118,7 @@ class Tests_WP_Hook_Add_Filter extends WP_UnitTestCase {
 		$b = new MockAction();
 		$c = new MockAction();
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		$hook->add_filter( $tag, array( $a, 'action' ), 10, 1 );
 		$hook->add_filter( $tag, array( $b, 'action' ), 5, 1 );

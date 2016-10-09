@@ -25,10 +25,10 @@ class Tests_Multisite_Option extends WP_UnitTestCase {
 	}
 
 	function test_from_same_site() {
-		$key = rand_str();
-		$key2 = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
+		$key    = __FUNCTION__ . '_1';
+		$key2   = __FUNCTION__ . '_2';
+		$value  = __FUNCTION__ . '_val1';
+		$value2 = __FUNCTION__ . '_val2';
 
 		$this->assertFalse( get_blog_option( 1, 'doesnotexist' ) );
 		$this->assertFalse( get_option( 'doesnotexist' ) ); // check get_option()
@@ -62,10 +62,10 @@ class Tests_Multisite_Option extends WP_UnitTestCase {
 	}
 
 	function test_from_same_site_with_null_blog_id() {
-		$key = rand_str();
-		$key2 = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
+		$key    = __FUNCTION__ . '_1';
+		$key2   = __FUNCTION__ . '_2';
+		$value  = __FUNCTION__ . '_val1';
+		$value2 = __FUNCTION__ . '_val2';
 
 		$this->assertFalse( get_blog_option( null, 'doesnotexist' ) );
 		$this->assertFalse( get_option( 'doesnotexist' ) ); // check get_option()
@@ -109,10 +109,10 @@ class Tests_Multisite_Option extends WP_UnitTestCase {
 		) );
 		$this->assertInternalType( 'integer', $blog_id );
 
-		$key = rand_str();
-		$key2 = rand_str();
-		$value = rand_str();
-		$value2 = rand_str();
+		$key    = __FUNCTION__ . '_key1';
+		$key2   = __FUNCTION__ . '_key2';
+		$value  = __FUNCTION__ . '_val1';
+		$value2 = __FUNCTION__ . '_val2';
 
 		$this->assertFalse( get_blog_option( $blog_id, 'doesnotexist' ) );
 		//$this->assertFalse( get_option( 'doesnotexist' ) ); // check get_option()

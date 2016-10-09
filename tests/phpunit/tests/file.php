@@ -84,7 +84,7 @@ class Tests_File extends WP_UnitTestCase {
 
 	function test_unique_filename_is_valid() {
 		// make sure it produces a valid, writable, unique filename
-		$filename = wp_unique_filename( $this->dir, rand_str() . '.txt' );
+		$filename = wp_unique_filename( $this->dir, __FUNCTION__ . '.txt' );
 
 		$this->assertTrue( $this->is_unique_writable_file($this->dir, $filename) );
 
@@ -93,7 +93,7 @@ class Tests_File extends WP_UnitTestCase {
 
 	function test_unique_filename_is_unique() {
 		// make sure it produces two unique filenames
-		$name = rand_str();
+		$name = __FUNCTION__;
 
 		$filename1 = wp_unique_filename( $this->dir, $name . '.txt' );
 		$this->assertTrue( $this->is_unique_writable_file($this->dir, $filename1) );
@@ -108,7 +108,7 @@ class Tests_File extends WP_UnitTestCase {
 	}
 
 	function test_unique_filename_is_sanitized() {
-		$name = rand_str();
+		$name = __FUNCTION__;
 		$filename = wp_unique_filename( $this->dir, $name . $this->badchars .  '.txt' );
 
 		// make sure the bad characters were all stripped out
@@ -120,7 +120,7 @@ class Tests_File extends WP_UnitTestCase {
 	}
 
 	function test_unique_filename_with_slashes() {
-		$name = rand_str();
+		$name = __FUNCTION__;
 		// "foo/foo.txt"
 		$filename = wp_unique_filename( $this->dir, $name . '/' . $name .  '.txt' );
 
@@ -133,7 +133,7 @@ class Tests_File extends WP_UnitTestCase {
 	}
 
 	function test_unique_filename_multiple_ext() {
-		$name = rand_str();
+		$name = __FUNCTION__;
 		$filename = wp_unique_filename( $this->dir, $name . '.php.txt' );
 
 		// "foo.php.txt" becomes "foo.php_.txt"
@@ -145,7 +145,7 @@ class Tests_File extends WP_UnitTestCase {
 	}
 
 	function test_unique_filename_no_ext() {
-		$name = rand_str();
+		$name = __FUNCTION__;
 		$filename = wp_unique_filename( $this->dir, $name );
 
 		$this->assertEquals( $name, $filename );

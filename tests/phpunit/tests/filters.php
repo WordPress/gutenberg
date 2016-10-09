@@ -9,8 +9,8 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_simple_filter() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		add_filter($tag, array($a, 'filter'));
 		$this->assertEquals($val, apply_filters($tag, $val));
@@ -27,8 +27,8 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_remove_filter() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		add_filter($tag, array($a, 'filter'));
 		$this->assertEquals($val, apply_filters($tag, $val));
@@ -46,8 +46,8 @@ class Tests_Filters extends WP_UnitTestCase {
 	}
 
 	function test_has_filter() {
-			$tag = rand_str();
-			$func = rand_str();
+			$tag  = __FUNCTION__;
+			$func = __FUNCTION__ . '_func';
 
 			$this->assertFalse( has_filter($tag, $func) );
 			$this->assertFalse( has_filter($tag) );
@@ -63,8 +63,8 @@ class Tests_Filters extends WP_UnitTestCase {
 	function test_multiple_filters() {
 		$a1 = new MockAction();
 		$a2 = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		// add both filters to the hook
 		add_filter($tag, array($a1, 'filter'));
@@ -79,9 +79,9 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_filter_args_1() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
-		$arg1 = rand_str();
+		$tag  = __FUNCTION__;
+		$val  = __FUNCTION__ . '_val';
+		$arg1 = __FUNCTION__ . '_arg1';
 
 		add_filter($tag, array($a, 'filter'), 10, 2);
 		// call the filter with a single argument
@@ -95,10 +95,10 @@ class Tests_Filters extends WP_UnitTestCase {
 	function test_filter_args_2() {
 		$a1 = new MockAction();
 		$a2 = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
-		$arg1 = rand_str();
-		$arg2 = rand_str();
+		$tag  = __FUNCTION__;
+		$val  = __FUNCTION__ . '_val';
+		$arg1 = __FUNCTION__ . '_arg1';
+		$arg2 = __FUNCTION__ . '_arg2';
 
 		// a1 accepts two arguments, a2 doesn't
 		add_filter($tag, array($a1, 'filter'), 10, 3);
@@ -119,8 +119,8 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_filter_priority() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		// make two filters with different priorities
 		add_filter($tag, array($a, 'filter'), 10);
@@ -150,9 +150,9 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_all_filter() {
 		$a = new MockAction();
-		$tag1 = rand_str();
-		$tag2 = rand_str();
-		$val = rand_str();
+		$tag1 = __FUNCTION__ . '_1';
+		$tag2 = __FUNCTION__ . '_2';
+		$val  = __FUNCTION__ . '_val';
 
 		// add an 'all' filter
 		add_filter('all', array($a, 'filterall'));
@@ -174,8 +174,8 @@ class Tests_Filters extends WP_UnitTestCase {
 
 	function test_remove_all_filter() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		add_filter('all', array($a, 'filterall'));
 		$this->assertTrue( has_filter('all') );
@@ -201,8 +201,8 @@ class Tests_Filters extends WP_UnitTestCase {
 	 */
 	function test_remove_all_filters_should_respect_the_priority_argument() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		add_filter( $tag, array( $a, 'filter' ), 12 );
 		$this->assertTrue( has_filter( $tag ) );
@@ -221,7 +221,7 @@ class Tests_Filters extends WP_UnitTestCase {
 	function test_filter_ref_array() {
 		$obj = new stdClass();
 		$a = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array($a, 'filter'));
 
@@ -241,7 +241,7 @@ class Tests_Filters extends WP_UnitTestCase {
 		$obj = new stdClass();
 		$a = new MockAction();
 		$b = new MockAction();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 
 		add_action($tag, array($a, 'filter_append'), 10, 2);
 		add_action($tag, array($b, 'filter_append'), 10, 2);
@@ -274,8 +274,8 @@ class Tests_Filters extends WP_UnitTestCase {
 	 */
 	function test_has_filter_after_remove_all_filters() {
 		$a = new MockAction();
-		$tag = rand_str();
-		$val = rand_str();
+		$tag = __FUNCTION__;
+		$val = __FUNCTION__ . '_val';
 
 		// No priority
 		add_filter( $tag, array( $a, 'filter' ), 11 );

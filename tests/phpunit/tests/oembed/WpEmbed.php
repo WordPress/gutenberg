@@ -64,7 +64,7 @@ class Tests_WP_Embed extends WP_UnitTestCase {
 	}
 
 	public function test_wp_embed_register_handler() {
-		$handle   = rand_str();
+		$handle   = __FUNCTION__;
 		$regex    = '#https?://example\.com/embed/([^/]+)#i';
 		$callback = array( $this, '_embed_handler_callback' );
 
@@ -102,7 +102,7 @@ class Tests_WP_Embed extends WP_UnitTestCase {
 	}
 
 	public function test_autoembed_should_return_modified_content() {
-		$handle   = rand_str();
+		$handle   = __FUNCTION__;
 		$regex    = '#https?://example\.com/embed/([^/]+)#i';
 		$callback = array( $this, '_embed_handler_callback' );
 

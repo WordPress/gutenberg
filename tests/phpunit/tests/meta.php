@@ -161,7 +161,7 @@ class Tests_Meta extends WP_UnitTestCase {
 	}
 
 	function test_metadata_slashes() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 		$value = 'Test\\singleslash';
 		$expected = 'Testsingleslash';
 		$value2 = 'Test\\\\doubleslash';

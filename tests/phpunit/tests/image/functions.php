@@ -306,7 +306,7 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 		$file = wp_crop_image( 'https://asdftestblog1.files.wordpress.com/2008/04/canola.jpg',
 							  0, 0, 100, 100, 100, 100, false,
-							  DIR_TESTDATA . '/images/' . rand_str() . '.jpg' );
+							  DIR_TESTDATA . '/images/' . __FUNCTION__ . '.jpg' );
 		$this->assertNotInstanceOf( 'WP_Error', $file );
 		$this->assertFileExists( $file );
 		$image = wp_get_image_editor( $file );

@@ -52,7 +52,7 @@ class Tests_Link_GetPreviewPostLink extends WP_UnitTestCase {
 	}
 
 	public function test_get_preview_post_link_should_return_empty_string_for_non_viewable_post_type() {
-		$post_type = register_post_type( rand_str(12), array(
+		$post_type = register_post_type( 'non_viewable_cpt', array(
 			'public' => false,
 		) );
 

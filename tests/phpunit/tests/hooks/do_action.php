@@ -19,10 +19,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 		$a = new MockAction();
 		$callback = array( $a, 'action' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$hook->do_action( array( $arg ) );
@@ -34,10 +34,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 		$a = new MockAction();
 		$callback = array( $a, 'filter' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$hook->do_action( array( $arg ) );
@@ -52,10 +52,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 		$callback_one = array( $a, 'filter' );
 		$callback_two = array( $b, 'filter' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback_one, $priority, $accepted_args );
 		$hook->add_filter( $tag, $callback_two, $priority, $accepted_args );
@@ -71,10 +71,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 		$callback_one = array( $a, 'filter' );
 		$callback_two = array( $b, 'filter' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback_one, $priority, $accepted_args );
 		$hook->add_filter( $tag, $callback_two, $priority, $accepted_args );
@@ -87,10 +87,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 	public function test_do_action_with_no_accepted_args() {
 		$callback = array( $this, '_action_callback' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = 0;
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$hook->do_action( array( $arg ) );
@@ -101,10 +101,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 	public function test_do_action_with_one_accepted_arg() {
 		$callback = array( $this, '_action_callback' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = 1;
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$hook->do_action( array( $arg ) );
@@ -115,10 +115,10 @@ class Tests_WP_Hook_Do_Action extends WP_UnitTestCase {
 	public function test_do_action_with_more_accepted_args() {
 		$callback = array( $this, '_action_callback' );
 		$hook = new WP_Hook();
-		$tag = rand_str();
+		$tag = __FUNCTION__;
 		$priority = rand( 1, 100 );
 		$accepted_args = 1000;
-		$arg = rand_str();
+		$arg = __FUNCTION__ . '_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$hook->do_action( array( $arg ) );

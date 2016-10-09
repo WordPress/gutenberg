@@ -14,7 +14,7 @@ class Tests_WP_Hook_Do_All_Hook extends WP_UnitTestCase {
 		$tag = 'all';
 		$priority = rand( 1, 100 );
 		$accepted_args = rand( 1, 100 );
-		$arg = rand_str();
+		$arg = 'all_arg';
 
 		$hook->add_filter( $tag, $callback, $priority, $accepted_args );
 		$args = array( $arg );
