@@ -279,6 +279,50 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test WP_Customize_Manager::validate_setting_values().
+	 *
+	 * @ticket 37638
+	 * @covers WP_Customize_Manager::validate_setting_values()
+	 */
+	function test_late_validate_setting_values() {
+		$setting = new Test_Setting_Without_Applying_Validate_Filter( $this->manager, 'required' );
+		$this->manager->add_setting( $setting );
+
+		$this->assertInstanceOf( 'WP_Error', $setting->validate( '' ) );
+		$setting_validities = $this->manager->validate_setting_values( array( $setting->id => '' ) );
+		$this->assertInstanceOf( 'WP_Error', $setting_validities[ $setting->id ] );
+
+		$this->assertTrue( $setting->validate( 'ok' ) );
+		$setting_validities = $this->manager->validate_setting_values( array( $setting->id => 'ok' ) );
+		$this->assertTrue( $setting_validities[ $setting->id ] );
+
+		add_filter( "customize_validate_{$setting->id}", array( $this, 'late_validate_length' ), 10, 3 );
+		$this->assertTrue( $setting->validate( 'bad' ) );
+		$setting_validities = $this->manager->validate_setting_values( array( $setting->id => 'bad' ) );
+		$validity = $setting_validities[ $setting->id ];
+		$this->assertInstanceOf( 'WP_Error', $validity );
+		$this->assertEquals( 'minlength', $validity->get_error_code() );
+	}
+
+	/**
+	 * Add a length constraint to a setting.
+	 *
+	 * Adds minimum-length error code if the length is less than 10.
+	 *
+	 * @param WP_Error             $validity Validity.
+	 * @param mixed                $value    Value.
+	 * @param WP_Customize_Setting $setting  Setting.
+	 * @return WP_Error Validity.
+	 */
+	function late_validate_length( $validity, $value, $setting ) {
+		$this->assertInstanceOf( 'WP_Customize_Setting', $setting );
+		if ( strlen( $value ) < 10 ) {
+			$validity->add( 'minlength', '' );
+		}
+		return $validity;
+	}
+
+	/**
 	 * Test the WP_Customize_Manager::validate_setting_values() method to make sure that the validation and sanitization are done in the right order.
 	 *
 	 * @ticket 37247
@@ -1029,4 +1073,26 @@ require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
 class Test_Dynamic_Customize_Setting extends WP_Customize_Setting {
 	public $type = 'dynamic';
 	public $custom;
+}
+
+/**
+ * Class Test_Setting_Without_Applying_Validate_Filter.
+ *
+ * @see Tests_WP_Customize_Manager::test_late_validate_setting_values()
+ */
+class Test_Setting_Without_Applying_Validate_Filter extends WP_Customize_Setting {
+
+	/**
+	 * Validates an input.
+	 *
+	 * @param mixed $value Value to validate.
+	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
+	 */
+	public function validate( $value ) {
+		if ( empty( $value ) ) {
+			return new WP_Error( 'empty_value', __( 'You must supply a value' ) );
+		}
+		return true;
+	}
+
 }
