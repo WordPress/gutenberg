@@ -20,10 +20,12 @@ class Tests_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The plugin should be installed and activated.
+	 * Checks that the main classes are loaded.
 	 */
-	function test_rest_api_activated() {
+	function test_rest_api_active() {
 		$this->assertTrue( class_exists( 'WP_REST_Server' ) );
+		$this->assertTrue( class_exists( 'WP_REST_Request' ) );
+		$this->assertTrue( class_exists( 'WP_REST_Response' ) );
 	}
 
 	/**
