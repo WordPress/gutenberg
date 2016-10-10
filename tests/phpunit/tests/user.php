@@ -181,9 +181,6 @@ class Tests_User extends WP_UnitTestCase {
 		$this->assertEquals( 'foo', $user->data->$key );  // This will fail with WP < 3.3
 
 		foreach ( (array) $user as $key => $value ) {
-			if ( $value instanceof wpdb ) {
-				continue;
-			}
 			$this->assertEquals( $value, $user->$key );
 		}
 	}
