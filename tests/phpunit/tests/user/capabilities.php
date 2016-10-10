@@ -457,9 +457,11 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		}
 
+		$this->assertFalse( $user->has_cap( 'start_a_fire' ), "User with the {$role} role should not have a custom capability" );
+		$this->assertFalse( user_can( $user, 'start_a_fire' ), "User with the {$role} role should not have a custom capability" );
+
 		$this->assertFalse( $user->has_cap( 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
 		$this->assertFalse( user_can( $user, 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
-
 	}
 
 	// special case for the link manager
@@ -526,6 +528,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertTrue( $user->has_cap( $cap ), "Super Admins should have the {$cap} capability" );
 			$this->assertTrue( user_can( $user, $cap ), "Super Admins should have the {$cap} capability" );
 		}
+
+		$this->assertTrue( $user->has_cap( 'start_a_fire' ), "Super admins should have all custom capabilities" );
+		$this->assertTrue( user_can( $user, 'start_a_fire' ), "Super admins should have all custom capabilities" );
 
 		$this->assertFalse( $user->has_cap( 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
 		$this->assertFalse( user_can( $user, 'do_not_allow' ), 'Super Admins should not have the do_not_allow capability' );
@@ -1479,6 +1484,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$this->assertFalse( current_user_can( $cap ), "Non-logged-in user should not have the {$cap} capability" );
 		}
 
+		$this->assertFalse( current_user_can( 'start_a_fire' ), "Non-logged-in user should not have a custom capability" );
 		$this->assertFalse( current_user_can( 'do_not_allow' ), "Non-logged-in user should not have the do_not_allow capability" );
 	}
 
