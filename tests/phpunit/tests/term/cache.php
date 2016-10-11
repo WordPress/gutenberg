@@ -390,4 +390,30 @@ class Tests_Term_Cache extends WP_UnitTestCase {
 		$this->assertSame( $term_meta, 'bar' );
 		$this->assertEquals( $num_queries, $wpdb->num_queries );
 	}
+
+	/**
+	 * @ticket 37291
+	 */
+	public function test_get_object_term_cache_should_return_error_if_any_term_is_an_error() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax' ) );
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, $t, 'wptests_tax' );
+
+		// Prime cache.
+		$terms = get_the_terms( $p, 'wptests_tax' );
+		$this->assertEqualSets( array( $t ), wp_list_pluck( $terms, 'term_id' ) );
+
+		/*
+		 * Modify cached array to insert an empty term ID,
+		 * which will trigger an error in get_term().
+		 */
+		$cached_ids = wp_cache_get( $p, 'wptests_tax_relationships' );
+		$cached_ids[] = 0;
+		wp_cache_set( $p, $cached_ids, 'wptests_tax_relationships' );
+
+		$terms = get_the_terms( $p, 'wptests_tax' );
+		$this->assertWPError( $terms );
+	}
 }
