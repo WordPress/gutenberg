@@ -322,4 +322,63 @@ class Tests_Term_Query extends WP_UnitTestCase {
 
 		$this->assertEqualSets( array( $terms[1] ), $found );
 	}
+
+	/**
+	 * @ticket 38295
+	 * @group cache
+	 */
+	public function test_count_query_should_be_cached() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'fields' => 'count',
+			'hide_empty' => false,
+		) );
+		$count = $query->get_terms();
+		$this->assertEquals( 2, $count );
+
+		$num_queries = $wpdb->num_queries;
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'fields' => 'count',
+			'hide_empty' => false,
+		) );
+		$count = $query->get_terms();
+		$this->assertEquals( 2, $count );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
+	/**
+	 * @ticket 38295
+	 * @group cache
+	 */
+	public function test_count_query_cache_should_be_invalidated_with_incrementor_bump() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+
+		$terms = self::factory()->term->create_many( 2, array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'fields' => 'count',
+			'hide_empty' => false,
+		) );
+		$count = $query->get_terms();
+		$this->assertEquals( 2, $count );
+
+		wp_delete_term( $terms[0], 'wptests_tax_1' );
+
+		$query = new WP_Term_Query( array(
+			'taxonomy' => 'wptests_tax_1',
+			'fields' => 'count',
+			'hide_empty' => false,
+		) );
+		$count = $query->get_terms();
+		$this->assertEquals( 1, $count );
+	}
 }
