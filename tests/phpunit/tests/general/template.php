@@ -488,4 +488,70 @@ class Tests_General_Template extends WP_UnitTestCase {
 		$actual = get_the_modified_time( $d, $post_id );
 		$this->assertEquals( $expected, $actual );
 	}
+
+	/**
+	 * @ticket 38253
+	 */
+	function test_get_site_icon_url_preserves_switched_state() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite.' );
+		}
+
+		$blog_id = $this->factory->blog->create();
+		switch_to_blog( $blog_id );
+
+		$expected = $GLOBALS['_wp_switched_stack'];
+
+		get_site_icon_url( 512, '', $blog_id );
+
+		$result = $GLOBALS['_wp_switched_stack'];
+
+		restore_current_blog();
+
+		$this->assertSame( $expected, $result );
+	}
+
+	/**
+	 * @ticket 38253
+	 */
+	function test_has_custom_logo_preserves_switched_state() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite.' );
+		}
+
+		$blog_id = $this->factory->blog->create();
+		switch_to_blog( $blog_id );
+
+		$expected = $GLOBALS['_wp_switched_stack'];
+
+		has_custom_logo( $blog_id );
+
+		$result = $GLOBALS['_wp_switched_stack'];
+
+		restore_current_blog();
+
+		$this->assertSame( $expected, $result );
+	}
+
+	/**
+	 * @ticket 38253
+	 */
+	function test_get_custom_logo_preserves_switched_state() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'This test requires multisite.' );
+		}
+
+		$blog_id = $this->factory->blog->create();
+		switch_to_blog( $blog_id );
+
+		$expected = $GLOBALS['_wp_switched_stack'];
+
+		get_custom_logo( $blog_id );
+
+		$result = $GLOBALS['_wp_switched_stack'];
+
+		restore_current_blog();
+
+		$this->assertSame( $expected, $result );
+	}
 }
