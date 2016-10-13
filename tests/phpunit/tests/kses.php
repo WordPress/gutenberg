@@ -195,10 +195,10 @@ EOF;
 
 			switch ( $attack->name ) {
 				case 'XSS Locator':
-					$this->assertEquals('\';alert(String.fromCharCode(88,83,83))//\\\';alert(String.fromCharCode(88,83,83))//";alert(String.fromCharCode(88,83,83))//\\";alert(String.fromCharCode(88,83,83))//--&gt;"&gt;\'&gt;alert(String.fromCharCode(88,83,83))=', $result);
+					$this->assertEquals('\';alert(String.fromCharCode(88,83,83))//\\\';alert(String.fromCharCode(88,83,83))//";alert(String.fromCharCode(88,83,83))//\\";alert(String.fromCharCode(88,83,83))//--&gt;"&gt;\'&gt;alert(String.fromCharCode(88,83,83))=&amp;{}', $result);
 					break;
 				case 'XSS Quick Test':
-					$this->assertEquals('\'\';!--"=', $result);
+					$this->assertEquals('\'\';!--"=&amp;{()}', $result);
 					break;
 				case 'SCRIPT w/Alert()':
 					$this->assertEquals( "alert('XSS')", $result );
