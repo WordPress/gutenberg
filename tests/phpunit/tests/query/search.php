@@ -60,6 +60,28 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38099
+	 */
+	function test_filter_wp_query_use_hyphen_for_exclusion() {
+		$title = '-HYPHENATION_TEST';
+
+		// Create a post with a title which starts with a hyphen
+		$post_id = self::factory()->post->create( array(
+			'post_content' => $title, 'post_type' => $this->post_type
+		) );
+
+		// By default, we can use the hyphen prefix to exclude results
+		$this->assertEquals( array(), $this->get_search_results( $title ) );
+
+		// After we disable the feature using the filter, we should get the result
+		add_filter( 'wp_query_use_hyphen_for_exclusion', '__return_false' );
+		$result = $this->get_search_results( $title );
+		$post = array_pop( $result );
+		$this->assertEquals( $post->ID, $post_id );
+		remove_filter( 'wp_query_use_hyphen_for_exclusion', '__return_false' );
+	}
+
+	/**
 	 * @ticket 33988
 	 */
 	public function test_s_should_exclude_term_prefixed_with_dash() {
