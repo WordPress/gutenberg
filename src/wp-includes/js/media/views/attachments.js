@@ -156,7 +156,7 @@ Attachments = View.extend({
 	initSortable: function() {
 		var collection = this.collection;
 
-		if ( wp.media.isTouchDevice || ! this.options.sortable || ! $.fn.sortable ) {
+		if ( ! this.options.sortable || ! $.fn.sortable ) {
 			return;
 		}
 
@@ -215,7 +215,7 @@ Attachments = View.extend({
 	},
 
 	refreshSortable: function() {
-		if ( wp.media.isTouchDevice || ! this.options.sortable || ! $.fn.sortable ) {
+		if ( ! this.options.sortable || ! $.fn.sortable ) {
 			return;
 		}
 
