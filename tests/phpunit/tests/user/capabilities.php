@@ -285,13 +285,17 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	// test the tests
 	function test_single_and_multisite_cap_tests_match() {
-		$single = $this->_getSingleSitePrimitiveCaps();
-		$multi  = $this->_getMultiSitePrimitiveCaps();
-		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
+		$single_primitive = array_keys( $this->_getSingleSitePrimitiveCaps() );
+		$multi_primitive  = array_keys( $this->_getMultiSitePrimitiveCaps() );
+		sort( $single_primitive );
+		sort( $multi_primitive );
+		$this->assertEquals( $single_primitive, $multi_primitive );
 
-		$single = $this->_getSingleSiteMetaCaps();
-		$multi  = $this->_getMultiSiteMetaCaps();
-		$this->assertEquals( array_keys( $single ), array_keys( $multi ) );
+		$single_meta = array_keys( $this->_getSingleSiteMetaCaps() );
+		$multi_meta  = array_keys( $this->_getMultiSiteMetaCaps() );
+		sort( $single_meta );
+		sort( $multi_meta );
+		$this->assertEquals( $single_meta, $multi_meta );
 	}
 
 	// test the tests
