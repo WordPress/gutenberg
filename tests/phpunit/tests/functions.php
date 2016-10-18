@@ -880,4 +880,22 @@ class Tests_Functions extends WP_UnitTestCase {
 		$this->assertSame( false, $raised_limit );
 		$this->assertEquals( WP_MAX_MEMORY_LIMIT, $ini_limit_after );
 	}
+
+	/**
+	 * Tests wp_generate_uuid4().
+	 *
+	 * @covers wp_generate_uuid4()
+	 * @ticket 38164
+	 */
+	function test_wp_generate_uuid4() {
+		$uuids = array();
+		for ( $i = 0; $i < 20; $i += 1 ) {
+			$uuid = wp_generate_uuid4();
+			$this->assertRegExp( '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid );
+			$uuids[] = $uuid;
+		}
+
+		$unique_uuids = array_unique( $uuids );
+		$this->assertEquals( $uuids, $unique_uuids );
+	}
 }

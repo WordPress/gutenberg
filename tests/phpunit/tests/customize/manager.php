@@ -27,6 +27,30 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	public $undefined;
 
 	/**
+	 * Admin user ID.
+	 *
+	 * @var int
+	 */
+	protected static $admin_user_id;
+
+	/**
+	 * Subscriber user ID.
+	 *
+	 * @var int
+	 */
+	protected static $subscriber_user_id;
+
+	/**
+	 * Set up before class.
+	 *
+	 * @param WP_UnitTest_Factory $factory Factory.
+	 */
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$subscriber_user_id = $factory->user->create( array( 'role' => 'subscriber' ) );
+		self::$admin_user_id = $factory->user->create( array( 'role' => 'administrator' ) );
+	}
+
+	/**
 	 * Set up test.
 	 */
 	function setUp() {
@@ -42,6 +66,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function tearDown() {
 		$this->manager = null;
 		unset( $GLOBALS['wp_customize'] );
+		$_REQUEST = array();
 		parent::tearDown();
 	}
 
@@ -53,6 +78,608 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function instantiate() {
 		$GLOBALS['wp_customize'] = new WP_Customize_Manager();
 		return $GLOBALS['wp_customize'];
+	}
+
+	/**
+	 * Test WP_Customize_Manager::__construct().
+	 *
+	 * @covers WP_Customize_Manager::__construct()
+	 */
+	function test_constructor() {
+		$uuid = wp_generate_uuid4();
+		$theme = 'twentyfifteen';
+		$messenger_channel = 'preview-123';
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'theme' => $theme,
+			'messenger_channel' => $messenger_channel,
+		) );
+		$this->assertEquals( $uuid, $wp_customize->changeset_uuid() );
+		$this->assertEquals( $theme, $wp_customize->get_stylesheet() );
+		$this->assertEquals( $messenger_channel, $wp_customize->get_messenger_channel() );
+
+		$theme = 'twentyfourteen';
+		$messenger_channel = 'preview-456';
+		$_REQUEST['theme'] = $theme;
+		$_REQUEST['customize_messenger_channel'] = $messenger_channel;
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$this->assertEquals( $theme, $wp_customize->get_stylesheet() );
+		$this->assertEquals( $messenger_channel, $wp_customize->get_messenger_channel() );
+
+		$theme = 'twentyfourteen';
+		$_REQUEST['customize_theme'] = $theme;
+		$wp_customize = new WP_Customize_Manager();
+		$this->assertEquals( $theme, $wp_customize->get_stylesheet() );
+		$this->assertNotEmpty( $wp_customize->changeset_uuid() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::setup_theme() for admin screen.
+	 *
+	 * @covers WP_Customize_Manager::setup_theme()
+	 */
+	function test_setup_theme_in_customize_admin() {
+		global $pagenow, $wp_customize;
+		$pagenow = 'customize.php';
+		set_current_screen( 'customize' );
+
+		// Unauthorized.
+		$exception = null;
+		$wp_customize = new WP_Customize_Manager();
+		wp_set_current_user( self::$subscriber_user_id );
+		try {
+			$wp_customize->setup_theme();
+		} catch ( Exception $e ) {
+			$exception = $e;
+		}
+		$this->assertInstanceOf( 'WPDieException', $exception );
+		$this->assertContains( 'you are not allowed to customize this site', $exception->getMessage() );
+
+		// Bad changeset.
+		$exception = null;
+		wp_set_current_user( self::$admin_user_id );
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => 'bad' ) );
+		try {
+			$wp_customize->setup_theme();
+		} catch ( Exception $e ) {
+			$exception = $e;
+		}
+		$this->assertInstanceOf( 'WPDieException', $exception );
+		$this->assertContains( 'Invalid changeset UUID', $exception->getMessage() );
+
+		$wp_customize = new WP_Customize_Manager();
+		$wp_customize->setup_theme();
+	}
+
+	/**
+	 * Test WP_Customize_Manager::setup_theme() for frontend.
+	 *
+	 * @covers WP_Customize_Manager::setup_theme()
+	 */
+	function test_setup_theme_in_frontend() {
+		global $wp_customize, $pagenow, $show_admin_bar;
+		$pagenow = 'front';
+		set_current_screen( 'front' );
+
+		wp_set_current_user( 0 );
+		$exception = null;
+		$wp_customize = new WP_Customize_Manager();
+		wp_set_current_user( self::$subscriber_user_id );
+		try {
+			$wp_customize->setup_theme();
+		} catch ( Exception $e ) {
+			$exception = $e;
+		}
+		$this->assertInstanceOf( 'WPDieException', $exception );
+		$this->assertContains( 'Non-existent changeset UUID', $exception->getMessage() );
+
+		wp_set_current_user( self::$admin_user_id );
+		$wp_customize = new WP_Customize_Manager( array( 'messenger_channel' => 'preview-1' ) );
+		$wp_customize->setup_theme();
+		$this->assertFalse( $show_admin_bar );
+
+		show_admin_bar( true );
+		wp_set_current_user( self::$admin_user_id );
+		$wp_customize = new WP_Customize_Manager( array( 'messenger_channel' => null ) );
+		$wp_customize->setup_theme();
+		$this->assertTrue( $show_admin_bar );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::changeset_uuid().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::changeset_uuid()
+	 */
+	function test_changeset_uuid() {
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$this->assertEquals( $uuid, $wp_customize->changeset_uuid() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::wp_loaded().
+	 *
+	 * Ensure that post values are previewed even without being in preview.
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::wp_loaded()
+	 */
+	function test_wp_loaded() {
+		wp_set_current_user( self::$admin_user_id );
+		$wp_customize = new WP_Customize_Manager();
+		$title = 'Hello World';
+		$wp_customize->set_post_value( 'blogname', $title );
+		$this->assertNotEquals( $title, get_option( 'blogname' ) );
+		$wp_customize->wp_loaded();
+		$this->assertFalse( $wp_customize->is_preview() );
+		$this->assertEquals( $title, $wp_customize->get_setting( 'blogname' )->value() );
+		$this->assertEquals( $title, get_option( 'blogname' ) );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::find_changeset_post_id().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::find_changeset_post_id()
+	 */
+	function test_find_changeset_post_id() {
+		$uuid = wp_generate_uuid4();
+		$post_id = $this->factory()->post->create( array(
+			'post_name' => $uuid,
+			'post_type' => 'customize_changeset',
+			'post_status' => 'auto-draft',
+			'post_content' => '{}',
+		) );
+
+		$wp_customize = new WP_Customize_Manager();
+		$this->assertNull( $wp_customize->find_changeset_post_id( wp_generate_uuid4() ) );
+		$this->assertEquals( $post_id, $wp_customize->find_changeset_post_id( $uuid ) );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::changeset_post_id().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::changeset_post_id()
+	 */
+	function test_changeset_post_id() {
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$this->assertNull( $wp_customize->changeset_post_id() );
+
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$post_id = $this->factory()->post->create( array(
+			'post_name' => $uuid,
+			'post_type' => 'customize_changeset',
+			'post_status' => 'auto-draft',
+			'post_content' => '{}',
+		) );
+		$this->assertEquals( $post_id, $wp_customize->changeset_post_id() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::changeset_data().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::changeset_data()
+	 */
+	function test_changeset_data() {
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$this->assertEquals( array(), $wp_customize->changeset_data() );
+
+		$uuid = wp_generate_uuid4();
+		$data = array( 'blogname' => array( 'value' => 'Hello World' ) );
+		$this->factory()->post->create( array(
+			'post_name' => $uuid,
+			'post_type' => 'customize_changeset',
+			'post_status' => 'auto-draft',
+			'post_content' => wp_json_encode( $data ),
+		) );
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$this->assertEquals( $data, $wp_customize->changeset_data() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::customize_preview_init().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::customize_preview_init()
+	 */
+	function test_customize_preview_init() {
+
+		// Test authorized admin user.
+		wp_set_current_user( self::$admin_user_id );
+		$did_action_customize_preview_init = did_action( 'customize_preview_init' );
+		$wp_customize = new WP_Customize_Manager();
+		$wp_customize->customize_preview_init();
+		$this->assertEquals( $did_action_customize_preview_init + 1, did_action( 'customize_preview_init' ) );
+
+		$this->assertEquals( 10, has_action( 'wp_head', 'wp_no_robots' ) );
+		$this->assertEquals( 10, has_filter( 'wp_headers', array( $wp_customize, 'filter_iframe_security_headers' ) ) );
+		$this->assertEquals( 10, has_filter( 'wp_redirect', array( $wp_customize, 'add_state_query_params' ) ) );
+		$this->assertTrue( wp_script_is( 'customize-preview', 'enqueued' ) );
+		$this->assertEquals( 10, has_action( 'wp_head', array( $wp_customize, 'customize_preview_loading_style' ) ) );
+		$this->assertEquals( 20, has_action( 'wp_footer', array( $wp_customize, 'customize_preview_settings' ) ) );
+
+		// Test unauthorized user outside preview (no messenger_channel).
+		wp_set_current_user( self::$subscriber_user_id );
+		$wp_customize = new WP_Customize_Manager();
+		$wp_customize->register_controls();
+		$this->assertNotEmpty( $wp_customize->controls() );
+		$wp_customize->customize_preview_init();
+		$this->assertEmpty( $wp_customize->controls() );
+
+		// Test unauthorized user inside preview (with messenger_channel).
+		wp_set_current_user( self::$subscriber_user_id );
+		$wp_customize = new WP_Customize_Manager( array( 'messenger_channel' => 'preview-0' ) );
+		$exception = null;
+		try {
+			$wp_customize->customize_preview_init();
+		} catch ( WPDieException $e ) {
+			$exception = $e;
+		}
+		$this->assertNotNull( $exception );
+		$this->assertContains( 'Unauthorized', $exception->getMessage() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::filter_iframe_security_headers().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::filter_iframe_security_headers()
+	 */
+	function test_filter_iframe_security_headers() {
+		$customize_url = admin_url( 'customize.php' );
+		$wp_customize = new WP_Customize_Manager();
+		$headers = $wp_customize->filter_iframe_security_headers( array() );
+		$this->assertArrayHasKey( 'X-Frame-Options', $headers );
+		$this->assertArrayHasKey( 'Content-Security-Policy', $headers );
+		$this->assertEquals( "ALLOW-FROM $customize_url", $headers['X-Frame-Options'] );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::add_state_query_params().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::add_state_query_params()
+	 */
+	function test_add_state_query_params() {
+		$uuid = wp_generate_uuid4();
+		$messenger_channel = 'preview-0';
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'messenger_channel' => $messenger_channel,
+		) );
+		$url = $wp_customize->add_state_query_params( home_url( '/' ) );
+		$parsed_url = wp_parse_url( $url );
+		parse_str( $parsed_url['query'], $query_params );
+		$this->assertArrayHasKey( 'customize_messenger_channel', $query_params );
+		$this->assertArrayHasKey( 'customize_changeset_uuid', $query_params );
+		$this->assertArrayNotHasKey( 'customize_theme', $query_params );
+		$this->assertEquals( $uuid, $query_params['customize_changeset_uuid'] );
+		$this->assertEquals( $messenger_channel, $query_params['customize_messenger_channel'] );
+
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'messenger_channel' => null,
+			'theme' => 'twentyfifteen',
+		) );
+		$url = $wp_customize->add_state_query_params( home_url( '/' ) );
+		$parsed_url = wp_parse_url( $url );
+		parse_str( $parsed_url['query'], $query_params );
+		$this->assertArrayNotHasKey( 'customize_messenger_channel', $query_params );
+		$this->assertArrayHasKey( 'customize_changeset_uuid', $query_params );
+		$this->assertArrayHasKey( 'customize_theme', $query_params );
+		$this->assertEquals( $uuid, $query_params['customize_changeset_uuid'] );
+		$this->assertEquals( 'twentyfifteen', $query_params['customize_theme'] );
+
+		$uuid = wp_generate_uuid4();
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'messenger_channel' => null,
+			'theme' => 'twentyfifteen',
+		) );
+		$url = $wp_customize->add_state_query_params( 'http://not-allowed.example.com/?q=1' );
+		$parsed_url = wp_parse_url( $url );
+		parse_str( $parsed_url['query'], $query_params );
+		$this->assertArrayNotHasKey( 'customize_messenger_channel', $query_params );
+		$this->assertArrayNotHasKey( 'customize_changeset_uuid', $query_params );
+		$this->assertArrayNotHasKey( 'customize_theme', $query_params );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::save_changeset_post().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_save_changeset_post_without_theme_activation() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$did_action = array(
+			'customize_save_validation_before' => did_action( 'customize_save_validation_before' ),
+			'customize_save' => did_action( 'customize_save' ),
+			'customize_save_after' => did_action( 'customize_save_after' ),
+		);
+		$uuid = wp_generate_uuid4();
+
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		$manager->register_controls();
+		$manager->set_post_value( 'blogname', 'Changeset Title' );
+		$manager->set_post_value( 'blogdescription', 'Changeset Tagline' );
+
+		$r = $manager->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'title' => 'Auto Draft',
+			'date_gmt' => '2010-01-01 00:00:00',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Overridden Changeset Title',
+				),
+				'blogdescription' => array(
+					'custom' => 'something',
+				),
+			),
+		) );
+		$this->assertInternalType( 'array', $r );
+
+		$this->assertEquals( $did_action['customize_save_validation_before'] + 1, did_action( 'customize_save_validation_before' ) );
+
+		$post_id = $manager->find_changeset_post_id( $uuid );
+		$this->assertNotNull( $post_id );
+		$saved_data = json_decode( get_post( $post_id )->post_content, true );
+		$this->assertEquals( $manager->unsanitized_post_values(), wp_list_pluck( $saved_data, 'value' ) );
+		$this->assertEquals( 'Overridden Changeset Title', $saved_data['blogname']['value'] );
+		$this->assertEquals( 'something', $saved_data['blogdescription']['custom'] );
+		$this->assertEquals( 'Auto Draft', get_post( $post_id )->post_title );
+		$this->assertEquals( 'auto-draft', get_post( $post_id )->post_status );
+		$this->assertEquals( '2010-01-01 00:00:00', get_post( $post_id )->post_date_gmt );
+		$this->assertNotEquals( 'Changeset Title', get_option( 'blogname' ) );
+		$this->assertArrayHasKey( 'setting_validities', $r );
+
+		// Test saving with invalid settings, ensuring transaction blocked.
+		$previous_saved_data = $saved_data;
+		$manager->add_setting( 'foo_unauthorized', array(
+			'capability' => 'do_not_allow',
+		) );
+		$manager->add_setting( 'baz_illegal', array(
+			'validate_callback' => array( $this, 'return_illegal_error' ),
+		) );
+		$r = $manager->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'OK',
+				),
+				'foo_unauthorized' => array(
+					'value' => 'No',
+				),
+				'bar_unknown' => array(
+					'value' => 'No',
+				),
+				'baz_illegal' => array(
+					'value' => 'No',
+				),
+			),
+		) );
+		$this->assertInstanceOf( 'WP_Error', $r );
+		$this->assertEquals( 'transaction_fail', $r->get_error_code() );
+		$this->assertInternalType( 'array', $r->get_error_data() );
+		$this->assertArrayHasKey( 'setting_validities', $r->get_error_data() );
+		$error_data = $r->get_error_data();
+		$this->assertArrayHasKey( 'blogname', $error_data['setting_validities'] );
+		$this->assertTrue( $error_data['setting_validities']['blogname'] );
+		$this->assertArrayHasKey( 'foo_unauthorized', $error_data['setting_validities'] );
+		$this->assertInstanceOf( 'WP_Error', $error_data['setting_validities']['foo_unauthorized'] );
+		$this->assertEquals( 'unauthorized', $error_data['setting_validities']['foo_unauthorized']->get_error_code() );
+		$this->assertArrayHasKey( 'bar_unknown', $error_data['setting_validities'] );
+		$this->assertInstanceOf( 'WP_Error', $error_data['setting_validities']['bar_unknown'] );
+		$this->assertEquals( 'unrecognized', $error_data['setting_validities']['bar_unknown']->get_error_code() );
+		$this->assertArrayHasKey( 'baz_illegal', $error_data['setting_validities'] );
+		$this->assertInstanceOf( 'WP_Error', $error_data['setting_validities']['baz_illegal'] );
+		$this->assertEquals( 'illegal', $error_data['setting_validities']['baz_illegal']->get_error_code() );
+
+		// Since transactional, ensure no changes have been made.
+		$this->assertEquals( $previous_saved_data, json_decode( get_post( $post_id )->post_content, true ) );
+
+		// Attempt a non-transactional/incremental update.
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		$manager->register_controls(); // That is, register settings.
+		$r = $manager->save_changeset_post( array(
+			'status' => null,
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Non-Transactional \o/ <script>unsanitized</script>',
+				),
+				'bar_unknown' => array(
+					'value' => 'No',
+				),
+			),
+		) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertArrayHasKey( 'setting_validities', $r );
+		$this->assertTrue( $r['setting_validities']['blogname'] );
+		$this->assertInstanceOf( 'WP_Error', $r['setting_validities']['bar_unknown'] );
+		$saved_data = json_decode( get_post( $post_id )->post_content, true );
+		$this->assertNotEquals( $previous_saved_data, $saved_data );
+		$this->assertEquals( 'Non-Transactional \o/ <script>unsanitized</script>', $saved_data['blogname']['value'] );
+
+		// Ensure the filter applies.
+		$customize_changeset_save_data_call_count = $this->customize_changeset_save_data_call_count;
+		add_filter( 'customize_changeset_save_data', array( $this, 'filter_customize_changeset_save_data' ), 10, 2 );
+		$manager->save_changeset_post( array(
+			'status' => null,
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Filtered',
+				),
+			),
+		) );
+		$this->assertEquals( $customize_changeset_save_data_call_count + 1, $this->customize_changeset_save_data_call_count );
+
+		// Publish the changeset.
+		$manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$manager->register_controls();
+		$GLOBALS['wp_customize'] = $manager;
+		$r = $manager->save_changeset_post( array(
+			'status' => 'publish',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Do it live \o/',
+				),
+			),
+		) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertEquals( 'Do it live \o/', get_option( 'blogname' ) );
+		$this->assertEquals( 'trash', get_post_status( $post_id ) ); // Auto-trashed.
+
+		// Test revisions.
+		add_post_type_support( 'customize_changeset', 'revisions' );
+		$uuid = wp_generate_uuid4();
+		$manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$manager->register_controls();
+		$GLOBALS['wp_customize'] = $manager;
+
+		$manager->set_post_value( 'blogname', 'Hello Surface' );
+		$manager->save_changeset_post( array( 'status' => 'auto-draft' ) );
+
+		$manager->set_post_value( 'blogname', 'Hello World' );
+		$manager->save_changeset_post( array( 'status' => 'draft' ) );
+		$this->assertTrue( wp_revisions_enabled( get_post( $manager->changeset_post_id() ) ) );
+
+		$manager->set_post_value( 'blogname', 'Hello Solar System' );
+		$manager->save_changeset_post( array( 'status' => 'draft' ) );
+
+		$manager->set_post_value( 'blogname', 'Hello Galaxy' );
+		$manager->save_changeset_post( array( 'status' => 'draft' ) );
+		$this->assertCount( 3, wp_get_post_revisions( $manager->changeset_post_id() ) );
+	}
+
+	/**
+	 * Call count for customize_changeset_save_data filter.
+	 *
+	 * @var int
+	 */
+	protected $customize_changeset_save_data_call_count = 0;
+
+	/**
+	 * Filter customize_changeset_save_data.
+	 *
+	 * @param array $data    Data.
+	 * @param array $context Context.
+	 * @returns array Data.
+	 */
+	function filter_customize_changeset_save_data( $data, $context ) {
+		$this->customize_changeset_save_data_call_count += 1;
+		$this->assertInternalType( 'array', $data );
+		$this->assertInternalType( 'array', $context );
+		$this->assertArrayHasKey( 'uuid', $context );
+		$this->assertArrayHasKey( 'title', $context );
+		$this->assertArrayHasKey( 'status', $context );
+		$this->assertArrayHasKey( 'date_gmt', $context );
+		$this->assertArrayHasKey( 'post_id', $context );
+		$this->assertArrayHasKey( 'previous_data', $context );
+		$this->assertArrayHasKey( 'manager', $context );
+		return $data;
+	}
+
+	/**
+	 * Return illegal error.
+	 *
+	 * @return WP_Error Error.
+	 */
+	function return_illegal_error() {
+		return new WP_Error( 'illegal' );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::save_changeset_post().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 * @covers WP_Customize_Manager::update_stashed_theme_mod_settings()
+	 */
+	function test_save_changeset_post_with_theme_activation() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$stashed_theme_mods = array(
+			'twentyfifteen' => array(
+				'background_color' => array(
+					'value' => '#123456',
+				),
+			),
+		);
+		update_option( 'customize_stashed_theme_mods', $stashed_theme_mods );
+		$uuid = wp_generate_uuid4();
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'theme' => 'twentyfifteen',
+		) );
+		$manager->register_controls();
+		$GLOBALS['wp_customize'] = $manager;
+
+		$manager->set_post_value( 'blogname', 'Hello 2015' );
+		$post_values = $manager->unsanitized_post_values();
+		$manager->save_changeset_post( array( 'status' => 'publish' ) ); // Activate.
+
+		$this->assertEquals( '#123456', $post_values['background_color'] );
+		$this->assertEquals( 'twentyfifteen', get_stylesheet() );
+		$this->assertEquals( 'Hello 2015', get_option( 'blogname' ) );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::is_cross_domain().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::is_cross_domain()
+	 */
+	function test_is_cross_domain() {
+		$wp_customize = new WP_Customize_Manager();
+
+		update_option( 'home', 'http://example.com' );
+		update_option( 'siteurl', 'http://example.com' );
+		$this->assertFalse( $wp_customize->is_cross_domain() );
+
+		update_option( 'home', 'http://example.com' );
+		update_option( 'siteurl', 'https://admin.example.com' );
+		$this->assertTrue( $wp_customize->is_cross_domain() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::get_allowed_urls().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::get_allowed_urls()
+	 */
+	function test_get_allowed_urls() {
+		$wp_customize = new WP_Customize_Manager();
+		$this->assertFalse( is_ssl() );
+		$this->assertFalse( $wp_customize->is_cross_domain() );
+		$allowed = $wp_customize->get_allowed_urls();
+		$this->assertEquals( $allowed, array( home_url( '/', 'http' ) ) );
+
+		add_filter( 'customize_allowed_urls', array( $this, 'filter_customize_allowed_urls' ) );
+		$allowed = $wp_customize->get_allowed_urls();
+		$this->assertEqualSets( $allowed, array( 'http://headless.example.com/', home_url( '/', 'http' ) ) );
+	}
+
+	/**
+	 * Callback for customize_allowed_urls filter.
+	 *
+	 * @param array $urls URLs.
+	 * @return array URLs.
+	 */
+	function filter_customize_allowed_urls( $urls ) {
+		$urls[] = 'http://headless.example.com/';
+		return $urls;
 	}
 
 	/**
@@ -90,7 +717,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 *
 	 * @ticket 30988
 	 */
-	function test_unsanitized_post_values() {
+	function test_unsanitized_post_values_from_input() {
+		wp_set_current_user( self::$admin_user_id );
 		$manager = $this->manager;
 
 		$customized = array(
@@ -100,6 +728,117 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$_POST['customized'] = wp_slash( wp_json_encode( $customized ) );
 		$post_values = $manager->unsanitized_post_values();
 		$this->assertEquals( $customized, $post_values );
+		$this->assertEmpty( $manager->unsanitized_post_values( array( 'exclude_post_data' => true ) ) );
+
+		$manager->set_post_value( 'foo', 'BAR' );
+		$post_values = $manager->unsanitized_post_values();
+		$this->assertEquals( 'BAR', $post_values['foo'] );
+		$this->assertEmpty( $manager->unsanitized_post_values( array( 'exclude_post_data' => true ) ) );
+
+		// If user is unprivileged, the post data is ignored.
+		wp_set_current_user( 0 );
+		$this->assertEmpty( $manager->unsanitized_post_values() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::unsanitized_post_values().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::unsanitized_post_values()
+	 */
+	function test_unsanitized_post_values_with_changeset_and_stashed_theme_mods() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$stashed_theme_mods = array(
+			'twentyfifteen' => array(
+				'background_color' => array(
+					'value' => '#000000',
+				),
+			),
+		);
+		$stashed_theme_mods[ get_stylesheet() ] = array(
+			'background_color' => array(
+				'value' => '#FFFFFF',
+			),
+		);
+		update_option( 'customize_stashed_theme_mods', $stashed_theme_mods );
+
+		$post_values = array(
+			'blogdescription' => 'Post Input Tagline',
+		);
+		$_POST['customized'] = wp_slash( wp_json_encode( $post_values ) );
+
+		$uuid = wp_generate_uuid4();
+		$changeset_data = array(
+			'blogname' => array(
+				'value' => 'Changeset Title',
+			),
+			'blogdescription' => array(
+				'value' => 'Changeset Tagline',
+			),
+		);
+		$this->factory()->post->create( array(
+			'post_type' => 'customize_changeset',
+			'post_status' => 'auto-draft',
+			'post_name' => $uuid,
+			'post_content' => wp_json_encode( $changeset_data ),
+		) );
+
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		$this->assertTrue( $manager->is_theme_active() );
+
+		$this->assertArrayNotHasKey( 'background_color', $manager->unsanitized_post_values() );
+
+		$this->assertEquals(
+			array(
+				'blogname' => 'Changeset Title',
+				'blogdescription' => 'Post Input Tagline',
+			),
+			$manager->unsanitized_post_values()
+		);
+		$this->assertEquals(
+			array(
+				'blogdescription' => 'Post Input Tagline',
+			),
+			$manager->unsanitized_post_values( array( 'exclude_changeset' => true ) )
+		);
+
+		$manager->set_post_value( 'blogdescription', 'Post Override Tagline' );
+		$this->assertEquals(
+			array(
+				'blogname' => 'Changeset Title',
+				'blogdescription' => 'Post Override Tagline',
+			),
+			$manager->unsanitized_post_values()
+		);
+
+		$this->assertEquals(
+			array(
+				'blogname' => 'Changeset Title',
+				'blogdescription' => 'Changeset Tagline',
+			),
+			$manager->unsanitized_post_values( array( 'exclude_post_data' => true ) )
+		);
+
+		$this->assertEmpty( $manager->unsanitized_post_values( array( 'exclude_post_data' => true, 'exclude_changeset' => true ) ) );
+
+		// Test unstashing theme mods.
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+			'theme' => 'twentyfifteen',
+		) );
+		$this->assertFalse( $manager->is_theme_active() );
+		$values = $manager->unsanitized_post_values( array( 'exclude_post_data' => true, 'exclude_changeset' => true ) );
+		$this->assertNotEmpty( $values );
+		$this->assertArrayHasKey( 'background_color', $values );
+		$this->assertEquals( '#000000', $values['background_color'] );
+
+		$values = $manager->unsanitized_post_values( array( 'exclude_post_data' => false, 'exclude_changeset' => false ) );
+		$this->assertArrayHasKey( 'background_color', $values );
+		$this->assertArrayHasKey( 'blogname', $values );
+		$this->assertArrayHasKey( 'blogdescription', $values );
 	}
 
 	/**
@@ -108,6 +847,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @ticket 30988
 	 */
 	function test_post_value() {
+		wp_set_current_user( self::$admin_user_id );
 		$posted_settings = array(
 			'foo' => 'OOF',
 		);
@@ -131,6 +871,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @ticket 34893
 	 */
 	function test_invalid_post_value() {
+		wp_set_current_user( self::$admin_user_id );
 		$default_value = 'foo_default';
 		$setting = $this->manager->add_setting( 'foo', array(
 			'validate_callback' => array( $this, 'filter_customize_validate_foo' ),
@@ -196,6 +937,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @ticket 37247
 	 */
 	function test_post_value_validation_sanitization_order() {
+		wp_set_current_user( self::$admin_user_id );
 		$default_value = '0';
 		$setting = $this->manager->add_setting( 'numeric', array(
 			'validate_callback' => array( $this, 'filter_customize_validate_numeric' ),
@@ -240,6 +982,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::validate_setting_values()
 	 */
 	function test_validate_setting_values() {
+		wp_set_current_user( self::$admin_user_id );
 		$setting = $this->manager->add_setting( 'foo', array(
 			'validate_callback' => array( $this, 'filter_customize_validate_foo' ),
 			'sanitize_callback' => array( $this, 'filter_customize_sanitize_foo' ),
@@ -305,6 +1048,40 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test WP_Customize_Manager::validate_setting_values().
+	 *
+	 * @ticket 30937
+	 * @covers WP_Customize_Manager::validate_setting_values()
+	 */
+	function test_validate_setting_values_args() {
+		wp_set_current_user( self::$admin_user_id );
+		$this->manager->register_controls();
+
+		$validities = $this->manager->validate_setting_values( array( 'unknown' => 'X' ) );
+		$this->assertEmpty( $validities );
+
+		$validities = $this->manager->validate_setting_values( array( 'unknown' => 'X' ), array( 'validate_existence' => false ) );
+		$this->assertEmpty( $validities );
+
+		$validities = $this->manager->validate_setting_values( array( 'unknown' => 'X' ), array( 'validate_existence' => true ) );
+		$this->assertNotEmpty( $validities );
+		$this->assertArrayHasKey( 'unknown', $validities );
+		$error = $validities['unknown'];
+		$this->assertInstanceOf( 'WP_Error', $error );
+		$this->assertEquals( 'unrecognized', $error->get_error_code() );
+
+		$this->manager->get_setting( 'blogname' )->capability = 'do_not_allow';
+		$validities = $this->manager->validate_setting_values( array( 'blogname' => 'X' ), array( 'validate_capability' => false ) );
+		$this->assertArrayHasKey( 'blogname', $validities );
+		$this->assertTrue( $validities['blogname'] );
+		$validities = $this->manager->validate_setting_values( array( 'blogname' => 'X' ), array( 'validate_capability' => true ) );
+		$this->assertArrayHasKey( 'blogname', $validities );
+		$error = $validities['blogname'];
+		$this->assertInstanceOf( 'WP_Error', $error );
+		$this->assertEquals( 'unauthorized', $error->get_error_code() );
+	}
+
+	/**
 	 * Add a length constraint to a setting.
 	 *
 	 * Adds minimum-length error code if the length is less than 10.
@@ -328,6 +1105,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @ticket 37247
 	 */
 	function test_validate_setting_values_validation_sanitization_order() {
+		wp_set_current_user( self::$admin_user_id );
 		$setting = $this->manager->add_setting( 'numeric', array(
 			'validate_callback' => array( $this, 'filter_customize_validate_numeric' ),
 			'sanitize_callback' => array( $this, 'filter_customize_sanitize_numeric' ),
@@ -369,6 +1147,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::set_post_value()
 	 */
 	function test_set_post_value() {
+		wp_set_current_user( self::$admin_user_id );
 		$this->manager->add_setting( 'foo', array(
 			'sanitize_callback' => array( $this, 'sanitize_foo_for_test_set_post_value' ),
 		) );
@@ -473,7 +1252,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		}
 		$this->assertFalse( $this->manager->has_published_pages() );
 
-		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'editor' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$this->manager->nav_menus->customize_register();
 		$setting_id = 'nav_menus_created_posts';
 		$setting = $this->manager->get_setting( $setting_id );
@@ -492,6 +1271,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @ticket 30936
 	 */
 	function test_register_dynamic_settings() {
+		wp_set_current_user( self::$admin_user_id );
 		$posted_settings = array(
 			'foo' => 'OOF',
 			'bar' => 'RAB',
@@ -591,7 +1371,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
 		$this->assertEquals( home_url( '/' ), $this->manager->get_return_url() );
 
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$this->assertTrue( current_user_can( 'edit_theme_options' ) );
 		$this->assertEquals( home_url( '/' ), $this->manager->get_return_url() );
 
@@ -684,7 +1464,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::customize_pane_settings()
 	 */
 	function test_customize_pane_settings() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$this->manager->register_controls();
 		$this->manager->prepare_controls();
 		$autofocus = array( 'control' => 'blogname' );
@@ -706,7 +1486,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$data = json_decode( $json, true );
 		$this->assertNotEmpty( $data );
 
-		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl', 'previewableDevices' ), array_keys( $data ) );
+		$this->assertEqualSets( array( 'theme', 'url', 'browser', 'panels', 'sections', 'nonce', 'autofocus', 'documentTitleTmpl', 'previewableDevices', 'changeset', 'timeouts' ), array_keys( $data ) );
 		$this->assertEquals( $autofocus, $data['autofocus'] );
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
@@ -718,7 +1498,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @see WP_Customize_Manager::customize_preview_settings()
 	 */
 	function test_customize_preview_settings() {
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$this->manager->register_controls();
 		$this->manager->prepare_controls();
 		$this->manager->set_post_value( 'foo', 'bar' );
@@ -740,9 +1520,10 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'settingValidities', $settings );
 		$this->assertArrayHasKey( 'nonce', $settings );
 		$this->assertArrayHasKey( '_dirty', $settings );
+		$this->assertArrayHasKey( 'timeouts', $settings );
+		$this->assertArrayHasKey( 'changeset', $settings );
 
 		$this->assertArrayHasKey( 'preview', $settings['nonce'] );
-		$this->assertEquals( array( 'foo' ), $settings['_dirty'] );
 	}
 
 	/**
@@ -814,7 +1595,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$manager = new WP_Customize_Manager();
 		$manager->register_controls();
 		$section_id = 'foo-section';
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$manager->add_section( $section_id, array(
 			'title'      => 'Section',
 			'priority'   => 1,
@@ -845,7 +1626,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 */
 	function test_add_section_return_instance() {
 		$manager = new WP_Customize_Manager();
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 
 		$section_id = 'foo-section';
 		$result_section = $manager->add_section( $section_id, array(
@@ -872,7 +1653,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 */
 	function test_add_setting_return_instance() {
 		$manager = new WP_Customize_Manager();
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 
 		$setting_id = 'foo-setting';
 		$result_setting = $manager->add_setting( $setting_id );
@@ -943,7 +1724,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 */
 	function test_add_panel_return_instance() {
 		$manager = new WP_Customize_Manager();
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 
 		$panel_id = 'foo-panel';
 		$result_panel = $manager->add_panel( $panel_id, array(
@@ -970,7 +1751,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function test_add_control_return_instance() {
 		$manager = new WP_Customize_Manager();
 		$section_id = 'foo-section';
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		wp_set_current_user( self::$admin_user_id );
 		$manager->add_section( $section_id, array(
 			'title'    => 'Section',
 			'priority' => 1,

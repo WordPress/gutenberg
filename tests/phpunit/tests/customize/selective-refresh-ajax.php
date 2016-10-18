@@ -140,25 +140,6 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Make sure that the Customizer "signature" is not included in partial render responses.
-	 *
-	 * @see WP_Customize_Selective_Refresh::handle_render_partials_request()
-	 */
-	function test_handle_render_partials_request_removes_customize_signature() {
-		$this->setup_valid_render_partials_request_environment();
-		$this->assertTrue( is_customize_preview() );
-		$this->assertEquals( 1000, has_action( 'shutdown', array( $this->wp_customize, 'customize_preview_signature' ) ) );
-		ob_start();
-		try {
-			$this->selective_refresh->handle_render_partials_request();
-		} catch ( WPDieException $e ) {
-			unset( $e );
-		}
-		ob_end_clean();
-		$this->assertFalse( has_action( 'shutdown', array( $this->wp_customize, 'customize_preview_signature' ) ) );
-	}
-
-	/**
 	 * Test WP_Customize_Selective_Refresh::handle_render_partials_request() for an unrecognized partial.
 	 *
 	 * @see WP_Customize_Selective_Refresh::handle_render_partials_request()

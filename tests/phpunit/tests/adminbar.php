@@ -550,4 +550,37 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 		$this->assertNull( $node );
 	}
+
+	/**
+	 * @ticket 30937
+	 * @covers wp_admin_bar_customize_menu()
+	 */
+	public function test_customize_link() {
+		global $wp_customize;
+		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
+		$uuid = wp_generate_uuid4();
+		$this->go_to( home_url( "/?customize_changeset_uuid=$uuid" ) );
+		wp_set_current_user( self::$admin_id );
+
+		$this->factory()->post->create( array(
+			'post_type' => 'customize_changeset',
+			'post_status' => 'auto-draft',
+			'post_name' => $uuid,
+		) );
+		$wp_customize = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		$wp_customize->start_previewing_theme();
+
+		set_current_screen( 'front' );
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node = $wp_admin_bar->get_node( 'customize' );
+		$this->assertNotEmpty( $node );
+
+		$parsed_url = wp_parse_url( $node->href );
+		$query_params = array();
+		wp_parse_str( $parsed_url['query'], $query_params );
+		$this->assertEquals( $uuid, $query_params['changeset_uuid'] );
+		$this->assertNotContains( 'changeset_uuid', $query_params['url'] );
+	}
 }

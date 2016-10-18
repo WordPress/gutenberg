@@ -1240,4 +1240,50 @@ class Tests_Post extends WP_UnitTestCase {
 		$this->assertEquals( 0, get_post( $page_id )->post_parent );
 	}
 
+	/**
+	 * Test ensuring that the post_name (UUID) is preserved when wp_insert_post()/wp_update_post() is called.
+	 *
+	 * @see _wp_customize_changeset_filter_insert_post_data()
+	 * @ticket 30937
+	 */
+	function test_wp_insert_post_for_customize_changeset_should_not_drop_post_name() {
+
+		$this->assertEquals( 10, has_filter( 'wp_insert_post_data', '_wp_customize_changeset_filter_insert_post_data' ) );
+
+		$changeset_data = array(
+			'blogname' => array(
+				'value' => 'Hello World',
+			),
+		);
+
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'contributor' ) ) );
+
+		$uuid = wp_generate_uuid4();
+		$post_id = wp_insert_post( array(
+			'post_type' => 'customize_changeset',
+			'post_name' => strtoupper( $uuid ),
+			'post_content' => wp_json_encode( $changeset_data ),
+		) );
+		$this->assertEquals( $uuid, get_post( $post_id )->post_name, 'Expected lower-case UUID4 to be inserted.' );
+		$this->assertEquals( $changeset_data, json_decode( get_post( $post_id )->post_content, true ) );
+
+		$changeset_data['blogname']['value'] = 'Hola Mundo';
+		wp_update_post( array(
+			'ID' => $post_id,
+			'post_status' => 'draft',
+			'post_content' => wp_json_encode( $changeset_data ),
+		) );
+		$this->assertEquals( $uuid, get_post( $post_id )->post_name, 'Expected post_name to not have been dropped for drafts.' );
+		$this->assertEquals( $changeset_data, json_decode( get_post( $post_id )->post_content, true ) );
+
+		$changeset_data['blogname']['value'] = 'Hallo Welt';
+		wp_update_post( array(
+			'ID' => $post_id,
+			'post_status' => 'pending',
+			'post_content' => wp_json_encode( $changeset_data ),
+		) );
+		$this->assertEquals( $uuid, get_post( $post_id )->post_name, 'Expected post_name to not have been dropped for pending.' );
+		$this->assertEquals( $changeset_data, json_decode( get_post( $post_id )->post_content, true ) );
+	}
+
 }

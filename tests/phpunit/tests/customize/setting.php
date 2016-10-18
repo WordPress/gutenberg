@@ -97,6 +97,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @see WP_Customize_Setting::value()
 	 */
 	function test_preview_standard_types_non_multidimensional() {
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$_POST['customized'] = wp_slash( wp_json_encode( $this->post_data_overrides ) );
 
 		// Try non-multidimensional settings.
@@ -175,6 +176,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @see WP_Customize_Setting::value()
 	 */
 	function test_preview_standard_types_multidimensional() {
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$_POST['customized'] = wp_slash( wp_json_encode( $this->post_data_overrides ) );
 
 		foreach ( $this->standard_type_configs as $type => $type_options ) {
@@ -314,6 +316,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @see WP_Customize_Setting::preview()
 	 */
 	function test_preview_custom_type() {
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$type = 'custom_type';
 		$post_data_overrides = array(
 			"unset_{$type}_with_post_value" => "unset_{$type}_without_post_value\\o/",
@@ -478,6 +481,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @ticket 31428
 	 */
 	function test_is_current_blog_previewed() {
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$type = 'option';
 		$name = 'blogname';
 		$post_value = __FUNCTION__;
@@ -502,6 +506,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Cannot test WP_Customize_Setting::is_current_blog_previewed() with switch_to_blog() if not on multisite.' );
 		}
 
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$type = 'option';
 		$name = 'blogdescription';
 		$post_value = __FUNCTION__;
@@ -647,6 +652,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @ticket 37294
 	 */
 	public function test_multidimensional_value_when_previewed() {
+		wp_set_current_user( $this->factory()->user->create( array( 'role' => 'administrator' ) ) );
 		WP_Customize_Setting::reset_aggregated_multidimensionals();
 
 		$initial_value = 456;
