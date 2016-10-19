@@ -71,6 +71,22 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Get a core theme that is not the same as the current theme.
+	 *
+	 * @throws Exception If an inactive core Twenty* theme cannot be found.
+	 * @return string Theme slug (stylesheet).
+	 */
+	function get_inactive_core_theme() {
+		$stylesheet = get_stylesheet();
+		foreach ( wp_get_themes() as $theme ) {
+			if ( $theme->stylesheet !== $stylesheet && 0 === strpos( $theme->stylesheet, 'twenty' ) ) {
+				return $theme->stylesheet;
+			}
+		}
+		throw new Exception( 'Unable to find inactive twenty* theme.' );
+	}
+
+	/**
 	 * Instantiate class, set global $wp_customize, and return instance.
 	 *
 	 * @return WP_Customize_Manager
@@ -347,6 +363,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @covers WP_Customize_Manager::add_state_query_params()
 	 */
 	function test_add_state_query_params() {
+		$preview_theme = $this->get_inactive_core_theme();
+
 		$uuid = wp_generate_uuid4();
 		$messenger_channel = 'preview-0';
 		$wp_customize = new WP_Customize_Manager( array(
@@ -366,7 +384,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$wp_customize = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 			'messenger_channel' => null,
-			'theme' => 'twentyfifteen',
+			'theme' => $preview_theme,
 		) );
 		$url = $wp_customize->add_state_query_params( home_url( '/' ) );
 		$parsed_url = wp_parse_url( $url );
@@ -375,13 +393,13 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'customize_changeset_uuid', $query_params );
 		$this->assertArrayHasKey( 'customize_theme', $query_params );
 		$this->assertEquals( $uuid, $query_params['customize_changeset_uuid'] );
-		$this->assertEquals( 'twentyfifteen', $query_params['customize_theme'] );
+		$this->assertEquals( $preview_theme, $query_params['customize_theme'] );
 
 		$uuid = wp_generate_uuid4();
 		$wp_customize = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 			'messenger_channel' => null,
-			'theme' => 'twentyfifteen',
+			'theme' => $preview_theme,
 		) );
 		$url = $wp_customize->add_state_query_params( 'http://not-allowed.example.com/?q=1' );
 		$parsed_url = wp_parse_url( $url );
@@ -610,8 +628,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function test_save_changeset_post_with_theme_activation() {
 		wp_set_current_user( self::$admin_user_id );
 
+		$preview_theme = $this->get_inactive_core_theme();
 		$stashed_theme_mods = array(
-			'twentyfifteen' => array(
+			$preview_theme => array(
 				'background_color' => array(
 					'value' => '#123456',
 				),
@@ -621,18 +640,18 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$uuid = wp_generate_uuid4();
 		$manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
-			'theme' => 'twentyfifteen',
+			'theme' => $preview_theme,
 		) );
 		$manager->register_controls();
 		$GLOBALS['wp_customize'] = $manager;
 
-		$manager->set_post_value( 'blogname', 'Hello 2015' );
+		$manager->set_post_value( 'blogname', 'Hello Preview Theme' );
 		$post_values = $manager->unsanitized_post_values();
 		$manager->save_changeset_post( array( 'status' => 'publish' ) ); // Activate.
 
 		$this->assertEquals( '#123456', $post_values['background_color'] );
-		$this->assertEquals( 'twentyfifteen', get_stylesheet() );
-		$this->assertEquals( 'Hello 2015', get_option( 'blogname' ) );
+		$this->assertEquals( $preview_theme, get_stylesheet() );
+		$this->assertEquals( 'Hello Preview Theme', get_option( 'blogname' ) );
 	}
 
 	/**
@@ -749,8 +768,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function test_unsanitized_post_values_with_changeset_and_stashed_theme_mods() {
 		wp_set_current_user( self::$admin_user_id );
 
+		$preview_theme = $this->get_inactive_core_theme();
 		$stashed_theme_mods = array(
-			'twentyfifteen' => array(
+			$preview_theme => array(
 				'background_color' => array(
 					'value' => '#000000',
 				),
@@ -827,7 +847,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		// Test unstashing theme mods.
 		$manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
-			'theme' => 'twentyfifteen',
+			'theme' => $preview_theme,
 		) );
 		$this->assertFalse( $manager->is_theme_active() );
 		$values = $manager->unsanitized_post_values( array( 'exclude_post_data' => true, 'exclude_changeset' => true ) );
