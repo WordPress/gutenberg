@@ -916,6 +916,34 @@ EOF;
 	}
 
 	/**
+	 * Tests the default output of `wp_get_attachment_image()`.
+	 * @ticket 34635
+	 */
+	function test_wp_get_attachment_image_defaults() {
+		$image = image_downsize( self::$large_id, 'thumbnail' );
+		$expected = sprintf( '<img width="%1$d" height="%2$d" src="%3$s" class="attachment-thumbnail size-thumbnail" alt="" />', $image[1], $image[2], $image[0] );
+
+		$this->assertEquals( $expected, wp_get_attachment_image( self::$large_id ) );
+	}
+
+	/**
+	 * Test that `wp_get_attachment_image()` returns a proper alt value.
+	 * @ticket 34635
+	 */
+	function test_wp_get_attachment_image_with_alt() {
+		// Add test alt metadata.
+		update_post_meta( self::$large_id, '_wp_attachment_image_alt', 'Some very clever alt text', true );
+
+		$image = image_downsize( self::$large_id, 'thumbnail' );
+		$expected = sprintf( '<img width="%1$d" height="%2$d" src="%3$s" class="attachment-thumbnail size-thumbnail" alt="Some very clever alt text" />', $image[1], $image[2], $image[0] );
+
+		$this->assertEquals( $expected, wp_get_attachment_image( self::$large_id ) );
+
+		// Cleanup.
+		update_post_meta( self::$large_id, '_wp_attachment_image_alt', '', true );
+	}
+
+	/**
 	 * @ticket 33878
 	 */
 	function test_wp_get_attachment_image_url() {
@@ -1808,7 +1836,7 @@ EOF;
 		$month = date( 'm' );
 
 		$expected = '<img width="999" height="999" src="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png"' .
-			' class="attachment-testsize size-testsize" alt="test-image-large.png"' .
+			' class="attachment-testsize size-testsize" alt=""' .
 			' srcset="http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-testsize-999x999.png 999w,' .
 				' http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $year . '/' . $month . '/test-image-large-150x150.png 150w"' .
 				' sizes="(max-width: 999px) 100vw, 999px" />';
