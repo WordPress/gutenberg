@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @group  template
+ * @group template
  * @ticket 34292
  */
 class Tests_WP_Resource_Hints extends WP_UnitTestCase {
@@ -238,6 +238,61 @@ class Tests_WP_Resource_Hints extends WP_UnitTestCase {
 	function _add_malformed_url_unsupported_scheme( $hints, $method ) {
 		if ( 'preconnect' === $method ) {
 			$hints[] = 'git://develop.git.wordpress.org/';
+		}
+
+		return $hints;
+	}
+
+	/**
+	 * @group 38121
+	 */
+	function test_custom_attributes() {
+		$expected = "<link rel='dns-prefetch' href='//s.w.org' />\n" .
+		            "<link rel='preconnect' href='https://make.wordpress.org' />\n" .
+		            "<link crossorigin as='image' pr='0.5' href='https://example.com/foo.jpeg' rel='prefetch' />\n" .
+		            "<link crossorigin='use-credentials' as='style' href='https://example.com/foo.css' rel='prefetch' />\n" .
+		            "<link href='http://wordpress.org' rel='prerender' />\n";
+
+		add_filter( 'wp_resource_hints', array( $this, '_add_url_with_attributes' ), 10, 2 );
+
+		$actual = get_echo( 'wp_resource_hints' );
+
+		remove_filter( 'wp_resource_hints', array( $this, '_add_url_with_attributes' ) );
+
+		$this->assertEquals( $expected, $actual );
+	}
+
+	function _add_url_with_attributes( $hints, $method ) {
+		// Ignore hints with missing href attributes.
+		$hints[] = array(
+			'rel'  => 'foo',
+		);
+
+		if ( 'preconnect' === $method ) {
+			// Should ignore rel attributes.
+			$hints[] = array(
+				'rel'  => 'foo',
+				'href' => 'https://make.wordpress.org/great-again',
+			);
+		} elseif ( 'prefetch' === $method ) {
+			$hints[] = array(
+				'crossorigin',
+				'as'   => 'image',
+				'pr'   => 0.5,
+				'href' => 'https://example.com/foo.jpeg',
+			);
+			$hints[] = array(
+				'crossorigin' => 'use-credentials',
+				'as'          => 'style',
+				'href'        => 'https://example.com/foo.css',
+			);
+		} elseif ( 'prerender' === $method ) {
+			// Ignore invalid attributes.
+			$hints[] = array(
+				'foo'  => 'bar',
+				'bar'  => 'baz',
+				'href' => 'http://wordpress.org',
+			);
 		}
 
 		return $hints;
