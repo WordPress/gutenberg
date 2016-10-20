@@ -137,7 +137,6 @@ class WP_PHPUnit_Util_Getopt extends PHPUnit_Util_Getopt {
 			'ajax' => true,
 			'ms-files' => true,
 			'external-http' => true,
-			'external-oembed' => true,
 		);
 
 		foreach ( $options as $option ) {
