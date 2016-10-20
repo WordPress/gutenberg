@@ -33,6 +33,18 @@ CAP;
 		$this->img_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $this->img_name;
 		$this->img_html = '<img src="' . $this->img_url . '"/>';
 		$this->img_meta = array( 'width' => 100, 'height' => 100, 'sizes' => '' );
+
+		// Disable Twenty Seventeen changes to the image size attribute
+		remove_filter( 'wp_calculate_image_sizes', 'twentyseventeen_content_image_sizes_attr' );
+		remove_filter( 'wp_get_attachment_image_attributes', 'twentyseventeen_post_thumbnail_sizes_attr' );
+	}
+
+	function tearDown() {
+		parent::tearDown();
+
+		// Reset Twenty Seventeen behaviour
+		add_filter( 'wp_calculate_image_sizes', 'twentyseventeen_content_image_sizes_attr', 10, 2 );
+		add_filter( 'wp_get_attachment_image_attributes', 'twentyseventeen_post_thumbnail_sizes_attr', 10, 3 );
 	}
 
 	function test_img_caption_shortcode_added() {
@@ -55,10 +67,16 @@ CAP;
 		$result = img_caption_shortcode(
 			array( 'width' => 20, 'caption' => $this->caption )
 		);
+
 		$this->assertEquals( 2, preg_match_all( '/wp-caption/', $result, $_r ) );
 		$this->assertEquals( 1, preg_match_all( '/alignnone/', $result, $_r ) );
 		$this->assertEquals( 1, preg_match_all( "/{$this->caption}/", $result, $_r ) );
-		$this->assertEquals( 1, preg_match_all( "/width: 30/", $result, $_r ) );
+
+		if ( current_theme_supports( 'html5', 'caption' ) ) {
+			$this->assertEquals( 1, preg_match_all( "/width: 20/", $result, $_r ) );
+		} else {
+			$this->assertEquals( 1, preg_match_all( "/width: 30/", $result, $_r ) );
+		}
 	}
 
 	function test_img_caption_shortcode_with_old_format_id_and_align() {
