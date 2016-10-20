@@ -62,7 +62,7 @@ class Tests_Query_Search extends WP_UnitTestCase {
 	/**
 	 * @ticket 38099
 	 */
-	function test_filter_wp_query_use_hyphen_for_exclusion() {
+	function test_disable_search_exclusion_prefix() {
 		$title = '-HYPHENATION_TEST';
 
 		// Create a post with a title which starts with a hyphen
@@ -74,11 +74,38 @@ class Tests_Query_Search extends WP_UnitTestCase {
 		$this->assertEquals( array(), $this->get_search_results( $title ) );
 
 		// After we disable the feature using the filter, we should get the result
-		add_filter( 'wp_query_use_hyphen_for_exclusion', '__return_false' );
+		add_filter( 'wp_query_search_exclusion_prefix', '__return_false' );
 		$result = $this->get_search_results( $title );
 		$post = array_pop( $result );
 		$this->assertEquals( $post->ID, $post_id );
-		remove_filter( 'wp_query_use_hyphen_for_exclusion', '__return_false' );
+		remove_filter( 'wp_query_search_exclusion_prefix', '__return_false' );
+	}
+
+	/**
+	 * @ticket 38099
+	 */
+	function test_change_search_exclusion_prefix() {
+		$title = '#OCTOTHORPE_TEST';
+
+		// Create a post with a title that starts with a non-hyphen prefix.
+		$post_id = self::factory()->post->create( array(
+			'post_content' => $title, 'post_type' => $this->post_type
+		) );
+
+		// By default, we should get the result.
+		$result = $this->get_search_results( $title );
+		$post = array_pop( $result );
+		$this->assertEquals( $post->ID, $post_id );
+
+		// After we change the prefix, the result should be excluded.
+		add_filter( 'wp_query_search_exclusion_prefix', array( $this, 'filter_search_exclusion_prefix_octothorpe' ) );
+		$found = $this->get_search_results( $title );
+		remove_filter( 'wp_query_search_exclusion_prefix', array( $this, 'filter_search_exclusion_prefix_octothorpe' ) );
+		$this->assertEquals( array(), $found );
+	}
+
+	function filter_search_exclusion_prefix_octothorpe() {
+		return '#';
 	}
 
 	/**
