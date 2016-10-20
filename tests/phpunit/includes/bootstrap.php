@@ -40,6 +40,8 @@ define( 'DISABLE_WP_CRON', true );
 define( 'WP_MEMORY_LIMIT', -1 );
 define( 'WP_MAX_MEMORY_LIMIT', -1 );
 
+define( 'REST_TESTS_IMPOSSIBLY_HIGH_NUMBER', 99999999 );
+
 $PHP_SELF = $GLOBALS['PHP_SELF'] = $_SERVER['PHP_SELF'] = '/index.php';
 
 // Should we run in multisite mode?
@@ -88,6 +90,8 @@ _delete_all_posts();
 
 require dirname( __FILE__ ) . '/testcase.php';
 require dirname( __FILE__ ) . '/testcase-rest-api.php';
+require dirname( __FILE__ ) . '/testcase-rest-controller.php';
+require dirname( __FILE__ ) . '/testcase-rest-post-type-controller.php';
 require dirname( __FILE__ ) . '/testcase-xmlrpc.php';
 require dirname( __FILE__ ) . '/testcase-ajax.php';
 require dirname( __FILE__ ) . '/testcase-canonical.php';

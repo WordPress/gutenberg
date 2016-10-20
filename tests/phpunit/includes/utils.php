@@ -453,3 +453,22 @@ function benchmark_pcre_backtracking( $pattern, $subject, $strategy ) {
 
 	return $i;
 }
+
+function test_rest_expand_compact_links( $links ) {
+	if ( empty( $links['curies'] ) ) {
+		return $links;
+	}
+	foreach ( $links as $rel => $links_array ) {
+		if ( ! strpos( $rel, ':' ) ) {
+			continue;
+		}
+
+		$name = explode( ':', $rel );
+
+		$curie = wp_list_filter( $links['curies'], array( 'name' => $name[0] ) );
+		$full_uri = str_replace( '{rel}', $name[1], $curie[0]['href'] );
+		$links[ $full_uri ] = $links_array;
+		unset( $links[ $rel ] );
+	}
+	return $links;
+}
