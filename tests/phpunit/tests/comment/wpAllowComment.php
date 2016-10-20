@@ -26,6 +26,8 @@ class Tests_Comment_WpAllowComment extends WP_UnitTestCase {
 	function tearDown() {
 		wp_delete_post( self::$post_id, true );
 		wp_delete_comment( self::$comment_id, true );
+
+		update_option( 'comment_whitelist', 1 );
 	}
 
 	public function test_allow_comment_if_comment_author_emails_differ() {
