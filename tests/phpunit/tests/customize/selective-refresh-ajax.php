@@ -61,6 +61,7 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 		// Remove actions that call add_theme_support( 'title-tag' ).
 		remove_action( 'after_setup_theme', 'twentyfifteen_setup' );
 		remove_action( 'after_setup_theme', 'twentysixteen_setup' );
+		remove_action( 'after_setup_theme', 'twentyseventeen_setup' );
 
 		$_SERVER['REQUEST_METHOD'] = 'POST';
 		do_action( 'setup_theme' );
