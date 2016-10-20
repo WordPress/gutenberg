@@ -14,10 +14,23 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 	 */
 	protected static $_wpdb;
 
+	/**
+	 * The version of the MySQL server.
+	 *
+	 * @var string
+	 */
+	private static $server_info;
+
 	public static function setUpBeforeClass() {
 		require_once( dirname( dirname( __FILE__ ) ) . '/db.php' );
 
 		self::$_wpdb = new wpdb_exposed_methods_for_testing();
+
+		if ( self::$_wpdb->use_mysqli ) {
+			self::$server_info = mysqli_get_server_info( self::$_wpdb->dbh );
+		} else {
+			self::$server_info = mysql_get_server_info( self::$_wpdb->dbh );
+		}
 	}
 
 	/**
@@ -361,6 +374,10 @@ class Tests_DB_Charset extends WP_UnitTestCase {
 
 		if ( 'utf8mb4' === $new_charset && ! self::$_wpdb->has_cap( 'utf8mb4' ) ) {
 			$this->markTestSkipped( "The current MySQL server doesn't support the utf8mb4 character set." );
+		}
+
+		if ( 'big5' === $new_charset && 'byte' === $data[0]['length']['type'] && false !== strpos( self::$server_info, 'MariaDB' ) ) {
+			$this->markTestSkipped( "MariaDB doesn't support this data set. See https://core.trac.wordpress.org/ticket/33171." );
 		}
 
 		self::$_wpdb->charset = $new_charset;
