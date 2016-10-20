@@ -677,7 +677,7 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$parent = get_term_by( 'id', $this->factory->category->create(), 'category' );
 		$term = get_term_by( 'id', $this->factory->category->create(), 'category' );
 
-		$request = new WP_REST_Request( 'POST', '/wp/v2/categories/' . $term->term_taxonomy_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/categories/' . $term->term_id );
 		$request->set_param( 'parent', $parent->term_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );

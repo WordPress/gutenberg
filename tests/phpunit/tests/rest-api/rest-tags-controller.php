@@ -531,7 +531,7 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( $this->administrator );
 		$term = get_term_by( 'id', $this->factory->tag->create(), 'post_tag' );
 
-		$request = new WP_REST_Request( 'POST', '/wp/v2/tags/' . $term->term_taxonomy_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags/' . $term->term_id );
 		$request->set_param( 'parent', REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_taxonomy_not_hierarchical', $response, 400 );

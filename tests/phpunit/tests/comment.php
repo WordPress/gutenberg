@@ -460,7 +460,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertFalse( $notification_sent, 'Moderator notification setting on, filter set to off' );
 
 		remove_filter( 'notify_moderator', '__return_false' );
-
+		remove_filter( 'comment_flood_filter', '__return_false' );
 	}
 
 	/**
@@ -481,6 +481,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertTrue( $notification_sent, 'Moderator notification setting off, filter set to on' );
 
 		remove_filter( 'notify_moderator', '__return_true' );
+		remove_filter( 'comment_flood_filter', '__return_false' );
 	}
 
 	/**
@@ -502,6 +503,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertFalse( $notification_sent, 'Test with author notification setting on, filter set to off' );
 
 		remove_filter( 'notify_post_author', '__return_false' );
+		remove_filter( 'comment_flood_filter', '__return_false' );
 	}
 
 	/**
@@ -522,6 +524,7 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertTrue( $notification_sent, 'Test with author notification setting off, filter set to on' );
 
 		remove_filter( 'notify_post_author', '__return_true' );
+		remove_filter( 'comment_flood_filter', '__return_false' );
 	}
 
 	/**
