@@ -645,6 +645,15 @@ module.exports = function(grunt) {
 		}
 	});
 
+	// Allow builds to be minimal
+	if( grunt.option( 'minimal-copy' ) ) {
+		var copyFilesOptions = grunt.config.get( 'copy.files.files' );
+		copyFilesOptions[0].src.push( '!wp-content/plugins/**' );
+		copyFilesOptions[0].src.push( '!wp-content/themes/!(twenty*)/**' );
+		grunt.config.set( 'copy.files.files', copyFilesOptions );
+	}
+
+
 	// Register tasks.
 
 	// RTL task.
