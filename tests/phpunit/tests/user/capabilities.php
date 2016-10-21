@@ -467,6 +467,9 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 		$this->assertFalse( $user->has_cap( 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
 		$this->assertFalse( user_can( $user, 'do_not_allow' ), "User with the {$role} role should not have the do_not_allow capability" );
+
+		$this->assertTrue( $user->has_cap( 'exist' ), "User with the {$role} role should have the exist capability" );
+		$this->assertTrue( user_can( $user, 'exist' ), "User with the {$role} role should have the exist capability" );
 	}
 
 	// special case for the link manager
