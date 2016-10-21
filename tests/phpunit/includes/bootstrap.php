@@ -53,6 +53,9 @@ $multisite = $multisite || ( defined( 'MULTISITE' ) && MULTISITE );
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
 $phpmailer = new MockPHPMailer();
 
+// Add a symlink to the empty default theme to the themes directory, so it can be used for the tests.
+_symlink_default_theme();
+
 system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite );
 
 if ( $multisite ) {

@@ -51,20 +51,12 @@ class Test_WP_Customize_Selective_Refresh_Ajax extends WP_UnitTestCase {
 		if ( isset( $this->wp_customize->selective_refresh ) ) {
 			$this->selective_refresh = $this->wp_customize->selective_refresh;
 		}
-
-		// Remove default theme actions that interfere with tests
-		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 	}
 
 	/**
 	 * Do Customizer boot actions.
 	 */
 	function do_customize_boot_actions() {
-		// Remove actions that call add_theme_support( 'title-tag' ).
-		remove_action( 'after_setup_theme', 'twentyfifteen_setup' );
-		remove_action( 'after_setup_theme', 'twentysixteen_setup' );
-		remove_action( 'after_setup_theme', 'twentyseventeen_setup' );
-
 		$_SERVER['REQUEST_METHOD'] = 'POST';
 		do_action( 'setup_theme' );
 		do_action( 'after_setup_theme' );

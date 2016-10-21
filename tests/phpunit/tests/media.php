@@ -33,18 +33,6 @@ CAP;
 		$this->img_url = 'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/' . $this->img_name;
 		$this->img_html = '<img src="' . $this->img_url . '"/>';
 		$this->img_meta = array( 'width' => 100, 'height' => 100, 'sizes' => '' );
-
-		// Disable Twenty Seventeen changes to the image size attribute
-		remove_filter( 'wp_calculate_image_sizes', 'twentyseventeen_content_image_sizes_attr' );
-		remove_filter( 'wp_get_attachment_image_attributes', 'twentyseventeen_post_thumbnail_sizes_attr' );
-	}
-
-	function tearDown() {
-		parent::tearDown();
-
-		// Reset Twenty Seventeen behaviour
-		add_filter( 'wp_calculate_image_sizes', 'twentyseventeen_content_image_sizes_attr', 10, 2 );
-		add_filter( 'wp_get_attachment_image_attributes', 'twentyseventeen_post_thumbnail_sizes_attr', 10, 3 );
 	}
 
 	function test_img_caption_shortcode_added() {

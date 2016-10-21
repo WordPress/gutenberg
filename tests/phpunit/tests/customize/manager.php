@@ -58,9 +58,6 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		require_once( ABSPATH . WPINC . '/class-wp-customize-manager.php' );
 		$this->manager = $this->instantiate();
 		$this->undefined = new stdClass();
-
-		// Remove default theme actions that interfere with tests
-		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 	}
 
 	/**

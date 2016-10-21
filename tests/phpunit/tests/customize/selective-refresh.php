@@ -39,9 +39,6 @@ class Test_WP_Customize_Selective_Refresh extends WP_UnitTestCase {
 		if ( isset( $this->wp_customize->selective_refresh ) ) {
 			$this->selective_refresh = $this->wp_customize->selective_refresh;
 		}
-
-		// Remove default theme actions that interfere with tests
-		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 	}
 
 	/**

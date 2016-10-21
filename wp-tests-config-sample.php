@@ -3,6 +3,14 @@
 /* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
 define( 'ABSPATH', dirname( __FILE__ ) . '/src/' );
 
+/*
+ * Path to the theme to test with.
+ *
+ * The 'default' theme is symlinked from test/phpunit/data/themedir1/default into
+ * the themes directory of the WordPress install defined above.
+ */
+define( 'WP_DEFAULT_THEME', 'default' );
+
 // Test with multisite enabled.
 // Alternatively, use the tests/phpunit/multisite.xml configuration file.
 // define( 'WP_TESTS_MULTISITE', true );

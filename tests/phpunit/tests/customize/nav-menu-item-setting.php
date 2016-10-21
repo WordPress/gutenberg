@@ -26,9 +26,6 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		global $wp_customize;
 		$this->wp_customize = new WP_Customize_Manager();
 		$wp_customize = $this->wp_customize;
-
-		// Remove default theme actions that interfere with tests
-		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 	}
 
 	/**

@@ -40,13 +40,6 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 2, $widget_categories );
 		$this->assertEquals( '', $widget_categories[2]['title'] );
 
-		// @todo We should not be including a theme anyway
-		remove_action( 'after_setup_theme', 'twentyfifteen_setup' );
-		remove_action( 'after_setup_theme', 'twentysixteen_setup' );
-		remove_action( 'customize_register', 'twentysixteen_customize_register', 11 );
-		remove_action( 'after_setup_theme', 'twentyseventeen_setup' );
-		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
-
 		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];
 
 		// Reset protected static var on class.
