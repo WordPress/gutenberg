@@ -1064,7 +1064,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertErrorResponse( 'rest_comment_invalid_status', $response, 403 );
 	}
 
-	public function test_create_comment_with_status_and_IP() {
+	public function test_create_comment_with_status_IP_and_user_agent() {
 		$post_id = $this->factory->post->create();
 		wp_set_current_user( $this->admin_id );
 
@@ -1074,6 +1074,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'author_email' => 'cbg@androidsdungeon.com',
 			'author_ip'    => '139.130.4.5',
 			'author_url'   => 'http://androidsdungeon.com',
+			'author_user_agent' => 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
 			'content'      => 'Worst Comment Ever!',
 			'status'       => 'approved',
 		);
@@ -1088,6 +1089,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$data = $response->get_data();
 		$this->assertEquals( 'approved', $data['status'] );
 		$this->assertEquals( '139.130.4.5', $data['author_ip'] );
+		$this->assertEquals( 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', $data['author_user_agent'] );
 	}
 
 	public function test_create_comment_invalid_author_IP() {
