@@ -45,6 +45,7 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 		remove_action( 'after_setup_theme', 'twentysixteen_setup' );
 		remove_action( 'customize_register', 'twentysixteen_customize_register', 11 );
 		remove_action( 'after_setup_theme', 'twentyseventeen_setup' );
+		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 
 		$this->backup_registered_sidebars = $GLOBALS['wp_registered_sidebars'];
 

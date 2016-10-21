@@ -31,6 +31,9 @@ class Test_WP_Customize_Control extends WP_UnitTestCase {
 		$GLOBALS['wp_customize'] = new WP_Customize_Manager();
 		// @codingStandardsIgnoreEnd
 		$this->wp_customize = $GLOBALS['wp_customize'];
+
+		// Remove default theme actions that interfere with tests
+		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
 	}
 
 	/**

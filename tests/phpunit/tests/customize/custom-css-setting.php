@@ -36,6 +36,9 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->wp_customize = new WP_Customize_Manager();
 		$wp_customize = $this->wp_customize;
 
+		// Remove default theme actions that interfere with tests
+		remove_action( 'customize_register', 'twentyseventeen_customize_register' );
+
 		do_action( 'customize_register', $this->wp_customize );
 		$this->setting = new WP_Customize_Custom_CSS_Setting( $this->wp_customize, 'custom_css[twentysixteen]' );
 		$this->wp_customize->add_setting( $this->setting );
