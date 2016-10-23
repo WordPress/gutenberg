@@ -340,15 +340,45 @@ EOF;
 		$this->assertEquals( $test_string, shortcode_unautop( wpautop( $test_string ) ) );
 	}
 
-	/**
-	 * @ticket 10326
-	 */
-	function test_strip_shortcodes() {
-		$this->assertEquals('before', strip_shortcodes('before[gallery]'));
-		$this->assertEquals('after', strip_shortcodes('[gallery]after'));
-		$this->assertEquals('beforeafter', strip_shortcodes('before[gallery]after'));
+	function data_test_strip_shortcodes() {
+		return array(
+			array( 'before', 'before[gallery]' ),
+			array( 'after', '[gallery]after' ),
+			array( 'beforeafter', 'before[gallery]after' ),
+			array( 'before[after', 'before[after' ),
+			array( 'beforeafter', 'beforeafter' ),
+			array( 'beforeafter', 'before[gallery id="123" size="medium"]after' ),
+			array( 'before[unregistered_shortcode]after', 'before[unregistered_shortcode]after' ),
+			array( 'beforeafter', 'before[footag]after' ),
+			array( 'before  after', 'before [footag]content[/footag] after' ),
+			array( 'before  after', 'before [footag foo="123"]content[/footag] after' ),
+		);
 	}
 
+	/**
+	 * @ticket 10326
+	 *
+	 * @dataProvider data_test_strip_shortcodes
+	 *
+	 * @param string $expected  Expected output.
+	 * @param string $content   Content to run strip_shortcodes() on.
+	 */
+	function test_strip_shortcodes( $expected, $content ) {
+		$this->assertEquals( $expected, strip_shortcodes( $content ) );
+	}
+
+	/**
+	 * @ticket 37767
+	 */
+	function test_strip_shortcodes_filter() {
+		add_filter( 'strip_shortcodes_tagnames', array( $this, '_filter_strip_shortcodes_tagnames' ) );
+		$this->assertEquals( 'beforemiddle [footag]after', strip_shortcodes( 'before[gallery]middle [footag]after' ) );
+		remove_filter( 'strip_shortcodes_tagnames', array( $this, '_filter_strip_shortcodes_tagnames' ) );
+	}
+
+	function _filter_strip_shortcodes_tagnames() {
+		return array( 'gallery' );
+	}
 
 	// Store passed in shortcode_atts_{$shortcode} args
 	function _filter_atts( $out, $pairs, $atts ) {
