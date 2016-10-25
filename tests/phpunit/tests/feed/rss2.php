@@ -12,6 +12,7 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 	static $user_id;
 	static $posts;
 	static $category;
+	static $post_date;
 
 	/**
 	 * Setup a new user and attribute some posts.
@@ -25,16 +26,20 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 		) );
 
 		// Create a taxonomy
-		self::$category = self::factory()->category->create_and_get( array(
-			'name' => 'Test Category',
-			'slug' => 'test-cat',
+		self::$category = $factory->category->create_and_get( array(
+			'name' => 'Foo Category',
+			'slug' => 'foo',
 		) );
+
+		// Set a predictable time for testing date archives.
+		self::$post_date = '2003-05-27 10:07:53';
 
 		$count = get_option( 'posts_per_rss' ) + 1;
 
 		// Create a few posts
 		self::$posts = $factory->post->create_many( $count, array(
 			'post_author'  => self::$user_id,
+			'post_date'    => self::$post_date,
 			'post_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec velit massa, ultrices eu est suscipit, mattis posuere est. Donec vitae purus lacus. Cras vitae odio odio.',
 			'post_excerpt' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		) );
@@ -55,6 +60,9 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 		$this->excerpt_only = get_option( 'rss_use_excerpt' );
 		// this seems to break something
 		update_option( 'use_smilies', false );
+
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+		create_initial_taxonomies();
 	}
 
 	/**
@@ -248,6 +256,215 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 		}
 
 		remove_filter( 'comments_open', '__return_false' );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for the home feed.
+	 * e.g. https://example.com/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_home_feed_endpoint() {
+		// An example of a valid home feed endpoint.
+		$this->go_to( 'feed/' );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed' );
+
+		// Queries performed on valid feed endpoints should contain posts.
+		$this->assertTrue( have_posts() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for the taxonomy feeds.
+	 * e.g. https://example.com/category/foo/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_taxonomy_feed_endpoint() {
+		// An example of an valid taxonomy feed endpoint.
+		$this->go_to( 'category/foo/feed/' );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed', 'is_archive', 'is_category' );
+
+		// Queries performed on valid feed endpoints should contain posts.
+		$this->assertTrue( have_posts() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for the main comment feed.
+	 * e.g. https://example.com/comments/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_main_comment_feed_endpoint() {
+		// Generate a bunch of comments
+		foreach ( self::$posts as $post ) {
+			self::factory()->comment->create_post_comments( $post, 3 );
+		}
+
+		// An example of an valid main comment feed endpoint.
+		$this->go_to( 'comments/feed/' );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed', 'is_comment_feed' );
+
+		// Queries performed on valid feed endpoints should contain comments.
+		$this->assertTrue( have_comments() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for the date archive feeds.
+	 * e.g. https://example.com/2003/05/27/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_archive_feed_endpoint() {
+		// An example of an valid date archive feed endpoint.
+		$this->go_to( '2003/05/27/feed/' );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed', 'is_archive', 'is_day', 'is_date' );
+
+		// Queries performed on valid feed endpoints should contain posts.
+		$this->assertTrue( have_posts() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for single post comment feeds.
+	 * e.g. https://example.com/2003/05/27/post-name/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_single_post_comment_feed_endpoint() {
+		// An example of an valid date archive feed endpoint.
+		$this->go_to( get_post_comments_feed_link( self::$posts[0] ) );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed', 'is_comment_feed', 'is_single', 'is_singular' );
+
+		// Queries performed on valid feed endpoints should contain posts.
+		$this->assertTrue( have_posts() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are rendering feed templates for the search archive feeds.
+	 * e.g. https://example.com/?s=Lorem&feed=rss
+	 *
+	 * @ticket 30210
+	 */
+	function test_valid_search_feed_endpoint() {
+		// An example of an valid search feed endpoint
+		$this->go_to( '?s=Lorem&feed=rss' );
+
+		// Verify the query object is a feed.
+		$this->assertQueryTrue( 'is_feed', 'is_search' );
+
+		// Queries performed on valid feed endpoints should contain posts.
+		$this->assertTrue( have_posts() );
+
+		// Check to see if we have the expected XML output from the feed template.
+		$feed = $this->do_rss2();
+
+		$xml = xml_to_array( $feed );
+
+		// Get the <rss> child element of <xml>.
+		$rss = xml_find( $xml, 'rss' );
+
+		// There should only be one <rss> child element.
+		$this->assertEquals( 1, count( $rss ) );
+	}
+
+	/*
+	 * Check to make sure we are not rendering feed templates for invalid feed endpoints.
+	 * e.g. https://example.com/wp-content/feed/
+	 *
+	 * @ticket 30210
+	 */
+	function test_invalid_feed_endpoint() {
+		// An example of an invalid feed endpoint
+		$this->go_to( 'wp-content/feed/' );
+
+		// Queries performed on invalid feed endpoints should never contain posts.
+		$this->assertFalse( have_posts() );
+
+		// This is the assertion. Once the exception is thrown in do_feed, execution stops, preventing futher assertions.
+		$this->setExpectedException( 'WPDieException', 'ERROR: This is not a valid feed.' );
+		do_feed();
+	}
+
+	/*
+	 * Make sure the requested feed is registered before rendering the requested template.
+	 *
+	 * @ticket 30210
+	 */
+	function test_nonexistent_feeds() {
+		global $wp_rewrite;
+		$badfeed = 'badfeed';
+
+		$this->assertNotContains( $badfeed, $wp_rewrite->feeds );
+
+		$this->go_to( '/?feed=' . $badfeed );
+
+		// This is the assertion. Once the exception is thrown in do_feed, execution stops, preventing futher assertions.
+		$this->setExpectedException( 'WPDieException', 'ERROR: This is not a valid feed template.' );
+		do_feed();
 	}
 
 }
