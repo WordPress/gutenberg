@@ -365,6 +365,37 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 		$this->assertFalse( wpmu_delete_user( $u_obj ) );
 		$this->assertEquals( $u_obj->ID, username_exists( $u_obj->user_login ) );
 	}
+
+	/**
+	 * @ticket 38356
+	 */
+	public function test_add_user_to_blog_subscriber() {
+		$site_id = self::factory()->blog->create();
+		$user_id = self::factory()->user->create();
+
+		add_user_to_blog( $site_id, $user_id, 'subscriber' );
+
+		switch_to_blog( $site_id );
+		$user = get_user_by( 'id', $user_id );
+		restore_current_blog();
+
+		wpmu_delete_blog( $site_id );
+		wpmu_delete_user( $user_id );
+
+		$this->assertContains( 'subscriber', $user->roles );
+	}
+
+	/**
+	 * @ticket 38356
+	 */
+	public function test_add_user_to_blog_invalid_user() {
+		$site_id = self::factory()->blog->create();
+
+		$result = add_user_to_blog( 73622, $site_id, 'subscriber' );
+		wpmu_delete_blog( $site_id );
+
+		$this->assertWPError( $result );
+	}
 }
 
 endif ;
