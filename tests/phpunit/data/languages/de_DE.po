@@ -1,0 +1,42 @@
+# Translation of 4.6.x in German
+# This file is distributed under the same license as the 4.6.x package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2016-10-25 18:27+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 1.8.10\n"
+"Project-Id-Version: 4.6.x\n"
+"Language: de_DE\n"
+
+#. translators: Translate this to the correct language tag for your locale, see
+#. https://www.w3.org/International/articles/language-tags/ for reference. Do
+#. not translate into your own language.
+#: wp-includes/general-template.php:716
+msgid "html_lang_attribute"
+msgstr "de-DE"
+
+#. translators: 'rtl' or 'ltr'. This sets the text direction for WordPress.
+#: wp-includes/class-wp-locale.php:223
+msgctxt "text direction"
+msgid "ltr"
+msgstr "ltr"
+
+#. translators: $dec_point argument for https://secure.php.net/number_format,
+#. default is .
+#: wp-includes/class-wp-locale.php:215
+msgid "number_format_decimal_point"
+msgstr ","
+
+#. translators: $thousands_sep argument for
+#. https://secure.php.net/number_format, default is ,
+#: wp-includes/class-wp-locale.php:202
+msgid "number_format_thousands_sep"
+msgstr "."
+
+#. translators: %s: Plugin name and version
+#: wp-includes/script-loader.php:620
+msgid "Update %s now"
+msgstr "Jetzt %s aktualisieren"

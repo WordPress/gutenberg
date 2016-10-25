@@ -85,7 +85,7 @@ class Tests_L10n extends WP_UnitTestCase {
 		$this->assertEmpty( $array );
 
 		$array = get_available_languages( DIR_TESTDATA . '/languages/' );
-		$this->assertEquals( array( 'en_GB', 'es_ES' ), $array );
+		$this->assertEquals( array( 'de_DE', 'en_GB', 'es_ES' ), $array );
 	}
 
 	/**
@@ -99,15 +99,15 @@ class Tests_L10n extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $installed_translations['default']['en_GB'] );
 		$data_en_GB = $installed_translations['default']['en_GB'];
-		$this->assertEquals( '2016-01-14 21:14:29+0000', $data_en_GB['PO-Revision-Date'] );
+		$this->assertEquals( '2016-10-26 00:01+0200', $data_en_GB['PO-Revision-Date'] );
 		$this->assertEquals( 'Development (4.4.x)', $data_en_GB['Project-Id-Version'] );
-		$this->assertEquals( 'GlotPress/1.0-alpha-1100', $data_en_GB['X-Generator'] );
+		$this->assertEquals( 'Poedit 1.8.10', $data_en_GB['X-Generator'] );
 
 		$this->assertNotEmpty( $installed_translations['admin']['es_ES'] );
 		$data_es_ES = $installed_translations['admin']['es_ES'];
-		$this->assertEquals( '2015-12-22 20:26:46+0000', $data_es_ES['PO-Revision-Date'] );
+		$this->assertEquals( '2016-10-25 18:29+0200', $data_es_ES['PO-Revision-Date'] );
 		$this->assertEquals( 'Administration', $data_es_ES['Project-Id-Version'] );
-		$this->assertEquals( 'GlotPress/1.0-alpha-1100', $data_es_ES['X-Generator'] );
+		$this->assertEquals( 'Poedit 1.8.10', $data_es_ES['X-Generator'] );
 	}
 
 	/**
