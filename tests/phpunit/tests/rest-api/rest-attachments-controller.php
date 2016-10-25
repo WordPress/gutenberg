@@ -280,7 +280,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertEquals( 0, count( $data ) );
 	}
 
-	public function test_get_items_invalid_status_param_is_discarded() {
+	public function test_get_items_invalid_status_param_is_error_response() {
 		wp_set_current_user( $this->editor_id );
 		$this->factory->attachment->create_object( $this->test_file, 0, array(
 			'post_mime_type' => 'image/jpeg',
@@ -291,8 +291,8 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$request->set_param( 'context', 'edit' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertCount( 1, $data );
-		$this->assertEquals( 'inherit', $data[0]['status'] );
+		$this->assertCount( 3, $data );
+		$this->assertEquals( 'rest_invalid_param', $data['code'] );
 	}
 
 	public function test_get_items_private_status() {
