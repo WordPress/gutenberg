@@ -30,8 +30,10 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 			'slug' => 'test-cat',
 		) );
 
+		$count = get_option( 'posts_per_rss' ) + 1;
+
 		// Create a few posts
-		self::$posts = $factory->post->create_many( 42, array(
+		self::$posts = $factory->post->create_many( $count, array(
 			'post_author'  => self::$user_id,
 			'post_content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec velit massa, ultrices eu est suscipit, mattis posuere est. Donec vitae purus lacus. Cras vitae odio odio.',
 			'post_excerpt' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
