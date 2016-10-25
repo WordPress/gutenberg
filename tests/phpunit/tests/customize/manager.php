@@ -1862,6 +1862,73 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	function filter_customize_previewable_devices( $devices ) {
 		return $this->filtered_device_list();
 	}
+
+	/**
+	 * @ticket 37128
+	 */
+	function test_prepare_controls_wp_list_sort_controls() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$controls = array( 'foo' => 2, 'bar' => 4, 'foobar' => 3, 'key' => 1 );
+		$controls_sorted = array( 'key', 'foo', 'foobar', 'bar' );
+
+		$this->manager->add_section( 'foosection', array() );
+
+		foreach ( $controls as $control_id => $priority ) {
+			$this->manager->add_setting( $control_id );
+			$this->manager->add_control( $control_id, array(
+				'priority' => $priority,
+				'section'  => 'foosection',
+			) );
+		}
+
+		$this->manager->prepare_controls();
+
+		$result = $this->manager->controls();
+		$this->assertEquals( $controls_sorted, array_keys( $result ) );
+	}
+
+	/**
+	 * @ticket 37128
+	 */
+	function test_prepare_controls_wp_list_sort_sections() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$sections = array( 'foo' => 2, 'bar' => 4, 'foobar' => 3, 'key' => 1 );
+		$sections_sorted = array( 'key', 'foo', 'foobar', 'bar' );
+
+		foreach ( $sections as $section_id => $priority ) {
+			$this->manager->add_section( $section_id, array(
+				'priority' => $priority,
+			) );
+		}
+
+		$this->manager->prepare_controls();
+
+		$result = $this->manager->sections();
+		$this->assertEquals( $sections_sorted, array_keys( $result ) );
+	}
+
+	/**
+	 * @ticket 37128
+	 */
+	function test_prepare_controls_wp_list_sort_panels() {
+		wp_set_current_user( self::$admin_user_id );
+
+		$panels = array( 'foo' => 2, 'bar' => 4, 'foobar' => 3, 'key' => 1 );
+		$panels_sorted = array( 'key', 'foo', 'foobar', 'bar' );
+
+		foreach ( $panels as $panel_id => $priority ) {
+			$this->manager->add_panel( $panel_id, array(
+				'priority' => $priority,
+			) );
+		}
+
+		$this->manager->prepare_controls();
+
+		$result = $this->manager->panels();
+		$this->assertEquals( $panels_sorted, array_keys( $result ) );
+	}
 }
 
 require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
