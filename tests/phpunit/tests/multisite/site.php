@@ -301,7 +301,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		wpmu_update_blogs_date();
 
 		// compare the update time with the current time, allow delta < 2
-		$blog = get_blog_details( $wpdb->blogid );
+		$blog = get_site( $wpdb->blogid );
 		$current_time = time();
 		$time_difference = $current_time - strtotime( $blog->last_updated );
 		$this->assertLessThan( 2, $time_difference );
@@ -368,14 +368,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'make_ham_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'spam', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->spam );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'spam' stays the same.
 		update_blog_status( $blog_id, 'spam', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->spam );
 		$this->assertEquals( 2, $test_action_counter );
@@ -391,14 +391,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'make_spam_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'spam', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->spam );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'spam' stays the same.
 		update_blog_status( $blog_id, 'spam', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->spam );
 		$this->assertEquals( 2, $test_action_counter );
@@ -414,14 +414,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'archive_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'archived', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->archived );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'archived' stays the same.
 		update_blog_status( $blog_id, 'archived', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->archived );
 		$this->assertEquals( 2, $test_action_counter );
@@ -438,14 +438,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'unarchive_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'archived', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->archived );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'archived' stays the same.
 		update_blog_status( $blog_id, 'archived', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 		$this->assertEquals( '0', $blog->archived );
 		$this->assertEquals( 2, $test_action_counter );
 
@@ -460,14 +460,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'make_delete_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'deleted', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->deleted );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'deleted' stays the same.
 		update_blog_status( $blog_id, 'deleted', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->deleted );
 		$this->assertEquals( 2, $test_action_counter );
@@ -484,14 +484,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'make_undelete_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'deleted', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->deleted );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'deleted' stays the same.
 		update_blog_status( $blog_id, 'deleted', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->deleted );
 		$this->assertEquals( 2, $test_action_counter );
@@ -507,14 +507,14 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 
 		add_action( 'mature_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'mature', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->mature );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'mature' stays the same.
 		update_blog_status( $blog_id, 'mature', 1 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '1', $blog->mature );
 		$this->assertEquals( 2, $test_action_counter );
@@ -532,13 +532,13 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		add_action( 'unmature_blog', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'mature', 0 );
 
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 		$this->assertEquals( '0', $blog->mature );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'mature' stays the same.
 		update_blog_status( $blog_id, 'mature', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->mature );
 		$this->assertEquals( 2, $test_action_counter );
@@ -555,13 +555,13 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		add_action( 'update_blog_public', array( $this, '_action_counter_cb' ), 10 );
 		update_blog_status( $blog_id, 'public', 0 );
 
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 		$this->assertEquals( '0', $blog->public );
 		$this->assertEquals( 1, $test_action_counter );
 
 		// The action should fire if the status of 'mature' stays the same.
 		update_blog_status( $blog_id, 'public', 0 );
-		$blog = get_blog_details( $blog_id );
+		$blog = get_site( $blog_id );
 
 		$this->assertEquals( '0', $blog->public );
 		$this->assertEquals( 2, $test_action_counter );
@@ -575,10 +575,10 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	function test_posts_count() {
 		self::factory()->post->create();
 		$post2 = self::factory()->post->create();
-		$this->assertEquals( 2, get_blog_details()->post_count );
+		$this->assertEquals( 2, get_site()->post_count );
 
 		wp_delete_post( $post2 );
-		$this->assertEquals( 1, get_blog_details()->post_count );
+		$this->assertEquals( 1, get_site()->post_count );
 	}
 
 	/**
@@ -586,11 +586,11 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_blog_details_cache_invalidation() {
 		update_option( 'blogname', 'foo' );
-		$details = get_blog_details( get_current_blog_id() );
+		$details = get_site( get_current_blog_id() );
 		$this->assertEquals( 'foo', $details->blogname );
 
 		update_option( 'blogname', 'bar' );
-		$details = get_blog_details( get_current_blog_id() );
+		$details = get_site( get_current_blog_id() );
 		$this->assertEquals( 'bar', $details->blogname );
 	}
 
@@ -600,7 +600,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_id_from_url() {
 		$blog_id = self::factory()->blog->create();
-		$details = get_blog_details( $blog_id, false );
+		$details = get_site( $blog_id );
 		$key = md5( $details->domain . $details->path );
 
 		// Test the original response and cached response for the newly created site.
@@ -613,7 +613,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_id_from_url_is_case_insensitive() {
 		$blog_id = self::factory()->blog->create( array( 'domain' => 'example.com', 'path' => '/xyz' ) );
-		$details = get_blog_details( $blog_id, false );
+		$details = get_site( $blog_id );
 
 		$this->assertEquals( $blog_id, get_blog_id_from_url( strtoupper( $details->domain ), strtoupper( $details->path ) ) );
 	}
@@ -623,7 +623,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_id_from_url_that_does_not_exist() {
 		$blog_id = self::factory()->blog->create( array( 'path' => '/xyz' ) );
-		$details = get_blog_details( $blog_id, false );
+		$details = get_site( $blog_id );
 
 		$this->assertEquals( 0, get_blog_id_from_url( $details->domain, 'foo' ) );
 		$this->assertEquals( -1, wp_cache_get( md5( $details->domain . 'foo' ), 'blog-id-cache' ) );
@@ -635,7 +635,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_id_from_url_with_deleted_flag() {
 		$blog_id = self::factory()->blog->create();
-		$details = get_blog_details( $blog_id, false );
+		$details = get_site( $blog_id );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id );
 
@@ -649,7 +649,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 */
 	function test_get_blog_id_from_url_after_dropped() {
 		$blog_id = self::factory()->blog->create();
-		$details = get_blog_details( $blog_id, false );
+		$details = get_site( $blog_id );
 		$key = md5( $details->domain . $details->path );
 		wpmu_delete_blog( $blog_id, true );
 
@@ -766,13 +766,13 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	}
 
 	function test_domain_exists_with_default_site_id() {
-		$details = get_blog_details( 1, false );
+		$details = get_site( 1 );
 
 		$this->assertEquals( 1, domain_exists( $details->domain, $details->path ) );
 	}
 
 	function test_domain_exists_with_specified_site_id() {
-		$details = get_blog_details( 1, false );
+		$details = get_site( 1 );
 
 		$this->assertEquals( 1, domain_exists( $details->domain, $details->path, $details->site_id ) );
 	}
@@ -782,7 +782,7 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 	 * it is marked as not existing.
 	 */
 	function test_domain_does_not_exist_with_invalid_site_id() {
-		$details = get_blog_details( 1, false );
+		$details = get_site( 1 );
 
 		$this->assertEquals( null, domain_exists( $details->domain, $details->path, 999 ) );
 	}
