@@ -53,7 +53,6 @@ $multisite = $multisite || ( defined( 'MULTISITE' ) && MULTISITE );
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
 $phpmailer = new MockPHPMailer();
 
-// Set the theme to our special empty theme, to avoid interference from the current Twenty* theme.
 if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
 	define( 'WP_DEFAULT_THEME', 'default' );
 }
