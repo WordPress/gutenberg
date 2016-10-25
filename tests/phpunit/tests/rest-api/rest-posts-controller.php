@@ -240,6 +240,14 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 1, count( $response->get_data() ) );
 	}
 
+	public function test_get_items_invalid_status_query() {
+		wp_set_current_user( 0 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'status', 'invalid' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_get_items_status_without_permissions() {
 		$draft_id = $this->factory->post->create( array(
 			'post_status' => 'draft',
