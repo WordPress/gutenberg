@@ -161,21 +161,3 @@ function _upload_dir_https( $uploads ) {
 
 	return $uploads;
 }
-
-/**
- * Helper functions to link and unlink the empty default theme into the WordPress install
- */
-function _symlink_default_theme() {
-	_unlink_default_theme();
-	symlink( DIR_TESTDATA . '/themedir1/default', ABSPATH . '/wp-content/themes/default' );
-}
-
-function _unlink_default_theme() {
-	if ( file_exists( ABSPATH . '/wp-content/themes/default' ) ) {
-		unlink( ABSPATH . '/wp-content/themes/default' );
-	}
-}
-// Only unlink when we're in the main process.
-if ( 'phpunit' === substr( $GLOBALS['argv'][0], -7 ) ) {
-	register_shutdown_function( '_unlink_default_theme' );
-}

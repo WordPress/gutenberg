@@ -9,6 +9,12 @@ error_reporting( E_ALL & ~E_DEPRECATED & ~E_STRICT );
 $config_file_path = $argv[1];
 $multisite = ! empty( $argv[2] );
 
+// Set the theme to our special empty theme, to avoid interference from the current Twenty* theme.
+if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
+	define( 'WP_DEFAULT_THEME', 'default' );
+}
+$wp_theme_directories = array( dirname( __FILE__ ) . '/../data/themedir1' );
+
 define( 'WP_INSTALLING', true );
 require_once $config_file_path;
 require_once dirname( __FILE__ ) . '/functions.php';

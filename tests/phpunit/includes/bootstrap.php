@@ -16,7 +16,7 @@ $config_file_path .= '/wp-tests-config.php';
  * Globalize some WordPress variables, because PHPUnit loads this file inside a function
  * See: https://github.com/sebastianbergmann/phpunit/issues/325
  */
-global $wpdb, $current_site, $current_blog, $wp_rewrite, $shortcode_tags, $wp, $phpmailer;
+global $wpdb, $current_site, $current_blog, $wp_rewrite, $shortcode_tags, $wp, $phpmailer, $wp_theme_directories;
 
 if ( !is_readable( $config_file_path ) ) {
 	die( "ERROR: wp-tests-config.php is missing! Please use wp-tests-config-sample.php to create a config file.\n" );
@@ -53,8 +53,11 @@ $multisite = $multisite || ( defined( 'MULTISITE' ) && MULTISITE );
 require_once( dirname( __FILE__ ) . '/mock-mailer.php' );
 $phpmailer = new MockPHPMailer();
 
-// Add a symlink to the empty default theme to the themes directory, so it can be used for the tests.
-_symlink_default_theme();
+// Set the theme to our special empty theme, to avoid interference from the current Twenty* theme.
+if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
+	define( 'WP_DEFAULT_THEME', 'default' );
+}
+$wp_theme_directories = array( DIR_TESTDATA . '/themedir1' );
 
 system( WP_PHP_BINARY . ' ' . escapeshellarg( dirname( __FILE__ ) . '/install.php' ) . ' ' . escapeshellarg( $config_file_path ) . ' ' . $multisite );
 

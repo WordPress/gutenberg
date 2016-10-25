@@ -14,16 +14,27 @@ class Tests_Theme extends WP_UnitTestCase {
 	);
 
 	function setUp() {
+		global $wp_theme_directories;
+
 		parent::setUp();
+
+		$backup_wp_theme_directories = $wp_theme_directories;
+		$wp_theme_directories = array( WP_CONTENT_DIR . '/themes' );
+
 		add_filter( 'extra_theme_headers', array( $this, '_theme_data_extra_headers' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 	}
 
 	function tearDown() {
+		global $wp_theme_directories;
+
+		$wp_theme_directories = $this->wp_theme_directories;
+
 		remove_filter( 'extra_theme_headers', array( $this, '_theme_data_extra_headers' ) );
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+
 		parent::tearDown();
 	}
 
