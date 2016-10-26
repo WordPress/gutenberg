@@ -76,6 +76,8 @@ var A11ySpeak = function( message, ariaLive ) {
 	// Clear previous messages to allow repeated strings being read out.
 	clear();
 
+	message = message.replace( /<[^<>]+>/g, "" );
+
 	if ( containerAssertive && "assertive" === ariaLive ) {
 		containerAssertive.textContent = message;
 	} else if ( containerPolite ) {
