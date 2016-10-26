@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @group locale
+ * @group l10n
  * @group i18n
  */
 class Tests_Locale extends WP_UnitTestCase {
