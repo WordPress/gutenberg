@@ -351,4 +351,57 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 		remove_filter( 'wp_image_editors', array( $this, 'mock_image_editor' ) );
 		WP_Image_Editor_Mock::$save_return = array();
 	}
+
+	/**
+	 * @ticket 31050
+	 */
+	public function test_wp_generate_attachment_metadata_pdf() {
+		if ( ! wp_image_editor_supports( array( 'mime_type' => 'application/pdf' ) ) ) {
+			$this->markTestSkipped( 'Rendering PDFs is not supported on this system.' );
+		}
+
+		$orig_file = DIR_TESTDATA . '/images/wordpress-gsoc-flyer.pdf';
+		$test_file = '/tmp/wordpress-gsoc-flyer.pdf';
+		copy( $orig_file, $test_file );
+
+		$attachment_id = $this->factory->attachment->create_object( $test_file, 0, array(
+			'post_mime_type' => 'application/pdf',
+		) );
+
+		$this->assertNotEmpty( $attachment_id );
+
+		$expected = array(
+			'sizes' => array(
+				'thumbnail' => array(
+					'file'      => "wordpress-gsoc-flyer-116x150.jpg",
+					'width'     => 116,
+					'height'    => 150,
+					'mime-type' => "image/jpeg",
+				),
+				'medium'    => array(
+					'file'      => "wordpress-gsoc-flyer-232x300.jpg",
+					'width'     => 232,
+					'height'    => 300,
+					'mime-type' => "image/jpeg",
+				),
+				'large'     => array(
+					'file'      => "wordpress-gsoc-flyer-791x1024.jpg",
+					'width'     => 791,
+					'height'    => 1024,
+					'mime-type' => "image/jpeg",
+				),
+				'full'      => array(
+					'file'      => "wordpress-gsoc-flyer.jpg",
+					'width'     => 1088,
+					'height'    => 1408,
+					'mime-type' => "image/jpeg",
+				),
+			),
+		);
+
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $test_file );
+		$this->assertSame( $expected, $metadata );
+
+		unlink( $test_file );
+	}
 }
