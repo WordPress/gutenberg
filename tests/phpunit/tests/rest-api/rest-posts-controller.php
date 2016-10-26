@@ -67,7 +67,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'categories',
 			'context',
 			'exclude',
-			'filter',
 			'include',
 			'offset',
 			'order',
@@ -97,10 +96,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	public function test_get_items_empty_query() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_query_params( array(
-			'filter' => array( 'year' => 2008 ),
+			'author' => REST_TESTS_IMPOSSIBLY_HIGH_NUMBER,
 		) );
 		$response = $this->server->dispatch( $request );
-		$this->assertEquals( array(), $response->get_data() );
+
+		$this->assertEmpty( $response->get_data() );
 		$this->assertEquals( 200, $response->get_status() );
 	}
 
@@ -309,7 +309,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		// Permit stickies
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'filter', array( 'ignore_sticky_posts' => false ) );
+		$request->set_param( 'ignore_sticky_posts', false );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( array( $post_id2, $this->post_id, $post_id3, $post_id1 ), wp_list_pluck( $data, 'id' ) );
@@ -576,16 +576,15 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertContains( '<' . $next_link . '>; rel="next"', $headers['Link'] );
 	}
 
-	public function test_get_items_private_filter_query_var() {
+	public function test_get_items_private_status_query_var() {
 		// Private query vars inaccessible to unauthorized users
 		wp_set_current_user( 0 );
 		$draft_id = $this->factory->post->create( array( 'post_status' => 'draft' ) );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'filter', array( 'post_status' => 'draft' ) );
+		$request->set_param( 'status', 'draft' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
-		$this->assertCount( 1, $data );
-		$this->assertEquals( $this->post_id, $data[0]['id'] );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+
 		// But they are accessible to authorized users
 		wp_set_current_user( $this->editor_id );
 		$response = $this->server->dispatch( $request );
@@ -599,18 +598,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request->set_query_params( array( 'per_page' => -1 ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-	}
-
-	public function test_get_items_invalid_posts_per_page_ignored() {
-		// This test ensures that filter[posts_per_page] is ignored, and that -1
-		// cannot be used to sidestep per_page's valid range to retrieve all posts
-		for ( $i = 0; $i < 20; $i++ ) {
-			$this->factory->post->create( array( 'post_status' => 'publish' ) );
-		}
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_query_params( array( 'filter' => array( 'posts_per_page' => -1 ) ) );
-		$response = $this->server->dispatch( $request );
-		$this->assertCount( 10, $response->get_data() );
 	}
 
 	public function test_get_items_invalid_context() {
