@@ -1044,6 +1044,17 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 18375
+	 */
+	function test_is_page_template_other_post_type() {
+		$post_id = self::factory()->post->create( array( 'post_type' => 'post' ) );
+		update_post_meta( $post_id, '_wp_page_template', 'example.php' );
+		$this->go_to( get_post_permalink( $post_id ) );
+		$this->assertFalse( is_page_template( array( 'test.php' ) ) );
+		$this->assertTrue( is_page_template( array( 'test.php', 'example.php' ) ) );
+	}
+
+	/**
 	 * @ticket 35902
 	 */
 	public function test_is_attachment_should_not_match_numeric_id_to_post_title_beginning_with_id() {

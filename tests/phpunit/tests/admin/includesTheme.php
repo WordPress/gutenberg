@@ -48,21 +48,41 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 
 		switch_theme( $theme['Template'], $theme['Stylesheet'] );
 
-		$templates = get_page_templates();
-		$this->assertCount( 3, $templates );
-		$this->assertEquals( "template-top-level.php", $templates['Top Level'] );
-		$this->assertEquals( "subdir/template-sub-dir.php", $templates['Sub Dir'] );
-		$this->assertEquals( "template-header.php", $templates['This Template Header Is On One Line'] );
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level'                           => 'template-top-level.php',
+			'Sub Dir'                             => 'subdir/template-sub-dir.php',
+			'This Template Header Is On One Line' => 'template-header.php',
+		), get_page_templates() );
 
 		$theme = wp_get_theme( 'page-templates' );
 		$this->assertNotEmpty( $theme );
 
 		switch_theme( $theme['Template'], $theme['Stylesheet'] );
 
-		$templates = get_page_templates();
-		$this->assertCount( 3, $templates );
-		$this->assertEquals( "template-top-level.php", $templates['Top Level'] );
-		$this->assertEquals( "subdir/template-sub-dir.php", $templates['Sub Dir'] );
-		$this->assertEquals( "template-header.php", $templates['This Template Header Is On One Line'] );
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level'                           => 'template-top-level.php',
+			'Sub Dir'                             => 'subdir/template-sub-dir.php',
+			'This Template Header Is On One Line' => 'template-header.php',
+		), get_page_templates() );
+	}
+
+	/**
+	 * @ticket 18375
+	 */
+	function test_page_templates_different_post_types() {
+		$theme = wp_get_theme( 'page-templates' );
+		$this->assertNotEmpty( $theme );
+
+		switch_theme( $theme['Template'], $theme['Stylesheet'] );
+
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level' => 'template-top-level-post-types.php',
+			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
+		), get_page_templates( null, 'foo' ) );
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level' => 'template-top-level-post-types.php',
+			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
+		), get_page_templates( null, 'post' ) );
+		$this->assertEquals( array(), get_page_templates( null, 'bar' ) );
 	}
 }

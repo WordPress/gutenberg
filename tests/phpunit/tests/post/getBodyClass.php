@@ -92,4 +92,70 @@ class Tests_Post_GetBodyClass extends WP_UnitTestCase {
 		$this->assertContains( "single-format-standard", $class );
 	}
 
+	public function test_page_template_body_classes_no_template() {
+		$post_id = self::factory()->post->create( array(
+			'post_type' => 'page',
+		) );
+		$this->go_to( get_permalink( $post_id ) );
+
+		$class = get_body_class();
+
+		$this->assertNotContains( 'page-template', $class );
+		$this->assertContains( 'page-template-default', $class );
+	}
+
+	public function test_page_template_body_classes() {
+		$post_id = self::factory()->post->create( array(
+			'post_type' => 'page',
+		) );
+
+		add_post_meta( $post_id, '_wp_page_template', 'templates/cpt.php' );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$class = get_body_class();
+
+		$this->assertContains( 'page-template', $class );
+		$this->assertContains( 'page-template-templates', $class );
+		$this->assertContains( 'page-template-cpt', $class );
+		$this->assertContains( 'page-template-templatescpt-php', $class );
+	}
+
+	/**
+	 * @ticket 18375
+	 */
+	public function test_page_template_body_classes_attachment() {
+		$post_id = self::factory()->post->create( array(
+			'post_type' => 'attachment',
+		) );
+
+		add_post_meta( $post_id, '_wp_page_template', 'templates/cpt.php' );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$class = get_body_class();
+
+		$this->assertContains( 'attachment-template', $class );
+		$this->assertContains( 'attachment-template-templates', $class );
+		$this->assertContains( 'attachment-template-cpt', $class );
+		$this->assertContains( 'attachment-template-templatescpt-php', $class );
+	}
+
+	/**
+	 * @ticket 18375
+	 */
+	public function test_page_template_body_classes_post() {
+		$post_id = self::factory()->post->create();
+
+		add_post_meta( $post_id, '_wp_page_template', 'templates/cpt.php' );
+
+		$this->go_to( get_permalink( $post_id ) );
+
+		$class = get_body_class();
+
+		$this->assertContains( 'post-template', $class );
+		$this->assertContains( 'post-template-templates', $class );
+		$this->assertContains( 'post-template-cpt', $class );
+		$this->assertContains( 'post-template-templatescpt-php', $class );
+	}
 }

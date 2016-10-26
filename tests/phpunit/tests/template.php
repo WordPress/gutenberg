@@ -36,6 +36,7 @@ class Tests_Template extends WP_UnitTestCase {
 			'post_date' => '1984-02-25 12:34:56',
 		) );
 		set_post_format( self::$post, 'quote' );
+		add_post_meta( self::$post->ID, '_wp_page_template', 'templates/post.php' );
 	}
 
 	public function setUp() {
@@ -203,8 +204,12 @@ class Tests_Template extends WP_UnitTestCase {
 		) );
 	}
 
+	/**
+	 * @ticket 18375
+	 */
 	public function test_single_template_hierarchy_for_post() {
 		$this->assertTemplateHierarchy( get_permalink( self::$post ), array(
+			'templates/post.php',
 			'single-post-post-name-😀.php',
 			'single-post-post-name-%f0%9f%98%80.php',
 			'single-post.php',
@@ -220,6 +225,26 @@ class Tests_Template extends WP_UnitTestCase {
 		) );
 
 		$this->assertTemplateHierarchy( get_permalink( $cpt ), array(
+			'single-cpt-cpt-name-😀.php',
+			'single-cpt-cpt-name-%f0%9f%98%80.php',
+			'single-cpt.php',
+			'single.php',
+			'singular.php',
+		) );
+	}
+
+	/**
+	 * @ticket 18375
+	 */
+	public function test_single_template_hierarchy_for_custom_post_type_with_template() {
+		$cpt = self::factory()->post->create_and_get( array(
+			'post_type' => 'cpt',
+			'post_name' => 'cpt-name-😀',
+		) );
+		add_post_meta( $cpt->ID, '_wp_page_template', 'templates/cpt.php' );
+
+		$this->assertTemplateHierarchy( get_permalink( $cpt ), array(
+			'templates/cpt.php',
 			'single-cpt-cpt-name-😀.php',
 			'single-cpt-cpt-name-%f0%9f%98%80.php',
 			'single-cpt.php',
@@ -247,11 +272,37 @@ class Tests_Template extends WP_UnitTestCase {
 		) );
 	}
 
+	/**
+	 * @ticket 18375
+	 */
+	public function test_attachment_template_hierarchy_with_template() {
+		$attachment = self::factory()->attachment->create_and_get( array(
+			'post_name'      => 'attachment-name-😀',
+			'file'           => 'image.jpg',
+			'post_mime_type' => 'image/jpeg',
+		) );
+
+		add_post_meta( $attachment, '_wp_page_template', 'templates/cpt.php' );
+
+		$this->assertTemplateHierarchy( get_permalink( $attachment ), array(
+			'image-jpeg.php',
+			'jpeg.php',
+			'image.php',
+			'attachment.php',
+			'single-attachment-attachment-name-😀.php',
+			'single-attachment-attachment-name-%f0%9f%98%80.php',
+			'single-attachment.php',
+			'single.php',
+			'singular.php',
+		) );
+	}
+
 	public function test_embed_template_hierarchy_for_post() {
 		$this->assertTemplateHierarchy( get_post_embed_url( self::$post ), array(
 			'embed-post-quote.php',
 			'embed-post.php',
 			'embed.php',
+			'templates/post.php',
 			'single-post-post-name-😀.php',
 			'single-post-post-name-%f0%9f%98%80.php',
 			'single-post.php',

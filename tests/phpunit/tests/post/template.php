@@ -271,16 +271,32 @@ NO;
 
 	/**
 	 * @ticket 31389
+	 * @ticket 18375
 	 */
 	public function test_get_page_template_slug_non_page() {
-		$post_id = self::factory()->post->create( array(
-			'post_type' => 'post',
-		) );
+		$post_id = self::factory()->post->create();
 
-		$this->assertFalse( get_page_template_slug( $post_id ) );
+		$this->assertEquals( '', get_page_template_slug( $post_id ) );
+
+		update_post_meta( $post_id, '_wp_page_template', 'default' );
+
+		$this->assertEquals( '', get_page_template_slug( $post_id ) );
+
+		update_post_meta( $post_id, '_wp_page_template', 'example.php' );
+		$this->assertEquals( 'example.php', get_page_template_slug( $post_id ) );
+	}
+
+	/**
+	 * @ticket 18375
+	 */
+	public function test_get_page_template_slug_non_page_from_loop() {
+		$post_id = self::factory()->post->create();
+
+		update_post_meta( $post_id, '_wp_page_template', 'example.php' );
 
 		$this->go_to( get_permalink( $post_id ) );
-		$this->assertFalse( get_page_template_slug() );
+
+		$this->assertEquals( 'example.php', get_page_template_slug() );
 	}
 
 	/**
