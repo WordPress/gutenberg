@@ -92,6 +92,12 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 2, count( $data ) );
 		$this->assertEquals( 'Season 5', $data[0]['name'] );
 		$this->assertEquals( 'The Be Sharps', $data[1]['name'] );
+
+		// Confirm the empty category "Uncategorized" category appears.
+		$request->set_param( 'hide_empty', 'false' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( 3, count( $data ) );
 	}
 
 	public function test_get_items_parent_zero_arg() {
