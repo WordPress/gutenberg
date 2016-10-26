@@ -533,6 +533,54 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
 	}
 
+	/**
+	 * @ticket 38505
+	 */
+	public function test_update_item_with_edit_term_cap_granted() {
+		wp_set_current_user( self::$subscriber );
+		$term = $this->factory->tag->create_and_get();
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags/' . $term->term_id );
+		$request->set_param( 'name', 'New Name' );
+
+		add_filter( 'map_meta_cap', array( $this, 'grant_edit_term' ), 10, 2 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'user_has_cap', array( $this, 'grant_edit_term' ), 10, 2 );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'New Name', $data['name'] );
+	}
+
+	public function grant_edit_term( $caps, $cap ) {
+		if ( 'edit_term' === $cap ) {
+			$caps = array( 'read' );
+		}
+		return $caps;
+	}
+
+	/**
+	 * @ticket 38505
+	 */
+	public function test_update_item_with_edit_term_cap_revoked() {
+		wp_set_current_user( self::$administrator );
+		$term = $this->factory->tag->create_and_get();
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags/' . $term->term_id );
+		$request->set_param( 'name', 'New Name' );
+
+		add_filter( 'map_meta_cap', array( $this, 'revoke_edit_term' ), 10, 2 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'user_has_cap', array( $this, 'revoke_edit_term' ), 10, 2 );
+
+		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
+	}
+
+	public function revoke_edit_term( $caps, $cap ) {
+		if ( 'edit_term' === $cap ) {
+			$caps = array( 'do_not_allow' );
+		}
+		return $caps;
+	}
+
 	public function test_update_item_parent_non_hierarchical_taxonomy() {
 		wp_set_current_user( self::$administrator );
 		$term = get_term_by( 'id', $this->factory->tag->create(), 'post_tag' );
@@ -576,6 +624,54 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/tags/' . $term->term_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+	}
+
+	/**
+	 * @ticket 38505
+	 */
+	public function test_delete_item_with_delete_term_cap_granted() {
+		wp_set_current_user( self::$subscriber );
+		$term = get_term_by( 'id', $this->factory->tag->create( array( 'name' => 'Deleted Tag' ) ), 'post_tag' );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/tags/' . $term->term_id );
+		$request->set_param( 'force', true );
+
+		add_filter( 'map_meta_cap', array( $this, 'grant_delete_term' ), 10, 2 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'map_meta_cap', array( $this, 'grant_delete_term' ), 10, 2 );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'Deleted Tag', $data['name'] );
+	}
+
+	public function grant_delete_term( $caps, $cap ) {
+		if ( 'delete_term' === $cap ) {
+			$caps = array( 'read' );
+		}
+		return $caps;
+	}
+
+	/**
+	 * @ticket 38505
+	 */
+	public function test_delete_item_with_delete_term_cap_revoked() {
+		wp_set_current_user( self::$administrator );
+		$term = get_term_by( 'id', $this->factory->tag->create( array( 'name' => 'Deleted Tag' ) ), 'post_tag' );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/tags/' . $term->term_id );
+		$request->set_param( 'force', true );
+
+		add_filter( 'map_meta_cap', array( $this, 'revoke_delete_term' ), 10, 2 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'map_meta_cap', array( $this, 'revoke_delete_term' ), 10, 2 );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+	}
+
+	public function revoke_delete_term( $caps, $cap ) {
+		if ( 'delete_term' === $cap ) {
+			$caps = array( 'do_not_allow' );
+		}
+		return $caps;
 	}
 
 	public function test_prepare_item() {
