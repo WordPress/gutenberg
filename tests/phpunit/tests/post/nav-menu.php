@@ -444,4 +444,83 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->assertTrue( is_object( $args ) );
 		return $ignored_1;
 	}
+
+
+	/**
+	 * @ticket 35272
+	 */
+	function test_no_front_page_class_applied() {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Home Page' ) );
+
+		wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'page',
+			'menu-item-object-id' => $page_id,
+			'menu-item-status' => 'publish',
+		));
+
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		_wp_menu_item_classes_by_context( $menu_items );
+
+		$classes = $menu_items[0]->classes;
+
+		$this->assertNotContains( 'menu-item-home', $classes );
+	}
+
+
+	/**
+	 * @ticket 35272
+	 */
+	function test_class_applied_to_front_page_item() {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Home Page' ) );
+		update_option( 'page_on_front', $page_id );
+
+		wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'page',
+			'menu-item-object-id' => $page_id,
+			'menu-item-status' => 'publish',
+		));
+
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		_wp_menu_item_classes_by_context( $menu_items );
+
+		$classes = $menu_items[0]->classes;
+
+		delete_option( 'page_on_front' );
+
+		$this->assertContains( 'menu-item-home', $classes );
+	}
+
+	/**
+	 * @ticket 35272
+	 */
+	function test_class_not_applied_to_taxonomies_with_same_id_as_front_page_item() {
+		global $wpdb;
+
+		$new_id = 35272;
+
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Home Page' ) );
+		$tag_id = self::factory()->tag->create();
+
+		$wpdb->query( "UPDATE $wpdb->posts SET ID=$new_id WHERE ID=$page_id" );
+		$wpdb->query( "UPDATE $wpdb->terms SET term_id=$new_id WHERE term_id=$page_id" );
+		$wpdb->query( "UPDATE $wpdb->term_taxonomy SET term_id=$new_id WHERE term_id=$page_id" );
+
+		update_option( 'page_on_front', $new_id );
+
+		wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'post_tag',
+			'menu-item-object-id' => $new_id,
+			'menu-item-status' => 'publish',
+		) );
+
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		_wp_menu_item_classes_by_context( $menu_items );
+
+		$classes = $menu_items[0]->classes;
+
+		$this->assertNotContains( 'menu-item-home', $classes );
+	}
 }
