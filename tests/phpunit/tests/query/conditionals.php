@@ -55,7 +55,7 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	}
 
 	function test_404() {
-		$this->go_to('/'.rand_str());
+		$this->go_to( '/notapage' );
 		$this->assertQueryTrue('is_404');
 	}
 

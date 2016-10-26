@@ -674,7 +674,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// change the capabilites associated with a role and make sure the change is reflected in has_cap()
 
 		global $wp_roles;
-		$role_name = rand_str();
+		$role_name = 'janitor';
 		add_role( $role_name, 'Janitor', array('level_1'=>true) );
 		$this->_flush_roles();
 		$this->assertTrue( $wp_roles->is_role($role_name) );
@@ -714,7 +714,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// change the capabilites associated with a role and make sure the change is reflected in has_cap()
 
 		global $wp_roles;
-		$role_name = rand_str();
+		$role_name = 'janitor';
 		add_role( $role_name, 'Janitor', array('level_1'=>true, 'sweep_floor'=>true, 'polish_doorknobs'=>true) );
 		$this->_flush_roles();
 		$this->assertTrue( $wp_roles->is_role($role_name) );

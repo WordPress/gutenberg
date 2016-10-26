@@ -56,17 +56,17 @@ class Tests_XMLRPC_wp_getUser extends WP_XMLRPC_UnitTestCase {
 		$registered_date = strtotime( '-1 day' );
 		$user_data = array(
 			'user_login' => 'getusertestuser',
-			'user_pass' => rand_str(),
-			'first_name' => rand_str(),
-			'last_name' => rand_str(),
-			'description' => rand_str( 100 ),
+			'user_pass' => 'password',
+			'first_name' => 'First',
+			'last_name' => 'Last',
+			'description' => 'I love WordPress',
 			'user_email' => 'getUserTestUser@example.com',
-			'nickname' => rand_str(),
-			'user_nicename' => rand_str(),
-			'display_name' => rand_str(),
+			'nickname' => 'nickname',
+			'user_nicename' => 'nicename',
+			'display_name' => 'First Last',
 			'user_url' => 'http://www.example.com/testuser',
 			'role' => 'author',
-			'aim' => rand_str(),
+			'aim' => 'wordpress',
 			'user_registered' => strftime( "%Y-%m-%d %H:%M:%S", $registered_date )
 		);
 		$user_id = wp_insert_user( $user_data );

@@ -281,8 +281,8 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$post_id = wp_insert_post( array(
 			'ID'            => self::$post->ID,
 			'post_status'   => 'publish',
-			'post_content'  => rand_str(),
-			'post_title'    => rand_str(),
+			'post_content'  => 'Post content',
+			'post_title'    => 'Post Title',
 			'_thumbnail_id' => self::$attachment_id,
 		) );
 
@@ -292,8 +292,8 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$post_id = wp_insert_post( array(
 			'ID'            => $post_id,
 			'post_status'   => 'publish',
-			'post_content'  => rand_str(),
-			'post_title'    => rand_str(),
+			'post_content'  => 'Post content',
+			'post_title'    => 'Post Title',
 			'_thumbnail_id' => - 1, // -1 removes post thumbnail.
 		) );
 
@@ -309,8 +309,8 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$post_id = wp_insert_post( array(
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
-			'post_content'   => rand_str(),
-			'post_title'     => rand_str(),
+			'post_content'   => 'Post content',
+			'post_title'     => 'Post Title',
 			'post_mime_type' => 'audio/mpeg',
 			'post_parent'    => 0,
 			'file'           => DIR_TESTDATA . '/audio/test-noise.mp3', // File does not exist, but does not matter here.
@@ -324,8 +324,8 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 		$post_id = wp_insert_post( array(
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
-			'post_content'   => rand_str(),
-			'post_title'     => rand_str(),
+			'post_content'   => 'Post content',
+			'post_title'     => 'Post Title',
 			'post_mime_type' => 'image/jpeg',
 			'post_parent'    => 0,
 			'file'           => DIR_TESTDATA . '/images/canola.jpg',

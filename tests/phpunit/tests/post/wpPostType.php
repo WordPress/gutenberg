@@ -13,7 +13,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 	}
 
 	public function test_add_supports_defaults() {
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type );
 
 		$post_type_object->add_supports();
@@ -27,7 +27,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 	}
 
 	public function test_add_supports_custom() {
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array(
 			'supports' => array(
 				'editor',
@@ -56,7 +56,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 		/* @var WP $wp */
 		global $wp;
 
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array( 'rewrite' => false, 'query_var' => 'foobar' ) );
 		$post_type_object->add_rewrite_rules();
 
@@ -69,7 +69,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 		/* @var WP $wp */
 		global $wp;
 
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array(
 			'public'    => true,
 			'rewrite'   => false,
@@ -92,7 +92,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 		/* @var WP_Rewrite $wp_rewrite */
 		global $wp_rewrite;
 
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array( 'public' => true, 'rewrite' => true ) );
 
 		$post_type_object->add_rewrite_rules();
@@ -106,7 +106,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 	}
 
 	public function test_register_meta_boxes() {
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array( 'register_meta_box_cb' => '__return_false' ) );
 
 		$post_type_object->register_meta_boxes();
@@ -119,7 +119,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 	}
 
 	public function test_adds_future_post_hook() {
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type );
 		$post_type_object->add_hooks();
 		$has_action = has_action( "future_$post_type", '_future_post_hook' );
@@ -133,7 +133,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 	public function test_register_taxonomies() {
 		global $wp_post_types;
 
-		$post_type        = rand_str();
+		$post_type        = 'cpt';
 		$post_type_object = new WP_Post_Type( $post_type, array( 'taxonomies' => array( 'post_tag' ) ) );
 
 		$wp_post_types[ $post_type ] = $post_type_object;

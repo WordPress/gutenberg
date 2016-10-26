@@ -47,7 +47,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 		if ( is_multisite() )
 			grant_super_admin( $administrator_id );
 
-		$filter = array( 'role' => rand_str() );
+		$filter = array( 'role' => 'invalidrole' );
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator', $filter ) );
 		$this->assertInstanceOf( 'IXR_Error', $results );
 		$this->assertEquals( 403, $results->code );

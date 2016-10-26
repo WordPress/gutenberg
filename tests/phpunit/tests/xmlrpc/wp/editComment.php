@@ -56,7 +56,7 @@ class Tests_XMLRPC_wp_editComment extends WP_XMLRPC_UnitTestCase {
 			'comment_author' => 'Test commenter',
 			'comment_author_url' => 'http://example.com/',
 			'comment_author_email' => 'example@example.com',
-			'comment_content' => rand_str( 100 ),
+			'comment_content' => 'Comment content',
 			'comment_approved' => '1'
 		);
 		$comment_id = wp_insert_comment( $comment_data );

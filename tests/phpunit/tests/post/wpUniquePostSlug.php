@@ -27,7 +27,7 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 				$post = array(
 					'post_author' => $author_id,
 					'post_status' => 'publish',
-					'post_content' => rand_str(),
+					'post_content' => 'Post content',
 					'post_title' => $post_title,
 				);
 

@@ -349,8 +349,8 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$post = array(
 			'post_author' => self::$editor_id,
 			'post_status' => 'publish',
-			'post_content' => rand_str(),
-			'post_title' => rand_str(),
+			'post_content' => 'Post Content',
+			'post_title' => 'Post Title',
 		);
 		$id = wp_insert_post( $post );
 

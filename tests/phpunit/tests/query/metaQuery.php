@@ -390,18 +390,23 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 
 	public function test_meta_query_relation_or() {
 		$post_id = self::factory()->post->create();
-		add_post_meta( $post_id, 'foo', rand_str() );
-		add_post_meta( $post_id, 'foo', rand_str() );
+		add_post_meta( $post_id, 'foo', 'foo_val_1' );
+		add_post_meta( $post_id, 'foo', 'foo_val_2' );
+
 		$post_id2 = self::factory()->post->create();
-		add_post_meta( $post_id2, 'bar', 'val2' );
+		add_post_meta( $post_id2, 'bar', 'bar_val_1' );
+
 		$post_id3 = self::factory()->post->create();
-		add_post_meta( $post_id3, 'baz', rand_str() );
+		add_post_meta( $post_id3, 'baz', 'baz_val_1' );
+
 		$post_id4 = self::factory()->post->create();
-		add_post_meta( $post_id4, 'froo', rand_str() );
+		add_post_meta( $post_id4, 'froo', 'froo_val_1' );
+
 		$post_id5 = self::factory()->post->create();
-		add_post_meta( $post_id5, 'tango', 'val2' );
+		add_post_meta( $post_id5, 'tango', 'tango_val_1' );
+
 		$post_id6 = self::factory()->post->create();
-		add_post_meta( $post_id6, 'bar', 'val1' );
+		add_post_meta( $post_id6, 'bar', 'bar_val_2' );
 
 		$query = new WP_Query( array(
 			'update_post_meta_cache' => false,
@@ -413,7 +418,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 				),
 				array(
 					'key' => 'bar',
-					'value' => 'val2'
+					'value' => 'bar_val_1'
 				),
 				array(
 					'key' => 'baz'
@@ -431,25 +436,31 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 
 	public function test_meta_query_relation_and() {
 		$post_id = self::factory()->post->create();
-		add_post_meta( $post_id, 'foo', rand_str() );
-		add_post_meta( $post_id, 'foo', rand_str() );
+		add_post_meta( $post_id, 'foo', 'foo_val_1' );
+		add_post_meta( $post_id, 'foo', 'foo_val_2' );
+
 		$post_id2 = self::factory()->post->create();
-		add_post_meta( $post_id2, 'bar', 'val2' );
-		add_post_meta( $post_id2, 'foo', rand_str() );
+		add_post_meta( $post_id2, 'bar', 'val_2' );
+		add_post_meta( $post_id2, 'foo', 'foo_val_3' );
+
 		$post_id3 = self::factory()->post->create();
-		add_post_meta( $post_id3, 'baz', rand_str() );
+		add_post_meta( $post_id3, 'baz', 'baz_val_1' );
+
 		$post_id4 = self::factory()->post->create();
-		add_post_meta( $post_id4, 'froo', rand_str() );
+		add_post_meta( $post_id4, 'froo', 'froo_val_1' );
+
 		$post_id5 = self::factory()->post->create();
-		add_post_meta( $post_id5, 'tango', 'val2' );
+		add_post_meta( $post_id5, 'tango', 'val_2' );
+
 		$post_id6 = self::factory()->post->create();
 		add_post_meta( $post_id6, 'bar', 'val1' );
-		add_post_meta( $post_id6, 'foo', rand_str() );
+		add_post_meta( $post_id6, 'foo', 'foo_val_4' );
+
 		$post_id7 = self::factory()->post->create();
-		add_post_meta( $post_id7, 'foo', rand_str() );
-		add_post_meta( $post_id7, 'froo', rand_str() );
-		add_post_meta( $post_id7, 'baz', rand_str() );
-		add_post_meta( $post_id7, 'bar', 'val2' );
+		add_post_meta( $post_id7, 'foo', 'foo_val_5' );
+		add_post_meta( $post_id7, 'froo', 'froo_val_2' );
+		add_post_meta( $post_id7, 'baz', 'baz_val_2' );
+		add_post_meta( $post_id7, 'bar', 'val_2' );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
@@ -458,7 +469,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 				),
 				array(
 					'key' => 'bar',
-					'value' => 'val2'
+					'value' => 'val_2'
 				),
 				array(
 					'key' => 'baz'
@@ -565,15 +576,19 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 	 */
 	public function test_meta_query_compare_not_exists() {
 		$post_id = self::factory()->post->create();
-		add_post_meta( $post_id, 'foo', rand_str() );
+		add_post_meta( $post_id, 'foo', 'foo_val_1' );
+
 		$post_id2 = self::factory()->post->create();
-		add_post_meta( $post_id2, 'bar', rand_str() );
+		add_post_meta( $post_id2, 'bar', 'bar_val_1' );
+
 		$post_id3 = self::factory()->post->create();
-		add_post_meta( $post_id3, 'bar', rand_str() );
+		add_post_meta( $post_id3, 'bar', 'bar_val_2' );
+
 		$post_id4 = self::factory()->post->create();
-		add_post_meta( $post_id4, 'baz', rand_str() );
+		add_post_meta( $post_id4, 'baz', 'baz_val_1' );
+
 		$post_id5 = self::factory()->post->create();
-		add_post_meta( $post_id5, 'foo', rand_str() );
+		add_post_meta( $post_id5, 'foo', 'foo_val_2' );
 
 		$query = new WP_Query( array(
 			'meta_query' => array(
@@ -1452,7 +1467,7 @@ class Tests_Query_MetaQuery extends WP_UnitTestCase {
 		$post_id4 = self::factory()->post->create();
 		add_post_meta( $post_id4, 'baz', 'bar' );
 		$post_id5 = self::factory()->post->create();
-		add_post_meta( $post_id5, 'foo', rand_str() );
+		add_post_meta( $post_id5, 'foo', 'tango' );
 
 		$posts = get_posts( array(
 			'meta_key' => 'foo',
