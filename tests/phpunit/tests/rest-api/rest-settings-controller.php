@@ -57,6 +57,8 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 			'default_category',
 			'default_post_format',
 			'posts_per_page',
+			'default_ping_status',
+			'default_comment_status',
 		), array_keys( $data ) );
 	}
 
@@ -226,6 +228,16 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( 10, $data['posts_per_page'] );
+	}
+
+	public function test_update_item_with_invalid_enum() {
+		update_option( 'posts_per_page', 9 );
+
+		wp_set_current_user( $this->administrator );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'default_ping_status', 'open&closed' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
 	public function test_delete_item() {
