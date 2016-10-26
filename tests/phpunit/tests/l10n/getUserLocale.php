@@ -43,6 +43,11 @@ class Tests_Get_User_Locale extends WP_UnitTestCase {
 		$this->assertSame( get_locale(), get_user_locale() );
 	}
 
+	public function test_returns_site_locale_if_no_user() {
+		wp_set_current_user( 0 );
+		$this->assertSame( get_locale(), get_user_locale() );
+	}
+
 	public function test_returns_correct_user_locale() {
 		set_current_screen( 'dashboard' );
 		$this->assertSame( 'de_DE', get_user_locale() );
@@ -74,5 +79,52 @@ class Tests_Get_User_Locale extends WP_UnitTestCase {
 
 		$this->assertSame( 'de_DE', $user_locale );
 		$this->assertSame( $user_locale, $user_locale_2 );
+	}
+
+	public function test_user_id_argument_with_id() {
+		$user_id = $this->factory()->user->create( array(
+			'locale' => 'es_ES',
+		) );
+
+		$user_locale1 = get_user_locale( $user_id );
+
+		delete_user_meta( $user_id, 'locale' );
+
+		$user_locale2 = get_user_locale( $user_id );
+
+		$this->assertSame( 'es_ES', $user_locale1 );
+		$this->assertSame( get_locale(), $user_locale2 );
+	}
+
+	public function test_user_id_argument_with_wp_user_object() {
+		$user_id = $this->factory()->user->create( array(
+			'locale' => 'es_ES',
+		) );
+
+		$user = get_user_by( 'id', $user_id );
+
+		$user_locale1 = get_user_locale( $user );
+
+		delete_user_meta( $user_id, 'locale' );
+
+		$user_locale2 = get_user_locale( $user );
+
+		$this->assertSame( 'es_ES', $user_locale1 );
+		$this->assertSame( get_locale(), $user_locale2 );
+	}
+
+	public function test_user_id_argument_with_nonexistent_user() {
+		global $wpdb;
+
+		$user_id = $wpdb->get_var( "SELECT MAX(ID) FROM $wpdb->users" ) + 1;
+
+		$user_locale = get_user_locale( $user_id );
+
+		$this->assertSame( get_locale(), $user_locale );
+	}
+
+	public function test_user_id_argument_with_invalid_type() {
+		$user_locale = get_user_locale( 'string' );
+		$this->assertSame( get_locale(), $user_locale );
 	}
 }
