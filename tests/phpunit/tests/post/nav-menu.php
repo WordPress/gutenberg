@@ -504,8 +504,8 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$tag_id = self::factory()->tag->create();
 
 		$wpdb->query( "UPDATE $wpdb->posts SET ID=$new_id WHERE ID=$page_id" );
-		$wpdb->query( "UPDATE $wpdb->terms SET term_id=$new_id WHERE term_id=$page_id" );
-		$wpdb->query( "UPDATE $wpdb->term_taxonomy SET term_id=$new_id WHERE term_id=$page_id" );
+		$wpdb->query( "UPDATE $wpdb->terms SET term_id=$new_id WHERE term_id=$tag_id" );
+		$wpdb->query( "UPDATE $wpdb->term_taxonomy SET term_id=$new_id WHERE term_id=$tag_id" );
 
 		update_option( 'page_on_front', $new_id );
 
