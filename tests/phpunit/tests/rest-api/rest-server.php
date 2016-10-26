@@ -727,6 +727,20 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertEquals( 'noindex', $headers['X-Robots-Tag'] );
 	}
 
+	/**
+	 * @ticket 38446
+	 * @expectedDeprecated rest_enabled
+	 */
+	public function test_rest_enable_filter_is_deprecated() {
+		add_filter( 'rest_enabled', '__return_false' );
+		$this->server->serve_request( '/' );
+		remove_filter( 'rest_enabled', '__return_false' );
+
+		$result = json_decode( $this->server->sent_body );
+
+		$this->assertObjectNotHasAttribute( 'code', $result );
+	}
+
 	public function test_link_header_on_requests() {
 		$api_root = get_rest_url();
 
