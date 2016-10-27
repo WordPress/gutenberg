@@ -770,6 +770,34 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$wp_rest_additional_fields = array();
 	}
 
+	/**
+	 * @ticket 38504
+	 */
+	public function test_object_term_queries_are_cached() {
+		global $wpdb;
+
+		$tags = $this->factory->tag->create_many( 2 );
+		$p = $this->factory->post->create();
+		wp_set_object_terms( $p, $tags[0], 'post_tag' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/tags' );
+		$request->set_param( 'post', $p );
+		$response = $this->server->dispatch( $request );
+		$found_1 = wp_list_pluck( $response->data, 'id' );
+
+		unset( $request, $response );
+
+		$num_queries = $wpdb->num_queries;
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/tags' );
+		$request->set_param( 'post', $p );
+		$response = $this->server->dispatch( $request );
+		$found_2 = wp_list_pluck( $response->data, 'id' );
+
+		$this->assertEqualSets( $found_1, $found_2 );
+		$this->assertSame( $num_queries, $wpdb->num_queries );
+	}
+
 	public function additional_field_get_callback( $object, $request ) {
 		return 123;
 	}
