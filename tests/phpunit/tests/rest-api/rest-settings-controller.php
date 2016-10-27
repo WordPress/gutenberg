@@ -159,6 +159,51 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		remove_all_filters( 'rest_pre_get_setting' );
 	}
 
+	public function test_get_item_with_invalid_value_array_in_options() {
+		wp_set_current_user( self::$administrator );
+
+		register_setting( 'somegroup', 'mycustomsetting', array(
+			'show_in_rest' => array(
+				'name'   => 'mycustomsettinginrest',
+				'schema' => array(
+					'enum'    => array( 'validvalue1', 'validvalue2' ),
+					'default' => 'validvalue1',
+				),
+			),
+			'type'         => 'string',
+		) );
+
+		update_option( 'mycustomsetting', array( 'A sneaky array!' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( null, $data['mycustomsettinginrest'] );
+	}
+
+	public function test_get_item_with_invalid_object_array_in_options() {
+		wp_set_current_user( self::$administrator );
+
+		register_setting( 'somegroup', 'mycustomsetting', array(
+			'show_in_rest' => array(
+				'name'   => 'mycustomsettinginrest',
+				'schema' => array(
+					'enum'    => array( 'validvalue1', 'validvalue2' ),
+					'default' => 'validvalue1',
+				),
+			),
+			'type'         => 'string',
+		) );
+
+		update_option( 'mycustomsetting', (object) array( 'A sneaky array!' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/settings' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( null, $data['mycustomsettinginrest'] );
+	}
+
+
 	public function test_create_item() {
 	}
 
@@ -246,6 +291,23 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_param( 'default_ping_status', 'open&closed' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_update_item_with_invalid_stored_value_in_options() {
+		wp_set_current_user( self::$administrator );
+
+		register_setting( 'somegroup', 'mycustomsetting', array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+		) );
+		update_option( 'mycustomsetting', array( 'A sneaky array!' ) );
+
+		wp_set_current_user( self::$administrator );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'mycustomsetting', null );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_stored_value', $response, 500 );
 	}
 
 	public function test_delete_item() {
