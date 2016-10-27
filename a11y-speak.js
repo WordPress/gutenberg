@@ -76,7 +76,14 @@ var A11ySpeak = function( message, ariaLive ) {
 	// Clear previous messages to allow repeated strings being read out.
 	clear();
 
-	message = message.replace( /<[^<>]+>/g, "" );
+	/*
+	 * Strip HTML tags (if any) from the message string. Ideally, messages should
+	 * be simple strings, carefully crafted for specific use with A11ySpeak.
+	 * When re-using already existing strings this will ensure simple HTML to be
+	 * stripped out and replaced with a space. Browsers will collapse multiple
+	 * spaces natively.
+	 */
+	message = message.replace( /<[^<>]+>/g, " " );
 
 	if ( containerAssertive && "assertive" === ariaLive ) {
 		containerAssertive.textContent = message;
