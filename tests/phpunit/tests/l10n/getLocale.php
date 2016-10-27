@@ -81,6 +81,40 @@ class Tests_L10n_GetLocale extends WP_UnitTestCase {
 		$this->assertSame( 'en_US', $found );
 	}
 
+	public function test_should_fall_back_on_locale_when_wpdb_is_unavailable() {
+		global $locale, $wpdb;
+
+		$old_locale = $locale;
+		$old_wpdb = $wpdb;
+
+		$locale = $expected = "Is this a locale? No. No it isn't.";
+		$wpdb = null;
+
+		$found = get_locale();
+
+		$locale = $old_locale;
+		$wpdb = $old_wpdb;
+
+		$this->assertSame( $expected, $found );
+	}
+
+	public function test_should_fall_back_on_es_US_when_locale_and_wpdb_are_unavailable() {
+		global $locale, $wpdb;
+
+		$old_locale = $locale;
+		$old_wpdb = $wpdb;
+
+		$locale = null;
+		$wpdb = null;
+
+		$found = get_locale();
+
+		$locale = $old_locale;
+		$wpdb = $old_wpdb;
+
+		$this->assertSame( 'en_US', $found );
+	}
+
 	public function test_should_respect_get_locale_filter() {
 		add_filter( 'locale', array( $this, 'filter_get_locale' ) );
 		$found = get_locale();
