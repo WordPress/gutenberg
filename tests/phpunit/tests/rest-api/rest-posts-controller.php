@@ -10,22 +10,36 @@
  * @group restapi
  */
 class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Testcase {
+	protected static $post_id;
+
+	protected static $editor_id;
+	protected static $author_id;
+	protected static $contributor_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$post_id = $factory->post->create();
+
+		self::$editor_id = $factory->user->create( array(
+			'role' => 'editor',
+		) );
+		self::$author_id = $factory->user->create( array(
+			'role' => 'author',
+		) );
+		self::$contributor_id = $factory->user->create( array(
+			'role' => 'contributor',
+		) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		wp_delete_post( self::$post_id, true );
+
+		self::delete_user( self::$editor_id );
+		self::delete_user( self::$author_id );
+		self::delete_user( self::$contributor_id );
+	}
 
 	public function setUp() {
 		parent::setUp();
-
-		$this->post_id = $this->factory->post->create();
-
-		$this->editor_id = $this->factory->user->create( array(
-			'role' => 'editor',
-		) );
-		$this->author_id = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-		$this->contributor_id = $this->factory->user->create( array(
-			'role' => 'contributor',
-		) );
-
 		register_post_type( 'youseeme', array( 'supports' => array(), 'show_in_rest' => true ) );
 	}
 
@@ -46,7 +60,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 		// Single
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . $this->post_id );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
@@ -105,8 +119,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_author_query() {
-		$this->factory->post->create( array( 'post_author' => $this->editor_id ) );
-		$this->factory->post->create( array( 'post_author' => $this->author_id ) );
+		$this->factory->post->create( array( 'post_author' => self::$editor_id ) );
+		$this->factory->post->create( array( 'post_author' => self::$author_id ) );
 		// All 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$response = $this->server->dispatch( $request );
@@ -114,25 +128,25 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 3, count( $response->get_data() ) );
 		// 2 of 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'author', array( $this->editor_id, $this->author_id ) );
+		$request->set_param( 'author', array( self::$editor_id, self::$author_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 2, count( $data ) );
-		$this->assertEqualSets( array( $this->editor_id, $this->author_id ), wp_list_pluck( $data, 'author' ) );
+		$this->assertEqualSets( array( self::$editor_id, self::$author_id ), wp_list_pluck( $data, 'author' ) );
 		// 1 of 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'author', $this->editor_id );
+		$request->set_param( 'author', self::$editor_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 1, count( $data ) );
-		$this->assertEquals( $this->editor_id, $data[0]['author'] );
+		$this->assertEquals( self::$editor_id, $data[0]['author'] );
 	}
 
 	public function test_get_items_author_exclude_query() {
-		$this->factory->post->create( array( 'post_author' => $this->editor_id ) );
-		$this->factory->post->create( array( 'post_author' => $this->author_id ) );
+		$this->factory->post->create( array( 'post_author' => self::$editor_id ) );
+		$this->factory->post->create( array( 'post_author' => self::$author_id ) );
 		// All 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$response = $this->server->dispatch( $request );
@@ -140,22 +154,22 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 3, count( $response->get_data() ) );
 		// 1 of 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'author_exclude', array( $this->editor_id, $this->author_id ) );
+		$request->set_param( 'author_exclude', array( self::$editor_id, self::$author_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 1, count( $data ) );
-		$this->assertNotEquals( $this->editor_id, $data[0]['author'] );
-		$this->assertNotEquals( $this->author_id, $data[0]['author'] );
+		$this->assertNotEquals( self::$editor_id, $data[0]['author'] );
+		$this->assertNotEquals( self::$author_id, $data[0]['author'] );
 		// 2 of 3 posts
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-		$request->set_param( 'author_exclude', $this->editor_id );
+		$request->set_param( 'author_exclude', self::$editor_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 2, count( $data ) );
-		$this->assertNotEquals( $this->editor_id, $data[0]['author'] );
-		$this->assertNotEquals( $this->editor_id, $data[1]['author'] );
+		$this->assertNotEquals( self::$editor_id, $data[0]['author'] );
+		$this->assertNotEquals( self::$editor_id, $data[1]['author'] );
 	}
 
 	public function test_get_items_include_query() {
@@ -232,7 +246,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request->set_param( 'status', 'draft' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'status', 'draft' );
 		$response = $this->server->dispatch( $request );
@@ -305,18 +319,18 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( array( $this->post_id, $post_id3, $post_id2, $post_id1 ), wp_list_pluck( $data, 'id' ) );
+		$this->assertEquals( array( self::$post_id, $post_id3, $post_id2, $post_id1 ), wp_list_pluck( $data, 'id' ) );
 
 		// Permit stickies
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'ignore_sticky_posts', false );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( array( $post_id2, $this->post_id, $post_id3, $post_id1 ), wp_list_pluck( $data, 'id' ) );
+		$this->assertEquals( array( $post_id2, self::$post_id, $post_id3, $post_id1 ), wp_list_pluck( $data, 'id' ) );
 	}
 
 	public function test_get_items_offset_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id4 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -335,7 +349,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_tags_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id4 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -352,7 +366,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_tags_exclude_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id4 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -371,7 +385,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_tags_and_categories_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id4 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -391,7 +405,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_tags_and_categories_exclude_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id4 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -413,7 +427,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_sticky_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
 		update_option( 'sticky_posts', array( $id2 ) );
@@ -430,7 +444,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_sticky_with_post__in_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
@@ -459,7 +473,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_not_sticky_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
 		update_option( 'sticky_posts', array( $id2 ) );
@@ -476,7 +490,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_items_sticky_with_post__not_in_query() {
-		$id1 = $this->post_id;
+		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
@@ -586,7 +600,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 
 		// But they are accessible to authorized users
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertCount( 1, $data );
@@ -630,31 +644,31 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_get_item() {
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->check_get_post_response( $response, 'view' );
 	}
 
 	public function test_get_item_links() {
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$links = $response->get_links();
 
-		$this->assertEquals( rest_url( '/wp/v2/posts/' . $this->post_id ), $links['self'][0]['href'] );
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . self::$post_id ), $links['self'][0]['href'] );
 		$this->assertEquals( rest_url( '/wp/v2/posts' ), $links['collection'][0]['href'] );
 
-		$this->assertEquals( rest_url( '/wp/v2/types/' . get_post_type( $this->post_id ) ), $links['about'][0]['href'] );
+		$this->assertEquals( rest_url( '/wp/v2/types/' . get_post_type( self::$post_id ) ), $links['about'][0]['href'] );
 
 		$replies_url = rest_url( '/wp/v2/comments' );
-		$replies_url = add_query_arg( 'post', $this->post_id, $replies_url );
+		$replies_url = add_query_arg( 'post', self::$post_id, $replies_url );
 		$this->assertEquals( $replies_url, $links['replies'][0]['href'] );
 
-		$this->assertEquals( rest_url( '/wp/v2/posts/' . $this->post_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertEquals( rest_url( '/wp/v2/posts/' . self::$post_id . '/revisions' ), $links['version-history'][0]['href'] );
 
 		$attachments_url = rest_url( '/wp/v2/media' );
-		$attachments_url = add_query_arg( 'parent', $this->post_id, $attachments_url );
+		$attachments_url = add_query_arg( 'parent', self::$post_id, $attachments_url );
 		$this->assertEquals( $attachments_url, $links['https://api.w.org/attachment'][0]['href'] );
 
 		$term_links = $links['https://api.w.org/term'];
@@ -672,23 +686,23 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertNotEmpty( $cat_link );
 		$this->assertNull( $format_link );
 
-		$tags_url = add_query_arg( 'post', $this->post_id, rest_url( '/wp/v2/tags' ) );
+		$tags_url = add_query_arg( 'post', self::$post_id, rest_url( '/wp/v2/tags' ) );
 		$this->assertEquals( $tags_url, $tag_link['href'] );
 
-		$category_url = add_query_arg( 'post', $this->post_id, rest_url( '/wp/v2/categories' ) );
+		$category_url = add_query_arg( 'post', self::$post_id, rest_url( '/wp/v2/categories' ) );
 		$this->assertEquals( $category_url, $cat_link['href'] );
 	}
 
 	public function test_get_item_links_no_author() {
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 		$links = $response->get_links();
 		$this->assertFalse( isset( $links['author'] ) );
-		wp_update_post( array( 'ID' => $this->post_id, 'post_author' => $this->author_id ) );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		wp_update_post( array( 'ID' => self::$post_id, 'post_author' => self::$author_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 		$links = $response->get_links();
-		$this->assertEquals( rest_url( '/wp/v2/users/' . $this->author_id ), $links['author'][0]['href'] );
+		$this->assertEquals( rest_url( '/wp/v2/users/' . self::$author_id ), $links['author'][0]['href'] );
 	}
 
 	public function test_get_post_without_permission() {
@@ -716,7 +730,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'context' => 'edit',
 		) );
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$response = $this->server->dispatch( $request );
 
@@ -736,7 +750,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_get_post_context_without_permission() {
 		wp_set_current_user( 0 );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_query_params( array(
 			'context' => 'edit',
 		) );
@@ -811,21 +825,21 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		register_post_status( 'testpubstatus', array( 'public' => true ) );
 		register_post_status( 'testprivtatus', array( 'public' => false ) );
 		// Public status
-		wp_update_post( array( 'ID' => $this->post_id, 'post_status' => 'testpubstatus' ) );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		wp_update_post( array( 'ID' => self::$post_id, 'post_status' => 'testpubstatus' ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		// Private status
-		wp_update_post( array( 'ID' => $this->post_id, 'post_status' => 'testprivtatus' ) );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		wp_update_post( array( 'ID' => self::$post_id, 'post_status' => 'testprivtatus' ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
 	public function test_prepare_item() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_query_params( array( 'context' => 'edit' ) );
 		$response = $this->server->dispatch( $request );
 
@@ -833,7 +847,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_item() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
@@ -845,7 +859,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_rest_create_item() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$request->add_header( 'content-type', 'application/json' );
@@ -857,7 +871,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_invalid_id() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -870,7 +884,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_as_contributor() {
-		wp_set_current_user( $this->contributor_id );
+		wp_set_current_user( self::$contributor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data(array(
@@ -883,7 +897,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_sticky() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -899,7 +913,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_sticky_as_contributor() {
-		wp_set_current_user( $this->contributor_id );
+		wp_set_current_user( self::$contributor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -913,11 +927,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_other_author_without_permission() {
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$author_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data(array(
-			'author' => $this->editor_id,
+			'author' => self::$editor_id,
 		));
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
@@ -939,7 +953,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_draft() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -958,7 +972,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_private() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -974,7 +988,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_private_without_permission() {
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$author_id );
 		$user = wp_get_current_user();
 		$user->add_cap( 'publish_posts', false );
 		// Flush capabilities, https://core.trac.wordpress.org/ticket/28374
@@ -984,7 +998,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
 			'status' => 'private',
-			'author' => $this->author_id,
+			'author' => self::$author_id,
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
@@ -993,7 +1007,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_publish_without_permission() {
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$author_id );
 		$user = wp_get_current_user();
 		$user->add_cap( 'publish_posts', false );
 		// Flush capabilities, https://core.trac.wordpress.org/ticket/28374
@@ -1011,7 +1025,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_invalid_status() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1024,7 +1038,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_format() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1040,7 +1054,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_invalid_format() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1060,7 +1074,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'menu_order' => rand( 1, 100 ),
 		) );
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1085,7 +1099,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_invalid_author() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1098,11 +1112,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_invalid_author_without_permission() {
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$author_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
-			'author' => $this->editor_id,
+			'author' => self::$editor_id,
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
@@ -1111,7 +1125,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_password() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1125,7 +1139,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_falsy_password() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1140,7 +1154,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_empty_string_password_and_sticky() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1156,7 +1170,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_password_and_sticky_fails() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1170,7 +1184,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_custom_date() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1187,7 +1201,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_custom_date_with_timezone() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1208,7 +1222,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_db_error() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params  = $this->set_post_data( array() );
@@ -1230,7 +1244,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_invalid_date() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1243,7 +1257,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_invalid_date_gmt() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1256,7 +1270,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_quotes_in_title() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1269,7 +1283,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_categories() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$category = wp_insert_term( 'Test Category', 'category' );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
@@ -1286,7 +1300,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_post_with_invalid_categories() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
 			'password'   => 'testing',
@@ -1302,9 +1316,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_item() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 		$params = $this->set_post_data();
 		$request->set_body_params( $params );
@@ -1312,20 +1326,20 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$this->check_update_post_response( $response );
 		$new_data = $response->get_data();
-		$this->assertEquals( $this->post_id, $new_data['id'] );
+		$this->assertEquals( self::$post_id, $new_data['id'] );
 		$this->assertEquals( $params['title'], $new_data['title']['raw'] );
 		$this->assertEquals( $params['content'], $new_data['content']['raw'] );
 		$this->assertEquals( $params['excerpt'], $new_data['excerpt']['raw'] );
-		$post = get_post( $this->post_id );
+		$post = get_post( self::$post_id );
 		$this->assertEquals( $params['title'], $post->post_title );
 		$this->assertEquals( $params['content'], $post->post_content );
 		$this->assertEquals( $params['excerpt'], $post->post_excerpt );
 	}
 
 	public function test_rest_update_post() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->add_header( 'content-type', 'application/json' );
 		$params = $this->set_post_data();
 		$request->set_body( wp_json_encode( $params ) );
@@ -1333,20 +1347,20 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$this->check_update_post_response( $response );
 		$new_data = $response->get_data();
-		$this->assertEquals( $this->post_id, $new_data['id'] );
+		$this->assertEquals( self::$post_id, $new_data['id'] );
 		$this->assertEquals( $params['title'], $new_data['title']['raw'] );
 		$this->assertEquals( $params['content'], $new_data['content']['raw'] );
 		$this->assertEquals( $params['excerpt'], $new_data['excerpt']['raw'] );
-		$post = get_post( $this->post_id );
+		$post = get_post( self::$post_id );
 		$this->assertEquals( $params['title'], $post->post_title );
 		$this->assertEquals( $params['content'], $post->post_content );
 		$this->assertEquals( $params['excerpt'], $post->post_excerpt );
 	}
 
 	public function test_rest_update_post_raw() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->add_header( 'content-type', 'application/json' );
 		$params = $this->set_raw_post_data();
 		$request->set_body( wp_json_encode( $params ) );
@@ -1354,20 +1368,20 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$this->check_update_post_response( $response );
 		$new_data = $response->get_data();
-		$this->assertEquals( $this->post_id, $new_data['id'] );
+		$this->assertEquals( self::$post_id, $new_data['id'] );
 		$this->assertEquals( $params['title']['raw'], $new_data['title']['raw'] );
 		$this->assertEquals( $params['content']['raw'], $new_data['content']['raw'] );
 		$this->assertEquals( $params['excerpt']['raw'], $new_data['excerpt']['raw'] );
-		$post = get_post( $this->post_id );
+		$post = get_post( self::$post_id );
 		$this->assertEquals( $params['title']['raw'], $post->post_title );
 		$this->assertEquals( $params['content']['raw'], $post->post_content );
 		$this->assertEquals( $params['excerpt']['raw'], $post->post_excerpt );
 	}
 
 	public function test_update_post_without_extra_params() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data();
 		unset( $params['type'] );
 		unset( $params['name'] );
@@ -1380,14 +1394,14 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_without_permission() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$user = wp_get_current_user();
 		$user->add_cap( 'edit_published_posts', false );
 		// Flush capabilities, https://core.trac.wordpress.org/ticket/28374
 		$user->get_role_caps();
 		$user->update_user_level_from_caps();
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data();
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
@@ -1396,9 +1410,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_sticky_as_contributor() {
-		wp_set_current_user( $this->contributor_id );
+		wp_set_current_user( self::$contributor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'sticky' => true,
 			'status' => 'pending',
@@ -1410,7 +1424,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_invalid_id() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', REST_TESTS_IMPOSSIBLY_HIGH_NUMBER ) );
 		$response = $this->server->dispatch( $request );
@@ -1419,18 +1433,18 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_invalid_route() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/pages/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/pages/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
 	}
 
 	public function test_update_post_with_format() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'format' => 'gallery',
 		) );
@@ -1444,9 +1458,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_with_invalid_format() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'format' => 'testformat',
 		) );
@@ -1457,12 +1471,12 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_ignore_readonly() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$new_content = rand_str();
 		$expected_modified = current_time( 'mysql' );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'modified' => '2010-06-01T02:00:00Z',
 			'content'  => $new_content,
@@ -1483,9 +1497,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_with_invalid_date() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'date' => rand_str(),
 		) );
@@ -1496,9 +1510,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_with_invalid_date_gmt() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'date_gmt' => rand_str(),
 		) );
@@ -1509,9 +1523,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_slug() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'slug' => 'sample-slug',
 		) );
@@ -1525,9 +1539,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_slug_accented_chars() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'slug' => 'tęst-acceńted-chäræcters',
 		) );
@@ -1541,9 +1555,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_sticky() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'sticky' => true,
 		) );
@@ -1556,7 +1570,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( true, is_sticky( $post->ID ) );
 
 		// Updating another field shouldn't change sticky status
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'title'       => 'This should not reset sticky',
 		) );
@@ -1570,9 +1584,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_excerpt() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( array(
 			'excerpt' => 'An Excerpt',
 		) );
@@ -1583,9 +1597,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_empty_excerpt() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( array(
 			'excerpt' => '',
 		) );
@@ -1596,9 +1610,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_content() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( array(
 			'content' => 'Some Content',
 		) );
@@ -1609,9 +1623,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_empty_content() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( array(
 			'content' => '',
 		) );
@@ -1622,9 +1636,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_with_password_and_sticky_fails() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'password' => '123',
 			'sticky'   => true,
@@ -1636,11 +1650,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_stick_post_with_password_fails() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		stick_post( $this->post_id );
+		stick_post( self::$post_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'password' => '123',
 		) );
@@ -1651,11 +1665,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_password_protected_post_with_sticky_fails() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		wp_update_post( array( 'ID' => $this->post_id, 'post_password' => '123' ) );
+		wp_update_post( array( 'ID' => self::$post_id, 'post_password' => '123' ) );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'sticky' => true,
 		) );
@@ -1666,9 +1680,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_update_post_with_quotes_in_title() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'title' => "Rob O'Rourke's Diary",
 		) );
@@ -1680,10 +1694,10 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_update_post_with_categories() {
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$category = wp_insert_term( 'Test Category', 'category' );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'title' => 'Tester',
 			'categories' => array(
@@ -1714,11 +1728,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_update_post_with_empty_categories() {
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$category = wp_insert_term( 'Test Category', 'category' );
-		wp_set_object_terms( $this->post_id, $category['term_id'], 'category' );
+		wp_set_object_terms( self::$post_id, $category['term_id'], 'category' );
 
-		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'title' => 'Tester',
 			'categories' => array(),
@@ -1731,7 +1745,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_delete_item() {
 		$post_id = $this->factory->post->create( array( 'post_title' => 'Deleted post' ) );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', $post_id ) );
 		$response = $this->server->dispatch( $request );
@@ -1744,7 +1758,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_delete_item_skip_trash() {
 		$post_id = $this->factory->post->create( array( 'post_title' => 'Deleted post' ) );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', $post_id ) );
 		$request['force'] = true;
@@ -1758,7 +1772,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_delete_item_already_trashed() {
 		$post_id = $this->factory->post->create( array( 'post_title' => 'Deleted post' ) );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', $post_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -1767,7 +1781,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_delete_post_invalid_id() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
 		$response = $this->server->dispatch( $request );
@@ -1777,7 +1791,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_delete_post_invalid_post_type() {
 		$page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . $page_id );
 		$response = $this->server->dispatch( $request );
@@ -1786,9 +1800,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_delete_post_without_permission() {
-		wp_set_current_user( $this->author_id );
+		wp_set_current_user( self::$author_id );
 
-		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
@@ -1905,9 +1919,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'update_callback' => array( $this, 'additional_field_update_callback' ),
 		) );
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		// Check for error on update.
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( array(
 			'my_custom_int' => 'returnError',
 		) );

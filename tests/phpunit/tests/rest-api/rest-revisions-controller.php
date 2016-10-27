@@ -10,22 +10,40 @@
   * @group restapi
   */
 class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase {
+	protected static $post_id;
+	protected static $page_id;
 
-	public function setUp() {
-		parent::setUp();
-		$this->post_id = $this->factory->post->create();
-		$this->page_id = $this->factory->post->create( array( 'post_type' => 'page' ) );
+	protected static $editor_id;
+	protected static $contributor_id;
 
-		$this->editor_id = $this->factory->user->create( array(
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$post_id = $factory->post->create();
+		self::$page_id = $factory->post->create( array( 'post_type' => 'page' ) );
+
+		self::$editor_id = $factory->user->create( array(
 			'role' => 'editor',
 		) );
-		$this->contributor_id = $this->factory->user->create( array(
+		self::$contributor_id = $factory->user->create( array(
 			'role' => 'contributor',
 		) );
 
-		wp_update_post( array( 'post_content' => 'This content is better.', 'ID' => $this->post_id ) );
-		wp_update_post( array( 'post_content' => 'This content is marvelous.', 'ID' => $this->post_id ) );
-		$revisions = wp_get_post_revisions( $this->post_id );
+		wp_update_post( array( 'post_content' => 'This content is better.', 'ID' => self::$post_id ) );
+		wp_update_post( array( 'post_content' => 'This content is marvelous.', 'ID' => self::$post_id ) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		// Also deletes revisions.
+		wp_delete_post( self::$post_id, true );
+		wp_delete_post( self::$page_id, true );
+
+		self::delete_user( self::$editor_id );
+		self::delete_user( self::$contributor_id );
+	}
+
+	public function setUp() {
+		parent::setUp();
+
+		$revisions = wp_get_post_revisions( self::$post_id );
 		$this->revision_1 = array_pop( $revisions );
 		$this->revision_id1 = $this->revision_1->ID;
 		$this->revision_2 = array_pop( $revisions );
@@ -42,13 +60,13 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 
 	public function test_context_param() {
 		// Collection
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEqualSets( array( 'view', 'edit', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );
 		// Single
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_1->ID );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_1->ID );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
@@ -56,8 +74,8 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 	}
 
 	public function test_get_items() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 200, $response->get_status() );
@@ -73,32 +91,32 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
-		wp_set_current_user( $this->contributor_id );
+		wp_set_current_user( self::$contributor_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
 	}
 
 	public function test_get_items_missing_parent() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
 	}
 
 	public function test_get_items_invalid_parent_post_type() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->page_id . '/revisions' );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$page_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
 	}
 
 	public function test_get_item() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->check_get_revision_response( $response, $this->revision_1 );
@@ -121,8 +139,8 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 	}
 
 	public function test_get_item_embed_context() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$request->set_param( 'context', 'embed' );
 		$response = $this->server->dispatch( $request );
 		$fields = array(
@@ -140,54 +158,54 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
-		wp_set_current_user( $this->contributor_id );
+		wp_set_current_user( self::$contributor_id );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
 	}
 
 	public function test_get_item_missing_parent() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
 	}
 
 	public function test_get_item_invalid_parent_post_type() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->page_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$page_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
 	}
 
 	public function test_delete_item() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertNull( get_post( $this->revision_id1 ) );
 	}
 
 	public function test_delete_item_no_permission() {
-		wp_set_current_user( $this->contributor_id );
-		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$contributor_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
 	}
 
 	public function test_prepare_item() {
-		wp_set_current_user( $this->editor_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->check_get_revision_response( $response, $this->revision_1 );
 	}
 
 	public function test_get_item_schema() {
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
@@ -207,13 +225,13 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 	}
 
 	public function test_create_item() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_no_route', $response, 404 );
 	}
 
 	public function test_update_item() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_no_route', $response, 404 );
 	}
@@ -233,7 +251,7 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 			'update_callback' => array( $this, 'additional_field_update_callback' ),
 		) );
 
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . $this->post_id . '/revisions' );
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/revisions' );
 
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
@@ -243,7 +261,7 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 
 		wp_set_current_user( 1 );
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $this->post_id . '/revisions/' . $this->revision_id1 );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertArrayHasKey( 'my_custom_int', $response->data );

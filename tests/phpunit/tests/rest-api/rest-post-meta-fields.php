@@ -10,6 +10,16 @@
   * @group restapi
   */
 class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
+	protected static $post_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$post_id = $factory->post->create();
+	}
+
+	public static function wpTearDownAfterClass() {
+		wp_delete_post( self::$post_id, true );
+	}
+
 	public function setUp() {
 		parent::setUp();
 
@@ -54,8 +64,6 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		global $wp_rest_server;
 		$this->server = $wp_rest_server = new Spy_REST_Server;
 		do_action( 'rest_api_init' );
-
-		$this->post_id = $this->factory->post->create();
 	}
 
 	protected function grant_write_permission() {
@@ -67,9 +75,9 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	public function test_get_value() {
-		add_post_meta( $this->post_id, 'test_single', 'testvalue' );
+		add_post_meta( self::$post_id, 'test_single', 'testvalue' );
 
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
@@ -86,8 +94,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_get_value
 	 */
 	public function test_get_multi_value() {
-		add_post_meta( $this->post_id, 'test_multi', 'value1' );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		add_post_meta( self::$post_id, 'test_multi', 'value1' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -99,7 +107,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertContains( 'value1', $meta['test_multi'] );
 
 		// Check after an update.
-		add_post_meta( $this->post_id, 'test_multi', 'value2' );
+		add_post_meta( self::$post_id, 'test_multi', 'value2' );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -113,8 +121,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_get_value
 	 */
 	public function test_get_unregistered() {
-		add_post_meta( $this->post_id, 'test_unregistered', 'value1' );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		add_post_meta( self::$post_id, 'test_unregistered', 'value1' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -128,8 +136,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_get_value
 	 */
 	public function test_get_registered_no_api_access() {
-		add_post_meta( $this->post_id, 'test_no_rest', 'for_the_wicked' );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		add_post_meta( self::$post_id, 'test_no_rest', 'for_the_wicked' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -143,8 +151,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_get_value
 	 */
 	public function test_get_registered_api_disabled() {
-		add_post_meta( $this->post_id, 'test_rest_disabled', 'sleepless_nights' );
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		add_post_meta( self::$post_id, 'test_rest_disabled', 'sleepless_nights' );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
@@ -176,11 +184,11 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->server = $wp_rest_server = new Spy_REST_Server;
 		do_action( 'rest_api_init' );
 
-		add_post_meta( $this->post_id, 'test_string', 42 );
-		add_post_meta( $this->post_id, 'test_number', '42' );
-		add_post_meta( $this->post_id, 'test_bool', 1 );
+		add_post_meta( self::$post_id, 'test_string', 42 );
+		add_post_meta( self::$post_id, 'test_number', '42' );
+		add_post_meta( self::$post_id, 'test_bool', 1 );
 
-		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -205,7 +213,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 */
 	public function test_set_value() {
 		// Ensure no data exists currently.
-		$values = get_post_meta( $this->post_id, 'test_single', false );
+		$values = get_post_meta( self::$post_id, 'test_single', false );
 		$this->assertEmpty( $values );
 
 		$this->grant_write_permission();
@@ -215,13 +223,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_single' => 'test_value',
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_single', false );
+		$meta = get_post_meta( self::$post_id, 'test_single', false );
 		$this->assertNotEmpty( $meta );
 		$this->assertCount( 1, $meta );
 		$this->assertEquals( 'test_value', $meta[0] );
@@ -237,8 +245,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 */
 	public function test_set_duplicate_single_value() {
 		// Start with an existing metakey and value.
-		$values = update_post_meta( $this->post_id, 'test_single', 'test_value' );
-		$this->assertEquals( 'test_value', get_post_meta( $this->post_id, 'test_single', true ) );
+		$values = update_post_meta( self::$post_id, 'test_single', 'test_value' );
+		$this->assertEquals( 'test_value', get_post_meta( self::$post_id, 'test_single', true ) );
 
 		$this->grant_write_permission();
 
@@ -247,13 +255,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_single' => 'test_value',
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_single', true );
+		$meta = get_post_meta( self::$post_id, 'test_single', true );
 		$this->assertNotEmpty( $meta );
 		$this->assertEquals( 'test_value', $meta );
 
@@ -275,14 +283,14 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		wp_set_current_user( 0 );
 
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 401 );
 
 		// Check that the value wasn't actually updated.
-		$this->assertEmpty( get_post_meta( $this->post_id, 'test_single', false ) );
+		$this->assertEmpty( get_post_meta( self::$post_id, 'test_single', false ) );
 	}
 
 	/**
@@ -297,12 +305,12 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$this->grant_write_permission();
 
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
-		$this->assertEmpty( get_post_meta( $this->post_id, 'test_bad_auth', false ) );
+		$this->assertEmpty( get_post_meta( self::$post_id, 'test_bad_auth', false ) );
 	}
 
 	/**
@@ -317,7 +325,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$this->grant_write_permission();
 
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		/**
@@ -335,7 +343,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 	public function test_set_value_multiple() {
 		// Ensure no data exists currently.
-		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		$values = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertEmpty( $values );
 
 		$this->grant_write_permission();
@@ -345,13 +353,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_multi' => array( 'val1' ),
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$meta = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertNotEmpty( $meta );
 		$this->assertCount( 1, $meta );
 		$this->assertEquals( 'val1', $meta[0] );
@@ -367,7 +375,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$meta = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertNotEmpty( $meta );
 		$this->assertCount( 2, $meta );
 		$this->assertContains( 'val1', $meta );
@@ -378,9 +386,9 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * Test removing only one item with duplicate items.
 	 */
 	public function test_set_value_remove_one() {
-		add_post_meta( $this->post_id, 'test_multi', 'c' );
-		add_post_meta( $this->post_id, 'test_multi', 'n' );
-		add_post_meta( $this->post_id, 'test_multi', 'n' );
+		add_post_meta( self::$post_id, 'test_multi', 'c' );
+		add_post_meta( self::$post_id, 'test_multi', 'n' );
+		add_post_meta( self::$post_id, 'test_multi', 'n' );
 
 		$this->grant_write_permission();
 
@@ -389,13 +397,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_multi' => array( 'c', 'n' ),
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$meta = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertNotEmpty( $meta );
 		$this->assertCount( 2, $meta );
 		$this->assertContains( 'c', $meta );
@@ -407,7 +415,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 */
 	public function test_set_value_multiple_unauthenticated() {
 		// Ensure no data exists currently.
-		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		$values = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertEmpty( $values );
 
 		wp_set_current_user( 0 );
@@ -417,13 +425,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_multi' => array( 'val1' ),
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 401 );
 
-		$meta = get_post_meta( $this->post_id, 'test_multi', false );
+		$meta = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertEmpty( $meta );
 	}
 
@@ -439,17 +447,17 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$this->grant_write_permission();
 
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_update', $response, 403 );
-		$this->assertEmpty( get_post_meta( $this->post_id, 'test_bad_auth_multi', false ) );
+		$this->assertEmpty( get_post_meta( self::$post_id, 'test_bad_auth_multi', false ) );
 	}
 
 	public function test_add_multi_value_db_error() {
 		// Ensure no data exists currently.
-		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		$values = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertEmpty( $values );
 
 		$this->grant_write_permission();
@@ -459,7 +467,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_multi' => array( 'val1' ),
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		/**
@@ -478,8 +486,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	public function test_remove_multi_value_db_error() {
-		add_post_meta( $this->post_id, 'test_multi', 'val1' );
-		$values = get_post_meta( $this->post_id, 'test_multi', false );
+		add_post_meta( self::$post_id, 'test_multi', 'val1' );
+		$values = get_post_meta( self::$post_id, 'test_multi', false );
 		$this->assertEquals( array( 'val1' ), $values );
 
 		$this->grant_write_permission();
@@ -489,7 +497,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_multi' => array(),
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		/**
@@ -508,8 +516,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	public function test_delete_value() {
-		add_post_meta( $this->post_id, 'test_single', 'val1' );
-		$current = get_post_meta( $this->post_id, 'test_single', true );
+		add_post_meta( self::$post_id, 'test_single', 'val1' );
+		$current = get_post_meta( self::$post_id, 'test_single', true );
 		$this->assertEquals( 'val1', $current );
 
 		$this->grant_write_permission();
@@ -519,13 +527,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_single' => null,
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 
-		$meta = get_post_meta( $this->post_id, 'test_single', false );
+		$meta = get_post_meta( self::$post_id, 'test_single', false );
 		$this->assertEmpty( $meta );
 	}
 
@@ -533,8 +541,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_delete_value
 	 */
 	public function test_delete_value_blocked() {
-		add_post_meta( $this->post_id, 'test_bad_auth', 'val1' );
-		$current = get_post_meta( $this->post_id, 'test_bad_auth', true );
+		add_post_meta( self::$post_id, 'test_bad_auth', 'val1' );
+		$current = get_post_meta( self::$post_id, 'test_bad_auth', true );
 		$this->assertEquals( 'val1', $current );
 
 		$this->grant_write_permission();
@@ -544,13 +552,13 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_bad_auth' => null,
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
 
-		$meta = get_post_meta( $this->post_id, 'test_bad_auth', true );
+		$meta = get_post_meta( self::$post_id, 'test_bad_auth', true );
 		$this->assertEquals( 'val1', $meta );
 	}
 
@@ -558,8 +566,8 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	 * @depends test_delete_value
 	 */
 	public function test_delete_value_db_error() {
-		add_post_meta( $this->post_id, 'test_single', 'val1' );
-		$current = get_post_meta( $this->post_id, 'test_single', true );
+		add_post_meta( self::$post_id, 'test_single', 'val1' );
+		$current = get_post_meta( self::$post_id, 'test_single', true );
 		$this->assertEquals( 'val1', $current );
 
 		$this->grant_write_permission();
@@ -569,7 +577,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				'test_single' => null,
 			),
 		);
-		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$request->set_body_params( $data );
 		/**
 		 * Disable showing error as the below is going to intentionally
@@ -587,7 +595,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 	}
 
 	public function test_get_schema() {
-		$request = new WP_REST_Request( 'OPTIONS', sprintf( '/wp/v2/posts/%d', $this->post_id ) );
+		$request = new WP_REST_Request( 'OPTIONS', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$data = $response->get_data();

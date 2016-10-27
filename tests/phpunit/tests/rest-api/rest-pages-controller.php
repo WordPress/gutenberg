@@ -11,17 +11,20 @@
   * @group restapi
   */
 class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Testcase {
+	protected static $editor_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$editor_id = $factory->user->create( array(
+			'role' => 'editor',
+		) );
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$editor_id );
+	}
 
 	public function setUp() {
 		parent::setUp();
-
-		$this->editor_id = $this->factory->user->create( array(
-			'role' => 'editor',
-		) );
-		$this->author_id = $this->factory->user->create( array(
-			'role' => 'author',
-		) );
-
 		$this->has_setup_template = false;
 		add_filter( 'theme_page_templates', array( $this, 'filter_theme_page_templates' ) );
 	}
@@ -183,7 +186,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 
 		// But they are accessible to authorized users
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertCount( 1, $data );
@@ -227,7 +230,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_item_with_template() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/pages' );
 		$params = $this->set_post_data( array(
@@ -246,7 +249,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$page_id = $this->factory->post->create( array(
 			'type' => 'page',
 		) );
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/pages' );
 		$params = $this->set_post_data( array(
@@ -267,7 +270,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	}
 
 	public function test_create_page_with_invalid_parent() {
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/pages' );
 		$params = $this->set_post_data( array(
@@ -322,7 +325,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'post_type' => 'page',
 		) );
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/pages/%d', $page_id ) );
 
@@ -342,7 +345,7 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			'menu_order' => 1,
 		) );
 
-		wp_set_current_user( $this->editor_id );
+		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/pages/%d', $page_id ) );
 
