@@ -561,6 +561,7 @@ jQuery( window ).load( function (){
 
 	module( 'Customize Controls wp.customize.dirtyValues' );
 	test( 'dirtyValues() returns expected values', function() {
+		wp.customize.state( 'changesetStatus' ).set( 'auto-draft' );
 		wp.customize.each( function( setting ) {
 			setting._dirty = false;
 		} );
@@ -575,6 +576,12 @@ jQuery( window ).load( function (){
 		ok( ! _.isEmpty( wp.customize.dirtyValues() ) );
 		ok( ! _.isEmpty( wp.customize.dirtyValues( { unsaved: true } ) ) );
 		equal( 'Modified', wp.customize.dirtyValues()['fixture-setting'] );
+
+		// When the changeset does not exist, all dirty settings are necessarily unsaved.
+		wp.customize.state( 'changesetStatus' ).set( '' );
+		wp.customize( 'fixture-setting' )._dirty = true;
+		ok( ! _.isEmpty( wp.customize.dirtyValues() ) );
+		ok( ! _.isEmpty( wp.customize.dirtyValues( { unsaved: true } ) ) );
 	} );
 
 	module( 'Customize Controls: wp.customize.requestChangesetUpdate()' );
