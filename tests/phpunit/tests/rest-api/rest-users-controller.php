@@ -635,13 +635,11 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users/me' );
 
 		$response = $this->server->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( 302, $response->get_status() );
 
 		$headers = $response->get_headers();
-		$this->assertArrayNotHasKey( 'Location', $headers );
-
-		$links = $response->get_links();
-		$this->assertEquals( rest_url( 'wp/v2/users/' . self::$user ), $links['self'][0]['href'] );
+		$this->assertArrayHasKey( 'Location', $headers );
+		$this->assertEquals( rest_url( 'wp/v2/users/' . self::$user ), $headers['Location'] );
 	}
 
 	public function test_get_current_user_without_permission() {
