@@ -65,6 +65,6 @@ class Tests_Date_I18n extends WP_UnitTestCase {
 	public function test_adjusts_format_based_on_timezone_string() {
 		update_option( 'timezone_string', 'Europe/Zurich' );
 
-		$this->assertEquals( '2012-12-01 00:00:00 CET +02:00 Europe/Zurich', date_i18n( 'Y-m-d H:i:s T P e', strtotime( '2012-12-01 00:00:00' ) ) );
+		$this->assertEquals( '2012-12-01 00:00:00 CET +01:00 Europe/Zurich', date_i18n( 'Y-m-d H:i:s T P e', strtotime( '2012-12-01 00:00:00' ) ) );
 	}
 }
