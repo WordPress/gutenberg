@@ -229,6 +229,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_post_tags'       => array( 'administrator', 'editor' ),
 			'edit_post_tags'         => array( 'administrator', 'editor' ),
 			'delete_post_tags'       => array( 'administrator', 'editor' ),
+			'unfiltered_css'         => array( 'administrator', 'editor' ),
 
 			'assign_categories'      => array( 'administrator', 'editor', 'author', 'contributor' ),
 			'assign_post_tags'       => array( 'administrator', 'editor', 'author', 'contributor' ),
@@ -247,6 +248,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_network_options' => array(),
 			'upload_plugins'         => array(),
 			'upload_themes'          => array(),
+			'unfiltered_css'         => array(),
 
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
@@ -391,7 +393,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			// These primitive capabilities have a 'case' in `map_meta_cap()` but aren't meta capabilities:
 			$expected['unfiltered_upload'],
 			$expected['unfiltered_html'],
-			$expected['unfiltered_css'],
 			$expected['edit_files'],
 			$expected['edit_plugins'],
 			$expected['edit_themes'],
