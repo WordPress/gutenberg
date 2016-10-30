@@ -542,11 +542,22 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Error', $r );
 		$this->assertEquals( 'unknown_post_type', $r->get_error_code() );
 
+		$r = $menus->insert_auto_draft_post( array( 'post_status' => 'publish', 'post_title' => 'Bad', 'post_type' => 'post' ) );
+		$this->assertInstanceOf( 'WP_Error', $r );
+		$this->assertEquals( 'status_forbidden', $r->get_error_code() );
+
 		$r = $menus->insert_auto_draft_post( array( 'post_title' => 'Hello World', 'post_type' => 'post' ) );
 		$this->assertInstanceOf( 'WP_Post', $r );
 		$this->assertEquals( 'Hello World', $r->post_title );
+		$this->assertEquals( 'hello-world', $r->post_name );
 		$this->assertEquals( 'post', $r->post_type );
-		$this->assertEquals( sanitize_title( $r->post_title ), $r->post_name );
+
+		$r = $menus->insert_auto_draft_post( array( 'post_title' => 'Hello World', 'post_type' => 'post', 'post_name' => 'greetings-world', 'post_content' => 'Hi World' ) );
+		$this->assertInstanceOf( 'WP_Post', $r );
+		$this->assertEquals( 'Hello World', $r->post_title );
+		$this->assertEquals( 'post', $r->post_type );
+		$this->assertEquals( 'greetings-world', $r->post_name );
+		$this->assertEquals( 'Hi World', $r->post_content );
 	}
 
 	/**
@@ -731,6 +742,7 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$post_ids = $this->factory()->post->create_many( 3, array(
 			'post_status' => 'auto-draft',
 			'post_type' => 'post',
+			'post_name' => 'auto-draft',
 		) );
 		$pre_published_post_id = $this->factory()->post->create( array( 'post_status' => 'publish' ) );
 
@@ -750,6 +762,11 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		foreach ( $post_ids as $post_id ) {
 			$this->assertEquals( 'publish', get_post_status( $post_id ) );
 		}
+
+		// Ensure that unique slugs were assigned.
+		$posts = array_map( 'get_post', $post_ids );
+		$post_names = wp_list_pluck( $posts, 'post_name' );
+		$this->assertEqualSets( $post_names, array_unique( $post_names ) );
 	}
 
 	/**
