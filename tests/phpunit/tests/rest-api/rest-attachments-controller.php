@@ -849,6 +849,8 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		if ( file_exists( $this->test_file2 ) ) {
 			unlink( $this->test_file2 );
 		}
+
+		$this->remove_added_uploads();
 	}
 
 	protected function check_post_data( $attachment, $data, $context = 'view', $links ) {
