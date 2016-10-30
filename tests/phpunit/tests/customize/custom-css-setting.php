@@ -30,7 +30,15 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	function setUp() {
 		parent::setUp();
 		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
-		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$user_id = self::factory()->user->create( array(
+			'role' => 'administrator',
+		) );
+		if ( is_multisite() ) {
+			grant_super_admin( $user_id );
+		}
+
+		wp_set_current_user( $user_id );
 
 		global $wp_customize;
 		$this->wp_customize = new WP_Customize_Manager();
@@ -115,7 +123,9 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 
 		$updated_css = 'body { color: blue; }';
 		$this->wp_customize->set_post_value( $this->setting->id, $updated_css );
-		$this->setting->save();
+		$saved = $this->setting->save();
+
+		$this->assertNotFalse( $saved );
 		$this->assertEquals( $updated_css, $this->setting->value() );
 		$this->assertEquals( $updated_css, wp_get_custom_css( $this->setting->stylesheet ) );
 
