@@ -1382,13 +1382,17 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			return;
 		}
 
-		$user = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$user = self::$users['administrator'];
 		$user->add_cap( 'manage_network_users' );
 		$other_user = self::$users['subscriber'];
 
 		wp_set_current_user( $user->ID );
 
-		$this->assertTrue( current_user_can( 'edit_user', $other_user->ID ) );
+		$can_edit_user = current_user_can( 'edit_user', $other_user->ID );
+
+		$user->remove_cap( 'manage_network_users' );
+
+		$this->assertTrue( $can_edit_user );
 	}
 
 	function test_multisite_administrator_with_manage_network_users_can_not_edit_super_admin() {
@@ -1397,14 +1401,19 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			return;
 		}
 
-		$user = new WP_User( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$user = self::$users['administrator'];
 		$user->add_cap( 'manage_network_users' );
-		$super_admin = new WP_User( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$super_admin = self::$users['subscriber'];
 		grant_super_admin( $super_admin->ID );
 
 		wp_set_current_user( $user->ID );
 
-		$this->assertFalse( current_user_can( 'edit_user', $super_admin->ID ) );
+		$can_edit_user = current_user_can( 'edit_user', $super_admin->ID );
+
+		$user->remove_cap( 'manage_network_users' );
+		revoke_super_admin( $super_admin->ID );
+
+		$this->assertFalse( $can_edit_user );
 	}
 
 	/**
