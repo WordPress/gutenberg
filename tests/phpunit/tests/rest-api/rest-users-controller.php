@@ -908,6 +908,26 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayNotHasKey( 'administrator', $user->caps );
 	}
 
+	public function test_update_user_multiple_roles() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+
+		wp_set_current_user( self::$user );
+		$this->allow_user_to_manage_multisite();
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'roles', 'author,editor' );
+		$response = $this->server->dispatch( $request );
+
+		$new_data = $response->get_data();
+
+		$this->assertEquals( array( 'author', 'editor' ), $new_data['roles'] );
+
+		$user = get_userdata( $user_id );
+		$this->assertArrayHasKey( 'author', $user->caps );
+		$this->assertArrayHasKey( 'editor', $user->caps );
+		$this->assertArrayNotHasKey( 'administrator', $user->caps );
+	}
+
 	public function test_update_user_role_invalid_privilege_escalation() {
 		wp_set_current_user( self::$editor );
 
