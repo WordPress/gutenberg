@@ -267,6 +267,22 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	public function test_update_item_with_integer() {
+		wp_set_current_user( self::$administrator );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'posts_per_page', 11 );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_update_item_with_invalid_float_for_integer() {
+		wp_set_current_user( self::$administrator );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/settings' );
+		$request->set_param( 'posts_per_page', 10.5 );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	/**
 	 * Setting an item to "null" will essentially restore it to it's default value.
 	 */
