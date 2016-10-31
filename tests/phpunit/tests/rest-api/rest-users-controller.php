@@ -661,7 +661,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 			'name'        => 'Test User',
 			'nickname'    => 'testuser',
 			'slug'        => 'test-user',
-			'role'        => 'editor',
+			'roles'       => array( 'editor' ),
 			'description' => 'New API User',
 			'url'         => 'http://example.com',
 		);
@@ -673,6 +673,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'http://example.com', $data['url'] );
+		$this->assertEquals( array( 'editor' ), $data['roles'] );
 		$this->check_add_edit_user_response( $response );
 	}
 
