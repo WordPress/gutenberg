@@ -770,7 +770,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->check_get_post_response( $response, 'view' );
 
 		$data = $response->get_data();
+		$this->assertEquals( '', $data['content']['rendered'] );
 		$this->assertTrue( $data['content']['protected'] );
+		$this->assertEquals( '', $data['excerpt']['rendered'] );
 		$this->assertTrue( $data['excerpt']['protected'] );
 	}
 
@@ -790,7 +792,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$data = $response->get_data();
 		$this->assertEquals( wpautop( $post->post_content ), $data['content']['rendered'] );
+		$this->assertTrue( $data['content']['protected'] );
 		$this->assertEquals( wpautop( $post->post_excerpt ), $data['excerpt']['rendered'] );
+		$this->assertTrue( $data['excerpt']['protected'] );
 	}
 
 	public function test_get_post_with_password_using_incorrect_password() {
@@ -817,8 +821,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$data = $response->get_data();
 		$this->check_get_post_response( $response, 'view' );
 		$this->assertEquals( '', $data['content']['rendered'] );
+		$this->assertTrue( $data['content']['protected'] );
 		$this->assertEquals( '', $data['excerpt']['rendered'] );
-
+		$this->assertTrue( $data['excerpt']['protected'] );
 	}
 
 	public function test_get_item_read_permission_custom_post_status() {
