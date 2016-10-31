@@ -199,7 +199,14 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$data = $response->get_data();
 		$this->assertTrue( in_array( $id1, wp_list_pluck( $data, 'id' ), true ) );
 		$this->assertTrue( in_array( $id2, wp_list_pluck( $data, 'id' ), true ) );
+
 		$request->set_param( 'exclude', array( $id2 ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertTrue( in_array( $id1, wp_list_pluck( $data, 'id' ), true ) );
+		$this->assertFalse( in_array( $id2, wp_list_pluck( $data, 'id' ), true ) );
+
+		$request->set_param( 'exclude', "$id2" );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertTrue( in_array( $id1, wp_list_pluck( $data, 'id' ), true ) );
@@ -1302,6 +1309,21 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$data = $response->get_data();
 		$this->assertEquals( array( $category['term_id'] ), $data['categories'] );
+	}
+
+	public function test_create_post_with_categories_as_csv() {
+		wp_set_current_user( self::$editor_id );
+		$category = wp_insert_term( 'Chicken', 'category' );
+		$category2 = wp_insert_term( 'Ribs', 'category' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'categories' => $category['term_id'] . ',' . $category2['term_id'],
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$this->assertEquals( array( $category['term_id'], $category2['term_id'] ), $data['categories'] );
 	}
 
 	public function test_create_post_with_invalid_categories() {
