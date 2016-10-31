@@ -245,6 +245,40 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38293
+	 */
+	public function test_user_cant_delete_protected_meta() {
+		$protected_meta_key = '_test_meta_data_that_is_protected';
+
+		// Add some protected meta data.
+		$post_id = self::$post_id;
+		$meta_id = add_post_meta( $post_id, $protected_meta_key, 'protected' );
+
+		// User editing the post should not effect outcome.
+		$expected = get_post_meta( $post_id, $protected_meta_key );
+
+		// Attempt to edit the post.
+		wp_set_current_user( self::$admin_id );
+
+		$post_data = array(
+			'post_ID' => $post_id,
+			'meta'    => array(
+				$meta_id => array(
+					'key'   => 'unprotected_meta_key',
+					'value' => 'protected',
+				),
+			),
+		);
+		edit_post( $post_data );
+
+		$actual = get_post_meta( $post_id, $protected_meta_key );
+		$this->assertSame( $expected, $actual );
+
+		// Tidy up.
+		delete_metadata_by_mid( 'post', $meta_id );
+	}
+
+	/**
 	 * @ticket 30910
 	 */
 	public function test_get_sample_permalink_should_return_pretty_permalink_for_posts_with_post_status_future() {
@@ -598,4 +632,5 @@ class Tests_Admin_Includes_Post extends WP_UnitTestCase {
 
 		$this->assertSame( $p, post_exists( $title, $content, $date ) );
 	}
+
 }
