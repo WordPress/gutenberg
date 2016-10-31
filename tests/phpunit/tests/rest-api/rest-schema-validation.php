@@ -103,4 +103,16 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		$this->assertTrue( rest_validate_value_from_schema( array( 1 ), $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( array( true ), $schema ) );
 	}
+
+	public function test_type_array_as_csv() {
+		$schema = array(
+			'type' => 'array',
+			'items' => array(
+				'type' => 'number',
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( '1', $schema ) );
+		$this->assertTrue( rest_validate_value_from_schema( '1,2,3', $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( 'lol', $schema ) );
+	}
 }
