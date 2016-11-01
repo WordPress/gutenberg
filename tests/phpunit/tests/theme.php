@@ -10,7 +10,7 @@ class Tests_Theme extends WP_UnitTestCase {
 	protected $theme_name = 'Twenty Eleven';
 	protected $default_themes = array(
 		'twentyten', 'twentyeleven', 'twentytwelve', 'twentythirteen',
-		'twentyfourteen', 'twentyfifteen',
+		'twentyfourteen', 'twentyfifteen', 'twentysixteen', 'twentyseventeen',
 	);
 
 	function setUp() {
@@ -187,14 +187,18 @@ class Tests_Theme extends WP_UnitTestCase {
 	 * @ticket 29925
 	 */
 	function test_default_theme_in_default_theme_list() {
-		if ( 'twenty' === substr( WP_DEFAULT_THEME, 0, 6 ) ) {
-			$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
+		$latest_default_theme = WP_Theme::get_core_default_theme();
+		if ( ! $latest_default_theme->exists() || 'twenty' !== substr( $latest_default_theme->get_stylesheet(), 0, 6 ) ) {
+			$this->markTestSkipped( 'No Twenty* series default themes are installed' ); 
 		}
+		$this->assertContains( $latest_default_theme->get_stylesheet(), $this->default_themes );
 	}
 
 	function test_default_themes_have_textdomain() {
 		foreach ( $this->default_themes as $theme ) {
-			$this->assertEquals( $theme, wp_get_theme( $theme )->get( 'TextDomain' ) );
+			if ( wp_get_theme( $theme )->exists() ) {
+				$this->assertEquals( $theme, wp_get_theme( $theme )->get( 'TextDomain' ) );
+			}
 		}
 	}
 
