@@ -155,6 +155,12 @@
 					selector: '#editor',
 					skin: false,
 					plugins: 'wptextpattern',
+					wptextpattern: {
+						inline: [
+							{ start: '`', end: '`', format: 'code' },
+							{ start: '``', end: '``', format: 'bold' }
+						]
+					},
 					init_instance_callback: function() {
 						editor = arguments[0];
 						editor.focus();
@@ -299,9 +305,16 @@
 		}, assert.async() );
 	} );
 
-	QUnit.test( 'Inline: single.', function( assert ) {
+	QUnit.test( 'Inline: single character.', function( assert ) {
 		type( '`test`', function() {
 			assert.equal( editor.getContent(), '<p><code>test</code></p>' );
+			assert.equal( editor.selection.getRng().startOffset, 1 );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Inline: two characters.', function( assert ) {
+		type( '``test``', function() {
+			assert.equal( editor.getContent(), '<p><strong>test</strong></p>' );
 			assert.equal( editor.selection.getRng().startOffset, 1 );
 		}, assert.async() );
 	} );
@@ -311,7 +324,7 @@
 		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 5 );
 
 		type( '`', function() {
-			editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 11 );
+			editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 10 );
 		}, '`', function() {
 			assert.equal( editor.getContent(), '<p>test <code>test</code> test</p>' );
 			assert.equal( editor.selection.getRng().startOffset, 1 );
@@ -321,6 +334,15 @@
 	QUnit.test( 'Inline: no change.', function( assert ) {
 		type( 'test `````', function() {
 			assert.equal( editor.getContent(), '<p>test `````</p>' );
+		}, assert.async() );
+	} );
+
+	QUnit.test( 'Convert with previously unconverted pattern', function( assert ) {
+		editor.setContent( '<p>`test` test&nbsp;</p>' );
+		editor.selection.setCursorLocation( editor.$( 'p' )[0].firstChild, 12 );
+
+		type( '`test`', function() {
+			assert.equal( editor.getContent(), '<p>`test` test&nbsp;<code>test</code></p>' );
 		}, assert.async() );
 	} );
 } )( window.jQuery, window.QUnit, window.tinymce, window.setTimeout );
