@@ -187,7 +187,6 @@ class Tests_Theme extends WP_UnitTestCase {
 	 * @ticket 29925
 	 */
 	function test_default_theme_in_default_theme_list() {
-		$this->markTestSkipped( 'Core repository inclusion was stopped after Twenty Fifteen' );
 		if ( 'twenty' === substr( WP_DEFAULT_THEME, 0, 6 ) ) {
 			$this->assertContains( WP_DEFAULT_THEME, $this->default_themes );
 		}
