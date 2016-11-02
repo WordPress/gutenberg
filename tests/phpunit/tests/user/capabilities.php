@@ -1654,4 +1654,13 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	public function _hook_wp_roles_init( $wp_roles ) {
 		$wp_roles->add_role( $this->_role_test_wp_roles_init['role'], $this->_role_test_wp_roles_init['info']['name'], $this->_role_test_wp_roles_init['info']['capabilities'] );
 	}
+
+	/**
+	 * @ticket 23016
+	 * @expectedDeprecated WP_Roles::reinit
+	 */
+	public function test_wp_roles_reinit_deprecated() {
+		$wp_roles = new WP_Roles();
+		$wp_roles->reinit();
+	}
 }
