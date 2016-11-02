@@ -818,6 +818,25 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 		$this->set_permalink_structure();
 	}
 
+	/**
+	 * @ticket 38225
+	 */
+	function test_is_single_with_attachment() {
+		$post_id = self::factory()->post->create();
+
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+		) );
+
+		$this->go_to( get_permalink( $attachment_id ) );
+
+		$q = $GLOBALS['wp_query'];
+
+		$this->assertTrue( is_single() );
+		$this->assertTrue( $q->is_single );
+		$this->assertTrue( $q->is_attachment );
+	}
+
 	function test_is_page() {
 		$post_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$this->go_to( "/?page_id=$post_id" );

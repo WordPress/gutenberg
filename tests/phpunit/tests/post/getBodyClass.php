@@ -158,4 +158,23 @@ class Tests_Post_GetBodyClass extends WP_UnitTestCase {
 		$this->assertContains( 'post-template-cpt', $class );
 		$this->assertContains( 'post-template-templatescpt-php', $class );
 	}
+
+	/**
+	 * @ticket 38225
+	 */
+	public function test_attachment_body_classes() {
+		$post_id = self::factory()->post->create();
+
+		$attachment_id = self::factory()->attachment->create_object( 'image.jpg', $post_id, array(
+			'post_mime_type' => 'image/jpeg',
+		) );
+
+		$this->go_to( get_permalink( $attachment_id ) );
+
+		$class = get_body_class();
+
+		$this->assertContains( 'attachment', $class );
+		$this->assertContains( "attachmentid-{$attachment_id}", $class );
+		$this->assertContains( 'attachment-jpeg', $class );
+	}
 }
