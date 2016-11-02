@@ -286,6 +286,18 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $this->request->get_params() );
 	}
 
+	public function test_parameter_merging_with_numeric_keys() {
+		$this->request->set_query_params( array(
+			'1'           => 'hello',
+			'2'           => 'goodbye',
+		) );
+		$expected = array(
+			'1'           => 'hello',
+			'2'           => 'goodbye',
+		);
+		$this->assertEquals( $expected, $this->request->get_params() );
+	}
+
 	public function test_sanitize_params() {
 		$this->request->set_url_params( array(
 			'someinteger' => '123',
