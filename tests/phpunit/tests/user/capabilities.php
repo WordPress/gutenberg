@@ -41,8 +41,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		// this will flush everything and reload it from the db
 		unset($GLOBALS['wp_user_roles']);
 		global $wp_roles;
-		if ( is_object( $wp_roles ) )
-			$wp_roles->_init();
+		$wp_roles = new WP_Roles();
 	}
 
 	function _meta_yes_you_can( $can, $key, $post_id, $user_id, $cap, $caps ) {
@@ -1626,4 +1625,33 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$this->assertFalse( current_user_can( 'do_not_allow' ), "Non-logged-in user should not have the do_not_allow capability" );
 	}
 
+	protected $_role_test_wp_roles_role;
+	/**
+	 * @ticket 23016
+	 */
+	public function test_wp_roles_init_action() {
+		$this->_role_test_wp_roles_init = array(
+			'role' => 'test_wp_roles_init',
+			'info' => array(
+				'name' => 'Test WP Roles Init',
+				'capabilities' => array( 'testing_magic' => true ),
+			),
+		);
+		add_action( 'wp_roles_init', array( $this, '_hook_wp_roles_init' ), 10, 1 );
+
+		$wp_roles = new WP_Roles();
+
+		remove_action( 'wp_roles_init', array( $this, '_hook_wp_roles_init' ) );
+
+		$expected = new WP_Role( $this->_role_test_wp_roles_init['role'], $this->_role_test_wp_roles_init['info']['capabilities'] );
+
+		$role = $wp_roles->get_role( $this->_role_test_wp_roles_init['role'] );
+
+		$this->assertEquals( $expected, $role );
+		$this->assertContains( $this->_role_test_wp_roles_init['info']['name'], $wp_roles->role_names );
+	}
+
+	public function _hook_wp_roles_init( $wp_roles ) {
+		$wp_roles->add_role( $this->_role_test_wp_roles_init['role'], $this->_role_test_wp_roles_init['info']['name'], $this->_role_test_wp_roles_init['info']['capabilities'] );
+	}
 }

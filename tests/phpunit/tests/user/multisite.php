@@ -396,6 +396,34 @@ class Tests_Multisite_User extends WP_UnitTestCase {
 
 		$this->assertWPError( $result );
 	}
+
+	/**
+	 * @ticket 23016
+	 */
+	public function test_wp_roles_global_is_reset() {
+		global $wp_roles;
+		$role = 'test_global_is_reset';
+		$role_name = 'Test Global Is Reset';
+		$blog_id = self::factory()->blog->create();
+
+		$wp_roles->add_role( $role, $role_name, array() );
+
+		$this->assertNotEmpty( $wp_roles->get_role( $role ) );
+
+		switch_to_blog( $blog_id );
+
+		$this->assertEmpty( $wp_roles->get_role( $role ) );
+
+		$wp_roles->add_role( $role, $role_name, array() );
+
+		$this->assertNotEmpty( $wp_roles->get_role( $role ) );
+
+		restore_current_blog();
+
+		$this->assertNotEmpty( $wp_roles->get_role( $role ) );
+
+		$wp_roles->remove_role( $role );
+	}
 }
 
 endif ;
