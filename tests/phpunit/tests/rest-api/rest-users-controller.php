@@ -777,6 +777,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 			'user_login' => 'test_update',
 			'first_name' => 'Old Name',
 			'user_url' => 'http://apple.com',
+			'locale' => 'en_US',
 		));
 		$this->allow_user_to_manage_multisite();
 		wp_set_current_user( self::$user );
@@ -788,6 +789,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$_POST['username'] = $userdata->user_login;
 		$_POST['first_name'] = 'New Name';
 		$_POST['url'] = 'http://google.com';
+		$_POST['locale'] = 'de_DE';
 
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
@@ -804,6 +806,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEquals( 'http://google.com', $new_data['url'] );
 		$this->assertEquals( 'http://google.com', $user->user_url );
+		$this->assertEquals( 'de_DE', $user->locale );
 
 		// Check that we haven't inadvertently changed the user's password,
 		// as per https://core.trac.wordpress.org/ticket/21429
@@ -821,6 +824,18 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 		$this->assertInstanceOf( 'WP_Error', $response->as_error() );
 		$this->assertEquals( 'rest_user_invalid_email', $response->as_error()->get_error_code() );
+	}
+
+	public function test_update_item_invalid_locale() {
+		$user1 = $this->factory->user->create( array( 'user_login' => 'test_json_user', 'user_email' => 'testjson@example.com' ) );
+		$this->allow_user_to_manage_multisite();
+		wp_set_current_user( self::$user );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/users/' . $user1 );
+		$request->set_param( 'locale', 'klingon' );
+		$response = $this->server->dispatch( $request );
+		$this->assertInstanceOf( 'WP_Error', $response->as_error() );
+		$this->assertEquals( 'rest_invalid_param', $response->as_error()->get_error_code() );
 	}
 
 	public function test_update_item_username_attempt() {
@@ -1139,7 +1154,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertEquals( 18, count( $properties ) );
+		$this->assertEquals( 19, count( $properties ) );
 		$this->assertArrayHasKey( 'avatar_urls', $properties );
 		$this->assertArrayHasKey( 'capabilities', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
@@ -1149,6 +1164,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'last_name', $properties );
 		$this->assertArrayHasKey( 'link', $properties );
+		$this->assertArrayHasKey( 'locale', $properties );
 		$this->assertArrayHasKey( 'meta', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'nickname', $properties );
@@ -1297,6 +1313,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 			$this->assertEquals( date( 'c', strtotime( $user->user_registered ) ), $data['registered_date'] );
 			$this->assertEquals( $user->user_login, $data['username'] );
 			$this->assertEquals( $user->roles, $data['roles'] );
+			$this->assertEquals( get_user_locale( $user ), $data['locale'] );
 		}
 
 		if ( 'edit' !== $context ) {
