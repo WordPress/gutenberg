@@ -58,6 +58,16 @@ class WP_Test_REST_Post_Types_Controller extends WP_Test_REST_Controller_Testcas
 		$request = new WP_REST_Request( 'GET', '/wp/v2/types/post' );
 		$response = $this->server->dispatch( $request );
 		$this->check_post_type_object_response( 'view', $response );
+		$data = $response->get_data();
+		$this->assertEquals( array( 'category', 'post_tag' ), $data['taxonomies'] );
+	}
+
+	public function test_get_item_page() {
+		$request = new WP_REST_Request( 'GET', '/wp/v2/types/page' );
+		$response = $this->server->dispatch( $request );
+		$this->check_post_type_object_response( 'view', $response, 'page' );
+		$data = $response->get_data();
+		$this->assertEquals( array(), $data['taxonomies'] );
 	}
 
 	public function test_get_item_invalid_type() {
@@ -109,13 +119,14 @@ class WP_Test_REST_Post_Types_Controller extends WP_Test_REST_Controller_Testcas
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 6, count( $properties ) );
+		$this->assertEquals( 7, count( $properties ) );
 		$this->assertArrayHasKey( 'capabilities', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'hierarchical', $properties );
 		$this->assertArrayHasKey( 'labels', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
+		$this->assertArrayHasKey( 'taxonomies', $properties );
 	}
 
 	public function test_get_additional_field_registration() {
@@ -172,10 +183,10 @@ class WP_Test_REST_Post_Types_Controller extends WP_Test_REST_Controller_Testcas
 		}
 	}
 
-	protected function check_post_type_object_response( $context, $response ) {
+	protected function check_post_type_object_response( $context, $response, $post_type = 'post' ) {
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$obj = get_post_type_object( 'post' );
+		$obj = get_post_type_object( $post_type );
 		$this->check_post_type_obj( $context, $obj, $data, $response->get_links() );
 	}
 
