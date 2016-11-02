@@ -838,6 +838,20 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'rest_invalid_param', $response->as_error()->get_error_code() );
 	}
 
+	public function test_update_item_en_US_locale() {
+		$user_id = $this->factory->user->create( array( 'user_login' => 'test_json_user', 'user_email' => 'testjson@example.com' ) );
+		$this->allow_user_to_manage_multisite();
+		wp_set_current_user( self::$user );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/users/' . $user_id );
+		$request->set_param( 'locale', 'en_US' );
+		$response = $this->server->dispatch( $request );
+		$this->check_add_edit_user_response( $response, true );
+
+		$user = get_userdata( $user_id );
+		$this->assertEquals( 'en_US', $user->locale );
+	}
+
 	public function test_update_item_username_attempt() {
 		$user1 = $this->factory->user->create( array( 'user_login' => 'test_json_user', 'user_email' => 'testjson@example.com' ) );
 		$user2 = $this->factory->user->create( array( 'user_login' => 'test_json_user2', 'user_email' => 'testjson2@example.com' ) );
