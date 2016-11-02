@@ -254,6 +254,42 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 'Apple', $data[0]['title']['rendered'] );
 	}
 
+	public function test_get_items_multiple_slugs_array_query() {
+		$this->factory->post->create( array( 'post_title' => 'Apple', 'post_status' => 'publish' ) );
+		$this->factory->post->create( array( 'post_title' => 'Banana', 'post_status' => 'publish' ) );
+		$this->factory->post->create( array( 'post_title' => 'Peach', 'post_status' => 'publish' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'slug', array( 'banana', 'peach' ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 2, count( $data ) );
+		$titles = array(
+			$data[0]['title']['rendered'],
+			$data[1]['title']['rendered'],
+		);
+		sort( $titles );
+		$this->assertEquals( array( 'Banana', 'Peach' ), $titles );
+	}
+
+	public function test_get_items_multiple_slugs_string_query() {
+		$this->factory->post->create( array( 'post_title' => 'Apple', 'post_status' => 'publish' ) );
+		$this->factory->post->create( array( 'post_title' => 'Banana', 'post_status' => 'publish' ) );
+		$this->factory->post->create( array( 'post_title' => 'Peach', 'post_status' => 'publish' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'slug', 'apple,banana' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 2, count( $data ) );
+		$titles = array(
+			$data[0]['title']['rendered'],
+			$data[1]['title']['rendered'],
+		);
+		sort( $titles );
+		$this->assertEquals( array( 'Apple', 'Banana' ), $titles );
+	}
+
 	public function test_get_items_status_query() {
 		wp_set_current_user( 0 );
 		$this->factory->post->create( array( 'post_status' => 'draft' ) );
