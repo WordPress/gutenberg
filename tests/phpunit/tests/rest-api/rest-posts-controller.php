@@ -16,6 +16,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	protected static $author_id;
 	protected static $contributor_id;
 
+	protected static $supported_formats;
+
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_id = $factory->post->create();
 
@@ -28,9 +30,20 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		self::$contributor_id = $factory->user->create( array(
 			'role' => 'contributor',
 		) );
+
+		// Only support 'post' and 'gallery'
+		self::$supported_formats = get_theme_support( 'post-formats' );
+		add_theme_support( 'post-formats', array( 'post', 'gallery' ) );
 	}
 
 	public static function wpTearDownAfterClass() {
+		// Restore theme support for formats.
+		if ( self::$supported_formats ) {
+			add_theme_support( 'post-formats', self::$supported_formats );
+		} else {
+			remove_theme_support( 'post-formats' );
+		}
+
 		wp_delete_post( self::$post_id, true );
 
 		self::delete_user( self::$editor_id );
@@ -1078,6 +1091,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * Test with a valid format, but one unsupported by the theme.
+	 *
+	 * https://core.trac.wordpress.org/ticket/38610
+	 */
+	public function test_create_post_with_unsupported_format() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'format' => 'link',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_create_update_post_with_featured_media() {
 
 		$file = DIR_TESTDATA . '/images/canola.jpg';
@@ -1490,6 +1521,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$params = $this->set_post_data( array(
 			'format' => 'testformat',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	/**
+	 * Test with a valid format, but one unsupported by the theme.
+	 *
+	 * https://core.trac.wordpress.org/ticket/38610
+	 */
+	public function test_update_post_with_unsupported_format() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'format' => 'link',
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
