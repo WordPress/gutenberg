@@ -1352,6 +1352,98 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 400, $response->get_status() );
 	}
 
+	/**
+	 * @ticket 38477
+	 */
+	public function test_create_comment_author_name_too_long() {
+		wp_set_current_user( 0 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => rand_long_str( 246 ),
+			'author_email' => 'murphy@gingivitis.com',
+			'author_url'   => 'http://jazz.gingivitis.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+			'date'         => '1995-04-30T10:22:00',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_create_comment_author_email_too_long() {
+		wp_set_current_user( 0 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Bleeding Gums Murphy',
+			'author_email' => 'murphy@' . rand_long_str( 190 ) . '.com',
+			'author_url'   => 'http://jazz.gingivitis.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+			'date'         => '1995-04-30T10:22:00',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_email_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_create_comment_author_url_too_long() {
+		wp_set_current_user( 0 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Bleeding Gums Murphy',
+			'author_email' => 'murphy@gingivitis.com',
+			'author_url'   => 'http://jazz.' . rand_long_str( 185 ) . '.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+			'date'         => '1995-04-30T10:22:00',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_url_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_create_comment_content_too_long() {
+		wp_set_current_user( 0 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Bleeding Gums Murphy',
+			'author_email' => 'murphy@gingivitis.com',
+			'author_url'   => 'http://jazz.gingivitis.com',
+			'content'      => rand_long_str( 66525 ),
+			'date'         => '1995-04-30T10:22:00',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_content_column_length', $response, 400 );
+	}
+
 	public function test_update_item() {
 		$post_id = $this->factory->post->create();
 
@@ -1607,6 +1699,81 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'children', $response->get_links() );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_update_comment_author_name_too_long() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'author_name' => rand_long_str( 246 ),
+			'content'     => 'This isn\'t a saxophone. It\'s an umbrella.',
+		);
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_update_comment_author_email_too_long() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'author_email' => 'murphy@' . rand_long_str( 190 ) . '.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+		);
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_email_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_update_comment_author_url_too_long() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'author_url' => 'http://jazz.' . rand_long_str( 185 ) . '.com',
+			'content'    => 'This isn\'t a saxophone. It\'s an umbrella.',
+		);
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_author_url_column_length', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38477
+	 */
+	public function test_update_comment_content_too_long() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'content' => rand_long_str( 66525 ),
+		);
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'comment_content_column_length', $response, 400 );
 	}
 
 	public function test_delete_item() {
