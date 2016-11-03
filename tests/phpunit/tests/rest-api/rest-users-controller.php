@@ -1154,7 +1154,29 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( 'Deleted User', $data['name'] );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertEquals( 'Deleted User', $data['previous']['name'] );
+	}
+
+	public function test_delete_item_no_trash() {
+		$user_id = $this->factory->user->create( array( 'display_name' => 'Deleted User' ) );
+
+		$this->allow_user_to_manage_multisite();
+		wp_set_current_user( self::$user );
+
+		$userdata = get_userdata( $user_id ); // cache for later
+
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+
+		$request->set_param( 'force', 'false' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+
+		// Ensure the user still exists
+		$user = get_user_by( 'id', $user_id );
+		$this->assertNotEmpty( $user );
 	}
 
 	public function test_delete_current_item() {
@@ -1170,34 +1192,22 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( 'Deleted User', $data['name'] );
-	}
-
-	public function test_delete_item_no_trash() {
-		$user_id = $this->factory->user->create( array( 'display_name' => 'Deleted User' ) );
-
-		$this->allow_user_to_manage_multisite();
-		wp_set_current_user( self::$user );
-
-		$userdata = get_userdata( $user_id ); // cache for later
-		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d', $user_id ) );
-		$response = $this->server->dispatch( $request );
-		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
-
-		// Ensure the user still exists
-		$user = get_user_by( 'id', $user_id );
-		$this->assertNotEmpty( $user );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertEquals( 'Deleted User', $data['previous']['name'] );
 	}
 
 	public function test_delete_current_item_no_trash() {
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator', 'display_name' => 'Deleted User' ) );
 
 		wp_set_current_user( $user_id );
 		$user = wp_get_current_user();
 		update_site_option( 'site_admins', array( $user->user_login ) );
 
-		$userdata = get_userdata( $user_id ); // cache for later
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/users/me' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+
+		$request->set_param( 'force', 'false' );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
 

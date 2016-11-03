@@ -625,16 +625,21 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( 'Deleted Tag', $data['name'] );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertEquals( 'Deleted Tag', $data['previous']['name'] );
 	}
 
-	public function test_delete_item_force_false() {
+	public function test_delete_item_no_trash() {
 		wp_set_current_user( self::$administrator );
 		$term = get_term_by( 'id', $this->factory->tag->create( array( 'name' => 'Deleted Tag' ) ), 'post_tag' );
+
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/tags/' . $term->term_id );
-		// force defaults to false
 		$response = $this->server->dispatch( $request );
-		$this->assertEquals( 501, $response->get_status() );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
+
+		$request->set_param( 'force', 'false' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_trash_not_supported', $response, 501 );
 	}
 
 	public function test_delete_item_invalid_term() {
@@ -667,7 +672,8 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( 'Deleted Tag', $data['name'] );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertEquals( 'Deleted Tag', $data['previous']['name'] );
 	}
 
 	public function grant_delete_term( $caps, $cap ) {

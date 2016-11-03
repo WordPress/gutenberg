@@ -2008,12 +2008,14 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/posts/%d', $post_id ) );
+		$request->set_param( 'force', 'false' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertNotInstanceOf( 'WP_Error', $response );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'Deleted post', $data['title']['raw'] );
+		$this->assertEquals( 'trash', $data['status'] );
 	}
 
 	public function test_delete_item_skip_trash() {
@@ -2027,7 +2029,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertNotInstanceOf( 'WP_Error', $response );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( 'Deleted post', $data['title']['raw'] );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertNotEmpty( $data['previous'] );
 	}
 
 	public function test_delete_item_already_trashed() {

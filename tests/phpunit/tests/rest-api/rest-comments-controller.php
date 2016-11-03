@@ -1888,12 +1888,14 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'comment_post_ID'  => self::$post_id,
 			'user_id'          => self::$subscriber_id,
 		));
-		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/comments/%d', $comment_id ) );
 
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/comments/%d', $comment_id ) );
+		$request->set_param( 'force', 'false' );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
+
 		$data = $response->get_data();
-		$this->assertEquals( self::$post_id, $data['post'] );
+		$this->assertEquals( 'trash', $data['status'] );
 	}
 
 	public function test_delete_item_skip_trash() {
@@ -1910,7 +1912,8 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
-		$this->assertEquals( self::$post_id, $data['post'] );
+		$this->assertTrue( $data['deleted'] );
+		$this->assertNotEmpty( $data['previous']['post'] );
 	}
 
 	public function test_delete_item_already_trashed() {
