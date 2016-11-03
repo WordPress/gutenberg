@@ -22,7 +22,7 @@
     "grunt-contrib-qunit": "^1.2.0",
     "grunt-contrib-uglify": "~2.0.0",
     "grunt-contrib-watch": "~1.0.0",
-    "grunt-includes": "~1.0.0",
+    "grunt-includes": "~0.5.1",
     "grunt-jsvalidate": "~0.2.2",
     "grunt-legacy-util": "^0.2.0",
     "grunt-patch-wordpress": "~0.4.2",
