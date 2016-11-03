@@ -6,6 +6,14 @@
  */
 class Tests_L10n_loadTextdomain extends WP_UnitTestCase {
 	protected $locale;
+	protected static $user_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_id = $factory->user->create( array(
+			'role'   => 'administrator',
+			'locale' => 'de_DE',
+		) );
+	}
 
 	public function setUp() {
 		parent::setUp();
@@ -183,15 +191,57 @@ class Tests_L10n_loadTextdomain extends WP_UnitTestCase {
 		$this->assertSame( get_locale(), $this->locale );
 	}
 
+	/**
+	 * @ticket 38485
+	 */
+	public function test_load_muplugin_textdomain_user_locale() {
+		set_current_screen( 'dashboard' );
+		wp_set_current_user( self::$user_id );
+
+		load_muplugin_textdomain( 'wp-tests-domain' );
+
+		set_current_screen( 'front' );
+
+		$this->assertSame( get_user_locale(), $this->locale );
+	}
+
 	public function test_load_plugin_textdomain_site_locale() {
 		load_plugin_textdomain( 'wp-tests-domain' );
 
 		$this->assertSame( get_locale(), $this->locale );
 	}
 
+	/**
+	 * @ticket 38485
+	 */
+	public function test_load_plugin_textdomain_user_locale() {
+		set_current_screen( 'dashboard' );
+		wp_set_current_user( self::$user_id );
+
+		load_plugin_textdomain( 'wp-tests-domain' );
+
+		set_current_screen( 'front' );
+
+		$this->assertSame( get_user_locale(), $this->locale );
+	}
+
 	public function test_load_theme_textdomain_site_locale() {
 		load_theme_textdomain( 'wp-tests-domain' );
 
 		$this->assertSame( get_locale(), $this->locale );
+	}
+
+	/**
+	 * @ticket 38485
+	 */
+	public function test_load_theme_textdomain_user_locale() {
+		set_current_screen( 'dashboard' );
+		wp_set_current_user( self::$user_id );
+
+		load_theme_textdomain( 'wp-tests-domain' );
+
+		set_current_screen( 'front' );
+
+		$this->assertSame( get_user_locale(), $this->locale );
 	}
 }

@@ -5,9 +5,16 @@
  * @group i18n
  */
 class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
+	protected $orig_theme_dir;
+	protected $theme_root;
+	protected static $user_id;
 
-	private $orig_theme_dir;
-	private $theme_root;
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$user_id = $factory->user->create( array(
+			'role'   => 'administrator',
+			'locale' => 'de_DE',
+		) );
+	}
 
 	public function setUp() {
 		parent::setUp();
@@ -167,6 +174,40 @@ class Tests_L10n_loadTextdomainJustInTime extends WP_UnitTestCase {
 		$expected = i18n_theme_test();
 		restore_previous_locale();
 
+		switch_theme( WP_DEFAULT_THEME );
+
+		$this->assertSame( 'Das ist ein Dummy Theme', $expected );
+	}
+
+	/**
+	 * @ticket 38485
+	 */
+	public function test_plugin_translation_with_user_locale() {
+		require_once DIR_TESTDATA . '/plugins/internationalized-plugin.php';
+
+		set_current_screen( 'dashboard' );
+		wp_set_current_user( self::$user_id );
+
+		$expected = i18n_plugin_test();
+
+		set_current_screen( 'front' );
+
+		$this->assertSame( 'Das ist ein Dummy Plugin', $expected );
+	}
+
+	/**
+	 * @ticket 38485
+	 */
+	public function test_theme_translation_with_user_locale() {
+		switch_theme( 'internationalized-theme' );
+		set_current_screen( 'dashboard' );
+		wp_set_current_user( self::$user_id );
+
+		require_once get_stylesheet_directory() . '/functions.php';
+
+		$expected = i18n_theme_test();
+
+		set_current_screen( 'front' );
 		switch_theme( WP_DEFAULT_THEME );
 
 		$this->assertSame( 'Das ist ein Dummy Theme', $expected );
