@@ -28,7 +28,7 @@
     "grunt-patch-wordpress": "~0.4.2",
     "grunt-postcss": "~0.7.1",
     "grunt-rtlcss": "~2.0.1",
-    "grunt-sass": "~1.1.0",
+    "grunt-sass": "~1.2.1",
     "matchdep": "~1.0.0"
   }
 }
