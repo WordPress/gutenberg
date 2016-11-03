@@ -20,7 +20,7 @@
     "grunt-contrib-imagemin": "~1.0.0",
     "grunt-contrib-jshint": "~1.0.0",
     "grunt-contrib-qunit": "^1.2.0",
-    "grunt-contrib-uglify": "~1.0.1",
+    "grunt-contrib-uglify": "~2.0.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-includes": "~0.5.1",
     "grunt-jsvalidate": "~0.2.2",

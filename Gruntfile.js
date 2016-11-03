@@ -443,7 +443,8 @@ module.exports = function(grunt) {
 		},
 		uglify: {
 			options: {
-				ASCIIOnly: true
+				ASCIIOnly: true,
+				screwIE8: false
 			},
 			core: {
 				expand: true,
