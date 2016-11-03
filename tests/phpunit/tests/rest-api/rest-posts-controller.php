@@ -18,6 +18,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	protected static $supported_formats;
 
+	protected $forbidden_cat;
+
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_id = $factory->post->create();
 
@@ -1504,6 +1506,35 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( array(), $data['categories'] );
 	}
 
+	/**
+	 * @ticket 38505
+	 */
+	public function test_create_post_with_categories_that_cannot_be_assigned_by_current_user() {
+		$cats = self::factory()->category->create_many( 2 );
+		$this->forbidden_cat = $cats[1];
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'password'   => 'testing',
+			'categories' => $cats,
+		) );
+		$request->set_body_params( $params );
+
+		add_filter( 'map_meta_cap', array( $this, 'revoke_assign_term' ), 10, 4 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'map_meta_cap', array( $this, 'revoke_assign_term' ), 10, 4 );
+
+		$this->assertErrorResponse( 'rest_cannot_assign_term', $response, 403 );
+	}
+
+	public function revoke_assign_term( $caps, $cap, $user_id, $args ) {
+		if ( 'assign_term' === $cap && isset( $args[0] ) && $this->forbidden_cat == $args[0] ) {
+			$caps = array( 'do_not_allow' );
+		}
+		return $caps;
+	}
+
 	public function test_update_item() {
 		wp_set_current_user( self::$editor_id );
 
@@ -1948,6 +1979,28 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$response = $this->server->dispatch( $request );
 		$new_data = $response->get_data();
 		$this->assertEquals( array(), $new_data['categories'] );
+	}
+
+	/**
+	 * @ticket 38505
+	 */
+	public function test_update_post_with_categories_that_cannot_be_assigned_by_current_user() {
+		$cats = self::factory()->category->create_many( 2 );
+		$this->forbidden_cat = $cats[1];
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'password'   => 'testing',
+			'categories' => $cats,
+		) );
+		$request->set_body_params( $params );
+
+		add_filter( 'map_meta_cap', array( $this, 'revoke_assign_term' ), 10, 4 );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'map_meta_cap', array( $this, 'revoke_assign_term' ), 10, 4 );
+
+		$this->assertErrorResponse( 'rest_cannot_assign_term', $response, 403 );
 	}
 
 	public function test_delete_item() {
