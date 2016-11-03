@@ -428,6 +428,15 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'Child', $data[0]['name'] );
 	}
 
+	public function test_get_terms_invalid_parent_arg() {
+		$category1 = $this->factory->category->create( array( 'name' => 'Parent' ) );
+		$this->factory->category->create( array( 'name' => 'Child', 'parent' => $category1 ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
+		$request->set_param( 'parent', 'invalid-parent' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_get_terms_private_taxonomy() {
 		register_taxonomy( 'robin', 'post', array( 'public' => false ) );
 		$this->factory->term->create( array( 'name' => 'Cape', 'taxonomy' => 'robin' ) );

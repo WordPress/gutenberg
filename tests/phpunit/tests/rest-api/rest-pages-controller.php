@@ -95,6 +95,10 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$data = $response->get_data();
 		$this->assertEquals( 1, count( $data ) );
 		$this->assertEquals( $id2, $data[0]['id'] );
+		// Invalid parent should fail
+		$request->set_param( 'parent', 'some-slug' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
 	public function test_get_items_parents_query() {
@@ -129,6 +133,10 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$data = $response->get_data();
 		$this->assertEquals( 1, count( $data ) );
 		$this->assertEquals( $id1, $data[0]['id'] );
+		// Invalid parent_exclude should error
+		$request->set_param( 'parent_exclude', 'some-slug' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
 	public function test_get_items_menu_order_query() {
@@ -156,6 +164,11 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $id4, $data[1]['id'] );
 		$this->assertEquals( $id2, $data[2]['id'] );
 		$this->assertEquals( $id3, $data[3]['id'] );
+		// Invalid menu_order should fail
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
+		$request->set_param( 'menu_order', 'top-first' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
 	public function test_get_items_min_max_pages_query() {
