@@ -327,6 +327,37 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertEquals( $attachment_id1, $data[0]['id'] );
 	}
 
+	public function test_get_items_multiple_statuses() {
+		// Logged out users can't make the request
+		wp_set_current_user( 0 );
+		$attachment_id1 = $this->factory->attachment->create_object( $this->test_file, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_excerpt'   => 'A sample caption',
+			'post_status'    => 'private',
+		) );
+		$attachment_id2 = $this->factory->attachment->create_object( $this->test_file, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_excerpt'   => 'A sample caption',
+			'post_status'    => 'trash',
+		) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media' );
+		$request->set_param( 'status', array( 'private', 'trash' ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		// Properly authorized users can make the request
+		wp_set_current_user( self::$editor_id );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 2, count( $data ) );
+		$ids = array(
+			$data[0]['id'],
+			$data[1]['id'],
+		);
+		sort( $ids );
+		$this->assertEquals( array( $attachment_id1, $attachment_id2 ), $ids );
+	}
+
 	public function test_get_items_invalid_date() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/media' );
 		$request->set_param( 'after', rand_str() );

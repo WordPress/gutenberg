@@ -115,4 +115,28 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		$this->assertTrue( rest_validate_value_from_schema( '1,2,3', $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( 'lol', $schema ) );
 	}
+
+	public function test_type_array_with_enum() {
+		$schema = array(
+			'type'  => 'array',
+			'items' => array(
+				'enum' => array( 'chicken', 'ribs', 'brisket' ),
+				'type' => 'string',
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( array( 'ribs', 'brisket' ), $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( array( 'coleslaw' ), $schema ) );
+	}
+
+	public function test_type_array_with_enum_as_csv() {
+		$schema = array(
+			'type'  => 'array',
+			'items' => array(
+				'enum' => array( 'chicken', 'ribs', 'brisket' ),
+				'type' => 'string',
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( 'ribs,chicken', $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( 'chicken,coleslaw', $schema ) );
+	}
 }

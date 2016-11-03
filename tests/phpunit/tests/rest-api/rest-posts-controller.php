@@ -310,6 +310,60 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 1, count( $response->get_data() ) );
 	}
 
+	public function test_get_items_multiple_statuses_string_query() {
+		wp_set_current_user( self::$editor_id );
+
+		$this->factory->post->create( array( 'post_status' => 'draft' ) );
+		$this->factory->post->create( array( 'post_status' => 'private' ) );
+		$this->factory->post->create( array( 'post_status' => 'publish' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'status', 'draft,private' );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 2, count( $data ) );
+		$statuses = array(
+			$data[0]['status'],
+			$data[1]['status'],
+		);
+		sort( $statuses );
+		$this->assertEquals( array( 'draft', 'private' ), $statuses );
+	}
+
+	public function test_get_items_multiple_statuses_array_query() {
+		wp_set_current_user( self::$editor_id );
+
+		$this->factory->post->create( array( 'post_status' => 'draft' ) );
+		$this->factory->post->create( array( 'post_status' => 'pending' ) );
+		$this->factory->post->create( array( 'post_status' => 'publish' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'status', array( 'draft', 'pending' ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 2, count( $data ) );
+		$statuses = array(
+			$data[0]['status'],
+			$data[1]['status'],
+		);
+		sort( $statuses );
+		$this->assertEquals( array( 'draft', 'pending' ), $statuses );
+	}
+
+	public function test_get_items_multiple_statuses_one_invalid_query() {
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'status', array( 'draft', 'nonsense' ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_get_items_invalid_status_query() {
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
@@ -1961,6 +2015,19 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertArrayHasKey( 'tags_exclude', $properties );
 		$this->assertArrayHasKey( 'categories', $properties );
 		$this->assertArrayHasKey( 'categories_exclude', $properties );
+	}
+
+	public function test_status_array_enum_args() {
+		$request = new WP_REST_Request( 'GET', '/wp/v2' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$list_posts_args = $data['routes']['/wp/v2/posts']['endpoints'][0]['args'];
+		$status_arg = $list_posts_args['status'];
+		$this->assertEquals( 'array', $status_arg['type'] );
+		$this->assertEquals( array(
+			'type' => 'string',
+			'enum' => array( 'publish', 'future', 'draft', 'pending', 'private', 'trash', 'auto-draft', 'inherit', 'any' ),
+		), $status_arg['items'] );
 	}
 
 	public function test_get_additional_field_registration() {

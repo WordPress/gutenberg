@@ -86,4 +86,28 @@ class WP_Test_REST_Schema_Sanitization extends WP_UnitTestCase {
 		$this->assertEquals( array( 1, 2 ), rest_sanitize_value_from_schema( '1,2', $schema ) );
 		$this->assertEquals( array( 1, 2, 0 ), rest_sanitize_value_from_schema( '1,2,a', $schema ) );
 	}
+
+	public function test_type_array_with_enum() {
+		$schema = array(
+			'type'  => 'array',
+			'items' => array(
+				'enum' => array( 'chicken', 'ribs', 'brisket' ),
+				'type' => 'string',
+			),
+		);
+		$this->assertEquals( array( 'ribs', 'brisket' ), rest_sanitize_value_from_schema( array( 'ribs', 'brisket' ), $schema ) );
+		$this->assertEquals( array( 'coleslaw' ), rest_sanitize_value_from_schema( array( 'coleslaw' ), $schema ) );
+	}
+
+	public function test_type_array_with_enum_as_csv() {
+		$schema = array(
+			'type'  => 'array',
+			'items' => array(
+				'enum' => array( 'chicken', 'ribs', 'brisket' ),
+				'type' => 'string',
+			),
+		);
+		$this->assertEquals( array( 'ribs', 'chicken' ), rest_sanitize_value_from_schema( 'ribs,chicken', $schema ) );
+		$this->assertEquals( array( 'chicken', 'coleslaw' ), rest_sanitize_value_from_schema( 'chicken,coleslaw', $schema ) );
+	}
 }
