@@ -322,6 +322,7 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 	 * @param array $post_args POST args.
 	 */
 	function test2_ajax_load_available_items_structure( $post_args ) {
+		do_action( 'customize_register', $this->wp_customize );
 
 		$expected_keys = array(
 			'id',
@@ -336,6 +337,9 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		// Create some terms and pages.
 		self::factory()->term->create_many( 5 );
 		self::factory()->post->create_many( 5, array( 'post_type' => 'page' ) );
+		$auto_draft_post = $this->wp_customize->nav_menus->insert_auto_draft_post( array( 'post_title' => 'Test Auto Draft', 'post_type' => 'post' ) );
+		$this->wp_customize->set_post_value( 'nav_menus_created_posts', array( $auto_draft_post->ID ) );
+		$this->wp_customize->get_setting( 'nav_menus_created_posts' )->preview();
 
 		$_POST = array_merge( array(
 			'action'                => 'load-available-menu-items-customizer',
@@ -371,6 +375,9 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 					}
 				}
 			}
+		} elseif ( 'post' === $test_item['object'] ) {
+			$item_ids = wp_list_pluck( $response['data']['items']['post_type:post'], 'id' );
+			$this->assertContains( 'post-' . $auto_draft_post->ID, $item_ids );
 		}
 	}
 
@@ -497,8 +504,13 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 	 * @param array $expected_results Expected results.
 	 */
 	function test_ajax_search_available_items_results( $post_args, $expected_results ) {
+		do_action( 'customize_register', $this->wp_customize );
 
 		self::factory()->post->create_many( 5, array( 'post_title' => 'Test Post' ) );
+		$included_auto_draft_post = $this->wp_customize->nav_menus->insert_auto_draft_post( array( 'post_title' => 'Test Included Auto Draft', 'post_type' => 'post' ) );
+		$excluded_auto_draft_post = $this->wp_customize->nav_menus->insert_auto_draft_post( array( 'post_title' => 'Excluded Auto Draft', 'post_type' => 'post' ) );
+		$this->wp_customize->set_post_value( 'nav_menus_created_posts', array( $included_auto_draft_post->ID, $excluded_auto_draft_post->ID ) );
+		$this->wp_customize->get_setting( 'nav_menus_created_posts' )->preview();
 
 		$_POST = array_merge( array(
 			'action'                => 'search-available-menu-items-customizer',
@@ -511,11 +523,13 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 
 		if ( isset( $post_args['search'] ) && 'test' === $post_args['search'] ) {
 			$this->assertsame( true, $response['success'] );
-			$this->assertSame( 5, count( $response['data']['items'] ) );
+			$this->assertSame( 6, count( $response['data']['items'] ) );
+			$item_ids = wp_list_pluck( $response['data']['items'], 'id' );
+			$this->assertContains( 'post-' . $included_auto_draft_post->ID, $item_ids );
+			$this->assertNotContains( 'post-' . $excluded_auto_draft_post->ID, $item_ids );
 		} else {
 			$this->assertSame( $expected_results, $response );
 		}
-
 	}
 
 	/**
