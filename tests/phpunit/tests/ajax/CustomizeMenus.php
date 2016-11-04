@@ -174,8 +174,8 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 			// Testing empty obj_type.
 			array(
 				array(
-					'type'     => '',
-					'object'   => 'post',
+					'type'     => 'post_type',
+					'object'   => '',
 				),
 				array(
 					'success'  => false,
@@ -187,6 +187,25 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 				array(
 					'type'     => '',
 					'object'   => 'post',
+				),
+				array(
+					'success'  => false,
+					'data'     => 'nav_menus_missing_type_or_object_parameter',
+				),
+			),
+			// Testing empty type of a bulk request.
+			array(
+				array(
+					'item_types' => array(
+						array(
+							'type'     => 'post_type',
+							'object'   => 'post',
+						),
+						array(
+							'type'     => 'post_type',
+							'object'   => '',
+						),
+					),
 				),
 				array(
 					'success'  => false,
@@ -276,6 +295,22 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 				),
 				true,
 			),
+			// Testing a bulk request.
+			array(
+				array(
+					'item_types' => array(
+						array(
+							'type'     => 'post_type',
+							'object'   => 'post',
+						),
+						array(
+							'type'     => 'post_type',
+							'object'   => 'page',
+						),
+					),
+				),
+				true,
+			),
 		);
 	}
 
@@ -313,10 +348,11 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		// Get the results.
 		$response = json_decode( $this->_last_response, true );
 
-		$this->assertNotEmpty( $response['data']['items'] );
+		$this->assertNotEmpty( current( $response['data']['items'] ) );
 
 		// Get the second index to avoid the home page edge case.
-		$test_item = $response['data']['items'][1];
+		$first_prop = current( $response['data']['items'] );
+		$test_item = $first_prop[1];
 
 		foreach ( $expected_keys as $key ) {
 			$this->assertArrayHasKey( $key, $test_item );
@@ -325,7 +361,8 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 
 		// Special test for the home page.
 		if ( 'page' === $test_item['object'] ) {
-			$home = $response['data']['items'][0];
+			$first_prop = current( $response['data']['items'] );
+			$home = $first_prop[0];
 			foreach ( $expected_keys as $key ) {
 				if ( 'object_id' !== $key ) {
 					$this->assertArrayHasKey( $key, $home );
