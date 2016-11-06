@@ -1,0 +1,39 @@
+@media all and (max-width:699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width :699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width 699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width>=699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width >=699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width>= 699px) {
+
+	/* Your selectors */
+}
+
+@mdia all and (max-width>= 699px) {
+
+	/* Your selectors */
+}
+
+@media screen and (color), projection and (color) {}
+
+@media screen and (color) ,
+	projection and (color) {}

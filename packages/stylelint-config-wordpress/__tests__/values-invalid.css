@@ -1,0 +1,12 @@
+.class { /* Avoid missing space and semicolon */
+	background:#fff
+}
+
+.class { /* Avoid adding a unit on a zero value */
+	margin: 0px 0px 20px 0px;
+}
+
+.class {
+	font-family: Times New Roman, serif; /* Quote font names when required */
+	font-weight: bold; /* Avoid named font weights */
+}

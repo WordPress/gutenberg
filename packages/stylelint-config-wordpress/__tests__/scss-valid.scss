@@ -1,0 +1,30 @@
+@import "path/to/foo.scss";
+
+@function fooBar {
+
+	@return 1;
+}
+
+@mixin foo {
+
+	@content;
+}
+
+a {
+
+	@debug 1;
+}
+
+$map: (
+	"foo": 1,
+	"bar": 2,
+	"baz": 3
+);
+
+@if $foo == block {
+	display: block;
+}
+
+@else {
+	display: inline-block;
+}
