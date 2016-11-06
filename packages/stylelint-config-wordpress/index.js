@@ -92,6 +92,7 @@ module.exports = {
     "selector-list-comma-newline-after": "always",
     "selector-list-comma-space-before": "never",
     "selector-max-empty-lines": 0,
+    "selector-no-empty": true,
     "selector-pseudo-class-case": "lower",
     "selector-pseudo-class-no-unknown": true,
     "selector-pseudo-class-parentheses-space-inside": "never",

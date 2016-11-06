@@ -2,6 +2,7 @@
 
 -   Removed:  `stylelint < 7.5.0` compatibility.
 -   Added:  NodeJS 7.x.x support
+-   Added:  `selector-no-empty` rule.
 
 # 9.1.1
 
