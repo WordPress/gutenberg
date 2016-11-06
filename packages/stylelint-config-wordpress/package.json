@@ -45,10 +45,10 @@
     "remark-cli": "^2.0.0",
     "remark-preset-lint-consistent": "^1.0.0",
     "remark-preset-lint-recommended": "^1.0.0",
-    "stylelint": "^7.2.0"
+    "stylelint": "^7.5.0"
   },
   "peerDependencies": {
-    "stylelint": "^7.2.0"
+    "stylelint": "^7.5.0"
   },
   "scripts": {
     "ava": "ava --verbose \"__tests__/**/*.js\"",

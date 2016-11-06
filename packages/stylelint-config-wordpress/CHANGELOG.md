@@ -1,3 +1,7 @@
+# HEAD
+
+-   Removed:  `stylelint < 7.5.0` compatibility.
+
 # 9.1.1
 
 -   Fixed:  Re-releasing failed npmjs.com 9.1.0 release as 9.1.1.
