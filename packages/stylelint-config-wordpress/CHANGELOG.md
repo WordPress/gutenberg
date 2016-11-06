@@ -1,6 +1,7 @@
 # HEAD
 
 -   Removed:  `stylelint < 7.5.0` compatibility.
+-   Added:  NodeJS 7.x.x support
 
 # 9.1.1
 
