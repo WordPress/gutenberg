@@ -4,6 +4,7 @@
 -   Added:  NodeJS 7.x.x support
 -   Added:  `selector-no-empty` rule.
 -   Fixed:  Removed `@debug` from `ignoreAtRules` array of `at-rule-no-unknown` rule in `stylelint-config-wordpress/scss` chared config.
+-   Added:  `scss/selector-no-redundant-nesting-selector` rule in `stylelint-config-wordpress/scss` chared config.
 
 # 9.1.1
 
