@@ -3,6 +3,7 @@
 -   Removed:  `stylelint < 7.5.0` compatibility.
 -   Added:  NodeJS 7.x.x support
 -   Added:  `selector-no-empty` rule.
+-   Fixed:  Removed `@debug` from `ignoreAtRules` array of `at-rule-no-unknown` rule in `stylelint-config-wordpress/scss` chared config.
 
 # 9.1.1
 

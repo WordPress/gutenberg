@@ -29,6 +29,7 @@ test("There are warnings with invalid values SCSS", async t => {
   const { errored, results } = data
   const { warnings } = results[0]
   t.truthy(errored, "errored")
-  t.is(warnings.length, 1, "flags one warning")
+  t.is(warnings.length, 2, "flags one warning")
   t.is(warnings[0].text, "Unexpected unknown at-rule \"@unknown\" (at-rule-no-unknown)", "correct warning text")
+  t.is(warnings[1].text, "Unexpected unknown at-rule \"@debug\" (at-rule-no-unknown)", "correct warning text")
 })

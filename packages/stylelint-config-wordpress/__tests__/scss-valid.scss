@@ -10,11 +10,6 @@
 	@content;
 }
 
-a {
-
-	@debug 1;
-}
-
 $map: (
 	"foo": 1,
 	"bar": 2,
