@@ -101,7 +101,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test WP_Customize_Custom_CSS_Setting::update().
+	 * Test crud methods on WP_Customize_Custom_CSS_Setting.
 	 *
 	 * @covers wp_get_custom_css()
 	 * @covers WP_Customize_Custom_CSS_Setting::value()
@@ -109,6 +109,10 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	 * @covers WP_Customize_Custom_CSS_Setting::update()
 	 */
 	function test_crud() {
+
+		$this->setting->default = '/* Hello World */';
+		$this->assertEquals( $this->setting->default, $this->setting->value() );
+
 		$original_css = 'body { color: black; }';
 		$this->factory()->post->create( array(
 			'post_title' => $this->setting->stylesheet,
