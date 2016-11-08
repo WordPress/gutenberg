@@ -85,4 +85,29 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 		), get_page_templates( null, 'post' ) );
 		$this->assertEquals( array(), get_page_templates( null, 'bar' ) );
 	}
+
+	/**
+	 * @ticket 38696
+	 */
+	function test_page_templates_child_theme() {
+		$theme = wp_get_theme( 'page-templates-child' );
+		$this->assertNotEmpty( $theme );
+
+		switch_theme( $theme['Template'], $theme['Stylesheet'] );
+
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level' => 'template-top-level-post-types.php',
+			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
+		), get_page_templates( null, 'foo' ) );
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level' => 'template-top-level-post-types.php',
+			'Sub Dir'   => 'subdir/template-sub-dir-post-types.php',
+		), get_page_templates( null, 'post' ) );
+		$this->assertEqualSetsWithIndex( array(
+			'Top Level'                           => 'template-top-level.php',
+			'Sub Dir'                             => 'subdir/template-sub-dir.php',
+			'This Template Header Is On One Line' => 'template-header.php',
+		), get_page_templates() );
+		$this->assertEquals( array(), get_page_templates( null, 'bar' ) );
+	}
 }
