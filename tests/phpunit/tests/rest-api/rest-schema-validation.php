@@ -66,7 +66,7 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 			'format' => 'email',
 		);
 		$this->assertTrue( rest_validate_value_from_schema( 'email@example.com', $schema ) );
-		$this->assertTrue( rest_validate_value_from_schema( 'a@b.c', $schema ) );
+		$this->assertTrue( rest_validate_value_from_schema( 'a@b.co', $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( 'email', $schema ) );
 	}
 
