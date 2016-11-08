@@ -908,6 +908,27 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		update_option( 'require_name_email', 0 );
 	}
 
+	public function test_create_comment_author_email_too_short() {
+		wp_set_current_user( 0 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Homer J. Simpson',
+			'author_email' => 'a@b',
+			'content'      => 'in this house, we obey the laws of thermodynamics!',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'author_email', $data['data']['params'] );
+	}
+
 	public function test_create_item_invalid_blank_content() {
 		wp_set_current_user( 0 );
 
