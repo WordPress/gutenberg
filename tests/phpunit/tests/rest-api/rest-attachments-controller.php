@@ -807,23 +807,23 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 			array(
 				// Raw values.
 				array(
-					'title'   => '\o/ ¯\_(ツ)_/¯ 🚢',
-					'description' => '\o/ ¯\_(ツ)_/¯ 🚢',
-					'caption' => '\o/ ¯\_(ツ)_/¯ 🚢',
+					'title'   => '\o/ ¯\_(ツ)_/¯',
+					'description' => '\o/ ¯\_(ツ)_/¯',
+					'caption' => '\o/ ¯\_(ツ)_/¯',
 				),
 				// Expected returned values.
 				array(
 					'title' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '\o/ ¯\_(ツ)_/¯ 🚢',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '\o/ ¯\_(ツ)_/¯',
 					),
 					'description' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯</p>',
 					),
 					'caption' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯</p>',
 					),
 				)
 			),
