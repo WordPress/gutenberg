@@ -246,8 +246,8 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 		@mkdir( WP_CONTENT_DIR . '/themes/foo' );
 		@mkdir( WP_CONTENT_DIR . '/themes/foo-themes' );
 
-		$this->assertTrue( file_exists( WP_CONTENT_DIR . '/themes/foo' ) );
-		$this->assertTrue( file_exists( WP_CONTENT_DIR . '/themes/foo-themes') );
+		$this->assertFileExists( WP_CONTENT_DIR . '/themes/foo' );
+		$this->assertFileExists( WP_CONTENT_DIR . '/themes/foo-themes' );
 
 		register_theme_directory( '/' );
 

@@ -210,7 +210,7 @@ class Tests_Theme extends WP_UnitTestCase {
 		$wp_theme = wp_get_theme( $this->theme_slug );
 		$this->assertNotEmpty( $wp_theme->get('License') );
 		$path_to_style_css = $wp_theme->get_theme_root() . '/' . $wp_theme->get_stylesheet() . '/style.css';
-		$this->assertTrue( file_exists( $path_to_style_css ) );
+		$this->assertFileExists( $path_to_style_css );
 		$theme_data = get_theme_data( $path_to_style_css );
 		$this->assertArrayHasKey( 'License', $theme_data );
 		$this->assertArrayNotHasKey( 'Not a Valid Key', $theme_data );
