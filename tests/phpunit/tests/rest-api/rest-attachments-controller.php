@@ -460,14 +460,31 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 
 	public function test_create_item() {
 		wp_set_current_user( self::$author_id );
+
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request->set_header( 'Content-Type', 'image/jpeg' );
 		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'title', 'My title is very cool' );
+		$request->set_param( 'caption', 'This is a better caption.' );
+		$request->set_param( 'description', 'Without a description, my attachment is descriptionless.' );
+		$request->set_param( 'alt_text', 'Alt text is stored outside post schema.' );
+
 		$request->set_body( file_get_contents( $this->test_file ) );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
+
 		$this->assertEquals( 201, $response->get_status() );
 		$this->assertEquals( 'image', $data['media_type'] );
+
+		$attachment = get_post( $data['id'] );
+		$this->assertEquals( 'My title is very cool', $data['title']['raw'] );
+		$this->assertEquals( 'My title is very cool', $attachment->post_title );
+		$this->assertEquals( 'This is a better caption.', $data['caption']['raw'] );
+		$this->assertEquals( 'This is a better caption.', $attachment->post_excerpt );
+		$this->assertEquals( 'Without a description, my attachment is descriptionless.', $data['description']['raw'] );
+		$this->assertEquals( 'Without a description, my attachment is descriptionless.', $attachment->post_content );
+		$this->assertEquals( 'Alt text is stored outside post schema.', $data['alt_text'] );
+		$this->assertEquals( 'Alt text is stored outside post schema.', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) );
 	}
 
 	public function test_create_item_default_filename_title() {
@@ -650,9 +667,9 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$attachment = get_post( $data['id'] );
 		$this->assertEquals( 'My title is very cool', $data['title']['raw'] );
 		$this->assertEquals( 'My title is very cool', $attachment->post_title );
-		$this->assertEquals( 'This is a better caption.', $data['caption'] );
+		$this->assertEquals( 'This is a better caption.', $data['caption']['raw'] );
 		$this->assertEquals( 'This is a better caption.', $attachment->post_excerpt );
-		$this->assertEquals( 'Without a description, my attachment is descriptionless.', $data['description'] );
+		$this->assertEquals( 'Without a description, my attachment is descriptionless.', $data['description']['raw'] );
 		$this->assertEquals( 'Without a description, my attachment is descriptionless.', $attachment->post_content );
 		$this->assertEquals( 'Alt text is stored outside post schema.', $data['alt_text'] );
 		$this->assertEquals( 'Alt text is stored outside post schema.', get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ) );
@@ -775,7 +792,11 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'author', $properties );
 		$this->assertArrayHasKey( 'alt_text', $properties );
 		$this->assertArrayHasKey( 'caption', $properties );
+		$this->assertArrayHasKey( 'raw', $properties['caption']['properties'] );
+		$this->assertArrayHasKey( 'rendered', $properties['caption']['properties'] );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'raw', $properties['description']['properties'] );
+		$this->assertArrayHasKey( 'rendered', $properties['description']['properties'] );
 		$this->assertArrayHasKey( 'comment_status', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
 		$this->assertArrayHasKey( 'date_gmt', $properties );
@@ -794,6 +815,8 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'source_url', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
+		$this->assertArrayHasKey( 'raw', $properties['title']['properties'] );
+		$this->assertArrayHasKey( 'rendered', $properties['title']['properties'] );
 		$this->assertArrayHasKey( 'type', $properties );
 	}
 
@@ -891,9 +914,17 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 	protected function check_post_data( $attachment, $data, $context = 'view', $links ) {
 		parent::check_post_data( $attachment, $data, $context, $links );
 
+		$this->assertArrayNotHasKey( 'content', $data );
+		$this->assertArrayNotHasKey( 'excerpt', $data );
+
 		$this->assertEquals( get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ), $data['alt_text'] );
-		$this->assertEquals( $attachment->post_excerpt, $data['caption'] );
-		$this->assertEquals( $attachment->post_content, $data['description'] );
+		if ( 'edit' === $context ) {
+			$this->assertEquals( $attachment->post_excerpt, $data['caption']['raw'] );
+			$this->assertEquals( $attachment->post_content, $data['description']['raw'] );
+		} else {
+			$this->assertFalse( isset( $data['caption']['raw'] ) );
+			$this->assertFalse( isset( $data['description']['raw'] ) );
+		}
 		$this->assertTrue( isset( $data['media_details'] ) );
 
 		if ( $attachment->post_parent ) {
