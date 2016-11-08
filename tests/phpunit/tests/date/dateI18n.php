@@ -22,19 +22,19 @@ class Tests_Date_I18n extends WP_UnitTestCase {
 	}
 
 	public function test_custom_timezone_setting() {
-		update_option( 'timezone_string', 'Europe/Zurich' );
+		update_option( 'timezone_string', 'America/Regina' );
 
 		$this->assertEquals( strtotime( date( 'Y-m-d H:i:s', time() + get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) ), strtotime( date_i18n( 'Y-m-d H:i:s' ) ), 'The dates should be equal', 2 );
 	}
 
 	public function test_date_should_be_in_gmt_with_custom_timezone_setting() {
-		update_option( 'timezone_string', 'Europe/Zurich' );
+		update_option( 'timezone_string', 'America/Regina' );
 
 		$this->assertEquals( strtotime( date( 'Y-m-d H:i:s' ) ), strtotime( date_i18n( 'Y-m-d H:i:s', false, true ) ), 'The dates should be equal', 2 );
 	}
 
 	public function test_date_should_be_in_gmt_with_custom_timezone_setting_and_timestamp() {
-		update_option( 'timezone_string', 'Europe/Zurich' );
+		update_option( 'timezone_string', 'America/Regina' );
 
 		$this->assertEquals( '2012-12-01 00:00:00', date_i18n( 'Y-m-d H:i:s', strtotime( '2012-12-01 00:00:00' ) ) );
 	}
@@ -63,8 +63,8 @@ class Tests_Date_I18n extends WP_UnitTestCase {
 	}
 
 	public function test_adjusts_format_based_on_timezone_string() {
-		update_option( 'timezone_string', 'Europe/Zurich' );
+		update_option( 'timezone_string', 'America/Regina' );
 
-		$this->assertEquals( '2012-12-01 00:00:00 CET +01:00 Europe/Zurich', date_i18n( 'Y-m-d H:i:s T P e', strtotime( '2012-12-01 00:00:00' ) ) );
+		$this->assertEquals( '2012-12-01 00:00:00 CST -06:00 America/Regina', date_i18n( 'Y-m-d H:i:s T P e', strtotime( '2012-12-01 00:00:00' ) ) );
 	}
 }
