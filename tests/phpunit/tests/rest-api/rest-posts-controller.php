@@ -12,6 +12,7 @@
 class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Testcase {
 	protected static $post_id;
 
+	protected static $superadmin_id;
 	protected static $editor_id;
 	protected static $author_id;
 	protected static $contributor_id;
@@ -23,6 +24,10 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_id = $factory->post->create();
 
+		self::$superadmin_id = $factory->user->create( array(
+			'role'       => 'administrator',
+			'user_login' => 'superadmin',
+		) );
 		self::$editor_id = $factory->user->create( array(
 			'role' => 'editor',
 		) );
@@ -32,6 +37,10 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		self::$contributor_id = $factory->user->create( array(
 			'role' => 'contributor',
 		) );
+
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( 'superadmin' ) );
+		}
 
 		// Only support 'post' and 'gallery'
 		self::$supported_formats = get_theme_support( 'post-formats' );
@@ -2001,6 +2010,228 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		remove_filter( 'map_meta_cap', array( $this, 'revoke_assign_term' ), 10, 4 );
 
 		$this->assertErrorResponse( 'rest_cannot_assign_term', $response, 403 );
+	}
+
+	public function verify_post_roundtrip( $input = array(), $expected_output = array() ) {
+		// Create the post
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertEquals( $expected_output['title']['raw']       , $actual_output['title']['raw'] );
+		$this->assertEquals( $expected_output['title']['rendered']  , trim( $actual_output['title']['rendered'] ) );
+		$this->assertEquals( $expected_output['content']['raw']     , $actual_output['content']['raw'] );
+		$this->assertEquals( $expected_output['content']['rendered'], trim( $actual_output['content']['rendered'] ) );
+		$this->assertEquals( $expected_output['excerpt']['raw']     , $actual_output['excerpt']['raw'] );
+		$this->assertEquals( $expected_output['excerpt']['rendered'], trim( $actual_output['excerpt']['rendered'] ) );
+
+		// Compare expected API output to WP internal values
+		$post = get_post( $actual_output['id'] );
+		$this->assertEquals( $expected_output['title']['raw']  , $post->post_title );
+		$this->assertEquals( $expected_output['content']['raw'], $post->post_content );
+		$this->assertEquals( $expected_output['excerpt']['raw'], $post->post_excerpt );
+
+		// Update the post
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $actual_output['id'] ) );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertEquals( $expected_output['title']['raw']       , $actual_output['title']['raw'] );
+		$this->assertEquals( $expected_output['title']['rendered']  , trim( $actual_output['title']['rendered'] ) );
+		$this->assertEquals( $expected_output['content']['raw']     , $actual_output['content']['raw'] );
+		$this->assertEquals( $expected_output['content']['rendered'], trim( $actual_output['content']['rendered'] ) );
+		$this->assertEquals( $expected_output['excerpt']['raw']     , $actual_output['excerpt']['raw'] );
+		$this->assertEquals( $expected_output['excerpt']['rendered'], trim( $actual_output['excerpt']['rendered'] ) );
+
+		// Compare expected API output to WP internal values
+		$post = get_post( $actual_output['id'] );
+		$this->assertEquals( $expected_output['title']['raw']  , $post->post_title );
+		$this->assertEquals( $expected_output['content']['raw'], $post->post_content );
+		$this->assertEquals( $expected_output['excerpt']['raw'], $post->post_excerpt );
+	}
+
+	public static function post_roundtrip_provider() {
+		return array(
+			array(
+				// Raw values.
+				array(
+					'title'   => '\o/ ¯\_(ツ)_/¯ 🚢',
+					'content' => '\o/ ¯\_(ツ)_/¯ 🚢',
+					'excerpt' => '\o/ ¯\_(ツ)_/¯ 🚢',
+				),
+				// Expected returned values.
+				array(
+					'title' => array(
+						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
+						'rendered' => '\o/ ¯\_(ツ)_/¯ 🚢',
+					),
+					'content' => array(
+						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+					),
+					'excerpt' => array(
+						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+					),
+				)
+			),
+			array(
+				// Raw values.
+				array(
+					'title'   => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+					'content' => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+					'excerpt' => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+				),
+				// Expected returned values.
+				array(
+					'title' => array(
+						'raw'      => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+						'rendered' => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+					),
+					'content' => array(
+						'raw'      => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+						'rendered' => '<p>\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;</p>',
+					),
+					'excerpt' => array(
+						'raw'      => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+						'rendered' => '<p>\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;</p>',
+					),
+				),
+			),
+			array(
+				// Raw values.
+				array(
+					'title'   => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'content' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'excerpt' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				),
+				// Expected returned values.
+				array(
+					'title' => array(
+						'raw'      => 'div <strong>strong</strong> oh noes',
+						'rendered' => 'div <strong>strong</strong> oh noes',
+					),
+					'content' => array(
+						'raw'      => '<div>div</div> <strong>strong</strong> oh noes',
+						'rendered' => "<div>div</div>\n<p> <strong>strong</strong> oh noes</p>",
+					),
+					'excerpt' => array(
+						'raw'      => '<div>div</div> <strong>strong</strong> oh noes',
+						'rendered' => "<div>div</div>\n<p> <strong>strong</strong> oh noes</p>",
+					),
+				)
+			),
+			array(
+				// Raw values.
+				array(
+					'title'   => '<a href="#" target="_blank" data-unfiltered=true>link</a>',
+					'content' => '<a href="#" target="_blank" data-unfiltered=true>link</a>',
+					'excerpt' => '<a href="#" target="_blank" data-unfiltered=true>link</a>',
+				),
+				// Expected returned values.
+				array(
+					'title' => array(
+						'raw'      => '<a href="#">link</a>',
+						'rendered' => '<a href="#">link</a>',
+					),
+					'content' => array(
+						'raw'      => '<a href="#" target="_blank">link</a>',
+						'rendered' => '<p><a href="#" target="_blank">link</a></p>',
+					),
+					'excerpt' => array(
+						'raw'      => '<a href="#" target="_blank">link</a>',
+						'rendered' => '<p><a href="#" target="_blank">link</a></p>',
+					),
+				)
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider post_roundtrip_provider
+	 */
+	public function test_post_roundtrip_as_author( $raw, $expected ) {
+		wp_set_current_user( self::$author_id );
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+		$this->verify_post_roundtrip( $raw, $expected );
+	}
+
+	public function test_post_roundtrip_as_editor_unfiltered_html() {
+		wp_set_current_user( self::$editor_id );
+		if ( is_multisite() ) {
+			$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+			$this->verify_post_roundtrip( array(
+				'title'   => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'content' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'excerpt' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'title' => array(
+					'raw'      => 'div <strong>strong</strong> oh noes',
+					'rendered' => 'div <strong>strong</strong> oh noes',
+				),
+				'content' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> oh noes',
+					'rendered' => "<div>div</div>\n<p> <strong>strong</strong> oh noes</p>",
+				),
+				'excerpt' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> oh noes',
+					'rendered' => "<div>div</div>\n<p> <strong>strong</strong> oh noes</p>",
+				),
+			) );
+		} else {
+			$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+			$this->verify_post_roundtrip( array(
+				'title'   => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'content' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'excerpt' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'title' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'rendered' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				),
+				'content' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+				),
+				'excerpt' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+				),
+			) );
+		}
+	}
+
+	public function test_post_roundtrip_as_superadmin_unfiltered_html() {
+		wp_set_current_user( self::$superadmin_id );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$this->verify_post_roundtrip( array(
+			'title'   => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			'content' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			'excerpt' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+		), array(
+			'title' => array(
+				'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'rendered' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			),
+			'content' => array(
+				'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+			),
+			'excerpt' => array(
+				'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+			),
+		) );
 	}
 
 	public function test_delete_item() {
