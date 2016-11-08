@@ -10,8 +10,9 @@
   * @group restapi
   */
 class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase {
-
+	protected static $superadmin_id;
 	protected static $admin_id;
+	protected static $editor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
 
@@ -25,8 +26,15 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 	protected $endpoint;
 
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$superadmin_id = $factory->user->create( array(
+			'role'       => 'administrator',
+			'user_login' => 'superadmin',
+		) );
 		self::$admin_id = $factory->user->create( array(
 			'role' => 'administrator',
+		) );
+		self::$editor_id = $factory->user->create( array(
+			'role' => 'editor',
 		) );
 		self::$subscriber_id = $factory->user->create( array(
 			'role' => 'subscriber',
@@ -79,6 +87,9 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 	public function setUp() {
 		parent::setUp();
 		$this->endpoint = new WP_REST_Comments_Controller;
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( 'superadmin' ) );
+		}
 	}
 
 	public function tearDown() {
@@ -1878,6 +1889,141 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'comment_content_column_length', $response, 400 );
+	}
+
+	public function verify_comment_roundtrip( $input = array(), $expected_output = array() ) {
+		// Create the comment
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'author_email', 'cbg@androidsdungeon.com' );
+		$request->set_param( 'post', self::$post_id );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertInternalType( 'array', $actual_output['content'] );
+		$this->assertArrayHasKey( 'raw', $actual_output['content'] );
+		$this->assertEquals( $expected_output['content']['raw']     , $actual_output['content']['raw'] );
+		$this->assertEquals( $expected_output['content']['rendered'], trim( $actual_output['content']['rendered'] ) );
+		$this->assertEquals( $expected_output['author_name']        , $actual_output['author_name'] );
+		$this->assertEquals( $expected_output['author_user_agent']  , $actual_output['author_user_agent'] );
+
+		// Compare expected API output to WP internal values
+		$comment = get_comment( $actual_output['id'] );
+		$this->assertEquals( $expected_output['content']['raw']   , $comment->comment_content );
+		$this->assertEquals( $expected_output['author_name']      , $comment->comment_author );
+		$this->assertEquals( $expected_output['author_user_agent'], $comment->comment_agent );
+
+		// Update the comment
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', $actual_output['id'] ) );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		// FIXME at least one value must change, or update fails
+		// See https://core.trac.wordpress.org/ticket/38700
+		$request->set_param( 'author_ip', '127.0.0.2' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertEquals( $expected_output['content']['raw']     , $actual_output['content']['raw'] );
+		$this->assertEquals( $expected_output['content']['rendered'], trim( $actual_output['content']['rendered'] ) );
+		$this->assertEquals( $expected_output['author_name']        , $actual_output['author_name'] );
+		$this->assertEquals( $expected_output['author_user_agent']  , $actual_output['author_user_agent'] );
+
+		// Compare expected API output to WP internal values
+		$comment = get_comment( $actual_output['id'] );
+		$this->assertEquals( $expected_output['content']['raw']   , $comment->comment_content );
+		$this->assertEquals( $expected_output['author_name']      , $comment->comment_author );
+		$this->assertEquals( $expected_output['author_user_agent'], $comment->comment_agent );
+	}
+
+	public function test_comment_roundtrip_as_editor() {
+		wp_set_current_user( self::$editor_id );
+		$this->assertEquals( ! is_multisite(), current_user_can( 'unfiltered_html' ) );
+		$this->verify_comment_roundtrip( array(
+			'content'           => '\o/ ¯\_(ツ)_/¯',
+			'author_name'       => '\o/ ¯\_(ツ)_/¯',
+			'author_user_agent' => '\o/ ¯\_(ツ)_/¯',
+		), array(
+			'content' => array(
+				'raw'      => '\o/ ¯\_(ツ)_/¯',
+				'rendered' => '<p>\o/ ¯\_(ツ)_/¯</p>',
+			),
+			'author_name'       => '\o/ ¯\_(ツ)_/¯',
+			'author_user_agent' => '\o/ ¯\_(ツ)_/¯',
+		) );
+	}
+
+	public function test_comment_roundtrip_as_editor_unfiltered_html() {
+		wp_set_current_user( self::$editor_id );
+		if ( is_multisite() ) {
+			$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+			$this->verify_comment_roundtrip( array(
+				'content'           => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'author_name'       => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'author_user_agent' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'content' => array(
+					'raw'      => 'div <strong>strong</strong> oh noes',
+					'rendered' => '<p>div <strong>strong</strong> oh noes</p>',
+				),
+				'author_name'       => 'div strong',
+				'author_user_agent' => 'div strong',
+			) );
+		} else {
+			$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+			$this->verify_comment_roundtrip( array(
+				'content'           => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'author_name'       => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'author_user_agent' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'content' => array(
+					'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+					'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+				),
+				'author_name'       => 'div strong',
+				'author_user_agent' => 'div strong',
+			) );
+		}
+	}
+
+	public function test_comment_roundtrip_as_superadmin() {
+		wp_set_current_user( self::$superadmin_id );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$this->verify_comment_roundtrip( array(
+			'content'           => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+			'author_name'       => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+			'author_user_agent' => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+		), array(
+			'content' => array(
+				'raw'      => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+				'rendered' => '<p>\\\&#038;\\\ &amp; &invalid; < &lt; &amp;lt;' . "\n</p>",
+			),
+			'author_name'       => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+			'author_user_agent' => '\\\&\\\ &amp; &invalid; &lt; &lt; &amp;lt;',
+		) );
+	}
+
+	public function test_comment_roundtrip_as_superadmin_unfiltered_html() {
+		wp_set_current_user( self::$superadmin_id );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$this->verify_comment_roundtrip( array(
+			'content'           => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			'author_name'       => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			'author_user_agent' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+		), array(
+			'content' => array(
+				'raw'      => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'rendered' => "<div>div</div>\n<p> <strong>strong</strong> <script>oh noes</script></p>",
+			),
+			'author_name'       => 'div strong',
+			'author_user_agent' => 'div strong',
+		) );
 	}
 
 	public function test_delete_item() {
