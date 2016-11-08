@@ -2065,23 +2065,23 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			array(
 				// Raw values.
 				array(
-					'title'   => '\o/ ¯\_(ツ)_/¯ 🚢',
-					'content' => '\o/ ¯\_(ツ)_/¯ 🚢',
-					'excerpt' => '\o/ ¯\_(ツ)_/¯ 🚢',
+					'title'   => '\o/ ¯\_(ツ)_/¯',
+					'content' => '\o/ ¯\_(ツ)_/¯',
+					'excerpt' => '\o/ ¯\_(ツ)_/¯',
 				),
 				// Expected returned values.
 				array(
 					'title' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '\o/ ¯\_(ツ)_/¯ 🚢',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '\o/ ¯\_(ツ)_/¯',
 					),
 					'content' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯</p>',
 					),
 					'excerpt' => array(
-						'raw'      => '\o/ ¯\_(ツ)_/¯ 🚢',
-						'rendered' => '<p>\o/ ¯\_(ツ)_/¯ 🚢</p>',
+						'raw'      => '\o/ ¯\_(ツ)_/¯',
+						'rendered' => '<p>\o/ ¯\_(ツ)_/¯</p>',
 					),
 				)
 			),
