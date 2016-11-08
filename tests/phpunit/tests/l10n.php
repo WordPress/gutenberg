@@ -100,6 +100,50 @@ class Tests_L10n extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38632
+	 */
+	function test_wp_dropdown_languages_site_default() {
+		$args = array(
+			'id'                       => 'foo',
+			'name'                     => 'bar',
+			'languages'                => array( 'de_DE' ),
+			'translations'             => $this->wp_dropdown_languages_filter(),
+			'selected'                 => 'de_DE',
+			'echo'                     => false,
+			'show_site_locale_default' => true,
+		);
+		$actual = wp_dropdown_languages( $args );
+
+		$this->assertContains( 'id="foo"', $actual );
+		$this->assertContains( 'name="bar"', $actual );
+		$this->assertContains( '<option value="site-default" data-installed="1">Site Default</option>', $actual );
+		$this->assertContains( '<option value="" lang="en" data-installed="1">English (United States)</option>', $actual );
+		$this->assertContains( '<option value="de_DE" lang="de" selected=\'selected\' data-installed="1">Deutsch</option>', $actual );
+		$this->assertContains( '<option value="it_IT" lang="it">Italiano</option>', $actual );
+	}
+
+	/**
+	 * @ticket 38632
+	 */
+	function test_wp_dropdown_languages_en_US_selected() {
+		$args = array(
+			'id'           => 'foo',
+			'name'         => 'bar',
+			'languages'    => array( 'de_DE' ),
+			'translations' => $this->wp_dropdown_languages_filter(),
+			'selected'     => 'en_US',
+			'echo'         => false,
+		);
+		$actual = wp_dropdown_languages( $args );
+
+		$this->assertContains( 'id="foo"', $actual );
+		$this->assertContains( 'name="bar"', $actual );
+		$this->assertContains( '<option value="" lang="en" data-installed="1" selected=\'selected\'>English (United States)</option>', $actual );
+		$this->assertContains( '<option value="de_DE" lang="de" data-installed="1">Deutsch</option>', $actual );
+		$this->assertContains( '<option value="it_IT" lang="it">Italiano</option>', $actual );
+	}
+
+	/**
 	 * We don't want to call the API when testing.
 	 *
 	 * @return array
