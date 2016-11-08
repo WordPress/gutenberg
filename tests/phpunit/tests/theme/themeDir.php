@@ -157,6 +157,7 @@ class Tests_Theme_ThemeDir extends WP_UnitTestCase {
 			'My Theme',
 			'My Theme/theme1', // duplicate theme should be given a unique name
 			'My Subdir Theme',// theme in a subdirectory should work
+			'Page Template Child Theme',// theme which inherits page templates
 			'Page Template Theme', // theme with page templates for other test code
 			'Theme with Spaces in the Directory',
 			'Internationalized Theme',
