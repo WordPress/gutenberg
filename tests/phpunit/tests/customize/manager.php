@@ -416,6 +416,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @covers WP_Customize_Manager::save_changeset_post()
 	 */
 	function test_save_changeset_post_without_theme_activation() {
+		global $wp_customize;
 		wp_set_current_user( self::$admin_user_id );
 
 		$did_action = array(
@@ -425,7 +426,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		);
 		$uuid = wp_generate_uuid4();
 
-		$manager = new WP_Customize_Manager( array(
+		$wp_customize = $manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 		) );
 		$manager->register_controls();
@@ -507,7 +508,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $previous_saved_data, json_decode( get_post( $post_id )->post_content, true ) );
 
 		// Attempt a non-transactional/incremental update.
-		$manager = new WP_Customize_Manager( array(
+		$wp_customize = $manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 		) );
 		$manager->register_controls(); // That is, register settings.
@@ -543,28 +544,61 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		) );
 		$this->assertEquals( $customize_changeset_save_data_call_count + 1, $this->customize_changeset_save_data_call_count );
 
-		// Publish the changeset.
-		$manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		// Publish the changeset: actions will be doubled since also trashed.
+		$expected_actions = array(
+			'wp_trash_post' => 1,
+			'clean_post_cache' => 2,
+			'transition_post_status' => 2,
+			'publish_to_trash' => 1,
+			'trash_customize_changeset' => 1,
+			'edit_post' => 2,
+			'save_post_customize_changeset' => 2,
+			'save_post' => 2,
+			'wp_insert_post' => 2,
+			'trashed_post' => 1,
+		);
+		$action_counts = array();
+		foreach ( array_keys( $expected_actions ) as $action_name ) {
+			$action_counts[ $action_name ] = did_action( $action_name );
+		}
+
+		$wp_customize = $manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
 		$manager->register_controls();
-		$GLOBALS['wp_customize'] = $manager;
+		$manager->add_setting( 'scratchpad', array(
+			'type' => 'option',
+			'capability' => 'exist',
+		) );
+		$manager->get_setting( 'blogname' )->capability = 'exist';
+		wp_set_current_user( self::$subscriber_user_id );
 		$r = $manager->save_changeset_post( array(
 			'status' => 'publish',
 			'data' => array(
 				'blogname' => array(
 					'value' => 'Do it live \o/',
 				),
+				'scratchpad' => array(
+					'value' => '<script>console.info( "HELLO" )</script>',
+				),
 			),
 		) );
 		$this->assertInternalType( 'array', $r );
 		$this->assertEquals( 'Do it live \o/', get_option( 'blogname' ) );
 		$this->assertEquals( 'trash', get_post_status( $post_id ) ); // Auto-trashed.
+		$this->assertContains( '<script>', get_post( $post_id )->post_content );
+		$this->assertEquals( $manager->changeset_uuid(), get_post( $post_id )->post_name, 'Expected that the "__trashed" suffix to not be added.' );
+		wp_set_current_user( self::$admin_user_id );
+		$this->assertEquals( 'publish', get_post_meta( $post_id, '_wp_trash_meta_status', true ) );
+		$this->assertTrue( is_numeric( get_post_meta( $post_id, '_wp_trash_meta_time', true ) ) );
+
+		foreach ( array_keys( $expected_actions ) as $action_name ) {
+			$this->assertEquals( $expected_actions[ $action_name ] + $action_counts[ $action_name ], did_action( $action_name ), "Action: $action_name" );
+		}
 
 		// Test revisions.
 		add_post_type_support( 'customize_changeset', 'revisions' );
 		$uuid = wp_generate_uuid4();
-		$manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
+		$wp_customize = $manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
 		$manager->register_controls();
-		$GLOBALS['wp_customize'] = $manager;
 
 		$manager->set_post_value( 'blogname', 'Hello Surface' );
 		$manager->save_changeset_post( array( 'status' => 'auto-draft' ) );
