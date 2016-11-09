@@ -45,7 +45,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$wp_customize = $this->wp_customize;
 
 		do_action( 'customize_register', $this->wp_customize );
-		$this->setting = new WP_Customize_Custom_CSS_Setting( $this->wp_customize, 'custom_css[twentysixteen]' );
+		$this->setting = new WP_Customize_Custom_CSS_Setting( $this->wp_customize, 'custom_css[' . get_stylesheet() . ']' );
 		$this->wp_customize->add_setting( $this->setting );
 	}
 
@@ -78,7 +78,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	function test_construct() {
 		$this->assertTrue( post_type_exists( 'custom_css' ) );
 		$this->assertEquals( 'custom_css', $this->setting->type );
-		$this->assertEquals( 'twentysixteen', $this->setting->stylesheet );
+		$this->assertEquals( get_stylesheet(), $this->setting->stylesheet );
 		$this->assertEquals( 'edit_css', $this->setting->capability );
 
 		$exception = null;
@@ -113,17 +113,36 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->setting->default = '/* Hello World */';
 		$this->assertEquals( $this->setting->default, $this->setting->value() );
 
+		$this->assertNull( wp_get_custom_css_post() );
+		$this->assertNull( wp_get_custom_css_post( $this->setting->stylesheet ) );
+		$this->assertNull( wp_get_custom_css_post( 'twentyten' ) );
+
 		$original_css = 'body { color: black; }';
-		$this->factory()->post->create( array(
+		$post_id = $this->factory()->post->create( array(
 			'post_title' => $this->setting->stylesheet,
 			'post_name' => $this->setting->stylesheet,
-			'post_content' => 'body { color: black; }',
+			'post_content' => $original_css,
 			'post_status' => 'publish',
 			'post_type' => 'custom_css',
 		) );
+		$twentyten_css = 'body { color: red; }';
+		$twentyten_post_id = $this->factory()->post->create( array(
+			'post_title' => 'twentyten',
+			'post_name' => 'twentyten',
+			'post_content' => $twentyten_css,
+			'post_status' => 'publish',
+			'post_type' => 'custom_css',
+		) );
+		$twentyten_setting = new WP_Customize_Custom_CSS_Setting( $this->wp_customize, 'custom_css[twentyten]' );
+
+		$this->assertEquals( $post_id, wp_get_custom_css_post()->ID );
+		$this->assertEquals( $post_id, wp_get_custom_css_post( $this->setting->stylesheet )->ID );
+		$this->assertEquals( $twentyten_post_id, wp_get_custom_css_post( 'twentyten' )->ID );
 
 		$this->assertEquals( $original_css, wp_get_custom_css( $this->setting->stylesheet ) );
 		$this->assertEquals( $original_css, $this->setting->value() );
+		$this->assertEquals( $twentyten_css, wp_get_custom_css( 'twentyten' ) );
+		$this->assertEquals( $twentyten_css, $twentyten_setting->value() );
 
 		$updated_css = 'body { color: blue; }';
 		$this->wp_customize->set_post_value( $this->setting->id, $updated_css );
@@ -138,6 +157,14 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->setting->preview();
 		$this->assertEquals( $previewed_css, $this->setting->value() );
 		$this->assertEquals( $previewed_css, wp_get_custom_css( $this->setting->stylesheet ) );
+
+		wp_delete_post( $post_id );
+		$this->assertNull( wp_get_custom_css_post() );
+		$this->assertNull( wp_get_custom_css_post( get_stylesheet() ) );
+		$this->assertEquals( $previewed_css, wp_get_custom_css( get_stylesheet() ), 'Previewed value remains in spite of deleted post.' );
+		wp_delete_post( $twentyten_post_id );
+		$this->assertNull( wp_get_custom_css_post( 'twentyten' ) );
+		$this->assertEquals( '', wp_get_custom_css( 'twentyten' ) );
 	}
 
 	/**
