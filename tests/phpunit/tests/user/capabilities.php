@@ -431,10 +431,19 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			$expected['delete_post_meta'],
 			$expected['add_post_meta'],
 			$expected['edit_comment'],
+			$expected['edit_comment_meta'],
+			$expected['delete_comment_meta'],
+			$expected['add_comment_meta'],
 			$expected['edit_term'],
 			$expected['delete_term'],
 			$expected['assign_term'],
-			$expected['delete_user']
+			$expected['edit_term_meta'],
+			$expected['delete_term_meta'],
+			$expected['add_term_meta'],
+			$expected['delete_user'],
+			$expected['edit_user_meta'],
+			$expected['delete_user_meta'],
+			$expected['add_user_meta']
 		);
 
 		$expected = array_keys( $expected );
@@ -1662,5 +1671,86 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	public function test_wp_roles_reinit_deprecated() {
 		$wp_roles = new WP_Roles();
 		$wp_roles->reinit();
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_no_one_can_edit_user_meta_for_non_existent_term() {
+		wp_set_current_user( self::$super_admin->ID );
+		$this->assertFalse( current_user_can( 'edit_user_meta', 999999 ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_can_edit_user_meta() {
+		wp_set_current_user( self::$users['administrator']->ID );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$users['administrator']->ID );
+		}
+		$this->assertTrue( current_user_can( 'edit_user_meta', self::$users['subscriber']->ID, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_cannot_edit_user_meta() {
+		wp_set_current_user( self::$users['editor']->ID );
+		$this->assertFalse( current_user_can( 'edit_user_meta', self::$users['subscriber']->ID, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_no_one_can_delete_user_meta_for_non_existent_term() {
+		wp_set_current_user( self::$super_admin->ID );
+		$this->assertFalse( current_user_can( 'delete_user_meta', 999999, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_can_delete_user_meta() {
+		wp_set_current_user( self::$users['administrator']->ID );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$users['administrator']->ID );
+		}
+		$this->assertTrue( current_user_can( 'delete_user_meta', self::$users['subscriber']->ID, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_cannot_delete_user_meta() {
+		wp_set_current_user( self::$users['editor']->ID );
+		$this->assertFalse( current_user_can( 'delete_user_meta', self::$users['subscriber']->ID, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_no_one_can_add_user_meta_for_non_existent_term() {
+		wp_set_current_user( self::$super_admin->ID );
+		$this->assertFalse( current_user_can( 'add_user_meta', 999999, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_can_add_user_meta() {
+		wp_set_current_user( self::$users['administrator']->ID );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$users['administrator']->ID );
+		}
+		$this->assertTrue( current_user_can( 'add_user_meta', self::$users['subscriber']->ID, 'foo' ) );
+	}
+
+	/**
+	 * @ticket 38412
+	 */
+	public function test_user_cannot_add_user_meta() {
+		wp_set_current_user( self::$users['editor']->ID );
+		$this->assertFalse( current_user_can( 'add_user_meta', self::$users['subscriber']->ID, 'foo' ) );
 	}
 }
