@@ -429,22 +429,24 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$wp_customize = $manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 		) );
+		$wp_customize = $manager;
 		$manager->register_controls();
 		$manager->set_post_value( 'blogname', 'Changeset Title' );
 		$manager->set_post_value( 'blogdescription', 'Changeset Tagline' );
 
+		$pre_saved_data = array(
+			'blogname' => array(
+				'value' => 'Overridden Changeset Title',
+			),
+			'blogdescription' => array(
+				'custom' => 'something',
+			),
+		);
 		$r = $manager->save_changeset_post( array(
 			'status' => 'auto-draft',
 			'title' => 'Auto Draft',
 			'date_gmt' => '2010-01-01 00:00:00',
-			'data' => array(
-				'blogname' => array(
-					'value' => 'Overridden Changeset Title',
-				),
-				'blogdescription' => array(
-					'custom' => 'something',
-				),
-			),
+			'data' => $pre_saved_data,
 		) );
 		$this->assertInternalType( 'array', $r );
 
@@ -454,8 +456,14 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertNotNull( $post_id );
 		$saved_data = json_decode( get_post( $post_id )->post_content, true );
 		$this->assertEquals( $manager->unsanitized_post_values(), wp_list_pluck( $saved_data, 'value' ) );
-		$this->assertEquals( 'Overridden Changeset Title', $saved_data['blogname']['value'] );
-		$this->assertEquals( 'something', $saved_data['blogdescription']['custom'] );
+		$this->assertEquals( $pre_saved_data['blogname']['value'], $saved_data['blogname']['value'] );
+		$this->assertEquals( $pre_saved_data['blogdescription']['custom'], $saved_data['blogdescription']['custom'] );
+		foreach ( $saved_data as $setting_id => $setting_params ) {
+			$this->assertArrayHasKey( 'type', $setting_params );
+			$this->assertEquals( 'option', $setting_params['type'] );
+			$this->assertArrayHasKey( 'user_id', $setting_params );
+			$this->assertEquals( self::$admin_user_id, $setting_params['user_id'] );
+		}
 		$this->assertEquals( 'Auto Draft', get_post( $post_id )->post_title );
 		$this->assertEquals( 'auto-draft', get_post( $post_id )->post_status );
 		$this->assertEquals( '2010-01-01 00:00:00', get_post( $post_id )->post_date_gmt );
@@ -511,6 +519,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$wp_customize = $manager = new WP_Customize_Manager( array(
 			'changeset_uuid' => $uuid,
 		) );
+		$wp_customize = $manager;
 		$manager->register_controls(); // That is, register settings.
 		$r = $manager->save_changeset_post( array(
 			'status' => null,
@@ -563,12 +572,13 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		}
 
 		$wp_customize = $manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
-		$manager->register_controls();
+		do_action( 'customize_register', $wp_customize );
 		$manager->add_setting( 'scratchpad', array(
 			'type' => 'option',
 			'capability' => 'exist',
 		) );
 		$manager->get_setting( 'blogname' )->capability = 'exist';
+		$original_capabilities = wp_list_pluck( $manager->settings(), 'capability' );
 		wp_set_current_user( self::$subscriber_user_id );
 		$r = $manager->save_changeset_post( array(
 			'status' => 'publish',
@@ -584,6 +594,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInternalType( 'array', $r );
 		$this->assertEquals( 'Do it live \o/', get_option( 'blogname' ) );
 		$this->assertEquals( 'trash', get_post_status( $post_id ) ); // Auto-trashed.
+		$this->assertEquals( $original_capabilities, wp_list_pluck( $manager->settings(), 'capability' ) );
 		$this->assertContains( '<script>', get_post( $post_id )->post_content );
 		$this->assertEquals( $manager->changeset_uuid(), get_post( $post_id )->post_name, 'Expected that the "__trashed" suffix to not be added.' );
 		wp_set_current_user( self::$admin_user_id );
@@ -598,7 +609,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		add_post_type_support( 'customize_changeset', 'revisions' );
 		$uuid = wp_generate_uuid4();
 		$wp_customize = $manager = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
-		$manager->register_controls();
+		do_action( 'customize_register', $manager );
 
 		$manager->set_post_value( 'blogname', 'Hello Surface' );
 		$manager->save_changeset_post( array( 'status' => 'auto-draft' ) );
@@ -660,6 +671,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 * @covers WP_Customize_Manager::update_stashed_theme_mod_settings()
 	 */
 	function test_save_changeset_post_with_theme_activation() {
+		global $wp_customize;
 		wp_set_current_user( self::$admin_user_id );
 
 		$preview_theme = $this->get_inactive_core_theme();
@@ -676,8 +688,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			'changeset_uuid' => $uuid,
 			'theme' => $preview_theme,
 		) );
-		$manager->register_controls();
-		$GLOBALS['wp_customize'] = $manager;
+		$wp_customize = $manager;
+		do_action( 'customize_register', $manager );
 
 		$manager->set_post_value( 'blogname', 'Hello Preview Theme' );
 		$post_values = $manager->unsanitized_post_values();
@@ -686,6 +698,233 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( '#123456', $post_values['background_color'] );
 		$this->assertEquals( $preview_theme, get_stylesheet() );
 		$this->assertEquals( 'Hello Preview Theme', get_option( 'blogname' ) );
+	}
+
+	/**
+	 * Test saving changesets with varying users and capabilities.
+	 *
+	 * @ticket 38705
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_save_changeset_post_with_varying_users() {
+		global $wp_customize;
+
+		add_theme_support( 'custom-background' );
+		wp_set_current_user( self::$admin_user_id );
+		$other_admin_user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		$uuid = wp_generate_uuid4();
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		$wp_customize = $manager;
+		do_action( 'customize_register', $manager );
+		$manager->add_setting( 'scratchpad', array(
+			'type' => 'option',
+			'capability' => 'exist',
+		) );
+
+		// Create initial set of
+		$r = $manager->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 1 Title',
+				),
+				'scratchpad' => array(
+					'value' => 'Admin 1 Scratch',
+				),
+				'background_color' => array(
+					'value' => '#000000',
+				),
+			),
+		) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertEquals(
+			array_fill_keys( array( 'blogname', 'scratchpad', 'background_color' ), true ),
+			$r['setting_validities']
+		);
+		$post_id = $manager->find_changeset_post_id( $uuid );
+		$data = json_decode( get_post( $post_id )->post_content, true );
+		$this->assertEquals( self::$admin_user_id, $data['blogname']['user_id'] );
+		$this->assertEquals( self::$admin_user_id, $data['scratchpad']['user_id'] );
+		$this->assertEquals( self::$admin_user_id, $data[ $this->manager->get_stylesheet() . '::background_color' ]['user_id'] );
+
+		// Attempt to save just one setting under a different user.
+		wp_set_current_user( $other_admin_user_id );
+		$r = $manager->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 2 Title',
+				),
+				'background_color' => array(
+					'value' => '#FFFFFF',
+				),
+			),
+		) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertEquals(
+			array_fill_keys( array( 'blogname', 'background_color' ), true ),
+			$r['setting_validities']
+		);
+		$data = json_decode( get_post( $post_id )->post_content, true );
+		$this->assertEquals( 'Admin 2 Title', $data['blogname']['value'] );
+		$this->assertEquals( $other_admin_user_id, $data['blogname']['user_id'] );
+		$this->assertEquals( 'Admin 1 Scratch', $data['scratchpad']['value'] );
+		$this->assertEquals( self::$admin_user_id, $data['scratchpad']['user_id'] );
+		$this->assertEquals( '#FFFFFF', $data[ $this->manager->get_stylesheet() . '::background_color' ]['value'] );
+		$this->assertEquals( $other_admin_user_id, $data[ $this->manager->get_stylesheet() . '::background_color' ]['user_id'] );
+
+		// Attempt to save now as under-privileged user.
+		$r = $manager->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'scratchpad' => array(
+					'value' => 'Subscriber Scratch',
+				),
+			),
+			'user_id' => self::$subscriber_user_id,
+		) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertEquals(
+			array_fill_keys( array( 'scratchpad' ), true ),
+			$r['setting_validities']
+		);
+		$data = json_decode( get_post( $post_id )->post_content, true );
+		$this->assertEquals( $other_admin_user_id, $data['blogname']['user_id'] );
+		$this->assertEquals( self::$subscriber_user_id, $data['scratchpad']['user_id'] );
+		$this->assertEquals( $other_admin_user_id, $data[ $this->manager->get_stylesheet() . '::background_color' ]['user_id'] );
+
+		// Manually update the changeset so that the user_id context is not included.
+		$data = json_decode( get_post( $post_id )->post_content, true );
+		$data['blogdescription']['value'] = 'Programmatically-supplied Tagline';
+		wp_update_post( wp_slash( array( 'ID' => $post_id, 'post_content' => wp_json_encode( $data ) ) ) );
+
+		// Ensure the modifying user set as the current user when each is saved, simulating WP Cron envronment.
+		wp_set_current_user( 0 );
+		$save_counts = array();
+		foreach ( array_keys( $data ) as $setting_id ) {
+			$setting_id = preg_replace( '/^.+::/', '', $setting_id );
+			$save_counts[ $setting_id ] = did_action( sprintf( 'customize_save_%s', $setting_id ) );
+		}
+		$this->filtered_setting_current_user_ids = array();
+		foreach ( $manager->settings() as $setting ) {
+			add_filter( sprintf( 'customize_sanitize_%s', $setting->id ), array( $this, 'filter_customize_setting_to_log_current_user' ), 10, 2 );
+		}
+		wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ) );
+		foreach ( array_keys( $data ) as $setting_id ) {
+			$setting_id = preg_replace( '/^.+::/', '', $setting_id );
+			$this->assertEquals( $save_counts[ $setting_id ] + 1, did_action( sprintf( 'customize_save_%s', $setting_id ) ), $setting_id );
+		}
+		$this->assertEqualSets( array( 'blogname', 'blogdescription', 'background_color', 'scratchpad' ), array_keys( $this->filtered_setting_current_user_ids ) );
+		$this->assertEquals( $other_admin_user_id, $this->filtered_setting_current_user_ids['blogname'] );
+		$this->assertEquals( 0, $this->filtered_setting_current_user_ids['blogdescription'] );
+		$this->assertEquals( self::$subscriber_user_id, $this->filtered_setting_current_user_ids['scratchpad'] );
+		$this->assertEquals( $other_admin_user_id, $this->filtered_setting_current_user_ids['background_color'] );
+		$this->assertEquals( 'Subscriber Scratch', get_option( 'scratchpad' ) );
+	}
+
+	/**
+	 * Test writing changesets and publishing with users who can unfiltered_html and those who cannot.
+	 *
+	 * @ticket 38705
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_save_changeset_post_with_varying_unfiltered_html_cap() {
+		global $wp_customize;
+		grant_super_admin( self::$admin_user_id );
+		$this->assertTrue( user_can( self::$admin_user_id, 'unfiltered_html' ) );
+		$this->assertFalse( user_can( self::$subscriber_user_id, 'unfiltered_html' ) );
+		wp_set_current_user( 0 );
+		add_action( 'customize_register', array( $this, 'register_scratchpad_setting' ) );
+
+		// Attempt scratchpad with user who has unfiltered_html.
+		update_option( 'scratchpad', '' );
+		$wp_customize = new WP_Customize_Manager();
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->set_post_value( 'scratchpad', 'Unfiltered<script>evil</script>' );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'user_id' => self::$admin_user_id,
+		) );
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $wp_customize->changeset_uuid() ) );
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->save_changeset_post( array( 'status' => 'publish' ) );
+		$this->assertEquals( 'Unfiltered<script>evil</script>', get_option( 'scratchpad' ) );
+
+		// Attempt scratchpad with user who doesn't have unfiltered_html.
+		update_option( 'scratchpad', '' );
+		$wp_customize = new WP_Customize_Manager();
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->set_post_value( 'scratchpad', 'Unfiltered<script>evil</script>' );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'user_id' => self::$subscriber_user_id,
+		) );
+		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $wp_customize->changeset_uuid() ) );
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->save_changeset_post( array( 'status' => 'publish' ) );
+		$this->assertEquals( 'Unfilteredevil', get_option( 'scratchpad' ) );
+
+		// Attempt publishing scratchpad as anonymous user when changeset was set by privileged user.
+		update_option( 'scratchpad', '' );
+		$wp_customize = new WP_Customize_Manager();
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->set_post_value( 'scratchpad', 'Unfiltered<script>evil</script>' );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'user_id' => self::$admin_user_id,
+		) );
+		$changeset_post_id = $wp_customize->changeset_post_id();
+		wp_set_current_user( 0 );
+		$wp_customize = null;
+		unset( $GLOBALS['wp_actions']['customize_register'] );
+		$this->assertEquals( 'Unfilteredevil', apply_filters( 'content_save_pre', 'Unfiltered<script>evil</script>' ) );
+		wp_publish_post( $changeset_post_id ); // @todo If wp_update_post() is used here, then kses will corrupt the post_content.
+		$this->assertEquals( 'Unfiltered<script>evil</script>', get_option( 'scratchpad' ) );
+	}
+
+	/**
+	 * Register scratchpad setting.
+	 *
+	 * @param WP_Customize_Manager $wp_customize Manager.
+	 */
+	function register_scratchpad_setting( WP_Customize_Manager $wp_customize ) {
+		$wp_customize->add_setting( 'scratchpad', array(
+			'type' => 'option',
+			'capability' => 'exist',
+			'sanitize_callback' => array( $this, 'filter_sanitize_scratchpad' ),
+		) );
+	}
+
+	/**
+	 * Sanitize scratchpad as if it is post_content so kses filters apply.
+	 *
+	 * @param string $value Value.
+	 * @return string Value.
+	 */
+	function filter_sanitize_scratchpad( $value ) {
+		return apply_filters( 'content_save_pre', $value );
+	}
+
+	/**
+	 * Current user when settings are filtered.
+	 *
+	 * @var array
+	 */
+	protected $filtered_setting_current_user_ids = array();
+
+	/**
+	 * Filter setting to capture the current user when the filter applies.
+	 *
+	 * @param mixed                $value   Setting value.
+	 * @param WP_Customize_Setting $setting Setting.
+	 * @return mixed Value.
+	 */
+	function filter_customize_setting_to_log_current_user( $value, $setting ) {
+		$this->filtered_setting_current_user_ids[ $setting->id ] = get_current_user_id();
+		return $value;
 	}
 
 	/**
