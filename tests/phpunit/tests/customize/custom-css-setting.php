@@ -79,7 +79,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->assertTrue( post_type_exists( 'custom_css' ) );
 		$this->assertEquals( 'custom_css', $this->setting->type );
 		$this->assertEquals( 'twentysixteen', $this->setting->stylesheet );
-		$this->assertEquals( 'unfiltered_css', $this->setting->capability );
+		$this->assertEquals( 'edit_css', $this->setting->capability );
 
 		$exception = null;
 		try {
