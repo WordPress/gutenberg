@@ -7,14 +7,14 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 	public function test_wp_update_term_taxonomy_does_not_exist() {
 		$found = wp_update_term( 1, 'bar' );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'invalid_taxonomy', $found->get_error_code() );
 	}
 
 	public function test_wp_update_term_term_empty_string_should_return_wp_error() {
 		$found = wp_update_term( '', 'post_tag' );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'invalid_term', $found->get_error_code() );
 	}
 
@@ -60,7 +60,7 @@ class Tests_Term_WpUpdateTerm extends WP_UnitTestCase {
 			'name' => '',
 		) );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'empty_term_name', $found->get_error_code() );
 		_unregister_taxonomy( 'wptests_tax' );
 	}

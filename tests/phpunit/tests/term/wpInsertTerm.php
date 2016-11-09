@@ -48,7 +48,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 	public function test_wp_insert_term_taxonomy_does_not_exist() {
 		$found = wp_insert_term( 'foo', 'bar' );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'invalid_taxonomy', $found->get_error_code() );
 	}
 
@@ -57,21 +57,21 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$found = wp_insert_term( 'foo', 'post_tag' );
 		remove_filter( 'pre_insert_term', array( $this, '_pre_insert_term_callback' ) );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'custom_error', $found->get_error_code() );
 	}
 
 	public function test_wp_insert_term_term_0() {
 		$found = wp_insert_term( 0, 'post_tag' );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'invalid_term_id', $found->get_error_code() );
 	}
 
 	public function test_wp_insert_term_term_trims_to_empty_string() {
 		$found = wp_insert_term( '  ', 'post_tag' );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'empty_term_name', $found->get_error_code() );
 	}
 
@@ -80,7 +80,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 			'parent' => 999999,
 		) );
 
-		$this->assertTrue( is_wp_error( $found ) );
+		$this->assertWPError( $found );
 		$this->assertSame( 'missing_parent', $found->get_error_code() );
 	}
 
@@ -170,7 +170,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 
 		// Test an existing term name
 		$term2 = self::factory()->tag->create( array( 'name' => 'Bozo' ) );
-		$this->assertTrue( is_wp_error( $term2 ) );
+		$this->assertWPError( $term2 );
 		$this->assertNotEmpty( $term2->errors );
 
 		// Test named terms ending in special characters
@@ -179,7 +179,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$term5 = self::factory()->tag->create( array( 'name' => 'T$$$' ) );
 		$term6 = self::factory()->tag->create( array( 'name' => 'T$$$$' ) );
 		$term7 = self::factory()->tag->create( array( 'name' => 'T$$$$' ) );
-		$this->assertTrue( is_wp_error( $term7 ) );
+		$this->assertWPError( $term7 );
 		$this->assertNotEmpty( $term7->errors );
 		$this->assertEquals( $term6, $term7->error_data['term_exists'] );
 
@@ -192,7 +192,7 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$term10 = self::factory()->tag->create( array( 'name' => '$$$' ) );
 		$term11 = self::factory()->tag->create( array( 'name' => '$$$$' ) );
 		$term12 = self::factory()->tag->create( array( 'name' => '$$$$' ) );
-		$this->assertTrue( is_wp_error( $term12 ) );
+		$this->assertWPError( $term12 );
 		$this->assertNotEmpty( $term12->errors );
 		$this->assertEquals( $term11, $term12->error_data['term_exists'] );
 
@@ -202,17 +202,17 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$term13 = self::factory()->tag->create( array( 'name' => 'A' ) );
 		$this->assertNotWPError( $term13 );
 		$term14 = self::factory()->tag->create( array( 'name' => 'A' ) );
-		$this->assertTrue( is_wp_error( $term14 ) );
+		$this->assertWPError( $term14 );
 		$term15 = self::factory()->tag->create( array( 'name' => 'A+', 'slug' => 'a' ) );
 		$this->assertNotWPError( $term15 );
 		$term16 = self::factory()->tag->create( array( 'name' => 'A+' ) );
-		$this->assertTrue( is_wp_error( $term16 ) );
+		$this->assertWPError( $term16 );
 		$term17 = self::factory()->tag->create( array( 'name' => 'A++' ) );
 		$this->assertNotWPError( $term17 );
 		$term18 = self::factory()->tag->create( array( 'name' => 'A-', 'slug' => 'a' ) );
 		$this->assertNotWPError( $term18 );
 		$term19 = self::factory()->tag->create( array( 'name' => 'A-' ) );
-		$this->assertTrue( is_wp_error( $term19 ) );
+		$this->assertWPError( $term19 );
 		$term20 = self::factory()->tag->create( array( 'name' => 'A--' ) );
 		$this->assertNotWPError( $term20 );
 	}

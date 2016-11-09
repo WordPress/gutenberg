@@ -29,7 +29,7 @@ class Tests_Import_Parser extends WP_Import_UnitTestCase {
 		foreach ( array( 'WXR_Parser_SimpleXML', 'WXR_Parser_XML' ) as $p ) {
 			$parser = new $p;
 			$result = $parser->parse($file);
-			$this->assertTrue( is_wp_error( $result ) );
+			$this->assertWPError( $result );
 			$this->assertEquals( 'There was an error when reading this WXR file', $result->get_error_message() );
 		}
 	}
@@ -42,7 +42,7 @@ class Tests_Import_Parser extends WP_Import_UnitTestCase {
 			foreach ( array( $f1, $f2 ) as $file ) {
 				$parser = new $p;
 				$result = $parser->parse( $file );
-				$this->assertTrue( is_wp_error( $result ) );
+				$this->assertWPError( $result );
 				$this->assertEquals( 'This does not appear to be a WXR file, missing/invalid WXR version number', $result->get_error_message() );
 			}
 		}

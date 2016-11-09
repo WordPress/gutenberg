@@ -131,13 +131,13 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 	function test_redirections_greater() {
 		// 10 > 5
 		$res = wp_remote_request($this->redirection_script . '?rt=' . 10, array('redirection' => 5) );
-		$this->assertTrue( is_wp_error($res), print_r($res, true) );
+		$this->assertWPError( $res );
 	}
 
 	function test_redirections_greater_edgecase() {
 		// 6 > 5 (close edgecase)
 		$res = wp_remote_request($this->redirection_script . '?rt=' . 6, array('redirection' => 5) );
-		$this->assertTrue( is_wp_error($res) );
+		$this->assertWPError( $res );
 	}
 
 	function test_redirections_less_edgecase() {
@@ -387,7 +387,7 @@ abstract class WP_HTTP_UnitTestCase extends WP_UnitTestCase {
 			$this->markTestSkipped( 'This install of PHP does not support SSL' );
 
 		$res = wp_remote_get( 'https://wordpress.org/' );
-		$this->assertTrue( ! is_wp_error( $res ), print_r( $res, true ) );
+		$this->assertNotWPError( $res );
 	}
 
 	/**

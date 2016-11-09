@@ -143,7 +143,7 @@ class Tests_Term_GetTheTerms extends WP_UnitTestCase {
 	function test_get_the_terms_should_return_wp_error_when_taxonomy_is_unregistered() {
 		$p = self::$post_ids[0];
 		$terms = get_the_terms( $p, 'this-taxonomy-does-not-exist' );
-		$this->assertTrue( is_wp_error( $terms ) );
+		$this->assertWPError( $terms );
 	}
 
 	/**

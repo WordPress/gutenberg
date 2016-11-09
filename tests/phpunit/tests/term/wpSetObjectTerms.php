@@ -165,7 +165,7 @@ class Tests_Term_WpSetObjectTerms extends WP_UnitTestCase {
 	function test_set_object_terms_invalid() {
 		// bogus taxonomy
 		$result = wp_set_object_terms( self::$post_ids[0], array(rand_str()), rand_str() );
-		$this->assertTrue( is_wp_error($result) );
+		$this->assertWPError( $result );
 	}
 
 	public function test_wp_set_object_terms_append_true() {

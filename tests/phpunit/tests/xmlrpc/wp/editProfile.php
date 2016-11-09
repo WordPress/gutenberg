@@ -51,7 +51,7 @@ class Tests_XMLRPC_wp_editProfile extends WP_XMLRPC_UnitTestCase {
         $auth_old = wp_authenticate( 'author', 'author' );
         $auth_new = wp_authenticate( 'author', $new_pass );
         $this->assertInstanceOf( 'WP_User', $auth_old );
-        $this->assertTrue( is_wp_error( $auth_new ) );
+        $this->assertWPError( $auth_new );
     }
 
     function test_ignore_email_change() {

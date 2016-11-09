@@ -9,7 +9,7 @@ class Tests_General_Errors extends WP_UnitTestCase {
 	function test_create_error() {
 		$error = new WP_Error( 'foo', 'message', 'data' );
 
-		$this->assertTrue( is_wp_error( $error ) );
+		$this->assertWPError( $error );
 		$this->assertEquals( 'foo', $error->get_error_code() );
 		$this->assertEquals( 'message', $error->get_error_message() );
 		$this->assertEquals( 'data', $error->get_error_data() );
@@ -19,7 +19,7 @@ class Tests_General_Errors extends WP_UnitTestCase {
 		$error = new WP_Error();
 		$error->add( 'foo', 'message', 'data' );
 
-		$this->assertTrue( is_wp_error( $error ) );
+		$this->assertWPError( $error );
 		$this->assertEquals( 'foo', $error->get_error_code() );
 		$this->assertEquals( 'message', $error->get_error_message() );
 		$this->assertEquals( 'data', $error->get_error_data() );
@@ -30,7 +30,7 @@ class Tests_General_Errors extends WP_UnitTestCase {
 		$error->add( 'foo', 'foo message', 'foo data' );
 		$error->add( 'bar', 'bar message', 'bar data' );
 
-		$this->assertTrue( is_wp_error( $error ) );
+		$this->assertWPError( $error );
 		$this->assertEquals( 'foo', $error->get_error_code() );
 		$this->assertEquals( 'foo message', $error->get_error_message() );
 		$this->assertEquals( 'foo data', $error->get_error_data() );

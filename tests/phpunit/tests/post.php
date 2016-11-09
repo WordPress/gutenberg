@@ -381,7 +381,7 @@ class Tests_Post extends WP_UnitTestCase {
 
 		// Test both return paths with or without WP_Error
 		$insert_post = wp_insert_post( $post, true );
-		$this->assertTrue( is_wp_error( $insert_post ), 'Did not get a WP_Error back from wp_insert_post' );
+		$this->assertWPError( $insert_post );
 		$this->assertEquals( 'invalid_date', $insert_post->get_error_code() );
 
 		$insert_post = wp_insert_post( $post );
