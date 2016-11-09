@@ -12,6 +12,7 @@
 class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	protected static $user;
 	protected static $editor;
+	protected static $site;
 
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$user = $factory->user->create( array(
@@ -21,11 +22,19 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 			'role'       => 'editor',
 			'user_email' => 'editor@example.com',
 		) );
+
+		if ( is_multisite() ) {
+			self::$site = $factory->blog->create( array( 'domain' => 'rest.wordpress.org', 'path' => '/' ) );
+		}
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$user );
 		self::delete_user( self::$editor );
+
+		if ( is_multisite() ) {
+			wpmu_delete_blog( self::$site, true );
+		}
 	}
 
 	/**
@@ -704,6 +713,142 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'http://example.com', $data['url'] );
 		$this->assertEquals( array( 'editor' ), $data['roles'] );
 		$this->check_add_edit_user_response( $response );
+	}
+
+	public function test_create_new_network_user_on_site_does_not_add_user_to_sub_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test requires multisite.' );
+		}
+
+		$this->allow_user_to_manage_multisite();
+
+		$params = array(
+			'username' => 'testuser123',
+			'password' => 'testpassword',
+			'email'    => 'test@example.com',
+			'name'     => 'Test User 123',
+			'roles'    => array( 'editor' ),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$user_id = $data['id'];
+
+		$user_is_member = is_user_member_of_blog( $user_id, self::$site );
+
+		wpmu_delete_user( $user_id );
+
+		$this->assertFalse( $user_is_member );
+	}
+
+	public function test_create_new_network_user_on_sub_site_adds_user_to_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test requires multisite.' );
+		}
+
+		$this->allow_user_to_manage_multisite();
+
+		$params = array(
+			'username' => 'testuser123',
+			'password' => 'testpassword',
+			'email'    => 'test@example.com',
+			'name'     => 'Test User 123',
+			'roles'    => array( 'editor' ),
+		);
+
+		switch_to_blog( self::$site );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$user_id = $data['id'];
+
+		restore_current_blog();
+
+		$user_is_member = is_user_member_of_blog( $user_id, self::$site );
+
+		wpmu_delete_user( $user_id );
+
+		$this->assertTrue( $user_is_member );
+	}
+
+	public function test_create_existing_network_user_on_sub_site_has_error() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test requires multisite.' );
+		}
+
+		$this->allow_user_to_manage_multisite();
+
+		$params = array(
+			'username' => 'testuser123',
+			'password' => 'testpassword',
+			'email'    => 'test@example.com',
+			'name'     => 'Test User 123',
+			'roles'    => array( 'editor' ),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$user_id = $data['id'];
+
+		switch_to_blog( self::$site );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$switched_response = $this->server->dispatch( $request );
+
+		restore_current_blog();
+
+		wpmu_delete_user( $user_id );
+
+		$this->assertErrorResponse( 'user_name', $switched_response );
+	}
+
+	public function test_update_existing_network_user_on_sub_site_adds_user_to_site() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test requires multisite.' );
+		}
+
+		$this->allow_user_to_manage_multisite();
+
+		$params = array(
+			'username' => 'testuser123',
+			'password' => 'testpassword',
+			'email'    => 'test@example.com',
+			'name'     => 'Test User 123',
+			'roles'    => array( 'editor' ),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$user_id = $data['id'];
+
+		switch_to_blog( self::$site );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/users/' . $user_id );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( $params );
+		$this->server->dispatch( $request );
+
+		restore_current_blog();
+
+		$user_is_member = is_user_member_of_blog( $user_id, self::$site );
+
+		wpmu_delete_user( $user_id );
+
+		$this->assertTrue( $user_is_member );
 	}
 
 	public function test_json_create_user() {
