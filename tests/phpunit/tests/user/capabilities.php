@@ -237,7 +237,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_post_tags'       => array( 'administrator', 'editor' ),
 			'edit_post_tags'         => array( 'administrator', 'editor' ),
 			'delete_post_tags'       => array( 'administrator', 'editor' ),
-			'unfiltered_css'         => array( 'administrator', 'editor' ),
+			'edit_css'               => array( 'administrator', 'editor' ),
 
 			'assign_categories'      => array( 'administrator', 'editor', 'author', 'contributor' ),
 			'assign_post_tags'       => array( 'administrator', 'editor', 'author', 'contributor' ),
@@ -256,7 +256,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_network_options' => array(),
 			'upload_plugins'         => array(),
 			'upload_themes'          => array(),
-			'unfiltered_css'         => array(),
+			'edit_css'               => array(),
 
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
