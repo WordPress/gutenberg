@@ -1025,6 +1025,49 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->check_create_post_response( $response );
 	}
 
+	/**
+	 * @ticket 38698
+	 */
+	public function test_create_item_with_template() {
+		wp_set_current_user( self::$editor_id );
+		add_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'template' => 'post-my-test-template.php',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$post_template = get_page_template_slug( get_post( $data['id'] ) );
+
+		remove_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
+
+		$this->assertEquals( 'post-my-test-template.php', $data['template'] );
+		$this->assertEquals( 'post-my-test-template.php', $post_template );
+	}
+
+	/**
+	 * @ticket 38698
+	 */
+	public function test_create_item_with_template_none_available() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'template' => 'post-my-test-template.php',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$post_template = get_page_template_slug( get_post( $data['id'] ) );
+
+		$this->assertEquals( '', $data['template'] );
+		$this->assertEquals( '', $post_template );
+	}
+
 	public function test_rest_create_item() {
 		wp_set_current_user( self::$editor_id );
 
@@ -2317,7 +2360,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 23, count( $properties ) );
+		$this->assertEquals( 24, count( $properties ) );
 		$this->assertArrayHasKey( 'author', $properties );
 		$this->assertArrayHasKey( 'comment_status', $properties );
 		$this->assertArrayHasKey( 'content', $properties );
@@ -2337,6 +2380,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'sticky', $properties );
+		$this->assertArrayHasKey( 'template', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
 		$this->assertArrayHasKey( 'tags', $properties );
@@ -2469,4 +2513,9 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		return $query;
 	}
 
+	public function filter_theme_post_templates( $post_templates ) {
+		return array(
+			'post-my-test-template.php' => 'My Test Template',
+		);
+	}
 }

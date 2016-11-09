@@ -1041,7 +1041,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 23, count( $properties ) );
+		$this->assertEquals( 24, count( $properties ) );
 		$this->assertArrayHasKey( 'author', $properties );
 		$this->assertArrayHasKey( 'alt_text', $properties );
 		$this->assertArrayHasKey( 'caption', $properties );
@@ -1067,6 +1067,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'source_url', $properties );
+		$this->assertArrayHasKey( 'template', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'raw', $properties['title']['properties'] );
 		$this->assertArrayHasKey( 'rendered', $properties['title']['properties'] );
