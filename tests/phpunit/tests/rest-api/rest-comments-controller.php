@@ -929,7 +929,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( 'author_email', $data['data']['params'] );
 	}
 
-	public function test_create_item_invalid_blank_content() {
+	public function test_create_item_invalid_no_content() {
 		wp_set_current_user( 0 );
 
 		$params = array(
@@ -937,13 +937,17 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'author_name'  => 'Reverend Lovejoy',
 			'author_email' => 'lovejoy@example.com',
 			'author_url'   => 'http://timothylovejoy.jr',
-			'content'      => '',
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 		$request->add_header( 'content-type', 'application/json' );
 		$request->set_body( wp_json_encode( $params ) );
 
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
+
+		$params['content'] = '';
+		$request->set_body( wp_json_encode( $params ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
 	}
@@ -1616,6 +1620,25 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals( mysql_to_rfc3339( $updated->comment_date ), $comment['date'] );
 		$this->assertEquals( '2014-11-07T10:14:25', $comment['date'] );
+	}
+
+	public function test_update_item_no_content() {
+		$post_id = $this->factory->post->create();
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->set_param( 'author_email', 'another@email.com' );
+
+		// Sending a request without content is fine.
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		// Sending a request with empty comment is not fine.
+		$request->set_param( 'author_email', 'yetanother@email.com' );
+		$request->set_param( 'content', '' );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_content_invalid', $response, 400 );
 	}
 
 	public function test_update_comment_status() {
