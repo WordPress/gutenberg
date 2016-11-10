@@ -10,16 +10,28 @@
  * @group restapi
  */
 class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
+	protected static $superadmin;
 	protected static $administrator;
+	protected static $editor;
 	protected static $subscriber;
 
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$superadmin = $factory->user->create( array(
+			'role'       => 'administrator',
+			'user_login' => 'superadmin',
+		) );
 		self::$administrator = $factory->user->create( array(
 			'role' => 'administrator',
+		) );
+		self::$editor = $factory->user->create( array(
+			'role' => 'editor',
 		) );
 		self::$subscriber = $factory->user->create( array(
 			'role' => 'subscriber',
 		) );
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( 'superadmin' ) );
+		}
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -615,6 +627,103 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$request->set_param( 'parent', REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_taxonomy_not_hierarchical', $response, 400 );
+	}
+
+	public function verify_tag_roundtrip( $input = array(), $expected_output = array() ) {
+		// Create the tag
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags' );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertEquals( $expected_output['name'], $actual_output['name'] );
+		$this->assertEquals( $expected_output['description'], $actual_output['description'] );
+
+		// Compare expected API output to WP internal values
+		$tag = get_term_by( 'id', $actual_output['id'], 'post_tag' );
+		$this->assertEquals( $expected_output['name'], $tag->name );
+		$this->assertEquals( $expected_output['description'], $tag->description );
+
+		// Update the tag
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/tags/%d', $actual_output['id'] ) );
+		foreach ( $input as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$actual_output = $response->get_data();
+
+		// Compare expected API output to actual API output
+		$this->assertEquals( $expected_output['name'], $actual_output['name'] );
+		$this->assertEquals( $expected_output['description'], $actual_output['description'] );
+
+		// Compare expected API output to WP internal values
+		$tag = get_term_by( 'id', $actual_output['id'], 'post_tag' );
+		$this->assertEquals( $expected_output['name'], $tag->name );
+		$this->assertEquals( $expected_output['description'], $tag->description );
+	}
+
+	public function test_tag_roundtrip_as_editor() {
+		wp_set_current_user( self::$editor );
+		$this->assertEquals( ! is_multisite(), current_user_can( 'unfiltered_html' ) );
+		$this->verify_tag_roundtrip( array(
+			'name'        => '\o/ ¯\_(ツ)_/¯',
+			'description' => '\o/ ¯\_(ツ)_/¯',
+		), array(
+			'name'        => '\o/ ¯\_(ツ)_/¯',
+			'description' => '\o/ ¯\_(ツ)_/¯',
+		) );
+	}
+
+	public function test_tag_roundtrip_as_editor_html() {
+		wp_set_current_user( self::$editor );
+		if ( is_multisite() ) {
+			$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+			$this->verify_tag_roundtrip( array(
+				'name'        => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'description' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'name'        => 'div strong',
+				'description' => 'div <strong>strong</strong>',
+			) );
+		} else {
+			$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+			$this->verify_tag_roundtrip( array(
+				'name'        => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+				'description' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			), array(
+				'name'        => 'div strong',
+				'description' => 'div <strong>strong</strong> oh noes',
+			) );
+		}
+	}
+
+	public function test_tag_roundtrip_as_superadmin() {
+		wp_set_current_user( self::$superadmin );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$this->verify_tag_roundtrip( array(
+			'name'        => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+			'description' => '\\\&\\\ &amp; &invalid; < &lt; &amp;lt;',
+		), array(
+			'name'        => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+			'description' => '\\\&amp;\\\ &amp; &amp;invalid; &lt; &lt; &amp;lt;',
+		) );
+	}
+
+	public function test_tag_roundtrip_as_superadmin_html() {
+		wp_set_current_user( self::$superadmin );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$this->verify_tag_roundtrip( array(
+			'name'        => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+			'description' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
+		), array(
+			'name'        => 'div strong',
+			'description' => 'div <strong>strong</strong> oh noes',
+		) );
 	}
 
 	public function test_delete_item() {
