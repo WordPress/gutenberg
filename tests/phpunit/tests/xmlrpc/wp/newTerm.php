@@ -4,14 +4,13 @@
  * @group xmlrpc
  */
 class Tests_XMLRPC_wp_newTerm extends WP_XMLRPC_UnitTestCase {
-	var $parent_term;
 
-	function setUp() {
-		parent::setUp();
+	protected static $parent_term_id;
 
-		$this->parent_term = wp_insert_term( 'parent' . rand_str(), 'category' );
-		$this->assertInternalType( 'array', $this->parent_term );
-		$this->parent_term = $this->parent_term['term_id'];
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$parent_term_id = $factory->term->create( array(
+			'taxonomy' => 'category',
+		) );
 	}
 
 	function test_invalid_username_password() {
@@ -59,7 +58,7 @@ class Tests_XMLRPC_wp_newTerm extends WP_XMLRPC_UnitTestCase {
 	function test_parent_for_nonhierarchical() {
 		$this->make_user_by_role( 'editor' );
 
-		$result = $this->myxmlrpcserver->wp_newTerm( array( 1, 'editor', 'editor', array( 'taxonomy' => 'post_tag', 'parent' => $this->parent_term, 'name' => 'test' ) ) );
+		$result = $this->myxmlrpcserver->wp_newTerm( array( 1, 'editor', 'editor', array( 'taxonomy' => 'post_tag', 'parent' => self::$parent_term_id, 'name' => 'test' ) ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
 		$this->assertEquals( __( 'This taxonomy is not hierarchical.' ), $result->message );
@@ -94,7 +93,7 @@ class Tests_XMLRPC_wp_newTerm extends WP_XMLRPC_UnitTestCase {
 	function test_add_term_with_parent() {
 		$this->make_user_by_role( 'editor' );
 
-		$result  = $this->myxmlrpcserver->wp_newTerm( array( 1, 'editor', 'editor', array( 'taxonomy' => 'category', 'parent' => $this->parent_term, 'name' => 'test' ) ) );
+		$result  = $this->myxmlrpcserver->wp_newTerm( array( 1, 'editor', 'editor', array( 'taxonomy' => 'category', 'parent' => self::$parent_term_id, 'name' => 'test' ) ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 		$this->assertStringMatchesFormat( '%d', $result );
 	}
@@ -102,7 +101,7 @@ class Tests_XMLRPC_wp_newTerm extends WP_XMLRPC_UnitTestCase {
 	function test_add_term_with_all() {
 		$this->make_user_by_role( 'editor' );
 
-		$taxonomy = array( 'taxonomy' => 'category', 'parent' => $this->parent_term, 'name' => 'test_all', 'description' => 'Test all', 'slug' => 'test_all' );
+		$taxonomy = array( 'taxonomy' => 'category', 'parent' => self::$parent_term_id, 'name' => 'test_all', 'description' => 'Test all', 'slug' => 'test_all' );
 		$result  = $this->myxmlrpcserver->wp_newTerm( array( 1, 'editor', 'editor', $taxonomy ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 		$this->assertStringMatchesFormat( '%d', $result );

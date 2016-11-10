@@ -7,33 +7,31 @@
  * @group user
  */
 class Tests_User_Author_Template extends WP_UnitTestCase {
-	protected $author_id = 0;
-	protected $post_id = 0;
+	protected static $author_id = 0;
+	protected static $post_id = 0;
 
 	private $permalink_structure;
 
-	function setUp() {
-		parent::setUp();
-
-		$this->author_id = self::factory()->user->create( array(
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$author_id = $factory->user->create( array(
 			'role' => 'author',
 			'user_login' => 'test_author',
 			'description' => 'test_author',
 		) );
-		$user = new WP_User( $this->author_id );
 
-		$post = array(
-			'post_author' => $this->author_id,
+		self::$post_id = $factory->post->create( array(
+			'post_author' => self::$author_id,
 			'post_status' => 'publish',
 			'post_content' => rand_str(),
 			'post_title' => rand_str(),
 			'post_type' => 'post'
-		);
+		) );
+	}
 
-		// insert a post and make sure the ID is ok
-		$this->post_id = self::factory()->post->create( $post );
+	function setUp() {
+		parent::setUp();
 
-		setup_postdata( get_post( $this->post_id ) );
+		setup_postdata( get_post( self::$post_id ) );
 	}
 
 	function tearDown() {
@@ -43,7 +41,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 
 	function test_get_the_author() {
 		$author_name = get_the_author();
-		$user = new WP_User( $this->author_id );
+		$user = new WP_User( self::$author_id );
 
 		$this->assertEquals( $user->display_name, $author_name );
 		$this->assertEquals( 'test_author', $author_name );
@@ -56,14 +54,14 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 
 		$this->assertEquals( 'test_author', get_the_author_meta( 'description' ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
-		add_user_meta( $this->author_id, 'user_description', 'user description' );
-		$this->assertEquals( 'user description', get_user_meta( $this->author_id, 'user_description', true ) );
+		add_user_meta( self::$author_id, 'user_description', 'user description' );
+		$this->assertEquals( 'user description', get_user_meta( self::$author_id, 'user_description', true ) );
 		// user_description in meta is ignored. The content of description is returned instead.
 		// See #20285
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'description' ) );
-		update_user_meta( $this->author_id, 'user_description', '' );
-		$this->assertEquals( '', get_user_meta( $this->author_id, 'user_description', true ) );
+		update_user_meta( self::$author_id, 'user_description', '' );
+		$this->assertEquals( '', get_user_meta( self::$author_id, 'user_description', true ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'user_description' ) );
 		$this->assertEquals( 'test_author', get_the_author_meta( 'description' ) );
 
@@ -80,7 +78,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 	function test_get_the_author_posts() {
 		// Test with no global post, result should be 0 because no author is found
 		$this->assertEquals( 0, get_the_author_posts() );
-		$GLOBALS['post'] = $this->post_id;
+		$GLOBALS['post'] = self::$post_id;
 		$this->assertEquals( 1, get_the_author_posts() );
 	}
 
@@ -91,7 +89,7 @@ class Tests_User_Author_Template extends WP_UnitTestCase {
 		register_post_type( 'wptests_pt' );
 
 		$cpt_ids = self::factory()->post->create_many( 2, array(
-			'post_author' => $this->author_id,
+			'post_author' => self::$author_id,
 			'post_type'   => 'wptests_pt',
 		) );
 		$GLOBALS['post'] = $cpt_ids[0];

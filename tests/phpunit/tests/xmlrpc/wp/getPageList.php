@@ -4,23 +4,18 @@
  * @group xmlrpc
  */
 class Tests_XMLRPC_wp_getPageList extends WP_XMLRPC_UnitTestCase {
-	var $post_data;
-	var $post_id;
-	var $post_date_ts;
+	protected static $post_id;
 
-	function setUp() {
-		parent::setUp();
-
-		$this->post_date_ts = strtotime( '+1 day' );
-		$this->post_data = array(
-			'post_type' => 'page',
-			'post_title' => rand_str(),
-			'post_content' => rand_str( 2000 ),
-			'post_excerpt' => rand_str( 100 ),
-			'post_author' => $this->make_user_by_role( 'author' ),
-			'post_date'  => strftime( "%Y-%m-%d %H:%M:%S", $this->post_date_ts ),
-		);
-		$this->post_id = wp_insert_post( $this->post_data );
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$post_id = $factory->post->create( array(
+			'post_type'   => 'page',
+			'post_author' => $factory->user->create( array(
+				'user_login' => 'author',
+				'user_pass'  => 'author',
+				'role'       => 'author'
+			) ),
+			'post_date'   => strftime( "%Y-%m-%d %H:%M:%S", strtotime( '+1 day' ) ),
+		) );
 	}
 
 	function test_invalid_username_password() {

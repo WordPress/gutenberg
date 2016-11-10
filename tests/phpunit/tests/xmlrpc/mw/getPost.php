@@ -4,27 +4,21 @@
  * @group xmlrpc
  */
 class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
-	var $post_data;
-	var $post_id;
-	var $post_date_ts;
+	protected static $post_id;
 
-	function setUp() {
-		parent::setUp();
-
-		$author_id = $this->make_user_by_role( 'author' );
-		$this->post_date_ts = strtotime( '+1 day' );
-		$this->post_data = array(
-			'post_title' => rand_str(),
-			'post_content' => rand_str( 2000 ),
-			'post_excerpt' => rand_str( 100 ),
-			'post_author' => $author_id,
-			'post_date'  => strftime( "%Y-%m-%d %H:%M:%S", $this->post_date_ts ),
-		);
-		$this->post_id = wp_insert_post( $this->post_data );
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$post_id = $factory->post->create( array(
+			'post_author' => $factory->user->create( array(
+				'user_login' => 'author',
+				'user_pass'  => 'author',
+				'role'       => 'author'
+			) ),
+			'post_date'   => strftime( "%Y-%m-%d %H:%M:%S", strtotime( '+1 day' ) ),
+		) );
 	}
 
 	function test_invalid_username_password() {
-		$result = $this->myxmlrpcserver->mw_getPost( array( $this->post_id, 'username', 'password' ) );
+		$result = $this->myxmlrpcserver->mw_getPost( array( self::$post_id, 'username', 'password' ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 403, $result->code );
 	}
@@ -32,7 +26,7 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 	function test_incapable_user() {
 		$this->make_user_by_role( 'subscriber' );
 
-		$result = $this->myxmlrpcserver->mw_getPost( array( $this->post_id, 'subscriber', 'subscriber' ) );
+		$result = $this->myxmlrpcserver->mw_getPost( array( self::$post_id, 'subscriber', 'subscriber' ) );
 		$this->assertInstanceOf( 'IXR_Error', $result );
 		$this->assertEquals( 401, $result->code );
 	}
@@ -50,7 +44,7 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 		add_theme_support( 'post-thumbnails' );
 
 		$fields = array( 'post' );
-		$result = $this->myxmlrpcserver->mw_getPost( array( $this->post_id, 'author', 'author' ) );
+		$result = $this->myxmlrpcserver->mw_getPost( array( self::$post_id, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 
 		// Check data types
@@ -76,14 +70,15 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertInternalType( 'string', $result['wp_post_format'] );
 		$this->assertInternalType( 'bool',   $result['sticky'] );
 
+		$post_data = get_post( self::$post_id );
 
 		// Check expected values
 		$this->assertStringMatchesFormat( '%d', $result['userid'] );
-		$this->assertEquals( $this->post_data['post_title'], $result['title'] );
-		$this->assertEquals( 'draft', $result['post_status'] );
+		$this->assertEquals( $post_data->post_title, $result['title'] );
+		$this->assertEquals( 'publish', $result['post_status'] );
 		$this->assertStringMatchesFormat( '%d', $result['wp_author_id'] );
-		$this->assertEquals( $this->post_data['post_excerpt'], $result['mt_excerpt'] );
-		$this->assertEquals( url_to_postid( $result['link'] ), $this->post_id );
+		$this->assertEquals( $post_data->post_excerpt, $result['mt_excerpt'] );
+		$this->assertEquals( url_to_postid( $result['link'] ), self::$post_id );
 
 		$this->assertEquals( '', $result['wp_post_thumbnail'] );
 
@@ -97,10 +92,10 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 		$filename = ( DIR_TESTDATA.'/images/a2-small.jpg' );
 		$attachment_id = self::factory()->attachment->create_upload_object( $filename );
 
-		set_post_thumbnail( $this->post_id, $attachment_id );
+		set_post_thumbnail( self::$post_id, $attachment_id );
 
 		$fields = array( 'post' );
-		$result = $this->myxmlrpcserver->mw_getPost( array( $this->post_id, 'author', 'author' ) );
+		$result = $this->myxmlrpcserver->mw_getPost( array( self::$post_id, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 
 		$this->assertInternalType( 'string', $result['wp_post_thumbnail'] );
@@ -112,7 +107,7 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 
 	function test_date() {
 		$fields = array( 'post' );
-		$result = $this->myxmlrpcserver->mw_getPost( array( $this->post_id, 'author', 'author' ) );
+		$result = $this->myxmlrpcserver->mw_getPost( array( self::$post_id, 'author', 'author' ) );
 		$this->assertNotInstanceOf( 'IXR_Error', $result );
 
 		$this->assertInstanceOf( 'IXR_Date', $result['dateCreated'] );
@@ -120,11 +115,13 @@ class Tests_XMLRPC_mw_getPost extends WP_XMLRPC_UnitTestCase {
 		$this->assertInstanceOf( 'IXR_Date', $result['date_modified'] );
 		$this->assertInstanceOf( 'IXR_Date', $result['date_modified_gmt'] );
 
-		$this->assertEquals( $this->post_date_ts, $result['dateCreated']->getTimestamp() );
-		$this->assertEquals( $this->post_date_ts, $result['date_modified']->getTimestamp() );
+		$post_data = get_post( self::$post_id );
 
-		$post_date_gmt = strtotime( get_gmt_from_date( mysql2date( 'Y-m-d H:i:s', $this->post_data['post_date'], false ), 'Ymd\TH:i:s' ) );
-		$post_modified_gmt = strtotime( get_gmt_from_date( mysql2date( 'Y-m-d H:i:s', $this->post_data['post_date'], false ), 'Ymd\TH:i:s' ) );
+		$this->assertEquals( strtotime( $post_data->post_date ), $result['dateCreated']->getTimestamp() );
+		$this->assertEquals( strtotime( $post_data->post_date ), $result['date_modified']->getTimestamp() );
+
+		$post_date_gmt = strtotime( get_gmt_from_date( mysql2date( 'Y-m-d H:i:s', $post_data->post_date, false ), 'Ymd\TH:i:s' ) );
+		$post_modified_gmt = strtotime( get_gmt_from_date( mysql2date( 'Y-m-d H:i:s', $post_data->post_date, false ), 'Ymd\TH:i:s' ) );
 
 		$this->assertEquals( $post_date_gmt, $result['date_created_gmt']->getTimestamp() );
 		$this->assertEquals( $post_modified_gmt, $result['date_modified_gmt']->getTimestamp() );

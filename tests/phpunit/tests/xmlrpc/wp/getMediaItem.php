@@ -4,29 +4,28 @@
  * @group xmlrpc
  */
 class Tests_XMLRPC_wp_getMediaItem extends WP_XMLRPC_UnitTestCase {
-	var $post_id;
+	protected static $post_id;
+
 	var $attachment_data;
 	var $attachment_id;
+
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$post_id = $factory->post->create();
+	}
 
 	function setUp() {
 		parent::setUp();
 
 		add_theme_support( 'post-thumbnails' );
 
-		$this->post_id = wp_insert_post( array(
-			'post_title' => rand_str(),
-			'post_content' => rand_str(),
-			'post_status' => 'publish'
-		));
-
 		$filename = ( DIR_TESTDATA.'/images/waffles.jpg' );
 		$contents = file_get_contents( $filename );
 		$upload = wp_upload_bits(basename($filename), null, $contents);
 
-		$this->attachment_id = $this->_make_attachment( $upload, $this->post_id );
+		$this->attachment_id = $this->_make_attachment( $upload, self::$post_id );
 		$this->attachment_data = get_post( $this->attachment_id, ARRAY_A );
 
-		set_post_thumbnail( $this->post_id, $this->attachment_id );
+		set_post_thumbnail( self::$post_id, $this->attachment_id );
 	}
 
 	function tearDown() {
