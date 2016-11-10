@@ -688,7 +688,7 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 				'description' => '<div>div</div> <strong>strong</strong> <script>oh noes</script>',
 			), array(
 				'name'        => 'div strong',
-				'description' => 'div <strong>strong</strong>',
+				'description' => 'div <strong>strong</strong> oh noes',
 			) );
 		} else {
 			$this->assertTrue( current_user_can( 'unfiltered_html' ) );
