@@ -45,6 +45,7 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'Tags', $data['post_tag']['name'] );
 		$this->assertEquals( 'post_tag', $data['post_tag']['slug'] );
 		$this->assertEquals( false, $data['post_tag']['hierarchical'] );
+		$this->assertEquals( 'tags', $data['post_tag']['rest_base'] );
 	}
 
 	public function test_get_items_invalid_permission_for_context() {
@@ -134,7 +135,7 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 8, count( $properties ) );
+		$this->assertEquals( 9, count( $properties ) );
 		$this->assertArrayHasKey( 'capabilities', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'hierarchical', $properties );
@@ -143,6 +144,7 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'show_cloud', $properties );
 		$this->assertArrayHasKey( 'types', $properties );
+		$this->assertArrayHasKey( 'rest_base', $properties );
 	}
 
 	public function tearDown() {
@@ -168,6 +170,7 @@ class WP_Test_REST_Taxonomies_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( $tax_obj->name, $data['slug'] );
 		$this->assertEquals( $tax_obj->description, $data['description'] );
 		$this->assertEquals( $tax_obj->hierarchical, $data['hierarchical'] );
+		$this->assertEquals( $tax_obj->rest_base, $data['rest_base'] );
 		$this->assertEquals( rest_url( 'wp/v2/taxonomies' ), $links['collection'][0]['href'] );
 		$this->assertArrayHasKey( 'https://api.w.org/items', $links );
 		if ( 'edit' === $context ) {
