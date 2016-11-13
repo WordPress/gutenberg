@@ -168,6 +168,95 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test crud methods on WP_Customize_Custom_CSS_Setting.
+	 *
+	 * @covers WP_Customize_Custom_CSS_Setting::value()
+	 */
+	function test_value_filter() {
+		add_filter( 'customize_value_custom_css', array( $this, 'filter_value' ), 10, 2 );
+		$this->setting->default = '/*default*/';
+		$this->assertEquals( '/*default*//*filtered*/', $this->setting->value() );
+
+		$this->factory()->post->create( array(
+			'post_title' => $this->setting->stylesheet,
+			'post_name' => $this->setting->stylesheet,
+			'post_content' => '/*custom*/',
+			'post_status' => 'publish',
+			'post_type' => 'custom_css',
+		) );
+		$this->assertEquals( '/*custom*//*filtered*/', $this->setting->value() );
+
+		$this->wp_customize->set_post_value( $this->setting->id, '/*overridden*/' );
+		$this->setting->preview();
+		$this->assertEquals( '/*overridden*/', $this->setting->value(), 'Expected value to not be filtered since post value is present.' );
+	}
+
+	/**
+	 * Filter value.
+	 *
+	 * @param string $value                 Value.
+	 * @param WP_Customize_Setting $setting Setting.
+	 * @return string
+	 */
+	function filter_value( $value, $setting ) {
+		$this->assertInstanceOf( 'WP_Customize_Custom_CSS_Setting', $setting );
+		$value .= '/*filtered*/';
+		return $value;
+	}
+
+	/**
+	 * Test update filter on WP_Customize_Custom_CSS_Setting.
+	 *
+	 * @covers WP_Customize_Custom_CSS_Setting::update()
+	 */
+	function test_update_filter() {
+		$original_css = 'body { color:red; }';
+		$post_id = $this->factory()->post->create( array(
+			'post_title' => $this->setting->stylesheet,
+			'post_name' => $this->setting->stylesheet,
+			'post_content' => $original_css,
+			'post_status' => 'publish',
+			'post_type' => 'custom_css',
+		) );
+
+		$overridden_css = 'body { color:green; }';
+		$this->wp_customize->set_post_value( $this->setting->id, $overridden_css );
+
+		$post = get_post( $post_id );
+		$original_title = $post->post_title;
+
+		add_filter( 'customize_update_custom_css_post_content_args', array( $this, 'filter_update_post_content_args' ), 10, 3 );
+		$this->setting->save();
+
+		$post = get_post( $post_id );
+		$this->assertEquals( $original_title, $post->post_title );
+		$this->assertContains( $overridden_css, $post->post_content );
+		$this->assertContains( '/* filtered post_content */', $post->post_content );
+		$this->assertContains( '/* filtered post_content_filtered */', $post->post_content_filtered );
+	}
+
+	/**
+	 * Filter `customize_update_custom_css_post_content_args`.
+	 *
+	 * @param array                $args    Post array.
+	 * @param string               $css     CSS.
+	 * @param WP_Customize_Setting $setting Setting.
+	 * @return array Args.
+	 */
+	function filter_update_post_content_args( $args, $css, $setting ) {
+		$this->assertInternalType( 'array', $args );
+		$this->assertEqualSets( array( 'post_content', 'post_content_filtered' ), array_keys( $args ) );
+		$this->assertEquals( $css, $args['post_content'] );
+		$this->assertEquals( '', $args['post_content_filtered'] );
+		$this->assertInstanceOf( 'WP_Customize_Custom_CSS_Setting', $setting );
+
+		$args['post_content'] .= '/* filtered post_content */';
+		$args['post_content_filtered'] = '/* filtered post_content_filtered */';
+		$args['post_title'] = 'Ignored';
+		return $args;
+	}
+
+	/**
 	 * Tests that validation errors are caught appropriately.
 	 *
 	 * Note that the $validity \WP_Error object must be reset each time
