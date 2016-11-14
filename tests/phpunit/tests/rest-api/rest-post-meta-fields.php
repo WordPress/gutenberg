@@ -26,24 +26,29 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		register_meta( 'post', 'test_single', array(
 			'show_in_rest' => true,
 			'single' => true,
+			'type' => 'string',
 		));
 		register_meta( 'post', 'test_multi', array(
 			'show_in_rest' => true,
 			'single' => false,
+			'type' => 'string',
 		));
 		register_meta( 'post', 'test_bad_auth', array(
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_false',
+			'type' => 'string',
 		));
 		register_meta( 'post', 'test_bad_auth_multi', array(
 			'show_in_rest' => true,
 			'single' => false,
 			'auth_callback' => '__return_false',
+			'type' => 'string',
 		));
 		register_meta( 'post', 'test_no_rest', array() );
 		register_meta( 'post', 'test_rest_disabled', array(
 			'show_in_rest' => false,
+			'type' => 'string',
 		));
 		register_meta( 'post', 'test_custom_schema', array(
 			'single' => true,
@@ -54,9 +59,23 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 				),
 			),
 		));
+		register_meta( 'post', 'test_custom_schema_multi', array(
+			'single' => false,
+			'type' => 'integer',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type' => 'number',
+				),
+			),
+		));
 		register_meta( 'post', 'test_invalid_type', array(
 			'single' => true,
-			'type' => false,
+			'type' => 'lalala',
+			'show_in_rest' => true,
+		));
+		register_meta( 'post', 'test_no_type', array(
+			'single' => true,
+			'type' => null,
 			'show_in_rest' => true,
 		));
 
@@ -341,6 +360,24 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$wpdb->show_errors = true;
 	}
 
+	public function test_set_value_invalid_type() {
+		$values = get_post_meta( self::$post_id, 'test_invalid_type', false );
+		$this->assertEmpty( $values );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_invalid_type' => 'test_value',
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEmpty( get_post_meta( self::$post_id, 'test_invalid_type', false ) );
+	}
+
 	public function test_set_value_multiple() {
 		// Ensure no data exists currently.
 		$values = get_post_meta( self::$post_id, 'test_multi', false );
@@ -435,6 +472,92 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertEmpty( $meta );
 	}
 
+	public function test_set_value_invalid_value() {
+		register_meta( 'post', 'my_meta_key', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'string',
+		));
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'my_meta_key' => array( 'c', 'n' ),
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_set_value_invalid_value_multiple() {
+		register_meta( 'post', 'my_meta_key', array(
+			'show_in_rest' => true,
+			'single' => false,
+			'type' => 'string',
+		));
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'my_meta_key' => array( array( 'a' ) ),
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_set_value_sanitized() {
+		register_meta( 'post', 'my_meta_key', array(
+			'show_in_rest' => true,
+			'single' => true,
+			'type' => 'integer',
+		));
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'my_meta_key' => '1', // Set to a string.
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( 1, $data['meta']['my_meta_key'] );
+	}
+
+	public function test_set_value_csv() {
+		register_meta( 'post', 'my_meta_key', array(
+			'show_in_rest' => true,
+			'single' => false,
+			'type' => 'integer',
+		));
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'my_meta_key' => '1,2,3', // Set to a string.
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( array( 1, 2, 3 ), $data['meta']['my_meta_key'] );
+	}
+
 	/**
 	 * @depends test_set_value_multiple
 	 */
@@ -485,6 +608,79 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
 	}
 
+	/**
+	 * @depends test_get_value
+	 */
+	public function test_set_value_single_custom_schema() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( self::$post_id, 'test_custom_schema', false );
+		$this->assertEmpty( $values );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_custom_schema' => 3,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_schema', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 3, $meta[0] );
+
+		$data = $response->get_data();
+		$meta = (array) $data['meta'];
+		$this->assertArrayHasKey( 'test_custom_schema', $meta );
+		$this->assertEquals( 3, $meta['test_custom_schema'] );
+	}
+
+	public function test_set_value_multiple_custom_schema() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( self::$post_id, 'test_custom_schema_multi', false );
+		$this->assertEmpty( $values );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'test_custom_schema_multi' => array( 2 ),
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_schema_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 2, $meta[0] );
+
+		// Add another value.
+		$data = array(
+			'meta' => array(
+				'test_custom_schema_multi' => array( 2, 8 ),
+			),
+		);
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_schema_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 2, $meta );
+		$this->assertContains( 2, $meta );
+		$this->assertContains( 8, $meta );
+	}
+
 	public function test_remove_multi_value_db_error() {
 		add_post_meta( self::$post_id, 'test_multi', 'val1' );
 		$values = get_post_meta( self::$post_id, 'test_multi', false );
@@ -514,6 +710,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 
 		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
 	}
+
 
 	public function test_delete_value() {
 		add_post_meta( self::$post_id, 'test_single', 'val1' );
@@ -618,6 +815,7 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'test_no_rest', $meta_schema );
 		$this->assertArrayNotHasKey( 'test_rest_disabled', $meta_schema );
 		$this->assertArrayNotHasKey( 'test_invalid_type', $meta_schema );
+		$this->assertArrayNotHasKey( 'test_no_type', $meta_schema );
 	}
 
 	/**

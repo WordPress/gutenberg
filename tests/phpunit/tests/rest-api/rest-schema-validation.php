@@ -104,6 +104,19 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		$this->assertWPError( rest_validate_value_from_schema( array( true ), $schema ) );
 	}
 
+	public function test_type_array_nested() {
+		$schema = array(
+			'type' => 'array',
+			'items' => array(
+				'type' => 'array',
+				'items' => array(
+					'type' => 'number',
+				),
+			),
+		);
+		$this->assertTrue( rest_validate_value_from_schema( array( array( 1 ), array( 2 ) ), $schema ) );
+	}
+
 	public function test_type_array_as_csv() {
 		$schema = array(
 			'type' => 'array',
@@ -138,5 +151,24 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		);
 		$this->assertTrue( rest_validate_value_from_schema( 'ribs,chicken', $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( 'chicken,coleslaw', $schema ) );
+	}
+
+	public function test_type_array_is_associative() {
+		$schema = array(
+			'type'  => 'array',
+			'items' => array(
+				'type' => 'string',
+			),
+		);
+		$this->assertWPError( rest_validate_value_from_schema( array( 'first' => '1', 'second' => '2' ), $schema ) );
+	}
+
+	public function test_type_unknown() {
+		$schema = array(
+			'type'  => 'lalala',
+		);
+		$this->assertTrue( rest_validate_value_from_schema( 'Best lyrics', $schema ) );
+		$this->assertTrue( rest_validate_value_from_schema( 1, $schema ) );
+		$this->assertTrue( rest_validate_value_from_schema( array(), $schema ) );
 	}
 }
