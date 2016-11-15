@@ -87,6 +87,32 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38766
+	 */
+	function test_page_templates_for_post_types_with_trailing_periods() {
+		$theme = wp_get_theme( 'page-templates' );
+		$this->assertNotEmpty( $theme );
+
+		switch_theme( $theme['Template'], $theme['Stylesheet'] );
+
+		$this->assertEqualSetsWithIndex( array(
+			'No Trailing Period' => '38766/no-trailing-period-post-types.php',
+			'Trailing Period.' => '38766/trailing-period-post-types.php',
+			'Trailing Comma,' => '38766/trailing-comma-post-types.php',
+			'Trailing Period, White Space.' => '38766/trailing-period-whitespace-post-types.php',
+			'Trailing White Space, Period.' => '38766/trailing-whitespace-period-post-types.php',
+			'Tilde in Post Type.' => '38766/tilde-post-types.php',
+		), get_page_templates( null, 'period' ) );
+		$this->assertEqualSetsWithIndex( array(
+			'No Trailing Period' => '38766/no-trailing-period-post-types.php',
+			'Trailing Period.' => '38766/trailing-period-post-types.php',
+			'Trailing Comma,' => '38766/trailing-comma-post-types.php',
+			'Trailing Period, White Space.' => '38766/trailing-period-whitespace-post-types.php',
+			'Trailing White Space, Period.' => '38766/trailing-whitespace-period-post-types.php',
+		), get_page_templates( null, 'full-stop' ) );
+	}
+
+	/**
 	 * @ticket 38696
 	 */
 	function test_page_templates_child_theme() {
