@@ -292,16 +292,16 @@ https://w.org</a>'
 
 		// now some values around
 		$hr = wp_convert_bytes_to_hr( $tb + $tb / 2 + $mb );
-		$this->assertEquals( 1.50000095367, (float) str_replace( ',', '.', $hr ), 0.0001 );
+		$this->assertEquals( 1.50000095367, (float) str_replace( ',', '.', $hr ), 'The values should be equal', 0.0001 );
 
 		$hr = wp_convert_bytes_to_hr( $tb - $mb - $kb );
-		$this->assertEquals( 1023.99902248, (float) str_replace( ',', '.', $hr ), 0.0001 );
+		$this->assertEquals( 1023.99902248, (float) str_replace( ',', '.', $hr ), 'The values should be equal', 0.0001 );
 
 		$hr = wp_convert_bytes_to_hr( $gb + $gb / 2 + $mb );
-		$this->assertEquals( 1.5009765625, (float) str_replace( ',', '.', $hr ), 0.0001 );
+		$this->assertEquals( 1.5009765625, (float) str_replace( ',', '.', $hr ), 'The values should be equal', 0.0001 );
 
 		$hr = wp_convert_bytes_to_hr( $gb - $mb - $kb );
-		$this->assertEquals( 1022.99902344, (float) str_replace( ',', '.', $hr ), 0.0001 );
+		$this->assertEquals( 1022.99902344, (float) str_replace( ',', '.', $hr ), 'The values should be equal', 0.0001 );
 
 		// edge
 		$this->assertEquals( '-1B', wp_convert_bytes_to_hr( -1 ) );
