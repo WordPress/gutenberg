@@ -3,8 +3,8 @@ import config from "../scss.js"
 import stylelint from "stylelint"
 import test from "ava"
 
-const validScss = fs.readFileSync("./selectors-valid.scss", "utf-8")
-const invalidScss = fs.readFileSync("./selectors-invalid.scss", "utf-8")
+const validScss = fs.readFileSync("./__tests__/selectors-valid.scss", "utf-8")
+const invalidScss = fs.readFileSync("./__tests__/selectors-invalid.scss", "utf-8")
 
 test("There are no warnings with values SCSS", async t => {
   const data = await stylelint.lint({

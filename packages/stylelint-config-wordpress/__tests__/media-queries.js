@@ -3,8 +3,8 @@ import config from "../"
 import stylelint from "stylelint"
 import test from "ava"
 
-const validCss = fs.readFileSync("./media-queries-valid.css", "utf-8")
-const invalidCss = fs.readFileSync("./media-queries-invalid.css", "utf-8")
+const validCss = fs.readFileSync("./__tests__/media-queries-valid.css", "utf-8")
+const invalidCss = fs.readFileSync("./__tests__/media-queries-invalid.css", "utf-8")
 
 test("There are no warnings with media queries CSS", async t => {
   const data = await stylelint.lint({
