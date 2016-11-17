@@ -2544,6 +2544,40 @@ class Tests_Comment_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37966
+	 * @ticket 37696
+	 */
+	public function test_fill_hierarchy_should_disregard_offset_and_number() {
+		$c0 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1' ) );
+		$c1 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1' ) );
+		$c2 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_parent' => $c1 ) );
+		$c3 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1' ) );
+		$c4 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_parent' => $c3 ) );
+		$c5 = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_approved' => '1', 'comment_parent' => $c3 ) );
+
+		$q = new WP_Comment_Query();
+		$found = $q->query( array(
+			'orderby' => 'comment_date_gmt',
+			'order' => 'ASC',
+			'status' => 'approve',
+			'post_id' => self::$post_id,
+			'no_found_rows' => false,
+			'hierarchical' => 'threaded',
+			'number' => 2,
+			'offset' => 1,
+		) );
+
+
+		$found_1 = $found[ $c1 ];
+		$children_1 = $found_1->get_children();
+		$this->assertEqualSets( array( $c2 ), array_keys( $children_1 ) );
+
+		$found_3 = $found[ $c3 ];
+		$children_3 = $found_3->get_children();
+		$this->assertEqualSets( array( $c4, $c5 ), array_keys( $children_3 ) );
+	}
+
+	/**
 	 * @ticket 27571
 	 */
 	public function test_update_comment_post_cache_should_be_disabled_by_default() {
