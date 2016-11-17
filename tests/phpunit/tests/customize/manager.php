@@ -163,8 +163,15 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WPDieException', $exception );
 		$this->assertContains( 'Invalid changeset UUID', $exception->getMessage() );
 
+		update_option( 'fresh_site', 0 );
 		$wp_customize = new WP_Customize_Manager();
 		$wp_customize->setup_theme();
+		$this->assertFalse( has_action( 'after_setup_theme', array( $wp_customize, 'import_theme_starter_content' ) ) );
+
+		// Make sure that starter content import gets queued on a fresh site.
+		update_option( 'fresh_site', 1 );
+		$wp_customize->setup_theme();
+		$this->assertEquals( 100, has_action( 'after_setup_theme', array( $wp_customize, 'import_theme_starter_content' ) ) );
 	}
 
 	/**
@@ -296,6 +303,145 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		) );
 		$wp_customize = new WP_Customize_Manager( array( 'changeset_uuid' => $uuid ) );
 		$this->assertEquals( $data, $wp_customize->changeset_data() );
+	}
+
+	/**
+	 * Test WP_Customize_Manager::import_theme_starter_content().
+	 *
+	 * @covers WP_Customize_Manager::import_theme_starter_content()
+	 * @covers WP_Customize_Manager::_save_starter_content_changeset()
+	 */
+	function test_import_theme_starter_content() {
+		wp_set_current_user( self::$admin_user_id );
+
+		global $wp_customize;
+		$wp_customize = new WP_Customize_Manager();
+		$starter_content_config = array(
+			'widgets' => array(
+				'sidebar-1' => array(
+					'text_business_info',
+					'meta_custom' => array( 'meta', array(
+						'title' => 'Pre-hydrated meta widget.',
+					) ),
+				),
+			),
+			'nav_menus' => array(
+				'top' => array(
+					'name'  => 'Menu Name',
+					'items' => array(
+						'page_home',
+						'page_about',
+						'page_blog',
+						'link_email',
+						'link_facebook',
+						'link_custom' => array(
+							'title' => 'Custom',
+							'url' => 'https://custom.example.com/',
+						),
+					),
+				),
+			),
+			'posts' => array(
+				'home',
+				'about',
+				'blog',
+				'custom' => array(
+					'post_type' => 'post',
+					'post_title' => 'Custom',
+				),
+			),
+			'options' => array(
+				'blogname' => 'Starter Content Title',
+				'blogdescription' => 'Starter Content Tagline',
+				'show_on_front'  => 'page',
+				'page_on_front'  => '{{home}}',
+				'page_for_posts' => '{{blog}}',
+			),
+		);
+
+		add_theme_support( 'starter-content', $starter_content_config );
+		$this->assertEmpty( $wp_customize->unsanitized_post_values() );
+		$wp_customize->import_theme_starter_content();
+		$changeset_values = $wp_customize->unsanitized_post_values();
+		$expected_setting_ids = array(
+			'blogname',
+			'blogdescription',
+			'widget_text[2]',
+			'widget_meta[3]',
+			'sidebars_widgets[sidebar-1]',
+			'nav_menus_created_posts',
+			'nav_menu[-1]',
+			'nav_menu_item[-1]',
+			'nav_menu_item[-2]',
+			'nav_menu_item[-3]',
+			'nav_menu_item[-4]',
+			'nav_menu_item[-5]',
+			'nav_menu_item[-6]',
+			'nav_menu_locations[top]',
+			'show_on_front',
+			'page_on_front',
+			'page_for_posts',
+		);
+		$this->assertEqualSets( $expected_setting_ids, array_keys( $changeset_values ) );
+
+		foreach ( array( 'widget_text[2]', 'widget_meta[3]' ) as $setting_id ) {
+			$this->assertInternalType( 'array', $changeset_values[ $setting_id ] );
+			$instance_data = $wp_customize->widgets->sanitize_widget_instance( $changeset_values[ $setting_id ] );
+			$this->assertInternalType( 'array', $instance_data );
+			$this->assertArrayHasKey( 'title', $instance_data );
+		}
+
+		$this->assertEquals( array( 'text-2', 'meta-3' ), $changeset_values['sidebars_widgets[sidebar-1]'] );
+
+		$posts_by_name = array();
+		foreach ( $changeset_values['nav_menus_created_posts'] as $post_id ) {
+			$post = get_post( $post_id );
+			$this->assertEquals( 'auto-draft', $post->post_status );
+			$posts_by_name[ $post->post_name ] = $post->ID;
+		}
+
+		$this->assertEquals( 'page', $changeset_values['show_on_front'] );
+		$this->assertEquals( $posts_by_name['home'], $changeset_values['page_on_front'] );
+		$this->assertEquals( $posts_by_name['blog'], $changeset_values['page_for_posts'] );
+
+		$this->assertEquals( -1, $changeset_values['nav_menu_locations[top]'] );
+		$this->assertEquals( $posts_by_name['home'], $changeset_values['nav_menu_item[-1]']['object_id'] );
+
+		$this->assertEmpty( $wp_customize->changeset_data() );
+		$this->assertNull( $wp_customize->changeset_post_id() );
+		$this->assertEquals( 1000, has_action( 'customize_register', array( $wp_customize, '_save_starter_content_changeset' ) ) );
+		do_action( 'customize_register', $wp_customize ); // This will trigger the changeset save.
+		$this->assertInternalType( 'int', $wp_customize->changeset_post_id() );
+		$this->assertNotEmpty( $wp_customize->changeset_data() );
+		foreach ( $wp_customize->changeset_data() as $setting_id => $setting_params ) {
+			$this->assertArrayHasKey( 'starter_content', $setting_params );
+			$this->assertTrue( $setting_params['starter_content'] );
+		}
+
+		// Test that saving non-starter content on top of the changeset clears the starter_content flag.
+		$wp_customize->save_changeset_post( array(
+			'data' => array(
+				'blogname' => array( 'value' => 'Starter Content Modified' ),
+			),
+		) );
+		$changeset_data = $wp_customize->changeset_data();
+		$this->assertArrayNotHasKey( 'starter_content', $changeset_data['blogname'] );
+		$this->assertArrayHasKey( 'starter_content', $changeset_data['blogdescription'] );
+
+		// Test that adding blogname starter content is ignored now that it is modified, but updating a non-modified starter content blog description passes.
+		$previous_blogname = $changeset_data['blogname']['value'];
+		$previous_blogdescription = $changeset_data['blogdescription']['value'];
+		$wp_customize->import_theme_starter_content( array(
+			'options' => array(
+				'blogname' => 'Newer Starter Content Title',
+				'blogdescription' => 'Newer Starter Content Description',
+			),
+		) );
+		$changeset_data = $wp_customize->changeset_data();
+		$this->assertEquals( $previous_blogname, $changeset_data['blogname']['value'] );
+		$this->assertArrayNotHasKey( 'starter_content', $changeset_data['blogname'] );
+		$this->assertNotEquals( $previous_blogdescription, $changeset_data['blogdescription']['value'] );
+		$this->assertArrayHasKey( 'starter_content', $changeset_data['blogdescription'] );
 	}
 
 	/**
