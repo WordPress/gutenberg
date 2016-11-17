@@ -266,6 +266,22 @@ class Tests_Category_WpListCategories extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38839
+	 */
+	public function test_hide_title_if_empty_should_not_output_stray_closing_tags() {
+		$cat = self::factory()->category->create();
+
+		$found = wp_list_categories( array(
+			'echo' => false,
+			'show_option_none' => '',
+			'child_of' => 1,
+			'hide_title_if_empty' => true,
+		) );
+
+		$this->assertNotContains( '</ul></li>', $found );
+	}
+
+	/**
 	 * @ticket 12981
 	 */
 	public function test_exclude_tree_should_be_respected() {
