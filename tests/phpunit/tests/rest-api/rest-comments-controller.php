@@ -1034,6 +1034,32 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( $comment_id, $collection_data[0]['id'] );
 	}
 
+	/**
+	 * @ticket 38820
+	 */
+	public function test_create_comment_with_invalid_type() {
+		$post_id = $this->factory->post->create();
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'author'       => self::$admin_id,
+			'author_name'  => 'Comic Book Guy',
+			'author_email' => 'cbg@androidsdungeon.com',
+			'author_url'   => 'http://androidsdungeon.com',
+			'content' => 'Worst Comment Ever!',
+			'date'    => '2014-11-07T10:14:25',
+			'type' => 'foo',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_comment_type', $response, 400 );
+	}
+
 	public function test_create_comment_invalid_email() {
 		$post_id = $this->factory->post->create();
 		wp_set_current_user( self::$admin_id );
@@ -2218,6 +2244,9 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( 'type', $properties );
 
 		$this->assertEquals( '127.0.0.1', $properties['author_ip']['default'] );
+
+		$this->assertEquals( 'comment', $properties['type']['default'] );
+
 		$this->assertEquals( 0, $properties['parent']['default'] );
 		$this->assertEquals( 0, $properties['post']['default'] );
 	}
