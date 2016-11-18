@@ -678,6 +678,7 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
+		$this->check_get_user_response( $response, 'view' );
 
 		$headers = $response->get_headers();
 		$this->assertArrayNotHasKey( 'Location', $headers );
