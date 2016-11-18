@@ -83,14 +83,30 @@ class WP_Test_REST_Schema_Validation extends WP_UnitTestCase {
 		$this->assertWPError( rest_validate_value_from_schema( '2016-06-30', $schema ) );
 	}
 
-	public function test_format_ipv4() {
+	public function test_format_ip() {
 		$schema = array(
 			'type'  => 'string',
-			'format' => 'ipv4',
+			'format' => 'ip',
 		);
+
+		// IPv4.
 		$this->assertTrue( rest_validate_value_from_schema( '127.0.0.1', $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( '3333.3333.3333.3333', $schema ) );
 		$this->assertWPError( rest_validate_value_from_schema( '1', $schema ) );
+
+		// IPv6.
+		$this->assertTrue( rest_validate_value_from_schema( '::1', $schema ) ); // Loopback, compressed, non-routable.
+		$this->assertTrue( rest_validate_value_from_schema( '::', $schema ) ); // Unspecified, compressed, non-routable.
+		$this->assertTrue( rest_validate_value_from_schema( '0:0:0:0:0:0:0:1', $schema ) ); // Loopback, full.
+		$this->assertTrue( rest_validate_value_from_schema( '0:0:0:0:0:0:0:0', $schema ) ); // Unspecified, full.
+		$this->assertTrue( rest_validate_value_from_schema( '2001:DB8:0:0:8:800:200C:417A', $schema ) ); // Unicast, full.
+		$this->assertTrue( rest_validate_value_from_schema( 'FF01:0:0:0:0:0:0:101', $schema ) ); // Multicast, full.
+		$this->assertTrue( rest_validate_value_from_schema( '2001:DB8::8:800:200C:417A', $schema ) ); // Unicast, compressed.
+		$this->assertTrue( rest_validate_value_from_schema( 'FF01::101', $schema ) ); // Multicast, compressed.
+		$this->assertTrue( rest_validate_value_from_schema( 'fe80::217:f2ff:fe07:ed62', $schema ) );
+		$this->assertWPError( rest_validate_value_from_schema( '', $schema ) ); // Empty string.
+		$this->assertWPError( rest_validate_value_from_schema( '2001:DB8:0:0:8:800:200C:417A:221', $schema ) ); // Unicast, full.
+		$this->assertWPError( rest_validate_value_from_schema( 'FF01::101::2', $schema ) ); // Multicast, compressed.
 	}
 
 	public function test_type_array() {

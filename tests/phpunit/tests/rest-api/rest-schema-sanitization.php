@@ -65,6 +65,17 @@ class WP_Test_REST_Schema_Sanitization extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid', rest_sanitize_value_from_schema( 'invalid', $schema ) );
 	}
 
+	public function test_format_ip() {
+		$schema = array(
+			'type'  => 'string',
+			'format' => 'ip',
+		);
+
+		$this->assertEquals( '127.0.0.1', rest_sanitize_value_from_schema( '127.0.0.1', $schema ) );
+		$this->assertEquals( 'hello', rest_sanitize_value_from_schema( 'hello', $schema ) );
+		$this->assertEquals( '2001:DB8:0:0:8:800:200C:417A', rest_sanitize_value_from_schema( '2001:DB8:0:0:8:800:200C:417A', $schema ) );
+	}
+
 	public function test_type_array() {
 		$schema = array(
 			'type' => 'array',
