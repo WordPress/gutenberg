@@ -17,6 +17,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 	protected static $author_id;
 
 	protected static $post_id;
+	protected static $password_id;
 	protected static $private_id;
 	protected static $draft_id;
 	protected static $trash_id;
@@ -52,6 +53,9 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		self::$private_id = $factory->post->create( array(
 			'post_status' => 'private',
 		) );
+		self::$password_id = $factory->post->create( array(
+			'post_password'    => 'toomanysecrets',
+		) );
 		self::$draft_id = $factory->post->create( array(
 			'post_status' => 'draft',
 		) );
@@ -78,6 +82,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 
 		wp_delete_post( self::$post_id, true );
 		wp_delete_post( self::$private_id, true );
+		wp_delete_post( self::$password_id, true );
 		wp_delete_post( self::$draft_id, true );
 		wp_delete_post( self::$trash_id, true );
 		wp_delete_post( self::$approved_id, true );
@@ -160,6 +165,42 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$comments = $response->get_data();
 		// We created 6 comments in this method, plus self::$approved_id.
 		$this->assertCount( 7, $comments );
+	}
+
+	public function test_get_password_items_without_edit_post_permission() {
+		wp_set_current_user( 0 );
+
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$collection_data = $response->get_data();
+		$this->assertFalse( in_array( $password_comment, wp_list_pluck( $collection_data, 'id' ), true ) );
+	}
+
+	public function test_get_password_items_with_edit_post_permission() {
+		wp_set_current_user( self::$admin_id );
+
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$collection_data = $response->get_data();
+		$this->assertTrue( in_array( $password_comment, wp_list_pluck( $collection_data, 'id' ), true ) );
 	}
 
 	public function test_get_items_without_private_post_permission() {
@@ -800,6 +841,18 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayNotHasKey( 'children', $response->get_links() );
 	}
 
+	public function test_get_comment_with_password_without_edit_post_permission() {
+		wp_set_current_user( 0 );
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%s', $password_comment ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
+	}
+
 	public function test_create_item() {
 		wp_set_current_user( 0 );
 
@@ -1369,6 +1422,25 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 
 		$response = $this->server->dispatch( $request );
 
+		$this->assertErrorResponse( 'rest_cannot_read_post', $response, 403 );
+	}
+
+	public function test_create_comment_password_post_invalid_permission() {
+		wp_set_current_user( self::$subscriber_id );
+
+		$params = array(
+			'post'         => self::$password_id,
+			'author_name'  => 'Homer Jay Simpson',
+			'author_email' => 'chunkylover53@aol.com',
+			'author_url'   => 'http://compuglobalhypermeganet.com',
+			'content'      => 'I\’d be a vegetarian if bacon grew on trees.',
+			'author'       => self::$subscriber_id,
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read_post', $response, 403 );
 	}
 
