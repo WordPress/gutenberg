@@ -1306,7 +1306,8 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_body( wp_json_encode( $params ) );
 
 		$response = $this->server->dispatch( $request );
-		$this->assertEquals( 201, $response->get_status() );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_post_id', $response, 403 );
 	}
 
 	public function test_create_comment_no_post_id_no_permission() {
