@@ -135,7 +135,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'context',
 			'exclude',
 			'include',
-			'karma',
 			'offset',
 			'order',
 			'orderby',
@@ -1161,27 +1160,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertErrorResponse( 'rest_comment_invalid_author', $response, 403 );
 	}
 
-	public function test_create_comment_karma_without_permission() {
-		wp_set_current_user( self::$subscriber_id );
-
-		$params = array(
-			'post'         => self::$post_id,
-			'author_name'  => 'Homer Jay Simpson',
-			'author_email' => 'chunkylover53@aol.com',
-			'author_url'   => 'http://compuglobalhypermeganet.com',
-			'content'      => 'Here\’s to alcohol: the cause of, and solution to, all of life\’s problems.',
-			'author'       => self::$subscriber_id,
-			'karma'        => 100,
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'content-type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = $this->server->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_invalid_karma', $response, 403 );
-	}
-
 	public function test_create_comment_invalid_post() {
 		wp_set_current_user( self::$subscriber_id );
 
@@ -1192,27 +1170,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'author_url'   => 'http://compuglobalhypermeganet.com',
 			'content'	   => 'Here\’s to alcohol: the cause of, and solution to, all of life\’s problems.',
 			'author'	   => self::$subscriber_id,
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'content-type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = $this->server->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-	}
-
-	public function test_create_comment_karma_invalid_value() {
-		wp_set_current_user( self::$subscriber_id );
-
-		$params = array(
-			'post'		 => self::$post_id,
-			'author_name'  => 'Homer Jay Simpson',
-			'author_email' => 'chunkylover53@aol.com',
-			'author_url'   => 'http://compuglobalhypermeganet.com',
-			'content'	  => 'Here\’s to alcohol: the cause of, and solution to, all of life\’s problems.',
-			'author'	   => self::$subscriber_id,
-			'karma'		=> 'themostkarmaever',
 		);
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -1649,7 +1606,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'author_ip'    => '4.4.4.4',
 			'content'      => 'Testing.',
 			'date'         => '2014-11-07T10:14:25',
-			'karma'        => 100,
 			'post'         => $post_id,
 		);
 		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
@@ -1668,7 +1624,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( $params['author_email'], $comment['author_email'] );
 		$this->assertEquals( $params['author_ip'], $comment['author_ip'] );
 		$this->assertEquals( $params['post'], $comment['post'] );
-		$this->assertEquals( $params['karma'], $comment['karma'] );
 
 		$this->assertEquals( mysql_to_rfc3339( $updated->comment_date ), $comment['date'] );
 		$this->assertEquals( '2014-11-07T10:14:25', $comment['date'] );
@@ -2223,7 +2178,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 18, count( $properties ) );
+		$this->assertEquals( 17, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'author', $properties );
 		$this->assertArrayHasKey( 'author_avatar_urls', $properties );
@@ -2235,7 +2190,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( 'content', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
 		$this->assertArrayHasKey( 'date_gmt', $properties );
-		$this->assertArrayHasKey( 'karma', $properties );
 		$this->assertArrayHasKey( 'link', $properties );
 		$this->assertArrayHasKey( 'meta', $properties );
 		$this->assertArrayHasKey( 'parent', $properties );
@@ -2382,7 +2336,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			$this->assertEquals( $comment->comment_author_IP, $data['author_ip'] );
 			$this->assertEquals( $comment->comment_agent, $data['author_user_agent'] );
 			$this->assertEquals( $comment->comment_content, $data['content']['raw'] );
-			$this->assertEquals( $comment->comment_karma, $data['karma'] );
 		}
 
 		if ( 'edit' !== $context ) {
@@ -2390,7 +2343,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			$this->assertArrayNotHasKey( 'author_ip', $data );
 			$this->assertArrayNotHasKey( 'author_user_agent', $data );
 			$this->assertArrayNotHasKey( 'raw', $data['content'] );
-			$this->assertArrayNotHasKey( 'karma', $data );
 		}
 	}
 }
