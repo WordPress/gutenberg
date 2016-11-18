@@ -6,9 +6,9 @@
  * @subpackage REST API
  */
 
- /**
-  * @group restapi
-  */
+/**
+ * @group restapi
+ */
 class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase {
 	protected static $superadmin_id;
 	protected static $admin_id;
@@ -1307,10 +1307,32 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 'Mozilla/4.0 (compatible; MSIE 5.5; AOL 4.0; Windows 95)', $new_comment->comment_agent );
 	}
 
+	public function test_create_comment_author_ip() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Comic Book Guy',
+			'author_email' => 'cbg@androidsdungeon.com',
+			'author_url'   => 'http://androidsdungeon.com',
+			'author_ip'    => '127.0.0.3',
+			'content'      => 'Worst Comment Ever!',
+			'status'       => 'approved',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+		$this->assertEquals( '127.0.0.3', $new_comment->comment_author_IP );
+	}
+
 	public function test_create_comment_invalid_author_IP() {
 		wp_set_current_user( self::$admin_id );
 
 		$params = array(
+			'post'         => self::$post_id,
 			'author_name'  => 'Comic Book Guy',
 			'author_email' => 'cbg@androidsdungeon.com',
 			'author_url'   => 'http://androidsdungeon.com',
@@ -1323,8 +1345,41 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_body( wp_json_encode( $params ) );
 
 		$response = $this->server->dispatch( $request );
-
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_create_comment_author_ip_no_permission() {
+		$params = array(
+			'author_name'  => 'Comic Book Guy',
+			'author_email' => 'cbg@androidsdungeon.com',
+			'author_url'   => 'http://androidsdungeon.com',
+			'author_ip'    => '10.0.10.1',
+			'content'      => 'Worst Comment Ever!',
+			'status'       => 'approved',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_invalid_author_ip', $response, 401 );
+	}
+
+	public function test_create_comment_author_ip_defaults_to_remote_addr() {
+		$_SERVER['REMOTE_ADDR'] = '127.0.0.2';
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Comic Book Guy',
+			'author_email' => 'cbg@androidsdungeon.com',
+			'author_url'   => 'http://androidsdungeon.com',
+			'content'      => 'Worst Comment Ever!',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+		$this->assertEquals( '127.0.0.2', $new_comment->comment_author_IP );
 	}
 
 	public function test_create_comment_no_post_id() {
@@ -2268,9 +2323,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( 'post', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
-
-		$this->assertEquals( '127.0.0.1', $properties['author_ip']['default'] );
-
 		$this->assertEquals( 'comment', $properties['type']['default'] );
 
 		$this->assertEquals( 0, $properties['parent']['default'] );
