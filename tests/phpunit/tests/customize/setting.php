@@ -395,6 +395,18 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertEquals( $post_data_overrides[ $name ], $this->custom_type_getter( $name, $this->undefined ) );
 		$this->assertEquals( $post_data_overrides[ $name ], $setting->value() );
 
+		// Custom type that does not handle supplying the post value from the customize_value_{$id_base} filter.
+		$setting_id = 'custom_without_previewing_value_filter';
+		$setting = $this->manager->add_setting( $setting_id, array(
+			'type' => 'custom_preview_test',
+			'default' => 123,
+			'sanitize_callback' => array( $this->manager->nav_menus, 'intval_base10' ),
+		) );
+		$this->assertSame( 123, $setting->value() );
+		$this->manager->set_post_value( $setting_id, '456' );
+		$setting->preview();
+		$this->assertSame( 456, $setting->value() );
+
 		unset( $this->custom_type_data_previewed, $this->custom_type_data_saved );
 	}
 
