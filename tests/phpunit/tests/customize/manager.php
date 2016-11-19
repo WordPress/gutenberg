@@ -860,18 +860,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$other_admin_user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 
 		$uuid = wp_generate_uuid4();
-		$manager = new WP_Customize_Manager( array(
-			'changeset_uuid' => $uuid,
-		) );
-		$wp_customize = $manager;
-		do_action( 'customize_register', $manager );
-		$manager->add_setting( 'scratchpad', array(
-			'type' => 'option',
-			'capability' => 'exist',
-		) );
-
-		// Create initial set of
-		$r = $manager->save_changeset_post( array(
+		$wp_customize = $this->create_test_manager( $uuid );
+		$r = $wp_customize->save_changeset_post( array(
 			'status' => 'auto-draft',
 			'data' => array(
 				'blogname' => array(
@@ -890,7 +880,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			array_fill_keys( array( 'blogname', 'scratchpad', 'background_color' ), true ),
 			$r['setting_validities']
 		);
-		$post_id = $manager->find_changeset_post_id( $uuid );
+		$post_id = $wp_customize->find_changeset_post_id( $uuid );
 		$data = json_decode( get_post( $post_id )->post_content, true );
 		$this->assertEquals( self::$admin_user_id, $data['blogname']['user_id'] );
 		$this->assertEquals( self::$admin_user_id, $data['scratchpad']['user_id'] );
@@ -898,7 +888,8 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 
 		// Attempt to save just one setting under a different user.
 		wp_set_current_user( $other_admin_user_id );
-		$r = $manager->save_changeset_post( array(
+		$wp_customize = $this->create_test_manager( $uuid );
+		$r = $wp_customize->save_changeset_post( array(
 			'status' => 'auto-draft',
 			'data' => array(
 				'blogname' => array(
@@ -923,9 +914,13 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $other_admin_user_id, $data[ $this->manager->get_stylesheet() . '::background_color' ]['user_id'] );
 
 		// Attempt to save now as under-privileged user.
-		$r = $manager->save_changeset_post( array(
+		$wp_customize = $this->create_test_manager( $uuid );
+		$r = $wp_customize->save_changeset_post( array(
 			'status' => 'auto-draft',
 			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 2 Title', // Identical to what is already in the changeset so will be skipped.
+				),
 				'scratchpad' => array(
 					'value' => 'Subscriber Scratch',
 				),
@@ -934,11 +929,11 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		) );
 		$this->assertInternalType( 'array', $r );
 		$this->assertEquals(
-			array_fill_keys( array( 'scratchpad' ), true ),
+			array_fill_keys( array( 'scratchpad', 'blogname' ), true ),
 			$r['setting_validities']
 		);
 		$data = json_decode( get_post( $post_id )->post_content, true );
-		$this->assertEquals( $other_admin_user_id, $data['blogname']['user_id'] );
+		$this->assertEquals( $other_admin_user_id, $data['blogname']['user_id'], 'Expected setting to be untouched.' );
 		$this->assertEquals( self::$subscriber_user_id, $data['scratchpad']['user_id'] );
 		$this->assertEquals( $other_admin_user_id, $data[ $this->manager->get_stylesheet() . '::background_color' ]['user_id'] );
 
@@ -955,7 +950,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			$save_counts[ $setting_id ] = did_action( sprintf( 'customize_save_%s', $setting_id ) );
 		}
 		$this->filtered_setting_current_user_ids = array();
-		foreach ( $manager->settings() as $setting ) {
+		foreach ( $wp_customize->settings() as $setting ) {
 			add_filter( sprintf( 'customize_sanitize_%s', $setting->id ), array( $this, 'filter_customize_setting_to_log_current_user' ), 10, 2 );
 		}
 		wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ) );
@@ -969,6 +964,115 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( self::$subscriber_user_id, $this->filtered_setting_current_user_ids['scratchpad'] );
 		$this->assertEquals( $other_admin_user_id, $this->filtered_setting_current_user_ids['background_color'] );
 		$this->assertEquals( 'Subscriber Scratch', get_option( 'scratchpad' ) );
+	}
+
+	/**
+	 * Create test manager.
+	 *
+	 * @param string $uuid Changeset UUID.
+	 * @return WP_Customize_Manager Manager.
+	 */
+	protected function create_test_manager( $uuid ) {
+		$manager = new WP_Customize_Manager( array(
+			'changeset_uuid' => $uuid,
+		) );
+		do_action( 'customize_register', $manager );
+		$manager->add_setting( 'blogfounded', array(
+			'type' => 'option',
+		) );
+		$manager->add_setting( 'blogterminated', array(
+			'type' => 'option',
+			'capability' => 'do_not_allow',
+		) );
+		$manager->add_setting( 'scratchpad', array(
+			'type' => 'option',
+			'capability' => 'exist',
+		) );
+		return $manager;
+	}
+
+	/**
+	 * Test writing changesets when user supplies unchanged values.
+	 *
+	 * @ticket 38865
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_save_changeset_post_with_unchanged_values() {
+		global $wp_customize;
+
+		add_theme_support( 'custom-background' );
+		wp_set_current_user( self::$admin_user_id );
+		$other_admin_user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+
+		$uuid = wp_generate_uuid4();
+		$wp_customize = $this->create_test_manager( $uuid );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 1 Title',
+				),
+				'blogdescription' => array(
+					'value' => 'Admin 1 Tagline',
+				),
+				'blogfounded' => array(
+					'value' => '2016',
+				),
+				'scratchpad' => array(
+					'value' => 'Admin 1 Scratch',
+				),
+			),
+		) );
+
+		// Make sure that setting properties of unknown and unauthorized settings are rejected.
+		$data = get_post( $wp_customize->changeset_post_id() )->post_content;
+		$r = $wp_customize->save_changeset_post( array(
+			'data' => array(
+				'unknownsetting' => array(
+					'custom' => 'prop',
+				),
+				'blogterminated' => array(
+					'custom' => 'prop',
+				),
+			),
+		) );
+		$this->assertInstanceOf( 'WP_Error', $r['setting_validities']['unknownsetting'] );
+		$this->assertEquals( 'unrecognized', $r['setting_validities']['unknownsetting']->get_error_code() );
+		$this->assertInstanceOf( 'WP_Error', $r['setting_validities']['blogterminated'] );
+		$this->assertEquals( 'unauthorized', $r['setting_validities']['blogterminated']->get_error_code() );
+		$this->assertEquals( $data, get_post( $wp_customize->changeset_post_id() )->post_content );
+
+		// Test submitting data with changed and unchanged settings, creating a new instance so that the post_values are cleared.
+		wp_set_current_user( $other_admin_user_id );
+		$wp_customize = $this->create_test_manager( $uuid );
+		$r = $wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 1 Title', // Unchanged value.
+				),
+				'blogdescription' => array(
+					'value' => 'Admin 1 Tagline Changed', // Changed value.
+				),
+				'blogfounded' => array(
+					'extra' => 'blogfounded_param', // New param.
+				),
+				'scratchpad' => array(
+					'value' => 'Admin 1 Scratch', // Unchanged value.
+					'extra' => 'background_scratchpad2', // New param.
+				),
+			),
+		) );
+
+		// Note that blogfounded is not included among setting_validities because no value was supplied and it is not unrecognized/unauthorized.
+		$this->assertEquals( array_fill_keys( array( 'blogname', 'blogdescription', 'scratchpad' ), true ), $r['setting_validities'], 'Expected blogname even though unchanged.' );
+
+		$data = json_decode( get_post( $wp_customize->changeset_post_id() )->post_content, true );
+
+		$this->assertEquals( self::$admin_user_id, $data['blogname']['user_id'], 'Expected unchanged user_id since value was unchanged.' );
+		$this->assertEquals( $other_admin_user_id, $data['blogdescription']['user_id'] );
+		$this->assertEquals( $other_admin_user_id, $data['blogfounded']['user_id'] );
+		$this->assertEquals( $other_admin_user_id, $data['scratchpad']['user_id'] );
 	}
 
 	/**
