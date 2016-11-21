@@ -79,6 +79,22 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 			'show_in_rest' => true,
 		));
 
+		register_meta( 'post', 'test_custom_name', array(
+			'single' => true,
+			'type' => 'string',
+			'show_in_rest' => array(
+				'name'	=> 'new_name',
+			),
+		));
+
+		register_meta( 'post', 'test_custom_name_multi', array(
+			'single' => false,
+			'type' => 'string',
+			'show_in_rest' => array(
+				'name'	=> 'new_name_multi',
+			),
+		));
+
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
 		$this->server = $wp_rest_server = new Spy_REST_Server;
@@ -225,6 +241,22 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'test_bool', $meta );
 		$this->assertInternalType( 'boolean', $meta['test_bool'] );
 		$this->assertSame( true, $meta['test_bool'] );
+	}
+
+	public function test_get_value_custom_name() {
+		add_post_meta( self::$post_id, 'test_custom_name', 'janet' );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'meta', $data );
+
+		$meta = (array) $data['meta'];
+		$this->assertArrayHasKey( 'new_name', $meta );
+		$this->assertEquals( 'janet', $meta['new_name'] );
 	}
 
 	/**
@@ -681,6 +713,79 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertContains( 8, $meta );
 	}
 
+	/**
+	 * @depends test_get_value_custom_name
+	 */
+	public function test_set_value_custom_name() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( self::$post_id, 'test_custom_name', false );
+		$this->assertEmpty( $values );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'new_name' => 'janet',
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_name', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 'janet', $meta[0] );
+
+		$data = $response->get_data();
+		$meta = (array) $data['meta'];
+		$this->assertArrayHasKey( 'new_name', $meta );
+		$this->assertEquals( 'janet', $meta['new_name'] );
+	}
+
+	public function test_set_value_custom_name_multiple() {
+		// Ensure no data exists currently.
+		$values = get_post_meta( self::$post_id, 'test_custom_name_multi', false );
+		$this->assertEmpty( $values );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'new_name_multi' => array( 'janet' ),
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_name_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 1, $meta );
+		$this->assertEquals( 'janet', $meta[0] );
+
+		// Add another value.
+		$data = array(
+			'meta' => array(
+				'new_name_multi' => array( 'janet', 'graeme' ),
+			),
+		);
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_name_multi', false );
+		$this->assertNotEmpty( $meta );
+		$this->assertCount( 2, $meta );
+		$this->assertContains( 'janet', $meta );
+		$this->assertContains( 'graeme', $meta );
+	}
+
 	public function test_remove_multi_value_db_error() {
 		add_post_meta( self::$post_id, 'test_multi', 'val1' );
 		$values = get_post_meta( self::$post_id, 'test_multi', false );
@@ -789,6 +894,28 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$wpdb->show_errors = true;
 
 		$this->assertErrorResponse( 'rest_meta_database_error', $response, 500 );
+	}
+
+	public function test_delete_value_custom_name() {
+		add_post_meta( self::$post_id, 'test_custom_name', 'janet' );
+		$current = get_post_meta( self::$post_id, 'test_custom_name', true );
+		$this->assertEquals( 'janet', $current );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'meta' => array(
+				'new_name' => null,
+			),
+		);
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$meta = get_post_meta( self::$post_id, 'test_custom_name', false );
+		$this->assertEmpty( $meta );
 	}
 
 	public function test_get_schema() {
