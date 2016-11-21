@@ -460,6 +460,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $did_action_customize_preview_init + 1, did_action( 'customize_preview_init' ) );
 
 		$this->assertEquals( 10, has_action( 'wp_head', 'wp_no_robots' ) );
+		$this->assertEquals( 10, has_action( 'wp_head', array( $wp_customize, 'remove_frameless_preview_messenger_channel' ) ) );
 		$this->assertEquals( 10, has_filter( 'wp_headers', array( $wp_customize, 'filter_iframe_security_headers' ) ) );
 		$this->assertEquals( 10, has_filter( 'wp_redirect', array( $wp_customize, 'add_state_query_params' ) ) );
 		$this->assertTrue( wp_script_is( 'customize-preview', 'enqueued' ) );
@@ -2033,6 +2034,27 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $autofocus, $data['autofocus'] );
 		$this->assertArrayHasKey( 'save', $data['nonce'] );
 		$this->assertArrayHasKey( 'preview', $data['nonce'] );
+	}
+
+	/**
+	 * Test remove_frameless_preview_messenger_channel.
+	 *
+	 * @ticket 38867
+	 * @covers WP_Customize_Manager::remove_frameless_preview_messenger_channel()
+	 */
+	function test_remove_frameless_preview_messenger_channel() {
+		wp_set_current_user( self::$admin_user_id );
+		$manager = new WP_Customize_Manager( array( 'messenger_channel' => null ) );
+		ob_start();
+		$manager->remove_frameless_preview_messenger_channel();
+		$output = ob_get_clean();
+		$this->assertEmpty( $output );
+
+		$manager = new WP_Customize_Manager( array( 'messenger_channel' => 'preview-0' ) );
+		ob_start();
+		$manager->remove_frameless_preview_messenger_channel();
+		$output = ob_get_clean();
+		$this->assertContains( '<script>', $output );
 	}
 
 	/**
