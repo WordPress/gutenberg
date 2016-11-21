@@ -2330,10 +2330,12 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertArrayHasKey( 'post', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
-		$this->assertEquals( 'comment', $properties['type']['default'] );
 
 		$this->assertEquals( 0, $properties['parent']['default'] );
 		$this->assertEquals( 0, $properties['post']['default'] );
+
+		$this->assertEquals( true, $properties['link']['readonly'] );
+		$this->assertEquals( true, $properties['type']['readonly'] );
 	}
 
 	public function test_get_item_schema_show_avatar() {
