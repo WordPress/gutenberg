@@ -110,7 +110,7 @@ class Tests_L10n extends WP_UnitTestCase {
 			'translations'             => $this->wp_dropdown_languages_filter(),
 			'selected'                 => 'de_DE',
 			'echo'                     => false,
-			'show_site_locale_default' => true,
+			'show_option_site_default' => true,
 		);
 		$actual = wp_dropdown_languages( $args );
 
