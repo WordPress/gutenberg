@@ -24,11 +24,13 @@ class Tests_Locale_Switcher extends WP_UnitTestCase {
 
 		unset( $GLOBALS['l10n'] );
 		unset( $GLOBALS['l10n_unloaded'] );
+		_get_path_to_translation( null, true );
 	}
 
 	public function tearDown() {
 		unset( $GLOBALS['l10n'] );
 		unset( $GLOBALS['l10n_unloaded'] );
+		_get_path_to_translation( null, true );
 
 		parent::tearDown();
 	}
