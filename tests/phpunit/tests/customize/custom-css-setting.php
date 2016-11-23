@@ -151,6 +151,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->assertTrue( false !== $saved );
 		$this->assertEquals( $updated_css, $this->setting->value() );
 		$this->assertEquals( $updated_css, wp_get_custom_css( $this->setting->stylesheet ) );
+		$this->assertEquals( $updated_css, get_post( $post_id )->post_content );
 
 		$previewed_css = 'body { color: red; }';
 		$this->wp_customize->set_post_value( $this->setting->id, $previewed_css );
@@ -158,6 +159,30 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->assertEquals( $previewed_css, $this->setting->value() );
 		$this->assertEquals( $previewed_css, wp_get_custom_css( $this->setting->stylesheet ) );
 
+		// Make sure that wp_update_custom_css_post() works as expected for updates.
+		$r = wp_update_custom_css_post( 'body { color:red; }', array(
+			'stylesheet' => $this->setting->stylesheet,
+			'preprocessed' => "body\n\tcolor:red;",
+		) );
+		$this->assertInstanceOf( 'WP_Post', $r );
+		$this->assertEquals( $post_id, $r->ID );
+		$this->assertEquals( 'body { color:red; }', get_post( $r )->post_content );
+		$this->assertEquals( "body\n\tcolor:red;", get_post( $r )->post_content_filtered );
+		$r = wp_update_custom_css_post( 'body { content: "\o/"; }' );
+		$this->assertEquals( $this->wp_customize->get_stylesheet(), get_post( $r )->post_name );
+		$this->assertEquals( 'body { content: "\o/"; }', get_post( $r )->post_content );
+		$this->assertEquals( '', get_post( $r )->post_content_filtered );
+
+		// Make sure that wp_update_custom_css_post() works as expected for insertion.
+		$r = wp_update_custom_css_post( 'body { background:black; }', array(
+			'stylesheet' => 'other',
+		) );
+		$this->assertInstanceOf( 'WP_Post', $r );
+		$this->assertEquals( 'other', get_post( $r )->post_name );
+		$this->assertEquals( 'body { background:black; }', get_post( $r )->post_content );
+		$this->assertEquals( 'publish', get_post( $r )->post_status );
+
+		// Test deletion.
 		wp_delete_post( $post_id );
 		$this->assertNull( wp_get_custom_css_post() );
 		$this->assertNull( wp_get_custom_css_post( get_stylesheet() ) );
@@ -225,7 +250,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$post = get_post( $post_id );
 		$original_title = $post->post_title;
 
-		add_filter( 'customize_update_custom_css_post_content_args', array( $this, 'filter_update_post_content_args' ), 10, 3 );
+		add_filter( 'update_custom_css_data', array( $this, 'filter_update_custom_css_data' ), 10, 3 );
 		$this->setting->save();
 
 		$post = get_post( $post_id );
@@ -238,22 +263,23 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	/**
 	 * Filter `customize_update_custom_css_post_content_args`.
 	 *
-	 * @param array                $args    Post array.
-	 * @param string               $css     CSS.
-	 * @param WP_Customize_Setting $setting Setting.
-	 * @return array Args.
+	 * @param array  $data Data.
+	 * @param string $args Args.
+	 * @return array Data.
 	 */
-	function filter_update_post_content_args( $args, $css, $setting ) {
+	function filter_update_custom_css_data( $data, $args ) {
+		$this->assertInternalType( 'array', $data );
+		$this->assertEqualSets( array( 'css', 'preprocessed' ), array_keys( $data ) );
+		$this->assertEquals( '', $data['preprocessed'] );
 		$this->assertInternalType( 'array', $args );
-		$this->assertEqualSets( array( 'post_content', 'post_content_filtered' ), array_keys( $args ) );
-		$this->assertEquals( $css, $args['post_content'] );
-		$this->assertEquals( '', $args['post_content_filtered'] );
-		$this->assertInstanceOf( 'WP_Customize_Custom_CSS_Setting', $setting );
+		$this->assertEqualSets( array( 'css', 'preprocessed', 'stylesheet' ), array_keys( $args ) );
+		$this->assertEquals( $args['css'], $data['css'] );
+		$this->assertEquals( $args['preprocessed'], $data['preprocessed'] );
 
-		$args['post_content'] .= '/* filtered post_content */';
-		$args['post_content_filtered'] = '/* filtered post_content_filtered */';
-		$args['post_title'] = 'Ignored';
-		return $args;
+		$data['css'] .= '/* filtered post_content */';
+		$data['preprocessed'] = '/* filtered post_content_filtered */';
+		$data['post_title'] = 'Ignored';
+		return $data;
 	}
 
 	/**
