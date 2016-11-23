@@ -1032,6 +1032,12 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		wp_set_current_user( self::$editor_id );
 		add_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
 
+		// reregister the route as we now have a template available.
+		$GLOBALS['wp_rest_server']->override_by_default = true;
+		$controller = new WP_REST_Posts_Controller( 'post' );
+		$controller->register_routes();
+		$GLOBALS['wp_rest_server']->override_by_default = false;
+
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
 			'template' => 'post-my-test-template.php',
@@ -1057,6 +1063,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$params = $this->set_post_data( array(
 			'template' => 'post-my-test-template.php',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	/**
+	 * @ticket 38877
+	 */
+	public function test_create_item_with_template_none() {
+		wp_set_current_user( self::$editor_id );
+		add_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
+		update_post_meta( self::$post_id, '_wp_page_template', 'post-my-test-template.php' );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'template' => '',
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
@@ -2054,6 +2078,62 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$this->assertErrorResponse( 'rest_cannot_assign_term', $response, 403 );
 	}
+
+	/**
+	 * @ticket 38698
+	 */
+	public function test_update_item_with_template() {
+		wp_set_current_user( self::$editor_id );
+		add_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
+
+		// reregister the route as we now have a template available.
+		$GLOBALS['wp_rest_server']->override_by_default = true;
+		$controller = new WP_REST_Posts_Controller( 'post' );
+		$controller->register_routes();
+		$GLOBALS['wp_rest_server']->override_by_default = false;
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'template' => 'post-my-test-template.php',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$post_template = get_page_template_slug( get_post( $data['id'] ) );
+
+		$this->assertEquals( 'post-my-test-template.php', $data['template'] );
+		$this->assertEquals( 'post-my-test-template.php', $post_template );
+	}
+
+	/**
+	 * @ticket 38877
+	 */
+	public function test_update_item_with_template_none() {
+		wp_set_current_user( self::$editor_id );
+		add_filter( 'theme_post_templates', array( $this, 'filter_theme_post_templates' ) );
+		update_post_meta( self::$post_id, '_wp_page_template', 'post-my-test-template.php' );
+
+		// reregister the route as we now have a template available.
+		$GLOBALS['wp_rest_server']->override_by_default = true;
+		$controller = new WP_REST_Posts_Controller( 'post' );
+		$controller->register_routes();
+		$GLOBALS['wp_rest_server']->override_by_default = false;
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'template' => '',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$post_template = get_page_template_slug( get_post( $data['id'] ) );
+
+		$this->assertEquals( '', $data['template'] );
+		$this->assertEquals( '', $post_template );
+	}
+
 
 	public function verify_post_roundtrip( $input = array(), $expected_output = array() ) {
 		// Create the post

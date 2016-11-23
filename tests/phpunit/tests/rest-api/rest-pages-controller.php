@@ -27,6 +27,11 @@ class WP_Test_REST_Pages_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		parent::setUp();
 		$this->has_setup_template = false;
 		add_filter( 'theme_page_templates', array( $this, 'filter_theme_page_templates' ) );
+		// reregister the route as we now have a template available.
+		$GLOBALS['wp_rest_server']->override_by_default = true;
+		$controller = new WP_REST_Posts_Controller( 'page' );
+		$controller->register_routes();
+		$GLOBALS['wp_rest_server']->override_by_default = false;
 	}
 
 	public function test_register_routes() {
