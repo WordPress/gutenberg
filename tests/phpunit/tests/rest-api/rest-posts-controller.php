@@ -1949,6 +1949,23 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( '', $new_data['content']['raw'] );
 	}
 
+	public function test_update_post_with_empty_password() {
+		wp_set_current_user( self::$editor_id );
+		wp_update_post( array(
+			'ID'            => self::$post_id,
+			'post_password' => 'foo',
+		) );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'password' => '',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$this->assertEquals( '', $data['password'] );
+	}
+
 	public function test_update_post_with_password_and_sticky_fails() {
 		wp_set_current_user( self::$editor_id );
 
