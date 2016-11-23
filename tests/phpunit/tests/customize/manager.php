@@ -313,6 +313,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	 */
 	function test_import_theme_starter_content() {
 		wp_set_current_user( self::$admin_user_id );
+		register_nav_menu( 'top', 'Top' );
 
 		global $wp_customize;
 		$wp_customize = new WP_Customize_Manager();
@@ -343,11 +344,22 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			),
 			'posts' => array(
 				'home',
-				'about',
+				'about' => array(
+					'template' => 'sample-page-template.php',
+				),
 				'blog',
 				'custom' => array(
 					'post_type' => 'post',
 					'post_title' => 'Custom',
+					'thumbnail' => '{{featured-image-logo}}',
+				),
+			),
+			'attachments' => array(
+				'featured-image-logo' => array(
+					'post_title' => 'Featured Image',
+					'post_content' => 'Attachment Description',
+					'post_excerpt' => 'Attachment Caption',
+					'file' => DIR_TESTDATA . '/images/waffles.jpg',
 				),
 			),
 			'options' => array(
@@ -394,11 +406,22 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( array( 'text-2', 'meta-3' ), $changeset_values['sidebars_widgets[sidebar-1]'] );
 
 		$posts_by_name = array();
+		$this->assertCount( 5, $changeset_values['nav_menus_created_posts'] );
 		foreach ( $changeset_values['nav_menus_created_posts'] as $post_id ) {
 			$post = get_post( $post_id );
 			$this->assertEquals( 'auto-draft', $post->post_status );
 			$posts_by_name[ $post->post_name ] = $post->ID;
 		}
+		$this->assertEquals( array( 'featured-image', 'home', 'about', 'blog', 'custom' ), array_keys( $posts_by_name ) );
+		$this->assertEquals( 'Custom', get_post( $posts_by_name['custom'] )->post_title );
+		$this->assertEquals( 'sample-page-template.php', get_page_template_slug( $posts_by_name['about'] ) );
+		$this->assertEquals( '', get_page_template_slug( $posts_by_name['blog'] ) );
+		$this->assertEquals( $posts_by_name['featured-image'], get_post_thumbnail_id( $posts_by_name['custom'] ) );
+		$this->assertEquals( '', get_post_thumbnail_id( $posts_by_name['blog'] ) );
+		$attachment_metadata = wp_get_attachment_metadata( $posts_by_name['featured-image'] );
+		$this->assertEquals( 'Featured Image', get_post( $posts_by_name['featured-image'] )->post_title );
+		$this->assertArrayHasKey( 'file', $attachment_metadata );
+		$this->assertContains( 'waffles', $attachment_metadata['file'] );
 
 		$this->assertEquals( 'page', $changeset_values['show_on_front'] );
 		$this->assertEquals( $posts_by_name['home'], $changeset_values['page_on_front'] );
@@ -417,6 +440,11 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			$this->assertArrayHasKey( 'starter_content', $setting_params );
 			$this->assertTrue( $setting_params['starter_content'] );
 		}
+
+		// Ensure that re-importing doesn't cause auto-drafts to balloon.
+		$wp_customize->import_theme_starter_content();
+		$changeset_data = $wp_customize->changeset_data();
+		$this->assertEqualSets( array_values( $posts_by_name ), $changeset_data['nav_menus_created_posts']['value'], 'Auto-drafts should not get re-created and amended with each import.' );
 
 		// Test that saving non-starter content on top of the changeset clears the starter_content flag.
 		$wp_customize->save_changeset_post( array(
@@ -442,6 +470,16 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'starter_content', $changeset_data['blogname'] );
 		$this->assertNotEquals( $previous_blogdescription, $changeset_data['blogdescription']['value'] );
 		$this->assertArrayHasKey( 'starter_content', $changeset_data['blogdescription'] );
+
+		// Publish.
+		$this->assertEquals( 'auto-draft', get_post( $posts_by_name['about'] )->post_status );
+		$this->assertEquals( 'auto-draft', get_post( $posts_by_name['featured-image'] )->post_status );
+		$this->assertNotEquals( $changeset_data['blogname']['value'], get_option( 'blogname' ) );
+		$r = $wp_customize->save_changeset_post( array( 'status' => 'publish' ) );
+		$this->assertInternalType( 'array', $r );
+		$this->assertEquals( 'publish', get_post( $posts_by_name['about'] )->post_status );
+		$this->assertEquals( 'inherit', get_post( $posts_by_name['featured-image'] )->post_status );
+		$this->assertEquals( $changeset_data['blogname']['value'], get_option( 'blogname' ) );
 	}
 
 	/**

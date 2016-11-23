@@ -41,7 +41,9 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 			'widgets' => array(
 				'sidebar-1' => array(
 					'text_business_info',
-					'text_about',
+					'text_about' => array(
+						'title' => 'Our Story',
+					),
 					'archives',
 					'calendar',
 					'categories',
@@ -63,7 +65,9 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 						'page_about',
 						'page_blog',
 						'page_news',
-						'page_contact',
+						'page_contact' => array(
+							'title' => 'Email Us',
+						),
 						'link_email',
 						'link_facebook',
 						'link_foursquare',
@@ -86,13 +90,28 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 				'home',
 				'about',
 				'contact',
-				'blog',
+				'blog' => array(
+					'template' => 'blog.php',
+					'post_excerpt' => 'Extended',
+				),
 				'news',
 				'homepage-section',
 				'unknown',
 				'custom' => array(
 					'post_type' => 'post',
 					'post_title' => 'Custom',
+					'thumbnail' => '{{featured-image-logo}}',
+				),
+			),
+			'attachments' => array(
+				'featured-image-logo' => array(
+					'post_title' => 'Title',
+					'post_content' => 'Description',
+					'post_excerpt' => 'Caption',
+					'file' => DIR_TESTDATA . '/images/waffles.jpg',
+				),
+				'featured-image-skipped' => array(
+					'post_title' => 'Skipped',
 				),
 			),
 			'options' => array(
@@ -115,6 +134,9 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 		$this->assertSame( $hydrated_starter_content['options'], $dehydrated_starter_content['options'] );
 		$this->assertCount( 16, $hydrated_starter_content['nav_menus']['top']['items'], 'Unknown should be dropped, custom should be present.' );
 		$this->assertCount( 10, $hydrated_starter_content['widgets']['sidebar-1'], 'Unknown should be dropped.' );
+		$this->assertCount( 1, $hydrated_starter_content['attachments'], 'Attachment with missing file is filtered out.' );
+		$this->assertArrayHasKey( 'featured-image-logo', $hydrated_starter_content['attachments'] );
+		$this->assertSame( $dehydrated_starter_content['attachments']['featured-image-logo'], $hydrated_starter_content['attachments']['featured-image-logo'] );
 
 		foreach ( $hydrated_starter_content['widgets']['sidebar-1'] as $widget ) {
 			$this->assertInternalType( 'array', $widget );
@@ -123,11 +145,14 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 			$this->assertInternalType( 'array', $widget[1] );
 			$this->assertArrayHasKey( 'title', $widget[1] );
 		}
+		$this->assertEquals( 'text', $hydrated_starter_content['widgets']['sidebar-1'][1][0], 'Core content extended' );
+		$this->assertEquals( 'Our Story', $hydrated_starter_content['widgets']['sidebar-1'][1][1]['title'], 'Core content extended' );
 
 		foreach ( $hydrated_starter_content['nav_menus']['top']['items'] as $nav_menu_item ) {
 			$this->assertInternalType( 'array', $nav_menu_item );
 			$this->assertTrue( ! empty( $nav_menu_item['object_id'] ) || ! empty( $nav_menu_item['url'] ) );
 		}
+		$this->assertEquals( 'Email Us', $hydrated_starter_content['nav_menus']['top']['items'][4]['title'], 'Core content extended' );
 
 		foreach ( $hydrated_starter_content['posts'] as $key => $post ) {
 			$this->assertInternalType( 'string', $key );
@@ -136,6 +161,9 @@ class Tests_WP_Theme_Get_Theme_Starter_Content extends WP_UnitTestCase {
 			$this->assertArrayHasKey( 'post_type', $post );
 			$this->assertArrayHasKey( 'post_title', $post );
 		}
+		$this->assertEquals( 'Extended', $hydrated_starter_content['posts']['blog']['post_excerpt'], 'Core content extended' );
+		$this->assertEquals( 'blog.php', $hydrated_starter_content['posts']['blog']['template'], 'Core content extended' );
+		$this->assertEquals( '{{featured-image-logo}}', $hydrated_starter_content['posts']['custom']['thumbnail'], 'Core content extended' );
 	}
 
 	/**
