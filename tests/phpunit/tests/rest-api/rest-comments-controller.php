@@ -146,6 +146,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 			'page',
 			'parent',
 			'parent_exclude',
+			'password',
 			'per_page',
 			'post',
 			'search',
@@ -165,6 +166,69 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$comments = $response->get_data();
 		// We created 6 comments in this method, plus self::$approved_id.
 		$this->assertCount( 7, $comments );
+	}
+
+	/**
+	 * @ticket 38692
+	 */
+	public function test_get_items_with_password() {
+		wp_set_current_user( 0 );
+
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'password', 'toomanysecrets' );
+		$request->set_param( 'post', self::$password_id );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$collection_data = $response->get_data();
+		$this->assertTrue( in_array( $password_comment, wp_list_pluck( $collection_data, 'id' ), true ) );
+	}
+
+	/**
+	 * @ticket 38692
+	 */
+	public function test_get_items_with_password_without_post() {
+		wp_set_current_user( 0 );
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'password', 'toomanysecrets' );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$collection_data = $response->get_data();
+		$this->assertFalse( in_array( $password_comment, wp_list_pluck( $collection_data, 'id' ), true ) );
+	}
+
+	/**
+	 * @ticket 38692
+	 */
+	public function test_get_items_with_password_with_multiple_post() {
+		wp_set_current_user( 0 );
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'password', 'toomanysecrets' );
+		$request->set_param( 'post', array( self::$password_id, self::$post_id ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_read_post', $response, 401 );
 	}
 
 	public function test_get_password_items_without_edit_post_permission() {
@@ -851,6 +915,25 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%s', $password_comment ) );
 		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
+	}
+
+	/**
+	 * @ticket 38692
+	 */
+	public function test_get_comment_with_password_with_valid_password() {
+		wp_set_current_user( self::$subscriber_id );
+
+		$args = array(
+			'comment_approved' => 1,
+			'comment_post_ID'  => self::$password_id,
+		);
+		$password_comment = $this->factory->comment->create( $args );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/comments/%s', $password_comment ) );
+		$request->set_param( 'password', 'toomanysecrets' );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
 	}
 
 	public function test_create_item() {
@@ -1725,6 +1808,44 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'comment_content_column_length', $response, 400 );
+	}
+
+	public function test_create_comment_without_password() {
+		wp_set_current_user( self::$subscriber_id );
+
+		$params = array(
+			'post'         => self::$password_id,
+			'author_name'  => 'Bleeding Gums Murphy',
+			'author_email' => 'murphy@gingivitis.com',
+			'author_url'   => 'http://jazz.gingivitis.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_read_post', $response, 403 );
+	}
+
+	public function test_create_comment_with_password() {
+		add_filter( 'rest_allow_anonymous_comments', '__return_true' );
+
+		$params = array(
+			'post'         => self::$password_id,
+			'author_name'  => 'Bleeding Gums Murphy',
+			'author_email' => 'murphy@gingivitis.com',
+			'author_url'   => 'http://jazz.gingivitis.com',
+			'content'      => 'This isn\'t a saxophone. It\'s an umbrella.',
+			'password'     => 'toomanysecrets',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
 	}
 
 	public function test_update_item() {
