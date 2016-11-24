@@ -1287,6 +1287,22 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 'gallery', get_post_format( $new_post->ID ) );
 	}
 
+	public function test_create_post_with_standard_format() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$params = $this->set_post_data( array(
+			'format' => 'standard',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$new_post = get_post( $data['id'] );
+		$this->assertEquals( 'standard', $data['format'] );
+		$this->assertFalse( get_post_format( $new_post->ID ) );
+	}
+
 	public function test_create_post_with_invalid_format() {
 		wp_set_current_user( self::$editor_id );
 
@@ -1751,6 +1767,22 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$new_post = get_post( $data['id'] );
 		$this->assertEquals( 'gallery', $data['format'] );
 		$this->assertEquals( 'gallery', get_post_format( $new_post->ID ) );
+	}
+
+	public function test_update_post_with_standard_format() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$params = $this->set_post_data( array(
+			'format' => 'standard',
+		) );
+		$request->set_body_params( $params );
+		$response = $this->server->dispatch( $request );
+
+		$data = $response->get_data();
+		$new_post = get_post( $data['id'] );
+		$this->assertEquals( 'standard', $data['format'] );
+		$this->assertFalse( get_post_format( $new_post->ID ) );
 	}
 
 	public function test_update_post_with_invalid_format() {
