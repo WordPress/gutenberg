@@ -15,7 +15,7 @@ wp-tests-config.php
 /npm-debug.log
 /build
 /tests/phpunit/build
-/wp-cli.local.yml 
+/wp-cli.local.yml
 
 # Files and folders that get created in wp-content
 /src/wp-content/blogs.dir
@@ -42,3 +42,9 @@ wp-tests-config.php
 
 # Ignore other .gitignore files to allow for personal customizations
 .gitignore
+
+# Files related to applying patches
+*.rej
+*.orig
+*.patch
+*.diff
