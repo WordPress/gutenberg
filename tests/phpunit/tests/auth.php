@@ -239,6 +239,7 @@ class Tests_Auth extends WP_UnitTestCase {
 
 		// A valid key should be accepted
 		$check = check_password_reset_key( $key, $this->user->user_login );
+		$this->assertNotWPError( $check );
 		$this->assertInstanceOf( 'WP_User', $check );
 		$this->assertSame( $this->user->ID, $check->ID );
 
