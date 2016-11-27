@@ -834,6 +834,67 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item() to set url for posts, terms, and post type archives.
+	 *
+	 * @ticket 38945
+	 * @covers WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item()
+	 */
+	function test_value_as_wp_post_nav_menu_item_term_urls() {
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'category' ) );
+		register_post_type( 'press_release', array(
+			'has_archive' => true,
+		) );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'press_release' ) );
+
+		// Term.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-1]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'type' => 'taxonomy',
+			'object' => 'category',
+			'object_id' => $term_id,
+			'title' => 'Category',
+			'url' => '',
+		) );
+		$setting->preview();
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( get_term_link( $term_id ), $nav_menu_item->url );
+
+		// Post.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-2]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'type' => 'post_type',
+			'object' => 'press_release',
+			'object_id' => $post_id,
+			'title' => 'PR',
+			'url' => '',
+		) );
+		$setting->preview();
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( get_permalink( $post_id ), $nav_menu_item->url );
+
+		// Post type archive.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-3]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'type' => 'post_type_archive',
+			'object' => 'press_release',
+			'title' => 'PR',
+			'url' => '',
+		) );
+		$setting->preview();
+		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertEquals( get_post_type_archive_link( 'press_release' ), $nav_menu_item->url );
+	}
+
+	/**
 	 * Test WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item() where title is empty.
 	 *
 	 * @ticket 38015
