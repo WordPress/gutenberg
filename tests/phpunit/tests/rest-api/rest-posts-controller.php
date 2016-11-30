@@ -1648,6 +1648,22 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $params['excerpt'], $post->post_excerpt );
 	}
 
+	public function test_update_item_no_change() {
+		wp_set_current_user( self::$editor_id );
+		$post = get_post( self::$post_id );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_param( 'author', $post->post_author );
+
+		// Run twice to make sure that the update still succeeds even if no DB
+		// rows are updated.
+		$response = $this->server->dispatch( $request );
+		$this->check_update_post_response( $response );
+
+		$response = $this->server->dispatch( $request );
+		$this->check_update_post_response( $response );
+	}
+
 	public function test_rest_update_post() {
 		wp_set_current_user( self::$editor_id );
 

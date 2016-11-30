@@ -554,6 +554,25 @@ class WP_Test_REST_Tags_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'new-slug', $data['slug'] );
 	}
 
+	public function test_update_item_no_change() {
+		wp_set_current_user( self::$administrator );
+		$term = get_term_by( 'id', $this->factory->tag->create(), 'post_tag' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/tags/' . $term->term_id );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$request->set_param( 'slug', $term->slug );
+
+		// Run twice to make sure that the update still succeeds even if no DB
+		// rows are updated.
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
 	public function test_update_item_invalid_term() {
 		wp_set_current_user( self::$administrator );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/tags/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
