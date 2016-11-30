@@ -811,8 +811,11 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 
 		$setting->preview();
 
+		$item_value = $setting->value();
+		$this->assertArrayHasKey( 'type_label', $item_value );
 		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
 		$this->assertEquals( 'Custom Link', $nav_menu_item->type_label );
+		$this->assertEquals( $item_value['type_label'], $nav_menu_item->type_label );
 		add_filter( 'wp_setup_nav_menu_item', array( $this, 'filter_type_label' ) );
 		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
 		$this->assertEquals( 'Custom Label', $nav_menu_item->type_label );
@@ -892,6 +895,167 @@ class Test_WP_Customize_Nav_Menu_Item_Setting extends WP_UnitTestCase {
 		$setting->preview();
 		$nav_menu_item = $setting->value_as_wp_post_nav_menu_item();
 		$this->assertEquals( get_post_type_archive_link( 'press_release' ), $nav_menu_item->url );
+	}
+
+	/**
+	 * Test WP_Customize_Nav_Menu_Item_Setting::value_as_wp_post_nav_menu_item() for obtaining original title.
+	 *
+	 * @ticket 38945
+	 * @covers WP_Customize_Nav_Menu_Item_Setting::get_original_title()
+	 */
+	function test_get_original_title() {
+		$menu_id = wp_create_nav_menu( 'Menu' );
+		register_post_type( 'press_release', array(
+			'has_archive' => true,
+			'labels' => array(
+				'name' => 'PRs',
+				'singular_name' => 'PR',
+				'archives' => 'All PRs',
+			),
+		) );
+		$original_post_title = 'The PR Post';
+		$post_id = self::factory()->post->create( array( 'post_type' => 'press_release', 'post_title' => $original_post_title ) );
+		$original_term_title = 'The Category Term';
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'category', 'name' => $original_term_title ) );
+
+		// Post: existing nav menu item.
+		$nav_menu_item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-object-id' => $post_id,
+			'menu-item-type' => 'post_type',
+			'menu-item-object' => 'press_release',
+			'menu-item-title' => '',
+			'menu-item-status' => 'publish',
+		) );
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[' . $nav_menu_item_id . ']'
+		);
+		$item_value = $setting->value();
+		$this->assertEquals( $original_post_title, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( $original_post_title, $item->original_title );
+		$this->assertEquals( $original_post_title, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->singular_name, $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
+
+		// Post: staged nav menu item.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-1]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'object_id' => $post_id,
+			'type' => 'post_type',
+			'object' => 'press_release',
+			'title' => '',
+			'status' => 'publish',
+		) );
+		$setting->preview();
+		$item_value = $setting->value();
+		$this->assertEquals( $original_post_title, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( $original_post_title, $item->original_title );
+		$this->assertEquals( $original_post_title, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->singular_name, $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
+
+		// Term: existing nav menu item.
+		$nav_menu_item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-object-id' => $term_id,
+			'menu-item-type' => 'taxonomy',
+			'menu-item-object' => 'category',
+			'menu-item-title' => '',
+			'menu-item-status' => 'publish',
+		) );
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[' . $nav_menu_item_id . ']'
+		);
+		$item_value = $setting->value();
+		$this->assertEquals( $original_term_title, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( $original_term_title, $item->original_title );
+		$this->assertEquals( $original_term_title, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( get_taxonomy( 'category' )->labels->singular_name, $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
+
+		// Term: staged nav menu item.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-2]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'object_id' => $term_id,
+			'type' => 'taxonomy',
+			'object' => 'category',
+			'title' => '',
+			'status' => 'publish',
+		) );
+		$setting->preview();
+		$item_value = $setting->value();
+		$this->assertEquals( $original_term_title, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( $original_term_title, $item->original_title );
+		$this->assertEquals( $original_term_title, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( get_taxonomy( 'category' )->labels->singular_name, $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
+
+		// Post Type Archive: existing nav menu item.
+		$nav_menu_item_id = wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-type' => 'post_type_archive',
+			'menu-item-object' => 'press_release',
+			'menu-item-title' => '',
+			'menu-item-status' => 'publish',
+		) );
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[' . $nav_menu_item_id . ']'
+		);
+		$item_value = $setting->value();
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item->original_title );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( __( 'Post Type Archive' ), $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
+
+		// Post Type Archive: staged nav menu item.
+		$setting = new WP_Customize_Nav_Menu_Item_Setting(
+			$this->wp_customize,
+			'nav_menu_item[-3]'
+		);
+		$this->wp_customize->set_post_value( $setting->id, array(
+			'type' => 'post_type_archive',
+			'object' => 'press_release',
+			'title' => '',
+			'status' => 'publish',
+		) );
+		$setting->preview();
+		$item_value = $setting->value();
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item_value['original_title'] );
+		$this->assertEquals( '', $item_value['title'] );
+		$item = $setting->value_as_wp_post_nav_menu_item();
+		$this->assertObjectHasAttribute( 'type_label', $item );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item->original_title );
+		$this->assertEquals( get_post_type_object( 'press_release' )->labels->archives, $item->title );
+		$this->assertArrayHasKey( 'type_label', $item_value );
+		$this->assertEquals( __( 'Post Type Archive' ), $item_value['type_label'] );
+		$this->assertEquals( $item->type_label, $item_value['type_label'] );
 	}
 
 	/**
