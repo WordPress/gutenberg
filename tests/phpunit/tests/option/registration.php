@@ -62,6 +62,18 @@ class Tests_Option_Registration extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38930
+	 */
+	public function test_add_option_with_no_options_cache() {
+		register_setting( 'test_group', 'test_default', array(
+			'default' => 'My Default :)',
+		));
+		wp_cache_delete( 'notoptions', 'options' );
+		$this->assertTrue( add_option( 'test_default', 'hello' ) );
+		$this->assertEquals( 'hello', get_option( 'test_default' ) );
+	}
+
+	/**
 	 * @expectedDeprecated register_setting
 	 */
 	public function test_register_deprecated_group_misc() {
