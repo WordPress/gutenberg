@@ -1505,7 +1505,26 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_body( wp_json_encode( $params ) );
 
 		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_invalid_post_id', $response, 403 );
+	}
 
+	public function test_create_comment_invalid_post_id() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'author_name'  => 'Homer Jay Simpson',
+			'author_email' => 'chunkylover53@aol.com',
+			'author_url'   => 'http://compuglobalhypermeganet.com',
+			'content'      => 'Here\’s to alcohol: the cause of, and solution to, all of life\’s problems.',
+			'status'       => 'approved',
+			'post'         => REST_TESTS_IMPOSSIBLY_HIGH_NUMBER,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
 		$this->assertErrorResponse( 'rest_comment_invalid_post_id', $response, 403 );
 	}
 
