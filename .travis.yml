@@ -35,7 +35,6 @@ matrix:
   allow_failures:
   - php: hhvm
   - php: nightly
-  - php: 7.1
 before_install:
 - git clone https://github.com/WordPress/twentysixteen.git src/wp-content/themes/twentysixteen
 - |
