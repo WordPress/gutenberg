@@ -402,6 +402,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			),
 		);
 
+		update_option( 'posts_per_page', 1 ); // To check #39022.
 		add_theme_support( 'starter-content', $starter_content_config );
 		$this->assertEmpty( $wp_customize->unsanitized_post_values() );
 		$wp_customize->import_theme_starter_content();
