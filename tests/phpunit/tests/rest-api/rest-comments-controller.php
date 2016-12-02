@@ -97,10 +97,6 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		}
 	}
 
-	public function tearDown() {
-		parent::tearDown();
-	}
-
 	public function test_register_routes() {
 		$routes = $this->server->get_routes();
 
@@ -987,28 +983,8 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( $params['content']['raw'], $new_comment->comment_content );
 	}
 
-	public function test_create_comment_missing_required_author_name_and_email_per_option_value() {
+	public function test_create_comment_missing_required_author_name() {
 		add_filter( 'rest_allow_anonymous_comments', '__return_true' );
-		update_option( 'require_name_email', 1 );
-
-		$params = array(
-			'post'    => self::$post_id,
-			'content' => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'content-type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-
-		$response = $this->server->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_author_data_required', $response, 400 );
-
-		update_option( 'require_name_email', 0 );
-	}
-
-	public function test_create_comment_missing_required_author_name_per_option_value() {
-		wp_set_current_user( self::$admin_id );
 		update_option( 'require_name_email', 1 );
 
 		$params = array(
@@ -1022,12 +998,31 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_body( wp_json_encode( $params ) );
 
 		$response = $this->server->dispatch( $request );
-		$this->assertErrorResponse( 'rest_comment_author_required', $response, 400 );
 
-		update_option( 'require_name_email', 0 );
+		$this->assertErrorResponse( 'rest_comment_author_data_required', $response, 400 );
 	}
 
-	public function test_create_comment_missing_required_author_email_per_option_value() {
+	public function test_create_comment_empty_required_author_name() {
+		add_filter( 'rest_allow_anonymous_comments', '__return_true' );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'author_name'  => '',
+			'author_email' => 'ekrabappel@springfield-elementary.edu',
+			'post'         => self::$post_id,
+			'content'      => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_author_data_required', $response, 400 );
+	}
+
+	public function test_create_comment_missing_required_author_email() {
 		wp_set_current_user( self::$admin_id );
 		update_option( 'require_name_email', 1 );
 
@@ -1042,9 +1037,26 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request->set_body( wp_json_encode( $params ) );
 
 		$response = $this->server->dispatch( $request );
-		$this->assertErrorResponse( 'rest_comment_author_email_required', $response, 400 );
+		$this->assertErrorResponse( 'rest_comment_author_data_required', $response, 400 );
+	}
 
-		update_option( 'require_name_email', 0 );
+	public function test_create_comment_empty_required_author_email() {
+		wp_set_current_user( self::$admin_id );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Edna Krabappel',
+			'author_email' => '',
+			'content'      => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_author_data_required', $response, 400 );
 	}
 
 	public function test_create_comment_author_email_too_short() {
@@ -1990,6 +2002,100 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$updated = get_comment( self::$approved_id );
 		$this->assertEquals( $params['date_gmt'], $comment['date_gmt'] );
 		$this->assertEquals( $params['date_gmt'], mysql_to_rfc3339( $updated->comment_date_gmt ) );
+	}
+
+	public function test_update_comment_author_email_only() {
+		wp_set_current_user( self::$editor_id );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_email' => 'ekrabappel@springfield-elementary.edu',
+			'content'      => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_update_comment_empty_author_name() {
+		wp_set_current_user( self::$editor_id );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'author_name'  => '',
+			'author_email' => 'ekrabappel@springfield-elementary.edu',
+			'post'         => self::$post_id,
+			'content'      => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_update_comment_author_name_only() {
+		wp_set_current_user( self::$admin_id );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'post'        => self::$post_id,
+			'author_name' => 'Edna Krabappel',
+			'content'     => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_update_comment_empty_author_email() {
+		wp_set_current_user( self::$admin_id );
+		update_option( 'require_name_email', 1 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Edna Krabappel',
+			'author_email' => '',
+			'content'      => 'Now, I don\'t want you to worry class. These tests will have no affect on your grades. They merely determine your future social status and financial success. If any.',
+		);
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_update_comment_author_email_too_short() {
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Homer J. Simpson',
+			'author_email' => 'a@b',
+			'content'      => 'in this house, we obey the laws of thermodynamics!',
+		);
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', self::$approved_id ) );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'author_email', $data['data']['params'] );
 	}
 
 	public function test_update_comment_invalid_type() {
