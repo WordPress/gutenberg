@@ -786,6 +786,65 @@ class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
 		$this->assertContains( 'graeme', $meta );
 	}
 
+	/**
+	 * @ticket 38989
+	 */
+	public function test_set_value_invalid_meta_string_request_type() {
+		update_post_meta( self::$post_id, 'test_single', 'So I tied an onion to my belt, which was the style at the time.' );
+		$post_original = get_post( self::$post_id );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'title' => 'Ignore this title',
+			'meta'  => 'Not an array.',
+		);
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+
+		// The meta value should not have changed.
+		$current_value = get_post_meta( self::$post_id, 'test_single', true );
+		$this->assertEquals( 'So I tied an onion to my belt, which was the style at the time.', $current_value );
+
+		// Ensure the post title update was not processed.
+		$post_updated = get_post( self::$post_id );
+		$this->assertEquals( $post_original->post_title, $post_updated->post_title );
+	}
+
+	/**
+	 * @ticket 38989
+	 */
+	public function test_set_value_invalid_meta_float_request_type() {
+		update_post_meta( self::$post_id, 'test_single', 'Now, to take the ferry cost a nickel, and in those days, nickels had pictures of bumblebees on them.' );
+		$post_original = get_post( self::$post_id );
+
+		$this->grant_write_permission();
+
+		$data = array(
+			'content' => 'Ignore this content.',
+			'meta'    => 1.234,
+		);
+
+		$request = new WP_REST_Request( 'POST', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_body_params( $data );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+
+		// The meta value should not have changed.
+		$current_value = get_post_meta( self::$post_id, 'test_single', true );
+		$this->assertEquals( 'Now, to take the ferry cost a nickel, and in those days, nickels had pictures of bumblebees on them.', $current_value );
+
+		// Ensure the post content update was not processed.
+		$post_updated = get_post( self::$post_id );
+		$this->assertEquals( $post_original->post_content, $post_updated->post_content );
+	}
+
 	public function test_remove_multi_value_db_error() {
 		add_post_meta( self::$post_id, 'test_multi', 'val1' );
 		$values = get_post_meta( self::$post_id, 'test_multi', false );
