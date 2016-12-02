@@ -444,6 +444,50 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	public function test_get_items_with_orderby_include_without_include_param() {
+		$this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'include' );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_orderby_include_missing_include', $response, 400 );
+	}
+
+	public function test_get_items_with_orderby_id() {
+		$id1 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_date' => '2016-01-13 02:26:48' ) );
+		$id2 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_date' => '2016-01-12 02:26:48' ) );
+		$id3 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_date' => '2016-01-11 02:26:48' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'id' );
+		$request->set_param( 'include', array( $id1, $id2, $id3 ) );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		// Default ORDER is DESC.
+		$this->assertEquals( $id3, $data[0]['id'] );
+		$this->assertEquals( $id2, $data[1]['id'] );
+		$this->assertEquals( $id1, $data[2]['id'] );
+	}
+
+	public function test_get_items_with_orderby_slug() {
+		$id1 = $this->factory->post->create( array( 'post_title' => 'ABC', 'post_name' => 'xyz', 'post_status' => 'publish' ) );
+		$id2 = $this->factory->post->create( array( 'post_title' => 'XYZ', 'post_name' => 'abc', 'post_status' => 'publish' ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'slug' );
+		$request->set_param( 'include', array( $id1, $id2 ) );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		// Default ORDER is DESC.
+		$this->assertEquals( 'xyz', $data[0]['slug'] );
+		$this->assertEquals( 'abc', $data[1]['slug'] );
+	}
+
 	public function test_get_items_with_orderby_relevance() {
 		$this->factory->post->create( array( 'post_title' => 'Title is more relevant', 'post_content' => 'Content is', 'post_status' => 'publish' ) );
 		$this->factory->post->create( array( 'post_title' => 'Title is', 'post_content' => 'Content is less relevant', 'post_status' => 'publish' ) );
