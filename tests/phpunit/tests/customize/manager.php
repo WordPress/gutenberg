@@ -627,10 +627,11 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 				'custom' => 'something',
 			),
 		);
+		$date = ( gmdate( 'Y' ) + 1 ) . '-12-01 00:00:00';
 		$r = $manager->save_changeset_post( array(
 			'status' => 'auto-draft',
 			'title' => 'Auto Draft',
-			'date_gmt' => '2010-01-01 00:00:00',
+			'date_gmt' => $date,
 			'data' => $pre_saved_data,
 		) );
 		$this->assertInternalType( 'array', $r );
@@ -651,7 +652,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		}
 		$this->assertEquals( 'Auto Draft', get_post( $post_id )->post_title );
 		$this->assertEquals( 'auto-draft', get_post( $post_id )->post_status );
-		$this->assertEquals( '2010-01-01 00:00:00', get_post( $post_id )->post_date_gmt );
+		$this->assertEquals( $date, get_post( $post_id )->post_date_gmt );
 		$this->assertNotEquals( 'Changeset Title', get_option( 'blogname' ) );
 		$this->assertArrayHasKey( 'setting_validities', $r );
 
