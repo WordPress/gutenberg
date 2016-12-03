@@ -54,8 +54,6 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 		$expected = array(
 			'title',
 			'description',
-			'url',
-			'email',
 			'timezone',
 			'date_format',
 			'time_format',
@@ -69,8 +67,9 @@ class WP_Test_REST_Settings_Controller extends WP_Test_REST_Controller_Testcase 
 			'default_comment_status',
 		);
 
-		if ( is_multisite() ) {
-			$expected = array_diff( $expected, array( 'url' ) );
+		if ( ! is_multisite() ) {
+			$expected[] = 'url';
+			$expected[] = 'email';
 		}
 
 		sort( $expected );
