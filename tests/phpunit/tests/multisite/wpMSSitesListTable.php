@@ -16,7 +16,7 @@ class Tests_WP_MS_Sites_List_Table extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		$this->table = _get_list_table( 'WP_MS_Sites_List_Table' );
+		$this->table = _get_list_table( 'WP_MS_Sites_List_Table', array( 'screen' => 'ms-sites' ) );
 	}
 
 	public static function wpSetUpBeforeClass( $factory ) {

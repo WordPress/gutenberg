@@ -16,9 +16,7 @@ class Tests_Admin_includesListTable extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		set_current_screen( 'edit-page' );
-		$GLOBALS['hook_suffix'] = '';
-		$this->table = _get_list_table( 'WP_Posts_List_Table' );
+		$this->table = _get_list_table( 'WP_Posts_List_Table', array( 'screen' => 'edit-page' ) );
 	}
 
 	public static function wpSetUpBeforeClass( $factory ) {
