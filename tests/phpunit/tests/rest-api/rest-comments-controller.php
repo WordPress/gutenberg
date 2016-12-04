@@ -1749,6 +1749,33 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( 400, $response->get_status() );
 	}
 
+	public function anonymous_comments_callback_null() {
+		// I'm a plugin developer who forgot to include a return value for some
+		// code path in my 'rest_allow_anonymous_comments' filter.
+	}
+
+	public function test_allow_anonymous_comments_null() {
+		add_filter( 'rest_allow_anonymous_comments', array( $this, 'anonymous_comments_callback_null' ), 10, 2 );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Comic Book Guy',
+			'author_email' => 'cbg@androidsdungeon.com',
+			'author_url'   => 'http://androidsdungeon.com',
+			'content'      => 'Worst Comment Ever!',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+
+		remove_filter( 'rest_allow_anonymous_comments', array( $this, 'anonymous_comments_callback_null' ), 10, 2 );
+
+		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
+	}
+
 	/**
 	 * @ticket 38477
 	 */
