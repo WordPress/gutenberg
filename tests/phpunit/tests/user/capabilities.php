@@ -225,11 +225,11 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_network_plugins' => array(),
 			'manage_network_themes'  => array(),
 			'manage_network_options' => array(),
+			'delete_site'            => array(),
 
 			'upload_plugins'         => array( 'administrator' ),
 			'upload_themes'          => array( 'administrator' ),
 			'customize'              => array( 'administrator' ),
-			'delete_site'            => array( 'administrator' ),
 			'add_users'              => array( 'administrator' ),
 
 			'edit_categories'        => array( 'administrator', 'editor' ),
