@@ -193,6 +193,34 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test revision saving on initial save of Custom CSS.
+	 *
+	 * @ticket 39032
+	 */
+	function test_custom_css_revision_saved() {
+		$inserted_css = 'body { background: black; }';
+		$updated_css = 'body { background: red; }';
+
+		$post = wp_update_custom_css_post( $inserted_css, array(
+			'stylesheet' => 'testtheme',
+		) );
+
+		$this->assertSame( $inserted_css, $post->post_content );
+		$revisions = array_values( wp_get_post_revisions( $post ) );
+		$this->assertCount( 1, $revisions );
+		$this->assertSame( $inserted_css, $revisions[0]->post_content );
+
+		wp_update_custom_css_post( $updated_css, array(
+			'stylesheet' => 'testtheme',
+		) );
+
+		$revisions = array_values( wp_get_post_revisions( $post ) );
+		$this->assertCount( 2, $revisions );
+		$this->assertSame( $updated_css, $revisions[0]->post_content );
+		$this->assertSame( $inserted_css, $revisions[1]->post_content );
+	}
+
+	/**
 	 * Test crud methods on WP_Customize_Custom_CSS_Setting.
 	 *
 	 * @covers WP_Customize_Custom_CSS_Setting::value()
