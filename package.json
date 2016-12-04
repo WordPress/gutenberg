@@ -6,6 +6,9 @@
     "type": "svn",
     "url": "https://develop.svn.wordpress.org/trunk"
   },
+  "engines": {
+    "node": "6.9.1"
+  },
   "author": "The WordPress Contributors",
   "license": "GPL-2.0+",
   "devDependencies": {
