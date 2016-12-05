@@ -601,7 +601,8 @@ class Tests_Ajax_CustomizeMenus extends WP_Ajax_UnitTestCase {
 		$post = get_post( $response['data']['post_id'] );
 		$this->assertEquals( 'Hello World', $post->post_title );
 		$this->assertEquals( 'post', $post->post_type );
-		$this->assertEquals( 'hello-world', $post->post_name );
+		$this->assertEquals( '', $post->post_name );
+		$this->assertEquals( 'hello-world', get_post_meta( $post->ID, '_customize_draft_post_name', true ) );
 	}
 
 	/**

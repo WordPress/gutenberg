@@ -347,46 +347,4 @@ class Tests_Post_WpUniquePostSlug extends WP_UnitTestCase {
 		$found = wp_unique_post_slug( 'embed', $p, 'publish', 'attachment', 0 );
 		$this->assertSame( 'embed-2', $found );
 	}
-
-	/**
-	 * @ticket 38928
-	 */
-	public function test_non_unique_slugs_for_existing_auto_draft_posts() {
-		$auto_draft_post_id = self::factory()->post->create( array(
-			'post_type' => 'post',
-			'post_name' => 'existing-post',
-			'post_status' => 'auto-draft',
-		) );
-		$auto_draft_page_id = self::factory()->post->create( array(
-			'post_type' => 'page',
-			'post_name' => 'existing-page',
-			'post_status' => 'auto-draft',
-		) );
-		$auto_draft_attachment_id = self::factory()->attachment->create_object( 'image.jpg', $auto_draft_page_id, array(
-			'post_mime_type' => 'image/jpeg',
-			'post_type' => 'attachment',
-			'post_name' => 'existing-attachment',
-			'post_status' => 'auto-draft',
-		) );
-
-		$post_id = self::factory()->post->create( array( 'post_type' => 'post' ) );
-		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$attachment_id = self::factory()->attachment->create_object( 'image2.jpg', $page_id, array(
-			'post_mime_type' => 'image/jpeg',
-			'post_type' => 'attachment',
-			'post_name' => 'existing-image',
-		) );
-
-		$this->assertEquals( 'existing-post', wp_unique_post_slug( 'existing-post', $post_id, 'publish', get_post_type( $post_id ), 0 ) );
-		wp_publish_post( $auto_draft_post_id );
-		$this->assertEquals( 'existing-post-2', wp_unique_post_slug( 'existing-post', $post_id, 'publish', get_post_type( $post_id ), 0 ) );
-
-		$this->assertEquals( 'existing-page', wp_unique_post_slug( 'existing-page', $page_id, 'publish', get_post_type( $page_id ), 0 ) );
-		wp_publish_post( $auto_draft_page_id );
-		$this->assertEquals( 'existing-page-2', wp_unique_post_slug( 'existing-page', $page_id, 'publish', get_post_type( $page_id ), 0 ) );
-
-		$this->assertEquals( 'existing-attachment', wp_unique_post_slug( 'existing-attachment', $attachment_id, 'publish', get_post_type( $attachment_id ), 0 ) );
-		wp_publish_post( $auto_draft_attachment_id );
-		$this->assertEquals( 'existing-attachment-2', wp_unique_post_slug( 'existing-attachment', $attachment_id, 'publish', get_post_type( $attachment_id ), 0 ) );
-	}
 }
