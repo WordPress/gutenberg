@@ -1386,16 +1386,20 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	 * @ticket 28374
 	 */
 	function test_current_user_edit_caps() {
-		$user = new WP_User( self::factory()->user->create( array( 'role' => 'contributor' ) ) );
+		$user = self::$users['contributor'];
 		wp_set_current_user( $user->ID );
 
 		$user->add_cap( 'publish_posts' );
-		$user->add_cap( 'publish_pages' );
 		$this->assertTrue( $user->has_cap( 'publish_posts' ) );
+
+		$user->add_cap( 'publish_pages' );
 		$this->assertTrue( $user->has_cap( 'publish_pages' ) );
 
 		$user->remove_cap( 'publish_pages' );
 		$this->assertFalse( $user->has_cap( 'publish_pages' ) );
+
+		$user->remove_cap( 'publish_posts' );
+		$this->assertFalse( $user->has_cap( 'publish_posts' ) );
 	}
 
 	function test_subscriber_cant_edit_posts() {
