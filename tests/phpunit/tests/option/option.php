@@ -72,7 +72,7 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	}
 
 	function test_serialized_data() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 		$value = array( 'foo' => true, 'bar' => true );
 
 		$this->assertTrue( add_option( $key, $value ) );

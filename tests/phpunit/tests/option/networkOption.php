@@ -17,8 +17,8 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		}
 
 		$id = self::factory()->network->create();
-		$option = rand_str();
-		$value = rand_str();
+		$option = __FUNCTION__;
+		$value = __FUNCTION__;
 
 		add_site_option( $option, $value );
 		$this->assertFalse( get_network_option( $id, $option, false ) );
@@ -30,8 +30,8 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		}
 
 		$id = self::factory()->network->create();
-		$option = rand_str();
-		$value = rand_str();
+		$option = __FUNCTION__;
+		$value = __FUNCTION__;
 
 		add_network_option( $id, $option, $value );
 		$this->assertEquals( $value, get_network_option( $id, $option, false ) );
@@ -43,8 +43,8 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 		}
 
 		$id = self::factory()->network->create();
-		$option = rand_str();
-		$value = rand_str();
+		$option = __FUNCTION__;
+		$value = __FUNCTION__;
 
 		add_site_option( $option, $value );
 		add_network_option( $id, $option, $value );
@@ -56,7 +56,7 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @ticket 22846
 	 */
 	public function test_add_network_option_is_not_stored_as_autoload_option() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'Does not apply when used in multisite.' );
@@ -73,7 +73,7 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @ticket 22846
 	 */
 	public function test_update_network_option_is_not_stored_as_autoload_option() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'Does not apply when used in multisite.' );

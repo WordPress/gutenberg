@@ -271,9 +271,9 @@ abstract class WP_Test_REST_Post_Type_Controller_Testcase extends WP_Test_REST_C
 
 	protected function set_post_data( $args = array() ) {
 		$defaults = array(
-			'title'   => rand_str(),
-			'content' => rand_str(),
-			'excerpt' => rand_str(),
+			'title'   => 'Post Title',
+			'content' => 'Post content',
+			'excerpt' => 'Post excerpt',
 			'name'    => 'test',
 			'status'  => 'publish',
 			'author'  => get_current_user_id(),
@@ -286,13 +286,13 @@ abstract class WP_Test_REST_Post_Type_Controller_Testcase extends WP_Test_REST_C
 	protected function set_raw_post_data( $args = array() ) {
 		return wp_parse_args( $args, $this->set_post_data( array(
 			'title'   => array(
-				'raw' => rand_str(),
+				'raw' => 'Post Title',
 			),
 			'content' => array(
-				'raw' => rand_str(),
+				'raw' => 'Post content',
 			),
 			'excerpt' => array(
-				'raw' => rand_str(),
+				'raw' => 'Post excerpt',
 			),
 		) ) );
 	}

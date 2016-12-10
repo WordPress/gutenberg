@@ -30,7 +30,7 @@ class Tests_Option_SiteTransient extends WP_UnitTestCase {
 	}
 
 	function test_serialized_data() {
-		$key = rand_str();
+		$key = __FUNCTION__;
 		$value = array( 'foo' => true, 'bar' => true );
 
 		$this->assertTrue( set_site_transient( $key, $value ) );
@@ -46,7 +46,7 @@ class Tests_Option_SiteTransient extends WP_UnitTestCase {
 	 * @ticket 22846
 	 */
 	public function test_set_site_transient_is_not_stored_as_autoload_option() {
-		$key = rand_str();
+		$key = 'not_autoloaded';
 
 		if ( is_multisite() ) {
 			$this->markTestSkipped( 'Does not apply when used in multisite.' );
