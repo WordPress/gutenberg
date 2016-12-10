@@ -350,7 +350,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 				'top' => array(
 					'name'  => 'Menu Name',
 					'items' => array(
-						'page_home',
+						'link_home',
 						'page_about',
 						'page_blog',
 						'link_email',
@@ -478,7 +478,9 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( $posts_by_name['blog'], $changeset_values['page_for_posts'] );
 
 		$this->assertEquals( -1, $changeset_values['nav_menu_locations[top]'] );
-		$this->assertEquals( $posts_by_name['home'], $changeset_values['nav_menu_item[-1]']['object_id'] );
+		$this->assertEquals( 0, $changeset_values['nav_menu_item[-1]']['object_id'] );
+		$this->assertEquals( 'custom', $changeset_values['nav_menu_item[-1]']['type'] );
+		$this->assertEquals( home_url(), $changeset_values['nav_menu_item[-1]']['url'] );
 
 		$this->assertEmpty( $wp_customize->changeset_data() );
 		$this->assertNull( $wp_customize->changeset_post_id() );
