@@ -364,11 +364,6 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$result = $this->setting->validate( $imbalanced_double_quotes );
 		$this->assertTrue( array_key_exists( 'unequal_double_quotes', $result->errors ) );
 
-		// Check for Imbalanced Single Quotes.
-		$imbalanced_single_quotes = $basic_css . " div.background-image { background-image: url( 'image.jpg ); } ";
-		$result = $this->setting->validate( $imbalanced_single_quotes );
-		$this->assertTrue( array_key_exists( 'unequal_single_quotes', $result->errors ) );
-
 		// Check for Unclosed Parentheses.
 		$unclosed_parentheses = $basic_css . ' div.background-image { background-image: url( "image.jpg" ; } ';
 		$result = $this->setting->validate( $unclosed_parentheses );
