@@ -2580,6 +2580,31 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$result = $this->manager->panels();
 		$this->assertEquals( $panels_sorted, array_keys( $result ) );
 	}
+
+	/**
+	 * Verify sanitization of external header video URL will trim the whitespaces in the beginning and end of the URL.
+	 *
+	 * @ticket 39125
+	 */
+	function test_sanitize_external_header_video_trim() {
+		$this->manager->register_controls();
+		$setting = $this->manager->get_setting( 'external_header_video' );
+		$video_url = 'https://www.youtube.com/watch?v=KiS8rZBeIO0';
+
+		$whitespaces = array(
+			' ',  // space
+			"\t", // horizontal tab
+			"\n", // line feed
+			"\r", // carriage return,
+			"\f", // form feed,
+			"\v", // vertical tab
+		);
+
+		foreach ( $whitespaces as $whitespace  ) {
+			$sanitized = $setting->sanitize( $whitespace . $video_url . $whitespace );
+			$this->assertEquals( $video_url, $sanitized );
+		}
+	}
 }
 
 require_once ABSPATH . WPINC . '/class-wp-customize-setting.php';
