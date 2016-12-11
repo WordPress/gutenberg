@@ -166,6 +166,31 @@ class Tests_Option_UpdateOption extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 38903
+	 */
+	public function test_update_option_array_with_object() {
+		$array_w_object = array(
+			'url'       => 'http://src.wordpress-develop.dev/wp-content/uploads/2016/10/cropped-Blurry-Lights.jpg',
+			'meta_data' => (object) array(
+				'attachment_id' => 292,
+				'height'        => 708,
+				'width'         => 1260,
+			),
+		);
+
+		// Add the option, it did not exist before this.
+		add_option( 'array_w_object', $array_w_object );
+
+		$num_queries_pre_update = get_num_queries();
+
+		// Update the option using the same array with an object for the value.
+		$this->assertFalse( update_option( 'array_w_object', $array_w_object ) );
+
+		// Check that no new database queries were performed.
+		$this->assertEquals( $num_queries_pre_update, get_num_queries() );
+	}
+
+	/**
 	 * `add_filter()` callback for test_should_respect_default_option_filter_when_option_does_not_yet_exist_in_database().
 	 */
 	public function __return_foo() {
