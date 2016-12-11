@@ -342,6 +342,42 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertEquals( 'rest_invalid_param', $valid->get_error_code() );
 	}
 
+	public function test_sanitize_params_with_null_callback() {
+		$this->request->set_url_params( array(
+			'some_email' => '',
+		) );
+
+		$this->request->set_attributes( array(
+			'args' => array(
+				'some_email' => array(
+					'type'              => 'string',
+					'format'            => 'email',
+					'sanitize_callback' => null,
+				),
+			),
+		) );
+
+		$this->assertTrue( $this->request->sanitize_params() );
+	}
+
+	public function test_sanitize_params_with_false_callback() {
+		$this->request->set_url_params( array(
+			'some_uri'   => 1.23422,
+		) );
+
+		$this->request->set_attributes( array(
+			'args' => array(
+				'some_uri' => array(
+					'type'              => 'string',
+					'format'            => 'uri',
+					'sanitize_callback' => false,
+				),
+			),
+		) );
+
+		$this->assertTrue( $this->request->sanitize_params() );
+	}
+
 	public function test_has_valid_params_required_flag() {
 		$this->request->set_attributes( array(
 			'args' => array(
