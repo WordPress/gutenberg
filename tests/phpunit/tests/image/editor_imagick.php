@@ -531,4 +531,15 @@ class Tests_Image_Editor_Imagick extends WP_Image_UnitTestCase {
 		$this->assertImageAlphaAtPointImagick( $save_to_file, array( 0, 0 ), $pre_rotate_alpha );
 		unlink( $save_to_file );
 	}
+
+	/**
+	 * Test WP_Image_Editor_Imagick handles extension-less images
+	 * @ticket 39195
+	 */
+	public function test_image_non_existent_extension() {
+		$image_editor = new WP_Image_Editor_Imagick( DIR_TESTDATA.'/images/test-image-no-extension' );
+		$result = $image_editor->load();
+
+		$this->assertTrue( $result );
+	}
 }
