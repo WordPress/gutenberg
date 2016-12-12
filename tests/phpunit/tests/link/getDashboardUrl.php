@@ -11,7 +11,11 @@ class Tests_Link_GetDashboardUrl extends WP_UnitTestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
-		wpmu_delete_user( self::$user_id );
+		if ( is_multisite() ) {
+			wpmu_delete_user( self::$user_id );
+		} else {
+			wp_delete_user( self::$user_id );
+		}
 	}
 
 	/**
