@@ -1757,4 +1757,21 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		wp_set_current_user( self::$users['editor']->ID );
 		$this->assertFalse( current_user_can( 'add_user_meta', self::$users['subscriber']->ID, 'foo' ) );
 	}
+
+	/**
+	 * @ticket 39063
+	 */
+	public function test_only_super_admins_can_remove_themselves_on_multisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite.' );
+		}
+
+		$this->assertTrue( user_can( self::$super_admin->ID, 'remove_user', self::$super_admin->ID ) );
+
+		$this->assertFalse( user_can( self::$users['administrator']->ID, 'remove_user', self::$users['administrator']->ID ) );
+		$this->assertFalse( user_can( self::$users['editor']->ID,        'remove_user', self::$users['editor']->ID ) );
+		$this->assertFalse( user_can( self::$users['author']->ID,        'remove_user', self::$users['author']->ID ) );
+		$this->assertFalse( user_can( self::$users['contributor']->ID,   'remove_user', self::$users['contributor']->ID ) );
+		$this->assertFalse( user_can( self::$users['subscriber']->ID,    'remove_user', self::$users['subscriber']->ID ) );
+	}
 }
