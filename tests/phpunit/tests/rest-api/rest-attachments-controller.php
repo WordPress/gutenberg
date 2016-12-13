@@ -172,6 +172,19 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$this->assertEqualSets( $media_types, $data['endpoints'][0]['args']['media_type']['enum'] );
 	}
 
+	public function test_registered_get_item_params() {
+		$id1 = $this->factory->attachment->create_object( $this->test_file, 0, array(
+			'post_mime_type' => 'image/jpeg',
+			'post_excerpt'   => 'A sample caption',
+		) );
+		$request = new WP_REST_Request( 'OPTIONS', sprintf( '/wp/v2/media/%d', $id1 ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$keys = array_keys( $data['endpoints'][0]['args'] );
+		sort( $keys );
+		$this->assertEquals( array( 'context' ), $keys );
+	}
+
 	public function test_get_items() {
 		wp_set_current_user( 0 );
 		$id1 = $this->factory->attachment->create_object( $this->test_file, 0, array(
