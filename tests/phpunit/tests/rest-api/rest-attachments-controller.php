@@ -1156,6 +1156,26 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$wp_rest_additional_fields = array();
 	}
 
+	public function test_search_item_by_filename() {
+		$id = $this->factory->attachment->create_object( $this->test_file, 0, array(
+			'post_mime_type' => 'image/jpeg',
+		) );
+		$id2 = $this->factory->attachment->create_object( $this->test_file2, 0, array(
+			'post_mime_type' => 'image/png',
+		) );
+
+		$filename = basename( $this->test_file2 );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media' );
+		$request->set_param( 'search', $filename );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertCount( 1, $data );
+		$this->assertEquals( $id2, $data[0]['id'] );
+		$this->assertEquals( 'image/png', $data[0]['mime_type'] );
+	}
+
 	public function additional_field_get_callback( $object, $request ) {
 		return 123;
 	}
