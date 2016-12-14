@@ -1074,6 +1074,32 @@ class Tests_Query_Conditionals extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 39211
+	 */
+	function test_is_page_template_not_singular() {
+		global $wpdb;
+
+		// We need a non-post that shares an ID with a post assigned a template.
+		$user_id = self::factory()->user->create();
+		if ( ! get_post( $user_id ) ) {
+			$post_id = self::factory()->post->create( array( 'post_type' => 'post' ) );
+			$wpdb->update( $wpdb->posts, array( 'ID' => $user_id ), array( 'ID' => $post_id ), array( '%d' ) );
+		}
+
+		update_post_meta( $user_id, '_wp_page_template', 'example.php' );
+
+		// Verify that the post correctly reports having a template.
+		$this->go_to( get_post_permalink( $user_id ) );
+		$this->assertInstanceOf( 'WP_Post', get_queried_object() );
+		$this->assertTrue( is_page_template( 'example.php' ) );
+
+		// Verify that the non-post with a matching ID does not report having a template.
+		$this->go_to( get_author_posts_url( $user_id ) );
+		$this->assertInstanceOf( 'WP_User', get_queried_object() );
+		$this->assertFalse( is_page_template( 'example.php' ) );
+	}
+
+	/**
 	 * @ticket 35902
 	 */
 	public function test_is_attachment_should_not_match_numeric_id_to_post_title_beginning_with_id() {
