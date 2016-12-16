@@ -136,6 +136,33 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that translated feeds have a valid listed date.
+	 * @group 39141
+	 */
+	function test_channel_pubdate_element_translated() {
+		$original_locale = $GLOBALS['wp_locale'];
+		/* @var WP_Locale $locale */
+		$locale = clone $GLOBALS['wp_locale'];
+
+		$locale->weekday[2] = 'Tuesday_Translated';
+		$locale->weekday_abbrev[ 'Tuesday_Translated' ] = 'Tue_Translated';
+
+		$GLOBALS['wp_locale'] = $locale;
+
+		$this->go_to( '/?feed=rss2' );
+		$feed = $this->do_rss2();
+
+		// Restore original locale.
+		$GLOBALS['wp_locale'] = $original_locale;
+
+		$xml = xml_to_array( $feed );
+
+		// Verify the date is untranslated.
+		$pubdate = xml_find( $xml, 'rss', 'channel', 'lastBuildDate' );
+		$this->assertNotContains( 'Tue_Translated', $pubdate[0]['content'] );
+	}
+
+	/**
 	 * @ticket UT32
 	 */
 	function test_item_elements() {
