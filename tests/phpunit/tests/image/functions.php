@@ -404,4 +404,49 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 
 		unlink( $test_file );
 	}
+
+	/**
+	 * @ticket 39231
+	 */
+	public function test_fallback_intermediate_image_sizes() {
+		if ( ! wp_image_editor_supports( array( 'mime_type' => 'application/pdf' ) ) ) {
+			$this->markTestSkipped( 'Rendering PDFs is not supported on this system.' );
+		}
+
+		$orig_file = DIR_TESTDATA . '/images/wordpress-gsoc-flyer.pdf';
+		$test_file = '/tmp/wordpress-gsoc-flyer.pdf';
+		copy( $orig_file, $test_file );
+
+		$attachment_id = $this->factory->attachment->create_object( $test_file, 0, array(
+			'post_mime_type' => 'application/pdf',
+		) );
+
+		$this->assertNotEmpty( $attachment_id );
+
+		add_image_size( 'test-size', 100, 100 );
+		add_filter( 'fallback_intermediate_image_sizes', array( $this, 'filter_fallback_intermediate_image_sizes' ), 10, 2 );
+
+		$expected = array(
+			'file'      => 'wordpress-gsoc-flyer-77x100.jpg',
+			'width'     => 77,
+			'height'    => 100,
+			'mime-type' => 'image/jpeg',
+		);
+
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $test_file );
+		$this->assertTrue( isset( $metadata['sizes']['test-size'] ), 'The `test-size` was not added to the metadata.' );
+		$this->assertSame( $metadata['sizes']['test-size'], $expected );
+
+		remove_image_size( 'test-size' );
+		remove_filter( 'fallback_intermediate_image_sizes', array( $this, 'filter_fallback_intermediate_image_sizes' ), 10 );
+
+		unlink( $test_file );
+	}
+
+	function filter_fallback_intermediate_image_sizes( $fallback_sizes, $metadata ) {
+		// Add the 'test-size' to the list of fallback sizes.
+		$fallback_sizes[] = 'test-size';
+
+		return $fallback_sizes;
+	}
 }
