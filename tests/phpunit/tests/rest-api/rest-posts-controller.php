@@ -858,6 +858,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $post2, $data[0]['id'] );
 	}
 
+	public function test_get_items_no_supported_post_formats() {
+		// This causes get_theme_support( 'post-formats' ) to return `true` (not an array)
+		add_theme_support( 'post-formats' );
+
+		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		// Set the expected state back for the rest of the tests.
+		global $_wp_theme_features;
+		unset( $_wp_theme_features['post-formats'] );
+		add_theme_support( 'post-formats', array( 'post', 'gallery' ) );
+
+		$formats = array( 'standard' );
+
+		$this->assertEquals( $formats, $data['schema']['properties']['format']['enum'] );
+	}
+
 	public function test_get_item() {
 		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
 		$response = $this->server->dispatch( $request );
