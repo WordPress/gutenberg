@@ -16,6 +16,7 @@ class Tests_Rewrite_NumericSlugs extends WP_UnitTestCase {
 	}
 
 	public function tearDown() {
+		parent::tearDown();
 		remove_filter( 'wp_unique_post_slug', array( $this, 'filter_unique_post_slug' ), 10, 6 );
 	}
 

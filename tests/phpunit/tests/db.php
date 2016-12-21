@@ -20,6 +20,7 @@ class Tests_DB extends WP_UnitTestCase {
 	protected static $_wpdb;
 
 	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
 		self::$_wpdb = new wpdb_exposed_methods_for_testing();
 	}
 
@@ -63,6 +64,11 @@ class Tests_DB extends WP_UnitTestCase {
 		$wpdb->close();
 
 		$var = $wpdb->get_var( "SELECT ID FROM $wpdb->users LIMIT 1" );
+
+		// Ensure all database handles have been properly reconnected after this test.
+		$wpdb->db_connect();
+		self::$_wpdb->db_connect();
+
 		$this->assertGreaterThan( 0, $var );
 	}
 

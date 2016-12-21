@@ -389,6 +389,11 @@ class wpdb_exposed_methods_for_testing extends wpdb {
 		$this->ready = true;
 		$this->field_types = $wpdb->field_types;
 		$this->charset = $wpdb->charset;
+
+		$this->dbuser = $wpdb->dbuser;
+		$this->dbpassword = $wpdb->dbpassword;
+		$this->dbname = $wpdb->dbname;
+		$this->dbhost = $wpdb->dbhost;
 	}
 
 	public function __call( $name, $arguments ) {
