@@ -167,9 +167,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		}
 	}
 
-	/**
-	 * @group test
-	 */
 	public function test_get_items_pagination_headers() {
 		wp_set_current_user( self::$user );
 		// Start of the index, including the three existing users

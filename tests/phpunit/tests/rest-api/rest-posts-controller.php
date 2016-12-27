@@ -723,9 +723,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $id1, $post['id'] );
 	}
 
-	/**
-	 * @group test
-	 */
 	public function test_get_items_pagination_headers() {
 		// Start of the index
 		for ( $i = 0; $i < 49; $i++ ) {
