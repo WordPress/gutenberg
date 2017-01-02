@@ -1380,4 +1380,33 @@ class Tests_Query_TaxQuery extends WP_UnitTestCase {
 
 		_unregister_taxonomy( 'foo' );
 	}
+
+	/**
+	 * @ticket 39315
+	 */
+	public function test_tax_terms_should_not_be_double_escaped() {
+		$name = "Don't worry be happy";
+
+		register_taxonomy( 'wptests_tax', 'post' );
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+			'name' => $name,
+		) );
+
+		$p = self::factory()->post->create();
+		wp_set_object_terms( $p, array( $t ), 'wptests_tax' );
+
+		$q = new WP_Query( array(
+			'fields' => 'ids',
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'wptests_tax',
+					'field' => 'name',
+					'terms' => $name,
+				),
+			),
+		) );
+
+		$this->assertEqualSets( array( $p ), $q->posts );
+	}
 }
