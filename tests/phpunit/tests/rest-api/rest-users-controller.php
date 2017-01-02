@@ -2111,12 +2111,14 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		if ( 'edit' !== $context ) {
 			$this->assertArrayNotHasKey( 'roles', $data );
 			$this->assertArrayNotHasKey( 'capabilities', $data );
-			$this->assertArrayNotHasKey( 'registered', $data );
+			$this->assertArrayNotHasKey( 'registered_date', $data );
 			$this->assertArrayNotHasKey( 'first_name', $data );
 			$this->assertArrayNotHasKey( 'last_name', $data );
 			$this->assertArrayNotHasKey( 'nickname', $data );
+			$this->assertArrayNotHasKey( 'email', $data );
 			$this->assertArrayNotHasKey( 'extra_capabilities', $data );
 			$this->assertArrayNotHasKey( 'username', $data );
+			$this->assertArrayNotHasKey( 'locale', $data );
 		}
 
 		$this->assertEqualSets( array(
