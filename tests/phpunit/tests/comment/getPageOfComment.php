@@ -241,18 +241,40 @@ class Tests_Comment_GetPageOfComment extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 31101
+	 * @ticket 39280
 	 */
-	public function test_should_respect_comment_order_newest() {
+	public function test_should_ignore_comment_order() {
 		$now = time();
 
 		$p = self::factory()->post->create();
 		$c1 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now ) ) );
 		$c2 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ) ) );
 		$c3 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ) ) );
+		$c4 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 40 ) ) );
 
 		update_option( 'comment_order', 'desc' );
 		update_option( 'page_comments', 1 );
-		update_option( 'comments_per_page', 2 );
+		update_option( 'comments_per_page', 1 );
+
+		$this->assertEquals( 2, get_page_of_comment( $c3 ) );
+	}
+
+	/**
+	 * @ticket 31101
+	 * @ticket 39280
+	 */
+	public function test_should_ignore_default_comment_page() {
+		$now = time();
+
+		$p = self::factory()->post->create();
+		$c1 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now ) ) );
+		$c2 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 20 ) ) );
+		$c3 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 30 ) ) );
+		$c4 = self::factory()->comment->create( array( 'comment_post_ID' => $p, 'comment_date_gmt' => date( 'Y-m-d H:i:s', $now - 40 ) ) );
+
+		update_option( 'default_comment_page', 'newest' );
+		update_option( 'page_comments', 1 );
+		update_option( 'comments_per_page', 1 );
 
 		$this->assertEquals( 2, get_page_of_comment( $c3 ) );
 	}
