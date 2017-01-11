@@ -13,6 +13,9 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	protected static $superadmin;
 	protected static $user;
 	protected static $editor;
+	protected static $editor2;
+	protected static $secret_editor;
+	protected static $secret_editor2;
 	protected static $site;
 
 	public static function wpSetUpBeforeClass( $factory ) {
@@ -27,6 +30,18 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 			'role'       => 'editor',
 			'user_email' => 'editor@example.com',
 		) );
+		self::$editor2 = $factory->user->create( array(
+			'role'       => 'editor',
+			'user_email' => 'editor2@example.com',
+		) );
+		self::$secret_editor = $factory->user->create( array(
+			'role'       => 'editor',
+			'user_email' => 'secret_editor@example.com',
+		) );
+		self::$secret_editor2 = $factory->user->create( array(
+			'role'       => 'editor',
+			'user_email' => 'secret_editor2@example.com',
+		) );
 
 		if ( is_multisite() ) {
 			self::$site = $factory->blog->create( array( 'domain' => 'rest.wordpress.org', 'path' => '/' ) );
@@ -37,6 +52,9 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$user );
 		self::delete_user( self::$editor );
+		self::delete_user( self::$editor2 );
+		self::delete_user( self::$secret_editor );
+		self::delete_user( self::$secret_editor2 );
 
 		if ( is_multisite() ) {
 			wpmu_delete_blog( self::$site, true );
@@ -48,6 +66,12 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function setUp() {
 		parent::setUp();
+
+		register_post_type( 'rest_public', array( 'public' => true, 'show_in_rest' => true ) );
+		register_post_type( 'secret_public', array( 'public' => true, 'show_in_rest' => false ) );
+		register_post_type( 'secret_hidden', array( 'public' => false, 'show_in_rest' => false ) );
+		register_post_type( 'rest_hidden', array( 'public' => false, 'show_in_rest' => true ) );
+
 		$this->endpoint = new WP_REST_Users_Controller();
 	}
 
@@ -144,33 +168,92 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
-	public function test_get_items_unauthenticated_only_shows_public_users() {
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$response = $this->server->dispatch( $request );
-
-		$this->assertEquals( array(), $response->get_data() );
-
-		$this->factory->post->create( array( 'post_author' => self::$editor ) );
-		$this->factory->post->create( array( 'post_author' => self::$user, 'post_status' => 'draft' ) );
+	public function test_get_items_unauthenticated_includes_authors_of_post_types_shown_in_rest() {
+		$created_posts = array();
+		$created_posts[] = $this->factory->post->create( array(
+			'post_author' => self::$user,
+			'post_status' => 'publish',
+		) );
+		// Expose authors if show_in_rest is true, even if the post_type is not public.
+		$created_posts[] = $this->factory->post->create( array(
+			'post_type' => 'rest_hidden',
+			'post_author' => self::$editor,
+			'post_status' => 'publish',
+		) );
+		$created_posts[] = $this->factory->post->create( array(
+			'post_type' => 'rest_public',
+			'post_author' => self::$editor2,
+			'post_status' => 'publish',
+		) );
+		$created_posts[] = $this->factory->post->create( array(
+			'post_type' => 'rest_public',
+			'post_author' => self::$secret_editor,
+			'post_status' => 'draft',
+		) );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$response = $this->server->dispatch( $request );
 		$users = $response->get_data();
 
-		foreach ( $users as $user ) {
-			$this->assertTrue( count_user_posts( $user['id'] ) > 0 );
+		$public_post_types = array_values( get_post_types( array( 'show_in_rest' => true ), 'names' ) );
 
-			// Ensure we don't expose non-public data
+		foreach ( $users as $user ) {
+			$this->assertTrue( count_user_posts( $user['id'], $public_post_types ) > 0 );
+
+			// Ensure we don't expose non-public data.
 			$this->assertArrayNotHasKey( 'capabilities', $user );
+			$this->assertArrayNotHasKey( 'registered_date', $user );
+			$this->assertArrayNotHasKey( 'first_name', $user );
+			$this->assertArrayNotHasKey( 'last_name', $user );
+			$this->assertArrayNotHasKey( 'nickname', $user );
+			$this->assertArrayNotHasKey( 'extra_capabilities', $user );
+			$this->assertArrayNotHasKey( 'username', $user );
 			$this->assertArrayNotHasKey( 'email', $user );
 			$this->assertArrayNotHasKey( 'roles', $user );
+			$this->assertArrayNotHasKey( 'locale', $user );
+		}
+
+		$this->assertTrue( in_array( self::$user, wp_list_pluck( $users, 'id' ), true ) );
+		$this->assertTrue( in_array( self::$editor, wp_list_pluck( $users, 'id' ), true ) );
+		$this->assertTrue( in_array( self::$editor2, wp_list_pluck( $users, 'id' ), true ) );
+
+		// Do not include authors of unpublished posts.
+		$this->assertFalse( in_array( self::$secret_editor, wp_list_pluck( $users, 'id' ), true ) );
+
+		foreach ( $created_posts as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+	}
+
+	public function test_get_items_unauthenticated_does_not_include_authors_of_post_types_not_shown_in_rest() {
+		$created_posts = array();
+		$created_posts[] = $this->factory->post->create( array(
+			'post_type' => 'secret_hidden',
+			'post_author' => self::$secret_editor,
+			'post_status' => 'publish',
+		) );
+		$created_posts[] = $this->factory->post->create( array(
+			'post_type' => 'secret_public',
+			'post_author' => self::$secret_editor2,
+			'post_status' => 'publish',
+		) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertFalse( in_array( self::$secret_editor, wp_list_pluck( $data, 'id' ), true ) );
+		$this->assertFalse( in_array( self::$secret_editor2, wp_list_pluck( $data, 'id' ), true ) );
+
+		foreach ( $created_posts as $post_id ) {
+			wp_delete_post( $post_id, true );
 		}
 	}
 
 	public function test_get_items_pagination_headers() {
 		wp_set_current_user( self::$user );
-		// Start of the index, including the three existing users
-		for ( $i = 0; $i < 47; $i++ ) {
+		// Start of the index, including the six existing users.
+		for ( $i = 0; $i < 44; $i++ ) {
 			$this->factory->user->create( array(
 				'name'   => "User {$i}",
 				) );
@@ -391,12 +474,12 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 	public function test_get_items_offset() {
 		wp_set_current_user( self::$user );
-		// 2 users created in __construct(), plus default user
+		// 5 users created in __construct(), plus default user.
 		$this->factory->user->create();
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$request->set_param( 'offset', 1 );
 		$response = $this->server->dispatch( $request );
-		$this->assertCount( 4, $response->get_data() );
+		$this->assertCount( 7, $response->get_data() );
 		// 'offset' works with 'per_page'
 		$request->set_param( 'per_page', 2 );
 		$response = $this->server->dispatch( $request );
@@ -2083,6 +2166,11 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	}
 
 	public function tearDown() {
+		_unregister_post_type( 'rest_public' );
+		_unregister_post_type( 'secret_public' );
+		_unregister_post_type( 'secret_hidden' );
+		_unregister_post_type( 'rest_hidden' );
+
 		parent::tearDown();
 	}
 
