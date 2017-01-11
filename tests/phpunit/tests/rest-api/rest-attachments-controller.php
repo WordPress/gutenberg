@@ -515,7 +515,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$request->set_file_params( array(
 			'file' => array(
 				'file'     => file_get_contents( $this->test_file2 ),
-				'name'     => 'codeispoetry.jpg',
+				'name'     => 'codeispoetry.png',
 				'size'     => filesize( $this->test_file2 ),
 				'tmp_name' => $this->test_file2,
 			),
