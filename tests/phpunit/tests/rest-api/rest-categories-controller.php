@@ -186,7 +186,7 @@ class WP_Test_REST_Categories_Controller extends WP_Test_REST_Controller_Testcas
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 		$data = $response->get_data();
 		$first_error = array_shift( $data['data']['params'] );
-		$this->assertContains( 'page must be greater than 1 (inclusive)', $first_error );
+		$this->assertContains( 'page must be greater than or equal to 1', $first_error );
 	}
 
 	public function test_get_items_include_query() {
