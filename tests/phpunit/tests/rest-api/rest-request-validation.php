@@ -108,7 +108,7 @@ class WP_Test_REST_Request_Validation extends WP_Test_REST_TestCase {
 			),
 		) );
 		$ret = rest_validate_request_arg( 1, $request, 'greaterthanmin' );
-		$this->assertEquals( 'greaterthanmin must be greater than 2 (inclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'greaterthanmin must be greater than or equal to 2', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 2, $request, 'greaterthanmin' );
 		$this->assertTrue( $ret );
 	}
@@ -124,9 +124,9 @@ class WP_Test_REST_Request_Validation extends WP_Test_REST_TestCase {
 			),
 		) );
 		$ret = rest_validate_request_arg( 1, $request, 'greaterthanmin' );
-		$this->assertEquals( 'greaterthanmin must be greater than 2 (exclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'greaterthanmin must be greater than 2', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 2, $request, 'greaterthanmin' );
-		$this->assertEquals( 'greaterthanmin must be greater than 2 (exclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'greaterthanmin must be greater than 2', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 3, $request, 'greaterthanmin' );
 		$this->assertTrue( $ret );
 	}
@@ -141,7 +141,7 @@ class WP_Test_REST_Request_Validation extends WP_Test_REST_TestCase {
 			),
 		) );
 		$ret = rest_validate_request_arg( 11, $request, 'lessthanmax' );
-		$this->assertEquals( 'lessthanmax must be less than 10 (inclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'lessthanmax must be less than or equal to 10', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 10, $request, 'lessthanmax' );
 		$this->assertTrue( $ret );
 	}
@@ -157,9 +157,9 @@ class WP_Test_REST_Request_Validation extends WP_Test_REST_TestCase {
 			),
 		) );
 		$ret = rest_validate_request_arg( 11, $request, 'lessthanmax' );
-		$this->assertEquals( 'lessthanmax must be less than 10 (exclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'lessthanmax must be less than 10', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 10, $request, 'lessthanmax' );
-		$this->assertEquals( 'lessthanmax must be less than 10 (exclusive)', $ret->get_error_message() );
+		$this->assertEquals( 'lessthanmax must be less than 10', $ret->get_error_message() );
 		$ret = rest_validate_request_arg( 9, $request, 'lessthanmax' );
 		$this->assertTrue( $ret );
 	}
