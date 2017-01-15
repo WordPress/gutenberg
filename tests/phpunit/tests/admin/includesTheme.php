@@ -136,4 +136,31 @@ class Tests_Admin_includesTheme extends WP_UnitTestCase {
 		), get_page_templates() );
 		$this->assertEquals( array(), get_page_templates( null, 'bar' ) );
 	}
+
+	/**
+	 * Test that the list of theme features pulled from the WordPress.org API returns the expected data structure.
+	 *
+	 * Differences in the structure can also trigger failure by causing PHP notices/warnings.
+	 *
+	 * @group external-http
+	 * @ticket 28121
+	 */
+	function test_get_theme_featured_list_api() {
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+		$featured_list_api = get_theme_feature_list( true );
+		$this->assertNonEmptyMultidimensionalArray( $featured_list_api );
+	}
+
+	/**
+	 * Test that the list of theme features hardcoded into Core returns the expected data structure.
+	 *
+	 * Differences in the structure can also trigger failure by causing PHP notices/warnings.
+	 *
+	 * @group external-http
+	 * @ticket 28121
+	 */
+	function test_get_theme_featured_list_hardcoded() {
+		$featured_list_hardcoded = get_theme_feature_list( false );
+		$this->assertNonEmptyMultidimensionalArray( $featured_list_hardcoded );
+	}
 }

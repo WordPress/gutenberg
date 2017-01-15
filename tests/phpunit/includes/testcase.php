@@ -440,6 +440,21 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Asserts that the given variable is a multidimensional array, and that all arrays are non-empty.
+	 *
+	 * @param array $array
+	 */
+	function assertNonEmptyMultidimensionalArray( $array ) {
+		$this->assertTrue( is_array( $array ) );
+		$this->assertNotEmpty( $array );
+
+		foreach( $array as $sub_array ) {
+			$this->assertTrue( is_array( $sub_array ) );
+			$this->assertNotEmpty( $sub_array );
+		}
+	}
+
+	/**
 	 * Modify WordPress's query internals as if a given URL has been requested.
 	 *
 	 * @param string $url The URL for the request.
