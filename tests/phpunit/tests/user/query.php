@@ -125,6 +125,16 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 39297
+	 */
+	public function test_get_total_is_int() {
+		$users = new WP_User_Query( array( 'blog_id' => get_current_blog_id() ) );
+		$total_users = $users->get_total();
+
+		$this->assertSame( 13, $total_users );
+	}
+
+	/**
 	 * @dataProvider orderby_should_convert_non_prefixed_keys_data
 	 */
 	public function test_orderby_should_convert_non_prefixed_keys( $short_key, $full_key ) {
