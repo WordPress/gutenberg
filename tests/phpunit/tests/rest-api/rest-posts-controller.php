@@ -57,6 +57,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		wp_delete_post( self::$post_id, true );
 
+		self::delete_user( self::$superadmin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$author_id );
 		self::delete_user( self::$contributor_id );

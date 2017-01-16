@@ -184,8 +184,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 * it has a chance to do so.
 	 */
 	protected function reset_post_types() {
-		foreach ( get_post_types() as $pt ) {
-			_unregister_post_type( $pt );
+		foreach ( get_post_types( array(), 'objects' ) as $pt ) {
+			if ( empty( $pt->tests_no_auto_unregister ) ) {
+				_unregister_post_type( $pt->name );
+			}
 		}
 		create_initial_post_types();
 	}
