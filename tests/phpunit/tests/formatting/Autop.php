@@ -534,4 +534,28 @@ line 2<br/>
 
 		$this->assertEquals( $expected, trim( wpautop( $content ) ) );
 	}
+
+	/**
+	 * wpautop() should not add extra </p> before <figcaption>
+	 *
+	 * @covers ::wpautop
+	 * @uses trim
+	 *
+	 * @ticket 39307
+	 */
+	function test_that_wpautop_doses_not_add_extra_closing_p_in_figure() {
+		$content1 = $expected1 = '<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
+
+		$content2 = '<figure>
+<img src="example.jpg" />
+<figcaption>Caption</figcaption>
+</figure>';
+
+		$expected2 = '<figure>
+<img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
+
+		$this->assertEquals( $expected1, trim( wpautop( $content1 ) ) );
+		$this->assertEquals( $expected2, trim( wpautop( $content2 ) ) );
+	}
+
 }
