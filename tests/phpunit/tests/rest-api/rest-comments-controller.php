@@ -985,6 +985,32 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( $params['content']['raw'], $new_comment->comment_content );
 	}
 
+	public function test_create_item_error_from_filter() {
+		add_filter( 'rest_pre_insert_comment', array( $this, 'return_premade_error' ) );
+		wp_set_current_user( self::$admin_id );
+
+		$params = array(
+			'post'         => self::$post_id,
+			'author_name'  => 'Homer Jay Simpson',
+			'author_email' => 'homer@example.org',
+			'content'      => array(
+				'raw' => 'Aw, he loves beer. Here, little fella.'
+			),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'test_rest_premade_error', $response, 418 );
+	}
+
+	public function return_premade_error() {
+		return new WP_Error( 'test_rest_premade_error', "I'm sorry, I thought he was a party robot.", array( 'status' => 418 ) );
+	}
+
 	public function test_create_comment_missing_required_author_name() {
 		add_filter( 'rest_allow_anonymous_comments', '__return_true' );
 		update_option( 'require_name_email', 1 );
