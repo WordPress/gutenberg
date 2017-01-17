@@ -302,7 +302,7 @@ class Tests_Theme extends WP_UnitTestCase {
 
 		$theme = wp_get_theme();
 		$this->assertEquals( $style, (string) $theme );
-		$this->assertNotSame( false, $theme->errors() );
+		$this->assertNotFalse( $theme->errors() );
 		$this->assertFalse( $theme->exists() );
 
 		// these return the bogus name - perhaps not ideal behaviour?

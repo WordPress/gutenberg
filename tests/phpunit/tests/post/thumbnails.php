@@ -194,7 +194,7 @@ class Tests_Post_Thumbnail_Template extends WP_UnitTestCase {
 	function test_get_the_post_thumbnail_url_with_invalid_post() {
 		set_post_thumbnail( self::$post, self::$attachment_id );
 
-		$this->assertTrue( false !== get_the_post_thumbnail_url( self::$post->ID ) );
+		$this->assertNotFalse( get_the_post_thumbnail_url( self::$post->ID ) );
 
 		$deleted = wp_delete_post( self::$post->ID, true );
 		$this->assertNotEmpty( $deleted );

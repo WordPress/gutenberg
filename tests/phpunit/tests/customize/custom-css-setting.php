@@ -150,7 +150,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 		$this->wp_customize->set_post_value( $this->setting->id, $updated_css );
 		$saved = $this->setting->save();
 
-		$this->assertTrue( false !== $saved );
+		$this->assertNotFalse( $saved );
 		$this->assertEquals( $updated_css, $this->setting->value() );
 		$this->assertEquals( $updated_css, wp_get_custom_css( $this->setting->stylesheet ) );
 		$this->assertEquals( $updated_css, get_post( $post_id )->post_content );

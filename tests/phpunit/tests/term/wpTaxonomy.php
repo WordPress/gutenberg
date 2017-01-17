@@ -66,7 +66,7 @@ class Tests_WP_Taxonomy extends WP_UnitTestCase {
 		$taxonomy_object->remove_rewrite_rules();
 		$rewrite_tags_after = $wp_rewrite->rewritecode;
 
-		$this->assertTrue( false !== array_search( "%$taxonomy%", $rewrite_tags ) );
+		$this->assertNotFalse( array_search( "%$taxonomy%", $rewrite_tags ) );
 		$this->assertFalse( array_search( "%$taxonomy%", $rewrite_tags_after ) );
 	}
 

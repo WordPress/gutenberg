@@ -456,7 +456,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 
 		// Satisfy all requirements for save to happen.
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		$this->assertTrue( false !== $setting->save() );
+		$this->assertNotFalse( $setting->save() );
 		$this->assertTrue( 1 === did_action( 'customize_update_custom' ) );
 		$this->assertTrue( 1 === did_action( 'customize_save_foo' ) );
 	}

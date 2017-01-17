@@ -457,6 +457,18 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Asserts that a condition is not false.
+	 *
+	 * @param bool   $condition
+	 * @param string $message
+	 *
+	 * @throws PHPUnit_Framework_AssertionFailedError
+	 */
+	public static function assertNotFalse( $condition, $message = '' ) {
+		self::assertThat( $condition, self::logicalNot( self::isFalse() ), $message );
+	}
+
+	/**
 	 * Modify WordPress's query internals as if a given URL has been requested.
 	 *
 	 * @param string $url The URL for the request.

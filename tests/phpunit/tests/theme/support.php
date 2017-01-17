@@ -90,7 +90,7 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		remove_theme_support( 'html5' );
 		$this->assertFalse( current_theme_supports( 'html5' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
-		$this->assertNotSame( false, add_theme_support( 'html5' ) );
+		$this->assertNotFalse( add_theme_support( 'html5' ) );
 		$this->assertTrue( current_theme_supports( 'html5' ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-list' ) );
@@ -108,7 +108,7 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 		$this->assertFalse( current_theme_supports( 'html5' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'comment-form' ) );
 		$this->assertFalse( add_theme_support( 'html5', 'comment-form' ) );
-		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comment-form' ) ) );
+		$this->assertNotFalse( add_theme_support( 'html5', array( 'comment-form' ) ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
 
 		// This will return true, which might help a plugin author decide what markup to serve,
@@ -117,7 +117,7 @@ class Tests_Theme_Support extends WP_UnitTestCase {
 
 		// It appends, rather than replaces.
 		$this->assertFalse( current_theme_supports( 'html5', 'comment-list' ) );
-		$this->assertNotSame( false, add_theme_support( 'html5', array( 'comment-list' ) ) );
+		$this->assertNotFalse( add_theme_support( 'html5', array( 'comment-list' ) ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-form' ) );
 		$this->assertTrue( current_theme_supports( 'html5', 'comment-list' ) );
 		$this->assertFalse( current_theme_supports( 'html5', 'search-form' ) );

@@ -101,7 +101,7 @@ class Tests_WP_Post_Type extends WP_UnitTestCase {
 		$post_type_object->remove_rewrite_rules();
 		$rewrite_tags_after = $wp_rewrite->rewritecode;
 
-		$this->assertTrue( false !== array_search( "%$post_type%", $rewrite_tags ) );
+		$this->assertNotFalse( array_search( "%$post_type%", $rewrite_tags ) );
 		$this->assertFalse( array_search( "%$post_type%", $rewrite_tags_after ) );
 	}
 

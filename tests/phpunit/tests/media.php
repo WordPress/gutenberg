@@ -1175,7 +1175,7 @@ EOF;
 
 		// Test to confirm all sources in the array include the same edit hash.
 		foreach ( $sizes as $size ) {
-			$this->assertTrue( false !== strpos( $size, $hash ) );
+			$this->assertNotFalse( strpos( $size, $hash ) );
 		}
 	}
 

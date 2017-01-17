@@ -25,8 +25,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false === strpos( $actual, 'That embed can&#8217;t be found.' ) );
-		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
+		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'Hello World' ) );
 	}
 
 	function test_oembed_output_post_with_thumbnail() {
@@ -52,8 +52,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
 		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
-		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
-		$this->assertTrue( false !== strpos( $actual, 'canola.jpg' ) );
+		$this->assertNotFalse( strpos( $actual, 'Hello World' ) );
+		$this->assertNotFalse( strpos( $actual, 'canola.jpg' ) );
 	}
 
 	function test_oembed_output_404() {
@@ -68,7 +68,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_attachment() {
@@ -92,8 +92,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
 		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
-		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
-		$this->assertTrue( false !== strpos( $actual, 'canola.jpg' ) );
+		$this->assertNotFalse( strpos( $actual, 'Hello World' ) );
+		$this->assertNotFalse( strpos( $actual, 'canola.jpg' ) );
 	}
 
 	function test_oembed_output_draft_post() {
@@ -114,7 +114,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_scheduled_post() {
@@ -136,7 +136,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_private_post() {
@@ -157,7 +157,7 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false !== strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
 	}
 
 	function test_oembed_output_private_post_with_permissions() {
@@ -182,8 +182,8 @@ class Tests_Embed_Template extends WP_UnitTestCase {
 
 		$doc = new DOMDocument();
 		$this->assertTrue( $doc->loadHTML( $actual ) );
-		$this->assertTrue( false === strpos( $actual, 'That embed can&#8217;t be found.' ) );
-		$this->assertTrue( false !== strpos( $actual, 'Hello World' ) );
+		$this->assertFalse( strpos( $actual, 'That embed can&#8217;t be found.' ) );
+		$this->assertNotFalse( strpos( $actual, 'Hello World' ) );
 	}
 
 	function test_wp_embed_excerpt_more_no_embed() {

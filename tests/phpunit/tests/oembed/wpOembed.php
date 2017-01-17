@@ -36,7 +36,7 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		$actual = $this->oembed->get_html( $permalink );
 		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
 
-		$this->assertTrue( false !== $this->pre_oembed_result_filtered );
+		$this->assertNotFalse( $this->pre_oembed_result_filtered );
 		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
 	}
 
@@ -51,7 +51,7 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		$actual = $this->oembed->get_html( $permalink );
 		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
 
-		$this->assertTrue( false !== $this->pre_oembed_result_filtered );
+		$this->assertNotFalse( $this->pre_oembed_result_filtered );
 		$this->assertEquals( $this->pre_oembed_result_filtered, $actual );
 	}
 
@@ -66,7 +66,7 @@ class Tests_WP_oEmbed extends WP_UnitTestCase {
 		$actual = $this->oembed->get_html( 'https://example.com/' );
 		remove_filter( 'pre_oembed_result', array( $this, '_filter_pre_oembed_result' ) );
 
-		$this->assertTrue( false !== $this->pre_oembed_result_filtered );
+		$this->assertNotFalse( $this->pre_oembed_result_filtered );
 		$this->assertFalse( $actual );
 	}
 }
