@@ -826,6 +826,106 @@ class Tests_dbDelta extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 34870
+	 */
+	function test_unchanged_key_lengths_do_not_recreate_index() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1(255)),
+				KEY compound_key (id,column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			", false );
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
+	 * @ticket 34870
+	 */
+	function test_changed_key_lengths_do_not_recreate_index() {
+		global $wpdb;
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				KEY changing_key_length (column_1(20)),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			" );
+
+		$this->assertSame( array(
+			"Added index {$wpdb->prefix}dbdelta_test KEY `changing_key_length` (`column_1`(20))"
+		), $updates );
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				KEY changing_key_length (column_1(50)),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			" );
+
+		$this->assertEmpty( $updates );
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				KEY changing_key_length (column_1(1)),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			" );
+
+		$this->assertEmpty( $updates );
+
+		$updates = dbDelta(
+			"
+			CREATE TABLE {$wpdb->prefix}dbdelta_test (
+				id bigint(20) NOT NULL AUTO_INCREMENT,
+				column_1 varchar(255) NOT NULL,
+				column_2 text,
+				column_3 blob,
+				PRIMARY KEY  (id),
+				KEY key_1 (column_1),
+				KEY compound_key (id,column_1),
+				KEY changing_key_length (column_1),
+				FULLTEXT KEY fulltext_key (column_1)
+			) ENGINE=MyISAM
+			" );
+
+		$this->assertEmpty( $updates );
+	}
+
+	/**
 	 * @ticket 31679
 	 */
 	function test_column_type_change_with_hyphens_in_name() {
