@@ -553,7 +553,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 30937
-	 * @covers wp_admin_bar_customize_menu()
+	 * @covers ::wp_admin_bar_customize_menu
 	 */
 	public function test_customize_link() {
 		global $wp_customize;

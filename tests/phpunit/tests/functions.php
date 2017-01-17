@@ -884,7 +884,7 @@ class Tests_Functions extends WP_UnitTestCase {
 	/**
 	 * Tests wp_generate_uuid4().
 	 *
-	 * @covers wp_generate_uuid4()
+	 * @covers ::wp_generate_uuid4
 	 * @ticket 38164
 	 */
 	function test_wp_generate_uuid4() {

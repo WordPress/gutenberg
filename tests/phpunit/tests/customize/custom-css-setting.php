@@ -103,7 +103,7 @@ class Test_WP_Customize_Custom_CSS_Setting extends WP_UnitTestCase {
 	/**
 	 * Test crud methods on WP_Customize_Custom_CSS_Setting.
 	 *
-	 * @covers wp_get_custom_css()
+	 * @covers ::wp_get_custom_css
 	 * @covers WP_Customize_Custom_CSS_Setting::value()
 	 * @covers WP_Customize_Custom_CSS_Setting::preview()
 	 * @covers WP_Customize_Custom_CSS_Setting::update()
