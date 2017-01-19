@@ -373,6 +373,10 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 					'post_title' => 'Custom',
 					'thumbnail' => '{{waffles}}',
 				),
+				'unknown_cpt' => array(
+					'post_type' => 'unknown_cpt',
+					'post_title' => 'Unknown CPT',
+				),
 			),
 			'attachments' => array(
 				'waffles' => array(
@@ -441,7 +445,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( array( 'text-2', 'meta-3' ), $changeset_values['sidebars_widgets[sidebar-1]'] );
 
 		$posts_by_name = array();
-		$this->assertCount( 6, $changeset_values['nav_menus_created_posts'] );
+		$this->assertCount( 7, $changeset_values['nav_menus_created_posts'] );
 		$this->assertContains( $existing_published_home_page_id, $changeset_values['nav_menus_created_posts'], 'Expected reuse of non-auto-draft posts.' );
 		$this->assertContains( $existing_canola_attachment_id, $changeset_values['nav_menus_created_posts'], 'Expected reuse of non-auto-draft attachment.' );
 		$this->assertNotContains( $existing_auto_draft_about_page_id, $changeset_values['nav_menus_created_posts'], 'Expected non-reuse of auto-draft posts.' );
@@ -461,7 +465,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			}
 			$posts_by_name[ $post_name ] = $post->ID;
 		}
-		$this->assertEquals( array( 'waffles', 'canola', 'home', 'about', 'blog', 'custom' ), array_keys( $posts_by_name ) );
+		$this->assertEquals( array( 'waffles', 'canola', 'home', 'about', 'blog', 'custom', 'unknown-cpt' ), array_keys( $posts_by_name ) );
 		$this->assertEquals( 'Custom', get_post( $posts_by_name['custom'] )->post_title );
 		$this->assertEquals( 'sample-page-template.php', get_page_template_slug( $posts_by_name['about'] ) );
 		$this->assertEquals( '', get_page_template_slug( $posts_by_name['blog'] ) );

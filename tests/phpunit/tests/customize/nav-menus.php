@@ -538,9 +538,13 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Error', $r );
 		$this->assertEquals( 'unknown_post_type', $r->get_error_code() );
 
-		$r = $menus->insert_auto_draft_post( array( 'post_type' => 'fake' ) );
+		// Non-existent post types allowed as of #39610.
+		$r = $menus->insert_auto_draft_post( array( 'post_title' => 'Non-existent', 'post_type' => 'nonexistent' ) );
+		$this->assertInstanceOf( 'WP_Post', $r );
+
+		$r = $menus->insert_auto_draft_post( array( 'post_type' => 'post' ) );
 		$this->assertInstanceOf( 'WP_Error', $r );
-		$this->assertEquals( 'unknown_post_type', $r->get_error_code() );
+		$this->assertEquals( 'empty_title', $r->get_error_code() );
 
 		$r = $menus->insert_auto_draft_post( array( 'post_status' => 'publish', 'post_title' => 'Bad', 'post_type' => 'post' ) );
 		$this->assertInstanceOf( 'WP_Error', $r );
