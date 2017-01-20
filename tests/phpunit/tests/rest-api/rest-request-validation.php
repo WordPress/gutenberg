@@ -1,5 +1,14 @@
 <?php
+/**
+ * Unit tests covering WP_REST_Request validation functionality.
+ *
+ * @package WordPress
+ * @subpackage REST API
+ */
 
+/**
+ * @group restapi
+ */
 class WP_Test_REST_Request_Validation extends WP_Test_REST_TestCase {
 
 	public function test_validate_within_min_max_range_inclusive() {
