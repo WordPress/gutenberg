@@ -583,4 +583,87 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertEquals( $uuid, $query_params['changeset_uuid'] );
 		$this->assertNotContains( 'changeset_uuid', $query_params['url'] );
 	}
+
+	/**
+	 * @ticket 39082
+	 */
+	public function test_my_sites_network_menu_for_regular_user() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+
+		$nodes = $wp_admin_bar->get_nodes();
+		foreach ( $this->get_my_sites_network_menu_items() as $id => $cap ) {
+			$this->assertFalse( isset( $nodes[ $id ] ), sprintf( 'Menu item %s must not display for a regular user.', $id ) );
+		}
+	}
+
+	/**
+	 * @ticket 39082
+	 */
+	public function test_my_sites_network_menu_for_super_admin() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+
+		grant_super_admin( self::$editor_id );
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		revoke_super_admin( self::$editor_id );
+
+		$nodes = $wp_admin_bar->get_nodes();
+		foreach ( $this->get_my_sites_network_menu_items() as $id => $cap ) {
+			$this->assertTrue( isset( $nodes[ $id ] ), sprintf( 'Menu item %s must display for a super admin.', $id ) );
+		}
+	}
+
+	/**
+	 * @ticket 39082
+	 */
+	public function test_my_sites_network_menu_for_regular_user_with_network_caps() {
+		global $current_user;
+
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		$network_user_caps = array( 'manage_network', 'manage_network_themes', 'manage_network_plugins' );
+
+		wp_set_current_user( self::$editor_id );
+
+		foreach ( $network_user_caps as $network_cap ) {
+			$current_user->add_cap( $network_cap );
+		}
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		foreach ( $network_user_caps as $network_cap ) {
+			$current_user->remove_cap( $network_cap );
+		}
+
+		$nodes = $wp_admin_bar->get_nodes();
+		foreach ( $this->get_my_sites_network_menu_items() as $id => $cap ) {
+			if ( in_array( $cap, $network_user_caps ) ) {
+				$this->assertTrue( isset( $nodes[ $id ] ), sprintf( 'Menu item %1$s must display for a user with the %2$s cap.', $id, $cap ) );
+			} else {
+				$this->assertFalse( isset( $nodes[ $id ] ), sprintf( 'Menu item %1$s must not display for a user without the %2$s cap.', $id, $cap ) );
+			}
+		}
+	}
+
+	private function get_my_sites_network_menu_items() {
+		return array(
+			'my-sites-super-admin' => 'manage_network',
+			'network-admin'        => 'manage_network',
+			'network-admin-d'      => 'manage_network',
+			'network-admin-s'      => 'manage_sites',
+			'network-admin-u'      => 'manage_network_users',
+			'network-admin-t'      => 'manage_network_themes',
+			'network-admin-p'      => 'manage_network_plugins',
+			'network-admin-o'      => 'manage_network_options',
+		);
+	}
 }
