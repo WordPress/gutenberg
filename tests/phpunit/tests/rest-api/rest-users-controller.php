@@ -1887,12 +1887,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$request->set_param( 'reassign', false );
 		$response = $this->server->dispatch( $request );
 
-		// Not implemented in multisite.
-		if ( is_multisite() ) {
-			$this->assertErrorResponse( 'rest_cannot_delete', $response, 501 );
-			return;
-		}
-
 		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
 	}
 

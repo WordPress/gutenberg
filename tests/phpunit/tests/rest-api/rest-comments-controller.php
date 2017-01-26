@@ -837,7 +837,7 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $comment_id );
 
 		$response = $this->server->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
+		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
 	}
 
 	public function test_get_comment_invalid_post_id_as_admin() {

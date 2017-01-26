@@ -182,7 +182,7 @@ class WP_Test_REST_Attachments_Controller extends WP_Test_REST_Post_Type_Control
 		$data = $response->get_data();
 		$keys = array_keys( $data['endpoints'][0]['args'] );
 		sort( $keys );
-		$this->assertEquals( array( 'context' ), $keys );
+		$this->assertEquals( array( 'context', 'id' ), $keys );
 	}
 
 	public function test_get_items() {
