@@ -543,7 +543,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$response = $this->server->dispatch( $request );
 		$this->assertCount( 2, $response->get_data() );
 		// 'offset' takes priority over 'page'
-		$request->set_param( 'page', 3 );
+		$request->set_param( 'page', 2 );
 		$response = $this->server->dispatch( $request );
 		$this->assertCount( 2, $response->get_data() );
 		// Invalid 'offset' should error
@@ -771,18 +771,13 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			), rest_url( '/wp/v2/posts' ) );
 		$this->assertContains( '<' . $prev_link . '>; rel="prev"', $headers['Link'] );
 		$this->assertFalse( stripos( $headers['Link'], 'rel="next"' ) );
+
 		// Out of bounds
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'page', 8 );
 		$response = $this->server->dispatch( $request );
 		$headers = $response->get_headers();
-		$this->assertEquals( 51, $headers['X-WP-Total'] );
-		$this->assertEquals( 6, $headers['X-WP-TotalPages'] );
-		$prev_link = add_query_arg( array(
-			'page'    => 6,
-			), rest_url( '/wp/v2/posts' ) );
-		$this->assertContains( '<' . $prev_link . '>; rel="prev"', $headers['Link'] );
-		$this->assertFalse( stripos( $headers['Link'], 'rel="next"' ) );
+		$this->assertErrorResponse( 'rest_post_invalid_page_number', $response, 400 );
 
 		// With query params.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
