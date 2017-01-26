@@ -827,6 +827,17 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * @ticket 39061
+	 */
+	public function test_get_items_invalid_max_pages() {
+		// Out of bounds
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'page', REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_post_invalid_page_number', $response, 400 );
+	}
+
 	public function test_get_items_invalid_context() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'context', 'banana' );
