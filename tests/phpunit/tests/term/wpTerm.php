@@ -63,46 +63,9 @@ class Tests_Term_WpTerm extends WP_UnitTestCase {
 	/**
 	 * @ticket 37738
 	 */
-	public function test_get_instance_should_fail_for_bool() {
-		$found = WP_Term::get_instance( true );
-
-		$this->assertFalse( $found );
-	}
-
-	/**
-	 * @ticket 37738
-	 */
 	public function test_get_instance_should_succeed_for_float_that_is_equal_to_post_id() {
 		$found = WP_Term::get_instance( 1.0 );
 
 		$this->assertSame( 1, $found->term_id );
-	}
-
-	/**
-	 * @ticket 37738
-	 */
-	public function test_get_instance_should_fail_for_float() {
-		$found = WP_Term::get_instance( 1.6 );
-
-		$this->assertFalse( $found );
-	}
-
-	/**
-	 * @ticket 37738
-	 */
-	public function test_get_instance_should_fail_for_array() {
-		$found = WP_Term::get_instance( array( 1 ) );
-
-		$this->assertFalse( $found );
-	}
-
-	/**
-	 * @ticket 37738
-	 */
-	public function test_get_instance_should_fail_for_class() {
-		$class = new stdClass();
-		$found = WP_Term::get_instance( $class );
-
-		$this->assertFalse( $found );
 	}
 }
