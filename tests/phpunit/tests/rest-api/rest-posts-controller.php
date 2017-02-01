@@ -20,6 +20,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	protected static $supported_formats;
 
 	protected $forbidden_cat;
+	protected $posts_orderby;
 
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_id = $factory->post->create();
@@ -66,6 +67,24 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	public function setUp() {
 		parent::setUp();
 		register_post_type( 'youseeme', array( 'supports' => array(), 'show_in_rest' => true ) );
+		add_filter( 'rest_pre_dispatch', array( $this, 'wpSetUpBeforeRequest' ), 10, 3 );
+		add_filter( 'posts_orderby', array( $this, 'save_posts_orderby' ), 10, 2 );
+	}
+
+	public function wpSetUpBeforeRequest( $result, $server, $request ) {
+		$this->posts_orderby = array();
+		return $result;
+	}
+
+	public function save_posts_orderby( $orderby, $query ) {
+		array_push( $this->posts_orderby, $orderby );
+		return $orderby;
+	}
+
+	public function assertPostsOrderedBy( $pattern ) {
+		global $wpdb;
+		$orderby = str_replace( '{posts}', $wpdb->posts, $pattern );
+		$this->assertEquals( array( $orderby ), $this->posts_orderby );
 	}
 
 	public function test_register_routes() {
@@ -224,12 +243,14 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$data = $response->get_data();
 		$this->assertEquals( 2, count( $data ) );
 		$this->assertEquals( $id3, $data[0]['id'] );
+		$this->assertPostsOrderedBy( '{posts}.post_date DESC' );
 		// Orderby=>include
 		$request->set_param( 'orderby', 'include' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 2, count( $data ) );
 		$this->assertEquals( $id1, $data[0]['id'] );
+		$this->assertPostsOrderedBy( "FIELD( {posts}.ID, $id1,$id3 )" );
 		// Invalid include should error
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'include', 'invalid' );
@@ -438,11 +459,13 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'Apple Sauce', $data[0]['title']['rendered'] );
+		$this->assertPostsOrderedBy( '{posts}.post_title DESC' );
 		// order=>asc
 		$request->set_param( 'order', 'asc' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$this->assertEquals( 'Apple Cobbler', $data[0]['title']['rendered'] );
+		$this->assertPostsOrderedBy( '{posts}.post_title ASC' );
 		// order=>asc,id should fail
 		$request->set_param( 'order', 'asc,id' );
 		$response = $this->server->dispatch( $request );
@@ -480,6 +503,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $id3, $data[0]['id'] );
 		$this->assertEquals( $id2, $data[1]['id'] );
 		$this->assertEquals( $id1, $data[2]['id'] );
+		$this->assertPostsOrderedBy( '{posts}.ID DESC' );
 	}
 
 	public function test_get_items_with_orderby_slug() {
@@ -496,12 +520,40 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		// Default ORDER is DESC.
 		$this->assertEquals( 'xyz', $data[0]['slug'] );
 		$this->assertEquals( 'abc', $data[1]['slug'] );
+		$this->assertPostsOrderedBy( '{posts}.post_name DESC' );
 	}
 
 	public function test_get_items_with_orderby_relevance() {
-		$this->factory->post->create( array( 'post_title' => 'Title is more relevant', 'post_content' => 'Content is', 'post_status' => 'publish' ) );
-		$this->factory->post->create( array( 'post_title' => 'Title is', 'post_content' => 'Content is less relevant', 'post_status' => 'publish' ) );
+		$id1 = $this->factory->post->create( array( 'post_title' => 'Title is more relevant', 'post_content' => 'Content is', 'post_status' => 'publish' ) );
+		$id2 = $this->factory->post->create( array( 'post_title' => 'Title is', 'post_content' => 'Content is less relevant', 'post_status' => 'publish' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'relevance' );
+		$request->set_param( 'search', 'relevant' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertCount( 2, $data );
+		$this->assertEquals( $id1, $data[0]['id'] );
+		$this->assertEquals( $id2, $data[1]['id'] );
+		$this->assertPostsOrderedBy( '{posts}.post_title LIKE \'%relevant%\' DESC, {posts}.post_date DESC' );
+	}
 
+	public function test_get_items_with_orderby_relevance_two_terms() {
+		$id1 = $this->factory->post->create( array( 'post_title' => 'Title is more relevant', 'post_content' => 'Content is', 'post_status' => 'publish' ) );
+		$id2 = $this->factory->post->create( array( 'post_title' => 'Title is', 'post_content' => 'Content is less relevant', 'post_status' => 'publish' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'orderby', 'relevance' );
+		$request->set_param( 'search', 'relevant content' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertCount( 2, $data );
+		$this->assertEquals( $id1, $data[0]['id'] );
+		$this->assertEquals( $id2, $data[1]['id'] );
+		$this->assertPostsOrderedBy( '(CASE WHEN {posts}.post_title LIKE \'%relevant content%\' THEN 1 WHEN {posts}.post_title LIKE \'%relevant%\' AND {posts}.post_title LIKE \'%content%\' THEN 2 WHEN {posts}.post_title LIKE \'%relevant%\' OR {posts}.post_title LIKE \'%content%\' THEN 3 WHEN {posts}.post_excerpt LIKE \'%relevant content%\' THEN 4 WHEN {posts}.post_content LIKE \'%relevant content%\' THEN 5 ELSE 6 END), {posts}.post_date DESC' );
+	}
+
+	public function test_get_items_with_orderby_relevance_missing_search() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 		$request->set_param( 'orderby', 'relevance' );
 		$response = $this->server->dispatch( $request );
@@ -2719,6 +2771,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		if ( isset( $this->attachment_id ) ) {
 			$this->remove_added_uploads();
 		}
+		remove_filter( 'rest_pre_dispatch', array( $this, 'wpSetUpBeforeRequest' ), 10, 3 );
+		remove_filter( 'posts_orderby', array( $this, 'save_posts_orderby' ), 10, 2 );
 		parent::tearDown();
 	}
 
