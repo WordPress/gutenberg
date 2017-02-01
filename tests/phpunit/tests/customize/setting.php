@@ -402,12 +402,21 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			'default' => 123,
 			'sanitize_callback' => array( $this->manager->nav_menus, 'intval_base10' ),
 		) );
+
+		/*
+		 * In #36952 the conditions were such that get_theme_mod() be erroneously used
+		 * to source the root value for a custom multidimensional type.
+		 * Add a theme mod with the same name as the custom setting to test fix.
+		 */
+		set_theme_mod( $setting_id, 999 );
 		$this->assertSame( 123, $setting->value() );
+
 		$this->manager->set_post_value( $setting_id, '456' );
 		$setting->preview();
 		$this->assertSame( 456, $setting->value() );
 
 		unset( $this->custom_type_data_previewed, $this->custom_type_data_saved );
+		remove_theme_mod( $setting_id );
 	}
 
 	/**
