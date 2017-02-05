@@ -1105,6 +1105,43 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that updating an auto-draft changeset bumps its post_date to keep it from getting garbage collected by wp_delete_auto_drafts().
+	 *
+	 * @ticket 31089
+	 * @see wp_delete_auto_drafts()
+	 * @covers WP_Customize_Manager::save_changeset_post()
+	 */
+	function test_save_changeset_post_dumping_auto_draft_date() {
+		global $wp_customize;
+		wp_set_current_user( self::$admin_user_id );
+
+		$uuid = wp_generate_uuid4();
+		$changeset_post_id = wp_insert_post( array(
+			'post_type' => 'customize_changeset',
+			'post_content' => '{}',
+			'post_name' => $uuid,
+			'post_status' => 'auto-draft',
+			'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+		) );
+
+		$post = get_post( $changeset_post_id );
+		$original_post_date = $post->post_date;
+
+		$wp_customize = $this->create_test_manager( $uuid );
+		$wp_customize->save_changeset_post( array(
+			'status' => 'auto-draft',
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Admin 1 Title',
+				),
+			),
+		) );
+
+		$post = get_post( $changeset_post_id );
+		$this->assertNotEquals( $post->post_date, $original_post_date );
+	}
+
+	/**
 	 * Test writing changesets when user supplies unchanged values.
 	 *
 	 * @ticket 38865
