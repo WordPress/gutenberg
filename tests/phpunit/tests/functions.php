@@ -442,6 +442,22 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_wp_parse_slug_list
+	 */
+	function test_wp_parse_slug_list( $expected, $actual ) {
+		$this->assertSame( $expected, array_values( wp_parse_slug_list( $actual ) ) );
+	}
+
+	function data_wp_parse_slug_list() {
+		return array(
+			array( array( 'apple', 'banana', 'carrot', 'dog' ), 'apple,banana,carrot,dog' ),
+			array( array( 'apple', 'banana', 'carrot', 'dog' ), 'apple, banana,,carrot,dog' ),
+			array( array( 'apple', 'banana', 'carrot', 'dog' ), 'apple banana carrot dog' ),
+			array( array( 'apple', 'banana-carrot', 'd-o-g' ), array( 'apple ', 'banana carrot', 'd o g' ) ),
+		);
+	}
+
+	/**
 	 * @dataProvider data_device_can_upload
 	 */
 	function test_device_can_upload( $user_agent, $expected ) {
