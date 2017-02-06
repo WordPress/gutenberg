@@ -710,4 +710,15 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 		$this->assertFalse( taxonomy_exists( 'foo' ) );
 	}
 
+	/**
+	 * @ticket 39308
+	 */
+	public function test_taxonomy_name_property_should_not_get_overridden_by_passed_args() {
+		register_taxonomy( 'foo', 'post', array( 'name' => 'bar' ) );
+
+		$taxonomy = get_taxonomy( 'foo' );
+		unregister_taxonomy( 'foo' );
+
+		$this->assertSame( 'foo', $taxonomy->name );
+	}
 }
