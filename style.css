@@ -1,7 +1,8 @@
 /**
  * Basic
  */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -91,7 +92,8 @@ p:before {
   height: 0;
   width: 108px;
   background: #191e23;
-  transition: all .05s ease;
+  transition: all .075s ease;
+  transform: translateZ(0);
 }
 h1.is-selected:before,
 h2.is-selected:before,
@@ -106,4 +108,34 @@ p.is-selected:before {
 
 p {
   min-height: 3.4em;
+}
+
+.block-controls {
+  opacity: 0;
+  margin-left: -54px;
+  height: 36px;
+  width: 54px;
+  position: absolute;
+  transition: opacity .075s ease;
+  transform: translateZ(0);
+}
+.block-controls svg {
+  fill: #86909c;
+  position: absolute;
+  cursor: pointer;
+}
+.block-controls svg:hover {
+  fill: #191e23;
+}
+.block-controls svg.up {
+  left: 0;
+  top: 0;
+}
+.block-controls svg.down {
+  left: 0;
+  bottom: 0;
+}
+.block-controls svg.type {
+  right: 6px;
+  top: 6px;
 }
