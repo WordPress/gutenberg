@@ -1,5 +1,6 @@
 "use strict";
 
+var editor = document.getElementsByClassName( 'editor' )[0];
 var text = document.getElementsByTagName( 'p' );
 var heading = document.getElementsByTagName( 'h2' );
 var blocks = [ ...text, ...heading ];
@@ -7,6 +8,7 @@ var blocks = [ ...text, ...heading ];
 var controls = document.getElementsByClassName( 'block-controls' )[0];
 
 window.addEventListener( 'click', clearBlocks, false );
+editor.addEventListener( 'input', clearBlocks, false );
 
 Array.from( blocks ).forEach( function( block ) {
 	block.addEventListener( 'click', selectBlock, false );
@@ -24,7 +26,7 @@ function selectBlock( event ) {
 	controls.style.top = ( position.top + 18 ) + 'px';
 }
 
-function clearBlocks( event ) {
+function clearBlocks() {
 	Array.from( blocks ).forEach( function( block ) {
 		block.className = '';
 	} );
