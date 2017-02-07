@@ -1,18 +1,26 @@
 "use strict";
 
 var editor = document.getElementsByClassName( 'editor' )[0];
-var text = document.getElementsByTagName( 'p' );
-var heading = document.getElementsByTagName( 'h2' );
-var blocks = [ ...text, ...heading ];
-
 var controls = document.getElementsByClassName( 'block-controls' )[0];
 
 window.addEventListener( 'click', clearBlocks, false );
+editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
 
-Array.from( blocks ).forEach( function( block ) {
-	block.addEventListener( 'click', selectBlock, false );
-} );
+attachBlockHandlers();
+
+function attachBlockHandlers() {
+	var blocks = getBlocks();
+	Array.from( blocks ).forEach( function( block ) {
+		block.addEventListener( 'click', selectBlock, false );
+	} );
+}
+
+function getBlocks() {
+	var text = document.getElementsByTagName( 'p' );
+	var heading = document.getElementsByTagName( 'h2' );
+	return [ ...text, ...heading ];
+}
 
 function selectBlock( event ) {
 	clearBlocks();
@@ -27,7 +35,7 @@ function selectBlock( event ) {
 }
 
 function clearBlocks() {
-	Array.from( blocks ).forEach( function( block ) {
+	Array.from( getBlocks() ).forEach( function( block ) {
 		block.className = '';
 	} );
 
