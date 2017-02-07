@@ -1,0 +1,109 @@
+/**
+ * Basic
+ */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+  max-width: 720px;
+  margin: 60px auto;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Merriweather", serif;
+  margin: 15px 0;
+  /* Uses paddings instead */
+}
+
+h2 {
+  font-weight: 900;
+  font-size: 28px;
+}
+
+p {
+  font-size: 16px;
+}
+
+section:focus {
+  outline: none;
+}
+
+/**
+ * Hover controls
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  position: relative;
+  box-shadow: inset 0px 0px 0px 0px #e0e5e9;
+  transition: all .2s ease;
+  padding: 15px;
+  /* replaces some block margins */
+}
+h1:hover,
+h2:hover,
+h3:hover,
+h4:hover,
+h5:hover,
+h6:hover,
+p:hover {
+  box-shadow: inset 0px 0px 0px 2px #e0e5e9;
+}
+h1.is-selected,
+h2.is-selected,
+h3.is-selected,
+h4.is-selected,
+h5.is-selected,
+h6.is-selected,
+p.is-selected {
+  box-shadow: inset 0px 0px 0px 2px #191e23;
+}
+h1:before,
+h2:before,
+h3:before,
+h4:before,
+h5:before,
+h6:before,
+p:before {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 108px;
+  background: #191e23;
+  transition: all .05s ease;
+}
+h1.is-selected:before,
+h2.is-selected:before,
+h3.is-selected:before,
+h4.is-selected:before,
+h5.is-selected:before,
+h6.is-selected:before,
+p.is-selected:before {
+  height: 36px;
+  top: -36px;
+}
+
+p {
+  min-height: 3.4em;
+}
