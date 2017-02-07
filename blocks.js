@@ -19,7 +19,8 @@ function attachBlockHandlers() {
 function getBlocks() {
 	var text = document.getElementsByTagName( 'p' );
 	var heading = document.getElementsByTagName( 'h2' );
-	return [ ...text, ...heading ];
+	var images = document.getElementsByTagName( 'img' );
+	return [ ...text, ...heading, ...images ];
 }
 
 function selectBlock( event ) {

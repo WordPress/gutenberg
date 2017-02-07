@@ -24,7 +24,8 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+img {
   font-family: "Merriweather", serif;
   margin: 15px 0;
   /* Uses paddings instead */
@@ -52,7 +53,8 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+img {
   position: relative;
   box-shadow: inset 0px 0px 0px 0px #e0e5e9;
   transition: all .2s ease;
@@ -65,7 +67,8 @@ h3:hover,
 h4:hover,
 h5:hover,
 h6:hover,
-p:hover {
+p:hover,
+img:hover {
   box-shadow: inset 0px 0px 0px 2px #e0e5e9;
 }
 h1.is-selected,
@@ -74,7 +77,8 @@ h3.is-selected,
 h4.is-selected,
 h5.is-selected,
 h6.is-selected,
-p.is-selected {
+p.is-selected,
+img.is-selected {
   box-shadow: inset 0px 0px 0px 2px #191e23;
 }
 h1:before,
@@ -83,7 +87,8 @@ h3:before,
 h4:before,
 h5:before,
 h6:before,
-p:before {
+p:before,
+img:before {
   content: "";
   position: absolute;
   display: block;
@@ -101,7 +106,8 @@ h3.is-selected:before,
 h4.is-selected:before,
 h5.is-selected:before,
 h6.is-selected:before,
-p.is-selected:before {
+p.is-selected:before,
+img.is-selected:before {
   height: 36px;
   top: -36px;
 }
@@ -138,4 +144,9 @@ p {
 .block-controls svg.type {
   right: 6px;
   top: 6px;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
 }
