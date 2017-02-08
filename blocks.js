@@ -7,7 +7,7 @@ var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
 
 /**
- * Globals 
+ * Globals
  */
 
 var editor = document.getElementsByClassName( 'editor' )[0];
