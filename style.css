@@ -142,9 +142,17 @@ p {
 	bottom: -6px;
 }
 
-.block-switcher svg.type {
+.block-switcher .type {
+    width: 24px;
+    height: 24px;
+    display: block;
+    position: absolute;
 	right: 6px;
 	top: 6px;
+}
+
+.block-switcher .type svg { /* node type js picks icon here */
+    display: none;
 }
 
 

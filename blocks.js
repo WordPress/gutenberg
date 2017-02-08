@@ -63,9 +63,23 @@ function clearBlocks() {
 }
 
 function showControls( node ) {
+	// show element type
+	document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'none';
+	document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'none';
+	document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'none';
+	if ( node.nodeName == 'IMG' ) {
+		document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'block';
+	} else if ( node.nodeName == 'H1' || node.nodeName == 'H2' || node.nodeName == 'H3' || node.nodeName == 'H4' || node.nodeName == 'H5' || node.nodeName == 'H6' ) {
+		document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'block';
+	} else {
+		document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'block';
+	}
+
+	// show controls
 	var position = node.getBoundingClientRect();
 	switcher.style.opacity = 1;
 	switcher.style.top = ( position.top + 18 ) + 'px';
+
 	blockControls.style.display = 'block';
 	blockControls.style.top = ( position.top - 36 ) + 'px';
 	blockControls.style.maxHeight = 'none';
