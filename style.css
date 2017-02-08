@@ -254,7 +254,7 @@ p {
  	float: left;
  }
 
-.block-controls button.is-selected {
+.block-controls button.is-active {
     background: #6d7882;
 }
 
