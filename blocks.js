@@ -104,11 +104,13 @@ function attachControlActions() {
 
 		if ( 'up' === classes ) {
 			node.addEventListener( 'click', function() {
+				event.stopPropagation();
 				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
 				attachBlockHandlers();
 			}, false );
 		} else if ( 'down' === classes ) {
 			node.addEventListener( 'click', function() {
+				event.stopPropagation();
 				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
 				attachBlockHandlers();
 			}, false );
