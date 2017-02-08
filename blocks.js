@@ -40,10 +40,8 @@ function attachBlockHandlers() {
 }
 
 function getBlocks() {
-	return Array.prototype.concat.apply( [], [ 'p', 'h2', 'img' ]
-		.map( function( tagName ) {
-			return Array.from( document.getElementsByTagName( tagName ) );
-		} ) );
+	return Array.prototype.concat.apply( [],
+			[ 'p', 'h2', 'img' ].map( query ) );
 }
 
 function selectBlock( event ) {
@@ -208,4 +206,8 @@ function hideMenu() {
 function l( data ) {
 	console.log( data );
 	return data;
+}
+
+function query( selector ) {
+	return Array.from( document.querySelectorAll( selector ) );
 }
