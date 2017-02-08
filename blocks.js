@@ -109,15 +109,21 @@ function attachControlActions() {
 				event.stopPropagation();
 				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
 				attachBlockHandlers();
+				reselect();
 			}, false );
 		} else if ( 'down' === classes ) {
 			node.addEventListener( 'click', function() {
 				event.stopPropagation();
 				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
 				attachBlockHandlers();
+				reselect();
 			}, false );
 		}
 	} );
+}
+
+function reselect() {
+	document.getElementsByClassName( 'is-selected' )[0].click();
 }
 
 function swapNodes( a, b ) {
@@ -129,9 +135,6 @@ function swapNodes( a, b ) {
 	if ( ! parent ) {
 		return false;
 	}
-
-	// how do we handle controls?
-	showControls( b );
 
 	// insert node copies before removal
 	parent.replaceChild( b.cloneNode( true ), a );
