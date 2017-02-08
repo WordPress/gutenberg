@@ -10,6 +10,7 @@ This is the development and prototyping hub for the editor focus in core.
 
 - <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
+- Mockups: https://cloudup.com/c9pKpaoDpQ4
 
 ## Prototypes
 
