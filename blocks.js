@@ -40,10 +40,8 @@ function attachBlockHandlers() {
 }
 
 function getBlocks() {
-	var text = document.getElementsByTagName( 'p' );
-	var heading = document.getElementsByTagName( 'h2' );
-	var images = document.getElementsByTagName( 'img' );
-	return [ ...text, ...heading, ...images ];
+	return Array.prototype.concat.apply( [],
+			[ 'p', 'h2', 'img' ].map( query ) );
 }
 
 function selectBlock( event ) {
@@ -208,4 +206,8 @@ function hideMenu() {
 function l( data ) {
 	console.log( data );
 	return data;
+}
+
+function query( selector ) {
+	return Array.from( document.querySelectorAll( selector ) );
 }
