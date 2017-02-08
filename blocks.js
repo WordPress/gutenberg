@@ -48,12 +48,8 @@ function selectBlock( event ) {
 	event.stopPropagation();
 	event.target.className = 'is-selected';
 
-	var position = event.target.getBoundingClientRect();
-
-	// Show switcher
-	controls.style.opacity = 1;
-	controls.style.top = ( position.top + 18 ) + 'px';
 	selectedBlock = event.target;
+	showControls( selectedBlock );
 }
 
 function clearBlocks() {
@@ -63,6 +59,12 @@ function clearBlocks() {
 	var selectedBlock = null;
 
 	hideControls();
+}
+
+function showControls( node ) {
+	var position = node.getBoundingClientRect();
+	controls.style.opacity = 1;
+	controls.style.top = ( position.top + 18 ) + 'px';
 }
 
 function hideControls() {
@@ -104,11 +106,13 @@ function attachControlActions() {
 
 		if ( 'up' === classes ) {
 			node.addEventListener( 'click', function() {
+				event.stopPropagation();
 				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
 				attachBlockHandlers();
 			}, false );
 		} else if ( 'down' === classes ) {
 			node.addEventListener( 'click', function() {
+				event.stopPropagation();
 				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
 				attachBlockHandlers();
 			}, false );
@@ -125,6 +129,9 @@ function swapNodes( a, b ) {
 	if ( ! parent ) {
 		return false;
 	}
+
+	// how do we handle controls?
+	showControls( b );
 
 	// insert node copies before removal
 	parent.replaceChild( b.cloneNode( true ), a );
