@@ -4,20 +4,20 @@
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+	margin: 0;
+	padding: 0;
+	height: 100%;
 }
 
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 body {
-    font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
-    max-width: 720px;
-    margin: 60px auto;
-    color: #12181e;
+	font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+	max-width: 720px;
+	margin: 60px auto;
+	color: #12181e;
 }
 
 img {
@@ -26,7 +26,7 @@ img {
 }
 
 svg {
-    fill: currentColor;
+	fill: currentColor;
 }
 
 p,
@@ -37,22 +37,22 @@ h4,
 h5,
 h6,
 img {
-    font-family: "Merriweather", serif;
-    margin: 15px 0;
-    /* Uses paddings instead */
+	font-family: "Merriweather", serif;
+	margin: 15px 0;
+	/* Uses paddings instead */
 }
 
 h2 {
-    font-weight: 900;
-    font-size: 28px;
+	font-weight: 900;
+	font-size: 28px;
 }
 
 p {
-    font-size: 16px;
+	font-size: 16px;
 }
 
 section:focus {
-    outline: none;
+	outline: none;
 }
 
 
@@ -68,11 +68,11 @@ h5,
 h6,
 p,
 img {
-    position: relative;
-    box-shadow: inset 0px 0px 0px 0px #e0e5e9;
-    transition: all .2s ease;
-    padding: 15px;
-    /* replaces some block margins */
+	position: relative;
+	box-shadow: inset 0px 0px 0px 0px #e0e5e9;
+	transition: all .2s ease;
+	padding: 15px;
+	/* replaces some block margins */
 }
 
 h1:hover,
@@ -83,7 +83,7 @@ h5:hover,
 h6:hover,
 p:hover,
 img:hover {
-    box-shadow: inset 0px 0px 0px 2px #e0e5e9;
+	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
 }
 
 h1.is-selected,
@@ -94,7 +94,7 @@ h5.is-selected,
 h6.is-selected,
 p.is-selected,
 img.is-selected {
-    box-shadow: inset 0px 0px 0px 2px #191e23;
+	box-shadow: inset 0px 0px 0px 2px #191e23;
 }
 
 h1:before,
@@ -105,16 +105,16 @@ h5:before,
 h6:before,
 p:before,
 img:before {
-    content: "";
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 0;
-    height: 0;
-    width: 108px;
-    background: #191e23;
-    transition: all .075s ease;
-    transform: translateZ(0);
+	content: "";
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	height: 0;
+	width: 108px;
+	background: #191e23;
+	transition: all .075s ease;
+	transform: translateZ(0);
 }
 
 h1.is-selected:before,
@@ -125,12 +125,12 @@ h5.is-selected:before,
 h6.is-selected:before,
 p.is-selected:before,
 img.is-selected:before {
-    height: 36px;
-    top: -36px;
+	height: 36px;
+	top: -36px;
 }
 
 p {
-    min-height: 3.4em;
+	min-height: 3.4em;
 }
 
 
@@ -139,44 +139,44 @@ p {
  */
 
 .block-controls {
-    opacity: 0;
-    margin-left: -54px;
-    height: 36px;
-    width: 54px;
-    position: absolute;
-    transition: opacity .075s ease;
-    transform: translateZ(0);
+	opacity: 0;
+	margin-left: -54px;
+	height: 36px;
+	width: 54px;
+	position: absolute;
+	transition: opacity .075s ease;
+	transform: translateZ(0);
 }
 
 .block-controls svg {
-    fill: #86909c;
-    position: absolute;
-    cursor: pointer;
+	fill: #86909c;
+	position: absolute;
+	cursor: pointer;
 }
 
 .block-controls svg:hover {
-    fill: #191e23;
+	fill: #191e23;
 }
 
 .block-controls svg.up,
 .block-controls svg.down {
-    padding: 3px;
-    width: 24px;
-    height: 24px;
-    left: -3px;
+	padding: 3px;
+	width: 24px;
+	height: 24px;
+	left: -3px;
 }
 
 .block-controls svg.up {
-    top: -6px;
+	top: -6px;
 }
 
 .block-controls svg.down {
-    bottom: -6px;
+	bottom: -6px;
 }
 
 .block-controls svg.type {
-    right: 6px;
-    top: 6px;
+	right: 6px;
+	top: 6px;
 }
 
 
@@ -185,69 +185,69 @@ p {
  */
 
 .inline-controls {
-    background: #fff;
-    border: 1px solid #e1e6ea;
-    box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
-    color: #12181e;
-    display: inline-block;
-    height: 38px;
-    overflow: hidden;
-    position: absolute;
-    z-index: 10;
-    display: none;
+	background: #fff;
+	border: 1px solid #e1e6ea;
+	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
+	color: #12181e;
+	display: inline-block;
+	height: 38px;
+	overflow: hidden;
+	position: absolute;
+	z-index: 10;
+	display: none;
 }
 
 .inline-controls button {
-    background: #fff;
-    border: none;
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-    cursor: pointer;
-    display: block;
-    float: left;
+	background: #fff;
+	border: none;
+	width: 36px;
+	height: 36px;
+	padding: 6px;
+	cursor: pointer;
+	display: block;
+	float: left;
 }
 
 .inline-controls button:hover {
-    background: #f0f2f4;
+	background: #f0f2f4;
 }
 
 .inline-controls button:focus {
-    outline: none;
+	outline: none;
 }
 
 .control-group {
-    display: inline-block;
-    margin-left: 20px;
+	display: inline-block;
+	margin-left: 20px;
 }
 
 .inline-controls button.heading-dropdown {
-    width: 54px;
-    position: relative;
+	width: 54px;
+	position: relative;
 }
 
 .heading-dropdown .heading {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 36px;
-    height: 36px;
-    padding: 6px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 36px;
+	height: 36px;
+	padding: 6px;
 }
 
 .heading-dropdown .dropdown {
-    width: 24px;
-    height: 36px;
-    padding: 6px 0;
-    position: absolute;
-    top: 0;
-    right: 0;
+	width: 24px;
+	height: 36px;
+	padding: 6px 0;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 .heading-dropdown sub {
-    font-weight: 900;
-    position: absolute;
-    bottom: 8px;
+	font-weight: 900;
+	position: absolute;
+	bottom: 8px;
 }
 
 
@@ -256,14 +256,14 @@ p {
  */
 
 .insert-block {
-    padding: 14px 0 0 14px;
+	padding: 14px 0 0 14px;
 }
 
 .insert-block svg {
-    cursor: pointer;
-    fill: #87919d;
+	cursor: pointer;
+	fill: #87919d;
 }
 
 .insert-block:hover svg {
-    fill: #12181e;
+	fill: #12181e;
 }

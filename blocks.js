@@ -9,7 +9,6 @@ var getPreviousSibling = siblingGetter( 'previous' );
 /**
  * Globals
  */
-
 var editor = document.getElementsByClassName( 'editor' )[0];
 var controls = document.getElementsByClassName( 'block-controls' )[0];
 var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
@@ -18,7 +17,6 @@ var selectedBlock = null;
 /**
  * Initialization
  */
-
 window.addEventListener( 'click', clearBlocks, false );
 editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
@@ -30,7 +28,6 @@ attachControlActions();
 /**
  * Core logic
  */
-
 function attachBlockHandlers() {
 	var blocks = getBlocks();
 	Array.from( blocks ).forEach( function( block ) {
@@ -72,7 +69,7 @@ function hideControls() {
 	controls.style.opacity = 0;
 }
 
-/* Show popup on text selection */
+// Show popup on text selection
 function onSelectText( event ) {
 	event.stopPropagation();
 	var txt = "";
