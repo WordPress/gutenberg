@@ -94,39 +94,7 @@ h5.is-selected,
 h6.is-selected,
 p.is-selected,
 img.is-selected {
-	box-shadow: inset 0px 0px 0px 2px #191e23;
-}
-
-h1:before,
-h2:before,
-h3:before,
-h4:before,
-h5:before,
-h6:before,
-p:before,
-img:before {
-	content: "";
-	position: absolute;
-	display: block;
-	top: 0;
-	left: 0;
-	height: 0;
-	width: 108px;
-	background: #191e23;
-	transition: all .075s ease;
-	transform: translateZ(0);
-}
-
-h1.is-selected:before,
-h2.is-selected:before,
-h3.is-selected:before,
-h4.is-selected:before,
-h5.is-selected:before,
-h6.is-selected:before,
-p.is-selected:before,
-img.is-selected:before {
-	height: 36px;
-	top: -36px;
+	box-shadow: inset 0px 0px 0px 2px #6d7882;
 }
 
 p {
@@ -135,10 +103,10 @@ p {
 
 
 /**
- * Block controls
+ * Block Switcher
  */
 
-.block-controls {
+.block-switcher {
 	opacity: 0;
 	margin-left: -54px;
 	height: 36px;
@@ -148,33 +116,33 @@ p {
 	transform: translateZ(0);
 }
 
-.block-controls svg {
+.block-switcher svg {
 	fill: #86909c;
 	position: absolute;
 	cursor: pointer;
 }
 
-.block-controls svg:hover {
+.block-switcher svg:hover {
 	fill: #191e23;
 }
 
-.block-controls svg.up,
-.block-controls svg.down {
+.block-switcher svg.up,
+.block-switcher svg.down {
 	padding: 3px;
 	width: 24px;
 	height: 24px;
 	left: -3px;
 }
 
-.block-controls svg.up {
+.block-switcher svg.up {
 	top: -6px;
 }
 
-.block-controls svg.down {
+.block-switcher svg.down {
 	bottom: -6px;
 }
 
-.block-controls svg.type {
+.block-switcher svg.type {
 	right: 6px;
 	top: 6px;
 }
@@ -248,6 +216,38 @@ p {
 	font-weight: 900;
 	position: absolute;
 	bottom: 8px;
+}
+
+
+/**
+ * Block Controls
+ */
+
+ .block-controls {
+ 	background: #191e23;
+ 	display: inline-block;
+ 	max-height: 36px;
+ 	overflow: hidden;
+ 	position: absolute;
+ 	z-index: 10;
+    display: none;
+    transform: translateZ( 0 );
+ }
+
+ .block-controls button {
+ 	background: #191e23;
+    color: #fff;
+ 	border: none;
+ 	width: 36px;
+ 	height: 36px;
+ 	padding: 6px;
+ 	cursor: pointer;
+ 	display: block;
+ 	float: left;
+ }
+
+.block-controls button.is-selected {
+    background: #6d7882;
 }
 
 

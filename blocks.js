@@ -10,7 +10,8 @@ var getPreviousSibling = siblingGetter( 'previous' );
  * Globals
  */
 var editor = document.getElementsByClassName( 'editor' )[0];
-var controls = document.getElementsByClassName( 'block-controls' )[0];
+var switcher = document.getElementsByClassName( 'block-switcher' )[0];
+var blockControls = document.getElementsByClassName( 'block-controls' )[0];
 var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
 var selectedBlock = null;
 
@@ -63,12 +64,17 @@ function clearBlocks() {
 
 function showControls( node ) {
 	var position = node.getBoundingClientRect();
-	controls.style.opacity = 1;
-	controls.style.top = ( position.top + 18 ) + 'px';
+	switcher.style.opacity = 1;
+	switcher.style.top = ( position.top + 18 ) + 'px';
+	blockControls.style.display = 'block';
+	blockControls.style.top = ( position.top - 36 ) + 'px';
+	blockControls.style.maxHeight = 'none';
 }
 
 function hideControls() {
-	controls.style.opacity = 0;
+	switcher.style.opacity = 0;
+	blockControls.style.display = 'none';
+	blockControls.style.maxHeight = 0;
 }
 
 // Show popup on text selection
@@ -97,7 +103,7 @@ function onSelectText( event ) {
 }
 
 function attachControlActions() {
-	Array.from( controls.childNodes ).forEach( function( node ) {
+	Array.from( switcher.childNodes ).forEach( function( node ) {
 		if ( 'svg' !== node.nodeName ) {
 			return;
 		}
