@@ -10,7 +10,8 @@ var getPreviousSibling = siblingGetter( 'previous' );
  * Globals
  */
 var editor = document.getElementsByClassName( 'editor' )[0];
-var controls = document.getElementsByClassName( 'block-controls' )[0];
+var switcher = document.getElementsByClassName( 'block-switcher' )[0];
+var blockControls = document.getElementsByClassName( 'block-controls' )[0];
 var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
 var selectedBlock = null;
 
@@ -62,13 +63,32 @@ function clearBlocks() {
 }
 
 function showControls( node ) {
+	// show element type
+	document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'none';
+	document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'none';
+	document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'none';
+	if ( node.nodeName == 'IMG' ) {
+		document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'block';
+	} else if ( node.nodeName == 'H1' || node.nodeName == 'H2' || node.nodeName == 'H3' || node.nodeName == 'H4' || node.nodeName == 'H5' || node.nodeName == 'H6' ) {
+		document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'block';
+	} else {
+		document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'block';
+	}
+
+	// show controls
 	var position = node.getBoundingClientRect();
-	controls.style.opacity = 1;
-	controls.style.top = ( position.top + 18 ) + 'px';
+	switcher.style.opacity = 1;
+	switcher.style.top = ( position.top + 18 ) + 'px';
+
+	blockControls.style.display = 'block';
+	blockControls.style.top = ( position.top - 36 ) + 'px';
+	blockControls.style.maxHeight = 'none';
 }
 
 function hideControls() {
-	controls.style.opacity = 0;
+	switcher.style.opacity = 0;
+	blockControls.style.display = 'none';
+	blockControls.style.maxHeight = 0;
 }
 
 // Show popup on text selection
@@ -89,7 +109,9 @@ function onSelectText( event ) {
 		inlineControls.style.display = 'block';
 		var range = txt.getRangeAt(0);
 		var pos = range.getBoundingClientRect();
-		inlineControls.style.left = pos.left + 'px';
+		var selectCenter = pos.width / 2;
+		var controlsCenter = inlineControls.offsetWidth / 2;
+		inlineControls.style.left = ( pos.left + selectCenter - controlsCenter ) + 'px';
 		inlineControls.style.top = ( pos.top - 48 ) + 'px';
 	} else {
 		inlineControls.style.display = 'none';
@@ -97,7 +119,7 @@ function onSelectText( event ) {
 }
 
 function attachControlActions() {
-	Array.from( controls.childNodes ).forEach( function( node ) {
+	Array.from( switcher.childNodes ).forEach( function( node ) {
 		if ( 'svg' !== node.nodeName ) {
 			return;
 		}
