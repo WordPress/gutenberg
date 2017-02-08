@@ -109,7 +109,9 @@ function onSelectText( event ) {
 		inlineControls.style.display = 'block';
 		var range = txt.getRangeAt(0);
 		var pos = range.getBoundingClientRect();
-		inlineControls.style.left = pos.left + 'px';
+		var selectCenter = pos.width / 2;
+		var controlsCenter = inlineControls.offsetWidth / 2;
+		inlineControls.style.left = ( pos.left + selectCenter - controlsCenter ) + 'px';
 		inlineControls.style.top = ( pos.top - 48 ) + 'px';
 	} else {
 		inlineControls.style.display = 'none';
