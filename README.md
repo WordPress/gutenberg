@@ -9,8 +9,8 @@ Prototyping since 1440.
 
 ## Prototypes
 
-- <a href="https://automattic.github.io/gutenberg/">UI prototype</a>.
-- <a href="https://calypso.live/blocks?branch=try/block-parsing-extension">Separate TinyMCE instances</a>.
+- <a href="https://wordpress.github.io/gutenberg/">UI prototype</a>.
+- <a href="https://calypso.live/blocks?branch=try/block-parsing-extension">Parsing HTML comments and separate TinyMCE instances</a>.
 
 ----
 
