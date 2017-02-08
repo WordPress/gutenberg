@@ -40,10 +40,10 @@ function attachBlockHandlers() {
 }
 
 function getBlocks() {
-	var text = document.getElementsByTagName( 'p' );
-	var heading = document.getElementsByTagName( 'h2' );
-	var images = document.getElementsByTagName( 'img' );
-	return [ ...text, ...heading, ...images ];
+	return Array.prototype.concat.apply( [], [ 'p', 'h2', 'img' ]
+		.map( function( tagName ) {
+			return Array.from( document.getElementsByTagName( tagName ) );
+		} ) );
 }
 
 function selectBlock( event ) {
