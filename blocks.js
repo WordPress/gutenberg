@@ -81,10 +81,10 @@ function showControls( node ) {
 	// show controls
 	var position = node.getBoundingClientRect();
 	switcher.style.opacity = 1;
-	switcher.style.top = ( position.top + 18 ) + 'px';
+	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	blockControls.style.display = 'block';
-	blockControls.style.top = ( position.top - 36 ) + 'px';
+	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
 	blockControls.style.maxHeight = 'none';
 }
 
@@ -115,7 +115,7 @@ function onSelectText( event ) {
 		var selectCenter = pos.width / 2;
 		var controlsCenter = inlineControls.offsetWidth / 2;
 		inlineControls.style.left = ( pos.left + selectCenter - controlsCenter ) + 'px';
-		inlineControls.style.top = ( pos.top - 48 ) + 'px';
+		inlineControls.style.top = ( pos.top - 48 + window.scrollY ) + 'px';
 	} else {
 		inlineControls.style.display = 'none';
 	}
