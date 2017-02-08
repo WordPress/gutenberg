@@ -12,6 +12,7 @@ var getPreviousSibling = siblingGetter( 'previous' );
 
 var editor = document.getElementsByClassName( 'editor' )[0];
 var controls = document.getElementsByClassName( 'block-controls' )[0];
+var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
 var selectedBlock = null;
 
 /**
@@ -21,6 +22,7 @@ var selectedBlock = null;
 window.addEventListener( 'click', clearBlocks, false );
 editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
+window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
 attachControlActions();
@@ -68,6 +70,31 @@ function clearBlocks() {
 
 function hideControls() {
 	controls.style.opacity = 0;
+}
+
+/* Show popup on text selection */
+function onSelectText( event ) {
+	event.stopPropagation();
+	var txt = "";
+
+	if ( window.getSelection ) {
+		txt = window.getSelection();
+	} else if ( document.getSelection ) {
+		txt = document.getSelection();
+	} else if ( document.selection ) {
+		txt = document.selection.createRange().text;
+	}
+
+	// Show formatting bar
+	if ( txt != '' ) {
+		inlineControls.style.display = 'block';
+		var range = txt.getRangeAt(0);
+		var pos = range.getBoundingClientRect();
+		inlineControls.style.left = pos.left + 'px';
+		inlineControls.style.top = ( pos.top - 48 ) + 'px';
+	} else {
+		inlineControls.style.display = 'none';
+	}
 }
 
 function attachControlActions() {
