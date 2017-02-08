@@ -15,7 +15,7 @@ This is the development and prototyping hub for the editor focus in core.
 
 - <a href="https://wordpress.github.io/gutenberg/">UI prototype</a>.
 - <a href="https://calypso.live/blocks?branch=try/block-parsing-extension">Parsing HTML comments and separate TinyMCE instances</a>.
-- <a href="fiddle.tinymce.com/block/">TinyMCE block concept</a>.
+- <a href="http://fiddle.tinymce.com/block/">TinyMCE block concept</a>.
 
 ## Parser
 
