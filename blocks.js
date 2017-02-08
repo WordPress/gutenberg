@@ -13,6 +13,7 @@ var editor = document.getElementsByClassName( 'editor' )[0];
 var switcher = document.getElementsByClassName( 'block-switcher' )[0];
 var blockControls = document.getElementsByClassName( 'block-controls' )[0];
 var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
+var insertBlockButton = document.getElementsByClassName( 'insert-block__button' )[0];
 var selectedBlock = null;
 
 /**
@@ -21,6 +22,7 @@ var selectedBlock = null;
 window.addEventListener( 'click', clearBlocks, false );
 editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
+insertBlockButton.addEventListener( 'click', openBlockMenu, false );
 window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
@@ -60,6 +62,7 @@ function clearBlocks() {
 	var selectedBlock = null;
 
 	hideControls();
+	hideMenu();
 }
 
 function showControls( node ) {
@@ -186,6 +189,20 @@ function siblingGetter( direction ) {
 
 		return node[ sibling ];
 	}
+}
+
+function openBlockMenu( event ) {
+	event.stopPropagation();
+	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	menu.style.display = 'block';
+	menu.addEventListener( 'click', function( event ) {
+		event.stopPropagation();
+	}, false );
+}
+
+function hideMenu() {
+	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	menu.style.display = 'none';
 }
 
 function l( data ) {
