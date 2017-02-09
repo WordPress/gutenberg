@@ -40,6 +40,7 @@ var config = {
 var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
 var switcherButtons = query( '.block-switcher .type svg' );
+var switcherMenu = queryFirst( '.switch-block__menu' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
@@ -133,6 +134,7 @@ function showControls( node ) {
 
 function hideControls() {
 	switcher.style.opacity = 0;
+	switcherMenu.style.display = 'none';
 	blockControls.style.display = 'none';
 }
 
@@ -183,6 +185,10 @@ function attachControlActions() {
 				reselect();
 			}, false );
 		}
+	} );
+
+	switcherButtons.forEach( function( button ) {
+		button.addEventListener( 'click', showSwitcherMenu, false );
 	} );
 
 	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
@@ -242,6 +248,14 @@ function openBlockMenu( event ) {
 
 function hideMenu() {
 	insertBlockMenu.style.display = 'none';
+}
+
+function showSwitcherMenu( event ) {
+	event.stopPropagation();
+
+	var position = switcher.getBoundingClientRect();
+	switcherMenu.style.top = ( position.top + 18 + window.scrollY ) + 'px';
+	switcherMenu.style.display = 'block';
 }
 
 function setImageState( classes, event ) {
