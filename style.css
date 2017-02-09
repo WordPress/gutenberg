@@ -231,7 +231,7 @@ p {
  * Block Controls
  */
 
- .block-controls {
+.block-controls {
  	background: #191e23;
  	display: inline-block;
  	max-height: 36px;
@@ -242,7 +242,7 @@ p {
     transform: translateZ( 0 );
  }
 
- .block-controls button {
+.block-controls button {
  	background: #191e23;
     color: #fff;
  	border: none;
@@ -258,6 +258,14 @@ p {
     background: #6d7882;
 }
 
+.block-controls button {
+	display: none;
+}
+
+.block-controls.is-image .block-image,
+.block-controls.is-text .block-text {
+	display: block;
+}
 
 /**
  * Inserter
@@ -354,24 +362,4 @@ img.align-right {
 	float: right;
 	width: 340px;
 	margin: 0 0 0 16px;
-}
-
-button.block-image__full-width,
-button.block-image__no-alignment,
-button.block-image__no-align,
-button.block-image__align-left,
-button.block-image__align-right {
-	display: none;
-}
-
-.block-controls.is-image button {
-	display: none;
-}
-
-.block-controls.is-image .block-image__full-width,
-.block-controls.is-image .block-image__no-alignment,
-.block-controls.is-image .block-image__no-align,
-.block-controls.is-image .block-image__align-left,
-.block-controls.is-image .block-image__align-right {
-	display: block;
 }
