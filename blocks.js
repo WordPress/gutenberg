@@ -47,7 +47,7 @@ function getBlocks() {
 function selectBlock( event ) {
 	clearBlocks();
 	event.stopPropagation();
-	event.target.className = 'is-selected';
+	event.target.className += ' is-selected';
 
 	selectedBlock = event.target;
 	showControls( selectedBlock );
@@ -55,7 +55,7 @@ function selectBlock( event ) {
 
 function clearBlocks() {
 	Array.from( getBlocks() ).forEach( function( block ) {
-		block.className = '';
+		block.className = block.className.replace( 'is-selected', '' );
 	} );
 	var selectedBlock = null;
 
@@ -70,11 +70,23 @@ function showControls( node ) {
 	document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'none';
 	if ( node.nodeName == 'IMG' ) {
 		document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'block';
+		blockControls.className = 'block-controls is-image';
 	} else if ( node.nodeName == 'H1' || node.nodeName == 'H2' || node.nodeName == 'H3' || node.nodeName == 'H4' || node.nodeName == 'H5' || node.nodeName == 'H6' ) {
 		document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'block';
+		blockControls.className = 'block-controls is-heading';
 	} else {
 		document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'block';
+		blockControls.className = 'block-controls is-text';
 	}
+
+	var imageFullBleed = document.getElementsByClassName( 'block-image__full-width' )[0];
+	var imageAlignNone = document.getElementsByClassName( 'block-image__no-align' )[0];
+	var imageAlignLeft = document.getElementsByClassName( 'block-image__align-left' )[0];
+	var imageAlignRight = document.getElementsByClassName( 'block-image__align-right' )[0];
+	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
+	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
+	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
+	imageAlignRight.addEventListener( 'click', setImageAlignRight, false );
 
 	// show controls
 	var position = node.getBoundingClientRect();
@@ -201,6 +213,32 @@ function openBlockMenu( event ) {
 function hideMenu() {
 	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
 	menu.style.display = 'none';
+}
+
+function setImageFullBleed( event ) {
+	event.stopPropagation();
+	var image = query('img')[0];
+	console.log(image);
+	image.className = 'is-selected align-full-bleed';
+}
+
+function setImageAlignNone( event ) {
+	event.stopPropagation();
+	var image = query('img')[0];
+	console.log(image);
+	image.className = 'is-selected';
+}
+
+function setImageAlignLeft( event ) {
+	event.stopPropagation();
+	var image = query('img')[0];
+	image.className = 'is-selected align-left';
+}
+
+function setImageAlignRight( event ) {
+	event.stopPropagation();
+	var image = query('img')[0];
+	image.className = 'is-selected align-right';
 }
 
 function l( data ) {
