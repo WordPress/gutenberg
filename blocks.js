@@ -17,19 +17,22 @@ var setImageAlignRight = setImageState.bind( null, 'align-right' );
  */
 var config = {
 	tagTypes: {
-		'IMG': 'image',
+		'BLOCKQUOTE': 'blockquote',
 		'H1': 'heading',
 		'H2': 'heading',
 		'H3': 'heading',
 		'H4': 'heading',
 		'H5': 'heading',
 		'H6': 'heading',
+		'IMG': 'image',
+		'P': 'paragraph',
 		'default': 'paragraph'
 	},
 	typeKinds: {
-		'paragraph': [ 'text' ],
+		'blockquote': [ 'text' ],
 		'heading': [ 'heading', 'text' ],
 		'image': [ 'image' ],
+		'paragraph': [ 'text' ],
 		'default': []
 	}
 };
@@ -44,8 +47,12 @@ var imageFullBleed = queryFirst( '.block-image__full-width' );
 var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
 var imageAlignRight = queryFirst( '.block-image__align-right' );
+
 var selectedBlock = null;
 
+var supportedBlockTags = Object.keys( config.tagTypes )
+	.slice( 0, -1 ) // remove 'default' option
+	.map( function( tag ) { return tag.toLowerCase(); } );
 
 /**
  * Initialization
@@ -71,7 +78,7 @@ function attachBlockHandlers() {
 
 function getBlocks() {
 	return Array.prototype.concat.apply( [],
-			[ 'p', 'h2', 'img' ].map( query ) );
+			supportedBlockTags.map( query ) );
 }
 
 function selectBlock( event ) {

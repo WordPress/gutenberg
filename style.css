@@ -30,6 +30,7 @@ svg {
 }
 
 p,
+blockquote,
 h1,
 h2,
 h3,
@@ -49,6 +50,13 @@ h2 {
 
 p {
 	font-size: 16px;
+	min-height: 3.4em;
+}
+
+blockquote {
+	font-size: 20px;
+	border-left: 4px solid black;
+	font-style: italic;
 }
 
 section:focus {
@@ -67,6 +75,7 @@ h4,
 h5,
 h6,
 p,
+blockquote,
 img {
 	position: relative;
 	box-shadow: inset 0px 0px 0px 0px #e0e5e9;
@@ -82,6 +91,7 @@ h4:hover,
 h5:hover,
 h6:hover,
 p:hover,
+blockquote:hover,
 img:hover {
 	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
 }
@@ -93,14 +103,10 @@ h4.is-selected,
 h5.is-selected,
 h6.is-selected,
 p.is-selected,
+blockquote.is-selected,
 img.is-selected {
 	box-shadow: inset 0px 0px 0px 2px #6d7882;
 }
-
-p {
-	min-height: 3.4em;
-}
-
 
 /**
  * Block Switcher
