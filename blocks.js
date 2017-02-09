@@ -7,6 +7,10 @@ var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
 var getTagType = getConfig.bind( null, 'tagTypes' );
 var getTypeKinds = getConfig.bind( null, 'typeKinds' );
+var setImageFullBleed = setImageState.bind( null, 'align-full-bleed' );
+var setImageAlignNone = setImageState.bind( null, '' );
+var setImageAlignLeft = setImageState.bind( null, 'align-left' );
+var setImageAlignRight = setImageState.bind( null, 'align-right' );
 
 /**
  * Globals
@@ -29,6 +33,7 @@ var config = {
 		'default': []
 	}
 };
+
 var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
 var switcherButtons = query( '.block-switcher .type svg' );
@@ -82,7 +87,7 @@ function clearBlocks() {
 	getBlocks().forEach( function( block ) {
 		block.className = block.className.replace( 'is-selected', '' );
 	} );
-	var selectedBlock = null;
+	selectedBlock = null;
 
 	hideControls();
 	hideMenu();
@@ -221,7 +226,7 @@ function siblingGetter( direction ) {
 
 function openBlockMenu( event ) {
 	event.stopPropagation();
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	var menu = queryFirst( '.insert-block__menu' );
 	menu.style.display = 'block';
 	menu.addEventListener( 'click', function( event ) {
 		event.stopPropagation();
@@ -229,34 +234,13 @@ function openBlockMenu( event ) {
 }
 
 function hideMenu() {
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	var menu = queryFirst( '.insert-block__menu' );
 	menu.style.display = 'none';
 }
 
-function setImageFullBleed( event ) {
+function setImageState( classes, event ) {
 	event.stopPropagation();
-	var image = query('img')[0];
-	console.log(image);
-	image.className = 'is-selected align-full-bleed';
-}
-
-function setImageAlignNone( event ) {
-	event.stopPropagation();
-	var image = query('img')[0];
-	console.log(image);
-	image.className = 'is-selected';
-}
-
-function setImageAlignLeft( event ) {
-	event.stopPropagation();
-	var image = query('img')[0];
-	image.className = 'is-selected align-left';
-}
-
-function setImageAlignRight( event ) {
-	event.stopPropagation();
-	var image = query('img')[0];
-	image.className = 'is-selected align-right';
+	selectedBlock.className = 'is-selected ' + classes;
 }
 
 function l( data ) {
