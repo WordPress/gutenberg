@@ -335,3 +335,43 @@ p {
 .insert-block__block svg {
 	margin-right: 4px;
 }
+
+img.align-full-bleed {
+	margin-left: calc(50% - 50vw);
+	width: 100vw;
+	max-width: none;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+img.align-left {
+	float: left;
+	width: 340px;
+	margin: 0 16px 0 0;
+}
+
+img.align-right {
+	float: right;
+	width: 340px;
+	margin: 0 0 0 16px;
+}
+
+button.block-image__full-width,
+button.block-image__no-alignment,
+button.block-image__no-align,
+button.block-image__align-left,
+button.block-image__align-right {
+	display: none;
+}
+
+.block-controls.is-image button {
+	display: none;
+}
+
+.block-controls.is-image .block-image__full-width,
+.block-controls.is-image .block-image__no-alignment,
+.block-controls.is-image .block-image__no-align,
+.block-controls.is-image .block-image__align-left,
+.block-controls.is-image .block-image__align-right {
+	display: block;
+}
