@@ -297,7 +297,8 @@ img.is-selected {
 }
 
 .insert-block svg,
-.switch-block svg {
+.switch-block__block svg,
+.switch-block__block label {
 	cursor: pointer;
 	fill: #87919d;
 }
@@ -323,6 +324,9 @@ img.is-selected {
 	left: 60px;
 	bottom: 0;
 	background: #fff;
+}
+.switch-block__menu {
+	width: 140px;
 }
 
 .switch-block__menu {
@@ -350,8 +354,7 @@ img.is-selected {
 	color: #9ea7af;
 }
 
-.insert-block__block-list,
-.switch-block__block-list {
+.insert-block__block-list {
 	display: flex;
 	flex-flow: row wrap;
 }
@@ -359,11 +362,13 @@ img.is-selected {
 .insert-block__block,
 .switch-block__block {
 	display: flex;
-	width: 50%;
 	color: #606a73;
 	padding: 8px;
 	font-size: 12px;
 	align-items: center;
+}
+.insert-block__block {
+	width: 50%;
 }
 .insert-block__block svg,
 .switch-block__block svg {

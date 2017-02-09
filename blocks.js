@@ -17,7 +17,7 @@ var setImageAlignRight = setImageState.bind( null, 'align-right' );
  */
 var config = {
 	tagTypes: {
-		'BLOCKQUOTE': 'blockquote',
+		'BLOCKQUOTE': 'quote',
 		'H1': 'heading',
 		'H2': 'heading',
 		'H3': 'heading',
@@ -29,7 +29,7 @@ var config = {
 		'default': 'paragraph'
 	},
 	typeKinds: {
-		'blockquote': [ 'text' ],
+		'quote': [ 'text' ],
 		'heading': [ 'heading', 'text' ],
 		'image': [ 'image' ],
 		'paragraph': [ 'text' ],
@@ -70,6 +70,7 @@ window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
 attachControlActions();
+attachTypeSwitcherActions();
 
 /**
  * Core logic
@@ -187,14 +188,46 @@ function attachControlActions() {
 		}
 	} );
 
-	switcherButtons.forEach( function( button ) {
-		button.addEventListener( 'click', showSwitcherMenu, false );
-	} );
-
 	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
 	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
 	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
 	imageAlignRight.addEventListener( 'click', setImageAlignRight, false );
+}
+
+function attachTypeSwitcherActions() {
+	var typeToTag = {
+		paragraph: 'p',
+		quote: 'blockquote',
+		heading: 'h2'
+	};
+
+	switcherButtons.forEach( function( button ) {
+		button.addEventListener( 'click', showSwitcherMenu, false );
+	} );
+
+	Object.keys( typeToTag ).forEach( function( type ) {
+		var selector = '.switch-block__block .type-icon-' + type;
+		var button = queryFirst( selector );
+		var label = queryFirst( selector + ' + label' );
+
+		button.addEventListener( 'click', switchBlockType, false );
+		label.addEventListener( 'click', switchBlockType, false );
+
+		function switchBlockType( event ) {
+			if ( ! selectedBlock ) {
+				return;
+			}
+
+			var openingRe = /^<\w+/;
+			var closingRe = /\w+>$/;
+			var tag = typeToTag[ type ];
+			selectedBlock.outerHTML = selectedBlock.outerHTML
+				.replace( openingRe, '<' + tag )
+				.replace( closingRe, tag + '>' );
+			clearBlocks();
+			attachBlockHandlers();
+		}
+	} );
 }
 
 function reselect() {
@@ -255,6 +288,7 @@ function showSwitcherMenu( event ) {
 
 	var position = switcher.getBoundingClientRect();
 	switcherMenu.style.top = ( position.top + 18 + window.scrollY ) + 'px';
+	switcherMenu.style.left = ( position.left + 48 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
 }
 
