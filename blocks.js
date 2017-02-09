@@ -43,6 +43,7 @@ var switcherButtons = query( '.block-switcher .type svg' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
+var insertBlockMenu = queryFirst( '.insert-block__menu' );
 var imageFullBleed = queryFirst( '.block-image__full-width' );
 var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
@@ -61,6 +62,9 @@ window.addEventListener( 'click', clearBlocks, false );
 editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
 insertBlockButton.addEventListener( 'click', openBlockMenu, false );
+insertBlockMenu.addEventListener( 'click', function( event ) {
+	event.stopPropagation();
+}, false );
 window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
@@ -233,16 +237,11 @@ function siblingGetter( direction ) {
 
 function openBlockMenu( event ) {
 	event.stopPropagation();
-	var menu = queryFirst( '.insert-block__menu' );
-	menu.style.display = 'block';
-	menu.addEventListener( 'click', function( event ) {
-		event.stopPropagation();
-	}, false );
+	insertBlockMenu.style.display = 'block';
 }
 
 function hideMenu() {
-	var menu = queryFirst( '.insert-block__menu' );
-	menu.style.display = 'none';
+	insertBlockMenu.style.display = 'none';
 }
 
 function setImageState( classes, event ) {
