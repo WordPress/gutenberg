@@ -5,16 +5,68 @@
  */
 var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
+var getTagType = getConfig.bind( null, 'tagTypes' );
+var getTypeKinds = getConfig.bind( null, 'typeKinds' );
+var setImageFullBleed = setElementState.bind( null, 'align-full-bleed' );
+var setImageAlignNone = setElementState.bind( null, '' );
+var setImageAlignLeft = setElementState.bind( null, 'align-left' );
+var setImageAlignRight = setElementState.bind( null, 'align-right' );
+
+var setTextAlignLeft = setElementState.bind( null, 'align-left' );
+var setTextAlignCenter = setElementState.bind( null, 'align-center' );
+var setTextAlignRight = setElementState.bind( null, 'align-right' );
 
 /**
  * Globals
  */
-var editor = document.getElementsByClassName( 'editor' )[0];
-var switcher = document.getElementsByClassName( 'block-switcher' )[0];
-var blockControls = document.getElementsByClassName( 'block-controls' )[0];
-var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
-var insertBlockButton = document.getElementsByClassName( 'insert-block__button' )[0];
+var config = {
+	tagTypes: {
+		'BLOCKQUOTE': 'quote',
+		'H1': 'heading',
+		'H2': 'heading',
+		'H3': 'heading',
+		'H4': 'heading',
+		'H5': 'heading',
+		'H6': 'heading',
+		'IMG': 'image',
+		'P': 'paragraph',
+		'default': 'paragraph'
+	},
+	typeKinds: {
+		'quote': [ 'text' ],
+		'heading': [ 'heading', 'text' ],
+		'image': [ 'image' ],
+		'paragraph': [ 'text' ],
+		'default': []
+	}
+};
+
+var editor = queryFirst( '.editor' );
+var switcher = queryFirst( '.block-switcher' );
+var switcherButtons = query( '.block-switcher .type svg' );
+var switcherMenu = queryFirst( '.switch-block__menu' );
+var blockControls = queryFirst( '.block-controls' );
+var inlineControls = queryFirst( '.inline-controls' );
+var insertBlockButton = queryFirst( '.insert-block__button' );
+
+var textAlignLeft = queryFirst( '.block-text__align-left' );
+var textAlignCenter = queryFirst( '.block-text__align-center' );
+var textAlignRight = queryFirst( '.block-text__align-right' );
+
+var insertBlockMenu = queryFirst( '.insert-block__menu' );
+var textAlignLeft = queryFirst( '.block-text__align-left' );
+var textAlignCenter = queryFirst( '.block-text__align-center' );
+var textAlignRight = queryFirst( '.block-text__align-right' );
+var imageFullBleed = queryFirst( '.block-image__full-width' );
+var imageAlignNone = queryFirst( '.block-image__no-align' );
+var imageAlignLeft = queryFirst( '.block-image__align-left' );
+var imageAlignRight = queryFirst( '.block-image__align-right' );
+
 var selectedBlock = null;
+
+var supportedBlockTags = Object.keys( config.tagTypes )
+	.slice( 0, -1 ) // remove 'default' option
+	.map( function( tag ) { return tag.toLowerCase(); } );
 
 /**
  * Initialization
@@ -23,17 +75,20 @@ window.addEventListener( 'click', clearBlocks, false );
 editor.addEventListener( 'input', attachBlockHandlers, false );
 editor.addEventListener( 'input', clearBlocks, false );
 insertBlockButton.addEventListener( 'click', openBlockMenu, false );
+insertBlockMenu.addEventListener( 'click', function( event ) {
+	event.stopPropagation();
+}, false );
 window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
 attachControlActions();
+attachTypeSwitcherActions();
 
 /**
  * Core logic
  */
 function attachBlockHandlers() {
-	var blocks = getBlocks();
-	Array.from( blocks ).forEach( function( block ) {
+	getBlocks().forEach( function( block ) {
 		block.removeEventListener( 'click', selectBlock, false );
 		block.addEventListener( 'click', selectBlock, false );
 	} );
@@ -41,55 +96,59 @@ function attachBlockHandlers() {
 
 function getBlocks() {
 	return Array.prototype.concat.apply( [],
-			[ 'p', 'h2', 'img' ].map( query ) );
+			supportedBlockTags.map( query ) );
 }
 
 function selectBlock( event ) {
 	clearBlocks();
 	event.stopPropagation();
-	event.target.className = 'is-selected';
+	event.target.className += ' is-selected';
 
 	selectedBlock = event.target;
 	showControls( selectedBlock );
 }
 
 function clearBlocks() {
-	Array.from( getBlocks() ).forEach( function( block ) {
-		block.className = '';
+	getBlocks().forEach( function( block ) {
+		block.className = block.className.replace( 'is-selected', '' );
 	} );
-	var selectedBlock = null;
+	selectedBlock = null;
 
 	hideControls();
 	hideMenu();
 }
 
 function showControls( node ) {
-	// show element type
-	document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'none';
-	document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'none';
-	document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'none';
-	if ( node.nodeName == 'IMG' ) {
-		document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'block';
-	} else if ( node.nodeName == 'H1' || node.nodeName == 'H2' || node.nodeName == 'H3' || node.nodeName == 'H4' || node.nodeName == 'H5' || node.nodeName == 'H6' ) {
-		document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'block';
-	} else {
-		document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'block';
-	}
+	// toggle block-specific switcher
+	switcherButtons.forEach( function( element ) {
+		element.style.display = 'none';
+	} );
+	var blockType = getTagType( node.nodeName );
+	var switcherQuery = '.type-icon-' + blockType;
+	queryFirst( switcherQuery ).style.display = 'block';
 
-	// show controls
+	// reposition switcher
 	var position = node.getBoundingClientRect();
 	switcher.style.opacity = 1;
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
+	// show/hide block-specific block controls
+	var kinds = getTypeKinds( blockType );
+	var kindClasses = kinds.map( function( kind ) {
+		return 'is-' + kind;
+	} ).join( ' ' );
+	blockControls.className = 'block-controls ' + kindClasses;
 	blockControls.style.display = 'block';
+
+	// reposition block-specific block controls
 	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
 	blockControls.style.maxHeight = 'none';
 }
 
 function hideControls() {
 	switcher.style.opacity = 0;
+	switcherMenu.style.display = 'none';
 	blockControls.style.display = 'none';
-	blockControls.style.maxHeight = 0;
 }
 
 // Show popup on text selection
@@ -126,27 +185,75 @@ function attachControlActions() {
 		}
 
 		var classes = node.className.baseVal;
+		var getter = {
+			up: getPreviousSibling,
+			down: getNextSibling
+		}[ classes ];
 
-		if ( 'up' === classes ) {
-			node.addEventListener( 'click', function() {
+		if ( getter ) {
+			node.addEventListener( 'click', function( event ) {
 				event.stopPropagation();
-				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
-				attachBlockHandlers();
-				reselect();
-			}, false );
-		} else if ( 'down' === classes ) {
-			node.addEventListener( 'click', function() {
-				event.stopPropagation();
-				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
+				swapNodes( selectedBlock, getter( selectedBlock ) );
 				attachBlockHandlers();
 				reselect();
 			}, false );
 		}
 	} );
+
+	// Text block event handlers.
+	textAlignLeft.addEventListener( 'click', setTextAlignLeft, false );
+	textAlignCenter.addEventListener( 'click', setTextAlignCenter, false );
+	textAlignRight.addEventListener( 'click', setTextAlignRight, false );
+
+	switcherButtons.forEach( function( button ) {
+		button.addEventListener( 'click', showSwitcherMenu, false );
+	} );
+
+	// Image block event handlers.
+	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
+	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
+	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
+	imageAlignRight.addEventListener( 'click', setImageAlignRight, false );
+}
+
+function attachTypeSwitcherActions() {
+	var typeToTag = {
+		paragraph: 'p',
+		quote: 'blockquote',
+		heading: 'h2'
+	};
+
+	switcherButtons.forEach( function( button ) {
+		button.addEventListener( 'click', showSwitcherMenu, false );
+	} );
+
+	Object.keys( typeToTag ).forEach( function( type ) {
+		var selector = '.switch-block__block .type-icon-' + type;
+		var button = queryFirst( selector );
+		var label = queryFirst( selector + ' + label' );
+
+		button.addEventListener( 'click', switchBlockType, false );
+		label.addEventListener( 'click', switchBlockType, false );
+
+		function switchBlockType( event ) {
+			if ( ! selectedBlock ) {
+				return;
+			}
+
+			var openingRe = /^<\w+/;
+			var closingRe = /\w+>$/;
+			var tag = typeToTag[ type ];
+			selectedBlock.outerHTML = selectedBlock.outerHTML
+				.replace( openingRe, '<' + tag )
+				.replace( closingRe, tag + '>' );
+			clearBlocks();
+			attachBlockHandlers();
+		}
+	} );
 }
 
 function reselect() {
-	document.getElementsByClassName( 'is-selected' )[0].click();
+	queryFirst( '.is-selected' ).click();
 }
 
 function swapNodes( a, b ) {
@@ -191,23 +298,65 @@ function siblingGetter( direction ) {
 
 function openBlockMenu( event ) {
 	event.stopPropagation();
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
-	menu.style.display = 'block';
-	menu.addEventListener( 'click', function( event ) {
-		event.stopPropagation();
-	}, false );
+	insertBlockMenu.style.display = 'block';
 }
 
 function hideMenu() {
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
-	menu.style.display = 'none';
+	insertBlockMenu.style.display = 'none';
+}
+
+function showSwitcherMenu( event ) {
+	event.stopPropagation();
+
+	if ( ! selectedBlock ) {
+		return;
+	}
+
+	// not all block types can be converted to all block types.
+	// filter which lists of types are shown in the menu depending on the
+	// selected block, based on _kinds_ (see config)
+	var blockType = getTagType( selectedBlock.nodeName );
+	var kinds = getTypeKinds( blockType );
+	var validClasses = kinds.map( function( kind ) {
+		return 'switch-block__block-list-' + kind;
+	} );
+	query( '.switch-block__block-list' ).forEach( function( switcherGroup ) {
+		var shouldShow = containsOneOf( switcherGroup, validClasses );
+		switcherGroup.style.display = shouldShow ? 'block' : 'none';
+	} );
+
+	// position switcher menu next to type icon
+	var position = switcher.getBoundingClientRect();
+	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
+	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
+	switcherMenu.style.display = 'block';
+}
+
+function setElementState( classes, event ) {
+	event.stopPropagation();
+	selectedBlock.className = 'is-selected ' + classes;
 }
 
 function l( data ) {
-	console.log( data );
+	console.log.apply( console.log, arguments );
 	return data;
 }
 
 function query( selector ) {
 	return Array.from( document.querySelectorAll( selector ) );
+}
+
+function queryFirst( selector ) {
+	return query( selector )[ 0 ];
+}
+
+function getConfig( configName, tagName ) {
+	return config[ configName ][ tagName ] ||
+		config[ configName ].default;
+}
+
+function containsOneOf( element, classes ) {
+	return classes.some( function( className ) {
+		return element.classList.contains( className );
+	} );
 }
