@@ -154,18 +154,15 @@ function attachControlActions() {
 		}
 
 		var classes = node.className.baseVal;
+		var getter = {
+			up: getPreviousSibling,
+			down: getNextSibling
+		}[ classes ];
 
-		if ( 'up' === classes ) {
+		if ( getter ) {
 			node.addEventListener( 'click', function( event ) {
 				event.stopPropagation();
-				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
-				attachBlockHandlers();
-				reselect();
-			}, false );
-		} else if ( 'down' === classes ) {
-			node.addEventListener( 'click', function( event ) {
-				event.stopPropagation();
-				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
+				swapNodes( selectedBlock, getter( selectedBlock ) );
 				attachBlockHandlers();
 				reselect();
 			}, false );
