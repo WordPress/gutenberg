@@ -7,14 +7,11 @@ var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
 var getTagType = getConfig.bind( null, 'tagTypes' );
 var getTypeKinds = getConfig.bind( null, 'typeKinds' );
+var getBlockType = getConfig.bind( null, 'blockTypes' );
 var setImageFullBleed = setElementState.bind( null, 'align-full-bleed' );
 var setImageAlignNone = setElementState.bind( null, '' );
 var setImageAlignLeft = setElementState.bind( null, 'align-left' );
 var setImageAlignRight = setElementState.bind( null, 'align-right' );
-
-var setTextAlignLeft = setElementState.bind( null, 'align-left' );
-var setTextAlignCenter = setElementState.bind( null, 'align-center' );
-var setTextAlignRight = setElementState.bind( null, 'align-right' );
 
 /**
  * Globals
@@ -38,6 +35,11 @@ var config = {
 		'image': [ 'image' ],
 		'paragraph': [ 'text' ],
 		'default': []
+	},
+	blockTypes: {
+		paragraph: textType,
+		heading: textType,
+		quote: textType
 	}
 };
 
@@ -118,8 +120,10 @@ function showControls( node ) {
 	switcherButtons.forEach( function( element ) {
 		element.style.display = 'none';
 	} );
-	var blockType = getTagType( node.nodeName );
-	var switcherQuery = '.type-icon-' + blockType;
+
+	var type = getTagType( node.nodeName );
+	var switcherQuery = '.type-icon-' + type;
+
 	queryFirst( switcherQuery ).style.display = 'block';
 
 	// reposition switcher
@@ -128,20 +132,61 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	blockControls.className = 'block-controls';
-	getTypeKinds( blockType ).forEach( function( kind ) {
-		blockControls.classList.add( 'is-' + kind );
-	} );
-	blockControls.style.display = 'block';
+	var nodeBlockType = getBlockType( type );
+	if ( typeof nodeBlockType !== 'undefined' ) {
+		// Could be cleaned up even more by putting these controls into a block.
+		var nodeBlockControls = document.createElement( 'div' );
+		nodeBlockControls.className = 'block-controls-from-api';
 
-	// reposition block-specific block controls
-	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
-	blockControls.style.maxHeight = 'none';
+		var blockTypeBlockControls = nodeBlockType.controls.filter( function( control ) {
+			return control.displayArea === 'block'
+		} ).map( function( control ) {
+			var controlNode = control.create().render()
+
+			if ( Array.isArray( control.handlers ) ) {
+				control.handlers.forEach( function( handler ) {
+					controlNode.addEventListener( handler.type, handler.action( node ), false );
+				} )
+			}
+
+			return controlNode;
+		} ).map( function( control ) {
+			nodeBlockControls.appendChild( control )
+		} );
+
+		nodeBlockControls.style.display = 'block';
+
+		// reposition block-specific block controls
+		nodeBlockControls.style.top = ( -36 ) + 'px';
+		nodeBlockControls.style.left = ( 0 ) + 'px';
+		nodeBlockControls.style.maxHeight = 'none';
+
+		node.insertBefore( nodeBlockControls, node.firstChild );
+	} else {
+		// This is the current way things are done.
+		var kinds = getTypeKinds( type );
+		var kindClasses = kinds.map( function( kind ) {
+			return 'is-' + kind;
+		} ).join( ' ' );
+
+		blockControls.className = 'block-controls ' + kindClasses;
+		blockControls.style.display = 'block';
+
+		// reposition block-specific block controls
+		blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
+		blockControls.style.maxHeight = 'none';
+	}
 }
 
 function hideControls() {
 	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
+
+	var blockControlsFromAPI = queryFirst( '.block-controls-from-api' );
+	if ( blockControlsFromAPI ) {
+		blockControlsFromAPI.parentNode.removeChild( blockControlsFromAPI )
+	}
+
 	blockControls.style.display = 'none';
 }
 
@@ -197,11 +242,6 @@ function attachControlActions() {
 			}, false );
 		}
 	} );
-
-	// Text block event handlers.
-	textAlignLeft.addEventListener( 'click', setTextAlignLeft, false );
-	textAlignCenter.addEventListener( 'click', setTextAlignCenter, false );
-	textAlignRight.addEventListener( 'click', setTextAlignRight, false );
 
 	switcherButtons.forEach( function( button ) {
 		button.addEventListener( 'click', showSwitcherMenu, false );
