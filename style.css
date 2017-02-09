@@ -265,6 +265,8 @@ p {
 
 .insert-block {
 	padding: 14px 0 0 14px;
+	position: relative;
+	display: inline-block;
 }
 
 .insert-block__button {
@@ -284,11 +286,20 @@ p {
 	fill: #12181e;
 }
 
+.insert-block__button:focus {
+	box-shadow: none;
+	outline: none;
+}
+
 .insert-block__menu {
 	display: none;
 	width: 280px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
+	position: absolute;
+	left: 60px;
+	bottom: 0;
+	background: #fff;
 }
 
 .insert-block__search {
