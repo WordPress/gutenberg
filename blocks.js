@@ -286,6 +286,24 @@ function hideMenu() {
 function showSwitcherMenu( event ) {
 	event.stopPropagation();
 
+	if ( ! selectedBlock ) {
+		return;
+	}
+
+	// not all block types can be converted to all block types.
+	// filter which lists of types are shown in the menu depending on the
+	// selected block, based on _kinds_ (see config)
+	var blockType = getTagType( selectedBlock.nodeName );
+	var kinds = getTypeKinds( blockType );
+	var validClasses = kinds.map( function( kind ) {
+		return 'switch-block__block-list-' + kind;
+	} );
+	query( '.switch-block__block-list' ).forEach( function( switcherGroup ) {
+		var shouldShow = containsOneOf( switcherGroup, validClasses );
+		switcherGroup.style.display = shouldShow ? 'block' : 'none';
+	} );
+
+	// position switcher menu next to type icon
 	var position = switcher.getBoundingClientRect();
 	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
 	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
@@ -313,4 +331,10 @@ function queryFirst( selector ) {
 function getConfig( configName, tagName ) {
 	return config[ configName ][ tagName ] ||
 		config[ configName ].default;
+}
+
+function containsOneOf( element, classes ) {
+	return classes.some( function( className ) {
+		return element.classList.contains( className );
+	} );
 }
