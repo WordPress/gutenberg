@@ -190,6 +190,11 @@ img.is-selected {
 	float: left;
 }
 
+.inline-controls button.do-not-work {
+	margin: 0 8px;
+	width: auto;
+}
+
 .inline-controls button:hover {
 	background: #f0f2f4;
 }
