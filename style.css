@@ -418,17 +418,23 @@ img.is-selected {
 .insert-block__block,
 .switch-block__block {
 	display: flex;
-	color: #606a73;
+	color: #86909B;
 	padding: 8px;
-	font-size: 12px;
+	font-size: 11px;
 	align-items: center;
 }
+.insert-block__block:hover,
+.switch-block__block:hover {
+	background: #f0f2f4;
+}
+
 .insert-block__block {
 	width: 50%;
 }
 .insert-block__block svg,
 .switch-block__block svg {
-	margin-right: 4px;
+	margin-right: 8px;
+	fill: #191e23;
 }
 
 /*
