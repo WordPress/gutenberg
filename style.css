@@ -478,3 +478,10 @@ p a {
 	text-indent: -5px;
 	display: inline-block;
 }
+
+.space-sep-end {
+	text-indent: -5px;
+	display: inline-block;
+	position: relative;
+	left: 5px;
+}
