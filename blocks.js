@@ -286,8 +286,9 @@ attachKeyboardShortcuts();
  */
 function attachBlockHandlers() {
 	getBlocks().forEach( function( block ) {
-		block.removeEventListener( 'click', selectBlock, false );
-		block.addEventListener( 'click', selectBlock, false );
+		bind( 'click', block, selectBlock );
+		bind( 'mouseenter', block, focusBlock );
+		bind( 'mouseleave', block, blurBlock );
 	} );
 }
 
@@ -311,6 +312,16 @@ function selectBlock( event ) {
 
 	selectedBlock = event.target;
 	showControls( selectedBlock );
+}
+
+function focusBlock( event ) {
+	if ( selectedBlock ) return;
+	showControls( event.target );
+}
+
+function blurBlock( event ) {
+	if ( selectedBlock ) return;
+	clearBlocks();
 }
 
 function clearBlocks() {
@@ -725,6 +736,11 @@ function setCaret( element ) {
 function l( data ) {
 	console.log.apply( console.log, arguments );
 	return data;
+}
+
+function bind( eventType, node, callback, useCapture ) {
+	node.removeEventListener( eventType, callback, !! useCapture );
+	node.addEventListener( eventType, callback, !! useCapture );
 }
 
 function query( selector ) {
