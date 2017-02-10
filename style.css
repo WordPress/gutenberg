@@ -465,3 +465,16 @@ img.align-right {
 	width: 340px;
 	margin: 0 0 0 16px;
 }
+
+p a {
+	text-decoration: none;
+	color: #006799;
+	background: rgba(0, 142, 194, 0.2);
+	padding: 0 6px;
+	border-radius: 2px;
+}
+
+.space-sep {
+	text-indent: -5px;
+	display: inline-block;
+}
