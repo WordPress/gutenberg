@@ -5,16 +5,47 @@
  */
 var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
+var getTagType = getConfig.bind( null, 'tagTypes' );
+var getTypeKinds = getConfig.bind( null, 'typeKinds' );
+var setImageFullBleed = setImageState.bind( null, 'align-full-bleed' );
+var setImageAlignNone = setImageState.bind( null, '' );
+var setImageAlignLeft = setImageState.bind( null, 'align-left' );
+var setImageAlignRight = setImageState.bind( null, 'align-right' );
 
 /**
  * Globals
  */
-var editor = document.getElementsByClassName( 'editor' )[0];
-var switcher = document.getElementsByClassName( 'block-switcher' )[0];
-var blockControls = document.getElementsByClassName( 'block-controls' )[0];
-var inlineControls = document.getElementsByClassName( 'inline-controls' )[0];
-var insertBlockButton = document.getElementsByClassName( 'insert-block__button' )[0];
+var config = {
+	tagTypes: {
+		'IMG': 'image',
+		'H1': 'heading',
+		'H2': 'heading',
+		'H3': 'heading',
+		'H4': 'heading',
+		'H5': 'heading',
+		'H6': 'heading',
+		'default': 'paragraph'
+	},
+	typeKinds: {
+		'paragraph': [ 'text' ],
+		'heading': [ 'heading', 'text' ],
+		'image': [ 'image' ],
+		'default': []
+	}
+};
+
+var editor = queryFirst( '.editor' );
+var switcher = queryFirst( '.block-switcher' );
+var switcherButtons = query( '.block-switcher .type svg' );
+var blockControls = queryFirst( '.block-controls' );
+var inlineControls = queryFirst( '.inline-controls' );
+var insertBlockButton = queryFirst( '.insert-block__button' );
+var imageFullBleed = queryFirst( '.block-image__full-width' );
+var imageAlignNone = queryFirst( '.block-image__no-align' );
+var imageAlignLeft = queryFirst( '.block-image__align-left' );
+var imageAlignRight = queryFirst( '.block-image__align-right' );
 var selectedBlock = null;
+
 
 /**
  * Initialization
@@ -32,8 +63,7 @@ attachControlActions();
  * Core logic
  */
 function attachBlockHandlers() {
-	var blocks = getBlocks();
-	Array.from( blocks ).forEach( function( block ) {
+	getBlocks().forEach( function( block ) {
 		block.removeEventListener( 'click', selectBlock, false );
 		block.addEventListener( 'click', selectBlock, false );
 	} );
@@ -47,41 +77,45 @@ function getBlocks() {
 function selectBlock( event ) {
 	clearBlocks();
 	event.stopPropagation();
-	event.target.className = 'is-selected';
+	event.target.className += ' is-selected';
 
 	selectedBlock = event.target;
 	showControls( selectedBlock );
 }
 
 function clearBlocks() {
-	Array.from( getBlocks() ).forEach( function( block ) {
-		block.className = '';
+	getBlocks().forEach( function( block ) {
+		block.className = block.className.replace( 'is-selected', '' );
 	} );
-	var selectedBlock = null;
+	selectedBlock = null;
 
 	hideControls();
 	hideMenu();
 }
 
 function showControls( node ) {
-	// show element type
-	document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'none';
-	document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'none';
-	document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'none';
-	if ( node.nodeName == 'IMG' ) {
-		document.getElementsByClassName( 'type-icon-image' )[0].style.display = 'block';
-	} else if ( node.nodeName == 'H1' || node.nodeName == 'H2' || node.nodeName == 'H3' || node.nodeName == 'H4' || node.nodeName == 'H5' || node.nodeName == 'H6' ) {
-		document.getElementsByClassName( 'type-icon-heading' )[0].style.display = 'block';
-	} else {
-		document.getElementsByClassName( 'type-icon-paragraph' )[0].style.display = 'block';
-	}
+	// toggle block-specific switcher
+	switcherButtons.forEach( function( element ) {
+		element.style.display = 'none';
+	} );
+	var blockType = getTagType( node.nodeName );
+	var switcherQuery = '.type-icon-' + blockType;
+	queryFirst( switcherQuery ).style.display = 'block';
 
-	// show controls
+	// reposition switcher
 	var position = node.getBoundingClientRect();
 	switcher.style.opacity = 1;
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
+	// show/hide block-specific block controls
+	var kinds = getTypeKinds( blockType );
+	var kindClasses = kinds.map( function( kind ) {
+		return 'is-' + kind;
+	} ).join( ' ' );
+	blockControls.className = 'block-controls ' + kindClasses;
 	blockControls.style.display = 'block';
+
+	// reposition block-specific block controls
 	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
 	blockControls.style.maxHeight = 'none';
 }
@@ -89,7 +123,6 @@ function showControls( node ) {
 function hideControls() {
 	switcher.style.opacity = 0;
 	blockControls.style.display = 'none';
-	blockControls.style.maxHeight = 0;
 }
 
 // Show popup on text selection
@@ -126,27 +159,29 @@ function attachControlActions() {
 		}
 
 		var classes = node.className.baseVal;
+		var getter = {
+			up: getPreviousSibling,
+			down: getNextSibling
+		}[ classes ];
 
-		if ( 'up' === classes ) {
-			node.addEventListener( 'click', function() {
+		if ( getter ) {
+			node.addEventListener( 'click', function( event ) {
 				event.stopPropagation();
-				swapNodes( selectedBlock, getPreviousSibling( selectedBlock ) );
-				attachBlockHandlers();
-				reselect();
-			}, false );
-		} else if ( 'down' === classes ) {
-			node.addEventListener( 'click', function() {
-				event.stopPropagation();
-				swapNodes( selectedBlock, getNextSibling( selectedBlock ) );
+				swapNodes( selectedBlock, getter( selectedBlock ) );
 				attachBlockHandlers();
 				reselect();
 			}, false );
 		}
 	} );
+
+	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
+	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
+	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
+	imageAlignRight.addEventListener( 'click', setImageAlignRight, false );
 }
 
 function reselect() {
-	document.getElementsByClassName( 'is-selected' )[0].click();
+	queryFirst( '.is-selected' ).click();
 }
 
 function swapNodes( a, b ) {
@@ -191,7 +226,7 @@ function siblingGetter( direction ) {
 
 function openBlockMenu( event ) {
 	event.stopPropagation();
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	var menu = queryFirst( '.insert-block__menu' );
 	menu.style.display = 'block';
 	menu.addEventListener( 'click', function( event ) {
 		event.stopPropagation();
@@ -199,15 +234,29 @@ function openBlockMenu( event ) {
 }
 
 function hideMenu() {
-	var menu = document.getElementsByClassName( 'insert-block__menu' )[0];
+	var menu = queryFirst( '.insert-block__menu' );
 	menu.style.display = 'none';
 }
 
+function setImageState( classes, event ) {
+	event.stopPropagation();
+	selectedBlock.className = 'is-selected ' + classes;
+}
+
 function l( data ) {
-	console.log( data );
+	console.log.apply( console.log, arguments );
 	return data;
 }
 
 function query( selector ) {
 	return Array.from( document.querySelectorAll( selector ) );
+}
+
+function queryFirst( selector ) {
+	return query( selector )[ 0 ];
+}
+
+function getConfig( configName, tagName ) {
+	return config[ configName ][ tagName ] ||
+		config[ configName ].default;
 }
