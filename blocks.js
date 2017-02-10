@@ -287,8 +287,8 @@ function showSwitcherMenu( event ) {
 	event.stopPropagation();
 
 	var position = switcher.getBoundingClientRect();
-	switcherMenu.style.top = ( position.top + 18 + window.scrollY ) + 'px';
-	switcherMenu.style.left = ( position.left + 48 + window.scrollX ) + 'px';
+	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
+	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
 }
 
