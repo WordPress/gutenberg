@@ -7,10 +7,7 @@ var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
 var getTagType = getConfig.bind( null, 'tagTypes' );
 var getTypeKinds = getConfig.bind( null, 'typeKinds' );
-var setImageFullBleed = setImageState.bind( null, 'align-full-bleed' );
-var setImageAlignNone = setImageState.bind( null, '' );
-var setImageAlignLeft = setImageState.bind( null, 'align-left' );
-var setImageAlignRight = setImageState.bind( null, 'align-right' );
+var getBlockType = getConfig.bind( null, 'blockTypes' );
 
 /**
  * Globals
@@ -31,6 +28,11 @@ var config = {
 		'heading': [ 'heading', 'text' ],
 		'image': [ 'image' ],
 		'default': []
+	},
+	blockTypes: {
+		'text': 'wp-text',
+		'paragraph': 'wp-text',
+		'image': 'wp-image'
 	}
 };
 
@@ -40,12 +42,17 @@ var switcherButtons = query( '.block-switcher .type svg' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
-var imageFullBleed = queryFirst( '.block-image__full-width' );
-var imageAlignNone = queryFirst( '.block-image__no-align' );
-var imageAlignLeft = queryFirst( '.block-image__align-left' );
-var imageAlignRight = queryFirst( '.block-image__align-right' );
 var selectedBlock = null;
 
+/**
+ * Blocks
+ */
+var Gutenberg = window.gutenberg();
+var textBlock = window.textBlock
+var imageBlock = window.imageBlock
+var blocks = Gutenberg.blocks;
+var registeredBlocks = blocks.registerBlocks( [ textBlock, imageBlock ] );
+var gutenbergEditor = Gutenberg.editor( registeredBlocks );
 
 /**
  * Initialization
@@ -98,8 +105,8 @@ function showControls( node ) {
 	switcherButtons.forEach( function( element ) {
 		element.style.display = 'none';
 	} );
-	var blockType = getTagType( node.nodeName );
-	var switcherQuery = '.type-icon-' + blockType;
+	var tagType = getTagType( node.nodeName );
+	var switcherQuery = '.type-icon-' + tagType;
 	queryFirst( switcherQuery ).style.display = 'block';
 
 	// reposition switcher
@@ -108,21 +115,50 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	var kinds = getTypeKinds( blockType );
-	var kindClasses = kinds.map( function( kind ) {
-		return 'is-' + kind;
-	} ).join( ' ' );
-	blockControls.className = 'block-controls ' + kindClasses;
-	blockControls.style.display = 'block';
+	var blockType = getBlockType( tagType );
+	var blockLevelControls = gutenbergEditor.getBlockControls( blockType );
+	var blockControlsContainer = document.createElement( 'div' );
+	blockControlsContainer.className = 'block-controls block-controls--active';
 
-	// reposition block-specific block controls
-	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
-	blockControls.style.maxHeight = 'none';
+	// Create a list of control elements.
+	var blockControlElements = blockLevelControls.map( function( control ) {
+		var element = gutenbergEditor.renderControl( control )
+
+		// Add event listeners.
+		if ( Array.isArray( control.handlers ) ) {
+			control.handlers.forEach( function( handler ) {
+				element.addEventListener( handler.type, handler.action, false );
+			} )
+		}
+
+		return element;
+	} );
+
+	// Append controls.
+	blockControlElements.forEach( function( element ) {
+		blockControlsContainer.appendChild( element );
+	} );
+
+	var body = queryFirst( 'body' );
+
+	blockControlsContainer.style.display = 'block';
+	blockControlsContainer.style.top = ( position.top - 36 + window.scrollY ) + 'px';
+	blockControlsContainer.style.maxHeight = 'none';
+
+	body.appendChild( blockControlsContainer );
 }
 
 function hideControls() {
 	switcher.style.opacity = 0;
-	blockControls.style.display = 'none';
+
+	var blockControls = queryFirst( '.block-controls.block-controls--active' );
+
+	// Potential need to remove event listeners somehow before destroyed.
+	if ( blockControls ) {
+		blockControls.parentNode.removeChild( blockControls );
+
+		blockControls.style.display = 'none';
+	}
 }
 
 // Show popup on text selection
@@ -173,11 +209,6 @@ function attachControlActions() {
 			}, false );
 		}
 	} );
-
-	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
-	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
-	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
-	imageAlignRight.addEventListener( 'click', setImageAlignRight, false );
 }
 
 function reselect() {
