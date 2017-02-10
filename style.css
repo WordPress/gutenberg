@@ -259,7 +259,7 @@ p {
 }
 
 .block-controls button {
-	display: none;
+	/*display: none;*/
 }
 
 .block-controls.is-image .block-image,
@@ -344,7 +344,7 @@ p {
 	margin-right: 4px;
 }
 
-img.align-full-bleed {
+img.align-full-width {
 	margin-left: calc(50% - 50vw);
 	width: 100vw;
 	max-width: none;
@@ -362,4 +362,16 @@ img.align-right {
 	float: right;
 	width: 340px;
 	margin: 0 0 0 16px;
+}
+
+p.align-left {
+	text-align: left;
+}
+
+p.align-center {
+	text-align: center;
+}
+
+p.align-right {
+	text-align: right;
 }
