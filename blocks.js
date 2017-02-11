@@ -44,12 +44,7 @@ var switcherMenu = queryFirst( '.switch-block__menu' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
-
-var textAlignLeft = queryFirst( '.block-text__align-left' );
-var textAlignCenter = queryFirst( '.block-text__align-center' );
-var textAlignRight = queryFirst( '.block-text__align-right' );
 var insertBlockMenu = queryFirst( '.insert-block__menu' );
-
 var imageFullBleed = queryFirst( '.block-image__full-width' );
 var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
