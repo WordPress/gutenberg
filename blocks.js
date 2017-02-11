@@ -7,14 +7,10 @@ var getNextSibling = siblingGetter( 'next' );
 var getPreviousSibling = siblingGetter( 'previous' );
 var getTagType = getConfig.bind( null, 'tagTypes' );
 var getTypeKinds = getConfig.bind( null, 'typeKinds' );
-var setImageFullBleed = setElementState.bind( null, 'align-full-bleed' );
-var setImageAlignNone = setElementState.bind( null, '' );
-var setImageAlignLeft = setElementState.bind( null, 'align-left' );
-var setImageAlignRight = setElementState.bind( null, 'align-right' );
-
-var setTextAlignLeft = setElementState.bind( null, 'align-left' );
-var setTextAlignCenter = setElementState.bind( null, 'align-center' );
-var setTextAlignRight = setElementState.bind( null, 'align-right' );
+var setImageFullBleed = setImageState.bind( null, 'align-full-bleed' );
+var setImageAlignNone = setImageState.bind( null, '' );
+var setImageAlignLeft = setImageState.bind( null, 'align-left' );
+var setImageAlignRight = setImageState.bind( null, 'align-right' );
 
 /**
  * Globals
@@ -48,10 +44,12 @@ var switcherMenu = queryFirst( '.switch-block__menu' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
+
 var textAlignLeft = queryFirst( '.block-text__align-left' );
 var textAlignCenter = queryFirst( '.block-text__align-center' );
 var textAlignRight = queryFirst( '.block-text__align-right' );
 var insertBlockMenu = queryFirst( '.insert-block__menu' );
+
 var imageFullBleed = queryFirst( '.block-image__full-width' );
 var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
@@ -195,9 +193,6 @@ function attachControlActions() {
 		}
 	} );
 
-	textAlignLeft.addEventListener( 'click', setTextAlignLeft, false );
-	textAlignCenter.addEventListener( 'click', setTextAlignCenter, false );
-	textAlignRight.addEventListener( 'click', setTextAlignRight, false );
 	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
 	imageAlignNone.addEventListener( 'click', setImageAlignNone, false );
 	imageAlignLeft.addEventListener( 'click', setImageAlignLeft, false );
@@ -320,10 +315,9 @@ function showSwitcherMenu( event ) {
 	switcherMenu.style.display = 'block';
 }
 
-function setElementState( classes, event ) {
+function setImageState( classes, event ) {
 	event.stopPropagation();
 	selectedBlock.className = 'is-selected ' + classes;
-
 }
 
 function l( data ) {
