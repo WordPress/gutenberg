@@ -122,9 +122,12 @@ function showControls( node ) {
 
 	// show/hide block-specific block controls
 	var kinds = getTypeKinds( blockType );
-	var kindClasses = kinds.map( function( kind ) {
+	kinds.map( function( kind ) {
 		return 'is-' + kind;
-	} ).join( ' ' );
+	} )
+	.forEach( function( className ) {
+	  blockControls.classList.add( className );
+	} );
 	blockControls.classList.add( 'block-controls' );
 	blockControls.style.display = 'block';
 
