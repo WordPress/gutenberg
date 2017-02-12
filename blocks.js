@@ -313,10 +313,10 @@ function showSwitcherMenu( event ) {
 	switcherMenu.style.display = 'block';
 }
 
-function setImageState( classes, event ) {
+function setImageState( className, event ) {
 	event.stopPropagation();
 	selectedBlock.classList.add( 'is-selected' );
-	selectedBlock.classList.add( classes );
+	selectedBlock.classList.add( className );
 }
 
 function l( data ) {
