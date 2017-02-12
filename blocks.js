@@ -316,6 +316,7 @@ function showSwitcherMenu( event ) {
 function setImageState( classes, event ) {
 	event.stopPropagation();
 	selectedBlock.classList.add( 'is-selected' );
+	selectedBlock.classList.add( classes );
 }
 
 function l( data ) {
