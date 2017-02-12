@@ -366,6 +366,60 @@ class Tests_Query_Results extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 39055
+	 */
+	function test_query_orderby_post__in_with_no_order_specified() {
+		$post__in_array = array( self::$post_ids[2], self::$post_ids[0], self::$post_ids[1] );
+		$expected_returned_array = array( self::$post_ids[2], self::$post_ids[0], self::$post_ids[1] );
+
+		$q = new WP_Query( array(
+			'post__in' => $post__in_array,
+			'orderby'  => 'post__in',
+			'fields'   => 'ids'
+		) );
+
+		// Expect post ids in the same order as post__in array when no 'order' param is passed in
+		$this->assertSame( $expected_returned_array, $q->posts );
+	}
+
+	/**
+	 * @ticket 39055
+	 */
+	function test_query_orderby_post__in_with_order_asc() {
+		$post__in_array = array( self::$post_ids[2], self::$post_ids[0], self::$post_ids[1] );
+		$expected_returned_array = array( self::$post_ids[2], self::$post_ids[0], self::$post_ids[1] );
+
+		$q = new WP_Query( array(
+			'post__in' => $post__in_array,
+			'orderby'  => 'post__in',
+			'order'    => 'asc',
+			'fields'   => 'ids'
+		) );
+
+		// Expect post ids in the same order as post__in array when order=asc is passed in
+		$this->assertSame( $expected_returned_array, $q->posts );
+	 }
+
+	/**
+	 * @ticket 39055
+	 */
+	function test_query_orderby_post__in_with_order_desc() {
+		$post__in_array = array( self::$post_ids[1], self::$post_ids[2], self::$post_ids[0] );
+		$expected_returned_array = array( self::$post_ids[1], self::$post_ids[2], self::$post_ids[0] );
+
+		$q = new WP_Query( array(
+			'post__in' => $post__in_array,
+			'orderby'  => 'post__in',
+			'order'    => 'desc',
+			'fields'   => 'ids'
+		) );
+
+		// Note that results are returned in the order specified in the post__in array
+		// Order=desc does not have an effect on the order of returned results
+		$this->assertSame( $expected_returned_array, $q->posts );
+	}
+
+	/**
 	 * @ticket 27252
 	 * @ticket 31194
 	 */
