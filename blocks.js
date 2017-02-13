@@ -90,7 +90,7 @@ function getBlocks() {
 function selectBlock( event ) {
 	clearBlocks();
 	event.stopPropagation();
-	event.target.className += ' is-selected';
+	event.target.classList.add( 'is-selected' );
 
 	selectedBlock = event.target;
 	showControls( selectedBlock );
@@ -98,7 +98,7 @@ function selectBlock( event ) {
 
 function clearBlocks() {
 	getBlocks().forEach( function( block ) {
-		block.className = block.className.replace( 'is-selected', '' );
+		block.classList.remove( 'is-selected' );
 	} );
 	selectedBlock = null;
 
@@ -121,11 +121,10 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	var kinds = getTypeKinds( blockType );
-	var kindClasses = kinds.map( function( kind ) {
-		return 'is-' + kind;
-	} ).join( ' ' );
-	blockControls.className = 'block-controls ' + kindClasses;
+	blockControls.className = 'block-controls';
+	getTypeKinds( blockType ).forEach( function( kind ) {
+		blockControls.classList.add( 'is-' + kind );
+	} );
 	blockControls.style.display = 'block';
 
 	// reposition block-specific block controls
@@ -310,9 +309,12 @@ function showSwitcherMenu( event ) {
 	switcherMenu.style.display = 'block';
 }
 
-function setImageState( classes, event ) {
+function setImageState( className, event ) {
 	event.stopPropagation();
-	selectedBlock.className = 'is-selected ' + classes;
+	selectedBlock.className = 'is-selected';
+	if ( className ) {
+		selectedBlock.classList.add( className );
+	}
 }
 
 function l( data ) {
