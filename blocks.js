@@ -121,10 +121,10 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
+	blockControls.className = 'block-controls';
 	getTypeKinds( blockType ).forEach( function( kind ) {
-	  blockControls.classList.add( 'is-' + kind );
+		blockControls.classList.add( 'is-' + kind );
 	} );
-	blockControls.classList.add( 'block-controls' );
 	blockControls.style.display = 'block';
 
 	// reposition block-specific block controls
@@ -311,8 +311,10 @@ function showSwitcherMenu( event ) {
 
 function setImageState( className, event ) {
 	event.stopPropagation();
-	selectedBlock.classList.add( 'is-selected' );
-	selectedBlock.classList.add( className );
+	selectedBlock.className = 'is-selected';
+	if ( className ) {
+		selectedBlock.classList.add( className );
+	}
 }
 
 function l( data ) {
