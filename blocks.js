@@ -121,12 +121,8 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	var kinds = getTypeKinds( blockType );
-	kinds.map( function( kind ) {
-		return 'is-' + kind;
-	} )
-	.forEach( function( className ) {
-	  blockControls.classList.add( className );
+	getTypeKinds( blockType ).forEach( function( kind ) {
+	  blockControls.classList.add( 'is-' + kind );
 	} );
 	blockControls.classList.add( 'block-controls' );
 	blockControls.style.display = 'block';
