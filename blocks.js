@@ -145,6 +145,10 @@ function hideControls() {
 	blockControls.style.display = 'none';
 }
 
+function hideInlineControls() {
+	inlineControls.style.display = 'none';
+}
+
 // Show popup on text selection
 function onSelectText( event ) {
 	event.stopPropagation();
@@ -291,8 +295,11 @@ function siblingGetter( direction ) {
 }
 
 function openBlockMenu( event ) {
+	hideInlineControls();
+	clearBlocks();
 	event.stopPropagation();
 	insertBlockMenu.style.display = 'block';
+	queryFirst( '.insert-block__search' ).focus();
 }
 
 function hideMenu() {

@@ -106,6 +106,8 @@ p.is-selected,
 blockquote.is-selected,
 img.is-selected {
 	box-shadow: inset 0px 0px 0px 2px #6d7882;
+	position: relative;
+	z-index: 1;
 }
 
 /**
@@ -283,6 +285,7 @@ img.is-selected {
  */
 
 .insert-block {
+	cursor: pointer;
 	padding: 14px 0 0 14px;
 	position: relative;
 	display: inline-block;
@@ -298,7 +301,6 @@ img.is-selected {
 	border: none;
 	margin: 0;
 	padding: 0;
-	cursor: pointer;
 }
 
 .insert-block svg,
@@ -399,18 +401,24 @@ img.is-selected {
 	display: block;
 	width: 100%;
 	border: none;
-	border-bottom: 1px solid #e0e5e9;
+	border-top: 1px solid #e0e5e9;
 	padding: 8px 16px;
 	font-size: 13px;
+}
+
+.insert-block__search:focus,
+.switch-block__search:focus {
+	outline: none;
 }
 
 .insert-block__separator,
 .switch-block__separator {
 	background: rgb(247,248,249);
 	display: block;
-	padding: 4px 16px;
+	padding: 2px 12px;
+	letter-spacing: 1px;
 	text-transform: uppercase;
-	font-size: 10px;
+	font-size: 11px;
 	font-weight: 500;
 	color: #9ea7af;
 }
@@ -427,6 +435,7 @@ img.is-selected {
 	padding: 8px;
 	font-size: 11px;
 	align-items: center;
+	cursor: pointer;
 }
 .insert-block__block:hover,
 .switch-block__block:hover {
