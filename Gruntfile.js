@@ -439,6 +439,10 @@ module.exports = function(grunt) {
 			'external-http': {
 				cmd: 'phpunit',
 				args: ['-c', 'phpunit.xml.dist', '--group', 'external-http']
+			},
+			'restapi-jsclient': {
+				cmd: 'phpunit',
+				args: ['-c', 'phpunit.xml.dist', '--group', 'restapi-jsclient']
 			}
 		},
 		uglify: {
@@ -670,6 +674,11 @@ module.exports = function(grunt) {
 		'jshint:themes',
 		'jshint:core',
 		'jshint:media'
+	] );
+
+	grunt.registerTask( 'restapi-jsclient', [
+		'phpunit:restapi-jsclient',
+		'qunit'
 	] );
 
 	grunt.renameTask( 'watch', '_watch' );
