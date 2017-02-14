@@ -276,6 +276,7 @@ function siblingGetter( direction ) {
 function openBlockMenu( event ) {
 	event.stopPropagation();
 	insertBlockMenu.style.display = 'block';
+	queryFirst( '.insert-block__search' ).focus();
 }
 
 function hideMenu() {
