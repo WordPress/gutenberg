@@ -106,6 +106,8 @@ p.is-selected,
 blockquote.is-selected,
 img.is-selected {
 	box-shadow: inset 0px 0px 0px 2px #6d7882;
+	position: relative;
+	z-index: 1;
 }
 
 /**
