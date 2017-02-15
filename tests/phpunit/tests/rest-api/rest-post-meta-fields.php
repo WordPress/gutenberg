@@ -10,13 +10,16 @@
   * @group restapi
   */
 class WP_Test_REST_Post_Meta_Fields extends WP_Test_REST_TestCase {
+	protected static $wp_meta_keys_saved;
 	protected static $post_id;
 
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$wp_meta_keys_saved = $GLOBALS['wp_meta_keys'];
 		self::$post_id = $factory->post->create();
 	}
 
 	public static function wpTearDownAfterClass() {
+		$GLOBALS['wp_meta_keys'] = self::$wp_meta_keys_saved;
 		wp_delete_post( self::$post_id, true );
 	}
 

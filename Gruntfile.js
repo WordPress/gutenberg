@@ -678,7 +678,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask( 'restapi-jsclient', [
 		'phpunit:restapi-jsclient',
-		'qunit'
+		'qunit:compiled'
 	] );
 
 	grunt.renameTask( 'watch', '_watch' );
