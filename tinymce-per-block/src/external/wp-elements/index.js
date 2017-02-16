@@ -5,8 +5,18 @@ import { render as baseRender } from 'preact';
 
 export { h as createElement, Component } from 'preact';
 
+/**
+ * Render element to target DOM node.
+ *
+ * This implementation is copied essentially verbatim from `preact-compat`:
+ *  - Source: https://github.com/developit/preact-compat
+ *  - License: MIT (https://choosealicense.com/licenses/mit/)
+ *
+ * @param  {VNode} element wp-elements Element
+ * @param  {Node}  target  Target DOM node
+ */
 export function render( element, target ) {
-	let previous = target && target._preactCompatRendered;
+	let previous = target && target._wpElementsRendered;
 
 	// Ignore impossible previous renders
 	if ( previous && previous.parentNode !== target ) {
@@ -29,12 +39,6 @@ export function render( element, target ) {
 
 	const out = baseRender( element, target, previous );
 	if ( target ) {
-		target._preactCompatRendered = out;
+		target._wpElementsRendered = out;
 	}
-
-	if ( out ) {
-		return out._component;
-	}
-
-	return out.base;
 }
