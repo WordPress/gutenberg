@@ -277,7 +277,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 
 			$fixture = $this->normalize_fixture( $data, $route['name'] );
 			$mocked_responses .= "\nmockedApiResponse." . $route['name'] . ' = '
-				. json_encode( $fixture, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+				. json_encode( $fixture, JSON_PRETTY_PRINT )
 				. ";\n";
 		}
 
