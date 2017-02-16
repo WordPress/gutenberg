@@ -27,8 +27,10 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 			'role' => 'contributor',
 		) );
 
+		wp_set_current_user( self::$editor_id );
 		wp_update_post( array( 'post_content' => 'This content is better.', 'ID' => self::$post_id ) );
 		wp_update_post( array( 'post_content' => 'This content is marvelous.', 'ID' => self::$post_id ) );
+		wp_set_current_user( 0 );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -136,6 +138,7 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 		);
 		$data = $response->get_data();
 		$this->assertEqualSets( $fields, array_keys( $data ) );
+		$this->assertSame( self::$editor_id, $data['author'] );
 	}
 
 	public function test_get_item_embed_context() {
