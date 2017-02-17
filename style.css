@@ -531,3 +531,29 @@ p a {
 	position: relative;
 	left: 5px;
 }
+
+.prototypes {
+	display: flex;
+	position: absolute;
+		top: 24px;
+		left: 24px;
+}
+
+.prototypes a {
+	display: inline-block;
+	width: 28px;
+	height: 28px;
+	font-size: 12px;
+	border: 1px solid #b4b9be;
+	line-height: 28px;
+	border-radius: 50%;
+	text-decoration: none;
+	text-align: center;
+	margin-right: 8px;
+}
+
+.prototypes a.is-current {
+	background: #008ec2;
+	border-color: #008ec2;
+	color: #fff;
+}
