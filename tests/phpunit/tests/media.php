@@ -391,6 +391,89 @@ BLOB;
 	}
 
 	/**
+	 * @ticket 39304
+	 */
+	function test_post_galleries_images_without_global_post() {
+		// Set up an unattached image.
+		$this->factory->attachment->create_object( array(
+			'file' => 'test.jpg',
+			'post_parent' => 0,
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment'
+		) );
+
+		$post_id = $this->factory->post->create( array(
+			'post_content' => '[gallery]',
+		) );
+
+		$galleries = get_post_galleries( $post_id, false );
+
+		$this->assertEmpty( $galleries[0]['src'] );
+	}
+
+	/**
+	 * @ticket 39304
+	 */
+	function test_post_galleries_ignores_global_post() {
+		$global_post_id = $this->factory->post->create( array(
+			'post_content' => 'Global Post',
+		) );
+		$post_id = $this->factory->post->create( array(
+			'post_content' => '[gallery]',
+		) );
+		$this->factory->attachment->create_object( array(
+			'file' => 'test.jpg',
+			'post_parent' => $post_id,
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment'
+		) );
+		$expected_srcs = array(
+			'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test.jpg'
+		);
+
+		// Set the global $post context to the other post.
+		$GLOBALS['post'] = get_post( $global_post_id );
+
+		$galleries = get_post_galleries( $post_id, false );
+
+		$this->assertNotEmpty( $galleries[0]['src'] );
+		$this->assertSame( $galleries[0]['src'], $expected_srcs );
+	}
+
+	/**
+	 * @ticket 39304
+	 */
+	function test_post_galleries_respects_id_attrs() {
+		$post_id = $this->factory->post->create( array(
+			'post_content' => 'No gallery defined',
+		) );
+		$post_id_two = $this->factory->post->create( array(
+			'post_content' => "[gallery id='$post_id']",
+		) );
+		$this->factory->attachment->create_object( array(
+			'file' => 'test.jpg',
+			'post_parent' => $post_id,
+			'post_mime_type' => 'image/jpeg',
+			'post_type' => 'attachment'
+		) );
+		$expected_srcs = array(
+			'http://' . WP_TESTS_DOMAIN . '/wp-content/uploads/test.jpg'
+		);
+
+		$galleries = get_post_galleries( $post_id_two, false );
+
+		// Set the global $post context
+		$GLOBALS['post'] = get_post( $post_id_two );
+		$galleries_with_global_context = get_post_galleries( $post_id_two, false );
+
+		// Check that the global post state doesn't affect the results
+		$this->assertSame( $galleries, $galleries_with_global_context );
+
+		$this->assertNotEmpty( $galleries[0]['src'] );
+		$this->assertSame( $galleries[0]['src'], $expected_srcs );
+	}
+
+	/**
 	 * @ticket 22960
 	 */
 	function test_post_gallery_images() {
