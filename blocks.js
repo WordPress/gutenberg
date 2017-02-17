@@ -743,12 +743,15 @@ function bind( eventType, node, callback, useCapture ) {
 	node.addEventListener( eventType, callback, !! useCapture );
 }
 
-function query( selector ) {
-	return Array.from( document.querySelectorAll( selector ) );
+function query( selector, baseNode ) {
+	var node = baseNode && baseNode.querySelectorAll
+		? baseNode
+		: document;
+	return Array.from( node.querySelectorAll( selector ) );
 }
 
-function queryFirst( selector ) {
-	return query( selector )[ 0 ];
+function queryFirst( selector, baseNode ) {
+	return query( selector, baseNode )[ 0 ];
 }
 
 function getConfig( configName, tagName ) {
