@@ -275,15 +275,21 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 
 			$this->assertTrue( ! empty( $data ), $route['name'] . ' route should return data.' );
 
-			$fixture = $this->normalize_fixture( $data, $route['name'] );
-			$mocked_responses .= "\nmockedApiResponse." . $route['name'] . ' = '
-				. json_encode( $fixture, JSON_PRETTY_PRINT )
-				. ";\n";
+			if ( version_compare( PHP_VERSION, '5.4', '>=' ) ) {
+				$fixture = $this->normalize_fixture( $data, $route['name'] );
+				$mocked_responses .= "\nmockedApiResponse." . $route['name'] . ' = '
+					. json_encode( $fixture, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )
+					. ";\n";
+			}
 		}
 
-		// Save the route object for QUnit tests.
-		$file = './tests/qunit/fixtures/wp-api-generated.js';
-		file_put_contents( $file, $mocked_responses );
+		if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
+			echo "Skipping generation of API client fixtures due to unsupported JSON_* constants.\n";
+		} else {
+			// Save the route object for QUnit tests.
+			$file = './tests/qunit/fixtures/wp-api-generated.js';
+			file_put_contents( $file, $mocked_responses );
+		}
 
 		// Clean up our test data.
 		wp_delete_post( $post_id, true );
