@@ -215,7 +215,12 @@ var config = {
 	        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Code</title><rect x="0" fill="none" width="24" height="24"/><g><path d="M4.83 12l4.58 4.59L8 18l-6-6 6-6 1.41 1.41L4.83 12zm9.76 4.59L16 18l6-6-6-6-1.41 1.41L19.17 12l-4.58 4.59z"/></g></svg>',
 	        category: 'other'
 	    }
-	]
+	],
+	typeToTag: {
+		paragraph: 'p',
+		quote: 'blockquote',
+		heading: 'h2'
+	}
 };
 
 var editor = queryFirst( '.editor' );
@@ -435,20 +440,15 @@ function attachControlActions() {
 }
 
 function attachTypeSwitcherActions() {
-	var typeToTag = {
-		paragraph: 'p',
-		quote: 'blockquote',
-		heading: 'h2'
-	};
-
 	switcherButtons.forEach( function( button ) {
 		button.addEventListener( 'click', showSwitcherMenu, false );
 	} );
 
-	Object.keys( typeToTag ).forEach( function( type ) {
+	Object.keys( config.typeToTag ).forEach( function( type ) {
 		var iconSelector = '.switch-block__block .type-icon-' + type;
 		var button = queryFirst( iconSelector ).parentNode;
-		button.addEventListener( 'click', switchBlockType, false );
+
+		bind( 'click', button, switchBlockType );
 
 		function switchBlockType( event ) {
 			if ( ! selectedBlock ) {
@@ -457,7 +457,7 @@ function attachTypeSwitcherActions() {
 
 			var openingRe = /^<\w+/;
 			var closingRe = /\w+>$/;
-			var tag = typeToTag[ type ];
+			var tag = config.typeToTag[ type ];
 			selectedBlock.outerHTML = selectedBlock.outerHTML
 				.replace( openingRe, '<' + tag )
 				.replace( closingRe, tag + '>' );
