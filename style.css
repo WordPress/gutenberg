@@ -428,6 +428,10 @@ img.is-selected {
 	overflow: auto;
 }
 
+.insert-block__content:focus {
+	outline: none;
+}
+
 .insert_block__category-blocks {
 	display: flex;
 	flex-flow: row wrap;
@@ -442,6 +446,7 @@ img.is-selected {
 	align-items: center;
 	cursor: pointer;
 }
+.insert-block__block.is-active,
 .insert-block__block:hover,
 .switch-block__block:hover {
 	background: #f0f2f4;
