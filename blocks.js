@@ -225,7 +225,6 @@ var config = {
 
 var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
-var switcherButtons = query( '.block-switcher .type svg' );
 var switcherMenu = queryFirst( '.switch-block__menu' );
 var dockedControls = queryFirst( '.docked-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
@@ -280,8 +279,8 @@ insertBlockMenu.addEventListener( 'click', function( event ) {
 	event.stopPropagation();
 }, false );
 
+cloneSwitcher();
 attachBlockHandlers();
-attachControlActions();
 attachTypeSwitcherActions();
 attachBlockMenuSearch();
 attachKeyboardShortcuts();
@@ -289,6 +288,26 @@ attachKeyboardShortcuts();
 /**
  * Core logic
  */
+function cloneSwitcher() {
+	getBlocks().forEach( function( block ) {
+		var container = document.createElement( 'div' );
+		var blockSwitcher = switcher.cloneNode( true );
+
+		var blockType = getTagType( block.nodeName );
+		query( '.type svg', blockSwitcher ).forEach( function ( typeButton ) {
+			typeButton.style.display = 'none';
+		} );
+		var switcherQuery = '.type-icon-' + blockType;
+		queryFirst( switcherQuery, blockSwitcher ).style.display = 'block';
+
+		container.className = 'block-container';
+		editor.insertBefore( container, block );
+		container.appendChild( blockSwitcher );
+		container.appendChild( block );
+		attachControlActions( block );
+	} );
+}
+
 function attachBlockHandlers() {
 	getBlocks().forEach( function( block ) {
 		bind( 'click', block, selectBlock );
@@ -328,19 +347,8 @@ function clearBlocks() {
 }
 
 function showControls( node ) {
-	// toggle block-specific switcher
-	switcherButtons.forEach( function( element ) {
-		element.style.display = 'none';
-	} );
-
 	var blockType = getTagType( node.nodeName );
-	var switcherQuery = '.type-icon-' + blockType;
-	queryFirst( switcherQuery ).style.display = 'block';
-
-	// reposition switcher
 	var position = node.getBoundingClientRect();
-	switcher.style.opacity = 1;
-	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
 	dockedControls.className = 'docked-controls';
@@ -382,13 +390,18 @@ function updateDockedControlsPosition( newClassName ) {
 }
 
 function hideControls() {
-	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
 	dockedControls.style.display = 'none';
 }
 
-function attachControlActions() {
-	Array.from( switcher.childNodes ).forEach( function( node ) {
+function attachControlActions( block ) {
+	var buttons = query( '.block-switcher svg', block.parentNode );
+	buttons.forEach( function( button ) {
+		bind( 'click', button, switchType );
+	} );
+
+	var blockSwitcher = queryFirst( '.block-switcher', block.parentNode );
+	Array.from( blockSwitcher.childNodes ).forEach( function( node ) {
 		if ( 'svg' !== node.nodeName ) {
 			return;
 		}
@@ -402,11 +415,17 @@ function attachControlActions() {
 		if ( getter ) {
 			node.addEventListener( 'click', function( event ) {
 				event.stopPropagation();
+				clearBlocks();
+				block.classList.add( 'is-selected' );
+				selectedBlock = block;
 				var previousOffset = selectedBlock.offsetTop;
-				swapNodes( selectedBlock, getter( selectedBlock ) );
-				attachBlockHandlers();
-				reselect();
+				swapNodes(
+					selectedBlock.parentNode,
+					getter( selectedBlock.parentNode )
+				);
 				window.scrollTo( window.scrollX, window.scrollY + selectedBlock.offsetTop - previousOffset );
+				attachBlockHandlers();
+				attachControlActions( queryFirst( '.is-selected' ) );
 			}, false );
 		}
 	} );
@@ -428,10 +447,6 @@ function attachControlActions() {
 }
 
 function attachTypeSwitcherActions() {
-	switcherButtons.forEach( function( button ) {
-		button.addEventListener( 'click', showSwitcherMenu, false );
-	} );
-
 	Object.keys( config.typeToTag ).forEach( function( type ) {
 		var iconSelector = '.switch-block__block .type-icon-' + type;
 		var button = queryFirst( iconSelector ).parentNode;
@@ -609,10 +624,6 @@ function attachKeyboardShortcuts() {
 	}
 }
 
-function reselect() {
-	queryFirst( '.is-selected' ).click();
-}
-
 function swapNodes( a, b ) {
 	if ( ! ( a && b ) ) {
 		return false;
@@ -697,7 +708,8 @@ function showSwitcherMenu( event ) {
 	} );
 
 	// position switcher menu next to type icon
-	var position = switcher.getBoundingClientRect();
+	var position = queryFirst( '.block-container:hover .block-switcher' )
+		.getBoundingClientRect();
 	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
 	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
@@ -710,6 +722,14 @@ function setElementState( className, event ) {
 		selectedBlock.classList.add( className );
 	}
 	updateBlockControlsPosition( className );
+}
+
+function switchType( event ) {
+	var block = event.target
+		.closest( '.block-container' )
+		.childNodes[1];
+	selectedBlock = block;
+	showSwitcherMenu( event );
 }
 
 function setCaret( element ) {
