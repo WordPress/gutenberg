@@ -168,6 +168,7 @@ function showControls( node ) {
 	switcherButtons.forEach( function( element ) {
 		element.style.display = 'none';
 	} );
+
 	var blockType = getTagType( node.nodeName );
 	var switcherQuery = '.type-icon-' + blockType;
 	queryFirst( switcherQuery ).style.display = 'block';
@@ -185,8 +186,35 @@ function showControls( node ) {
 	blockControls.style.display = 'block';
 
 	// reposition block-specific block controls
-	blockControls.style.top = ( position.top - 36 + window.scrollY ) + 'px';
+	updateBlockControlsPosition();
+}
+
+function updateBlockControlsPosition( newClassName ) {
+	var isImage = selectedBlock.tagName === 'IMG';
+	var className = selectedBlock.className;
+	var position = selectedBlock.getBoundingClientRect();
+	var alignedRight = className.match( /align-right/ );
+	var alignedLeft = className.match( /align-left/ );
+	var fullBleed = className.match( /full-bleed/ );
+
+	var topPosition = position.top - 36 + window.scrollY;
+	var leftPosition = null;
+
+	if ( isImage && alignedRight ) {
+		leftPosition = position.left;
+		topPosition = newClassName ? topPosition - 15 : topPosition;
+	} else if ( isImage && alignedLeft && newClassName ) {
+		topPosition = topPosition - 15;
+	} else if ( isImage && className === 'is-selected' && blockControls.style.left ) {
+		leftPosition = null;
+		topPosition = topPosition + 15;
+	} else if ( fullBleed ) {
+		leftPosition = ( window.innerWidth / 2 ) - ( blockControls.clientWidth / 2 );
+	}
+
 	blockControls.style.maxHeight = 'none';
+	blockControls.style.top = topPosition + 'px';
+	blockControls.style.left = leftPosition ? leftPosition + 'px' : null;
 }
 
 function hideControls() {
@@ -436,6 +464,7 @@ function setElementState( className, event ) {
 	if ( className ) {
 		selectedBlock.classList.add( className );
 	}
+	updateBlockControlsPosition( className );
 }
 
 function l( data ) {
