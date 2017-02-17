@@ -3,6 +3,7 @@
 Prototyping since 1440.
 
 This is the development and prototyping hub for the editor focus in core.
+Gutenberg is the project name. Conversations and discussions take place in #core-editor in Slack.
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
 
@@ -10,7 +11,6 @@ This is the development and prototyping hub for the editor focus in core.
 
 - <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
-- Mockups: https://cloudup.com/c9pKpaoDpQ4
 
 ## Prototypes
 
@@ -22,6 +22,34 @@ This is the development and prototyping hub for the editor focus in core.
 
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post grammar parser</a>.
 
-----
+## Mockups
 
-Conversations and discussions take place in #core-editor in Slack.
+These mockups are all subject to change and feedback.
+
+See also, <a href="https://projects.invisionapp.com/share/NMAHISEE5#/screens/219366717">clickable prototype</a>.
+
+**Formatting**
+
+![Hover](mockups/Formatting, Hover.png)
+
+![Click](mockups/Formatting, Click.png)
+
+**New Blocks**
+
+![New Blocks](mockups/New Blocks.png)
+![Insert Between](mockups/Insert Between.png)
+![Insert](mockups/Insert.png)
+
+**Type Switcher**
+
+![Switcher](mockups/Type Switcher.png)
+
+**Other Blocks**
+
+![Image](mockups/Image.png)
+![Quote](mockups/Quote.png)
+![Headings](mockups/Headings.png)
+
+**Mobile**
+
+![Mobile](mockups/Mobile.png)
