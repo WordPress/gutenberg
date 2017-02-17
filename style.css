@@ -423,7 +423,12 @@ img.is-selected {
 	color: #9ea7af;
 }
 
-.insert-block__block-list {
+.insert-block__content {
+	max-height: 180px;
+	overflow: auto;
+}
+
+.insert_block__category-blocks {
 	display: flex;
 	flex-flow: row wrap;
 }
