@@ -283,7 +283,9 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			}
 		}
 
-		if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
+		if ( is_multisite() ) {
+			echo "Skipping generation of API client fixtures in multisite mode.\n";
+		} else if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 			echo "Skipping generation of API client fixtures due to unsupported JSON_* constants.\n";
 		} else {
 			// Save the route object for QUnit tests.
