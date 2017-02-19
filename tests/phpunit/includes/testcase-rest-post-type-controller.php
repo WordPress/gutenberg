@@ -134,11 +134,11 @@ abstract class WP_Test_REST_Post_Type_Controller_Testcase extends WP_Test_REST_C
 			$this->assertFalse( isset( $data['excerpt'] ) );
 		}
 
+		$this->assertEquals( $post->post_status, $data['status'] );
 		$this->assertEquals( $post->guid, $data['guid']['rendered'] );
 
 		if ( 'edit' === $context ) {
 			$this->assertEquals( $post->guid, $data['guid']['raw'] );
-			$this->assertEquals( $post->post_status, $data['status'] );
 
 			if ( '0000-00-00 00:00:00' === $post->post_date_gmt ) {
 				$this->assertNull( $data['date_gmt'] );
