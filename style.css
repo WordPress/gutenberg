@@ -461,6 +461,11 @@ img.is-selected {
 	fill: #191e23;
 }
 
+.insert-block__block svg {
+	widows: 24px;
+	height: 24px;
+}
+
 /*
  * Text actions
  */
