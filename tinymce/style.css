@@ -1,0 +1,21 @@
+/**
+ * Basic
+ */
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+	max-width: 720px;
+	margin: 60px auto;
+	color: #12181e;
+}
