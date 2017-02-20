@@ -38,6 +38,7 @@ See also, <a href="https://projects.invisionapp.com/share/NMAHISEE5#/screens/219
 
 ![New Blocks](mockups/New Blocks.png)
 ![Insert Between](mockups/Insert Between.png)
+![Insert Between, Keyboard Only](mockups/Insert Between, Keyboard.png)
 ![Insert](mockups/Insert.png)
 
 **Type Switcher**
@@ -48,6 +49,7 @@ See also, <a href="https://projects.invisionapp.com/share/NMAHISEE5#/screens/219
 
 ![Image](mockups/Image.png)
 ![Quote](mockups/Quote.png)
+![Quote 2](mockups/Quote 2.png)
 ![Headings](mockups/Headings.png)
 
 **Mobile**
