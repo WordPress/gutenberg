@@ -1,5 +1,5 @@
 ( function( window, document ) {
-	var PROTOTYPES, linkCounter, navigation, path, link, style;
+	var PROTOTYPES, paths, p, pl, path, navigation, path, label, link, style;
 
 	/**
 	 * Set of all prototypes, keyed by path with label value.
@@ -16,17 +16,16 @@
 	navigation = document.createElement( 'div' );
 	navigation.className = 'prototype-navigation';
 
-	linkCounter = 0;
+	paths = Object.keys( PROTOTYPES );
 
-	for ( path in PROTOTYPES ) {
-		if ( ! PROTOTYPES.hasOwnProperty( path ) ) {
-			return;
-		}
+	for ( p = 0, pl = paths.length; p < pl; p++ ) {
+		path = paths[ p ];
+		label = PROTOTYPES[ path ];
 
 		link = document.createElement( 'a' );
 		link.href = '/gutenberg' + path;
-		link.setAttribute( 'title', PROTOTYPES[ path ] );
-		link.textContent = ++linkCounter;
+		link.setAttribute( 'title', label );
+		link.textContent = ( p + 1 );
 
 		if ( '/gutenberg' + path === window.location.pathname ) {
 			link.className = 'is-current';
@@ -38,7 +37,6 @@
 	// Generate Stylesheet DOM
 
 	style = document.createElement( 'style' );
-
 	style.innerHTML = [
 		'.prototype-navigation {',
 			'font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;',
