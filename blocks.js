@@ -113,11 +113,23 @@ var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
 var imageAlignRight = queryFirst( '.block-image__align-right' );
 
+// Contants
+var KEY_ENTER = 13;
+var KEY_ARROW_LEFT = 37;
+var KEY_ARROW_UP = 38;
+var KEY_ARROW_RIGHT = 39;
+var KEY_ARROW_DOWN = 40;
+
+// Editor Variables
 var selectedBlock = null;
+
+// Block Menu Variables
+var previouslyFocusedBlock = null;
 var searchBlockFilter = '';
 var blockMenuOpened = false;
 var menuSelectedBlock = null;
 
+// Helper variables
 var orderedBlocks = config.blockCategories.reduce( function( memo, category ) {
 	var categoryBlocks = config.blocks.filter( function( block ) {
 		return block.category === category.id;
@@ -161,6 +173,14 @@ function attachBlockHandlers() {
 function getBlocks() {
 	return Array.prototype.concat.apply( [],
 			supportedBlockTags.map( query ) );
+}
+
+function getFocusedBlock() {
+	var focusedBlocks = getBlocks().filter( function( block ) {
+		return block.contains( window.getSelection().anchorNode );
+	} );
+
+	return focusedBlocks.length ? focusedBlocks[ 0 ] : null;
 }
 
 function selectBlock( event ) {
@@ -358,12 +378,12 @@ function renderBlockMenu() {
 function attachBlockMenuSearch() {
 	insertBlockMenuSearchInput.addEventListener( 'keyup', filterBlockMenu, false );
 	insertBlockMenuSearchInput.addEventListener( 'input', filterBlockMenu, false );
-	selectBlockInMenu( 'none' );
+	selectBlockInMenu();
 	renderBlockMenu();
 
 	function filterBlockMenu( event ) {
 		searchBlockFilter = event.target.value;
-		selectBlockInMenu( 'none' );
+		selectBlockInMenu();
 		renderBlockMenu();
 	}
 }
@@ -391,7 +411,7 @@ function selectBlockInMenu( direction ) {
 	var nextBlock = filteredBlocks[ selectedBlockIndex + 1 ];
 	var offset = 0;
 	switch ( direction ) {
-		case 'up':
+		case KEY_ARROW_UP:
 			offset = (
 				currentBlock
 				&& filteredBlocks[ selectedBlockIndex - 2 ]
@@ -401,7 +421,7 @@ function selectBlockInMenu( direction ) {
 				)
 			) ? -2 : -1;
 			break;
-		case 'down':
+		case KEY_ARROW_DOWN:
 			offset = (
 				currentBlock
 				&& filteredBlocks[ selectedBlockIndex + 2 ]
@@ -412,10 +432,10 @@ function selectBlockInMenu( direction ) {
 				)
 			) ? 2 : 1;
 			break;
-		case 'right':
+		case KEY_ARROW_RIGHT:
 			offset = 1;
 			break;
-		case 'left':
+		case KEY_ARROW_LEFT:
 			offset = -1;
 			break;
 	}
@@ -441,52 +461,28 @@ function attachKeyboardShortcuts() {
 	document.addEventListener( 'keydown', handleKeyDown, false );
 
 	function handleKeyPress( event ) {
-		 if (
-			 /[a-zA-Z0-9-_ ]/.test( String.fromCharCode( event.keyCode ) )
-			 && document.activeElement === insertBlockMenuContent
-		 ) {
-			searchBlockFilter = searchBlockFilter + String.fromCharCode( event.keyCode );
-			insertBlockMenuSearchInput.value = searchBlockFilter;
-			selectBlockInMenu( '' );
-			renderBlockMenu();
-		} else if ( '/' === String.fromCharCode( event.keyCode ) ) {
-			if ( document.activeElement === editor ) return;
-			event.preventDefault();
-			! blockMenuOpened && openBlockMenu();
+		if ( '/' === String.fromCharCode( event.keyCode ) && ! blockMenuOpened ) {
+			var focusedBlock = getFocusedBlock();
+			if ( document.activeElement !== editor || ( focusedBlock && ! focusedBlock.textContent ) ) {
+				event.preventDefault();
+				openBlockMenu();
+			}
 		}
 	}
 
 	function handleKeyDown( event ) {
+		if ( ! blockMenuOpened ) return;
 		switch ( event.keyCode  ) {
-			case 13:
+			case KEY_ENTER:
 				event.preventDefault();
-				blockMenuOpened && hideMenu();
+				hideMenu();
 				break;
-			case 37:
+			case KEY_ARROW_DOWN:
+			case KEY_ARROW_UP:
+			case KEY_ARROW_LEFT:
+			case KEY_ARROW_RIGHT:
 				event.preventDefault();
-				selectBlockInMenu( 'left' );
-				renderBlockMenu();
-				break;
-			case 38:
-				event.preventDefault();
-				selectBlockInMenu( 'up' );
-				renderBlockMenu();
-				break;
-			case 39:
-				event.preventDefault();
-				selectBlockInMenu( 'right' );
-				renderBlockMenu();
-				break;
-			case 40:
-				event.preventDefault();
-				selectBlockInMenu( 'down' );
-				renderBlockMenu();
-				break;
-			case 8:
-				event.preventDefault();
-				searchBlockFilter = searchBlockFilter.substr( 0, searchBlockFilter.length - 1 );
-				insertBlockMenuSearchInput.value = searchBlockFilter;
-				selectBlockInMenu( '' );
+				selectBlockInMenu( event.keyCode );
 				renderBlockMenu();
 				break;
 		}
@@ -546,14 +542,19 @@ function openBlockMenu( event ) {
 	searchBlockFilter = '';
 	insertBlockMenuSearchInput.value = '';
 	menuSelectedBlock = false;
-	insertBlockMenuContent.focus();
-	selectBlockInMenu( 'none' );
+	previouslyFocusedBlock = getFocusedBlock();
+	insertBlockMenuSearchInput.focus();
+	selectBlockInMenu();
 	renderBlockMenu();
 }
 
 function hideMenu() {
+	if ( ! blockMenuOpened ) return;
 	insertBlockMenu.style.display = 'none';
 	blockMenuOpened = false;
+	if ( previouslyFocusedBlock ) {
+		setCaret( previouslyFocusedBlock );
+	}
 }
 
 function showSwitcherMenu( event ) {
@@ -589,6 +590,15 @@ function setElementState( className, event ) {
 	if ( className ) {
 		selectedBlock.classList.add( className );
 	}
+}
+
+function setCaret( element ) {
+	var range = document.createRange();
+	range.setStart( element.childNodes[0] ,0 );
+	range.collapse( true );
+	var selection = window.getSelection();
+	selection.removeAllRanges();
+	selection.addRange( range );
 }
 
 function l( data ) {
