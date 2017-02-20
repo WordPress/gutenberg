@@ -425,7 +425,12 @@ function selectBlockInMenu( direction ) {
 	// Hack to wait for the rerender before scrolling
 	setTimeout( function() {
 		var blockElement = queryFirst( '.insert-block__block.block-' + menuSelectedBlock.id );
-		if ( blockElement ) {
+		if (
+			blockElement && (
+				blockElement.offsetTop + blockElement.offsetHeight > insertBlockMenuContent.clientHeight + insertBlockMenuContent.scrollTop
+				|| blockElement.offsetTop < insertBlockMenuContent.scrollTop
+			)
+		) {
 			insertBlockMenuContent.scrollTop = blockElement.offsetTop - 23;
 		}
 	} );
@@ -433,7 +438,7 @@ function selectBlockInMenu( direction ) {
 
 function attachKeyboardShortcuts() {
 	document.addEventListener( 'keypress', handleKeyPress, false );
-	document.addEventListener( 'keyup', handleKeyUp, false );
+	document.addEventListener( 'keydown', handleKeyDown, false );
 
 	function handleKeyPress( event ) {
 		 if (
@@ -444,16 +449,15 @@ function attachKeyboardShortcuts() {
 			insertBlockMenuSearchInput.value = searchBlockFilter;
 			selectBlockInMenu( '' );
 			renderBlockMenu();
+		} else if ( '/' === String.fromCharCode( event.keyCode ) ) {
+			if ( document.activeElement === editor ) return;
+			event.preventDefault();
+			! blockMenuOpened && openBlockMenu();
 		}
 	}
 
-	function handleKeyUp( event ) {
+	function handleKeyDown( event ) {
 		switch ( event.keyCode  ) {
-			case 191:
-				if ( document.activeElement === editor ) return;
-				event.preventDefault();
-				! blockMenuOpened && openBlockMenu();
-				break;
 			case 13:
 				event.preventDefault();
 				blockMenuOpened && hideMenu();
