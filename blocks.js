@@ -308,9 +308,11 @@ function attachControlActions() {
 		if ( getter ) {
 			node.addEventListener( 'click', function( event ) {
 				event.stopPropagation();
+				var previousOffset = selectedBlock.offsetTop;
 				swapNodes( selectedBlock, getter( selectedBlock ) );
 				attachBlockHandlers();
 				reselect();
+				window.scrollTo( window.scrollX, window.scrollY + selectedBlock.offsetTop - previousOffset );
 			}, false );
 		}
 	} );
