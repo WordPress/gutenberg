@@ -215,16 +215,12 @@ var config = {
 	        icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Code</title><rect x="0" fill="none" width="24" height="24"/><g><path d="M4.83 12l4.58 4.59L8 18l-6-6 6-6 1.41 1.41L4.83 12zm9.76 4.59L16 18l6-6-6-6-1.41 1.41L19.17 12l-4.58 4.59z"/></g></svg>',
 	        category: 'other'
 	    }
-	],
-	typeToTag: {
-		paragraph: 'p',
-		quote: 'blockquote',
-		heading: 'h2'
-	}
+	]
 };
 
 var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
+var hoverSwitcher;
 var switcherMenu = queryFirst( '.switch-block__menu' );
 var dockedControls = queryFirst( '.docked-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
@@ -248,6 +244,7 @@ var KEY_ARROW_DOWN = 40;
 
 // Editor Variables
 var selectedBlock = null;
+var hoveredBlock = null;
 
 // Block Menu Variables
 var previouslyFocusedBlock = null;
@@ -279,8 +276,9 @@ insertBlockMenu.addEventListener( 'click', function( event ) {
 	event.stopPropagation();
 }, false );
 
-cloneSwitcher();
+createHoverSwitcher();
 attachBlockHandlers();
+attachControlActions();
 attachTypeSwitcherActions();
 attachBlockMenuSearch();
 attachKeyboardShortcuts();
@@ -288,35 +286,28 @@ attachKeyboardShortcuts();
 /**
  * Core logic
  */
-function cloneSwitcher() {
-	getBlocks().forEach( function( block ) {
-		var container = document.createElement( 'div' );
-		var blockSwitcher = switcher.cloneNode( true );
-
-		var blockType = getTagType( block.nodeName );
-		query( '.type svg', blockSwitcher ).forEach( function ( typeButton ) {
-			typeButton.style.display = 'none';
-		} );
-		var switcherQuery = '.type-icon-' + blockType;
-		queryFirst( switcherQuery, blockSwitcher ).style.display = 'block';
-
-		container.className = 'block-container';
-		editor.insertBefore( container, block );
-		container.appendChild( blockSwitcher );
-		container.appendChild( block );
-		attachControlActions( block );
-	} );
+function createHoverSwitcher() {
+	hoverSwitcher = switcher.cloneNode( true );
+	hoverSwitcher.classList.add( 'hover-switcher' );
+	hoverSwitcher.addEventListener( 'mouseleave', hideHoverSwitcher );
+	document.body.appendChild( hoverSwitcher );
 }
 
 function attachBlockHandlers() {
 	getBlocks().forEach( function( block ) {
-		bind( 'click', block, selectBlock );
+		block.removeEventListener( 'mouseenter', hoverBlock, false );
+		block.addEventListener( 'mouseenter', hoverBlock, false );
+
+		block.removeEventListener( 'mouseleave', hoverBlock, false );
+		block.addEventListener( 'mouseleave', hoverBlock, false );
+
+		block.removeEventListener( 'click', selectBlock, false );
+		block.addEventListener( 'click', selectBlock, false );
 	} );
 }
 
 function getBlocks() {
-	return Array.prototype.concat.apply( [],
-			supportedBlockTags.map( query ) );
+	return query( supportedBlockTags.join(), editor );
 }
 
 function getFocusedBlock() {
@@ -325,6 +316,29 @@ function getFocusedBlock() {
 	} );
 
 	return focusedBlocks.length ? focusedBlocks[ 0 ] : null;
+}
+
+function hoverBlock( event ) {
+	var isHovered = 'mouseenter' === event.type,
+		position, blockType, iconQuery;
+
+	if ( isHovered ) {
+		if ( event.target === selectedBlock ) {
+			return;
+		}
+
+		hoveredBlock = event.target;
+		resetSwitcher( hoverSwitcher );
+		position = hoveredBlock.getBoundingClientRect();
+		blockType = getTagType( hoveredBlock.nodeName );
+		iconQuery = '.type-icon-' + blockType;
+		queryFirst( iconQuery, hoverSwitcher ).style.display = 'block';
+		hoverSwitcher.style.top = ( position.top + window.scrollY ) + 'px';
+		hoverSwitcher.style.height = ( position.bottom - position.top ) + 'px';
+		hoverSwitcher.style.opacity = 1;
+	} else {
+		hideHoverSwitcher( event );
+	}
 }
 
 function selectBlock( event ) {
@@ -342,13 +356,68 @@ function clearBlocks() {
 	} );
 	selectedBlock = null;
 
+	hideHoverSwitcher();
 	hideControls();
 	hideMenu();
 }
 
+function resetSwitcher( context ) {
+	var switcherButtons = query( '.type svg', context );
+
+	switcherButtons.forEach( function( button ) {
+		button.style.display = 'none';
+		button.addEventListener( 'click', showSwitcherMenu, false );
+	} );
+
+	context.addEventListener( 'click', moveBlock );
+}
+
+function moveBlock( event ) {
+	event.preventDefault();
+
+	var button = event.target.closest( 'svg' );
+	if ( ! button ) {
+		return;
+	}
+
+	var classes = button.className.baseVal;
+	var getter = {
+		up: getPreviousSibling,
+		down: getNextSibling
+	}[ classes ];
+
+	if ( ! getter ) {
+		return;
+	}
+
+	var closestSwitcher = button.closest( '.block-switcher' );
+	if ( ! closestSwitcher ) {
+		return;
+	}
+
+	var target = closestSwitcher.classList.contains( 'hover-switcher' ) ? hoveredBlock : selectedBlock;
+	if ( ! target ) {
+		return;
+	}
+
+	var previousOffset = target.offsetTop;
+	swapNodes( target, getter( target ) );
+	attachBlockHandlers();
+	reselect();
+	window.scrollTo( window.scrollX, window.scrollY + target.offsetTop - previousOffset );
+}
+
 function showControls( node ) {
+	// toggle block-specific switcher
+	resetSwitcher( switcher );
 	var blockType = getTagType( node.nodeName );
+	var switcherQuery = '.type-icon-' + blockType;
+	queryFirst( switcherQuery ).style.display = 'block';
+
+	// reposition switcher
 	var position = node.getBoundingClientRect();
+	switcher.style.opacity = 1;
+	switcher.style.top = ( position.top + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
 	dockedControls.className = 'docked-controls';
@@ -389,55 +458,28 @@ function updateDockedControlsPosition( newClassName ) {
 	dockedControls.style.left = leftPosition ? leftPosition + 'px' : null;
 }
 
+function hideHoverSwitcher( event ) {
+	// Continue showing while moving from block to switcher, or from switcher
+	// to switcher menu options
+	if ( event && ( hoverSwitcher === event.relatedTarget || switcherMenu.contains( event.relatedTarget ) ) ) {
+		return;
+	}
+
+	hoverSwitcher.style.opacity = 0;
+	hoveredBlock = null;
+}
+
 function hideControls() {
+	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
 	dockedControls.style.display = 'none';
 }
 
-function attachControlActions( block ) {
-	var buttons = query( '.block-switcher svg', block.parentNode );
-	buttons.forEach( function( button ) {
-		bind( 'click', button, switchType );
-	} );
-
-	var blockSwitcher = queryFirst( '.block-switcher', block.parentNode );
-	Array.from( blockSwitcher.childNodes ).forEach( function( node ) {
-		if ( 'svg' !== node.nodeName ) {
-			return;
-		}
-
-		var classes = node.className.baseVal;
-		var getter = {
-			up: getPreviousSibling,
-			down: getNextSibling
-		}[ classes ];
-
-		if ( getter ) {
-			node.addEventListener( 'click', function( event ) {
-				event.stopPropagation();
-				clearBlocks();
-				block.classList.add( 'is-selected' );
-				selectedBlock = block;
-				var previousOffset = selectedBlock.offsetTop;
-				swapNodes(
-					selectedBlock.parentNode,
-					getter( selectedBlock.parentNode )
-				);
-				window.scrollTo( window.scrollX, window.scrollY + selectedBlock.offsetTop - previousOffset );
-				attachBlockHandlers();
-				attachControlActions( queryFirst( '.is-selected' ) );
-			}, false );
-		}
-	} );
-
+function attachControlActions() {
 	// Text block event handlers.
 	textAlignLeft.addEventListener( 'click', setTextAlignLeft, false );
 	textAlignCenter.addEventListener( 'click', setTextAlignCenter, false );
 	textAlignRight.addEventListener( 'click', setTextAlignRight, false );
-
-	switcherButtons.forEach( function( button ) {
-		button.addEventListener( 'click', showSwitcherMenu, false );
-	} );
 
 	// Image block event handlers.
 	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
@@ -447,21 +489,27 @@ function attachControlActions( block ) {
 }
 
 function attachTypeSwitcherActions() {
-	Object.keys( config.typeToTag ).forEach( function( type ) {
+	var typeToTag = {
+		paragraph: 'p',
+		quote: 'blockquote',
+		heading: 'h2'
+	};
+
+	Object.keys( typeToTag ).forEach( function( type ) {
 		var iconSelector = '.switch-block__block .type-icon-' + type;
 		var button = queryFirst( iconSelector ).parentNode;
-
-		bind( 'click', button, switchBlockType );
+		button.addEventListener( 'click', switchBlockType, false );
 
 		function switchBlockType( event ) {
-			if ( ! selectedBlock ) {
+			var target = selectedBlock || hoveredBlock;
+			if ( ! target ) {
 				return;
 			}
 
 			var openingRe = /^<\w+/;
 			var closingRe = /\w+>$/;
-			var tag = config.typeToTag[ type ];
-			selectedBlock.outerHTML = selectedBlock.outerHTML
+			var tag = typeToTag[ type ];
+			target.outerHTML = target.outerHTML
 				.replace( openingRe, '<' + tag )
 				.replace( closingRe, tag + '>' );
 			clearBlocks();
@@ -624,6 +672,17 @@ function attachKeyboardShortcuts() {
 	}
 }
 
+function reselect() {
+	var selected = queryFirst( '.is-selected' );
+	clearBlocks();
+
+	if ( selected ) {
+		setTimeout( function() {
+			selected.click();
+		} );
+	}
+}
+
 function swapNodes( a, b ) {
 	if ( ! ( a && b ) ) {
 		return false;
@@ -690,14 +749,15 @@ function hideMenu() {
 function showSwitcherMenu( event ) {
 	event.stopPropagation();
 
-	if ( ! selectedBlock ) {
+	var target = event.target.closest( '.block-switcher' );
+	if ( ! target ) {
 		return;
 	}
 
 	// not all block types can be converted to all block types.
 	// filter which lists of types are shown in the menu depending on the
 	// selected block, based on _kinds_ (see config)
-	var blockType = getTagType( selectedBlock.nodeName );
+	var blockType = getTagType( target.nodeName );
 	var kinds = getTypeKinds( blockType );
 	var validClasses = kinds.map( function( kind ) {
 		return 'switch-block__block-list-' + kind;
@@ -708,9 +768,8 @@ function showSwitcherMenu( event ) {
 	} );
 
 	// position switcher menu next to type icon
-	var position = queryFirst( '.block-container:hover .block-switcher' )
-		.getBoundingClientRect();
-	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
+	var position = target.getBoundingClientRect();
+	switcherMenu.style.top = ( position.top + 60 + window.scrollY ) + 'px';
 	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
 }
@@ -722,14 +781,6 @@ function setElementState( className, event ) {
 		selectedBlock.classList.add( className );
 	}
 	updateBlockControlsPosition( className );
-}
-
-function switchType( event ) {
-	var block = event.target
-		.closest( '.block-container' )
-		.childNodes[1];
-	selectedBlock = block;
-	showSwitcherMenu( event );
 }
 
 function setCaret( element ) {
@@ -746,20 +797,12 @@ function l( data ) {
 	return data;
 }
 
-function bind( eventType, node, callback, useCapture ) {
-	node.removeEventListener( eventType, callback, !! useCapture );
-	node.addEventListener( eventType, callback, !! useCapture );
+function query( selector, context ) {
+	return Array.from( ( context || document ).querySelectorAll( selector ) );
 }
 
-function query( selector, baseNode ) {
-	var node = baseNode && baseNode.querySelectorAll
-		? baseNode
-		: document;
-	return Array.from( node.querySelectorAll( selector ) );
-}
-
-function queryFirst( selector, baseNode ) {
-	return query( selector, baseNode )[ 0 ];
+function queryFirst( selector, context ) {
+	return query( selector, context )[ 0 ];
 }
 
 function getConfig( configName, tagName ) {
@@ -771,4 +814,22 @@ function containsOneOf( element, classes ) {
 	return classes.some( function( className ) {
 		return element.classList.contains( className );
 	} );
+}
+
+/**
+ * Polyfills
+ */
+if ( window.Element && ! Element.prototype.closest ) {
+	Element.prototype.closest = function( selector ) {
+		var matches = ( this.document || this.ownerDocument ).querySelectorAll( selector ),
+			el = this,
+			i;
+
+		do {
+			i = matches.length;
+			while ( --i >= 0 && matches.item( i ) !== el ) {};
+		} while ( ( i < 0 ) && ( el = el.parentElement ) );
+
+		return el;
+	};
 }
