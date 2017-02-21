@@ -468,12 +468,9 @@ function attachTypeSwitcherActions() {
 	} );
 
 	Object.keys( typeToTag ).forEach( function( type ) {
-		var selector = '.switch-block__block .type-icon-' + type;
-		var button = queryFirst( selector );
-		var label = queryFirst( selector + ' + label' );
-
+		var iconSelector = '.switch-block__block .type-icon-' + type;
+		var button = queryFirst( iconSelector ).parentNode;
 		button.addEventListener( 'click', switchBlockType, false );
-		label.addEventListener( 'click', switchBlockType, false );
 
 		function switchBlockType( event ) {
 			if ( ! selectedBlock ) {
