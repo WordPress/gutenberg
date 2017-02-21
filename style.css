@@ -426,6 +426,11 @@ img.is-selected {
 .insert-block__content {
 	max-height: 180px;
 	overflow: auto;
+	box-shadow: inset 0px -4px 6px -2px rgba(224,229,233,1);
+}
+
+.insert-block__content.is-bottom {
+	box-shadow: none;
 }
 
 .insert-block__content:focus {
