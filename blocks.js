@@ -222,6 +222,7 @@ var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
 var switcherButtons = query( '.block-switcher .type svg' );
 var switcherMenu = queryFirst( '.switch-block__menu' );
+var dockedControls = queryFirst( '.docked-controls' );
 var blockControls = queryFirst( '.block-controls' );
 var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
@@ -341,11 +342,11 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	blockControls.className = 'block-controls';
+	dockedControls.className = 'docked-controls';
 	getTypeKinds( blockType ).forEach( function( kind ) {
-		blockControls.classList.add( 'is-' + kind );
+		dockedControls.classList.add( 'is-' + kind );
 	} );
-	blockControls.style.display = 'block';
+	dockedControls.style.display = 'block';
 
 	// reposition block-specific block controls
 	updateBlockControlsPosition();
@@ -367,22 +368,22 @@ function updateBlockControlsPosition( newClassName ) {
 		topPosition = newClassName ? topPosition - 15 : topPosition;
 	} else if ( isImage && alignedLeft && newClassName ) {
 		topPosition = topPosition - 15;
-	} else if ( isImage && className === 'is-selected' && blockControls.style.left ) {
+	} else if ( isImage && className === 'is-selected' && dockedControls.style.left ) {
 		leftPosition = null;
 		topPosition = topPosition + 15;
 	} else if ( fullBleed ) {
-		leftPosition = ( window.innerWidth / 2 ) - ( blockControls.clientWidth / 2 );
+		leftPosition = ( window.innerWidth / 2 ) - ( dockedControls.clientWidth / 2 );
 	}
 
-	blockControls.style.maxHeight = 'none';
-	blockControls.style.top = topPosition + 'px';
-	blockControls.style.left = leftPosition ? leftPosition + 'px' : null;
+	dockedControls.style.maxHeight = 'none';
+	dockedControls.style.top = topPosition + 'px';
+	dockedControls.style.left = leftPosition ? leftPosition + 'px' : null;
 }
 
 function hideControls() {
 	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
-	blockControls.style.display = 'none';
+	dockedControls.style.display = 'none';
 }
 
 function hideInlineControls() {
@@ -391,7 +392,7 @@ function hideInlineControls() {
 
 // Show popup on text selection
 function onSelectText( event ) {
-	event.stopPropagation();
+	event && event.stopPropagation();
 	var txt = "";
 
 	if ( window.getSelection ) {
@@ -404,13 +405,7 @@ function onSelectText( event ) {
 
 	// Show formatting bar
 	if ( txt != '' ) {
-		inlineControls.style.display = 'block';
-		var range = txt.getRangeAt(0);
-		var pos = range.getBoundingClientRect();
-		var selectCenter = pos.width / 2;
-		var controlsCenter = inlineControls.offsetWidth / 2;
-		inlineControls.style.left = ( pos.left + selectCenter - controlsCenter ) + 'px';
-		inlineControls.style.top = ( pos.top - 48 + window.scrollY ) + 'px';
+		inlineControls.style.display = 'inline-block';
 	} else {
 		inlineControls.style.display = 'none';
 	}
