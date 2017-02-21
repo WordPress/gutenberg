@@ -521,16 +521,12 @@ function renderBlockMenu() {
 			insertBlockMenuContent.appendChild( node );
 		}
 	} );
-
-	var placeholder = document.createElement('div');
-	placeholder.className = 'insert-block__separator';
-	placeholder.textContent = 'These don\'t work yet.';
-	insertBlockMenuContent.appendChild( placeholder );
 }
 
 function attachBlockMenuSearch() {
 	insertBlockMenuSearchInput.addEventListener( 'keyup', filterBlockMenu, false );
 	insertBlockMenuSearchInput.addEventListener( 'input', filterBlockMenu, false );
+	insertBlockMenuContent.addEventListener( 'scroll', handleBlockMenuScroll, false );
 	selectBlockInMenu();
 	renderBlockMenu();
 
@@ -538,6 +534,14 @@ function attachBlockMenuSearch() {
 		searchBlockFilter = event.target.value;
 		selectBlockInMenu();
 		renderBlockMenu();
+	}
+
+	function handleBlockMenuScroll( event ) {
+		if ( insertBlockMenuContent.scrollHeight - insertBlockMenuContent.scrollTop <= insertBlockMenuContent.clientHeight ) {
+			insertBlockMenuContent.className = 'insert-block__content is-bottom';
+		} else {
+			insertBlockMenuContent.className = 'insert-block__content';
+		}
 	}
 }
 
