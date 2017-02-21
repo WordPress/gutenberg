@@ -105,7 +105,7 @@ h6.is-selected,
 p.is-selected,
 blockquote.is-selected,
 img.is-selected {
-	box-shadow: inset 0px 0px 0px 2px #6d7882;
+	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
 	position: relative;
 	z-index: 1;
 }
@@ -163,12 +163,23 @@ img.is-selected {
     display: none;
 }
 
-
 /**
- * Inline controls
+ * Controls
  */
+.docked-controls {
+	position: absolute;
+	display: none;
+	z-index: 10;
+		transform: translateZ( 0 );
+}
 
-.inline-controls {
+.docked-controls.is-image .block-image,
+.docked-controls.is-text .block-text {
+	display: block;
+}
+
+.inline-controls,
+.block-controls {
 	background: #fff;
 	border: 1px solid #e1e6ea;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
@@ -176,12 +187,15 @@ img.is-selected {
 	display: inline-block;
 	height: 38px;
 	overflow: hidden;
-	position: absolute;
-	z-index: 10;
+	margin-left: 20px;
+}
+
+.docked-controls.is-image .inline-controls {
 	display: none;
 }
 
-.inline-controls button {
+.inline-controls button,
+.block-controls button {
 	background: #fff;
 	border: none;
 	width: 36px;
@@ -192,27 +206,36 @@ img.is-selected {
 	float: left;
 }
 
-.inline-controls button.do-not-work {
+.inline-controls button.do-not-work,
+.block-controls button.do-not-work {
 	margin: 0 8px;
 	width: auto;
 }
 
-.inline-controls button:hover {
+.inline-controls button:hover,
+.block-controls button:hover {
 	background: #f0f2f4;
 }
 
-.inline-controls button:focus {
+.inline-controls button:focus,
+.block-controls button:focus {
 	outline: none;
 }
 
-.control-group {
+.control-group, {
 	display: inline-block;
 	margin-left: 20px;
 }
 
-.inline-controls button.heading-dropdown {
+.inline-controls button.heading-dropdown,
+.block-controls button.heading-dropdown {
 	width: 54px;
 	position: relative;
+}
+
+.inline-controls button.is-active,
+.block-controls button.is-active {
+	background: #e0e5e9;
 }
 
 .heading-dropdown .heading {
@@ -239,45 +262,8 @@ img.is-selected {
 	bottom: 8px;
 }
 
-
-/**
- * Block Controls
- */
-
-.block-controls {
- 	background: #191e23;
- 	display: inline-block;
- 	max-height: 36px;
- 	overflow: hidden;
- 	position: absolute;
- 	z-index: 10;
-    display: none;
-    transform: translateZ( 0 );
- }
-
-.block-controls button {
- 	background: #191e23;
-    color: #fff;
- 	border: none;
- 	width: 36px;
- 	height: 36px;
- 	padding: 6px;
- 	cursor: pointer;
- 	display: block;
- 	float: left;
- }
-
-.block-controls button.is-active {
-    background: #6d7882;
-}
-
 .block-controls button {
 	display: none;
-}
-
-.block-controls.is-image .block-image,
-.block-controls.is-text .block-text {
-	display: block;
 }
 
 /**

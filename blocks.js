@@ -222,8 +222,7 @@ var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
 var switcherButtons = query( '.block-switcher .type svg' );
 var switcherMenu = queryFirst( '.switch-block__menu' );
-var blockControls = queryFirst( '.block-controls' );
-var inlineControls = queryFirst( '.inline-controls' );
+var dockedControls = queryFirst( '.docked-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
 var insertBlockMenu = queryFirst( '.insert-block__menu' );
 var insertBlockMenuSearchInput = queryFirst( '.insert-block__search' );
@@ -275,7 +274,6 @@ insertBlockButton.addEventListener( 'click', openBlockMenu, false );
 insertBlockMenu.addEventListener( 'click', function( event ) {
 	event.stopPropagation();
 }, false );
-window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
 attachControlActions();
@@ -341,17 +339,17 @@ function showControls( node ) {
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
-	blockControls.className = 'block-controls';
+	dockedControls.className = 'docked-controls';
 	getTypeKinds( blockType ).forEach( function( kind ) {
-		blockControls.classList.add( 'is-' + kind );
+		dockedControls.classList.add( 'is-' + kind );
 	} );
-	blockControls.style.display = 'block';
+	dockedControls.style.display = 'block';
 
 	// reposition block-specific block controls
-	updateBlockControlsPosition();
+	updateDockedControlsPosition();
 }
 
-function updateBlockControlsPosition( newClassName ) {
+function updateDockedControlsPosition( newClassName ) {
 	var isImage = selectedBlock.tagName === 'IMG';
 	var className = selectedBlock.className;
 	var position = selectedBlock.getBoundingClientRect();
@@ -367,53 +365,22 @@ function updateBlockControlsPosition( newClassName ) {
 		topPosition = newClassName ? topPosition - 15 : topPosition;
 	} else if ( isImage && alignedLeft && newClassName ) {
 		topPosition = topPosition - 15;
-	} else if ( isImage && className === 'is-selected' && blockControls.style.left ) {
+	} else if ( isImage && className === 'is-selected' && dockedControls.style.left ) {
 		leftPosition = null;
 		topPosition = topPosition + 15;
 	} else if ( fullBleed ) {
-		leftPosition = ( window.innerWidth / 2 ) - ( blockControls.clientWidth / 2 );
+		leftPosition = ( window.innerWidth / 2 ) - ( dockedControls.clientWidth / 2 );
 	}
 
-	blockControls.style.maxHeight = 'none';
-	blockControls.style.top = topPosition + 'px';
-	blockControls.style.left = leftPosition ? leftPosition + 'px' : null;
+	dockedControls.style.maxHeight = 'none';
+	dockedControls.style.top = topPosition + 'px';
+	dockedControls.style.left = leftPosition ? leftPosition + 'px' : null;
 }
 
 function hideControls() {
 	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
-	blockControls.style.display = 'none';
-}
-
-function hideInlineControls() {
-	inlineControls.style.display = 'none';
-}
-
-// Show popup on text selection
-function onSelectText( event ) {
-	event.stopPropagation();
-	var txt = "";
-
-	if ( window.getSelection ) {
-		txt = window.getSelection();
-	} else if ( document.getSelection ) {
-		txt = document.getSelection();
-	} else if ( document.selection ) {
-		txt = document.selection.createRange().text;
-	}
-
-	// Show formatting bar
-	if ( txt != '' ) {
-		inlineControls.style.display = 'block';
-		var range = txt.getRangeAt(0);
-		var pos = range.getBoundingClientRect();
-		var selectCenter = pos.width / 2;
-		var controlsCenter = inlineControls.offsetWidth / 2;
-		inlineControls.style.left = ( pos.left + selectCenter - controlsCenter ) + 'px';
-		inlineControls.style.top = ( pos.top - 48 + window.scrollY ) + 'px';
-	} else {
-		inlineControls.style.display = 'none';
-	}
+	dockedControls.style.display = 'none';
 }
 
 function attachControlActions() {
@@ -688,7 +655,6 @@ function siblingGetter( direction ) {
 }
 
 function openBlockMenu( event ) {
-	hideInlineControls();
 	clearBlocks();
 	event && event.stopPropagation();
 	insertBlockMenu.style.display = 'block';
