@@ -960,6 +960,84 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 		$this->assertEquals( self::$post_id, $data['post'] );
 	}
 
+	public function comment_dates_provider() {
+		return array(
+			'set date without timezone' => array(
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date'            => '2016-12-12T14:00:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date_gmt without timezone' => array(
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date with timezone' => array(
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date'            => '2016-12-12T18:00:00-01:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date_gmt with timezone' => array(
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date_gmt'        => '2016-12-12T18:00:00-01:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider comment_dates_provider
+	 */
+	public function test_create_comment_date( $params, $results ) {
+		wp_set_current_user( self::$admin_id );
+		update_option( 'timezone_string', $params['timezone_string'] );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'content', 'not empty' );
+		$request->set_param( 'post', self::$post_id );
+		if ( isset( $params['date'] ) ) {
+			$request->set_param( 'date', $params['date'] );
+		}
+		if ( isset( $params['date_gmt'] ) ) {
+			$request->set_param( 'date_gmt', $params['date_gmt'] );
+		}
+		$response = $this->server->dispatch( $request );
+
+		update_option( 'timezone_string', '' );
+
+		$this->assertEquals( 201, $response->get_status() );
+		$data = $response->get_data();
+		$comment = get_comment( $data['id'] );
+
+		$this->assertEquals( $results['date'], $data['date'] );
+		$comment_date = str_replace( 'T', ' ', $results['date'] );
+		$this->assertEquals( $comment_date, $comment->comment_date );
+
+		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
+		$comment_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
+		$this->assertEquals( $comment_date_gmt, $comment->comment_date_gmt );
+	}
+
 	public function test_create_item_using_accepted_content_raw_value() {
 		wp_set_current_user( self::$admin_id );
 
@@ -1968,6 +2046,39 @@ class WP_Test_REST_Comments_Controller extends WP_Test_REST_Controller_Testcase 
 
 		$this->assertEquals( mysql_to_rfc3339( $updated->comment_date ), $comment['date'] );
 		$this->assertEquals( '2014-11-07T10:14:25', $comment['date'] );
+	}
+
+	/**
+	 * @dataProvider comment_dates_provider
+	 */
+	public function test_update_comment_date( $params, $results ) {
+		wp_set_current_user( self::$editor_id );
+		update_option( 'timezone_string', $params['timezone_string'] );
+
+		$comment_id = $this->factory->comment->create();
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/comments/%d', $comment_id ) );
+		if ( isset( $params['date'] ) ) {
+			$request->set_param( 'date', $params['date'] );
+		}
+		if ( isset( $params['date_gmt'] ) ) {
+			$request->set_param( 'date_gmt', $params['date_gmt'] );
+		}
+		$response = $this->server->dispatch( $request );
+
+		update_option( 'timezone_string', '' );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$comment = get_comment( $data['id'] );
+
+		$this->assertEquals( $results['date'], $data['date'] );
+		$comment_date = str_replace( 'T', ' ', $results['date'] );
+		$this->assertEquals( $comment_date, $comment->comment_date );
+
+		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
+		$comment_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
+		$this->assertEquals( $comment_date_gmt, $comment->comment_date_gmt );
 	}
 
 	public function test_update_item_no_content() {

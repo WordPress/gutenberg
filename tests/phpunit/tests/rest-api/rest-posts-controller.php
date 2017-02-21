@@ -1152,6 +1152,110 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->check_create_post_response( $response );
 	}
 
+	public function post_dates_provider() {
+		$all_statuses = array(
+			'draft',
+			'publish',
+			'future',
+			'pending',
+			'private',
+		);
+
+		$cases_short = array(
+			'set date without timezone' => array(
+				'statuses' => $all_statuses,
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date'            => '2016-12-12T14:00:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date_gmt without timezone' => array(
+				'statuses' => $all_statuses,
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date with timezone' => array(
+				'statuses' => array( 'draft', 'publish' ),
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date'            => '2016-12-12T18:00:00-01:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+			'set date_gmt with timezone' => array(
+				'statuses' => array( 'draft', 'publish' ),
+				'params'   => array(
+					'timezone_string' => 'America/New_York',
+					'date_gmt'        => '2016-12-12T18:00:00-01:00',
+				),
+				'results' => array(
+					'date'            => '2016-12-12T14:00:00',
+					'date_gmt'        => '2016-12-12T19:00:00',
+				),
+			),
+		);
+
+		$cases = array();
+		foreach ( $cases_short as $description => $case ) {
+			foreach ( $case['statuses'] as $status ) {
+				$cases[ $description . ', status=' . $status ] = array(
+					$status,
+					$case['params'],
+					$case['results'],
+				);
+			}
+		}
+
+		return $cases;
+	}
+
+	/**
+	 * @dataProvider post_dates_provider
+	 */
+	public function test_create_post_date( $status, $params, $results ) {
+		wp_set_current_user( self::$editor_id );
+		update_option( 'timezone_string', $params['timezone_string'] );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
+		$request->set_param( 'status', $status );
+		$request->set_param( 'title', 'not empty' );
+		if ( isset( $params['date'] ) ) {
+			$request->set_param( 'date', $params['date'] );
+		}
+		if ( isset( $params['date_gmt'] ) ) {
+			$request->set_param( 'date_gmt', $params['date_gmt'] );
+		}
+		$response = $this->server->dispatch( $request );
+
+		update_option( 'timezone_string', '' );
+
+		$this->assertEquals( 201, $response->get_status() );
+		$data = $response->get_data();
+		$post = get_post( $data['id'] );
+
+		$this->assertEquals( $results['date'], $data['date'] );
+		$post_date = str_replace( 'T', ' ', $results['date'] );
+		$this->assertEquals( $post_date, $post->post_date );
+
+		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
+		// TODO expect null here for drafts (see https://core.trac.wordpress.org/ticket/5698#comment:14)
+		$post_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
+		$this->assertEquals( $post_date_gmt, $post->post_date_gmt );
+	}
+
 	/**
 	 * @ticket 38698
 	 */
@@ -1983,6 +2087,40 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		// The modified date should equal the current time.
 		$this->assertEquals( date( 'Y-m-d', strtotime( mysql_to_rfc3339( $expected_modified ) ) ), date( 'Y-m-d', strtotime( $data['modified'] ) ) );
 		$this->assertEquals( date( 'Y-m-d', strtotime( $expected_modified ) ), date( 'Y-m-d', strtotime( $new_post->post_modified ) ) );
+	}
+
+	/**
+	 * @dataProvider post_dates_provider
+	 */
+	public function test_update_post_date( $status, $params, $results ) {
+		wp_set_current_user( self::$editor_id );
+		update_option( 'timezone_string', $params['timezone_string'] );
+
+		$post_id = $this->factory->post->create( array( 'post_status' => $status ) );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $post_id ) );
+		if ( isset( $params['date'] ) ) {
+			$request->set_param( 'date', $params['date'] );
+		}
+		if ( isset( $params['date_gmt'] ) ) {
+			$request->set_param( 'date_gmt', $params['date_gmt'] );
+		}
+		$response = $this->server->dispatch( $request );
+
+		update_option( 'timezone_string', '' );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$post = get_post( $data['id'] );
+
+		$this->assertEquals( $results['date'], $data['date'] );
+		$post_date = str_replace( 'T', ' ', $results['date'] );
+		$this->assertEquals( $post_date, $post->post_date );
+
+		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
+		// TODO expect null here for drafts (see https://core.trac.wordpress.org/ticket/5698#comment:14)
+		$post_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
+		$this->assertEquals( $post_date_gmt, $post->post_date_gmt );
 	}
 
 	public function test_update_post_with_invalid_date() {

@@ -383,4 +383,67 @@ class Tests_REST_API extends WP_UnitTestCase {
 		$this->assertEquals( $valid, wp_check_jsonp_callback( $callback ) );
 	}
 
+	public function rest_date_provider() {
+		return array(
+			// Valid dates with timezones
+			array( '2017-01-16T11:30:00-05:00', gmmktime( 11, 30,  0,  1, 16, 2017 ) + 5 * HOUR_IN_SECONDS ),
+			array( '2017-01-16T11:30:00-05:30', gmmktime( 11, 30,  0,  1, 16, 2017 ) + 5.5 * HOUR_IN_SECONDS ),
+			array( '2017-01-16T11:30:00-05'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) + 5 * HOUR_IN_SECONDS ),
+			array( '2017-01-16T11:30:00+05'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) - 5 * HOUR_IN_SECONDS ),
+			array( '2017-01-16T11:30:00-00'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00+00'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00Z'     , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+
+			// Valid dates without timezones
+			array( '2017-01-16T11:30:00'      , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+
+			// Invalid dates (TODO: support parsing partial dates as ranges, see #38641)
+			array( '2017-01-16T11:30:00-5', false ),
+			array( '2017-01-16T11:30', false ),
+			array( '2017-01-16T11', false ),
+			array( '2017-01-16T', false ),
+			array( '2017-01-16', false ),
+			array( '2017-01', false ),
+			array( '2017', false ),
+		);
+	}
+
+	/**
+	 * @dataProvider rest_date_provider
+	 */
+	public function test_rest_parse_date( $string, $value ) {
+		$this->assertEquals( $value, rest_parse_date( $string ) );
+	}
+
+	public function rest_date_force_utc_provider() {
+		return array(
+			// Valid dates with timezones
+			array( '2017-01-16T11:30:00-05:00', gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00-05:30', gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00-05'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00+05'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00-00'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00+00'   , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+			array( '2017-01-16T11:30:00Z'     , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+
+			// Valid dates without timezones
+			array( '2017-01-16T11:30:00'      , gmmktime( 11, 30,  0,  1, 16, 2017 ) ),
+
+			// Invalid dates (TODO: support parsing partial dates as ranges, see #38641)
+			array( '2017-01-16T11:30:00-5', false ),
+			array( '2017-01-16T11:30', false ),
+			array( '2017-01-16T11', false ),
+			array( '2017-01-16T', false ),
+			array( '2017-01-16', false ),
+			array( '2017-01', false ),
+			array( '2017', false ),
+		);
+	}
+
+	/**
+	 * @dataProvider rest_date_force_utc_provider
+	 */
+	public function test_rest_parse_date_force_utc( $string, $value ) {
+		$this->assertEquals( $value, rest_parse_date( $string, true ) );
+	}
 }
