@@ -223,8 +223,6 @@ var switcher = queryFirst( '.block-switcher' );
 var switcherButtons = query( '.block-switcher .type svg' );
 var switcherMenu = queryFirst( '.switch-block__menu' );
 var dockedControls = queryFirst( '.docked-controls' );
-var blockControls = queryFirst( '.block-controls' );
-var inlineControls = queryFirst( '.inline-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
 var insertBlockMenu = queryFirst( '.insert-block__menu' );
 var insertBlockMenuSearchInput = queryFirst( '.insert-block__search' );
@@ -276,7 +274,6 @@ insertBlockButton.addEventListener( 'click', openBlockMenu, false );
 insertBlockMenu.addEventListener( 'click', function( event ) {
 	event.stopPropagation();
 }, false );
-window.addEventListener( 'mouseup', onSelectText, false );
 
 attachBlockHandlers();
 attachControlActions();
@@ -349,10 +346,10 @@ function showControls( node ) {
 	dockedControls.style.display = 'block';
 
 	// reposition block-specific block controls
-	updateBlockControlsPosition();
+	updateDockedControlsPosition();
 }
 
-function updateBlockControlsPosition( newClassName ) {
+function updateDockedControlsPosition( newClassName ) {
 	var isImage = selectedBlock.tagName === 'IMG';
 	var className = selectedBlock.className;
 	var position = selectedBlock.getBoundingClientRect();
@@ -384,31 +381,6 @@ function hideControls() {
 	switcher.style.opacity = 0;
 	switcherMenu.style.display = 'none';
 	dockedControls.style.display = 'none';
-}
-
-function hideInlineControls() {
-	inlineControls.style.display = 'none';
-}
-
-// Show popup on text selection
-function onSelectText( event ) {
-	event && event.stopPropagation();
-	var txt = "";
-
-	if ( window.getSelection ) {
-		txt = window.getSelection();
-	} else if ( document.getSelection ) {
-		txt = document.getSelection();
-	} else if ( document.selection ) {
-		txt = document.selection.createRange().text;
-	}
-
-	// Show formatting bar
-	if ( txt != '' ) {
-		inlineControls.style.display = 'inline-block';
-	} else {
-		inlineControls.style.display = 'none';
-	}
 }
 
 function attachControlActions() {
@@ -686,7 +658,6 @@ function siblingGetter( direction ) {
 }
 
 function openBlockMenu( event ) {
-	hideInlineControls();
 	clearBlocks();
 	event && event.stopPropagation();
 	insertBlockMenu.style.display = 'block';

@@ -190,12 +190,8 @@ img.is-selected {
 	margin-left: 20px;
 }
 
-.inline-controls {
-	display: none;
-}
-
 .docked-controls.is-image .inline-controls {
-	display: none !important;
+	display: none;
 }
 
 .inline-controls button,
