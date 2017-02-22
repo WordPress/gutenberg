@@ -373,7 +373,7 @@ function resetSwitcher( context ) {
 }
 
 function moveBlock( event ) {
-	event.preventDefault();
+	event.stopPropagation();
 
 	var button = event.target.closest( 'svg' );
 	if ( ! button ) {
@@ -675,12 +675,8 @@ function attachKeyboardShortcuts() {
 
 function reselect() {
 	var selected = queryFirst( '.is-selected' );
-	clearBlocks();
-
 	if ( selected ) {
-		setTimeout( function() {
-			selected.click();
-		} );
+		selected.click();
 	}
 }
 
@@ -694,9 +690,17 @@ function swapNodes( a, b ) {
 		return false;
 	}
 
-	// insert node copies before removal
-	parent.replaceChild( b.cloneNode( true ), a );
-	parent.replaceChild( a.cloneNode( true ), b );
+	var isAfter = false;
+	var next = a;
+
+	do {
+		next = getNextSibling( next );
+		if ( next === b ) {
+			isAfter = true;
+		}
+	} while ( next );
+
+	parent.insertBefore.apply( parent, isAfter ? [ b, a ] : [ a, b ] );
 
 	return true;
 }
