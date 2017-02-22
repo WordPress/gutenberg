@@ -84,18 +84,6 @@ img {
 	/* replaces some block margins */
 }
 
-h1:hover,
-h2:hover,
-h3:hover,
-h4:hover,
-h5:hover,
-h6:hover,
-p:hover,
-blockquote:hover,
-img:hover {
-	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
-}
-
 h1.is-selected,
 h2.is-selected,
 h3.is-selected,
@@ -116,12 +104,28 @@ img.is-selected {
 
 .block-switcher {
 	opacity: 0;
+	pointer-events: none;
 	margin-left: -54px;
 	height: 36px;
 	width: 54px;
 	position: absolute;
 	transition: opacity .075s ease;
 	transform: translateZ(0);
+}
+
+.block-switcher.is-visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.block-switcher.hover-switcher::after {
+	content: '';
+	position: absolute;
+	left: 100%;
+	top: 0;
+	height: 100%;
+	width: 2px;
+	background-color: #e0e5e9;
 }
 
 .block-switcher svg {
@@ -143,11 +147,11 @@ img.is-selected {
 }
 
 .block-switcher svg.up {
-	top: -6px;
+	top: 12px;
 }
 
 .block-switcher svg.down {
-	bottom: -6px;
+	top: 34px;
 }
 
 .block-switcher .type {
@@ -156,7 +160,7 @@ img.is-selected {
     display: block;
     position: absolute;
 	right: 6px;
-	top: 6px;
+	top: 24px;
 }
 
 .block-switcher .type svg { /* node type js picks icon here */

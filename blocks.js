@@ -220,7 +220,7 @@ var config = {
 
 var editor = queryFirst( '.editor' );
 var switcher = queryFirst( '.block-switcher' );
-var switcherButtons = query( '.block-switcher .type svg' );
+var hoverSwitcher;
 var switcherMenu = queryFirst( '.switch-block__menu' );
 var dockedControls = queryFirst( '.docked-controls' );
 var insertBlockButton = queryFirst( '.insert-block__button' );
@@ -244,6 +244,7 @@ var KEY_ARROW_DOWN = 40;
 
 // Editor Variables
 var selectedBlock = null;
+var hoveredBlock = null;
 
 // Block Menu Variables
 var previouslyFocusedBlock = null;
@@ -275,6 +276,7 @@ insertBlockMenu.addEventListener( 'click', function( event ) {
 	event.stopPropagation();
 }, false );
 
+createHoverSwitcher();
 attachBlockHandlers();
 attachControlActions();
 attachTypeSwitcherActions();
@@ -284,16 +286,28 @@ attachKeyboardShortcuts();
 /**
  * Core logic
  */
+function createHoverSwitcher() {
+	hoverSwitcher = switcher.cloneNode( true );
+	hoverSwitcher.classList.add( 'hover-switcher' );
+	hoverSwitcher.addEventListener( 'mouseleave', hideHoverSwitcher );
+	document.body.appendChild( hoverSwitcher );
+}
+
 function attachBlockHandlers() {
 	getBlocks().forEach( function( block ) {
+		block.removeEventListener( 'mouseenter', hoverBlock, false );
+		block.addEventListener( 'mouseenter', hoverBlock, false );
+
+		block.removeEventListener( 'mouseleave', hoverBlock, false );
+		block.addEventListener( 'mouseleave', hoverBlock, false );
+
 		block.removeEventListener( 'click', selectBlock, false );
 		block.addEventListener( 'click', selectBlock, false );
 	} );
 }
 
 function getBlocks() {
-	return Array.prototype.concat.apply( [],
-			supportedBlockTags.map( query ) );
+	return query( supportedBlockTags.join(), editor );
 }
 
 function getFocusedBlock() {
@@ -302,6 +316,29 @@ function getFocusedBlock() {
 	} );
 
 	return focusedBlocks.length ? focusedBlocks[ 0 ] : null;
+}
+
+function hoverBlock( event ) {
+	var isHovered = 'mouseenter' === event.type,
+		position, blockType, iconQuery;
+
+	if ( isHovered ) {
+		if ( event.target === selectedBlock ) {
+			return;
+		}
+
+		hoveredBlock = event.target;
+		resetSwitcher( hoverSwitcher );
+		position = hoveredBlock.getBoundingClientRect();
+		blockType = getTagType( hoveredBlock.nodeName );
+		iconQuery = '.type-icon-' + blockType;
+		queryFirst( iconQuery, hoverSwitcher ).style.display = 'block';
+		hoverSwitcher.style.top = ( position.top + window.scrollY ) + 'px';
+		hoverSwitcher.style.height = ( position.bottom - position.top ) + 'px';
+		hoverSwitcher.classList.add( 'is-visible' );
+	} else {
+		hideHoverSwitcher( event );
+	}
 }
 
 function selectBlock( event ) {
@@ -319,24 +356,68 @@ function clearBlocks() {
 	} );
 	selectedBlock = null;
 
+	hideHoverSwitcher();
 	hideControls();
 	hideMenu();
 }
 
-function showControls( node ) {
-	// toggle block-specific switcher
-	switcherButtons.forEach( function( element ) {
-		element.style.display = 'none';
+function resetSwitcher( context ) {
+	var switcherButtons = query( '.type svg', context );
+
+	switcherButtons.forEach( function( button ) {
+		button.style.display = 'none';
+		button.addEventListener( 'click', showSwitcherMenu, false );
 	} );
 
+	context.addEventListener( 'click', moveBlock );
+}
+
+function moveBlock( event ) {
+	event.stopPropagation();
+
+	var button = event.target.closest( 'svg' );
+	if ( ! button ) {
+		return;
+	}
+
+	var classes = button.className.baseVal;
+	var getter = {
+		up: getPreviousSibling,
+		down: getNextSibling
+	}[ classes ];
+
+	if ( ! getter ) {
+		return;
+	}
+
+	var closestSwitcher = button.closest( '.block-switcher' );
+	if ( ! closestSwitcher ) {
+		return;
+	}
+
+	var target = closestSwitcher.classList.contains( 'hover-switcher' ) ? hoveredBlock : selectedBlock;
+	if ( ! target ) {
+		return;
+	}
+
+	var previousOffset = target.offsetTop;
+	swapNodes( target, getter( target ) );
+	attachBlockHandlers();
+	reselect();
+	window.scrollTo( window.scrollX, window.scrollY + target.offsetTop - previousOffset );
+}
+
+function showControls( node ) {
+	// toggle block-specific switcher
+	resetSwitcher( switcher );
 	var blockType = getTagType( node.nodeName );
 	var switcherQuery = '.type-icon-' + blockType;
 	queryFirst( switcherQuery ).style.display = 'block';
 
 	// reposition switcher
 	var position = node.getBoundingClientRect();
-	switcher.style.opacity = 1;
-	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
+	switcher.classList.add( 'is-visible' );
+	switcher.style.top = ( position.top + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
 	dockedControls.className = 'docked-controls';
@@ -377,44 +458,28 @@ function updateDockedControlsPosition( newClassName ) {
 	dockedControls.style.left = leftPosition ? leftPosition + 'px' : null;
 }
 
+function hideHoverSwitcher( event ) {
+	// Continue showing while moving from block to switcher, or from switcher
+	// to switcher menu options
+	if ( event && ( hoverSwitcher === event.relatedTarget || switcherMenu.contains( event.relatedTarget ) ) ) {
+		return;
+	}
+
+	hoverSwitcher.classList.remove( 'is-visible' );
+	hoveredBlock = null;
+}
+
 function hideControls() {
-	switcher.style.opacity = 0;
+	switcher.classList.remove( 'is-visible' );
 	switcherMenu.style.display = 'none';
 	dockedControls.style.display = 'none';
 }
 
 function attachControlActions() {
-	Array.from( switcher.childNodes ).forEach( function( node ) {
-		if ( 'svg' !== node.nodeName ) {
-			return;
-		}
-
-		var classes = node.className.baseVal;
-		var getter = {
-			up: getPreviousSibling,
-			down: getNextSibling
-		}[ classes ];
-
-		if ( getter ) {
-			node.addEventListener( 'click', function( event ) {
-				event.stopPropagation();
-				var previousOffset = selectedBlock.offsetTop;
-				swapNodes( selectedBlock, getter( selectedBlock ) );
-				attachBlockHandlers();
-				reselect();
-				window.scrollTo( window.scrollX, window.scrollY + selectedBlock.offsetTop - previousOffset );
-			}, false );
-		}
-	} );
-
 	// Text block event handlers.
 	textAlignLeft.addEventListener( 'click', setTextAlignLeft, false );
 	textAlignCenter.addEventListener( 'click', setTextAlignCenter, false );
 	textAlignRight.addEventListener( 'click', setTextAlignRight, false );
-
-	switcherButtons.forEach( function( button ) {
-		button.addEventListener( 'click', showSwitcherMenu, false );
-	} );
 
 	// Image block event handlers.
 	imageFullBleed.addEventListener( 'click', setImageFullBleed, false );
@@ -430,24 +495,22 @@ function attachTypeSwitcherActions() {
 		heading: 'h2'
 	};
 
-	switcherButtons.forEach( function( button ) {
-		button.addEventListener( 'click', showSwitcherMenu, false );
-	} );
-
 	Object.keys( typeToTag ).forEach( function( type ) {
 		var iconSelector = '.switch-block__block .type-icon-' + type;
 		var button = queryFirst( iconSelector ).parentNode;
 		button.addEventListener( 'click', switchBlockType, false );
 
 		function switchBlockType( event ) {
-			if ( ! selectedBlock ) {
+			var switcherParent = switcherMenu._switcherParent;
+			if ( ! switcherParent ) {
 				return;
 			}
 
+			var target = switcherParent.classList.contains( 'hover-switcher' ) ? hoveredBlock : selectedBlock;
 			var openingRe = /^<\w+/;
 			var closingRe = /\w+>$/;
 			var tag = typeToTag[ type ];
-			selectedBlock.outerHTML = selectedBlock.outerHTML
+			target.outerHTML = target.outerHTML
 				.replace( openingRe, '<' + tag )
 				.replace( closingRe, tag + '>' );
 			clearBlocks();
@@ -611,7 +674,10 @@ function attachKeyboardShortcuts() {
 }
 
 function reselect() {
-	queryFirst( '.is-selected' ).click();
+	var selected = queryFirst( '.is-selected' );
+	if ( selected ) {
+		selected.click();
+	}
 }
 
 function swapNodes( a, b ) {
@@ -624,9 +690,17 @@ function swapNodes( a, b ) {
 		return false;
 	}
 
-	// insert node copies before removal
-	parent.replaceChild( b.cloneNode( true ), a );
-	parent.replaceChild( a.cloneNode( true ), b );
+	var isAfter = false;
+	var next = a;
+
+	do {
+		next = getNextSibling( next );
+		if ( next === b ) {
+			isAfter = true;
+		}
+	} while ( next );
+
+	parent.insertBefore.apply( parent, isAfter ? [ b, a ] : [ a, b ] );
 
 	return true;
 }
@@ -680,14 +754,15 @@ function hideMenu() {
 function showSwitcherMenu( event ) {
 	event.stopPropagation();
 
-	if ( ! selectedBlock ) {
+	var switcherParent = event.target.closest( '.block-switcher' );
+	if ( ! switcherParent ) {
 		return;
 	}
 
 	// not all block types can be converted to all block types.
 	// filter which lists of types are shown in the menu depending on the
 	// selected block, based on _kinds_ (see config)
-	var blockType = getTagType( selectedBlock.nodeName );
+	var blockType = getTagType( switcherParent.nodeName );
 	var kinds = getTypeKinds( blockType );
 	var validClasses = kinds.map( function( kind ) {
 		return 'switch-block__block-list-' + kind;
@@ -698,10 +773,11 @@ function showSwitcherMenu( event ) {
 	} );
 
 	// position switcher menu next to type icon
-	var position = switcher.getBoundingClientRect();
-	switcherMenu.style.top = ( position.top + 42 + window.scrollY ) + 'px';
+	var position = switcherParent.getBoundingClientRect();
+	switcherMenu.style.top = ( position.top + 60 + window.scrollY ) + 'px';
 	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
+	switcherMenu._switcherParent = switcherParent;
 }
 
 function setElementState( className, event ) {
@@ -727,12 +803,12 @@ function l( data ) {
 	return data;
 }
 
-function query( selector ) {
-	return Array.from( document.querySelectorAll( selector ) );
+function query( selector, context ) {
+	return Array.from( ( context || document ).querySelectorAll( selector ) );
 }
 
-function queryFirst( selector ) {
-	return query( selector )[ 0 ];
+function queryFirst( selector, context ) {
+	return query( selector, context )[ 0 ];
 }
 
 function getConfig( configName, tagName ) {
@@ -744,4 +820,22 @@ function containsOneOf( element, classes ) {
 	return classes.some( function( className ) {
 		return element.classList.contains( className );
 	} );
+}
+
+/**
+ * Polyfills
+ */
+if ( window.Element && ! Element.prototype.closest ) {
+	Element.prototype.closest = function( selector ) {
+		var matches = ( this.document || this.ownerDocument ).querySelectorAll( selector ),
+			el = this,
+			i;
+
+		do {
+			i = matches.length;
+			while ( --i >= 0 && matches.item( i ) !== el ) {};
+		} while ( ( i < 0 ) && ( el = el.parentElement ) );
+
+		return el;
+	};
 }
