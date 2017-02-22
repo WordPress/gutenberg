@@ -501,11 +501,12 @@ function attachTypeSwitcherActions() {
 		button.addEventListener( 'click', switchBlockType, false );
 
 		function switchBlockType( event ) {
-			var target = selectedBlock || hoveredBlock;
-			if ( ! target ) {
+			var switcherParent = switcherMenu._switcherParent;
+			if ( ! switcherParent ) {
 				return;
 			}
 
+			var target = switcherParent.classList.contains( 'hover-switcher' ) ? hoveredBlock : selectedBlock;
 			var openingRe = /^<\w+/;
 			var closingRe = /\w+>$/;
 			var tag = typeToTag[ type ];
@@ -749,15 +750,15 @@ function hideMenu() {
 function showSwitcherMenu( event ) {
 	event.stopPropagation();
 
-	var target = event.target.closest( '.block-switcher' );
-	if ( ! target ) {
+	var switcherParent = event.target.closest( '.block-switcher' );
+	if ( ! switcherParent ) {
 		return;
 	}
 
 	// not all block types can be converted to all block types.
 	// filter which lists of types are shown in the menu depending on the
 	// selected block, based on _kinds_ (see config)
-	var blockType = getTagType( target.nodeName );
+	var blockType = getTagType( switcherParent.nodeName );
 	var kinds = getTypeKinds( blockType );
 	var validClasses = kinds.map( function( kind ) {
 		return 'switch-block__block-list-' + kind;
@@ -768,10 +769,11 @@ function showSwitcherMenu( event ) {
 	} );
 
 	// position switcher menu next to type icon
-	var position = target.getBoundingClientRect();
+	var position = switcherParent.getBoundingClientRect();
 	switcherMenu.style.top = ( position.top + 60 + window.scrollY ) + 'px';
 	switcherMenu.style.left = ( position.left - 32 + window.scrollX ) + 'px';
 	switcherMenu.style.display = 'block';
+	switcherMenu._switcherParent = switcherParent;
 }
 
 function setElementState( className, event ) {
