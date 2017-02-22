@@ -17,6 +17,7 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 			'wordpress.org/'         => array( 'domain' => 'wordpress.org', 'path' => '/' ),
 			'make.wordpress.org/'    => array( 'domain' => 'make.wordpress.org', 'path' => '/' ),
 			'wordpress.org/one/'     => array( 'domain' => 'wordpress.org', 'path' => '/one/' ),
+			'wordpress.org/one/b/'   => array( 'domain' => 'wordpress.org', 'path' => '/one/b/' ),
 			'wordpress.net/'         => array( 'domain' => 'wordpress.net', 'path' => '/' ),
 			'www.wordpress.net/'     => array( 'domain' => 'www.wordpress.net', 'path' => '/' ),
 			'www.wordpress.net/two/' => array( 'domain' => 'www.wordpress.net', 'path' => '/two/' ),
@@ -80,12 +81,71 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 			array( 'wordpress.net/',         'wordpress.net',       '/notapath/', 'A missing path on a top level domain should find the correct network.' ),
 			array( 'www.wordpress.net/',     'www.wordpress.net',   '/notapath/', 'A missing path should find the correct network.' ),
 			array( 'wordpress.org/one/',     'www.wordpress.org',   '/one/',      'Should find the path despite the www.' ),
+			array( 'wordpress.org/one/',     'wordpress.org',       '/one/page/', 'A request with two path segments should find the correct network.' ),
+			array( 'wordpress.org/one/b/',   'wordpress.org',       '/one/b/',    'A request with two valid path segments should find the correct network.' ),
 			array( 'wordpress.org/',         'site1.wordpress.org', '/one/',      'Should not find path because domains do not match.' ),
 			array( 'wordpress.net/three/',   'wordpress.net',       '/three/',    'A network can have a path.' ),
 			array( 'www.wordpress.net/two/', 'www.wordpress.net',   '/two/',      'A www network with a path can coexist with a non-www network.' ),
 			array( 'wordpress.net/',         'site1.wordpress.net', '/notapath/', 'An invalid subdomain should find the top level network domain.' ),
 			array( 'wordpress.net/',         'site1.wordpress.net', '/three/',    'An invalid subdomain and path should find the top level network domain.' ),
+			array( 'wordpress.net/',         'x.y.wordpress.net',   '/',          'An invalid two level subdomain should find the top level network domain.' ),
 		);
+	}
+
+	/**
+	 * @ticket 37217
+	 * @dataProvider data_get_network_by_path_not_using_paths
+	 *
+	 * @param string $expected_key The array key associated with expected data for the test.
+	 * @param string $domain       The requested domain.
+	 * @param string $path         The requested path.
+	 * @param string $message      The message to pass for failed tests.
+	 */
+	public function test_get_network_by_path_not_using_paths( $expected_key, $domain, $path, $message ) {
+		if ( ! wp_using_ext_object_cache() ) {
+			$this->markTestSkipped( 'Only testable with an external object cache.' );
+		}
+
+		// Temporarily store original object cache and using paths values.
+		$using_paths_orig = wp_cache_get( 'networks_have_paths', 'site-options' );
+
+		wp_cache_set( 'networks_have_paths', 0, 'site-options'  );
+
+		$network = get_network_by_path( $domain, $path );
+
+		// Restore original object cache and using paths values.
+		wp_cache_set( 'networks_have_paths', $using_paths_orig, 'site-options' );
+
+		$this->assertEquals( self::$network_ids[ $expected_key ], $network->id, $message );
+	}
+
+	public function data_get_network_by_path_not_using_paths() {
+		return array(
+			array( 'wordpress.org/',         'wordpress.org',       '/',          'A standard domain and path request should work.' ),
+			array( 'wordpress.net/',         'wordpress.net',       '/notapath/', 'A network matching a top level domain should be found regardless of path.' ),
+			array( 'www.wordpress.net/',     'www.wordpress.net',   '/notapath/', 'A network matching a domain should be found regardless of path.' ),
+			array( 'wordpress.org/',         'www.wordpress.org',   '/one/',      'Should find the network despite the www and regardless of path.' ),
+			array( 'wordpress.org/',         'site1.wordpress.org', '/one/',      'Should find the network with the corresponding top level domain regardless of path.' ),
+			array( 'www.wordpress.net/',     'www.wordpress.net',   '/two/',      'A www network can coexist with a non-www network.' ),
+			array( 'make.wordpress.org/',    'make.wordpress.org',  '/notapath/', 'A subdomain network should be found regardless of path.' ),
+			array( 'wordpress.net/',         'x.y.wordpress.net',   '/',          'An invalid two level subdomain should find the top level network domain.' ),
+		);
+	}
+
+	/**
+	 * Even if a matching network is available, it should not match if the the filtered
+	 * value for network path segments is fewer than the number of paths passed.
+	 */
+	public function test_get_network_by_path_with_forced_single_path_segment_returns_single_path_network() {
+		add_filter( 'network_by_path_segments_count', array( $this, 'filter_network_path_segments' ) );
+		$network = get_network_by_path( 'wordpress.org', '/one/b/' );
+		remove_filter( 'network_by_path_segments_count', array( $this, 'filter_network_path_segments' ) );
+
+		$this->assertEquals( self::$network_ids[ 'wordpress.org/one/' ], $network->id );
+	}
+
+	public function filter_network_path_segments() {
+		return 1;
 	}
 
 	/**
