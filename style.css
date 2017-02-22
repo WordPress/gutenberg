@@ -104,6 +104,7 @@ img.is-selected {
 
 .block-switcher {
 	opacity: 0;
+	pointer-events: none;
 	margin-left: -54px;
 	height: 36px;
 	width: 54px;
@@ -112,8 +113,9 @@ img.is-selected {
 	transform: translateZ(0);
 }
 
-.block-switcher.hover-switcher {
+.block-switcher.is-visible {
 	opacity: 1;
+	pointer-events: auto;
 }
 
 .block-switcher.hover-switcher::after {

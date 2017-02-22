@@ -335,7 +335,7 @@ function hoverBlock( event ) {
 		queryFirst( iconQuery, hoverSwitcher ).style.display = 'block';
 		hoverSwitcher.style.top = ( position.top + window.scrollY ) + 'px';
 		hoverSwitcher.style.height = ( position.bottom - position.top ) + 'px';
-		hoverSwitcher.style.opacity = 1;
+		hoverSwitcher.classList.add( 'is-visible' );
 	} else {
 		hideHoverSwitcher( event );
 	}
@@ -416,7 +416,7 @@ function showControls( node ) {
 
 	// reposition switcher
 	var position = node.getBoundingClientRect();
-	switcher.style.opacity = 1;
+	switcher.classList.add( 'is-visible' );
 	switcher.style.top = ( position.top + window.scrollY ) + 'px';
 
 	// show/hide block-specific block controls
@@ -465,12 +465,12 @@ function hideHoverSwitcher( event ) {
 		return;
 	}
 
-	hoverSwitcher.style.opacity = 0;
+	hoverSwitcher.classList.remove( 'is-visible' );
 	hoveredBlock = null;
 }
 
 function hideControls() {
-	switcher.style.opacity = 0;
+	switcher.classList.remove( 'is-visible' );
 	switcherMenu.style.display = 'none';
 	dockedControls.style.display = 'none';
 }
