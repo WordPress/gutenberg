@@ -93,7 +93,7 @@ h6:hover,
 p:hover,
 blockquote:hover,
 img:hover {
-	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
+	box-shadow: inset 9px 0px 0px -7px #e0e5e9;
 }
 
 h1.is-selected,
