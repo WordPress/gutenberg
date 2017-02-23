@@ -37,6 +37,8 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 		$this->assertTrue( is_array( $routes ), '`get_routes` should return an array.' );
 		$this->assertTrue( ! empty( $routes ), 'Routes should not be empty.' );
 
+		$routes = array_filter( array_keys( $routes ), array( $this, 'is_builtin_route' ) );
+
 		$expected_routes = array(
 			'/',
 			'/oembed/1.0',
@@ -70,7 +72,15 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'/wp/v2/settings',
 		);
 
-		$this->assertEquals( $expected_routes, array_keys( $routes ) );
+		$this->assertEquals( $expected_routes, $routes );
+	}
+
+	private function is_builtin_route( $route ) {
+		return (
+			'/' === $route ||
+			preg_match( '#^/oembed/1\.0(/.+)?$#', $route ) ||
+			preg_match( '#^/wp/v2(/.+)?$#', $route )
+		);
 	}
 
 	public function test_build_wp_api_client_fixtures() {
