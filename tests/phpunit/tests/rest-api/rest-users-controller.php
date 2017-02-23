@@ -675,10 +675,15 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users/' . $lolz );
 		$request->set_param( 'context', 'edit' );
 		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
 
-		$this->assertEquals( $data['capabilities'], new stdClass() );
-		$this->assertEquals( $data['extra_capabilities'], new stdClass() );
+		if ( is_multisite() ) {
+			$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+		} else {
+			$data = $response->get_data();
+
+			$this->assertEquals( $data['capabilities'], new stdClass() );
+			$this->assertEquals( $data['extra_capabilities'], new stdClass() );
+		}
 	}
 
 	public function test_cannot_get_item_without_permission() {
@@ -1034,44 +1039,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 				$this->assertEquals( 'Sorry, that email address is already used!', $error['message'] );
 			}
 		}
-	}
-
-	public function test_update_existing_network_user_on_sub_site_adds_user_to_site() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite.' );
-		}
-
-		$this->allow_user_to_manage_multisite();
-
-		$params = array(
-			'username' => 'testuser123',
-			'password' => 'testpassword',
-			'email'    => 'test@example.com',
-			'name'     => 'Test User 123',
-			'roles'    => array( 'editor' ),
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/users' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$request->set_body_params( $params );
-		$response = $this->server->dispatch( $request );
-		$data = $response->get_data();
-		$user_id = $data['id'];
-
-		switch_to_blog( self::$site );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/users/' . $user_id );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-		$request->set_body_params( $params );
-		$this->server->dispatch( $request );
-
-		restore_current_blog();
-
-		$user_is_member = is_user_member_of_blog( $user_id, self::$site );
-
-		wpmu_delete_user( $user_id );
-
-		$this->assertTrue( $user_is_member );
 	}
 
 	public function test_json_create_user() {
@@ -2187,6 +2154,140 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 
 		global $wp_rest_additional_fields;
 		$wp_rest_additional_fields = array();
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_get_item_from_different_site_as_site_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d', $user_id ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_get_item_from_different_site_as_network_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$superadmin );
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/users/%d', $user_id ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_update_item_from_different_site_as_site_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( array( 'first_name' => 'New Name' ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_update_item_from_different_site_as_network_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$superadmin );
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params( array( 'first_name' => 'New Name' ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_delete_item_from_different_site_as_site_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$user );
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'force', true );
+		$request->set_param( 'reassign', false );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @ticket 39701
+	 */
+	public function test_delete_item_from_different_site_as_network_administrator() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs in multisite' );
+		}
+
+		switch_to_blog( self::$site );
+		$user_id = $this->factory->user->create( array(
+			'role' => 'author',
+		) );
+		restore_current_blog();
+
+		wp_set_current_user( self::$superadmin );
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/wp/v2/users/%d', $user_id ) );
+		$request->set_param( 'force', true );
+		$request->set_param( 'reassign', false );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertErrorResponse( 'rest_user_invalid_id', $response, 404 );
 	}
 
 	public function additional_field_get_callback( $object ) {
