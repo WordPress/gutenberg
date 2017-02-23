@@ -1,0 +1,85 @@
+body {
+	background: #f3f6f8;
+	color: #2f4452;
+	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
+	font-size: 1.25em;
+	line-height: 1.5;
+	margin: 1em;
+}
+
+a {
+	color: inherit;
+}
+
+nav {
+	font-size: 16px;
+}
+
+nav:target {
+	display: none;
+}
+
+nav li.is-active {
+	font-weight: bold;
+}
+
+#editor {
+	background: #fff;
+	margin: 5em auto;
+	outline: none;
+	padding: 5em;
+	width: 37.5em;
+}
+
+#editor iframe {
+	max-width: 100%;
+	border: 0;
+}
+
+#editor img {
+	max-width: 100%;
+	height: auto;
+}
+
+#editor figure {
+	margin: 0;
+}
+
+#editor figure.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#editor figure.alignleft {
+	float: left;
+	margin: 0.5em 1em 0.5em 0;
+	width: 50%;
+}
+
+#editor figure.alignright {
+	float: right;
+	margin: 0.5em 0 0.5em 1em;
+	width: 50%;
+}
+
+#editor figcaption {
+	font-size: 0.8em;
+	margin-top: 0.5em;
+}
+
+#editor figure img {
+	display: block;
+}
+
+#editor pre {
+	overflow: auto;
+}
+
+#editor:after {
+   content: ".";
+   visibility: hidden;
+   display: block;
+   height: 0;
+   clear: both;
+}

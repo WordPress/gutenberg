@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Editor Blocks Demo (Single TinyMCE Instance)</title>
+		<link rel="stylesheet" type="text/css" href="https://s1.wp.com/i/fonts/merriweather/merriweather.css?v=20160210">
+		<link rel="stylesheet" type="text/css" href="../shared/index.css">
+	</head>
+	<body>
+		<!-- Target to hide: #user-test -->
+		<nav id="user-test">
+			<ol>
+				<li><a href="../">Main UI prototype</a></li>
+				<li><a href="../tinymce-per-block/">TinyMCE Instance per Block</a></li>
+				<li class="is-active">Single TinyMCE Instance</li>
+			</ol>
+		</nav>
+		<div id="editor">
+			<h1>1.0 Is The Loneliest Number</h1>
+
+			<p>Many entrepreneurs idolize Steve Jobs. He’s such a perfectionist, they say. Nothing leaves the doors of 1 Infinite Loop in Cupertino without a polish and finish that makes geeks everywhere drool. No compromise!</p>
+
+			<figure>
+				<img src="https://cldup.com/HN3-c7ER9p.jpg" alt="">
+			</figure>
+
+			<p>I like Apple for the opposite reason: they’re not afraid of getting a rudimentary 1.0 out into the world.</p>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.3/tinymce.min.js"></script>
+		<script src="../shared/tinymce/clean-paste.js"></script>
+		<script src="../shared/tinymce/toolbar.js"></script>
+		<script src="../shared/tinymce/wplink.js"></script>
+		<script src="../shared/tinymce/wptextpattern.js"></script>
+		<link rel="stylesheet" type="text/css" href="tinymce/block.css">
+		<script src="tinymce/block.js"></script>
+		<script src="tinymce/formatting.js"></script>
+		<script src="tinymce/new.js"></script>
+		<script src="tinymce/config.js"></script>
+	</body>
+</html>
