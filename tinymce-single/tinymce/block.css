@@ -1,9 +1,13 @@
+#editor img[data-mce-selected] {
+	outline: none;
+}
+
 #editor img::selection {
 	background-color: transparent;
 }
 
 #editor *[data-mce-selected="block"] {
-	outline: 2px solid #87a6bc;
+	outline: 2px solid #e0e5e9;
 	outline-offset: 11px;
 	/*background-color: rgba( 135, 166, 188, 0.3 );
 	box-shadow: 0px 0px 0px 11px rgba( 135, 166, 188, 0.3 );
