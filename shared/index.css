@@ -7,6 +7,10 @@ body {
 	margin: 1em;
 }
 
+a {
+	color: inherit;
+}
+
 #editor {
 	background: #fff;
 	margin: 5em auto;
