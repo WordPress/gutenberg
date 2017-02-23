@@ -7,6 +7,7 @@ window.tinymce.init( {
 	keep_styles: false,
 	menubar: false,
 	object_resizing: false,
+	plugins: [ 'logger', 'paste' ],
 	schema: 'html5-strict',
 	selector: 'section',
 	theme: false,
