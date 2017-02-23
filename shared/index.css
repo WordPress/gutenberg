@@ -7,28 +7,16 @@ body {
 	margin: 1em;
 }
 
-a {
-	color: inherit;
-}
-
-nav {
-	font-size: 16px;
-}
-
-nav:target {
-	display: none;
-}
-
-nav li.is-active {
-	font-weight: bold;
-}
-
 #editor {
 	background: #fff;
 	margin: 5em auto;
 	outline: none;
 	padding: 5em;
 	width: 37.5em;
+}
+
+#editor a {
+	color: inherit;
 }
 
 #editor iframe {
