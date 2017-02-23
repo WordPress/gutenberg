@@ -7,16 +7,16 @@ body {
 	margin: 1em;
 }
 
-a {
-	color: inherit;
-}
-
 #editor {
 	background: #fff;
 	margin: 5em auto;
 	outline: none;
 	padding: 5em;
 	width: 37.5em;
+}
+
+#editor a {
+	color: inherit;
 }
 
 #editor iframe {
