@@ -26,8 +26,6 @@ Gutenberg is the project name. Conversations and discussions take place in #core
 
 These mockups are all subject to change and feedback.
 
-See also, <a href="https://projects.invisionapp.com/share/NMAHISEE5#/screens/219366717">clickable prototype</a>.
-
 **Formatting**
 
 ![Hover](mockups/Formatting, Hover.png)
@@ -52,6 +50,12 @@ See also, <a href="https://projects.invisionapp.com/share/NMAHISEE5#/screens/219
 ![Quote 2](mockups/Quote 2.png)
 ![Headings](mockups/Headings.png)
 
-**Mobile**
+**Early Desktop Chrome Concept**
+
+**Note:** This is how it _could_ look.
+
+![Desktop](mockups/Admin Chrome, Sidebar Open.png)
+
+**Early Mobile Chrome Concept**
 
 ![Mobile](mockups/Mobile.png)
