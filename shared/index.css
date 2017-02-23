@@ -7,22 +7,6 @@ body {
 	margin: 1em;
 }
 
-a {
-	color: inherit;
-}
-
-nav {
-	font-size: 16px;
-}
-
-nav:target {
-	display: none;
-}
-
-nav li.is-active {
-	font-weight: bold;
-}
-
 #editor {
 	background: #fff;
 	margin: 5em auto;
