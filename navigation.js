@@ -8,7 +8,8 @@
 	 */
 	PROTOTYPES = {
 		'/': 'UI Prototype',
-		'/tinymce-per-block/': 'TinyMCE per block prototype'
+		'/tinymce-per-block/': 'TinyMCE per block prototype',
+		'/dom-parser/': 'DOM Parsing Prototype'
 	};
 
 	// Generate Navigation DOM
