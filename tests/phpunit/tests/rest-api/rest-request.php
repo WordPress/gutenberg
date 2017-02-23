@@ -203,11 +203,22 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertEmpty( $this->request->get_param( 'has_json_params' ) );
 	}
 
+	public function non_post_http_methods_with_request_body_provider() {
+		return array(
+			array( 'PUT' ),
+			array( 'PATCH' ),
+			array( 'DELETE' ),
+		);
+	}
+
 	/**
-	 * PUT requests don't get $_POST automatically parsed, so ensure that
-	 * WP_REST_Request does it for us.
+	 * Tests that methods supporting request bodies have access to the
+	 * request's body.  For POST this is straightforward via `$_POST`; for
+	 * other methods `WP_REST_Request` needs to parse the body for us.
+	 *
+	 * @dataProvider non_post_http_methods_with_request_body_provider
 	 */
-	public function test_parameters_for_put() {
+	public function test_non_post_body_parameters( $request_method ) {
 		$data = array(
 			'foo' => 'bar',
 			'alot' => array(
@@ -219,11 +230,9 @@ class Tests_REST_Request extends WP_UnitTestCase {
 				'stuff',
 			),
 		);
-
-		$this->request->set_method( 'PUT' );
+		$this->request->set_method( $request_method );
 		$this->request->set_body_params( array() );
 		$this->request->set_body( http_build_query( $data ) );
-
 		foreach ( $data as $key => $expected_value ) {
 			$this->assertEquals( $expected_value, $this->request->get_param( $key ) );
 		}
