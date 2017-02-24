@@ -1251,7 +1251,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $post_date, $post->post_date );
 
 		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
-		// TODO expect null here for drafts (see https://core.trac.wordpress.org/ticket/5698#comment:14)
 		$post_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
 		$this->assertEquals( $post_date_gmt, $post->post_date_gmt );
 	}
@@ -1350,15 +1349,27 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 	public function test_create_post_as_contributor() {
 		wp_set_current_user( self::$contributor_id );
+		update_option( 'timezone_string', 'America/Chicago' );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
-		$params = $this->set_post_data(array(
+		$params = $this->set_post_data( array(
+			// This results in a special `post_date_gmt` value of
+			// '0000-00-00 00:00:00'.  See #38883.
 			'status' => 'pending',
-		));
+		) );
 
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+
+		$data = $response->get_data();
+		$post = get_post( $data['id'] );
+		$this->assertEquals( '0000-00-00 00:00:00', $post->post_date_gmt );
+		$this->assertNotEquals( '0000-00-00T00:00:00', $data['date_gmt'] );
+
 		$this->check_create_post_response( $response );
+
+		update_option( 'timezone_string', '' );
 	}
 
 	public function test_create_post_sticky() {
@@ -1431,9 +1442,12 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$new_post = get_post( $data['id'] );
 		$this->assertEquals( 'draft', $data['status'] );
 		$this->assertEquals( 'draft', $new_post->post_status );
-		// Confirm dates are null
-		$this->assertNull( $data['date_gmt'] );
-		$this->assertNull( $data['modified_gmt'] );
+		// Confirm dates are shimmed for gmt_offset
+		$post_modified_gmt = date( 'Y-m-d H:i:s', strtotime( $new_post->post_modified ) + ( get_option( 'gmt_offset' ) * 3600 ) );
+		$post_date_gmt = date( 'Y-m-d H:i:s', strtotime( $new_post->post_date ) + ( get_option( 'gmt_offset' ) * 3600 ) );
+
+		$this->assertEquals( mysql_to_rfc3339( $post_modified_gmt ), $data['modified_gmt'] );
+		$this->assertEquals( mysql_to_rfc3339( $post_date_gmt ), $data['date_gmt'] );
 	}
 
 	public function test_create_post_private() {
@@ -2118,7 +2132,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $post_date, $post->post_date );
 
 		$this->assertEquals( $results['date_gmt'], $data['date_gmt'] );
-		// TODO expect null here for drafts (see https://core.trac.wordpress.org/ticket/5698#comment:14)
 		$post_date_gmt = str_replace( 'T', ' ', $results['date_gmt'] );
 		$this->assertEquals( $post_date_gmt, $post->post_date_gmt );
 	}
@@ -2147,6 +2160,57 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	public function test_empty_post_date_gmt_shimmed_using_post_date() {
+		global $wpdb;
+
+		wp_set_current_user( self::$editor_id );
+		update_option( 'timezone_string', 'America/Chicago' );
+
+		// Need to set dates using wpdb directly because `wp_update_post` and
+		// `wp_insert_post` have additional validation on dates.
+		$post_id = $this->factory->post->create();
+		$wpdb->update(
+			$wpdb->posts,
+			array(
+				'post_date'     => '2016-02-23 12:00:00',
+				'post_date_gmt' => '0000-00-00 00:00:00',
+			),
+			array(
+				'ID' => $post_id,
+			),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+		wp_cache_delete( $post_id, 'posts' );
+
+		$post = get_post( $post_id );
+		$this->assertEquals( $post->post_date,     '2016-02-23 12:00:00' );
+		$this->assertEquals( $post->post_date_gmt, '0000-00-00 00:00:00' );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', $post_id ) );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+
+		$this->assertEquals( '2016-02-23T12:00:00', $data['date'] );
+		$this->assertEquals( '2016-02-23T18:00:00', $data['date_gmt'] );
+
+		$request = new WP_REST_Request( 'PUT', sprintf( '/wp/v2/posts/%d', $post_id ) );
+		$request->set_param( 'date', '2016-02-23T13:00:00' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+
+		$this->assertEquals( '2016-02-23T13:00:00', $data['date'] );
+		$this->assertEquals( '2016-02-23T19:00:00', $data['date_gmt'] );
+
+		$post = get_post( $post_id );
+		$this->assertEquals( $post->post_date,     '2016-02-23 13:00:00' );
+		$this->assertEquals( $post->post_date_gmt, '2016-02-23 19:00:00' );
+
+		update_option( 'timezone_string', '' );
 	}
 
 	public function test_update_post_slug() {
