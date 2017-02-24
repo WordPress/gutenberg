@@ -8,7 +8,6 @@
 
 #editor *[data-mce-selected="block"] {
 	outline: 2px solid #e0e5e9;
-	outline-offset: 11px;
 	/*background-color: rgba( 135, 166, 188, 0.3 );
 	box-shadow: 0px 0px 0px 11px rgba( 135, 166, 188, 0.3 );
 	position: relative;*/
@@ -178,13 +177,13 @@ div.mce-inline-toolbar-grp {
 	border: 1px solid #e1e6ea;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	box-sizing: border-box;
-	margin-bottom: 8px;
 	position: absolute;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 	max-width: 98%;
+	margin-left: 20px;
 }
 
 div.mce-inline-toolbar-grp:not(.block-toolbar) {
@@ -232,6 +231,15 @@ div.mce-inline-toolbar-grp.block-toolbar {
 	border: none;
 	background: none;
 	box-shadow: none;
+}
+
+.block-toolbar svg {
+	fill: #86909c;
+}
+
+.block-toolbar svg:hover {
+	cursor: pointer;
+	fill: #191e23;
 }
 
 .mce-btn.mce-move-up {
