@@ -433,6 +433,10 @@
 						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 					})
 
+					setTimeout( function() {
+						editor.nodeChanged();
+					}, 500 );
+
 					this.show()
 				}
 

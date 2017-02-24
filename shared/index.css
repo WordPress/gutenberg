@@ -30,11 +30,13 @@ body {
 }
 
 #editor figure {
+	float: none;
 	margin: 0;
+	width: 100%;
+    transition: margin 0.5s, width 0.5s;
 }
 
 #editor figure.aligncenter {
-	display: block;
 	margin-left: auto;
 	margin-right: auto;
 }
