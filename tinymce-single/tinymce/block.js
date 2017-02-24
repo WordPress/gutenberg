@@ -144,9 +144,15 @@
 						var button = this;
 
 						editor.on( 'nodechange', function( event ) {
-							element = event.parents[ event.parents.length - 1 ];
+							$element = editor.$( event.parents[ event.parents.length - 1 ] );
 
-							button.active( editor.$( element ).hasClass( 'align' + position ) );
+							if ( position === 'center' ) {
+								button.active( ! (
+									$element.hasClass( 'alignleft' ) || $element.hasClass( 'alignright' )
+								) );
+							} else {
+								button.active( $element.hasClass( 'align' + position ) );
+							}
 						} );
 					}
 				} );
