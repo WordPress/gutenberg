@@ -192,4 +192,44 @@
 		} );
 	} );
 
+// Test the jswidget custom namespace and endpoints.
+wp.api.init( {
+	'versionString': 'js-widgets/v1/'
+} ).done( function() {
+		var customClasses = [
+			'WidgetsArchives',
+			'WidgetsCalendar',
+			'WidgetsCategories',
+			'WidgetsMeta',
+			'WidgetsNav_menu',
+			'WidgetsPages',
+			'WidgetsPostCollection',
+			'WidgetsRecentComments',
+			'WidgetsRecentPosts',
+			'WidgetsRss',
+			'WidgetsSearch',
+			'WidgetsTag_cloud',
+			'WidgetsText'
+		];
+
+		// Check that we have and can get each model type.
+		_.each( customClasses, function( className ) {
+			QUnit.test( 'Checking ' + className + ' class name.' , function( assert ) {
+				var done = assert.async();
+
+				assert.expect( 2 );
+
+				wp.api.loadPromise.done( function() {
+					var theModel = new wp.api.models[ className ]();
+					assert.ok( theModel, 'We can instantiate wp.api.models.' + className );
+					var theCollection = new wp.api.collections[ className ]();
+					assert.ok( theCollection, 'We can instantiate wp.api.collections.' + className );
+					// Trigger Qunit async completion.
+					done();
+				} );
+			} );
+		} );
+
+	} );
+
 } )( window.QUnit );

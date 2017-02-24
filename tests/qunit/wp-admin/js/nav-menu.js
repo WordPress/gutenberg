@@ -7,7 +7,9 @@
 
 	// Fail if we don't see the expected number of events triggered in 1500 ms.
 	setTimeout( function() {
-		assert.equal(
+		// QUnit may load this file without running it, in which case `assert`
+		// will never be set to `assertPassed` below.
+		assert && assert.equal(
 			eventsFired,
 			eventsExpected,
 			eventsExpected + ' wpNavMenu events should fire.'

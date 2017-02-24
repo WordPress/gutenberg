@@ -1,4 +1,4 @@
-/* global mockedApiResponse, Backbone */
+/* global mockedApiResponse, Backbone, jsWidgetsEndpointSchema */
 /**
  * @var mockedApiResponse defined in wp-api-generated.js
  */
@@ -23,7 +23,8 @@ var pathToData = {
 	'wp-json/wp/v2/user': mockedApiResponse.UserModel,
 	'wp-json/wp/v2/taxonomy': mockedApiResponse.TaxonomyModel,
 	'wp-json/wp/v2/status': mockedApiResponse.StatusModel,
-	'wp-json/wp/v2/type': mockedApiResponse.TypeModel
+	'wp-json/wp/v2/type': mockedApiResponse.TypeModel,
+	'wp-json/js-widgets/v1/': jsWidgetsEndpointSchema
 };
 
 /**
