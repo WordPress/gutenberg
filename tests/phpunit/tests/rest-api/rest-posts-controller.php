@@ -914,20 +914,12 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $post2, $data[0]['id'] );
 	}
 
-	public function test_get_items_no_supported_post_formats() {
-		// This causes get_theme_support( 'post-formats' ) to return `true` (not an array)
-		add_theme_support( 'post-formats' );
-
+	public function test_get_items_all_post_formats() {
 		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 
-		// Set the expected state back for the rest of the tests.
-		global $_wp_theme_features;
-		unset( $_wp_theme_features['post-formats'] );
-		add_theme_support( 'post-formats', array( 'post', 'gallery' ) );
-
-		$formats = array( 'standard' );
+		$formats = array_values( get_post_format_slugs() );
 
 		$this->assertEquals( $formats, $data['schema']['properties']['format']['enum'] );
 	}
@@ -1575,8 +1567,10 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
 
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$data = $response->get_data();
+		$this->assertEquals( 'link', $data['format'] );
 	}
 
 	public function test_create_update_post_with_featured_media() {
@@ -2073,8 +2067,10 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		) );
 		$request->set_body_params( $params );
 		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
 
-		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$data = $response->get_data();
+		$this->assertEquals( 'link', $data['format'] );
 	}
 
 	public function test_update_post_ignore_readonly() {
