@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, forEach } from 'lodash';
+import { forEach } from 'lodash';
 import { createElement, Component, render } from 'wp-elements';
 
 /**
@@ -68,5 +68,5 @@ class App extends Component {
 
 render(
 	<App content={ window.content } />,
-	document.getElementById( 'root' )
+	document.querySelector( '.editor' )
 );

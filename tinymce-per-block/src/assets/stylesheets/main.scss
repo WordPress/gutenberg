@@ -1,3 +1,4 @@
+@import '../../../../shared/index';
 @import 'variables';
 @import 'animations';
 @import '~blocks/text-block/style';
@@ -11,14 +12,11 @@ html {
 }
 
 body {
-	margin: 60px auto;
-	max-width: 720px;
-	font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
-	color: #12181e;
 	height: 100%;
+	-webkit-font-smoothing: antialiased !important;
 }
 
-#root {
+.editor {
 	height: 100%;
 }
 
