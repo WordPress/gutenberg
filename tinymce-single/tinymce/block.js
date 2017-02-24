@@ -322,8 +322,8 @@
 
 				DOM.setStyles(toolbar, {
 					position: 'absolute',
-					left: contentRect.left + 50 + 'px',
-					top: elementRect.top + window.pageYOffset + 'px'
+					left: contentRect.left - 60 + 'px',
+					top: elementRect.top + window.pageYOffset + 22 + 'px'
 				} );
 
 			  this.show()
@@ -430,7 +430,7 @@
 					DOM.setStyles(toolbar, {
 						position: 'absolute',
 						left: elementRect.left + 'px',
-						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
+						top: elementRect.top + window.pageYOffset - toolbarRect.height + 'px'
 					})
 
 					setTimeout( function() {
