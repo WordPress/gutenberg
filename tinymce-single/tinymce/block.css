@@ -286,8 +286,8 @@ div.mce-inline-toolbar-grp.block-toolbar {
 	width: 20px;
 }*/
 
-.block-toolbar .mce-btn {
-	margin: 0;
+.block-toolbar {
+	margin-top: -6px;
 }
 
 .block-toolbar .mce-btn:hover,
