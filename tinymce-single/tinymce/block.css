@@ -187,6 +187,10 @@ div.mce-inline-toolbar-grp {
 	max-width: 98%;
 }
 
+div.mce-inline-toolbar-grp:not(.block-toolbar) {
+	transition: all 0.5s;
+}
+
 div.wp-link-preview {
 	float: left;
 	max-width: 694px;
@@ -200,12 +204,6 @@ div.wp-link-preview a {
 	font-size: 16px;
 	padding: 9px;
 	text-decoration: underline;
-	-webkit-transition-property: border, background, color;
-	transition-property: border, background, color;
-	-webkit-transition-duration: .05s;
-	transition-duration: .05s;
-	-webkit-transition-timing-function: ease-in-out;
-	transition-timing-function: ease-in-out;
 	cursor: pointer;
 }
 
