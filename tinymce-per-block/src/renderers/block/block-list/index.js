@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement } from 'wp-elements';
+import { createElement, Component } from 'wp-elements';
 import { map } from 'lodash';
 
 /**
@@ -9,35 +9,45 @@ import { map } from 'lodash';
  */
 import BlockListBlock from './block';
 
-function BlockList( { nodes, focusIndex, onFocusIndexChange, onChange } ) {
-	function onNodeChange( index, nextNode ) {
-		const nextNodes = [ ...nodes ];
-		nextNodes[ index ] = {
-			...nextNodes[ index ],
-			...nextNode
-		};
+class BlockList extends Component {
+	state = {
+		focusIndex: null
+	};
 
-		onChange( nextNodes );
+	onFocusIndexChange = ( index ) => {
+		this.setState( { focusIndex: index } );
 	}
 
-	return (
-		<div className="block-list">
-			{ map( nodes, ( node, index ) => {
-				const isFocused = index === focusIndex;
+	render( { content, onChange }, { focusIndex } ) {
+		function onNodeChange( index, nextNode ) {
+			const nextNodes = [ ...content ];
+			nextNodes[ index ] = {
+				...nextNodes[ index ],
+				...nextNode
+			};
 
-				return (
-					<BlockListBlock
-						key={ index }
-						tabIndex={ index }
-						isFocused={ isFocused }
-						onFocus={ () => onFocusIndexChange( index ) }
-						onFocusOut={ () => onFocusIndexChange( null ) }
-						onChange={ ( nextNode ) => onNodeChange( index, nextNode ) }
-						node={ node } />
-				);
-			} ) }
-		</div>
-	);
+			onChange( nextNodes );
+		}
+
+		return (
+			<div className="block-list">
+				{ map( content, ( node, index ) => {
+					const isFocused = index === focusIndex;
+
+					return (
+						<BlockListBlock
+							key={ index }
+							tabIndex={ index }
+							isFocused={ isFocused }
+							onFocus={ () => this.onFocusIndexChange( index ) }
+							onFocusOut={ () => this.onFocusIndexChange( null ) }
+							onChange={ ( nextNode ) => onNodeChange( index, nextNode ) }
+							node={ node } />
+					);
+				} ) }
+			</div>
+		);
+	}
 }
 
 export default BlockList;

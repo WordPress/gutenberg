@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { map, forEach } from 'lodash';
+import { createElement, Component, render } from 'wp-elements';
 
 /**
  * Internal dependencies
@@ -13,38 +14,59 @@ import 'assets/stylesheets/main.scss';
 import 'blocks/text-block';
 import 'blocks/image-block';
 
-function render( content, initialParsed = {} ) {
-	forEach( renderers, ( renderer, type ) => {
-		const parser = parsers[ type ];
-		const targetNode = document.getElementById( type );
+class App extends Component {
+	state = {
+		activeRenderer: 'block'
+	};
 
-		let parsedContent;
-		if ( initialParsed[ type ] ) {
-			parsedContent = initialParsed[ type ];
-		} else if ( parser ) {
-			parsedContent = parser.parse( content );
+	updateParsedContent = ( nextContent ) => {
+		if ( serializers[ this.state.activeRenderer ] ) {
+			this.updateContent( serializers[ this.state.activeRenderer ].serialize( nextContent ) );
 		} else {
-			parsedContent = content;
+			this.updateContent( nextContent );
 		}
+	}
 
-		// TODO: Consider whether there's a better way to (a) account for re-
-		// render during focusOut of block and (b) batch accumulated changes
+	toggleRenderer = () => {
+		this.setState( {
+			activeRenderer: this.state.activeRenderer === 'block' ? 'html' : 'block'
+		} );
+	}
 
-		function onChange( nextParsedContent ) {
-			const serializer = serializers[ type ];
-
-			let nextContent = nextParsedContent;
-			if ( serializer ) {
-				nextContent = serializer.serialize( nextContent );
+	updateContent( content ) {
+		const parsedContent = {};
+		forEach( renderers, ( renderer, type ) => {
+			const parser = parsers[ type ];
+			if ( parser ) {
+				parsedContent[ type ] = parser.parse( content );
+			} else {
+				parsedContent[ type ] = content;
 			}
+		} );
 
-			render( nextContent, {
-				[ type ]: nextParsedContent
-			} );
-		}
+		this.setState( {
+			content: parsedContent
+		} );
+	}
 
-		renderer( parsedContent, targetNode, onChange );
-	} );
+	componentWillMount() {
+		this.updateContent( this.props.content );
+	}
+
+	render( props, { content, activeRenderer } ) {
+		const Renderer = renderers[ activeRenderer ];
+		return (
+			<div class="renderers">
+				<button class="toggle-renderer" onClick={ this.toggleRenderer }>Html/Block</button>
+				<div class={ `renderer-${ activeRenderer }` }>
+					<Renderer content={ content[ activeRenderer ] } onChange={ this.updateParsedContent } />
+				</div>
+			</div>
+		);
+	}
 }
 
-render( window.content );
+render(
+	<App content={ window.content } />,
+	document.getElementById( 'root' )
+);
