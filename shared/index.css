@@ -4,7 +4,7 @@
 
 body {
 	color: #2f4452;
-	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
 	font-size: 1.25em;
 	line-height: 1.5;
 	margin: 0;
@@ -20,6 +20,7 @@ a {
 }
 
 .editor {
+	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
 	margin: 5em auto;
 	padding: 5em;
 	width: 47.5em;
