@@ -19,7 +19,7 @@ window.tinymce.init( {
 		'wptextpattern'
 	],
 	schema: 'html5-strict',
-	selector: '#editor',
+	selector: '.editor',
 	theme: false,
 	toolbar: false,
 	formats: {

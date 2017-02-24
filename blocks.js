@@ -358,15 +358,13 @@ function updateDockedControlsPosition( newClassName ) {
 	var fullBleed = className.match( /full-bleed/ );
 
 	var topPosition = position.top - 36 + window.scrollY;
-	var leftPosition = null;
+	var leftPosition = position.left;
 
 	if ( isImage && alignedRight ) {
-		leftPosition = position.left;
 		topPosition = newClassName ? topPosition - 15 : topPosition;
 	} else if ( isImage && alignedLeft && newClassName ) {
 		topPosition = topPosition - 15;
 	} else if ( isImage && className === 'is-selected' && dockedControls.style.left ) {
-		leftPosition = null;
 		topPosition = topPosition + 15;
 	} else if ( fullBleed ) {
 		leftPosition = ( window.innerWidth / 2 ) - ( dockedControls.clientWidth / 2 );

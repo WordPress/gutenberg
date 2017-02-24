@@ -1,72 +1,82 @@
+* {
+	box-sizing: border-box;
+}
+
 body {
-	background: #f3f6f8;
 	color: #2f4452;
 	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
 	font-size: 1.25em;
 	line-height: 1.5;
-	margin: 1em;
+	margin: 0;
+	padding: 0;
 }
 
-#editor {
-	background: #fff;
-	margin: 5em auto;
-	outline: none;
-	padding: 5em;
-	width: 37.5em;
+svg {
+	fill: currentColor;
 }
 
-#editor a {
+a {
 	color: inherit;
 }
 
-#editor iframe {
+.editor {
+	margin: 5em auto;
+	padding: 5em;
+	width: 47.5em;
+}
+
+.editor:focus {
+	outline: none;
+}
+
+.editor iframe {
 	max-width: 100%;
 	border: 0;
 }
 
-#editor img {
+.editor img {
 	max-width: 100%;
 	height: auto;
 }
 
-#editor figure {
+.editor figure {
 	float: none;
 	margin: 0;
 	width: 100%;
     transition: margin 0.5s, width 0.5s;
 }
 
-#editor figure.aligncenter {
+.editor figure.aligncenter {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-#editor figure.alignleft {
+.editor figure.alignleft {
 	float: left;
 	margin: 0.5em 1em 0.5em 0;
 	width: 50%;
 }
 
-#editor figure.alignright {
+.editor figure.alignright {
 	float: right;
 	margin: 0.5em 0 0.5em 1em;
 	width: 50%;
 }
 
-#editor figcaption {
+.editor figcaption {
 	font-size: 0.8em;
 	margin-top: 0.5em;
 }
 
-#editor figure img {
+.editor figure img {
 	display: block;
 }
 
-#editor pre {
+.editor pre {
 	overflow: auto;
 }
 
-#editor:after {
+.editor:after {
    content: ".";
    visibility: hidden;
    display: block;

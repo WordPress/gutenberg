@@ -1,12 +1,12 @@
-#editor img[data-mce-selected] {
+.editor img[data-mce-selected] {
 	outline: none;
 }
 
-#editor img::selection {
+.editor img::selection {
 	background-color: transparent;
 }
 
-#editor *[data-mce-selected="block"] {
+.editor *[data-mce-selected="block"] {
 	outline: 2px solid #e0e5e9;
 	outline-offset: 11px;
 	/*background-color: rgba( 135, 166, 188, 0.3 );
@@ -14,7 +14,7 @@
 	position: relative;*/
 }
 
-/*#editor *[data-mce-selected="block"]:before {
+/*.editor *[data-mce-selected="block"]:before {
   content: '';
   border-top: 2px solid #87a6bc;
   border-left: 2px solid #87a6bc;
@@ -27,18 +27,18 @@
   bottom: -14px;
 }
 
-#editor *[data-mce-selected="block"] ~ [data-mce-selected="block"]:before {
+.editor *[data-mce-selected="block"] ~ [data-mce-selected="block"]:before {
 	border-top: none;
 	border-bottom: 2px solid #87a6bc;
 }*/
 
-#editor *[data-mce-selected="move"] {
+.editor *[data-mce-selected="move"] {
 	color: #87a6bc;
 	outline: 1px dashed #87a6bc;
 	outline-offset: 11px;
 }
 
-#editor.is-moving-block > *:before {
+.editor.is-moving-block > *:before {
 	content: '\21E2';
 	display: block;
 	position: absolute;
@@ -53,9 +53,9 @@
 	left: 40px;
 }
 
-#editor.is-moving-block > .alignright:before,
-#editor.is-moving-block > [data-mce-selected="move"]:before,
-#editor.is-moving-block > [data-mce-selected="move"] + *:before {
+.editor.is-moving-block > .alignright:before,
+.editor.is-moving-block > [data-mce-selected="move"]:before,
+.editor.is-moving-block > [data-mce-selected="move"] + *:before {
 	content: '';
 }
 
