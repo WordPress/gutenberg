@@ -1,23 +1,24 @@
 .heading-block__form {
-	input {
+	textarea {
 		width: 100%;
 		border: none;
 		font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
+		resize: none;
 
 		&:focus {
 			outline: 0;
 		}
 	}
 
-	&.h1 input {
+	&.h1 textarea {
 		font-size: 34px;
 	}
 
-	&.h2 input {
+	&.h2 textarea {
 		font-size: 28px;
 	}
 
-	&.h3 input {
+	&.h3 textarea {
 		font-size: 20px;
 	}
 }

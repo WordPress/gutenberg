@@ -25,7 +25,7 @@ class BlockList extends Component {
 	};
 
 	focusBlock = ( index ) => {
-		// this.blocks[ index ].focus( 0 );
+		this.blocks[ index ].focus( 0 );
 	};
 
 	executeCommands = ( index, commands = [] ) => {
@@ -45,12 +45,17 @@ class BlockList extends Component {
 						? command.block
 						: {
 							type: 'WP_Block',
-							blockType: 'text',
+							blockType: 'paragraph',
 							attrs: {},
-							startText: '<!-- wp:text -->',
+							startText: '<!-- wp:paragraph -->',
 							endText: '<!-- /wp -->',
-							rawContent: '<!-- wp:text --><!-- /wp -->',
-							children: []
+							rawContent: '<!-- wp:paragraph --><!-- /wp -->',
+							children: [
+								{
+									type: 'Text',
+									value: ' '
+								}
+							]
 						};
 					return [
 						...memo.slice( 0, index + 1 ),
@@ -66,7 +71,9 @@ class BlockList extends Component {
 		}
 	};
 
-	render( { content }, { focusIndex } ) {
+	render() {
+		const { content } = this.props;
+		const { focusIndex } = this.state;
 		return (
 			<div className="block-list">
 				{ map( content, ( node, index ) => {
@@ -79,7 +86,7 @@ class BlockList extends Component {
 							tabIndex={ index }
 							isFocused={ isFocused }
 							onFocus={ () => this.onFocusIndexChange( index ) }
-							onFocusOut={ () => this.onFocusIndexChange( null ) }
+							onBlur={ () => this.onFocusIndexChange( null ) }
 							executeCommands={ ( commands ) => this.executeCommands( index, commands ) }
 							node={ node } />
 					);

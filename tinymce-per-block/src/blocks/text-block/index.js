@@ -3,7 +3,7 @@
  */
 import { registerBlock } from 'wp-blocks';
 import {
-	EditorParagraphIcon,
+	EditorTableIcon,
 	EditorAlignLeftIcon,
 	EditorAlignCenterIcon,
 	EditorAlignRightIcon
@@ -17,7 +17,7 @@ import form from './form';
 registerBlock( 'text', {
 	title: 'Text',
 	form: form,
-	icon: EditorParagraphIcon,
+	icon: EditorTableIcon,
 	controls: [
 		{
 			label: 'Align Left',

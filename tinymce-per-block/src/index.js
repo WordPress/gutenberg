@@ -14,6 +14,7 @@ import 'assets/stylesheets/main.scss';
 import 'blocks/text-block';
 import 'blocks/image-block';
 import 'blocks/heading-block';
+import 'blocks/paragraph-block';
 
 class App extends Component {
 	state = {
@@ -54,12 +55,13 @@ class App extends Component {
 		this.updateContent( this.props.content );
 	}
 
-	render( props, { content, activeRenderer } ) {
+	render() {
+		const { content, activeRenderer } = this.state;
 		const Renderer = renderers[ activeRenderer ];
 		return (
-			<div class="renderers">
-				<button class="toggle-renderer" onClick={ this.toggleRenderer }>Html/Block</button>
-				<div class={ `renderer-${ activeRenderer }` }>
+			<div className="renderers">
+				<button className="toggle-renderer" onClick={ this.toggleRenderer }>Html/Block</button>
+				<div className={ `renderer-${ activeRenderer }` }>
 					<Renderer content={ content[ activeRenderer ] } onChange={ this.updateParsedContent } />
 				</div>
 			</div>

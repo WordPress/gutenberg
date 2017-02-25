@@ -12,7 +12,7 @@ export default function TextBlockForm( { block, setChildren, executeCommands } )
 	const style = reduce( block.attrs, ( memo, value, key ) => {
 		switch ( key ) {
 			case 'align':
-				memo[ 'text-align' ] = value;
+				memo.textAlign = value;
 				break;
 		}
 
@@ -20,7 +20,7 @@ export default function TextBlockForm( { block, setChildren, executeCommands } )
 	}, {} );
 
 	return (
-		<div classnName="text-block__form" style={ style }>
+		<div className="text-block__form" style={ style }>
 			<EditableComponent initialContent={ serialize( children ) }
 				onChange={ ( value ) => executeCommands( setChildren( value ) ) } />
 		</div>

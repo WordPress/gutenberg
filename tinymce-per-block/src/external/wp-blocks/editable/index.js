@@ -68,7 +68,7 @@ export default class EditableComponent extends Component {
 	render() {
 		return (
 			<div ref={ this.setRef }>
-				<div contenteditable />
+				<div contentEditable />
 			</div>
 		);
 	}

@@ -1,0 +1,14 @@
+.paragraph-block__form textarea {
+	width: 100%;
+	border: none;
+	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
+	font-size: 16px;
+	color: #2f4452;
+	font-size: inherit;
+	line-height: 1.5;
+	resize: none;
+
+	&:focus {
+		outline: 0;
+	}
+}

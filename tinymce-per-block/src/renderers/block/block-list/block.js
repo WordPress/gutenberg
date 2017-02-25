@@ -15,7 +15,7 @@ export default class BlockListBlock extends Component {
 		}
 
 		if ( ! this.node.contains( event.relatedTarget ) ) {
-			this.props.onFocusOut( event );
+			this.props.onBlur( event );
 		}
 	};
 
@@ -85,18 +85,19 @@ export default class BlockListBlock extends Component {
 				ref={ this.setRef }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				onFocusOut={ this.maybeFocusOut }
+				onBlur={ this.maybeFocusOut }
 				className={ classes }>
 				<Form ref={ this.bindForm } block={ node } { ...state } />
 				{ isFocused && size( block.controls ) > 0 && (
 					<div className="block-list__block-controls">
-						{ map( block.controls, ( control ) => {
+						{ map( block.controls, ( control, index ) => {
 							const controlClasses = classNames( 'block-list__block-control', {
 								'is-selected': control.isSelected( node )
 							} );
 
 							return (
 								<button
+									key={ index }
 									onClick={ () => control.onClick( state ) }
 									className={ controlClasses }>
 									<control.icon />

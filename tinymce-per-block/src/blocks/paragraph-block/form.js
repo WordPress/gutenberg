@@ -6,7 +6,7 @@ import { createElement, Component } from 'wp-elements';
 import { serialize } from 'serializers/block';
 import { EnhancedInputComponent } from 'wp-blocks';
 
-export default class HeadingBlockForm extends Component {
+export default class ParagraphBlockForm extends Component {
 	bindInput = ( ref ) => {
 		this.input = ref;
 	}
@@ -43,10 +43,9 @@ export default class HeadingBlockForm extends Component {
 					: appendBlock()
 			] );
 		};
-		const className = block.attrs.size ? block.attrs.size : 'h2';
 
 		return (
-			<div className={ `heading-block__form ${ className }` }>
+			<div className="paragraph-block__form">
 				<EnhancedInputComponent ref={ this.bindInput } value={ serialize( children ) }
 					onChange={ onChangeContent }
 					splitValue={ splitValue } />

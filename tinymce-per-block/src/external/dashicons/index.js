@@ -8,4 +8,5 @@ export { default as EditorHeading3Icon } from './icons/editor-heading-3';
 export { default as ArrowDownAlt2Icon } from './icons/arrow-down-alt2';
 export { default as ArrowUpAlt2Icon } from './icons/arrow-up-alt2';
 export { default as EditorParagraphIcon } from './icons/editor-paragraph';
+export { default as EditorTableIcon } from './icons/editor-paragraph';
 export { default as FormatImageIcon } from './icons/format-image';
