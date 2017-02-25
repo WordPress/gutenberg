@@ -388,7 +388,16 @@ mockedApiResponse.Schema = {
                         "format": {
                             "required": false,
                             "enum": [
-                                "standard"
+                                "standard",
+                                "aside",
+                                "chat",
+                                "gallery",
+                                "link",
+                                "image",
+                                "quote",
+                                "status",
+                                "video",
+                                "audio"
                             ],
                             "description": "The format for the object.",
                             "type": "string"
@@ -562,7 +571,16 @@ mockedApiResponse.Schema = {
                         "format": {
                             "required": false,
                             "enum": [
-                                "standard"
+                                "standard",
+                                "aside",
+                                "chat",
+                                "gallery",
+                                "link",
+                                "image",
+                                "quote",
+                                "status",
+                                "video",
+                                "audio"
                             ],
                             "description": "The format for the object.",
                             "type": "string"
