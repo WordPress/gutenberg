@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { map } from 'lodash';
+import { assign, map, compact } from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,21 +14,59 @@ class BlockList extends Component {
 		focusIndex: null
 	};
 
+	blocks = [];
+
 	onFocusIndexChange = ( index ) => {
 		this.setState( { focusIndex: index } );
-	}
+	};
 
-	render( { content, onChange }, { focusIndex } ) {
-		function onNodeChange( index, nextNode ) {
-			const nextNodes = [ ...content ];
-			nextNodes[ index ] = {
-				...nextNodes[ index ],
-				...nextNode
-			};
+	bindBlock = ( index ) => ( ref ) => {
+		this.blocks[ index ] = ref;
+	};
 
-			onChange( nextNodes );
+	focusBlock = ( index ) => {
+		// this.blocks[ index ].focus( 0 );
+	};
+
+	executeCommands = ( index, commands = [] ) => {
+		const { content, onChange } = this.props;
+		const nonEmptyCommands = compact( commands );
+		if ( ! nonEmptyCommands.length ) {
+			return;
 		}
+		const focus = nonEmptyCommands.find( command => command.type === 'append' ) ? index + 1 : false;
+		const nextNodes = nonEmptyCommands.reduce( ( memo, command ) => {
+			switch ( command.type ) {
+				case 'change':
+					memo[ index ] = assign( {}, memo[ index ], command.changes );
+					return memo;
+				case 'append':
+					const block = command.block
+						? command.block
+						: {
+							type: 'WP_Block',
+							blockType: 'text',
+							attrs: {},
+							startText: '<!-- wp:text -->',
+							endText: '<!-- /wp -->',
+							rawContent: '<!-- wp:text --><!-- /wp -->',
+							children: []
+						};
+					return [
+						...memo.slice( 0, index + 1 ),
+						block,
+						...memo.slice( index + 1 )
+					];
+			}
+		}, [ ...content ] );
 
+		onChange( nextNodes );
+		if ( focus !== false ) {
+			setTimeout( () => this.focusBlock( focus ) );
+		}
+	};
+
+	render( { content }, { focusIndex } ) {
 		return (
 			<div className="block-list">
 				{ map( content, ( node, index ) => {
@@ -36,12 +74,13 @@ class BlockList extends Component {
 
 					return (
 						<BlockListBlock
+							ref={ this.bindBlock( index ) }
 							key={ index }
 							tabIndex={ index }
 							isFocused={ isFocused }
 							onFocus={ () => this.onFocusIndexChange( index ) }
 							onFocusOut={ () => this.onFocusIndexChange( null ) }
-							onChange={ ( nextNode ) => onNodeChange( index, nextNode ) }
+							executeCommands={ ( commands ) => this.executeCommands( index, commands ) }
 							node={ node } />
 					);
 				} ) }

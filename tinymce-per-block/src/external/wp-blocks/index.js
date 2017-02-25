@@ -4,6 +4,7 @@
 import { defaults } from 'lodash';
 
 export { default as EditableComponent } from './editable';
+export { default as EnhancedInputComponent } from './input';
 
 const _registered = {};
 

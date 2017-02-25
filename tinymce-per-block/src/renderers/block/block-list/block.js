@@ -3,7 +3,7 @@
  */
 import { createElement, Component } from 'wp-elements';
 import { getBlock } from 'wp-blocks';
-import { size, map } from 'lodash';
+import { size, map, castArray } from 'lodash';
 import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 import classNames from 'classnames';
 import isEqualShallow from 'is-equal-shallow';
@@ -23,6 +23,14 @@ export default class BlockListBlock extends Component {
 		this.node = node;
 	};
 
+	bindForm = ( form ) => {
+		this.form = form;
+	}
+
+	focus = ( position ) => {
+		this.form.focus( position );
+	};
+
 	render() {
 		const { node } = this.props;
 		const block = getBlock( node.blockType );
@@ -30,8 +38,8 @@ export default class BlockListBlock extends Component {
 			return null;
 		}
 
-		const form = block.form || block.display;
-		if ( ! form ) {
+		const Form = block.form;
+		if ( ! Form ) {
 			return null;
 		}
 
@@ -40,27 +48,36 @@ export default class BlockListBlock extends Component {
 			'is-focused': isFocused
 		} );
 
-		const { onChange, tabIndex, onFocus } = this.props;
+		const { executeCommands, tabIndex, onFocus } = this.props;
 		const state = {
 			setChildren( children ) {
-				onChange( {
-					...node,
-					children
-				} );
+				return {
+					type: 'change',
+					changes: { children }
+				};
 			},
 			setAttributes( attributes ) {
 				if ( isEqualShallow( attributes, node.attrs ) ) {
 					return;
 				}
 
-				onChange( {
-					...node,
-					attrs: {
-						...node.attrs,
-						...attributes
+				return {
+					type: 'change',
+					changes: {
+						attrs: {
+							...node.attrs,
+							...attributes
+						}
 					}
-				} );
-			}
+				};
+			},
+			appendBlock( newBlock ) {
+				return {
+					type: 'append',
+					block: newBlock
+				};
+			},
+			executeCommands: commands => executeCommands( castArray( commands ) )
 		};
 
 		return (
@@ -70,7 +87,7 @@ export default class BlockListBlock extends Component {
 				onFocus={ onFocus }
 				onFocusOut={ this.maybeFocusOut }
 				className={ classes }>
-				{ form( node, state ) }
+				<Form ref={ this.bindForm } block={ node } { ...state } />
 				{ isFocused && size( block.controls ) > 0 && (
 					<div className="block-list__block-controls">
 						{ map( block.controls, ( control ) => {

@@ -13,6 +13,7 @@ import * as serializers from 'serializers';
 import 'assets/stylesheets/main.scss';
 import 'blocks/text-block';
 import 'blocks/image-block';
+import 'blocks/heading-block';
 
 class App extends Component {
 	state = {

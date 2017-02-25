@@ -23,30 +23,30 @@ registerBlock( 'text', {
 			label: 'Align Left',
 			icon: EditorAlignLeftIcon,
 			isSelected: ( { attrs } ) => ! attrs.align || 'left' === attrs.align,
-			onClick( state ) {
-				state.setAttributes( {
+			onClick( { setAttributes, executeCommands } ) {
+				executeCommands( setAttributes( {
 					align: 'left'
-				} );
+				} ) );
 			}
 		},
 		{
 			label: 'Align Center',
 			icon: EditorAlignCenterIcon,
 			isSelected: ( { attrs } ) => 'center' === attrs.align,
-			onClick( state ) {
-				state.setAttributes( {
+			onClick( { setAttributes, executeCommands } ) {
+				executeCommands( setAttributes( {
 					align: 'center'
-				} );
+				} ) );
 			}
 		},
 		{
 			label: 'Align Right',
 			icon: EditorAlignRightIcon,
 			isSelected: ( { attrs } ) => 'right' === attrs.align,
-			onClick( state ) {
-				state.setAttributes( {
+			onClick( { setAttributes, executeCommands } ) {
+				executeCommands( setAttributes( {
 					align: 'right'
-				} );
+				} ) );
 			}
 		}
 	]
