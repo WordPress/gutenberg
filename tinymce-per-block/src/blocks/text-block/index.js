@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { registerBlock, bindEditable } from 'wp-blocks';
+import { registerBlock } from 'wp-blocks';
 import {
 	EditorParagraphIcon,
 	EditorAlignLeftIcon,
@@ -16,7 +16,7 @@ import form from './form';
 
 registerBlock( 'text', {
 	title: 'Text',
-	form: bindEditable( form ),
+	form: form,
 	icon: EditorParagraphIcon,
 	controls: [
 		{

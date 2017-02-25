@@ -3,7 +3,7 @@
  */
 import { defaults } from 'lodash';
 
-export { default as bindEditable } from './bind-editable';
+export { default as EditableComponent } from './editable';
 
 const _registered = {};
 

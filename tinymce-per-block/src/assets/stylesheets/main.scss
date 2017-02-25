@@ -38,3 +38,7 @@ body {
 		bottom: 0;
 	width: 100%;
 }
+
+.mce-content-body:focus {
+	outline: 0;
+}
