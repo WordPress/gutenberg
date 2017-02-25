@@ -20,7 +20,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 	protected static $supported_formats;
 
 	protected $forbidden_cat;
-	protected $posts_orderby;
+	protected $posts_clauses;
 
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$post_id = $factory->post->create();
@@ -68,23 +68,32 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		parent::setUp();
 		register_post_type( 'youseeme', array( 'supports' => array(), 'show_in_rest' => true ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'wpSetUpBeforeRequest' ), 10, 3 );
-		add_filter( 'posts_orderby', array( $this, 'save_posts_orderby' ), 10, 2 );
+		add_filter( 'posts_clauses', array( $this, 'save_posts_clauses' ), 10, 2 );
 	}
 
 	public function wpSetUpBeforeRequest( $result, $server, $request ) {
-		$this->posts_orderby = array();
+		$this->posts_clauses = array();
 		return $result;
 	}
 
-	public function save_posts_orderby( $orderby, $query ) {
-		array_push( $this->posts_orderby, $orderby );
+	public function save_posts_clauses( $orderby, $query ) {
+		array_push( $this->posts_clauses, $orderby );
 		return $orderby;
 	}
 
-	public function assertPostsOrderedBy( $pattern ) {
+	public function assertPostsClause( $clause, $pattern ) {
 		global $wpdb;
-		$orderby = str_replace( '{posts}', $wpdb->posts, $pattern );
-		$this->assertEquals( array( $orderby ), $this->posts_orderby );
+		$expected_clause = str_replace( '{posts}', $wpdb->posts, $pattern );
+		$this->assertCount( 1, $this->posts_clauses );
+		$this->assertEquals( $expected_clause, $this->posts_clauses[0][ $clause ] );
+	}
+
+	public function assertPostsOrderedBy( $pattern ) {
+		$this->assertPostsClause( 'orderby', $pattern );
+	}
+
+	public function assertPostsWhere( $pattern ) {
+		$this->assertPostsClause( 'where', $pattern );
 	}
 
 	public function test_register_routes() {
@@ -690,7 +699,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
-	public function test_get_items_sticky_query() {
+	public function test_get_items_sticky() {
 		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
@@ -711,7 +720,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
-	public function test_get_items_sticky_with_post__in_query() {
+	public function test_get_items_sticky_with_include() {
 		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -724,6 +733,12 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 
 		$response = $this->server->dispatch( $request );
 		$this->assertCount( 0, $response->get_data() );
+
+		// FIXME Since this request returns zero posts, the query is executed twice.
+		$this->assertCount( 2, $this->posts_clauses );
+		$this->posts_clauses = array_slice( $this->posts_clauses, 0, 1 );
+
+		$this->assertPostsWhere( " AND {posts}.ID IN (0) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
 
 		update_option( 'sticky_posts', array( $id1, $id2 ) );
 
@@ -738,9 +753,48 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$posts = $response->get_data();
 		$post = $posts[0];
 		$this->assertEquals( $id1, $post['id'] );
+
+		$this->assertPostsWhere( " AND {posts}.ID IN ($id1) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
 	}
 
-	public function test_get_items_not_sticky_query() {
+	public function test_get_items_sticky_no_sticky_posts() {
+		$id1 = self::$post_id;
+
+		update_option( 'sticky_posts', array() );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'sticky', true );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertCount( 0, $response->get_data() );
+
+		// FIXME Since this request returns zero posts, the query is executed twice.
+		$this->assertCount( 2, $this->posts_clauses );
+		$this->posts_clauses = array_slice( $this->posts_clauses, 0, 1 );
+
+		$this->assertPostsWhere( " AND {posts}.ID IN (0) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
+	}
+
+	public function test_get_items_sticky_with_include_no_sticky_posts() {
+		$id1 = self::$post_id;
+
+		update_option( 'sticky_posts', array() );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'sticky', true );
+		$request->set_param( 'include', array( $id1 ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertCount( 0, $response->get_data() );
+
+		// FIXME Since this request returns zero posts, the query is executed twice.
+		$this->assertCount( 2, $this->posts_clauses );
+		$this->posts_clauses = array_slice( $this->posts_clauses, 0, 1 );
+
+		$this->assertPostsWhere( " AND {posts}.ID IN (0) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
+	}
+
+	public function test_get_items_not_sticky() {
 		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 
@@ -755,9 +809,11 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$posts = $response->get_data();
 		$post = $posts[0];
 		$this->assertEquals( $id1, $post['id'] );
+
+		$this->assertPostsWhere( " AND {posts}.ID NOT IN ($id2) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
 	}
 
-	public function test_get_items_sticky_with_post__not_in_query() {
+	public function test_get_items_not_sticky_with_exclude() {
 		$id1 = self::$post_id;
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
@@ -774,6 +830,30 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$posts = $response->get_data();
 		$post = $posts[0];
 		$this->assertEquals( $id1, $post['id'] );
+
+		$this->assertPostsWhere( " AND {posts}.ID NOT IN ($id3,$id2) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
+	}
+
+	public function test_get_items_not_sticky_with_exclude_no_sticky_posts() {
+		$id1 = self::$post_id;
+		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+
+		update_option( 'sticky_posts', array() );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'sticky', false );
+		$request->set_param( 'exclude', array( $id3 ) );
+
+		$response = $this->server->dispatch( $request );
+		$this->assertCount( 2, $response->get_data() );
+
+		$posts = $response->get_data();
+		$ids = wp_list_pluck( $posts, 'id' );
+		sort( $ids );
+		$this->assertEquals( array( $id1, $id2 ), $ids );
+
+		$this->assertPostsWhere( " AND {posts}.ID NOT IN ($id3) AND {posts}.post_type = 'post' AND (({posts}.post_status = 'publish'))" );
 	}
 
 	public function test_get_items_pagination_headers() {
@@ -2970,7 +3050,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 			$this->remove_added_uploads();
 		}
 		remove_filter( 'rest_pre_dispatch', array( $this, 'wpSetUpBeforeRequest' ), 10, 3 );
-		remove_filter( 'posts_orderby', array( $this, 'save_posts_orderby' ), 10, 2 );
+		remove_filter( 'posts_clauses', array( $this, 'save_posts_clauses' ), 10, 2 );
 		parent::tearDown();
 	}
 
