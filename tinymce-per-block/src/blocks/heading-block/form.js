@@ -15,41 +15,64 @@ export default class HeadingBlockForm extends Component {
 		this.input.focus( position );
 	}
 
+	merge = ( block, index ) => {
+		const acceptedBlockTypes = [ 'paragraph', 'heading' ];
+		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
+			return;
+		}
+
+		const { block: { children }, focus, remove, setChildren } = this.props;
+		const value = serialize( children );
+		setChildren( children.concat( block.children ) );
+		remove( index );
+		focus( value.length );
+	}
+
 	render() {
-		const { block, setChildren, appendBlock, executeCommands } = this.props;
+		const { block, setChildren, appendBlock, mergeWithPrevious, remove } = this.props;
 		const { children } = block;
+		const value = serialize( children );
 		const onChangeContent = ( event ) => {
-			executeCommands( setChildren( [ {
+			setChildren( [ {
 				type: 'Text',
 				value: event.target.value || ' ' // grammar bug
-			} ] ) );
+			} ] );
 		};
 		const splitValue = ( left, right ) => {
-			executeCommands( [
-				setChildren( [ {
-					type: 'Text',
-					value: left || ' ' // grammar bug
-				} ] ),
-				right
-					? appendBlock( {
-						...block,
-						children: [
-							{
-								type: 'Text',
-								value: right
-							}
-						]
-					} )
-					: appendBlock()
-			] );
+			setChildren( [ {
+				type: 'Text',
+				value: left || ' ' // grammar bug
+			} ] );
+			if ( right ) {
+				appendBlock( {
+					...block,
+					children: [
+						{
+							type: 'Text',
+							value: right
+						}
+					]
+				} );
+			} else {
+				appendBlock();
+			}
+		};
+		const removePrevious = () => {
+			if ( value && value !== ' ' ) {
+				mergeWithPrevious();
+			} else {
+				remove();
+			}
 		};
 		const className = block.attrs.size ? block.attrs.size : 'h2';
 
 		return (
 			<div className={ `heading-block__form ${ className }` }>
-				<EnhancedInputComponent ref={ this.bindInput } value={ serialize( children ) }
+				<EnhancedInputComponent ref={ this.bindInput } value={ value }
 					onChange={ onChangeContent }
-					splitValue={ splitValue } />
+					splitValue={ splitValue }
+					removePrevious={ removePrevious }
+				/>
 			</div>
 		);
 	}

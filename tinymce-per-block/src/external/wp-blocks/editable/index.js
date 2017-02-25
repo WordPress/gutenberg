@@ -38,6 +38,16 @@ export default class EditableComponent extends Component {
 		}
 	}
 
+	focus( position ) {
+		this.editor.focus();
+		if ( position !== undefined ) {
+			this.editor.selection.setCursorLocation( undefined, position );
+		} else {
+			this.editor.selection.select( this.editor.getBody(), true );
+			this.editor.selection.collapse( false );
+		}
+	}
+
 	onSetup = ( editor ) => {
 		this.editor = editor;
 

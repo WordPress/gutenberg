@@ -3,7 +3,7 @@
  */
 import { createElement, Component } from 'wp-elements';
 import { getBlock } from 'wp-blocks';
-import { size, map, castArray } from 'lodash';
+import { size, map } from 'lodash';
 import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 import classNames from 'classnames';
 import isEqualShallow from 'is-equal-shallow';
@@ -31,6 +31,10 @@ export default class BlockListBlock extends Component {
 		this.form.focus( position );
 	};
 
+	merge = ( block, index ) => {
+		this.form.merge && this.form.merge( block, index );
+	}
+
 	render() {
 		const { node } = this.props;
 		const block = getBlock( node.blockType );
@@ -48,20 +52,20 @@ export default class BlockListBlock extends Component {
 			'is-focused': isFocused
 		} );
 
-		const { executeCommands, tabIndex, onFocus } = this.props;
+		const { executeCommand, tabIndex, onFocus } = this.props;
 		const state = {
 			setChildren( children ) {
-				return {
+				executeCommand( {
 					type: 'change',
 					changes: { children }
-				};
+				} );
 			},
 			setAttributes( attributes ) {
 				if ( isEqualShallow( attributes, node.attrs ) ) {
 					return;
 				}
 
-				return {
+				executeCommand( {
 					type: 'change',
 					changes: {
 						attrs: {
@@ -69,15 +73,31 @@ export default class BlockListBlock extends Component {
 							...attributes
 						}
 					}
-				};
+				} );
 			},
 			appendBlock( newBlock ) {
-				return {
+				executeCommand( {
 					type: 'append',
 					block: newBlock
-				};
+				} );
 			},
-			executeCommands: commands => executeCommands( castArray( commands ) )
+			remove( index ) {
+				executeCommand( {
+					type: 'remove',
+					index
+				} );
+			},
+			mergeWithPrevious() {
+				executeCommand( {
+					type: 'mergeWithPrevious'
+				} );
+			},
+			focus( position ) {
+				executeCommand( {
+					type: 'focus',
+					position
+				} );
+			}
 		};
 
 		return (

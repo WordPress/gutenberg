@@ -6,7 +6,8 @@ import Textarea from 'react-textarea-autosize';
 
 export default class EnhancedInput extends Component {
 	static defaultProps = {
-		splitValue: () => {}
+		splitValue: () => {},
+		removePrevious: () => {}
 	};
 
 	bindInput = ( ref ) => {
@@ -15,27 +16,38 @@ export default class EnhancedInput extends Component {
 
 	focus = ( position ) => {
 		this.input.focus();
-		this.input.setSelectionRange( position, position );
+		if ( position !== undefined ) {
+			this.input.setSelectionRange( position, position );
+		}
 	}
 
+	onKeyDown = ( event ) => {
+		const { value, splitValue, removePrevious } = this.props;
+		if ( event.keyCode === 13 ) {
+			event.preventDefault();
+			event.stopPropagation();
+			const textBeforeSelection = value.slice( 0, this.input.selectionStart );
+			const textAfterSelection = value.slice( this.input.selectionEnd );
+			const selection = value.slice( this.selectionStart, this.selectionEnd );
+			splitValue( textBeforeSelection, textAfterSelection, selection );
+		} else if (
+			event.keyCode === 8 &&
+			this.input.selectionStart === this.input.selectionEnd &&
+			(	this.input.selectionStart === 0 || ( this.input.selectionStart === 1 && value === ' ' ) )
+		) {
+			removePrevious();
+		}
+	};
+
 	render() {
-		const { value, splitValue, ...props } = this.props;
-		const onKeyDown = ( event ) => {
-			if ( event.keyCode === 13 ) {
-				event.preventDefault();
-				event.stopPropagation();
-				const textBeforeSelection = value.slice( 0, this.input.selectionStart );
-				const textAfterSelection = value.slice( this.input.selectionEnd );
-				const selection = value.slice( this.selectionStart, this.selectionEnd );
-				splitValue( textBeforeSelection, textAfterSelection, selection );
-			}
-		};
+		// Keeping splitValue to exclude it from props
+		const { value, splitValue, removePrevious, ...props } = this.props;
 
 		return <Textarea
 			ref={ this.bindInput }
 			{ ...props }
 			onInput={ this.autogrow }
 			value={ value }
-			onKeyDown={ onKeyDown } />;
+			onKeyDown={ this.onKeyDown } />;
 	}
 }
