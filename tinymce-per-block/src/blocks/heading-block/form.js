@@ -21,14 +21,14 @@ export default class HeadingBlockForm extends Component {
 		const onChangeContent = ( event ) => {
 			executeCommands( setChildren( [ {
 				type: 'Text',
-				value: event.target.value
+				value: event.target.value || ' ' // grammar bug
 			} ] ) );
 		};
 		const splitValue = ( left, right ) => {
 			executeCommands( [
 				setChildren( [ {
 					type: 'Text',
-					value: left
+					value: left || ' ' // grammar bug
 				} ] ),
 				right
 					? appendBlock( {

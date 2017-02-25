@@ -2,37 +2,20 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
+import Textarea from 'react-textarea-autosize';
 
 export default class EnhancedInput extends Component {
 	static defaultProps = {
 		splitValue: () => {}
 	};
 
-	state = {
-		height: 'auto'
-	};
-
 	bindInput = ( ref ) => {
-		this.input = ref;
+		this.input = ref && ref._rootDOMNode;
 	};
 
 	focus = ( position ) => {
 		this.input.focus();
 		this.input.setSelectionRange( position, position );
-	}
-
-	autogrow = () => {
-		this.setState( { height: this.input.scrollHeight } );
-	};
-
-	componentDidMount() {
-		this.autogrow();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.value !== this.props.value ) {
-			this.autogrow();
-		}
 	}
 
 	render() {
@@ -48,8 +31,7 @@ export default class EnhancedInput extends Component {
 			}
 		};
 
-		return <textarea
-			style={ { height: this.state.height } }
+		return <Textarea
 			ref={ this.bindInput }
 			{ ...props }
 			onInput={ this.autogrow }

@@ -4,7 +4,7 @@
 import { createElement } from 'wp-elements';
 import { find } from 'lodash';
 
-export default function ImageBlockForm( { children } ) {
+export default function ImageBlockForm( { block: { children } } ) {
 	const image = find( children, ( { name } ) => 'img' === name );
 	if ( ! image ) {
 		return null;

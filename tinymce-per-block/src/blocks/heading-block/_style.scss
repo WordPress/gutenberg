@@ -4,6 +4,10 @@
 		border: none;
 		font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
 		resize: none;
+		color: inherit;
+		font-size: inherit;
+		font-weight: bold;
+		overflow: hidden;
 
 		&:focus {
 			outline: 0;
