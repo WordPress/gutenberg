@@ -931,6 +931,14 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 39550
 	 */
 	function test_wp_check_filetype_and_ext_with_filtered_svg() {
+		if ( ! extension_loaded( 'fileinfo' ) ) {
+			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
+		}
+
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test does not run in multisite' );
+		}
+
 		$file = DIR_TESTDATA . '/uploads/video-play.svg';
 		$filename = 'video-play.svg';
 
@@ -951,6 +959,14 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @ticket 39550
 	 */
 	function test_wp_check_filetype_and_ext_with_filtered_woff() {
+		if ( ! extension_loaded( 'fileinfo' ) ) {
+			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
+		}
+
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test does not run in multisite' );
+		}
+
 		$file = DIR_TESTDATA . '/uploads/dashicons.woff';
 		$filename = 'dashicons.woff';
 
@@ -978,7 +994,7 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	public function _wp_check_filetype_and_ext_data() {
-		return array(
+		$data = array(
 			// Standard image.
 			array(
 				DIR_TESTDATA . '/images/canola.jpg',
@@ -1019,26 +1035,6 @@ class Tests_Functions extends WP_UnitTestCase {
 					'proper_filename' => false,
 				),
 			),
-			// Standard non-image file.
-			array(
-				DIR_TESTDATA . '/formatting/big5.txt',
-				'big5.txt',
-				array(
-					'ext' => 'txt',
-					'type' => 'text/plain',
-					'proper_filename' => false,
-				),
-			),
-			// Non-image file with wrong sub-type.
-			array(
-				DIR_TESTDATA . '/uploads/pages-to-word.docx',
-				'pages-to-word.docx',
-				array(
-					'ext' => 'docx',
-					'type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-					'proper_filename' => false,
-				),
-			),
 			// Non-image file not allowed.
 			array(
 				DIR_TESTDATA . '/export/crazy-cdata.xml',
@@ -1050,5 +1046,33 @@ class Tests_Functions extends WP_UnitTestCase {
 				),
 			),
 		);
+
+		// Test a few additional file types on single sites.
+		if ( ! is_multisite() ) {
+			$data = array_merge( $data, array(
+				// Standard non-image file.
+				array(
+					DIR_TESTDATA . '/formatting/big5.txt',
+					'big5.txt',
+					array(
+						'ext' => 'txt',
+						'type' => 'text/plain',
+						'proper_filename' => false,
+					),
+				),
+				// Non-image file with wrong sub-type.
+				array(
+					DIR_TESTDATA . '/uploads/pages-to-word.docx',
+					'pages-to-word.docx',
+					array(
+						'ext' => 'docx',
+						'type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+						'proper_filename' => false,
+					),
+				),
+			) );
+		}
+
+		return $data;
 	}
 }
