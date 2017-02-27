@@ -1,4 +1,5 @@
 #editor figure[data-wp-block-type="core:gallery"] {
+	clear: both;
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: space-between;
@@ -20,6 +21,11 @@
 	float: right;
 	margin: 0.5em 0 0.5em 1em;
 	width: 50%;
+}
+
+#editor figure[data-wp-block-type="core:gallery"].alignleft,
+#editor figure[data-wp-block-type="core:gallery"].alignright {
+	clear: none;
 }
 
 #editor figure[data-wp-block-type="core:gallery"] figure {
