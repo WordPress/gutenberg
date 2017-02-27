@@ -468,6 +468,10 @@ class Tests_Image_Functions extends WP_UnitTestCase {
 	 * @ticket 39875
 	 */
 	public function test_pdf_preview_doesnt_overwrite_existing_jpeg() {
+		if ( ! wp_image_editor_supports( array( 'mime_type' => 'application/pdf' ) ) ) {
+			$this->markTestSkipped( 'Rendering PDFs is not supported on this system.' );
+		}
+
 		// Dummy JPEGs.
 		$jpg1_path = '/tmp/test.jpg'; // Straight.
 		file_put_contents( $jpg1_path, 'asdf' );
