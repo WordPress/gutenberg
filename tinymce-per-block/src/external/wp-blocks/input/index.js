@@ -63,11 +63,7 @@ export default class EnhancedInput extends Component {
 				sanitizeValue( value.substring( 0, this.input.selectionStart ) ) +
 				'.<br/>.';
 			const currentHeight = this.mirror.clientHeight;
-			this.mirror.innerHTML =
-				sanitizeValue( value.substring( 0, this.input.selectionStart ) ) +
-				'.' +
-				sanitizeValue( value.substring( this.input.selectionStart ) ) +
-				'<br/>.';
+			this.mirror.innerHTML = sanitizeValue( value ) + '<br/>.';
 			const allHeight = this.mirror.clientHeight;
 			this.mirror.style.display = 'none';
 

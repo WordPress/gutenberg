@@ -1,5 +1,5 @@
 .heading-block__form {
-	textarea {
+	textarea, .textarea-mirror {
 		width: 100%;
 		border: none;
 		font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
@@ -14,15 +14,15 @@
 		}
 	}
 
-	&.h1 textarea {
+	&.h1 textarea, &.h1 .textarea-mirror {
 		font-size: 34px;
 	}
 
-	&.h2 textarea {
+	&.h2 textarea, &.h2 .textarea-mirror {
 		font-size: 28px;
 	}
 
-	&.h3 textarea {
+	&.h3 textarea, &.h3 .textarea-mirror {
 		font-size: 20px;
 	}
 }
