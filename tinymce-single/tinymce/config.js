@@ -21,18 +21,6 @@ window.tinymce.init( {
 	theme: false,
 	toolbar: false,
 	formats: {
-		alignleft: [ {
-			selector: 'p,h1,h2,h3,h4,h5,h6',
-			styles: { textAlign: 'left' }
-		} ],
-		aligncenter: [ {
-			selector: 'p,h1,h2,h3,h4,h5,h6',
-			styles: { textAlign: 'center' }
-		} ],
-		alignright: [ {
-			selector: 'p,h1,h2,h3,h4,h5,h6',
-			styles: { textAlign: 'right' }
-		} ],
 		strikethrough: { inline: 'del' }
 	}
 } );

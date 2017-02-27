@@ -3,9 +3,9 @@ window.wp.blocks.register( {
 	type: 'text',
 	icon: 'gridicons-posts',
 	buttons: [
-		'alignleft',
-		'aligncenter',
-		'alignright',
+		'text-align-left',
+		'text-align-center',
+		'text-align-right',
 		{
 			icon: 'gridicons-heading',
 			onClick: function( editor ) {
