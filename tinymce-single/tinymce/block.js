@@ -48,8 +48,6 @@
 			} );
 
 			// Adjust icon of TinyMCE core buttons.
-			editor.buttons.bullist.icon = 'gridicons-list-unordered';
-			editor.buttons.numlist.icon = 'gridicons-list-ordered';
 			editor.buttons.bold.icon = 'gridicons-bold';
 			editor.buttons.italic.icon = 'gridicons-italic';
 			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';

@@ -3,20 +3,28 @@ window.wp.blocks.register( {
 	type: 'text',
 	icon: 'gridicons-list-unordered',
 	buttons: [
-		'bullist',
-		'numlist',
+		{
+			icon: 'gridicons-list-unordered',
+			stateSelector: 'ul',
+			onClick: function( editor, element ) {
+				editor.execCommand( 'InsertUnorderedList' );
+			}
+		},
+		{
+			icon: 'gridicons-list-ordered',
+			stateSelector: 'ol',
+			onClick: function( editor, element ) {
+				editor.execCommand( 'InsertOrderedList' );
+			}
+		},
 		{
 			icon: 'gridicons-posts',
 			onClick: function( editor, element ) {
-				editor.selection.select( element );
-
 				if ( element.nodeName === 'UL' ) {
 					editor.execCommand( 'InsertUnorderedList' );
 				} else if ( element.nodeName === 'OL' ) {
 					editor.execCommand( 'InsertOrderedList' );
 				}
-
-				editor.nodeChanged();
 			}
 		}
 	]
