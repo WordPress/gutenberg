@@ -1,0 +1,39 @@
+#editor figure[data-wp-block-type="core:gallery"] {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+	width: auto;
+}
+
+#editor figure[data-wp-block-type="core:gallery"].aligncenter {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#editor figure[data-wp-block-type="core:gallery"].alignleft {
+	float: left;
+	margin: 0.5em 1em 0.5em 0;
+	width: 50%;
+}
+
+#editor figure[data-wp-block-type="core:gallery"].alignright {
+	float: right;
+	margin: 0.5em 0 0.5em 1em;
+	width: 50%;
+}
+
+#editor figure[data-wp-block-type="core:gallery"] figure {
+	margin: 0;
+}
+
+#editor figure[data-wp-block-type="core:gallery"][data-wp-block-setting-column="2"] figure {
+	width: 43%;
+}
+
+#editor figure[data-wp-block-type="core:gallery"][data-wp-block-setting-column="3"] figure {
+	width: 32%;
+}
+
+#editor figure[data-wp-block-type="core:gallery"][data-wp-block-setting-column="4"] figure {
+	width: 24%;
+}
