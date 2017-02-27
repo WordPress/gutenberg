@@ -1,3 +1,103 @@
+( function( wp ) {
+	var _settings = {};
+
+	wp.blocks = {
+		register: function( settings ) {
+			// Note, elements should probably only be registered by core.
+			// May for all block, we should offer to extend the settings (add buttons).
+
+			if ( settings.elements ) {
+				settings.elements.forEach( function( element ) {
+					_settings[ 'element:' + element ] = settings;
+				} );
+			} else if ( settings.namespace && settings.name ) {
+				_settings[ settings.namespace + ':' + settings.name ] = settings;
+			}
+		},
+		getSettings: function( id ) {
+			return _settings[ id ];
+		}
+	};
+} )( window.wp = window.wp || {} );
+
+( function( register ) {
+	register( {
+		elements: [ 'p' ],
+		type: 'text',
+		icon: 'gridicons-posts',
+		buttons: [
+			'alignleft',
+			'aligncenter',
+			'alignright',
+			'heading',
+			'blockquote',
+			'bullist',
+			'preformatted'
+		]
+	} );
+
+	register( {
+		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+		type: 'text',
+		icon: 'gridicons-heading',
+		buttons: [
+			'alignleft',
+			'aligncenter',
+			'alignright',
+			'heading1',
+			'heading2',
+			'heading3',
+			'heading4',
+			'heading5',
+			'heading6',
+			'removeheading'
+		]
+	} );
+
+	register( {
+		elements: [ 'ul', 'ol' ],
+		type: 'text',
+		icon: 'gridicons-list-unordered',
+		buttons: [
+			'bullist',
+			'numlist',
+			'removelist'
+		]
+	} );
+
+	register( {
+		elements: [ 'blockquote' ],
+		type: 'text',
+		icon: 'gridicons-quote',
+		buttons: [
+			'removeblockquote'
+		]
+	} );
+
+	register( {
+		elements: [ 'pre' ],
+		type: 'text',
+		icon: 'gridicons-code',
+		buttons: [
+			'syntax',
+			'removepreformatted'
+		]
+	} );
+
+	register( {
+		name: 'image',
+		namespace: 'core',
+		type: 'image',
+		icon: 'gridicons-image',
+		buttons: [
+			'block-align-left',
+			'block-align-center',
+			'block-align-right',
+			'togglefigcaption'
+		]
+	} );
+} )( window.wp.blocks.register );
+
 ( function( tinymce ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		function focusToolbar( toolbar ) {
@@ -10,7 +110,6 @@
 			var element;
 			var blockToolbar;
 			var blockToolbars = {};
-			var blockSelection = false;
 
 			tinymce.each( '123456'.split(''), function( level ) {
 				editor.addCommand( 'heading' + level, function() {
@@ -109,6 +208,11 @@
 			editor.buttons.bullist.icon = 'gridicons-list-unordered';
 			editor.buttons.numlist.icon = 'gridicons-list-ordered';
 
+			editor.buttons.bold.icon = 'gridicons-bold';
+			editor.buttons.italic.icon = 'gridicons-italic';
+			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
+			editor.buttons.link.icon = 'gridicons-link';
+
 			editor.addCommand( 'removelist', function() {
 				editor.selection.select( element );
 
@@ -127,24 +231,24 @@
 			} );
 
 			tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-				editor.addCommand( 'imgalign' + position, function() {
+				editor.addCommand( 'block-align-' + position, function() {
 					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.formatter.remove( 'align' + position, element );
+						editor.$( element ).removeClass( 'align' + position );
 					} );
 
-					editor.formatter.apply( 'align' + position, element );
+					editor.$( element ).addClass( 'align' + position );
 
 					editor.nodeChanged();
 				} );
 
-				editor.addButton( 'imgalign' + position, {
+				editor.addButton( 'block-align-' + position, {
 					icon: 'gridicons-align-image-' + position,
-					cmd: 'imgalign' + position,
+					cmd: 'block-align-' + position,
 					onPostRender: function() {
 						var button = this;
 
 						editor.on( 'nodechange', function( event ) {
-							$element = editor.$( event.parents[ event.parents.length - 1 ] );
+							$element = editor.$( element );
 
 							if ( position === 'center' ) {
 								button.active( ! (
@@ -201,24 +305,7 @@
 				}
 			} );
 
-			editor.addCommand( 'selectblock', function() {
-				editor.$( element ).attr( 'data-mce-selected', 'block' );
-				editor.nodeChanged();
-
-				editor.once('click keydown', function ( event ) {
-					if ( tinymce.util.VK.modifierPressed( event ) ) {
-						return;
-					}
-
-					editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-					editor.nodeChanged();
-				} );
-			} );
-
-			// editor.addCommand( 'moveblock', function() {
-			// 	blockSelection = false;
-
-			// } );
+			editor.addCommand( 'selectblock', function() {} );
 
 			editor.addButton( 'moveblock', {
 				icon: 'gridicons-reblog',
@@ -249,7 +336,7 @@
 				}
 			});
 
-			editor.addCommand( 'removeblock', function() {
+			editor.addCommand( 'block-remove', function() {
 				var $blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
 				var p = editor.$( '<p><br></p>' );
 
@@ -258,15 +345,11 @@
 					editor.selection.setCursorLocation( p[0], 0 );
 					$blocks.remove();
 				} );
-
-				setTimeout( function() {
-					editor.$( p ).attr( 'data-mce-selected', null );
-				} );
 			} );
 
-			editor.addButton( 'removeblock', {
+			editor.addButton( 'block-remove', {
 				icon: 'gridicons-trash',
-				cmd: 'removeblock'
+				cmd: 'block-remove'
 			} );
 
 			editor.addCommand( 'up', function() {
@@ -307,200 +390,227 @@
 				classes: 'widget btn move-down'
 			} );
 
-			blockToolbar = editor.wp._createToolbar( [ 'up', 'block', 'down' ] )
+			editor.addButton( 'add', {
+				icon: 'gridicons-add-outline',
+				tooltip: 'Add Block'
+			} );
 
-			blockToolbar.$el.addClass('block-toolbar')
+			var toolbarInline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
+			var toolbarCaret = editor.wp._createToolbar( [ 'add' ] );
+			blockToolbar = editor.wp._createToolbar( [ 'up', 'block', 'down' ] );
 
+			toolbarCaret.$el.addClass( 'block-toolbar' );
+			blockToolbar.$el.addClass( 'block-toolbar' );
+
+			var range;
+
+			toolbarInline.reposition = function () {
+				if ( ! range ) {
+					return;
+				}
+
+				var toolbar = this.getEl();
+				var toolbarRect = toolbar.getBoundingClientRect();
+				var elementRect = range.getBoundingClientRect();
+
+				DOM.setStyles( toolbar, {
+					position: 'absolute',
+					left: elementRect.left + 'px',
+					top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
+				} );
+
+				this.show();
+			}
+
+			toolbarCaret.reposition =
 			blockToolbar.reposition = function () {
-				if (!element) return
+				if ( ! element ) {
+					return;
+				}
 
-				var toolbar = this.getEl()
-				var toolbarRect = toolbar.getBoundingClientRect()
-				var elementRect = element.getBoundingClientRect()
+				var toolbar = this.getEl();
+				var toolbarRect = toolbar.getBoundingClientRect();
+				var elementRect = element.getBoundingClientRect();
 
 				var contentRect = editor.getBody().getBoundingClientRect();
 
-				DOM.setStyles(toolbar, {
+				DOM.setStyles( toolbar, {
 					position: 'absolute',
 					left: contentRect.left + 50 + 'px',
 					top: elementRect.top + window.pageYOffset + 'px'
 				} );
 
-			  this.show()
+				this.show();
 			}
 
-			editor.on('blur', function () {
-				blockToolbar.hide()
+			editor.on( 'blur', function() {
+				toolbarCaret.hide();
+				blockToolbar.hide();
+				tinymce.each( editor.settings.blocks, function( block, key ) {
+					blockToolbars[ key ].hide();
+				} );
 			} );
 
-			editor.on( 'nodechange', function( event ) {
-				var empty = (
-					editor.dom.isEmpty( event.element ) &&
-					( event.element.nodeName === 'P' || (
-						event.element.nodeName === 'BR' &&
-						event.element.parentNode.nodeName === 'P'
-					) )
-				);
-
-				element = event.parents[ event.parents.length - 1 ];
-
-				if ( ! empty && editor.dom.isBlock( element ) ) {
-					blockToolbar.reposition();
-				} else {
-					blockToolbar.hide();
+			function isEmptySlot( node ) {
+				// Text node.
+				if ( node.nodeType === 3 ) {
+					// Has text.
+					if ( node.data.length ) {
+						return false;
+					} else {
+						node = node.parentNode;
+					}
 				}
 
-				if ( element.nodeName === 'FIGURE' ) {
-					editor.$( element ).attr( 'data-mce-selected', 'block' );
+				// Element node.
+				if ( node.nodeType === 1 ) {
+					// Element is no direct child.
+					if ( node.parentNode !== editor.getBody() ) {
+						return false;
+					}
 
-					editor.once('click keydown', function ( event ) {
-						if ( tinymce.util.VK.modifierPressed( event ) ) {
-							return;
-						}
+					var childNodes = node.childNodes;
+					var i = childNodes.length;
 
-						editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-						editor.nodeChanged();
-					} );
-				}
-
-				var range = editor.selection.getRng()
-
-				var $start = editor.$( editor.dom.getParent( range.startContainer, function( element ) {
-					return element.parentNode === editor.getBody();
-				} ) );
-
-				var $end = editor.$( editor.dom.getParent( range.endContainer, function( element ) {
-					return element.parentNode === editor.getBody();
-				} ) );
-
-				// Selection only has the start of a new block.
-				if ( $end[0] === range.endContainer && range.endOffset === 0 ) {
-					$end = $end.prev();
-				}
-
-				if ( ! empty && $start[0] !== $end[0] ) {
-					// $start.add( $start.nextUntil( $end ) ).add( $end ).attr( 'data-mce-selected', 'block' );
-
-					// editor.once('click keydown', function ( event ) {
-					// 	if ( tinymce.util.VK.modifierPressed( event ) ) {
-					// 		return;
-					// 	}
-
-					// 	editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-					// 	editor.nodeChanged();
-					// } );
-
-					return;
-				}
-
-				if ( ! empty && editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
-					blockSelection = true;
-
-					tinymce.each( editor.settings.blocks, function( block, key ) {
-						if ( block.match( element ) ) {
-							blockToolbars[ key ].reposition();
-
-							if ( element.nodeName !== 'FIGURE' ) {
-								focusToolbar( blockToolbars[ key ] );
+					// Loop over children.
+					while ( i-- ) {
+						// Text node.
+						if ( childNodes[ i ].nodeType === 3 ) {
+							// Has text.
+							if ( node.data.length ) {
+								return false;
 							}
-						} else {
-							blockToolbars[ key ].hide();
 						}
-					} );
+
+						// Element node.
+						if ( childNodes[ i ].nodeType === 1 ) {
+							// Is not BR.
+							if ( childNodes[ i ].nodeName !== 'BR' ) {
+								return false;
+							}
+						}
+					}
+				}
+
+				return true;
+			}
+
+			function hideBlockUI() {
+				blockToolbar.hide();
+
+				tinymce.each( blockToolbars, function( toolbar ) {
+					toolbar.hide();
+				} );
+			}
+
+			function showBlockUI( focus ) {
+				blockToolbar.reposition();
+
+				var name = element.getAttribute( 'data-wp-block-type' ) || 'element:' + element.nodeName.toLowerCase();
+				var settings = wp.blocks.getSettings( name );
+
+				console.log(name, settings);
+
+				tinymce.each( blockToolbars, function( toolbar, key ) {
+					if ( key !== name ) {
+						toolbar.hide();
+					}
+				} );
+
+				if ( settings ) {
+					if ( ! blockToolbars[ name ] ) {
+						blockToolbars[ name ] = editor.wp._createToolbar( settings.buttons.concat( [ 'block-remove' ] ) );
+						blockToolbars[ name ].reposition = function () {
+							if (!element) return
+
+							var toolbar = this.getEl();
+							var toolbarRect = toolbar.getBoundingClientRect();
+							var elementRect = element.getBoundingClientRect();
+							var contentRect = editor.getBody().getBoundingClientRect();
+
+							DOM.setStyles( toolbar, {
+								position: 'absolute',
+								left: elementRect.left + 'px',
+								top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
+							} );
+
+							this.show();
+						}
+
+						editor.nodeChanged(); // Update UI.
+					}
+
+					blockToolbars[ name ].reposition();
+					focus && focusToolbar( blockToolbars[ name ] );
+				}
+			}
+
+			var hidden = true;
+
+			editor.on( 'keydown', function() {
+				hidden = true;
+			} );
+
+			editor.on( 'mousedown touchstart', function() {
+				hidden = false;
+			} );
+
+			editor.on( 'selectionChange nodeChange', function( event ) {
+				var selection = window.getSelection();
+				var isCollapsed = selection.isCollapsed;
+				var anchorNode = selection.anchorNode;
+				var isEmpty = isCollapsed && isEmptySlot( anchorNode );
+				var isBlockUIVisible = ! hidden;
+
+				if ( isEmpty ) {
+					window.console.log( 'Debug: empty node.' );
+
+					hideBlockUI();
+					toolbarInline.hide();
+					toolbarCaret.reposition();
 				} else {
-					blockSelection = false;
+					toolbarCaret.hide();
 
-					tinymce.each( editor.settings.blocks, function( block, key ) {
-						blockToolbars[ key ].hide();
-					} );
-				}
-			} )
+					if ( ! isCollapsed && anchorNode.nodeType === 3 ) {
+						hidden = true;
+						hideBlockUI();
 
-			tinymce.each( editor.settings.blocks, function( block, key ) {
-				blockToolbars[ key ] = editor.wp._createToolbar( block.buttons );
-				blockToolbars[ key ].reposition = function () {
-					if (!element) return
-
-					var toolbar = this.getEl()
-					var toolbarRect = toolbar.getBoundingClientRect()
-					var elementRect = element.getBoundingClientRect()
-
-					var contentRect = editor.getBody().getBoundingClientRect();
-
-					DOM.setStyles(toolbar, {
-						position: 'absolute',
-						left: elementRect.left + 'px',
-						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
-					})
-
-					setTimeout( function() {
-						editor.nodeChanged();
-					}, 500 );
-
-					this.show()
-				}
-
-				blockToolbars[ key ].on( 'keydown', function( event ) {
-					if ( event.keyCode === 27 ) {
-						editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-						editor.nodeChanged();
-						editor.focus();
-					}
-
-					// if ( event.keyCode === tinymce.util.VK.DOWN ) {
-					// 	editor.execCommand( 'down' );
-					// 	event.preventDefault();
-					// 	event.stopImmediatePropagation();
-					// }
-
-					// if ( event.keyCode === tinymce.util.VK.UP ) {
-					// 	editor.execCommand( 'up' );
-					// 	event.preventDefaultntDefault();
-					// 	event.stopImmediatePropagation();
-					// }
-				}, true );
-			} );
-
-			editor.on( 'beforeexeccommand', function( event ) {
-				var block = blockSelection;
-
-				editor.once( 'nodechange', function( event ) {
-					setTimeout( function() {
-						if ( block ) {
-							editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-							editor.$( element ).attr( 'data-mce-selected', 'block' );
-							editor.nodeChanged();
+						if ( anchorNode.parentNode.nodeName === 'A' ) {
+							toolbarInline.hide();
+						} else {
+							range = document.createRange();
+							range.setStart( selection.anchorNode, selection.anchorOffset );
+							range.setEnd( selection.anchorNode, selection.anchorOffset );
+							toolbarInline.reposition();
 						}
-					} );
-				}, true );
-			} );
+					} else {
+						toolbarInline.hide();
 
-			var prevEmpty;
-
-			// Throttle?
-			editor.on( 'keyup', function() {
-				var empty = editor.dom.isEmpty( element );
-
-				if ( ( empty && ! prevEmpty ) || ( ! empty && prevEmpty ) ) {
-					editor.nodeChanged()
-				}
-
-				prevEmpty = empty;
-			} );
-
-			editor.on( 'keydown', function( event ) {
-				if ( editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
-					if ( event.keyCode === tinymce.util.VK.DOWN ) {
-						editor.execCommand( 'down' );
-						event.preventDefault();
-					}
-
-					if ( event.keyCode === tinymce.util.VK.UP ) {
-						editor.execCommand( 'up' );
-						event.preventDefault();
+						// setTimeout( function() {
+							if ( isBlockUIVisible ) {
+								window.console.log( 'Debug: visible block UI.' );
+								showBlockUI();
+							} else {
+								hideBlockUI();
+							}
+						// }, 50 );
 					}
 				}
 			} );
+
+			// editor.on( 'keydown', function( event ) {
+			// 	if ( editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
+			// 		if ( event.keyCode === tinymce.util.VK.DOWN ) {
+			// 			editor.execCommand( 'down' );
+			// 			event.preventDefault();
+			// 		}
+
+			// 		if ( event.keyCode === tinymce.util.VK.UP ) {
+			// 			editor.execCommand( 'up' );
+			// 			event.preventDefault();
+			// 		}
+			// 	}
+			// } );
 
 			var metaCount = 0;
 
@@ -518,7 +628,7 @@
 						var caretEl = editor.selection.getNode();
 
 						if ( caretEl.nodeName !== 'FIGCAPTION' ) {
-							editor.execCommand( 'removeblock' );
+							editor.execCommand( 'block-remove' );
 							event.preventDefault();
 						} else {
 							var range = editor.selection.getRng();
@@ -546,14 +656,13 @@
 				}
 
 				if ( keyCode === 27 ) {
-					editor.$('*[data-mce-selected="block"]').removeAttr('data-mce-selected');
-					editor.nodeChanged();
+					hideBlockUI();
 				}
 			}, true );
 
 			editor.on( 'keyup', function( event ) {
 				if ( metaCount === 1 ) {
-					editor.execCommand( 'selectblock' );
+					showBlockUI( true );
 				}
 
 				metaCount = 0;
@@ -564,10 +673,6 @@
 					event.preventDefault();
 				}
 			} );
-		} );
-
-		editor.on( 'init', function() {
-			editor.focus();
 		} );
 	} );
 } )( window.tinymce );

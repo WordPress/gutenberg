@@ -190,83 +190,7 @@
 
 				toolbar.bottom = bottom;
 
-				function reposition() {
-					if ( ! currentSelection ) {
-						return this;
-					}
-
-					var scrollX = window.pageXOffset || document.documentElement.scrollLeft,
-						scrollY = window.pageYOffset || document.documentElement.scrollTop,
-						windowWidth = window.innerWidth,
-						windowHeight = window.innerHeight,
-						toolbar = this.getEl(),
-						toolbarWidth = toolbar.offsetWidth,
-						toolbarHeight = toolbar.clientHeight + 10,
-						selection = currentSelection.getBoundingClientRect(),
-						selectionMiddle = ( selection.left + selection.right ) / 2,
-						buffer = 5,
-						spaceNeeded = toolbarHeight + buffer,
-						spaceTop = selection.top,
-						spaceBottom = windowHeight - selection.bottom,
-						editorHeight = windowHeight,
-						className = '',
-						top, left;
-
-					if ( spaceTop >= editorHeight || spaceBottom >= editorHeight ) {
-						this.scrolling = true;
-						this.hide();
-						this.scrolling = false;
-						return this;
-					}
-
-					if ( this.bottom ) {
-						if ( spaceBottom >= spaceNeeded ) {
-							className = ' mce-arrow-up';
-							top = selection.bottom + scrollY;
-						} else if ( spaceTop >= spaceNeeded ) {
-							className = ' mce-arrow-down';
-							top = selection.top + scrollY - toolbarHeight;
-						}
-					} else {
-						if ( spaceTop >= spaceNeeded ) {
-							className = ' mce-arrow-down';
-							top = selection.top + scrollY - toolbarHeight;
-						} else if ( spaceBottom >= spaceNeeded && editorHeight / 2 > selection.bottom ) {
-							className = ' mce-arrow-up';
-							top = selection.bottom + scrollY;
-						}
-					}
-
-					if ( typeof top === 'undefined' ) {
-						top = scrollY + buffer;
-					}
-
-					left = selectionMiddle - toolbarWidth / 2 + scrollX;
-
-					if ( selection.left < 0 || selection.right > windowWidth ) {
-						left = scrollX + ( windowWidth - toolbarWidth ) / 2;
-					} else if ( toolbarWidth >= windowWidth ) {
-						className += ' mce-arrow-full';
-						left = 0;
-					} else if ( ( left < 0 && selection.left + toolbarWidth > windowWidth ) || ( left + toolbarWidth > windowWidth && selection.right - toolbarWidth < 0 ) ) {
-						left = ( windowWidth - toolbarWidth ) / 2;
-					} else if ( left < scrollX ) {
-						className += ' mce-arrow-left';
-						left = selection.left + scrollX;
-					} else if ( left + toolbarWidth > windowWidth + scrollX ) {
-						className += ' mce-arrow-right';
-						left = selection.right - toolbarWidth + scrollX;
-					}
-
-					toolbar.className = toolbar.className.replace( / ?mce-arrow-[\w]+/g, '' ) + className;
-
-					DOM.setStyles( toolbar, {
-						'left': left,
-						'top': top
-					} );
-
-					return this;
-				}
+				function reposition() {}
 
 				toolbar.on( 'show', function() {
 					this.reposition();
@@ -289,67 +213,11 @@
 				return toolbar;
 			}
 
-			editor.shortcuts.add( 'alt+119', '', function() {
-				var node;
-
-				if ( activeToolbar ) {
-					node = activeToolbar.find( 'toolbar' )[0];
-					node && node.focus( true );
-				}
-			} );
-
-			editor.on( 'nodechange', function( event ) {
-				// This can move the carect unexpectedly!
-				// event.element.normalize();
-
-				var range = editor.selection.getRng()
-
-				var empty = (
-					editor.dom.isEmpty( event.element ) &&
-					( event.element.nodeName === 'P' || (
-						event.element.nodeName === 'BR' &&
-						event.element.parentNode.nodeName === 'P'
-					) )
-				);
-
-				var args = {
-					element: event.element,
-					empty: empty,
-					parents: event.parents,
-					range: range,
-				};
-
-				editor.fire( 'wptoolbar', args );
-
-				currentSelection = args.selection || args.element;
-
-				if ( activeToolbar && activeToolbar !== args.toolbar ) {
-					activeToolbar.hide();
-				}
-
-				if ( args.toolbar ) {
-					if ( activeToolbar !== args.toolbar ) {
-						activeToolbar = args.toolbar;
-						activeToolbar.show();
-					} else {
-						activeToolbar.reposition();
-					}
-				} else {
-					activeToolbar = false;
-				}
-			} );
-
-			editor.on( 'focus', function() {
-				if ( activeToolbar ) {
-					activeToolbar.show();
-				}
-			} );
-
 			function hide( event ) {
-				if ( activeToolbar ) {
-					if ( activeToolbar.tempHide || event.type === 'hide' ) {
-						activeToolbar.hide();
-						activeToolbar = false;
+				// if ( activeToolbar ) {
+				// 	if ( activeToolbar.tempHide || event.type === 'hide' ) {
+				// 		activeToolbar.hide();
+				// 		activeToolbar = false;
 					// } else if ( (
 					// 	event.type === 'resizewindow' ||
 					// 	event.type === 'scrollwindow' ||
@@ -367,8 +235,8 @@
 
 					// 	activeToolbar.scrolling = true;
 					// 	activeToolbar.hide();
-					}
-				}
+				// 	}
+				// }
 			}
 
 			// For full height editor.
