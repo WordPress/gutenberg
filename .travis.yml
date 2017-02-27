@@ -52,12 +52,14 @@ before_install:
     echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   fi
 before_script:
+- phpenv config-rm xdebug.ini
 - npm install -g npm
 - npm install -g grunt-cli
 - npm install
 - npm prune
 - mysql --version
 - phpenv versions
+- php --version
 - npm --version
 - node --version
 script: grunt $WP_TRAVISCI
