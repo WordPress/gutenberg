@@ -602,6 +602,19 @@
 				}
 			} );
 
+			editor.on( 'focus', function() {
+				tinymce.$( editor.getBody() ).addClass( 'wp-edit-focus' );
+			} );
+
+			editor.on( 'blur', function() {
+				tinymce.$( editor.getBody() ).removeClass( 'wp-edit-focus' );
+			} );
+
+			editor.on( 'nodeChange', function( event ) {
+				editor.$( '*[data-mce-selected="block"]' ).attr( 'data-mce-selected', null );
+				editor.$( element ).attr( 'data-mce-selected', 'block' );
+			} );
+
 			// editor.on( 'keydown', function( event ) {
 			// 	if ( editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
 			// 		if ( event.keyCode === tinymce.util.VK.DOWN ) {
