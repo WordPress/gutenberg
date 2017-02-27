@@ -1,111 +1,3 @@
-( function( wp ) {
-	var _settings = {};
-
-	wp.blocks = {
-		register: function( settings ) {
-			// Note, elements should probably only be registered by core.
-			// May for all block, we should offer to extend the settings (add buttons).
-
-			if ( settings.elements ) {
-				settings.elements.forEach( function( element ) {
-					_settings[ 'element:' + element ] = settings;
-					_settings[ 'element:' + element ]._id = 'element:' + element;
-				} );
-			} else if ( settings.namespace && settings.name ) {
-				_settings[ settings.namespace + ':' + settings.name ] = settings;
-				_settings[ settings.namespace + ':' + settings.name ]._id = settings.namespace + ':' + settings.name;
-			}
-		},
-		getSettings: function( id ) {
-			return _settings[ id ];
-		},
-		getSettingsByElement( element ) {
-			var blockType = element.getAttribute( 'data-wp-block-type' );
-			var nodeName = element.nodeName.toLowerCase();
-
-			return this.getSettings( blockType || 'element:' + nodeName );
-		}
-	};
-} )( window.wp = window.wp || {} );
-
-( function( register ) {
-	register( {
-		elements: [ 'p' ],
-		type: 'text',
-		icon: 'gridicons-posts',
-		buttons: [
-			'alignleft',
-			'aligncenter',
-			'alignright',
-			'heading',
-			'blockquote',
-			'bullist',
-			'preformatted'
-		]
-	} );
-
-	register( {
-		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
-		type: 'text',
-		icon: 'gridicons-heading',
-		buttons: [
-			'alignleft',
-			'aligncenter',
-			'alignright',
-			'heading1',
-			'heading2',
-			'heading3',
-			'heading4',
-			'heading5',
-			'heading6',
-			'removeheading'
-		]
-	} );
-
-	register( {
-		elements: [ 'ul', 'ol' ],
-		type: 'text',
-		icon: 'gridicons-list-unordered',
-		buttons: [
-			'bullist',
-			'numlist',
-			'removelist'
-		]
-	} );
-
-	register( {
-		elements: [ 'blockquote' ],
-		type: 'text',
-		icon: 'gridicons-quote',
-		buttons: [
-			'removeblockquote'
-		]
-	} );
-
-	register( {
-		elements: [ 'pre' ],
-		type: 'text',
-		icon: 'gridicons-code',
-		buttons: [
-			'syntax',
-			'removepreformatted'
-		]
-	} );
-
-	register( {
-		name: 'image',
-		namespace: 'core',
-		type: 'image',
-		icon: 'gridicons-image',
-		buttons: [
-			'block-align-left',
-			'block-align-center',
-			'block-align-right',
-			'togglefigcaption'
-		]
-	} );
-} )( window.wp.blocks.register );
-
 ( function( tinymce, wp ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		function focusToolbar( toolbar ) {
@@ -113,80 +5,14 @@
 			node && node.focus( true );
 		}
 
+		editor.on( 'nodechange', function( event ) {
+			window.element = event.parents[ event.parents.length - 1 ];
+		} );
+
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
-			var element;
 			var blockToolbar;
 			var blockToolbars = {};
-
-			tinymce.each( '123456'.split(''), function( level ) {
-				editor.addCommand( 'heading' + level, function() {
-					editor.formatter.apply( 'h' + level );
-					editor.nodeChanged();
-				} );
-
-				editor.addButton( 'heading' + level, {
-					text: level,
-					cmd: 'heading' + level,
-					onpostrender: function() {
-						var button = this;
-
-						editor.on( 'nodechange', function( event ) {
-							button.active( element.nodeName === 'H' + level );
-						} );
-					}
-				} );
-			} );
-
-			editor.addButton( 'heading', {
-				icon: 'gridicons-heading',
-				cmd: 'heading1'
-			} );
-
-			editor.addCommand( 'removeheading', function() {
-				editor.formatter.apply( 'p' );
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'removeheading', {
-				icon: 'gridicons-posts',
-				cmd: 'removeheading'
-			} );
-
-			editor.addCommand( 'preformatted', function() {
-				editor.formatter.apply( 'pre' );
-				editor.nodeChanged();
-			} );
-
-			editor.addButton( 'preformatted', {
-				icon: 'gridicons-code',
-				cmd: 'preformatted'
-			} );
-
-			editor.addCommand( 'removepreformatted', function() {
-				editor.formatter.remove( 'pre' );
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'removepreformatted', {
-				icon: 'gridicons-posts',
-				cmd: 'removepreformatted'
-			} );
-
-			editor.addButton( 'syntax', {
-				text: 'syntax',
-				onclick: function() {}
-			} );
-
-			editor.addCommand( 'removeblockquote', function() {
-				editor.formatter.remove( 'blockquote' );
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'removeblockquote', {
-				icon: 'gridicons-posts',
-				cmd: 'removeblockquote'
-			} );
 
 			editor.addCommand( 'alignleft', function() {
 				editor.formatter.remove( 'alignleft' );
@@ -212,7 +38,6 @@
 			// Adjust icon of TinyMCE core buttons.
 			editor.buttons.aligncenter.icon = 'gridicons-align-center';
 			editor.buttons.alignright.icon = 'gridicons-align-right';
-			editor.buttons.blockquote.icon = 'gridicons-quote';
 			editor.buttons.bullist.icon = 'gridicons-list-unordered';
 			editor.buttons.numlist.icon = 'gridicons-list-ordered';
 
@@ -220,23 +45,6 @@
 			editor.buttons.italic.icon = 'gridicons-italic';
 			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
 			editor.buttons.link.icon = 'gridicons-link';
-
-			editor.addCommand( 'removelist', function() {
-				editor.selection.select( element );
-
-				if ( element.nodeName === 'UL' ) {
-					editor.execCommand( 'InsertUnorderedList' );
-				} else if ( element.nodeName === 'OL' ) {
-					editor.execCommand( 'InsertOrderedList' );
-				}
-
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'removelist', {
-				icon: 'gridicons-posts',
-				cmd: 'removelist'
-			} );
 
 			tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
 				editor.addCommand( 'block-align-' + position, function() {
@@ -306,7 +114,7 @@
 					var button = this;
 
 					editor.on( 'nodechange', function( event ) {
-						element = event.parents[ event.parents.length - 1 ];
+						var element = event.parents[ event.parents.length - 1 ];
 
 						button.active( editor.$( element ).find( 'figcaption' ).length > 0 );
 					} );
@@ -600,6 +408,19 @@
 						// }, 50 );
 					}
 				}
+			} );
+
+			editor.on( 'focus', function() {
+				tinymce.$( editor.getBody() ).addClass( 'wp-edit-focus' );
+			} );
+
+			editor.on( 'blur', function() {
+				tinymce.$( editor.getBody() ).removeClass( 'wp-edit-focus' );
+			} );
+
+			editor.on( 'nodeChange', function( event ) {
+				editor.$( '*[data-mce-selected="block"]' ).attr( 'data-mce-selected', null );
+				editor.$( element ).attr( 'data-mce-selected', 'block' );
 			} );
 
 			// editor.on( 'keydown', function( event ) {
