@@ -60,7 +60,7 @@ These mockups are all subject to change and feedback.
 
 ![Mobile](mockups/Mobile.png)
 
-## How designers can contribute
+## How Designers Can Contribute
 
 The editor we're building means to make the editing experience better for every WordPress user, by creating an interface that "makes writing rich posts effortless, and has 'blocks' to make it easy what today might take shortcodes, custom HTML, or 'mystery meat' embed discovery", to quote the kickoff goal.
 
@@ -68,7 +68,7 @@ That is difficult. So your designer eyes and help is appreciated, in what capaci
 
 A good place to start is having a look at <a href="https://github.com/WordPress/gutenberg#mockups">the current mockups</a> and <a href="https://wordpress.github.io/gutenberg/">the UI prototype</a>. We also have a GitHub repository, where <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">anything labelled "Design"</a> could use thoughtful replies, mockups, animatics, sketches, doodles.
 
-With regards to specific changes to the design, the details & execution (like colors, borders, shadows), those are best done as minimal and specific iterations on the work that preceeds it, so we can ideally compare. That doesn't preclude wild ideas, but should be considered for precise tasks like "give the pressed buttons more contrast", things in that vein.
+With regards to specific changes to the design, the details & execution (like colors, borders, shadows), those are best done as minimal and specific iterations on the work that precedes it, so we can ideally compare. That doesn't preclude wild ideas, but should be considered for precise tasks like "give the pressed buttons more contrast", things in that vein.
 
 Grab the Sketch file so you don't have to start from scratch:
 
