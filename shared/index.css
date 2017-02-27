@@ -15,6 +15,18 @@ body {
 	width: 37.5em;
 }
 
+#editor .text-align-left {
+	text-align: left;
+}
+
+#editor .text-align-center {
+	text-align: center;
+}
+
+#editor .text-align-right {
+	text-align: right;
+}
+
 #editor a {
 	color: inherit;
 }

@@ -14,33 +14,42 @@
 			var blockToolbar;
 			var blockToolbars = {};
 
-			editor.addCommand( 'alignleft', function() {
-				editor.formatter.remove( 'alignleft' );
-				editor.formatter.remove( 'aligncenter' );
-				editor.formatter.remove( 'alignright' );
-
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'alignleft', {
-				icon: 'gridicons-align-left',
-				cmd: 'alignleft',
-				onpostrender: function() {
-					var button = this;
-
-					editor.on( 'nodechange', function( event ) {
-						button.active( ! editor.formatter.matchNode( element, 'aligncenter' ) &&
-							! editor.formatter.matchNode( element, 'alignright' ) );
+			tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+				editor.addCommand( 'text-align-' + position, function() {
+					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+						editor.$( element ).removeClass( 'text-align-' + position );
 					} );
-				}
+
+					if ( position !== 'left' ) {
+						editor.$( element ).addClass( 'text-align-' + position );
+						editor.nodeChanged();
+					}
+				} );
+
+				editor.addButton( 'text-align-' + position, {
+					icon: 'gridicons-align-' + position,
+					cmd: 'text-align-' + position,
+					onPostRender: function() {
+						var button = this;
+
+						editor.on( 'nodechange', function( event ) {
+							$element = editor.$( element );
+
+							if ( position === 'left' ) {
+								button.active( ! (
+									$element.hasClass( 'text-align-center' ) || $element.hasClass( 'text-align-right' )
+								) );
+							} else {
+								button.active( $element.hasClass( 'text-align-' + position ) );
+							}
+						} );
+					}
+				} );
 			} );
 
 			// Adjust icon of TinyMCE core buttons.
-			editor.buttons.aligncenter.icon = 'gridicons-align-center';
-			editor.buttons.alignright.icon = 'gridicons-align-right';
 			editor.buttons.bullist.icon = 'gridicons-list-unordered';
 			editor.buttons.numlist.icon = 'gridicons-list-ordered';
-
 			editor.buttons.bold.icon = 'gridicons-bold';
 			editor.buttons.italic.icon = 'gridicons-italic';
 			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
@@ -53,7 +62,6 @@
 					} );
 
 					editor.$( element ).addClass( 'align' + position );
-
 					editor.nodeChanged();
 				} );
 
