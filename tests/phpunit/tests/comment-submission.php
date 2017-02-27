@@ -68,7 +68,6 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 	}
 
 	public function test_submitting_comment_to_draft_post_returns_error() {
-
 		$error = 'comment_on_draft';
 
 		$this->assertSame( 0, did_action( $error ) );
@@ -84,7 +83,37 @@ class Tests_Comment_Submission extends WP_UnitTestCase {
 		$this->assertSame( 1, did_action( $error ) );
 		$this->assertWPError( $comment );
 		$this->assertSame( $error, $comment->get_error_code() );
+		$this->assertEmpty( $comment->get_error_message() );
 
+	}
+
+	/**
+	 * @ticket 39650
+	 */
+	public function test_submitting_comment_to_draft_post_returns_error_message_for_user_with_correct_caps() {
+		$error = 'comment_on_draft';
+
+		$user = self::factory()->user->create_and_get( array(
+			'role' => 'author',
+		) );
+
+		wp_set_current_user( $user->ID );
+
+		$this->assertSame( 0, did_action( $error ) );
+
+		$post = self::factory()->post->create_and_get( array(
+			'post_status' => 'draft',
+			'post_author' => $user->ID,
+		) );
+		$data = array(
+			'comment_post_ID' => $post->ID,
+		);
+		$comment = wp_handle_comment_submission( $data );
+
+		$this->assertSame( 1, did_action( $error ) );
+		$this->assertWPError( $comment );
+		$this->assertSame( $error, $comment->get_error_code() );
+		$this->assertNotEmpty( $comment->get_error_message() );
 	}
 
 	public function test_submitting_comment_to_scheduled_post_returns_error() {
