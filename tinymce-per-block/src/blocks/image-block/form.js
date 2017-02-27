@@ -10,6 +10,14 @@ export default class ImageBlockForm extends Component {
 		this.props.remove();
 	}
 
+	focus( position ) {
+		if ( position !== 0 ) {
+			this.props.moveUp();
+		} else {
+			this.props.moveDown();
+		}
+	}
+
 	render() {
 		const { block: { children } } = this.props;
 		const image = find( children, ( { name } ) => 'img' === name );

@@ -97,6 +97,16 @@ export default class BlockListBlock extends Component {
 					type: 'focus',
 					position
 				} );
+			},
+			moveUp() {
+				executeCommand( {
+					type: 'moveUp'
+				} );
+			},
+			moveDown() {
+				executeCommand( {
+					type: 'moveDown'
+				} );
 			}
 		};
 

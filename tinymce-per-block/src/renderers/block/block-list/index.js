@@ -45,15 +45,15 @@ class BlockList extends Component {
 	executeCommand = ( index, command ) => {
 		const { content } = this;
 		// Updating blocks
-		switch ( command.type ) {
-			case 'change':
+		const commandHandlers = {
+			change: ( { changes } ) => {
 				const newNodes = [ ...content ];
-				newNodes[ index ] = assign( {}, content[ index ], command.changes );
+				newNodes[ index ] = assign( {}, content[ index ], changes );
 				this.onChange( newNodes );
-				return;
-			case 'append':
-				const block = command.block
-					? command.block
+			},
+			append: ( { block: commandBlock } ) => {
+				const block = commandBlock
+					? commandBlock
 					: {
 						type: 'WP_Block',
 						blockType: 'paragraph',
@@ -74,9 +74,9 @@ class BlockList extends Component {
 					...content.slice( index + 1 )
 				] );
 				setTimeout( () => this.focusBlock( index + 1, 0 ) );
-				return;
-			case 'remove':
-				const indexToRemove = command.index === undefined ? index : command.index;
+			},
+			remove: ( { index: commandIndex } ) => {
+				const indexToRemove = commandIndex === undefined ? index : commandIndex;
 				if ( indexToRemove === 0 && index === 0 ) {
 					return;
 				}
@@ -85,18 +85,32 @@ class BlockList extends Component {
 					...content.slice( indexToRemove + 1 ),
 				] );
 				setTimeout( () => this.focusBlock( indexToRemove - 1 ) );
-				return;
-			case 'mergeWithPrevious':
+			},
+			mergeWithPrevious: () => {
 				const previousBlockNode = this.blockNodes[ index - 1 ];
 				if ( ! previousBlockNode ) {
 					return;
 				}
 				setTimeout( () => previousBlockNode.merge( content[ index ], index ) );
-				return;
-			case 'focus':
-				this.focusBlock( index, command.position );
-				return;
-		}
+			},
+			focus: ( { position } ) => {
+				this.focusBlock( index, position );
+			},
+			moveUp: () => {
+				const previousBlockNode = this.blockNodes[ index - 1 ];
+				if ( previousBlockNode ) {
+					this.focusBlock( index - 1 );
+				}
+			},
+			moveDown: () => {
+				const nextBlockNode = this.blockNodes[ index + 1 ];
+				if ( nextBlockNode ) {
+					this.focusBlock( index + 1, 0 );
+				}
+			}
+		};
+
+		commandHandlers[ command.type ] && commandHandlers[ command.type ]( command );
 	};
 
 	render() {

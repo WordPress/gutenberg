@@ -29,7 +29,7 @@ export default class HeadingBlockForm extends Component {
 	}
 
 	render() {
-		const { block, setChildren, appendBlock, mergeWithPrevious, remove } = this.props;
+		const { block, setChildren, appendBlock, mergeWithPrevious, remove, moveUp, moveDown } = this.props;
 		const { children } = block;
 		const value = serialize( children );
 		const onChangeContent = ( event ) => {
@@ -72,6 +72,8 @@ export default class HeadingBlockForm extends Component {
 					onChange={ onChangeContent }
 					splitValue={ splitValue }
 					removePrevious={ removePrevious }
+					moveUp={ moveUp }
+					moveDown={ moveDown }
 				/>
 			</div>
 		);
