@@ -30,6 +30,7 @@ body {
 }
 
 #editor figure {
+	clear: both;
 	float: none;
 	margin: 1em 0;
 	width: 100%;
@@ -51,6 +52,11 @@ body {
 	float: right;
 	margin: 0.5em 0 0.5em 1em;
 	width: 50%;
+}
+
+#editor figure.alignleft,
+#editor figure.alignright {
+	clear: none;
 }
 
 #editor figcaption {

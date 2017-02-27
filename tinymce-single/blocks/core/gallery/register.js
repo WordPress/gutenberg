@@ -20,6 +20,8 @@ window.wp.blocks.register( {
 		// 		// body...
 		// 	}
 		// },
-		'block-options'
+		{
+			icon: 'gridicons-cog'
+		}
 	]
 } );
