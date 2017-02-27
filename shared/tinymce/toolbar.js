@@ -72,6 +72,12 @@
 				each( buttons, function( item ) {
 					var itemName;
 
+					function onClick( callback ) {
+						return function() {
+							callback( editor, window.element );
+						}
+					}
+
 					function bindSelectorChanged() {
 						var selection = editor.selection;
 
@@ -125,7 +131,7 @@
 					if ( item === '|' ) {
 						buttonGroup = null;
 					} else {
-						if ( Factory.has( item ) ) {
+						if ( typeof item === 'string' && Factory.has( item ) ) {
 							item = {
 								type: item
 							};
@@ -148,13 +154,16 @@
 							}
 
 							if ( editor.buttons[ item ] ) {
-								itemName = item;
-								item = editor.buttons[ itemName ];
+								item = editor.buttons[ item ];
+							} else {
+								item.onClick = onClick( item.onClick );
+							}
 
-								if ( typeof item === 'function' ) {
-									item = item();
-								}
+							if ( typeof item === 'function' ) {
+								item = item();
+							}
 
+							if ( item ) {
 								item.type = item.type || 'svgbutton';
 
 								if ( settings.toolbar_items_size ) {
