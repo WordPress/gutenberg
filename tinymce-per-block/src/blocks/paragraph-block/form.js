@@ -16,7 +16,7 @@ export default class ParagraphBlockForm extends Component {
 	}
 
 	merge = ( block, index ) => {
-		const acceptedBlockTypes = [ 'paragraph', 'heading' ];
+		const acceptedBlockTypes = [ 'quote', 'paragraph', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
 		}

@@ -9,4 +9,5 @@ export { default as ArrowDownAlt2Icon } from './icons/arrow-down-alt2';
 export { default as ArrowUpAlt2Icon } from './icons/arrow-up-alt2';
 export { default as EditorParagraphIcon } from './icons/editor-paragraph';
 export { default as EditorTableIcon } from './icons/editor-table';
+export { default as EditorQuoteIcon } from './icons/editor-quote';
 export { default as FormatImageIcon } from './icons/format-image';

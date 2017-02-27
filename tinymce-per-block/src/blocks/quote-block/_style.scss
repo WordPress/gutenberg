@@ -1,0 +1,18 @@
+.quote-block__form textarea, .quote-block__form .textarea-mirror {
+	width: 100%;
+	border: none;
+	font: inherit;
+	font-family: "Merriweather", serif;
+	color: inherit;
+	font-weight: 300;
+	resize: none;
+	font-size: 20px;
+	border-left: 4px solid black;
+	margin-left: -20px;
+	padding-left: 20px;
+	font-style: italic;
+
+	&:focus {
+		outline: 0;
+	}
+}

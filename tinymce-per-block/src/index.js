@@ -15,6 +15,7 @@ import 'blocks/text-block';
 import 'blocks/image-block';
 import 'blocks/heading-block';
 import 'blocks/paragraph-block';
+import 'blocks/quote-block';
 
 class App extends Component {
 	state = {

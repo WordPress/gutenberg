@@ -28,6 +28,10 @@ export default class EnhancedInput extends Component {
 		}
 	}
 
+	componentDidMount() {
+		this.render();
+	}
+
 	onKeyDown = ( event ) => {
 		const { value, splitValue, removePrevious, moveUp, moveDown } = this.props;
 		if ( event.keyCode === 13 ) {

@@ -3,13 +3,10 @@
  */
 import { createElement, Component } from 'wp-elements';
 
-/**
- * Internal dependencies
- */
 import { serialize } from 'serializers/block';
 import { EnhancedInputComponent } from 'wp-blocks';
 
-export default class HeadingBlockForm extends Component {
+export default class QuoteBlockForm extends Component {
 	bindInput = ( ref ) => {
 		this.input = ref;
 	}
@@ -35,6 +32,7 @@ export default class HeadingBlockForm extends Component {
 		const { block, setChildren, appendBlock, mergeWithPrevious, remove, moveUp, moveDown } = this.props;
 		const { children } = block;
 		const value = serialize( children );
+		console.log( block );
 		const onChangeContent = ( event ) => {
 			setChildren( [ {
 				type: 'Text',
@@ -67,11 +65,11 @@ export default class HeadingBlockForm extends Component {
 				remove();
 			}
 		};
-		const className = block.attrs.size ? block.attrs.size : 'h2';
 
 		return (
-			<div className={ `heading-block__form ${ className }` }>
-				<EnhancedInputComponent ref={ this.bindInput } value={ value }
+			<div className="quote-block__form">
+				<EnhancedInputComponent ref={ this.bindInput }
+					value={ value }
 					onChange={ onChangeContent }
 					splitValue={ splitValue }
 					removePrevious={ removePrevious }
