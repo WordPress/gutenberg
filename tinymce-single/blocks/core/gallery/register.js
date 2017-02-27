@@ -3,7 +3,7 @@ window.wp.blocks.register( {
 	namespace: 'core',
 	type: 'image',
 	keywords: [],
-	icon: 'gridicons-image',
+	icon: 'gridicons-image-multiple',
 	buttons: [
 		'block-align-left',
 		'block-align-center',
