@@ -9,13 +9,21 @@
 			if ( settings.elements ) {
 				settings.elements.forEach( function( element ) {
 					_settings[ 'element:' + element ] = settings;
+					_settings[ 'element:' + element ]._id = 'element:' + element;
 				} );
 			} else if ( settings.namespace && settings.name ) {
 				_settings[ settings.namespace + ':' + settings.name ] = settings;
+				_settings[ settings.namespace + ':' + settings.name ]._id = settings.namespace + ':' + settings.name;
 			}
 		},
 		getSettings: function( id ) {
 			return _settings[ id ];
+		},
+		getSettingsByElement( element ) {
+			var blockType = element.getAttribute( 'data-wp-block-type' );
+			var nodeName = element.nodeName.toLowerCase();
+
+			return this.getSettings( blockType || 'element:' + nodeName );
 		}
 	};
 } )( window.wp = window.wp || {} );
@@ -98,7 +106,7 @@
 	} );
 } )( window.wp.blocks.register );
 
-( function( tinymce ) {
+( function( tinymce, wp ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		function focusToolbar( toolbar ) {
 			var node = toolbar.find( 'toolbar' )[0];
@@ -325,13 +333,7 @@
 
 					editor.on( 'nodechange', function( event ) {
 						element = event.parents[ event.parents.length - 1 ];
-
-						tinymce.each( editor.settings.blocks, function( block, key ) {
-							if ( block.match( element ) ) {
-								button.icon( block.icon || '' );
-								button.text( block.text || '' );
-							}
-						} );
+						button.icon( wp.blocks.getSettingsByElement( element ).icon );
 					} );
 				}
 			});
@@ -504,23 +506,20 @@
 			}
 
 			function showBlockUI( focus ) {
+				var settings = wp.blocks.getSettingsByElement( element );
+
 				blockToolbar.reposition();
 
-				var name = element.getAttribute( 'data-wp-block-type' ) || 'element:' + element.nodeName.toLowerCase();
-				var settings = wp.blocks.getSettings( name );
-
-				console.log(name, settings);
-
 				tinymce.each( blockToolbars, function( toolbar, key ) {
-					if ( key !== name ) {
+					if ( key !== settings._id ) {
 						toolbar.hide();
 					}
 				} );
 
 				if ( settings ) {
-					if ( ! blockToolbars[ name ] ) {
-						blockToolbars[ name ] = editor.wp._createToolbar( settings.buttons.concat( [ 'block-remove' ] ) );
-						blockToolbars[ name ].reposition = function () {
+					if ( ! blockToolbars[ settings._id ] ) {
+						blockToolbars[ settings._id ] = editor.wp._createToolbar( settings.buttons.concat( [ 'block-remove' ] ) );
+						blockToolbars[ settings._id ].reposition = function () {
 							if (!element) return
 
 							var toolbar = this.getEl();
@@ -540,8 +539,8 @@
 						editor.nodeChanged(); // Update UI.
 					}
 
-					blockToolbars[ name ].reposition();
-					focus && focusToolbar( blockToolbars[ name ] );
+					blockToolbars[ settings._id ].reposition();
+					focus && focusToolbar( blockToolbars[ settings._id ] );
 				}
 			}
 
@@ -559,6 +558,11 @@
 				var selection = window.getSelection();
 				var isCollapsed = selection.isCollapsed;
 				var anchorNode = selection.anchorNode;
+
+				if ( ! anchorNode ) {
+					return;
+				}
+
 				var isEmpty = isCollapsed && isEmptySlot( anchorNode );
 				var isBlockUIVisible = ! hidden;
 
@@ -675,4 +679,4 @@
 			} );
 		} );
 	} );
-} )( window.tinymce );
+} )( window.tinymce, window.wp );
