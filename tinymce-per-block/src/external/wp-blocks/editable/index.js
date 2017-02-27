@@ -3,6 +3,7 @@
  */
 import { createElement, Component } from 'wp-elements';
 import tinymce from 'tinymce';
+import { isEqual } from 'lodash';
 
 import { parse } from 'parsers/block';
 
@@ -48,11 +49,31 @@ export default class EditableComponent extends Component {
 		}
 	}
 
+	onKeyDown = ( event ) => {
+		if ( event.keyCode === 38 ) {
+			const range = this.editor.selection.getRng();
+			if ( range.startOffset === 0 && this.editor.getBody().firstChild === this.editor.selection.getStart() ) {
+				event.preventDefault();
+				this.props.moveUp();
+			}
+		} else if ( event.keyCode === 40 ) {
+			const bookmark = this.editor.selection.getBookmark();
+			this.focus();
+			const finalBookmark = this.editor.selection.getBookmark( 2, true );
+			this.editor.selection.moveToBookmark( bookmark );
+			if ( isEqual( this.editor.selection.getBookmark( 2, true ), finalBookmark ) ) {
+				event.preventDefault();
+				this.props.moveDown();
+			}
+		}
+	}
+
 	onSetup = ( editor ) => {
 		this.editor = editor;
 
 		editor.on( 'init', this.setInitialContent );
 		editor.on( 'change focusout undo redo', this.onChange );
+		editor.on( 'keydown', this.onKeyDown );
 	};
 
 	setInitialContent = () => {

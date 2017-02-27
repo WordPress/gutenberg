@@ -17,7 +17,7 @@ export default class TextBlockForm extends Component {
 	}
 
 	render() {
-		const { block, setChildren } = this.props;
+		const { block, setChildren, moveUp, moveDown } = this.props;
 		const { children } = block;
 		const style = reduce( block.attrs, ( memo, value, key ) => {
 			switch ( key ) {
@@ -31,7 +31,11 @@ export default class TextBlockForm extends Component {
 
 		return (
 			<div className="text-block__form" style={ style }>
-				<EditableComponent ref={ this.bindEditable } initialContent={ serialize( children ) }
+				<EditableComponent
+					ref={ this.bindEditable }
+					initialContent={ serialize( children ) }
+					moveUp={ moveUp }
+					moveDown={ moveDown }
 					onChange={ ( value ) => setChildren( value ) } />
 			</div>
 		);

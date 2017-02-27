@@ -32,7 +32,6 @@ export default class QuoteBlockForm extends Component {
 		const { block, setChildren, appendBlock, mergeWithPrevious, remove, moveUp, moveDown } = this.props;
 		const { children } = block;
 		const value = serialize( children );
-		console.log( block );
 		const onChangeContent = ( event ) => {
 			setChildren( [ {
 				type: 'Text',

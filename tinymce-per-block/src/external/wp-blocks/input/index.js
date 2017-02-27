@@ -47,39 +47,12 @@ export default class EnhancedInput extends Component {
 			(	this.input.selectionStart === 0 || ( this.input.selectionStart === 1 && value === ' ' ) )
 		) {
 			removePrevious();
-		} else if (
-			event.keyCode === 38 || event.keyCode === 40
-		) {
-			const sanitizeValue = rawValue => {
-				return rawValue
-					.replace( /&/g, '&amp;' )
-					.replace( /"/g, '&quot;' )
-					.replace( /'/g, '&#39;' )
-					.replace( /</g, '&lt;' )
-					.replace( />/g, '&gt;' )
-					.replace( /\n/g, '<br />' );
-			};
-
-			this.mirror.style.display = 'block';
-			this.mirror.innerHTML = '.<br/>.';
-			const initialHeight = this.mirror.clientHeight;
-			this.mirror.innerHTML =
-				sanitizeValue( value.substring( 0, this.input.selectionStart ) ) +
-				'.<br/>.';
-			const currentHeight = this.mirror.clientHeight;
-			this.mirror.innerHTML = sanitizeValue( value ) + '<br/>.';
-			const allHeight = this.mirror.clientHeight;
-			this.mirror.style.display = 'none';
-
-			const currentRow = currentHeight / ( initialHeight / 2 ) - 1;
-			const countRows = allHeight / ( initialHeight / 2 ) - 1;
-			if ( currentRow === 1 && event.keyCode === 38 ) {
-				event.preventDefault();
-				moveUp();
-			} else if ( currentRow === countRows && event.keyCode === 40 ) {
-				event.preventDefault();
-				moveDown();
-			}
+		} else if ( event.keyCode === 38 && this.input.selectionStart === 0 ) {
+			event.preventDefault();
+			moveUp();
+		} else if ( event.keyCode === 40 && this.input.selectionStart === value.length ) {
+			event.preventDefault();
+			moveDown();
 		}
 	};
 

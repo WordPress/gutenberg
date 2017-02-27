@@ -10,6 +10,7 @@ import { createElement, Component, render } from 'wp-elements';
 import * as parsers from 'parsers';
 import * as renderers from 'renderers';
 import * as serializers from 'serializers';
+import { getBlock } from 'wp-blocks';
 import 'assets/stylesheets/main.scss';
 import 'blocks/text-block';
 import 'blocks/image-block';
@@ -41,7 +42,8 @@ class App extends Component {
 		forEach( renderers, ( renderer, type ) => {
 			const parser = parsers[ type ];
 			if ( parser ) {
-				parsedContent[ type ] = parser.parse( content );
+				// Drop the undefined blocks to avoid bugs
+				parsedContent[ type ] = parser.parse( content ).filter( block => !! getBlock( block.blockType ) );
 			} else {
 				parsedContent[ type ] = content;
 			}
