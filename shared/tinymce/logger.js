@@ -11,12 +11,12 @@ window.tinymce.PluginManager.add( 'logger', function( editor ) {
 		beforeExecCommand: 'fires before commands are executed.',
 		execCommand: 'fires after commands are executed.',
 		change: 'fires when a new undo level is added.',
-		dirty: 'fires when the editor is considered to be in a dirty (unsaved) state. '
+		dirty: 'fires when the editor is considered to be in a dirty (unsaved) state.'
 	};
 
 	window.tinymce.each( types, function( info, type ) {
 		editor.on( type, function( event ) {
-			console.log( type, info, event );
+			window.console.log( type, info, event );
 		} );
 	} );
 } );

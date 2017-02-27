@@ -31,9 +31,9 @@ body {
 
 #editor figure {
 	float: none;
-	margin: 0;
+	margin: 1em 0;
 	width: 100%;
-	transition: margin 0.5s, width 0.5s;
+	/*transition: margin 0.5s, width 0.5s;*/
 }
 
 #editor figure.aligncenter {
