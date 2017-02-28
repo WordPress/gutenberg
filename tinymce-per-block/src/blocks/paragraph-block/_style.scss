@@ -1,0 +1,14 @@
+.paragraph-block__form textarea, .paragraph-block__form .textarea-mirror {
+	width: 100%;
+	border: none;
+	font: inherit;
+	font-family: "Merriweather", serif;
+	font-size: 16px;
+	color: inherit;
+	font-weight: 300;
+	resize: none;
+
+	&:focus {
+		outline: 0;
+	}
+}

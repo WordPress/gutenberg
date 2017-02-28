@@ -2,51 +2,62 @@
 @import 'animations';
 @import '~blocks/text-block/style';
 @import '~blocks/image-block/style';
+@import '~blocks/heading-block/style';
+@import '~blocks/paragraph-block/style';
+@import '~blocks/quote-block/style';
 @import '~external/dashicons/style';
 @import '~renderers/block/block-list/style';
 @import '~renderers/html/html-editor/style';
 
+* {
+	box-sizing: border-box;
+}
+
 html {
 	height: 100%;
-	font-size: 10px;
 }
 
 body {
-	margin: 4vh auto;
-	min-height: 92vh;
-	width: 90%;
-	max-width: 1280px;
-    -webkit-font-smoothing: antialiased !important;
+	height: 100%;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+body {
+	font: 13px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+	max-width: 720px;
+	margin: 60px auto;
+	color: #12181e;
+}
+
+.editor {
+	height: 100%;
+}
+
+.toggle-renderer {
+	position: absolute;
+	top: -20px;
+	right: 0;
 }
 
 .renderers {
 	position: relative;
-	display: flex;
-	min-height: 100%;
+	height: 100%;
+}
 
-	&::after {
-		content: '';
-		position: absolute;
+.renderer-html {
+	z-index: 10;
+	position: absolute;
 		top: 0;
 		bottom: 0;
-		left: 50%;
-		margin-left: -2px;
-		width: 4px;
-		background-color: $gray-light;
-	}
+	width: 100%;
+}
 
-	> #html,
-	> #block {
-		flex-basis: 50%;
-		margin: 0 8rem;
-		padding: 4vh 0;
-
-		&:first-child {
-			margin-left: 0;
-		}
-
-		&:last-child {
-			margin-right: 0;
-		}
-	}
+.mce-content-body:focus {
+	outline: 0;
 }
