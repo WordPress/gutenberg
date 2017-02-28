@@ -1,43 +1,70 @@
 /**
  * External dependencies
  */
-import { createElement } from 'wp-elements';
-import { unescape as unescapeString, reduce, map } from 'lodash';
+import { createElement, Component } from 'wp-elements';
+import { reduce } from 'lodash';
+import { EditableComponent } from 'wp-blocks';
 
-function getChildElements( child ) {
-	if ( child.value ) {
-		return unescapeString( child.value );
+import { serialize } from 'serializers/block';
+
+export default class TextBlockForm extends Component {
+	focus( position ) {
+		this.editable.focus( position );
 	}
 
-	let children;
-	if ( child.children ) {
-		children = map( child.children, getChildElements );
-	}
-
-	if ( 'HTML_Tag' === child.type ) {
-		return createElement( child.name, child.attrs, children );
-	}
-
-	return children;
-}
-
-export default function TextBlockForm( { node } ) {
-	const style = reduce( node.attrs, ( memo, value, key ) => {
-		switch ( key ) {
-			case 'align':
-				memo[ 'text-align' ] = value;
-				break;
+	merge = ( block, index ) => {
+		const acceptedBlockTypes = [ 'text', 'quote', 'paragraph', 'heading' ];
+		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
+			return;
 		}
 
-		return memo;
-	}, {} );
+		const { block: { children }, remove, setChildren } = this.props;
+		setChildren( children.concat( block.children ) );
+		remove( index );
+		setTimeout( () => this.editable.appendContent( serialize( block.children ) ) );
+	}
 
-	return (
-		<p
-			contentEditable
-			style={ style }
-			className="text-block__form">
-			{ map( node.children, getChildElements ) }
-		</p>
-	);
+	bindEditable = ( ref ) => {
+		this.editable = ref;
+	}
+
+	render() {
+		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
+		const { children } = block;
+		const style = reduce( block.attrs, ( memo, value, key ) => {
+			switch ( key ) {
+				case 'align':
+					memo.textAlign = value;
+					break;
+			}
+
+			return memo;
+		}, {} );
+
+		const splitValue = ( left, right ) => {
+			setChildren( left );
+			if ( right ) {
+				appendBlock( {
+					...block,
+					children: right
+				} );
+			} else {
+				appendBlock();
+			}
+		};
+
+		return (
+			<div className="text-block__form" style={ style }>
+				<EditableComponent
+					ref={ this.bindEditable }
+					initialContent={ serialize( children ) }
+					moveUp={ moveUp }
+					moveDown={ moveDown }
+					splitValue={ splitValue }
+					mergeWithPrevious={ mergeWithPrevious }
+					remove={ remove }
+					onChange={ ( value ) => setChildren( value ) } />
+			</div>
+		);
+	}
 }
