@@ -1,13 +1,14 @@
 ( function( register ) {
 	function getButtons() {
 		var buttons = [
-			'alignleft',
-			'aligncenter',
-			'alignright'
+			'text-align-left',
+			'text-align-center',
+			'text-align-right'
 		];
 
 		'123456'.split( '' ).forEach( function( level ) {
 			buttons.push( {
+				icon: 'gridicons-heading',
 				text: level,
 				stateSelector: 'h' + level,
 				onClick: function( editor, element ) {

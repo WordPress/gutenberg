@@ -3,9 +3,9 @@ window.wp.blocks.register( {
 	type: 'text',
 	icon: 'gridicons-posts',
 	buttons: [
-		'alignleft',
-		'aligncenter',
-		'alignright',
+		'text-align-left',
+		'text-align-center',
+		'text-align-right',
 		{
 			icon: 'gridicons-heading',
 			onClick: function( editor ) {
@@ -18,7 +18,12 @@ window.wp.blocks.register( {
 				editor.formatter.apply( 'blockquote' );
 			}
 		},
-		'bullist',
+		{
+			icon: 'gridicons-list-unordered',
+			onClick: function( editor, element ) {
+				editor.execCommand( 'InsertUnorderedList' );
+			}
+		},
 		{
 			icon: 'gridicons-code',
 			onClick: function( editor ) {

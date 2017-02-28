@@ -1,141 +1,138 @@
 ( function( tinymce, wp ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
-		function focusToolbar( toolbar ) {
-			var node = toolbar.find( 'toolbar' )[0];
-			node && node.focus( true );
-		}
+
+		// Set focussed block. Global variable for now. Top-level node for now.
 
 		editor.on( 'nodechange', function( event ) {
 			window.element = event.parents[ event.parents.length - 1 ];
 		} );
+
+		// Global buttons.
+
+		tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+			editor.addCommand( 'text-align-' + position, function() {
+				tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+					editor.$( element ).removeClass( 'text-align-' + position );
+				} );
+
+				if ( position !== 'left' ) {
+					editor.$( element ).addClass( 'text-align-' + position );
+					editor.nodeChanged();
+				}
+			} );
+
+			editor.addButton( 'text-align-' + position, {
+				icon: 'gridicons-align-' + position,
+				cmd: 'text-align-' + position,
+				onPostRender: function() {
+					var button = this;
+
+					editor.on( 'nodechange', function( event ) {
+						$element = editor.$( element );
+
+						if ( position === 'left' ) {
+							button.active( ! (
+								$element.hasClass( 'text-align-center' ) || $element.hasClass( 'text-align-right' )
+							) );
+						} else {
+							button.active( $element.hasClass( 'text-align-' + position ) );
+						}
+					} );
+				}
+			} );
+
+			editor.addCommand( 'block-align-' + position, function() {
+				tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+					editor.$( element ).removeClass( 'align' + position );
+				} );
+
+				editor.$( element ).addClass( 'align' + position );
+				editor.nodeChanged();
+			} );
+
+			editor.addButton( 'block-align-' + position, {
+				icon: 'gridicons-align-image-' + position,
+				cmd: 'block-align-' + position,
+				onPostRender: function() {
+					var button = this;
+
+					editor.on( 'nodechange', function( event ) {
+						$element = editor.$( element );
+
+						if ( position === 'center' ) {
+							button.active( ! (
+								$element.hasClass( 'alignleft' ) || $element.hasClass( 'alignright' )
+							) );
+						} else {
+							button.active( $element.hasClass( 'align' + position ) );
+						}
+					} );
+				}
+			} );
+		} );
+
+		editor.addCommand( 'addfigcaption', function() {
+			if ( ! editor.$( element ).find( 'figcaption' ).length ) {
+				var figcaption = editor.$( '<figcaption><br></figcaption>' );
+
+				editor.undoManager.transact( function() {
+					editor.$( element ).append( figcaption );
+					editor.selection.setCursorLocation( figcaption[0], 0 );
+				} );
+			}
+		} );
+
+		editor.addCommand( 'removefigcaption', function() {
+			var figcaption = editor.$( element ).find( 'figcaption' );
+
+			if ( figcaption.length ) {
+				editor.undoManager.transact( function() {
+					figcaption.remove();
+				} );
+			}
+		} );
+
+		editor.addCommand( 'togglefigcaption', function() {
+			if ( editor.$( element ).find( 'figcaption' ).length ) {
+				editor.execCommand( 'removefigcaption' );
+			} else {
+				editor.execCommand( 'addfigcaption' );
+			}
+		} );
+
+		editor.addButton( 'togglefigcaption', {
+			icon: 'gridicons-caption',
+			cmd: 'togglefigcaption',
+			onPostRender: function() {
+				var button = this;
+
+				editor.on( 'nodechange', function( event ) {
+					var element = event.parents[ event.parents.length - 1 ];
+
+					button.active( editor.$( element ).find( 'figcaption' ).length > 0 );
+				} );
+			}
+		} );
+
+		// Attach block UI.
 
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
 			var blockToolbar;
 			var blockToolbars = {};
 
-			editor.addCommand( 'alignleft', function() {
-				editor.formatter.remove( 'alignleft' );
-				editor.formatter.remove( 'aligncenter' );
-				editor.formatter.remove( 'alignright' );
-
-				editor.nodeChanged();
-			});
-
-			editor.addButton( 'alignleft', {
-				icon: 'gridicons-align-left',
-				cmd: 'alignleft',
-				onpostrender: function() {
-					var button = this;
-
-					editor.on( 'nodechange', function( event ) {
-						button.active( ! editor.formatter.matchNode( element, 'aligncenter' ) &&
-							! editor.formatter.matchNode( element, 'alignright' ) );
-					} );
-				}
-			} );
-
-			// Adjust icon of TinyMCE core buttons.
-			editor.buttons.aligncenter.icon = 'gridicons-align-center';
-			editor.buttons.alignright.icon = 'gridicons-align-right';
-			editor.buttons.bullist.icon = 'gridicons-list-unordered';
-			editor.buttons.numlist.icon = 'gridicons-list-ordered';
-
-			editor.buttons.bold.icon = 'gridicons-bold';
-			editor.buttons.italic.icon = 'gridicons-italic';
-			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
-			editor.buttons.link.icon = 'gridicons-link';
-
-			tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-				editor.addCommand( 'block-align-' + position, function() {
-					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.$( element ).removeClass( 'align' + position );
-					} );
-
-					editor.$( element ).addClass( 'align' + position );
-
-					editor.nodeChanged();
-				} );
-
-				editor.addButton( 'block-align-' + position, {
-					icon: 'gridicons-align-image-' + position,
-					cmd: 'block-align-' + position,
-					onPostRender: function() {
-						var button = this;
-
-						editor.on( 'nodechange', function( event ) {
-							$element = editor.$( element );
-
-							if ( position === 'center' ) {
-								button.active( ! (
-									$element.hasClass( 'alignleft' ) || $element.hasClass( 'alignright' )
-								) );
-							} else {
-								button.active( $element.hasClass( 'align' + position ) );
-							}
-						} );
-					}
-				} );
-			} );
-
-			editor.addCommand( 'addfigcaption', function() {
-				if ( ! editor.$( element ).find( 'figcaption' ).length ) {
-					var figcaption = editor.$( '<figcaption><br></figcaption>' );
-
-					editor.undoManager.transact( function() {
-						editor.$( element ).append( figcaption );
-						editor.selection.setCursorLocation( figcaption[0], 0 );
-					} );
-				}
-			} );
-
-			editor.addCommand( 'removefigcaption', function() {
-				var figcaption = editor.$( element ).find( 'figcaption' );
-
-				if ( figcaption.length ) {
-					editor.undoManager.transact( function() {
-						figcaption.remove();
-					} );
-				}
-			} );
-
-			editor.addCommand( 'togglefigcaption', function() {
-				if ( editor.$( element ).find( 'figcaption' ).length ) {
-					editor.execCommand( 'removefigcaption' );
-				} else {
-					editor.execCommand( 'addfigcaption' );
-				}
-			} );
-
-			editor.addButton( 'togglefigcaption', {
-				icon: 'gridicons-caption',
-				cmd: 'togglefigcaption',
-				onPostRender: function() {
-					var button = this;
-
-					editor.on( 'nodechange', function( event ) {
-						var element = event.parents[ event.parents.length - 1 ];
-
-						button.active( editor.$( element ).find( 'figcaption' ).length > 0 );
-					} );
-				}
-			} );
-
-			editor.addCommand( 'selectblock', function() {} );
-
-			editor.addButton( 'moveblock', {
-				icon: 'gridicons-reblog',
-				onclick: function() {
-					editor.$( element ).attr( 'data-mce-selected', 'move' );
-					editor.$( editor.getBody() ).addClass( 'is-moving-block' );
-					editor.nodeChanged();
-				}
-			} );
+			// editor.addButton( 'moveblock', {
+			// 	icon: 'gridicons-reblog',
+			// 	onclick: function() {
+			// 		editor.$( element ).attr( 'data-mce-selected', 'move' );
+			// 		editor.$( editor.getBody() ).addClass( 'is-moving-block' );
+			// 		editor.nodeChanged();
+			// 	}
+			// } );
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
-				cmd: 'selectblock',
 				onPostRender: function() {
 					var button = this;
 
@@ -204,6 +201,12 @@
 				icon: 'gridicons-add-outline',
 				tooltip: 'Add Block'
 			} );
+
+			// Adjust icon of TinyMCE core buttons.
+			editor.buttons.bold.icon = 'gridicons-bold';
+			editor.buttons.italic.icon = 'gridicons-italic';
+			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
+			editor.buttons.link.icon = 'gridicons-link';
 
 			var toolbarInline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
 			var toolbarCaret = editor.wp._createToolbar( [ 'add' ] );
@@ -311,6 +314,11 @@
 				tinymce.each( blockToolbars, function( toolbar ) {
 					toolbar.hide();
 				} );
+			}
+
+			function focusToolbar( toolbar ) {
+				var node = toolbar.find( 'toolbar' )[0];
+				node && node.focus( true );
 			}
 
 			function showBlockUI( focus ) {
