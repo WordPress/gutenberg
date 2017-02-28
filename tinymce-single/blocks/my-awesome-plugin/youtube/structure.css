@@ -1,0 +1,29 @@
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"] {
+	position: relative;
+}
+
+/* Should probably be handled internally. */
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"]:before {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"][data-mce-selected]:before {
+	display: none;
+}
+
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"] iframe {
+	width: 750px;
+	height: 422px;
+}
+
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignleft iframe,
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignright iframe {
+	width: 375px;
+	height: 211px;
+}
