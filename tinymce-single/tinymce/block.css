@@ -6,7 +6,12 @@
 	background-color: transparent;
 }
 
-#editor.has-block-ui *[data-mce-selected="block"] {
+#editor hr[data-mce-selected] {
+	outline: none;
+}
+
+#editor.has-block-ui *[data-mce-selected="block"],
+#editor.has-block-ui hr[data-mce-selected] {
 	outline: 2px solid #e0e5e9;
 	outline-offset: 11px;
 	/*background-color: rgba( 135, 166, 188, 0.3 );
