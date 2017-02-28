@@ -10,20 +10,19 @@
 		// Global buttons.
 
 		tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-			editor.addCommand( 'text-align-' + position, function() {
-				tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-					editor.$( element ).removeClass( 'text-align-' + position );
-				} );
-
-				if ( position !== 'left' ) {
-					editor.$( element ).addClass( 'text-align-' + position );
-					editor.nodeChanged();
-				}
-			} );
-
 			editor.addButton( 'text-align-' + position, {
 				icon: 'gridicons-align-' + position,
 				cmd: 'text-align-' + position,
+				onClick: function() {
+					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+						editor.$( element ).removeClass( 'text-align-' + position );
+					} );
+
+					if ( position !== 'left' ) {
+						editor.$( element ).addClass( 'text-align-' + position );
+						editor.nodeChanged();
+					}
+				},
 				onPostRender: function() {
 					var button = this;
 
@@ -41,18 +40,17 @@
 				}
 			} );
 
-			editor.addCommand( 'block-align-' + position, function() {
-				tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-					editor.$( element ).removeClass( 'align' + position );
-				} );
-
-				editor.$( element ).addClass( 'align' + position );
-				editor.nodeChanged();
-			} );
-
 			editor.addButton( 'block-align-' + position, {
 				icon: 'gridicons-align-image-' + position,
 				cmd: 'block-align-' + position,
+				onClick: function() {
+					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
+						editor.$( element ).removeClass( 'align' + position );
+					} );
+
+					editor.$( element ).addClass( 'align' + position );
+					editor.nodeChanged();
+				},
 				onPostRender: function() {
 					var button = this;
 
@@ -71,7 +69,7 @@
 			} );
 		} );
 
-		editor.addCommand( 'addfigcaption', function() {
+		function addfigcaption() {
 			if ( ! editor.$( element ).find( 'figcaption' ).length ) {
 				var figcaption = editor.$( '<figcaption><br></figcaption>' );
 
@@ -80,9 +78,9 @@
 					editor.selection.setCursorLocation( figcaption[0], 0 );
 				} );
 			}
-		} );
+		}
 
-		editor.addCommand( 'removefigcaption', function() {
+		function removefigcaption() {
 			var figcaption = editor.$( element ).find( 'figcaption' );
 
 			if ( figcaption.length ) {
@@ -90,19 +88,17 @@
 					figcaption.remove();
 				} );
 			}
-		} );
-
-		editor.addCommand( 'togglefigcaption', function() {
-			if ( editor.$( element ).find( 'figcaption' ).length ) {
-				editor.execCommand( 'removefigcaption' );
-			} else {
-				editor.execCommand( 'addfigcaption' );
-			}
-		} );
+		}
 
 		editor.addButton( 'togglefigcaption', {
 			icon: 'gridicons-caption',
-			cmd: 'togglefigcaption',
+			onClick: function() {
+				if ( editor.$( element ).find( 'figcaption' ).length ) {
+					removefigcaption();
+				} else {
+					addfigcaption();
+				}
+			},
 			onPostRender: function() {
 				var button = this;
 
@@ -147,7 +143,7 @@
 				}
 			});
 
-			editor.addCommand( 'block-remove', function() {
+			function removeBlock() {
 				var $blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
 				var p = editor.$( '<p><br></p>' );
 
@@ -156,14 +152,14 @@
 					editor.selection.setCursorLocation( p[0], 0 );
 					$blocks.remove();
 				} );
-			} );
+			}
 
 			editor.addButton( 'block-remove', {
 				icon: 'gridicons-trash',
-				cmd: 'block-remove'
+				onClick: removeBlock
 			} );
 
-			editor.addCommand( 'up', function() {
+			function moveBlockUp() {
 				$blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
 				rect = element.getBoundingClientRect();
 				$prev = $blocks.first().prev();
@@ -173,9 +169,9 @@
 					editor.nodeChanged();
 					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
 				}
-			} );
+			}
 
-			editor.addCommand( 'down', function() {
+			function moveBlockDown() {
 				$blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
 				rect = element.getBoundingClientRect();
 				$next = $blocks.last().next();
@@ -185,19 +181,19 @@
 					editor.nodeChanged();
 					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
 				}
-			} );
+			}
 
 			editor.addButton( 'up', {
 				icon: 'gridicons-chevron-up',
 				tooltip: 'Up',
-				cmd: 'up',
+				onClick: moveBlockUp,
 				classes: 'widget btn move-up'
 			} );
 
 			editor.addButton( 'down', {
 				icon: 'gridicons-chevron-down',
 				tooltip: 'Down',
-				cmd: 'down',
+				onClick: moveBlockDown,
 				classes: 'widget btn move-down'
 			} );
 
@@ -533,7 +529,7 @@
 
 				if ( element.nodeName === 'FIGURE' ) {
 					if ( keyCode === VK.ENTER ) {
-						editor.execCommand( 'addfigcaption' );
+						addfigcaption();
 						event.preventDefault();
 					}
 
@@ -541,13 +537,13 @@
 						var caretEl = editor.selection.getNode();
 
 						if ( caretEl.nodeName !== 'FIGCAPTION' ) {
-							editor.execCommand( 'block-remove' );
+							removeBlock();
 							event.preventDefault();
 						} else {
 							var range = editor.selection.getRng();
 
 							if ( range.collapsed && range.startOffset === 0 ) {
-								editor.execCommand( 'removefigcaption' );
+								removefigcaption();
 								event.preventDefault();
 							}
 						}
