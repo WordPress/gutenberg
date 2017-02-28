@@ -137,8 +137,12 @@
 					var button = this;
 
 					editor.on( 'nodechange', function( event ) {
-						element = event.parents[ event.parents.length - 1 ];
-						button.icon( wp.blocks.getSettingsByElement( element ).icon );
+						var element = event.parents[ event.parents.length - 1 ];
+						var settings = wp.blocks.getSettingsByElement( element );
+
+						if ( settings ) {
+							button.icon( settings.icon );
+						}
 					} );
 				}
 			});
@@ -264,7 +268,7 @@
 				} );
 			} );
 
-			function isEmptySlot( node ) {
+			function isEmptySlot( node, isAtRoot ) {
 				// Text node.
 				if ( node.nodeType === 3 ) {
 					// Has text.
@@ -278,7 +282,7 @@
 				// Element node.
 				if ( node.nodeType === 1 ) {
 					// Element is no direct child.
-					if ( node.parentNode !== editor.getBody() ) {
+					if ( isAtRoot && node.parentNode !== editor.getBody() ) {
 						return false;
 					}
 
@@ -290,7 +294,7 @@
 						// Text node.
 						if ( childNodes[ i ].nodeType === 3 ) {
 							// Has text.
-							if ( node.data.length ) {
+							if ( childNodes[ i ].data.length ) {
 								return false;
 							}
 						}
@@ -372,14 +376,80 @@
 				}
 			}
 
+			function isInputKeyEvent( event ) {
+				var code = event.keyCode;
+				var VK = tinymce.util.VK;
+
+				if ( VK.metaKeyPressed( event ) ) {
+					return false;
+				}
+
+				// Special keys.
+				if ( code <= 47 && ! (
+					code === VK.SPACEBAR || code === VK.ENTER || code === VK.DELETE || code === VK.BACKSPACE
+				) ) {
+					return false;
+				}
+
+				// OS keys.
+				if ( code >= 91 && code <= 93 ) {
+					return false;
+				}
+
+				// Function keys.
+				if ( code >= 112 && code <= 123 ) {
+					return false;
+				}
+
+				// Lock keys.
+				if ( code >= 144 && code <= 145 ) {
+					return false;
+				}
+
+				return true;
+			}
+
+			var anchorNode;
 			var hidden = true;
+			var keypress = false;
 
 			editor.on( 'keydown', function( event ) {
-				if ( tinymce.util.VK.metaKeyPressed( event ) ) {
+				keypress = true;
+
+				if ( ! isInputKeyEvent( event ) ) {
 					return;
 				}
 
-				hidden = true;
+				// No typing directly on elements.
+				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
+					event.preventDefault();
+				} else {
+					hidden = true;
+				}
+			} );
+
+			editor.on( 'keyup', function( event ) {
+				keypress = false;
+			} );
+
+			editor.on( 'beforePastePreProcess beforeExecCommand', function( event ) {
+				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
+					event.preventDefault();
+				}
+			} );
+
+			editor.on( 'input', function( event ) {
+				// Non key input (e.g. emoji).
+				if ( keypress ) {
+					return;
+				}
+
+				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
+					// Event not cancelable. :(
+					// Let's see how this goes, it might be buggy.
+					editor.undoManager.add();
+					editor.undoManager.undo();
+				}
 			} );
 
 			editor.on( 'mousedown touchstart', function() {
@@ -389,13 +459,18 @@
 			editor.on( 'selectionChange nodeChange', function( event ) {
 				var selection = window.getSelection();
 				var isCollapsed = selection.isCollapsed;
-				var anchorNode = selection.anchorNode;
 
-				if ( ! anchorNode ) {
+				if ( ! selection.anchorNode ) {
 					return;
 				}
 
-				var isEmpty = isCollapsed && isEmptySlot( anchorNode );
+				if ( selection.anchorNode.parentNode.id === 'mcepastebin' ) {
+					return;
+				}
+
+				anchorNode = selection.anchorNode;
+
+				var isEmpty = isCollapsed && isEmptySlot( anchorNode, true );
 				var isBlockUIVisible = ! hidden;
 
 				if ( isEmpty ) {
@@ -422,14 +497,11 @@
 					} else {
 						toolbarInline.hide();
 
-						// setTimeout( function() {
-							if ( isBlockUIVisible ) {
-								window.console.log( 'Debug: visible block UI.' );
-								showBlockUI();
-							} else {
-								hideBlockUI();
-							}
-						// }, 50 );
+						if ( isBlockUIVisible ) {
+							showBlockUI();
+						} else {
+							hideBlockUI();
+						}
 					}
 				}
 			} );
