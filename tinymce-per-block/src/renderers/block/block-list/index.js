@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { assign, map } from 'lodash';
+import { assign, map, uniqueId } from 'lodash';
 
 /**
  * Internal dependencies
@@ -38,21 +38,27 @@ class BlockList extends Component {
 	};
 
 	onChange = ( content ) => {
-		this.props.onChange( content );
 		this.content = content;
+		this.props.onChange( content );
 	}
 
-	executeCommand = ( index, command ) => {
+	executeCommand = ( index, block, command ) => {
 		const { content } = this;
+
+		// Ignore commands for removed blocks
+		if ( ! content.find( b => b.uid === block.uid ) ) {
+			return;
+		}
+
 		// Updating blocks
 		const commandHandlers = {
 			change: ( { changes } ) => {
-				const newNodes = [ ...content ];
-				newNodes[ index ] = assign( {}, content[ index ], changes );
-				this.onChange( newNodes );
+				const newBlocks = [ ...content ];
+				newBlocks[ index ] = assign( {}, content[ index ], changes );
+				this.onChange( newBlocks );
 			},
 			append: ( { block: commandBlock } ) => {
-				const block = commandBlock
+				const createdBlock = commandBlock
 					? commandBlock
 					: {
 						type: 'WP_Block',
@@ -70,7 +76,7 @@ class BlockList extends Component {
 					};
 				this.onChange( [
 					...content.slice( 0, index + 1 ),
-					block,
+					Object.assign( {}, createdBlock, { uid: uniqueId() } ),
 					...content.slice( index + 1 )
 				] );
 				setTimeout( () => this.focusBlock( index + 1, 0 ) );
@@ -118,19 +124,19 @@ class BlockList extends Component {
 		const { focusIndex } = this.state;
 		return (
 			<div className="block-list">
-				{ map( content, ( node, index ) => {
+				{ map( content, ( block, index ) => {
 					const isFocused = index === focusIndex;
 
 					return (
 						<BlockListBlock
 							ref={ this.bindBlock( index ) }
-							key={ index }
+							key={ block.uid }
 							tabIndex={ index }
 							isFocused={ isFocused }
 							onFocus={ () => this.onFocusIndexChange( index ) }
 							onBlur={ () => this.onFocusIndexChange( null ) }
-							executeCommand={ ( command ) => this.executeCommand( index, command ) }
-							node={ node } />
+							executeCommand={ ( command ) => this.executeCommand( index, block, command ) }
+							block={ block } />
 					);
 				} ) }
 			</div>

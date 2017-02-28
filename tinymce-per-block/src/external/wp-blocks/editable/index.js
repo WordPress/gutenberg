@@ -7,12 +7,12 @@ import { isEqual } from 'lodash';
 
 import { parse } from 'parsers/block';
 
-function initialize( node, onSetup ) {
+function initialize( node, inline, onSetup ) {
 	if ( ! node ) {
 		return;
 	}
 
-	tinymce.init( {
+	const config = {
 		target: node.querySelector( '[contenteditable=true]' ),
 		theme: false,
 		inline: true,
@@ -20,23 +20,41 @@ function initialize( node, onSetup ) {
 		skin_url: '//s1.wp.com/wp-includes/js/tinymce/skins/lightgray',
 		entity_encoding: 'raw',
 		setup: onSetup
-	} );
+	};
+
+	if ( inline ) {
+		config.valid_elements = 'p,br,b,i,strong,em';
+	}
+
+	tinymce.init( config );
 }
 
 export default class EditableComponent extends Component {
 	static defaultProps = {
 		onChange: () => {},
-		initialContent: ''
+		splitValue: () => {},
+		initialContent: '',
+		inline: false
 	};
 
 	componentDidMount() {
-		initialize( this.node, this.onSetup );
+		initialize( this.node, this.props.inline, this.onSetup );
 	}
 
 	componentWillUnmount() {
 		if ( this.editor ) {
 			this.editor.destroy();
 		}
+	}
+
+	appendContent( content ) {
+		const div = document.createElement( 'div' );
+		div.innerHTML = content;
+		const newNodes = Array.from( div.childNodes );
+		newNodes.forEach( node => {
+			this.editor.getBody().appendChild( node );
+		} );
+		this.editor.selection.setCursorLocation( newNodes[ 0 ], 0 );
 	}
 
 	focus( position ) {
@@ -49,10 +67,27 @@ export default class EditableComponent extends Component {
 		}
 	}
 
+	isStartOfEditor() {
+		const range = this.editor.selection.getRng();
+		if ( range.startOffset !== 0 || ! range.collapsed ) {
+			return false;
+		}
+		const start = this.editor.selection.getStart();
+		const body = this.editor.getBody();
+		let element = start;
+		do {
+			const child = element;
+			element = element.parentNode;
+			if ( element.childNodes[ 0 ] !== child ) {
+				return false;
+			}
+		} while ( element !== body );
+		return true;
+	}
+
 	onKeyDown = ( event ) => {
 		if ( event.keyCode === 38 ) {
-			const range = this.editor.selection.getRng();
-			if ( range.startOffset === 0 && this.editor.getBody().firstChild === this.editor.selection.getStart() ) {
+			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
 				this.props.moveUp();
 			}
@@ -65,6 +100,33 @@ export default class EditableComponent extends Component {
 				event.preventDefault();
 				this.props.moveDown();
 			}
+		} else if ( event.keyCode === 13 && this.props.inline ) {
+			// Wait for the event to propagate
+			setTimeout( () => {
+				this.editor.selection.getStart();
+				// Remove bogus nodes to avoid grammar bugs
+				Array.from( this.editor.getBody().querySelectorAll( '[data-mce-bogus]' ) )
+					.forEach( node => node.remove() );
+
+				const childNodes = Array.from( this.editor.getBody().childNodes );
+				const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
+				const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
+				const before = getHtml( childNodes.slice( 0, splitIndex ) );
+				const after = getHtml( childNodes.slice( splitIndex ) );
+				const hasAfter = !! childNodes.slice( splitIndex )
+					.reduce( ( memo, node ) => memo + node.textContent, '' );
+				this.editor.setContent( before );
+				this.props.splitValue( parse( before ), hasAfter ? parse( after ) : '' );
+			} );
+		} else if ( event.keyCode === 8 ) {
+			if ( this.isStartOfEditor() ) {
+				event.preventDefault();
+				if ( this.editor.getBody().textContent ) {
+					this.props.mergeWithPrevious();
+				} else {
+					this.props.remove();
+				}
+			}
 		}
 	}
 
@@ -72,7 +134,7 @@ export default class EditableComponent extends Component {
 		this.editor = editor;
 
 		editor.on( 'init', this.setInitialContent );
-		editor.on( 'change focusout undo redo', this.onChange );
+		editor.on( 'change keyup focusout undo redo', this.onChange );
 		editor.on( 'keydown', this.onKeyDown );
 	};
 

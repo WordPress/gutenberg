@@ -10,17 +10,17 @@ import isEqualShallow from 'is-equal-shallow';
 
 export default class BlockListBlock extends Component {
 	maybeFocusOut = ( event ) => {
-		if ( ! this.node ) {
+		if ( ! this.blockNode ) {
 			return;
 		}
 
-		if ( ! this.node.contains( event.relatedTarget ) ) {
+		if ( ! this.blockNode.contains( event.relatedTarget ) ) {
 			this.props.onBlur( event );
 		}
 	};
 
-	setRef = ( node ) => {
-		this.node = node;
+	setRef = ( blockNode ) => {
+		this.blockNode = blockNode;
 	};
 
 	bindForm = ( form ) => {
@@ -36,13 +36,13 @@ export default class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { node } = this.props;
-		const block = getBlock( node.blockType );
-		if ( ! block ) {
+		const { block } = this.props;
+		const blockDefinition = getBlock( block.blockType );
+		if ( ! blockDefinition ) {
 			return null;
 		}
 
-		const Form = block.form;
+		const Form = blockDefinition.form;
 		if ( ! Form ) {
 			return null;
 		}
@@ -61,7 +61,7 @@ export default class BlockListBlock extends Component {
 				} );
 			},
 			setAttributes( attributes ) {
-				if ( isEqualShallow( attributes, node.attrs ) ) {
+				if ( isEqualShallow( attributes, block.attrs ) ) {
 					return;
 				}
 
@@ -69,7 +69,7 @@ export default class BlockListBlock extends Component {
 					type: 'change',
 					changes: {
 						attrs: {
-							...node.attrs,
+							...block.attrs,
 							...attributes
 						}
 					}
@@ -117,12 +117,12 @@ export default class BlockListBlock extends Component {
 				onFocus={ onFocus }
 				onBlur={ this.maybeFocusOut }
 				className={ classes }>
-				<Form ref={ this.bindForm } block={ node } { ...state } />
-				{ isFocused && size( block.controls ) > 0 && (
+				<Form ref={ this.bindForm } block={ block } { ...state } />
+				{ isFocused && size( blockDefinition.controls ) > 0 && (
 					<div className="block-list__block-controls">
-						{ map( block.controls, ( control, index ) => {
+						{ map( blockDefinition.controls, ( control, index ) => {
 							const controlClasses = classNames( 'block-list__block-control', {
-								'is-selected': control.isSelected( node )
+								'is-selected': control.isSelected( block )
 							} );
 
 							return (

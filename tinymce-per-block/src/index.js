@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { uniqueId } from 'lodash';
 import { createElement, Component, render } from 'wp-elements';
 
 /**
@@ -23,11 +23,27 @@ class App extends Component {
 		activeRenderer: 'block'
 	};
 
-	updateParsedContent = ( nextContent ) => {
-		if ( serializers[ this.state.activeRenderer ] ) {
-			this.updateContent( serializers[ this.state.activeRenderer ].serialize( nextContent ) );
-		} else {
-			this.updateContent( nextContent );
+	updateParsedContent = ( nextContent, forceType ) => {
+		const type = forceType ? forceType : this.state.activeRenderer;
+		switch ( type ) {
+			case 'block':
+				this.setState( {
+					content: {
+						block: nextContent,
+						html: serializers.block.serialize( nextContent )
+					}
+				} );
+				return;
+			case 'html':
+				this.setState( {
+					content: {
+						block: parsers.block.parse( nextContent )
+							.filter( block => !! getBlock( block.blockType ) )
+							.map( block => Object.assign( { uid: uniqueId() }, block ) ),
+						html: nextContent
+					}
+				} );
+				return;
 		}
 	}
 
@@ -37,25 +53,8 @@ class App extends Component {
 		} );
 	}
 
-	updateContent( content ) {
-		const parsedContent = {};
-		forEach( renderers, ( renderer, type ) => {
-			const parser = parsers[ type ];
-			if ( parser ) {
-				// Drop the undefined blocks to avoid bugs
-				parsedContent[ type ] = parser.parse( content ).filter( block => !! getBlock( block.blockType ) );
-			} else {
-				parsedContent[ type ] = content;
-			}
-		} );
-
-		this.setState( {
-			content: parsedContent
-		} );
-	}
-
 	componentWillMount() {
-		this.updateContent( this.props.content );
+		this.updateParsedContent( this.props.content, 'html' );
 	}
 
 	render() {
