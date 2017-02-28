@@ -257,11 +257,9 @@
 			}
 
 			editor.on( 'blur', function() {
+				toolbarInline.hide();
 				toolbarCaret.hide();
-				blockToolbar.hide();
-				tinymce.each( editor.settings.blocks, function( block, key ) {
-					blockToolbars[ key ].hide();
-				} );
+				hideBlockUI();
 			} );
 
 			function isEmptySlot( node, isAtRoot ) {
