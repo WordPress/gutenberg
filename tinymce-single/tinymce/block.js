@@ -224,7 +224,13 @@
 
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = range.getBoundingClientRect();
+				var elementRect = range.getClientRects();
+
+				if ( ! elementRect.length ) {
+					return;
+				}
+
+				elementRect = elementRect[0];
 
 				DOM.setStyles( toolbar, {
 					position: 'absolute',
