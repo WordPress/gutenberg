@@ -52,7 +52,7 @@ before_install:
     echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   fi
 before_script:
-- phpenv config-rm xdebug.ini
+- stable='^[0-9\.]+$'; if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then phpenv config-rm xdebug.ini; fi
 - npm install -g npm
 - npm install -g grunt-cli
 - npm install
