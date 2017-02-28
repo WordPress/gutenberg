@@ -6,7 +6,7 @@
 	background-color: transparent;
 }
 
-#editor.wp-edit-focus *[data-mce-selected="block"] {
+#editor.has-block-ui *[data-mce-selected="block"] {
 	outline: 2px solid #e0e5e9;
 	outline-offset: 11px;
 	/*background-color: rgba( 135, 166, 188, 0.3 );

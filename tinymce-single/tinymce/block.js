@@ -308,7 +308,14 @@
 				return true;
 			}
 
+			var hasBlockUI = false;
+
 			function hideBlockUI() {
+				if ( hasBlockUI ) {
+					tinymce.$( editor.getBody() ).removeClass( 'has-block-ui' );
+					hasBlockUI = false;
+				}
+
 				blockToolbar.hide();
 
 				tinymce.each( blockToolbars, function( toolbar ) {
@@ -323,6 +330,11 @@
 
 			function showBlockUI( focus ) {
 				var settings = wp.blocks.getSettingsByElement( element );
+
+				if ( ! hasBlockUI ) {
+					tinymce.$( editor.getBody() ).addClass( 'has-block-ui' );
+					hasBlockUI = true;
+				}
 
 				blockToolbar.reposition();
 
@@ -362,7 +374,11 @@
 
 			var hidden = true;
 
-			editor.on( 'keydown', function() {
+			editor.on( 'keydown', function( event ) {
+				if ( tinymce.util.VK.metaKeyPressed( event ) ) {
+					return;
+				}
+
 				hidden = true;
 			} );
 
@@ -416,14 +432,6 @@
 						// }, 50 );
 					}
 				}
-			} );
-
-			editor.on( 'focus', function() {
-				tinymce.$( editor.getBody() ).addClass( 'wp-edit-focus' );
-			} );
-
-			editor.on( 'blur', function() {
-				tinymce.$( editor.getBody() ).removeClass( 'wp-edit-focus' );
 			} );
 
 			editor.on( 'nodeChange', function( event ) {
