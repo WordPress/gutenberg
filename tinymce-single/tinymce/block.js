@@ -464,6 +464,10 @@
 					return;
 				}
 
+				if ( ! editor.getBody().contains( selection.anchorNode ) ) {
+					return;
+				}
+
 				anchorNode = selection.anchorNode;
 
 				var isEmpty = isCollapsed && isEmptySlot( anchorNode, true );

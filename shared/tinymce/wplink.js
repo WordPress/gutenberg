@@ -192,7 +192,7 @@
 				editToolbar.on( 'show', function() {
 					if ( typeof window.wpLink === 'undefined' || ! window.wpLink.modalOpen ) {
 						window.setTimeout( function() {
-							var element = editToolbar.$el.find( 'input.ui-autocomplete-input' )[0],
+							var element = editToolbar.$el.find( 'input' )[0],
 								selection = linkNode && ( linkNode.textContent || linkNode.innerText );
 
 							if ( element ) {
