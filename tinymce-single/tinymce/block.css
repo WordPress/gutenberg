@@ -153,13 +153,15 @@ svg.gridicon {
 }
 
 .mce-btn .mce-txt {
-	display: block;
-	height: 24px;
-	min-width: 24px;
+	display: inline-block;
+	font-size: 12px;
 	text-align: center;
-	font-size: 18px;
-	font-weight: 500;
-	line-height: 24px;
+	vertical-align: bottom;
+	width: 6px;
+}
+
+.mce-btn-has-text svg.gridicons-heading {
+	margin: 0 -4px 0 -2px;
 }
 
 .mce-btn select {

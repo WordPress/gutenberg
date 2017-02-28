@@ -8,6 +8,7 @@
 
 		'123456'.split( '' ).forEach( function( level ) {
 			buttons.push( {
+				icon: 'gridicons-heading',
 				text: level,
 				stateSelector: 'h' + level,
 				onClick: function( editor, element ) {
