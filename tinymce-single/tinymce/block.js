@@ -223,7 +223,7 @@
 
 			var toolbarInline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
 			var toolbarCaret = editor.wp._createToolbar( [ 'add' ] );
-			blockToolbar = editor.wp._createToolbar( [ 'up', 'block', 'down' ] );
+			blockToolbar = editor.wp._createToolbar( [ 'up', 'down' ] );
 
 			toolbarCaret.$el.addClass( 'block-toolbar' );
 			blockToolbar.$el.addClass( 'block-toolbar' );

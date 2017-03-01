@@ -256,16 +256,17 @@ div.mce-inline-toolbar-grp.block-toolbar {
 	box-shadow: none;
 }
 
-.mce-btn.mce-move-up {
-	position: absolute;
-	top: -10px;
-	left: -30px;
+.mce-btn.mce-move-up,
+.mce-btn.mce-move-down {
+	display: block;
 }
 
-.mce-btn.mce-move-down {
-	position: absolute;
-	bottom: -10px;
-	left: -30px;
+.mce-btn.mce-move-up,
+.mce-btn.mce-move-up button,
+.mce-btn.mce-move-down,
+.mce-btn.mce-move-down button {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 .block-toolbar {
