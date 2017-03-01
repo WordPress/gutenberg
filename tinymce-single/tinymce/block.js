@@ -348,7 +348,7 @@
 
 				if ( settings ) {
 					if ( ! blockToolbars[ settings._id ] ) {
-						blockToolbars[ settings._id ] = editor.wp._createToolbar( settings.buttons.concat( [ 'block-remove' ] ) );
+						blockToolbars[ settings._id ] = editor.wp._createToolbar( settings.buttons );
 						blockToolbars[ settings._id ].reposition = function () {
 							if (!element) return
 
@@ -551,6 +551,24 @@
 
 						if ( keyCode === VK.LEFT && range.startOffset === 0 ) {
 							event.preventDefault();
+						}
+					}
+				} else {
+					if ( keyCode === VK.BACKSPACE ) {
+						var selection = window.getSelection();
+
+						if ( ! selection.isCollapsed ) {
+							if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
+								if ( element.nextSibling && element.nextSibling.contains( selection.focusNode ) ) {
+									removeBlock();
+									event.preventDefault();
+								}
+							}
+
+							if ( selection.anchorOffset === 0 && selection.anchorNode === selection.focusNode ) {
+								removeBlock();
+								event.preventDefault();
+							}
 						}
 					}
 				}
