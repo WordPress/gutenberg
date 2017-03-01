@@ -1,0 +1,22 @@
+.image-caption-block__display {
+	display: block;
+	max-width: 100%;
+}
+
+
+.image-caption-block__caption textarea,
+.image-caption-block__caption .textarea-mirror {
+	margin-top: 10px;
+	width: 100%;
+	border: none;
+	font: inherit;
+	font-family: "Merriweather", serif;
+	font-weight: 300;
+	font-size: 14px;
+	color: $gray-dark-300;
+	resize: none;
+
+	&:focus {
+		outline: 0;
+	}
+}

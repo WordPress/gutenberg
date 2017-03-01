@@ -44,12 +44,27 @@ export default class QuoteBlockForm extends Component {
 
 	moveToContent = () => {
 		this.content.focus();
-	}
+	};
 
 	render() {
-		const { block, setChildren, setAttributes, moveUp, moveDown, remove, mergeWithPrevious } = this.props;
+		const { block, setChildren, setAttributes, moveUp, moveDown, remove, mergeWithPrevious, appendBlock } = this.props;
 		const { children } = block;
 		const cite = block.attrs.cite || '';
+		const splitValue = ( left, right ) => {
+			setAttributes( { cite: left } );
+			appendBlock( {
+				type: 'WP_Block',
+				blockType: 'paragraph',
+				attrs: {},
+				startText: '<!-- wp:paragraph -->',
+				endText: '<!-- /wp -->',
+				rawContent: '<!-- wp:paragraph -->' + right + '<!-- /wp -->',
+				children: [ {
+					type: 'Text',
+					value: right
+				} ]
+			} );
+		};
 
 		return (
 			<div className="quote-block__form">
@@ -72,6 +87,7 @@ export default class QuoteBlockForm extends Component {
 						removePrevious={ this.moveToContent }
 						moveDown={ moveDown }
 						value={ cite }
+						splitValue={ splitValue }
 						onChange={ ( value ) => setAttributes( { cite: value } ) }
 						placeholder="Enter a cite"
 					/>
