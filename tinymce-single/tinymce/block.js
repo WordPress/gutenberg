@@ -198,9 +198,15 @@
 				classes: 'widget btn move-down'
 			} );
 
+			var insert = false;
+
 			editor.addButton( 'add', {
 				icon: 'gridicons-add-outline',
-				tooltip: 'Add Block'
+				tooltip: 'Add Block',
+				onClick: function() {
+					insert = true;
+					editor.nodeChanged();
+				}
 			} );
 
 			// Adjust icon of TinyMCE core buttons.
@@ -216,9 +222,52 @@
 			toolbarCaret.$el.addClass( 'block-toolbar' );
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
+			function getInsertButtons() {
+				var allSettings = wp.blocks.getAllSettings();
+				var buttons = [];
+				var key;
+
+				for ( key in allSettings ) {
+					if ( allSettings[ key ].insert ) {
+						buttons.push( {
+							icon: allSettings[ key ].icon,
+							onClick: allSettings[ key ].insert
+						} );
+					}
+				}
+
+				buttons.push( {
+					text: 'Work in progress',
+					onClick: function() {}
+				} );
+
+				return buttons;
+			}
+
+			var toolbarInsert = editor.wp._createToolbar( getInsertButtons() );
+
 			var anchorNode;
 			var range;
 			var blockToolbarWidth = 0;
+
+			toolbarInsert.reposition = function () {
+				if ( ! element ) {
+					return;
+				}
+
+				var toolbar = this.getEl();
+				var toolbarRect = toolbar.getBoundingClientRect();
+				var elementRect = element.getBoundingClientRect();
+				var contentRect = editor.getBody().getBoundingClientRect();
+
+				DOM.setStyles( toolbar, {
+					position: 'absolute',
+					left: contentRect.left + 100 + 'px',
+					top: elementRect.top + window.pageYOffset + 'px'
+				} );
+
+				this.show();
+			}
 
 			toolbarInline.reposition = function () {
 				if ( ! element ) {
@@ -279,7 +328,7 @@
 				// Element node.
 				if ( node.nodeType === 1 ) {
 					// Element is no direct child.
-					if ( isAtRoot && node.parentNode !== editor.getBody() ) {
+					if ( isAtRoot && node.parentNode !== editor.getBody() && node.nodeName !== 'P' ) {
 						return false;
 					}
 
@@ -431,6 +480,8 @@
 				} else {
 					hidden = true;
 				}
+
+				insert = false;
 			} );
 
 			editor.on( 'keyup', function( event ) {
@@ -459,6 +510,7 @@
 
 			editor.on( 'mousedown touchstart', function() {
 				hidden = false;
+				insert = false;
 			} );
 
 			editor.on( 'selectionChange nodeChange', function( event ) {
@@ -497,11 +549,19 @@
 						hideBlockUI();
 					}
 				}
+
+				if ( insert ) {
+					toolbarInsert.reposition();
+				} else {
+					toolbarInsert.hide();
+				}
 			} );
 
 			editor.on( 'nodeChange', function( event ) {
 				editor.$( '*[data-mce-selected="block"]' ).attr( 'data-mce-selected', null );
 				editor.$( element ).attr( 'data-mce-selected', 'block' );
+
+				insert = false;
 			} );
 
 			// editor.on( 'keydown', function( event ) {

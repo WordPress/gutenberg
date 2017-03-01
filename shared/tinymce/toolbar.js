@@ -74,7 +74,9 @@
 
 					function onClick( callback ) {
 						return function() {
-							callback( editor, window.element );
+							editor.undoManager.transact( function() {
+								callback( editor, window.element );
+							} );
 						}
 					}
 
