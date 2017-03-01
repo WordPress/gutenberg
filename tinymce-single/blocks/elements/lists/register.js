@@ -18,7 +18,8 @@ window.wp.blocks.register( {
 			}
 		},
 		{
-			icon: 'gridicons-posts',
+			classes: 'remove-formatting',
+			icon: 'gridicons-list-unordered',
 			onClick: function( editor, element ) {
 				if ( element.nodeName === 'UL' ) {
 					editor.execCommand( 'InsertUnorderedList' );
