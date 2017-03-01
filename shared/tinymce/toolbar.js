@@ -211,7 +211,7 @@
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
 						left: elementRect.left + 'px',
-						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
+						top: elementRect.bottom + window.pageYOffset + 'px'
 					} );
 
 					this.show();
