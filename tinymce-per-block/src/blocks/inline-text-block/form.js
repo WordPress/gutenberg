@@ -2,24 +2,32 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { reduce } from 'lodash';
 import { EditableComponent } from 'wp-blocks';
 
 import { serialize } from 'serializers/block';
 
-export default class TextBlockForm extends Component {
+export default class InlineTextBlockForm extends Component {
 	focus( position ) {
 		this.editable.focus( position );
 	}
 
 	merge = ( block, index ) => {
-		const acceptedBlockTypes = [ 'text', 'quote', 'paragraph', 'heading' ];
+		const acceptedBlockTypes = [ 'quote', 'paragraph', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
 		}
+
+		const getLeaves = children => {
+			if ( children.length === 1 && children[ 0 ].name === 'p' ) {
+				return getLeaves( children[ 0 ].children );
+			}
+
+			return children;
+		};
+
 		const { block: { children }, remove, setChildren } = this.props;
 		remove( index );
-		setTimeout( () => setChildren( children.concat( block.children ) ) );
+		setTimeout( () => setChildren( getLeaves( children ).concat( getLeaves( block.children ) ) ) );
 	}
 
 	bindEditable = ( ref ) => {
@@ -29,15 +37,6 @@ export default class TextBlockForm extends Component {
 	render() {
 		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
 		const { children } = block;
-		const style = reduce( block.attrs, ( memo, value, key ) => {
-			switch ( key ) {
-				case 'align':
-					memo.textAlign = value;
-					break;
-			}
-
-			return memo;
-		}, {} );
 
 		const splitValue = ( left, right ) => {
 			setChildren( left );
@@ -52,17 +51,16 @@ export default class TextBlockForm extends Component {
 		};
 
 		return (
-			<div className="text-block__form" style={ style }>
-				<EditableComponent
-					ref={ this.bindEditable }
-					content={ serialize( children ) }
-					moveUp={ moveUp }
-					moveDown={ moveDown }
-					splitValue={ splitValue }
-					mergeWithPrevious={ mergeWithPrevious }
-					remove={ remove }
-					onChange={ ( value ) => setChildren( value ) } />
-			</div>
+			<EditableComponent
+				ref={ this.bindEditable }
+				content={ serialize( children ) }
+				moveUp={ moveUp }
+				moveDown={ moveDown }
+				splitValue={ splitValue }
+				mergeWithPrevious={ mergeWithPrevious }
+				remove={ remove }
+				onChange={ ( value ) => setChildren( value ) }
+				inline />
 		);
 	}
 }

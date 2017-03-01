@@ -41,20 +41,18 @@ export default class EditableComponent extends Component {
 		initialize( this.node, this.props.inline, this.onSetup );
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.content !== this.props.content ) {
+			const bookmark = this.editor.selection.getBookmark( 2, true );
+			this.editor.setContent( this.props.content );
+			this.editor.selection.moveToBookmark( bookmark );
+		}
+	}
+
 	componentWillUnmount() {
 		if ( this.editor ) {
 			this.editor.destroy();
 		}
-	}
-
-	appendContent( content ) {
-		const div = document.createElement( 'div' );
-		div.innerHTML = content;
-		const newNodes = Array.from( div.childNodes );
-		newNodes.forEach( node => {
-			this.editor.getBody().appendChild( node );
-		} );
-		this.editor.selection.setCursorLocation( newNodes[ 0 ], 0 );
 	}
 
 	focus( position ) {
@@ -130,16 +128,26 @@ export default class EditableComponent extends Component {
 		}
 	}
 
+	onPaste = ( event ) => {
+		if ( this.props.inline ) {
+			event.preventDefault();
+			const clipboardData = event.clipboardData || window.clipboardData;
+			const text = clipboardData.getData( 'Text' );
+			this.editor.execCommand( 'mceInsertContent', false, text );
+		}
+	}
+
 	onSetup = ( editor ) => {
 		this.editor = editor;
 
 		editor.on( 'init', this.setInitialContent );
 		editor.on( 'change keyup focusout undo redo', this.onChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'paste', this.onPaste );
 	};
 
 	setInitialContent = () => {
-		this.editor.setContent( this.props.initialContent );
+		this.editor.setContent( this.props.content );
 	};
 
 	onChange = () => {
