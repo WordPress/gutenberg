@@ -19,11 +19,14 @@
 		getSettings: function( id ) {
 			return _settings[ id ];
 		},
-		getSettingsByElement( element ) {
+		getSettingsByElement: function( element ) {
 			var blockType = element.getAttribute( 'data-wp-block-type' );
 			var nodeName = element.nodeName.toLowerCase();
 
 			return this.getSettings( blockType || 'element:' + nodeName );
+		},
+		getAllSettings: function() {
+			return _settings;
 		}
 	};
 } )( window.wp = window.wp || {} );

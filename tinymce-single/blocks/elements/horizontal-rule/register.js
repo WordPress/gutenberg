@@ -4,5 +4,8 @@ window.wp.blocks.register( {
 	icon: 'gridicons-minus',
 	buttons: [
 
-	]
+	],
+	insert: function( editor, element ) {
+		element.parentNode.replaceChild( document.createElement( 'hr' ), element );
+	}
 } );
