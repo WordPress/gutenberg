@@ -76,12 +76,29 @@ body {
 	margin-top: 0.5em;
 }
 
-#editor figure img {
+#editor figure img,
+#editor figure iframe {
 	display: block;
 }
 
 #editor pre {
 	overflow: auto;
+}
+
+#editor hr {
+	border: none;
+	font-size: 36px;
+	margin: 1em 0;
+}
+
+#editor hr:before {
+	content: '\2767';
+	display: block;
+	text-align: center;
+}
+
+#editor blockquote {
+	margin: 2em;
 }
 
 #editor:after {

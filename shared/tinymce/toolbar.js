@@ -199,7 +199,23 @@
 
 				toolbar.bottom = bottom;
 
-				function reposition() {}
+				function reposition() {
+					if ( ! currentSelection ) {
+						return;
+					}
+
+					var toolbar = this.getEl();
+					var toolbarRect = toolbar.getBoundingClientRect();
+					var elementRect = currentSelection.getBoundingClientRect();
+
+					DOM.setStyles( toolbar, {
+						position: 'absolute',
+						left: elementRect.left + 'px',
+						top: elementRect.bottom + window.pageYOffset + 'px'
+					} );
+
+					this.show();
+				}
 
 				toolbar.on( 'show', function() {
 					this.reposition();
@@ -221,6 +237,32 @@
 
 				return toolbar;
 			}
+
+			editor.on( 'nodechange', function( event ) {
+				var args = {
+					element: event.element,
+					parents: event.parents
+				};
+
+				editor.fire( 'wptoolbar', args );
+
+				currentSelection = args.selection || args.element;
+
+				if ( activeToolbar && activeToolbar !== args.toolbar ) {
+					activeToolbar.hide();
+				}
+
+				if ( args.toolbar ) {
+					if ( activeToolbar !== args.toolbar ) {
+						activeToolbar = args.toolbar;
+						activeToolbar.show();
+					} else {
+						activeToolbar.reposition();
+					}
+				} else {
+					activeToolbar = false;
+				}
+			} );
 
 			function hide( event ) {
 				// if ( activeToolbar ) {
