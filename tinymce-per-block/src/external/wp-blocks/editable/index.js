@@ -23,7 +23,7 @@ function initialize( node, inline, onSetup ) {
 	};
 
 	if ( inline ) {
-		config.valid_elements = 'p,br,b,i,strong,em';
+		config.valid_elements = '#p,br,b,i,strong,em';
 	}
 
 	tinymce.init( config );
