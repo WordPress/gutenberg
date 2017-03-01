@@ -217,25 +217,20 @@
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
 			var range;
+			var blockToolbarWidth = 0;
 
 			toolbarInline.reposition = function () {
-				if ( ! range ) {
+				if ( ! element ) {
 					return;
 				}
 
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = range.getClientRects();
-
-				if ( ! elementRect.length ) {
-					return;
-				}
-
-				elementRect = elementRect[0];
+				var elementRect = element.getBoundingClientRect();
 
 				DOM.setStyles( toolbar, {
 					position: 'absolute',
-					left: elementRect.left + 'px',
+					left: elementRect.left + 8 + blockToolbarWidth + 'px',
 					top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 				} );
 
@@ -366,6 +361,8 @@
 								top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 							} );
 
+							blockToolbarWidth = toolbarRect.width;
+
 							this.show();
 						}
 
@@ -487,26 +484,16 @@
 				} else {
 					toolbarCaret.hide();
 
-					if ( ! isCollapsed && anchorNode.nodeType === 3 ) {
-						hidden = true;
-						hideBlockUI();
-
-						if ( anchorNode.parentNode.nodeName === 'A' ) {
-							toolbarInline.hide();
-						} else {
-							range = document.createRange();
-							range.setStart( selection.anchorNode, selection.anchorOffset );
-							range.setEnd( selection.anchorNode, selection.anchorOffset );
-							toolbarInline.reposition();
-						}
+					if ( anchorNode.nodeType === 3 ) {
+						toolbarInline.reposition();
 					} else {
 						toolbarInline.hide();
+					}
 
-						if ( isBlockUIVisible ) {
-							showBlockUI();
-						} else {
-							hideBlockUI();
-						}
+					if ( isBlockUIVisible ) {
+						showBlockUI();
+					} else {
+						hideBlockUI();
 					}
 				}
 			} );
