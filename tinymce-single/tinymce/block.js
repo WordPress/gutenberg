@@ -20,8 +20,9 @@
 
 					if ( position !== 'left' ) {
 						editor.$( element ).addClass( 'text-align-' + position );
-						editor.nodeChanged();
 					}
+
+					editor.nodeChanged();
 				},
 				onPostRender: function() {
 					var button = this;
