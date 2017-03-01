@@ -60,7 +60,9 @@ export default class InlineTextBlockForm extends Component {
 				mergeWithPrevious={ mergeWithPrevious }
 				remove={ remove }
 				onChange={ ( value ) => setChildren( value ) }
-				inline />
+				inline
+				single
+			/>
 		);
 	}
 }

@@ -9,6 +9,7 @@ export default class EnhancedInput extends Component {
 	static defaultProps = {
 		splitValue: () => {},
 		removePrevious: () => {},
+		onChange: () => {},
 		moveUp: () => {},
 		moveDown: () => {}
 	};
@@ -46,6 +47,7 @@ export default class EnhancedInput extends Component {
 			this.input.selectionStart === this.input.selectionEnd &&
 			(	this.input.selectionStart === 0 || ( this.input.selectionStart === 1 && value === ' ' ) )
 		) {
+			event.preventDefault();
 			removePrevious();
 		} else if ( event.keyCode === 38 && this.input.selectionStart === 0 ) {
 			event.preventDefault();
@@ -54,6 +56,10 @@ export default class EnhancedInput extends Component {
 			event.preventDefault();
 			moveDown();
 		}
+	};
+
+	onChange = ( event ) => {
+		this.props.onChange( event.target.value );
 	};
 
 	render() {
@@ -79,7 +85,9 @@ export default class EnhancedInput extends Component {
 					{ ...props }
 					onInput={ this.autogrow }
 					value={ value }
-					onKeyDown={ this.onKeyDown } />
+					onKeyDown={ this.onKeyDown }
+					onChange={ this.onChange }
+				/>
 			</div>
 		);
 	}

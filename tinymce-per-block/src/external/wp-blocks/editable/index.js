@@ -34,7 +34,8 @@ export default class EditableComponent extends Component {
 		onChange: () => {},
 		splitValue: () => {},
 		initialContent: '',
-		inline: false
+		inline: false,
+		single: false,
 	};
 
 	componentDidMount() {
@@ -98,7 +99,7 @@ export default class EditableComponent extends Component {
 				event.preventDefault();
 				this.props.moveDown();
 			}
-		} else if ( event.keyCode === 13 && this.props.inline ) {
+		} else if ( event.keyCode === 13 && this.props.single ) {
 			// Wait for the event to propagate
 			setTimeout( () => {
 				this.editor.selection.getStart();

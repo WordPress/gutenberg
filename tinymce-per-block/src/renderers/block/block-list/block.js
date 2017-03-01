@@ -28,7 +28,7 @@ export default class BlockListBlock extends Component {
 	}
 
 	focus = ( position ) => {
-		this.form.focus( position );
+		this.form.focus && this.form.focus( position );
 	};
 
 	merge = ( block, index ) => {
