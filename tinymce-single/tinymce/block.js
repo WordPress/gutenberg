@@ -166,7 +166,10 @@
 				$prev = $blocks.first().prev();
 
 				if ( $prev.length ) {
-					$blocks.last().after( $prev );
+					editor.undoManager.transact( function() {
+						$blocks.last().after( $prev );
+					} );
+
 					editor.nodeChanged();
 					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
 				}
@@ -178,7 +181,10 @@
 				$next = $blocks.last().next();
 
 				if ( $next.length ) {
-					$blocks.first().before( $next );
+					editor.undoManager.transact( function() {
+						$blocks.first().before( $next );
+					} );
+
 					editor.nodeChanged();
 					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
 				}
