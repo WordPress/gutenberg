@@ -20,8 +20,9 @@
 
 					if ( position !== 'left' ) {
 						editor.$( element ).addClass( 'text-align-' + position );
-						editor.nodeChanged();
 					}
+
+					editor.nodeChanged();
 				},
 				onPostRender: function() {
 					var button = this;
@@ -216,19 +217,20 @@
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
 			var range;
+			var blockToolbarWidth = 0;
 
 			toolbarInline.reposition = function () {
-				if ( ! range ) {
+				if ( ! element ) {
 					return;
 				}
 
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = range.getBoundingClientRect();
+				var elementRect = element.getBoundingClientRect();
 
 				DOM.setStyles( toolbar, {
 					position: 'absolute',
-					left: elementRect.left + 'px',
+					left: elementRect.left + 8 + blockToolbarWidth + 'px',
 					top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 				} );
 
@@ -257,11 +259,9 @@
 			}
 
 			editor.on( 'blur', function() {
+				toolbarInline.hide();
 				toolbarCaret.hide();
-				blockToolbar.hide();
-				tinymce.each( editor.settings.blocks, function( block, key ) {
-					blockToolbars[ key ].hide();
-				} );
+				hideBlockUI();
 			} );
 
 			function isEmptySlot( node, isAtRoot ) {
@@ -360,6 +360,8 @@
 								left: elementRect.left + 'px',
 								top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 							} );
+
+							blockToolbarWidth = toolbarRect.width;
 
 							this.show();
 						}
@@ -464,6 +466,10 @@
 					return;
 				}
 
+				if ( ! editor.getBody().contains( selection.anchorNode ) ) {
+					return;
+				}
+
 				anchorNode = selection.anchorNode;
 
 				var isEmpty = isCollapsed && isEmptySlot( anchorNode, true );
@@ -478,26 +484,16 @@
 				} else {
 					toolbarCaret.hide();
 
-					if ( ! isCollapsed && anchorNode.nodeType === 3 ) {
-						hidden = true;
-						hideBlockUI();
-
-						if ( anchorNode.parentNode.nodeName === 'A' ) {
-							toolbarInline.hide();
-						} else {
-							range = document.createRange();
-							range.setStart( selection.anchorNode, selection.anchorOffset );
-							range.setEnd( selection.anchorNode, selection.anchorOffset );
-							toolbarInline.reposition();
-						}
+					if ( anchorNode.nodeType === 3 ) {
+						toolbarInline.reposition();
 					} else {
 						toolbarInline.hide();
+					}
 
-						if ( isBlockUIVisible ) {
-							showBlockUI();
-						} else {
-							hideBlockUI();
-						}
+					if ( isBlockUIVisible ) {
+						showBlockUI();
+					} else {
+						hideBlockUI();
 					}
 				}
 			} );
