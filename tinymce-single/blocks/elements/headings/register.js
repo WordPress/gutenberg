@@ -1,10 +1,6 @@
 ( function( register ) {
 	function getButtons() {
-		var buttons = [
-			'text-align-left',
-			'text-align-center',
-			'text-align-right'
-		];
+		var buttons = [];
 
 		'123456'.split( '' ).forEach( function( level ) {
 			buttons.push( {
@@ -18,11 +14,14 @@
 		} );
 
 		buttons.push( {
-			icon: 'gridicons-posts',
+			classes: 'remove-formatting',
+			icon: 'gridicons-heading',
 			onClick: function( editor, element ) {
 				editor.formatter.apply( 'p', element );
 			}
 		} );
+
+		buttons.push( 'text-align-center' );
 
 		return buttons;
 	}

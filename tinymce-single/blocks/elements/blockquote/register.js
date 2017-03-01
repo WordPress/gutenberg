@@ -4,7 +4,8 @@ window.wp.blocks.register( {
 	icon: 'gridicons-quote',
 	buttons: [
 		{
-			icon: 'gridicons-posts',
+			classes: 'remove-formatting',
+			icon: 'gridicons-quote',
 			onClick: function( editor ) {
 				editor.formatter.remove( 'blockquote' );
 			}

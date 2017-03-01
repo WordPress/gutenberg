@@ -180,6 +180,25 @@ svg.gridicon {
 	top: 0;
 }
 
+.mce-btn.mce-remove-formatting button {
+	position: relative;
+}
+
+.mce-remove-formatting button:before {
+	content: '';
+	height: 2px;
+	width: 32px;
+	background-color: currentColor;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	bottom: 2px;
+	left: 2px;
+	overflow: hidden;
+	transform: rotate(45deg);
+	transform-origin: top left;
+}
+
 div.mce-inline-toolbar-grp {
 	background-color: #fff;
 	border: 1px solid #e1e6ea;
