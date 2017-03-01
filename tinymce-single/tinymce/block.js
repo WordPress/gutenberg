@@ -557,7 +557,7 @@
 					if ( keyCode === VK.BACKSPACE ) {
 						var selection = window.getSelection();
 
-						if ( ! selection.isCollapsed ) {
+						if ( ! selection.isCollapsed && editor.dom.isBlock( selection.focusNode ) ) {
 							if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
 								if ( element.nextSibling && element.nextSibling.contains( selection.focusNode ) ) {
 									removeBlock();
