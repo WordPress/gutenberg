@@ -26,11 +26,13 @@ Gutenberg is the project name. Conversations and discussions take place in #core
 
 These mockups are all subject to change and feedback.
 
-**Formatting**
+**Blocks & Formatting**
 
 ![Hover](mockups/Formatting, Hover.png)
 
 ![Click](mockups/Formatting, Click.png)
+
+![Drag & Drop](mockups/Drag and drop.png)
 
 **New Blocks**
 
@@ -54,7 +56,9 @@ These mockups are all subject to change and feedback.
 
 **Note:** This is how it _could_ look.
 
-![Desktop](mockups/Admin Chrome, Sidebar Open.png)
+![Desktop](mockups/Admin Chrome.png)
+
+![Desktop, Sidebar Open](mockups/Admin Chrome, Sidebar Open.png)
 
 **Early Mobile Chrome Concept**
 
@@ -72,4 +76,4 @@ With regards to specific changes to the design, the details & execution (like co
 
 Grab the Sketch file so you don't have to start from scratch:
 
-**<a href="mockups/editor.sketch">Download, Updated Feb. 23rd.</a>**
+**<a href="mockups/editor.sketch">Download, Updated Mar. 1st.</a>**
