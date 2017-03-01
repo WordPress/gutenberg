@@ -216,6 +216,7 @@
 			toolbarCaret.$el.addClass( 'block-toolbar' );
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
+			var anchorNode;
 			var range;
 			var blockToolbarWidth = 0;
 
@@ -316,6 +317,7 @@
 					hasBlockUI = false;
 				}
 
+				toolbarInline.hide();
 				blockToolbar.hide();
 
 				tinymce.each( blockToolbars, function( toolbar ) {
@@ -371,6 +373,12 @@
 
 					blockToolbars[ settings._id ].reposition();
 					focus && focusToolbar( blockToolbars[ settings._id ] );
+
+					if ( anchorNode.nodeType === 3 ) {
+						toolbarInline.reposition();
+					} else {
+						toolbarInline.hide();
+					}
 				}
 			}
 
@@ -407,7 +415,6 @@
 				return true;
 			}
 
-			var anchorNode;
 			var hidden = true;
 			var keypress = false;
 
@@ -483,12 +490,6 @@
 					toolbarCaret.reposition();
 				} else {
 					toolbarCaret.hide();
-
-					if ( anchorNode.nodeType === 3 ) {
-						toolbarInline.reposition();
-					} else {
-						toolbarInline.hide();
-					}
 
 					if ( isBlockUIVisible ) {
 						showBlockUI();
