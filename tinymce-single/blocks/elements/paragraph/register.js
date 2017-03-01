@@ -3,9 +3,6 @@ window.wp.blocks.register( {
 	type: 'text',
 	icon: 'gridicons-posts',
 	buttons: [
-		'text-align-left',
-		'text-align-center',
-		'text-align-right',
 		{
 			icon: 'gridicons-heading',
 			onClick: function( editor ) {
@@ -29,6 +26,7 @@ window.wp.blocks.register( {
 			onClick: function( editor ) {
 				editor.formatter.apply( 'pre' );
 			}
-		}
+		},
+		'text-align-center'
 	]
 } );
