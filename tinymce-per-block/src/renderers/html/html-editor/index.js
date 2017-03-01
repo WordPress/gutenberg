@@ -7,8 +7,6 @@ export default function HtmlEditor( { content, onChange } ) {
 	return (
 		<textarea
 			onChange={ ( event ) => onChange( event.target.value ) }
-			className="html-editor">
-			{ content }
-		</textarea>
+			className="html-editor" value={ content } />
 	);
 }

@@ -110,6 +110,8 @@ export default class BlockListBlock extends Component {
 			}
 		};
 
+		const Icon = blockDefinition.icon;
+
 		return (
 			<div
 				ref={ this.setRef }
@@ -146,10 +148,10 @@ export default class BlockListBlock extends Component {
 								<ArrowDownAlt2Icon />
 							</button>
 						</div>
-						{ block.icon && (
+						{ Icon && (
 							<div className="block-list__type-controls">
 								<button className="block-list__block-arrange-control">
-									<block.icon />
+									<Icon />
 								</button>
 							</div>
 						) }

@@ -1,28 +1,25 @@
 .heading-block__form {
-	textarea, .textarea-mirror {
-		width: 100%;
-		border: none;
-		font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
-		resize: none;
-		color: inherit;
-		font-size: inherit;
-		font-weight: bold;
-		overflow: hidden;
-
-		&:focus {
-			outline: 0;
-		}
+	width: 100%;
+	border: none;
+	font-family: Merriweather, Georgia, "Times New Roman", Times, serif;
+	color: inherit;
+	font-size: inherit;
+	font-weight: bold;
+	overflow: hidden;
+	p {
+		padding: 0;
+		margin: 0;
 	}
 
-	&.h1 textarea, &.h1 .textarea-mirror {
+	&.h1 {
 		font-size: 34px;
 	}
 
-	&.h2 textarea, &.h2 .textarea-mirror {
+	&.h2 {
 		font-size: 28px;
 	}
 
-	&.h3 textarea, &.h3 .textarea-mirror {
+	&.h3 {
 		font-size: 20px;
 	}
 }

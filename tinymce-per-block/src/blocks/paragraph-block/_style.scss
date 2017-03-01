@@ -1,4 +1,4 @@
-.paragraph-block__form textarea, .paragraph-block__form .textarea-mirror {
+.paragraph-block__form {
 	width: 100%;
 	border: none;
 	font: inherit;
@@ -6,9 +6,8 @@
 	font-size: 16px;
 	color: inherit;
 	font-weight: 300;
-	resize: none;
-
-	&:focus {
-		outline: 0;
+	p {
+		padding: 0;
+		margin: 0;
 	}
 }
