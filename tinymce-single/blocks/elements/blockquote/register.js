@@ -9,6 +9,9 @@ window.wp.blocks.register( {
 				editor.formatter.remove( 'blockquote' );
 			}
 		}
-	]
+	],
+	insert: function( editor, element ) {
+		editor.formatter.apply( 'blockquote', element );
+	}
 } );
 
