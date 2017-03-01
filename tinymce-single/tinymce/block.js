@@ -18,7 +18,7 @@
 						editor.$( element ).removeClass( 'text-align-' + position );
 					} );
 
-					if ( position !== 'left' ) {
+					if ( position !== 'left' && ! this.active() ) {
 						editor.$( element ).addClass( 'text-align-' + position );
 					}
 
