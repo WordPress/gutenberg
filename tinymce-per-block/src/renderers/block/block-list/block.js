@@ -2,10 +2,9 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { getBlock } from 'wp-blocks';
-import { size, map } from 'lodash';
-import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 import classNames from 'classnames';
+import { getBlock } from 'wp-blocks';
+import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 import isEqualShallow from 'is-equal-shallow';
 
 export default class BlockListBlock extends Component {
@@ -36,7 +35,7 @@ export default class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block } = this.props;
+		const { block, isFocused } = this.props;
 		const blockDefinition = getBlock( block.blockType );
 		if ( ! blockDefinition ) {
 			return null;
@@ -47,7 +46,6 @@ export default class BlockListBlock extends Component {
 			return null;
 		}
 
-		const { isFocused } = this.props;
 		const classes = classNames( 'block-list__block', {
 			'is-focused': isFocused
 		} );
@@ -119,25 +117,7 @@ export default class BlockListBlock extends Component {
 				onFocus={ onFocus }
 				onBlur={ this.maybeFocusOut }
 				className={ classes }>
-				<Form ref={ this.bindForm } block={ block } { ...state } />
-				{ isFocused && size( blockDefinition.controls ) > 0 && (
-					<div className="block-list__block-controls">
-						{ map( blockDefinition.controls, ( control, index ) => {
-							const controlClasses = classNames( 'block-list__block-control', {
-								'is-selected': control.isSelected( block )
-							} );
-
-							return (
-								<button
-									key={ index }
-									onClick={ () => control.onClick( state ) }
-									className={ controlClasses }>
-									<control.icon />
-								</button>
-							);
-						} ) }
-					</div>
-				) }
+				<Form ref={ this.bindForm } block={ block } { ...state } isFocused={ isFocused } />
 				{ isFocused && (
 					<div className="block-list__block-arrangement">
 						<div className="block-list__movement-controls">

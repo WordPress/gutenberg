@@ -19,11 +19,14 @@ function initialize( node, inline, onSetup ) {
 		toolbar: false,
 		skin_url: '//s1.wp.com/wp-includes/js/tinymce/skins/lightgray',
 		entity_encoding: 'raw',
-		setup: onSetup
+		setup: onSetup,
+		formats: {
+			strikethrough: { inline: 'del' }
+		}
 	};
 
 	if ( inline ) {
-		config.valid_elements = '#p,br,b,i,strong,em';
+		config.valid_elements = '#p,br,b,i,strong,em,del';
 	}
 
 	tinymce.init( config );
@@ -42,13 +45,16 @@ export default class EditableComponent extends Component {
 		initialize( this.node, this.props.inline, this.onSetup );
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.content !== this.props.content ) {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
-			this.editor.setContent( this.props.content );
-			this.editor.selection.moveToBookmark( bookmark );
-		}
+	updateContent() {
+		// This could not be called on each content change, it used to change the cursor position
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		this.editor.setContent( this.props.content );
+		this.editor.selection.moveToBookmark( bookmark );
 	}
+
+	executeCommand = ( ...args ) => {
+		this.editor.execCommand( ...args );
+	};
 
 	componentWillUnmount() {
 		if ( this.editor ) {
@@ -105,7 +111,7 @@ export default class EditableComponent extends Component {
 				this.editor.selection.getStart();
 				// Remove bogus nodes to avoid grammar bugs
 				Array.from( this.editor.getBody().querySelectorAll( '[data-mce-bogus]' ) )
-					.forEach( node => node.remove() );
+					.forEach( node => node.removeAttribute( 'data-mce-bogus' ) );
 
 				const childNodes = Array.from( this.editor.getBody().childNodes );
 				const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
@@ -121,6 +127,7 @@ export default class EditableComponent extends Component {
 			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
 				if ( this.editor.getBody().textContent ) {
+					this.onChange();
 					this.props.mergeWithPrevious();
 				} else {
 					this.props.remove();
@@ -138,16 +145,34 @@ export default class EditableComponent extends Component {
 		}
 	}
 
+	syncToolbar = ( event ) => {
+		if ( ! this.props.setToolbarState ) {
+			return;
+		}
+		const formats = [
+			{ id: 'bold', nodes: [ 'STRONG', 'B' ] },
+			{ id: 'italic', nodes: [ 'EM', 'I' ] },
+			{ id: 'strikethrough', nodes: [ 'DEL' ] }
+		];
+		formats.forEach( format => {
+			const formatValue =
+				format.nodes.indexOf( event.element.nodeName ) !== -1 ||
+				!! event.parents.find( parent => format.nodes.indexOf( parent.nodeName ) !== -1 );
+			this.props.setToolbarState( format.id, formatValue );
+		} );
+	};
+
 	onSetup = ( editor ) => {
 		this.editor = editor;
 
-		editor.on( 'init', this.setInitialContent );
-		editor.on( 'change keyup focusout undo redo', this.onChange );
+		editor.on( 'init', this.onInit );
+		editor.on( 'change focusout undo redo', this.onChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'paste', this.onPaste );
+		editor.on( 'nodechange', this.syncToolbar );
 	};
 
-	setInitialContent = () => {
+	onInit = () => {
 		this.editor.setContent( this.props.content );
 	};
 
@@ -156,7 +181,7 @@ export default class EditableComponent extends Component {
 		// should check implication of performance and see if we can rely
 		// on raw formatting instead.
 		const content = this.editor.getContent();
-		if ( content === this.content ) {
+		if ( content === this.props.content ) {
 			return;
 		}
 
