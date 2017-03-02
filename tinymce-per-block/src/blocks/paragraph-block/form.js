@@ -5,6 +5,7 @@ import { createElement, Component } from 'wp-elements';
 
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import AlignmentToolbar from 'controls/alignment-toolbar';
+import BlockArrangement from 'controls/block-arrangement';
 import InlineTextBlockForm from '../inline-text-block/form';
 
 export default class ParagraphBlockForm extends Component {
@@ -35,6 +36,7 @@ export default class ParagraphBlockForm extends Component {
 
 		return (
 			<div>
+				{ isFocused && <BlockArrangement block={ block } /> }
 				{ isFocused &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">

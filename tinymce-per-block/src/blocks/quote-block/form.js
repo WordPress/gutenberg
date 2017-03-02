@@ -6,6 +6,7 @@ import { createElement, Component } from 'wp-elements';
 import { EditableComponent, EnhancedInputComponent } from 'wp-blocks';
 import { serialize } from 'serializers/block';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
+import BlockArrangement from 'controls/block-arrangement';
 
 export default class QuoteBlockForm extends Component {
 	bindContent = ( ref ) => {
@@ -79,6 +80,7 @@ export default class QuoteBlockForm extends Component {
 
 		return (
 			<div>
+				{ isFocused && <BlockArrangement block={ block } /> }
 				{ isFocused &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
