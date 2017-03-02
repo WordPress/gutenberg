@@ -1,0 +1,11 @@
+{
+	"root": true,
+	"extends": "wpcalypso",
+	"env": {
+		"browser": true
+	},
+	"rules": {
+		"no-var": "off",
+		"camelcase": "off"
+	}
+}
