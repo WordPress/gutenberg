@@ -337,6 +337,7 @@ function showControls( node ) {
 	var position = node.getBoundingClientRect();
 	switcher.style.opacity = 1;
 	switcher.style.top = ( position.top + 18 + window.scrollY ) + 'px';
+	switcher.style.left = position.left - 10 + 'px';
 
 	// show/hide block-specific block controls
 	dockedControls.className = 'docked-controls';
