@@ -4,10 +4,11 @@ window.wp.blocks.register( {
 	icon: 'gridicons-code',
 	buttons: [
 		{
-			text: 'syntax'
+			icon: 'gridicons-cog'
 		},
 		{
-			icon: 'gridicons-posts',
+			classes: 'remove-formatting',
+			icon: 'gridicons-code',
 			onClick: function( editor ) {
 				editor.formatter.remove( 'pre' );
 			}
