@@ -4,7 +4,7 @@ window.wp.blocks.registerBlock( {
 	type: 'image',
 	keywords: [],
 	icon: 'gridicons-image-multiple',
-	buttons: [
+	controls: [
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',
