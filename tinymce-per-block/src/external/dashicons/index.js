@@ -11,3 +11,6 @@ export { default as EditorParagraphIcon } from './icons/editor-paragraph';
 export { default as EditorTableIcon } from './icons/editor-table';
 export { default as EditorQuoteIcon } from './icons/editor-quote';
 export { default as FormatImageIcon } from './icons/format-image';
+export { default as EditorBoldIcon } from './icons/editor-bold';
+export { default as EditorItalicIcon } from './icons/editor-italic';
+export { default as EditorStrikethroughIcon } from './icons/editor-strikethrough';

@@ -28,18 +28,24 @@ export default class InlineTextBlockForm extends Component {
 		const { block: { children }, remove, setChildren } = this.props;
 		remove( index );
 		setTimeout( () => setChildren( getLeaves( children ).concat( getLeaves( block.children ) ) ) );
+		setTimeout( () => this.editable.updateContent() );
 	}
 
 	bindEditable = ( ref ) => {
 		this.editable = ref;
 	}
 
+	executeCommand = ( ...args ) => {
+		this.editable.executeCommand( ...args );
+	};
+
 	render() {
-		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
+		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove, setToolbarState } = this.props;
 		const { children } = block;
 
 		const splitValue = ( left, right ) => {
 			setChildren( left );
+			setTimeout( () => this.editable.updateContent() );
 			if ( right ) {
 				appendBlock( {
 					...block,
@@ -62,6 +68,7 @@ export default class InlineTextBlockForm extends Component {
 				onChange={ ( value ) => setChildren( value ) }
 				inline
 				single
+				setToolbarState={ setToolbarState }
 			/>
 		);
 	}
