@@ -2,10 +2,11 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { reduce } from 'lodash';
-import { EditableComponent } from 'wp-blocks';
 
+import { EditableComponent } from 'wp-blocks';
 import { serialize } from 'serializers/block';
+import AlignmentToolbar from 'controls/alignment-toolbar';
+import EditableFormatToolbar from 'controls/editable-format-toolbar';
 
 export default class TextBlockForm extends Component {
 	focus( position ) {
@@ -26,19 +27,21 @@ export default class TextBlockForm extends Component {
 		this.editable = ref;
 	}
 
+	setAlignment = ( textAlign ) => {
+		this.props.setAttributes( { textAlign } );
+	};
+
+	bindFormatToolbar = ( ref ) => {
+		this.toolbar = ref;
+	};
+
+	setToolbarState = ( ...args ) => {
+		this.toolbar && this.toolbar.setToolbarState( ...args );
+	};
+
 	render() {
-		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
+		const { block, isFocused, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
 		const { children } = block;
-		const style = reduce( block.attrs, ( memo, value, key ) => {
-			switch ( key ) {
-				case 'align':
-					memo.textAlign = value;
-					break;
-			}
-
-			return memo;
-		}, {} );
-
 		const splitValue = ( left, right ) => {
 			setChildren( left );
 			if ( right ) {
@@ -50,18 +53,36 @@ export default class TextBlockForm extends Component {
 				appendBlock();
 			}
 		};
+		const selectedTextAlign = block.attrs.textAlign || 'left';
+		const style = {
+			textAlign: selectedTextAlign
+		};
 
 		return (
-			<div className="text-block__form" style={ style }>
-				<EditableComponent
-					ref={ this.bindEditable }
-					content={ serialize( children ) }
-					moveUp={ moveUp }
-					moveDown={ moveDown }
-					splitValue={ splitValue }
-					mergeWithPrevious={ mergeWithPrevious }
-					remove={ remove }
-					onChange={ ( value ) => setChildren( value ) } />
+			<div>
+				{ isFocused && (
+					<div className="block-list__block-controls">
+						<div className="block-list__block-controls-group">
+							<AlignmentToolbar value={ block.attrs.textAlign } onChange={ this.setAlignment } />
+						</div>
+
+						<div className="block-list__block-controls-group">
+							<EditableFormatToolbar editable={ this.editable } ref={ this.bindFormatToolbar } />
+						</div>
+					</div>
+				) }
+				<div className="text-block__form" style={ style }>
+					<EditableComponent
+						ref={ this.bindEditable }
+						content={ serialize( children ) }
+						moveUp={ moveUp }
+						moveDown={ moveDown }
+						splitValue={ splitValue }
+						mergeWithPrevious={ mergeWithPrevious }
+						remove={ remove }
+						setToolbarState={ this.setToolbarState }
+						onChange={ ( value ) => setChildren( value ) } />
+				</div>
 			</div>
 		);
 	}
