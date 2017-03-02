@@ -1,10 +1,11 @@
 ( function( tinymce, wp ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
+		var element;
 
 		// Set focussed block. Global variable for now. Top-level node for now.
 
 		editor.on( 'nodechange', function( event ) {
-			window.element = event.parents[ event.parents.length - 1 ];
+			element = window.element = event.parents[ event.parents.length - 1 ];
 		} );
 
 		// Global buttons.
