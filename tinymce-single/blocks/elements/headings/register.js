@@ -21,6 +21,8 @@
 			}
 		} );
 
+		buttons.push( 'text-align-left', 'text-align-center', 'text-align-right' );
+
 		return buttons;
 	}
 
