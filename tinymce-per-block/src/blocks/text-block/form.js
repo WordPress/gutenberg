@@ -7,6 +7,7 @@ import { EditableComponent } from 'wp-blocks';
 import { serialize } from 'serializers/block';
 import AlignmentToolbar from 'controls/alignment-toolbar';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
+import BlockArrangement from 'controls/block-arrangement';
 
 export default class TextBlockForm extends Component {
 	focus( position ) {
@@ -60,6 +61,7 @@ export default class TextBlockForm extends Component {
 
 		return (
 			<div>
+				{ isFocused && <BlockArrangement block={ block } /> }
 				{ isFocused && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">

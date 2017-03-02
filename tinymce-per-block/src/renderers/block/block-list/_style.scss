@@ -5,18 +5,23 @@
 }
 
 .block-list__block {
-	position: relative;
-	border: 2px solid transparent;
-	outline: none;
-	margin-bottom: 1rem;
-	padding: 0.8rem 1.2rem;
-	transition: 0.2s border-color;
+	outline: 0;
 
-	&:hover {
+	> div {
+		position: relative;
+		outline: none;
+		border: 2px solid transparent;
+		outline: none;
+		padding: 0.8rem 1.2rem;
+		transition: 0.2s border-color;
+		margin-bottom: 1rem;
+	}
+
+	&:hover > div {
 		border-left-color: mix( $gray-light, $gray-dark-300, 80% );
 	}
 
-	&.is-focused {
+	&.is-focused > div {
 		border-color: mix( $gray-light, $gray-dark-300, 80% );
 	}
 }

@@ -4,7 +4,6 @@
 import { createElement, Component } from 'wp-elements';
 import classNames from 'classnames';
 import { getBlock } from 'wp-blocks';
-import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 import isEqualShallow from 'is-equal-shallow';
 
 export default class BlockListBlock extends Component {
@@ -108,35 +107,15 @@ export default class BlockListBlock extends Component {
 			}
 		};
 
-		const Icon = blockDefinition.icon;
-
 		return (
 			<div
 				ref={ this.setRef }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				onBlur={ this.maybeFocusOut }
-				className={ classes }>
+				className={ classes }
+			>
 				<Form ref={ this.bindForm } block={ block } { ...state } isFocused={ isFocused } />
-				{ isFocused && (
-					<div className="block-list__block-arrangement">
-						<div className="block-list__movement-controls">
-							<button className="block-list__block-arrange-control">
-								<ArrowUpAlt2Icon />
-							</button>
-							<button className="block-list__block-arrange-control">
-								<ArrowDownAlt2Icon />
-							</button>
-						</div>
-						{ Icon && (
-							<div className="block-list__type-controls">
-								<button className="block-list__block-arrange-control">
-									<Icon />
-								</button>
-							</div>
-						) }
-					</div>
-				) }
 			</div>
 		);
 	}
