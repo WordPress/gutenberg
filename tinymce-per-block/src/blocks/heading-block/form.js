@@ -15,7 +15,6 @@ import EditableFormatToolbar from 'controls/editable-format-toolbar';
 export default class HeadingBlockForm extends Component {
 	bindForm = ( ref ) => {
 		this.form = ref;
-		this.focus = ( ...args ) => this.form.focus( ...args );
 		this.merge = ( ...args ) => this.form.merge( ...args );
 	};
 

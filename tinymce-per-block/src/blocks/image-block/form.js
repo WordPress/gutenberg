@@ -20,10 +20,6 @@ export default class ImageBlockForm extends Component {
 		this.props.remove();
 	}
 
-	focus( position ) {
-		this.caption.focus( position );
-	}
-
 	bindCaption = ( ref ) => {
 		this.caption = ref;
 	}

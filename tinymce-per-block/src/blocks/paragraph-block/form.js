@@ -11,7 +11,6 @@ import InlineTextBlockForm from '../inline-text-block/form';
 export default class ParagraphBlockForm extends Component {
 	bindForm = ( ref ) => {
 		this.form = ref;
-		this.focus = ( ...args ) => this.form.focus( ...args );
 		this.merge = ( ...args ) => this.form.merge( ...args );
 	};
 
