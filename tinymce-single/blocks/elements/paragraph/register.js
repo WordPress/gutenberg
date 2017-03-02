@@ -2,7 +2,7 @@ window.wp.blocks.registerBlock( {
 	elements: [ 'p' ],
 	type: 'text',
 	icon: 'gridicons-posts',
-	buttons: [
+	controls: [
 		{
 			icon: 'gridicons-heading',
 			onClick: function( editor ) {

@@ -4,7 +4,7 @@ window.wp.blocks.registerBlock( {
 	type: 'video',
 	keywords: [],
 	icon: 'gridicons-video',
-	buttons: [
+	controls: [
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',

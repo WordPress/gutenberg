@@ -2,7 +2,7 @@ window.wp.blocks.registerBlock( {
 	elements: [ 'pre' ],
 	type: 'text',
 	icon: 'gridicons-code',
-	buttons: [
+	controls: [
 		{
 			icon: 'gridicons-cog'
 		},

@@ -351,7 +351,8 @@
 			}
 
 			function showBlockUI( focus ) {
-				var settings = wp.blocks.getBlockSettingsByElement( element );
+				var settings = wp.blocks.getBlockSettingsByElement( element ),
+					controls;
 
 				if ( ! hasBlockUI ) {
 					tinymce.$( editor.getBody() ).addClass( 'has-block-ui' );
@@ -368,7 +369,9 @@
 
 				if ( settings ) {
 					if ( ! blockToolbars[ settings._id ] ) {
-						blockToolbars[ settings._id ] = editor.wp._createToolbar( settings.buttons );
+						controls = settings.controls || [];
+
+						blockToolbars[ settings._id ] = editor.wp._createToolbar( controls );
 						blockToolbars[ settings._id ].reposition = function () {
 							if (!element) return
 
