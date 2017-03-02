@@ -1,4 +1,4 @@
-( function( tinymce, wp ) {
+( function( tinymce, wp, _ ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		var element;
 
@@ -8,67 +8,31 @@
 			element = window.element = event.parents[ event.parents.length - 1 ];
 		} );
 
-		// Global buttons.
+		// Global controls
 
-		tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-			editor.addButton( 'text-align-' + position, {
-				icon: 'gridicons-align-' + position,
-				cmd: 'text-align-' + position,
-				onClick: function() {
-					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.$( element ).removeClass( 'text-align-' + position );
-					} );
+		_.forEach( wp.blocks.getControls(), function( control, name ) {
+			var settings = {
+				icon: control.icon
+			};
 
-					if ( position !== 'left' && ! this.active() ) {
-						editor.$( element ).addClass( 'text-align-' + position );
-					}
-
+			if ( control.onClick ) {
+				settings.onClick = function() {
+					control.onClick( element );
 					editor.nodeChanged();
-				},
-				onPostRender: function() {
+				};
+			}
+
+			if ( control.isActive ) {
+				settings.onPostRender = function() {
 					var button = this;
 
-					editor.on( 'nodechange', function( event ) {
-						$element = editor.$( element );
-
-						if ( position === 'left' ) {
-							button.active( ! (
-								$element.hasClass( 'text-align-center' ) || $element.hasClass( 'text-align-right' )
-							) );
-						} else {
-							button.active( $element.hasClass( 'text-align-' + position ) );
-						}
+					editor.on( 'nodechange', function() {
+						button.active( control.isActive( element ) );
 					} );
-				}
-			} );
+				};
+			}
 
-			editor.addButton( 'block-align-' + position, {
-				icon: 'gridicons-align-image-' + position,
-				cmd: 'block-align-' + position,
-				onClick: function() {
-					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.$( element ).removeClass( 'align' + position );
-					} );
-
-					editor.$( element ).addClass( 'align' + position );
-					editor.nodeChanged();
-				},
-				onPostRender: function() {
-					var button = this;
-
-					editor.on( 'nodechange', function( event ) {
-						$element = editor.$( element );
-
-						if ( position === 'center' ) {
-							button.active( ! (
-								$element.hasClass( 'alignleft' ) || $element.hasClass( 'alignright' )
-							) );
-						} else {
-							button.active( $element.hasClass( 'align' + position ) );
-						}
-					} );
-				}
-			} );
+			editor.addButton( name, settings );
 		} );
 
 		function addfigcaption() {
@@ -666,4 +630,4 @@
 			} );
 		} );
 	} );
-} )( window.tinymce, window.wp );
+} )( window.tinymce, window.wp, window._ );
