@@ -4,8 +4,8 @@
 
 		// Set focussed block. Global variable for now. Top-level node for now.
 
-		editor.on( 'nodechange', function() {
-			element = editor.selection.getSelectedBlocks()[ 0 ];
+		editor.on( 'nodechange', function( event ) {
+			element = window.element = event.parents[ event.parents.length - 1 ];
 		} );
 
 		// Global controls
