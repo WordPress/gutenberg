@@ -1,8 +1,8 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	elements: [ 'p' ],
 	type: 'text',
 	icon: 'gridicons-posts',
-	buttons: [
+	controls: [
 		{
 			icon: 'gridicons-heading',
 			onClick: function( editor ) {
@@ -27,6 +27,8 @@ window.wp.blocks.register( {
 				editor.formatter.apply( 'pre' );
 			}
 		},
-		'text-align-center'
+		'text-align-left',
+		'text-align-center',
+		'text-align-right'
 	]
 } );

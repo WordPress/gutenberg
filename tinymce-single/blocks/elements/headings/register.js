@@ -1,9 +1,9 @@
-( function( register ) {
-	function getButtons() {
-		var buttons = [];
+( function( wp ) {
+	function getControls() {
+		var controls = [];
 
 		'123456'.split( '' ).forEach( function( level ) {
-			buttons.push( {
+			controls.push( {
 				icon: 'gridicons-heading',
 				text: level,
 				stateSelector: 'h' + level,
@@ -13,7 +13,7 @@
 			} );
 		} );
 
-		buttons.push( {
+		controls.push( {
 			classes: 'remove-formatting',
 			icon: 'gridicons-heading',
 			onClick: function( editor, element ) {
@@ -21,15 +21,15 @@
 			}
 		} );
 
-		buttons.push( 'text-align-center' );
+		controls.push( 'text-align-left', 'text-align-center', 'text-align-right' );
 
-		return buttons;
+		return controls;
 	}
 
-	register( {
+	wp.blocks.registerBlock( {
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'text',
 		icon: 'gridicons-heading',
-		buttons: getButtons()
+		controls: getControls()
 	} );
-} )( window.wp.blocks.register );
+} )( window.wp );
