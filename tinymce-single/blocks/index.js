@@ -2,7 +2,7 @@
 	var _settings = {};
 
 	wp.blocks = {
-		register: function( settings ) {
+		registerBlock: function( settings ) {
 			// Note, elements should probably only be registered by core.
 			// Maybe for each block, we should offer to extend the settings (add buttons).
 
@@ -16,16 +16,16 @@
 				_settings[ settings.namespace + ':' + settings.name ]._id = settings.namespace + ':' + settings.name;
 			}
 		},
-		getSettings: function( id ) {
+		getBlockSettings: function( id ) {
 			return _settings[ id ];
 		},
-		getSettingsByElement: function( element ) {
+		getBlockSettingsByElement: function( element ) {
 			var blockType = element.getAttribute( 'data-wp-block-type' );
 			var nodeName = element.nodeName.toLowerCase();
 
 			return this.getSettings( blockType || 'element:' + nodeName );
 		},
-		getAllSettings: function() {
+		getBlocks: function() {
 			return _settings;
 		}
 	};

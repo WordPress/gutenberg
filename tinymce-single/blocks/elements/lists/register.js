@@ -1,4 +1,4 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	elements: [ 'ul', 'ol' ],
 	type: 'text',
 	icon: 'gridicons-list-unordered',

@@ -135,7 +135,7 @@
 
 					editor.on( 'nodechange', function( event ) {
 						var element = event.parents[ event.parents.length - 1 ];
-						var settings = wp.blocks.getSettingsByElement( element );
+						var settings = wp.blocks.getBlockSettingsByElement( element );
 
 						if ( settings ) {
 							button.icon( settings.icon );
@@ -229,7 +229,7 @@
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
 			function getInsertButtons() {
-				var allSettings = wp.blocks.getAllSettings();
+				var allSettings = wp.blocks.getBlocks();
 				var buttons = [];
 				var key;
 
@@ -386,7 +386,7 @@
 			}
 
 			function showBlockUI( focus ) {
-				var settings = wp.blocks.getSettingsByElement( element );
+				var settings = wp.blocks.getBlockSettingsByElement( element );
 
 				if ( ! hasBlockUI ) {
 					tinymce.$( editor.getBody() ).addClass( 'has-block-ui' );

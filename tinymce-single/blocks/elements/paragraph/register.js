@@ -1,4 +1,4 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	elements: [ 'p' ],
 	type: 'text',
 	icon: 'gridicons-posts',

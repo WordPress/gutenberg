@@ -1,4 +1,4 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	name: 'youtube',
 	namespace: 'my-awesome-plugin',
 	type: 'video',

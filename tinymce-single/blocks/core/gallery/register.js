@@ -1,4 +1,4 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	name: 'gallery',
 	namespace: 'core',
 	type: 'image',
