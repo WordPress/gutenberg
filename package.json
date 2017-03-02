@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/WordPress/gutenberg#readme",
   "devDependencies": {
+    "eslint": "^3.16.1",
+    "eslint-config-wordpress": "^1.1.0",
     "http-server": "0.9.0"
   }
 }
