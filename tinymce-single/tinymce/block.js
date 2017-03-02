@@ -10,6 +10,17 @@
 
 		// Global controls
 
+		function isNodeEligibleForControl( node, name ) {
+			var block;
+
+			if ( ! node ) {
+				return false;
+			}
+
+			block = wp.blocks.getBlockSettingsByElement( node );
+			return block && _.includes( block.controls, name );
+		}
+
 		_.forEach( wp.blocks.getControls(), function( control, name ) {
 			var settings = {
 				icon: control.icon
@@ -27,7 +38,9 @@
 					var button = this;
 
 					editor.on( 'nodechange', function() {
-						button.active( control.isActive( element ) );
+						if ( isNodeEligibleForControl( element, name ) ) {
+							button.active( control.isActive( element ) );
+						}
 					} );
 				};
 			}
