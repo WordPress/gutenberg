@@ -1,0 +1,53 @@
+{
+	"root": true,
+	"extends": "wordpress",
+	"env": {
+		"browser": true
+	},
+	"rules": {
+		"array-bracket-spacing": [ "error", "always" ],
+		"brace-style": [ "error", "1tbs" ],
+		"comma-spacing": "error",
+		"comma-style": "error",
+		"computed-property-spacing": [ "error", "always" ],
+		"dot-notation": "error",
+		"eol-last": "error",
+		"func-call-spacing": "error",
+		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
+		"key-spacing": "error",
+		"keyword-spacing": "error",
+		"no-console": "error",
+		"no-debugger": "error",
+		"no-dupe-args": "error",
+		"no-dupe-keys": "error",
+		"no-duplicate-case": "error",
+		"no-else-return": "error",
+		"no-extra-semi": "error",
+		"no-lonely-if": "error",
+		"no-mixed-spaces-and-tabs": "error",
+		"no-multiple-empty-lines": [ "error", { "max": 1 } ],
+		"no-multi-spaces": "error",
+		"no-negated-in-lhs": "error",
+		"no-nested-ternary": "error",
+		"no-redeclare": "error",
+		"no-shadow": "error",
+		"no-unreachable": "error",
+		"no-use-before-define": [ "error", "nofunc" ],
+		"no-var": "error",
+		"object-curly-spacing": [ "error", "always" ],
+		"padded-blocks": [ "error", "never" ],
+		"quote-props": [ "error", "as-needed", { "keywords": true } ],
+		"semi": "error",
+		"semi-spacing": "error",
+		"space-before-blocks": [ "error", "always" ],
+		"space-before-function-paren": [ "error", "never" ],
+		"space-in-parens": [ "error", "always" ],
+		"space-infix-ops": [ "error", { "int32Hint": false } ],
+		"space-unary-ops": [ "error", {
+			"overrides": {
+				"!": true
+			}
+		} ],
+		"valid-jsdoc": [ "error", { "requireReturn": false } ]
+	}
+}
