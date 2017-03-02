@@ -14,7 +14,6 @@ import { getBlock } from 'wp-blocks';
 import 'assets/stylesheets/main.scss';
 import 'blocks/text-block';
 import 'blocks/image-block';
-import 'blocks/image-caption-block';
 import 'blocks/heading-block';
 import 'blocks/paragraph-block';
 import 'blocks/quote-block';
