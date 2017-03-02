@@ -1,10 +1,10 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	name: 'youtube',
 	namespace: 'my-awesome-plugin',
 	type: 'video',
 	keywords: [],
 	icon: 'gridicons-video',
-	buttons: [
+	controls: [
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',

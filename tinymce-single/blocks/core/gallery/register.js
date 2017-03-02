@@ -1,10 +1,10 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	name: 'gallery',
 	namespace: 'core',
 	type: 'image',
 	keywords: [],
 	icon: 'gridicons-image-multiple',
-	buttons: [
+	controls: [
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',

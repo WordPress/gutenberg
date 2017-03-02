@@ -1,8 +1,8 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	elements: [ 'ul', 'ol' ],
 	type: 'text',
 	icon: 'gridicons-list-unordered',
-	buttons: [
+	controls: [
 		{
 			icon: 'gridicons-list-unordered',
 			stateSelector: 'ul',

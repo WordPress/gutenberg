@@ -1,73 +1,51 @@
-( function( tinymce, wp ) {
+( function( tinymce, wp, _ ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
+		var element;
 
 		// Set focussed block. Global variable for now. Top-level node for now.
 
 		editor.on( 'nodechange', function( event ) {
-			window.element = event.parents[ event.parents.length - 1 ];
+			element = window.element = event.parents[ event.parents.length - 1 ];
 		} );
 
-		// Global buttons.
+		// Global controls
 
-		tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-			editor.addButton( 'text-align-' + position, {
-				icon: 'gridicons-align-' + position,
-				cmd: 'text-align-' + position,
-				onClick: function() {
-					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.$( element ).removeClass( 'text-align-' + position );
-					} );
+		function isNodeEligibleForControl( node, name ) {
+			var block;
 
-					if ( position !== 'left' && ! this.active() ) {
-						editor.$( element ).addClass( 'text-align-' + position );
-					}
+			if ( ! node ) {
+				return false;
+			}
 
+			block = wp.blocks.getBlockSettingsByElement( node );
+			return block && _.includes( block.controls, name );
+		}
+
+		_.forEach( wp.blocks.getControls(), function( control, name ) {
+			var settings = {
+				icon: control.icon
+			};
+
+			if ( control.onClick ) {
+				settings.onClick = function() {
+					control.onClick( element );
 					editor.nodeChanged();
-				},
-				onPostRender: function() {
+				};
+			}
+
+			if ( control.isActive ) {
+				settings.onPostRender = function() {
 					var button = this;
 
-					editor.on( 'nodechange', function( event ) {
-						$element = editor.$( element );
-
-						if ( position === 'left' ) {
-							button.active( ! (
-								$element.hasClass( 'text-align-center' ) || $element.hasClass( 'text-align-right' )
-							) );
-						} else {
-							button.active( $element.hasClass( 'text-align-' + position ) );
+					editor.on( 'nodechange', function() {
+						if ( isNodeEligibleForControl( element, name ) ) {
+							button.active( control.isActive( element ) );
 						}
 					} );
-				}
-			} );
+				};
+			}
 
-			editor.addButton( 'block-align-' + position, {
-				icon: 'gridicons-align-image-' + position,
-				cmd: 'block-align-' + position,
-				onClick: function() {
-					tinymce.each( [ 'left', 'center', 'right' ], function( position ) {
-						editor.$( element ).removeClass( 'align' + position );
-					} );
-
-					editor.$( element ).addClass( 'align' + position );
-					editor.nodeChanged();
-				},
-				onPostRender: function() {
-					var button = this;
-
-					editor.on( 'nodechange', function( event ) {
-						$element = editor.$( element );
-
-						if ( position === 'center' ) {
-							button.active( ! (
-								$element.hasClass( 'alignleft' ) || $element.hasClass( 'alignright' )
-							) );
-						} else {
-							button.active( $element.hasClass( 'align' + position ) );
-						}
-					} );
-				}
-			} );
+			editor.addButton( name, settings );
 		} );
 
 		function addfigcaption() {
@@ -135,7 +113,7 @@
 
 					editor.on( 'nodechange', function( event ) {
 						var element = event.parents[ event.parents.length - 1 ];
-						var settings = wp.blocks.getSettingsByElement( element );
+						var settings = wp.blocks.getBlockSettingsByElement( element );
 
 						if ( settings ) {
 							button.icon( settings.icon );
@@ -229,7 +207,7 @@
 			blockToolbar.$el.addClass( 'block-toolbar' );
 
 			function getInsertButtons() {
-				var allSettings = wp.blocks.getAllSettings();
+				var allSettings = wp.blocks.getBlocks();
 				var buttons = [];
 				var key;
 
@@ -386,7 +364,8 @@
 			}
 
 			function showBlockUI( focus ) {
-				var settings = wp.blocks.getSettingsByElement( element );
+				var settings = wp.blocks.getBlockSettingsByElement( element ),
+					controls;
 
 				if ( ! hasBlockUI ) {
 					tinymce.$( editor.getBody() ).addClass( 'has-block-ui' );
@@ -403,7 +382,9 @@
 
 				if ( settings ) {
 					if ( ! blockToolbars[ settings._id ] ) {
-						blockToolbars[ settings._id ] = editor.wp._createToolbar( settings.buttons );
+						controls = settings.controls || [];
+
+						blockToolbars[ settings._id ] = editor.wp._createToolbar( controls );
 						blockToolbars[ settings._id ].reposition = function () {
 							if (!element) return
 
@@ -665,4 +646,4 @@
 			} );
 		} );
 	} );
-} )( window.tinymce, window.wp );
+} )( window.tinymce, window.wp, window._ );
