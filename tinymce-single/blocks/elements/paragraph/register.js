@@ -27,6 +27,8 @@ window.wp.blocks.registerBlock( {
 				editor.formatter.apply( 'pre' );
 			}
 		},
-		'text-align-center'
+		'text-align-left',
+		'text-align-center',
+		'text-align-right'
 	]
 } );
