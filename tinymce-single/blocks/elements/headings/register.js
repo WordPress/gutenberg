@@ -1,4 +1,4 @@
-( function( register ) {
+( function( wp ) {
 	function getButtons() {
 		var buttons = [];
 
@@ -26,10 +26,10 @@
 		return buttons;
 	}
 
-	register( {
+	wp.blocks.registerBlock( {
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'text',
 		icon: 'gridicons-heading',
 		buttons: getButtons()
 	} );
-} )( window.wp.blocks.register );
+} )( window.wp );

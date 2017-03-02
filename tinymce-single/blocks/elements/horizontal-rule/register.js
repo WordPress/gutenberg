@@ -1,4 +1,4 @@
-window.wp.blocks.register( {
+window.wp.blocks.registerBlock( {
 	elements: [ 'hr' ],
 	type: 'separator',
 	icon: 'gridicons-minus',
