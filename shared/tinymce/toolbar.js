@@ -75,7 +75,8 @@
 					function onClick( callback ) {
 						return function() {
 							editor.undoManager.transact( function() {
-								callback( editor, window.element );
+								var element = editor.selection.getSelectedBlocks()[ 0 ];
+								callback( editor, element );
 							} );
 						}
 					}
