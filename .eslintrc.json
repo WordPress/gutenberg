@@ -33,7 +33,6 @@
 		"no-shadow": "error",
 		"no-unreachable": "error",
 		"no-use-before-define": [ "error", "nofunc" ],
-		"no-var": "error",
 		"object-curly-spacing": [ "error", "always" ],
 		"padded-blocks": [ "error", "never" ],
 		"quote-props": [ "error", "as-needed", { "keywords": true } ],
