@@ -7,10 +7,6 @@ import { EditableComponent } from 'wp-blocks';
 import { serialize } from 'serializers/block';
 
 export default class InlineTextBlockForm extends Component {
-	focus( position ) {
-		this.editable.focus( position );
-	}
-
 	merge = ( block, index ) => {
 		const acceptedBlockTypes = [ 'quote', 'paragraph', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
@@ -40,7 +36,8 @@ export default class InlineTextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove, setToolbarState } = this.props;
+		const { block, setChildren, moveUp, moveDown, appendBlock,
+			mergeWithPrevious, remove, setToolbarState, focus, focusConfig } = this.props;
 		const { children } = block;
 
 		const splitValue = ( left, right ) => {
@@ -66,9 +63,11 @@ export default class InlineTextBlockForm extends Component {
 				mergeWithPrevious={ mergeWithPrevious }
 				remove={ remove }
 				onChange={ ( value ) => setChildren( value ) }
+				setToolbarState={ setToolbarState }
+				focusConfig={ focusConfig }
+				onFocusChange={ focus }
 				inline
 				single
-				setToolbarState={ setToolbarState }
 			/>
 		);
 	}

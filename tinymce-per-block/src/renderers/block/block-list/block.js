@@ -7,16 +7,6 @@ import { getBlock } from 'wp-blocks';
 import isEqualShallow from 'is-equal-shallow';
 
 export default class BlockListBlock extends Component {
-	maybeFocusOut = ( event ) => {
-		if ( ! this.blockNode ) {
-			return;
-		}
-
-		if ( ! this.blockNode.contains( event.relatedTarget ) ) {
-			this.props.onBlur( event );
-		}
-	};
-
 	setRef = ( blockNode ) => {
 		this.blockNode = blockNode;
 	};
@@ -25,16 +15,12 @@ export default class BlockListBlock extends Component {
 		this.form = form;
 	}
 
-	focus = ( position ) => {
-		this.form.focus && this.form.focus( position );
-	};
-
 	merge = ( block, index ) => {
 		this.form.merge && this.form.merge( block, index );
 	}
 
 	render() {
-		const { block, isFocused } = this.props;
+		const { block, isFocused, focusConfig } = this.props;
 		const blockDefinition = getBlock( block.blockType );
 		if ( ! blockDefinition ) {
 			return null;
@@ -89,10 +75,10 @@ export default class BlockListBlock extends Component {
 					type: 'mergeWithPrevious'
 				} );
 			},
-			focus( position ) {
+			focus( config ) {
 				executeCommand( {
 					type: 'focus',
-					position
+					config
 				} );
 			},
 			moveUp() {
@@ -112,10 +98,15 @@ export default class BlockListBlock extends Component {
 				ref={ this.setRef }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				onBlur={ this.maybeFocusOut }
 				className={ classes }
 			>
-				<Form ref={ this.bindForm } block={ block } { ...state } isFocused={ isFocused } />
+				<Form
+					ref={ this.bindForm }
+					block={ block }
+					{ ...state }
+					isFocused={ isFocused }
+					focusConfig={ focusConfig }
+				/>
 			</div>
 		);
 	}

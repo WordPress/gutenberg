@@ -10,8 +10,9 @@ export default class EnhancedInput extends Component {
 		splitValue: () => {},
 		removePrevious: () => {},
 		onChange: () => {},
+		onFocusChange: () => {},
 		moveUp: () => {},
-		moveDown: () => {}
+		moveDown: () => {},
 	};
 
 	bindInput = ( ref ) => {
@@ -22,15 +23,18 @@ export default class EnhancedInput extends Component {
 		this.mirror = ref;
 	};
 
-	focus = ( position ) => {
+	focus() {
+		const { start = false } = this.props.focusConfig;
 		this.input.focus();
-		if ( position !== undefined ) {
-			this.input.setSelectionRange( position, position );
+		if (  start ) {
+			this.input.setSelectionRange( 0, 0 );
 		}
 	}
 
-	componentDidMount() {
-		this.render();
+	componentDidUpdate( prevProps ) {
+		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
+			this.focus();
+		}
 	}
 
 	onKeyDown = ( event ) => {
@@ -40,8 +44,7 @@ export default class EnhancedInput extends Component {
 			event.stopPropagation();
 			const textBeforeSelection = value.slice( 0, this.input.selectionStart );
 			const textAfterSelection = value.slice( this.input.selectionEnd );
-			const selection = value.slice( this.selectionStart, this.selectionEnd );
-			splitValue( textBeforeSelection, textAfterSelection, selection );
+			splitValue( textBeforeSelection, textAfterSelection );
 		} else if (
 			event.keyCode === 8 &&
 			this.input.selectionStart === this.input.selectionEnd &&
@@ -62,9 +65,13 @@ export default class EnhancedInput extends Component {
 		this.props.onChange( event.target.value );
 	};
 
+	onFocus = () => {
+		this.props.onFocusChange( { position: this.input.selectionStart } );
+	};
+
 	render() {
 		// Keeping splitValue to exclude it from props
-		const ignoredProps = [ 'value', 'splitValue', 'removePrevious', 'moveDown', 'moveUp' ];
+		const ignoredProps = [ 'value', 'splitValue', 'removePrevious', 'moveDown', 'moveUp', 'focusConfig', 'onFocusChange' ];
 		const { value } = this.props;
 		const props = omit( this.props, ignoredProps );
 
@@ -87,6 +94,7 @@ export default class EnhancedInput extends Component {
 					value={ value }
 					onKeyDown={ this.onKeyDown }
 					onChange={ this.onChange }
+					onFocus={ this.onFocus }
 				/>
 			</div>
 		);

@@ -12,6 +12,7 @@ import BlockListBlock from './block';
 class BlockList extends Component {
 	state = {
 		focusIndex: null,
+		focusConfig: {}
 	};
 
 	blockNodes = [];
@@ -25,16 +26,15 @@ class BlockList extends Component {
 		this.content = this.props.content;
 	}
 
-	onFocusIndexChange = ( index ) => {
-		this.setState( { focusIndex: index } );
+	focus = ( index, config = {} ) => {
+		this.setState( {
+			focusIndex: index,
+			focusConfig: config
+		} );
 	};
 
 	bindBlock = ( index ) => ( ref ) => {
 		this.blockNodes[ index ] = ref;
-	};
-
-	focusBlock = ( index, position ) => {
-		this.blockNodes[ index ].focus( position );
 	};
 
 	onChange = ( content ) => {
@@ -79,7 +79,7 @@ class BlockList extends Component {
 					Object.assign( {}, createdBlock, { uid: uniqueId() } ),
 					...content.slice( index + 1 )
 				] );
-				setTimeout( () => this.focusBlock( index + 1, 0 ) );
+				setTimeout( () => this.focus( index + 1, { start: true } ) );
 			},
 			remove: ( { index: commandIndex } ) => {
 				const indexToRemove = commandIndex === undefined ? index : commandIndex;
@@ -90,7 +90,7 @@ class BlockList extends Component {
 					...content.slice( 0, indexToRemove ),
 					...content.slice( indexToRemove + 1 ),
 				] );
-				setTimeout( () => this.focusBlock( indexToRemove - 1 ) );
+				setTimeout( () => this.focus( indexToRemove - 1, { end: true } ) );
 			},
 			mergeWithPrevious: () => {
 				const previousBlockNode = this.blockNodes[ index - 1 ];
@@ -99,19 +99,19 @@ class BlockList extends Component {
 				}
 				setTimeout( () => previousBlockNode.merge( content[ index ], index ) );
 			},
-			focus: ( { position } ) => {
-				this.focusBlock( index, position );
+			focus: ( { config } ) => {
+				this.focus( index, config );
 			},
 			moveUp: () => {
 				const previousBlockNode = this.blockNodes[ index - 1 ];
 				if ( previousBlockNode ) {
-					this.focusBlock( index - 1 );
+					this.focus( index - 1, { end: true } );
 				}
 			},
 			moveDown: () => {
 				const nextBlockNode = this.blockNodes[ index + 1 ];
 				if ( nextBlockNode ) {
-					this.focusBlock( index + 1, 0 );
+					this.focus( index + 1, { start: true } );
 				}
 			}
 		};
@@ -121,7 +121,7 @@ class BlockList extends Component {
 
 	render() {
 		const { content } = this.props;
-		const { focusIndex } = this.state;
+		const { focusIndex, focusConfig } = this.state;
 		return (
 			<div className="block-list">
 				{ map( content, ( block, index ) => {
@@ -133,8 +133,7 @@ class BlockList extends Component {
 							key={ block.uid }
 							tabIndex={ index }
 							isFocused={ isFocused }
-							onFocus={ () => this.onFocusIndexChange( index ) }
-							onBlur={ () => this.onFocusIndexChange( null ) }
+							focusConfig={ isFocused ? focusConfig : null }
 							executeCommand={ ( command ) => this.executeCommand( index, block, command ) }
 							block={ block } />
 					);

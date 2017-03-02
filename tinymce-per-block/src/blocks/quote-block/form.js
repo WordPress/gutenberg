@@ -17,10 +17,6 @@ export default class QuoteBlockForm extends Component {
 		this.cite = ref;
 	};
 
-	focus( position ) {
-		this.content.focus( position );
-	}
-
 	merge = ( block, index ) => {
 		const acceptedBlockTypes = [ 'quote', 'paragraph', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
@@ -38,15 +34,15 @@ export default class QuoteBlockForm extends Component {
 		const { block: { children }, remove, setChildren } = this.props;
 		remove( index );
 		setTimeout( () => setChildren( getLeaves( children ).concat( getLeaves( block.children ) ) ) );
-		setTimeout( () => this.editable.updateContent() );
+		setTimeout( () => this.content.updateContent() );
 	}
 
 	moveToCite = () => {
-		this.cite.focus( 0 );
+		this.props.focus( { input: 'cite', start: true } );
 	};
 
 	moveToContent = () => {
-		this.content.focus();
+		this.props.focus( { input: 'content', end: true } );
 	};
 
 	bindFormatToolbar = ( ref ) => {
@@ -59,7 +55,7 @@ export default class QuoteBlockForm extends Component {
 
 	render() {
 		const { block, setChildren, setAttributes, moveUp,
-			moveDown, remove, mergeWithPrevious, appendBlock, isFocused } = this.props;
+			moveDown, remove, mergeWithPrevious, appendBlock, isFocused, focusConfig, focus } = this.props;
 		const { children } = block;
 		const cite = block.attrs.cite || '';
 		const splitValue = ( left, right ) => {
@@ -77,6 +73,10 @@ export default class QuoteBlockForm extends Component {
 				} ]
 			} );
 		};
+		let focusInput = focusConfig && focusConfig.input;
+		if ( ! focusInput && focusConfig ) {
+			focusInput = focusConfig.end ? 'cite' : 'content';
+		}
 
 		return (
 			<div>
@@ -100,6 +100,8 @@ export default class QuoteBlockForm extends Component {
 							remove={ remove }
 							onChange={ ( value ) => setChildren( value ) }
 							setToolbarState={ this.setToolbarState }
+							focusConfig={ focusInput === 'content' ? focusConfig : null }
+							onFocusChange={ ( config ) => focus( Object.assign( { input: 'content' }, config ) ) }
 							inline
 						/>
 					</div>
@@ -112,6 +114,8 @@ export default class QuoteBlockForm extends Component {
 							value={ cite }
 							splitValue={ splitValue }
 							onChange={ ( value ) => setAttributes( { cite: value } ) }
+							focusConfig={ focusInput === 'cite' ? focusConfig : null }
+							onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
 							placeholder="Enter a cite"
 						/>
 					</div>

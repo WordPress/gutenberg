@@ -10,10 +10,6 @@ import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
 
 export default class TextBlockForm extends Component {
-	focus( position ) {
-		this.editable.focus( position );
-	}
-
 	merge = ( block, index ) => {
 		const acceptedBlockTypes = [ 'text', 'quote', 'paragraph', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
@@ -22,6 +18,7 @@ export default class TextBlockForm extends Component {
 		const { block: { children }, remove, setChildren } = this.props;
 		remove( index );
 		setTimeout( () => setChildren( children.concat( block.children ) ) );
+		setTimeout( () => this.editable.updateContent() );
 	}
 
 	bindEditable = ( ref ) => {
@@ -41,7 +38,8 @@ export default class TextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused, setChildren, moveUp, moveDown, appendBlock, mergeWithPrevious, remove } = this.props;
+		const { block, isFocused, setChildren, moveUp, moveDown, appendBlock,
+			mergeWithPrevious, remove, focusConfig, focus } = this.props;
 		const { children } = block;
 		const splitValue = ( left, right ) => {
 			setChildren( left );
@@ -83,7 +81,10 @@ export default class TextBlockForm extends Component {
 						mergeWithPrevious={ mergeWithPrevious }
 						remove={ remove }
 						setToolbarState={ this.setToolbarState }
-						onChange={ ( value ) => setChildren( value ) } />
+						onChange={ ( value ) => setChildren( value ) }
+						focusConfig={ focusConfig }
+						onFocusChange={ focus }
+					/>
 				</div>
 			</div>
 		);
