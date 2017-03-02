@@ -36,6 +36,7 @@ export default class EditableComponent extends Component {
 	static defaultProps = {
 		onChange: () => {},
 		splitValue: () => {},
+		onFocusChange: () => {},
 		initialContent: '',
 		inline: false,
 		single: false,
@@ -62,13 +63,22 @@ export default class EditableComponent extends Component {
 		}
 	}
 
-	focus( position ) {
+	componentDidUpdate( prevProps ) {
+		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
+			this.focus();
+		}
+	}
+
+	focus() {
 		this.editor.focus();
-		if ( position !== undefined ) {
-			this.editor.selection.setCursorLocation( undefined, position );
-		} else {
+		const { start = false, end = false, bookmark = false } = this.props.focusConfig;
+		if ( start ) {
+			this.editor.selection.setCursorLocation( undefined, 0 );
+		} else if ( end ) {
 			this.editor.selection.select( this.editor.getBody(), true );
 			this.editor.selection.collapse( false );
+		} else if ( bookmark ) {
+			// this.editor.selection.moveToBookmark( bookmark );
 		}
 	}
 
@@ -98,7 +108,8 @@ export default class EditableComponent extends Component {
 			}
 		} else if ( event.keyCode === 40 ) {
 			const bookmark = this.editor.selection.getBookmark();
-			this.focus();
+			this.editor.selection.select( this.editor.getBody(), true );
+			this.editor.selection.collapse( false );
 			const finalBookmark = this.editor.selection.getBookmark( 2, true );
 			this.editor.selection.moveToBookmark( bookmark );
 			if ( isEqual( this.editor.selection.getBookmark( 2, true ), finalBookmark ) ) {
@@ -162,6 +173,11 @@ export default class EditableComponent extends Component {
 		} );
 	};
 
+	onFocus = () => {
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		this.props.onFocusChange( { bookmark } );
+	};
+
 	onSetup = ( editor ) => {
 		this.editor = editor;
 
@@ -170,6 +186,7 @@ export default class EditableComponent extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'paste', this.onPaste );
 		editor.on( 'nodechange', this.syncToolbar );
+		editor.on( 'focusin', this.onFocus );
 	};
 
 	onInit = () => {
