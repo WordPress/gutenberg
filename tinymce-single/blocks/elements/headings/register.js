@@ -7,9 +7,7 @@
 				icon: 'gridicons-heading',
 				text: level,
 				stateSelector: 'h' + level,
-				onClick: function( editor ) {
-					var block = wp.blocks.getSelectedBlock( editor );
-
+				onClick: function( block, editor ) {
 					editor.formatter.apply( 'h' + level, block );
 				}
 			} );
@@ -18,9 +16,7 @@
 		controls.push( {
 			classes: 'remove-formatting',
 			icon: 'gridicons-heading',
-			onClick: function( editor ) {
-				var block = wp.blocks.getSelectedBlock( editor );
-
+			onClick: function( block, editor ) {
 				editor.formatter.apply( 'p', block );
 			}
 		} );
