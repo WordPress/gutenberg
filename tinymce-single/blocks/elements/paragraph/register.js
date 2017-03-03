@@ -17,7 +17,7 @@ window.wp.blocks.registerBlock( {
 		},
 		{
 			icon: 'gridicons-list-unordered',
-			onClick: function( editor, element ) {
+			onClick: function( editor ) {
 				editor.execCommand( 'InsertUnorderedList' );
 			}
 		},
