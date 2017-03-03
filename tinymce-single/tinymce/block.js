@@ -96,15 +96,6 @@
 			var blockToolbar;
 			var blockToolbars = {};
 
-			// editor.addButton( 'moveblock', {
-			// 	icon: 'gridicons-reblog',
-			// 	onclick: function() {
-			// 		editor.$( element ).attr( 'data-mce-selected', 'move' );
-			// 		editor.$( editor.getBody() ).addClass( 'is-moving-block' );
-			// 		editor.nodeChanged();
-			// 	}
-			// } );
-
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
@@ -133,38 +124,39 @@
 				} );
 			}
 
-			editor.addButton( 'block-remove', {
-				icon: 'gridicons-trash',
-				onClick: removeBlock
-			} );
-
 			function moveBlockUp() {
 				$blocks = getBlockSelection();
-				rect = element.getBoundingClientRect();
-				$prev = $blocks.first().prev();
+				$first = $blocks.first();
+				$last = $blocks.last();
+				$prev = $first.prev();
+
+				rect = $first[0].getBoundingClientRect();
 
 				if ( $prev.length ) {
 					editor.undoManager.transact( function() {
-						$blocks.last().after( $prev );
+						$last.after( $prev );
 					} );
 
 					editor.nodeChanged();
-					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
+					window.scrollBy( 0, - rect.top + $first[0].getBoundingClientRect().top );
 				}
 			}
 
 			function moveBlockDown() {
 				$blocks = getBlockSelection();
-				rect = element.getBoundingClientRect();
-				$next = $blocks.last().next();
+				$first = $blocks.first();
+				$last = $blocks.last();
+				$next = $last.next();
+
+				rect = $first[0].getBoundingClientRect();
 
 				if ( $next.length ) {
 					editor.undoManager.transact( function() {
-						$blocks.first().before( $next );
+						$first.before( $next );
 					} );
 
 					editor.nodeChanged();
-					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
+					window.scrollBy( 0, - rect.top + $first[0].getBoundingClientRect().top );
 				}
 			}
 
@@ -592,20 +584,6 @@
 			editor.on( 'nodeChange', function( event ) {
 				insert = false;
 			} );
-
-			// editor.on( 'keydown', function( event ) {
-			// 	if ( editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
-			// 		if ( event.keyCode === tinymce.util.VK.DOWN ) {
-			// 			editor.execCommand( 'down' );
-			// 			event.preventDefault();
-			// 		}
-
-			// 		if ( event.keyCode === tinymce.util.VK.UP ) {
-			// 			editor.execCommand( 'up' );
-			// 			event.preventDefault();
-			// 		}
-			// 	}
-			// } );
 
 			var metaCount = 0;
 
