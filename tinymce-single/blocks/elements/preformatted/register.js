@@ -9,7 +9,7 @@ window.wp.blocks.registerBlock( {
 		{
 			classes: 'remove-formatting',
 			icon: 'gridicons-code',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
 				editor.formatter.remove( 'pre' );
 			}
 		}

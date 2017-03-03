@@ -20,9 +20,7 @@ window.wp.blocks.registerBlock( {
 		{
 			classes: 'remove-formatting',
 			icon: 'gridicons-list-unordered',
-			onClick: function( editor ) {
-				var block = wp.blocks.getSelectedBlock( editor );
-
+			onClick: function( block, editor ) {
 				if ( block.nodeName === 'UL' ) {
 					editor.execCommand( 'InsertUnorderedList' );
 				} else if ( block.nodeName === 'OL' ) {
