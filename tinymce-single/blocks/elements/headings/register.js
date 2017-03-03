@@ -7,8 +7,8 @@
 				icon: 'gridicons-heading',
 				text: level,
 				stateSelector: 'h' + level,
-				onClick: function( editor, element ) {
-					editor.formatter.apply( 'h' + level, element );
+				onClick: function( block, editor ) {
+					editor.formatter.apply( 'h' + level, block );
 				}
 			} );
 		} );
@@ -16,8 +16,8 @@
 		controls.push( {
 			classes: 'remove-formatting',
 			icon: 'gridicons-heading',
-			onClick: function( editor, element ) {
-				editor.formatter.apply( 'p', element );
+			onClick: function( block, editor ) {
+				editor.formatter.apply( 'p', block );
 			}
 		} );
 
