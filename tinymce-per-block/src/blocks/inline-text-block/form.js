@@ -4,6 +4,7 @@
 import { createElement, Component } from 'wp-elements';
 import { EditableComponent } from 'wp-blocks';
 
+import { parse } from 'parsers/block';
 import { serialize } from 'serializers/block';
 
 export default class InlineTextBlockForm extends Component {
@@ -21,9 +22,11 @@ export default class InlineTextBlockForm extends Component {
 			return children;
 		};
 
-		const { block: { children }, remove, setChildren } = this.props;
+		const { block: { content }, remove, change } = this.props;
 		remove( index );
-		setTimeout( () => setChildren( getLeaves( children ).concat( getLeaves( block.children ) ) ) );
+		setTimeout( () => change(
+			{ content: serialize( getLeaves( parse( content ) ).concat( getLeaves( parse( block.content ) ) ) ) }
+		) );
 		setTimeout( () => this.editable.updateContent() );
 	}
 
@@ -36,17 +39,16 @@ export default class InlineTextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, setChildren, moveUp, moveDown, appendBlock,
+		const { block, change, moveUp, moveDown, appendBlock,
 			mergeWithPrevious, remove, setToolbarState, focus, focusConfig } = this.props;
-		const { children } = block;
 
 		const splitValue = ( left, right ) => {
-			setChildren( left );
+			change( { content: left } );
 			setTimeout( () => this.editable.updateContent() );
 			if ( right ) {
 				appendBlock( {
 					...block,
-					children: right
+					content: right
 				} );
 			} else {
 				appendBlock();
@@ -56,13 +58,13 @@ export default class InlineTextBlockForm extends Component {
 		return (
 			<EditableComponent
 				ref={ this.bindEditable }
-				content={ serialize( children ) }
+				content={ block.content }
 				moveUp={ moveUp }
 				moveDown={ moveDown }
 				splitValue={ splitValue }
 				mergeWithPrevious={ mergeWithPrevious }
 				remove={ remove }
-				onChange={ ( value ) => setChildren( value ) }
+				onChange={ ( value ) => change( { content: value } ) }
 				setToolbarState={ setToolbarState }
 				focusConfig={ focusConfig }
 				onFocusChange={ focus }

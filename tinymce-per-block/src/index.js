@@ -30,7 +30,12 @@ class App extends Component {
 				this.setState( {
 					content: {
 						block: nextContent,
-						html: serializers.block.serialize( nextContent )
+						html: serializers.block.serialize(
+							nextContent.map( block => {
+								const blockDefinition = getBlock( block.blockType );
+								return blockDefinition.serialize( block );
+							} )
+						)
 					}
 				} );
 				return;
@@ -38,7 +43,12 @@ class App extends Component {
 				this.setState( {
 					content: {
 						block: parsers.block.parse( nextContent )
-							.filter( block => !! getBlock( block.blockType ) )
+							.filter( rawBlock => !! getBlock( rawBlock.blockType ) )
+							.map( rawBlock => {
+								const blockDefinition = getBlock( rawBlock.blockType );
+								const parsedBlock = blockDefinition.parse( rawBlock );
+								return parsedBlock ? parsedBlock : getBlock( 'text' ).parse( rawBlock );
+							} )
 							.map( block => Object.assign( { uid: uniqueId() }, block ) ),
 						html: nextContent
 					}

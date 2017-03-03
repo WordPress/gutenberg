@@ -71,7 +71,9 @@ export default class EnhancedInput extends Component {
 
 	render() {
 		// Keeping splitValue to exclude it from props
-		const ignoredProps = [ 'value', 'splitValue', 'removePrevious', 'moveDown', 'moveUp', 'focusConfig', 'onFocusChange' ];
+		const ignoredProps = [
+			'value', 'splitValue', 'removePrevious', 'moveDown', 'moveUp', 'focusConfig', 'onFocusChange'
+		];
 		const { value } = this.props;
 		const props = omit( this.props, ignoredProps );
 

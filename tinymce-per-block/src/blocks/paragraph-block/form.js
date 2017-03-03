@@ -22,13 +22,13 @@ export default class ParagraphBlockForm extends Component {
 		this.toolbar && this.toolbar.setToolbarState( ...args );
 	};
 
-	setAlignment = ( textAlign ) => {
-		this.props.setAttributes( { textAlign } );
+	setAlignment = ( align ) => {
+		this.props.change( { align } );
 	};
 
 	render() {
 		const { block, isFocused } = this.props;
-		const selectedTextAlign = block.attrs.textAlign || 'left';
+		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
 		};
@@ -39,7 +39,7 @@ export default class ParagraphBlockForm extends Component {
 				{ isFocused &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<AlignmentToolbar value={ block.attrs.textAlign } onChange={ this.setAlignment } />
+							<AlignmentToolbar value={ block.align } onChange={ this.setAlignment } />
 						</div>
 
 						<div className="block-list__block-controls-group">
