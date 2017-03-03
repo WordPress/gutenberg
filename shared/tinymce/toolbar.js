@@ -75,7 +75,7 @@
 					function onClick( callback ) {
 						return function() {
 							editor.undoManager.transact( function() {
-								callback( editor, window.element );
+								callback( window.wp.blocks.getSelectedBlock(), editor );
 							} );
 						}
 					}

@@ -6,13 +6,13 @@ window.wp.blocks.registerBlock( {
 		{
 			classes: 'remove-formatting',
 			icon: 'gridicons-quote',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
 				editor.formatter.remove( 'blockquote' );
 			}
 		}
 	],
-	insert: function( editor, element ) {
-		editor.formatter.apply( 'blockquote', element );
+	insert: function( block, editor ) {
+		editor.formatter.apply( 'blockquote', block );
 	}
 } );
 

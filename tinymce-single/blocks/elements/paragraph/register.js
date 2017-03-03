@@ -5,25 +5,25 @@ window.wp.blocks.registerBlock( {
 	controls: [
 		{
 			icon: 'gridicons-heading',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
 				editor.formatter.apply( 'h1' );
 			}
 		},
 		{
 			icon: 'gridicons-quote',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
 				editor.formatter.apply( 'blockquote' );
 			}
 		},
 		{
 			icon: 'gridicons-list-unordered',
-			onClick: function( editor, element ) {
+			onClick: function( block, editor ) {
 				editor.execCommand( 'InsertUnorderedList' );
 			}
 		},
 		{
 			icon: 'gridicons-code',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
 				editor.formatter.apply( 'pre' );
 			}
 		},

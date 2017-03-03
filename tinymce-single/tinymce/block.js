@@ -1,12 +1,6 @@
 ( function( tinymce, wp, _ ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
-		var element;
-
-		// Set focussed block. Global variable for now. Top-level node for now.
-
-		editor.on( 'nodechange', function( event ) {
-			element = window.element = event.parents[ event.parents.length - 1 ];
-		} );
+		var getSelectedBlock = wp.blocks.getSelectedBlock;
 
 		// Global controls
 
@@ -28,7 +22,7 @@
 
 			if ( control.onClick ) {
 				settings.onClick = function() {
-					control.onClick( element );
+					control.onClick( getSelectedBlock() );
 					editor.nodeChanged();
 				};
 			}
@@ -38,8 +32,10 @@
 					var button = this;
 
 					editor.on( 'nodechange', function() {
-						if ( isNodeEligibleForControl( element, name ) ) {
-							button.active( control.isActive( element ) );
+						var block = getSelectedBlock();
+
+						if ( isNodeEligibleForControl( block, name ) ) {
+							button.active( control.isActive( block ) );
 						}
 					} );
 				};
@@ -49,18 +45,21 @@
 		} );
 
 		function addfigcaption() {
-			if ( ! editor.$( element ).find( 'figcaption' ).length ) {
+			var block = getSelectedBlock();
+
+			if ( ! editor.$( block ).find( 'figcaption' ).length ) {
 				var figcaption = editor.$( '<figcaption><br></figcaption>' );
 
 				editor.undoManager.transact( function() {
-					editor.$( element ).append( figcaption );
+					editor.$( block ).append( figcaption );
 					editor.selection.setCursorLocation( figcaption[0], 0 );
 				} );
 			}
 		}
 
 		function removefigcaption() {
-			var figcaption = editor.$( element ).find( 'figcaption' );
+			var block = getSelectedBlock();
+			var figcaption = editor.$( block ).find( 'figcaption' );
 
 			if ( figcaption.length ) {
 				editor.undoManager.transact( function() {
@@ -72,7 +71,9 @@
 		editor.addButton( 'togglefigcaption', {
 			icon: 'gridicons-caption',
 			onClick: function() {
-				if ( editor.$( element ).find( 'figcaption' ).length ) {
+				var block = getSelectedBlock();
+
+				if ( editor.$( block ).find( 'figcaption' ).length ) {
 					removefigcaption();
 				} else {
 					addfigcaption();
@@ -82,9 +83,9 @@
 				var button = this;
 
 				editor.on( 'nodechange', function( event ) {
-					var element = event.parents[ event.parents.length - 1 ];
+					var block = getSelectedBlock();
 
-					button.active( editor.$( element ).find( 'figcaption' ).length > 0 );
+					button.active( editor.$( block ).find( 'figcaption' ).length > 0 );
 				} );
 			}
 		} );
@@ -96,15 +97,6 @@
 			var blockToolbar;
 			var blockToolbars = {};
 
-			// editor.addButton( 'moveblock', {
-			// 	icon: 'gridicons-reblog',
-			// 	onclick: function() {
-			// 		editor.$( element ).attr( 'data-mce-selected', 'move' );
-			// 		editor.$( editor.getBody() ).addClass( 'is-moving-block' );
-			// 		editor.nodeChanged();
-			// 	}
-			// } );
-
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
@@ -112,8 +104,8 @@
 					var button = this;
 
 					editor.on( 'nodechange', function( event ) {
-						var element = event.parents[ event.parents.length - 1 ];
-						var settings = wp.blocks.getBlockSettingsByElement( element );
+						var block = getSelectedBlock();
+						var settings = wp.blocks.getBlockSettingsByElement( block );
 
 						if ( settings ) {
 							button.icon( settings.icon );
@@ -123,7 +115,7 @@
 			});
 
 			function removeBlock() {
-				var $blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
+				var $blocks = editor.$( getSelectedBlock() );
 				var p = editor.$( '<p><br></p>' );
 
 				editor.undoManager.transact( function() {
@@ -133,38 +125,39 @@
 				} );
 			}
 
-			editor.addButton( 'block-remove', {
-				icon: 'gridicons-trash',
-				onClick: removeBlock
-			} );
-
 			function moveBlockUp() {
 				$blocks = getBlockSelection();
-				rect = element.getBoundingClientRect();
-				$prev = $blocks.first().prev();
+				$first = $blocks.first();
+				$last = $blocks.last();
+				$prev = $first.prev();
+
+				rect = $first[0].getBoundingClientRect();
 
 				if ( $prev.length ) {
 					editor.undoManager.transact( function() {
-						$blocks.last().after( $prev );
+						$last.after( $prev );
 					} );
 
 					editor.nodeChanged();
-					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
+					window.scrollBy( 0, - rect.top + $first[0].getBoundingClientRect().top );
 				}
 			}
 
 			function moveBlockDown() {
 				$blocks = getBlockSelection();
-				rect = element.getBoundingClientRect();
-				$next = $blocks.last().next();
+				$first = $blocks.first();
+				$last = $blocks.last();
+				$next = $last.next();
+
+				rect = $first[0].getBoundingClientRect();
 
 				if ( $next.length ) {
 					editor.undoManager.transact( function() {
-						$blocks.first().before( $next );
+						$first.before( $next );
 					} );
 
 					editor.nodeChanged();
-					window.scrollBy( 0, - rect.top + element.getBoundingClientRect().top );
+					window.scrollBy( 0, - rect.top + $first[0].getBoundingClientRect().top );
 				}
 			}
 
@@ -240,13 +233,9 @@
 			var blockToolbarWidth = 0;
 
 			toolbarInsert.reposition = function () {
-				if ( ! element ) {
-					return;
-				}
-
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = element.getBoundingClientRect();
+				var elementRect = getSelectedBlock().getBoundingClientRect();
 				var contentRect = editor.getBody().getBoundingClientRect();
 
 				DOM.setStyles( toolbar, {
@@ -259,13 +248,9 @@
 			}
 
 			toolbarInline.reposition = function () {
-				if ( ! element ) {
-					return;
-				}
-
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = element.getBoundingClientRect();
+				var elementRect = getSelectedBlock().getBoundingClientRect();
 
 				DOM.setStyles( toolbar, {
 					position: 'absolute',
@@ -278,13 +263,9 @@
 
 			toolbarCaret.reposition =
 			blockToolbar.reposition = function () {
-				if ( ! element ) {
-					return;
-				}
-
 				var toolbar = this.getEl();
 				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = element.getBoundingClientRect();
+				var elementRect = getSelectedBlock().getBoundingClientRect();
 
 				var contentRect = editor.getBody().getBoundingClientRect();
 
@@ -369,7 +350,7 @@
 			}
 
 			function showBlockUI( focus ) {
-				var settings = wp.blocks.getBlockSettingsByElement( element ),
+				var settings = wp.blocks.getBlockSettingsByElement( getSelectedBlock() ),
 					controls;
 
 				if ( ! hasBlockUI ) {
@@ -391,11 +372,9 @@
 
 						blockToolbars[ settings._id ] = editor.wp._createToolbar( controls );
 						blockToolbars[ settings._id ].reposition = function () {
-							if (!element) return
-
 							var toolbar = this.getEl();
 							var toolbarRect = toolbar.getBoundingClientRect();
-							var elementRect = element.getBoundingClientRect();
+							var elementRect = getSelectedBlock().getBoundingClientRect();
 							var contentRect = editor.getBody().getBoundingClientRect();
 
 							DOM.setStyles( toolbar, {
@@ -593,27 +572,14 @@
 				insert = false;
 			} );
 
-			// editor.on( 'keydown', function( event ) {
-			// 	if ( editor.$( element ).attr( 'data-mce-selected' ) === 'block' ) {
-			// 		if ( event.keyCode === tinymce.util.VK.DOWN ) {
-			// 			editor.execCommand( 'down' );
-			// 			event.preventDefault();
-			// 		}
-
-			// 		if ( event.keyCode === tinymce.util.VK.UP ) {
-			// 			editor.execCommand( 'up' );
-			// 			event.preventDefault();
-			// 		}
-			// 	}
-			// } );
-
 			var metaCount = 0;
 
 			editor.on( 'keydown', function( event ) {
 				var keyCode = event.keyCode;
 				var VK = tinymce.util.VK;
+				var block = getSelectedBlock();
 
-				if ( element.nodeName === 'FIGURE' ) {
+				if ( block.nodeName === 'FIGURE' ) {
 					if ( keyCode === VK.ENTER ) {
 						addfigcaption();
 						event.preventDefault();
@@ -648,7 +614,7 @@
 
 						if ( ! selection.isCollapsed && editor.dom.isBlock( selection.focusNode ) ) {
 							if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
-								if ( element.nextSibling && element.nextSibling.contains( selection.focusNode ) ) {
+								if ( block.nextSibling && block.nextSibling.contains( selection.focusNode ) ) {
 									removeBlock();
 									event.preventDefault();
 								}
@@ -682,7 +648,9 @@
 			} );
 
 			editor.on( 'dragstart', function( event ) {
-				if ( element.nodeName === 'FIGURE' ) {
+				var block = getSelectedBlock();
+
+				if ( block.nodeName === 'FIGURE' ) {
 					event.preventDefault();
 				}
 			} );
