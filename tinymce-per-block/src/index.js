@@ -27,15 +27,17 @@ class App extends Component {
 		const type = forceType ? forceType : this.state.activeRenderer;
 		switch ( type ) {
 			case 'block':
+				const html = serializers.block.serialize(
+					nextContent.map( block => {
+						const blockDefinition = getBlock( block.blockType );
+						return blockDefinition.serialize( block );
+					} )
+				);
 				this.setState( {
 					content: {
 						block: nextContent,
-						html: serializers.block.serialize(
-							nextContent.map( block => {
-								const blockDefinition = getBlock( block.blockType );
-								return blockDefinition.serialize( block );
-							} )
-						)
+						raw: html,
+						html
 					}
 				} );
 				return;
@@ -50,16 +52,17 @@ class App extends Component {
 								return parsedBlock ? parsedBlock : getBlock( 'text' ).parse( rawBlock );
 							} )
 							.map( block => Object.assign( { uid: uniqueId() }, block ) ),
-						html: nextContent
+						html: nextContent,
+						raw: nextContent
 					}
 				} );
 				return;
 		}
 	}
 
-	toggleRenderer = () => {
+	selectRenderer = ( renderer ) => () => {
 		this.setState( {
-			activeRenderer: this.state.activeRenderer === 'block' ? 'html' : 'block'
+			activeRenderer: renderer
 		} );
 	}
 
@@ -72,7 +75,11 @@ class App extends Component {
 		const Renderer = renderers[ activeRenderer ];
 		return (
 			<div className="renderers">
-				<button className="toggle-renderer" onClick={ this.toggleRenderer }>Html/Block</button>
+				<div className="toggle-renderer">
+					<button onClick={ this.selectRenderer( 'block' ) }>Block</button>
+					<button onClick={ this.selectRenderer( 'html' ) }>Html</button>
+					<button onClick={ this.selectRenderer( 'raw' ) }>Preview</button>
+				</div>
 				<div className={ `renderer-${ activeRenderer }` }>
 					<Renderer content={ content[ activeRenderer ] } onChange={ this.updateParsedContent } />
 				</div>
