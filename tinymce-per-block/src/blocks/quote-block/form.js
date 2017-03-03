@@ -5,6 +5,7 @@ import { createElement, Component } from 'wp-elements';
 
 import { EditableComponent, EnhancedInputComponent } from 'wp-blocks';
 import { serialize } from 'serializers/block';
+import { parse } from 'parsers/block';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
 
@@ -31,9 +32,11 @@ export default class QuoteBlockForm extends Component {
 			return children;
 		};
 
-		const { block: { children }, remove, setChildren } = this.props;
+		const { block: { content }, remove, change } = this.props;
 		remove( index );
-		setTimeout( () => setChildren( getLeaves( children ).concat( getLeaves( block.children ) ) ) );
+		setTimeout( () => change(
+			{ content: serialize( getLeaves( parse( content ) ).concat( getLeaves( parse( block.content ) ) ) ) }
+		) );
 		setTimeout( () => this.content.updateContent() );
 	}
 
@@ -54,23 +57,13 @@ export default class QuoteBlockForm extends Component {
 	};
 
 	render() {
-		const { block, setChildren, setAttributes, moveUp,
-			moveDown, remove, mergeWithPrevious, appendBlock, isFocused, focusConfig, focus } = this.props;
-		const { children } = block;
-		const cite = block.attrs.cite || '';
+		const { block, change, moveUp, moveDown, remove,
+			mergeWithPrevious, appendBlock, isFocused, focusConfig, focus } = this.props;
 		const splitValue = ( left, right ) => {
-			setAttributes( { cite: left } );
+			change( { cite: left } );
 			appendBlock( {
-				type: 'WP_Block',
 				blockType: 'paragraph',
-				attrs: {},
-				startText: '<!-- wp:paragraph -->',
-				endText: '<!-- /wp -->',
-				rawContent: '<!-- wp:paragraph -->' + right + '<!-- /wp -->',
-				children: [ {
-					type: 'Text',
-					value: right
-				} ]
+				content: right
 			} );
 		};
 		let focusInput = focusConfig && focusConfig.input;
@@ -93,12 +86,12 @@ export default class QuoteBlockForm extends Component {
 					<div className="quote-block__content">
 						<EditableComponent
 							ref={ this.bindContent }
-							content={ serialize( children ) }
+							content={ block.content }
 							moveUp={ moveUp }
 							moveDown={ this.moveToCite }
 							mergeWithPrevious={ mergeWithPrevious }
 							remove={ remove }
-							onChange={ ( value ) => setChildren( value ) }
+							onChange={ ( value ) => change( { content: value } ) }
 							setToolbarState={ this.setToolbarState }
 							focusConfig={ focusInput === 'content' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'content' }, config ) ) }
@@ -111,9 +104,9 @@ export default class QuoteBlockForm extends Component {
 							moveUp={ this.moveToContent }
 							removePrevious={ this.moveToContent }
 							moveDown={ moveDown }
-							value={ cite }
+							value={ block.cite }
 							splitValue={ splitValue }
-							onChange={ ( value ) => setAttributes( { cite: value } ) }
+							onChange={ ( value ) => change( { cite: value } ) }
 							focusConfig={ focusInput === 'cite' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
 							placeholder="Enter a cite"

@@ -60,20 +60,7 @@ class BlockList extends Component {
 			append: ( { block: commandBlock } ) => {
 				const createdBlock = commandBlock
 					? commandBlock
-					: {
-						type: 'WP_Block',
-						blockType: 'paragraph',
-						attrs: {},
-						startText: '<!-- wp:paragraph -->',
-						endText: '<!-- /wp -->',
-						rawContent: '<!-- wp:paragraph --><!-- /wp -->',
-						children: [
-							{
-								type: 'Text',
-								value: ' '
-							}
-						]
-					};
+					: { blockType: 'paragraph', content: ' ' };
 				this.onChange( [
 					...content.slice( 0, index + 1 ),
 					Object.assign( {}, createdBlock, { uid: uniqueId() } ),

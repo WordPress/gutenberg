@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { find } from 'lodash';
 import {
 	ImageNoAlignIcon,
 	ImageAlignRightIcon,
@@ -25,35 +24,21 @@ export default class ImageBlockForm extends Component {
 	}
 
 	setImageAlignment = ( id ) => () => {
-		this.props.setAttributes( { align: id } );
+		this.props.change( { align: id } );
 	};
 
 	render() {
-		const { block, setAttributes, moveDown, moveUp, remove, appendBlock, isFocused } = this.props;
-		const { attrs, children } = block;
-		const image = find( children, ( { name } ) => 'img' === name );
-		if ( ! image ) {
-			return null;
-		}
-		const caption = attrs.caption || '';
+		const { block, change, moveDown, moveUp, remove, appendBlock, isFocused } = this.props;
 		const removePrevious = () => {
-			if ( ! caption ) {
+			if ( ! block.caption ) {
 				remove();
 			}
 		};
 		const splitValue = ( left, right ) => {
-			setAttributes( { caption: left } );
+			change( { caption: left } );
 			appendBlock( {
-				type: 'WP_Block',
 				blockType: 'paragraph',
-				attrs: {},
-				startText: '<!-- wp:paragraph -->',
-				endText: '<!-- /wp -->',
-				rawContent: '<!-- wp:paragraph -->' + right + '<!-- /wp -->',
-				children: [ {
-					type: 'Text',
-					value: right
-				} ]
+				content: right
 			} );
 		};
 		const imageAlignments = [
@@ -62,7 +47,7 @@ export default class ImageBlockForm extends Component {
 			{ id: 'align-right', icon: ImageAlignRightIcon },
 			{ id: 'align-full-width', icon: ImageFullWidthIcon },
 		];
-		const alignValue = attrs.align || 'no-align';
+		const alignValue = block.align || 'no-align';
 
 		return (
 			<div className={ classNames( 'image-caption-block', alignValue ) }>
@@ -85,7 +70,7 @@ export default class ImageBlockForm extends Component {
 					</div>
 				}
 				<img
-					src={ image.attrs.src }
+					src={ block.src }
 					className="image-caption-block__display"
 				/>
 				<div className="image-caption-block__caption">
@@ -95,8 +80,8 @@ export default class ImageBlockForm extends Component {
 						removePrevious={ removePrevious }
 						moveDown={ moveDown }
 						splitValue={ splitValue }
-						value={ caption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						value={ block.caption }
+						onChange={ ( value ) => change( { caption: value } ) }
 						placeholder="Enter a caption"
 					/>
 				</div>

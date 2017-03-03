@@ -27,12 +27,11 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	setSize = ( size ) => () => {
-		this.props.setAttributes( { size } );
+		this.props.change( { size } );
 	};
 
 	render() {
 		const { block, isFocused } = this.props;
-		const className = block.attrs.size ? block.attrs.size : 'h2';
 		const sizes = [
 			{ id: 'h1', icon: EditorHeading1Icon },
 			{ id: 'h2', icon: EditorHeading2Icon },
@@ -49,7 +48,7 @@ export default class HeadingBlockForm extends Component {
 									key={ id }
 									onClick={ this.setSize( id ) }
 									className={ classNames( 'block-list__block-control', {
-										'is-selected': className === id
+										'is-selected': block.size === id
 									} ) }
 								>
 									<Icon />
@@ -62,7 +61,7 @@ export default class HeadingBlockForm extends Component {
 						</div>
 					</div>
 				) }
-				<div className={ `heading-block__form ${ className }` }>
+				<div className={ `heading-block__form ${ block.size }` }>
 					<InlineTextBlockForm
 						ref={ this.bindForm }
 						{ ...this.props }
