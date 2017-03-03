@@ -26,12 +26,14 @@ registerBlock( 'paragraph', {
 		return {
 			blockType: 'paragraph',
 			align: rawBlock.attrs.align || 'no-align',
-			content: serialize( rawBlock.children ),
+			content: serialize( rawBlock.children[ 0 ].children ),
 		};
 	},
 	serialize: ( block ) => {
-		const children = parse( block.content );
-		const rawHtml = serialize( children );
+		let children = parse( block.content );
+		// Should probably be handled in the form
+		children = children.length === 1 && children[ 0 ].name === 'p' ? children[ 0 ].children : children;
+		const rawHtml = `<p style="text-align: ${ block.align };">${ serialize( children ) }</p>`;
 
 		return {
 			type: 'WP_Block',
@@ -40,7 +42,7 @@ registerBlock( 'paragraph', {
 			startText: '<!-- wp:paragraph -->',
 			endText: '<!-- /wp -->',
 			rawContent: '<!-- wp:paragraph -->' + rawHtml + '<!-- /wp -->',
-			children
+			children: parse( rawHtml )
 		};
 	}
 } );
