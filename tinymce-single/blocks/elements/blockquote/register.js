@@ -11,8 +11,10 @@ window.wp.blocks.registerBlock( {
 			}
 		}
 	],
-	insert: function( editor, element ) {
-		editor.formatter.apply( 'blockquote', element );
+	insert: function( editor ) {
+		var block = wp.blocks.getSelectedBlock( editor );
+
+		editor.formatter.apply( 'blockquote', block );
 	}
 } );
 

@@ -6,24 +6,26 @@ window.wp.blocks.registerBlock( {
 		{
 			icon: 'gridicons-list-unordered',
 			stateSelector: 'ul',
-			onClick: function( editor, element ) {
+			onClick: function( editor ) {
 				editor.execCommand( 'InsertUnorderedList' );
 			}
 		},
 		{
 			icon: 'gridicons-list-ordered',
 			stateSelector: 'ol',
-			onClick: function( editor, element ) {
+			onClick: function( editor ) {
 				editor.execCommand( 'InsertOrderedList' );
 			}
 		},
 		{
 			classes: 'remove-formatting',
 			icon: 'gridicons-list-unordered',
-			onClick: function( editor, element ) {
-				if ( element.nodeName === 'UL' ) {
+			onClick: function( editor ) {
+				var block = wp.blocks.getSelectedBlock( editor );
+
+				if ( block.nodeName === 'UL' ) {
 					editor.execCommand( 'InsertUnorderedList' );
-				} else if ( element.nodeName === 'OL' ) {
+				} else if ( block.nodeName === 'OL' ) {
 					editor.execCommand( 'InsertOrderedList' );
 				}
 			}

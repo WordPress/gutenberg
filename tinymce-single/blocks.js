@@ -39,6 +39,25 @@
 		},
 		getControls: function() {
 			return _controls;
+		},
+		getSelectedBlocks: function() {
+
+		},
+		getSelectedBlock: function( editor ) {
+			var node = editor.selection.getNode();
+			var rootNode = editor.getBody();
+
+			if ( node === rootNode ) {
+				return rootNode.firstChild;
+			}
+
+			while ( node.parentNode ) {
+				if ( node.parentNode === rootNode ) {
+					return node;
+				}
+
+				node = node.parentNode;
+			}
 		}
 	};
 } )( window.wp = window.wp || {} );
