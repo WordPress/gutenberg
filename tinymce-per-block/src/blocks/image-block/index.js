@@ -4,8 +4,6 @@
 import { registerBlock } from 'wp-blocks';
 import { FormatImageIcon } from 'dashicons';
 
-import { parse } from 'parsers/block';
-
 /**
  * Internal dependencies
  */
@@ -16,31 +14,45 @@ registerBlock( 'image', {
 	icon: FormatImageIcon,
 	form,
 	parse: ( rawBlock ) => {
+		const div = document.createElement( 'div' );
+		div.innerHTML = rawBlock.rawContent;
 		if (
-			rawBlock.children.length !== 1 ||
-			rawBlock.children[ 0 ].name !== 'img'
+			div.childNodes.length !== 1 ||
+			! (
+				div.firstChild.nodeName === 'IMG' ||
+				(
+					div.firstChild.nodeName === 'FIGURE' &&
+					div.firstChild.childNodes.length &&
+					div.firstChild.firstChild.nodeName === 'IMG'
+				)
+			)
 		) {
 			return false;
 		}
 
+		const src = div.firstChild.nodeName === 'IMG'
+			? div.firstChild.getAttribute( 'src' )
+			: div.firstChild.firstChild.getAttribute( 'src' );
+
+		const caption = div.firstChild.childNodes.length > 1
+			? rawBlock.firstChild.childNodes[ 1 ].innerHTML
+			: '';
+
 		return {
 			blockType: 'image',
-			src: rawBlock.children[ 0 ].attrs.src,
-			caption: rawBlock.children[ 0 ].attrs.caption || '',
-			align: rawBlock.children[ 0 ].attrs.align || 'no-align'
+			align: rawBlock.attrs.align || 'no-align',
+			src,
+			caption
 		};
 	},
 	serialize: ( block ) => {
-		const rawHtml = `<img src="${ block.src }">`;
+		const captionHtml = block.caption ? `<figcaption>${ block.caption }</figcaption>` : '';
+		const rawContent = `<figure><img src="${ block.src }" />${ captionHtml }</figure>`;
 
 		return {
-			type: 'WP_Block',
 			blockType: 'image',
 			attrs: { /* caption: block.caption , align: block.align */ },
-			startText: '<!-- wp:image -->',
-			endText: '<!-- /wp -->',
-			rawContent: '<!-- wp:image -->' + rawHtml + '<!-- /wp -->',
-			children: parse( rawHtml )
+			rawContent
 		};
 	}
 } );
