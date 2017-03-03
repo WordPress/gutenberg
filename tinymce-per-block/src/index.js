@@ -7,6 +7,7 @@ import { createElement, Component, render } from 'wp-elements';
 /**
  * Internal dependencies
  */
+import '../../shared/post-content';
 import * as parsers from 'parsers';
 import * as renderers from 'renderers';
 import * as serializers from 'serializers';
