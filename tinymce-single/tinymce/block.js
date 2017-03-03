@@ -1,9 +1,6 @@
 ( function( tinymce, wp, _ ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
-
-		function getSelectedBlock() {
-			return wp.blocks.getSelectedBlock( editor );
-		}
+		var getSelectedBlock = wp.blocks.getSelectedBlock;
 
 		// Global controls
 
