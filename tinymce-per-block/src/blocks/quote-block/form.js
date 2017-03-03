@@ -24,18 +24,19 @@ export default class QuoteBlockForm extends Component {
 			return;
 		}
 
-		const getLeaves = children => {
-			if ( children.length === 1 && children[ 0 ].name === 'p' ) {
-				return getLeaves( children[ 0 ].children );
+		const getLeaves = html => {
+			const div = document.createElement( 'div' );
+			div.innerHTML = html;
+			if ( div.childNodes.length === 1 && div.firstChild.nodeName === 'P' ) {
+				return getLeaves( div.firstChild.innerHTML );
 			}
-
-			return children;
+			return html;
 		};
 
 		const { block: { content }, remove, change } = this.props;
 		remove( index );
 		setTimeout( () => change(
-			{ content: serialize( getLeaves( parse( content ) ).concat( getLeaves( parse( block.content ) ) ) ) }
+			{ content: getLeaves( content ) + getLeaves( block.content ) }
 		) );
 		setTimeout( () => this.content.updateContent() );
 	}

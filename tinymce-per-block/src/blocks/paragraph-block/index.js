@@ -8,17 +8,17 @@ import { EditorParagraphIcon } from 'dashicons';
  * Internal dependencies
  */
 import form from './form';
-import { parse } from 'parsers/block';
-import { serialize } from 'serializers/block';
 
 registerBlock( 'paragraph', {
 	title: 'Paragraph',
 	form: form,
 	icon: EditorParagraphIcon,
 	parse: ( rawBlock ) => {
+		const div = document.createElement( 'div' );
+		div.innerHTML = rawBlock.rawContent;
 		if (
-			rawBlock.children.length !== 1 ||
-			rawBlock.children[ 0 ].name !== 'p'
+			div.childNodes.length !== 1 ||
+			div.firstChild.nodeName !== 'P'
 		) {
 			return false;
 		}
@@ -26,23 +26,22 @@ registerBlock( 'paragraph', {
 		return {
 			blockType: 'paragraph',
 			align: rawBlock.attrs.align || 'no-align',
-			content: serialize( rawBlock.children[ 0 ].children ),
+			content: div.firstChild.innerHTML,
 		};
 	},
 	serialize: ( block ) => {
-		let children = parse( block.content );
+		const div = document.createElement( 'div' );
+		div.innerHTML = block.content;
 		// Should probably be handled in the form
-		children = children.length === 1 && children[ 0 ].name === 'p' ? children[ 0 ].children : children;
-		const rawHtml = `<p style="text-align: ${ block.align };">${ serialize( children ) }</p>`;
+		const content = div.childNodes.length === 1 && div.firstChild.nodeName === 'P'
+			? div.firstChild.innerHTML
+			: block.content;
+		const rawContent = `<p style="text-align: ${ block.align };">${ content }</p>`;
 
 		return {
-			type: 'WP_Block',
 			blockType: 'paragraph',
 			attrs: { /* align: block.align */ },
-			startText: '<!-- wp:paragraph -->',
-			endText: '<!-- /wp -->',
-			rawContent: '<!-- wp:paragraph -->' + rawHtml + '<!-- /wp -->',
-			children: parse( rawHtml )
+			rawContent
 		};
 	}
 } );

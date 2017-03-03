@@ -9,8 +9,6 @@ import {
 /**
  * Internal dependencies
  */
-import { parse } from 'parsers/block';
-import { serialize } from 'serializers/block';
 import form from './form';
 
 registerBlock( 'quote', {
@@ -18,9 +16,11 @@ registerBlock( 'quote', {
 	form: form,
 	icon: EditorQuoteIcon,
 	parse: ( rawBlock ) => {
+		const div = document.createElement( 'div' );
+		div.innerHTML = rawBlock.rawContent;
 		if (
-			rawBlock.children.length !== 1 ||
-			rawBlock.children[ 0 ].name !== 'p'
+			div.childNodes.length !== 1 ||
+			div.firstChild.nodeName !== 'P'
 		) {
 			return false;
 		}
@@ -28,21 +28,14 @@ registerBlock( 'quote', {
 		return {
 			blockType: 'quote',
 			cite: rawBlock.attrs.cite || '',
-			content: serialize( rawBlock.children ),
+			content: rawBlock.rawContent,
 		};
 	},
 	serialize: ( block ) => {
-		const children = parse( block.content );
-		const rawHtml = serialize( children );
-
 		return {
-			type: 'WP_Block',
 			blockType: 'quote',
 			attrs: { cite: block.cite },
-			startText: '<!-- wp:quote -->',
-			endText: '<!-- /wp -->',
-			rawContent: '<!-- wp:quote -->' + rawHtml + '<!-- /wp -->',
-			children
+			rawContent: block.content
 		};
 	}
 } );

@@ -4,9 +4,6 @@
 import { registerBlock } from 'wp-blocks';
 import { EditorHeadingIcon } from 'dashicons';
 
-import { parse } from 'parsers/block';
-import { serialize } from 'serializers/block';
-
 /**
  * Internal dependencies
  */
@@ -17,32 +14,30 @@ registerBlock( 'heading', {
 	form: form,
 	icon: EditorHeadingIcon,
 	parse: ( rawBlock ) => {
-		const nodeNames = [ 'h1', 'h2', 'h3' ];
+		const div = document.createElement( 'div' );
+		div.innerHTML = rawBlock.rawContent;
+		const nodeNames = [ 'H1', 'H2', 'H3' ];
 		if (
-			rawBlock.children.length !== 1 ||
-			nodeNames.indexOf( rawBlock.children[ 0 ].name ) === -1
+			div.childNodes.length !== 1 ||
+			nodeNames.indexOf( div.firstChild.nodeName ) === -1
 		) {
 			return false;
 		}
 
 		return {
 			blockType: 'heading',
-			content: serialize( rawBlock.children[ 0 ].children ),
-			size: rawBlock.children[ 0 ].name
+			content: div.firstChild.innerHTML,
+			size: div.firstChild.nodeName.toLowerCase()
 		};
 	},
 	serialize: ( block ) => {
 		const elementName = block.size ? block.size : 'h2';
-		const rawHtml = `<${ elementName }>` + block.content + `</${ elementName }>`;
+		const rawContent = `<${ elementName }>` + block.content + `</${ elementName }>`;
 
 		return {
-			type: 'WP_Block',
 			blockType: 'heading',
 			attrs: { size: elementName },
-			startText: '<!-- wp:heading -->',
-			endText: '<!-- /wp -->',
-			rawContent: '<!-- wp:heading -->' + rawHtml + '<!-- /wp -->',
-			children: parse( rawHtml )
+			rawContent
 		};
 	}
 } );
