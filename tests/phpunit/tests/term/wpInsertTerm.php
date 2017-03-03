@@ -393,6 +393,41 @@ class Tests_Term_WpInsertTerm extends WP_UnitTestCase {
 		$this->assertSame( 'term_exists', $error->get_error_code() );
 		$this->assertSame( $t1, $error->get_error_data() );
 	}
+
+	/**
+	 * @ticket 39984
+	 */
+	public function test_error_should_reference_correct_term_when_rejected_as_duplicate() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+		$t1 = self::factory()->term->create( array(
+			'name' => 'Foo',
+			'slug' => 'foo',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t2 = self::factory()->term->create( array(
+			'name' => 'Bar',
+			'slug' => 'bar',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$t1_child = wp_insert_term( 'Child', 'wptests_tax', array(
+			'parent' => $t1,
+		) );
+
+		$t2_child = wp_insert_term( 'Child', 'wptests_tax', array(
+			'parent' => $t2,
+		) );
+
+		$error = wp_insert_term( 'Child', 'wptests_tax', array(
+			'parent' => $t2,
+		) );
+
+		$this->assertWPError( $error );
+		$this->assertSame( 'term_exists', $error->get_error_code() );
+		$this->assertSame( $t2_child['term_id'], $error->get_error_data() );
+	}
+
 	/**
 	 * @ticket 31328
 	 */
