@@ -35,7 +35,7 @@ registerBlock( 'image', {
 			: div.firstChild.firstChild.getAttribute( 'src' );
 
 		const caption = div.firstChild.childNodes.length > 1
-			? rawBlock.firstChild.childNodes[ 1 ].innerHTML
+			? div.firstChild.childNodes[ 1 ].innerHTML
 			: '';
 
 		return {
@@ -46,8 +46,26 @@ registerBlock( 'image', {
 		};
 	},
 	serialize: ( block ) => {
+		const styles = {
+			'align-left': {
+				figure: 'float: left;'
+			},
+			'align-right': {
+				figure: 'float: right;'
+			},
+			'align-full-width': {
+				figure: 'margin-left: calc(50% - 50vw);width: 100vw;max-width: none;padding-left: 0;padding-right: 0;',
+				img: 'width: 100%'
+			}
+		};
+		const figureStyle = styles[ block.align ] && styles[ block.align ].figure
+			? ` style="${ styles[ block.align ].figure }"`
+			: '';
+		const imgStyle = styles[ block.align ] && styles[ block.align ].img
+			? ` style="${ styles[ block.align ].img }"`
+			: '';
 		const captionHtml = block.caption ? `<figcaption>${ block.caption }</figcaption>` : '';
-		const rawContent = `<figure><img src="${ block.src }" />${ captionHtml }</figure>`;
+		const rawContent = `<figure${ figureStyle }><img src="${ block.src }"${ imgStyle } />${ captionHtml }</figure>`;
 
 		return {
 			blockType: 'image',

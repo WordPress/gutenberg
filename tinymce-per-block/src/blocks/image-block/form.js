@@ -28,7 +28,7 @@ export default class ImageBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveDown, moveUp, remove, appendBlock, isFocused } = this.props;
+		const { block, change, moveDown, moveUp, remove, appendBlock, isFocused, focusConfig, focus } = this.props;
 		const removePrevious = () => {
 			if ( ! block.caption ) {
 				remove();
@@ -72,6 +72,9 @@ export default class ImageBlockForm extends Component {
 				<img
 					src={ block.src }
 					className="image-caption-block__display"
+					onClick={ () => {
+						! isFocused && focus();
+					} }
 				/>
 				<div className="image-caption-block__caption">
 					<EnhancedInputComponent
@@ -83,6 +86,8 @@ export default class ImageBlockForm extends Component {
 						value={ block.caption }
 						onChange={ ( value ) => change( { caption: value } ) }
 						placeholder="Enter a caption"
+						focusConfig={ focusConfig }
+						onFocusChange={ focus }
 					/>
 				</div>
 			</div>
