@@ -5,8 +5,6 @@ import { createElement, Component } from 'wp-elements';
 import tinymce from 'tinymce';
 import { isEqual } from 'lodash';
 
-import { parse } from 'parsers/block';
-
 function initialize( node, inline, onSetup ) {
 	if ( ! node ) {
 		return;
@@ -132,7 +130,7 @@ export default class EditableComponent extends Component {
 				const hasAfter = !! childNodes.slice( splitIndex )
 					.reduce( ( memo, node ) => memo + node.textContent, '' );
 				this.editor.setContent( before );
-				this.props.splitValue( parse( before ), hasAfter ? parse( after ) : '' );
+				this.props.splitValue( before, hasAfter ? after : '' );
 			} );
 		} else if ( event.keyCode === 8 ) {
 			if ( this.isStartOfEditor() ) {
@@ -202,7 +200,7 @@ export default class EditableComponent extends Component {
 			return;
 		}
 
-		this.props.onChange( parse( content ) );
+		this.props.onChange( content );
 	};
 
 	setRef = ( node ) => {

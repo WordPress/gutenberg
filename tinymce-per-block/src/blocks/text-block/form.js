@@ -4,7 +4,6 @@
 import { createElement, Component } from 'wp-elements';
 
 import { EditableComponent } from 'wp-blocks';
-import { serialize } from 'serializers/block';
 import AlignmentToolbar from 'controls/alignment-toolbar';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
@@ -15,9 +14,10 @@ export default class TextBlockForm extends Component {
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
 		}
-		const { block: { children }, remove, setChildren } = this.props;
+
+		const { block: { content }, remove, change } = this.props;
 		remove( index );
-		setTimeout( () => setChildren( children.concat( block.children ) ) );
+		setTimeout( () => change( { content: content + block.content } ) );
 		setTimeout( () => this.editable.updateContent() );
 	}
 
@@ -25,8 +25,8 @@ export default class TextBlockForm extends Component {
 		this.editable = ref;
 	}
 
-	setAlignment = ( textAlign ) => {
-		this.props.setAttributes( { textAlign } );
+	setAlignment = ( align ) => {
+		this.props.change( { align } );
 	};
 
 	bindFormatToolbar = ( ref ) => {
@@ -38,21 +38,20 @@ export default class TextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused, setChildren, moveUp, moveDown, appendBlock,
+		const { block, isFocused, change, moveUp, moveDown, appendBlock,
 			mergeWithPrevious, remove, focusConfig, focus } = this.props;
-		const { children } = block;
 		const splitValue = ( left, right ) => {
-			setChildren( left );
+			change( { content: left } );
 			if ( right ) {
 				appendBlock( {
 					...block,
-					children: right
+					content: right
 				} );
 			} else {
 				appendBlock();
 			}
 		};
-		const selectedTextAlign = block.attrs.textAlign || 'left';
+		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
 		};
@@ -63,7 +62,7 @@ export default class TextBlockForm extends Component {
 				{ isFocused && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<AlignmentToolbar value={ block.attrs.textAlign } onChange={ this.setAlignment } />
+							<AlignmentToolbar value={ selectedTextAlign } onChange={ this.setAlignment } />
 						</div>
 
 						<div className="block-list__block-controls-group">
@@ -74,14 +73,14 @@ export default class TextBlockForm extends Component {
 				<div className="text-block__form" style={ style }>
 					<EditableComponent
 						ref={ this.bindEditable }
-						content={ serialize( children ) }
+						content={ block.content }
 						moveUp={ moveUp }
 						moveDown={ moveDown }
 						splitValue={ splitValue }
 						mergeWithPrevious={ mergeWithPrevious }
 						remove={ remove }
 						setToolbarState={ this.setToolbarState }
-						onChange={ ( value ) => setChildren( value ) }
+						onChange={ ( value ) => change( { content: value } ) }
 						focusConfig={ focusConfig }
 						onFocusChange={ focus }
 					/>

@@ -4,7 +4,6 @@
 import { createElement, Component } from 'wp-elements';
 import classNames from 'classnames';
 import { getBlock } from 'wp-blocks';
-import isEqualShallow from 'is-equal-shallow';
 
 export default class BlockListBlock extends Component {
 	setRef = ( blockNode ) => {
@@ -37,25 +36,10 @@ export default class BlockListBlock extends Component {
 
 		const { executeCommand, tabIndex, onFocus } = this.props;
 		const state = {
-			setChildren( children ) {
+			change( changes ) {
 				executeCommand( {
 					type: 'change',
-					changes: { children }
-				} );
-			},
-			setAttributes( attributes ) {
-				if ( isEqualShallow( attributes, block.attrs ) ) {
-					return;
-				}
-
-				executeCommand( {
-					type: 'change',
-					changes: {
-						attrs: {
-							...block.attrs,
-							...attributes
-						}
-					}
+					changes
 				} );
 			},
 			appendBlock( newBlock ) {
