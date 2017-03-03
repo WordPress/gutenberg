@@ -161,7 +161,7 @@
 			} );
 
 			function moveBlockUp() {
-				$blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
+				$blocks = getBlockSelection();
 				rect = element.getBoundingClientRect();
 				$prev = $blocks.first().prev();
 
@@ -176,7 +176,7 @@
 			}
 
 			function moveBlockDown() {
-				$blocks = editor.$( '*[data-mce-selected="block"]' ).add( element );
+				$blocks = getBlockSelection();
 				rect = element.getBoundingClientRect();
 				$next = $blocks.last().next();
 
@@ -220,6 +220,11 @@
 			editor.buttons.italic.icon = 'gridicons-italic';
 			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
 			editor.buttons.link.icon = 'gridicons-link';
+
+			var blockOutline = document.createElement( 'div' );
+
+			blockOutline.className = 'block-outline';
+			document.body.appendChild( blockOutline );
 
 			var toolbarInline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
 			var toolbarCaret = editor.wp._createToolbar( [ 'add' ] );
@@ -519,6 +524,28 @@
 				insert = false;
 			} );
 
+			function getBlockSelection( selection ) {
+				selection = selection || window.getSelection();
+
+				if ( selection.anchorNode.compareDocumentPosition( selection.focusNode ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					var startNode = selection.anchorNode;
+					var endNode = selection.focusNode;
+				} else {
+					var startNode = selection.focusNode;
+					var endNode = selection.anchorNode;
+				}
+
+				var $start = editor.$( editor.dom.getParent( startNode, function( element ) {
+					return element.parentNode === editor.getBody();
+				} ) );
+
+				var $end = editor.$( editor.dom.getParent( endNode, function( element ) {
+					return element.parentNode === editor.getBody();
+				} ) );
+
+				return $start.add( $start.nextUntil( $end ) ).add( $end );
+			}
+
 			editor.on( 'selectionChange nodeChange', function( event ) {
 				var selection = window.getSelection();
 				var isCollapsed = selection.isCollapsed;
@@ -550,7 +577,25 @@
 					toolbarCaret.hide();
 
 					if ( isBlockUIVisible ) {
-						showBlockUI();
+						var selectedBlocks = getBlockSelection();
+
+						if ( selectedBlocks.length === 1 ) {
+							showBlockUI();
+						} else {
+							hideBlockUI();
+							blockToolbar.reposition();
+						}
+
+						var startRect = selectedBlocks.first()[0].getBoundingClientRect();
+						var endRect = selectedBlocks.last()[0].getBoundingClientRect();
+
+						DOM.setStyles( blockOutline, {
+							position: 'absolute',
+							left: Math.min( startRect.left, endRect.left ) + 'px',
+							top: startRect.top + window.pageYOffset + 'px',
+							height: endRect.bottom - startRect.top + 'px',
+							width: Math.max( startRect.width, endRect.width ) + 'px'
+						} );
 					} else {
 						hideBlockUI();
 					}
@@ -564,9 +609,6 @@
 			} );
 
 			editor.on( 'nodeChange', function( event ) {
-				editor.$( '*[data-mce-selected="block"]' ).attr( 'data-mce-selected', null );
-				editor.$( element ).attr( 'data-mce-selected', 'block' );
-
 				insert = false;
 			} );
 
