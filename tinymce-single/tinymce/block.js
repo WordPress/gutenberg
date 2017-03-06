@@ -94,8 +94,6 @@
 
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
-			var blockToolbar;
-			var blockToolbars = {};
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -192,95 +190,165 @@
 			editor.buttons.strikethrough.icon = 'gridicons-strikethrough';
 			editor.buttons.link.icon = 'gridicons-link';
 
-			var blockOutline = document.createElement( 'div' );
+			var blockToolbarWidth = 0;
 
-			blockOutline.className = 'block-outline';
-			document.body.appendChild( blockOutline );
+			function createBlockOutline() {
+				var outline = document.createElement( 'div' );
 
-			var toolbarInline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
-			var toolbarCaret = editor.wp._createToolbar( [ 'add' ] );
-			blockToolbar = editor.wp._createToolbar( [ 'up', 'down' ] );
+				outline.className = 'block-outline';
+				document.body.appendChild( outline );
 
-			toolbarCaret.$el.addClass( 'block-toolbar' );
-			blockToolbar.$el.addClass( 'block-toolbar' );
+				return outline;
+			}
 
-			function getInsertButtons() {
-				var allSettings = wp.blocks.getBlocks();
-				var buttons = [];
+			function createInsertToolbar() {
+				var insert = editor.wp._createToolbar( [ 'add' ] );
+
+				insert.$el.addClass( 'block-toolbar' );
+
+				insert.reposition = function () {
+					var elementRect = getSelectedBlock().getBoundingClientRect();
+					var contentRect = editor.getBody().getBoundingClientRect();
+
+					DOM.setStyles( this.getEl(), {
+						position: 'absolute',
+						left: contentRect.left + 50 + 'px',
+						top: elementRect.top + window.pageYOffset + 'px'
+					} );
+
+					this.show();
+				}
+
+				return insert;
+			}
+
+			function createInsertMenu() {
+				var insertMenu = editor.wp._createToolbar( ( function() {
+					var allSettings = wp.blocks.getBlocks();
+					var buttons = [];
+					var key;
+
+					for ( key in allSettings ) {
+						if ( allSettings[ key ].insert ) {
+							buttons.push( {
+								icon: allSettings[ key ].icon,
+								onClick: allSettings[ key ].insert
+							} );
+						}
+					}
+
+					buttons.push( {
+						text: 'Work in progress',
+						onClick: function() {}
+					} );
+
+					return buttons;
+				} )() );
+
+				insertMenu.reposition = function () {
+					var toolbar = this.getEl();
+					var toolbarRect = toolbar.getBoundingClientRect();
+					var elementRect = getSelectedBlock().getBoundingClientRect();
+					var contentRect = editor.getBody().getBoundingClientRect();
+
+					DOM.setStyles( toolbar, {
+						position: 'absolute',
+						left: contentRect.left + 100 + 'px',
+						top: elementRect.top + window.pageYOffset + 'px'
+					} );
+
+					this.show();
+				}
+
+				return insertMenu;
+			}
+
+			function createInlineToolbar() {
+				var inline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
+
+				inline.reposition = function () {
+					var toolbar = this.getEl();
+					var toolbarRect = toolbar.getBoundingClientRect();
+					var elementRect = getSelectedBlock().getBoundingClientRect();
+
+					DOM.setStyles( toolbar, {
+						position: 'absolute',
+						left: elementRect.left + 8 + blockToolbarWidth + 'px',
+						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
+					} );
+
+					this.show();
+				}
+
+				return inline;
+			}
+
+			function createBlockNavigation() {
+				var navigation = editor.wp._createToolbar( [ 'up', 'down' ] );
+
+				navigation.$el.addClass( 'block-toolbar' );
+
+				navigation.reposition = function () {
+					var toolbar = this.getEl();
+					var toolbarRect = toolbar.getBoundingClientRect();
+					var elementRect = getSelectedBlock().getBoundingClientRect();
+
+					var contentRect = editor.getBody().getBoundingClientRect();
+
+					DOM.setStyles( toolbar, {
+						position: 'absolute',
+						left: contentRect.left + 50 + 'px',
+						top: elementRect.top + window.pageYOffset + 'px'
+					} );
+
+					this.show();
+				}
+
+				return navigation;
+			}
+
+			function createBlockToolbars() {
+				var settings = wp.blocks.getBlocks();
+				var toolbars = {};
 				var key;
 
-				for ( key in allSettings ) {
-					if ( allSettings[ key ].insert ) {
-						buttons.push( {
-							icon: allSettings[ key ].icon,
-							onClick: allSettings[ key ].insert
+				for ( key in settings ) {
+					toolbars[ key ] = editor.wp._createToolbar( settings[ key ].controls || [] );
+					toolbars[ key ].reposition = function () {
+						var toolbar = this.getEl();
+						var toolbarRect = toolbar.getBoundingClientRect();
+						var elementRect = getSelectedBlock().getBoundingClientRect();
+
+						DOM.setStyles( toolbar, {
+							position: 'absolute',
+							left: elementRect.left + 'px',
+							top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 						} );
+
+						blockToolbarWidth = toolbarRect.width;
+
+						this.show();
 					}
 				}
 
-				buttons.push( {
-					text: 'Work in progress',
-					onClick: function() {}
-				} );
-
-				return buttons;
+				return toolbars;
 			}
 
-			var toolbarInsert = editor.wp._createToolbar( getInsertButtons() );
+			var UI = {
+				outline: createBlockOutline(),
+				insert: createInsertToolbar(),
+				insertMenu: createInsertMenu(),
+				inline: createInlineToolbar(),
+				navigation: createBlockNavigation(),
+				blocks: createBlockToolbars()
+			};
 
 			var anchorNode;
 			var range;
-			var blockToolbarWidth = 0;
-
-			toolbarInsert.reposition = function () {
-				var toolbar = this.getEl();
-				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = getSelectedBlock().getBoundingClientRect();
-				var contentRect = editor.getBody().getBoundingClientRect();
-
-				DOM.setStyles( toolbar, {
-					position: 'absolute',
-					left: contentRect.left + 100 + 'px',
-					top: elementRect.top + window.pageYOffset + 'px'
-				} );
-
-				this.show();
-			}
-
-			toolbarInline.reposition = function () {
-				var toolbar = this.getEl();
-				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = getSelectedBlock().getBoundingClientRect();
-
-				DOM.setStyles( toolbar, {
-					position: 'absolute',
-					left: elementRect.left + 8 + blockToolbarWidth + 'px',
-					top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
-				} );
-
-				this.show();
-			}
-
-			toolbarCaret.reposition =
-			blockToolbar.reposition = function () {
-				var toolbar = this.getEl();
-				var toolbarRect = toolbar.getBoundingClientRect();
-				var elementRect = getSelectedBlock().getBoundingClientRect();
-
-				var contentRect = editor.getBody().getBoundingClientRect();
-
-				DOM.setStyles( toolbar, {
-					position: 'absolute',
-					left: contentRect.left + 50 + 'px',
-					top: elementRect.top + window.pageYOffset + 'px'
-				} );
-
-				this.show();
-			}
 
 			editor.on( 'blur', function() {
-				toolbarInline.hide();
-				toolbarCaret.hide();
+				UI.inline.hide();
+				UI.insert.hide();
 				hideBlockUI();
 			} );
 
@@ -336,14 +404,14 @@
 					hasBlockUI = false;
 				}
 
-				toolbarInline.hide();
-				blockToolbar.hide();
+				UI.inline.hide();
+				UI.navigation.hide();
 
-				tinymce.each( blockToolbars, function( toolbar ) {
+				tinymce.each( UI.blocks, function( toolbar ) {
 					toolbar.hide();
 				} );
 
-				DOM.setStyles( blockOutline, {
+				DOM.setStyles( UI.outline, {
 					display: 'none'
 				} );
 			}
@@ -362,46 +430,22 @@
 					hasBlockUI = true;
 				}
 
-				blockToolbar.reposition();
+				UI.navigation.reposition();
 
-				tinymce.each( blockToolbars, function( toolbar, key ) {
+				tinymce.each( UI.blocks, function( toolbar, key ) {
 					if ( key !== settings._id ) {
 						toolbar.hide();
 					}
 				} );
 
 				if ( settings ) {
-					if ( ! blockToolbars[ settings._id ] ) {
-						controls = settings.controls || [];
-
-						blockToolbars[ settings._id ] = editor.wp._createToolbar( controls );
-						blockToolbars[ settings._id ].reposition = function () {
-							var toolbar = this.getEl();
-							var toolbarRect = toolbar.getBoundingClientRect();
-							var elementRect = getSelectedBlock().getBoundingClientRect();
-							var contentRect = editor.getBody().getBoundingClientRect();
-
-							DOM.setStyles( toolbar, {
-								position: 'absolute',
-								left: elementRect.left + 'px',
-								top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
-							} );
-
-							blockToolbarWidth = toolbarRect.width;
-
-							this.show();
-						}
-
-						editor.nodeChanged(); // Update UI.
-					}
-
-					blockToolbars[ settings._id ].reposition();
-					focus && focusToolbar( blockToolbars[ settings._id ] );
+					UI.blocks[ settings._id ].reposition();
+					focus && focusToolbar( UI.blocks[ settings._id ] );
 
 					if ( anchorNode.nodeType === 3 ) {
-						toolbarInline.reposition();
+						UI.inline.reposition();
 					} else {
-						toolbarInline.hide();
+						UI.inline.hide();
 					}
 				}
 			}
@@ -529,10 +573,10 @@
 					window.console.log( 'Debug: empty node.' );
 
 					hideBlockUI();
-					toolbarInline.hide();
-					toolbarCaret.reposition();
+					UI.inline.hide();
+					UI.insert.reposition();
 				} else {
-					toolbarCaret.hide();
+					UI.insert.hide();
 
 					if ( isBlockUIVisible ) {
 						var selectedBlocks = getBlockSelection();
@@ -541,13 +585,13 @@
 							showBlockUI();
 						} else {
 							hideBlockUI();
-							blockToolbar.reposition();
+							UI.navigation.reposition();
 						}
 
 						var startRect = selectedBlocks.first()[0].getBoundingClientRect();
 						var endRect = selectedBlocks.last()[0].getBoundingClientRect();
 
-						DOM.setStyles( blockOutline, {
+						DOM.setStyles( UI.outline, {
 							display: 'block',
 							position: 'absolute',
 							left: Math.min( startRect.left, endRect.left ) + 'px',
@@ -561,9 +605,9 @@
 				}
 
 				if ( insert ) {
-					toolbarInsert.reposition();
+					UI.insertMenu.reposition();
 				} else {
-					toolbarInsert.hide();
+					UI.insertMenu.hide();
 				}
 			} );
 
