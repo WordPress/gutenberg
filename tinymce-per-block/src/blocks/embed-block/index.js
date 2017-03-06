@@ -15,7 +15,6 @@ registerBlock( 'embed', {
 	form: form,
 	icon: VideoAlt3Icon,
 	parse: ( rawBlock ) => {
-		console.log( rawBlock );
 		return {
 			blockType: 'embed',
 			url: rawBlock.attrs.url,

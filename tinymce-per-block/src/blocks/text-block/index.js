@@ -40,7 +40,7 @@ registerBlock( 'text', {
 
 		return {
 			blockType: 'text',
-			attrs: { /* align: block.align */ },
+			attrs: { align: block.align },
 			rawContent
 		};
 	}

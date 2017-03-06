@@ -1,0 +1,37 @@
+.my-theme {
+	font-family: "Merriweather", serif;
+	font-size: 16px;
+	color: inherit;
+	font-weight: 300;
+
+	blockquote {
+		width: 100%;
+		font-weight: 300;
+		font-size: 20px;
+		border-left: 4px solid black;
+		margin-left: -20px;
+		padding-left: 20px;
+		font-style: italic;
+
+		footer {
+			font-weight: 300;
+			font-size: 14px;
+			color: $gray-dark-300;
+		}
+	}
+
+	figure {
+		padding: 0;
+		margin: 1em 0;
+
+		figcaption {
+			font-weight: 300;
+			font-size: 14px;
+			color: $gray-dark-300;
+		}
+	}
+
+	img {
+		max-width: 100%;
+	}
+}

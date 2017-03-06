@@ -44,7 +44,6 @@ class App extends Component {
 				} );
 				return;
 			case 'html':
-			console.log( parsers.block.parse( nextContent ) );
 				this.setState( {
 					content: {
 						block: parsers.block.parse( nextContent )
