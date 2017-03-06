@@ -1,4 +1,4 @@
-.image-caption-block {
+.image-block__form {
 	position: relative;
 
 	&.align-full-width {
@@ -26,13 +26,13 @@
 	}
 
 
-	.image-caption-block__display {
+	.image-block__display {
 		display: block;
 		max-width: 100%;
 	}
 
-	.image-caption-block__caption textarea,
-	.image-caption-block__caption .textarea-mirror {
+	.image-block__caption textarea,
+	.image-block__caption .textarea-mirror {
 		margin-top: 10px;
 		width: 100%;
 		border: none;

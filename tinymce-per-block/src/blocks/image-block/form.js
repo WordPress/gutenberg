@@ -50,7 +50,7 @@ export default class ImageBlockForm extends Component {
 		const alignValue = block.align || 'no-align';
 
 		return (
-			<div className={ classNames( 'image-caption-block', alignValue ) }>
+			<div className={ classNames( 'image-block__form', alignValue ) }>
 				{ isFocused && <BlockArrangement block={ block } /> }
 				{ isFocused &&
 					<div className="block-list__block-controls">
@@ -71,12 +71,12 @@ export default class ImageBlockForm extends Component {
 				}
 				<img
 					src={ block.src }
-					className="image-caption-block__display"
+					className="image-block__display"
 					onClick={ () => {
 						! isFocused && focus();
 					} }
 				/>
-				<div className="image-caption-block__caption">
+				<div className="image-block__caption">
 					<EnhancedInputComponent
 						ref={ this.bindCaption }
 						moveUp={ moveUp }
