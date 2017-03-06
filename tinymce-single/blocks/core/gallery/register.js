@@ -8,6 +8,7 @@ window.wp.blocks.registerBlock( {
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',
+		'block-align-full',
 		// {
 		// 	type: 'select',
 		// 	label: 'Columns'

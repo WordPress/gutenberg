@@ -27,3 +27,8 @@
 	width: 375px;
 	height: 211px;
 }
+
+#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignfull iframe {
+	width: 950px;
+	height: 534px;
+}

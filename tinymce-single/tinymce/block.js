@@ -247,7 +247,7 @@
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
 							left: left + 'px',
-							top: blockRect.top + Math.max( blockRect.height, 48 ) - 4 + window.pageYOffset + 'px'
+							top: blockRect.top + Math.max( blockRect.height, 48 ) - 1 + window.pageYOffset + 'px'
 						} );
 					}
 
@@ -360,10 +360,11 @@
 						var toolbar = this.getEl();
 						var toolbarRect = toolbar.getBoundingClientRect();
 						var elementRect = getSelectedBlock().getBoundingClientRect();
+						var contentRect = editor.getBody().getBoundingClientRect();
 
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: elementRect.left + 'px',
+							left: Math.max( contentRect.left + 100, elementRect.left ) + 'px',
 							top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 						} );
 

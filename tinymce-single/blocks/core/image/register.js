@@ -7,6 +7,7 @@ window.wp.blocks.registerBlock( {
 		'block-align-left',
 		'block-align-center',
 		'block-align-right',
+		'block-align-full',
 		'togglefigcaption'
 	]
 } );
