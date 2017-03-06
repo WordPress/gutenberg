@@ -18,3 +18,4 @@ export { default as ImageNoAlignIcon } from './icons/image-align-left';
 export { default as ImageAlignLeftIcon } from './icons/image-align-left';
 export { default as ImageAlignRightIcon } from './icons/image-align-right';
 export { default as ImageFullWidthIcon } from './icons/image-full-width';
+export { default as VideoAlt3Icon } from './icons/video-alt3';
