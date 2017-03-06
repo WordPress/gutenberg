@@ -646,6 +646,12 @@
 
 			editor.on( 'keyup', function( event ) {
 				if ( metaCount === 1 ) {
+					var selection = window.getSelection();
+
+					if ( selection.isCollapsed && isEmptySlot( selection.anchorNode, true ) ) {
+						return;
+					}
+
 					showBlockUI( true );
 				}
 
