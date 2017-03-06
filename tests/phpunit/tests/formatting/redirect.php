@@ -59,6 +59,8 @@ class Tests_Formatting_Redirect extends WP_UnitTestCase {
 			array( 'http://user@example.com/', 'http://user@example.com/' ),
 			array( 'http://user:@example.com/', 'http://user:@example.com/' ),
 			array( 'http://user:pass@example.com/', 'http://user:pass@example.com/' ),
+			array( " \t\n\r\0\x08\x0Bhttp://example.com", 'http://example.com' ),
+			array( " \t\n\r\0\x08\x0B//example.com", 'http://example.com' ),
 		);
 	}
 
@@ -70,6 +72,10 @@ class Tests_Formatting_Redirect extends WP_UnitTestCase {
 
 			// non-safelisted domain
 			array( 'http://non-safelisted.example/' ),
+
+			// non-safelisted domain (leading whitespace)
+			array( " \t\n\r\0\x08\x0Bhttp://non-safelisted.example.com" ),
+			array( " \t\n\r\0\x08\x0B//non-safelisted.example.com" ),
 
 			// unsupported schemes
 			array( 'data:text/plain;charset=utf-8,Hello%20World!' ),
