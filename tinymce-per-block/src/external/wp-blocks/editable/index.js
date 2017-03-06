@@ -24,7 +24,7 @@ function initialize( node, inline, onSetup ) {
 	};
 
 	if ( inline ) {
-		config.valid_elements = '#p,br,b,i,strong,em,del';
+		config.valid_elements = '#p,br,b,i,strong,em,del,a[href|target]';
 	}
 
 	tinymce.init( config );
@@ -169,6 +169,13 @@ export default class EditableComponent extends Component {
 				!! event.parents.find( parent => format.nodes.indexOf( parent.nodeName ) !== -1 );
 			this.props.setToolbarState( format.id, formatValue );
 		} );
+
+		// Link format
+		const link = event.element.nodeName === 'A'
+			? event.element
+			: event.parents.find( parent => parent.nodeName === 'A' );
+		const linkValue = link ? link.getAttribute( 'href' ) : '';
+		this.props.setToolbarState( 'link', linkValue );
 	};
 
 	onFocus = () => {
