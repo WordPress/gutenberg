@@ -37,7 +37,7 @@ registerBlock( 'quote', {
 			: div.firstChild.firstChild.outerHTML;
 
 		const cite = div.firstChild.childNodes.length > 1
-			? div.firstChild.lastChild.textContent
+			? div.firstChild.lastChild.innerHTML
 			: '';
 
 		return {

@@ -78,7 +78,7 @@ export default class QuoteBlockForm extends Component {
 				{ isFocused &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<EditableFormatToolbar editable={ this.content } ref={ this.bindFormatToolbar } />
+							<EditableFormatToolbar editable={ focusInput === 'content' ? this.content : this.cite } ref={ this.bindFormatToolbar } />
 						</div>
 					</div>
 				}
@@ -93,24 +93,27 @@ export default class QuoteBlockForm extends Component {
 							mergeWithPrevious={ mergeWithPrevious }
 							remove={ remove }
 							onChange={ ( value ) => change( { content: value } ) }
-							setToolbarState={ this.setToolbarState }
+							setToolbarState={ focusInput === 'content' ? this.setToolbarState : undefined }
 							focusConfig={ focusInput === 'content' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'content' }, config ) ) }
 							inline
 						/>
 					</div>
 					<div className="quote-block__cite">
-						<EnhancedInputComponent
+						<EditableComponent
 							ref={ this.bindCite }
 							moveUp={ this.moveToContent }
-							removePrevious={ this.moveToContent }
 							moveDown={ moveDown }
-							value={ block.cite }
+							mergeWithPrevious={ this.moveToContent }
+							remove={ this.moveToContent }
+							content={ block.cite }
 							splitValue={ splitValue }
 							onChange={ ( value ) => change( { cite: value } ) }
+							setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
 							focusConfig={ focusInput === 'cite' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
-							placeholder="Enter a cite"
+							inline
+							single
 						/>
 					</div>
 				</div>
