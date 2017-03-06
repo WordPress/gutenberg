@@ -342,6 +342,10 @@
 				tinymce.each( blockToolbars, function( toolbar ) {
 					toolbar.hide();
 				} );
+
+				DOM.setStyles( blockOutline, {
+					display: 'none'
+				} );
 			}
 
 			function focusToolbar( toolbar ) {
@@ -550,6 +554,7 @@
 						var endRect = selectedBlocks.last()[0].getBoundingClientRect();
 
 						DOM.setStyles( blockOutline, {
+							display: 'block',
 							position: 'absolute',
 							left: Math.min( startRect.left, endRect.left ) + 'px',
 							top: startRect.top + window.pageYOffset + 'px',
