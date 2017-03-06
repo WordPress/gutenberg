@@ -305,10 +305,11 @@
 					var toolbar = this.getEl();
 					var toolbarRect = toolbar.getBoundingClientRect();
 					var elementRect = getSelectedBlock().getBoundingClientRect();
+					var contentRect = editor.getBody().getBoundingClientRect();
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: elementRect.left + 8 + blockToolbarWidth + 'px',
+						left: Math.max( contentRect.left + 100, elementRect.left ) + 8 + blockToolbarWidth + 'px',
 						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 					} );
 
