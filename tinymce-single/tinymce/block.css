@@ -241,11 +241,7 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	position: absolute;
 	top: -12px;
 	right: -12px;
-	bottom: -9px;
+	bottom: -12px;
 	left: -12px;
 	border: 2px solid #e0e5e9;
-}
-
-.insert-toolbar button {
-	background: #fff;
 }

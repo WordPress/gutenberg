@@ -66,6 +66,22 @@ body {
 	width: 50%;
 }
 
+#editor figure.alignfull {
+	margin-left: -100px;
+	margin-right: -100px;
+	width: calc( 100% + 200px );
+}
+
+#editor figure.alignfull figcaption {
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+#editor figure.alignfull > figcaption {
+	margin-left: 100px;
+	margin-right: 100px;
+}
+
 #editor figure.alignleft,
 #editor figure.alignright {
 	clear: none;
