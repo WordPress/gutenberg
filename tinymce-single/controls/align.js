@@ -29,7 +29,7 @@
 		};
 	}
 
-	[ 'left', 'center', 'right' ].forEach( function( position ) {
+	[ 'left', 'center', 'right', 'full' ].forEach( function( position ) {
 		wp.blocks.registerControl( 'text-align-' + position, {
 			icon: 'gridicons-align-' + position,
 			onClick: createOnClick( 'text-align-', position ),
