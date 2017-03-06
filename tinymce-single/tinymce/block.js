@@ -1,6 +1,7 @@
 ( function( tinymce, wp, _ ) {
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		var getSelectedBlock = wp.blocks.getSelectedBlock;
+		var getSelectedBlocks = wp.blocks.getSelectedBlocks;
 
 		// Global controls
 
@@ -124,7 +125,7 @@
 			}
 
 			function moveBlockUp() {
-				$blocks = getBlockSelection();
+				$blocks = editor.$( getSelectedBlocks() );
 				$first = $blocks.first();
 				$last = $blocks.last();
 				$prev = $first.prev();
@@ -142,7 +143,7 @@
 			}
 
 			function moveBlockDown() {
-				$blocks = getBlockSelection();
+				$blocks = editor.$( getSelectedBlocks() );
 				$first = $blocks.first();
 				$last = $blocks.last();
 				$next = $last.next();
@@ -573,22 +574,6 @@
 				insert = false;
 			} );
 
-			function getBlockSelection() {
-				var startNode = editor.selection.getStart();
-				var endNode = editor.selection.getEnd();
-				var rootNode = editor.getBody();
-
-				var $start = editor.$( editor.dom.getParent( startNode, function( element ) {
-					return element.parentNode === rootNode;
-				} ) );
-
-				var $end = editor.$( editor.dom.getParent( endNode, function( element ) {
-					return element.parentNode === rootNode;
-				} ) );
-
-				return $start.add( $start.nextUntil( $end ) ).add( $end );
-			}
-
 			editor.on( 'selectionChange nodeChange', function( event ) {
 				var selection = window.getSelection();
 				var isCollapsed = selection.isCollapsed;
@@ -618,17 +603,19 @@
 					UI.insert.reposition( { isEmpty: isEmpty } );
 				} else {
 					if ( isBlockUIVisible ) {
-						var selectedBlocks = getBlockSelection();
+						var selectedBlocks = getSelectedBlocks();
 
 						if ( selectedBlocks.length === 1 ) {
 							showBlockUI();
+							UI.insert.reposition();
 						} else {
 							hideBlockUI();
 							UI.navigation.reposition();
+							UI.insert.hide();
 						}
 
-						var startRect = selectedBlocks.first()[0].getBoundingClientRect();
-						var endRect = selectedBlocks.last()[0].getBoundingClientRect();
+						var startRect = selectedBlocks[0].getBoundingClientRect();
+						var endRect = selectedBlocks[ selectedBlocks.length - 1 ].getBoundingClientRect();
 
 						DOM.setStyles( UI.outline, {
 							display: 'block',
@@ -638,8 +625,6 @@
 							height: endRect.bottom - startRect.top + 'px',
 							width: Math.max( startRect.width, endRect.width ) + 'px'
 						} );
-
-						UI.insert.reposition();
 					} else {
 						hideBlockUI();
 						UI.insert.hide();

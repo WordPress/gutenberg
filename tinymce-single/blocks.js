@@ -41,24 +41,44 @@
 			return _controls;
 		},
 		getSelectedBlocks: function() {
-
-		},
-		getSelectedBlock: function( editor ) {
 			var editor = window.tinyMCE.activeEditor;
-			var node = editor.selection.getNode();
+			var selection = window.getSelection();
+			var startNode = editor.selection.getStart();
+			var endNode = editor.selection.getEnd();
 			var rootNode = editor.getBody();
+			var blocks = [];
 
-			if ( node === rootNode ) {
-				return rootNode.firstChild;
+			while ( startNode.parentNode !== rootNode ) {
+				startNode = startNode.parentNode;
 			}
 
-			while ( node.parentNode ) {
-				if ( node.parentNode === rootNode ) {
-					return node;
+			while ( endNode.parentNode !== rootNode ) {
+				endNode = endNode.parentNode;
+			}
+
+			if ( startNode.compareDocumentPosition( endNode ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+				while ( startNode ) {
+					blocks.push( startNode );
+
+					if ( startNode === endNode ) {
+						break;
+					}
+
+					startNode = startNode.nextSibling;
 				}
-
-				node = node.parentNode;
+			} else {
+				blocks.push( startNode );
 			}
+
+			// Handle tripple click selection.
+			if ( ! selection.isCollapsed && selection.focusOffset === 0 && selection.focusNode === endNode ) {
+				blocks.pop();
+			}
+
+			return blocks;
+		},
+		getSelectedBlock: function() {
+			return wp.blocks.getSelectedBlocks()[0];
 		}
 	};
 } )( window.wp = window.wp || {} );
