@@ -5,6 +5,6 @@ import { createElement } from 'wp-elements';
 
 export default function RawRenderer( { content } ) {
 	return (
-		<div dangerouslySetInnerHTML={ { __html: content } } />
+		<div className="my-theme" dangerouslySetInnerHTML={ { __html: content } } />
 	);
 }

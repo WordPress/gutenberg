@@ -69,7 +69,7 @@ registerBlock( 'image', {
 
 		return {
 			blockType: 'image',
-			attrs: { /* caption: block.caption , align: block.align */ },
+			attrs: { /* caption: block.caption ,*/ align: block.align },
 			rawContent
 		};
 	}

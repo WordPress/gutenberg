@@ -23,7 +23,7 @@ registerBlock( 'html', {
 	serialize: ( block ) => {
 		return {
 			blockType: 'html',
-			attrs: { /* align: block.align */ },
+			attrs: { align: block.align },
 			rawContent: block.content
 		};
 	}
