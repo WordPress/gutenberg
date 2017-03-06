@@ -6,7 +6,7 @@ import { EditableComponent } from 'wp-blocks';
 
 export default class InlineTextBlockForm extends Component {
 	merge = ( block, index ) => {
-		const acceptedBlockTypes = [ 'quote', 'paragraph', 'heading' ];
+		const acceptedBlockTypes = [ 'quote', 'text', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
 		}

@@ -60,7 +60,7 @@ class BlockList extends Component {
 			append: ( { block: commandBlock } ) => {
 				const createdBlock = commandBlock
 					? commandBlock
-					: { blockType: 'paragraph', content: ' ' };
+					: { blockType: 'text', content: ' ' };
 				this.onChange( [
 					...content.slice( 0, index + 1 ),
 					Object.assign( {}, createdBlock, { uid: uniqueId() } ),
