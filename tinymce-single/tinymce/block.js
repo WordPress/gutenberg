@@ -342,6 +342,10 @@
 				tinymce.each( blockToolbars, function( toolbar ) {
 					toolbar.hide();
 				} );
+
+				DOM.setStyles( blockOutline, {
+					display: 'none'
+				} );
 			}
 
 			function focusToolbar( toolbar ) {
@@ -484,23 +488,17 @@
 				insert = false;
 			} );
 
-			function getBlockSelection( selection ) {
-				selection = selection || window.getSelection();
-
-				if ( selection.anchorNode.compareDocumentPosition( selection.focusNode ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
-					var startNode = selection.anchorNode;
-					var endNode = selection.focusNode;
-				} else {
-					var startNode = selection.focusNode;
-					var endNode = selection.anchorNode;
-				}
+			function getBlockSelection() {
+				var startNode = editor.selection.getStart();
+				var endNode = editor.selection.getEnd();
+				var rootNode = editor.getBody();
 
 				var $start = editor.$( editor.dom.getParent( startNode, function( element ) {
-					return element.parentNode === editor.getBody();
+					return element.parentNode === rootNode;
 				} ) );
 
 				var $end = editor.$( editor.dom.getParent( endNode, function( element ) {
-					return element.parentNode === editor.getBody();
+					return element.parentNode === rootNode;
 				} ) );
 
 				return $start.add( $start.nextUntil( $end ) ).add( $end );
@@ -550,6 +548,7 @@
 						var endRect = selectedBlocks.last()[0].getBoundingClientRect();
 
 						DOM.setStyles( blockOutline, {
+							display: 'block',
 							position: 'absolute',
 							left: Math.min( startRect.left, endRect.left ) + 'px',
 							top: startRect.top + window.pageYOffset + 'px',
@@ -641,6 +640,12 @@
 
 			editor.on( 'keyup', function( event ) {
 				if ( metaCount === 1 ) {
+					var selection = window.getSelection();
+
+					if ( selection.isCollapsed && isEmptySlot( selection.anchorNode, true ) ) {
+						return;
+					}
+
 					showBlockUI( true );
 				}
 
