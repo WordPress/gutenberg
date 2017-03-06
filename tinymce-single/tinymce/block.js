@@ -223,20 +223,30 @@
 				insert.reposition = function ( settings ) {
 					settings = settings || {};
 
-					var elementRect = getSelectedBlock().getBoundingClientRect();
+					var toolbar = this.getEl();
+					var block = getSelectedBlock();
+					var isRightAligned = editor.$( block ).hasClass( 'alignright' );
+					var toolbarRect = toolbar.getBoundingClientRect();
+					var blockRect = block.getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
 
+					if ( isRightAligned ) {
+						var left = contentRect.right - toolbarRect.width - 50;
+					} else {
+						var left = contentRect.left + 50
+					}
+
 					if ( settings.isEmpty ) {
-						DOM.setStyles( this.getEl(), {
+						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: contentRect.left + 50 + 'px',
-							top: elementRect.top + 3 + window.pageYOffset + 'px'
+							left: left + 'px',
+							top: blockRect.top + 3 + window.pageYOffset + 'px'
 						} );
 					} else {
-						DOM.setStyles( this.getEl(), {
+						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: contentRect.left + 50 + 'px',
-							top: elementRect.top + Math.max( elementRect.height, 48 ) - 4 + window.pageYOffset + 'px'
+							left: left + 'px',
+							top: blockRect.top + Math.max( blockRect.height, 48 ) - 4 + window.pageYOffset + 'px'
 						} );
 					}
 
@@ -314,15 +324,22 @@
 
 				navigation.reposition = function () {
 					var toolbar = this.getEl();
+					var block = getSelectedBlock();
+					var isRightAligned = editor.$( block ).hasClass( 'alignright' );
 					var toolbarRect = toolbar.getBoundingClientRect();
-					var elementRect = getSelectedBlock().getBoundingClientRect();
-
+					var blockRect = block.getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
+
+					if ( isRightAligned ) {
+						var left = contentRect.right - toolbarRect.width - 50;
+					} else {
+						var left = contentRect.left + 50
+					}
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: contentRect.left + 50 + 'px',
-						top: elementRect.top + window.pageYOffset + 'px'
+						left: left + 'px',
+						top: blockRect.top + window.pageYOffset + 'px'
 					} );
 
 					this.show();
