@@ -179,8 +179,22 @@
 				icon: 'gridicons-add-outline',
 				tooltip: 'Add Block',
 				onClick: function() {
-					insert = true;
-					editor.nodeChanged();
+					var selection = window.getSelection();
+
+					if ( ! selection.isCollapsed || ! isEmptySlot( selection.anchorNode, true ) ) {
+						var $blocks = editor.$( getSelectedBlock() );
+						var $p = editor.$( '<p><br></p>' );
+
+						editor.undoManager.transact( function() {
+							$blocks.last().after( $p );
+							editor.selection.setCursorLocation( $p[0], 0 );
+						} );
+					}
+
+					setTimeout( function() {
+						insert = true;
+						editor.nodeChanged();
+					} );
 				}
 			} );
 
@@ -204,17 +218,27 @@
 			function createInsertToolbar() {
 				var insert = editor.wp._createToolbar( [ 'add' ] );
 
-				insert.$el.addClass( 'block-toolbar' );
+				insert.$el.addClass( 'block-toolbar insert-toolbar' );
 
-				insert.reposition = function () {
+				insert.reposition = function ( settings ) {
+					settings = settings || {};
+
 					var elementRect = getSelectedBlock().getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
 
-					DOM.setStyles( this.getEl(), {
-						position: 'absolute',
-						left: contentRect.left + 50 + 'px',
-						top: elementRect.top + window.pageYOffset + 'px'
-					} );
+					if ( settings.isEmpty ) {
+						DOM.setStyles( this.getEl(), {
+							position: 'absolute',
+							left: contentRect.left + 50 + 'px',
+							top: elementRect.top + 3 + window.pageYOffset + 'px'
+						} );
+					} else {
+						DOM.setStyles( this.getEl(), {
+							position: 'absolute',
+							left: contentRect.left + 50 + 'px',
+							top: elementRect.top + Math.max( elementRect.height, 48 ) - 4 + window.pageYOffset + 'px'
+						} );
+					}
 
 					this.show();
 				}
@@ -574,10 +598,8 @@
 
 					hideBlockUI();
 					UI.inline.hide();
-					UI.insert.reposition();
+					UI.insert.reposition( { isEmpty: isEmpty } );
 				} else {
-					UI.insert.hide();
-
 					if ( isBlockUIVisible ) {
 						var selectedBlocks = getBlockSelection();
 
@@ -599,8 +621,11 @@
 							height: endRect.bottom - startRect.top + 'px',
 							width: Math.max( startRect.width, endRect.width ) + 'px'
 						} );
+
+						UI.insert.reposition();
 					} else {
 						hideBlockUI();
+						UI.insert.hide();
 					}
 				}
 
@@ -689,6 +714,8 @@
 					if ( selection.isCollapsed && isEmptySlot( selection.anchorNode, true ) ) {
 						return;
 					}
+
+					UI.insert.reposition();
 
 					showBlockUI( true );
 				}

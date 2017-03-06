@@ -232,7 +232,20 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 }
 
 .block-outline {
+	position: relative;
 	pointer-events: none;
-	outline: 2px solid #e0e5e9;
-	outline-offset: 11px;
+}
+
+.block-outline:before {
+	content: '';
+	position: absolute;
+	top: -12px;
+	right: -12px;
+	bottom: -9px;
+	left: -12px;
+	border: 2px solid #e0e5e9;
+}
+
+.insert-toolbar button {
+	background: #fff;
 }
