@@ -37,7 +37,7 @@ export default class ImageBlockForm extends Component {
 		const splitValue = ( left, right ) => {
 			change( { caption: left } );
 			appendBlock( {
-				blockType: 'paragraph',
+				blockType: 'text',
 				content: right
 			} );
 		};

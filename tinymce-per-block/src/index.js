@@ -13,10 +13,10 @@ import * as renderers from 'renderers';
 import * as serializers from 'serializers';
 import { getBlock } from 'wp-blocks';
 import 'assets/stylesheets/main.scss';
-import 'blocks/text-block';
+import 'blocks/html-block';
 import 'blocks/image-block';
 import 'blocks/heading-block';
-import 'blocks/paragraph-block';
+import 'blocks/text-block';
 import 'blocks/quote-block';
 
 class App extends Component {
@@ -50,7 +50,7 @@ class App extends Component {
 							.map( rawBlock => {
 								const blockDefinition = getBlock( rawBlock.blockType );
 								const parsedBlock = blockDefinition.parse( rawBlock );
-								return parsedBlock ? parsedBlock : getBlock( 'text' ).parse( rawBlock );
+								return parsedBlock ? parsedBlock : getBlock( 'html' ).parse( rawBlock );
 							} )
 							.map( block => Object.assign( { uid: uniqueId() }, block ) ),
 						html: nextContent,
