@@ -1,6 +1,6 @@
-.paragraph-block__form {
-	width: 100%;
-	border: none;
+.html-block__form {
+	margin: 0;
+	outline: none;
 	font: inherit;
 	font-family: "Merriweather", serif;
 	font-size: 16px;
@@ -8,6 +8,6 @@
 	font-weight: 300;
 	p {
 		padding: 0;
-		margin: 0;
+		margin-top: 0;
 	}
 }
