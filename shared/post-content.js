@@ -27,7 +27,7 @@ window.content = [
 	'<p>By shipping early and often you have the unique competitive advantage of hearing from real people what they think of your work, which in best case helps you anticipate market direction, and in worst case gives you a few people rooting for you that you can email when your team pivots to a new idea. Nothing can recreate the crucible of real usage.</p>',
 	'<!-- /wp -->',
 
-	'<!-- wp:embed -->',
-	'https://www.youtube.com/watch?v=Nl6U7UotA-M',
+	'<!-- wp:embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
+	'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
 	'<!-- /wp -->'
 ].join( '' );

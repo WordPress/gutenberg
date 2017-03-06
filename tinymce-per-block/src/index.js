@@ -18,6 +18,7 @@ import 'blocks/image-block';
 import 'blocks/heading-block';
 import 'blocks/text-block';
 import 'blocks/quote-block';
+import 'blocks/embed-block';
 
 class App extends Component {
 	state = {
@@ -43,6 +44,7 @@ class App extends Component {
 				} );
 				return;
 			case 'html':
+			console.log( parsers.block.parse( nextContent ) );
 				this.setState( {
 					content: {
 						block: parsers.block.parse( nextContent )
