@@ -747,6 +747,11 @@
 					event.preventDefault();
 				}
 			} );
+
+			editor.on( 'nodeChange', function() {
+				editor.$( editor.getBody() ).children().attr( 'data-mce-selected', null );
+				editor.$( getSelectedBlock() ).attr( 'data-mce-selected', 'true' );
+			} );
 		} );
 	} );
 } )( window.tinymce, window.wp, window._ );
