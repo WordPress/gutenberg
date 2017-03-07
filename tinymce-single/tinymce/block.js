@@ -328,6 +328,7 @@
 					var toolbar = this.getEl();
 					var block = getSelectedBlock();
 					var isRightAligned = editor.$( block ).hasClass( 'alignright' );
+					var isFullBleed = editor.$( block ).hasClass( 'alignfull' );
 					var toolbarRect = toolbar.getBoundingClientRect();
 					var blockRect = block.getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
@@ -338,10 +339,16 @@
 						var left = contentRect.left + 50
 					}
 
+					if ( isFullBleed ) {
+						var top = blockRect.top - toolbarRect.height - 10;
+					} else {
+						var top = blockRect.top;
+					}
+
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
 						left: left + 'px',
-						top: blockRect.top + window.pageYOffset + 'px'
+						top: top + window.pageYOffset + 'px'
 					} );
 
 					this.show();
