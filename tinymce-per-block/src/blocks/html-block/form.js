@@ -38,7 +38,7 @@ export default class HtmlBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused, change, moveUp, moveDown, appendBlock,
+		const { block, isSelected, change, moveUp, moveDown, appendBlock,
 			mergeWithPrevious, remove, focusConfig, focus } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { content: left } );
@@ -58,8 +58,8 @@ export default class HtmlBlockForm extends Component {
 
 		return (
 			<div>
-				{ isFocused && <BlockArrangement block={ block } /> }
-				{ isFocused && (
+				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
 							<AlignmentToolbar value={ selectedTextAlign } onChange={ this.setAlignment } />

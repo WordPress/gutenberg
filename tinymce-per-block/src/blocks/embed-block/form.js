@@ -17,7 +17,7 @@ export default class EmbedBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused, change, moveUp, moveDown, remove, focusConfig, focus } = this.props;
+		const { block, isSelected, change, moveUp, moveDown, remove, focusConfig, focus } = this.props;
 
 		const removePrevious = () => {
 			if ( ! block.url ) {
@@ -29,7 +29,7 @@ export default class EmbedBlockForm extends Component {
 
 		return (
 			<div>
-				{ isFocused && <BlockArrangement block={ block } /> }
+				{ isSelected && <BlockArrangement block={ block } /> }
 				<div className="embed-block__form">
 					<div className="embed-block__content" dangerouslySetInnerHTML={ { __html: html } } />
 					<EnhancedInputComponent

@@ -12,7 +12,8 @@ import BlockListBlock from './block';
 class BlockList extends Component {
 	state = {
 		focusIndex: null,
-		focusConfig: {}
+		focusConfig: {},
+		selectedIndex: null,
 	};
 
 	blockNodes = [];
@@ -32,6 +33,12 @@ class BlockList extends Component {
 			focusConfig: config
 		} );
 	};
+
+	select = ( index ) => {
+		this.setState( {
+			selectedIndex: index
+		} );
+	}
 
 	bindBlock = ( index ) => ( ref ) => {
 		this.blockNodes[ index ] = ref;
@@ -56,6 +63,7 @@ class BlockList extends Component {
 				const newBlocks = [ ...content ];
 				newBlocks[ index ] = assign( {}, content[ index ], changes );
 				this.onChange( newBlocks );
+				this.select( null );
 			},
 			append: ( { block: commandBlock } ) => {
 				const createdBlock = commandBlock
@@ -67,6 +75,7 @@ class BlockList extends Component {
 					...content.slice( index + 1 )
 				] );
 				setTimeout( () => this.focus( index + 1, { start: true } ) );
+				this.select( null );
 			},
 			remove: ( { index: commandIndex } ) => {
 				const indexToRemove = commandIndex === undefined ? index : commandIndex;
@@ -78,6 +87,7 @@ class BlockList extends Component {
 					...content.slice( indexToRemove + 1 ),
 				] );
 				setTimeout( () => this.focus( indexToRemove - 1, { end: true } ) );
+				this.select( null );
 			},
 			mergeWithPrevious: () => {
 				const previousBlockNode = this.blockNodes[ index - 1 ];
@@ -85,6 +95,7 @@ class BlockList extends Component {
 					return;
 				}
 				setTimeout( () => previousBlockNode.merge( content[ index ], index ) );
+				this.select( null );
 			},
 			focus: ( { config } ) => {
 				this.focus( index, config );
@@ -94,12 +105,20 @@ class BlockList extends Component {
 				if ( previousBlockNode ) {
 					this.focus( index - 1, { end: true } );
 				}
+				this.select( null );
 			},
 			moveDown: () => {
 				const nextBlockNode = this.blockNodes[ index + 1 ];
 				if ( nextBlockNode ) {
 					this.focus( index + 1, { start: true } );
 				}
+				this.select( null );
+			},
+			select: () => {
+				this.select( index );
+			},
+			unselect: () => {
+				this.select( null );
 			}
 		};
 
@@ -108,7 +127,7 @@ class BlockList extends Component {
 
 	render() {
 		const { content } = this.props;
-		const { focusIndex, focusConfig } = this.state;
+		const { focusIndex, focusConfig,  selectedIndex } = this.state;
 		return (
 			<div className="block-list">
 				{ map( content, ( block, index ) => {
@@ -119,7 +138,7 @@ class BlockList extends Component {
 							ref={ this.bindBlock( index ) }
 							key={ block.uid }
 							tabIndex={ index }
-							isFocused={ isFocused }
+							isSelected={ selectedIndex === index }
 							focusConfig={ isFocused ? focusConfig : null }
 							executeCommand={ ( command ) => this.executeCommand( index, block, command ) }
 							block={ block } />

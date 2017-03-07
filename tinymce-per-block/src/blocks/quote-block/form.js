@@ -59,7 +59,7 @@ export default class QuoteBlockForm extends Component {
 
 	render() {
 		const { block, change, moveUp, moveDown, remove,
-			mergeWithPrevious, appendBlock, isFocused, focusConfig, focus } = this.props;
+			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { cite: left } );
 			appendBlock( {
@@ -74,8 +74,8 @@ export default class QuoteBlockForm extends Component {
 
 		return (
 			<div>
-				{ isFocused && <BlockArrangement block={ block } /> }
-				{ isFocused &&
+				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
 							<EditableFormatToolbar editable={ focusInput === 'content' ? this.content : this.cite } ref={ this.bindFormatToolbar } />
