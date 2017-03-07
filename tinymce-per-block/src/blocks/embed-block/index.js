@@ -26,5 +26,11 @@ registerBlock( 'embed', {
 			attrs: { url: block.url },
 			rawContent: getEmbedHtmlFromUrl( block.url )
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'embed',
+			url: ''
+		};
 	}
 } );

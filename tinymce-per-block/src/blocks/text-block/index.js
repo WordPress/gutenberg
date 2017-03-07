@@ -43,5 +43,12 @@ registerBlock( 'text', {
 			attrs: { align: block.align },
 			rawContent
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'text',
+			content: '',
+			align: 'no-align'
+		};
 	}
 } );
