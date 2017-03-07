@@ -27,7 +27,7 @@ export default class TextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused } = this.props;
+		const { block, isSelected } = this.props;
 		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
@@ -35,8 +35,8 @@ export default class TextBlockForm extends Component {
 
 		return (
 			<div>
-				{ isFocused && <BlockArrangement block={ block } /> }
-				{ isFocused &&
+				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
 							<AlignmentToolbar value={ block.align } onChange={ this.setAlignment } />
