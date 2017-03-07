@@ -5,7 +5,7 @@ import { createElement, Component } from 'wp-elements';
 import { EditableComponent } from 'wp-blocks';
 
 export default class InlineTextBlockForm extends Component {
-	merge = ( block, index ) => {
+	merge = ( block ) => {
 		const acceptedBlockTypes = [ 'quote', 'text', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
@@ -21,7 +21,7 @@ export default class InlineTextBlockForm extends Component {
 		};
 
 		const { block: { content }, remove, change } = this.props;
-		remove( index );
+		remove( block.uid );
 		setTimeout( () => change(
 			{ content: getLeaves( content ) + getLeaves( block.content ) }
 		) );
@@ -37,7 +37,7 @@ export default class InlineTextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveUp, moveDown, appendBlock,
+		const { block, change, moveCursorUp, moveCursorDown, appendBlock,
 			mergeWithPrevious, remove, setToolbarState, focus, focusConfig } = this.props;
 
 		const splitValue = ( left, right ) => {
@@ -57,8 +57,8 @@ export default class InlineTextBlockForm extends Component {
 			<EditableComponent
 				ref={ this.bindEditable }
 				content={ block.content }
-				moveUp={ moveUp }
-				moveDown={ moveDown }
+				moveCursorUp={ moveCursorUp }
+				moveCursorDown={ moveCursorDown }
 				splitValue={ splitValue }
 				mergeWithPrevious={ mergeWithPrevious }
 				remove={ remove }
