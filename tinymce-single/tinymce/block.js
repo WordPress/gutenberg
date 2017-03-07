@@ -226,28 +226,28 @@
 
 					var toolbar = this.getEl();
 					var block = getSelectedBlock();
-					var isRightAligned = editor.$( block ).hasClass( 'alignright' );
+					var isFullBleed = editor.$( block ).hasClass( 'alignfull' );
 					var toolbarRect = toolbar.getBoundingClientRect();
 					var blockRect = block.getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
 
-					if ( isRightAligned ) {
-						var left = contentRect.right - toolbarRect.width - 50;
-					} else {
-						var left = contentRect.left + 50
-					}
-
 					if ( settings.isEmpty ) {
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: left + 'px',
+							left: contentRect.left + 50 + 'px',
 							top: blockRect.top + 3 + window.pageYOffset + 'px'
 						} );
 					} else {
+						if ( isFullBleed ) {
+							var left = contentRect.left + 50;
+						} else {
+							var left = blockRect.left - 6;
+						}
+
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
 							left: left + 'px',
-							top: blockRect.top + Math.max( blockRect.height, 48 ) - 1 + window.pageYOffset + 'px'
+							top: blockRect.bottom - 3 + window.pageYOffset + 'px'
 						} );
 					}
 
