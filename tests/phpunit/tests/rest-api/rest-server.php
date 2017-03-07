@@ -646,6 +646,8 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'description', $data );
 		$this->assertArrayHasKey( 'url', $data );
 		$this->assertArrayHasKey( 'home', $data );
+		$this->assertArrayHasKey( 'gmt_offset', $data );
+		$this->assertArrayHasKey( 'timezone_string', $data );
 		$this->assertArrayHasKey( 'namespaces', $data );
 		$this->assertArrayHasKey( 'authentication', $data );
 		$this->assertArrayHasKey( 'routes', $data );
