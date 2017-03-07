@@ -48,10 +48,10 @@ export default class BlockListBlock extends Component {
 					block: newBlock
 				} );
 			},
-			remove( index ) {
+			remove( uid ) {
 				executeCommand( {
 					type: 'remove',
-					index
+					uid
 				} );
 			},
 			mergeWithPrevious() {
@@ -65,19 +65,29 @@ export default class BlockListBlock extends Component {
 					config
 				} );
 			},
-			moveUp() {
+			moveCursorUp() {
 				executeCommand( {
-					type: 'moveUp'
+					type: 'moveCursorUp'
 				} );
 			},
-			moveDown() {
+			moveCursorDown() {
 				executeCommand( {
-					type: 'moveDown'
+					type: 'moveCursorDown'
 				} );
 			},
 			select() {
 				executeCommand( {
 					type: 'select'
+				} );
+			},
+			moveBlockUp() {
+				executeCommand( {
+					type: 'moveBlockUp'
+				} );
+			},
+			moveBlockDown() {
+				executeCommand( {
+					type: 'moveBlockDown'
 				} );
 			}
 		};

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { assign, map, uniqueId } from 'lodash';
+import { assign, map, uniqueId, findIndex } from 'lodash';
+import { findDOMNode } from 'react-dom';
 
 /**
  * Internal dependencies
@@ -11,9 +12,9 @@ import BlockListBlock from './block';
 
 class BlockList extends Component {
 	state = {
-		focusIndex: null,
+		selectedUID: null,
+		focusedUID: null,
 		focusConfig: {},
-		selectedIndex: null,
 	};
 
 	blockNodes = [];
@@ -27,21 +28,21 @@ class BlockList extends Component {
 		this.content = this.props.content;
 	}
 
-	focus = ( index, config = {} ) => {
+	focus = ( uid, config = {} ) => {
 		this.setState( {
-			focusIndex: index,
+			focusedUID: uid,
 			focusConfig: config
 		} );
 	};
 
-	select = ( index ) => {
+	select = ( uid ) => {
 		this.setState( {
-			selectedIndex: index
+			selectedUID: uid
 		} );
 	}
 
-	bindBlock = ( index ) => ( ref ) => {
-		this.blockNodes[ index ] = ref;
+	bindBlock = ( uid ) => ( ref ) => {
+		this.blockNodes[ uid ] = ref;
 	};
 
 	onChange = ( content ) => {
@@ -49,11 +50,12 @@ class BlockList extends Component {
 		this.props.onChange( content );
 	}
 
-	executeCommand = ( index, block, command ) => {
+	executeCommand = ( uid, command ) => {
 		const { content } = this;
+		const index = findIndex( content, b => b.uid === uid );
 
 		// Ignore commands for removed blocks
-		if ( ! content.find( b => b.uid === block.uid ) ) {
+		if ( index === -1 ) {
 			return;
 		}
 
@@ -69,57 +71,107 @@ class BlockList extends Component {
 				const createdBlock = commandBlock
 					? commandBlock
 					: { blockType: 'text', content: ' ' };
+				const appenedBlockId = uniqueId();
 				this.onChange( [
 					...content.slice( 0, index + 1 ),
-					Object.assign( {}, createdBlock, { uid: uniqueId() } ),
+					Object.assign( {}, createdBlock, { uid: appenedBlockId } ),
 					...content.slice( index + 1 )
 				] );
-				setTimeout( () => this.focus( index + 1, { start: true } ) );
+				setTimeout( () => this.focus( appenedBlockId, { start: true } ) );
 				this.select( null );
 			},
-			remove: ( { index: commandIndex } ) => {
-				const indexToRemove = commandIndex === undefined ? index : commandIndex;
-				if ( indexToRemove === 0 && index === 0 ) {
+			remove: ( { uid: commandUID } ) => {
+				const uidToRemove = commandUID === undefined ? uid : commandUID;
+				const indexToRemove = findIndex( content, b => b.uid === uidToRemove );
+				if ( ! commandUID && indexToRemove === 0 ) {
 					return;
 				}
 				this.onChange( [
 					...content.slice( 0, indexToRemove ),
 					...content.slice( indexToRemove + 1 ),
 				] );
-				setTimeout( () => this.focus( indexToRemove - 1, { end: true } ) );
+				if ( indexToRemove ) {
+					const previousBlock = content[ indexToRemove - 1 ];
+					setTimeout( () => this.focus( previousBlock.uid, { end: true } ) );
+				}
 				this.select( null );
 			},
 			mergeWithPrevious: () => {
-				const previousBlockNode = this.blockNodes[ index - 1 ];
-				if ( ! previousBlockNode ) {
+				const previousBlock = this.content[ index - 1 ];
+				if ( ! previousBlock ) {
 					return;
 				}
-				setTimeout( () => previousBlockNode.merge( content[ index ], index ) );
+				const previousBlockNode = this.blockNodes[ previousBlock.uid ];
+				setTimeout( () => previousBlockNode.merge( content[ index ] ) );
 				this.select( null );
 			},
 			focus: ( { config } ) => {
-				this.focus( index, config );
+				this.focus( uid, config );
 			},
-			moveUp: () => {
-				const previousBlockNode = this.blockNodes[ index - 1 ];
-				if ( previousBlockNode ) {
-					this.focus( index - 1, { end: true } );
+			moveCursorUp: () => {
+				const previousBlock = this.content[ index - 1 ];
+				if ( previousBlock ) {
+					this.focus( previousBlock.uid, { end: true } );
 				}
 				this.select( null );
 			},
-			moveDown: () => {
-				const nextBlockNode = this.blockNodes[ index + 1 ];
-				if ( nextBlockNode ) {
-					this.focus( index + 1, { start: true } );
+			moveCursorDown: () => {
+				const nextBlock = this.content[ index + 1 ];
+				if ( nextBlock ) {
+					this.focus( nextBlock.uid, { start: true } );
 				}
 				this.select( null );
 			},
 			select: () => {
-				this.select( index );
+				this.select( uid );
 			},
 			unselect: () => {
 				this.select( null );
-			}
+			},
+			moveBlockUp: () => {
+				if ( index === 0 ) {
+					return;
+				}
+				const movedBlockNode = findDOMNode( this.blockNodes[ content[ index ].uid ] );
+				const previousOffset = movedBlockNode.getBoundingClientRect().top;
+				const newBlocks = [
+					...content.slice( 0, index - 1 ),
+					content[ index ],
+					content[ index - 1 ],
+					...content.slice( index + 1 )
+				];
+				this.onChange( newBlocks );
+				// Restaure scrolling after moving the block
+				setTimeout( () => {
+					const destinationBlock = findDOMNode( this.blockNodes[ content[ index ].uid ] );
+					window.scrollTo(
+						window.scrollX,
+						window.scrollY + destinationBlock.getBoundingClientRect().top - previousOffset
+					);
+				} );
+			},
+			moveBlockDown: () => {
+				if ( index === content.length - 1 ) {
+					return;
+				}
+				const movedBlockNode = findDOMNode( this.blockNodes[ content[ index ].uid ] );
+				const previousOffset = movedBlockNode.getBoundingClientRect().top;
+				const newBlocks = [
+					...content.slice( 0, index ),
+					content[ index + 1 ],
+					content[ index ],
+					...content.slice( index + 2 )
+				];
+				this.onChange( newBlocks );
+				// Restaure scrolling after moving the block
+				setTimeout( () => {
+					const destinationBlock = findDOMNode( this.blockNodes[ content[ index ].uid ] );
+					window.scrollTo(
+						window.scrollX,
+						window.scrollY + destinationBlock.getBoundingClientRect().top - previousOffset
+					);
+				} );
+			},
 		};
 
 		commandHandlers[ command.type ] && commandHandlers[ command.type ]( command );
@@ -127,20 +179,20 @@ class BlockList extends Component {
 
 	render() {
 		const { content } = this.props;
-		const { focusIndex, focusConfig,  selectedIndex } = this.state;
+		const { focusedUID, focusConfig, selectedUID } = this.state;
 		return (
 			<div className="block-list">
 				{ map( content, ( block, index ) => {
-					const isFocused = index === focusIndex;
+					const isFocused = block.uid === focusedUID;
 
 					return (
 						<BlockListBlock
-							ref={ this.bindBlock( index ) }
+							ref={ this.bindBlock( block.uid ) }
 							key={ block.uid }
 							tabIndex={ index }
-							isSelected={ selectedIndex === index }
+							isSelected={ selectedUID === block.uid }
 							focusConfig={ isFocused ? focusConfig : null }
-							executeCommand={ ( command ) => this.executeCommand( index, block, command ) }
+							executeCommand={ ( command ) => this.executeCommand( block.uid, command ) }
 							block={ block } />
 					);
 				} ) }

@@ -11,6 +11,7 @@ import {
 
 import InlineTextBlockForm from '../inline-text-block/form';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
+import BlockArrangement from 'controls/block-arrangement';
 
 export default class HeadingBlockForm extends Component {
 	bindForm = ( ref ) => {
@@ -31,7 +32,7 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected } = this.props;
+		const { block, isSelected, moveBlockUp, moveBlockDown } = this.props;
 		const sizes = [
 			{ id: 'h1', icon: EditorHeading1Icon },
 			{ id: 'h2', icon: EditorHeading2Icon },
@@ -40,6 +41,8 @@ export default class HeadingBlockForm extends Component {
 
 		return (
 			<div>
+				{ isSelected && <BlockArrangement block={ block }
+					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">

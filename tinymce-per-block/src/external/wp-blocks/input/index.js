@@ -11,8 +11,8 @@ export default class EnhancedInput extends Component {
 		removePrevious: () => {},
 		onChange: () => {},
 		onFocusChange: () => {},
-		moveUp: () => {},
-		moveDown: () => {},
+		moveCursorUp: () => {},
+		moveCursorDown: () => {},
 	};
 
 	bindInput = ( ref ) => {
@@ -38,7 +38,7 @@ export default class EnhancedInput extends Component {
 	}
 
 	onKeyDown = ( event ) => {
-		const { value, splitValue, removePrevious, moveUp, moveDown } = this.props;
+		const { value, splitValue, removePrevious, moveCursorUp, moveCursorDown } = this.props;
 		if ( event.keyCode === 13 ) {
 			event.preventDefault();
 			event.stopPropagation();
@@ -57,13 +57,13 @@ export default class EnhancedInput extends Component {
 			this.input.selectionStart === 0
 		) {
 			event.preventDefault();
-			moveUp();
+			moveCursorUp();
 		} else if (
 			( event.keyCode === 40 || event.keyCode === 39 ) &&
 			this.input.selectionStart === value.length
 		) {
 			event.preventDefault();
-			moveDown();
+			moveCursorDown();
 		}
 	};
 
@@ -78,7 +78,7 @@ export default class EnhancedInput extends Component {
 	render() {
 		// Keeping splitValue to exclude it from props
 		const ignoredProps = [
-			'value', 'splitValue', 'removePrevious', 'moveDown', 'moveUp', 'focusConfig', 'onFocusChange'
+			'value', 'splitValue', 'removePrevious', 'moveCursorDown', 'moveCursorUp', 'focusConfig', 'onFocusChange'
 		];
 		const { value } = this.props;
 		const props = omit( this.props, ignoredProps );

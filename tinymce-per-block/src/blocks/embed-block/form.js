@@ -17,7 +17,8 @@ export default class EmbedBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, change, moveUp, moveDown, remove, focusConfig, focus } = this.props;
+		const { block, isSelected, change, moveCursorUp, moveCursorDown,
+			remove, focusConfig, focus, moveBlockUp, moveBlockDown } = this.props;
 
 		const removePrevious = () => {
 			if ( ! block.url ) {
@@ -29,14 +30,15 @@ export default class EmbedBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected && <BlockArrangement block={ block }
+					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				<div className="embed-block__form">
 					<div className="embed-block__content" dangerouslySetInnerHTML={ { __html: html } } />
 					<EnhancedInputComponent
 						ref={ this.bindInput }
-						moveUp={ moveUp }
+						moveCursorUp={ moveCursorUp }
 						removePrevious={ removePrevious }
-						moveDown={ moveDown }
+						moveCursorDown={ moveCursorDown }
 						value={ block.url }
 						onChange={ ( value ) => change( { url: value } ) }
 						focusConfig={ focusConfig }
