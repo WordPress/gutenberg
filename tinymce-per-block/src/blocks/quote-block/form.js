@@ -33,11 +33,10 @@ export default class QuoteBlockForm extends Component {
 			return html;
 		};
 
-		const { block: { content }, remove, change } = this.props;
+		const { block: { content }, remove, change, focus } = this.props;
+		focus( { end: true } );
 		remove( block.uid );
-		setTimeout( () => change(
-			{ content: getLeaves( content ) + getLeaves( block.content ) }
-		) );
+		change( { content: getLeaves( content ) + getLeaves( block.content ) } );
 		setTimeout( () => this.content.updateContent() );
 	}
 

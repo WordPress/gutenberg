@@ -61,10 +61,8 @@ class BlockList extends Component {
 			newBlock
 		];
 		this.onChange( newBlocks );
-		setTimeout( () => {
-			this.focus( newBlockUid );
-			this.select( newBlockUid );
-		} );
+		this.focus( newBlockUid );
+		this.select( newBlockUid );
 	};
 
 	executeCommand = ( uid, command ) => {
@@ -94,7 +92,7 @@ class BlockList extends Component {
 					Object.assign( {}, createdBlock, { uid: appenedBlockId } ),
 					...content.slice( index + 1 )
 				] );
-				setTimeout( () => this.focus( appenedBlockId, { start: true } ) );
+				this.focus( appenedBlockId, { start: true } );
 				this.select( null );
 			},
 			remove: ( { uid: commandUID } ) => {
@@ -107,9 +105,9 @@ class BlockList extends Component {
 					...content.slice( 0, indexToRemove ),
 					...content.slice( indexToRemove + 1 ),
 				] );
-				if ( indexToRemove ) {
+				if ( indexToRemove && this.state.focusedUID === uidToRemove ) {
 					const previousBlock = content[ indexToRemove - 1 ];
-					setTimeout( () => this.focus( previousBlock.uid, { end: true } ) );
+					this.focus( previousBlock.uid, { end: true } );
 				}
 				this.select( null );
 			},
@@ -119,7 +117,7 @@ class BlockList extends Component {
 					return;
 				}
 				const previousBlockNode = this.blockNodes[ previousBlock.uid ];
-				setTimeout( () => previousBlockNode.merge( content[ index ] ) );
+				previousBlockNode.merge( content[ index ] );
 				this.select( null );
 			},
 			focus: ( { config } ) => {
@@ -199,9 +197,7 @@ class BlockList extends Component {
 					...this.content.slice( index + 1 )
 				];
 				this.onChange( newBlocks );
-				setTimeout( () => {
-					this.focus( newBlockUid );
-				} );
+				this.focus( newBlockUid );
 			}
 		};
 
