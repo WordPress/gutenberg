@@ -52,10 +52,16 @@ export default class EnhancedInput extends Component {
 		) {
 			event.preventDefault();
 			removePrevious();
-		} else if ( event.keyCode === 38 && this.input.selectionStart === 0 ) {
+		} else if (
+			( event.keyCode === 38 || event.keyCode === 37 ) &&
+			this.input.selectionStart === 0
+		) {
 			event.preventDefault();
 			moveUp();
-		} else if ( event.keyCode === 40 && this.input.selectionStart === value.length ) {
+		} else if (
+			( event.keyCode === 40 || event.keyCode === 39 ) &&
+			this.input.selectionStart === value.length
+		) {
 			event.preventDefault();
 			moveDown();
 		}

@@ -99,12 +99,12 @@ export default class EditableComponent extends Component {
 	}
 
 	onKeyDown = ( event ) => {
-		if ( event.keyCode === 38 ) {
+		if ( event.keyCode === 38 || event.keyCode === 37 ) {
 			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
 				this.props.moveUp();
 			}
-		} else if ( event.keyCode === 40 ) {
+		} else if ( event.keyCode === 40 || event.keyCode === 39 ) {
 			const bookmark = this.editor.selection.getBookmark();
 			this.editor.selection.select( this.editor.getBody(), true );
 			this.editor.selection.collapse( false );
