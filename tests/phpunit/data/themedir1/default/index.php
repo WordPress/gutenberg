@@ -1,3 +1,5 @@
 <?php
 
-// Empty theme
+wp_head();
+
+wp_footer();
