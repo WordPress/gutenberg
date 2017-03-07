@@ -102,7 +102,7 @@ export default class EditableComponent extends Component {
 		if ( event.keyCode === 38 || event.keyCode === 37 ) {
 			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
-				this.props.moveUp();
+				this.props.moveCursorUp();
 			}
 		} else if ( event.keyCode === 40 || event.keyCode === 39 ) {
 			const bookmark = this.editor.selection.getBookmark();
@@ -112,7 +112,7 @@ export default class EditableComponent extends Component {
 			this.editor.selection.moveToBookmark( bookmark );
 			if ( isEqual( this.editor.selection.getBookmark( 2, true ), finalBookmark ) ) {
 				event.preventDefault();
-				this.props.moveDown();
+				this.props.moveCursorDown();
 			}
 		} else if ( event.keyCode === 13 && this.props.single ) {
 			// Wait for the event to propagate

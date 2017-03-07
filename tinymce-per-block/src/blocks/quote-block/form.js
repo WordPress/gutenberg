@@ -18,7 +18,7 @@ export default class QuoteBlockForm extends Component {
 		this.cite = ref;
 	};
 
-	merge = ( block, index ) => {
+	merge = ( block ) => {
 		const acceptedBlockTypes = [ 'quote', 'text', 'heading' ];
 		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
 			return;
@@ -34,7 +34,7 @@ export default class QuoteBlockForm extends Component {
 		};
 
 		const { block: { content }, remove, change } = this.props;
-		remove( index );
+		remove( block.uid );
 		setTimeout( () => change(
 			{ content: getLeaves( content ) + getLeaves( block.content ) }
 		) );
@@ -58,8 +58,9 @@ export default class QuoteBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveUp, moveDown, remove,
-			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus } = this.props;
+		const { block, change, moveCursorUp, moveCursorDown, remove,
+			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus,
+			moveBlockUp, moveBlockDown } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { cite: left } );
 			appendBlock( {
@@ -74,7 +75,8 @@ export default class QuoteBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected && <BlockArrangement block={ block }
+					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
@@ -88,8 +90,8 @@ export default class QuoteBlockForm extends Component {
 						<EditableComponent
 							ref={ this.bindContent }
 							content={ block.content }
-							moveUp={ moveUp }
-							moveDown={ this.moveToCite }
+							moveCursorUp={ moveCursorUp }
+							moveCursorDown={ this.moveToCite }
 							mergeWithPrevious={ mergeWithPrevious }
 							remove={ remove }
 							onChange={ ( value ) => change( { content: value } ) }
@@ -102,8 +104,8 @@ export default class QuoteBlockForm extends Component {
 					<div className="quote-block__cite">
 						<EditableComponent
 							ref={ this.bindCite }
-							moveUp={ this.moveToContent }
-							moveDown={ moveDown }
+							moveCursorUp={ this.moveToContent }
+							moveCursorDown={ moveCursorDown }
 							mergeWithPrevious={ this.moveToContent }
 							remove={ this.moveToContent }
 							content={ block.cite }
