@@ -21,3 +21,9 @@ export function registerBlock( name, options ) {
 export function getBlock( name ) {
 	return _registered[ name ];
 }
+
+export function getBlocks() {
+	return Object.keys( _registered ).map( ( id ) => {
+		return Object.assign( {}, _registered[ id ], { id } );
+	} );
+}

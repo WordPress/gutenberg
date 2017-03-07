@@ -4,11 +4,13 @@
 import { createElement, Component } from 'wp-elements';
 import { assign, map, uniqueId, findIndex } from 'lodash';
 import { findDOMNode } from 'react-dom';
+import { getBlock } from 'wp-blocks';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
+import InserterButtonComponent from 'inserter/button';
 
 class BlockList extends Component {
 	state = {
@@ -39,7 +41,7 @@ class BlockList extends Component {
 		this.setState( {
 			selectedUID: uid
 		} );
-	}
+	};
 
 	bindBlock = ( uid ) => ( ref ) => {
 		this.blockNodes[ uid ] = ref;
@@ -48,7 +50,22 @@ class BlockList extends Component {
 	onChange = ( content ) => {
 		this.content = content;
 		this.props.onChange( content );
-	}
+	};
+
+	addBlock = ( id ) => {
+		const newBlockUid = uniqueId();
+		const blockDefinition = getBlock( id );
+		const newBlock = Object.assign( { uid: newBlockUid }, blockDefinition.create() );
+		const newBlocks = [
+			...this.content,
+			newBlock
+		];
+		this.onChange( newBlocks );
+		setTimeout( () => {
+			this.focus( newBlockUid );
+			this.select( newBlockUid );
+		} );
+	};
 
 	executeCommand = ( uid, command ) => {
 		const { content } = this;
@@ -181,21 +198,24 @@ class BlockList extends Component {
 		const { content } = this.props;
 		const { focusedUID, focusConfig, selectedUID } = this.state;
 		return (
-			<div className="block-list">
-				{ map( content, ( block, index ) => {
-					const isFocused = block.uid === focusedUID;
+			<div>
+				<div className="block-list">
+					{ map( content, ( block, index ) => {
+						const isFocused = block.uid === focusedUID;
 
-					return (
-						<BlockListBlock
-							ref={ this.bindBlock( block.uid ) }
-							key={ block.uid }
-							tabIndex={ index }
-							isSelected={ selectedUID === block.uid }
-							focusConfig={ isFocused ? focusConfig : null }
-							executeCommand={ ( command ) => this.executeCommand( block.uid, command ) }
-							block={ block } />
-					);
-				} ) }
+						return (
+							<BlockListBlock
+								ref={ this.bindBlock( block.uid ) }
+								key={ block.uid }
+								tabIndex={ index }
+								isSelected={ selectedUID === block.uid }
+								focusConfig={ isFocused ? focusConfig : null }
+								executeCommand={ ( command ) => this.executeCommand( block.uid, command ) }
+								block={ block } />
+						);
+					} ) }
+				</div>
+				<InserterButtonComponent onAdd={ this.addBlock } />
 			</div>
 		);
 	}
