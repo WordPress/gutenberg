@@ -31,7 +31,7 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isFocused } = this.props;
+		const { block, isSelected } = this.props;
 		const sizes = [
 			{ id: 'h1', icon: EditorHeading1Icon },
 			{ id: 'h2', icon: EditorHeading2Icon },
@@ -40,7 +40,7 @@ export default class HeadingBlockForm extends Component {
 
 		return (
 			<div>
-				{ isFocused && (
+				{ isSelected && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
 							{ sizes.map( ( { id, icon: Icon } ) =>

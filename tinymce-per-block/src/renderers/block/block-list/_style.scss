@@ -21,7 +21,7 @@
 		border-left-color: mix( $gray-light, $gray-dark-300, 80% );
 	}
 
-	&.is-focused > div {
+	&.is-selected > div {
 		border-color: mix( $gray-light, $gray-dark-300, 80% );
 	}
 }

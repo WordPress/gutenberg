@@ -28,7 +28,7 @@ export default class ImageBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveDown, moveUp, remove, appendBlock, isFocused, focusConfig, focus } = this.props;
+		const { block, change, moveDown, moveUp, remove, appendBlock, isSelected, focusConfig, focus } = this.props;
 		const removePrevious = () => {
 			if ( ! block.caption ) {
 				remove();
@@ -51,8 +51,8 @@ export default class ImageBlockForm extends Component {
 
 		return (
 			<div className={ classNames( 'image-block__form', alignValue ) }>
-				{ isFocused && <BlockArrangement block={ block } /> }
-				{ isFocused &&
+				{ isSelected && <BlockArrangement block={ block } /> }
+				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
 							{ imageAlignments.map( ( { id, icon: Icon } ) =>
@@ -73,7 +73,7 @@ export default class ImageBlockForm extends Component {
 					src={ block.src }
 					className="image-block__display"
 					onClick={ () => {
-						! isFocused && focus();
+						! focusConfig && focus();
 					} }
 				/>
 				<div className="image-block__caption">

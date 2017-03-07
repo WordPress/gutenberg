@@ -19,7 +19,7 @@ export default class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, isFocused, focusConfig } = this.props;
+		const { block, isSelected, focusConfig } = this.props;
 		const blockDefinition = getBlock( block.blockType );
 		if ( ! blockDefinition ) {
 			return null;
@@ -31,7 +31,7 @@ export default class BlockListBlock extends Component {
 		}
 
 		const classes = classNames( 'block-list__block', {
-			'is-focused': isFocused
+			'is-selected': isSelected
 		} );
 
 		const { executeCommand, tabIndex, onFocus } = this.props;
@@ -74,6 +74,11 @@ export default class BlockListBlock extends Component {
 				executeCommand( {
 					type: 'moveDown'
 				} );
+			},
+			select() {
+				executeCommand( {
+					type: 'select'
+				} );
 			}
 		};
 
@@ -83,12 +88,13 @@ export default class BlockListBlock extends Component {
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				className={ classes }
+				onClick={ state.select }
 			>
 				<Form
 					ref={ this.bindForm }
 					block={ block }
 					{ ...state }
-					isFocused={ isFocused }
+					isSelected={ isSelected }
 					focusConfig={ focusConfig }
 				/>
 			</div>
