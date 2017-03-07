@@ -26,5 +26,12 @@ registerBlock( 'html', {
 			attrs: { align: block.align },
 			rawContent: block.content
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'html',
+			content: '',
+			align: 'no-align'
+		};
 	}
 } );

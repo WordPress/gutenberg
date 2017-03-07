@@ -72,5 +72,13 @@ registerBlock( 'image', {
 			attrs: { /* caption: block.caption ,*/ align: block.align },
 			rawContent
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'image',
+			src: '',
+			caption: '',
+			align: 'no-align'
+		};
 	}
 } );

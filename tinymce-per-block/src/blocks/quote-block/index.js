@@ -54,5 +54,12 @@ registerBlock( 'quote', {
 			attrs: {},
 			rawContent
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'quote',
+			cite: '',
+			content: ''
+		};
 	}
 } );

@@ -39,5 +39,12 @@ registerBlock( 'heading', {
 			attrs: { size: elementName },
 			rawContent
 		};
+	},
+	create: () => {
+		return {
+			blockType: 'heading',
+			content: '',
+			size: 'h2'
+		};
 	}
 } );
