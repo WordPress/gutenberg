@@ -189,6 +189,20 @@ class BlockList extends Component {
 					);
 				} );
 			},
+			replace: ( { id } ) => {
+				const newBlockUid = uniqueId();
+				const blockDefinition = getBlock( id );
+				const newBlock = Object.assign( { uid: newBlockUid }, blockDefinition.create() );
+				const newBlocks = [
+					...this.content.slice( 0, index ),
+					newBlock,
+					...this.content.slice( index + 1 )
+				];
+				this.onChange( newBlocks );
+				setTimeout( () => {
+					this.focus( newBlockUid );
+				} );
+			}
 		};
 
 		commandHandlers[ command.type ] && commandHandlers[ command.type ]( command );
