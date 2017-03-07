@@ -1,4 +1,5 @@
 .text-block__form {
+	position: relative;
 	width: 100%;
 	border: none;
 	font: inherit;
@@ -8,6 +9,12 @@
 	font-weight: 300;
 	p {
 		padding: 0;
+		margin: 0;
+	}
+
+	.inserter__button {
+		position: absolute;
+		left: -50px;
 		margin: 0;
 	}
 }

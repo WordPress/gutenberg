@@ -10,15 +10,29 @@ export default class InserterComponent extends Component {
 		onAdd: () => {}
 	};
 
+	state = {
+		filterValue: ''
+	};
+
+	filter = ( event ) => {
+		this.setState( {
+			filterValue: event.target.value
+		} );
+	};
+
 	render() {
 		const addBlock = ( id ) => () => this.props.onAdd( id );
+		const stopPropagation = ( event ) => event.stopPropagation();
+		const blocks = getBlocks().filter(
+			( block ) => block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1
+		);
 
 		return (
-			<div className="inserter">
+			<div className="inserter" onClick={ stopPropagation }>
 				<div className="inserter__arrow" />
 				<div className="inserter__content">
 					<div className="inserter__category-blocks">
-						{ getBlocks().map( ( { id, title, icon: Icon } ) => (
+						{ blocks.map( ( { id, title, icon: Icon } ) => (
 							<div key={ title } className="inserter__block" onClick={ addBlock( id ) }>
 								<Icon />
 								{ title }
@@ -26,7 +40,7 @@ export default class InserterComponent extends Component {
 						) ) }
 					</div>
 				</div>
-				<input className="inserter__search" type="search" placeholder="Search..." />
+				<input className="inserter__search" type="search" placeholder="Search..." onChange={ this.filter } />
 			</div>
 		);
 	}

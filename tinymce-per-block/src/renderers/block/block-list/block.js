@@ -89,6 +89,12 @@ export default class BlockListBlock extends Component {
 				executeCommand( {
 					type: 'moveBlockDown'
 				} );
+			},
+			replace( id ) {
+				executeCommand( {
+					type: 'replace',
+					id
+				} );
 			}
 		};
 
