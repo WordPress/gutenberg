@@ -37,7 +37,7 @@ export default class TextBlockForm extends Component {
 		};
 
 		return (
-			<div>
+			<div className="text-block__form">
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
@@ -56,10 +56,11 @@ export default class TextBlockForm extends Component {
 					</div>
 				}
 
-				<div className="text-block__form" style={ style } onClick={ select }>
-					{ ! block.content.trim() && ! isSelected && focusConfig &&
-						<InserterButton onAdd={ ( id ) => replace( id ) } />
-					}
+				{ ! block.content.trim() && ! isSelected && focusConfig &&
+					<InserterButton onAdd={ ( id ) => replace( id ) } />
+				}
+
+				<div style={ style } onClick={ select }>
 					<InlineTextBlockForm
 						ref={ this.bindForm }
 						{ ...this.props }
