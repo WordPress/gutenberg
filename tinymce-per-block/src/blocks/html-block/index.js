@@ -18,20 +18,23 @@ registerBlock( 'html', {
 			blockType: 'html',
 			align: rawBlock.attrs.align || 'no-align',
 			content: rawBlock.rawContent,
+			caption: rawBlock.caption
 		};
 	},
 	serialize: ( block ) => {
 		return {
 			blockType: 'html',
 			attrs: { align: block.align },
-			rawContent: block.content
+			rawContent: block.content,
+			caption: block.caption
 		};
 	},
 	create: () => {
 		return {
 			blockType: 'html',
 			content: '',
-			align: 'no-align'
+			align: 'no-align',
+			caption: ''
 		};
 	}
 } );

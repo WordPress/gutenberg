@@ -2,16 +2,11 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import {
-	ImageNoAlignIcon,
-	ImageAlignRightIcon,
-	ImageAlignLeftIcon,
-	ImageFullWidthIcon
-} from 'dashicons';
 import classNames from 'classnames';
 
 import { EnhancedInputComponent } from 'wp-blocks';
 import BlockArrangement from 'controls/block-arrangement';
+import FigureAlignmentToolbar from 'controls/figure-alignment-toolbar';
 
 export default class ImageBlockForm extends Component {
 
@@ -19,11 +14,7 @@ export default class ImageBlockForm extends Component {
 		this.props.remove();
 	}
 
-	bindCaption = ( ref ) => {
-		this.caption = ref;
-	}
-
-	setImageAlignment = ( id ) => () => {
+	setAlignment = ( id ) => {
 		this.props.change( { align: id } );
 	};
 
@@ -42,32 +33,15 @@ export default class ImageBlockForm extends Component {
 				content: right
 			} );
 		};
-		const imageAlignments = [
-			{ id: 'no-align', icon: ImageNoAlignIcon },
-			{ id: 'align-left', icon: ImageAlignLeftIcon },
-			{ id: 'align-right', icon: ImageAlignRightIcon },
-			{ id: 'align-full-width', icon: ImageFullWidthIcon },
-		];
-		const alignValue = block.align || 'no-align';
 
 		return (
-			<div className={ classNames( 'image-block__form', alignValue ) }>
+			<div className={ classNames( 'image-block__form', block.align ) }>
 				{ isSelected && <BlockArrangement block={ block }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							{ imageAlignments.map( ( { id, icon: Icon } ) =>
-								<button
-									key={ id }
-									onClick={ this.setImageAlignment( id ) }
-									className={ classNames( 'block-list__block-control', {
-										'is-selected': alignValue === id
-									} ) }
-								>
-									<Icon />
-								</button>
-							) }
+							<FigureAlignmentToolbar value={ block.align } onChange={ this.setAlignment } />
 						</div>
 					</div>
 				}
@@ -80,14 +54,13 @@ export default class ImageBlockForm extends Component {
 				/>
 				<div className="image-block__caption">
 					<EnhancedInputComponent
-						ref={ this.bindCaption }
 						moveCursorUp={ moveCursorUp }
 						removePrevious={ removePrevious }
 						moveCursorDown={ moveCursorDown }
 						splitValue={ splitValue }
 						value={ block.caption }
 						onChange={ ( value ) => change( { caption: value } ) }
-						placeholder="Enter a caption"
+						placeholder="Write caption"
 						focusConfig={ focusConfig }
 						onFocusChange={ focus }
 					/>
