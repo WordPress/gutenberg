@@ -292,20 +292,13 @@ img.is-selected {
 	border: none;
 	margin: 0;
 	padding: 0;
-}
-
-.insert-block svg,
-.switch-block__block svg,
-.switch-block__block label {
+	color: #87919d;
 	cursor: pointer;
-	fill: #87919d;
 }
 
-.insert-block__button:hover svg,
-.switch-block__button:hover svg {
-	fill: #f8f9f9;
-	outline: 1px solid #6d7882;
-	position: relative;
+.insert-block__button:hover,
+.switch-block__button:hover {
+	color: #19a2d4;
 }
 
 .insert-block__button:focus,
