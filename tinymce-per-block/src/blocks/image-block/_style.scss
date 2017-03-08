@@ -25,9 +25,13 @@
 		z-index: 1;
 	}
 
+	&.align-center {
+		text-align: center;
+		max-width: 100%;
+	}
 
 	.image-block__display {
-		display: block;
+		display: inline-block;
 		max-width: 100%;
 	}
 
@@ -42,6 +46,7 @@
 		font-size: 14px;
 		color: $gray-dark-300;
 		resize: none;
+		text-align: center;
 
 		&:focus {
 			outline: 0;
