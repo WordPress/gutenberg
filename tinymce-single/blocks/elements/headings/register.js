@@ -33,8 +33,9 @@
 		type: 'text',
 		icon: 'gridicons-heading',
 		controls: getControls(),
-		insert: function() {
-
+		insert: function( block, editor ) {
+			// Maybe detect best heading based on document outline.
+			editor.formatter.apply( 'h1', block );
 		}
 	} );
 } )( window.wp );

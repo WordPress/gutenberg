@@ -34,6 +34,6 @@ window.wp.blocks.registerBlock( {
 		'text-align-right'
 	],
 	insert: function( block, editor ) {
-		editor.formatter.apply( 'paragraph', block );
+		editor.formatter.apply( 'p', block );
 	}
 } );
