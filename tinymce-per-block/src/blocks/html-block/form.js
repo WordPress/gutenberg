@@ -39,7 +39,7 @@ export default class HtmlBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, change, moveCursorUp, moveCursorDown, appendBlock,
+		const { block, isSelected, change, moveCursorUp, moveCursorDown, appendBlock, first, last,
 			mergeWithPrevious, remove, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { content: left } );
@@ -59,7 +59,7 @@ export default class HtmlBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block }
+				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">

@@ -1,0 +1,32 @@
+.block-list__block-arrangement {
+	@include animate_fade;
+	position: absolute;
+	top: 10px;
+	left: -65px;
+	display: flex;
+	align-items: center;
+}
+
+.block-list__type-controls {
+	margin-left: 0.6rem;
+}
+
+.block-list__block-arrange-control {
+	display: block;
+	padding: 0;
+	border: none;
+	outline: none;
+	background: none;
+	color: $gray-dark-300;
+	cursor: pointer;
+
+	&.is-disabled {
+		color: $gray-light;
+	}
+
+	.dashicon {
+		display: block;
+		height: 20px;
+		width: 20px;
+	}
+}

@@ -238,7 +238,10 @@ class BlockList extends Component {
 								isSelected={ selectedUID === block.uid }
 								focusConfig={ isFocused ? focusConfig : null }
 								executeCommand={ ( command ) => this.executeCommand( block.uid, command ) }
-								block={ block } />
+								block={ block }
+								first={ index === 0 }
+								last={ index === content.length - 1 }
+							/>
 						);
 					} ) }
 				</div>

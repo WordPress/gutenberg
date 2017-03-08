@@ -33,7 +33,7 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, moveBlockUp, moveBlockDown, select, transform } = this.props;
+		const { block, isSelected, moveBlockUp, moveBlockDown, select, transform, first, last } = this.props;
 		const sizes = [
 			{ id: 'h1', icon: EditorHeading1Icon },
 			{ id: 'h2', icon: EditorHeading2Icon },
@@ -42,7 +42,7 @@ export default class HeadingBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block }
+				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
