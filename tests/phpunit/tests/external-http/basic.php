@@ -5,9 +5,6 @@
 class Tests_External_HTTP_Basic extends WP_UnitTestCase {
 
 	function test_readme() {
-		// This test is designed to only run on trunk/master
-		$this->skipOnAutomatedBranches();
-
 		$readme = file_get_contents( ABSPATH . 'readme.html' );
 
 		preg_match( '#Recommendations.*PHP</a> version <strong>([0-9.]*)#s', $readme, $matches );
