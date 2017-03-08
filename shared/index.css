@@ -92,6 +92,7 @@ body {
 #editor blockquote {
 	font-size: 20px;
 	border-left: 4px solid black;
+	padding-left: 1em;
 	font-style: italic;
 }
 
