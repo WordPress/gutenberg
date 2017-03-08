@@ -357,7 +357,7 @@ function updateDockedControlsPosition( newClassName ) {
 	var alignedLeft = className.match( /align-left/ );
 	var fullBleed = className.match( /full-bleed/ );
 
-	var topPosition = position.top - 36 + window.scrollY;
+	var topPosition = position.top - 34 + window.scrollY;
 	var leftPosition = null;
 
 	if ( isImage && alignedRight ) {
@@ -710,7 +710,7 @@ function setElementState( className, event ) {
 	if ( className ) {
 		selectedBlock.classList.add( className );
 	}
-	updateBlockControlsPosition( className );
+	updateDockedControlsPosition( className );
 }
 
 function setCaret( element ) {
