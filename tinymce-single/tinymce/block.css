@@ -250,3 +250,21 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	background: #fff;
 	border-radius: 12px;
 }
+
+.insert-menu {
+	width: 330px;
+}
+
+.insert-menu .mce-btn {
+	float: left;
+}
+
+.insert-menu .mce-txt {
+	font-size: 16px;
+	text-align: inherit;
+	vertical-align: inherit;
+	width: auto;
+	line-height: 16px;
+	width: 120px;
+	padding: 4px;
+}
