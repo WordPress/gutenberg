@@ -710,7 +710,7 @@ function setElementState( className, event ) {
 	if ( className ) {
 		selectedBlock.classList.add( className );
 	}
-	updateBlockControlsPosition( className );
+	updateDockedControlsPosition( className );
 }
 
 function setCaret( element ) {
