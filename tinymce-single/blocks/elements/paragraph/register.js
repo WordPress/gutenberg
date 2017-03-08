@@ -1,7 +1,8 @@
 window.wp.blocks.registerBlock( {
+	name: 'paragraph',
+	displayName: 'Paragraph',
 	elements: [ 'p' ],
 	type: 'text',
-	displayName: 'Paragraph',
 	icon: 'gridicons-posts',
 	controls: [
 		{

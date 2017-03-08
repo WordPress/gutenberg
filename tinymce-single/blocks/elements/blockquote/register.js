@@ -1,6 +1,7 @@
 window.wp.blocks.registerBlock( {
-	elements: [ 'blockquote' ],
+	name: 'blockquote',
 	displayName: 'Quote',
+	elements: [ 'blockquote' ],
 	type: 'text',
 	icon: 'gridicons-quote',
 	controls: [
