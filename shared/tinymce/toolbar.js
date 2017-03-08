@@ -49,6 +49,9 @@
 			} );
 
 			return this;
+		},
+		active: function( isActive ) {
+			this.$( this.getEl() ).toggleClass( 'is-active', isActive );
 		}
 	} );
 

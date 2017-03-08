@@ -71,7 +71,7 @@
 	background-color: #f0f2f4;
 }
 
-.mce-inline-toolbar-grp .mce-btn.mce-active,
+.mce-inline-toolbar-grp .mce-btn.is-active,
 .mce-inline-toolbar-grp .mce-btn:active {
 	background-color: #e0e5e9;
 }
