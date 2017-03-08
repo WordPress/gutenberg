@@ -42,6 +42,9 @@ export default class EditableComponent extends Component {
 
 	componentDidMount() {
 		initialize( this.node, this.props.inline, this.onSetup );
+		if ( this.props.focusConfig ) {
+			this.focus();
+		}
 	}
 
 	updateContent() {
@@ -129,8 +132,10 @@ export default class EditableComponent extends Component {
 				const after = getHtml( childNodes.slice( splitIndex ) );
 				const hasAfter = !! childNodes.slice( splitIndex )
 					.reduce( ( memo, node ) => memo + node.textContent, '' );
-				this.editor.setContent( before );
-				this.props.splitValue( before, hasAfter ? after : '' );
+				if ( before ) {
+					this.editor.setContent( before );
+					this.props.splitValue( before, hasAfter ? after : '' );
+				}
 			} );
 		} else if ( event.keyCode === 8 ) {
 			if ( this.isStartOfEditor() ) {
