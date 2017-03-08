@@ -1,4 +1,6 @@
 window.wp.blocks.registerBlock( {
+	name: 'preformatted',
+	displayName: 'Preformatted',
 	elements: [ 'pre' ],
 	type: 'text',
 	icon: 'gridicons-code',
@@ -13,5 +15,8 @@ window.wp.blocks.registerBlock( {
 				editor.formatter.remove( 'pre' );
 			}
 		}
-	]
+	],
+	insert: function( block, editor ) {
+		editor.formatter.apply( 'pre' );
+	}
 } );

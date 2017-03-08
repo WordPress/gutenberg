@@ -27,9 +27,14 @@
 	}
 
 	wp.blocks.registerBlock( {
+		name: 'heading',
+		displayName: 'Heading',
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'text',
 		icon: 'gridicons-heading',
-		controls: getControls()
+		controls: getControls(),
+		insert: function() {
+
+		}
 	} );
 } )( window.wp );

@@ -1,4 +1,6 @@
 window.wp.blocks.registerBlock( {
+	name: 'paragraph',
+	displayName: 'Paragraph',
 	elements: [ 'p' ],
 	type: 'text',
 	icon: 'gridicons-posts',
@@ -30,5 +32,8 @@ window.wp.blocks.registerBlock( {
 		'text-align-left',
 		'text-align-center',
 		'text-align-right'
-	]
+	],
+	insert: function( block, editor ) {
+		editor.formatter.apply( 'paragraph', block );
+	}
 } );
