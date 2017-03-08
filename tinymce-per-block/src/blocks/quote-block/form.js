@@ -59,7 +59,7 @@ export default class QuoteBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveCursorUp, moveCursorDown, remove,
+		const { block, change, moveCursorUp, moveCursorDown, remove, first, last,
 			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus,
 			moveBlockUp, moveBlockDown, select, unselect, transform } = this.props;
 		const splitValue = ( left, right ) => {
@@ -76,7 +76,7 @@ export default class QuoteBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block }
+				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
