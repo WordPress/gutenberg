@@ -55,15 +55,17 @@
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		color: #191e23;
+		border: 1px solid transparent;
 
-		&.is-active,
 		&:hover {
-			background: #f0f2f4;
+			background: #f8f9f9;
+			outline: 1px solid #6d7882;
+			position: relative;
 		}
 
 		.dashicon {
 			margin-right: 8px;
-			fill: #191e23;
 			width: 24px;
 			height: 24px;
 		}

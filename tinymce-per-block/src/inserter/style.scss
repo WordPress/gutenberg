@@ -5,15 +5,19 @@
 	border: none;
 	margin: 20px;
 	padding: 0;
-	.dashicon {
-		cursor: pointer;
-		fill: #87919d;
-		width: 24px;
-		height: 24px;
+
+	a {
+		color: #87919d;
 
 		&:hover {
-			fill: #12181e;
+			color: #12181e;
 		}
+	}
+
+	.dashicon {
+		cursor: pointer;
+		width: 24px;
+		height: 24px;
 
 		&:focus {
 			box-shadow: none;
@@ -81,15 +85,24 @@
 				font-size: 11px;
 				align-items: center;
 				cursor: pointer;
+				border: 1px solid transparent;
 
-				&.is-active,
 				&:hover {
-					background: #f0f2f4;
+					background: #f8f9f9;
+					border: 1px solid #6d7882;
+					position: relative;
+				}
+
+				&.is-active {
+					background: #eef0f0;
+					border: 1px solid #6d7882;
+					position: relative;
+					color: #3e444c;
 				}
 
 				.dashicon {
-					margin-right: 8px;
 					fill: #191e23;
+					margin-right: 8px;
 					width: 24px;
 					height: 24px;
 				}
