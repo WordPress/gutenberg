@@ -28,6 +28,7 @@
 
 	wp.blocks.registerBlock( {
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+		displayName: 'Heading',
 		type: 'text',
 		icon: 'gridicons-heading',
 		controls: getControls()

@@ -267,19 +267,17 @@
 					for ( key in allSettings ) {
 						if ( allSettings[ key ].insert ) {
 							buttons.push( {
+								text: allSettings[ key ].displayName,
 								icon: allSettings[ key ].icon,
 								onClick: allSettings[ key ].insert
 							} );
 						}
 					}
 
-					buttons.push( {
-						text: 'Work in progress',
-						onClick: function() {}
-					} );
-
 					return buttons;
 				} )() );
+
+				insertMenu.$el.addClass( 'insert-menu' );
 
 				insertMenu.reposition = function () {
 					var toolbar = this.getEl();
