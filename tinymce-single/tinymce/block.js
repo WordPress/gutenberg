@@ -2,6 +2,7 @@
 	tinymce.PluginManager.add( 'block', function( editor ) {
 		var getSelectedBlock = wp.blocks.getSelectedBlock;
 		var getSelectedBlocks = wp.blocks.getSelectedBlocks;
+		var editorPadding = 50;
 
 		// Global controls
 
@@ -234,12 +235,12 @@
 					if ( settings.isEmpty ) {
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: contentRect.left + 50 + 'px',
+							left: contentRect.left + 'px',
 							top: blockRect.top + 3 + window.pageYOffset + 'px'
 						} );
 					} else {
 						if ( isFullBleed ) {
-							var left = contentRect.left + 50;
+							var left = contentRect.left;
 						} else {
 							var left = blockRect.left - 6;
 						}
@@ -288,7 +289,7 @@
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: contentRect.left + 100 + 'px',
+						left: contentRect.left + editorPadding + 'px',
 						top: elementRect.top + window.pageYOffset + 'px'
 					} );
 
@@ -309,7 +310,7 @@
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: Math.max( contentRect.left + 100, elementRect.left ) + 8 + blockToolbarWidth + 'px',
+						left: Math.max( contentRect.left + editorPadding, elementRect.left ) + 8 + blockToolbarWidth + 'px',
 						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 					} );
 
@@ -334,9 +335,9 @@
 					var contentRect = editor.getBody().getBoundingClientRect();
 
 					if ( isRightAligned ) {
-						var left = contentRect.right - toolbarRect.width - 50;
+						var left = contentRect.right - toolbarRect.width;
 					} else {
-						var left = contentRect.left + 50
+						var left = contentRect.left;
 					}
 
 					if ( isFullBleed ) {
@@ -372,7 +373,7 @@
 
 						DOM.setStyles( toolbar, {
 							position: 'absolute',
-							left: Math.max( contentRect.left + 100, elementRect.left ) + 'px',
+							left: Math.max( contentRect.left + editorPadding, elementRect.left ) + 'px',
 							top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 						} );
 
