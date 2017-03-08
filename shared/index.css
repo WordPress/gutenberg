@@ -74,7 +74,7 @@ body {
 #editor h5,
 #editor h6,
 #editor img {
-	margin: 30px 0;
+	margin: 1em 0;
 	box-shadow: inset 0px 0px 0px 0px #e0e5e9;
 	transition: all .2s ease;
 }
@@ -152,6 +152,7 @@ body {
 #editor figure img,
 #editor figure iframe {
 	display: block;
+	margin: 0;
 }
 
 #editor pre {
