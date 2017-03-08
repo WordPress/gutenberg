@@ -24,7 +24,7 @@ export default class EmbedBlockForm extends Component {
 
 	render() {
 		const { block, isSelected, change, moveCursorUp, moveCursorDown,
-			remove, focusConfig, focus, moveBlockUp, moveBlockDown, appendBlock } = this.props;
+			remove, focusConfig, focus, moveBlockUp, moveBlockDown, appendBlock, unselect } = this.props;
 
 		const removePrevious = () => {
 			if ( ! block.url ) {
@@ -81,7 +81,10 @@ export default class EmbedBlockForm extends Component {
 								moveCursorDown={ moveCursorDown }
 								splitValue={ splitValue }
 								value={ block.caption }
-								onChange={ ( value ) => change( { caption: value } ) }
+								onChange={ ( value ) => {
+									change( { caption: value } );
+									unselect();
+								} }
 								placeholder="Write caption"
 								focusConfig={ focusConfig }
 								onFocusChange={ focus }

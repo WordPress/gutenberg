@@ -21,7 +21,6 @@ export default class InserterButtonComponent extends Component {
 
 	toggleInserter = ( event ) => {
 		event.preventDefault();
-		event.stopPropagation();
 		this.setState( {
 			opened: ! this.state.opened
 		} );

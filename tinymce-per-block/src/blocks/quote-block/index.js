@@ -11,6 +11,14 @@ import {
  */
 import form from './form';
 
+const createQuoteBlockWithContent = ( content = '' ) => {
+	return {
+		blockType: 'quote',
+		cite: '',
+		content
+	};
+};
+
 registerBlock( 'quote', {
 	title: 'Quote',
 	form: form,
@@ -55,11 +63,11 @@ registerBlock( 'quote', {
 			rawContent
 		};
 	},
-	create: () => {
-		return {
-			blockType: 'quote',
-			cite: '',
-			content: ''
-		};
-	}
+	create: createQuoteBlockWithContent,
+	transformations: [
+		{
+			blocks: [ 'text', 'heading' ],
+			transform: ( block ) => createQuoteBlockWithContent( block.content )
+		}
+	]
 } );

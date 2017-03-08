@@ -6,6 +6,7 @@ import { createElement, Component } from 'wp-elements';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import AlignmentToolbar from 'controls/alignment-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
+import TransformBlockToolbar from 'controls/transform-block-toolbar';
 import InlineTextBlockForm from 'blocks/inline-text-block/form';
 import InserterButton from 'inserter/button';
 
@@ -28,7 +29,7 @@ export default class TextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, focusConfig, moveBlockUp, moveBlockDown, replace } = this.props;
+		const { block, isSelected, focusConfig, moveBlockUp, moveBlockDown, replace, select, transform } = this.props;
 		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
@@ -41,6 +42,10 @@ export default class TextBlockForm extends Component {
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
+							<TransformBlockToolbar blockType="text" onTransform={ transform } />
+						</div>
+
+						<div className="block-list__block-controls-group">
 							<AlignmentToolbar value={ block.align } onChange={ this.setAlignment } />
 						</div>
 
@@ -50,7 +55,7 @@ export default class TextBlockForm extends Component {
 					</div>
 				}
 
-				<div className="text-block__form" style={ style }>
+				<div className="text-block__form" style={ style } onClick={ select }>
 					{ ! block.content.trim() && ! isSelected && focusConfig &&
 						<InserterButton onAdd={ ( id ) => replace( id ) } />
 					}
