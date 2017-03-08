@@ -1,4 +1,6 @@
 window.wp.blocks.registerBlock( {
+	name: 'list',
+	displayName: 'List',
 	elements: [ 'ul', 'ol' ],
 	type: 'text',
 	icon: 'gridicons-list-unordered',
@@ -28,5 +30,8 @@ window.wp.blocks.registerBlock( {
 				}
 			}
 		}
-	]
+	],
+	insert: function( block, editor ) {
+		editor.execCommand( 'InsertUnorderedList' );
+	}
 } );
