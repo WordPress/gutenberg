@@ -5,7 +5,7 @@
 	border: none;
 	margin: 20px;
 	padding: 0;
-	svg {
+	.dashicon {
 		cursor: pointer;
 		fill: #87919d;
 		width: 24px;
@@ -88,7 +88,7 @@
 					background: #f0f2f4;
 				}
 
-				svg {
+				.dashicon {
 					margin-right: 8px;
 					fill: #191e23;
 					width: 24px;

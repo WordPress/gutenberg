@@ -8,6 +8,7 @@ import { FormatImageIcon } from 'dashicons';
  * Internal dependencies
  */
 import form from './form';
+import { getFigureAlignmentStyles } from 'utils/figure-alignment';
 
 registerBlock( 'image', {
 	title: 'Image',
@@ -40,36 +41,24 @@ registerBlock( 'image', {
 
 		return {
 			blockType: 'image',
-			align: rawBlock.attrs.align || 'no-align',
+			align: rawBlock.attrs.align,
 			src,
 			caption
 		};
 	},
 	serialize: ( block ) => {
-		const styles = {
-			'align-left': {
-				figure: 'float: left;'
-			},
-			'align-right': {
-				figure: 'float: right;'
-			},
-			'align-full-width': {
-				figure: 'margin-left: calc(50% - 50vw);width: 100vw;max-width: none;padding-left: 0;padding-right: 0;',
-				img: 'width: 100%'
-			}
-		};
-		const figureStyle = styles[ block.align ] && styles[ block.align ].figure
-			? ` style="${ styles[ block.align ].figure }"`
-			: '';
-		const imgStyle = styles[ block.align ] && styles[ block.align ].img
-			? ` style="${ styles[ block.align ].img }"`
-			: '';
+		const styles = getFigureAlignmentStyles( block.align );
 		const captionHtml = block.caption ? `<figcaption>${ block.caption }</figcaption>` : '';
-		const rawContent = `<figure${ figureStyle }><img src="${ block.src }"${ imgStyle } />${ captionHtml }</figure>`;
+		const rawContent = [
+			`<figure${ styles.figure }>`,
+			`<img src="${ block.src }"${ styles.content } />`,
+			captionHtml,
+			'</figure>'
+		].join( '' );
 
 		return {
 			blockType: 'image',
-			attrs: { /* caption: block.caption ,*/ align: block.align },
+			attrs: { align: block.align },
 			rawContent
 		};
 	},
