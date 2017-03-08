@@ -8,6 +8,9 @@
 class Tests_Basic extends WP_UnitTestCase {
 
 	function test_license() {
+		// This test is designed to only run on trunk/master
+		$this->skipOnAutomatedBranches();
+
 		$license = file_get_contents( ABSPATH . 'license.txt' );
 		preg_match( '#Copyright 2011-(\d+) by the contributors#', $license, $matches );
 		$this_year = date( 'Y' );
