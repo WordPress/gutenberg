@@ -37,7 +37,7 @@ export default class InlineTextBlockForm extends Component {
 
 	render() {
 		const { block, change, moveCursorUp, moveCursorDown, appendBlock,
-			mergeWithPrevious, remove, setToolbarState, focus, focusConfig } = this.props;
+			mergeWithPrevious, remove, setToolbarState, focus, focusConfig, unselect } = this.props;
 
 		const splitValue = ( left, right ) => {
 			change( { content: left } );
@@ -65,6 +65,7 @@ export default class InlineTextBlockForm extends Component {
 				setToolbarState={ setToolbarState }
 				focusConfig={ focusConfig }
 				onFocusChange={ focus }
+				onType={ unselect }
 				inline
 				single
 			/>

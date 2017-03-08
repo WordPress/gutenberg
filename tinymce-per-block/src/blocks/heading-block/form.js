@@ -12,6 +12,7 @@ import {
 import InlineTextBlockForm from '../inline-text-block/form';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
+import TransformBlockToolbar from 'controls/transform-block-toolbar';
 
 export default class HeadingBlockForm extends Component {
 	bindForm = ( ref ) => {
@@ -32,7 +33,7 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, moveBlockUp, moveBlockDown } = this.props;
+		const { block, isSelected, moveBlockUp, moveBlockDown, select, transform } = this.props;
 		const sizes = [
 			{ id: 'h1', icon: EditorHeading1Icon },
 			{ id: 'h2', icon: EditorHeading2Icon },
@@ -45,6 +46,9 @@ export default class HeadingBlockForm extends Component {
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
+						<div className="block-list__block-controls-group">
+							<TransformBlockToolbar blockType="heading" onTransform={ transform } />
+						</div>
 						<div className="block-list__block-controls-group">
 							{ sizes.map( ( { id, icon: Icon } ) =>
 								<button
@@ -64,7 +68,7 @@ export default class HeadingBlockForm extends Component {
 						</div>
 					</div>
 				) }
-				<div className={ `heading-block__form ${ block.size }` }>
+				<div className={ `heading-block__form ${ block.size }` } onClick={ select }>
 					<InlineTextBlockForm
 						ref={ this.bindForm }
 						{ ...this.props }

@@ -51,8 +51,7 @@ export default class EditableFormatToolbar extends Component {
 		}	);
 	}
 
-	toggleLinkModal = ( event ) => {
-		event.stopPropagation();
+	toggleLinkModal = () => {
 		this.setState( {
 			linkModal: {
 				open: ! this.state.linkModal.open,

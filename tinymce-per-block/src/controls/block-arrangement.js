@@ -8,22 +8,14 @@ import { ArrowDownAlt2Icon, ArrowUpAlt2Icon } from 'dashicons';
 export default function BlockArrangement( { block, moveBlockUp, moveBlockDown } ) {
 	const blockDefinition = getBlock( block.blockType );
 	const Icon = blockDefinition.icon;
-	const onMoveUp = ( event ) => {
-		event.stopPropagation();
-		moveBlockUp();
-	};
-	const onMoveDown = ( event ) => {
-		event.stopPropagation();
-		moveBlockDown();
-	};
 
 	return (
 		<div className="block-list__block-arrangement">
 			<div className="block-list__movement-controls">
-				<button className="block-list__block-arrange-control" onClick={ onMoveUp }>
+				<button className="block-list__block-arrange-control" onClick={ moveBlockUp }>
 					<ArrowUpAlt2Icon />
 				</button>
-				<button className="block-list__block-arrange-control" onClick={ onMoveDown }>
+				<button className="block-list__block-arrange-control" onClick={ moveBlockDown }>
 					<ArrowDownAlt2Icon />
 				</button>
 			</div>

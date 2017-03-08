@@ -22,13 +22,12 @@ export default class InserterComponent extends Component {
 
 	render() {
 		const addBlock = ( id ) => () => this.props.onAdd( id );
-		const stopPropagation = ( event ) => event.stopPropagation();
 		const blocks = getBlocks().filter(
 			( block ) => block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1
 		);
 
 		return (
-			<div className="inserter" onClick={ stopPropagation }>
+			<div className="inserter">
 				<div className="inserter__arrow" />
 				<div className="inserter__content">
 					<div className="inserter__category-blocks">

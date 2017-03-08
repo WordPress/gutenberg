@@ -35,6 +35,7 @@ export default class EditableComponent extends Component {
 		onChange: () => {},
 		splitValue: () => {},
 		onFocusChange: () => {},
+		onType: () => {},
 		initialContent: '',
 		inline: false,
 		single: false,
@@ -197,6 +198,7 @@ export default class EditableComponent extends Component {
 		editor.on( 'paste', this.onPaste );
 		editor.on( 'nodechange', this.syncToolbar );
 		editor.on( 'focusin', this.onFocus );
+		editor.on( 'paste keydown undo redo', this.props.onType );
 	};
 
 	onInit = () => {

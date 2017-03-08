@@ -3,11 +3,13 @@
  */
 import { createElement, Component } from 'wp-elements';
 
-import { EditableComponent, EnhancedInputComponent } from 'wp-blocks';
-import { serialize } from 'serializers/block';
-import { parse } from 'parsers/block';
+/**
+ * Internal dependencies
+ */
+import { EditableComponent } from 'wp-blocks';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
+import TransformBlockToolbar from 'controls/transform-block-toolbar';
 
 export default class QuoteBlockForm extends Component {
 	bindContent = ( ref ) => {
@@ -59,7 +61,7 @@ export default class QuoteBlockForm extends Component {
 	render() {
 		const { block, change, moveCursorUp, moveCursorDown, remove,
 			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus,
-			moveBlockUp, moveBlockDown } = this.props;
+			moveBlockUp, moveBlockDown, select, unselect, transform } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { cite: left } );
 			appendBlock( {
@@ -79,12 +81,16 @@ export default class QuoteBlockForm extends Component {
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
+							<TransformBlockToolbar blockType="quote" onTransform={ transform } />
+						</div>
+
+						<div className="block-list__block-controls-group">
 							<EditableFormatToolbar editable={ focusInput === 'content' ? this.content : this.cite } ref={ this.bindFormatToolbar } />
 						</div>
 					</div>
 				}
 
-				<div className="quote-block__form">
+				<div className="quote-block__form" onClick={ select }>
 					<div className="quote-block__content">
 						<EditableComponent
 							ref={ this.bindContent }
@@ -97,6 +103,7 @@ export default class QuoteBlockForm extends Component {
 							setToolbarState={ focusInput === 'content' ? this.setToolbarState : undefined }
 							focusConfig={ focusInput === 'content' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'content' }, config ) ) }
+							onType={ unselect }
 							inline
 						/>
 					</div>
@@ -113,6 +120,7 @@ export default class QuoteBlockForm extends Component {
 							setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
 							focusConfig={ focusInput === 'cite' ? focusConfig : null }
 							onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
+							onType={ unselect }
 							inline
 							single
 						/>
