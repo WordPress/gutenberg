@@ -6,9 +6,6 @@
 	color: inherit;
 	font-weight: 300;
 	font-size: 20px;
-	border-left: 4px solid black;
-	margin-left: -20px;
-	padding-left: 20px;
 	font-style: italic;
 	p {
 		padding: 0;
@@ -16,8 +13,8 @@
 	}
 }
 
-.quote-block__cite textarea,
-.quote-block__cite .textarea-mirror {
+.quote-block__cite,
+.quote-block__cite {
 	width: 100%;
 	border: none;
 	font: inherit;
@@ -27,11 +24,10 @@
 	color: $gray-dark-300;
 	font-style: italic;
 	resize: none;
+}
+
+.quote-block__form {
 	border-left: 4px solid black;
 	margin-left: -20px;
 	padding-left: 20px;
-
-	&:focus {
-		outline: 0;
-	}
 }
