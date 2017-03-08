@@ -31,6 +31,12 @@ export default class EnhancedInput extends Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( this.props.focusConfig ) {
+			this.focus();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
 			this.focus();
