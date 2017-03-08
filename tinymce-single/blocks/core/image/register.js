@@ -1,7 +1,8 @@
 window.wp.blocks.registerBlock( {
 	name: 'image',
 	namespace: 'core',
-	type: 'image',
+	displayName: 'Image',
+	type: 'media',
 	icon: 'gridicons-image',
 	controls: [
 		'block-align-left',
@@ -9,5 +10,8 @@ window.wp.blocks.registerBlock( {
 		'block-align-right',
 		'block-align-full',
 		'togglefigcaption'
-	]
+	],
+	insert: function( block, editor ) {
+
+	}
 } );

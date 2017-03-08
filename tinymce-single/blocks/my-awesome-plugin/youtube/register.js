@@ -1,7 +1,8 @@
 window.wp.blocks.registerBlock( {
 	name: 'youtube',
 	namespace: 'my-awesome-plugin',
-	type: 'video',
+	displayName: 'YouTube Video',
+	type: 'media',
 	keywords: [],
 	icon: 'gridicons-video',
 	controls: [
@@ -12,5 +13,8 @@ window.wp.blocks.registerBlock( {
 		{
 			icon: 'gridicons-cog'
 		}
-	]
+	],
+	insert: function( block, editor ) {
+
+	}
 } );

@@ -250,3 +250,32 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	background: #fff;
 	border-radius: 12px;
 }
+
+.insert-menu {
+	width: 330px;
+}
+
+.insert-menu .mce-btn {
+	float: left;
+}
+
+.insert-menu .insert-separator {
+	clear: both;
+	background: #f0f2f4;
+	padding: 4px;
+	text-transform: uppercase;
+}
+
+.insert-menu .mce-txt {
+	font-size: 16px;
+	text-align: inherit;
+	vertical-align: inherit;
+	width: auto;
+	line-height: 16px;
+	width: 120px;
+	padding: 4px;
+}
+
+.insert-menu .mce-btn-has-text svg.gridicons-heading {
+	margin: 0;
+}

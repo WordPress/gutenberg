@@ -1,7 +1,8 @@
 window.wp.blocks.registerBlock( {
 	name: 'gallery',
 	namespace: 'core',
-	type: 'image',
+	displayName: 'Gallery',
+	type: 'media',
 	keywords: [],
 	icon: 'gridicons-image-multiple',
 	controls: [
@@ -24,5 +25,8 @@ window.wp.blocks.registerBlock( {
 		{
 			icon: 'gridicons-cog'
 		}
-	]
+	],
+	insert: function( block, editor ) {
+
+	}
 } );

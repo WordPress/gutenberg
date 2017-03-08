@@ -4,19 +4,23 @@
 	_blocks = {};
 	_controls = {};
 
+	var _elementMap = {};
+
 	wp.blocks = {
 		registerBlock: function( settings ) {
 			// Note, elements should probably only be registered by core.
 			// Maybe for each block, we should offer to extend the settings (add buttons).
 
+			var namespace = settings.namespace || 'elements';
+			var id = namespace + ':' + settings.name;
+
+			_blocks[ id ] = settings;
+			_blocks[ id ]._id = id;
+
 			if ( settings.elements ) {
 				settings.elements.forEach( function( element ) {
-					_blocks[ 'element:' + element ] = settings;
-					_blocks[ 'element:' + element ]._id = 'element:' + element;
+					_elementMap[ element ] = id;
 				} );
-			} else if ( settings.namespace && settings.name ) {
-				_blocks[ settings.namespace + ':' + settings.name ] = settings;
-				_blocks[ settings.namespace + ':' + settings.name ]._id = settings.namespace + ':' + settings.name;
 			}
 		},
 		registerControl: function( name, settings ) {
@@ -29,10 +33,13 @@
 			return _controls[ name ];
 		},
 		getBlockSettingsByElement: function( element ) {
-			var blockType = element.getAttribute( 'data-wp-block-type' );
-			var nodeName = element.nodeName.toLowerCase();
+			var id = element.getAttribute( 'data-wp-block-type' );
 
-			return this.getBlockSettings( blockType || 'element:' + nodeName );
+			if ( ! id ) {
+				id = _elementMap[ element.nodeName.toLowerCase() ];
+			}
+
+			return this.getBlockSettings( id );
 		},
 		getBlocks: function() {
 			return _blocks;
