@@ -2,7 +2,7 @@ window.wp.blocks.registerBlock( {
 	name: 'image',
 	namespace: 'core',
 	displayName: 'Image',
-	type: 'image',
+	type: 'media',
 	icon: 'gridicons-image',
 	controls: [
 		'block-align-left',

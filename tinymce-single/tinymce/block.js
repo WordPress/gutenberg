@@ -258,21 +258,38 @@
 				return insert;
 			}
 
+			window.tinymce.ui.WPInsertSeparator = tinymce.ui.Control.extend( {
+				renderHtml: function() {
+					console.log(this)
+					return (
+						'<div id="' + this._id + '" class="insert-separator">' + this.settings.text + '</div>'
+					);
+				}
+			} );
+
 			function createInsertMenu() {
 				var insertMenu = editor.wp._createToolbar( ( function() {
 					var allSettings = wp.blocks.getBlocks();
 					var buttons = [];
 					var key;
+					var types = [ 'text', 'media', 'separator' ];
 
-					for ( key in allSettings ) {
-						if ( allSettings[ key ].insert ) {
-							buttons.push( {
-								text: allSettings[ key ].displayName,
-								icon: allSettings[ key ].icon,
-								onClick: allSettings[ key ].insert
-							} );
+					types.forEach( function( type ) {
+						buttons.push( {
+							type: 'WPInsertSeparator',
+							text: type
+						} );
+
+						for ( key in allSettings ) {
+							if ( allSettings[ key ].type === type ) {
+								buttons.push( {
+									text: allSettings[ key ].displayName,
+									icon: allSettings[ key ].icon,
+									onClick: allSettings[ key ].insert
+								} );
+							}
 						}
-					}
+					} );
 
 					return buttons;
 				} )() );

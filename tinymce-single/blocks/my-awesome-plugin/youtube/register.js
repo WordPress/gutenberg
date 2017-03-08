@@ -2,7 +2,7 @@ window.wp.blocks.registerBlock( {
 	name: 'youtube',
 	namespace: 'my-awesome-plugin',
 	displayName: 'YouTube Video',
-	type: 'video',
+	type: 'media',
 	keywords: [],
 	icon: 'gridicons-video',
 	controls: [

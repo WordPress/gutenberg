@@ -2,7 +2,7 @@ window.wp.blocks.registerBlock( {
 	name: 'gallery',
 	namespace: 'core',
 	displayName: 'Gallery',
-	type: 'image',
+	type: 'media',
 	keywords: [],
 	icon: 'gridicons-image-multiple',
 	controls: [
