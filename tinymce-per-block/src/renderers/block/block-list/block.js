@@ -19,7 +19,7 @@ export default class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, isSelected, focusConfig } = this.props;
+		const { block, isSelected, focusConfig, first, last } = this.props;
 		const blockDefinition = getBlock( block.blockType );
 		if ( ! blockDefinition ) {
 			return null;
@@ -122,6 +122,8 @@ export default class BlockListBlock extends Component {
 					{ ...state }
 					isSelected={ isSelected }
 					focusConfig={ focusConfig }
+					first={ first }
+					last={ last }
 				/>
 			</div>
 		);

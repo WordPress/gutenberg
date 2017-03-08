@@ -23,8 +23,8 @@ export default class EmbedBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, change, moveCursorUp, moveCursorDown,
-			remove, focusConfig, focus, moveBlockUp, moveBlockDown, appendBlock, unselect } = this.props;
+		const { block, isSelected, change, moveCursorUp, moveCursorDown, first, last,
+			remove, focusConfig, focus, moveBlockUp, moveBlockDown, appendBlock, select, unselect } = this.props;
 
 		const removePrevious = () => {
 			if ( ! block.url ) {
@@ -43,7 +43,7 @@ export default class EmbedBlockForm extends Component {
 
 		return (
 			<div className={ classNames( 'embed-block', block.align ) }>
-				{ isSelected && <BlockArrangement block={ block }
+				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
@@ -52,46 +52,49 @@ export default class EmbedBlockForm extends Component {
 						</div>
 					</div>
 				}
-				{ ! block.url &&
-					<div className="embed-block__form">
-						<div className="embed-block__title">
-							<CloudOutline /> Embed URL
-						</div>
-						<EnhancedInputComponent
-							ref={ this.bindInput }
-							moveCursorUp={ moveCursorUp }
-							removePrevious={ removePrevious }
-							moveCursorDown={ moveCursorDown }
-							value={ block.url }
-							onChange={ ( value ) => change( { url: value } ) }
-							focusConfig={ focusConfig }
-							onFocusChange={ ( config ) => focus( config ) }
-							placeholder="Paste URL to embed here..."
-						/>
-					</div>
-				}
-				{ block.url &&
-					<div className="embed-block__content">
-						<div dangerouslySetInnerHTML={ { __html: html } } />
-						<div className="embed-block__caption">
+
+				<div onClick={ select }>
+					{ ! block.url &&
+						<div className="embed-block__form">
+							<div className="embed-block__title">
+								<CloudOutline /> Embed URL
+							</div>
 							<EnhancedInputComponent
-								ref={ this.bindCaption }
+								ref={ this.bindInput }
 								moveCursorUp={ moveCursorUp }
 								removePrevious={ removePrevious }
 								moveCursorDown={ moveCursorDown }
-								splitValue={ splitValue }
-								value={ block.caption }
-								onChange={ ( value ) => {
-									change( { caption: value } );
-									unselect();
-								} }
-								placeholder="Write caption"
+								value={ block.url }
+								onChange={ ( value ) => change( { url: value } ) }
 								focusConfig={ focusConfig }
-								onFocusChange={ focus }
+								onFocusChange={ ( config ) => focus( config ) }
+								placeholder="Paste URL to embed here..."
 							/>
 						</div>
-					</div>
-				}
+					}
+					{ block.url &&
+						<div className="embed-block__content">
+							<div dangerouslySetInnerHTML={ { __html: html } } />
+							<div className="embed-block__caption">
+								<EnhancedInputComponent
+									ref={ this.bindCaption }
+									moveCursorUp={ moveCursorUp }
+									removePrevious={ removePrevious }
+									moveCursorDown={ moveCursorDown }
+									splitValue={ splitValue }
+									value={ block.caption }
+									onChange={ ( value ) => {
+										change( { caption: value } );
+										unselect();
+									} }
+									placeholder="Write caption"
+									focusConfig={ focusConfig }
+									onFocusChange={ focus }
+								/>
+							</div>
+						</div>
+					}
+				</div>
 			</div>
 		);
 	}

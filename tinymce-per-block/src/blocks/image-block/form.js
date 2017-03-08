@@ -19,7 +19,7 @@ export default class ImageBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveCursorDown, moveCursorUp, remove, appendBlock,
+		const { block, change, moveCursorDown, moveCursorUp, remove, appendBlock, first, last,
 			isSelected, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
 		const removePrevious = () => {
 			if ( ! block.caption ) {
@@ -36,7 +36,7 @@ export default class ImageBlockForm extends Component {
 
 		return (
 			<div className={ classNames( 'image-block__form', block.align ) }>
-				{ isSelected && <BlockArrangement block={ block }
+				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
 					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
