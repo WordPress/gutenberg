@@ -26,6 +26,7 @@ body {
 
 #editor {
 	font-family: "Noto Serif", serif;
+	font-size: 16px;
 	outline: none;
 	padding: 50px;
 }
@@ -82,10 +83,6 @@ body {
 #editor h2 {
 	font-weight: 900;
 	font-size: 28px;
-}
-
-#editor p {
-	font-size: 16px;
 }
 
 #editor blockquote {
