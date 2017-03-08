@@ -38,7 +38,7 @@ h4,
 h5,
 h6,
 img {
-	font-family: "Merriweather", serif;
+	font-family: "Noto Serif", serif;
 	margin: 15px 0;
 	/* Uses paddings instead */
 }
@@ -105,7 +105,7 @@ h6.is-selected,
 p.is-selected,
 blockquote.is-selected,
 img.is-selected {
-	box-shadow: inset 0px 0px 0px 2px #e0e5e9;
+	box-shadow: inset 0px 0px 0px 2px #e1e6ea;
 	position: relative;
 	z-index: 1;
 }
@@ -181,13 +181,12 @@ img.is-selected {
 .inline-controls,
 .block-controls {
 	background: #fff;
-	border: 1px solid #e1e6ea;
+	border: 1px solid #d8dbdf;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	color: #12181e;
 	display: inline-block;
 	height: 38px;
-	overflow: hidden;
-	margin-left: 20px;
+	margin-left: 14px;
 }
 
 .docked-controls.is-image .inline-controls {
@@ -204,6 +203,7 @@ img.is-selected {
 	cursor: pointer;
 	display: block;
 	float: left;
+	color: #6d7882;
 }
 
 .inline-controls button.do-not-work,
@@ -214,7 +214,9 @@ img.is-selected {
 
 .inline-controls button:hover,
 .block-controls button:hover {
-	background: #f0f2f4;
+	background: #f8f9f9;
+	outline: 1px solid #6d7882;
+	position: relative;
 }
 
 .inline-controls button:focus,
@@ -235,7 +237,10 @@ img.is-selected {
 
 .inline-controls button.is-active,
 .block-controls button.is-active {
-	background: #e0e5e9;
+	background: #eef0f0;
+	outline: 1px solid #6d7882;
+	position: relative;
+	color: #3e444c;
 }
 
 .heading-dropdown .heading {
@@ -287,18 +292,13 @@ img.is-selected {
 	border: none;
 	margin: 0;
 	padding: 0;
-}
-
-.insert-block svg,
-.switch-block__block svg,
-.switch-block__block label {
+	color: #87919d;
 	cursor: pointer;
-	fill: #87919d;
 }
 
-.insert-block__button:hover svg,
-.switch-block__button:hover svg {
-	fill: #12181e;
+.insert-block__button:hover,
+.switch-block__button:hover {
+	color: #19a2d4;
 }
 
 .insert-block__button:focus,
