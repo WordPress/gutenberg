@@ -9,6 +9,14 @@ import { EditorHeadingIcon } from 'dashicons';
  */
 import form from './form';
 
+const createHeadingBlockWithContent = ( content = '' ) => {
+	return {
+		blockType: 'heading',
+		size: 'h2',
+		content
+	};
+};
+
 registerBlock( 'heading', {
 	title: 'Heading',
 	form: form,
@@ -40,11 +48,11 @@ registerBlock( 'heading', {
 			rawContent
 		};
 	},
-	create: () => {
-		return {
-			blockType: 'heading',
-			content: '',
-			size: 'h2'
-		};
-	}
+	create: createHeadingBlockWithContent,
+	transformations: [
+		{
+			blocks: [ 'text', 'quote' ],
+			transform: ( block ) => createHeadingBlockWithContent( block.content )
+		}
+	]
 } );

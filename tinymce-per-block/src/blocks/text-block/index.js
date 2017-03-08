@@ -9,6 +9,14 @@ import { EditorParagraphIcon } from 'dashicons';
  */
 import form from './form';
 
+const createTextBlockWithContent = ( content = '' ) => {
+	return {
+		blockType: 'text',
+		align: 'no-align',
+		content
+	};
+};
+
 registerBlock( 'text', {
 	title: 'Text',
 	form: form,
@@ -44,11 +52,11 @@ registerBlock( 'text', {
 			rawContent
 		};
 	},
-	create: () => {
-		return {
-			blockType: 'text',
-			content: '',
-			align: 'no-align'
-		};
-	}
+	create: () => createTextBlockWithContent,
+	transformations: [
+		{
+			blocks: [ 'heading', 'quote' ],
+			transform: ( block ) => createTextBlockWithContent( block.content )
+		}
+	]
 } );

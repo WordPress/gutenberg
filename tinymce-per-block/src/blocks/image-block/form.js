@@ -20,7 +20,7 @@ export default class ImageBlockForm extends Component {
 
 	render() {
 		const { block, change, moveCursorDown, moveCursorUp, remove, appendBlock,
-			isSelected, focusConfig, focus, moveBlockUp, moveBlockDown } = this.props;
+			isSelected, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
 		const removePrevious = () => {
 			if ( ! block.caption ) {
 				remove();
@@ -45,25 +45,30 @@ export default class ImageBlockForm extends Component {
 						</div>
 					</div>
 				}
-				<img
-					src={ block.src }
-					className="image-block__display"
-					onClick={ () => {
-						! focusConfig && focus();
-					} }
-				/>
-				<div className="image-block__caption">
-					<EnhancedInputComponent
-						moveCursorUp={ moveCursorUp }
-						removePrevious={ removePrevious }
-						moveCursorDown={ moveCursorDown }
-						splitValue={ splitValue }
-						value={ block.caption }
-						onChange={ ( value ) => change( { caption: value } ) }
-						placeholder="Write caption"
-						focusConfig={ focusConfig }
-						onFocusChange={ focus }
+				<div onClick={ select }>
+					<img
+						src={ block.src }
+						className="image-block__display"
+						onClick={ () => {
+							! focusConfig && focus();
+						} }
 					/>
+					<div className="image-block__caption">
+						<EnhancedInputComponent
+							moveCursorUp={ moveCursorUp }
+							removePrevious={ removePrevious }
+							moveCursorDown={ moveCursorDown }
+							splitValue={ splitValue }
+							value={ block.caption }
+							onChange={ ( value ) => {
+								change( { caption: value } );
+								unselect();
+							} }
+							placeholder="Write caption"
+							focusConfig={ focusConfig }
+							onFocusChange={ focus }
+						/>
+					</div>
 				</div>
 			</div>
 		);

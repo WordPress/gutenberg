@@ -80,6 +80,11 @@ export default class BlockListBlock extends Component {
 					type: 'select'
 				} );
 			},
+			unselect() {
+				executeCommand( {
+					type: 'unselect'
+				} );
+			},
 			moveBlockUp() {
 				executeCommand( {
 					type: 'moveBlockUp'
@@ -95,6 +100,12 @@ export default class BlockListBlock extends Component {
 					type: 'replace',
 					id
 				} );
+			},
+			transform( id ) {
+				executeCommand( {
+					type: 'transform',
+					id
+				} );
 			}
 		};
 
@@ -104,7 +115,6 @@ export default class BlockListBlock extends Component {
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				className={ classes }
-				onClick={ state.select }
 			>
 				<Form
 					ref={ this.bindForm }

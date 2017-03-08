@@ -80,7 +80,6 @@ class BlockList extends Component {
 				const newBlocks = [ ...content ];
 				newBlocks[ index ] = assign( {}, content[ index ], changes );
 				this.onChange( newBlocks );
-				this.select( null );
 			},
 			append: ( { block: commandBlock } ) => {
 				const createdBlock = commandBlock
@@ -191,6 +190,24 @@ class BlockList extends Component {
 				const newBlockUid = uniqueId();
 				const blockDefinition = getBlock( id );
 				const newBlock = Object.assign( { uid: newBlockUid }, blockDefinition.create() );
+				const newBlocks = [
+					...this.content.slice( 0, index ),
+					newBlock,
+					...this.content.slice( index + 1 )
+				];
+				this.onChange( newBlocks );
+				this.focus( newBlockUid );
+			},
+			transform: ( { id } ) => {
+				const newBlockUid = uniqueId();
+				const currentBlockType = content[ index ].blockType;
+				const blockDefinition = getBlock( id );
+				const transformation = blockDefinition.transformations
+					.find( t => t.blocks.indexOf( currentBlockType ) !== -1 );
+				if ( ! transformation ) {
+					return;
+				}
+				const newBlock = Object.assign( { uid: newBlockUid }, transformation.transform( content[ index ] ) );
 				const newBlocks = [
 					...this.content.slice( 0, index ),
 					newBlock,

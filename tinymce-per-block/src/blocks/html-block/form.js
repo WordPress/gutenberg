@@ -40,7 +40,7 @@ export default class HtmlBlockForm extends Component {
 
 	render() {
 		const { block, isSelected, change, moveCursorUp, moveCursorDown, appendBlock,
-			mergeWithPrevious, remove, focusConfig, focus, moveBlockUp, moveBlockDown } = this.props;
+			mergeWithPrevious, remove, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
 		const splitValue = ( left, right ) => {
 			change( { content: left } );
 			if ( right ) {
@@ -72,7 +72,7 @@ export default class HtmlBlockForm extends Component {
 						</div>
 					</div>
 				) }
-				<div className="html-block__form" style={ style }>
+				<div className="html-block__form" style={ style } onClick={ select }>
 					<EditableComponent
 						ref={ this.bindEditable }
 						content={ block.content }
@@ -85,6 +85,7 @@ export default class HtmlBlockForm extends Component {
 						onChange={ ( value ) => change( { content: value } ) }
 						focusConfig={ focusConfig }
 						onFocusChange={ focus }
+						onType={ unselect }
 					/>
 				</div>
 			</div>
