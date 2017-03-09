@@ -11,7 +11,12 @@ window.wp.blocks.registerBlock( {
 		'block-align-full',
 		'togglefigcaption'
 	],
-	insert: function( block, editor ) {
-
+	insert: function() {
+		return (
+			'<figure data-wp-block-type="core:image" class="alignright">' +
+				'<img src="https://cldup.com/HN3-c7ER9p.jpg" alt="">' +
+				'<figcaption>I have no idea which mountain this is. It looks tall!</figcaption>' +
+			'</figure>'
+		);
 	}
 } );
