@@ -45,30 +45,29 @@ export default class ImageBlockForm extends Component {
 						</div>
 					</div>
 				}
-				<div onClick={ select }>
-					<img
-						src={ block.src }
-						className="image-block__display"
-						onClick={ () => {
-							! focusConfig && focus();
-						} }
-					/>
-					<div className="image-block__caption">
-						<EnhancedInputComponent
-							moveCursorUp={ moveCursorUp }
-							removePrevious={ removePrevious }
-							moveCursorDown={ moveCursorDown }
-							splitValue={ splitValue }
-							value={ block.caption }
-							onChange={ ( value ) => {
-								change( { caption: value } );
-								unselect();
-							} }
-							placeholder="Write caption"
-							focusConfig={ focusConfig }
-							onFocusChange={ focus }
-						/>
-					</div>
+				<div onClick={ () => {
+					select();
+					! focusConfig && focus();
+				} }>
+					<img src={ block.src } className="image-block__display" />
+					{ ( focusConfig || block.caption ) &&
+						<div className="image-block__caption">
+							<EnhancedInputComponent
+								moveCursorUp={ moveCursorUp }
+								removePrevious={ removePrevious }
+								moveCursorDown={ moveCursorDown }
+								splitValue={ splitValue }
+								value={ block.caption }
+								onChange={ ( value ) => {
+									change( { caption: value } );
+									unselect();
+								} }
+								placeholder="Write caption"
+								focusConfig={ focusConfig }
+								onFocusChange={ focus }
+							/>
+						</div>
+					}
 				</div>
 			</div>
 		);

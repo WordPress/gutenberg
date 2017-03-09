@@ -53,7 +53,10 @@ export default class EmbedBlockForm extends Component {
 					</div>
 				}
 
-				<div onClick={ select }>
+				<div onClick={ () => {
+					select();
+					! focusConfig && focus();
+				} }>
 					{ ! block.url &&
 						<div className="embed-block__form">
 							<div className="embed-block__title">
@@ -75,23 +78,25 @@ export default class EmbedBlockForm extends Component {
 					{ block.url &&
 						<div className="embed-block__content">
 							<div dangerouslySetInnerHTML={ { __html: html } } />
-							<div className="embed-block__caption">
-								<EnhancedInputComponent
-									ref={ this.bindCaption }
-									moveCursorUp={ moveCursorUp }
-									removePrevious={ removePrevious }
-									moveCursorDown={ moveCursorDown }
-									splitValue={ splitValue }
-									value={ block.caption }
-									onChange={ ( value ) => {
-										change( { caption: value } );
-										unselect();
-									} }
-									placeholder="Write caption"
-									focusConfig={ focusConfig }
-									onFocusChange={ focus }
-								/>
-							</div>
+							{ ( focusConfig || block.caption ) &&
+								<div className="embed-block__caption">
+									<EnhancedInputComponent
+										ref={ this.bindCaption }
+										moveCursorUp={ moveCursorUp }
+										removePrevious={ removePrevious }
+										moveCursorDown={ moveCursorDown }
+										splitValue={ splitValue }
+										value={ block.caption }
+										onChange={ ( value ) => {
+											change( { caption: value } );
+											unselect();
+										} }
+										placeholder="Write caption"
+										focusConfig={ focusConfig }
+										onFocusChange={ focus }
+									/>
+								</div>
+							}
 						</div>
 					}
 				</div>
