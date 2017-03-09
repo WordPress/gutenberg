@@ -35,7 +35,7 @@
 		getBlockSettingsByElement: function( element ) {
 			var id = element.getAttribute( 'data-wp-block-type' );
 
-			if ( ! id ) {
+			if ( ! id || ! this.getBlockSettings( id ) ) {
 				id = _elementMap[ element.nodeName.toLowerCase() ];
 			}
 
@@ -86,6 +86,36 @@
 		},
 		getSelectedBlock: function() {
 			return wp.blocks.getSelectedBlocks()[0];
+		},
+		extendBlock: function( settings ) {
+			var extendId = settings.extends;
+			var id = settings.namespace + ':' + settings.name;
+
+			if ( _blocks[ extendId ] ) {
+				_blocks[ extendId ].controls.unshift( {
+					icon: settings.icon,
+					text: '2',
+					onClick: function( block ) {
+						block.setAttribute( 'data-wp-block-type', id );
+					},
+					isActive: function( block ) {
+						return block.getAttribute( 'data-wp-block-type' ) === id;
+					}
+				} );
+
+				_blocks[ extendId ].controls.unshift( {
+					icon: settings.icon,
+					text: '1',
+					onClick: function( block ) {
+						block.removeAttribute( 'data-wp-block-type' );
+					},
+					isActive: function( block ) {
+						return ! block.getAttribute( 'data-wp-block-type' );
+					}
+				} );
+
+				_elementMap[ id ] = extendId;
+			}
 		}
 	};
 } )( window.wp = window.wp || {} );
