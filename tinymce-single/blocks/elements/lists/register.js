@@ -8,14 +8,16 @@ window.wp.blocks.registerBlock( {
 		{
 			icon: 'gridicons-list-unordered',
 			stateSelector: 'ul',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
+				// Use native command to toggle current selected list.
 				editor.execCommand( 'InsertUnorderedList' );
 			}
 		},
 		{
 			icon: 'gridicons-list-ordered',
 			stateSelector: 'ol',
-			onClick: function( editor ) {
+			onClick: function( block, editor ) {
+				// Use native command to toggle current selected list.
 				editor.execCommand( 'InsertOrderedList' );
 			}
 		},
