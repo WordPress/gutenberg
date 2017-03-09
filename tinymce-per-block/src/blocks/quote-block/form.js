@@ -133,24 +133,26 @@ export default class QuoteBlockForm extends Component {
 							inline
 						/>
 					</div>
-					<div className="quote-block__cite">
-						<EditableComponent
-							ref={ this.bindCite }
-							moveCursorUp={ this.moveToContent }
-							moveCursorDown={ moveCursorDown }
-							mergeWithPrevious={ this.moveToContent }
-							remove={ this.moveToContent }
-							content={ block.cite }
-							splitValue={ splitValue }
-							onChange={ ( value ) => change( { cite: value } ) }
-							setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
-							focusConfig={ focusInput === 'cite' ? focusConfig : null }
-							onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
-							onType={ unselect }
-							inline
-							single
-						/>
-					</div>
+					{ ( focusConfig || block.cite ) &&
+						<div className="quote-block__cite">
+							<EditableComponent
+								ref={ this.bindCite }
+								moveCursorUp={ this.moveToContent }
+								moveCursorDown={ moveCursorDown }
+								mergeWithPrevious={ this.moveToContent }
+								remove={ this.moveToContent }
+								content={ block.cite }
+								splitValue={ splitValue }
+								onChange={ ( value ) => change( { cite: value } ) }
+								setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
+								focusConfig={ focusInput === 'cite' ? focusConfig : null }
+								onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
+								onType={ unselect }
+								inline
+								single
+							/>
+						</div>
+					}
 				</div>
 			</div>
 		);
