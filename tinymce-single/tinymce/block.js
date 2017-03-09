@@ -441,7 +441,6 @@
 				blocks: createBlockToolbars()
 			};
 
-			var anchorNode;
 			var range;
 
 			editor.on( 'blur', function() {
@@ -459,6 +458,10 @@
 					} else {
 						node = node.parentNode;
 					}
+				}
+
+				if ( node.nodeName === 'BR' ) {
+					node = node.parentNode;
 				}
 
 				// Element node.
@@ -524,6 +527,10 @@
 				var settings = wp.blocks.getBlockSettingsByElement( selectedBlocks[0] ),
 					controls;
 
+				if ( ! settings ) {
+					return;
+				}
+
 				if ( ! hasBlockUI ) {
 					tinymce.$( editor.getBody() ).addClass( 'has-block-ui' );
 					hasBlockUI = true;
@@ -538,19 +545,21 @@
 				} );
 
 				if ( selectedBlocks.length === 1 ) {
-					if ( settings ) {
-						UI.blocks[ settings._id ].reposition();
-						focus && focusToolbar( UI.blocks[ settings._id ] );
+					UI.blocks[ settings._id ].reposition();
+					focus && focusToolbar( UI.blocks[ settings._id ] );
 
-						if ( anchorNode.nodeType === 3 ) {
-							UI.inline.reposition();
-						} else {
-							UI.inline.hide();
-						}
+					var selection = window.getSelection();
+
+					if ( selection.anchorNode.nodeType === 3 ) {
+						UI.inline.reposition();
+					} else {
+						UI.inline.hide();
 					}
 
 					UI.insert.reposition();
 				} else {
+					UI.blocks[ settings._id ].hide();
+					UI.inline.hide();
 					UI.insert.hide();
 				}
 
@@ -567,43 +576,10 @@
 				} );
 			}
 
-			function isInputKeyEvent( event ) {
-				var code = event.keyCode;
-				var VK = tinymce.util.VK;
-
-				if ( VK.metaKeyPressed( event ) ) {
-					return false;
-				}
-
-				// Special keys.
-				if ( code <= 47 && ! (
-					code === VK.SPACEBAR || code === VK.ENTER || code === VK.DELETE || code === VK.BACKSPACE
-				) ) {
-					return false;
-				}
-
-				// OS keys.
-				if ( code >= 91 && code <= 93 ) {
-					return false;
-				}
-
-				// Function keys.
-				if ( code >= 112 && code <= 123 ) {
-					return false;
-				}
-
-				// Lock keys.
-				if ( code >= 144 && code <= 145 ) {
-					return false;
-				}
-
-				return true;
-			}
-
 			var hidden = true;
 
 			editor.on( 'keydown', function( event ) {
-				if ( ! isInputKeyEvent( event ) ) {
+				if ( tinymce.util.VK.metaKeyPressed( event ) ) {
 					return;
 				}
 
@@ -617,29 +593,25 @@
 			} );
 
 			editor.on( 'selectionChange nodeChange', function( event ) {
-				var selection = window.getSelection();
-				var isCollapsed = selection.isCollapsed;
+				var isCollapsed = editor.selection.isCollapsed();
+				var startNode = editor.selection.getStart();
 
-				if ( ! selection.anchorNode ) {
+				if ( ! startNode ) {
 					return;
 				}
 
-				if ( selection.anchorNode.parentNode.id === 'mcepastebin' ) {
+				if ( startNode.id === 'mcepastebin' ) {
 					return;
 				}
 
-				if ( ! editor.getBody().contains( selection.anchorNode ) ) {
+				if ( ! editor.getBody().contains( startNode ) ) {
 					return;
 				}
 
-				anchorNode = selection.anchorNode;
-
-				var isEmpty = isCollapsed && isEmptySlot( anchorNode, true );
+				var isEmpty = isCollapsed && isEmptySlot( startNode, true );
 				var isBlockUIVisible = ! hidden;
 
 				if ( isEmpty ) {
-					window.console.log( 'Debug: empty node.' );
-
 					hideBlockUI();
 					UI.inline.hide();
 					UI.insert.reposition( { isEmpty: isEmpty } );
