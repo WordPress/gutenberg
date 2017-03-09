@@ -285,7 +285,24 @@
 								buttons.push( {
 									text: allSettings[ key ].displayName,
 									icon: allSettings[ key ].icon,
-									onClick: allSettings[ key ].insert
+									onClick: ( function( callback ) {
+										return function( block ) {
+											var content = callback.apply( this, arguments );
+
+											if ( content ) {
+												if ( typeof content === 'string' ) {
+													var temp = document.createElement( 'div' );
+													temp.innerHTML = content;
+													content = temp.firstChild;
+													temp = null;
+												}
+
+												block.parentNode.replaceChild( content, block );
+											}
+
+											editor.selection.setCursorLocation( content, 0 );
+										}
+									} )( allSettings[ key ].insert )
 								} );
 							}
 						}

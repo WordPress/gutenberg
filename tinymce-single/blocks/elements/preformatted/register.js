@@ -16,7 +16,7 @@ window.wp.blocks.registerBlock( {
 			}
 		}
 	],
-	insert: function( block, editor ) {
-		editor.formatter.apply( 'pre' );
+	insert: function() {
+		return '<pre><br></pre>';
 	}
 } );
