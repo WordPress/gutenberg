@@ -50,7 +50,7 @@
 			var block = getSelectedBlock();
 
 			if ( ! editor.$( block ).find( 'figcaption' ).length ) {
-				var figcaption = editor.$( '<figcaption><br></figcaption>' );
+				var figcaption = editor.$( '<figcaption contenteditable="true"><br></figcaption>' );
 
 				editor.undoManager.transact( function() {
 					editor.$( block ).append( figcaption );
@@ -96,6 +96,16 @@
 
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
+
+			editor.on( 'mousedown click', function( event ) {
+				if ( event.target.getAttribute( 'contenteditable' ) === 'true' ) {
+					if ( event.target !== editor.selection.getNode() ) {
+						setTimeout( function() {
+							editor.selection.placeCaretAt( event.clientX, event.clientY );
+						}, 50 );
+					}
+				}
+			}, true );
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -591,47 +601,14 @@
 			}
 
 			var hidden = true;
-			var keypress = false;
 
 			editor.on( 'keydown', function( event ) {
-				keypress = true;
-
 				if ( ! isInputKeyEvent( event ) ) {
 					return;
 				}
 
-				// No typing directly on elements.
-				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
-					event.preventDefault();
-				} else {
-					hidden = true;
-				}
-
+				hidden = true;
 				insert = false;
-			} );
-
-			editor.on( 'keyup', function( event ) {
-				keypress = false;
-			} );
-
-			editor.on( 'beforePastePreProcess beforeExecCommand', function( event ) {
-				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
-					event.preventDefault();
-				}
-			} );
-
-			editor.on( 'input', function( event ) {
-				// Non key input (e.g. emoji).
-				if ( keypress ) {
-					return;
-				}
-
-				if ( anchorNode.nodeType === 1 && ! isEmptySlot( anchorNode ) ) {
-					// Event not cancelable. :(
-					// Let's see how this goes, it might be buggy.
-					editor.undoManager.add();
-					editor.undoManager.undo();
-				}
 			} );
 
 			editor.on( 'mousedown touchstart', function() {
@@ -698,30 +675,6 @@
 						addfigcaption();
 						event.preventDefault();
 					}
-
-					if ( keyCode === VK.BACKSPACE ) {
-						var caretEl = editor.selection.getNode();
-
-						if ( caretEl.nodeName !== 'FIGCAPTION' ) {
-							removeBlock();
-							event.preventDefault();
-						} else {
-							var range = editor.selection.getRng();
-
-							if ( range.collapsed && range.startOffset === 0 ) {
-								removefigcaption();
-								event.preventDefault();
-							}
-						}
-					}
-
-					if ( keyCode === VK.LEFT ) {
-						var range = editor.selection.getRng();
-
-						if ( keyCode === VK.LEFT && range.startOffset === 0 ) {
-							event.preventDefault();
-						}
-					}
 				} else {
 					if ( keyCode === VK.BACKSPACE ) {
 						var selection = window.getSelection();
@@ -767,14 +720,6 @@
 				}
 
 				metaCount = 0;
-			} );
-
-			editor.on( 'dragstart', function( event ) {
-				var block = getSelectedBlock();
-
-				if ( block.nodeName === 'FIGURE' ) {
-					event.preventDefault();
-				}
 			} );
 
 			editor.on( 'nodeChange', function() {
