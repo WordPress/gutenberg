@@ -83,6 +83,16 @@
 						}
 					}
 
+					function onPostRender( callback ) {
+						return function() {
+							var button = this;
+
+							editor.on( 'nodechange', function() {
+								button.active( callback( window.wp.blocks.getSelectedBlock() ) );
+							} );
+						}
+					}
+
 					function bindSelectorChanged() {
 						var selection = editor.selection;
 
@@ -162,6 +172,10 @@
 								item = editor.buttons[ item ];
 							} else {
 								item.onClick = onClick( item.onClick );
+
+								if ( item.isActive ) {
+									item.onPostRender = onPostRender( item.isActive );
+								}
 							}
 
 							if ( typeof item === 'function' ) {
