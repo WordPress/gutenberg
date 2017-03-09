@@ -23,3 +23,14 @@
 		font-size: 20px;
 	}
 }
+
+
+.heading-block__toolbar-size-button {
+	position: relative;
+
+	.heading-block__toolbar-size {
+		position: absolute;
+		bottom: 6px;
+		right: 4px;
+	}
+}

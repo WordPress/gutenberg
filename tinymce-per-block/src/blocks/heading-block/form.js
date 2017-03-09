@@ -3,11 +3,7 @@
  */
 import { createElement, Component } from 'wp-elements';
 import classNames from 'classnames';
-import {
-	EditorHeading1Icon,
-	EditorHeading2Icon,
-	EditorHeading3Icon
-} from 'dashicons';
+import { EditorHeadingIcon } from 'dashicons';
 
 import InlineTextBlockForm from '../inline-text-block/form';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
@@ -34,11 +30,7 @@ export default class HeadingBlockForm extends Component {
 
 	render() {
 		const { block, isSelected, moveBlockUp, moveBlockDown, select, transform, first, last } = this.props;
-		const sizes = [
-			{ id: 'h1', icon: EditorHeading1Icon },
-			{ id: 'h2', icon: EditorHeading2Icon },
-			{ id: 'h3', icon: EditorHeading3Icon }
-		];
+		const sizes = [ 'h1', 'h2', 'h3' ];
 
 		return (
 			<div>
@@ -49,16 +41,20 @@ export default class HeadingBlockForm extends Component {
 						<div className="block-list__block-controls-group">
 							<TransformBlockToolbar blockType="heading" onTransform={ transform } />
 						</div>
+
 						<div className="block-list__block-controls-group">
-							{ sizes.map( ( { id, icon: Icon } ) =>
+							{ sizes.map( ( size, index ) =>
 								<button
-									key={ id }
-									onClick={ this.setSize( id ) }
-									className={ classNames( 'block-list__block-control', {
-										'is-selected': block.size === id
-									} ) }
+									key={ size }
+									onClick={ this.setSize( size ) }
+									className={ classNames(
+										'block-list__block-control',
+										'heading-block__toolbar-size-button',
+										{ 'is-selected': block.size === size }
+									) }
 								>
-									<Icon />
+									<EditorHeadingIcon />
+									<span className="heading-block__toolbar-size">{ index }</span>
 								</button>
 							) }
 						</div>

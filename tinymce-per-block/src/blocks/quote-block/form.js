@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
+import classNames from 'classnames';
+import { EditorQuoteIcon } from 'dashicons';
 
 /**
  * Internal dependencies
@@ -58,6 +60,10 @@ export default class QuoteBlockForm extends Component {
 		this.toolbar && this.toolbar.setToolbarState( ...args );
 	};
 
+	setStyle = ( style ) => () => {
+		this.props.change( { style } );
+	};
+
 	render() {
 		const { block, change, moveCursorUp, moveCursorDown, remove, first, last,
 			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus,
@@ -73,6 +79,8 @@ export default class QuoteBlockForm extends Component {
 		if ( ! focusInput && focusConfig ) {
 			focusInput = focusConfig.end ? 'cite' : 'content';
 		}
+		const styles = [ 'style1', 'style2' ];
+		const currentStyle = block.style || 'style1';
 
 		return (
 			<div>
@@ -85,12 +93,30 @@ export default class QuoteBlockForm extends Component {
 						</div>
 
 						<div className="block-list__block-controls-group">
-							<EditableFormatToolbar editable={ focusInput === 'content' ? this.content : this.cite } ref={ this.bindFormatToolbar } />
+							{ styles.map( ( style, index ) =>
+								<button
+									key={ style }
+									onClick={ this.setStyle( style ) }
+									className={ classNames(
+										'block-list__block-control',
+										'quote-block__toolbar-style-button',
+										{ 'is-selected': currentStyle === style }
+									) }
+								>
+									<EditorQuoteIcon />
+									<span className="quote-block__toolbar-style">{ index }</span>
+								</button>
+							) }
+						</div>
+
+						<div className="block-list__block-controls-group">
+							<EditableFormatToolbar editable={ focusInput === 'content' ? this.content : this.cite }
+								ref={ this.bindFormatToolbar } />
 						</div>
 					</div>
 				}
 
-				<div className="quote-block__form" onClick={ select }>
+				<div className={ 'quote-block__form quote-' + currentStyle } onClick={ select }>
 					<div className="quote-block__content">
 						<EditableComponent
 							ref={ this.bindContent }

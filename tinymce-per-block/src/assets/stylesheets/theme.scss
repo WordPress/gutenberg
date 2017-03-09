@@ -17,6 +17,20 @@
 			font-weight: 300;
 			font-size: 14px;
 			color: $gray-dark-300;
+			font-style: italic;
+		}
+
+		&.quote-style2 {
+			font-style: normal;
+			background: $gray-light;
+			padding: 10px;
+			margin-left: 0;
+			border: none;
+		}
+
+		p {
+			margin: 0;
+			padding-bottom: 0.5em;
 		}
 	}
 
