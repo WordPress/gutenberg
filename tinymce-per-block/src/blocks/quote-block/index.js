@@ -50,16 +50,23 @@ registerBlock( 'quote', {
 
 		return {
 			blockType: 'quote',
+			style: rawBlock.attrs.style,
 			cite,
-			content
+			content,
 		};
 	},
 	serialize: ( block ) => {
-		const rawContent = `<blockquote>${ block.content }<footer>${ block.cite }</footer></blockquote>`;
+		const style = block.style || 'style1';
+		const rawContent = [
+			`<blockquote class="quote-${ style }">`,
+			block.content,
+			`<footer>${ block.cite }</footer>`,
+			'</blockquote>'
+		].join( '' );
 
 		return {
 			blockType: 'quote',
-			attrs: {},
+			attrs: { style: style },
 			rawContent
 		};
 	},
