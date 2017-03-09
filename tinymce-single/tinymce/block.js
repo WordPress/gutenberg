@@ -289,14 +289,7 @@
 								block.parentNode.replaceChild( content, block );
 							}
 
-							var brs = content.getElementsByTagName( 'BR' );
-
-							// Has placeholder for text.
-							if ( brs.length ) {
-								editor.selection.setCursorLocation( brs[0].parentNode, 0 );
-							} else {
-								editor.selection.select( content );
-							}
+							window.wp.blocks.selectBlock( content );
 
 							setTimeout( showBlockUI )
 						}
