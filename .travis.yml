@@ -36,7 +36,6 @@ matrix:
   - php: hhvm
   - php: nightly
 before_install:
-- git clone https://github.com/WordPress/twentysixteen.git src/wp-content/themes/twentysixteen
 - |
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
       mysql -u root -e "CREATE DATABASE wordpress_tests;"
