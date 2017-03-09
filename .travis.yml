@@ -59,7 +59,9 @@ before_script:
   elif [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
     composer global require "phpunit/phpunit=4.8.*"
   fi
-- npm install -g npm
+- npm --version
+- node --version
+- nvm install 6.9.1
 - npm install -g grunt-cli
 - npm install
 - npm prune
