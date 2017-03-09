@@ -49,6 +49,9 @@
 		},
 		getSelectedBlocks: function() {
 			var editor = window.tinyMCE.activeEditor;
+
+			editor.selection.explicitRange = null;
+
 			var selection = window.getSelection();
 			var startNode = editor.selection.getStart();
 			var endNode = editor.selection.getEnd();
