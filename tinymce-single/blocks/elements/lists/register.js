@@ -25,11 +25,32 @@ window.wp.blocks.registerBlock( {
 			classes: 'remove-formatting',
 			icon: 'gridicons-list-unordered',
 			onClick: function( block, editor ) {
-				if ( block.nodeName === 'UL' ) {
-					editor.execCommand( 'InsertUnorderedList' );
-				} else if ( block.nodeName === 'OL' ) {
-					editor.execCommand( 'InsertOrderedList' );
+				var p = document.createElement( 'P' );
+
+				function build( list, p ) {
+					var item;
+
+					while ( item = list.firstChild ) {
+						if ( p.childNodes.length ) {
+							p.appendChild( document.createElement( 'BR' ) );
+						}
+
+						while ( item.firstChild ) {
+							if ( item.firstChild.nodeName === 'UL' || item.firstChild.nodeName === 'OL' ) {
+								build( item.firstChild, p )
+								item.removeChild( item.firstChild );
+							} else {
+								p.appendChild( item.firstChild );
+							}
+						}
+
+						list.removeChild( item );
+					}
 				}
+
+				build( block, p );
+
+				block.parentNode.replaceChild( p, block );
 			}
 		}
 	],
