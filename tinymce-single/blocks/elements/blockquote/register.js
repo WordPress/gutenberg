@@ -11,6 +11,22 @@ window.wp.blocks.registerBlock( {
 			onClick: function( block, editor ) {
 				editor.formatter.remove( 'blockquote' );
 			}
+		},
+		{
+			icon: 'gridicons-caption',
+			onClick: function( block ) {
+				var footer = block.querySelector( 'footer' );
+
+				if ( footer ) {
+					block.removeChild( footer );
+				} else {
+					block.insertAdjacentHTML( 'beforeend',
+						'<footer contenteditable="false">— <cite contenteditable="true"></cite></footer>' );
+				}
+			},
+			isActive: function( block ) {
+				return !! block.querySelector( 'footer' );
+			}
 		}
 	],
 	insert: function() {

@@ -20,6 +20,10 @@ body {
 	color: #12181e;
 }
 
+*[contenteditable] {
+	outline: none;
+}
+
 /**
  * Editor Basics
  */
@@ -27,7 +31,6 @@ body {
 #editor {
 	font-family: "Noto Serif", serif;
 	font-size: 16px;
-	outline: none;
 	padding: 50px;
 }
 
@@ -170,6 +173,13 @@ body {
 
 #editor blockquote {
 	margin: 2em;
+}
+
+/* hack to make editing work */
+#editor blockquote cite {
+	min-width: 100px;
+	min-height: 27px;
+	display: inline-block;
 }
 
 #editor:after {
