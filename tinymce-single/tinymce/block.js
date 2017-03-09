@@ -274,6 +274,34 @@
 					var key;
 					var types = [ 'text', 'media', 'separator' ];
 
+					function onClick( callback ) {
+						return function( block ) {
+							var content = callback.apply( this, arguments );
+
+							if ( content ) {
+								if ( typeof content === 'string' ) {
+									var temp = document.createElement( 'div' );
+									temp.innerHTML = content;
+									content = temp.firstChild;
+									temp = null;
+								}
+
+								block.parentNode.replaceChild( content, block );
+							}
+
+							var brs = content.getElementsByTagName( 'BR' );
+
+							// Has placeholder for text.
+							if ( brs.length ) {
+								editor.selection.setCursorLocation( brs[0].parentNode, 0 );
+							} else {
+								editor.selection.select( content );
+							}
+
+							setTimeout( showBlockUI )
+						}
+					}
+
 					types.forEach( function( type ) {
 						buttons.push( {
 							type: 'WPInsertSeparator',
@@ -285,24 +313,7 @@
 								buttons.push( {
 									text: allSettings[ key ].displayName,
 									icon: allSettings[ key ].icon,
-									onClick: ( function( callback ) {
-										return function( block ) {
-											var content = callback.apply( this, arguments );
-
-											if ( content ) {
-												if ( typeof content === 'string' ) {
-													var temp = document.createElement( 'div' );
-													temp.innerHTML = content;
-													content = temp.firstChild;
-													temp = null;
-												}
-
-												block.parentNode.replaceChild( content, block );
-											}
-
-											editor.selection.setCursorLocation( content, 0 );
-										}
-									} )( allSettings[ key ].insert )
+									onClick: onClick( allSettings[ key ].insert )
 								} );
 							}
 						}
@@ -506,7 +517,8 @@
 			}
 
 			function showBlockUI( focus ) {
-				var settings = wp.blocks.getBlockSettingsByElement( getSelectedBlock() ),
+				var selectedBlocks = getSelectedBlocks();
+				var settings = wp.blocks.getBlockSettingsByElement( selectedBlocks[0] ),
 					controls;
 
 				if ( ! hasBlockUI ) {
@@ -522,16 +534,34 @@
 					}
 				} );
 
-				if ( settings ) {
-					UI.blocks[ settings._id ].reposition();
-					focus && focusToolbar( UI.blocks[ settings._id ] );
+				if ( selectedBlocks.length === 1 ) {
+					if ( settings ) {
+						UI.blocks[ settings._id ].reposition();
+						focus && focusToolbar( UI.blocks[ settings._id ] );
 
-					if ( anchorNode.nodeType === 3 ) {
-						UI.inline.reposition();
-					} else {
-						UI.inline.hide();
+						if ( anchorNode.nodeType === 3 ) {
+							UI.inline.reposition();
+						} else {
+							UI.inline.hide();
+						}
 					}
+
+					UI.insert.reposition();
+				} else {
+					UI.insert.hide();
 				}
+
+				var startRect = selectedBlocks[0].getBoundingClientRect();
+				var endRect = selectedBlocks[ selectedBlocks.length - 1 ].getBoundingClientRect();
+
+				DOM.setStyles( UI.outline, {
+					display: 'block',
+					position: 'absolute',
+					left: Math.min( startRect.left, endRect.left ) + 'px',
+					top: startRect.top + window.pageYOffset + 'px',
+					height: endRect.bottom - startRect.top + 'px',
+					width: Math.max( startRect.width, endRect.width ) + 'px'
+				} );
 			}
 
 			function isInputKeyEvent( event ) {
@@ -645,28 +675,7 @@
 					UI.insert.reposition( { isEmpty: isEmpty } );
 				} else {
 					if ( isBlockUIVisible ) {
-						var selectedBlocks = getSelectedBlocks();
-
-						if ( selectedBlocks.length === 1 ) {
-							showBlockUI();
-							UI.insert.reposition();
-						} else {
-							hideBlockUI();
-							UI.navigation.reposition();
-							UI.insert.hide();
-						}
-
-						var startRect = selectedBlocks[0].getBoundingClientRect();
-						var endRect = selectedBlocks[ selectedBlocks.length - 1 ].getBoundingClientRect();
-
-						DOM.setStyles( UI.outline, {
-							display: 'block',
-							position: 'absolute',
-							left: Math.min( startRect.left, endRect.left ) + 'px',
-							top: startRect.top + window.pageYOffset + 'px',
-							height: endRect.bottom - startRect.top + 'px',
-							width: Math.max( startRect.width, endRect.width ) + 'px'
-						} );
+						showBlockUI();
 					} else {
 						hideBlockUI();
 						UI.insert.hide();
