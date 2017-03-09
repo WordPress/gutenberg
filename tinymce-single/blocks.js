@@ -87,6 +87,17 @@
 		getSelectedBlock: function() {
 			return wp.blocks.getSelectedBlocks()[0];
 		},
+		selectBlock: function( block ) {
+			var editor = window.tinyMCE.activeEditor;
+			var brs = block.getElementsByTagName( 'BR' );
+
+			// Has placeholder for text.
+			if ( brs.length ) {
+				editor.selection.setCursorLocation( brs[0].parentNode, 0 );
+			} else {
+				editor.selection.select( block );
+			}
+		},
 		extendBlock: function( settings ) {
 			var extendId = settings.extends;
 			var id = settings.namespace + ':' + settings.name;

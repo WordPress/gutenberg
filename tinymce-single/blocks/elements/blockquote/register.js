@@ -9,7 +9,20 @@ window.wp.blocks.registerBlock( {
 			classes: 'remove-formatting',
 			icon: 'gridicons-quote',
 			onClick: function( block, editor ) {
-				editor.formatter.remove( 'blockquote' );
+				var footer = block.querySelector( 'footer' );
+				var firstChild = block.firstChild;
+
+				if ( footer ) {
+					block.removeChild( footer );
+				}
+
+				while ( block.firstChild ) {
+					block.parentNode.insertBefore( block.firstChild, block );
+				}
+
+				block.parentNode.removeChild( block );
+
+				window.wp.blocks.selectBlock( firstChild );
 			}
 		},
 		{
