@@ -31,7 +31,7 @@ window.wp.blocks.registerBlock( {
 			}
 		}
 	],
-	insert: function( block, editor ) {
-		editor.execCommand( 'InsertUnorderedList' );
+	insert: function() {
+		return '<ul><li><br></li></ul>';
 	}
 } );
