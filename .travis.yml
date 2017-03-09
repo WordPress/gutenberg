@@ -56,7 +56,7 @@ before_script:
 - |
   if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
     composer global require "phpunit/phpunit=5.7.*"
-  else
+  elif [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
     composer global require "phpunit/phpunit=4.8.*"
   fi
 - npm install -g npm
