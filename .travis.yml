@@ -52,6 +52,13 @@ before_install:
   fi
 before_script:
 - stable='^[0-9\.]+$'; if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then phpenv config-rm xdebug.ini; fi
+- export PATH="$HOME/.composer/vendor/bin:$PATH"
+- |
+  if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
+    composer global require "phpunit/phpunit=5.7.*"
+  else
+    composer global require "phpunit/phpunit=4.8.*"
+  fi
 - npm install -g npm
 - npm install -g grunt-cli
 - npm install
@@ -61,6 +68,7 @@ before_script:
 - php --version
 - npm --version
 - node --version
+- phpunit --version
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
