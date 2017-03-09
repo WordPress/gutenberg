@@ -26,7 +26,5 @@ window.wp.blocks.registerBlock( {
 			icon: 'gridicons-cog'
 		}
 	],
-	insert: function( block, editor ) {
-
-	}
+	insert: function() {}
 } );

@@ -13,8 +13,8 @@ window.wp.blocks.registerBlock( {
 			}
 		}
 	],
-	insert: function( block, editor ) {
-		editor.formatter.apply( 'blockquote', block );
+	insert: function() {
+		return '<blockquote><p><br></p></blockquote>';
 	}
 } );
 

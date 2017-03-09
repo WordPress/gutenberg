@@ -33,7 +33,7 @@ window.wp.blocks.registerBlock( {
 		'text-align-center',
 		'text-align-right'
 	],
-	insert: function( block, editor ) {
-		editor.formatter.apply( 'p', block );
+	insert: function() {
+		return '<p><br></p>';
 	}
 } );
