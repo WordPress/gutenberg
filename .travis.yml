@@ -51,7 +51,11 @@ before_install:
     echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   fi
 before_script:
-- stable='^[0-9\.]+$'; if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then phpenv config-rm xdebug.ini; fi
+- |
+  stable='^[0-9\.]+$'
+  if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then
+    phpenv config-rm xdebug.ini
+  fi
 - export PATH="$HOME/.composer/vendor/bin:$PATH"
 - |
   if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
@@ -68,9 +72,14 @@ before_script:
 - mysql --version
 - phpenv versions
 - php --version
+- php -m
 - npm --version
 - node --version
 - phpunit --version
+- curl --version
+- grunt --version
+- git --version
+- svn --version
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
