@@ -31,7 +31,6 @@
 	position: absolute;
 	left: 0;
 	top: -36px;
-	z-index: 2;
 }
 
 .block-list__block-controls-group {
@@ -49,6 +48,7 @@
 }
 
 .block-list__block-control {
+	position: relative;
 	background: #fff;
 	border: none;
 	width: 36px;
@@ -66,14 +66,14 @@
 	&:hover {
 		background: #f8f9f9;
 		outline: 1px solid #6d7882;
-		position: relative;
+		z-index: 1;
 	}
 
 	&.is-selected {
 		background: #eef0f0;
 		outline: 1px solid #6d7882;
-		position: relative;
 		color: #3e444c;
+		z-index: 1;
 	}
 
 	.dashicon {

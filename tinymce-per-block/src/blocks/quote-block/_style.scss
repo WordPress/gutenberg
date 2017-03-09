@@ -6,7 +6,6 @@
 	color: inherit;
 	font-weight: 300;
 	font-size: 20px;
-	font-style: italic;
 	p {
 		padding: 0;
 		margin: 0;
@@ -22,12 +21,31 @@
 	font-weight: 300;
 	font-size: 14px;
 	color: $gray-dark-300;
-	font-style: italic;
 	resize: none;
+	font-style: italic;
 }
 
-.quote-block__form {
+.quote-block__form.quote-style1 {
 	border-left: 4px solid black;
 	margin-left: -20px;
 	padding-left: 20px;
+
+	.quote-block__content {
+		font-style: italic;
+	}
+}
+
+.quote-block__form.quote-style2 {
+	background: $gray-light;
+	padding: 10px;
+}
+
+.quote-block__toolbar-style-button {
+	position: relative;
+
+	.quote-block__toolbar-style {
+		position: absolute;
+		bottom: 3px;
+		right: 3px;
+	}
 }
