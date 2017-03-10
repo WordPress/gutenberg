@@ -9,11 +9,6 @@ import BlockArrangement from 'controls/block-arrangement';
 import FigureAlignmentToolbar from 'controls/figure-alignment-toolbar';
 
 export default class ImageBlockForm extends Component {
-
-	merge() {
-		this.props.api.remove();
-	}
-
 	setAlignment = ( id ) => {
 		this.props.api.change( { align: id } );
 	};

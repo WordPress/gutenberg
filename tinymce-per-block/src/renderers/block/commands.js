@@ -10,7 +10,7 @@ export const appendBlock = ( newBlock ) => ( {
 
 export const remove = ( uid ) => ( {
 	type: 'remove',
-	uid
+	removedUID: uid
 } );
 
 export const mergeWithPrevious = () => ( {

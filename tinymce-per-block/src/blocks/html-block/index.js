@@ -36,5 +36,25 @@ registerBlock( 'html', {
 			align: 'no-align',
 			caption: ''
 		};
-	}
+	},
+	merge: [ {
+		blocks: [ 'html', 'quote', 'text', 'heading' ],
+		merge: ( state, index ) => {
+			const currentBlock = state.blocks[ index ];
+			const blockToMerge = state.blocks[ index + 1 ];
+			const newBlock = Object.assign( {}, currentBlock, {
+				content: currentBlock.content + blockToMerge.content,
+				externalChange: ( currentBlock.externalChange || 0 ) + 1
+			} );
+			const newBlocks = [
+				...state.blocks.slice( 0, index ),
+				newBlock,
+				...state.blocks.slice( index + 2 )
+			];
+			return Object.assign( {}, state, {
+				blocks: newBlocks,
+				focus: { uid: newBlock.uid, config: { end: true } }
+			} );
+		}
+	} ]
 } );
