@@ -1,6 +1,12 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import HtmlEditor from './html-editor';
+import { createElement } from 'wp-elements';
 
-export default HtmlEditor;
+export default function HtmlEditor( { content, onChange } ) {
+	return (
+		<textarea
+			onChange={ ( event ) => onChange( event.target.value ) }
+			className="html-editor" value={ content } />
+	);
+}

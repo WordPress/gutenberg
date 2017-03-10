@@ -15,11 +15,13 @@ export default class HtmlBlockForm extends Component {
 			return;
 		}
 
-		const { block: { content }, remove, change, focus } = this.props;
-		focus( { end: true } );
-		remove( block.uid );
-		change( { content: content + block.content } );
-		setTimeout( () => this.editable.updateContent() );
+		const { api, block: { content, externalChange = 0 } } = this.props;
+		api.focus( { end: true } );
+		api.remove( block.uid );
+		api.change( {
+			content: content + block.content,
+			externalChange: externalChange + 1
+		} );
 	}
 
 	bindEditable = ( ref ) => {
@@ -27,7 +29,7 @@ export default class HtmlBlockForm extends Component {
 	}
 
 	setAlignment = ( align ) => {
-		this.props.change( { align } );
+		this.props.api.change( { align } );
 	};
 
 	bindFormatToolbar = ( ref ) => {
@@ -39,17 +41,19 @@ export default class HtmlBlockForm extends Component {
 	};
 
 	render() {
-		const { block, isSelected, change, moveCursorUp, moveCursorDown, appendBlock, first, last,
-			mergeWithPrevious, remove, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
+		const { api, block, isSelected, first, last, focusConfig } = this.props;
 		const splitValue = ( left, right ) => {
-			change( { content: left } );
+			api.change( {
+				content: left,
+				externalChange: ( block.externalChange || 0 ) + 1
+			} );
 			if ( right ) {
-				appendBlock( {
+				api.appendBlock( {
 					...block,
 					content: right
 				} );
 			} else {
-				appendBlock();
+				api.appendBlock();
 			}
 		};
 		const selectedTextAlign = block.align || 'left';
@@ -60,7 +64,7 @@ export default class HtmlBlockForm extends Component {
 		return (
 			<div>
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
@@ -72,20 +76,21 @@ export default class HtmlBlockForm extends Component {
 						</div>
 					</div>
 				) }
-				<div className="html-block__form" style={ style } onClick={ select }>
+				<div className="html-block__form" style={ style } onClick={ api.select }>
 					<EditableComponent
 						ref={ this.bindEditable }
 						content={ block.content }
-						moveCursorUp={ moveCursorUp }
-						moveCursorDown={ moveCursorDown }
+						externalChange={ block.externalChange }
+						moveCursorUp={ api.moveCursorUp }
+						moveCursorDown={ api.moveCursorDown }
 						splitValue={ splitValue }
-						mergeWithPrevious={ mergeWithPrevious }
-						remove={ remove }
+						mergeWithPrevious={ api.mergeWithPrevious }
+						remove={ api.remove }
 						setToolbarState={ this.setToolbarState }
-						onChange={ ( value ) => change( { content: value } ) }
+						onChange={ ( value ) => api.change( { content: value } ) }
 						focusConfig={ focusConfig }
-						onFocusChange={ focus }
-						onType={ unselect }
+						onFocusChange={ api.focus }
+						onType={ api.unselect }
 					/>
 				</div>
 			</div>

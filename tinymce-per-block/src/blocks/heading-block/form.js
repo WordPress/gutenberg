@@ -25,21 +25,21 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	setSize = ( size ) => () => {
-		this.props.change( { size } );
+		this.props.api.change( { size } );
 	};
 
 	render() {
-		const { block, isSelected, moveBlockUp, moveBlockDown, select, transform, first, last } = this.props;
+		const { api, block, isSelected, first, last } = this.props;
 		const sizes = [ 'h1', 'h2', 'h3' ];
 
 		return (
 			<div>
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<TransformBlockToolbar blockType="heading" onTransform={ transform } />
+							<TransformBlockToolbar blockType="heading" onTransform={ api.transform } />
 						</div>
 
 						<div className="block-list__block-controls-group">
@@ -64,7 +64,7 @@ export default class HeadingBlockForm extends Component {
 						</div>
 					</div>
 				) }
-				<div className={ `heading-block__form ${ block.size }` } onClick={ select }>
+				<div className={ `heading-block__form ${ block.size }` } onClick={ api.select }>
 					<InlineTextBlockForm
 						ref={ this.bindForm }
 						{ ...this.props }
