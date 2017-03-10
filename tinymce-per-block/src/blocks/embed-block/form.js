@@ -14,10 +14,6 @@ import { getEmbedHtmlFromUrl } from '../../utils/embed';
 import FigureAlignmentToolbar from 'controls/figure-alignment-toolbar';
 
 export default class EmbedBlockForm extends Component {
-	merge = () => {
-		this.props.api.remove();
-	};
-
 	setAlignment = ( id ) => {
 		this.props.api.change( { align: id } );
 	};

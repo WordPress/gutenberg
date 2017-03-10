@@ -78,9 +78,13 @@ export default class EditableComponent extends Component {
 	}
 
 	focus() {
-		this.editor.focus();
+		if ( this.props.focusConfig.bookmark ) {
+			return;
+		}
 		const { start = false, end = false, bookmark = false } = this.props.focusConfig;
+		this.editor.focus();
 		if ( start ) {
+			this.editor.focus();
 			this.editor.selection.setCursorLocation( undefined, 0 );
 		} else if ( end ) {
 			this.editor.selection.select( this.editor.getBody(), true );
@@ -140,7 +144,6 @@ export default class EditableComponent extends Component {
 				const hasAfter = !! childNodes.slice( splitIndex )
 					.reduce( ( memo, node ) => memo + node.textContent, '' );
 				if ( before ) {
-					this.editor.setContent( before );
 					this.props.splitValue( before, hasAfter ? after : '' );
 				}
 			} );

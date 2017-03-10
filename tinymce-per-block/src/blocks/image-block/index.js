@@ -9,6 +9,7 @@ import { FormatImageIcon } from 'dashicons';
  */
 import form from './form';
 import { getFigureAlignmentStyles } from 'utils/figure-alignment';
+import { removeBlockFromState } from 'utils/state';
 
 registerBlock( 'image', {
 	title: 'Image',
@@ -69,5 +70,6 @@ registerBlock( 'image', {
 			caption: '',
 			align: 'no-align'
 		};
-	}
+	},
+	merge: removeBlockFromState
 } );

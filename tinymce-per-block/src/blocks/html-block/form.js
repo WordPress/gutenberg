@@ -9,21 +9,6 @@ import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
 
 export default class HtmlBlockForm extends Component {
-	merge = ( block ) => {
-		const acceptedBlockTypes = [ 'html', 'quote', 'text', 'heading' ];
-		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
-			return;
-		}
-
-		const { api, block: { content, externalChange = 0 } } = this.props;
-		api.focus( { end: true } );
-		api.remove( block.uid );
-		api.change( {
-			content: content + block.content,
-			externalChange: externalChange + 1
-		} );
-	}
-
 	bindEditable = ( ref ) => {
 		this.editable = ref;
 	}
