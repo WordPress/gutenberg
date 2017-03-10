@@ -72,7 +72,10 @@ before_script:
 - mysql --version
 - phpenv versions
 - php --version
-- php -m
+- |
+  if [[ "$TRAVIS_PHP_VERSION" != 'hhvm' ]]; then
+    php -m
+  fi
 - npm --version
 - node --version
 - phpunit --version
