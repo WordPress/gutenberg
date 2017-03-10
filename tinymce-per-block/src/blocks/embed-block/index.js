@@ -10,6 +10,7 @@ import { VideoAlt3Icon } from 'dashicons';
 import form from './form';
 import { getEmbedHtmlFromUrl } from 'utils/embed';
 import { getFigureAlignmentStyles } from 'utils/figure-alignment';
+import { removeBlockFromState } from 'utils/state';
 
 registerBlock( 'embed', {
 	title: 'Embed',
@@ -52,5 +53,6 @@ registerBlock( 'embed', {
 			align: 'no-align',
 			caption: ''
 		};
-	}
+	},
+	merge: removeBlockFromState
 } );

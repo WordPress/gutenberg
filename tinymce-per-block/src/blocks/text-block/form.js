@@ -13,7 +13,6 @@ import InserterButton from 'inserter/button';
 export default class TextBlockForm extends Component {
 	bindForm = ( ref ) => {
 		this.form = ref;
-		this.merge = ( ...args ) => this.form.merge( ...args );
 	};
 
 	bindFormatToolbar = ( ref ) => {

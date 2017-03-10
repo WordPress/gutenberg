@@ -22,30 +22,6 @@ export default class QuoteBlockForm extends Component {
 		this.cite = ref;
 	};
 
-	merge = ( block ) => {
-		const acceptedBlockTypes = [ 'quote', 'text', 'heading' ];
-		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
-			return;
-		}
-
-		const getLeaves = html => {
-			const div = document.createElement( 'div' );
-			div.innerHTML = html;
-			if ( div.childNodes.length === 1 && div.firstChild.nodeName === 'P' ) {
-				return getLeaves( div.firstChild.innerHTML );
-			}
-			return html;
-		};
-
-		const { api, block: { content, externalChange = 0 } } = this.props;
-		api.focus( { input: 'content', end: true } );
-		api.remove( block.uid );
-		api.change( {
-			content: getLeaves( content ) + getLeaves( block.content ),
-			externalChange: externalChange + 1,
-		} );
-	}
-
 	moveToCite = () => {
 		this.props.api.focus( { input: 'cite', start: true } );
 	};
@@ -71,7 +47,7 @@ export default class QuoteBlockForm extends Component {
 		const splitValue = ( left, right ) => {
 			api.change( {
 				cite: left,
-				externalChange: ( block.externalChange || 0 ) + 1
+				citeExternalChange: ( block.citeExternalChange || 0 ) + 1
 			} );
 			api.appendBlock( {
 				blockType: 'text',
@@ -146,7 +122,7 @@ export default class QuoteBlockForm extends Component {
 								mergeWithPrevious={ this.moveToContent }
 								remove={ this.moveToContent }
 								content={ block.cite }
-								externalChange={ block.externalChange }
+								externalChange={ block.citeExternalChange }
 								splitValue={ splitValue }
 								onChange={ ( value ) => api.change( { cite: value } ) }
 								setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }

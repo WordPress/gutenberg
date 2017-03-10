@@ -8,6 +8,7 @@ import { EditorParagraphIcon } from 'dashicons';
  * Internal dependencies
  */
 import form from './form';
+import { mergeInlineTextBlocks } from 'utils/state';
 
 const createTextBlockWithContent = ( content = '' ) => {
 	return {
@@ -58,5 +59,9 @@ registerBlock( 'text', {
 			blocks: [ 'heading', 'quote' ],
 			transform: ( block ) => createTextBlockWithContent( block.content )
 		}
-	]
+	],
+	merge: [ {
+		blocks: [ 'text', 'quote', 'heading' ],
+		merge: mergeInlineTextBlocks
+	} ]
 } );

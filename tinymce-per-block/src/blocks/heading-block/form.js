@@ -13,7 +13,6 @@ import TransformBlockToolbar from 'controls/transform-block-toolbar';
 export default class HeadingBlockForm extends Component {
 	bindForm = ( ref ) => {
 		this.form = ref;
-		this.merge = ( ...args ) => this.form.merge( ...args );
 	};
 
 	bindFormatToolbar = ( ref ) => {

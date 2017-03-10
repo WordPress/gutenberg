@@ -11,18 +11,6 @@ import { getBlock } from 'wp-blocks';
 import * as commands from './commands';
 
 export default class BlockListBlock extends Component {
-	setRef = ( blockNode ) => {
-		this.blockNode = blockNode;
-	};
-
-	bindForm = ( form ) => {
-		this.form = form;
-	}
-
-	merge = ( block, index ) => {
-		this.form.merge && this.form.merge( block, index );
-	}
-
 	render() {
 		const { block, isSelected, focusConfig, first, last } = this.props;
 		const blockDefinition = getBlock( block.blockType );
@@ -47,13 +35,11 @@ export default class BlockListBlock extends Component {
 
 		return (
 			<div
-				ref={ this.setRef }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
 				className={ classes }
 			>
 				<Form
-					ref={ this.bindForm }
 					block={ block }
 					api={ api }
 					isSelected={ isSelected }

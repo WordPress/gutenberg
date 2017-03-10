@@ -5,30 +5,6 @@ import { createElement, Component } from 'wp-elements';
 import { EditableComponent } from 'wp-blocks';
 
 export default class InlineTextBlockForm extends Component {
-	merge = ( block ) => {
-		const acceptedBlockTypes = [ 'quote', 'text', 'heading' ];
-		if ( acceptedBlockTypes.indexOf( block.blockType ) === -1 ) {
-			return;
-		}
-
-		const getLeaves = html => {
-			const div = document.createElement( 'div' );
-			div.innerHTML = html;
-			if ( div.childNodes.length === 1 && div.firstChild.nodeName === 'P' ) {
-				return getLeaves( div.firstChild.innerHTML );
-			}
-			return html;
-		};
-
-		const { api, block: { content, externalChange = 0 } } = this.props;
-		api.focus( { end: true } );
-		api.remove( block.uid );
-		api.change( {
-			content: getLeaves( content ) + getLeaves( block.content ),
-			externalChange: externalChange + 1
-		} );
-	}
-
 	bindEditable = ( ref ) => {
 		this.editable = ref;
 	}

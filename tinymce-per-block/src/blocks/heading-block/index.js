@@ -8,6 +8,7 @@ import { EditorHeadingIcon } from 'dashicons';
  * Internal dependencies
  */
 import form from './form';
+import { mergeInlineTextBlocks } from 'utils/state';
 
 const createHeadingBlockWithContent = ( content = '' ) => {
 	return {
@@ -49,10 +50,12 @@ registerBlock( 'heading', {
 		};
 	},
 	create: createHeadingBlockWithContent,
-	transformations: [
-		{
-			blocks: [ 'text', 'quote' ],
-			transform: ( block ) => createHeadingBlockWithContent( block.content )
-		}
-	]
+	transformations: [ {
+		blocks: [ 'text', 'quote' ],
+		transform: ( block ) => createHeadingBlockWithContent( block.content )
+	} ],
+	merge: [ {
+		blocks: [ 'text', 'quote', 'heading' ],
+		merge: mergeInlineTextBlocks
+	} ]
 } );

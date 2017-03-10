@@ -10,6 +10,7 @@ import {
  * Internal dependencies
  */
 import form from './form';
+import { mergeInlineTextBlocks } from 'utils/state';
 
 const createQuoteBlockWithContent = ( content = '' ) => {
 	return {
@@ -76,5 +77,14 @@ registerBlock( 'quote', {
 			blocks: [ 'text', 'heading' ],
 			transform: ( block ) => createQuoteBlockWithContent( block.content )
 		}
-	]
+	],
+	merge: [ {
+		blocks: [ 'quote', 'text', 'heading' ],
+		merge: ( state, index ) => {
+			const mergedState = mergeInlineTextBlocks( state, index );
+			return Object.assign( {}, mergedState, {
+				focus: { uid: state.blocks[ index ].uid, config: { input: 'content', end: true } }
+			} );
+		}
+	} ]
 } );
