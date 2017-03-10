@@ -60,32 +60,58 @@
 			} );
 		} );
 
+		function toInlineContent( content ) {
+			var settings = {
+				valid_elements: 'strong,em,del,a[href]'
+			};
+
+			var schema = new tinymce.html.Schema( settings );
+			var parser = new tinymce.html.DomParser( settings, schema );
+			var serializer = new tinymce.html.Serializer( settings, schema );
+
+			return serializer.serialize( parser.parse( content, { forced_root_block: false } ) )
+		}
+
 		editor.on( 'beforeSetContent', function( event ) {
 			if ( event.initial ) {
 				return;
 			}
 
-			var settings = {
-				valid_elements: 'strong,em,del,a[href]'
-			};
-
 			var selectedBlock = wp.blocks.getSelectedBlock();
+			var blockSettings = wp.blocks.getBlockSettingsByElement( selectedBlock );
 
 			if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
-				var schema = new tinymce.html.Schema( settings );
-				var parser = new tinymce.html.DomParser( settings, schema );
-				var serializer = new tinymce.html.Serializer( settings, schema );
+				event.content = toInlineContent( event.content );
+			}
 
-				event.content = serializer.serialize( parser.parse( event.content, { forced_root_block: false } ) );
+			if ( blockSettings && blockSettings.restrictToInline ) {
+				blockSettings.restrictToInline.forEach( function( selector ) {
+					var node = editor.selection.getNode();
+
+					if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
+						event.content = toInlineContent( event.content );
+					}
+				} );
 			}
 		} );
 
 		editor.on( 'keydown', function( event ) {
 			if ( event.keyCode === tinymce.util.VK.ENTER ) {
 				var selectedBlock = wp.blocks.getSelectedBlock();
+				var blockSettings = wp.blocks.getBlockSettingsByElement( selectedBlock );
 
 				if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
 					event.preventDefault();
+				}
+
+				if ( blockSettings && blockSettings.restrictToInline ) {
+					blockSettings.restrictToInline.forEach( function( selector ) {
+						var node = editor.selection.getNode();
+
+						if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
+							event.preventDefault();
+						}
+					} );
 				}
 			}
 		} );
