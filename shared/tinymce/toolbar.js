@@ -1,5 +1,5 @@
 ( function( tinymce ) {
-	tinymce.ui.svgbutton = tinymce.ui.Button.extend( {
+	tinymce.ui.Factory.add( 'svgbutton', tinymce.ui.Button.extend( {
 		renderHtml: function() {
 			var id = this._id;
 			var prefix = this.classPrefix;
@@ -53,7 +53,7 @@
 		active: function( isActive ) {
 			this.$( this.getEl() ).toggleClass( 'is-active', isActive );
 		}
-	} );
+	} ) );
 
 	tinymce.PluginManager.add( 'toolbar', function( editor ) {
 		var each = tinymce.each;

@@ -204,7 +204,8 @@
 			function createInsertToolbar() {
 				var insert = editor.wp._createToolbar( [ 'add' ] );
 
-				insert.$el.addClass( 'block-toolbar insert-toolbar' );
+				insert.$el.addClass( 'block-toolbar' );
+				insert.$el.addClass( 'insert-toolbar' );
 
 				insert.reposition = function ( settings ) {
 					settings = settings || {};
@@ -242,13 +243,13 @@
 				return insert;
 			}
 
-			window.tinymce.ui.WPInsertSeparator = tinymce.ui.Control.extend( {
+			tinymce.ui.Factory.add( 'WPInsertSeparator', tinymce.ui.Control.extend( {
 				renderHtml: function() {
 					return (
 						'<div id="' + this._id + '" class="insert-separator">' + this.settings.text + '</div>'
 					);
 				}
-			} );
+			} ) );
 
 			function createInsertMenu() {
 				var insertMenu = editor.wp._createToolbar( ( function() {
