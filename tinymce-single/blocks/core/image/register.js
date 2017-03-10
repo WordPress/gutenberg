@@ -9,7 +9,24 @@ window.wp.blocks.registerBlock( {
 		'block-align-center',
 		'block-align-right',
 		'block-align-full',
-		'togglefigcaption'
+		{
+			icon: 'gridicons-caption',
+			onClick: function( block ) {
+				var figcaption = block.querySelector( 'figcaption' );
+
+				if ( figcaption ) {
+					block.removeChild( figcaption );
+				} else {
+					block.insertAdjacentHTML( 'beforeend',
+						'<figcaption contenteditable="true"><br></figcaption>' );
+				}
+
+				window.wp.blocks.selectBlock( block );
+			},
+			isActive: function( block ) {
+				return !! block.querySelector( 'figcaption' );
+			}
+		}
 	],
 	insert: function() {
 		return (
