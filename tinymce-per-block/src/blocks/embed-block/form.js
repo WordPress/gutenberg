@@ -38,7 +38,7 @@ export default class EmbedBlockForm extends Component {
 
 		return (
 			<div className={ classNames( 'embed-block', block.align ) }>
-				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
+				{ isSelected && <BlockArrangement first={ first } last={ last }
 					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">

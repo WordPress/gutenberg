@@ -53,7 +53,7 @@ registerBlock( 'text', {
 			rawContent
 		};
 	},
-	create: () => createTextBlockWithContent,
+	create: createTextBlockWithContent,
 	transformations: [
 		{
 			blocks: [ 'heading', 'quote' ],
