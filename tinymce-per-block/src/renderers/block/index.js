@@ -4,13 +4,15 @@
 import { createElement, Component } from 'wp-elements';
 import { map, debounce } from 'lodash';
 import { findDOMNode } from 'react-dom';
+import classNames from 'classnames';
+import { getBlock } from 'wp-blocks';
 
 /**
  * Internal dependencies
  */
-import BlockListBlock from './block';
 import InserterButtonComponent from 'inserter/button';
 import stateUpdater from './updater';
+import * as commands from './commands';
 
 class BlockList extends Component {
 	state = {
@@ -84,26 +86,47 @@ class BlockList extends Component {
 
 	render() {
 		const { blocks, focus, selected } = this.state;
+
 		return (
 			<div>
 				<div className="block-list">
 					{ map( blocks, ( block, index ) => {
 						const isFocused = block.uid === focus.uid;
+						const api = Object.keys( commands ).reduce( ( memo, command ) => {
+							memo[ command ] = ( ...args ) => {
+								const commandObject = Object.assign(
+									{ uid: block.uid },
+									commands[ command ]( ...args )
+								);
+								this.executeCommand( commandObject );
+							};
+							return memo;
+						}, {} );
+						const classes = classNames( 'block-list__block', {
+							'is-selected': selected === block.uid
+						} );
+						const blockDefinition = getBlock( block.blockType );
+						if ( ! blockDefinition ) {
+							return null;
+						}
+						const Form = blockDefinition.form;
 
 						return (
-							<BlockListBlock
-								ref={ this.bindBlock( block.uid ) }
+							<div
 								key={ block.uid }
 								tabIndex={ index }
-								isSelected={ selected === block.uid }
-								focusConfig={ isFocused ? focus.config : null }
-								executeCommand={ ( command ) =>
-									this.executeCommand( Object.assign( { uid: block.uid }, command ) )
-								}
-								block={ block }
-								first={ index === 0 }
-								last={ index === blocks.length - 1 }
-							/>
+								className={ classes }
+								ref={ this.bindBlock( block.uid ) }
+							>
+								<Form
+									block={ block }
+									api={ api }
+									isSelected={ selected === block.uid }
+									focusConfig={ isFocused ? focus.config : null }
+									first={ index === 0 }
+									last={ index === blocks.length - 1 }
+								/>
+							</div>
 						);
 					} ) }
 				</div>

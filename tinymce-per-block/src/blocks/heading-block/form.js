@@ -33,7 +33,7 @@ export default class HeadingBlockForm extends Component {
 
 		return (
 			<div>
-				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
+				{ isSelected && <BlockArrangement first={ first } last={ last }
 					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
