@@ -5,6 +5,7 @@ window.wp.blocks.registerBlock( {
 	type: 'media',
 	keywords: [],
 	icon: 'gridicons-video',
+	editable: [ 'figcaption' ],
 	controls: [
 		'block-align-left',
 		'block-align-center',

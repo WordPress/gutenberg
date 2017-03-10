@@ -46,6 +46,20 @@
 			editor.addButton( name, settings );
 		} );
 
+		editor.on( 'setContent', function( event ) {
+			$blocks = editor.$( editor.getBody() ).find( '*[data-wp-block-type]' );
+			$blocks.attr( 'contenteditable', 'false' );
+			$blocks.each( function( i, block ) {
+				var settings = wp.blocks.getBlockSettingsByElement( block );
+
+				if ( settings && settings.editable ) {
+					settings.editable.forEach( function( selector ) {
+						editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+					} );
+				}
+			} );
+		} );
+
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
@@ -251,8 +265,16 @@
 					function onClick( callback ) {
 						return function( block ) {
 							var content = callback.apply( this, arguments );
+							var args = {
+									format: 'html',
+									set: true,
+									selection: true,
+									content: content
+								};
 
 							if ( content ) {
+								editor.fire( 'beforeSetContent', args );
+
 								if ( typeof content === 'string' ) {
 									var temp = document.createElement( 'div' );
 									temp.innerHTML = content;
@@ -261,11 +283,13 @@
 								}
 
 								block.parentNode.replaceChild( content, block );
+
+								editor.fire( 'setContent', args );
 							}
 
 							window.wp.blocks.selectBlock( content );
 
-							setTimeout( showBlockUI )
+							setTimeout( showBlockUI, 50 )
 						}
 					}
 
