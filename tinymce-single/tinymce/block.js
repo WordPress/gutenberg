@@ -60,6 +60,36 @@
 			} );
 		} );
 
+		editor.on( 'beforeSetContent', function( event ) {
+			if ( event.initial ) {
+				return;
+			}
+
+			var settings = {
+				valid_elements: 'strong,em,del,a[href]'
+			};
+
+			var selectedBlock = wp.blocks.getSelectedBlock();
+
+			if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
+				var schema = new tinymce.html.Schema( settings );
+				var parser = new tinymce.html.DomParser( settings, schema );
+				var serializer = new tinymce.html.Serializer( settings, schema );
+
+				event.content = serializer.serialize( parser.parse( event.content, { forced_root_block: false } ) );
+			}
+		} );
+
+		editor.on( 'keydown', function( event ) {
+			if ( event.keyCode === tinymce.util.VK.ENTER ) {
+				var selectedBlock = wp.blocks.getSelectedBlock();
+
+				if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
+					event.preventDefault();
+				}
+			}
+		} );
+
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
