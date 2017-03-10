@@ -164,21 +164,4 @@ function _upload_dir_https( $uploads ) {
 
 // Skip `setcookie` calls in auth_cookie functions due to warning:
 // Cannot modify header information - headers already sent by ...
-
-function wp_set_auth_cookie( $user_id, $remember = false, $secure = '', $token = '' ) {
-	$auth_cookie = null;
-	$expire = null;
-	$expiration = null;
-	$user_id = null;
-	$scheme = null;
-	/** This action is documented in wp-inclues/pluggable.php */
-	do_action( 'set_auth_cookie', $auth_cookie, $expire, $expiration, $user_id, $scheme );
-	$logged_in_cookie = null;
-	/** This action is documented in wp-inclues/pluggable.php */
-	do_action( 'set_logged_in_cookie', $logged_in_cookie, $expire, $expiration, $user_id, 'logged_in' );
-}
-
-function wp_clear_auth_cookie() {
-	/** This action is documented in wp-inclues/pluggable.php */
-	do_action( 'clear_auth_cookie' );
-}
+tests_add_filter( 'send_auth_cookies', '__return_false' );
