@@ -7,6 +7,8 @@ Gutenberg is the project name. Conversations and discussions take place in #core
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
 
+WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor give them many rich layout options. By embracing the blocky nature, we can hopefully surface blocks that already exist, as well as attach more advanced layout options to each of them, allowing you to easily write richer posts.
+
 ## Overview
 
 - <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
@@ -22,48 +24,6 @@ Gutenberg is the project name. Conversations and discussions take place in #core
 
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post grammar parser</a>.
 
-## Mockups
-
-These mockups are all subject to change and feedback.
-
-**Blocks & Formatting**
-
-![Hover](mockups/Formatting, Hover.png)
-
-![Click](mockups/Formatting, Click.png)
-
-![Drag & Drop](mockups/Drag and drop.png)
-
-**New Blocks**
-
-![New Blocks](mockups/New Blocks.png)
-![Insert Between](mockups/Insert Between.png)
-![Insert Between, Keyboard Only](mockups/Insert Between, Keyboard.png)
-![Insert](mockups/Insert.png)
-
-**Type Switcher**
-
-![Switcher](mockups/Type Switcher.png)
-
-**Other Blocks**
-
-![Image](mockups/Image.png)
-![Quote](mockups/Quote.png)
-![Quote 2](mockups/Quote 2.png)
-![Headings](mockups/Headings.png)
-
-**Early Desktop Chrome Concept**
-
-**Note:** This is how it _could_ look.
-
-![Desktop](mockups/Admin Chrome.png)
-
-![Desktop, Sidebar Open](mockups/Admin Chrome, Sidebar Open.png)
-
-**Early Mobile Chrome Concept**
-
-![Mobile](mockups/Mobile.png)
-
 ## How Designers Can Contribute
 
 The editor we're building means to make the editing experience better for every WordPress user, by creating an interface that "makes writing rich posts effortless, and has 'blocks' to make it easy what today might take shortcodes, custom HTML, or 'mystery meat' embed discovery", to quote the kickoff goal.
@@ -76,4 +36,88 @@ With regards to specific changes to the design, the details & execution (like co
 
 Grab the Sketch file so you don't have to start from scratch:
 
-**<a href="mockups/editor.sketch">Download, Updated Mar. 1st.</a>**
+**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated Mar. 10th.</a>**
+
+## Mockups
+
+These mockups are all subject to change and feedback.
+
+**Basic Blocks**
+
+_Text_
+![Text, Neutral](mockups/Text, Neutral.png)
+_Text, Hover_
+![Text, Hover](mockups/Text, Hover.png)
+_Text, Selected_
+![Text, Selected](mockups/Text, Selected.png)
+
+_Image_
+![Image, Neutral](mockups/Image, Neutral.png)
+_Image, Hover_
+![Image, Hover](mockups/Image, Hover.png)
+_Image, Selected_
+![Image, Selected](mockups/Image, Selected.png)
+_Image, Caption_
+![Image, Caption](mockups/Image, Caption.png)
+
+_Quote_
+![Quote, Neutral](mockups/Quote, Neutral.png)
+![Quote, Hover](mockups/Quote, Hover.png)
+![Quote, Selected](mockups/Quote, Selected.png)
+![Quote, Citation](mockups/Quote, Citation.png)
+
+_Quote 2_
+![Quote 2, Neutral](mockups/Quote 2, Neutral.png)
+_Quote 2, Hover_
+![Quote 2, Hover](mockups/Quote 2, Hover.png)
+_Quote 2, Selected_
+![Quote 2, Selected](mockups/Quote 2, Selected.png)
+
+_Heading_
+![Heading, Neutral](mockups/Heading, Neutral.png)
+_Heading, Hover_
+![Heading, Hover](mockups/Heading, Hover.png)
+_Heading, Selected_
+![Heading, Selected](mockups/Heading, Selected.png)
+
+_Empty Embed_
+![Empty Embed, Neutral](mockups/Empty Embed, Neutral.png)
+_Empty Embed, Hover_
+![Empty Embed, Hover](mockups/Empty Embed, Hover.png)
+_Embed, Neutral_
+![Embed, Neutral](mockups/Embed, Neutral.png)
+_Embed, Hover_
+![Embed, Hover](mockups/Embed, Hover.png)
+_Embed, Selected_
+![Embed, Selected](mockups/Embed, Selected.png)
+_Embed, Caption_
+![Embed, Caption](mockups/Embed, Caption.png)
+
+_Gallery_
+![Gallery, Neutral](mockups/Gallery, Neutral.png)
+_Gallery, Hover_
+![Gallery, Hover](mockups/Gallery, Hover.png)
+_Gallery, Selected_
+![Gallery, Selected](mockups/Gallery, Selected.png)
+_Gallery, Selected Image_
+![Gallery, Selected Image](mockups/Gallery, Selected Image.png)
+_Gallery, Caption_
+![Gallery, Caption](mockups/Gallery, Caption.png)
+
+_Basic UI controls_
+![Drag and drop](mockups/Drag and drop.png)
+![Insert](mockups/Insert.png)
+![Newlines](mockups/Newlines.png)
+![Type Switcher](mockups/Type Switcher.png)
+
+**Early Admin UI Concept**
+
+**Note:** This is how it _could_ look.
+
+![Admin UI](mockups/Admin UI.png)
+
+![Admin UI, Sidebar Open](mockups/Admin UI, Sidebar Open.png)
+
+**Early Mobile UI Concept**
+
+![Mobile](mockups/Mobile.png)
