@@ -51,16 +51,6 @@
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
 
-			editor.on( 'mousedown click', function( event ) {
-				if ( event.target.getAttribute( 'contenteditable' ) === 'true' ) {
-					if ( event.target !== editor.selection.getNode() ) {
-						setTimeout( function() {
-							editor.selection.placeCaretAt( event.clientX, event.clientY );
-						}, 50 );
-					}
-				}
-			}, true );
-
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
