@@ -36,7 +36,7 @@ export default class TextBlockForm extends Component {
 
 		return (
 			<div className="text-block__form">
-				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
+				{ isSelected && <BlockArrangement first={ first } last={ last }
 					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
