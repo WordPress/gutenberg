@@ -5,6 +5,7 @@ window.wp.blocks.registerBlock( {
 	type: 'media',
 	keywords: [],
 	icon: 'gridicons-image-multiple',
+	editable: [ 'figcaption' ],
 	controls: [
 		'block-align-left',
 		'block-align-center',

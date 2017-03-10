@@ -4,6 +4,7 @@ window.wp.blocks.registerBlock( {
 	displayName: 'Image',
 	type: 'media',
 	icon: 'gridicons-image',
+	editable: [ 'figcaption' ],
 	controls: [
 		'block-align-left',
 		'block-align-center',
@@ -18,7 +19,7 @@ window.wp.blocks.registerBlock( {
 					block.removeChild( figcaption );
 				} else {
 					block.insertAdjacentHTML( 'beforeend',
-						'<figcaption contenteditable="true"><br></figcaption>' );
+						'<figcaption><br></figcaption>' );
 				}
 
 				window.wp.blocks.selectBlock( block );
@@ -30,9 +31,9 @@ window.wp.blocks.registerBlock( {
 	],
 	insert: function() {
 		return (
-			'<figure data-wp-block-type="core:image" class="alignright" contenteditable="false">' +
+			'<figure data-wp-block-type="core:image">' +
 				'<img src="https://cldup.com/HN3-c7ER9p.jpg" alt="">' +
-				'<figcaption contenteditable="true">I have no idea which mountain this is. It looks tall!</figcaption>' +
+				'<figcaption>I have no idea which mountain this is. It looks tall!</figcaption>' +
 			'</figure>'
 		);
 	}
