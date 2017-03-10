@@ -175,14 +175,34 @@
 				icon: 'gridicons-chevron-up',
 				tooltip: 'Up',
 				onClick: moveBlockUp,
-				classes: 'widget btn move-up'
+				classes: 'widget btn move-up',
+				onPostRender: function() {
+					var button = this;
+
+					editor.on( 'nodeChange', function() {
+						var selectedBlocks = getSelectedBlocks();
+						var firstBlock = selectedBlocks[0];
+
+						button.disabled( ! firstBlock.previousSibling );
+					} );
+				}
 			} );
 
 			editor.addButton( 'down', {
 				icon: 'gridicons-chevron-down',
 				tooltip: 'Down',
 				onClick: moveBlockDown,
-				classes: 'widget btn move-down'
+				classes: 'widget btn move-down',
+				onPostRender: function() {
+					var button = this;
+
+					editor.on( 'nodeChange', function() {
+						var selectedBlocks = getSelectedBlocks();
+						var lastBlock = selectedBlocks[ selectedBlocks.length - 1 ];
+
+						button.disabled( ! lastBlock.nextSibling );
+					} );
+				}
 			} );
 
 			var insert = false;

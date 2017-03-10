@@ -87,6 +87,10 @@ svg.gridicon {
 	fill: #12181e;
 }
 
+.mce-inline-toolbar-grp .mce-btn.mce-disabled svg.gridicon {
+	fill: #e0e5e9;
+}
+
 .mce-inline-toolbar-grp .mce-btn.mce-primary {
 	background: #0085ba;
 }
