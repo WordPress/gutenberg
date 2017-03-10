@@ -20,11 +20,13 @@ export default class InlineTextBlockForm extends Component {
 			return html;
 		};
 
-		const { block: { content }, remove, change, focus } = this.props;
-		focus( { end: true } );
-		remove( block.uid );
-		change( { content: getLeaves( content ) + getLeaves( block.content ) } );
-		setTimeout( () => this.editable.updateContent() );
+		const { api, block: { content, externalChange = 0 } } = this.props;
+		api.focus( { end: true } );
+		api.remove( block.uid );
+		api.change( {
+			content: getLeaves( content ) + getLeaves( block.content ),
+			externalChange: externalChange + 1
+		} );
 	}
 
 	bindEditable = ( ref ) => {
@@ -36,19 +38,20 @@ export default class InlineTextBlockForm extends Component {
 	};
 
 	render() {
-		const { block, change, moveCursorUp, moveCursorDown, appendBlock,
-			mergeWithPrevious, remove, setToolbarState, focus, focusConfig, unselect } = this.props;
+		const { api, block, setToolbarState, focusConfig } = this.props;
 
 		const splitValue = ( left, right ) => {
-			change( { content: left } );
-			setTimeout( () => this.editable.updateContent() );
+			api.change( {
+				content: left,
+				externalChange: ( block.externalChange || 0 ) + 1
+			} );
 			if ( right ) {
-				appendBlock( {
+				api.appendBlock( {
 					...block,
 					content: right
 				} );
 			} else {
-				appendBlock();
+				api.appendBlock();
 			}
 		};
 
@@ -56,16 +59,17 @@ export default class InlineTextBlockForm extends Component {
 			<EditableComponent
 				ref={ this.bindEditable }
 				content={ block.content }
-				moveCursorUp={ moveCursorUp }
-				moveCursorDown={ moveCursorDown }
+				externalChange={ block.externalChange }
+				moveCursorUp={ api.moveCursorUp }
+				moveCursorDown={ api.moveCursorDown }
 				splitValue={ splitValue }
-				mergeWithPrevious={ mergeWithPrevious }
-				remove={ remove }
-				onChange={ ( value ) => change( { content: value } ) }
+				mergeWithPrevious={ api.mergeWithPrevious }
+				remove={ api.remove }
+				onChange={ ( value ) => api.change( { content: value } ) }
 				setToolbarState={ setToolbarState }
 				focusConfig={ focusConfig }
-				onFocusChange={ focus }
-				onType={ unselect }
+				onFocusChange={ api.focus }
+				onType={ api.unselect }
 				inline
 				single
 			/>

@@ -37,19 +37,21 @@ export default class QuoteBlockForm extends Component {
 			return html;
 		};
 
-		const { block: { content }, remove, change, focus } = this.props;
-		focus( { end: true } );
-		remove( block.uid );
-		change( { content: getLeaves( content ) + getLeaves( block.content ) } );
-		setTimeout( () => this.content.updateContent() );
+		const { api, block: { content, externalChange = 0 } } = this.props;
+		api.focus( { input: 'content', end: true } );
+		api.remove( block.uid );
+		api.change( {
+			content: getLeaves( content ) + getLeaves( block.content ),
+			externalChange: externalChange + 1,
+		} );
 	}
 
 	moveToCite = () => {
-		this.props.focus( { input: 'cite', start: true } );
+		this.props.api.focus( { input: 'cite', start: true } );
 	};
 
 	moveToContent = () => {
-		this.props.focus( { input: 'content', end: true } );
+		this.props.api.focus( { input: 'content', end: true } );
 	};
 
 	bindFormatToolbar = ( ref ) => {
@@ -61,16 +63,17 @@ export default class QuoteBlockForm extends Component {
 	};
 
 	setStyle = ( style ) => () => {
-		this.props.change( { style } );
+		this.props.api.change( { style } );
 	};
 
 	render() {
-		const { block, change, moveCursorUp, moveCursorDown, remove, first, last,
-			mergeWithPrevious, appendBlock, isSelected, focusConfig, focus,
-			moveBlockUp, moveBlockDown, select, unselect, transform } = this.props;
+		const { api, block, first, last, isSelected, focusConfig } = this.props;
 		const splitValue = ( left, right ) => {
-			change( { cite: left } );
-			appendBlock( {
+			api.change( {
+				cite: left,
+				externalChange: ( block.externalChange || 0 ) + 1
+			} );
+			api.appendBlock( {
 				blockType: 'text',
 				content: right
 			} );
@@ -85,11 +88,11 @@ export default class QuoteBlockForm extends Component {
 		return (
 			<div>
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<TransformBlockToolbar blockType="quote" onTransform={ transform } />
+							<TransformBlockToolbar blockType="quote" onTransform={ api.transform } />
 						</div>
 
 						<div className="block-list__block-controls-group">
@@ -116,20 +119,21 @@ export default class QuoteBlockForm extends Component {
 					</div>
 				}
 
-				<div className={ 'quote-block__form quote-' + currentStyle } onClick={ select }>
+				<div className={ 'quote-block__form quote-' + currentStyle } onClick={ api.select }>
 					<div className="quote-block__content">
 						<EditableComponent
 							ref={ this.bindContent }
 							content={ block.content }
-							moveCursorUp={ moveCursorUp }
+							externalChange={ block.externalChange }
+							moveCursorUp={ api.moveCursorUp }
 							moveCursorDown={ this.moveToCite }
-							mergeWithPrevious={ mergeWithPrevious }
-							remove={ remove }
-							onChange={ ( value ) => change( { content: value } ) }
+							mergeWithPrevious={ api.mergeWithPrevious }
+							remove={ api.remove }
+							onChange={ ( value ) => api.change( { content: value } ) }
 							setToolbarState={ focusInput === 'content' ? this.setToolbarState : undefined }
 							focusConfig={ focusInput === 'content' ? focusConfig : null }
-							onFocusChange={ ( config ) => focus( Object.assign( { input: 'content' }, config ) ) }
-							onType={ unselect }
+							onFocusChange={ ( config ) => api.focus( Object.assign( { input: 'content' }, config ) ) }
+							onType={ api.unselect }
 							inline
 						/>
 					</div>
@@ -138,16 +142,17 @@ export default class QuoteBlockForm extends Component {
 							<EditableComponent
 								ref={ this.bindCite }
 								moveCursorUp={ this.moveToContent }
-								moveCursorDown={ moveCursorDown }
+								moveCursorDown={ api.moveCursorDown }
 								mergeWithPrevious={ this.moveToContent }
 								remove={ this.moveToContent }
 								content={ block.cite }
+								externalChange={ block.externalChange }
 								splitValue={ splitValue }
-								onChange={ ( value ) => change( { cite: value } ) }
+								onChange={ ( value ) => api.change( { cite: value } ) }
 								setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
 								focusConfig={ focusInput === 'cite' ? focusConfig : null }
-								onFocusChange={ ( config ) => focus( Object.assign( { input: 'cite' }, config ) ) }
-								onType={ unselect }
+								onFocusChange={ ( config ) => api.focus( Object.assign( { input: 'cite' }, config ) ) }
+								onType={ api.unselect }
 								inline
 								single
 							/>

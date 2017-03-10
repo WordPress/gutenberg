@@ -15,25 +15,24 @@ import FigureAlignmentToolbar from 'controls/figure-alignment-toolbar';
 
 export default class EmbedBlockForm extends Component {
 	merge = () => {
-		this.props.remove();
+		this.props.api.remove();
 	};
 
 	setAlignment = ( id ) => {
-		this.props.change( { align: id } );
+		this.props.api.change( { align: id } );
 	};
 
 	render() {
-		const { block, isSelected, change, moveCursorUp, moveCursorDown, first, last,
-			remove, focusConfig, focus, moveBlockUp, moveBlockDown, appendBlock, select, unselect } = this.props;
+		const { api, block, isSelected, first, last, focusConfig } = this.props;
 
 		const removePrevious = () => {
 			if ( ! block.url ) {
-				remove();
+				api.remove();
 			}
 		};
 		const splitValue = ( left, right ) => {
-			change( { caption: left } );
-			appendBlock( {
+			api.change( { caption: left } );
+			api.appendBlock( {
 				blockType: 'text',
 				content: right
 			} );
@@ -44,7 +43,7 @@ export default class EmbedBlockForm extends Component {
 		return (
 			<div className={ classNames( 'embed-block', block.align ) }>
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
@@ -54,8 +53,8 @@ export default class EmbedBlockForm extends Component {
 				}
 
 				<div onClick={ () => {
-					select();
-					! focusConfig && focus();
+					api.select();
+					! focusConfig && api.focus();
 				} }>
 					{ ! block.url &&
 						<div className="embed-block__form">
@@ -64,13 +63,13 @@ export default class EmbedBlockForm extends Component {
 							</div>
 							<EnhancedInputComponent
 								ref={ this.bindInput }
-								moveCursorUp={ moveCursorUp }
+								moveCursorUp={ api.moveCursorUp }
 								removePrevious={ removePrevious }
-								moveCursorDown={ moveCursorDown }
+								moveCursorDown={ api.moveCursorDown }
 								value={ block.url }
-								onChange={ ( value ) => change( { url: value } ) }
+								onChange={ ( value ) => api.change( { url: value } ) }
 								focusConfig={ focusConfig }
-								onFocusChange={ ( config ) => focus( config ) }
+								onFocusChange={ api.focus }
 								placeholder="Paste URL to embed here..."
 							/>
 						</div>
@@ -82,18 +81,18 @@ export default class EmbedBlockForm extends Component {
 								<div className="embed-block__caption">
 									<EnhancedInputComponent
 										ref={ this.bindCaption }
-										moveCursorUp={ moveCursorUp }
+										moveCursorUp={ api.moveCursorUp }
 										removePrevious={ removePrevious }
-										moveCursorDown={ moveCursorDown }
+										moveCursorDown={ api.moveCursorDown }
 										splitValue={ splitValue }
 										value={ block.caption }
 										onChange={ ( value ) => {
-											change( { caption: value } );
-											unselect();
+											api.change( { caption: value } );
+											api.unselect();
 										} }
 										placeholder="Write caption"
 										focusConfig={ focusConfig }
-										onFocusChange={ focus }
+										onFocusChange={ api.focus }
 									/>
 								</div>
 							}

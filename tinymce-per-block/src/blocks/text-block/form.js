@@ -25,12 +25,11 @@ export default class TextBlockForm extends Component {
 	};
 
 	setAlignment = ( align ) => {
-		this.props.change( { align } );
+		this.props.api.change( { align } );
 	};
 
 	render() {
-		const { block, isSelected, focusConfig, moveBlockUp, moveBlockDown,
-			replace, select, transform, first, last } = this.props;
+		const { api, block, isSelected, focusConfig, first, last } = this.props;
 		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
@@ -39,11 +38,11 @@ export default class TextBlockForm extends Component {
 		return (
 			<div className="text-block__form">
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
-							<TransformBlockToolbar blockType="text" onTransform={ transform } />
+							<TransformBlockToolbar blockType="text" onTransform={ api.transform } />
 						</div>
 
 						<div className="block-list__block-controls-group">
@@ -57,10 +56,10 @@ export default class TextBlockForm extends Component {
 				}
 
 				{ ! block.content.trim() && ! isSelected && focusConfig &&
-					<InserterButton onAdd={ ( id ) => replace( id ) } />
+					<InserterButton onAdd={ api.replace } />
 				}
 
-				<div style={ style } onClick={ select }>
+				<div style={ style } onClick={ api.select }>
 					<InlineTextBlockForm
 						ref={ this.bindForm }
 						{ ...this.props }
