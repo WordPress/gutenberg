@@ -11,24 +11,23 @@ import FigureAlignmentToolbar from 'controls/figure-alignment-toolbar';
 export default class ImageBlockForm extends Component {
 
 	merge() {
-		this.props.remove();
+		this.props.api.remove();
 	}
 
 	setAlignment = ( id ) => {
-		this.props.change( { align: id } );
+		this.props.api.change( { align: id } );
 	};
 
 	render() {
-		const { block, change, moveCursorDown, moveCursorUp, remove, appendBlock, first, last,
-			isSelected, focusConfig, focus, moveBlockUp, moveBlockDown, select, unselect } = this.props;
+		const { api, block, first, last, isSelected, focusConfig } = this.props;
 		const removePrevious = () => {
 			if ( ! block.caption ) {
-				remove();
+				api.remove();
 			}
 		};
 		const splitValue = ( left, right ) => {
-			change( { caption: left } );
-			appendBlock( {
+			api.change( { caption: left } );
+			api.appendBlock( {
 				blockType: 'text',
 				content: right
 			} );
@@ -37,7 +36,7 @@ export default class ImageBlockForm extends Component {
 		return (
 			<div className={ classNames( 'image-block__form', block.align ) }>
 				{ isSelected && <BlockArrangement block={ block } first={ first } last={ last }
-					moveBlockUp={ moveBlockUp } moveBlockDown={ moveBlockDown } /> }
+					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected &&
 					<div className="block-list__block-controls">
 						<div className="block-list__block-controls-group">
@@ -46,25 +45,25 @@ export default class ImageBlockForm extends Component {
 					</div>
 				}
 				<div onClick={ () => {
-					select();
-					! focusConfig && focus();
+					api.select();
+					! focusConfig && api.focus();
 				} }>
 					<img src={ block.src } className="image-block__display" />
 					{ ( focusConfig || block.caption ) &&
 						<div className="image-block__caption">
 							<EnhancedInputComponent
-								moveCursorUp={ moveCursorUp }
+								moveCursorUp={ api.moveCursorUp }
 								removePrevious={ removePrevious }
-								moveCursorDown={ moveCursorDown }
+								moveCursorDown={ api.moveCursorDown }
 								splitValue={ splitValue }
 								value={ block.caption }
 								onChange={ ( value ) => {
-									change( { caption: value } );
-									unselect();
+									api.change( { caption: value } );
+									api.unselect();
 								} }
 								placeholder="Write caption"
 								focusConfig={ focusConfig }
-								onFocusChange={ focus }
+								onFocusChange={ api.focus }
 							/>
 						</div>
 					}

@@ -69,6 +69,12 @@ export default class EditableComponent extends Component {
 		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
 			this.focus();
 		}
+
+		// We should be able to compare content instead
+		// But I came up with externalChange due the moving cursor bugs when spitting/merging content
+		if ( this.props.externalChange !== prevProps.externalChange ) {
+			this.updateContent();
+		}
 	}
 
 	focus() {
