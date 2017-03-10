@@ -9,7 +9,7 @@ env:
     - WP_TRAVISCI=travis:phpunit
 matrix:
   include:
-  - php: 7
+  - php: 7.0
     env: WP_TRAVISCI=travis:js
   - php: 5.2
   - php: 5.3
@@ -52,17 +52,37 @@ before_install:
   fi
 before_script:
 - |
+  # Remove Xdebug for a huge performance increase, but not from nightly or hhvm:
   stable='^[0-9\.]+$'
   if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then
     phpenv config-rm xdebug.ini
   fi
-- export PATH="$HOME/.composer/vendor/bin:$PATH"
 - |
-  if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
-    composer global require "phpunit/phpunit=5.7.*"
-  elif [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
-    composer global require "phpunit/phpunit=4.8.*"
+  # Export Composer's global bin dir to PATH, but not on PHP 5.2:
+  if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
+    composer config --list --global
+    export PATH=`composer config --list --global | grep '\[home\]' | { read a; echo "${a#* }/vendor/bin:$PATH"; }`
   fi
+- |
+  # Install the specified version of PHPUnit depending on the PHP version:
+  case "$TRAVIS_PHP_VERSION" in
+    7.1|7.0|hhvm|nightly)
+      echo "Using PHPUnit 5.7"
+      composer global require "phpunit/phpunit=5.7.*"
+      ;;
+    5.6|5.5|5.4|5.3)
+      echo "Using PHPUnit 4.8"
+      composer global require "phpunit/phpunit=4.8.*"
+      ;;
+    5.2)
+      # Do nothing, use default PHPUnit 3.6.x
+      echo "Using default PHPUnit, hopefully 3.6"
+      ;;
+    *)
+      echo "No PHPUnit version handling for PHP version $TRAVIS_PHP_VERSION"
+      exit 1
+      ;;
+  esac
 - npm --version
 - node --version
 - nvm install 6.9.1
@@ -73,11 +93,13 @@ before_script:
 - phpenv versions
 - php --version
 - |
+  # Debug PHP extensions, but not on HHVM because the command hangs indefinitely:
   if [[ "$TRAVIS_PHP_VERSION" != 'hhvm' ]]; then
     php -m
   fi
 - npm --version
 - node --version
+- which phpunit
 - phpunit --version
 - curl --version
 - grunt --version
