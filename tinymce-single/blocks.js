@@ -96,7 +96,11 @@
 
 			// Has placeholder for text.
 			if ( brs.length ) {
-				editor.selection.setCursorLocation( brs[0].parentNode, 0 );
+				if ( brs[0].parentNode.getAttribute( 'contenteditable' ) === 'true' ) {
+					editor.selection.select( brs[0].parentNode );
+				} else {
+					editor.selection.setCursorLocation( brs[0].parentNode, 0 );
+				}
 			} else {
 				editor.selection.select( block );
 			}

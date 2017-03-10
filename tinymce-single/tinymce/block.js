@@ -46,52 +46,6 @@
 			editor.addButton( name, settings );
 		} );
 
-		function addfigcaption() {
-			var block = getSelectedBlock();
-
-			if ( ! editor.$( block ).find( 'figcaption' ).length ) {
-				var figcaption = editor.$( '<figcaption contenteditable="true"><br></figcaption>' );
-
-				editor.undoManager.transact( function() {
-					editor.$( block ).append( figcaption );
-					editor.selection.setCursorLocation( figcaption[0], 0 );
-				} );
-			}
-		}
-
-		function removefigcaption() {
-			var block = getSelectedBlock();
-			var figcaption = editor.$( block ).find( 'figcaption' );
-
-			if ( figcaption.length ) {
-				editor.undoManager.transact( function() {
-					figcaption.remove();
-				} );
-			}
-		}
-
-		editor.addButton( 'togglefigcaption', {
-			icon: 'gridicons-caption',
-			onClick: function() {
-				var block = getSelectedBlock();
-
-				if ( editor.$( block ).find( 'figcaption' ).length ) {
-					removefigcaption();
-				} else {
-					addfigcaption();
-				}
-			},
-			onPostRender: function() {
-				var button = this;
-
-				editor.on( 'nodechange', function( event ) {
-					var block = getSelectedBlock();
-
-					button.active( editor.$( block ).find( 'figcaption' ).length > 0 );
-				} );
-			}
-		} );
-
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
@@ -290,7 +244,6 @@
 
 			window.tinymce.ui.WPInsertSeparator = tinymce.ui.Control.extend( {
 				renderHtml: function() {
-					console.log(this)
 					return (
 						'<div id="' + this._id + '" class="insert-separator">' + this.settings.text + '</div>'
 					);
@@ -662,27 +615,20 @@
 				var VK = tinymce.util.VK;
 				var block = getSelectedBlock();
 
-				if ( block.nodeName === 'FIGURE' ) {
-					if ( keyCode === VK.ENTER ) {
-						addfigcaption();
-						event.preventDefault();
-					}
-				} else {
-					if ( keyCode === VK.BACKSPACE ) {
-						var selection = window.getSelection();
+				if ( keyCode === VK.BACKSPACE ) {
+					var selection = window.getSelection();
 
-						if ( ! selection.isCollapsed && editor.dom.isBlock( selection.focusNode ) ) {
-							if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
-								if ( block.nextSibling && block.nextSibling.contains( selection.focusNode ) ) {
-									removeBlock();
-									event.preventDefault();
-								}
-							}
-
-							if ( selection.anchorOffset === 0 && selection.anchorNode === selection.focusNode ) {
+					if ( ! selection.isCollapsed && editor.dom.isBlock( selection.focusNode ) ) {
+						if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
+							if ( block.nextSibling && block.nextSibling.contains( selection.focusNode ) ) {
 								removeBlock();
 								event.preventDefault();
 							}
+						}
+
+						if ( selection.anchorOffset === 0 && selection.anchorNode === selection.focusNode ) {
+							removeBlock();
+							event.preventDefault();
 						}
 					}
 				}
