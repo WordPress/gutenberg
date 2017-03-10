@@ -34,7 +34,7 @@ window.wp.blocks.registerBlock( {
 					block.removeChild( footer );
 				} else {
 					block.insertAdjacentHTML( 'beforeend',
-						'<footer contenteditable="false">— <cite contenteditable="true"></cite></footer>' );
+						'<footer><br></footer>' );
 				}
 			},
 			isActive: function( block ) {

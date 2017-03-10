@@ -175,11 +175,8 @@ body {
 	margin: 2em;
 }
 
-/* hack to make editing work */
-#editor blockquote cite {
-	min-width: 100px;
-	min-height: 27px;
-	display: inline-block;
+#editor blockquote footer:before {
+	content: '— '
 }
 
 #editor:after {
