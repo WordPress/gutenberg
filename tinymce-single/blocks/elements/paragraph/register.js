@@ -19,23 +19,8 @@ window.wp.blocks.registerBlock( {
 		},
 		{
 			icon: 'gridicons-list-unordered',
-			onClick: function( block, editor ) {
-				var list = document.createElement( 'UL' );
-				var item = document.createElement( 'LI' );
-
-				list.appendChild( item );
-
-				while ( block.firstChild ) {
-					if ( block.firstChild.nodeName === 'BR' ) {
-						item = document.createElement( 'LI' );
-						list.appendChild( item );
-						block.removeChild( block.firstChild );
-					} else {
-						item.appendChild( block.firstChild );
-					}
-				}
-
-				block.parentNode.replaceChild( list, block );
+			onClick: function( block ) {
+				wp.blocks.getBlockSettings( 'elements:list' ).fromBaseState( block );
 			}
 		},
 		{

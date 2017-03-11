@@ -283,3 +283,14 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 .insert-menu .mce-btn-has-text svg.gridicons-heading {
 	margin: 0;
 }
+
+#editor .wp-blocks-placeholder {
+	padding: 50px 0;
+	background: #f0f2f4;
+	text-align: center;
+}
+
+#editor .wp-blocks-placeholder svg {
+	display: block;
+	margin: 0 auto 20px;
+}
