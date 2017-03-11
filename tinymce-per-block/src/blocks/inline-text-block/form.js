@@ -17,10 +17,7 @@ export default class InlineTextBlockForm extends Component {
 		const { api, block, setToolbarState, focusConfig } = this.props;
 
 		const splitValue = ( left, right ) => {
-			api.change( {
-				content: left,
-				externalChange: ( block.externalChange || 0 ) + 1
-			} );
+			api.change( { content: left } );
 			if ( right ) {
 				api.appendBlock( {
 					...block,
@@ -35,7 +32,6 @@ export default class InlineTextBlockForm extends Component {
 			<EditableComponent
 				ref={ this.bindEditable }
 				content={ block.content }
-				externalChange={ block.externalChange }
 				moveCursorUp={ api.moveCursorUp }
 				moveCursorDown={ api.moveCursorDown }
 				splitValue={ splitValue }

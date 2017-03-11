@@ -22,7 +22,7 @@ const blockLevelUpdater = ( state, command ) => {
 		},
 
 		append: ( { block: commandBlock } ) => {
-			const createdBlock = commandBlock ? commandBlock : { blockType: 'text', content: ' ' };
+			const createdBlock = commandBlock ? commandBlock : { blockType: 'text', content: '' };
 			const appenedBlockId = uniqueId();
 			const newBlocks = [
 				...state.blocks.slice( 0, currentIndex + 1 ),
@@ -92,7 +92,7 @@ const blockLevelUpdater = ( state, command ) => {
 		moveCursorDown: () => {
 			const nextBlock = state.blocks[ currentIndex + 1 ];
 			return mergeStates( {
-				focus: nextBlock ? { uid: nextBlock.uid, config: { end: true } } : state.focus,
+				focus: nextBlock ? { uid: nextBlock.uid, config: { start: true } } : state.focus,
 				selected: null
 			} );
 		},

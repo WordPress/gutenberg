@@ -45,10 +45,7 @@ export default class QuoteBlockForm extends Component {
 	render() {
 		const { api, block, first, last, isSelected, focusConfig } = this.props;
 		const splitValue = ( left, right ) => {
-			api.change( {
-				cite: left,
-				citeExternalChange: ( block.citeExternalChange || 0 ) + 1
-			} );
+			api.change( { cite: left } );
 			api.appendBlock( {
 				blockType: 'text',
 				content: right
@@ -100,7 +97,6 @@ export default class QuoteBlockForm extends Component {
 						<EditableComponent
 							ref={ this.bindContent }
 							content={ block.content }
-							externalChange={ block.externalChange }
 							moveCursorUp={ api.moveCursorUp }
 							moveCursorDown={ this.moveToCite }
 							mergeWithPrevious={ api.mergeWithPrevious }
@@ -122,7 +118,6 @@ export default class QuoteBlockForm extends Component {
 								mergeWithPrevious={ this.moveToContent }
 								remove={ this.moveToContent }
 								content={ block.cite }
-								externalChange={ block.citeExternalChange }
 								splitValue={ splitValue }
 								onChange={ ( value ) => api.change( { cite: value } ) }
 								setToolbarState={ focusInput === 'cite' ? this.setToolbarState : undefined }
