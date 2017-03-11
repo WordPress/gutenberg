@@ -240,6 +240,14 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	pointer-events: none;
 }
 
+.mce-drag-container {
+	opacity: 1 !important;
+	outline: 2px solid #e0e5e9;
+	outline-offset: 8px;
+	background: #fff;
+	box-shadow: 0 0 0 8px #fff;
+}
+
 .block-outline:before {
 	content: '';
 	position: absolute;
@@ -248,6 +256,38 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	bottom: -10px;
 	left: -10px;
 	border: 2px solid #e0e5e9;
+}
+
+.block-outline-handle {
+	position: absolute;
+	width: 10px;
+	top: 0;
+	bottom: 0;
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	pointer-events: all;
+}
+
+.block-outline-handle-left {
+	left: -10px;
+}
+
+.block-outline-handle-right {
+	right: -10px;
+}
+
+#editor *[data-wp-block-dragging] {
+	background: #f0f2f4;
+	color: #f0f2f4;
+	border-color: #f0f2f4;
+	text-shadow: none;
+	box-shadow: 0 0 0 10px #f0f2f4;
+}
+
+#editor *[data-wp-block-dragging] > * {
+	opacity: 0;
 }
 
 .insert-toolbar svg {
