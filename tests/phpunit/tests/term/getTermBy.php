@@ -192,4 +192,17 @@ class Tests_Term_GetTermBy extends WP_UnitTestCase {
 		$this->assertSame( $term_id, $found->term_id );
 		$this->assertContains( 'LIMIT 1', $wpdb->last_query );
 	}
+
+	/**
+	 * @ticket 21760
+	 */
+	public function test_prevent_recursion_by_get_terms_filter() {
+		$action = new MockAction();
+
+		add_filter( 'get_terms', array( $action, 'filter' ) );
+		get_term_by( 'name', 'burrito', 'post_tag' );
+		remove_filter( 'get_terms', array( $action, 'filter' ) );
+
+		$this->assertEquals( 0, $action->get_call_count() );
+	}
 }
