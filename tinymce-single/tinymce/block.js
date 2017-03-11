@@ -46,6 +46,24 @@
 			editor.addButton( name, settings );
 		} );
 
+		editor.on( 'pastePreProcess', function( event ) {
+			var block = getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( block );
+
+			if ( settings.onPaste ) {
+				settings.onPaste( event, block )
+			}
+		} );
+
+		editor.on( 'click', function( event ) {
+			var block = getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( block );
+
+			if ( settings.onClick ) {
+				settings.onClick( event, block, function() { editor.nodeChanged() } )
+			}
+		} );
+
 		editor.on( 'setContent', function( event ) {
 			$blocks = editor.$( editor.getBody() ).find( '*[data-wp-block-type]' );
 			$blocks.attr( 'contenteditable', 'false' );
@@ -58,6 +76,17 @@
 					} );
 				}
 			} );
+		} );
+
+		editor.on( 'nodeChange', function( event ) {
+			var block = wp.blocks.getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( block );
+
+			if ( settings && settings.editable ) {
+				settings.editable.forEach( function( selector ) {
+					editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+				} );
+			}
 		} );
 
 		function toInlineContent( content ) {
@@ -318,7 +347,7 @@
 					var key;
 					var types = [ 'text', 'media', 'separator' ];
 
-					function onClick( callback ) {
+					function onClick( callback, settings ) {
 						return function( block ) {
 							var content = callback.apply( this, arguments );
 							var args = {
@@ -340,6 +369,10 @@
 
 								block.parentNode.replaceChild( content, block );
 
+								if ( ! settings.elements ) {
+									content.setAttribute( 'data-wp-block-type', settings._id );
+								}
+
 								editor.fire( 'setContent', args );
 							}
 
@@ -360,7 +393,7 @@
 								buttons.push( {
 									text: allSettings[ key ].displayName,
 									icon: allSettings[ key ].icon,
-									onClick: onClick( allSettings[ key ].insert )
+									onClick: onClick( allSettings[ key ].insert, allSettings[ key ] )
 								} );
 							}
 						}
