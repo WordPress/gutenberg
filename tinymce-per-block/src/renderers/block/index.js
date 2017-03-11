@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { map, debounce } from 'lodash';
+import { map, debounce, isEqual } from 'lodash';
 import { findDOMNode } from 'react-dom';
 import classNames from 'classnames';
 import { getBlock } from 'wp-blocks';

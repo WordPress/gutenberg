@@ -45,7 +45,10 @@ registerBlock( 'text', {
 		const content = div.childNodes.length === 1 && div.firstChild.nodeName === 'P'
 			? div.firstChild.innerHTML
 			: block.content;
-		const rawContent = `<p style="text-align: ${ block.align };">${ content }</p>`;
+		const alignStyle = block.align && block.align !== 'no-align'
+			? ` style="text-align: ${ block.align };"`
+			: '';
+		const rawContent = `<p${ alignStyle }>${ content }</p>`;
 
 		return {
 			blockType: 'text',

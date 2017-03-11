@@ -50,9 +50,14 @@ export default class EditableComponent extends Component {
 
 	updateContent() {
 		// This could not be called on each content change, it used to change the cursor position
-		const bookmark = this.editor.selection.getBookmark( 2, true );
+		let bookmark;
+		if ( this.props.focusConfig ) {
+			bookmark = this.editor.selection.getBookmark( 2, true );
+		}
 		this.editor.setContent( this.props.content );
-		this.editor.selection.moveToBookmark( bookmark );
+		if ( this.props.focusConfig ) {
+			this.editor.selection.moveToBookmark( bookmark );
+		}
 	}
 
 	executeCommand = ( ...args ) => {
@@ -70,9 +75,7 @@ export default class EditableComponent extends Component {
 			this.focus();
 		}
 
-		// We should be able to compare content instead
-		// But I came up with externalChange due the moving cursor bugs when spitting/merging content
-		if ( this.props.externalChange !== prevProps.externalChange ) {
+		if ( this.props.content !== prevProps.content ) {
 			this.updateContent();
 		}
 	}
@@ -143,6 +146,7 @@ export default class EditableComponent extends Component {
 				const after = getHtml( childNodes.slice( splitIndex ) );
 				const hasAfter = !! childNodes.slice( splitIndex )
 					.reduce( ( memo, node ) => memo + node.textContent, '' );
+				this.editor.setContent( this.props.content );
 				if ( before ) {
 					this.props.splitValue( before, hasAfter ? after : '' );
 				}
@@ -202,7 +206,7 @@ export default class EditableComponent extends Component {
 		this.editor = editor;
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'change focusout undo redo', this.onChange );
+		editor.on( 'focusout undo redo', this.onChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'paste', this.onPaste );
 		editor.on( 'nodechange', this.syncToolbar );

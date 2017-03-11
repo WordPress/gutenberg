@@ -43,8 +43,7 @@ registerBlock( 'html', {
 			const currentBlock = state.blocks[ index ];
 			const blockToMerge = state.blocks[ index + 1 ];
 			const newBlock = Object.assign( {}, currentBlock, {
-				content: currentBlock.content + blockToMerge.content,
-				externalChange: ( currentBlock.externalChange || 0 ) + 1
+				content: currentBlock.content + blockToMerge.content
 			} );
 			const newBlocks = [
 				...state.blocks.slice( 0, index ),
