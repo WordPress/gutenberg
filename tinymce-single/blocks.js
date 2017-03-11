@@ -55,6 +55,10 @@
 			var rootNode = editor.getBody();
 			var blocks = [];
 
+			if ( ! startNode || ! editor.getBody().contains( startNode ) ) {
+				return [ rootNode.firstChild ];
+			}
+
 			while ( startNode.parentNode !== rootNode ) {
 				startNode = startNode.parentNode;
 			}

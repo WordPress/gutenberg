@@ -149,6 +149,7 @@
 
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
+			var hidden = true;
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -283,9 +284,59 @@
 
 			function createBlockOutline() {
 				var outline = document.createElement( 'div' );
+				var handleLeft = document.createElement( 'div' );
+				var handleRight = document.createElement( 'div' );
 
 				outline.className = 'block-outline';
+				handleLeft.className = 'block-outline-handle block-outline-handle-right';
+				handleRight.className = 'block-outline-handle block-outline-handle-left';
+				outline.appendChild( handleLeft );
+				outline.appendChild( handleRight );
 				document.body.appendChild( outline );
+
+				var target;
+
+				DOM.bind( outline, 'mousedown', function( event ) {
+					var newEvent = Object.assign( {}, event );
+
+					target = getSelectedBlock();
+
+					if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
+						target.setAttribute( 'contenteditable', 'false' );
+					}
+
+					newEvent.target = target;
+
+					editor.fire( 'mousedown', newEvent );
+				} );
+
+				editor.on( 'dragstart', function( event ) {
+					if ( ! target ) {
+						event.preventDefault();
+						return;
+					}
+
+					hidden = true;
+
+					hideBlockUI();
+
+					target.setAttribute( 'data-wp-block-dragging', 'true' );
+
+					function end( event ) {
+						DOM.unbind( editor.getDoc(), 'mouseup', end );
+
+						target = null;
+
+						setTimeout( function() {
+							editor.$( '*[data-wp-block-dragging]' )
+								.attr( 'data-wp-block-dragging', null )
+								.attr( 'contenteditable', null );
+							editor.nodeChanged();
+						} );
+					}
+
+					DOM.bind( editor.getDoc(), 'mouseup', end );
+				} );
 
 				return outline;
 			}
@@ -652,8 +703,6 @@
 					width: Math.max( startRect.width, endRect.width ) + 'px'
 				} );
 			}
-
-			var hidden = true;
 
 			editor.on( 'keydown', function( event ) {
 				if ( tinymce.util.VK.metaKeyPressed( event ) ) {
