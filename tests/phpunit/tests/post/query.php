@@ -136,7 +136,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			'post__in' => $ordered,
 			'orderby' => 'post__in'
 		) );
-		$this->assertEqualSets( $ordered, wp_list_pluck( $q->posts, 'ID' ) );
+		$this->assertSame( $ordered, wp_list_pluck( $q->posts, 'ID' ) );
 	}
 
 	function test_post__in_attachment_ordering() {
@@ -175,7 +175,7 @@ class Tests_Post_Query extends WP_UnitTestCase {
 			'posts_per_page' => '-1',
 			'orderby' => 'post__in'
 		) );
-		$this->assertEqualSets( $ordered, wp_list_pluck( $attached->posts, 'ID' ) );
+		$this->assertSame( $ordered, wp_list_pluck( $attached->posts, 'ID' ) );
 	}
 
 	/**
