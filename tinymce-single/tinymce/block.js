@@ -61,6 +61,7 @@
 
 			if ( settings.onClick ) {
 				settings.onClick( event, block, function() { editor.nodeChanged() } )
+				removeHoverClass();
 			}
 		} );
 
@@ -78,16 +79,33 @@
 			} );
 		} );
 
+		var currentEditingBlock = null;
+		var overBlockClass = 'wp-hover-block';
+
+		function removeHoverClass() {
+			editor.$( editor.getBody() ).find( '.' + overBlockClass ).removeClass( overBlockClass );
+		}
+
 		editor.on( 'nodeChange', function( event ) {
-			var block = wp.blocks.getSelectedBlock();
-			var settings = wp.blocks.getBlockSettingsByElement( block );
+			currentEditingBlock = wp.blocks.getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( currentEditingBlock );
 
 			if ( settings && settings.editable ) {
 				settings.editable.forEach( function( selector ) {
-					editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+					editor.$( currentEditingBlock ).find( selector ).attr( 'contenteditable', 'true' );
+					removeHoverClass();
 				} );
 			}
 		} );
+
+		editor.on( 'mouseover', function (e) {
+			var blockOver = wp.blocks.getHoverSelectedBlock(e);
+			removeHoverClass();
+			if ( blockOver !== null && currentEditingBlock !== blockOver) {
+				blockOver.classList.add(overBlockClass);
+			}
+
+		});
 
 		function toInlineContent( content ) {
 			var settings = {
