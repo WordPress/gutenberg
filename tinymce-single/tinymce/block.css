@@ -146,6 +146,10 @@ svg.gridicon {
 	transform-origin: top left;
 }
 
+.mce-gridicons-rotate svg {
+	transform: rotate( 90deg );
+}
+
 div.mce-inline-toolbar-grp {
 	background-color: #fff;
 	border: 1px solid #e1e6ea;

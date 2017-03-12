@@ -148,6 +148,8 @@ body {
 
 #editor figcaption {
 	margin-top: 0.5em;
+	font-size: 0.9em;
+	font-style: italic;
 }
 
 #editor figure img,
@@ -178,6 +180,22 @@ body {
 
 #editor blockquote footer:before {
 	content: '— '
+}
+
+#editor table {
+	border-collapse: collapse;
+	table-layout: fixed;
+	width: 100%;
+}
+
+#editor table {
+	width: 100%;
+}
+
+#editor td,
+#editor th {
+	padding: 0.5em;
+	border: 1px solid currentColor;
 }
 
 #editor:after {
