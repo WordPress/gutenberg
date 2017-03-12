@@ -126,19 +126,22 @@
 
 		editor.on( 'keydown', function( event ) {
 			if ( event.keyCode === tinymce.util.VK.ENTER ) {
-				var selectedBlock = wp.blocks.getSelectedBlock();
-				var blockSettings = wp.blocks.getBlockSettingsByElement( selectedBlock );
+				var block = wp.blocks.getSelectedBlock();
+				var settings = wp.blocks.getBlockSettingsByElement( block );
 
-				if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
+				if ( editor.$( block ).attr( 'contenteditable' ) === 'false' ) {
 					event.preventDefault();
 				}
 
-				if ( blockSettings && blockSettings.restrictToInline ) {
-					blockSettings.restrictToInline.forEach( function( selector ) {
+				if ( settings ) {
+					var restrict = ( settings.restrictToInline || [] ).concat( settings.editable || [] );
+
+					restrict.forEach( function( selector ) {
 						var node = editor.selection.getNode();
 
 						if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
 							event.preventDefault();
+							editor.execCommand( 'InsertLineBreak' );
 						}
 					} );
 				}
