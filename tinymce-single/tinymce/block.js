@@ -4,7 +4,69 @@
 		var getSelectedBlocks = wp.blocks.getSelectedBlocks;
 		var editorPadding = 50;
 
+		var DOM = tinymce.DOM;
+		var hidden = true
+
 		// Global controls
+
+		function createBlockOutline(getter) {
+			var outline = document.createElement( 'div' );
+			var handleLeft = document.createElement( 'div' );
+			var handleRight = document.createElement( 'div' );
+
+			outline.className = 'block-outline';
+			handleLeft.className = 'block-outline-handle block-outline-handle-right';
+			handleRight.className = 'block-outline-handle block-outline-handle-left';
+			outline.appendChild( handleLeft );
+			outline.appendChild( handleRight );
+			document.body.appendChild( outline );
+
+			var target;
+
+			DOM.bind( outline, 'mousedown', function( event ) {
+				var newEvent = Object.assign( {}, event );
+
+				target = getter();
+
+				if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
+					target.setAttribute( 'contenteditable', 'false' );
+				}
+
+				newEvent.target = target;
+
+				editor.fire( 'mousedown', newEvent );
+			} );
+
+			editor.on( 'dragstart', function( event ) {
+				if ( ! target ) {
+					event.preventDefault();
+					return;
+				}
+
+				hidden = true;
+
+				// hideBlockUI();
+
+				target.setAttribute( 'data-wp-block-dragging', 'true' );
+
+				function end( event ) {
+					DOM.unbind( editor.getDoc(), 'mouseup', end );
+
+					target = null;
+
+					setTimeout( function() {
+						editor.$( '*[data-wp-block-dragging]' )
+							.attr( 'data-wp-block-dragging', null )
+							.attr( 'contenteditable', null );
+						editor.nodeChanged();
+					} );
+				}
+
+				DOM.bind( editor.getDoc(), 'mouseup', end );
+			} );
+
+			return outline;
+		}
 
 		function isNodeEligibleForControl( node, name ) {
 			var block;
@@ -82,9 +144,9 @@
 		var currentEditingBlock = null;
 		var overBlockClass = 'wp-hover-block';
 
-		function removeHoverClass() {
-			editor.$( editor.getBody() ).find( '.' + overBlockClass ).removeClass( overBlockClass );
-		}
+		// function removeHoverClass() {
+		// 	editor.$( editor.getBody() ).find( '.' + overBlockClass ).removeClass( overBlockClass );
+		// }
 
 		editor.on( 'nodeChange', function( event ) {
 			currentEditingBlock = wp.blocks.getSelectedBlock();
@@ -93,18 +155,17 @@
 			if ( settings && settings.editable ) {
 				settings.editable.forEach( function( selector ) {
 					editor.$( currentEditingBlock ).find( selector ).attr( 'contenteditable', 'true' );
-					removeHoverClass();
+					// removeHoverClass();
 				} );
 			}
 		} );
 
 		editor.on( 'mouseover', function (e) {
 			var blockOver = wp.blocks.getHoverSelectedBlock(e);
-			removeHoverClass();
+			// removeHoverClass();
 			if ( blockOver !== null && currentEditingBlock !== blockOver) {
 				blockOver.classList.add(overBlockClass);
 			}
-
 		});
 
 		function toInlineContent( content ) {
@@ -166,8 +227,7 @@
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
-			var DOM = tinymce.DOM;
-			var hidden = true;
+;
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -300,64 +360,7 @@
 
 			var blockToolbarWidth = 0;
 
-			function createBlockOutline() {
-				var outline = document.createElement( 'div' );
-				var handleLeft = document.createElement( 'div' );
-				var handleRight = document.createElement( 'div' );
 
-				outline.className = 'block-outline';
-				handleLeft.className = 'block-outline-handle block-outline-handle-right';
-				handleRight.className = 'block-outline-handle block-outline-handle-left';
-				outline.appendChild( handleLeft );
-				outline.appendChild( handleRight );
-				document.body.appendChild( outline );
-
-				var target;
-
-				DOM.bind( outline, 'mousedown', function( event ) {
-					var newEvent = Object.assign( {}, event );
-
-					target = getSelectedBlock();
-
-					if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
-						target.setAttribute( 'contenteditable', 'false' );
-					}
-
-					newEvent.target = target;
-
-					editor.fire( 'mousedown', newEvent );
-				} );
-
-				editor.on( 'dragstart', function( event ) {
-					if ( ! target ) {
-						event.preventDefault();
-						return;
-					}
-
-					hidden = true;
-
-					hideBlockUI();
-
-					target.setAttribute( 'data-wp-block-dragging', 'true' );
-
-					function end( event ) {
-						DOM.unbind( editor.getDoc(), 'mouseup', end );
-
-						target = null;
-
-						setTimeout( function() {
-							editor.$( '*[data-wp-block-dragging]' )
-								.attr( 'data-wp-block-dragging', null )
-								.attr( 'contenteditable', null );
-							editor.nodeChanged();
-						} );
-					}
-
-					DOM.bind( editor.getDoc(), 'mouseup', end );
-				} );
-
-				return outline;
-			}
 
 			function createInsertToolbar() {
 				var insert = editor.wp._createToolbar( [ 'add' ] );
@@ -579,7 +582,7 @@
 			}
 
 			var UI = {
-				outline: createBlockOutline(),
+				outline: createBlockOutline(getSelectedBlock),
 				insert: createInsertToolbar(),
 				insertMenu: createInsertMenu(),
 				inline: createInlineToolbar(),
