@@ -42,7 +42,26 @@
 			'block-align-right',
 			'block-align-full',
 			{
-				icon: 'gridicons-cog'
+				icon: 'gridicons-caption',
+				onClick: function( block ) {
+					var figcaption = block.querySelector( 'figcaption' );
+
+					if ( figcaption ) {
+						block.removeChild( figcaption );
+					} else {
+						block.insertAdjacentHTML( 'beforeend',
+							'<figcaption><br></figcaption>' );
+					}
+
+					window.wp.blocks.selectBlock( block );
+				},
+				isActive: function( block ) {
+					return !! block.querySelector( 'figcaption' );
+				}
+			},
+			{
+				icon: 'gridicons-cog',
+				onClick: function() {}
 			}
 		],
 		insert: insertEmpty,

@@ -26,6 +26,14 @@
 		return controls;
 	}
 
+	function toBaseState( block, editor ) {
+		editor.formatter.apply( 'p', block );
+	}
+
+	function fromBaseState( block, editor ) {
+		editor.formatter.apply( 'h1', block );
+	}
+
 	wp.blocks.registerBlock( {
 		name: 'heading',
 		displayName: 'Heading',
@@ -33,6 +41,8 @@
 		type: 'text',
 		icon: 'gridicons-heading',
 		controls: getControls(),
+		toBaseState: toBaseState,
+		fromBaseState: fromBaseState,
 		insert: function() {
 			// Maybe detect best heading based on document outline.
 			return '<h1><br></h1>';
