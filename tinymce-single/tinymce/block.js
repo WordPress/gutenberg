@@ -618,8 +618,8 @@
 			editor.on( 'mouseover', function( event ) {
 				var target = wp.blocks.getParentBlock( event.target );
 
-				if ( target && target !== hoverTarget ) {
-					if ( isDragging || wp.blocks.getSelectedBlock() === hoverTarget ) {
+				if ( target !== hoverTarget ) {
+					if ( ! target || isDragging || wp.blocks.getSelectedBlock() === hoverTarget ) {
 						DOM.setStyles( UI.hoverOutline, {
 							display: 'none'
 						} );
@@ -712,6 +712,10 @@
 				} );
 
 				DOM.setStyles( UI.outline, {
+					display: 'none'
+				} );
+
+				DOM.setStyles( UI.hoverOutline, {
 					display: 'none'
 				} );
 			}
