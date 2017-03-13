@@ -104,14 +104,29 @@
 			} );
 		} );
 
-		editor.on( 'nodeChange', function( event ) {
+		editor.on( 'nodeChange selectionChange', function( event ) {
 			var block = wp.blocks.getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );
 
-			if ( settings && settings.editable ) {
-				settings.editable.forEach( function( selector ) {
-					editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
-				} );
+			if ( settings ) {
+				if ( settings.editable ) {
+					settings.editable.forEach( function( selector ) {
+						editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+					} );
+				}
+
+				if ( settings.placeholders ) {
+					for ( var selector in settings.placeholders ) {
+						( selector ? editor.$( block ).find( selector ) : editor.$( block ) )
+							.each( function( i, node ) {
+								if ( ! node.textContent ) {
+									editor.$( node ).attr( 'data-wp-placeholder', settings.placeholders[ selector ] );
+								} else {
+									editor.$( node ).attr( 'data-wp-placeholder', null );
+								}
+							} );
+					}
+				}
 			}
 		} );
 
@@ -182,6 +197,9 @@
 			var hoverTarget;
 			var dragTarget;
 			var isDragging = false;
+
+			editor.serializer.addTempAttr( 'data-wp-block-selected' );
+			editor.serializer.addTempAttr( 'data-wp-placeholder' );
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -443,7 +461,7 @@
 					var allSettings = wp.blocks.getBlocks();
 					var buttons = [];
 					var key;
-					var types = [ 'text', 'media', 'separator' ];
+					var types = [ 'text', 'media', 'data visualisation', 'separator' ];
 
 					function onClick( callback, settings ) {
 						return function( block ) {
@@ -668,7 +686,7 @@
 				// Element node.
 				if ( node.nodeType === 1 ) {
 					// Element is no direct child.
-					if ( isAtRoot && node.parentNode !== editor.getBody() && node.nodeName !== 'P' ) {
+					if ( isAtRoot && ( node.parentNode !== editor.getBody() || node.nodeName !== 'P' ) ) {
 						return false;
 					}
 
@@ -748,6 +766,28 @@
 						toolbar.hide();
 					}
 				} );
+
+				var $prevSelected = editor.$( '*[data-wp-block-selected]' );
+
+				if ( selectedBlocks && $prevSelected[0] !== selectedBlocks[0] ) {
+					if ( $prevSelected.length ) {
+						var prevSettings = wp.blocks.getBlockSettingsByElement( $prevSelected[0] );
+
+						if ( prevSettings.onDeselect ) {
+							prevSettings.onDeselect( $prevSelected[0] );
+						}
+
+						$prevSelected.attr( 'data-wp-block-selected', null );
+					}
+
+					if ( selectedBlocks.length === 1 ) {
+						if ( settings.onSelect ) {
+							settings.onSelect( selectedBlocks[0] );
+						}
+
+						editor.$( selectedBlocks[0] ).attr( 'data-wp-block-selected', 'true' );
+					}
+				}
 
 				if ( selectedBlocks.length === 1 ) {
 					UI.blocks[ settings._id ].reposition();
@@ -888,11 +928,6 @@
 				}
 
 				metaCount = 0;
-			} );
-
-			editor.on( 'nodeChange', function() {
-				editor.$( editor.getBody() ).children().attr( 'data-mce-selected', null );
-				editor.$( getSelectedBlock() ).attr( 'data-mce-selected', 'true' );
 			} );
 		} );
 	} );

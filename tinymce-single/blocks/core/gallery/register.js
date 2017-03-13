@@ -23,6 +23,30 @@
 		);
 	}
 
+	function onSelect( block ) {
+		var figures = block.querySelectorAll( 'figure' );
+		var figcaption;
+
+		for ( var i = 0; i < figures.length; i++ ) {
+			figcaption = figures[ i ].querySelector( 'figcaption' );
+
+			if ( ! figcaption ) {
+				figures[ i ].insertAdjacentHTML( 'beforeend',
+					'<figcaption><br></figcaption>' );
+			}
+		}
+	}
+
+	function onDeselect( block ) {
+		var figcaptions = block.querySelectorAll( 'figcaption' );
+
+		for ( var i = 0; i < figcaptions.length; i++ ) {
+			if ( ! figcaptions[ i ].textContent ) {
+				figcaptions[ i ].parentNode.removeChild( figcaptions[ i ] );
+			}
+		}
+	}
+
 	function pickTarget( parents, child ) {
 		for ( var i = 0; i < parents.length; i++ ) {
 			if ( parents[ i ] === child || parents[ i ].contains( child ) ) {
@@ -70,6 +94,9 @@
 		keywords: [],
 		icon: 'gridicons-image-multiple',
 		editable: [ 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		controls: [
 			'block-align-left',
 			'block-align-center',
@@ -80,6 +107,9 @@
 			}
 		],
 		insert: insertEmpty,
+		onSelect: onSelect,
+		onDeselect: onDeselect,
 		onClick: onClick
 	} );
+
 } )( window.wp );

@@ -183,10 +183,15 @@ body {
 	color: #86909b;
 	font-size: 0.9em;
 	font-style: normal;
+	margin-left: 1.3em;
+	position: relative;
 }
 
-#editor blockquote footer:before {
+#editor blockquote footer:after {
 	content: '— ';
+	position: absolute;
+	left: -1.3em;
+	top: 0;
 }
 
 #editor table {
