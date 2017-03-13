@@ -8,12 +8,16 @@
 		var hidden = true
 
 		// Global controls
-		function createBlockOutline(getter) {
+		function createBlockOutline(getter, settings) {
 			var outline = document.createElement( 'div' );
 			var handleLeft = document.createElement( 'div' );
 			var handleRight = document.createElement( 'div' );
 
-			outline.className = 'block-outline';
+			if (settings && settings.extraClass) {
+				outline.className = settings.extraClass;
+			}
+
+			outline.className += ' block-outline';
 			handleLeft.className = 'block-outline-handle block-outline-handle-right';
 			handleRight.className = 'block-outline-handle block-outline-handle-left';
 			outline.appendChild( handleLeft );
@@ -118,7 +122,7 @@
 			var block = getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );
 
-			if ( settings.onClick ) {
+			if ( settings && settings.onClick ) {
 				settings.onClick( event, block, function() { editor.nodeChanged() } )
 			}
 		} );
@@ -150,7 +154,7 @@
 
 		var hoverDragOutline = createBlockOutline(function () {
 			return hoverTarget;
-		});
+		}, { extraClass: 'wp-blocks-hover' });
 
 		function hideEl( el ) {
 			DOM.setStyles( el, {
@@ -374,8 +378,6 @@
 
 			var blockToolbarWidth = 0;
 
-
-
 			function createInsertToolbar() {
 				var insert = editor.wp._createToolbar( [ 'add' ] );
 
@@ -596,7 +598,7 @@
 			}
 
 			var UI = {
-				outline: createBlockOutline(getSelectedBlock),
+				outline: createBlockOutline(getSelectedBlock, {}),
 				insert: createInsertToolbar(),
 				insertMenu: createInsertMenu(),
 				inline: createInlineToolbar(),
