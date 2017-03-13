@@ -32,9 +32,9 @@
 					target.setAttribute( 'contenteditable', 'false' );
 				}
 
-				newEvent.target = target;
+				newEvent.target = target; // change target to the content element (not UI el)
 
-				editor.fire( 'mousedown', newEvent );
+				editor.fire( 'mousedown', newEvent ); // let tiny handle dragging/moving the content
 			} );
 
 			editor.on( 'dragstart', function( event ) {
@@ -243,8 +243,6 @@
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
-;
-
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
