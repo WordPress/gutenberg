@@ -265,6 +265,11 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	border: 2px solid #e0e5e9;
 }
 
+.block-outline-hover:before {
+	border: none;
+	border-left: 2px solid #e0e5e9;
+}
+
 .block-outline-handle {
 	position: absolute;
 	width: 20px;
