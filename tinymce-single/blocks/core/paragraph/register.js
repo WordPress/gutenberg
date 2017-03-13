@@ -1,5 +1,6 @@
 window.wp.blocks.registerBlock( {
 	name: 'paragraph',
+	nameSpace: 'core',
 	displayName: 'Paragraph',
 	elements: [ 'p' ],
 	type: 'text',

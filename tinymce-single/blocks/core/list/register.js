@@ -54,6 +54,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'list',
+		nameSpace: 'core',
 		displayName: 'List',
 		elements: [ 'ul', 'ol' ],
 		type: 'text',
