@@ -1,4 +1,5 @@
 ( function( wp ) {
+
 	function getControls() {
 		var controls = [];
 
@@ -49,4 +50,5 @@
 			return '<h1><br></h1>';
 		}
 	} );
+
 } )( window.wp );
