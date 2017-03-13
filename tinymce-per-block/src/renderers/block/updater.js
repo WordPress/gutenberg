@@ -61,8 +61,11 @@ const blockLevelUpdater = ( state, command ) => {
 
 		mergeWithPrevious: () => {
 			const previousBlock = state.blocks[ currentIndex - 1 ];
+			if ( ! previousBlock ) {
+				return state;
+			}
 			const previousBlockDefinition = getBlock( previousBlock.blockType );
-			if ( ! previousBlock || ! previousBlockDefinition.merge ) {
+			if ( ! previousBlockDefinition.merge ) {
 				return state;
 			}
 			const mergeDefinition = isArray( previousBlockDefinition.merge )

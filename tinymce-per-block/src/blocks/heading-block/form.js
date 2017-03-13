@@ -68,6 +68,7 @@ export default class HeadingBlockForm extends Component {
 						ref={ this.bindForm }
 						{ ...this.props }
 						setToolbarState={ this.setToolbarState }
+						single
 					/>
 				</div>
 			</div>
