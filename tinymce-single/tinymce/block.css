@@ -265,6 +265,12 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	border: 2px solid #e0e5e9;
 }
 
+.wp-blocks-hover.block-outline:before {
+	border-top: none;
+	border-bottom: none;
+	border-right: none;
+}
+
 .block-outline-handle {
 	position: absolute;
 	width: 20px;

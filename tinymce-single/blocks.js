@@ -59,6 +59,23 @@
 		getControls: function() {
 			return _controls;
 		},
+
+		getHoverSelectedBlock: function (e) {
+			var editor = window.tinyMCE.activeEditor;
+			var targetNode = e.target;
+			var rootNode = editor.getBody();
+
+			if ( targetNode === rootNode || ! editor.getBody().contains( targetNode ) ) {
+				return null;
+			}
+			
+			while ( targetNode.parentNode !== rootNode ) {
+				targetNode = targetNode.parentNode;
+			}
+
+			return targetNode;
+		},
+
 		getSelectedBlocks: function() {
 			var editor = window.tinyMCE.activeEditor;
 			var selection = window.getSelection();
@@ -67,7 +84,7 @@
 			var rootNode = editor.getBody();
 			var blocks = [];
 
-			if ( ! startNode || ! editor.getBody().contains( startNode ) ) {
+			if ( startNode === rootNode || ! editor.getBody().contains( startNode ) ) {
 				return [ rootNode.firstChild ];
 			}
 
