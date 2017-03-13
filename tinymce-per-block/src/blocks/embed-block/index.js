@@ -35,7 +35,7 @@ registerBlock( 'embed', {
 		const styles = getFigureAlignmentStyles( block.align );
 		const rawContent = [
 			`<figure${ styles.figure }>`,
-			`<div${ styles.content }>${ getEmbedHtmlFromUrl( block.url ) }</div>`,
+			`<div${ styles.content }>${ getEmbedHtmlFromUrl( block.url, block.align ) }</div>`,
 			`<figcaption>${ block.caption }</figcaption>`,
 			'</figure>'
 		].join( '' );
