@@ -17,6 +17,23 @@
 		);
 	}
 
+	function onSelect( block ) {
+		var figcaption = block.querySelector( 'figcaption' );
+
+		if ( ! figcaption ) {
+			block.insertAdjacentHTML( 'beforeend',
+				'<figcaption><br></figcaption>' );
+		}
+	}
+
+	function onDeselect( block ) {
+		var figcaption = block.querySelector( 'figcaption' );
+
+		if ( ! figcaption.textContent ) {
+			block.removeChild( figcaption );
+		}
+	}
+
 	wp.blocks.registerBlock( {
 		name: 'table',
 		nameSpace: 'core',
@@ -25,6 +42,8 @@
 		icon: 'gridicons-grid',
 		editable: [ 'table', 'figcaption' ],
 		insert: insertEmpty,
+		onSelect: onSelect,
+		onDeselect: onDeselect,
 		controls: [
 			'block-align-left',
 			'block-align-center',
@@ -54,24 +73,6 @@
 				icon: 'gridicons-indent-left',
 				onClick: function( block, editor ) {
 					editor.execCommand( 'mceTableInsertColAfter' );
-				}
-			},
-			{
-				icon: 'gridicons-caption',
-				onClick: function( block ) {
-					var figcaption = block.querySelector( 'figcaption' );
-
-					if ( figcaption ) {
-						block.removeChild( figcaption );
-					} else {
-						block.insertAdjacentHTML( 'beforeend',
-							'<figcaption><br></figcaption>' );
-					}
-
-					window.wp.blocks.selectBlock( block );
-				},
-				isActive: function( block ) {
-					return !! block.querySelector( 'figcaption' );
 				}
 			},
 			{

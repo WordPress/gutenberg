@@ -183,6 +183,8 @@
 			var dragTarget;
 			var isDragging = false;
 
+			editor.serializer.addTempAttr( 'data-wp-block-selected' );
+
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
 				tooltip: 'Add Block',
@@ -749,6 +751,28 @@
 					}
 				} );
 
+				var $prevSelected = editor.$( '*[data-wp-block-selected]' );
+
+				if ( selectedBlocks && $prevSelected[0] !== selectedBlocks[0] ) {
+					if ( $prevSelected.length ) {
+						var prevSettings = wp.blocks.getBlockSettingsByElement( $prevSelected[0] );
+
+						if ( prevSettings.onDeselect ) {
+							prevSettings.onDeselect( $prevSelected[0] );
+						}
+
+						$prevSelected.attr( 'data-wp-block-selected', null );
+					}
+
+					if ( selectedBlocks.length === 1 ) {
+						if ( settings.onSelect ) {
+							settings.onSelect( selectedBlocks[0] );
+						}
+
+						editor.$( selectedBlocks[0] ).attr( 'data-wp-block-selected', 'true' );
+					}
+				}
+
 				if ( selectedBlocks.length === 1 ) {
 					UI.blocks[ settings._id ].reposition();
 					focus && focusToolbar( UI.blocks[ settings._id ] );
@@ -888,11 +912,6 @@
 				}
 
 				metaCount = 0;
-			} );
-
-			editor.on( 'nodeChange', function() {
-				editor.$( editor.getBody() ).children().attr( 'data-mce-selected', null );
-				editor.$( getSelectedBlock() ).attr( 'data-mce-selected', 'true' );
 			} );
 		} );
 	} );
