@@ -4,7 +4,6 @@
 		var getSelectedBlocks = wp.blocks.getSelectedBlocks;
 		var editorPadding = 50;
 		var hoverTarget = null;
-		var dragInProgress = false;
 		var DOM = tinymce.DOM;
 		var hidden = true
 
@@ -25,7 +24,10 @@
 				var newEvent = Object.assign( {}, event );
 
 				var target = getter(); // get the content element (not UI element)
-
+				if ( !target ) {
+					event.preventDefault();
+					return;
+				}
 				if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
 					target.setAttribute( 'contenteditable', 'false' );
 				}
@@ -45,15 +47,12 @@
 				hidden = true;
 
 				// hideBlockUI();
-				dragInProgress = true;
 				console.log('>> start dragging');
 				target.setAttribute( 'data-wp-block-dragging', 'true' );
 
 				function end( event ) {
 					console.log('>> mouse up, end drag', event);
 					DOM.unbind( editor.getDoc(), 'mouseup', end );
-
-					dragInProgress = false;
 
 					setTimeout( function() {
 						editor.$( '[data-wp-block-dragging]' )
@@ -153,7 +152,6 @@
 		} );
 
 		var hoverDragOutline = createBlockOutline(function () {
-			console.log('hover target',hoverTarget)
 			return hoverTarget;
 		});
 
@@ -176,6 +174,12 @@
 				} );
 
 			}
+		});
+
+		editor.on( 'mouseout', function (e) {
+			DOM.setStyles( hoverDragOutline, {
+				display: 'none'
+			} );
 		});
 
 		function toInlineContent( content ) {
