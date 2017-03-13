@@ -23,6 +23,18 @@
 				} );
 			}
 		},
+		getType: function( name ) {
+			var settings = [];
+			var key;
+
+			for ( key in _blocks ) {
+				if ( _blocks[ key ].type === name ) {
+					settings.push( _blocks[ key ] );
+				}
+			}
+
+			return settings;
+		},
 		registerControl: function( name, settings ) {
 			_controls[ name ] = settings;
 		},

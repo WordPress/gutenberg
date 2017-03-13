@@ -10,6 +10,7 @@ window.tinymce.init( {
 		'clean-paste',
 		'lists',
 		'paste',
+		'table',
 		'toolbar',
 		'wplink',
 		'wptextpattern'
