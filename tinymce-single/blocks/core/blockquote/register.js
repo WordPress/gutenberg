@@ -1,4 +1,5 @@
 ( function( wp ) {
+
 	function insertEmpty() {
 		return '<blockquote><p><br></p></blockquote>';
 	}
@@ -24,38 +25,47 @@
 		window.wp.blocks.selectBlock( firstChild );
 	}
 
-	window.wp.blocks.registerBlock( {
+	function onSelect( block ) {
+		var footer = block.querySelector( 'footer' );
+
+		if ( ! footer ) {
+			block.insertAdjacentHTML( 'beforeend',
+				'<footer><br></footer>' );
+		}
+	}
+
+	function onDeselect( block ) {
+		var footer = block.querySelector( 'footer' );
+
+		if ( ! footer.textContent ) {
+			block.removeChild( footer );
+		}
+	}
+
+	wp.blocks.registerBlock( {
 		name: 'blockquote',
+		nameSpace: 'core',
 		displayName: 'Quote',
 		elements: [ 'blockquote' ],
 		type: 'text',
 		icon: 'gridicons-quote',
 		restrictToInline: [ 'footer' ],
+		placeholders: {
+			'': 'Write quote\u2026',
+			footer: 'Write citation\u2026'
+		},
 		controls: [
 			{
 				classes: 'remove-formatting',
 				icon: 'gridicons-quote',
 				onClick: toBaseState
-			},
-			{
-				icon: 'gridicons-caption',
-				onClick: function( block ) {
-					var footer = block.querySelector( 'footer' );
-
-					if ( footer ) {
-						block.removeChild( footer );
-					} else {
-						block.insertAdjacentHTML( 'beforeend',
-							'<footer><br></footer>' );
-					}
-				},
-				isActive: function( block ) {
-					return !! block.querySelector( 'footer' );
-				}
 			}
 		],
 		insert: insertEmpty,
 		fromBaseState: fromBaseState,
-		toBaseState: toBaseState
+		toBaseState: toBaseState,
+		onSelect: onSelect,
+		onDeselect: onDeselect
 	} );
+
 } )( window.wp );

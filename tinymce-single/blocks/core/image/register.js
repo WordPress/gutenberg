@@ -13,6 +13,23 @@
 		);
 	}
 
+	function onSelect( block ) {
+		var figcaption = block.querySelector( 'figcaption' );
+
+		if ( ! figcaption ) {
+			block.insertAdjacentHTML( 'beforeend',
+				'<figcaption><br></figcaption>' );
+		}
+	}
+
+	function onDeselect( block ) {
+		var figcaption = block.querySelector( 'figcaption' );
+
+		if ( ! figcaption.textContent ) {
+			block.removeChild( figcaption );
+		}
+	}
+
 	function pickTarget( parents, child ) {
 		for ( var i = 0; i < parents.length; i++ ) {
 			if ( parents[ i ] === child || parents[ i ].contains( child ) ) {
@@ -59,31 +76,18 @@
 		type: 'media',
 		icon: 'gridicons-image',
 		editable: [ 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		controls: [
 			'block-align-left',
 			'block-align-center',
 			'block-align-right',
-			'block-align-full',
-			{
-				icon: 'gridicons-caption',
-				onClick: function( block ) {
-					var figcaption = block.querySelector( 'figcaption' );
-
-					if ( figcaption ) {
-						block.removeChild( figcaption );
-					} else {
-						block.insertAdjacentHTML( 'beforeend',
-							'<figcaption><br></figcaption>' );
-					}
-
-					window.wp.blocks.selectBlock( block );
-				},
-				isActive: function( block ) {
-					return !! block.querySelector( 'figcaption' );
-				}
-			}
+			'block-align-full'
 		],
 		insert: insertEmpty,
+		onSelect: onSelect,
+		onDeselect: onDeselect,
 		onClick: onClick
 	} );
 

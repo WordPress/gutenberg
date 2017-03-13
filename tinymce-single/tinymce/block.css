@@ -376,3 +376,13 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	-ms-user-select: none;
 	user-select: none;
 }
+
+*[data-wp-placeholder] {
+	position: relative;
+}
+
+*[data-wp-placeholder]:before {
+	content: attr(data-wp-placeholder);
+	position: absolute;
+	opacity: 0.5;
+}
