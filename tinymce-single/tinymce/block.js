@@ -178,6 +178,9 @@
 		editor.on( 'preinit', function() {
 			var DOM = tinymce.DOM;
 			var hidden = true;
+			var hoverTarget;
+			var dragTarget;
+			var isDragging = false;
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -310,64 +313,73 @@
 
 			var blockToolbarWidth = 0;
 
-			function createBlockOutline() {
+			function createBlockOutline( hover ) {
 				var outline = document.createElement( 'div' );
 				var handleLeft = document.createElement( 'div' );
 				var handleRight = document.createElement( 'div' );
 
-				outline.className = 'block-outline';
+				if ( hover ) {
+					outline.className = 'block-outline block-outline-hover';
+				} else {
+					outline.className = 'block-outline';
+				}
+
 				handleLeft.className = 'block-outline-handle block-outline-handle-right';
 				handleRight.className = 'block-outline-handle block-outline-handle-left';
 				outline.appendChild( handleLeft );
 				outline.appendChild( handleRight );
 				document.body.appendChild( outline );
 
-				var target;
-
 				DOM.bind( outline, 'mousedown', function( event ) {
 					var newEvent = Object.assign( {}, event );
 
-					target = getSelectedBlock();
-
-					if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
-						target.setAttribute( 'contenteditable', 'false' );
+					if ( hover ) {
+						dragTarget = hoverTarget;
+					} else {
+						dragTarget = getSelectedBlock();
 					}
 
-					newEvent.target = target;
+					if ( dragTarget.getAttribute( 'contenteditable' ) !== 'false' ) {
+						dragTarget.setAttribute( 'contenteditable', 'false' );
+					}
+
+					newEvent.target = dragTarget;
 
 					editor.fire( 'mousedown', newEvent );
 				} );
 
-				editor.on( 'dragstart', function( event ) {
-					if ( ! target ) {
-						event.preventDefault();
-						return;
-					}
-
-					hidden = true;
-
-					hideBlockUI();
-
-					target.setAttribute( 'data-wp-block-dragging', 'true' );
-
-					function end( event ) {
-						DOM.unbind( editor.getDoc(), 'mouseup', end );
-
-						target = null;
-
-						setTimeout( function() {
-							editor.$( '*[data-wp-block-dragging]' )
-								.attr( 'data-wp-block-dragging', null )
-								.attr( 'contenteditable', null );
-							editor.nodeChanged();
-						} );
-					}
-
-					DOM.bind( editor.getDoc(), 'mouseup', end );
-				} );
-
 				return outline;
 			}
+
+			editor.on( 'dragstart', function( event ) {
+				if ( ! dragTarget ) {
+					event.preventDefault();
+					return;
+				}
+
+				isDragging = true;
+				hidden = true;
+
+				hideBlockUI();
+
+				dragTarget.setAttribute( 'data-wp-block-dragging', 'true' );
+
+				function end( event ) {
+					DOM.unbind( editor.getDoc(), 'mouseup', end );
+
+					isDragging = false;
+					dragTarget = null;
+
+					setTimeout( function() {
+						editor.$( '*[data-wp-block-dragging]' )
+							.attr( 'data-wp-block-dragging', null )
+							.attr( 'contenteditable', null );
+						editor.nodeChanged();
+					} );
+				}
+
+				DOM.bind( editor.getDoc(), 'mouseup', end );
+			} );
 
 			function createInsertToolbar() {
 				var insert = editor.wp._createToolbar( [ 'add' ] );
@@ -590,12 +602,38 @@
 
 			var UI = {
 				outline: createBlockOutline(),
+				hoverOutline: createBlockOutline( true ),
 				insert: createInsertToolbar(),
 				insertMenu: createInsertMenu(),
 				inline: createInlineToolbar(),
 				navigation: createBlockNavigation(),
 				blocks: createBlockToolbars()
 			};
+
+			editor.on( 'mouseover', function( event ) {
+				var target = wp.blocks.getParentBlock( event.target );
+
+				if ( target && target !== hoverTarget ) {
+					if ( isDragging || wp.blocks.getSelectedBlock() === hoverTarget ) {
+						DOM.setStyles( UI.hoverOutline, {
+							display: 'none'
+						} );
+					} else {
+						var rect = target.getBoundingClientRect();
+
+						DOM.setStyles( UI.hoverOutline, {
+							display: 'block',
+							position: 'absolute',
+							left: rect.left + 'px',
+							top: rect.top + window.pageYOffset + 'px',
+							height: rect.height + 'px',
+							width: rect.width + 'px'
+						} );
+					}
+
+					hoverTarget = target;
+				}
+			} );
 
 			var range;
 

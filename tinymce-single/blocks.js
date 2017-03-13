@@ -59,6 +59,20 @@
 		getControls: function() {
 			return _controls;
 		},
+		getParentBlock: function( node ) {
+			var editor = window.tinyMCE.activeEditor;
+			var rootNode = editor.getBody();
+
+			if ( node === rootNode || ! editor.getBody().contains( node ) ) {
+				return null;
+			}
+
+			while ( node.parentNode !== rootNode ) {
+				node = node.parentNode;
+			}
+
+			return node;
+		},
 		getSelectedBlocks: function() {
 			var editor = window.tinyMCE.activeEditor;
 			var selection = window.getSelection();
