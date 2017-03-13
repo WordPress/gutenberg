@@ -339,9 +339,7 @@
 						dragTarget = getSelectedBlock();
 					}
 
-					if ( dragTarget.getAttribute( 'contenteditable' ) !== 'false' ) {
-						dragTarget.setAttribute( 'contenteditable', 'false' );
-					}
+					dragTarget.setAttribute( 'contenteditable', 'false' );
 
 					newEvent.target = dragTarget;
 
@@ -371,9 +369,16 @@
 					dragTarget = null;
 
 					setTimeout( function() {
-						editor.$( '*[data-wp-block-dragging]' )
-							.attr( 'data-wp-block-dragging', null )
-							.attr( 'contenteditable', null );
+						var $draggedNode = editor.$( '*[data-wp-block-dragging]' );
+
+						if ( $draggedNode.length ) {
+							$draggedNode[0].removeAttribute( 'data-wp-block-dragging' );
+
+							if ( ! $draggedNode[0].getAttribute( 'data-wp-block-type' ) ) {
+								$draggedNode[0].removeAttribute( 'contenteditable' );
+							}
+						}
+
 						editor.nodeChanged();
 					} );
 				}
