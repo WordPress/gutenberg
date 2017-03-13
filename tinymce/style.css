@@ -14,19 +14,22 @@ body {
 }
 
 body {
-	font-family: Georgia, serif;
-	font-size: 16px;
 	max-width: 720px;
 	margin: 60px auto;
-	color: #12181e;
+	color: #191e23;
 }
 
 *[contenteditable] {
 	outline: none;
 }
 
+body #editor a {
+	color: #009fd4;
+	padding: 0 2px;
+}
+
 a[data-mce-selected] {
-	background: #bfe6ff;
+	background: #dcf2f8;
 	border-radius: 1px;
-	box-shadow: 0 0 0 1px #bfe6ff;
+	box-shadow: 0 0 0 1px #dcf2f8;
 }
