@@ -200,6 +200,8 @@ const blockLevelUpdater = ( state, command ) => {
 };
 
 const globalLevelUpdater = ( state, command ) => {
+	const mergeStates = newState => Object.assign( {}, state, newState );
+
 	const commandHandlers = {
 		addBlock: ( { id } ) => {
 			const newBlockUID = uniqueId();
@@ -209,10 +211,17 @@ const globalLevelUpdater = ( state, command ) => {
 				...state.blocks,
 				newBlock
 			];
-			return Object.assign( {}, state, {
+			return mergeStates( {
 				blocks: newBlocks,
 				focus: { uid: newBlockUID, config: {} },
 				selected: newBlockUID
+			} );
+		},
+
+		unselectAll: () => {
+			return mergeStates( {
+				focus: { uid: null, config: {} },
+				selected: null
 			} );
 		}
 	};
