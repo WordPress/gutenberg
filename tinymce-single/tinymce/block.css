@@ -337,7 +337,3 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	display: block;
 	margin: 0 auto 20px;
 }
-
-#editor .wp-hover-block {
-	box-shadow: -8px 0px 0 #fff, -10px 0px 0 #e1e6ea;
-}
