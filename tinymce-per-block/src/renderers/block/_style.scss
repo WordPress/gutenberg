@@ -6,21 +6,33 @@
 
 .block-list__block {
 	outline: 0;
+	position: relative;
+	margin-left: -35px;
+	margin-bottom: 15px;
 
 	> div {
 		position: relative;
-		border: 2px solid transparent;
 		outline: none;
-		padding: 0.8rem 1.2rem;
-		transition: 0.2s border-color;
-		margin-bottom: 1rem;
+		padding: 15px 15px 15px 50px;
+
+		&:before {
+			z-index: -1;
+			content: '';
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 35px;
+			right: 0;
+			border: 2px solid transparent;
+			transition: 0.2s border-color;
+		}
 	}
 
-	&:hover > div {
+	&:hover > div:before {
 		border-left-color: #e1e6ea;
 	}
 
-	&.is-selected > div {
+	&.is-selected > div:before {
 		border-color: #e1e6ea;
 	}
 }
@@ -28,7 +40,7 @@
 .block-list__block-controls {
 	@include animate_fade;
 	position: absolute;
-	left: 0;
+	left: 35px;
 	top: -36px;
 	z-index: 1;
 }

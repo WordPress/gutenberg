@@ -16,6 +16,7 @@ import * as commands from './commands';
 
 class BlockList extends Component {
 	state = {
+		hovered: null,
 		selected: null,
 		focus: { uid: null },
 		blocks: [],
@@ -85,7 +86,7 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const { blocks, focus, selected } = this.state;
+		const { blocks, focus, selected, hovered } = this.state;
 
 		return (
 			<div>
@@ -122,6 +123,7 @@ class BlockList extends Component {
 									block={ block }
 									api={ api }
 									isSelected={ selected === block.uid }
+									isHovered={ hovered === block.uid }
 									focusConfig={ isFocused ? focus.config : null }
 									first={ index === 0 }
 									last={ index === blocks.length - 1 }
