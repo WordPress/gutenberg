@@ -50,6 +50,10 @@
 		type: 'text',
 		icon: 'gridicons-quote',
 		restrictToInline: [ 'footer' ],
+		placeholders: {
+			'': 'Write quote\u2026',
+			footer: 'Write citation\u2026'
+		},
 		controls: [
 			{
 				classes: 'remove-formatting',

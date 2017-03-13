@@ -19,6 +19,9 @@
 		elements: [ 'pre' ],
 		type: 'text',
 		icon: 'gridicons-code',
+		placeholders: {
+			'': 'Write preformatted text\u2026'
+		},
 		controls: [
 			{
 				icon: 'gridicons-cog',

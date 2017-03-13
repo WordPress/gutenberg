@@ -53,6 +53,9 @@
 		keywords: [],
 		icon: 'gridicons-video',
 		editable: [ 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		controls: [
 			'block-align-left',
 			'block-align-center',

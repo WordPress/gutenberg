@@ -76,6 +76,9 @@
 		type: 'media',
 		icon: 'gridicons-image',
 		editable: [ 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		controls: [
 			'block-align-left',
 			'block-align-center',

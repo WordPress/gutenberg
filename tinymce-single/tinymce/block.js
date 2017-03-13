@@ -104,14 +104,29 @@
 			} );
 		} );
 
-		editor.on( 'nodeChange', function( event ) {
+		editor.on( 'nodeChange selectionChange', function( event ) {
 			var block = wp.blocks.getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );
 
-			if ( settings && settings.editable ) {
-				settings.editable.forEach( function( selector ) {
-					editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
-				} );
+			if ( settings ) {
+				if ( settings.editable ) {
+					settings.editable.forEach( function( selector ) {
+						editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+					} );
+				}
+
+				if ( settings.placeholders ) {
+					for ( var selector in settings.placeholders ) {
+						( selector ? editor.$( block ).find( selector ) : editor.$( block ) )
+							.each( function( i, node ) {
+								if ( ! node.textContent ) {
+									editor.$( node ).attr( 'data-wp-placeholder', settings.placeholders[ selector ] );
+								} else {
+									editor.$( node ).attr( 'data-wp-placeholder', null );
+								}
+							} );
+					}
+				}
 			}
 		} );
 
@@ -184,6 +199,7 @@
 			var isDragging = false;
 
 			editor.serializer.addTempAttr( 'data-wp-block-selected' );
+			editor.serializer.addTempAttr( 'data-wp-placeholder' );
 
 			editor.addButton( 'block', {
 				icon: 'gridicons-posts',
@@ -670,7 +686,7 @@
 				// Element node.
 				if ( node.nodeType === 1 ) {
 					// Element is no direct child.
-					if ( isAtRoot && node.parentNode !== editor.getBody() && node.nodeName !== 'P' ) {
+					if ( isAtRoot && ( node.parentNode !== editor.getBody() || node.nodeName !== 'P' ) ) {
 						return false;
 					}
 

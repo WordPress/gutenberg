@@ -41,6 +41,9 @@
 		type: 'data visualisation',
 		icon: 'gridicons-grid',
 		editable: [ 'table', 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		insert: insertEmpty,
 		onSelect: onSelect,
 		onDeselect: onDeselect,
