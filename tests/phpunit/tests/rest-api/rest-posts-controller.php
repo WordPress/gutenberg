@@ -2242,7 +2242,8 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		global $wpdb;
 
 		wp_set_current_user( self::$editor_id );
-		update_option( 'timezone_string', 'America/Chicago' );
+		update_option( 'timezone_string', '' );
+		update_option( 'gmt_offset', -6 );
 
 		// Need to set dates using wpdb directly because `wp_update_post` and
 		// `wp_insert_post` have additional validation on dates.
@@ -2287,6 +2288,7 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( $post->post_date_gmt, '2016-02-23 19:00:00' );
 
 		update_option( 'timezone_string', '' );
+		update_option( 'gmt_offset', 0 );
 	}
 
 	public function test_update_post_slug() {
