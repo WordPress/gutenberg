@@ -21,7 +21,7 @@
 			}
 		} );
 
-		controls.push( 'text-align-left', 'text-align-center', 'text-align-right' );
+		controls.push( '|', 'text-align-left', 'text-align-center', 'text-align-right' );
 
 		return controls;
 	}
