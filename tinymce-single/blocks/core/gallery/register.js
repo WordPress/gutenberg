@@ -94,6 +94,9 @@
 		keywords: [],
 		icon: 'gridicons-image-multiple',
 		editable: [ 'figcaption' ],
+		placeholders: {
+			figcaption: 'Write caption\u2026'
+		},
 		controls: [
 			'block-align-left',
 			'block-align-center',
