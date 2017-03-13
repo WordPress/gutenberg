@@ -322,6 +322,7 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	text-transform: uppercase;
 }
 
+.mce-menu-item .mce-txt,
 .insert-menu .mce-txt {
 	font-size: 16px;
 	text-align: inherit;
@@ -330,6 +331,7 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	line-height: 16px;
 	width: 120px;
 	padding: 4px;
+	display: inline-block;
 }
 
 .insert-menu .mce-btn-has-text svg.gridicons-heading {
@@ -352,7 +354,8 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	background-color: #fff;
 	border: 1px solid #e1e6ea;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
-	margin-top: 2px;
+	margin-top: 3px;
+	margin-left: -1px;
 }
 
 .mce-listbox .mce-txt {
@@ -360,5 +363,8 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 }
 
 .mce-menu-item {
-	padding: 4px;
+	padding: 6px;
+	position: relative;
+	background: none;
+	color: #12181e;
 }
