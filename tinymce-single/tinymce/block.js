@@ -24,10 +24,12 @@
 			var target;
 
 			DOM.bind( outline, 'mousedown', function( event ) {
+			console.log('>> attach mousedown to outline', outline);
 				var newEvent = Object.assign( {}, event );
 
 				target = getter();
 
+				console.log('target=', target)
 				if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
 					target.setAttribute( 'contenteditable', 'false' );
 				}
@@ -38,6 +40,7 @@
 			} );
 
 			editor.on( 'dragstart', function( event ) {
+				console.log('dragstart target=', target, ' drag blocked=', !target);
 				if ( ! target ) {
 					event.preventDefault();
 					return;
@@ -47,9 +50,11 @@
 
 				// hideBlockUI();
 
+				console.log('>> start dragging');
 				target.setAttribute( 'data-wp-block-dragging', 'true' );
 
 				function end( event ) {
+					console.log('>> mouse up, end drag', event);
 					DOM.unbind( editor.getDoc(), 'mouseup', end );
 
 					target = null;
