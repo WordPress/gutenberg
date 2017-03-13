@@ -55,6 +55,47 @@
 		}
 	} ) );
 
+	tinymce.ui.Factory.add( 'svglistbox', tinymce.ui.ListBox.extend( {
+		renderHtml: function() {
+			var id = this._id;
+			var prefix = this.classPrefix;
+			var icon = this.state.get( 'icon' );
+			var text = this.state.get( 'text' );
+			var html = '';
+
+			if ( icon && icon.indexOf( 'gridicons-' ) === 0 ) {
+				html += (
+					'<svg width="24" height="24" class="gridicon ' + icon + '">' +
+						'<use xlink:href="../shared/gridicons.svg#' + icon + '"></use>' +
+					'</svg>'
+				);
+			} else if ( icon ) {
+				html += '<i class="' + prefix + 'ico ' + prefix + 'i-' + icon + '"></i>';
+			}
+
+			if ( text ) {
+				this.classes.add( 'btn-has-text' );
+				html += '<span class="' + prefix + 'txt">' + this.encode( text ) + '</span>';
+			}
+
+			html += (
+				'<svg width="24" height="24" class="gridicon gridicons-dropdown">' +
+					'<use xlink:href="../shared/gridicons.svg#gridicons-dropdown"></use>' +
+				'</svg>'
+			);
+
+			this.aria( 'role', 'button' );
+
+			return (
+				'<div id="' + id + '" class="' + this.classes + '" tabindex="-1" aria-labelledby="' + id + '">' +
+					'<button id="' + id + '-open" role="presentation" type="button" tabindex="-1">' +
+						html +
+					'</button>' +
+				'</div>'
+			);
+		}
+	} ) );
+
 	tinymce.PluginManager.add( 'toolbar', function( editor ) {
 		var each = tinymce.each;
 		var DOM = tinymce.DOM;
@@ -76,9 +117,9 @@
 					var itemName;
 
 					function onClick( callback ) {
-						return function() {
+						return function( event ) {
 							editor.undoManager.transact( function() {
-								callback( window.wp.blocks.getSelectedBlock(), editor );
+								callback( window.wp.blocks.getSelectedBlock(), editor, event );
 							} );
 						}
 					}
