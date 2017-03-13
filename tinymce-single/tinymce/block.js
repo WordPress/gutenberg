@@ -46,6 +46,31 @@
 			editor.addButton( name, settings );
 		} );
 
+		var textBlocks = wp.blocks.getType( 'text' );
+
+		editor.addButton( 'text-switcher', {
+			type: 'svglistbox',
+			icon: 'gridicons-posts',
+			values: textBlocks.map( function( settings ) {
+				return {
+					text: settings.displayName,
+					value: settings._id
+				}
+			} ),
+			onClick: function( event ) {
+				if ( event.control && event.control.settings.value ) {
+					var block = wp.blocks.getSelectedBlock();
+					var currentSettings = wp.blocks.getBlockSettingsByElement( block );
+					var nextSettings = wp.blocks.getBlockSettings( event.control.settings.value );
+
+					editor.undoManager.transact( function() {
+						currentSettings.toBaseState( block, editor );
+						nextSettings.fromBaseState( block, editor );
+					} );
+				}
+			}
+		} );
+
 		editor.on( 'pastePreProcess', function( event ) {
 			var block = getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );

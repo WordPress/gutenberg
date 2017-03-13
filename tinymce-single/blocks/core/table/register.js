@@ -21,7 +21,7 @@
 		name: 'table',
 		nameSpace: 'core',
 		displayName: 'Table',
-		type: 'text',
+		type: 'media',
 		icon: 'gridicons-grid',
 		editable: [ 'table', 'figcaption' ],
 		insert: insertEmpty,
