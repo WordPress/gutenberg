@@ -3,12 +3,12 @@
 		var getSelectedBlock = wp.blocks.getSelectedBlock;
 		var getSelectedBlocks = wp.blocks.getSelectedBlocks;
 		var editorPadding = 50;
-
+		var hoverTarget = null;
+		var dragInProgress = false;
 		var DOM = tinymce.DOM;
 		var hidden = true
 
 		// Global controls
-
 		function createBlockOutline(getter) {
 			var outline = document.createElement( 'div' );
 			var handleLeft = document.createElement( 'div' );
@@ -21,15 +21,11 @@
 			outline.appendChild( handleRight );
 			document.body.appendChild( outline );
 
-			var target;
-
 			DOM.bind( outline, 'mousedown', function( event ) {
-			console.log('>> attach mousedown to outline', outline);
 				var newEvent = Object.assign( {}, event );
 
-				target = getter();
+				var target = getter(); // get the content element (not UI element)
 
-				console.log('target=', target)
 				if ( target.getAttribute( 'contenteditable' ) !== 'false' ) {
 					target.setAttribute( 'contenteditable', 'false' );
 				}
@@ -40,7 +36,7 @@
 			} );
 
 			editor.on( 'dragstart', function( event ) {
-				console.log('dragstart target=', target, ' drag blocked=', !target);
+				var target = event.target; // get the content element (not UI element)
 				if ( ! target ) {
 					event.preventDefault();
 					return;
@@ -49,7 +45,7 @@
 				hidden = true;
 
 				// hideBlockUI();
-
+				dragInProgress = true;
 				console.log('>> start dragging');
 				target.setAttribute( 'data-wp-block-dragging', 'true' );
 
@@ -57,10 +53,10 @@
 					console.log('>> mouse up, end drag', event);
 					DOM.unbind( editor.getDoc(), 'mouseup', end );
 
-					target = null;
+					dragInProgress = false;
 
 					setTimeout( function() {
-						editor.$( '*[data-wp-block-dragging]' )
+						editor.$( '[data-wp-block-dragging]' )
 							.attr( 'data-wp-block-dragging', null )
 							.attr( 'contenteditable', null );
 						editor.nodeChanged();
@@ -145,30 +141,40 @@
 			} );
 		} );
 
-		var currentEditingBlock = null;
-		var overBlockClass = 'wp-hover-block';
-
-		// function removeHoverClass() {
-		// 	editor.$( editor.getBody() ).find( '.' + overBlockClass ).removeClass( overBlockClass );
-		// }
-
 		editor.on( 'nodeChange', function( event ) {
-			currentEditingBlock = wp.blocks.getSelectedBlock();
+			var currentEditingBlock = wp.blocks.getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( currentEditingBlock );
 
 			if ( settings && settings.editable ) {
 				settings.editable.forEach( function( selector ) {
 					editor.$( currentEditingBlock ).find( selector ).attr( 'contenteditable', 'true' );
-					// removeHoverClass();
 				} );
 			}
 		} );
 
+		var hoverDragOutline = createBlockOutline(function () {
+			console.log('hover target',hoverTarget)
+			return hoverTarget;
+		});
+
 		editor.on( 'mouseover', function (e) {
-			var blockOver = wp.blocks.getHoverSelectedBlock(e);
-			// removeHoverClass();
-			if ( blockOver !== null && currentEditingBlock !== blockOver) {
-				blockOver.classList.add(overBlockClass);
+			hoverTarget = wp.blocks.getHoverSelectedBlock(e);
+			console.log('%c mouseover ', 'background:lightorange;')
+			// mouse is not on the editing block, and we are not dragging
+			var notDragging = editor.$( '[data-wp-block-dragging]' ).length === 0;
+			if ( hoverTarget !== null && wp.blocks.getSelectedBlock() !== hoverTarget && notDragging) {
+				console.log('%c mouseover ', 'background:lightgreen;')
+				var rect = hoverTarget.getBoundingClientRect();
+
+				DOM.setStyles( hoverDragOutline, {
+					display: 'block',
+					position: 'absolute',
+					left: rect.left + 'px',
+					top: rect.top + window.pageYOffset + 'px',
+					height: rect.height + 'px',
+					width: rect.width + 'px'
+				} );
+
 			}
 		});
 
