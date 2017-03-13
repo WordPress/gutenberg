@@ -155,6 +155,12 @@
 			return hoverTarget;
 		});
 
+		function hideEl( el ) {
+			DOM.setStyles( el, {
+				display: 'none'
+			} );
+		}
+
 		editor.on( 'mouseover', function (e) {
 			hoverTarget = wp.blocks.getHoverSelectedBlock(e);
 			console.log('%c mouseover ', 'background:lightorange;')
@@ -162,9 +168,7 @@
 			var notDragging = editor.$( '[data-wp-block-dragging]' ).length === 0;
 			if ( hoverTarget !== null) {
 				if (wp.blocks.getSelectedBlock() === hoverTarget) {
-					DOM.setStyles( hoverDragOutline, {
-						display: 'none'
-					} );
+					hideEl(hoverDragOutline);
 				} else if (notDragging) {
 					console.log('%c mouseover ', 'background:lightgreen;')
 					var rect = hoverTarget.getBoundingClientRect();
@@ -182,9 +186,7 @@
 		});
 
 		editor.on( 'mouseout', function (e) {
-			DOM.setStyles( hoverDragOutline, {
-				display: 'none'
-			} );
+			hideEl( hoverDragOutline );
 		});
 
 		function toInlineContent( content ) {
