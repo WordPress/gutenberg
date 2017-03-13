@@ -4,7 +4,7 @@ window.wp.blocks.registerBlock( {
 	elements: [ 'p' ],
 	type: 'text',
 	section: 'text',
-	icon: 'gridicons-posts',
+	icon: 'gridicons-paragraph',
 	controls: [
 		'text-switcher',
 		'|',
