@@ -46,12 +46,9 @@
 
 				hidden = true;
 
-				// hideBlockUI();
-				console.log('>> start dragging');
 				target.setAttribute( 'data-wp-block-dragging', 'true' );
 
 				function end( event ) {
-					console.log('>> mouse up, end drag', event);
 					DOM.unbind( editor.getDoc(), 'mouseup', end );
 
 					setTimeout( function() {
@@ -163,16 +160,14 @@
 
 		editor.on( 'mouseover', function (e) {
 			hoverTarget = wp.blocks.getHoverSelectedBlock(e);
-			console.log('%c mouseover ', 'background:lightorange;')
+
 			// mouse is not on the editing block, and we are not dragging
 			var notDragging = editor.$( '[data-wp-block-dragging]' ).length === 0;
 			if ( hoverTarget !== null) {
 				if (wp.blocks.getSelectedBlock() === hoverTarget) {
 					hideEl(hoverDragOutline);
 				} else if (notDragging) {
-					console.log('%c mouseover ', 'background:lightgreen;')
 					var rect = hoverTarget.getBoundingClientRect();
-
 					DOM.setStyles( hoverDragOutline, {
 						display: 'block',
 						position: 'absolute',
