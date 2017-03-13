@@ -50,7 +50,7 @@
 
 		editor.addButton( 'text-switcher', {
 			type: 'svglistbox',
-			icon: 'gridicons-posts',
+			icon: 'gridicons-paragraph',
 			values: textBlocks.map( function( settings ) {
 				return {
 					text: settings.displayName,
