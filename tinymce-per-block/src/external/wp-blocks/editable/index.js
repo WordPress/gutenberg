@@ -3,7 +3,7 @@
  */
 import { createElement, Component } from 'wp-elements';
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
+import { isEqual, last } from 'lodash';
 
 function initialize( node, inline, onSetup ) {
 	if ( ! node ) {
@@ -102,7 +102,7 @@ export default class EditableComponent extends Component {
 		if ( range.startOffset !== 0 || ! range.collapsed ) {
 			return false;
 		}
-		const start = this.editor.selection.getStart();
+		const start = range.startContainer;
 		const body = this.editor.getBody();
 		let element = start;
 		do {
@@ -131,7 +131,7 @@ export default class EditableComponent extends Component {
 				event.preventDefault();
 				this.props.moveCursorDown();
 			}
-		} else if ( event.keyCode === 13 && this.props.single ) {
+		} else if ( event.keyCode === 13 ) {
 			// Wait for the event to propagate
 			setTimeout( () => {
 				this.editor.selection.getStart();
@@ -142,14 +142,31 @@ export default class EditableComponent extends Component {
 				const childNodes = Array.from( this.editor.getBody().childNodes );
 				const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
 				const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
-				const before = getHtml( childNodes.slice( 0, splitIndex ) );
+				const beforeNodes = childNodes.slice( 0, splitIndex );
+				const lastNodeBeforeCursor = last( beforeNodes );
+				let before = getHtml( beforeNodes );
 				const after = getHtml( childNodes.slice( splitIndex ) );
 				const hasAfter = !! childNodes.slice( splitIndex )
 					.reduce( ( memo, node ) => memo + node.textContent, '' );
-				this.editor.setContent( this.props.content );
-				if ( before ) {
-					this.props.splitValue( before, hasAfter ? after : '' );
+
+				// Single enter adds a new inline
+				// Double enter adds a new block
+				if (
+					! this.props.single &&
+					!! lastNodeBeforeCursor &&
+					lastNodeBeforeCursor.innerHTML !== '<br>'
+				) {
+					return;
+				} else if (
+					! this.props.single &&
+					!! lastNodeBeforeCursor &&
+					lastNodeBeforeCursor.innerHTML === '<br>'
+				) {
+					before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
 				}
+
+				this.editor.setContent( this.props.content );
+				this.props.splitValue( before, hasAfter ? after : '' );
 			} );
 		} else if ( event.keyCode === 8 ) {
 			if ( this.isStartOfEditor() ) {
