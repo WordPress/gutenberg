@@ -160,19 +160,24 @@
 			console.log('%c mouseover ', 'background:lightorange;')
 			// mouse is not on the editing block, and we are not dragging
 			var notDragging = editor.$( '[data-wp-block-dragging]' ).length === 0;
-			if ( hoverTarget !== null && wp.blocks.getSelectedBlock() !== hoverTarget && notDragging) {
-				console.log('%c mouseover ', 'background:lightgreen;')
-				var rect = hoverTarget.getBoundingClientRect();
+			if ( hoverTarget !== null) {
+				if (wp.blocks.getSelectedBlock() === hoverTarget) {
+					DOM.setStyles( hoverDragOutline, {
+						display: 'none'
+					} );
+				} else if (notDragging) {
+					console.log('%c mouseover ', 'background:lightgreen;')
+					var rect = hoverTarget.getBoundingClientRect();
 
-				DOM.setStyles( hoverDragOutline, {
-					display: 'block',
-					position: 'absolute',
-					left: rect.left + 'px',
-					top: rect.top + window.pageYOffset + 'px',
-					height: rect.height + 'px',
-					width: rect.width + 'px'
-				} );
-
+					DOM.setStyles( hoverDragOutline, {
+						display: 'block',
+						position: 'absolute',
+						left: rect.left + 'px',
+						top: rect.top + window.pageYOffset + 'px',
+						height: rect.height + 'px',
+						width: rect.width + 'px'
+					} );
+				}
 			}
 		});
 
