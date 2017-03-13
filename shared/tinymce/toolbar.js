@@ -96,6 +96,34 @@
 		}
 	} ) );
 
+	tinymce.ui.Factory.add( 'menuitem', tinymce.ui.MenuItem.extend( {
+		renderHtml: function () {
+			var self = this, id = self._id, settings = self.settings, prefix = self.classPrefix;
+
+			var icon = this.settings.icon;
+			var text = this.settings.text;
+			var html = '';
+
+			if ( icon ) {
+				html += (
+					'<svg width="24" height="24" class="gridicon ' + icon + '">' +
+						'<use xlink:href="../shared/gridicons.svg#' + icon + '"></use>' +
+					'</svg>'
+				);
+			}
+
+			if ( text ) {
+				html += '<span class="' + prefix + 'txt">' + this.encode( text ) + '</span>';
+			}
+
+			return (
+				'<div id="' + id + '" class="' + self.classes + '" tabindex="-1">' +
+					html +
+				'</div>'
+			);
+		}
+	} ) );
+
 	tinymce.PluginManager.add( 'toolbar', function( editor ) {
 		var each = tinymce.each;
 		var DOM = tinymce.DOM;

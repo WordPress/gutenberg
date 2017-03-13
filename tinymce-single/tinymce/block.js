@@ -54,6 +54,7 @@
 			values: textBlocks.map( function( settings ) {
 				return {
 					text: settings.displayName,
+					icon: settings.icon,
 					value: settings._id
 				}
 			} ),
