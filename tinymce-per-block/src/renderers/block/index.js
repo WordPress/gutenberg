@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component } from 'wp-elements';
-import { map, debounce, isEqual } from 'lodash';
+import { map, debounce } from 'lodash';
 import { findDOMNode } from 'react-dom';
 import classNames from 'classnames';
 import { getBlock } from 'wp-blocks';
@@ -25,8 +25,24 @@ class BlockList extends Component {
 	blockNodes = [];
 	commands = [];
 
+	bindEditor = ( ref ) => {
+		this.editor = ref;
+	};
+
+	handleDocumentClick = ( evt ) => {
+		const area = findDOMNode( this.editor );
+		if ( ! area.contains( evt.target ) ) {
+			this.executeCommand( { type: 'unselectAll' } );
+		}
+	};
+
 	componentDidMount() {
 		this.setState( { blocks: this.props.content } );
+		window.addEventListener( 'click', this.handleDocumentClick );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'click', this.handleDocumentClick );
 	}
 
 	componentDidUpdate() {
@@ -90,7 +106,7 @@ class BlockList extends Component {
 
 		return (
 			<div>
-				<div className="block-list">
+				<div className="block-list" ref={ this.bindEditor }>
 					{ map( blocks, ( block, index ) => {
 						const isFocused = block.uid === focus.uid;
 						const api = Object.keys( commands ).reduce( ( memo, command ) => {
