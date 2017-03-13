@@ -180,7 +180,7 @@
 			}
 		});
 
-		editor.on( 'mouseout', function (e) {
+		hoverDragOutline.addEventListener('mouseleave', function () {
 			hideEl( hoverDragOutline );
 		});
 
