@@ -28,12 +28,12 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { api, block, isSelected, first, last } = this.props;
+		const { api, block, isSelected, isHovered, first, last } = this.props;
 		const sizes = [ 'h1', 'h2', 'h3' ];
 
 		return (
-			<div>
-				{ isSelected && <BlockArrangement first={ first } last={ last }
+			<div onMouseEnter={ api.hover } onMouseLeave={ api.unhover }>
+				{ ( isSelected || isHovered ) && <BlockArrangement first={ first } last={ last }
 					moveBlockUp={ api.moveBlockUp } moveBlockDown={ api.moveBlockDown } /> }
 				{ isSelected && (
 					<div className="block-list__block-controls">
