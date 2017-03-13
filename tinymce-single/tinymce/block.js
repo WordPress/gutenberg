@@ -123,7 +123,6 @@
 
 			if ( settings.onClick ) {
 				settings.onClick( event, block, function() { editor.nodeChanged() } )
-				removeHoverClass();
 			}
 		} );
 
