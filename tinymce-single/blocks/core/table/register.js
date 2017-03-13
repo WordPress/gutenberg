@@ -21,7 +21,7 @@
 		name: 'table',
 		nameSpace: 'core',
 		displayName: 'Table',
-		type: 'media',
+		type: 'data visualisation',
 		icon: 'gridicons-grid',
 		editable: [ 'table', 'figcaption' ],
 		insert: insertEmpty,

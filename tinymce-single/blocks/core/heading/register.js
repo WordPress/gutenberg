@@ -36,6 +36,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'heading',
+		nameSpace: 'core',
 		displayName: 'Heading',
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'text',

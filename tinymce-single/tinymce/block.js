@@ -443,7 +443,7 @@
 					var allSettings = wp.blocks.getBlocks();
 					var buttons = [];
 					var key;
-					var types = [ 'text', 'media', 'separator' ];
+					var types = [ 'text', 'media', 'data visualisation', 'separator' ];
 
 					function onClick( callback, settings ) {
 						return function( block ) {

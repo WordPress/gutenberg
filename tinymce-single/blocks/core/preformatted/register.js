@@ -14,6 +14,7 @@
 
 	window.wp.blocks.registerBlock( {
 		name: 'preformatted',
+		nameSpace: 'core',
 		displayName: 'Preformatted',
 		elements: [ 'pre' ],
 		type: 'text',
