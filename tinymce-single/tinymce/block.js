@@ -313,7 +313,7 @@
 			editor.buttons.link.icon = 'gridicons-link';
 
 			var blockToolbarWidth = 0;
-
+			var beforeSelection;
 			function createBlockOutline( hover ) {
 				var outline = document.createElement( 'div' );
 				var handleLeft = document.createElement( 'div' );
@@ -333,6 +333,7 @@
 
 				DOM.bind( outline, 'mousedown', function( event ) {
 					var newEvent = Object.assign( {}, event );
+					beforeSelection = editor.selection.getBookmark();
 
 					if ( hover ) {
 						dragTarget = hoverTarget;
@@ -379,7 +380,7 @@
 								$draggedNode[0].removeAttribute( 'contenteditable' );
 							}
 						}
-
+						editor.selection.moveToBookmark(beforeSelection);
 						editor.nodeChanged();
 					} );
 				}
