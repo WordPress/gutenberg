@@ -23,7 +23,7 @@
 	color: $gray-dark-300;
 	resize: none;
 	font-style: italic;
-	padding-left: 20px;
+	padding-left: 15px;
 
 	&:before {
 		display: block;
@@ -37,8 +37,8 @@
 
 .quote-block__form.quote-style1 {
 	border-left: 4px solid black;
-	margin-left: -20px;
-	padding-left: 20px;
+	margin-left: -15px;
+	padding-left: 15px;
 
 	.quote-block__content {
 		font-style: italic;

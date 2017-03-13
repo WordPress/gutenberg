@@ -55,3 +55,11 @@ export const transform = ( id ) => ( {
 	type: 'transform',
 	id
 } );
+
+export const hover = () => ( {
+	type: 'hover'
+} );
+
+export const unhover = () => ( {
+	type: 'unhover'
+} );
