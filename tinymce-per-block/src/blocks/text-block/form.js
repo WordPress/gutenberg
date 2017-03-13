@@ -3,11 +3,14 @@
  */
 import { createElement, Component } from 'wp-elements';
 
+/**
+ * Internal dependencies
+ */
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import AlignmentToolbar from 'controls/alignment-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
 import TransformBlockToolbar from 'controls/transform-block-toolbar';
-import InlineTextBlockForm from 'blocks/inline-text-block/form';
+import { EditableComponent } from 'wp-blocks';
 import InserterButton from 'inserter/button';
 
 export default class TextBlockForm extends Component {
@@ -32,6 +35,17 @@ export default class TextBlockForm extends Component {
 		const selectedTextAlign = block.align || 'left';
 		const style = {
 			textAlign: selectedTextAlign
+		};
+		const splitValue = ( left, right ) => {
+			api.change( { content: left } );
+			if ( right ) {
+				api.appendBlock( {
+					...block,
+					content: right
+				} );
+			} else {
+				api.appendBlock();
+			}
 		};
 
 		return (
@@ -59,10 +73,20 @@ export default class TextBlockForm extends Component {
 				}
 
 				<div style={ style } onClick={ api.select }>
-					<InlineTextBlockForm
+					<EditableComponent
 						ref={ this.bindForm }
-						{ ...this.props }
+						content={ block.content }
+						moveCursorUp={ api.moveCursorUp }
+						moveCursorDown={ api.moveCursorDown }
+						splitValue={ splitValue }
+						mergeWithPrevious={ api.mergeWithPrevious }
+						remove={ api.remove }
+						onChange={ ( value ) => api.change( { content: value } ) }
 						setToolbarState={ this.setToolbarState }
+						focusConfig={ focusConfig }
+						onFocusChange={ api.focus }
+						onType={ api.unselect }
+						inline
 					/>
 				</div>
 			</div>

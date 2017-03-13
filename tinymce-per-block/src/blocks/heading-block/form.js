@@ -5,7 +5,10 @@ import { createElement, Component } from 'wp-elements';
 import classNames from 'classnames';
 import { EditorHeadingIcon } from 'dashicons';
 
-import InlineTextBlockForm from '../inline-text-block/form';
+/**
+ * Internal dependencies
+ */
+import { EditableComponent } from 'wp-blocks';
 import EditableFormatToolbar from 'controls/editable-format-toolbar';
 import BlockArrangement from 'controls/block-arrangement';
 import TransformBlockToolbar from 'controls/transform-block-toolbar';
@@ -28,8 +31,19 @@ export default class HeadingBlockForm extends Component {
 	};
 
 	render() {
-		const { api, block, isSelected, isHovered, first, last } = this.props;
+		const { api, block, isSelected, isHovered, first, last, focusConfig } = this.props;
 		const sizes = [ 'h1', 'h2', 'h3' ];
+		const splitValue = ( left, right ) => {
+			api.change( { content: left } );
+			if ( right ) {
+				api.appendBlock( {
+					...block,
+					content: right
+				} );
+			} else {
+				api.appendBlock();
+			}
+		};
 
 		return (
 			<div onMouseEnter={ api.hover } onMouseLeave={ api.unhover }>
@@ -64,11 +78,21 @@ export default class HeadingBlockForm extends Component {
 					</div>
 				) }
 				<div className={ `heading-block__form ${ block.size }` } onClick={ api.select }>
-					<InlineTextBlockForm
+					<EditableComponent
 						ref={ this.bindForm }
-						{ ...this.props }
+						content={ block.content }
+						moveCursorUp={ api.moveCursorUp }
+						moveCursorDown={ api.moveCursorDown }
+						splitValue={ splitValue }
+						mergeWithPrevious={ api.mergeWithPrevious }
+						remove={ api.remove }
+						onChange={ ( value ) => api.change( { content: value } ) }
 						setToolbarState={ this.setToolbarState }
+						focusConfig={ focusConfig }
+						onFocusChange={ api.focus }
+						onType={ api.unselect }
 						single
+						inline
 					/>
 				</div>
 			</div>
