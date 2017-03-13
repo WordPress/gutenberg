@@ -148,6 +148,7 @@ body {
 
 #editor figcaption {
 	margin-top: 0.5em;
+	color: #86909b;
 	font-size: 0.9em;
 	font-style: italic;
 }
@@ -178,8 +179,14 @@ body {
 	margin: 2em;
 }
 
+#editor blockquote footer {
+	color: #86909b;
+	font-size: 0.9em;
+	font-style: normal;
+}
+
 #editor blockquote footer:before {
-	content: '— '
+	content: '— ';
 }
 
 #editor table {
