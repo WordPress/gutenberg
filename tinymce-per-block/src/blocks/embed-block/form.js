@@ -34,7 +34,7 @@ export default class EmbedBlockForm extends Component {
 			} );
 		};
 
-		const html = getEmbedHtmlFromUrl( block.url );
+		const html = getEmbedHtmlFromUrl( block.url, block.align );
 
 		return (
 			<div className={ classNames( 'embed-block', block.align ) }

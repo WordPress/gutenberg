@@ -1,4 +1,4 @@
-export const getEmbedHtmlFromUrl = ( url ) => {
+export const getEmbedHtmlFromUrl = ( url, align ) => {
 	const getYoutubeId = ( youtubeUrl ) => {
 		const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 		const match = youtubeUrl.match( regExp );
@@ -11,8 +11,11 @@ export const getEmbedHtmlFromUrl = ( url ) => {
 	};
 
 	const youtubeId = getYoutubeId( url );
+	const style = align === 'align-full-width'
+		? 'style="width: 100vw; min-height: 50vw;"'
+		: 'width="560" height="315"';
+
 	return youtubeId
-		? '<iframe width="560" height="315" src="//www.youtube.com/embed/' +
-			youtubeId + '" frameborder="0" allowfullscreen></iframe>'
+		? `<iframe ${ style } src="//www.youtube.com/embed/${ youtubeId }" frameborder="0" allowfullscreen></iframe>`
 		: '';
 };
