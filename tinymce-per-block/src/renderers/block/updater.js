@@ -174,7 +174,19 @@ const blockLevelUpdater = ( state, command ) => {
 				blocks: newBlocks,
 				focus: { uid: newBlockUid, config: {} }
 			} );
-		}
+		},
+
+		hover: () => {
+			return mergeStates( {
+				hovered: currentUID
+			} );
+		},
+
+		unhover: () => {
+			return mergeStates( {
+				hovered: null
+			} );
+		},
 	};
 
 	if ( blockCommandHandlers[ command.type ] ) {
