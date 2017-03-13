@@ -530,7 +530,7 @@
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: Math.max( contentRect.left + editorPadding, elementRect.left ) + 8 + blockToolbarWidth + 'px',
+						left: Math.max( contentRect.left + editorPadding, elementRect.left ) + blockToolbarWidth + 'px',
 						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 					} );
 

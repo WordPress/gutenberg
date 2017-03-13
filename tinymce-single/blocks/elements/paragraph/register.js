@@ -7,6 +7,7 @@ window.wp.blocks.registerBlock( {
 	icon: 'gridicons-posts',
 	controls: [
 		'text-switcher',
+		'|',
 		'text-align-left',
 		'text-align-center',
 		'text-align-right'
