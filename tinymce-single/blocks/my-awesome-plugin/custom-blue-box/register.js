@@ -23,7 +23,7 @@
 
 		block.parentNode.removeChild( block );
 
-		window.wp.blocks.selectBlock( firstChild );
+		wp.blocks.selectBlock( firstChild );
 	}
 
 	wp.blocks.registerBlock( {
@@ -44,7 +44,11 @@
 				classes: 'remove-formatting',
 				icon: 'gridicons-custom-post-type',
 				onClick: toBaseState
-			}
+			},
+			'|',
+			'text-align-left',
+			'text-align-center',
+			'text-align-right'
 		]
 	} );
 
