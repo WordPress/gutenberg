@@ -36,20 +36,38 @@ export default class Toolbar extends React.Component {
 					</Button>
 				</div>
 
-				<div className={sideToolbarStyles} onMouseEnter={ () => { } }>
+				<div className={sideToolbarStyles} onMouseEnter={() => { }}>
 
-						<Dropbutton status={'ACTIVE'}
-												dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]}
-												hoverchoices={[
-													<AlignLeftButton />,
-													<AlignRightButton />,
-													<AlignCenterButton />
-												 ]}
-												selected={<H1Button />} />
+					<Dropbutton status={'ACTIVE'}
+						dropchoices={[<ParagraphButton />, <QuoteButton />]}
+						hoverchoices={[
+							<AlignLeftButton />,
+							<AlignRightButton />,
+							<AlignCenterButton />
+						]}
+						selected={<H1Button />} />
 
 
-						{/*<Dropbutton status={'INACTIVE'} dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<ParagraphButton />} />
-						<Dropbutton status={'INACTIVE'} dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<QuoteButton />} />*/}
+					<Dropbutton status={'INACTIVE'}
+						dropchoices={[<H1Button />, <QuoteButton />]}
+						hoverchoices={[
+							<AlignLeftButton />,
+							<AlignRightButton />,
+							<AlignCenterButton />
+						]}
+						selected={<ParagraphButton />} />
+
+
+					<Dropbutton status={'INACTIVE'}
+						dropchoices={[<H1Button />, <ParagraphButton />]}
+						hoverchoices={[
+							<AlignLeftButton />,
+							<AlignRightButton />,
+							<AlignCenterButton />
+						]}
+						selected={<QuoteButton />} />
+
+
 				</div>
 			</div>
 		)
