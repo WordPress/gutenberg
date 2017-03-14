@@ -15,8 +15,6 @@ export default class TinyMCEReactUI extends Component {
 
   render() {
     return (
-      <div>
-        <div>Menu DIVS all up here</div>
         <TinyMCE
           content={this.props.content}
           config={{
@@ -39,7 +37,6 @@ export default class TinyMCEReactUI extends Component {
           }}
           onChange={this.handleEditorChange}
         />
-      </div>
     );
   }
 }
