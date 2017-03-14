@@ -205,6 +205,18 @@
 				.attr( 'data-wp-block-selected', null );
 		} );
 
+		editor.on( 'keyup', function( event ) {
+			if ( event.keyCode === tinymce.util.VK.BACKSPACE ) {
+				var $empty = editor.$( editor.selection.getNode() ).find( ':empty' );
+
+				$empty.append( '<br>' );
+
+				if ( $empty.length ) {
+					editor.selection.setCursorLocation( $empty[0], 0 );
+				}
+			}
+		} );
+
 		// Attach block UI.
 
 		editor.on( 'preinit', function() {
