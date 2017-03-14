@@ -6,11 +6,9 @@
 
 	blockquote {
 		width: 100%;
-		font-weight: 300;
-		font-size: 20px;
 		border-left: 4px solid black;
-		margin-left: -20px;
 		padding-left: 20px;
+		margin-left: 0;
 		font-style: italic;
 
 		footer {
@@ -20,6 +18,10 @@
 			color: $gray-dark-300;
 			font-style: italic;
 			padding-left: 20px;
+
+			a {
+				color: #28b2dd;
+			}
 
 			&:before {
 				display: block;
