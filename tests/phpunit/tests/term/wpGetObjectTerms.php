@@ -85,6 +85,25 @@ class Tests_Term_WpGetObjectTerms extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * @ticket 40154
+	 */
+	public function test_taxonomies_passed_to_wp_get_object_terms_filter_should_be_quoted() {
+		register_taxonomy( 'wptests_tax', 'post' );
+		register_taxonomy( 'wptests_tax_2', 'post' );
+
+		add_filter( 'wp_get_object_terms', array( $this, 'wp_get_object_terms_callback' ), 10, 3 );
+		$terms = wp_get_object_terms( 1, array( 'wptests_tax', 'wptests_tax_2' ) );
+		remove_filter( 'wp_get_object_terms', array( $this, 'wp_get_object_terms_callback' ), 10, 3 );
+
+		$this->assertSame( "'wptests_tax', 'wptests_tax_2'", $this->taxonomies );
+	}
+
+	public function wp_get_object_terms_callback( $terms, $object_ids, $taxonomies ) {
+		$this->taxonomies = $taxonomies;
+		return $terms;
+	}
+
 	public function test_orderby_name() {
 		$p = self::factory()->post->create();
 
