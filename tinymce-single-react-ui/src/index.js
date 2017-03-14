@@ -1,13 +1,10 @@
-/**
- * External dependencies
- */
-import '../../shared/post-content';
-
-import React, { createElement, Component } from 'react';
-import * as Icons from './external/dashicons/index';
-import { render } from 'react-dom';
-
-import TinyMCEReactUI from 'tinymce-react/tinymce-react-ui';
+import '../../shared/post-content'
+import 'assets/stylesheets/main.scss'
+import React, { createElement, Component } from 'react'
+import { render } from 'react-dom'
+import * as Icons from './external/dashicons/index'
+import Toolbar from './components/toolbar/Toolbar'
+import TinyMCEReactUI from 'tinymce-react/tinymce-react-ui'
 
 // ////////////////////////////////
 import { createStore } from 'redux'

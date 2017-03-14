@@ -1,29 +1,9 @@
-@import 'variables';
-@import 'animations';
-@import 'theme';
-@import '~blocks/html-block/style';
-@import '~blocks/image-block/style';
-@import '~blocks/heading-block/style';
-@import '~blocks/text-block/style';
-@import '~blocks/quote-block/style';
-@import '~blocks/embed-block/style';
-@import '~external/dashicons/style';
-@import '~renderers/block/style';
-@import '~renderers/html/style';
-@import '~controls/block-arrangement/style';
-@import '~controls/editable-format-toolbar/style';
-@import '~controls/transform-block-toolbar/style';
-@import '~inserter/style';
-
 * {
 	box-sizing: border-box;
 }
 
+body,
 html {
-	height: 100%;
-}
-
-body {
 	height: 100%;
 }
 
@@ -40,30 +20,6 @@ body {
 	margin: 60px auto;
 	color: #12181e;
 }
-
-.editor {
-	height: 100%;
-}
-
-.toggle-renderer {
-	position: absolute;
-	top: -20px;
-	right: 0;
-}
-
-.renderers {
-	position: relative;
-	height: 100%;
-}
-
-.renderer-html {
-	z-index: 10;
-	position: absolute;
-		top: 0;
-		bottom: 0;
-	width: 100%;
-}
-
 .mce-content-body:focus {
 	outline: 0;
 }

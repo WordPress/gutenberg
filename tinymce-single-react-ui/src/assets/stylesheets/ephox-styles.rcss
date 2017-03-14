@@ -1,9 +1,0 @@
-.move {
-  position: absolute;
-  top: -36px;
-  right: 0;
-}
-
-.topToolbar {
-  display: flex;
-}
