@@ -60,7 +60,8 @@ function initialize( node, inline, onSetup ) {
 	static defaultProps = {
 		onChange: () => {},
 		splitValue: () => {},
-		onFocusChange: () => {},
+		onFocus: () => {},
+		onBlur: () => {},
 		onType: () => {},
 		initialContent: '',
 		inline: false,
@@ -250,9 +251,15 @@ function initialize( node, inline, onSetup ) {
 	};
 
 	onFocus = () => {
-    console.log('>>onFocus')
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.props.onFocusChange( { bookmark } );
+    console.log('>>onFocus', bookmark)
+		this.props.onFocus( bookmark );
+	};
+
+	onBlur = () => {
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+    console.log('>>onBlur', bookmark)
+		this.props.onBlur( bookmark );
 	};
 
 	onSetup = ( editor ) => {
@@ -260,11 +267,12 @@ function initialize( node, inline, onSetup ) {
 		this.editor = editor;
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout undo redo', this.onChange );
+		editor.on( 'undo redo', this.onChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'paste', this.onPaste );
 		editor.on( 'nodechange', this.syncToolbar );
 		editor.on( 'focusin', this.onFocus );
+		editor.on( 'focusout', this.onBlur );
 		editor.on( 'paste keydown undo redo', this.props.onType );
 	};
 
