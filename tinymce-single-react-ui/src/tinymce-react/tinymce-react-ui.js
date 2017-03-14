@@ -1,12 +1,7 @@
-// import { render } from 'react-dom';
-// import { createElement, Component } from 'react';
-// import TinyMCE from 'react-tinymce';
-
 import { render } from 'react-dom';
 import { createElement, Component } from 'react';
 import tinymce from 'tinymce';
 import { isEqual, last } from 'lodash';
-
 
 // import './react-toolbar'
 // import './react-block'
