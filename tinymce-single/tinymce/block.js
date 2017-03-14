@@ -199,10 +199,10 @@
 			}
 		} );
 
-		editor.on( 'keyup', function( event ) {
-			if ( event.keyCode === tinymce.util.VK.ENTER ) {
-				editor.$( editor.selection.getNode() ).attr( 'data-wp-placeholder', null );
-			}
+		editor.on( 'newBlock', function( event ) {
+			editor.$( event.newBlock )
+				.attr( 'data-wp-placeholder', null )
+				.attr( 'data-wp-block-selected', null );
 		} );
 
 		// Attach block UI.
