@@ -4,12 +4,12 @@ import React, { createElement, Component } from 'react'
 import { render } from 'react-dom'
 import * as Icons from './external/dashicons/index'
 import Toolbar from './components/toolbar/Toolbar'
-import TinyMCEReactUI from 'tinymce-react/tinymce-react-ui'
+import TinyMCEReactUI from './components/tinymce/tinymce-react-ui'
 
 // ////////////////////////////////
 import { createStore } from 'redux'
-import Counter from './tinymce-react/components/Counter'
-import counter from './tinymce-react/reducers/counter'
+import Counter from './components/tinymce/components/Counter'
+import counter from './components/tinymce/reducers/counter'
 
 const store = createStore(counter)
 
