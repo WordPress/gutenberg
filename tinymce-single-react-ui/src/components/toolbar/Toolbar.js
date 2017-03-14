@@ -18,6 +18,10 @@ export default class Toolbar extends React.Component {
 		const ParagraphButton = props => <Button><Icons.EditorParagraphIcon /></Button>
 		const QuoteButton = props => <Button><Icons.EditorQuoteIcon /></Button>
 
+		const AlignLeftButton = props => <Button><Icons.EditorAlignLeftIcon /></Button>
+		const AlignRightButton = props => <Button><Icons.EditorAlignRightIcon /></Button>
+		const AlignCenterButton = props => <Button><Icons.EditorAlignCenterIcon /></Button>
+
 		return (
 			<div>
 				<div className={styles.toolbar}>
@@ -34,22 +38,18 @@ export default class Toolbar extends React.Component {
 
 				<div className={sideToolbarStyles} onMouseEnter={ () => { } }>
 
-						<Dropbutton status={'ACTIVE'} choices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<H1Button />} />
-						<Dropbutton status={'INACTIVE'} choices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<ParagraphButton />} />
-						<Dropbutton status={'INACTIVE'} choices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<QuoteButton />} />
+						<Dropbutton status={'ACTIVE'}
+												dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]}
+												hoverchoices={[
+													<AlignLeftButton />,
+													<AlignRightButton />,
+													<AlignCenterButton />
+												 ]}
+												selected={<H1Button />} />
 
-						<Button>
-							<Icons.EditorAlignLeftIcon />
-						</Button>
-						<Button>
-							<Icons.EditorAlignCenterIcon />
-						</Button>
-						<Button>
-							<Icons.EditorAlignRightIcon />
-						</Button>
-						<Button>
-							<Icons.EditorParagraphIcon />
-						</Button>
+
+						{/*<Dropbutton status={'INACTIVE'} dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<ParagraphButton />} />
+						<Dropbutton status={'INACTIVE'} dropchoices={[<H1Button />,<ParagraphButton />,<QuoteButton />]} selected={<QuoteButton />} />*/}
 				</div>
 			</div>
 		)

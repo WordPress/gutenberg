@@ -11,19 +11,38 @@ export default class Dropbutton extends React.Component {
 		super(props)
     this.state = {
       hoverOpen: false,
-      click: false
+      dropOpen: false
     }
 
 	}
 
 	render() {
-    let status = this.props.status;
-    let choices = status === 'ACTIVE' ? this.props.choices : [];
-    let active = this.props.active;
+    if (this.props.status !== 'ACTIVE')
+      return null;
+
 
 		return (
-        <div>
-        {choices.map( (type) => (this.props.selected) )}
+        <div
+          onMouseEnter={() => { this.setState( { hoverOpen: true } )}} onMouseLeave={() => { this.setState( { hoverOpen: false } )}}
+          onClick={() => { this.setState( {dropOpen: !this.state.dropOpen }) } }
+          >
+          {
+            this.state.hoverOpen ?
+            <div >
+
+              {this.props.hoverchoices.map( (hoverchoice) => ( hoverchoice ) )}
+
+            </div>
+            : ''
+          }
+          {this.props.selected}
+          {
+            this.state.dropOpen ?
+          <div>
+            {this.props.dropchoices.map( (dropchoice) => ( dropchoice ) )}
+          </div>
+          : ''
+          }
         </div>
 		)
 	}
