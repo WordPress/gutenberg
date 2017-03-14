@@ -1,5 +1,5 @@
 import '../../shared/post-content'
-
+import 'assets/stylesheets/main.scss';
 import React, { createElement, Component } from 'react'
 import { render } from 'react-dom'
 import Toolbar from './components/toolbar/Toolbar'
