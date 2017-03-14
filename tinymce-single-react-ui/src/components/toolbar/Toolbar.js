@@ -1,13 +1,13 @@
-import React, { createElement, Component } from 'react';
-import ReactDOM from 'react-dom';
-import * as Icons from '../../external/dashicons';
-import Button from '../button/Button';
-
+import React, { createElement, Component } from 'react'
+import ReactDOM from 'react-dom'
+import * as Icons from '../../external/dashicons'
+import Button from '../button/Button'
+import styles from './toolbar.scss'
 
 export default class Toolbar extends React.Component {
 	render() {
 		return (
-			<div>
+			<div className={styles.toolbar}>
         <Button>
 					<Icons.EditorBoldIcon />
 				</Button>
