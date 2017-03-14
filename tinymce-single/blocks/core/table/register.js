@@ -29,7 +29,7 @@
 	function onDeselect( block ) {
 		var figcaption = block.querySelector( 'figcaption' );
 
-		if ( ! figcaption.textContent ) {
+		if ( figcaption && ! figcaption.textContent ) {
 			block.removeChild( figcaption );
 		}
 	}
