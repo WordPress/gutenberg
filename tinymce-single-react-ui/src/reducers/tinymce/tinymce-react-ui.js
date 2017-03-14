@@ -9,24 +9,34 @@ const initialState = fromJS({
 })
 
 export default (state = initialState, action) => {
+  console.log('>>action:'+action.type, action)
   switch (action.type) {
-    case 'FOCUS': {
-      console.log('>>FOCUS', action)
+    case 'FOCUS': { // action.val: [bookmark, node]
       return state.merge( {
         focused: true,
         bookmark: action.val[0],
         node: action.val[1]
       } )
-  }
-    case 'BLUR': {
-      console.log('>>BLUR', action)
+    }
+    case 'BLUR': { // action.val: [bookmark, node]
       return state.merge( {
         focused: false,
         bookmark: action.val[0],
         node: action.val[1]
       } )
-  }
+    }
+    case 'NODECHANGE': { // action.val: [bookmark, node]
+      // if (action.val[1] !== action.val[2].element)
+      //   console.log('!! '+action.type, action.val[1], action.val[2].element, action)
+      // else
+      //   console.log('OK '+action.type, action.val[1], action.val[2].element, action)
+      return state.merge( {
+        bookmark: action.val[0],
+        node: action.val[1]
+      } )
+    }
     default:
+      console.log('!!UNHANDLED ACTION', action)
       return state
   }
 }
