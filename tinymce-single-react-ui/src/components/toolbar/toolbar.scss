@@ -1,4 +1,7 @@
+@import "../../assets/stylesheets/_variables.scss";
+
 .toolbar {
   display: flex;
-  background: #aba091;
+  border: 1px solid $toolbar-border;
+  background: $toolbar-background;
 }

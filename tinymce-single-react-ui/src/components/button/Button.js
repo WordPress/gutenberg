@@ -1,6 +1,6 @@
 import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
-
+import styles from './button.scss';
 
 export default class Button extends React.Component {
 	constructor(props) {
@@ -9,7 +9,7 @@ export default class Button extends React.Component {
 
 	render() {
 		return (
-			<div className="button"> { this.props.children } </div>
+			<div className={styles.button}> { this.props.children } </div>
 		)
 	}
 }
