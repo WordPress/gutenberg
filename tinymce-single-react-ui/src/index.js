@@ -26,36 +26,6 @@ renderIt()
 store.subscribe(renderIt)
 // ////////////////////////////////
 
-class Button extends Component {
-	constructor(props) {
-		super(props)
-	}
-
-	render() {
-		return (
-			<div className="button"> { this.props.children } </div>
-		)
-	}
-}
-
-class Toolbar extends Component {
-	render() {
-		return (
-			<div>
-				<Button>
-					<Icons.EditorBoldIcon />
-				</Button>
-				<Button>
-					<Icons.EditorItalicIcon />
-				</Button>
-				<Button>
-					<Icons.EditorStrikethroughIcon />
-				</Button>
-			</div>
-		)
-	}
-}
-
 
 render(
 	<div>
