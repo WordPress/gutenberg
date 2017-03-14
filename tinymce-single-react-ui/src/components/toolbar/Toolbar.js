@@ -1,11 +1,18 @@
 import React, { createElement, Component } from 'react'
 import ReactDOM from 'react-dom'
+import cx from 'classnames';
+
+
 import * as Icons from '../../external/dashicons'
 import Button from '../button/Button'
 import styles from './toolbar.scss'
 
 export default class Toolbar extends React.Component {
+
 	render() {
+
+		let sideToolbarStyles = cx(styles.toolbar, styles.sideToolbar)
+
 		return (
 			<div>
 				<div className={styles.toolbar}>
@@ -19,8 +26,7 @@ export default class Toolbar extends React.Component {
 						<Icons.EditorStrikethroughIcon />
 					</Button>
 				</div>
-				<div className={styles.toolbar}>
-					<div>
+				<div className={sideToolbarStyles} onMouseEnter={ () => { } }>
 						<Button>
 							<Icons.EditorAlignLeftIcon />
 						</Button>
@@ -30,8 +36,9 @@ export default class Toolbar extends React.Component {
 						<Button>
 							<Icons.EditorAlignRightIcon />
 						</Button>
-					</div>
-
+						<Button>
+							<Icons.EditorParagraphIcon />
+						</Button>
 				</div>
 			</div>
 		)
