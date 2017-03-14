@@ -1,0 +1,61 @@
+.quote-block__content {
+	width: 100%;
+	border: none;
+	font: inherit;
+	font-family: "Noto Serif", serif;
+	color: inherit;
+	font-weight: 300;
+	font-size: 20px;
+	p {
+		padding: 0;
+		margin: 0;
+	}
+}
+
+.quote-block__cite {
+	position: relative;
+	width: 100%;
+	border: none;
+	font: inherit;
+	font-family: "Noto Serif", serif;
+	font-weight: 300;
+	font-size: 14px;
+	color: $gray-dark-300;
+	resize: none;
+	font-style: italic;
+	padding-left: 15px;
+
+	&:before {
+		display: block;
+		position: absolute;
+		left: 0;
+		top: 0;
+		color: $gray-dark-300;
+		content: '— ';
+	}
+}
+
+.quote-block__form.quote-style1 {
+	border-left: 4px solid black;
+	margin-left: -15px;
+	padding-left: 15px;
+
+	.quote-block__content {
+		font-style: italic;
+	}
+}
+
+.quote-block__form.quote-style2 {
+	background: $gray-light;
+	padding: 10px;
+}
+
+.quote-block__toolbar-style-button {
+	position: relative;
+
+	.quote-block__toolbar-style {
+		position: absolute;
+		bottom: 3px;
+		right: 3px;
+	}
+}
