@@ -113,7 +113,7 @@
 			} );
 		} );
 
-		editor.on( 'nodeChange selectionChange', function( event ) {
+		function setFields() {
 			var block = wp.blocks.getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );
 
@@ -137,7 +137,7 @@
 					}
 				}
 			}
-		} );
+		}
 
 		function toInlineContent( content ) {
 			var settings = {
@@ -509,8 +509,6 @@
 							}
 
 							window.wp.blocks.selectBlock( content );
-
-							setTimeout( showBlockUI, 50 )
 						}
 					}
 
@@ -794,6 +792,8 @@
 						}
 
 						$prevSelected.attr( 'data-wp-block-selected', null );
+
+						window.console.log( 'Deselected: ' + prevSettings._id );
 					}
 
 					if ( selectedBlocks.length === 1 ) {
@@ -802,6 +802,8 @@
 						}
 
 						editor.$( selectedBlocks[0] ).attr( 'data-wp-block-selected', 'true' );
+
+						window.console.log( 'Selected: ' + settings._id );
 					}
 				}
 
@@ -846,7 +848,7 @@
 				insert = false;
 			} );
 
-			editor.on( 'mousedown touchstart', function() {
+			editor.on( 'mousedown touchstart setSelectionRange', function() {
 				hidden = false;
 				insert = false;
 			} );
@@ -882,6 +884,8 @@
 						UI.insert.hide();
 					}
 				}
+
+				setFields();
 
 				if ( insert ) {
 					UI.insertMenu.reposition();
