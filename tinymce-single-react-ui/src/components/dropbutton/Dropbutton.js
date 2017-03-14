@@ -2,9 +2,8 @@ import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
 import cx from 'classnames';
 
-import styles from './dropbutton.scss';
 import Button from '../button/Button'
-
+import styles from './dropbutton.scss';
 
 export default class Dropbutton extends React.Component {
   constructor(props) {
@@ -30,7 +29,11 @@ export default class Dropbutton extends React.Component {
           this.state.hoverOpen ?
             <div >
 
-              {this.props.hoverchoices.map((hoverchoice) => (hoverchoice))}
+              {this.props.hoverchoices.map((hoverchoice) => {
+                return (
+                  hoverchoice
+                )
+              })}
 
             </div>
             : ''
@@ -39,7 +42,11 @@ export default class Dropbutton extends React.Component {
         {
           this.state.dropOpen ?
             <div>
-              {this.props.dropchoices.map((dropchoice) => (dropchoice))}
+              {this.props.dropchoices.map((dropchoice) => {
+                return (
+                  dropchoice
+                )
+              })}
             </div>
             : ''
         }
