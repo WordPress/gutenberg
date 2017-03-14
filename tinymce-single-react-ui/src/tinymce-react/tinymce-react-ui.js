@@ -73,6 +73,7 @@ function initialize( node, inline, onSetup ) {
 	};
 
 	componentDidMount() {
+    console.log('>>componentDidMount')
 		initialize( this.node, this.props.inline, this.onSetup );
 		if ( this.props.focusConfig ) {
 			this.focus();
@@ -80,6 +81,7 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	updateContent() {
+    console.log('>>updateContent')
 		// This could not be called on each content change, it used to change the cursor position
 		let bookmark;
 		if ( this.props.focusConfig ) {
@@ -92,16 +94,19 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	executeCommand = ( ...args ) => {
+    console.log('>>executeCommand', args)
 		this.editor.execCommand( ...args );
 	};
 
 	componentWillUnmount() {
+    console.log('>>componentWillUnmount')
 		if ( this.editor ) {
 			this.editor.destroy();
 		}
 	}
 
 	componentDidUpdate( prevProps ) {
+    console.log('>>componentDidUpdate', prevProps)
 		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
 			this.focus();
 		}
@@ -112,6 +117,7 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	focus() {
+    console.log('>>focus', props)
 		if ( this.props.focusConfig.bookmark ) {
 			return;
 		}
@@ -129,6 +135,7 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	isStartOfEditor() {
+    console.log('>>isStartOfEditor')
 		const range = this.editor.selection.getRng();
 		if ( range.startOffset !== 0 || ! range.collapsed ) {
 			return false;
@@ -147,6 +154,7 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	onKeyDown = ( event ) => {
+    console.log('>>onKeyDown', event)
 		if ( event.keyCode === 38 || event.keyCode === 37 ) {
 			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
@@ -222,6 +230,7 @@ function initialize( node, inline, onSetup ) {
 	}
 
 	syncToolbar = ( event ) => {
+    console.log('>>syncToolbar', event)
 		if ( ! this.props.setToolbarState ) {
 			return;
 		}
@@ -246,11 +255,13 @@ function initialize( node, inline, onSetup ) {
 	};
 
 	onFocus = () => {
+    console.log('>>onFocus')
 		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.props.onFocusChange( { bookmark } );
 	};
 
 	onSetup = ( editor ) => {
+    console.log('>>onSetup', this.props, editor)
 		this.editor = editor;
 
 		editor.on( 'init', this.onInit );
@@ -270,6 +281,7 @@ function initialize( node, inline, onSetup ) {
 		// TODO: `getContent` is slow, but formats better than 'raw'. We
 		// should check implication of performance and see if we can rely
 		// on raw formatting instead.
+    console.log('>>onChange', this.props)
 		const content = this.editor.getContent();
 		if ( content === this.props.content ) {
 			return;
