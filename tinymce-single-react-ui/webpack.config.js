@@ -30,15 +30,6 @@ const config = module.exports = {
 			},
 			{
 				test: /\.s?css$/,
-				use: [
-					{ loader: 'style-loader' },
-					{ loader: 'css-loader' },
-					{ loader: 'postcss-loader' },
-					{ loader: 'sass-loader' }
-				]
-			},
-			{
-				test: /\.rcss$/,
 				use: [{ loader: 'style-loader' },
 				{
 					loader: 'css-loader',
