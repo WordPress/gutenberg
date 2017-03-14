@@ -207,12 +207,14 @@
 
 		editor.on( 'keyup', function( event ) {
 			if ( event.keyCode === tinymce.util.VK.BACKSPACE ) {
-				var $empty = editor.$( editor.selection.getNode() ).find( ':empty' );
+				var block = getSelectedBlock();
 
-				$empty.append( '<br>' );
+				if ( ! block.textContent ) {
+					var p = editor.$( '<p><br></p>' );
 
-				if ( $empty.length ) {
-					editor.selection.setCursorLocation( $empty[0], 0 );
+					editor.$( block ).before( p );
+					editor.selection.setCursorLocation( p[0], 0 );
+					editor.$( block ).remove();
 				}
 			}
 		} );
