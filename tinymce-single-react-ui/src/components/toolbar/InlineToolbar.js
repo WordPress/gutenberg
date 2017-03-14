@@ -19,6 +19,8 @@ const status = (pred, el) => (
 export default class InlineToolbar extends React.Component {
 
 	render() {
+		let hidden = this.props.selection.isCollapsed()
+
 		return (
 			<div className={styles.toolbarWrapper}>
 				<div className={styles.toolbar}>

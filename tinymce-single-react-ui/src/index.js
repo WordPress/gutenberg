@@ -13,20 +13,20 @@ import action from './reducers/tinymce/tinymce-react-ui'
 const store = createStore(action)
 
 const renderApp = () => render(
-	<Provider store={store}>
 		<div data='TODO-this-is-the-new-app'>
-			<InlineToolbar node={store.getState().get('node')}/>
-			<BlockToolbar node={store.getState().get('node')}/>
+			<InlineToolbar selection={store.getState().get('selection')} node={store.getState().get('node')}/>
+			<BlockToolbar selection={store.getState().get('selection')} node={store.getState().get('node')}/>
 			<TinyMCEReactUI content={window.content}
 				onFocus={ ( bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [bookmark, node] } ) }
 				onBlur={ ( bookmark, node ) => store.dispatch( { type: 'BLUR', val: [bookmark, node] } ) }
 				onNodeChange={ ( bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [bookmark, node, event] } ) }
 				/>
 		</div>
-	</Provider>
 	,
 	document.getElementById('tiny-react')
 );
 
 renderApp()
 store.subscribe(renderApp)
+
+// TODO: wrap the app in a provider and add the react-redux stuff	<Provider store={store}>
