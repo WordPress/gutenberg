@@ -92,24 +92,33 @@
 
 		editor.on( 'setContent', function( event ) {
 			$blocks = editor.$( editor.getBody() ).find( '*[data-wp-block-type]' );
-			$blocks.attr( 'contenteditable', 'false' );
 			$blocks.each( function( i, block ) {
 				var settings = wp.blocks.getBlockSettingsByElement( block );
 
-				if ( settings && settings.editable ) {
-					settings.editable.forEach( function( selector ) {
-						editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
-					} );
+				if ( ! settings ) {
+					return;
+				}
+
+				editor.$( block ).attr( 'contenteditable', 'false' );
+
+				if ( settings.editable ) {
+					if ( settings.editable.length ) {
+						settings.editable.forEach( function( selector ) {
+							editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
+						} );
+					} else {
+						editor.$( block ).attr( 'contenteditable', null );
+					}
 				}
 			} );
 		} );
 
-		editor.on( 'nodeChange selectionChange', function( event ) {
+		function setFields() {
 			var block = wp.blocks.getSelectedBlock();
 			var settings = wp.blocks.getBlockSettingsByElement( block );
 
 			if ( settings ) {
-				if ( settings.editable ) {
+				if ( settings.editable && settings.editable.length ) {
 					settings.editable.forEach( function( selector ) {
 						editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
 					} );
@@ -128,7 +137,7 @@
 					}
 				}
 			}
-		} );
+		}
 
 		function toInlineContent( content ) {
 			var settings = {
@@ -175,7 +184,8 @@
 				}
 
 				if ( settings ) {
-					var restrict = ( settings.restrictToInline || [] ).concat( settings.editable || [] );
+					var editable = settings.editable && settings.editable.length ? settings.editable : [];
+					var restrict = ( settings.restrictToInline || [] ).concat( editable );
 
 					restrict.forEach( function( selector ) {
 						var node = editor.selection.getNode();
@@ -186,6 +196,12 @@
 						}
 					} );
 				}
+			}
+		} );
+
+		editor.on( 'keyup', function( event ) {
+			if ( event.keyCode === tinymce.util.VK.ENTER ) {
+				editor.$( editor.selection.getNode() ).attr( 'data-wp-placeholder', null );
 			}
 		} );
 
@@ -493,8 +509,6 @@
 							}
 
 							window.wp.blocks.selectBlock( content );
-
-							setTimeout( showBlockUI, 50 )
 						}
 					}
 
@@ -778,6 +792,8 @@
 						}
 
 						$prevSelected.attr( 'data-wp-block-selected', null );
+
+						window.console.log( 'Deselected: ' + prevSettings._id );
 					}
 
 					if ( selectedBlocks.length === 1 ) {
@@ -786,6 +802,8 @@
 						}
 
 						editor.$( selectedBlocks[0] ).attr( 'data-wp-block-selected', 'true' );
+
+						window.console.log( 'Selected: ' + settings._id );
 					}
 				}
 
@@ -830,7 +848,7 @@
 				insert = false;
 			} );
 
-			editor.on( 'mousedown touchstart', function() {
+			editor.on( 'mousedown touchstart setSelectionRange', function() {
 				hidden = false;
 				insert = false;
 			} );
@@ -866,6 +884,8 @@
 						UI.insert.hide();
 					}
 				}
+
+				setFields();
 
 				if ( insert ) {
 					UI.insertMenu.reposition();
