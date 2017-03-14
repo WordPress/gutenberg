@@ -37,7 +37,7 @@
 	function onDeselect( block ) {
 		var footer = block.querySelector( 'footer' );
 
-		if ( ! footer.textContent ) {
+		if ( footer && ! footer.textContent ) {
 			block.removeChild( footer );
 		}
 	}
