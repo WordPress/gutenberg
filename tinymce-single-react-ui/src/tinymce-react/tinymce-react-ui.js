@@ -1,8 +1,12 @@
-import { createElement, Component, render } from 'wp-elements';
-import tinymce from 'tinymce';
+import { render } from 'react-dom';
+import { createElement, Component } from 'react';
 import TinyMCE from 'react-tinymce';
 
 export default class TinyMCEReactUI extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   handleEditorChange = (e) => {
     console.log('Content was updated:', e.target.getContent());
   }
@@ -12,7 +16,7 @@ export default class TinyMCEReactUI extends Component {
       <div>
         <div>Menu DIVS all up here</div>
         <TinyMCE
-          content="<p>This is the initial content of the editor</p><p>It has some lines</p>"
+          content={this.props.content}
           config={{
             theme: false,
             inline: true,
