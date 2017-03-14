@@ -1,7 +1,7 @@
 .my-theme {
 	font-family: "Noto Serif", serif;
 	font-size: 16px;
-	color: inherit;
+	color: #191e23;
 	font-weight: 300;
 
 	blockquote {
@@ -34,11 +34,11 @@
 		}
 
 		&.quote-style2 {
-			font-style: normal;
-			background: $gray-light;
-			padding: 10px;
+			padding: 10px 10px 10px 30px;
 			margin-left: 0;
 			border: none;
+			font-size: 24px;
+			font-style: italic;
 		}
 
 		p {
