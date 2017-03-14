@@ -1,7 +1,7 @@
 import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
-import * as Icons from '../external/dashicons';
-import Button from './Button';
+import * as Icons from '../../external/dashicons';
+import Button from '../button/Button';
 
 
 export default class Toolbar extends React.Component {
