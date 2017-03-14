@@ -1,5 +1,4 @@
 import { fromJS } from 'immutable'
-
 // TODO: use redux-actions
 
 const initialState = fromJS({
@@ -10,7 +9,11 @@ const initialState = fromJS({
 
 export default (state = initialState, action) => {
   console.log('>>action:'+action.type, action)
+
   switch (action.type) {
+    case '@@redux/INIT': {
+      return state
+    }
     case 'FOCUS': { // action.val: [bookmark, node]
       return state.merge( {
         focused: true,
