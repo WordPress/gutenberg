@@ -1,28 +1,59 @@
 import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
-import styles from './dropbutton.scss';
 import cx from 'classnames';
 
-export default class Button extends React.Component {
+import styles from './dropbutton.scss';
+import Button from '../button/Button'
+
+
+export default class Dropbutton extends React.Component {
 	constructor(props) {
 		super(props)
+    this.state = {
+      hoverOpen: false,
+      dropOpen: false
+    }
+
 	}
 
 	render() {
+    if (this.props.status !== 'ACTIVE')
+      return null;
 
-		let classMap = {
-			ACTIVE: styles.active,
-			INACTIVE: styles.inactive,
-			DISABLED: styles.disabled
-		};
-
-		let buttonClasses = cx(
-			styles.button,
-			classMap[this.props.status] || styles.inactive
-		)
 
 		return (
-			<div className={buttonClasses}> { this.props.children } </div>
+        <div
+          onMouseEnter={() => { this.setState( { hoverOpen: true } )}} onMouseLeave={() => { this.setState( { hoverOpen: false } )}}
+          onClick={() => { this.setState( {dropOpen: !this.state.dropOpen }) } }
+          >
+          {
+            this.state.hoverOpen ?
+            <div >
+
+              {this.props.hoverchoices.map( (hoverchoice) => ( hoverchoice ) )}
+
+            </div>
+            : ''
+          }
+          {this.props.selected}
+          {
+            this.state.dropOpen ?
+          <div>
+            {this.props.dropchoices.map( (dropchoice) => ( dropchoice ) )}
+          </div>
+          : ''
+          }
+        </div>
 		)
 	}
 }
+
+
+
+// return (
+      /*<div onMouseEnter={() => { this.setState( { hoverOpen: true } )}} onMouseLeave={() => { this.setState( { hoverOpen: false } )}}>
+        { this.state.hoverOpen ? <div>Appears on hover</div> : false }
+			  <div> { this.props.children } </div>
+        <div>Appears on click</div>
+      </div>
+		)*/
