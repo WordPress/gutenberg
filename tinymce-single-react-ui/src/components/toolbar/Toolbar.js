@@ -16,10 +16,10 @@ export default class Toolbar extends React.Component {
 		return (
 			<div>
 				<div className={styles.toolbar}>
-					<Button>
+					<Button status={'ACTIVE'}>
 						<Icons.EditorBoldIcon />
 					</Button>
-					<Button>
+					<Button status={'INACTIVE'}>
 						<Icons.EditorItalicIcon />
 					</Button>
 					<Button>

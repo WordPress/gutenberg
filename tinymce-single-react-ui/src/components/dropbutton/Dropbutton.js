@@ -1,6 +1,6 @@
 import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
-import styles from './button.scss';
+import styles from './dropbutton.scss';
 import cx from 'classnames';
 
 export default class Button extends React.Component {

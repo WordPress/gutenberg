@@ -18,6 +18,7 @@
     }
   }
 
+  &.active,
   &:active {
     background: $active-bg;
     border-color: $active-border;
@@ -29,6 +30,10 @@
     }
   }
 
+  &.inactive {
+    opacity: .8;
+  }
+
   :global {
     .dashicon {
       width: 24px;
@@ -37,3 +42,5 @@
     }
   }
 }
+
+
