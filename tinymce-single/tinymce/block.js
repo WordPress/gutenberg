@@ -209,24 +209,15 @@
 			if ( event.keyCode === tinymce.util.VK.BACKSPACE ) {
 				var block = getSelectedBlock();
 
-				console.log(block, block.textContent)
-
 				if ( ! block.textContent ) {
-					removeBlock( block );
+					var p = editor.$( '<p><br></p>' );
+
+					editor.$( block ).before( p );
+					editor.selection.setCursorLocation( p[0], 0 );
+					editor.$( block ).remove();
 				}
 			}
 		} );
-
-		function removeBlock( block ) {
-			var $blocks = editor.$( block || getSelectedBlock() );
-			var p = editor.$( '<p><br></p>' );
-
-			editor.undoManager.transact( function() {
-				$blocks.first().before( p );
-				editor.selection.setCursorLocation( p[0], 0 );
-				$blocks.remove();
-			} );
-		}
 
 		// Attach block UI.
 
@@ -256,6 +247,17 @@
 					} );
 				}
 			});
+
+			function removeBlock() {
+				var $blocks = editor.$( getSelectedBlock() );
+				var p = editor.$( '<p><br></p>' );
+
+				editor.undoManager.transact( function() {
+					$blocks.first().before( p );
+					editor.selection.setCursorLocation( p[0], 0 );
+					$blocks.remove();
+				} );
+			}
 
 			function moveBlockUp() {
 				$blocks = editor.$( getSelectedBlocks() );
