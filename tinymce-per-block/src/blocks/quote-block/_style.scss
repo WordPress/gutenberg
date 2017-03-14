@@ -4,8 +4,8 @@
 	font: inherit;
 	font-family: "Noto Serif", serif;
 	color: inherit;
-	font-weight: 300;
-	font-size: 20px;
+	font-size: 16px;
+
 	p {
 		padding: 0;
 		margin: 0;
@@ -18,12 +18,14 @@
 	border: none;
 	font: inherit;
 	font-family: "Noto Serif", serif;
-	font-weight: 300;
-	font-size: 14px;
+	font-size: 13px;
 	color: $gray-dark-300;
 	resize: none;
-	font-style: italic;
-	padding-left: 15px;
+	padding-left: 20px;
+
+	a {
+		color: #28b2dd;
+	}
 
 	&:before {
 		display: block;
@@ -37,11 +39,10 @@
 
 .quote-block__form.quote-style1 {
 	border-left: 4px solid black;
-	margin-left: -15px;
-	padding-left: 15px;
+	padding-left: 20px;
 
 	.quote-block__content {
-		font-style: italic;
+		padding-top: 2px;
 	}
 }
 
