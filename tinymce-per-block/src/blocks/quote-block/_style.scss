@@ -47,8 +47,12 @@
 }
 
 .quote-block__form.quote-style2 {
-	background: $gray-light;
-	padding: 10px;
+	padding: 10px 10px 10px 30px;
+
+	.quote-block__content {
+		font-size: 24px;
+		font-style: italic;
+	}
 }
 
 .quote-block__toolbar-style-button {
