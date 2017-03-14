@@ -2,8 +2,38 @@
 
 .button {
   display: flex;
-  width: 36px;
-  height: 26px;
   align-items: center;
   justify-content: center;
+  border: 1px solid $toolbar-bg;
+  padding: 5px;
+
+  &:hover {
+    background: $hover-bg;
+    border-color: $hover-border;
+    color: $hover-color;
+    :global {
+      .dashicon {
+        fill: $hover-color;
+      }
+    }
+  }
+
+  &:active {
+    background: $active-bg;
+    border-color: $active-border;
+    color: $active-color;
+    :global {
+      .dashicon {
+        fill: $active-color;
+      }
+    }
+  }
+
+  :global {
+    .dashicon {
+      width: 24px;
+      height: 24px;
+      fill: $inactive-color;
+    }
+  }
 }
