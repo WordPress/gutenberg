@@ -252,14 +252,16 @@ function initialize( node, inline, onSetup ) {
 
 	onFocus = () => {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const node = this.editor.selection.getNode();
     console.log('>>onFocus', bookmark)
-		this.props.onFocus( bookmark );
+		this.props.onFocus( bookmark, node );
 	};
 
 	onBlur = () => {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const node = this.editor.selection.getNode();
     console.log('>>onBlur', bookmark)
-		this.props.onBlur( bookmark );
+		this.props.onBlur( bookmark, node );
 	};
 
 	onSetup = ( editor ) => {
