@@ -58,15 +58,56 @@ function initialize( node, inline, onSetup ) {
 
   export default class TinyMCEReactUI extends Component {
 	static defaultProps = {
+		// onSetup: ( editor ) => {},
+		onFocus: ( bookmark, node ) => {},
+		onBlur: ( bookmark, node ) => {},
+		onNodeChange: ( bookmark, node, event ) => {},
+
 		onChange: () => {},
 		splitValue: () => {},
-		onFocus: () => {},
-		onBlur: () => {},
 		onType: () => {},
 		initialContent: '',
 		inline: false,
 		single: false,
 	};
+
+	// ///////////////////////
+	// API Events
+	onSetup = ( editor ) => {
+    console.log('>>onSetup', this.props, editor)
+		this.editor = editor;
+		editor.on( 'focusin', this.onFocus );
+		editor.on( 'focusout', this.onBlur );
+		editor.on( 'nodechange', this.nodeChange );
+
+		editor.on( 'init', this.onInit );
+		editor.on( 'undo redo', this.onChange );
+		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'paste', this.onPaste );
+		editor.on( 'paste keydown undo redo', this.props.onType );
+	};
+
+	onFocus = () => {
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const node = this.editor.selection.getNode();
+    console.log('>>onFocus', bookmark)
+		this.props.onFocus( bookmark, node );
+	};
+
+	onBlur = () => {
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const node = this.editor.selection.getNode();
+    console.log('>>onBlur', bookmark)
+		this.props.onBlur( bookmark, node );
+	};
+
+	nodeChange = ( event ) => {
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const node = this.editor.selection.getNode();
+		console.log('>>onNodeChange', event)
+		this.props.onNodeChange( bookmark, node, event );
+	};
+	// ///////////////////////
 
 	componentDidMount() {
     console.log('>>componentDidMount')
@@ -224,59 +265,6 @@ function initialize( node, inline, onSetup ) {
 			this.editor.execCommand( 'mceInsertContent', false, text );
 		}
 	}
-
-	syncToolbar = ( event ) => {
-    console.log('>>syncToolbar', event)
-		if ( ! this.props.setToolbarState ) {
-			return;
-		}
-		const formats = [
-			{ id: 'bold', nodes: [ 'STRONG', 'B' ] },
-			{ id: 'italic', nodes: [ 'EM', 'I' ] },
-			{ id: 'strikethrough', nodes: [ 'DEL' ] }
-		];
-		formats.forEach( format => {
-			const formatValue =
-				format.nodes.indexOf( event.element.nodeName ) !== -1 ||
-				!! event.parents.find( parent => format.nodes.indexOf( parent.nodeName ) !== -1 );
-			this.props.setToolbarState( format.id, formatValue );
-		} );
-
-		// Link format
-		const link = event.element.nodeName === 'A'
-			? event.element
-			: event.parents.find( parent => parent.nodeName === 'A' );
-		const linkValue = link ? link.getAttribute( 'href' ) : '';
-		this.props.setToolbarState( 'link', linkValue );
-	};
-
-	onFocus = () => {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		const node = this.editor.selection.getNode();
-    console.log('>>onFocus', bookmark)
-		this.props.onFocus( bookmark, node );
-	};
-
-	onBlur = () => {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		const node = this.editor.selection.getNode();
-    console.log('>>onBlur', bookmark)
-		this.props.onBlur( bookmark, node );
-	};
-
-	onSetup = ( editor ) => {
-    console.log('>>onSetup', this.props, editor)
-		this.editor = editor;
-
-		editor.on( 'init', this.onInit );
-		editor.on( 'undo redo', this.onChange );
-		editor.on( 'keydown', this.onKeyDown );
-		editor.on( 'paste', this.onPaste );
-		editor.on( 'nodechange', this.syncToolbar );
-		editor.on( 'focusin', this.onFocus );
-		editor.on( 'focusout', this.onBlur );
-		editor.on( 'paste keydown undo redo', this.props.onType );
-	};
 
 	onInit = () => {
 		this.editor.setContent( this.props.content );

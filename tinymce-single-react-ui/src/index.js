@@ -16,6 +16,7 @@ const renderApp = () => render(
 		<TinyMCEReactUI content={window.content}
 			onFocus={ ( bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [bookmark, node] } ) }
 			onBlur={ ( bookmark, node ) => store.dispatch( { type: 'BLUR', val: [bookmark, node] } ) }
+			onNodeChange={ ( bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [bookmark, node, event] } ) }
 			/>
 		<hr />
 		<br />
