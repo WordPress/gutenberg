@@ -1,0 +1,17 @@
+@import "../../assets/stylesheets/_variables.scss";
+
+.toolbarWrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.toolbar {
+  display: inline-flex;
+  border: 1px solid $toolbar-border;
+  background: $toolbar-bg;
+}
+
+.sideToolbar {
+   display: inline-flex;
+}
+

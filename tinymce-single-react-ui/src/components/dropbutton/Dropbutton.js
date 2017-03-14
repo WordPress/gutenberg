@@ -9,8 +9,8 @@ export default class Dropbutton extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      hoverOpen: false,
-      dropOpen: false
+      hoverOpen: true,
+      dropOpen: true
     }
 
   }
@@ -27,7 +27,7 @@ export default class Dropbutton extends React.Component {
       >
         {
           this.state.hoverOpen ?
-            <div >
+            <div className={styles.hoverChoices}>
 
               {this.props.hoverchoices.map((hoverchoice) => {
                 return (
@@ -41,7 +41,7 @@ export default class Dropbutton extends React.Component {
         {this.props.selected}
         {
           this.state.dropOpen ?
-            <div>
+            <div className={styles.dropChoices}>
               {this.props.dropchoices.map((dropchoice) => {
                 return (
                   dropchoice

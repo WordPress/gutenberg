@@ -5,18 +5,9 @@ import cx from 'classnames';
 import * as Icons from '../../external/dashicons'
 import Dropbutton from '../dropbutton/Dropbutton'
 import Button from '../button/Button'
-import styles from './toolbar.scss'
-import {isBold, isItalic, isDel, isLink} from '../../utils/tag'
+import styles from './blocktoolbar.scss'
 
-const nodeOrParent = (pred, el) => (
-	pred(el.nodeName) || (el.parentNode && pred(el.parentNode.nodeName))
-)
-
-const status = (pred, el) => (
-	( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
-)
-
-export default class Toolbar extends React.Component {
+export default class BlockToolbar extends React.Component {
 
 	render() {
 
@@ -32,26 +23,15 @@ export default class Toolbar extends React.Component {
 
 		return (
 			<div className={styles.toolbarWrapper}>
-				<div className={styles.toolbar}>
-					<Button status={ status( isBold, this.props.node ) } >
-						<Icons.EditorBoldIcon />
-					</Button>
-					<Button status={ status( isItalic, this.props.node ) } >
-						<Icons.EditorItalicIcon />
-					</Button>
-					<Button status={ status( isDel, this.props.node ) } >
-						<Icons.EditorStrikethroughIcon />
-					</Button>
-				</div>
 
 				<div className={sideToolbarStyles} onMouseEnter={() => { }}>
 
 					<Dropbutton status={'ACTIVE'}
 						dropchoices={[<ParagraphButton key="pbutton" />, <QuoteButton key="qbutton" />]}
 						hoverchoices={[
-							<AlignLeftButton />,
-							<AlignRightButton />,
-							<AlignCenterButton />
+							<AlignLeftButton key="left" />,
+							<AlignRightButton key="right" />,
+							<AlignCenterButton key="center" />
 						]}
 						selected={<H1Button key="h1button" />} />
 
@@ -59,9 +39,9 @@ export default class Toolbar extends React.Component {
 					<Dropbutton status={'INACTIVE'}
 						dropchoices={[<H1Button key="h1button" />, <QuoteButton key="qbutton" />]}
 						hoverchoices={[
-							<AlignLeftButton />,
-							<AlignRightButton />,
-							<AlignCenterButton />
+							<AlignLeftButton key="left" />,
+							<AlignRightButton key="right" />,
+							<AlignCenterButton key="center" />
 						]}
 						selected={<ParagraphButton key="pbutton" />} />
 
@@ -69,9 +49,9 @@ export default class Toolbar extends React.Component {
 					<Dropbutton status={'INACTIVE'}
 						dropchoices={[<H1Button key="h1button" />, <ParagraphButton key="pbutton" />]}
 						hoverchoices={[
-							<AlignLeftButton />,
-							<AlignRightButton />,
-							<AlignCenterButton />
+							<AlignLeftButton key="left" />,
+							<AlignRightButton key="right" />,
+							<AlignCenterButton key="center" />
 						]}
 						selected={<QuoteButton key="qbutton" />} />
 
