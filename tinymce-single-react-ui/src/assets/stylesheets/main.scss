@@ -20,6 +20,9 @@ body {
 	margin: 60px auto;
 	color: #12181e;
 }
-.mce-content-body:focus {
-	outline: 0;
+:global {
+	.mce-content-body:focus {
+		outline: 0;
+	}
 }
+
