@@ -13,15 +13,13 @@ const store = createStore(action)
 
 const renderApp = () => render(
 	<Provider store={store}>
-		<div>
-			<Toolbar />
+		<div data='TODO-this-is-the-new-app'>
+			<Toolbar node={store.getState().get('node')}/>
 			<TinyMCEReactUI content={window.content}
 				onFocus={ ( bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [bookmark, node] } ) }
 				onBlur={ ( bookmark, node ) => store.dispatch( { type: 'BLUR', val: [bookmark, node] } ) }
 				onNodeChange={ ( bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [bookmark, node, event] } ) }
 				/>
-			<hr />
-			<br />
 		</div>
 	</Provider>
 	,
@@ -30,11 +28,3 @@ const renderApp = () => render(
 
 renderApp()
 store.subscribe(renderApp)
-
-/*
-		<Counter
-			value={store.getState()}
-			onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-			onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-		/>
-*/
