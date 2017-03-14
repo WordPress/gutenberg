@@ -21,7 +21,8 @@ export default class BlockToolbar extends React.Component {
 		const AlignRightButton = props => <Button><Icons.EditorAlignRightIcon /></Button>
 		const AlignCenterButton = props => <Button><Icons.EditorAlignCenterIcon /></Button>
 
-		let hidden = !this.props.selection.isCollapsed()
+		// TODO: add option types
+		let hidden = !this.props.selection || !this.props.selection.isCollapsed()
 
 		return (
 			<div className={styles.toolbarWrapper}>
