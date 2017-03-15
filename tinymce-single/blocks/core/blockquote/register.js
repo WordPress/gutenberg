@@ -49,7 +49,7 @@
 		elements: [ 'blockquote' ],
 		type: 'text',
 		icon: 'gridicons-quote',
-		restrictToInline: [ 'footer' ],
+		editable: [ '', 'footer' ],
 		placeholders: {
 			'': 'Write quote\u2026',
 			footer: 'Write citation\u2026'

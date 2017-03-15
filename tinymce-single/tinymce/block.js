@@ -91,7 +91,7 @@
 		} );
 
 		editor.on( 'setContent', function( event ) {
-			$blocks = editor.$( editor.getBody() ).find( '*[data-wp-block-type]' );
+			$blocks = editor.$( editor.getBody() ).children();
 			$blocks.each( function( i, block ) {
 				var settings = wp.blocks.getBlockSettingsByElement( block );
 
@@ -99,16 +99,18 @@
 					return;
 				}
 
-				editor.$( block ).attr( 'contenteditable', 'false' );
+				if ( settings.editable && settings.editable.length ) {
+					editor.$( block ).attr( 'contenteditable', 'false' );
 
-				if ( settings.editable ) {
-					if ( settings.editable.length ) {
-						settings.editable.forEach( function( selector ) {
+					settings.editable.forEach( function( selector ) {
+						if ( ! selector ) {
+							editor.$( block ).attr( 'contenteditable', null );
+						} else {
 							editor.$( block ).find( selector ).attr( 'contenteditable', 'true' );
-						} );
-					} else {
-						editor.$( block ).attr( 'contenteditable', null );
-					}
+						}
+					} );
+				} else {
+					editor.$( block ).attr( 'contenteditable', 'false' );
 				}
 			} );
 		} );
@@ -156,16 +158,16 @@
 				return;
 			}
 
-			var selectedBlock = wp.blocks.getSelectedBlock();
-			var blockSettings = wp.blocks.getBlockSettingsByElement( selectedBlock );
+			var block = wp.blocks.getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( block );
 
-			if ( editor.$( selectedBlock ).attr( 'contenteditable' ) === 'false' ) {
-				event.content = toInlineContent( event.content );
-			}
-
-			if ( blockSettings && blockSettings.restrictToInline ) {
-				blockSettings.restrictToInline.forEach( function( selector ) {
+			if ( settings && settings.editable && settings.editable.length ) {
+				settings.editable.forEach( function( selector ) {
 					var node = editor.selection.getNode();
+
+					if ( ! selector ) {
+						return;
+					}
 
 					if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
 						event.content = toInlineContent( event.content );
@@ -175,27 +177,25 @@
 		} );
 
 		editor.on( 'keydown', function( event ) {
-			if ( event.keyCode === tinymce.util.VK.ENTER ) {
-				var block = wp.blocks.getSelectedBlock();
-				var settings = wp.blocks.getBlockSettingsByElement( block );
+			if ( event.keyCode !== tinymce.util.VK.ENTER ) {
+				return;
+			}
 
-				if ( editor.$( block ).attr( 'contenteditable' ) === 'false' ) {
-					event.preventDefault();
-				}
+			var block = wp.blocks.getSelectedBlock();
+			var settings = wp.blocks.getBlockSettingsByElement( block );
 
-				if ( settings ) {
-					var editable = settings.editable && settings.editable.length ? settings.editable : [];
-					var restrict = ( settings.restrictToInline || [] ).concat( editable );
+			if ( settings && settings.editable && settings.editable.length ) {
+				settings.editable.forEach( function( selector ) {
+					var node = editor.selection.getNode();
 
-					restrict.forEach( function( selector ) {
-						var node = editor.selection.getNode();
+					if ( ! selector ) {
+						return;
+					}
 
-						if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
-							event.preventDefault();
-							editor.execCommand( 'InsertLineBreak' );
-						}
-					} );
-				}
+					if ( editor.$( node ).is( selector ) || editor.$( node ).parents( selector ).length ) {
+						event.preventDefault();
+					}
+				} );
 			}
 		} );
 
@@ -203,20 +203,6 @@
 			editor.$( event.newBlock )
 				.attr( 'data-wp-placeholder', null )
 				.attr( 'data-wp-block-selected', null );
-		} );
-
-		editor.on( 'keyup', function( event ) {
-			if ( event.keyCode === tinymce.util.VK.BACKSPACE ) {
-				var block = getSelectedBlock();
-
-				if ( ! block.textContent ) {
-					var p = editor.$( '<p><br></p>' );
-
-					editor.$( block ).before( p );
-					editor.selection.setCursorLocation( p[0], 0 );
-					editor.$( block ).remove();
-				}
-			}
 		} );
 
 		// Attach block UI.
@@ -423,8 +409,14 @@
 						if ( $draggedNode.length ) {
 							$draggedNode[0].removeAttribute( 'data-wp-block-dragging' );
 
-							if ( ! $draggedNode[0].getAttribute( 'data-wp-block-type' ) ) {
-								$draggedNode[0].removeAttribute( 'contenteditable' );
+							var settings = wp.blocks.getBlockSettingsByElement( $draggedNode[0] );
+
+							if ( settings && settings.editable && settings.editable.length ) {
+								settings.editable.forEach( function( selector ) {
+									if ( ! selector ) {
+										editor.$( block ).attr( 'contenteditable', null );
+									}
+								} );
 							}
 						}
 
@@ -800,13 +792,15 @@
 					if ( $prevSelected.length ) {
 						var prevSettings = wp.blocks.getBlockSettingsByElement( $prevSelected[0] );
 
-						if ( prevSettings.onDeselect ) {
-							prevSettings.onDeselect( $prevSelected[0] );
+						if ( prevSettings ) {
+							if ( prevSettings.onDeselect ) {
+								prevSettings.onDeselect( $prevSelected[0] );
+							}
+
+							$prevSelected.attr( 'data-wp-block-selected', null );
+
+							window.console.log( 'Deselected: ' + prevSettings._id );
 						}
-
-						$prevSelected.attr( 'data-wp-block-selected', null );
-
-						window.console.log( 'Deselected: ' + prevSettings._id );
 					}
 
 					if ( selectedBlocks.length === 1 ) {
@@ -920,26 +914,60 @@
 
 			var metaCount = 0;
 
+			function getEditableRoot( node ) {
+				var rootNode = editor.getBody();
+
+				while ( node && node !== rootNode ) {
+					if ( node.contentEditable === 'true' ) {
+						return node;
+					}
+
+					node = node.parentNode;
+				}
+
+				return null;
+			}
+
 			editor.on( 'keydown', function( event ) {
 				var keyCode = event.keyCode;
 				var VK = tinymce.util.VK;
-				var block = getSelectedBlock();
 
 				if ( keyCode === VK.BACKSPACE ) {
-					var selection = window.getSelection();
+					var rng = editor.selection.getRng();
+					var startNode = editor.selection.getStart();
+					var endNode = editor.selection.getEnd();
+					var editableRoot = getEditableRoot( editor.selection.getNode() );
 
-					if ( ! selection.isCollapsed && editor.dom.isBlock( selection.focusNode ) ) {
-						if ( selection.anchorOffset === 0 && selection.focusOffset === 0 ) {
-							if ( block.nextSibling && block.nextSibling.contains( selection.focusNode ) ) {
-								removeBlock();
-								event.preventDefault();
-							}
-						}
-
-						if ( selection.anchorOffset === 0 && selection.anchorNode === selection.focusNode ) {
-							removeBlock();
+					if ( editableRoot ) {
+						if ( editor.dom.isEmpty( editableRoot ) ) {
 							event.preventDefault();
 						}
+					}
+
+					// Handle tripple click
+					// Some browsers select start of the next block.
+					if (
+						// It's a selection.
+						! rng.isCollapsed &&
+						// Cursor is at start of node.
+						rng.startOffset === 0 &&
+						// Cursor is at start of parent.
+						( startNode === rng.startContainer || startNode.firstChild === rng.startContainer ) &&
+						// Cursor is at end of parent.
+						(
+							endNode === rng.endContainer ||
+							( startNode.lastChild === rng.startContainer && rng.endOffset === rng.startContainer.data.length ) ||
+							( editor.dom.isBlock( rng.endContainer ) && rng.endOffset === 0 )
+						)
+					) {
+						editor.undoManager.transact( function() {
+							startNode.innerHTML = '<br>';
+							editor.selection.setCursorLocation( startNode, 0 );
+						} );
+
+						console.log('adjust');
+
+						event.preventDefault();
 					}
 				}
 
@@ -953,6 +981,20 @@
 					hideBlockUI();
 				}
 			}, true );
+
+			editor.on( 'keyup', function( event ) {
+				if ( event.keyCode === tinymce.util.VK.BACKSPACE ) {
+					var block = getSelectedBlock();
+
+					if ( block.contentEditable === 'false' && editor.dom.isEmpty( block ) ) {
+						var p = editor.$( '<p><br></p>' );
+
+						editor.$( block ).before( p );
+						editor.selection.setCursorLocation( p[0], 0 );
+						editor.$( block ).remove();
+					}
+				}
+			} );
 
 			editor.on( 'keyup', function( event ) {
 				if ( metaCount === 1 ) {

@@ -32,7 +32,7 @@
 		displayName: 'Custom Box',
 		icon: 'gridicons-custom-post-type',
 		type: 'text',
-		editable: true,
+		editable: [ '' ],
 		placeholders: {
 			'p:first': 'Write in the magic box! ✨'
 		},
