@@ -1,8 +1,14 @@
+@import "../../assets/stylesheets/_variables.scss";
 .hoverChoices {
-  display: flex;
+  position: absolute;
 
 }
 
 .dropChoices {
-  display: flex;
+  position: absolute;
+}
+
+.section {
+  position: absolute;
+  background: $toolbar-bg;
 }

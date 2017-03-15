@@ -5,8 +5,10 @@ import cx from 'classnames';
 import * as Icons from '../../external/dashicons'
 import Dropbutton from '../dropbutton/Dropbutton'
 import Button from '../button/Button'
-import styles from './inlinetoolbar.scss'
+
 import {isBold, isItalic, isDel, isLink} from '../../utils/tag'
+import styles from './inlinetoolbar.scss'
+
 
 const nodeOrParent = (pred, el) => (
 	pred(el.nodeName) || (el.parentNode && pred(el.parentNode.nodeName))
@@ -19,9 +21,9 @@ const status = (pred, el) => (
 export default class InlineToolbar extends React.Component {
 
 	render() {
-		let hidden = this.props.selection.isCollapsed()
+		let hidden = false;
 
-		return (
+		if (!hidden) return (
 			<div className={styles.toolbarWrapper}>
 				<div className={styles.toolbar}>
 					<Button status={ status( isBold, this.props.node ) } >
