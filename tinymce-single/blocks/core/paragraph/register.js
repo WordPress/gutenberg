@@ -4,6 +4,7 @@ window.wp.blocks.registerBlock( {
 	displayName: 'Paragraph',
 	elements: [ 'p' ],
 	type: 'text',
+	editable: [ '' ],
 	section: 'text',
 	icon: 'gridicons-paragraph',
 	controls: [
