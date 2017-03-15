@@ -23,6 +23,7 @@ export default class InlineToolbar extends React.Component {
 		let top = this.props.rangeRect ? this.props.rangeRect.top : 0
 		let left = this.props.rangeRect ? this.props.rangeRect.left : 0
 		let offset = this.props.pageYOffset || 0
+		let node = this.props.node
 
 		// TODO: add option types
 		return this.props.isOpen ? (
@@ -32,13 +33,13 @@ export default class InlineToolbar extends React.Component {
               	top: (top + offset - 48 + 'px')}}
 				>
 				<div className={styles.toolbar}>
-					<Button status={ status( isBold, this.props.node ) } >
+					<Button status={ status( isBold, node ) } >
 						<Icons.EditorBoldIcon />
 					</Button>
-					<Button status={ status( isItalic, this.props.node ) } >
+					<Button status={ status( isItalic, node ) } >
 						<Icons.EditorItalicIcon />
 					</Button>
-					<Button status={ status( isDel, this.props.node ) } >
+					<Button status={ status( isDel, node ) } >
 						<Icons.EditorStrikethroughIcon />
 					</Button>
 				</div>

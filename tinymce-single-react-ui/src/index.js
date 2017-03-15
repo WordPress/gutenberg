@@ -49,11 +49,12 @@ const renderApp = () => render(
 				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
 					rangeRect={ findStartOfRange(store.getState().get('range')) }
 					pageYOffset={ window.pageYOffset }
+					node={ store.getState().get('node') }
 					/>
 				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
 				 	blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
 					blockAlign={ blockAlign(store.getState().get('node')) }
-					blockRect={ rangeRect(store.getState().get('range')) }
+					blockRect={ rangeRect(store.getState().get('node')) }
 				 />
 			</div>
 			<TinyMCEReactUI content={window.content}
