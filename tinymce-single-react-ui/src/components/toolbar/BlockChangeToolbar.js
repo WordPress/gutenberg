@@ -5,19 +5,19 @@ import cx from 'classnames';
 import * as Icons from '../../external/dashicons'
 import Button from '../button/Button'
 import styles from './blocktoolbar.scss'
+import {blockIconMap, blockList} from '../../utils/tag'
 
 export default function BlockChangeToolbar(props) {
-  const iconMap = {
-    'p': <Icons.EditorParagraphIcon />,
-    'h': <Icons.EditorHeadingIcon />,
-    'blockquote': <Icons.EditorQuoteIcon />,
-  }
 
-  return props.isOpen ? null : (
-    <div>show something
-      {props.choices.map( (choice) =>
-        ( <Button extraClass={ [] } icon={ iconMap[choice] } status={ (choice === props.selected) }>{iconMap[choice]}</Button>)
+  return props.isOpen ? (
+    <div>
+      {blockList.map( (choice) => (
+        <Button extraClass={ [] }
+          status={ (choice === props.selected) ? 'ACTIVE' : 'INACTIVE' }>
+          {blockIconMap[choice]}
+        </Button>
+        )
       )}
-    </div>
-  )
+      </div>
+  ) : null;
 }

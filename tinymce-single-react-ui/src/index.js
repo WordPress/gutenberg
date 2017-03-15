@@ -5,30 +5,28 @@ import { render } from 'react-dom'
 import { createStore } from 'redux'
 import { connect, Provider } from 'react-redux'
 import * as Icons from './external/dashicons/index'
+import BlockChangeToolbar from './components/toolbar/BlockChangeToolbar'
 import BlockToolbar from './components/toolbar/BlockToolbar'
 import InlineToolbar from './components/toolbar/InlineToolbar'
 import TinyMCEReactUI from './components/tinymce/tinymce-react-ui'
 import action from './reducers/tinymce/tinymce-react-ui'
+import {blockList, blockType, blockAlign} from './utils/tag'
 
 const store = createStore(action)
 
-let blockOpen = (collapsed) => {
-	console.log(collapsed, ' <<<<<<<<< <<<< < << < < <')
-	return (collapsed === null || !collapsed)
-}
-let inlineOpen = (collapsed) => (collapsed === null || collapsed)
-let blockMap = {P: 'p', H1: 'h', H2: 'h', BLOCKQUOTE: 'blockquote'}
-let blockList = ['p', 'h', 'blockquote']
-// TODO: dont default 'p' for unsupported tag
-let blockType = (el) => ( (el && blockMap[el.nodeName]) || 'p')
+let blockOpen  = (collapsed) => (collapsed !== null &&  collapsed) // block  if caret
+let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if range selection
+
 
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
 			<div style={{position : 'relative'}}>
-
-				<BlockToolbar isOpen={ blockOpen(store.getState().get('collapsed')) }
-				 choices={ blockList }
-				 selected={ blockType(store.getState().get('node'))}/>
+				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
+					/>
+				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
+				 	blockType={ blockType(store.getState().get('node')) }
+					blockAlign={ blockAlign(store.getState().get('node')) }
+				 />
 			</div>
 			<TinyMCEReactUI content={window.content}
 				onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
@@ -45,4 +43,4 @@ store.subscribe(renderApp)
 
 // TODO: wrap the app in a provider and add the react-redux stuff	<Provider store={store}>
 
-// {/*<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) } node={store.getState().get('node')}/>*/}
+// {/**/}

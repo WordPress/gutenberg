@@ -15,14 +15,12 @@ export default class BlockToolbar extends React.Component {
 	render() {
 		// TODO: add option types
 		console.log('%c', 'background: lime; font-size: 20px;', this.props.isOpen)
-		return this.props.isOpen ? null : (
+		return this.props.isOpen ? (
 			<div className={styles.toolbar} onMouseEnter={() => { }}>
-
-				<BlockChangeToolbar isOpen={true} choices={['p','h','blockquote']} selected={'p'} />
-				<BlockAlignToolbar isOpen={true} choices={['left','right','center']} selected={'left'} />
-
-
+				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
+				<BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} />
 			</div>
 		)
+		: null
 	}
 }
