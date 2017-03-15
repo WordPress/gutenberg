@@ -36,8 +36,8 @@ export default class BlockChangeToolbar extends React.Component {
 
   render() {
 
-    return this.props.isOpen ? (
-      <div className={styles.horizontal} onClick={ this.toggleMenu } >
+    return (
+      <div className={cx(styles.horizontal, styles.toolbarStyle)} onClick={ this.toggleMenu } >
         <div>
        {this.getActiveButton().map((choice, index) => (
           <Button key={index}
@@ -49,7 +49,7 @@ export default class BlockChangeToolbar extends React.Component {
 
 
           {this.state.open && this.getDropdownButtons().map((choice, index) => (
-            <Button key={index}
+            <Button key={index} extraClass={[styles.verticalStyle]}
               status={'INACTIVE'}>
               {blockIconMap[choice]}
             </Button>
@@ -57,7 +57,7 @@ export default class BlockChangeToolbar extends React.Component {
           )}
         </div>
       </div>
-    ) : null;
+    )
   }
 
 }
