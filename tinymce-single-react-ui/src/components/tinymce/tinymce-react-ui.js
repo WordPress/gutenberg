@@ -3,34 +3,6 @@ import { createElement, Component } from 'react';
 import tinymce from 'tinymce';
 import { isEqual, last } from 'lodash';
 
-// import './react-toolbar'
-// import './react-block'
-
-/*
-<TinyMCE
-          content={this.props.content}
-          config={{
-            theme: false,
-            inline: true,
-            toolbar: false,
-            menubar: false,
-            keep_styles: false,
-            browser_spellcheck: true,
-            plugins: [
-              'react-toolbar', // fns to make button, list-box, menuitem,...
-              'react-block'    // block toolbar
-              ],
-            skin_url: '//s1.wp.com/wp-includes/js/tinymce/skins/lightgray',
-            entity_encoding: 'raw',
-            schema: 'html5-strict',
-            formats: {
-              strikethrough: { inline: 'del' }
-            }
-          }}
-          onChange={this.handleEditorChange}
-        />
-*/
-
 function initialize( node, inline, onSetup ) {
 	if ( ! node ) {
 		return;
@@ -56,9 +28,10 @@ function initialize( node, inline, onSetup ) {
 	tinymce.init( config );
 }
 
+// NOTE: This file was modifed from tinymce-per-block
 export default class TinyMCEReactUI extends Component {
 	static defaultProps = {
-		// onSetup: ( editor ) => {},
+		onSetup: ( editor ) => {},
 		onFocus: ( collapsed, bookmark, node,  range ) => {},
 		onBlur: ( collapsed, bookmark, node, range ) => {},
 		onNodeChange: ( collapsed, bookmark, node, range, event ) => {},
@@ -108,6 +81,7 @@ export default class TinyMCEReactUI extends Component {
 	};
 	// ///////////////////////
 
+	// TODO: add state events where necessary ...
 	componentDidMount() {
 
 		initialize( this.node, this.props.inline, this.onSetup );
