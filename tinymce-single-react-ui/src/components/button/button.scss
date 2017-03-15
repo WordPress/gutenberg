@@ -4,8 +4,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid $toolbar-bg;
+  border: 1px solid $inactive-border;
   padding: 5px;
+  background: $inactive-bg;
+  color: $inactive-color;
 
   &:hover {
     background: $hover-bg;
