@@ -15,6 +15,7 @@ const nodeOrParent = (pred, el) => {
 }
 
 const status = (pred, el) => {
+	console.log('element >> ',el)
 	return ( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
 }
 
