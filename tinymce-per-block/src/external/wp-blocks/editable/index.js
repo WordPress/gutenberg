@@ -48,15 +48,17 @@ export default class EditableComponent extends Component {
 		}
 	}
 
-	updateContent() {
+	updateContent( wasFocused ) {
 		// This could not be called on each content change, it used to change the cursor position
-		let bookmark;
-		if ( this.props.focusConfig ) {
-			bookmark = this.editor.selection.getBookmark( 2, true );
-		}
-		this.editor.setContent( this.props.content );
-		if ( this.props.focusConfig ) {
-			this.editor.selection.moveToBookmark( bookmark );
+		if ( ! wasFocused ) {
+			let bookmark;
+			if ( this.props.focusConfig ) {
+				bookmark = this.editor.selection.getBookmark( 2, true );
+			}
+			this.editor.setContent( this.props.content );
+			if ( this.props.focusConfig ) {
+				this.editor.selection.moveToBookmark( bookmark );
+			}
 		}
 	}
 
@@ -76,7 +78,7 @@ export default class EditableComponent extends Component {
 		}
 
 		if ( this.props.content !== prevProps.content ) {
-			this.updateContent();
+			this.updateContent( !! prevProps.focusConfig );
 		}
 	}
 

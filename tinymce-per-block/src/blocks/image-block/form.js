@@ -43,7 +43,7 @@ export default class ImageBlockForm extends Component {
 				}
 				<div onClick={ () => {
 					api.select();
-					! focusConfig && api.focus();
+					! focusConfig && api.focus( { end: true } );
 				} }>
 					<img src={ block.src } className="image-block__display" />
 					{ ( focusConfig || block.caption ) &&
