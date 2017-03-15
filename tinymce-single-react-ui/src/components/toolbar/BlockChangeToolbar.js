@@ -31,7 +31,7 @@ export default class BlockChangeToolbar extends React.Component {
 
        {this.getActiveButton().map((choice, index) => (
           <Button key={index} extraClass={[ styles.horizontal ]}
-            status={'INACTIVE'}>
+            status={'ACTIVE'}>
             {blockIconMap[choice]}
           </Button>
         )
