@@ -1,0 +1,14 @@
+.gutenberg {
+	background: #fff;
+	margin: -20px 0 0 -20px;
+	padding: 60px;
+}
+
+.gutenberg__editor {
+	max-width: 700px;
+	margin: 0 auto;
+}
+
+.gutenberg__editor img {
+	max-width: 100%;
+}
