@@ -11,20 +11,18 @@ import styles from './inlinetoolbar.scss'
 
 
 const nodeOrParent = (pred, el) => {
-	console.log('>>>>>> <><><>>>', pred(el.nodeName))
 	return pred(el.nodeName) || (el.parentNode && pred(el.parentNode.nodeName))
 }
 
 const status = (pred, el) => {
-	console.log('element: ', el)
 	return ( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
 }
 
 export default class InlineToolbar extends React.Component {
 	render() {
-		let top = this.props.rangeTopLeft.top
-		let left = this.props.rangeTopLeft.left
-		let offset = this.props.pageYOffset
+		let top = this.props.rangeRect ? this.props.rangeRect.top : 0
+		let left = this.props.rangeRect ? this.props.rangeRect.left : 0
+		let offset = this.props.pageYOffset || 0
 
 		// TODO: add option types
 		return this.props.isOpen ? (

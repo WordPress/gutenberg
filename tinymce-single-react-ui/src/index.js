@@ -26,15 +26,20 @@ let findBlockType = (editorNode, node) => {
 	}
 }
 
+// Rect at the start of the Range
 let findStartOfRange = (range) => {
 	// make a collapsed range at the start point
 	if (range) {
 		let r = range.cloneRange();
 		r.setEnd(range.startContainer, range.startOffset);
-		let rect = r.getBoundingClientRect();
-		return { top: rect.top, left: rect.left }
-	} else {
-		return { top: 0, left: 0 }
+		return r.getBoundingClientRect();
+	}
+}
+
+// Rect for the Range
+let rangeRect = (range) => {
+	if (range) {
+		return range.getBoundingClientRect();
 	}
 }
 
@@ -42,12 +47,13 @@ const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
 			<div>
 				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
-					rangeTopLeft={ findStartOfRange(store.getState().get('range')) }
+					rangeRect={ findStartOfRange(store.getState().get('range')) }
 					pageYOffset={ window.pageYOffset }
 					/>
 				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
 				 	blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
 					blockAlign={ blockAlign(store.getState().get('node')) }
+					blockRect={ rangeRect(store.getState().get('range')) }
 				 />
 			</div>
 			<TinyMCEReactUI content={window.content}
