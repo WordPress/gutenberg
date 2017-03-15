@@ -21,9 +21,7 @@ const status = (pred, el) => (
 export default class InlineToolbar extends React.Component {
 	render() {
 		// TODO: add option types
-
-
-		return this.props.isOpen ? null : (
+		return this.props.isOpen ? (
 			<div className={styles.toolbarWrapper}>
 				<div className={styles.toolbar}>
 					<Button status={ status( isBold, this.props.node ) } >
@@ -38,5 +36,6 @@ export default class InlineToolbar extends React.Component {
 				</div>
 			</div>
 		)
+		: null
 	}
 }
