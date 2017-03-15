@@ -12,22 +12,24 @@ export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			open: true
+			open: false
 		}
 	}
 	render() {
 		let rect = this.props.blockRect;
 		console.log(rect)
 		// TODO: add option types
-		return this.props.isOpen ? (
-			<div className={styles.toolbar}
-					onMouseEnter={() => { this.setState({ open: true }) }}
-					onMouseLeave={ () => { this.setState({ open: false }) } }
+		return (this.props.isOpen && rect) ? (
+			<div style={ { position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px' } }>
+				<div className={styles.toolbar}
+						onMouseEnter={() => { this.setState({ open: true }) }}
+						onMouseLeave={ () => { this.setState({ open: false }) } }
 
 
-					>
-				<BlockAlignToolbar  isOpen={this.state.open} selected={this.props.blockAlign} />
-				<BlockChangeToolbar selected={this.props.blockType} />
+						>
+					<BlockAlignToolbar  isOpen={this.state.open} selected={this.props.blockAlign} />
+					<BlockChangeToolbar selected={this.props.blockType} />
+				</div>
 			</div>
 		)
 		: null
