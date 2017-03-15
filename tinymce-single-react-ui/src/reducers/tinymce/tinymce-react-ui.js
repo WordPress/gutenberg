@@ -8,6 +8,7 @@ const initialState = fromJS({
   collapsed: null, // current selection is collapsed
   bookmark: null,  // current bookmark for restoring the selection
   node: null,      // current node of the selection (if collapsed) or common ancestor containing the selection)
+  range: null,     // current selection range
   editorRef: null  // reference to the editor
 })
 
@@ -28,7 +29,8 @@ export default (state = initialState, action) => {
         focused: true,
         collapsed: action.val[0],
         bookmark: action.val[1],
-        node: action.val[2]
+        node: action.val[2],
+        range: action.val[3]
       } )
     }
     case 'BLUR': {
@@ -36,18 +38,16 @@ export default (state = initialState, action) => {
         focused: false,
         collapsed: action.val[0],
         bookmark: action.val[1],
-        node: action.val[2]
+        node: action.val[2],
+        range: action.val[3]
       } )
     }
     case 'NODECHANGE': {
-      // if (action.val[1] !== action.val[2].element)
-      //   console.log('!! '+action.type, action.val[1], action.val[2].element, action)
-      // else
-      //   console.log('OK '+action.type, action.val[1], action.val[2].element, action)
       return state.merge( {
         collapsed: action.val[0],
         bookmark: action.val[1],
-        node: action.val[2]
+        node: action.val[2],
+        range: action.val[3]
       } )
     }
     default:
