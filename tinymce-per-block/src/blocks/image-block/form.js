@@ -61,6 +61,7 @@ export default class ImageBlockForm extends Component {
 								placeholder="Write caption"
 								focusConfig={ focusConfig }
 								onFocusChange={ api.focus }
+								selectionName="caption"
 							/>
 						</div>
 					}

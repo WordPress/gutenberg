@@ -6,6 +6,7 @@ import { map, debounce } from 'lodash';
 import { findDOMNode } from 'react-dom';
 import classNames from 'classnames';
 import { getBlock } from 'wp-blocks';
+import rangy from 'rangy';
 
 /**
  * Internal dependencies
@@ -20,10 +21,12 @@ class BlockList extends Component {
 		selected: null,
 		focus: { uid: null },
 		blocks: [],
+		contentEditable: false
 	};
 
-	blockNodes = [];
+	blockNodes = {};
 	commands = [];
+	selections = [];
 
 	bindEditor = ( ref ) => {
 		this.editor = ref;
@@ -39,6 +42,57 @@ class BlockList extends Component {
 	componentDidMount() {
 		this.setState( { blocks: this.props.content } );
 		window.addEventListener( 'click', this.handleDocumentClick );
+		this.editor.addEventListener( 'mousedown', () => {
+			this.setState( { contentEditable: true } );
+		} );
+		this.editor.addEventListener( 'mouseup', () => {
+			const range = rangy.getSelection().getRangeAt( 0 );
+			let closestContentEditable;
+			if ( ! range.commonAncestorContainer.getAttribute ) {
+				closestContentEditable = range.commonAncestorContainer.parentNode.closest( '[contentEditable]' );
+			}
+			else if ( range.commonAncestorContainer.getAttribute( 'contentEditable' ) ) {
+				closestContentEditable = range.commonAncestorContainer;
+			} else {
+				closestContentEditable = range.commonAncestorContainer.closest( '[contentEditable]' );
+			}
+			const editorNode = findDOMNode( this.editor );
+			if ( range.collpased || closestContentEditable !== editorNode ) {
+				this.setState( { contentEditable: false } );
+			}
+		} );
+		document.addEventListener( 'selectionchange', () => {
+			const range = rangy.getSelection().getRangeAt( 0 );
+			if ( range.commonAncestorContainer !== findDOMNode( this.editor ) ) {
+				return;
+			}
+			const blockSelections = [];
+			this.state.blocks.forEach( ( { uid } ) => {
+				const blockNode = this.blockNodes[ uid ];
+				const blockDomNode = findDOMNode( blockNode );
+				const selectionNodes = Array.from( blockDomNode.querySelectorAll( '[data-selection]' ) );
+				const contained = range.containsNode( blockDomNode );
+				const containedPartially = range.containsNode( blockDomNode, true );
+				const selections = selectionNodes.map( ( selectionNode ) => {
+					const id = selectionNode.getAttribute( 'data-selection' );
+					const nodeRange = rangy.createRange();
+					nodeRange.selectNodeContents( selectionNode );
+					const intersection = nodeRange.intersection( range );
+					if ( ! intersection ) {
+						return { id, content: false };
+					}
+					const content = intersection.toHtml();
+					return { id, content, node: selectionNode, range: intersection };
+				} );
+				blockSelections.push( {
+					uid,
+					contained,
+					containedPartially,
+					selections
+				} );
+			} );
+			this.selections = blockSelections;
+		} );
 	}
 
 	componentWillUnmount() {
@@ -99,14 +153,55 @@ class BlockList extends Component {
 
 	addBlock = ( id ) => {
 		this.executeCommand( { type: 'addBlock', id } );
-	}
+	};
+
+	onKeyDown = ( event ) => {
+		if ( ! this.state.contentEditable ) {
+			return;
+		}
+		event.preventDefault();
+		event.stopPropagation();
+		const containedElements = this.selections.filter( selection => selection.contained );
+		const containedPartially = this.selections.filter( selection => selection.containedPartially );
+		containedElements.forEach( ( { uid } ) => {
+			const command = commands.remove();
+			command.uid = uid;
+			this.executeCommand( command );
+		} );
+		containedPartially.forEach( ( { uid, selections } ) => {
+			const changes = selections.reduce(
+				( memo, selection ) => {
+					if ( ! selection.content ) {
+						return memo;
+					}
+					selection.range.deleteContents();
+					memo[ selection.id ] = selection.node.innerHTML;
+					return memo;
+				},
+				{}
+			);
+			const command = commands.change( changes );
+			command.uid = uid;
+			this.executeCommand( command );
+		} );
+		if ( containedPartially.length === 2 ) {
+			const mergedBlock = containedPartially[ 1 ].uid;
+			const command = commands.mergeWithPrevious();
+			command.uid = mergedBlock;
+			this.executeCommand( command );
+		}
+
+		setTimeout( () => {
+			this.setState( { contentEditable: false } );
+		} );
+	};
 
 	render() {
-		const { blocks, focus, selected, hovered } = this.state;
+		const { blocks, focus, selected, hovered, contentEditable } = this.state;
 
 		return (
 			<div>
-				<div className="block-list" ref={ this.bindEditor }>
+				<div className="block-list" ref={ this.bindEditor } contentEditable={ contentEditable } suppressContentEditableWarning onKeyDown={ this.onKeyDown }>
 					{ map( blocks, ( block, index ) => {
 						const isFocused = block.uid === focus.uid;
 						const api = Object.keys( commands ).reduce( ( memo, command ) => {

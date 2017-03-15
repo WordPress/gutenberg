@@ -106,6 +106,7 @@ export default class QuoteBlockForm extends Component {
 							focusConfig={ focusInput === 'content' ? focusConfig : null }
 							onFocusChange={ ( config ) => api.focus( Object.assign( { input: 'content' }, config ) ) }
 							onType={ api.unselect }
+							selectionName="caption"
 							inline
 						/>
 					</div>
@@ -124,6 +125,7 @@ export default class QuoteBlockForm extends Component {
 								focusConfig={ focusInput === 'cite' ? focusConfig : null }
 								onFocusChange={ ( config ) => api.focus( Object.assign( { input: 'cite' }, config ) ) }
 								onType={ api.unselect }
+								selectionName="cite"
 								inline
 								single
 							/>
