@@ -4,25 +4,31 @@
 		return '<blockquote><p><br></p></blockquote>';
 	}
 
-	function fromBaseState( block, editor ) {
-		editor.formatter.apply( 'blockquote', block );
+	function fromBaseState( oldState ) {
+		var newState = document.createElement( 'BLOCKQUOTE' );
+
+		oldState.parentNode.insertBefore( newState, oldState );
+
+		newState.appendChild( oldState );
+
+		return newState;
 	}
 
-	function toBaseState( block ) {
-		var footer = block.querySelector( 'footer' );
-		var firstChild = block.firstChild;
+	function toBaseState( oldState ) {
+		var newState = oldState.firstChild;
+		var footer = oldState.querySelector( 'footer' );
 
 		if ( footer ) {
-			block.removeChild( footer );
+			oldState.removeChild( footer );
 		}
 
-		while ( block.firstChild ) {
-			block.parentNode.insertBefore( block.firstChild, block );
+		while ( oldState.firstChild ) {
+			oldState.parentNode.insertBefore( oldState.firstChild, oldState );
 		}
 
-		block.parentNode.removeChild( block );
+		oldState.parentNode.removeChild( oldState );
 
-		window.wp.blocks.selectBlock( firstChild );
+		return newState;
 	}
 
 	function onSelect( block ) {
@@ -55,11 +61,7 @@
 			footer: 'Write citation\u2026'
 		},
 		controls: [
-			{
-				classes: 'remove-formatting',
-				icon: 'gridicons-quote',
-				onClick: toBaseState
-			}
+			'text-switcher'
 		],
 		insert: insertEmpty,
 		fromBaseState: fromBaseState,

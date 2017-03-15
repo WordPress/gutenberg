@@ -93,6 +93,17 @@
 					'</button>' +
 				'</div>'
 			);
+		},
+		bindStates: function() {
+			var $el = this.$( this.getEl() );
+
+			this._super();
+
+			this.state.on( 'change:icon', function( event ) {
+				$el.find( 'use' ).first().attr( 'xlink:href', '../shared/gridicons.svg#' + event.value );
+			} );
+
+			return this;
 		}
 	} ) );
 
@@ -121,6 +132,9 @@
 					html +
 				'</div>'
 			);
+		},
+		active: function( isActive ) {
+			this.$( this.getEl() ).toggleClass( 'is-active', isActive );
 		}
 	} ) );
 
