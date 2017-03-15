@@ -84,7 +84,8 @@ export default class EnhancedInput extends Component {
 	render() {
 		// Keeping splitValue to exclude it from props
 		const ignoredProps = [
-			'value', 'splitValue', 'removePrevious', 'moveCursorDown', 'moveCursorUp', 'focusConfig', 'onFocusChange'
+			'value', 'splitValue', 'removePrevious', 'moveCursorDown', 'moveCursorUp',
+			'focusConfig', 'onFocusChange', 'selectionName'
 		];
 		const { value } = this.props;
 		const props = omit( this.props, ignoredProps );
@@ -100,7 +101,8 @@ export default class EnhancedInput extends Component {
 				<div
 					className="textarea-mirror"
 					ref={ this.bindMirror }
-					style={ style } />
+					style={ style }
+				/>
 				<Textarea
 					ref={ this.bindInput }
 					{ ...props }
@@ -109,6 +111,7 @@ export default class EnhancedInput extends Component {
 					onKeyDown={ this.onKeyDown }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
+					data-selection={ this.props.selectionName }
 				/>
 			</div>
 		);

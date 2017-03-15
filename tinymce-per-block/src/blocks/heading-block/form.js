@@ -91,6 +91,7 @@ export default class HeadingBlockForm extends Component {
 						focusConfig={ focusConfig }
 						onFocusChange={ api.focus }
 						onType={ api.unselect }
+						selectionName="content"
 						single
 						inline
 					/>

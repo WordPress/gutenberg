@@ -217,8 +217,10 @@ export default class EditableComponent extends Component {
 	};
 
 	onFocus = () => {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.props.onFocusChange( { bookmark } );
+		if ( ! this.props.focusConfig ) {
+			const bookmark = this.editor.selection.getBookmark( 2, true );
+			this.props.onFocusChange( { bookmark } );
+		}
 	};
 
 	onSetup = ( editor ) => {
@@ -256,7 +258,7 @@ export default class EditableComponent extends Component {
 	render() {
 		return (
 			<div ref={ this.setRef }>
-				<div contentEditable />
+				<div contentEditable data-selection={ this.props.selectionName } />
 			</div>
 		);
 	}
