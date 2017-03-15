@@ -2,12 +2,19 @@
 
 .toolbar {
   display: inline-block;
-  border: 1px solid $toolbar-border;
-  background: $toolbar-bg;
   position: absolute;
   right: 0;
 }
 
 .horizontal {
   display: inline-block;
+  float: left;
+}
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
 }

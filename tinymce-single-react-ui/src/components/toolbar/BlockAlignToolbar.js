@@ -12,7 +12,7 @@ export default function BlockAlignToolbar(props) {
   return props.isOpen ? (
     <div className={styles.horizontal}>
       {blockAlignList.map( (choice, index) => (
-        <Button key={index} extraClass={ [styles.horizontal] } >
+        <Button key={index} >
           {blockAlignIconMap[choice]}
         </Button>
         )

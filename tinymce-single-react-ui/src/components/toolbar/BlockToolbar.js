@@ -11,11 +11,14 @@ import styles from './blocktoolbar.scss'
 export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
+		this.state = {
+
+		}
 	}
 	render() {
 		// TODO: add option types
 		return this.props.isOpen ? (
-			<div className={styles.toolbar} onMouseEnter={() => { }}>
+			<div className={styles.toolbar} onMouseEnter={() => { }} onMouseLeave={ () => { } }>
 				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
 				<BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} />
 			</div>
