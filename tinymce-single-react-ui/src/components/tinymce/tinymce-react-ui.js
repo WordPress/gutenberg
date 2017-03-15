@@ -59,9 +59,9 @@ function initialize( node, inline, onSetup ) {
 export default class TinyMCEReactUI extends Component {
 	static defaultProps = {
 		// onSetup: ( editor ) => {},
-		onFocus: ( collapsed, bookmark, node ) => {},
-		onBlur: ( collapsed, bookmark, node ) => {},
-		onNodeChange: ( collapsed, bookmark, node, event ) => {},
+		onFocus: ( collapsed, bookmark, node,  range ) => {},
+		onBlur: ( collapsed, bookmark, node, range ) => {},
+		onNodeChange: ( collapsed, bookmark, node, range, event ) => {},
 		onSetup: ( editorRef ) => {},
 
 		onChange: () => {},
@@ -92,19 +92,19 @@ export default class TinyMCEReactUI extends Component {
 	onFocus = () => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		this.props.onFocus( selection.isCollapsed(), bookmark, selection.getNode() );
+		this.props.onFocus( selection.isCollapsed(), bookmark, selection.getNode(), selection.getRng() );
 	};
 
 	onBlur = () => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		this.props.onBlur( selection.isCollapsed(), bookmark, selection.getNode() );
+		this.props.onBlur( selection.isCollapsed(), bookmark, selection.getNode(), selection.getRng() );
 	};
 
 	nodeChange = ( event ) => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		this.props.onNodeChange( selection.isCollapsed(), bookmark, selection.getNode(), event );
+		this.props.onNodeChange( selection.isCollapsed(), bookmark, selection.getNode(), selection.getRng(), event );
 	};
 	// ///////////////////////
 
