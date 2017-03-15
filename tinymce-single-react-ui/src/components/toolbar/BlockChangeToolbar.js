@@ -10,7 +10,7 @@ import {blockIconMap, blockList} from '../../utils/tag'
 export default function BlockChangeToolbar(props) {
 
   return props.isOpen ? (
-    <div>
+    <div className={styles.horizontal}>
       {blockList.map( (choice, index) => (
         <Button key={index} extraClass={ [ styles.horizontal ] }
           status={ (choice === props.selected) ? 'ACTIVE' : 'INACTIVE' }>
