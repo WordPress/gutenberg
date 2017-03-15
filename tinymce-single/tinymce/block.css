@@ -385,4 +385,5 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	content: attr(data-wp-placeholder);
 	position: absolute;
 	opacity: 0.5;
+	pointer-events: none;
 }

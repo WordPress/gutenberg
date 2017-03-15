@@ -123,14 +123,12 @@
 
 			// Has placeholder for text.
 			if ( brs.length ) {
-				if ( brs[0].parentNode.getAttribute( 'contenteditable' ) === 'true' ) {
-					editor.selection.select( brs[0].parentNode );
-				} else {
-					editor.selection.setCursorLocation( brs[0].parentNode, 0 );
-				}
+				editor.selection.setCursorLocation( brs[0].parentNode, 0 );
 			} else {
 				editor.selection.select( block );
 			}
+
+			editor.nodeChanged();
 		},
 		extendBlock: function( settings ) {
 			var extendId = settings.extends;

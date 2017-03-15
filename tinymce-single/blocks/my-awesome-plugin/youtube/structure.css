@@ -1,5 +1,6 @@
 #editor figure[data-wp-block-type="my-awesome-plugin:youtube"] {
 	position: relative;
+	overflow: hidden;
 }
 
 /* Should probably be handled internally. */
