@@ -18,31 +18,8 @@ const status = (pred, el) => (
 	( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
 )
 
-/*
-var sel = window.getSelection();
-					if (!sel.isCollapsed) {
-						var toolbar = this.getEl();
-						var toolbarRect = toolbar.getBoundingClientRect();
-						var selRange = sel.getRangeAt(0);
-						var startRange = selRange.cloneRange();
-						startRange.setEnd(startRange.startContainer, startRange.startOffset);
-						var selRect = startRange.getBoundingClientRect();
-
-						DOM.setStyles( toolbar, {
-							position: 'absolute',
-							left: selRect.left - 10 + 'px',
-							top: selRect.top + window.pageYOffset - toolbarRect.height - 10 + 'px'
-						} );
-
-.insert-toolbar svg {
-	background: #fff;
-	border-radius: 12px;
-}
-
-						*/
 export default class InlineToolbar extends React.Component {
 	render() {
-		let topLeft = this.props.targetTopLeft
 		// TODO: add option types
 		return this.props.isOpen ? (
 			<div className={styles.toolbarWrapper}>

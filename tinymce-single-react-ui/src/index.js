@@ -25,29 +25,11 @@ let findBlockType = (editorNode, node) => {
 		return topType
 	}
 }
-/* var sel = window.getSelection();
-					if (!sel.isCollapsed) {
-						var toolbar = this.getEl();
-						var toolbarRect = toolbar.getBoundingClientRect();
-						var selRange = sel.getRangeAt(0);
-						var startRange = selRange.cloneRange();
-						startRange.setEnd(startRange.startContainer, startRange.startOffset);
-						var selRect = startRange.getBoundingClientRect();
 
-						DOM.setStyles( toolbar, {
-							position: 'absolute',
-							left: selRect.left - 10 + 'px',
-							top: selRect.top + window.pageYOffset - toolbarRect.height - 10 + 'px'
-						} );
-*/
-let targetCoords = () {
-
-}
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
 			<div>
 				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
-					targetTopLeft={  }
 					/>
 				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
 				 	blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
