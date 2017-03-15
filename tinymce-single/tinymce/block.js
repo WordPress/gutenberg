@@ -78,11 +78,15 @@
 					var currentSettings = wp.blocks.getBlockSettingsByElement( block );
 					var nextSettings = wp.blocks.getBlockSettings( event.control.settings.value );
 
+					editor.selection.collapse();
+
+					var bookmark = editor.selection.getBookmark();
+
 					editor.undoManager.transact( function() {
 						var newBlock = nextSettings.fromBaseState(
 							currentSettings.toBaseState( block, editor ), editor );
 
-						wp.blocks.selectBlock( newBlock );
+						wp.blocks.selectBlock( newBlock, bookmark );
 					} );
 				}
 			}

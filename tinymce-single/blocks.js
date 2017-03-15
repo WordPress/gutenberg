@@ -117,13 +117,16 @@
 		getSelectedBlock: function() {
 			return wp.blocks.getSelectedBlocks()[0];
 		},
-		selectBlock: function( block ) {
+		selectBlock: function( block, _bookmark ) {
 			var editor = window.tinyMCE.activeEditor;
 			var brs = block.getElementsByTagName( 'BR' );
 
 			// Has placeholder for text.
 			if ( brs.length ) {
 				editor.selection.setCursorLocation( brs[0].parentNode, 0 );
+			} else if ( _bookmark ) {
+				editor.selection.moveToBookmark( _bookmark );
+				editor.focus();
 			} else {
 				editor.selection.select( block );
 			}
