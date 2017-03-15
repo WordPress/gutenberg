@@ -22,7 +22,7 @@ export default class BlockToolbar extends React.Component {
 		const AlignCenterButton = props => <Button><Icons.EditorAlignCenterIcon /></Button>
 
 		// TODO: add option types
-		let hidden = !this.props.selection || !this.props.selection.isCollapsed()
+		let hidden = this.props.collapsed === null || !this.props.collapsed
 
 		return (
 			<div className={styles.toolbarWrapper}>

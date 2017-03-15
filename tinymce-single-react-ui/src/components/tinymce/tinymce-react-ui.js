@@ -59,9 +59,9 @@ function initialize( node, inline, onSetup ) {
   export default class TinyMCEReactUI extends Component {
 	static defaultProps = {
 		// onSetup: ( editor ) => {},
-		onFocus: ( selection, bookmark, node ) => {},
-		onBlur: ( selection, bookmark, node ) => {},
-		onNodeChange: ( selection, bookmark, node, event ) => {},
+		onFocus: ( collapsed, bookmark, node ) => {},
+		onBlur: ( collapsed, bookmark, node ) => {},
+		onNodeChange: ( collapsed, bookmark, node, event ) => {},
 
 		onChange: () => {},
 		splitValue: () => {},
@@ -90,22 +90,19 @@ function initialize( node, inline, onSetup ) {
 	onFocus = () => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		const node = selection.getNode();
-		this.props.onFocus( selection, bookmark, node );
+		this.props.onFocus( selection.isCollapsed(), bookmark, selection.getNode() );
 	};
 
 	onBlur = () => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		const node = selection.getNode();
-		this.props.onBlur( selection, bookmark, node );
+		this.props.onBlur( selection.isCollapsed(), bookmark, selection.getNode() );
 	};
 
 	nodeChange = ( event ) => {
 		const selection = this.editor.selection
 		const bookmark = selection.getBookmark( 2, true );
-		const node = selection.getNode();
-		this.props.onNodeChange( selection, bookmark, node, event );
+		this.props.onNodeChange( selection.isCollapsed(), bookmark, selection.getNode(), event );
 	};
 	// ///////////////////////
 

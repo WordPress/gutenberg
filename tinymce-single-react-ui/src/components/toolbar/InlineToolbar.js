@@ -19,7 +19,7 @@ const status = (pred, el) => (
 export default class InlineToolbar extends React.Component {
 	render() {
 		// TODO: add option types
-		let hidden = !this.props.selection || this.props.selection.isCollapsed()
+		let hidden = this.props.collapsed === null || this.props.collapsed
 
 		return (
 			<div className={styles.toolbarWrapper}>
