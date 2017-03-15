@@ -11,9 +11,8 @@ export default function BlockAlignToolbar(props) {
 
   return props.isOpen ? (
     <div>
-      {blockAlignList.map( (choice) => (
-        <Button extraClass={ [styles.horizontal] } >
-          status={ (choice === props.selected) ? 'ACTIVE' : 'INACTIVE' }
+      {blockAlignList.map( (choice, index) => (
+        <Button key={index} extraClass={ [styles.horizontal] } >
           {blockAlignIconMap[choice]}
         </Button>
         )

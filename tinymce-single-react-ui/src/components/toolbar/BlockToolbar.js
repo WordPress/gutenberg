@@ -14,7 +14,6 @@ export default class BlockToolbar extends React.Component {
 	}
 	render() {
 		// TODO: add option types
-		console.log('%c', 'background: lime; font-size: 20px;', this.props.isOpen)
 		return this.props.isOpen ? (
 			<div className={styles.toolbar} onMouseEnter={() => { }}>
 				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />

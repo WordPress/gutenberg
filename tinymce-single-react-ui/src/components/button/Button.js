@@ -9,7 +9,7 @@ export default class Button extends React.Component {
 	}
 
 	render() {
-		let myStyle = this.props.style || styles
+		let extraClass = this.props.extraClass && this.props.extraClass.length > 0 ? this.props.extraClass.join(' ') : '';
 
 		let classMap = {
 			ACTIVE: styles.active,
@@ -19,7 +19,8 @@ export default class Button extends React.Component {
 
 		let buttonClasses = cx(
 			styles.button,
-			classMap[this.props.status] || styles.inactive
+			classMap[this.props.status] || styles.inactive,
+			extraClass
 		)
 
 		return (

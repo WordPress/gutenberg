@@ -11,8 +11,8 @@ export default function BlockChangeToolbar(props) {
 
   return props.isOpen ? (
     <div>
-      {blockList.map( (choice) => (
-        <Button extraClass={ [] }
+      {blockList.map( (choice, index) => (
+        <Button key={index} extraClass={ [ styles.horizontal ] }
           status={ (choice === props.selected) ? 'ACTIVE' : 'INACTIVE' }>
           {blockIconMap[choice]}
         </Button>

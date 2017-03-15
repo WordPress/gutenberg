@@ -20,7 +20,7 @@ let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if 
 
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
-			<div style={{position : 'relative'}}>
+			<div>
 				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
 					/>
 				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
