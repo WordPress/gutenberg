@@ -11,6 +11,7 @@
     background: $hover-bg;
     border-color: $hover-border;
     color: $hover-color;
+    cursor: pointer;
     :global {
       .dashicon {
         fill: $hover-color;
