@@ -12,11 +12,20 @@ import action from './reducers/tinymce/tinymce-react-ui'
 
 const store = createStore(action)
 
+let blockOpen = (collapsed) => (collapsed === null || !collapsed)
+let inlineOpen = (collapsed) => (collapsed === null || collapsed)
+let blockMap = {P: 'p', H1: 'h', H2: 'h', BLOCKQUOTE: 'blockquote'}
+let blockList = ['p', 'h', 'blockquote']
+// TODO: dont default 'p' for unsupported tag
+let blockType = (el) => ( (el && blockMap[el.nodeName]) || 'p')
+
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
 			<div style={{position : 'relative'}}>
-			<InlineToolbar collapsed={store.getState().get('collapsed')} node={store.getState().get('node')}/>
-			<BlockToolbar collapsed={store.getState().get('collapsed')} node={store.getState().get('node')}/>
+				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) } node={store.getState().get('node')}/>
+				<BlockToolbar isOpen={ blockOpen(store.getState().get('collapsed')) }
+				 choices={ blockList }
+				 selected={ blockType(store.getState().get('node'))}/>
 			</div>
 			<TinyMCEReactUI content={window.content}
 				onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }

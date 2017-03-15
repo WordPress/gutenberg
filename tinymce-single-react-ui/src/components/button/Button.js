@@ -9,6 +9,7 @@ export default class Button extends React.Component {
 	}
 
 	render() {
+		let myStyle = this.props.style || styles
 
 		let classMap = {
 			ACTIVE: styles.active,
