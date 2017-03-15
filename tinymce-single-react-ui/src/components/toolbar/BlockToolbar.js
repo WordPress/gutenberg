@@ -22,8 +22,8 @@ export default class BlockToolbar extends React.Component {
 		// TODO: add option types
 		let hidden = this.props.collapsed === null || !this.props.collapsed
 
-		if (hidden) return (
-			<div className={sideToolbarStyles} onMouseEnter={() => { }}>
+		return hidden ? null : (
+			<div className={styles.toolbar} onMouseEnter={() => { }}>
 
 				<Dropbutton status={'ACTIVE'}
 					dropchoices={[<ParagraphButton key="pbutton" />, <QuoteButton key="qbutton" />]}
