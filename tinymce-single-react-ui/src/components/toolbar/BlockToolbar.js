@@ -18,6 +18,8 @@ export default class BlockToolbar extends React.Component {
 	render() {
 		let rect = this.props.blockRect;
 
+
+
 		// TODO: add option types
 		return (this.props.isOpen && rect) ? (
 			<div style={ { position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px', zIndex: 23 } }>

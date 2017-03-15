@@ -2,14 +2,17 @@
 
 .toolbar {
   display: inline-block;
-  // position: absolute;
-  // right: 0;
-  z-index: 20;
 }
 
+.toolbarStyle {
+  border: 1px solid $toolbar-border;
+}
 .horizontal {
   display: inline-flex;
-  background: $toolbar-bg;
+}
+.verticalStyle {
+  background: $active-bg;
+  border-color: $active-bg;
 }
 
 .visible {
