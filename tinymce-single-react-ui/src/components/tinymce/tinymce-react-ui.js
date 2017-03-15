@@ -56,12 +56,13 @@ function initialize( node, inline, onSetup ) {
 	tinymce.init( config );
 }
 
-  export default class TinyMCEReactUI extends Component {
+export default class TinyMCEReactUI extends Component {
 	static defaultProps = {
 		// onSetup: ( editor ) => {},
 		onFocus: ( collapsed, bookmark, node ) => {},
 		onBlur: ( collapsed, bookmark, node ) => {},
 		onNodeChange: ( collapsed, bookmark, node, event ) => {},
+		onSetup: ( editorRef ) => {},
 
 		onChange: () => {},
 		splitValue: () => {},
@@ -85,6 +86,7 @@ function initialize( node, inline, onSetup ) {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'paste', this.onPaste );
 		editor.on( 'paste keydown undo redo', this.props.onType );
+		this.props.onSetup( this.node );
 	};
 
 	onFocus = () => {

@@ -7,7 +7,8 @@ const initialState = fromJS({
   focused: false,  // does the editor have focus
   collapsed: null, // current selection is collapsed
   bookmark: null,  // current bookmark for restoring the selection
-  node: null       // current node of the selection (if collapsed) or common ancestor containing the selection)
+  node: null,      // current node of the selection (if collapsed) or common ancestor containing the selection)
+  editorRef: null  // reference to the editor
 })
 
 export default (state = initialState, action) => {
@@ -16,6 +17,11 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case '@@redux/INIT': {
       return state
+    }
+    case 'SETUP': {
+      return state.merge( {
+        editorRef: action.val
+      } )
     }
     case 'FOCUS': {
       return state.merge( {
