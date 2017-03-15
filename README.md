@@ -46,158 +46,158 @@ These mockups are all subject to change and feedback.
 
 _Text_
 
-![Text, Neutral](mockups/Text, Neutral.png)
+![Text, Neutral](mockups/Text,%20Neutral.png)
 
 _Text, Hover_
 
-![Text, Hover](mockups/Text, Hover.png)
+![Text, Hover](mockups/Text,%20Hover.png)
 
 _Text, Selected_
 
-![Text, Selected](mockups/Text, Selected.png)
+![Text, Selected](mockups/Text,%20Selected.png)
 
 ---
 
 _Empty Image_
 
-![Empty Image](mockups/Image, Empty.png)
+![Empty Image](mockups/Image,%20Empty.png)
 
 _Empty Image, Hover_
 
-![Empty Image, Hover](mockups/Image, Empty, Hover.png)
+![Empty Image, Hover](mockups/Image,%20Empty,%20Hover.png)
 
 _Image_
 
-![Image, Neutral](mockups/Image, Neutral.png)
+![Image, Neutral](mockups/Image,%20Neutral.png)
 
 _Image, Hover_
 
-![Image, Hover](mockups/Image, Hover.png)
+![Image, Hover](mockups/Image,%20Hover.png)
 
 _Image, Selected_
 
-![Image, Selected](mockups/Image, Selected.png)
+![Image, Selected](mockups/Image,%20Selected.png)
 
 _Image, Caption_
 
-![Image, Caption](mockups/Image, Caption.png)
+![Image, Caption](mockups/Image,%20Caption.png)
 
 ---
 
 _Empty Quote_
 
-![Empty Quote](mockups/Quote, Empty.png)
+![Empty Quote](mockups/Quote,%20Empty.png)
 
 _Empty Quote, Hover_
 
-![Empty Quote, Hover](mockups/Quote, Empty, Hover.png)
+![Empty Quote, Hover](mockups/Quote,%20Empty,%20Hover.png)
 
 _Quote_
 
-![Quote, Neutral](mockups/Quote, Neutral.png)
+![Quote, Neutral](mockups/Quote,%20Neutral.png)
 
 _Quote, Hover_
 
-![Quote, Hover](mockups/Quote, Hover.png)
+![Quote, Hover](mockups/Quote,%20Hover.png)
 
 _Quote, Selected_
 
-![Quote, Selected](mockups/Quote, Selected.png)
+![Quote, Selected](mockups/Quote,%20Selected.png)
 
 _Quote, Citation_
 
-![Quote, Citation](mockups/Quote, Citation.png)
+![Quote, Citation](mockups/Quote,%20Citation.png)
 
 _Quote 2_
 
-![Quote 2, Neutral](mockups/Quote 2, Neutral.png)
+![Quote 2, Neutral](mockups/Quote%202,%20Neutral.png)
 
 _Quote 2, Hover_
 
-![Quote 2, Hover](mockups/Quote 2, Hover.png)
+![Quote 2, Hover](mockups/Quote%202,%20Hover.png)
 
 _Quote 2, Selected_
 
-![Quote 2, Selected](mockups/Quote 2, Selected.png)
+![Quote 2, Selected](mockups/Quote%202,%20Selected.png)
 
 ---
 
 _Heading_
 
-![Heading, Neutral](mockups/Heading, Neutral.png)
+![Heading, Neutral](mockups/Heading,%20Neutral.png)
 
 _Heading, Hover_
 
-![Heading, Hover](mockups/Heading, Hover.png)
+![Heading, Hover](mockups/Heading,%20Hover.png)
 
 _Heading, Selected_
 
-![Heading, Selected](mockups/Heading, Selected.png)
+![Heading, Selected](mockups/Heading,%20Selected.png)
 
 ---
 
 _Empty Embed_
 
-![Empty Embed, Neutral](mockups/Empty Embed, Neutral.png)
+![Empty Embed, Neutral](mockups/Empty%20Embed,%20Neutral.png)
 
 _Empty Embed, Hover_
 
-![Empty Embed, Hover](mockups/Empty Embed, Hover.png)
+![Empty Embed, Hover](mockups/Empty%20Embed,%20Hover.png)
 
 _Embed, Neutral_
 
-![Embed, Neutral](mockups/Embed, Neutral.png)
+![Embed, Neutral](mockups/Embed,%20Neutral.png)
 
 _Embed, Hover_
 
-![Embed, Hover](mockups/Embed, Hover.png)
+![Embed, Hover](mockups/Embed,%20Hover.png)
 
 _Embed, Selected_
 
-![Embed, Selected](mockups/Embed, Selected.png)
+![Embed, Selected](mockups/Embed,%20Selected.png)
 
 _Embed, Caption_
 
-![Embed, Caption](mockups/Embed, Caption.png)
+![Embed, Caption](mockups/Embed,%20Caption.png)
 
 ---
 
 _Gallery_
 
-![Gallery, Neutral](mockups/Gallery, Neutral.png)
+![Gallery, Neutral](mockups/Gallery,%20Neutral.png)
 
 _Gallery, Hover_
 
-![Gallery, Hover](mockups/Gallery, Hover.png)
+![Gallery, Hover](mockups/Gallery,%20Hover.png)
 
 _Gallery, Selected_
 
-![Gallery, Selected](mockups/Gallery, Selected.png)
+![Gallery, Selected](mockups/Gallery,%20Selected.png)
 
 _Gallery, Selected Image_
 
-![Gallery, Selected Image](mockups/Gallery, Selected Image.png)
+![Gallery, Selected Image](mockups/Gallery,%20Selected%20Image.png)
 
 _Gallery, Caption_
 
-![Gallery, Caption](mockups/Gallery, Caption.png)
+![Gallery, Caption](mockups/Gallery,%20Caption.png)
 
 ---
 
 _Basic UI controls_
 
-![Drag and drop](mockups/Drag and drop.png)
+![Drag and drop](mockups/Drag%20and%20drop.png)
 ![Insert](mockups/Insert.png)
 ![Newlines](mockups/Newlines.png)
-![Type Switcher](mockups/Type Switcher.png)
+![Type Switcher](mockups/Type%20Switcher.png)
 
 **Early Admin UI Concept**
 
 **Note:** This is how it _could_ look.
 
-![Admin UI](mockups/Admin UI.png)
+![Admin UI](mockups/Admin%20UI.png)
 
-![Admin UI, Sidebar Open](mockups/Admin UI, Sidebar Open.png)
+![Admin UI, Sidebar Open](mockups/Admin%20UI,%20Sidebar%20Open.png)
 
 **Early Mobile UI Concept**
 
