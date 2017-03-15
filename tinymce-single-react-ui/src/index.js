@@ -10,13 +10,12 @@ import BlockToolbar from './components/toolbar/BlockToolbar'
 import InlineToolbar from './components/toolbar/InlineToolbar'
 import TinyMCEReactUI from './components/tinymce/tinymce-react-ui'
 import action from './reducers/tinymce/tinymce-react-ui'
-import {blockList, blockType, blockAlign} from './utils/tag'
+import {blockList, blockType, blockAlign, getTopLevelBlock} from './utils/tag'
 
 const store = createStore(action)
 
 let blockOpen  = (collapsed) => (collapsed !== null &&  collapsed) // block  if caret
 let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if range selection
-
 
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>

@@ -33,17 +33,15 @@ export const blockType = (el) => ( (el && blockMap[el.nodeName]) || 'p')
 export const blockAlign = (el) => ( 'left' )
 
 
-// Find the top-level block
-// export const getTopLevelBlock = ( editor, node ) => {
-// 		var rootNode = editor.getBody();
+// Find the top-level block (rootNode === editor.getBody())
+export const getTopLevelBlock = ( rootNode, node ) => {
+	if ( node === rootNode || ! rootNode.contains( node ) ) {
+		return null;
+	}
 
-// 		if ( node === rootNode || ! editor.getBody().contains( node ) ) {
-// 			return null;
-// 		}
+	while ( node.parentNode !== rootNode ) {
+		node = node.parentNode;
+	}
 
-// 		while ( node.parentNode !== rootNode ) {
-// 			node = node.parentNode;
-// 		}
-
-// 		return node;
-// 	}
+	return node;
+}
