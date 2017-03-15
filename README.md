@@ -36,7 +36,7 @@ With regards to specific changes to the design, the details & execution (like co
 
 Grab the Sketch file so you don't have to start from scratch:
 
-**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated Mar. 10th.</a>**
+**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated Mar. 15th.</a>**
 
 ## Mockups
 
@@ -58,6 +58,14 @@ _Text, Selected_
 
 ---
 
+_Empty Image_
+
+![Empty Image](mockups/Image, Empty.png)
+
+_Empty Image, Hover_
+
+![Empty Image, Hover](mockups/Image, Empty, Hover.png)
+
 _Image_
 
 ![Image, Neutral](mockups/Image, Neutral.png)
@@ -75,6 +83,14 @@ _Image, Caption_
 ![Image, Caption](mockups/Image, Caption.png)
 
 ---
+
+_Empty Quote_
+
+![Empty Quote](mockups/Quote, Empty.png)
+
+_Empty Quote, Hover_
+
+![Empty Quote, Hover](mockups/Quote, Empty, Hover.png)
 
 _Quote_
 
