@@ -4,26 +4,28 @@
 		return '<section><p><br></p></section>';
 	}
 
-	function fromBaseState( block, editor ) {
-		var section = document.createElement( 'section' );
+	function fromBaseState( oldState ) {
+		var newState = document.createElement( 'SECTION' );
 
-		section.setAttribute( 'data-wp-block-type', 'my-awesome-plugin:custom-blue-box' );
+		newState.setAttribute( 'data-wp-block-type', 'my-awesome-plugin:custom-blue-box' );
 
-		block.parentNode.insertBefore( section, block );
+		oldState.parentNode.insertBefore( newState, oldState );
 
-		section.appendChild( block );
+		newState.appendChild( oldState );
+
+		return newState;
 	}
 
-	function toBaseState( block ) {
-		var firstChild = block.firstChild;
+	function toBaseState( oldState ) {
+		var newState = oldState.firstChild;
 
-		while ( block.firstChild ) {
-			block.parentNode.insertBefore( block.firstChild, block );
+		while ( oldState.firstChild ) {
+			oldState.parentNode.insertBefore( oldState.firstChild, oldState );
 		}
 
-		block.parentNode.removeChild( block );
+		oldState.parentNode.removeChild( oldState );
 
-		wp.blocks.selectBlock( firstChild );
+		return newState;
 	}
 
 	wp.blocks.registerBlock( {
@@ -40,11 +42,7 @@
 		fromBaseState: fromBaseState,
 		toBaseState: toBaseState,
 		controls: [
-			{
-				classes: 'remove-formatting',
-				icon: 'gridicons-custom-post-type',
-				onClick: toBaseState
-			},
+			'text-switcher',
 			'|',
 			'text-align-left',
 			'text-align-center',

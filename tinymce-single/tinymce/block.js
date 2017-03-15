@@ -58,6 +58,20 @@
 					value: settings._id
 				}
 			} ),
+			onPostRender: function() {
+				var button = this;
+
+				editor.on( 'nodeChange', function() {
+					var block = wp.blocks.getSelectedBlock();
+					var settings = wp.blocks.getBlockSettingsByElement( block );
+
+					if ( settings ) {
+						button.value( settings._id );
+						button.icon( settings.icon );
+						button.text( settings.displayName );
+					}
+				} );
+			},
 			onClick: function( event ) {
 				if ( event.control && event.control.settings.value ) {
 					var block = wp.blocks.getSelectedBlock();
@@ -65,8 +79,10 @@
 					var nextSettings = wp.blocks.getBlockSettings( event.control.settings.value );
 
 					editor.undoManager.transact( function() {
-						currentSettings.toBaseState( block, editor );
-						nextSettings.fromBaseState( block, editor );
+						var newBlock = nextSettings.fromBaseState(
+							currentSettings.toBaseState( block, editor ), editor );
+
+						wp.blocks.selectBlock( newBlock );
 					} );
 				}
 			}

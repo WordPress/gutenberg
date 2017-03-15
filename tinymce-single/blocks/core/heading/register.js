@@ -3,6 +3,8 @@
 	function getControls() {
 		var controls = [];
 
+		controls.push( 'text-switcher', '|' );
+
 		'123456'.split( '' ).forEach( function( level ) {
 			controls.push( {
 				icon: 'gridicons-heading',
@@ -14,25 +16,33 @@
 			} );
 		} );
 
-		controls.push( {
-			classes: 'remove-formatting',
-			icon: 'gridicons-heading',
-			onClick: function( block, editor ) {
-				editor.formatter.apply( 'p', block );
-			}
-		} );
-
 		controls.push( '|', 'text-align-left', 'text-align-center', 'text-align-right' );
 
 		return controls;
 	}
 
-	function toBaseState( block, editor ) {
-		editor.formatter.apply( 'p', block );
+	function toBaseState( oldState ) {
+		var newState = document.createElement( 'P' );
+
+		while ( oldState.firstChild ) {
+			newState.appendChild( oldState.firstChild );
+		}
+
+		oldState.parentNode.replaceChild( newState, oldState );
+
+		return newState;
 	}
 
-	function fromBaseState( block, editor ) {
-		editor.formatter.apply( 'h1', block );
+	function fromBaseState( oldState ) {
+		var newState = document.createElement( 'H1' );
+
+		while ( oldState.firstChild ) {
+			newState.appendChild( oldState.firstChild );
+		}
+
+		oldState.parentNode.replaceChild( newState, oldState );
+
+		return newState;
 	}
 
 	wp.blocks.registerBlock( {

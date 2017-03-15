@@ -14,8 +14,12 @@ window.wp.blocks.registerBlock( {
 		'text-align-center',
 		'text-align-right'
 	],
-	toBaseState: function() {},
-	fromBaseState: function() {},
+	toBaseState: function( state ) {
+		return state;
+	},
+	fromBaseState: function( state ) {
+		return state;
+	},
 	insert: function() {
 		return '<p><br></p>';
 	}

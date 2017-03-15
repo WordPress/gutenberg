@@ -4,12 +4,28 @@
 		return '<pre><br></pre>';
 	}
 
-	function fromBaseState( block, editor ) {
-		editor.formatter.apply( 'pre', block );
+	function fromBaseState( oldState ) {
+		var newState = document.createElement( 'PRE' );
+
+		while ( oldState.firstChild ) {
+			newState.appendChild( oldState.firstChild );
+		}
+
+		oldState.parentNode.replaceChild( newState, oldState );
+
+		return newState;
 	}
 
-	function toBaseState( block, editor ) {
-		editor.formatter.remove( 'pre', block );
+	function toBaseState( oldState ) {
+		var newState = document.createElement( 'P' );
+
+		while ( oldState.firstChild ) {
+			newState.appendChild( oldState.firstChild );
+		}
+
+		oldState.parentNode.replaceChild( newState, oldState );
+
+		return newState;
 	}
 
 	window.wp.blocks.registerBlock( {
@@ -24,16 +40,11 @@
 			'': 'Write preformatted text\u2026'
 		},
 		controls: [
+			'text-switcher',
+			'|',
 			{
 				icon: 'gridicons-cog',
 				onClick: function() {}
-			},
-			{
-				classes: 'remove-formatting',
-				icon: 'gridicons-code',
-				onClick: function( block, editor ) {
-					editor.formatter.remove( 'pre', block );
-				}
 			}
 		],
 		insert: insertEmpty,

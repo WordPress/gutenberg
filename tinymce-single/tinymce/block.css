@@ -375,6 +375,11 @@ div.mce-inline-toolbar-grp.block-toolbar > div.mce-stack-layout {
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	cursor: default;
+}
+
+.mce-menu-item.is-active {
+	background-color: #e0e5e9;
 }
 
 *[data-wp-placeholder] {

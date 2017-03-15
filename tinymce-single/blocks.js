@@ -135,18 +135,9 @@
 			var id = settings.namespace + ':' + settings.name;
 
 			if ( _blocks[ extendId ] ) {
-				_blocks[ extendId ].controls.unshift( {
-					icon: settings.icon,
-					text: '2',
-					onClick: function( block ) {
-						block.setAttribute( 'data-wp-block-type', id );
-					},
-					isActive: function( block ) {
-						return block.getAttribute( 'data-wp-block-type' ) === id;
-					}
-				} );
+				_blocks[ extendId ].controls.push( '|' );
 
-				_blocks[ extendId ].controls.unshift( {
+				_blocks[ extendId ].controls.push( {
 					icon: settings.icon,
 					text: '1',
 					onClick: function( block ) {
@@ -154,6 +145,17 @@
 					},
 					isActive: function( block ) {
 						return ! block.getAttribute( 'data-wp-block-type' );
+					}
+				} );
+
+				_blocks[ extendId ].controls.push( {
+					icon: settings.icon,
+					text: '2',
+					onClick: function( block ) {
+						block.setAttribute( 'data-wp-block-type', id );
+					},
+					isActive: function( block ) {
+						return block.getAttribute( 'data-wp-block-type' ) === id;
 					}
 				} );
 

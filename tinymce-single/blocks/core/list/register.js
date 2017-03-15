@@ -21,6 +21,8 @@
 		}
 
 		state.parentNode.replaceChild( list, state );
+
+		return list;
 	}
 
 	function toBaseState( block ) {
@@ -50,6 +52,8 @@
 		build( block, state );
 
 		block.parentNode.replaceChild( state, block );
+
+		return state;
 	}
 
 	wp.blocks.registerBlock( {
@@ -65,6 +69,8 @@
 		toBaseState: toBaseState,
 		fromBaseState: fromBaseState,
 		controls: [
+			'text-switcher',
+			'|',
 			{
 				icon: 'gridicons-list-unordered',
 				stateSelector: 'ul',
@@ -80,11 +86,6 @@
 					// Use native command to toggle current selected list.
 					editor.execCommand( 'InsertOrderedList' );
 				}
-			},
-			{
-				classes: 'remove-formatting',
-				icon: 'gridicons-list-unordered',
-				onClick: toBaseState
 			}
 		]
 	} );
