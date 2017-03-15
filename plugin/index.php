@@ -1,14 +1,18 @@
 <?php
-
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://wordpress.github.io/gutenberg/
  * Description: Prototyping since 1440. Development plugin for the editor focus in core.
  * Version: 0.1
  */
-
+// Hook.
 add_action( 'admin_menu', 'gutenberg_menu' );
 
+/**
+ * Gutenberg's Menu.
+ *
+ * @since  0.0.1
+ */
 function gutenberg_menu() {
 	add_menu_page(
 		'Gutenberg',
@@ -19,13 +23,26 @@ function gutenberg_menu() {
 	);
 }
 
+// Hook.
+add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+
+/**
+ * Scripts & Styles.
+ *
+ * @param  [type]    $hook
+ * @since  0.0.1
+ */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( $hook === 'toplevel_page_gutenberg' ) {
 		wp_enqueue_style( 'gutenberg_css', plugins_url( 'style.css', __FILE__ ) );
 	}
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
+/**
+ * Project.
+ *
+ * @since  0.0.1
+ */
 function the_gutenberg_project() {
 	?>
 	<div class="gutenberg">
