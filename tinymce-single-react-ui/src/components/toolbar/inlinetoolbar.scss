@@ -1,8 +1,7 @@
 @import "../../assets/stylesheets/_variables.scss";
 
 .toolbarWrapper {
-  display: flex;
-  justify-content: space-between;
+  display: inline-block;
 }
 
 .toolbar {

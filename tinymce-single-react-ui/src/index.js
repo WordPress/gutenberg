@@ -14,8 +14,10 @@ const store = createStore(action)
 
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
+			<div style={{position : 'relative'}}>
 			<InlineToolbar collapsed={store.getState().get('collapsed')} node={store.getState().get('node')}/>
 			<BlockToolbar collapsed={store.getState().get('collapsed')} node={store.getState().get('node')}/>
+			</div>
 			<TinyMCEReactUI content={window.content}
 				onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
 				onBlur={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'BLUR', val: [collapsed, bookmark, node] } ) }

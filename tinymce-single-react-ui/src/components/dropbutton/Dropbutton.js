@@ -22,6 +22,7 @@ export default class Dropbutton extends React.Component {
 
     return (
       <div
+        className={styles.section}
         onMouseEnter={() => { this.setState({ hoverOpen: true }) }} onMouseLeave={() => { this.setState({ hoverOpen: false }) }}
         onClick={() => { this.setState({ dropOpen: !this.state.dropOpen }) }}
       >
@@ -41,7 +42,7 @@ export default class Dropbutton extends React.Component {
         {this.props.selected}
         {
           this.state.dropOpen ?
-            <div className={styles.dropChoices}>
+            <div className={cx(styles.dropChoices, styles.section)}>
               {this.props.dropchoices.map((dropchoice) => {
                 return (
                   dropchoice
