@@ -41,9 +41,24 @@ export default function Turducken(props) {
   let editorRef = store.getState().get('editorRef')
   let tiny = tinyNode(editorRef)
   let topBlock = topLevelBlock(tiny, node)
+  let topRect = rangeRect(topBlock)
 
   return (
     <div>
+      { topRect && topRect.width &&
+        <div>
+          <div style={ {position: 'absolute', top: topRect.top + 'px',
+                                              width: topRect.width + 'px',
+                                              height: '2px', background: '#ccc' } }></div>
+
+          <div style={ {position: 'absolute', top: topRect.height + topRect.top + 'px', width: topRect.width + 'px', height: '2px', background: '#ccc' } }></div>
+
+          <div style={ {position: 'absolute', top: topRect.top + 'px', width: '2px', height: topRect.height + 'px', background: '#ccc' } }></div>
+
+          <div style={ {position: 'absolute', top: topRect.top + 'px', width: '2px', height: topRect.height + 'px', left: topRect.width + topRect.left + 'px', background: '#ccc' } }></div>
+
+        </div>
+      }
       <div>
         <InlineToolbar isOpen={ inlineOpen(collapsed) }
           rangeRect={ findStartOfRange(range) }
