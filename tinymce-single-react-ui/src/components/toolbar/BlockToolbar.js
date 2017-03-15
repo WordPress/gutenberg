@@ -12,7 +12,7 @@ export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			open: false
+			open: true
 		}
 	}
 	render() {
