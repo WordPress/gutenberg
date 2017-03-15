@@ -37,30 +37,28 @@ let rangeRect = (range) => {
 	}
 }
 
-export default class Turducken extends React.Component {
-  render() {
-    let store = this.props.store
-    return (
+export default function Turducken(props) {
+  let store = props.store
+  return (
+    <div>
       <div>
-        <div>
-          <InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
-            rangeRect={ findStartOfRange(store.getState().get('range')) }
-            pageYOffset={ window.pageYOffset }
-            node={ store.getState().get('node') }
-            />
-          <BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
-            blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
-            blockAlign={ blockAlign(store.getState().get('node')) }
-            blockRect={ rangeRect(store.getState().get('node')) }
+        <InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
+          rangeRect={ findStartOfRange(store.getState().get('range')) }
+          pageYOffset={ window.pageYOffset }
+          node={ store.getState().get('node') }
           />
-        </div>
-        <TinyMCEReact content={window.content}
-          onSetup={ ( editorRef ) => store.dispatch( { type: 'SETUP', val: editorRef } ) }
-          onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
-          onBlur={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'BLUR', val: [collapsed, bookmark, node] } ) }
-          onNodeChange={ ( collapsed, bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [collapsed, bookmark, node, event] } ) }
-          />
+        <BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
+          blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
+          blockAlign={ blockAlign(store.getState().get('node')) }
+          blockRect={ rangeRect(store.getState().get('node')) }
+        />
       </div>
-    )
-  }
+      <TinyMCEReact content={window.content}
+        onSetup={ ( editorRef ) => store.dispatch( { type: 'SETUP', val: editorRef } ) }
+        onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
+        onBlur={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'BLUR', val: [collapsed, bookmark, node] } ) }
+        onNodeChange={ ( collapsed, bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [collapsed, bookmark, node, event] } ) }
+        />
+    </div>
+  )
 }
