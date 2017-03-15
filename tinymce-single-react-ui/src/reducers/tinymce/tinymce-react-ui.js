@@ -12,7 +12,7 @@ const initialState = fromJS({
 })
 
 export default (state = initialState, action) => {
-  console.log('>>action:'+action.type, action)
+
 
   switch (action.type) {
     case '@@redux/INIT': {
@@ -41,9 +41,9 @@ export default (state = initialState, action) => {
     }
     case 'NODECHANGE': {
       // if (action.val[1] !== action.val[2].element)
-      //   console.log('!! '+action.type, action.val[1], action.val[2].element, action)
+      //
       // else
-      //   console.log('OK '+action.type, action.val[1], action.val[2].element, action)
+      //
       return state.merge( {
         collapsed: action.val[0],
         bookmark: action.val[1],
@@ -51,7 +51,7 @@ export default (state = initialState, action) => {
       } )
     }
     default:
-      console.log('!!UNHANDLED ACTION', action)
+
       return state
   }
 }

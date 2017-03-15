@@ -10,13 +10,15 @@ import {isBold, isItalic, isDel, isLink} from '../../utils/tag'
 import styles from './inlinetoolbar.scss'
 
 
-const nodeOrParent = (pred, el) => (
-	pred(el.nodeName) || (el.parentNode && pred(el.parentNode.nodeName))
-)
+const nodeOrParent = (pred, el) => {
+	console.log('>>>>>> <><><>>>', pred(el.nodeName))
+	return pred(el.nodeName) || (el.parentNode && pred(el.parentNode.nodeName))
+}
 
-const status = (pred, el) => (
-	( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
-)
+const status = (pred, el) => {
+	console.log('element: ', el)
+	return ( el && nodeOrParent(pred, el) ) ? 'ACTIVE' : 'INACTIVE'
+}
 
 export default class InlineToolbar extends React.Component {
 	render() {

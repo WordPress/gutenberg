@@ -21,7 +21,7 @@ let findBlockType = (editorNode, node) => {
 	if (editorNode && editorNode.children.length > 0 && node) {
 		let top = getTopLevelBlock(editorNode.children[0], node)
 		let topType = blockType(top)
-	  console.log('>> BLOCK=', topType, top && top.nodeName)
+
 		return topType
 	}
 }

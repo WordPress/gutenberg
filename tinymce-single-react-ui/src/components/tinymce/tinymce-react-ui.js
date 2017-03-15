@@ -75,7 +75,7 @@ export default class TinyMCEReactUI extends Component {
 	// ///////////////////////
 	// API Events
 	onSetup = ( editor ) => {
-    console.log('>>onSetup', this.props, editor)
+
 		this.editor = editor;
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'focusout', this.onBlur );
@@ -109,7 +109,7 @@ export default class TinyMCEReactUI extends Component {
 	// ///////////////////////
 
 	componentDidMount() {
-    console.log('>>componentDidMount')
+
 		initialize( this.node, this.props.inline, this.onSetup );
 		if ( this.props.focusConfig ) {
 			this.focus();
@@ -117,7 +117,7 @@ export default class TinyMCEReactUI extends Component {
 	}
 
 	updateContent() {
-    console.log('>>updateContent')
+
 		// This could not be called on each content change, it used to change the cursor position
 		let bookmark;
 		if ( this.props.focusConfig ) {
@@ -130,19 +130,19 @@ export default class TinyMCEReactUI extends Component {
 	}
 
 	executeCommand = ( ...args ) => {
-    console.log('>>executeCommand', args)
+
 		this.editor.execCommand( ...args );
 	};
 
 	componentWillUnmount() {
-    console.log('>>componentWillUnmount')
+
 		if ( this.editor ) {
 			this.editor.destroy();
 		}
 	}
 
 	componentDidUpdate( prevProps ) {
-    console.log('>>componentDidUpdate', prevProps)
+
 		if ( this.props.focusConfig !== prevProps.focusConfig && this.props.focusConfig ) {
 			this.focus();
 		}
@@ -153,7 +153,7 @@ export default class TinyMCEReactUI extends Component {
 	}
 
 	focus() {
-    console.log('>>focus', props)
+
 		if ( this.props.focusConfig.bookmark ) {
 			return;
 		}
@@ -171,7 +171,7 @@ export default class TinyMCEReactUI extends Component {
 	}
 
 	isStartOfEditor() {
-    console.log('>>isStartOfEditor')
+
 		const range = this.editor.selection.getRng();
 		if ( range.startOffset !== 0 || ! range.collapsed ) {
 			return false;
@@ -190,7 +190,7 @@ export default class TinyMCEReactUI extends Component {
 	}
 
 	onKeyDown = ( event ) => {
-    console.log('>>onKeyDown', event)
+
 		if ( event.keyCode === 38 || event.keyCode === 37 ) {
 			if ( this.isStartOfEditor() ) {
 				event.preventDefault();
@@ -273,7 +273,7 @@ export default class TinyMCEReactUI extends Component {
 		// TODO: `getContent` is slow, but formats better than 'raw'. We
 		// should check implication of performance and see if we can rely
 		// on raw formatting instead.
-    console.log('>>onChange', this.props)
+
 		const content = this.editor.getContent();
 		if ( content === this.props.content ) {
 			return;
