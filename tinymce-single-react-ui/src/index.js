@@ -2,7 +2,7 @@ import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux'
 import Turducken from './Turducken';
-import action from './reducers/tinymce/tinymce-react-ui'
+import action from './reducers/action'
 
 const store = createStore(action)
 
