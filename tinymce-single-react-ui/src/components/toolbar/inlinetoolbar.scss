@@ -2,11 +2,14 @@
 
 .toolbarWrapper {
   display: inline-block;
+  z-index: 20;
+
 }
 
 .toolbar {
   display: inline-flex;
   border: 1px solid $toolbar-border;
+  background: $inline-toolbar-bg;
 }
 
 .sideToolbar {
