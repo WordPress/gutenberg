@@ -862,7 +862,14 @@
 				insert = false;
 			} );
 
-			editor.on( 'mousedown touchstart setSelectionRange', function() {
+			editor.on( 'mousedown touchstart setSelectionRange', function( event ) {
+				// Show UI on setSelectionRange for non editable blocks.
+				if ( event.range ) {
+					if ( editor.selection.getNode().isContentEditable ) {
+						return;
+					}
+				}
+
 				hidden = false;
 				insert = false;
 			} );
