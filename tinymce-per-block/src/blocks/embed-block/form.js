@@ -52,7 +52,7 @@ export default class EmbedBlockForm extends Component {
 
 				<div onClick={ () => {
 					api.select();
-					! focusConfig && api.focus();
+					! focusConfig && api.focus( { end: true } );
 				} }>
 					{ ! block.url &&
 						<div className="embed-block__form">
