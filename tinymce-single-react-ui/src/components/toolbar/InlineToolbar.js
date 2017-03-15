@@ -21,9 +21,9 @@ const status = (pred, el) => (
 export default class InlineToolbar extends React.Component {
 	render() {
 		// TODO: add option types
-		let hidden = this.props.collapsed === null || this.props.collapsed
 
-		return hidden ? null : (
+
+		return this.props.isOpen ? null : (
 			<div className={styles.toolbarWrapper}>
 				<div className={styles.toolbar}>
 					<Button status={ status( isBold, this.props.node ) } >
