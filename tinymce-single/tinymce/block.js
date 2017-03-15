@@ -560,19 +560,20 @@
 			function createInlineToolbar() {
 				var inline = editor.wp._createToolbar( [ 'bold', 'italic', 'strikethrough', 'link' ] );
 
-				inline.reposition = function () {
+				inline.reposition = function( editableRoot ) {
+					this.show();
+
 					var toolbar = this.getEl();
 					var toolbarRect = toolbar.getBoundingClientRect();
-					var elementRect = getSelectedBlock().getBoundingClientRect();
+					var elementRect = ( editableRoot || getSelectedBlock() ).getBoundingClientRect();
 					var contentRect = editor.getBody().getBoundingClientRect();
+					var offset = editableRoot ? 0 : blockToolbarWidth;
 
 					DOM.setStyles( toolbar, {
 						position: 'absolute',
-						left: Math.max( contentRect.left + editorPadding, elementRect.left ) + blockToolbarWidth + 'px',
+						left: Math.max( contentRect.left + editorPadding, elementRect.left ) + offset + 'px',
 						top: elementRect.top + window.pageYOffset - toolbarRect.height - 8 + 'px'
 					} );
-
-					this.show();
 				}
 
 				return inline;
@@ -818,12 +819,22 @@
 					UI.blocks[ settings._id ].reposition();
 					focus && focusToolbar( UI.blocks[ settings._id ] );
 
-					var selection = window.getSelection();
+					UI.inline.hide();
 
-					if ( selection.anchorNode.nodeType === 3 ) {
-						UI.inline.reposition();
-					} else {
-						UI.inline.hide();
+					if ( settings.editable && settings.editable.length ) {
+						var selection = window.getSelection();
+						var editableRoot = getEditableRoot( selection.anchorNode );
+
+						settings.editable.forEach( function( selector ) {
+							if ( selector ) {
+								if ( editor.$( editableRoot ).is( selector ) ) {
+									UI.inline.reposition( editableRoot );
+									return;
+								}
+							} else {
+								UI.inline.reposition();
+							}
+						} );
 					}
 
 					UI.insert.reposition();
