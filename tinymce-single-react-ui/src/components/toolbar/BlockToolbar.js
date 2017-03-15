@@ -19,8 +19,9 @@ export default class BlockToolbar extends React.Component {
 		// TODO: add option types
 		return this.props.isOpen ? (
 			<div className={styles.toolbar} onMouseEnter={() => { }} onMouseLeave={ () => { } }>
-				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
 				<BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} />
+				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
+
 			</div>
 		)
 		: null
