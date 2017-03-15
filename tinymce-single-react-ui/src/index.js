@@ -40,14 +40,11 @@ let findBlockType = (editorNode, node) => {
 							top: selRect.top + window.pageYOffset - toolbarRect.height - 10 + 'px'
 						} );
 */
-let targetCoords = () {
-
-}
 const renderApp = () => render(
 		<div data='TODO-this-is-the-new-app'>
 			<div>
 				<InlineToolbar isOpen={ inlineOpen(store.getState().get('collapsed')) }
-					targetTopLeft={  }
+
 					/>
 				<BlockToolbar  isOpen={ blockOpen(store.getState().get('collapsed')) }
 				 	blockType={ findBlockType(store.getState().get('editorRef'), store.getState().get('node')) }
