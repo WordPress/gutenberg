@@ -12,14 +12,20 @@ export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			open: true
+			open: false
 		}
+
+		this.blockRect = this.props.blockRect
 	}
+
 	render() {
-		let rect = this.props.blockRect;
+		if (this.props.blockRect) {
+			this.blockRect = this.props.blockRect;
+		}
 
+		let rect = this.props.blockRect || this.blockRect;
 
-
+		console.log(rect, this.props.blockRect , this.blockRect)
 		// TODO: add option types
 		return (this.props.isOpen && rect) ? (
 			<div style={ { position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px', zIndex: 23 } }>
