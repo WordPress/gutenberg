@@ -12,7 +12,7 @@ export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			open: false
+			open: true
 		}
 	}
 	render() {
@@ -23,11 +23,11 @@ export default class BlockToolbar extends React.Component {
 			<div className={styles.toolbar}
 					onMouseEnter={() => { this.setState({ open: true }) }}
 					onMouseLeave={ () => { this.setState({ open: false }) } }
-					style={{ top: rect.top - 38 + 'px', left: rect.right - 38 + 'px', position: 'absolute' }}
+
 
 					>
-				{ this.state.open && <BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} /> }
-				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
+				<BlockAlignToolbar  isOpen={this.state.open} selected={this.props.blockAlign} />
+				<BlockChangeToolbar selected={this.props.blockType} />
 			</div>
 		)
 		: null

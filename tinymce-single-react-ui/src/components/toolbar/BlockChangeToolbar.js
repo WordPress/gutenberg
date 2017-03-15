@@ -36,7 +36,7 @@ export default class BlockChangeToolbar extends React.Component {
 
   render() {
 
-    return this.props.isOpen ? (
+    return (
       <div className={styles.horizontal} onClick={ this.toggleMenu } >
         <div>
        {this.getActiveButton().map((choice, index) => (
@@ -57,7 +57,7 @@ export default class BlockChangeToolbar extends React.Component {
           )}
         </div>
       </div>
-    ) : null;
+    )
   }
 
 }
