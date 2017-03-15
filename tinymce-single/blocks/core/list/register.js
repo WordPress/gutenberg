@@ -58,6 +58,7 @@
 		displayName: 'List',
 		elements: [ 'ul', 'ol' ],
 		type: 'text',
+		editable: [ '' ],
 		icon: 'gridicons-list-unordered',
 		base: 'elements:paragraph',
 		insert: insertEmpty,

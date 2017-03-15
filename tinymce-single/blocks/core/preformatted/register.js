@@ -18,6 +18,7 @@
 		displayName: 'Preformatted',
 		elements: [ 'pre' ],
 		type: 'text',
+		editable: [ '' ],
 		icon: 'gridicons-code',
 		placeholders: {
 			'': 'Write preformatted text\u2026'
