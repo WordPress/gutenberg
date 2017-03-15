@@ -12,15 +12,15 @@ export default class BlockToolbar extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-
+			open: false
 		}
 	}
 	render() {
 		// TODO: add option types
 		return this.props.isOpen ? (
-			<div className={styles.toolbar} onMouseEnter={() => { }} onMouseLeave={ () => { } }>
+			<div className={styles.toolbar} onMouseEnter={() => { this.setState({ open: true }) }} onMouseLeave={ () => { this.setState({ open: false }) } }>
+				{ this.state.open && <BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} /> }
 				<BlockChangeToolbar isOpen={true} selected={this.props.blockType} />
-				<BlockAlignToolbar  isOpen={true} selected={this.props.blockAlign} />
 			</div>
 		)
 		: null

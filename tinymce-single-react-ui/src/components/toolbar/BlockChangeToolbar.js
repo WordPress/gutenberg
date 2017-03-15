@@ -10,7 +10,17 @@ import { blockIconMap, blockList } from '../../utils/tag'
 export default class BlockChangeToolbar extends React.Component {
   constructor(props){
     super(props)
+    this.state = {
+		  open: false
+	  }
   }
+
+
+	toggleMenu = () => {
+		this.setState( {
+			open: ! this.state.open
+		} );
+	}
 
   getDropdownButtons() {
     return blockList.filter((item) => {
@@ -27,10 +37,10 @@ export default class BlockChangeToolbar extends React.Component {
   render() {
 
     return this.props.isOpen ? (
-      <div className={styles.horizontal}>
-
+      <div className={styles.horizontal} onClick={ this.toggleMenu } >
+        <div>
        {this.getActiveButton().map((choice, index) => (
-          <Button key={index} extraClass={[ styles.horizontal ]}
+          <Button key={index}
             status={'ACTIVE'}>
             {blockIconMap[choice]}
           </Button>
@@ -38,13 +48,14 @@ export default class BlockChangeToolbar extends React.Component {
         )}
 
 
-        {this.getDropdownButtons().map((choice, index) => (
-          <Button key={index} extraClass={[ styles.horizontal ]}
-            status={'INACTIVE'}>
-            {blockIconMap[choice]}
-          </Button>
-        )
-        )}
+          {this.state.open && this.getDropdownButtons().map((choice, index) => (
+            <Button key={index}
+              status={'INACTIVE'}>
+              {blockIconMap[choice]}
+            </Button>
+          )
+          )}
+        </div>
       </div>
     ) : null;
   }
