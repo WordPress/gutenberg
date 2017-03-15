@@ -20,9 +20,17 @@ const status = (pred, el) => (
 
 export default class InlineToolbar extends React.Component {
 	render() {
+		let top = this.props.rangeTopLeft.top
+		let left = this.props.rangeTopLeft.left
+		let offset = this.props.pageYOffset
+
 		// TODO: add option types
 		return this.props.isOpen ? (
-			<div className={styles.toolbarWrapper}>
+			<div className={styles.toolbarWrapper}
+				style={{position: 'absolute',
+				 				left: (left - 10 + 'px'),
+              	top: (top + offset - 48 + 'px')}}
+				>
 				<div className={styles.toolbar}>
 					<Button status={ status( isBold, this.props.node ) } >
 						<Icons.EditorBoldIcon />
