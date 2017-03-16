@@ -15,6 +15,7 @@ const config = module.exports = {
 	resolve: {
 		modules: [
 			'editor',
+			'external',
 			'node_modules'
 		]
 	},
