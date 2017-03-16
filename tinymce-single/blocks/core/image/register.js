@@ -71,7 +71,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'image',
-		namespace: 'core',
+		namespace: 'wp',
 		displayName: 'Image',
 		type: 'media',
 		icon: 'gridicons-image',

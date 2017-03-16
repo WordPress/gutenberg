@@ -58,7 +58,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'list',
-		nameSpace: 'core',
+		namespace: 'wp',
 		displayName: 'List',
 		elements: [ 'ul', 'ol' ],
 		type: 'text',

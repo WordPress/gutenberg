@@ -7,6 +7,7 @@ window.tinymce.init( {
 	object_resizing: false,
 	plugins: [
 		'block',
+		'wp:blocks:parse',
 		'clean-paste',
 		'lists',
 		'paste',
@@ -21,5 +22,10 @@ window.tinymce.init( {
 	toolbar: false,
 	formats: {
 		strikethrough: { inline: 'del' }
+	},
+	setup: function( editor ) {
+		editor.on( 'loadContent', function() {
+			editor.setContent( window.content );
+		} );
 	}
 } );

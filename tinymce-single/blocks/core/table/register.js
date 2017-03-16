@@ -36,7 +36,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'table',
-		nameSpace: 'core',
+		namespace: 'wp',
 		displayName: 'Table',
 		type: 'data visualisation',
 		icon: 'gridicons-grid',

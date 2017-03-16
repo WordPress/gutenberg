@@ -15,56 +15,10 @@
 		<link rel="stylesheet" type="text/css" href="blocks/my-awesome-plugin/special-blockquote/structure.css">
 	</head>
 	<body>
-		<div id="editor">
-
-			<h1>1.0 Is The Loneliest Number</h1>
-
-			<p>Many entrepreneurs idolize Steve Jobs. He’s such a perfectionist, they say. Nothing leaves the doors of 1 Infinite Loop in Cupertino without a polish and finish that makes geeks everywhere drool. No compromise!</p>
-
-			<figure data-wp-block-type="core:image" class="alignright">
-				<img src="https://cldup.com/HN3-c7ER9p.jpg" alt="">
-				<figcaption>I have no idea which mountain this is. It looks tall!</figcaption>
-			</figure>
-
-			<p>I like Apple for the opposite reason: they’re not afraid of getting a rudimentary 1.0 out into the world.</p>
-
-			<p>A beautiful thing about Apple is how quickly they obsolete their own products. I imagine this also makes the discipline of getting things out there easier. Like I mentioned before, the longer it’s been since the last release the more pressure there is, but if you know that if your bit of code doesn’t make this version but there’s the +0.1 coming out in 6 weeks, then it’s not that bad. It’s like flights from San Francisco to LA, if you miss one you know there’s another one an hour later so it’s not a big deal. Amazon has done a fantastic job of this with the Kindle as well, with a new model every year.</p>
-
-			<hr>
-
-			<h2>NASA discovers system of seven Earth-sized planets</h2>
-
-			<blockquote>
-				<p>NASA’s Spitzer Space Telescope has revealed a new exoplanet discovery: the <a href="https://exoplanets.nasa.gov/trappist1">first known system of seven Earth-size planets around a single star</a>. Three of these planets are firmly located in the habitable zone, the area around the parent star where a rocky planet is most likely to have liquid water.</p>
-
-				<p>The discovery sets a new record for greatest number of habitable-zone planets found around a single star outside our solar system. All of these seven planets could have liquid water—key to life as we know it—under the right atmospheric conditions, but the chances are highest with the three in the habitable zone.</p>
-			</blockquote>
-
-			<figure data-wp-block-type="core:gallery" data-wp-block-setting-column="3">
-				<figure>
-					<img src="https://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/1_main_pia21423-png.png" alt="A star shines on a planet's surface.">
-					<figcaption>TRAPPIST-1f</figcaption>
-				</figure>
-				<figure>
-					<img src="https://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/exovolcano1920x1080.00033-1041.jpg" alt="">
-				</figure>
-				<figure>
-					<img src="https://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/proximasurface.jpg" alt="">
-				</figure>
-			</figure>
-
-			<p>Okay, now let’s take an interstellar road trip:</p>
-
-			<figure data-wp-block-type="my-awesome-plugin:youtube">
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/3-NTv0CdFCk" allowfullscreen></iframe>
-				<figcaption>More planets! 😊</figcaption>
-			</figure>
-
-			<p>And this is the end of another editor block prototype.</p>
-
-		</div>
+		<div id="editor"></div>
 
 		<script src="../shared/navigation.js"></script>
+		<script src="../shared/post-content.js"></script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 		<script src="https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js"></script>
@@ -91,7 +45,10 @@
 		<script src="../shared/tinymce/wptextpattern.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="tinymce/block.css">
+
+		<script src="tinymce/parse.js"></script>
 		<script src="tinymce/block.js"></script>
+
 		<script src="tinymce/config.js"></script>
 	</body>
 </html>

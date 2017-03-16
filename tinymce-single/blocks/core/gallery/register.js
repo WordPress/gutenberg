@@ -88,7 +88,7 @@
 
 	wp.blocks.registerBlock( {
 		name: 'gallery',
-		namespace: 'core',
+		namespace: 'wp',
 		displayName: 'Gallery',
 		type: 'media',
 		keywords: [],
