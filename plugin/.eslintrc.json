@@ -1,0 +1,16 @@
+{
+	"root": true,
+	"extends": "wpcalypso",
+	"parser": "babel-eslint",
+	"env": {
+		"browser": true,
+		"node": true
+	},
+	"parserOptions": {
+		"ecmaVersion": 3
+	},
+	"rules": {
+		"no-var": "off",
+		"camelcase": "off"
+	}
+}

@@ -21,7 +21,7 @@ function gutenberg_menu() {
 
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( $hook === 'toplevel_page_gutenberg' ) {
-		wp_enqueue_style( 'gutenberg_css', plugins_url( 'style.css', __FILE__ ) );
+		wp_enqueue_script( 'gutenberg_js', plugins_url( 'build/app.js', __FILE__ ) );
 	}
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
