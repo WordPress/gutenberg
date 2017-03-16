@@ -6,7 +6,7 @@ const webpack = require( 'webpack' );
 
 const config = module.exports = {
 	entry: {
-		app: './src/index.js'
+		app: './editor/index.js'
 	},
 	output: {
 		filename: 'build/[name].js',
@@ -14,7 +14,7 @@ const config = module.exports = {
 	},
 	resolve: {
 		modules: [
-			'src',
+			'editor',
 			'node_modules'
 		]
 	},
