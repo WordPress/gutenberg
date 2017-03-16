@@ -2223,6 +2223,57 @@ class Tests_Term_getTerms extends WP_UnitTestCase {
 		return 'foo';
 	}
 
+	/**
+	 * @ticket 21760
+	 */
+	public function test_with_term_slug_equal_to_string_0() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$term_id = self::factory()->term->create( array(
+			'name' => '0',
+			'slug' => '0',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = get_terms( array(
+			'taxonomy'   => 'wptests_tax',
+			'hide_empty' => 0,
+			'slug'       => '0',
+		) );
+
+		$this->assertEqualSets( array( $term_id ), wp_list_pluck( $found, 'term_id' ) );
+	}
+
+	/**
+	 * @ticket 21760
+	 */
+	public function test_with_multiple_term_slugs_one_equal_to_string_0() {
+		register_taxonomy( 'wptests_tax', 'post', array( 'hierarchical' => true ) );
+
+		$term_id1 = self::factory()->term->create( array(
+			'name'     => '0',
+			'slug'     => '0',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$term_id2 = self::factory()->term->create( array(
+			'name'     => 'Test',
+			'slug'     => 'test',
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$found = get_terms( array(
+			'taxonomy'   => 'wptests_tax',
+			'hide_empty' => 0,
+			'slug'       => array(
+				'0',
+				'test',
+			),
+		) );
+
+		$this->assertEqualSets( array( $term_id1, $term_id2 ), wp_list_pluck( $found, 'term_id' ) );
+	}
+
 	protected function create_hierarchical_terms_and_posts() {
 		$terms = array();
 
