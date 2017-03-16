@@ -8,7 +8,7 @@ window.tinymce.init( {
 	plugins: [
 		'block',
 		'wp:blocks:parse',
-		'clean-paste',
+		'wp:blocks:paste:external',
 		'lists',
 		'paste',
 		'table',
