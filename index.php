@@ -8,9 +8,6 @@
  * @package gutenberg
  */
 
-// Hook gutenberg_menu to admin menu.
-add_action( 'admin_menu', 'gutenberg_menu' );
-
 /**
  * Gutenberg's Menu.
  *
@@ -27,9 +24,7 @@ function gutenberg_menu() {
 		'the_gutenberg_project'
 	);
 }
-
-// Enqueue the scripts and style in the admin.
-add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
  * Scripts & Styles.
@@ -44,6 +39,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		wp_enqueue_script( 'gutenberg_js', plugins_url( 'build/app.js', __FILE__ ) );
 	}
 }
+add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
 /**
  * Project.
