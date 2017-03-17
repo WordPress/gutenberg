@@ -38,3 +38,15 @@ function the_gutenberg_project() {
 	</div>
 	<?php
 }
+
+/**
+ * Registers a block.
+ *
+ * @param  string $namespace Block grouping unique to package or plugin
+ * @param  string $block     Block name
+ * @param  array  $args      Optional. Array of settings for the block. Default empty array.
+ * @return bool              True on success, false on error
+ */
+function register_block( $namespace, $block, $args = array() ) {
+
+}
