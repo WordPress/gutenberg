@@ -8,15 +8,26 @@ export { default as Editable } from './components/editable';
 const blocks = {};
 
 /**
+ * Validates a block name and throws an error if it is invalid.
+ *
+ * @param {string} name Block name
+ */
+export function validateBlockName( name ) {
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+		throw new Error(
+			'Block names must contain a namespace prefix.  Example:  my-plugin/my-custom-block'
+		)
+	}
+}
+
+/**
  * Registers a block.
  *
  * @param {string} name     Block name
  * @param {Object} settings Block settings
  */
 export function registerBlock( name, settings ) {
-	if ( ! /^\w+\/\w+$/.test( name ) ) {
-		throw new Error( 'Use a namespace for your block name please. Example: namespace/block' );
-	}
+	validateBlockName( name );
 	blocks[ name ] = Object.assign( { name }, settings );
 }
 
