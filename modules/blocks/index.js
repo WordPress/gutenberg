@@ -1,21 +1,21 @@
 export { default as Editable } from './components/editable';
 
 /**
- * Block settings keyed by block name.
+ * Block settings keyed by block slug.
  *
  * @var {Object} blocks
  */
 const blocks = {};
 
 /**
- * Validates a block name and throws an error if it is invalid.
+ * Validates a block slug and throws an error if it is invalid.
  *
- * @param {string} name Block name
+ * @param {string} slug Block slug
  */
-export function validateBlockName( name ) {
-	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+export function validateBlockSlug( slug ) {
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( slug ) ) {
 		throw new Error(
-			'Block names must contain a namespace prefix.  Example:  my-plugin/my-custom-block'
+			'Block slugs must contain a namespace prefix.  Example:  my-plugin/my-custom-block'
 		)
 	}
 }
@@ -23,22 +23,22 @@ export function validateBlockName( name ) {
 /**
  * Registers a block.
  *
- * @param {string} name     Block name
+ * @param {string} slug     Block slug
  * @param {Object} settings Block settings
  */
-export function registerBlock( name, settings ) {
-	validateBlockName( name );
-	blocks[ name ] = Object.assign( { name }, settings );
+export function registerBlock( slug, settings ) {
+	validateBlockSlug( slug );
+	blocks[ slug ] = Object.assign( { slug }, settings );
 }
 
 /**
  * Returns settings associated with a block.
  *
- * @param  {string}  name Block name
+ * @param  {string}  slug Block slug
  * @return {?Object}      Block settings
  */
-export function getBlockSettings( name ) {
-	return blocks[ name ];
+export function getBlockSettings( slug ) {
+	return blocks[ slug ];
 }
 
 /**

@@ -18,28 +18,28 @@ describe( 'blocks API', () => {
 		blockSettings.mutated = true;
 	} );
 
-	describe( 'validateBlockName', () => {
+	describe( 'validateBlockSlug', () => {
 		it( 'should reject numbers', () => {
 			expect(
-				() => blocks.validateBlockName( 999 )
-			).to.throw( /^Block names must contain a namespace prefix/ );
+				() => blocks.validateBlockSlug( 999 )
+			).to.throw( /^Block slugs must contain a namespace prefix/ );
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
 			expect(
-				() => blocks.validateBlockName( 'doing-it-wrong' )
-			).to.throw( /^Block names must contain a namespace prefix/ );
+				() => blocks.validateBlockSlug( 'doing-it-wrong' )
+			).to.throw( /^Block slugs must contain a namespace prefix/ );
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			expect(
-				() => blocks.validateBlockName( 'still/_doing_it_wrong' )
-			).to.throw( /^Block names must contain a namespace prefix/ );
+				() => blocks.validateBlockSlug( 'still/_doing_it_wrong' )
+			).to.throw( /^Block slugs must contain a namespace prefix/ );
 		} );
 
 		it( 'should accept valid block names', () => {
 			expect(
-				() => blocks.validateBlockName( 'my-plugin/fancy-block-4' )
+				() => blocks.validateBlockSlug( 'my-plugin/fancy-block-4' )
 			).not.to.throw();
 		} );
 	} );
@@ -47,15 +47,15 @@ describe( 'blocks API', () => {
 	// TODO: registerBlock tests
 
 	describe( 'getBlockSettings', () => {
-		it( 'should return { name } for blocks with no settings', () => {
+		it( 'should return { slug } for blocks with no settings', () => {
 			expect( blocks.getBlockSettings( 'core/test-block' ) ).to.eql( {
-				name: 'core/test-block',
+				slug: 'core/test-block',
 			} );
 		} );
 
-		it( 'should return { name } for blocks with no settings', () => {
+		it( 'should return { slug } for blocks with no settings', () => {
 			expect( blocks.getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
-				name: 'core/test-block-with-settings',
+				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 			} );
 		} );
