@@ -66,10 +66,6 @@ class Tests_Multisite_WpmuValidateBlogSignup extends WP_UnitTestCase {
 			array( self::$existing_user_login, 'Site names must not collide with an existing user login.' ),
 		);
 
-		if ( ! is_super_admin() ) {
-			$data[] = array( 'foo', 'Site names must at least contain 4 characters.' );
-		}
-
 		$illegal_names = get_site_option( 'illegal_names' );
 		if ( ! empty( $illegal_names ) ) {
 			$data[] = array( array_shift( $illegal_names ), 'Illegal site names are not allowed.' );
@@ -87,6 +83,14 @@ class Tests_Multisite_WpmuValidateBlogSignup extends WP_UnitTestCase {
 
 	public function test_validate_blogname_from_same_existing_user() {
 		$result = wpmu_validate_blog_signup( self::$existing_user_login, 'Foo Site Title', get_userdata( self::$existing_user_id ) );
+		$this->assertEmpty( $result['errors']->get_error_codes() );
+	}
+
+	/**
+	 * @ticket 39676
+	 */
+	public function test_validate_short_blogname() {
+		$result = wpmu_validate_blog_signup( 'foo', 'Foo Site Title', get_userdata( self::$super_admin_id ) );
 		$this->assertEmpty( $result['errors']->get_error_codes() );
 	}
 }
