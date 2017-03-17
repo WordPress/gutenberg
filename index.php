@@ -5,7 +5,7 @@
  * Description: Prototyping since 1440. Development plugin for the editor focus in core.
  * Version: 0.1
  *
- * @package WordPress
+ * @package gutenberg
  */
 
 // Hook gutenberg_menu to admin menu.
