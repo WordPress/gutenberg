@@ -10,8 +10,8 @@ const blocks = {};
 /**
  * Registers a block.
  *
- * @param  {string} name      Block name
- * @param  {Object} settings  Block settings
+ * @param {string} name     Block name
+ * @param {Object} settings Block settings
  */
 export function registerBlock( name, settings ) {
 	if ( ! /^\w+\/\w+$/.test( name ) ) {
