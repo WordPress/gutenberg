@@ -46,8 +46,8 @@
 	}
 
 	wp.blocks.registerBlock( {
-		name: 'youtube',
-		namespace: 'my-awesome-plugin',
+		name: 'embed',
+		namespace: 'wp',
 		displayName: 'YouTube Video',
 		type: 'media',
 		keywords: [],

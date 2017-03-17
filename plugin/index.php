@@ -29,7 +29,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 /**
  * Scripts & Styles.
  *
- * @param  [type]    $hook
+ * @param  mix $hook Screen name.
  * @since  0.0.1
  */
 function gutenberg_scripts_and_styles( $hook ) {

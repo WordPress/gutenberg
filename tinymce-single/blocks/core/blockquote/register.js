@@ -49,8 +49,8 @@
 	}
 
 	wp.blocks.registerBlock( {
-		name: 'blockquote',
-		nameSpace: 'core',
+		name: 'quote',
+		namespace: 'wp',
 		displayName: 'Quote',
 		elements: [ 'blockquote' ],
 		type: 'text',

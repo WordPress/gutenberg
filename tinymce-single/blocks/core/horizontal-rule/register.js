@@ -1,6 +1,6 @@
 window.wp.blocks.registerBlock( {
 	name: 'hortizontal-rule',
-	nameSpace: 'core',
+	namespace: 'wp',
 	displayName: 'Horizontal Rule',
 	elements: [ 'hr' ],
 	type: 'separator',

@@ -1,35 +1,35 @@
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"] {
+#editor figure[data-wp-block-type="wp:embed"] {
 	position: relative;
 	overflow: hidden;
 }
 
 /* Should probably be handled internally. */
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"]:before {
+#editor figure[data-wp-block-type="wp:embed"]:before {
 	content: '';
 	display: block;
 	position: absolute;
 }
 
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"][data-mce-selected]:before {
+#editor figure[data-wp-block-type="wp:embed"][data-mce-selected]:before {
 	display: none;
 }
 
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"]:before,
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"] iframe {
+#editor figure[data-wp-block-type="wp:embed"]:before,
+#editor figure[data-wp-block-type="wp:embed"] iframe {
 	width: 750px;
 	height: 422px;
 }
 
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignleft:before,
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignright:before,
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignleft iframe,
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignright iframe {
+#editor figure[data-wp-block-type="wp:embed"].alignleft:before,
+#editor figure[data-wp-block-type="wp:embed"].alignright:before,
+#editor figure[data-wp-block-type="wp:embed"].alignleft iframe,
+#editor figure[data-wp-block-type="wp:embed"].alignright iframe {
 	width: 375px;
 	height: 211px;
 }
 
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignfull:before,
-#editor figure[data-wp-block-type="my-awesome-plugin:youtube"].alignfull iframe {
+#editor figure[data-wp-block-type="wp:embed"].alignfull:before,
+#editor figure[data-wp-block-type="wp:embed"].alignfull iframe {
 	width: 950px;
 	height: 534px;
 }

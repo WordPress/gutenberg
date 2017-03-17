@@ -11,7 +11,7 @@
 			// Note, elements should probably only be registered by core.
 			// Maybe for each block, we should offer to extend the settings (add buttons).
 
-			var namespace = settings.namespace || 'elements';
+			var namespace = settings.namespace;
 			var id = namespace + ':' + settings.name;
 
 			_blocks[ id ] = settings;

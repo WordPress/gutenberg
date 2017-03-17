@@ -30,7 +30,7 @@
 
 	window.wp.blocks.registerBlock( {
 		name: 'preformatted',
-		nameSpace: 'core',
+		namespace: 'wp',
 		displayName: 'Preformatted',
 		elements: [ 'pre' ],
 		type: 'text',

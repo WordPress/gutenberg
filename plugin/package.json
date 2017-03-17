@@ -1,0 +1,33 @@
+{
+  "name": "gutenberg",
+  "version": "1.0.0",
+  "description": "Prototyping a new WordPress editor experience",
+  "main": "build/app.js",
+  "repository": "git+https://github.com/WordPress/gutenberg.git",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0+",
+  "keywords": [
+    "WordPress",
+    "editor"
+  ],
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "clean": "rimraf build"
+  },
+  "devDependencies": {
+    "autoprefixer": "^6.7.7",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-preset-latest": "^6.24.0",
+    "cross-env": "^3.2.4",
+    "css-loader": "^0.27.3",
+    "eslint": "^3.17.1",
+    "eslint-config-wordpress": "^1.1.0",
+    "node-sass": "^4.5.0",
+    "postcss-loader": "^1.3.3",
+    "rimraf": "^2.6.1",
+    "sass-loader": "^6.0.3",
+    "style-loader": "^0.14.1",
+    "webpack": "^2.2.1"
+  }
+}
