@@ -11,9 +11,9 @@
 /**
  * Gutenberg's Menu.
  *
- * Adds a new menu page for the Gutenberg editor.
+ * Adds a new wp-admin menu page for the Gutenberg editor.
  *
- * @since  4.8.0
+ * @since 4.8.0
  */
 function gutenberg_menu() {
 	add_menu_page(
@@ -24,30 +24,33 @@ function gutenberg_menu() {
 		'the_gutenberg_project'
 	);
 }
+
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
  * Scripts & Styles.
  *
- * Enqueues scripts and styles when visiting the top-level page of the Gutenberg editor.
+ * Enqueues the needed scripts and styles when visiting the top-level page of
+ * the Gutenberg editor.
  *
- * @param  string $hook Screen name.
- * @since  4.8.0
+ * @param string $hook Screen name.
+ * @since 4.8.0
  */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
 		wp_enqueue_script( 'gutenberg_js', plugins_url( 'build/app.js', __FILE__ ) );
 	}
 }
+
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
 /**
  * Project.
  *
- * The main entry point for the Gutenberg editor. 
- * Renders the editor on the wp-admin page for the plugin.
+ * The main entry point for the Gutenberg editor. Renders the editor on the
+ * wp-admin page for the plugin.
  *
- * @since  4.8.0
+ * @since 4.8.0
  */
 function the_gutenberg_project() {
 	?>
