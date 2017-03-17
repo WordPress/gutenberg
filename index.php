@@ -49,7 +49,9 @@ add_action( 'init', 'gutenberg_register_scripts' );
  */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
-		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element' ) );
+		wp_register_script( 'gutenberg-content', plugins_url( 'docs/shared/post-content.js', __FILE__ ) );
+		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element', 'gutenberg-content' ), false, true );
+		wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', { content: window.content } );' );
 	}
 }
 
@@ -66,12 +68,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 function the_gutenberg_project() {
 	?>
 	<div class="gutenberg">
-		<section class="gutenberg__editor" contenteditable="true">
-			<h2>1.0 Is The Loneliest Number</h2>
-			<p>Many entrepreneurs idolize Steve Jobs. He’s such a <a href=""><span class="space-sep">&nbsp;</span>perfectionist<span class="space-sep-end">&nbsp;</span></a>, they say. Nothing leaves the doors of 1 Infinite Loop in Cupertino without a polish and finish that makes geeks everywhere drool. No compromise!</p>
-			<img alt="" src="https://cldup.com/HN3-c7ER9p.jpg" />
-			<p>I like Apple for the opposite reason: they’re not afraid of getting a rudimentary 1.0 out into the world.</p>
-		</section>
+		<section id="editor" class="gutenberg__editor" contenteditable="true"></section>
 	</div>
 	<?php
 }
