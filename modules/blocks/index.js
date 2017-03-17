@@ -1,5 +1,7 @@
 export { default as Editable } from './components/editable';
 
+const blocks = {};
+
 /**
  * Registers a block.
  *
@@ -8,7 +10,14 @@ export { default as Editable } from './components/editable';
  * @param  {Object} settings  Block settings
  */
 export function registerBlock( namespace, block, settings ) {
+	if ( ! blocks.namespace ) {
+		blocks[ namespace ] = {};
+	}
 
+	blocks[ namespace ][ block ] = Object.assign(
+		{ name: block, namespace },
+		settings
+	);
 }
 
 /**
@@ -19,14 +28,20 @@ export function registerBlock( namespace, block, settings ) {
  * @return {?Object}           Block settings
  */
 export function getBlockSettings( namespace, block ) {
+	if ( ! blocks[ namespace ] || ! blocks[ namespace ][ block ] ) {
+		return null;
+	}
 
+	return blocks[ namespace ][ block ];
 }
 
 /**
  * Returns all registered blocks.
  *
- * @return {Object} Block settings keyed by block name
+ * @return {Array} Blocks settings
  */
 export function getBlocks() {
-
+	return Object.values( blocks ).reduce( ( memo, namespaceBlocks ) => {
+		return memo.concat( Object.values( namespaceBlocks ) );
+	} );
 }
