@@ -1,0 +1,12 @@
+{
+  "name": "@wordpress/blocks",
+  "version": "4.8.0",
+  "main": "build/index.js",
+  "module": "index.js",
+  "repository": "git+https://github.com/WordPress/gutenberg.git",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0+",
+  "dependencies": {
+    "@wordpress/elements": "4.8.0"
+  }
+}

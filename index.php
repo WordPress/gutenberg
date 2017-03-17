@@ -38,7 +38,9 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
-		wp_enqueue_script( 'gutenberg_js', plugins_url( 'build/app.js', __FILE__ ) );
+		wp_register_script( 'wp-blocks', plugins_url( 'modules/blocks/build/index.js', __FILE__ ) );
+		wp_register_script( 'wp-elements', plugins_url( 'modules/elements/build/index.js', __FILE__ ) );
+		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-elements' ) );
 	}
 }
 
