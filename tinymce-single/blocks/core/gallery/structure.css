@@ -23,6 +23,7 @@
 	width: 50%;
 }
 
+
 #editor figure[data-wp-block-type="wp:gallery"].alignleft,
 #editor figure[data-wp-block-type="wp:gallery"].alignright {
 	clear: none;
