@@ -8,11 +8,13 @@
  * @package WordPress
  */
 
-// Hook.
+// Hook gutenberg_menu to admin menu.
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
  * Gutenberg's Menu.
+ *
+ * Adds a new menu page for the Gutenberg editor.
  *
  * @since  4.8.0
  */
@@ -26,11 +28,13 @@ function gutenberg_menu() {
 	);
 }
 
-// Hook.
+// Enqueue the scripts and style in the admin.
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
 /**
  * Scripts & Styles.
+ *
+ * Enqueues scripts and styles when visiting the top-level page of the Gutenberg editor.
  *
  * @param  string $hook Screen name.
  * @since  4.8.0
@@ -43,6 +47,9 @@ function gutenberg_scripts_and_styles( $hook ) {
 
 /**
  * Project.
+ *
+ * The main entry point for the Gutenberg editor. 
+ * Renders the editor on the wp-admin page for the plugin.
  *
  * @since  4.8.0
  */
