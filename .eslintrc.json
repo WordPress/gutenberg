@@ -38,6 +38,7 @@
 		"no-unreachable": "error",
 		"no-use-before-define": [ "error", "nofunc" ],
 		"object-curly-spacing": [ "error", "always" ],
+		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"quote-props": [ "error", "as-needed", { "keywords": true } ],
 		"semi": "error",
