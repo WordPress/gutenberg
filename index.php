@@ -1,14 +1,21 @@
 <?php
-
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://wordpress.github.io/gutenberg/
  * Description: Prototyping since 1440. Development plugin for the editor focus in core.
  * Version: 0.1
+ *
+ * @package WordPress
  */
 
+// Hook.
 add_action( 'admin_menu', 'gutenberg_menu' );
 
+/**
+ * Gutenberg's Menu.
+ *
+ * @since  4.8.0
+ */
 function gutenberg_menu() {
 	add_menu_page(
 		'Gutenberg',
@@ -19,13 +26,26 @@ function gutenberg_menu() {
 	);
 }
 
+// Hook.
+add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+
+/**
+ * Scripts & Styles.
+ *
+ * @param  string $hook Screen name.
+ * @since  4.8.0
+ */
 function gutenberg_scripts_and_styles( $hook ) {
-	if ( $hook === 'toplevel_page_gutenberg' ) {
+	if ( 'toplevel_page_gutenberg' === $hook ) {
 		wp_enqueue_script( 'gutenberg_js', plugins_url( 'build/app.js', __FILE__ ) );
 	}
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
+/**
+ * Project.
+ *
+ * @since  4.8.0
+ */
 function the_gutenberg_project() {
 	?>
 	<div class="gutenberg">
@@ -42,10 +62,10 @@ function the_gutenberg_project() {
 /**
  * Registers a block.
  *
- * @param  string $namespace Block grouping unique to package or plugin
- * @param  string $block     Block name
+ * @param  string $namespace Block grouping unique to package or plugin.
+ * @param  string $block     Block name.
  * @param  array  $args      Optional. Array of settings for the block. Default empty array.
- * @return bool              True on success, false on error
+ * @return bool              True on success, false on error.
  */
 function register_block( $namespace, $block, $args = array() ) {
 
