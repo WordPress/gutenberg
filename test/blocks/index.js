@@ -45,7 +45,7 @@ describe( 'blocks API', () => {
 	} );
 
 	// TODO: registerBlock tests
-	
+
 	describe( 'getBlockSettings', () => {
 		it( 'should return { name } for blocks with no settings', () => {
 			expect( blocks.getBlockSettings( 'core/test-block' ) ).to.eql( {
