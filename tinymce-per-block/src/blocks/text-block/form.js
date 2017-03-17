@@ -86,6 +86,7 @@ export default class TextBlockForm extends Component {
 						focusConfig={ focusConfig }
 						onFocusChange={ api.focus }
 						onType={ api.unselect }
+						selectionName="content"
 						inline
 					/>
 				</div>

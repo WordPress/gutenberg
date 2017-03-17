@@ -91,6 +91,7 @@ export default class EmbedBlockForm extends Component {
 										placeholder="Write caption"
 										focusConfig={ focusConfig }
 										onFocusChange={ api.focus }
+										selectionName="caption"
 									/>
 								</div>
 							}

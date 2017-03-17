@@ -72,6 +72,7 @@ export default class HtmlBlockForm extends Component {
 						focusConfig={ focusConfig }
 						onFocusChange={ api.focus }
 						onType={ api.unselect }
+						selectionName="caption"
 					/>
 				</div>
 			</div>
