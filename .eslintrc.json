@@ -2,7 +2,8 @@
 	"root": true,
 	"extends": "wordpress",
 	"env": {
-		"browser": true
+		"browser": true,
+		"node": true
 	},
 	"parserOptions": {
 		"sourceType": "module"
