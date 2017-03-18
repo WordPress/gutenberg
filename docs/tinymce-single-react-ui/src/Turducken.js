@@ -17,16 +17,6 @@ let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if 
 let tinyNode = (containerNode) => ((containerNode && containerNode.children.length > 0) ? containerNode.children[0] : null)
 let topLevelBlock = (tinyNode, node) => ((tinyNode && node) ? getTopLevelBlock(tinyNode, node) : null)
 
-// Rect at the start of the Range
-let findStartOfRange = (range) => {
-	// make a collapsed range at the start point
-	if (range) {
-		let r = range.cloneRange();
-		r.setEnd(range.startContainer, range.startOffset);
-		return r.getBoundingClientRect();
-	}
-}
-
 // Rect for the Range
 let rangeRect = (range) => {
 	if (range) {
@@ -49,8 +39,7 @@ export default function Turducken(props) {
       <Box rect={topRect}/>
       <div>
         <InlineToolbar isOpen={ inlineOpen(collapsed) }
-          rangeRect={ findStartOfRange(range) }
-          pageYOffset={ window.pageYOffset }
+          rect={ positionNearCursor(range) }
           node={ node }
           />
         <BlockToolbar  isOpen={ blockOpen(collapsed) }
@@ -68,3 +57,22 @@ export default function Turducken(props) {
     </div>
   )
 }
+
+// ////////
+// Anna's style: InlineToolbar appears at the start of the current Range
+let findStartOfRange = (range) => {
+	// make a collapsed range at the start point
+	if (range) {
+		let r = range.cloneRange();
+		r.setEnd(range.startContainer, range.startOffset);
+		return r.getBoundingClientRect();
+	}
+}
+
+let positionNearCursor = (range) => {
+  if (range) {
+    let r = findStartOfRange(range)
+    return { left: r.left - 10, top: r.top - 48 + window.pageYOffset }
+  }
+}
+// ////////
