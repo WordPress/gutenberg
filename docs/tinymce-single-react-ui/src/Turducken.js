@@ -24,6 +24,8 @@ let rangeRect = (range) => {
 	}
 }
 
+let blockMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px', zIndex: 23 } : {} )
+
 export default function Turducken(props) {
   let store = props.store
   let collapsed = store.getState().get('collapsed')
@@ -45,7 +47,7 @@ export default function Turducken(props) {
         <BlockToolbar  isOpen={ blockOpen(collapsed) }
           blockType={ blockType(topBlock) }
           blockAlign={ blockAlign(topBlock) }
-          blockRect={ rangeRect(topBlock) }
+          pos={ blockMenuPos(rangeRect(topBlock)) }
           />
       </div>
       <TinyMCEReact content={window.content}

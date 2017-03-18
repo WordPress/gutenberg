@@ -15,19 +15,19 @@ export default class BlockToolbar extends React.Component {
 			open: false
 		}
 
-		this.blockRect = this.props.blockRect
+		this.pos = this.props.pos
 	}
 
 	render() {
-		if (this.props.blockRect) {
-			this.blockRect = this.props.blockRect;
+		if (this.props.pos) {
+			this.pos = this.props.pos;
 		}
 
-		let rect = this.props.blockRect || this.blockRect;
+		let pos = this.props.pos || this.pos;
 
 		// TODO: add option types
-		return (this.props.isOpen && rect) ? (
-			<div style={ { position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px', zIndex: 23 } }>
+		return (this.props.isOpen && pos) ? (
+			<div style={ pos }>
 				<div className={styles.toolbar}
 						onMouseEnter={() => { this.setState({ open: true }) }}
 						onMouseLeave={ () => { this.setState({ open: false }) } }
