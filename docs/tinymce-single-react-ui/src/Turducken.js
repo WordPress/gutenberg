@@ -10,7 +10,7 @@ import {blockList, blockType, blockAlign, getTopLevelBlock} from './utils/tag'
 import '../../shared/post-content'
 import 'assets/stylesheets/main.scss'
 
-let blockOpen  = (collapsed) => (collapsed !== null &&  collapsed) // block  if caret
+let blockOpen  = (collapsed) => (collapsed !== null)               // block always appears
 let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if range selection
 
 // get tiny node from the container, and the top level block from the caret node
@@ -25,6 +25,7 @@ let rangeRect = (range) => {
 }
 
 let blockMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38 + 'px', right: rect.left + 38 + 'px', zIndex: 23 } : {} )
+let insertMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38 + 'px', left: rect.left + 38 + 'px'} : {} )
 
 export default function Turducken(props) {
   let store = props.store
@@ -41,7 +42,7 @@ export default function Turducken(props) {
       <Box rect={topRect}/>
       <div>
         <InlineToolbar isOpen={ inlineOpen(collapsed) }
-          pos={ positionNearCursor(range) }
+          pos={ insertMenuPos(rangeRect(topBlock)) }
           node={ node }
           />
         <BlockToolbar  isOpen={ blockOpen(collapsed) }
