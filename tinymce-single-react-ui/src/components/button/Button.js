@@ -3,28 +3,22 @@ import ReactDOM from 'react-dom';
 import styles from './button.scss';
 import cx from 'classnames'
 
-export default class Button extends React.Component {
-	constructor(props) {
-		super(props)
-	}
+export default function Button(props) {
+	let extraClass = props.extraClass && props.extraClass.length > 0 ? props.extraClass.join(' ') : '';
 
-	render() {
-		let extraClass = this.props.extraClass && this.props.extraClass.length > 0 ? this.props.extraClass.join(' ') : '';
+	let classMap = {
+		ACTIVE: styles.active,
+		INACTIVE: styles.inactive,
+		DISABLED: styles.disabled
+	};
 
-		let classMap = {
-			ACTIVE: styles.active,
-			INACTIVE: styles.inactive,
-			DISABLED: styles.disabled
-		};
+	let buttonClasses = cx(
+		styles.button,
+		classMap[props.status] || styles.inactive,
+		extraClass
+	)
 
-		let buttonClasses = cx(
-			styles.button,
-			classMap[this.props.status] || styles.inactive,
-			extraClass
-		)
-
-		return (
-			<div className={buttonClasses}> { this.props.children } </div>
-		)
-	}
+	return (
+		<div className={buttonClasses}> { props.children } </div>
+	)
 }
