@@ -40,17 +40,15 @@ export default function Turducken(props) {
   return (
     <div>
       <Box rect={topRect}/>
-      <div>
-        <InlineToolbar isOpen={ inlineOpen(collapsed) }
-          pos={ insertMenuPos(rangeRect(topBlock)) }
-          node={ node }
-          />
-        <BlockToolbar  isOpen={ blockOpen(collapsed) }
-          blockType={ blockType(topBlock) }
-          blockAlign={ blockAlign(topBlock) }
-          pos={ blockMenuPos(rangeRect(topBlock)) }
-          />
-      </div>
+      <InlineToolbar isOpen={ inlineOpen(collapsed) }
+        pos={ insertMenuPos(rangeRect(topBlock)) }
+        node={ node }
+        />
+      <BlockToolbar  isOpen={ blockOpen(collapsed) }
+        blockType={ blockType(topBlock) }
+        blockAlign={ blockAlign(topBlock) }
+        pos={ blockMenuPos(rangeRect(topBlock)) }
+        />
       <TinyMCEReact content={window.content}
         onSetup={ ( editorRef ) => store.dispatch( { type: 'SETUP', val: editorRef } ) }
         onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
