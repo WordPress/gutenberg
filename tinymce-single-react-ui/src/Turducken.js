@@ -4,6 +4,7 @@ import * as Icons from './external/dashicons/index'
 import BlockChangeToolbar from './components/toolbar/BlockChangeToolbar'
 import BlockToolbar from './components/toolbar/BlockToolbar'
 import InlineToolbar from './components/toolbar/InlineToolbar'
+import Box from './components/box/Box'
 import TinyMCEReact from './components/tinymce/tinymce-react-ui'
 import {blockList, blockType, blockAlign, getTopLevelBlock} from './utils/tag'
 import '../../shared/post-content'
@@ -45,20 +46,7 @@ export default function Turducken(props) {
 
   return (
     <div>
-      { topRect && topRect.width &&
-        <div>
-          <div style={ {position: 'absolute', top: topRect.top + 'px',
-                                              width: topRect.width + 'px',
-                                              height: '2px', background: '#ccc' } }></div>
-
-          <div style={ {position: 'absolute', top: topRect.height + topRect.top + 'px', width: topRect.width + 'px', height: '2px', background: '#ccc' } }></div>
-
-          <div style={ {position: 'absolute', top: topRect.top + 'px', width: '2px', height: topRect.height + 'px', background: '#ccc' } }></div>
-
-          <div style={ {position: 'absolute', top: topRect.top + 'px', width: '2px', height: topRect.height + 'px', left: topRect.width + topRect.left + 'px', background: '#ccc' } }></div>
-
-        </div>
-      }
+      <Box rect={topRect}/>
       <div>
         <InlineToolbar isOpen={ inlineOpen(collapsed) }
           rangeRect={ findStartOfRange(range) }
