@@ -490,7 +490,7 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 		$this->assertEquals( -1, $changeset_values['nav_menu_locations[top]'] );
 		$this->assertEquals( 0, $changeset_values['nav_menu_item[-1]']['object_id'] );
 		$this->assertEquals( 'custom', $changeset_values['nav_menu_item[-1]']['type'] );
-		$this->assertEquals( home_url(), $changeset_values['nav_menu_item[-1]']['url'] );
+		$this->assertEquals( home_url( '/' ), $changeset_values['nav_menu_item[-1]']['url'] );
 
 		$this->assertEmpty( $wp_customize->changeset_data() );
 		$this->assertNull( $wp_customize->changeset_post_id() );
