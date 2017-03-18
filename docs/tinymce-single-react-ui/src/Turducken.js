@@ -41,7 +41,7 @@ export default function Turducken(props) {
       <Box rect={topRect}/>
       <div>
         <InlineToolbar isOpen={ inlineOpen(collapsed) }
-          rect={ positionNearCursor(range) }
+          pos={ positionNearCursor(range) }
           node={ node }
           />
         <BlockToolbar  isOpen={ blockOpen(collapsed) }
@@ -74,7 +74,7 @@ let findStartOfRange = (range) => {
 let positionNearCursor = (range) => {
   if (range) {
     let r = findStartOfRange(range)
-    return { left: r.left - 10, top: r.top - 48 + window.pageYOffset }
+    return { position: 'absolute', left: r.left - 10 + 'px', top: r.top - 48 + window.pageYOffset + 'px' }
   }
 }
 // ////////

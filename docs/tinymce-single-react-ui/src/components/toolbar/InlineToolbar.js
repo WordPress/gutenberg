@@ -22,11 +22,12 @@ export default class InlineToolbar extends React.Component {
 	render() {
 		let {top = 0, left = 0} = this.props.rect || {}
 		let node = this.props.node
+		let pos = this.props.pos
 
 		// TODO: add option types
 		return this.props.isOpen ? (
 			<div className={styles.toolbarWrapper}
-				style={ { position: 'absolute', left: left + 'px', top: top + 'px' } } >
+				style={ pos } >
 				<div className={styles.toolbar}>
 					<Button status={ status( isBold, node ) } >
 						<Icons.EditorBoldIcon />
