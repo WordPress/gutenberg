@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
-import { createElement } from '@wordpress/elements';
-import { registerBlock, Editable } from '@wordpress/blocks';
-
-registerBlock( 'wp', 'Text', {
+wp.blocks.registerBlock( 'wp', 'Text', {
 	edit( state, onChange ) {
-		return createElement( Editable, {
+		return wp.elements.createElement( wp.blocks.Editable, {
 			value: state.value,
 			onChange: ( value ) => onChange( { value } )
 		} );
 	},
 	save( state ) {
-		return createElement( 'p', null, state.value );
+		return wp.elements.createElement( 'p', null, state.value );
 	}
 } );

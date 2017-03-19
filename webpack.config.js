@@ -36,7 +36,7 @@ const config = module.exports = {
 		filename: '[name]/build/index.js',
 		path: path.resolve( BASE_PATH ),
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'umd2'
+		libraryTarget: 'this'
 	},
 	resolve: {
 		modules: [
@@ -45,11 +45,6 @@ const config = module.exports = {
 			'node_modules'
 		]
 	},
-	externals: Object.keys( entry ).reduce( ( memo, filename ) => {
-		const name = require( BASE_PATH + '/' + filename + '/package' ).name;
-		memo[ name ] = { 'this': [ 'wp', filename ] };
-		return memo;
-	}, {} ),
 	module: {
 		rules: [
 			{

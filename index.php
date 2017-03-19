@@ -28,6 +28,15 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
+ * Registers common scripts to be used as dependencies of the editor and plugins.
+ */
+function gutenberg_register_scripts() {
+	wp_register_script( 'wp-elements', plugins_url( 'modules/elements/build/index.js', __FILE__ ) );
+	wp_register_script( 'wp-blocks', plugins_url( 'modules/blocks/build/index.js', __FILE__ ), array( 'wp-elements' ) );
+}
+add_action( 'init', 'gutenberg_register_scripts' );
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -38,8 +47,6 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
-		wp_register_script( 'wp-blocks', plugins_url( 'modules/blocks/build/index.js', __FILE__ ) );
-		wp_register_script( 'wp-elements', plugins_url( 'modules/elements/build/index.js', __FILE__ ) );
 		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-elements' ) );
 	}
 }

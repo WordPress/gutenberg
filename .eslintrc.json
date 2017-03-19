@@ -8,6 +8,9 @@
 	"parserOptions": {
 		"sourceType": "module"
 	},
+	"globals": {
+		"wp": true
+	},
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
 		"brace-style": [ "error", "1tbs" ],

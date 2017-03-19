@@ -1,5 +1,6 @@
 {
   "name": "@wordpress/elements",
+  "private": true,
   "version": "4.8.0",
   "main": "build/index.js",
   "module": "index.js",
