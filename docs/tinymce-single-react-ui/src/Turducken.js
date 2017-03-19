@@ -11,8 +11,8 @@ import actions from './actions/content'
 import '../../shared/post-content'
 import 'assets/stylesheets/main.scss'
 
-let blockOpen  = ( focused, collapsed ) => (focused && collapsed !== null && collapsed !== undefined && collapsed)               // block always appears
-let inlineOpen = ( focused, collapsed ) => (focused && collapsed !== null && collapsed !== undefined && !collapsed) // inline if range selection
+let blockOpen  = ( focused, collapsed ) => ( focused )               // block menu shown when focused
+let inlineOpen = ( focused, collapsed ) => ( focused && !collapsed ) // inline if range selection
 
 // get tiny node from the container, and the top level block from the caret node
 let tinyNode = (containerNode) => ((containerNode && containerNode.children.length > 0) ? containerNode.children[0] : null)
