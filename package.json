@@ -12,7 +12,9 @@
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
-    "clean": "rimraf build"
+    "clean": "rimraf build",
+    "lint": "eslint editor",
+    "test": "npm run lint"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",
