@@ -30,11 +30,12 @@ let insertMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38
 
 export default function Turducken(props) {
   let store = props.myStore
-  let collapsed = store.getState().collapsed
-  let focused = store.getState().focused
-  let range = store.getState().range
-  let node =  store.getState().node // node of caret or ancestor of range
-  let editorRef = store.getState().editorRef
+  let state = store.getState()
+  let collapsed = state.collapsed
+  let focused = state.focused
+  let range = state.range
+  let node =  state.node // node of caret or ancestor of range
+  let editorRef = state.editorRef
   let tiny = tinyNode(editorRef)
   let topBlock = topLevelBlock(tiny, node)
   let topRect = rangeRect(topBlock)
@@ -42,7 +43,7 @@ export default function Turducken(props) {
   return (
     <div>
       <Box rect={topRect}/>
-      <InlineToolbar isOpen={ inlineOpen(focused, collapsed) } myStore={store}
+      <InlineToolbar isOpen={ inlineOpen(focused, collapsed) } myStore={ store }
         pos={ insertMenuPos(rangeRect(topBlock)) }
         node={ node }
         />
