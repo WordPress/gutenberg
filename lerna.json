@@ -3,5 +3,5 @@
 	"packages": [
 		"modules/*"
 	],
-	"version": "4.8.0"
+	"version": "0.1.0"
 }

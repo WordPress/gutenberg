@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://wordpress.github.io/gutenberg/
  * Description: Prototyping since 1440. Development plugin for the editor focus in core.
- * Version: 0.1
+ * Version: 0.1.0
  *
  * @package gutenberg
  */
@@ -13,7 +13,7 @@
  *
  * Adds a new wp-admin menu page for the Gutenberg editor.
  *
- * @since 4.8.0
+ * @since 0.1.0
  */
 function gutenberg_menu() {
 	add_menu_page(
@@ -29,6 +29,8 @@ add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
  * Registers common scripts to be used as dependencies of the editor and plugins.
+ *
+ * @since 0.1.0
  */
 function gutenberg_register_scripts() {
 	wp_register_script( 'wp-elements', plugins_url( 'modules/elements/build/index.js', __FILE__ ) );
@@ -43,7 +45,7 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * the Gutenberg editor.
  *
  * @param string $hook Screen name.
- * @since 4.8.0
+ * @since 0.1.0
  */
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
@@ -59,7 +61,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
- * @since 4.8.0
+ * @since 0.1.0
  */
 function the_gutenberg_project() {
 	?>

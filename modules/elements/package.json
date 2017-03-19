@@ -1,7 +1,7 @@
 {
   "name": "@wordpress/elements",
   "private": true,
-  "version": "4.8.0",
+  "version": "0.1.0",
   "main": "build/index.js",
   "module": "index.js",
   "repository": "git+https://github.com/WordPress/gutenberg.git",
