@@ -7,11 +7,12 @@ import InlineToolbar from './components/toolbar/InlineToolbar'
 import Box from './components/box/Box'
 import TinyMCEReact from './components/tinymce/tinymce-react-ui'
 import {blockList, blockType, blockAlign, getTopLevelBlock} from './utils/tag'
+import actions from './actions/content'
 import '../../shared/post-content'
 import 'assets/stylesheets/main.scss'
 
-let blockOpen  = (collapsed) => (collapsed !== null)               // block always appears
-let inlineOpen = (collapsed) => (collapsed !== null && !collapsed) // inline if range selection
+let blockOpen  = ( focused, collapsed ) => (focused && collapsed !== null && collapsed !== undefined && collapsed)               // block always appears
+let inlineOpen = ( focused, collapsed ) => (focused && collapsed !== null && collapsed !== undefined && !collapsed) // inline if range selection
 
 // get tiny node from the container, and the top level block from the caret node
 let tinyNode = (containerNode) => ((containerNode && containerNode.children.length > 0) ? containerNode.children[0] : null)
@@ -28,11 +29,12 @@ let blockMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38 
 let insertMenuPos = (rect) => ( rect ? {position: 'absolute', top: rect.top - 38 + 'px', left: rect.left + 38 + 'px'} : {} )
 
 export default function Turducken(props) {
-  let store = props.store
-  let collapsed = store.getState().get('collapsed')
-  let range = store.getState().get('range')
-  let node =  store.getState().get('node') // node of caret or ancestor of range
-  let editorRef = store.getState().get('editorRef')
+  let store = props.myStore
+  let collapsed = store.getState().collapsed
+  let focused = store.getState().focused
+  let range = store.getState().range
+  let node =  store.getState().node // node of caret or ancestor of range
+  let editorRef = store.getState().editorRef
   let tiny = tinyNode(editorRef)
   let topBlock = topLevelBlock(tiny, node)
   let topRect = rangeRect(topBlock)
@@ -40,20 +42,20 @@ export default function Turducken(props) {
   return (
     <div>
       <Box rect={topRect}/>
-      <InlineToolbar isOpen={ inlineOpen(collapsed) }
+      <InlineToolbar isOpen={ inlineOpen(focused, collapsed) } myStore={store}
         pos={ insertMenuPos(rangeRect(topBlock)) }
         node={ node }
         />
-      <BlockToolbar  isOpen={ blockOpen(collapsed) }
+      <BlockToolbar  isOpen={ blockOpen(focused, collapsed) }
         blockType={ blockType(topBlock) }
         blockAlign={ blockAlign(topBlock) }
         pos={ blockMenuPos(rangeRect(topBlock)) }
         />
       <TinyMCEReact content={window.content}
-        onSetup={ ( editorRef ) => store.dispatch( { type: 'SETUP', val: editorRef } ) }
-        onFocus={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'FOCUS', val: [collapsed, bookmark, node] } ) }
-        onBlur={ ( collapsed, bookmark, node ) => store.dispatch( { type: 'BLUR', val: [collapsed, bookmark, node] } ) }
-        onNodeChange={ ( collapsed, bookmark, node, event ) => store.dispatch( { type: 'NODECHANGE', val: [collapsed, bookmark, node, event] } ) }
+        onSetup={ ( editorRef ) => store.dispatch( actions.setup(editorRef) ) }
+        onNodeChange={ ( collapsed, bookmark, node, event ) => store.dispatch( actions.nodechange( collapsed, bookmark, node, event ) ) }
+        onFocus={ ( collapsed, bookmark, node ) => store.dispatch( actions.focus( collapsed, bookmark, node ) ) }
+        onBlur={ ( collapsed, bookmark, node ) => store.dispatch( actions.blur( collapsed, bookmark, node ) ) }
         />
     </div>
   )

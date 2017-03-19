@@ -1,13 +1,16 @@
 import React, { createElement, Component } from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import Turducken from './Turducken';
-import action from './reducers/action'
+import content from './reducers/content'
 
-const store = createStore(action)
+const store = createStore(content)
 
 const render = () => ReactDOM.render(
-		<Turducken store={store}/>
+	<Provider store={store}>
+		<Turducken myStore={store}/>
+	</Provider>
 		, document.getElementById('tiny-react')
 	);
 
