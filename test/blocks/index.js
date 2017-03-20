@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import * as blocks from '@wordpress/blocks';
+import * as blocks from 'blocks';
 
 describe( 'blocks API', () => {
 	// TODO: We probably want a way to undo this, and split this logic out into

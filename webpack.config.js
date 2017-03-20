@@ -40,8 +40,7 @@ const config = {
 	},
 	resolve: {
 		modules: [
-			'editor',
-			'external',
+			'modules',
 			'node_modules'
 		]
 	},
