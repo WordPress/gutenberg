@@ -11,10 +11,10 @@
     "editor"
   ],
   "scripts": {
-    "test": "mocha-webpack test/",
+    "test-unit": "cross-env NODE_ENV=test mocha-webpack test/ --webpack-config webpack.config.js --recursive --include test/boot.js",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint editor",
-    "test": "npm run lint"
+    "test": "npm run lint && npm run test-unit"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",

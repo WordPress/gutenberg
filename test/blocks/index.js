@@ -1,10 +1,12 @@
-import mocha from 'mocha';
-import chai, { expect } from 'chai';
-import dirtyChai from 'dirty-chai';
+/**
+ * External dependencies
+ */
+import { expect } from 'chai';
 
+/**
+ * Internal dependencies
+ */
 import * as blocks from '@wordpress/blocks';
-
-chai.use( dirtyChai );
 
 describe( 'blocks API', () => {
 	// TODO: We probably want a way to undo this, and split this logic out into

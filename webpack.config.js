@@ -5,6 +5,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
+const nodeExternals = require( 'webpack-node-externals' );
 
 /**
  * Base path from which modules are to be discovered.
@@ -29,7 +30,7 @@ const entry = fs.readdirSync( BASE_PATH ).reduce( ( memo, filename ) => {
 	return memo;
 }, {} );
 
-const config = module.exports = {
+const config = {
 	entry: entry,
 	output: {
 		filename: '[name]/build/index.js',
@@ -79,3 +80,10 @@ if ( 'production' === process.env.NODE_ENV ) {
 } else {
 	config.devtool = 'source-map';
 }
+
+if ( 'test' === process.env.NODE_ENV ) {
+	config.target = 'node';
+	config.externals = [ nodeExternals() ];
+}
+
+module.exports = config;
