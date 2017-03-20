@@ -40,7 +40,9 @@ const config = {
 	},
 	resolve: {
 		modules: [
-			'modules',
+			...Object.keys( entry ).map( ( filename ) => {
+				return path.join( BASE_PATH, filename );
+			} ),
 			'node_modules'
 		]
 	},
