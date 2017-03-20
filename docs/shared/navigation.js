@@ -9,8 +9,7 @@
 	PROTOTYPES = {
 		'/': 'UI Prototype',
 		'/tinymce-per-block/': 'TinyMCE per block prototype',
-		'/tinymce-single/': 'Single TinyMCE instance prototype',
-		'/tinymce-single-react-ui/': 'Single TinyMCE with React UI'
+		'/tinymce-single/': 'Single TinyMCE instance prototype'
 	};
 
 	// Generate Navigation DOM
