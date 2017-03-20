@@ -23,8 +23,7 @@ const BASE_PATH = './modules';
  */
 const entry = fs.readdirSync( BASE_PATH ).reduce( ( memo, filename ) => {
 	if ( '.' !== filename && '..' !== filename ) {
-		const submodule = BASE_PATH + '/' + filename;
-		memo[ filename ] = submodule + '/' + require( submodule + '/package' ).module;
+		memo[ filename ] = BASE_PATH + '/' + filename + '/index.js';
 	}
 
 	return memo;
