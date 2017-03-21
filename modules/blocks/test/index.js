@@ -9,53 +9,84 @@ import { expect } from 'chai';
 import * as blocks from '../';
 
 describe( 'blocks API', () => {
-	// TODO: We probably want a way to undo this, and split this logic out into
-	// separate tests (clearing require.cache for example, but this probably
-	// won't work with webpack)
-	before( () => {
-		blocks.registerBlock( 'core/test-block' );
-		const blockSettings = { settingName: 'settingValue' };
-		blocks.registerBlock( 'core/test-block-with-settings', blockSettings );
-		// This is tested later: `registerBlock` should store a copy of its input
-		blockSettings.mutated = true;
+	// Reset block state before each test.
+	beforeEach( () => {
+		blocks.getBlocks().forEach( block => {
+			blocks.unregisterBlock( block.slug );
+		} );
 	} );
 
-	describe( 'validateBlockSlug', () => {
+	describe( 'registerBlock', () => {
 		it( 'should reject numbers', () => {
 			expect(
-				() => blocks.validateBlockSlug( 999 )
-			).to.throw( /^Block slugs must contain a namespace prefix/ );
+				() => blocks.registerBlock( 999 )
+			).to.throw( 'Block slugs must be strings.' );
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
 			expect(
-				() => blocks.validateBlockSlug( 'doing-it-wrong' )
+				() => blocks.registerBlock( 'doing-it-wrong' )
 			).to.throw( /^Block slugs must contain a namespace prefix/ );
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			expect(
-				() => blocks.validateBlockSlug( 'still/_doing_it_wrong' )
+				() => blocks.registerBlock( 'still/_doing_it_wrong' )
 			).to.throw( /^Block slugs must contain a namespace prefix/ );
 		} );
 
 		it( 'should accept valid block names', () => {
 			expect(
-				() => blocks.validateBlockSlug( 'my-plugin/fancy-block-4' )
+				() => blocks.registerBlock( 'my-plugin/fancy-block-4' )
 			).not.to.throw();
+		} );
+
+		it( 'should prohibit registering the same block twice', () => {
+			blocks.registerBlock( 'core/test-block' );
+			expect(
+				() => blocks.registerBlock( 'core/test-block' )
+			).to.throw( 'Block "core/test-block" is already registered.' );
+		} );
+
+		it( 'should store a copy of block settings', () => {
+			const blockSettings = { settingName: 'settingValue' };
+			blocks.registerBlock( 'core/test-block-with-settings', blockSettings );
+			blockSettings.mutated = true;
+			expect( blocks.getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
+				slug: 'core/test-block-with-settings',
+				settingName: 'settingValue',
+			} );
 		} );
 	} );
 
-	// TODO: registerBlock tests
+	describe( 'unregisterBlock', () => {
+		it( 'should fail if a block is not registered', () => {
+			expect(
+				() => blocks.unregisterBlock( 'core/test-block' )
+			).to.throw( 'Block "core/test-block" is not registered.' );
+		} );
+
+		it( 'should unregister existing blocks', () => {
+			blocks.registerBlock( 'core/test-block' );
+			expect( blocks.getBlocks() ).to.eql( [
+				{ slug: 'core/test-block' },
+			] );
+			blocks.unregisterBlock( 'core/test-block' );
+			expect( blocks.getBlocks() ).to.eql( [] );
+		} );
+	} );
 
 	describe( 'getBlockSettings', () => {
 		it( 'should return { slug } for blocks with no settings', () => {
+			blocks.registerBlock( 'core/test-block' );
 			expect( blocks.getBlockSettings( 'core/test-block' ) ).to.eql( {
 				slug: 'core/test-block',
 			} );
 		} );
 
-		it( 'should return { slug } for blocks with no settings', () => {
+		it( 'should return all block settings', () => {
+			const blockSettings = { settingName: 'settingValue' };
+			blocks.registerBlock( 'core/test-block-with-settings', blockSettings );
 			expect( blocks.getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
@@ -64,10 +95,17 @@ describe( 'blocks API', () => {
 	} );
 
 	describe( 'getBlocks', () => {
+		it( 'should return an empty array at first', () => {
+			expect( blocks.getBlocks() ).to.eql( [] );
+		} );
+
 		it( 'should return all registered blocks', () => {
+			blocks.registerBlock( 'core/test-block' );
+			const blockSettings = { settingName: 'settingValue' };
+			blocks.registerBlock( 'core/test-block-with-settings', blockSettings );
 			expect( blocks.getBlocks() ).to.eql( [
-				blocks.getBlockSettings( 'core/test-block' ),
-				blocks.getBlockSettings( 'core/test-block-with-settings' ),
+				{ slug: 'core/test-block' },
+				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
 			] );
 		} );
 	} );
