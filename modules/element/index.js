@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { createElement as reactCreateElement } from 'react';
+import { render as reactRender } from 'react-dom';
+
+/**
  * Returns a new element of given type. Type can be either a string tag name or
  * another function which itself returns an element.
  *
@@ -10,7 +16,7 @@
  * @return {wp.Element}                  Element
  */
 export function createElement( type, props, ...children ) {
-
+	return reactCreateElement( type, props, ...children );
 }
 
 /**
@@ -20,5 +26,5 @@ export function createElement( type, props, ...children ) {
  * @param {Element}    target  DOM node into which element should be rendered
  */
 export function render( element, target ) {
-
+	reactRender( element, target );
 }
