@@ -5,7 +5,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
-const nodeExternals = require( 'webpack-node-externals' );
 
 /**
  * Base path from which modules are to be discovered.
