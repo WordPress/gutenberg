@@ -2,4 +2,3 @@ node_modules
 build
 *.log
 yarn.lock
-.tmp
