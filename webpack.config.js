@@ -82,9 +82,4 @@ if ( 'production' === process.env.NODE_ENV ) {
 	config.devtool = 'source-map';
 }
 
-if ( 'test' === process.env.NODE_ENV ) {
-	config.target = 'node';
-	config.externals = [ nodeExternals() ];
-}
-
 module.exports = config;

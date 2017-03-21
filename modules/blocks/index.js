@@ -16,7 +16,7 @@ export function validateBlockSlug( slug ) {
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( slug ) ) {
 		throw new Error(
 			'Block slugs must contain a namespace prefix.  Example:  my-plugin/my-custom-block'
-		)
+		);
 	}
 }
 
