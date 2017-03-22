@@ -77,11 +77,6 @@ const config = {
 		new ExtractTextPlugin( {
 			filename: './[name]/build/style.css'
 		} ),
-		new webpack.DefinePlugin( {
-			'process.env': {
-				NODE_ENV: JSON.stringify( process.env.NODE_ENV )
-			}
-		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
