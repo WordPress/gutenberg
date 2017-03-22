@@ -14,6 +14,7 @@
     "test-unit": "cross-env NODE_ENV=test mocha modules/**/test/*.js --compilers js:babel-register --recursive --require ./bootstrap-test.js",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint modules",
+    "dev": "webpack --watch",
     "test": "npm run lint && npm run test-unit"
   },
   "devDependencies": {
