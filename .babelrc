@@ -5,5 +5,13 @@
 				"modules": false
 			}
 		} ]
-	]
+	],
+	"plugins": [
+		"transform-runtime"
+	],
+	"env": {
+		"test": {
+			"presets": [ "latest" ]
+		}
+	}
 }

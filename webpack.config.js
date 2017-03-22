@@ -29,7 +29,7 @@ const entry = fs.readdirSync( BASE_PATH ).reduce( ( memo, filename ) => {
 	return memo;
 }, {} );
 
-const config = module.exports = {
+const config = {
 	entry: entry,
 	output: {
 		filename: '[name]/build/index.js',
@@ -39,8 +39,9 @@ const config = module.exports = {
 	},
 	resolve: {
 		modules: [
-			'editor',
-			'external',
+			...Object.keys( entry ).map( ( filename ) => {
+				return path.join( BASE_PATH, filename );
+			} ),
 			'node_modules'
 		]
 	},
@@ -48,6 +49,7 @@ const config = module.exports = {
 		rules: [
 			{
 				test: /\.js$/,
+				exclude: /node_modules/,
 				use: 'babel-loader'
 			},
 			{
@@ -62,6 +64,11 @@ const config = module.exports = {
 		]
 	},
 	plugins: [
+		new webpack.DefinePlugin( {
+			'process.env': {
+				NODE_ENV: JSON.stringify( process.env.NODE_ENV )
+			}
+		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
@@ -79,3 +86,5 @@ if ( 'production' === process.env.NODE_ENV ) {
 } else {
 	config.devtool = 'source-map';
 }
+
+module.exports = config;

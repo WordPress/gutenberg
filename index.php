@@ -76,11 +76,11 @@ function the_gutenberg_project() {
 /**
  * Registers a block.
  *
- * @param  string $namespace Block grouping unique to package or plugin.
- * @param  string $block     Block name.
- * @param  array  $args      Optional. Array of settings for the block. Default empty array.
- * @return bool              True on success, false on error.
+ * @param  string $name Block name including namespace.
+ * @param  array  $args Optional. Array of settings for the block. Default
+ *                      empty array.
+ * @return bool         True on success, false on error.
  */
-function register_block( $namespace, $block, $args = array() ) {
-
+function register_block( $name, $args = array() ) {
+	// Not implemented yet.
 }
