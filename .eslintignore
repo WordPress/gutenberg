@@ -1,2 +1,2 @@
 modules/*/build
-modules/editor/grammar/index.js
+modules/blocks/grammar/index.js

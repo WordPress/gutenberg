@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test-unit": "cross-env NODE_ENV=test mocha modules/**/test/*.js --compilers js:babel-register --recursive --require ./bootstrap-test.js",
-    "build:parser": "pegjs --format commonjs -o ./modules/editor/grammar/index.js ./modules/editor/grammar/post.pegjs",
+    "build:parser": "pegjs --format commonjs -o ./modules/blocks/grammar/index.js ./modules/blocks/grammar/post.pegjs",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint modules",
     "dev": "webpack --watch",

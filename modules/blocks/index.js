@@ -1,4 +1,5 @@
 export { default as Editable } from './components/editable';
+export { parse } from './grammar';
 
 /**
  * Block settings keyed by block slug.
