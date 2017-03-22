@@ -109,5 +109,4 @@ describe( 'blocks API', () => {
 			] );
 		} );
 	} );
-
 } );

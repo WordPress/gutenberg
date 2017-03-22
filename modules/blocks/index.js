@@ -37,7 +37,7 @@ export function registerBlock( slug, settings ) {
  *
  * @param {string} slug Block slug
  */
-export function unregisterBlock( slug, settings ) {
+export function unregisterBlock( slug ) {
 	if ( ! blocks[ slug ] ) {
 		throw new Error(
 			'Block "' + slug + '" is not registered.'
