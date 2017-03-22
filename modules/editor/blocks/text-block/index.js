@@ -1,4 +1,4 @@
-wp.blocks.registerBlock( 'wp', 'Text', {
+wp.blocks.registerBlock( 'wp/text', {
 	edit( state, onChange ) {
 		return wp.element.createElement( wp.blocks.Editable, {
 			value: state.value,
