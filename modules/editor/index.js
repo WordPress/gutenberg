@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import 'assets/stylesheets/main.scss';
-import 'blocks';
+import './assets/stylesheets/main.scss';
+import './blocks';
 import Editor from './editor';
 
 /**

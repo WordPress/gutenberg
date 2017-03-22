@@ -5,6 +5,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
+const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 /**
  * Base path from which modules are to be discovered.
@@ -29,6 +30,13 @@ const entry = fs.readdirSync( BASE_PATH ).reduce( ( memo, filename ) => {
 	return memo;
 }, {} );
 
+/**
+ * Whether build output should be configured to optimize for distribution.
+ *
+ * @type {Boolean}
+ */
+const isProduction = ( 'production' === process.env.NODE_ENV );
+
 const config = {
 	entry: entry,
 	output: {
@@ -37,13 +45,9 @@ const config = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this'
 	},
-	resolve: {
-		modules: [
-			...Object.keys( entry ).map( ( filename ) => {
-				return path.join( BASE_PATH, filename );
-			} ),
-			'node_modules'
-		]
+	externals: {
+		react: 'React',
+		'react-dom': 'ReactDOM'
 	},
 	module: {
 		rules: [
@@ -54,20 +58,24 @@ const config = {
 			},
 			{
 				test: /\.s?css$/,
-				use: [
-					{ loader: 'style-loader' },
-					{ loader: 'css-loader' },
-					{ loader: 'postcss-loader' },
-					{ loader: 'sass-loader' }
-				]
+				use: ExtractTextPlugin.extract( {
+					use: [
+						{ loader: 'raw-loader' },
+						{ loader: 'postcss-loader' },
+						{
+							loader: 'sass-loader',
+							query: {
+								outputStyle: isProduction ? 'compressed' : 'nested'
+							}
+						}
+					]
+				} )
 			}
 		]
 	},
 	plugins: [
-		new webpack.DefinePlugin( {
-			'process.env': {
-				NODE_ENV: JSON.stringify( process.env.NODE_ENV )
-			}
+		new ExtractTextPlugin( {
+			filename: './[name]/build/style.css'
 		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
@@ -81,7 +89,7 @@ const config = {
 	]
 };
 
-if ( 'production' === process.env.NODE_ENV ) {
+if ( isProduction ) {
 	config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
 } else {
 	config.devtool = 'source-map';
