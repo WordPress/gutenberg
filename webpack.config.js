@@ -37,14 +37,6 @@ const config = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this'
 	},
-	resolve: {
-		modules: [
-			...Object.keys( entry ).map( ( filename ) => {
-				return path.join( BASE_PATH, filename );
-			} ),
-			'node_modules'
-		]
-	},
 	module: {
 		rules: [
 			{
