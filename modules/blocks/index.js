@@ -8,6 +8,13 @@ export { default as Editable } from './components/editable';
 const blocks = {};
 
 /**
+ * Matches node value of a block opening comment.
+ *
+ * @type {RegExp}
+ */
+const RE_BLOCK_OPEN = /^\s*wp:(\S+)/;
+
+/**
  * Registers a block.
  *
  * @param {string} slug     Block slug
@@ -63,4 +70,57 @@ export function getBlockSettings( slug ) {
  */
 export function getBlocks() {
 	return Object.values( blocks );
+}
+
+/**
+ * Iterates through children of a given element to discover block nodes.
+ *
+ * @param  {Element}  rootNode Element to iterate
+ * @return {Object[]}          Block nodes
+ */
+export function findBlockNodes( rootNode ) {
+	const nodes = [];
+
+	let child = rootNode.firstChild;
+	while ( child ) {
+		// Test as opening comment
+		if ( Node.COMMENT_NODE !== child.nodeType || ! RE_BLOCK_OPEN.test( child.nodeValue ) ) {
+			child = child.nextSibling;
+			continue;
+		}
+
+		// Found opening block comment
+		const match = child.nodeValue.match( RE_BLOCK_OPEN );
+		const closeTag = '/' + child.nodeValue.trim();
+		const block = {
+			type: match[ 1 ],
+			startNode: child,
+			blockNodes: []
+		};
+
+		// Consider adjacent elements as nodes of block
+		while ( ( child = child.nextSibling ) ) {
+			if ( Node.COMMENT_NODE === child.nodeType && closeTag === child.nodeValue.trim() ) {
+				// Stop considering siblings once closing comment found
+				block.endNode = child;
+				break;
+			} else if ( Node.ELEMENT_NODE === child.nodeType ||
+					( Node.TEXT_NODE === child.nodeType && child.nodeValue.trim() ) ) {
+				// Only elements and non-empty text nodes included
+				block.blockNodes.push( child );
+			}
+		}
+
+		nodes.push( block );
+
+		// Done if exhausted siblings
+		if ( ! child ) {
+			break;
+		}
+
+		// Resume iteration from sibling after closing comment
+		child = child.nextSibling;
+	}
+
+	return nodes;
 }
