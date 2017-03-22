@@ -9,7 +9,7 @@ WP_Block
   / WP_Block_Html
 
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })+ e:WP_Block_End
+  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })+ e:WP_Block_End & { return s.blockType === e.blockType }
   { return {
     blockType: s.blockType,
     attrs: s.attrs,
@@ -29,21 +29,18 @@ WP_Block_Html
 WP_Block_Start
   = "<!--" __ "wp:" blockType:WP_Block_Type attrs:WP_Block_Attribute_List _? "-->"
   { return {
-    type: 'WP_Block_Start',
     blockType,
-    attrs,
-    text: text()
+    attrs
   } }
 
 WP_Block_End
-  = "<!--" __ "/wp" __ "-->"
+  = "<!--" __ "/wp:" blockType:WP_Block_Type __ "-->"
   { return {
-    type: 'WP_Block_End',
-    text: text()
+		blockType
   } }
 
 WP_Block_Type
-  = head:ASCII_Letter tail:ASCII_AlphaNumeric*
+  = head:ASCII_Letter tail:WP_Block_Type_Char*
   { return [ head ].concat( tail ).join('')  }
 
 WP_Block_Attribute_List
@@ -64,6 +61,10 @@ WP_Block_Attribute_Name
 WP_Block_Attribute_Value
   = head:ASCII_Letter tail:WP_Block_Attribute_Value_Char*
   { return [ head ].concat( tail ).join('') }
+
+WP_Block_Type_Char
+ = ASCII_AlphaNumeric
+ / [\/]
 
 ASCII_AlphaNumeric
   = ASCII_Letter
