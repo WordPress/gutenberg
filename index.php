@@ -33,7 +33,13 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  * @since 0.1.0
  */
 function gutenberg_register_scripts() {
-	wp_register_script( 'wp-element', plugins_url( 'modules/element/build/index.js', __FILE__ ) );
+	// Vendor
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	wp_register_script( 'react', 'https://unpkg.com/react@15/dist/react' . $suffix . '.js' );
+	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@15/dist/react-dom' . $suffix . '.js', array( 'react' ) );
+
+	// Editor
+	wp_register_script( 'wp-element', plugins_url( 'modules/element/build/index.js', __FILE__ ), array( 'react', 'react-dom' ) );
 	wp_register_script( 'wp-blocks', plugins_url( 'modules/blocks/build/index.js', __FILE__ ), array( 'wp-element' ) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );

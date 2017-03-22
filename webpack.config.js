@@ -37,6 +37,10 @@ const config = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this'
 	},
+	externals: {
+		react: 'React',
+		'react-dom': 'ReactDOM'
+	},
 	module: {
 		rules: [
 			{
