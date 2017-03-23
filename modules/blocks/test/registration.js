@@ -17,7 +17,7 @@ describe( 'blocks API', () => {
 		blocks.getBlocks().forEach( block => {
 			blocks.unregisterBlock( block.slug );
 		} );
-		sinon.spy( console, 'error' );
+		sinon.stub( console, 'error' );
 	} );
 
 	afterEach( () => {
