@@ -37,12 +37,13 @@ em[data-mce-selected] {
 }
 
 code {
-	color: #00924b;
+	color: #222;
+	background: #f8f9f9;
 	font-family: Menlo, Monaco, Andale Mono, Courier New, monospace;
 	font-size: 14px;
 	padding: 2px 4px;
 	border-radius: 2px;
 }
 code[data-mce-selected] {
-	background: #e8f0ec;
+	background: #eef0f0;
 }
