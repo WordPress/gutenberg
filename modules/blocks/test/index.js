@@ -9,7 +9,7 @@ import sinon from 'sinon';
 /**
  * Internal dependencies
  */
-import * as blocks from '../registration';
+import * as blocks from '../';
 
 describe( 'blocks API', () => {
 	// Reset block state before each test.

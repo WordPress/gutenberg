@@ -11,7 +11,7 @@
     "editor"
   ],
   "scripts": {
-    "test-unit": "cross-env NODE_ENV=test mocha modules/**/test/*.js --compilers js:babel-register --recursive --require ./bootstrap-test.js",
+    "test-unit": "cross-env NODE_ENV=test webpack && mocha build",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint modules",
     "dev": "webpack --watch",
@@ -23,13 +23,13 @@
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-latest": "^6.24.0",
-    "babel-register": "^6.24.0",
     "chai": "^3.5.0",
     "cross-env": "^3.2.4",
     "dirty-chai": "^1.2.2",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
     "extract-text-webpack-plugin": "^2.1.0",
+    "glob": "^7.1.1",
     "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "pegjs": "^0.10.0",
