@@ -42,15 +42,20 @@ export function registerBlock( slug, settings ) {
 /**
  * Unregisters a block.
  *
- * @param {string} slug Block slug
+ * @param  {string}   slug Block slug
+ * @return {?WPBlock}      The previous block value, if it has been
+ *                         successfully unregistered; otherwise `undefined`.
  */
 export function unregisterBlock( slug ) {
 	if ( ! blocks[ slug ] ) {
-		throw new Error(
+		console.error(
 			'Block "' + slug + '" is not registered.'
 		);
+		return;
 	}
+	const oldBlock = blocks[ slug ];
 	delete blocks[ slug ];
+	return oldBlock;
 }
 
 /**

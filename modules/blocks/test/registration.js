@@ -69,9 +69,9 @@ describe( 'blocks API', () => {
 
 	describe( 'unregisterBlock', () => {
 		it( 'should fail if a block is not registered', () => {
-			expect(
-				() => blocks.unregisterBlock( 'core/test-block' )
-			).to.throw( 'Block "core/test-block" is not registered.' );
+			const oldBlock = blocks.unregisterBlock( 'core/test-block' );
+			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is not registered.' );
+			expect( oldBlock ).to.be.undefined();
 		} );
 
 		it( 'should unregister existing blocks', () => {
@@ -79,7 +79,9 @@ describe( 'blocks API', () => {
 			expect( blocks.getBlocks() ).to.eql( [
 				{ slug: 'core/test-block' },
 			] );
-			blocks.unregisterBlock( 'core/test-block' );
+			const oldBlock = blocks.unregisterBlock( 'core/test-block' );
+			expect( console.error ).to.not.have.been.called();
+			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
 			expect( blocks.getBlocks() ).to.eql( [] );
 		} );
 	} );
