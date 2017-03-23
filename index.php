@@ -79,7 +79,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 function the_gutenberg_project() {
 	?>
 	<div class="gutenberg">
-		<section id="editor" class="gutenberg__editor" contenteditable="true"></section>
+		<section id="editor" class="gutenberg__editor"></section>
 	</div>
 	<?php
 }
