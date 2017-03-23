@@ -10,9 +10,9 @@ const blocks = {};
 /**
  * Registers a block.
  *
- * @param {string} slug     Block slug
- * @param {Object} settings Block settings
- * @return {?WPBlock}        Whether the block has been successfuly registered
+ * @param  {string}   slug     Block slug
+ * @param  {Object}   settings Block settings
+ * @return {?WPBlock}          Whether the block has been successfuly registered
  */
 export function registerBlock( slug, settings ) {
 	if ( typeof slug !== 'string' ) {
