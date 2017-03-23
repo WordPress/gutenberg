@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * External dependencies
  */
@@ -9,7 +11,6 @@ import sinon from 'sinon';
  */
 import * as blocks from '../registration';
 
-/* eslint-disable no-console */
 describe( 'blocks API', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -25,34 +26,34 @@ describe( 'blocks API', () => {
 
 	describe( 'registerBlock', () => {
 		it( 'should reject numbers', () => {
-			const isRegistered = blocks.registerBlock( 999 );
+			const block = blocks.registerBlock( 999 );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must be strings.' );
-			expect( isRegistered ).to.eql( false );
+			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
-			const isRegistered = blocks.registerBlock( 'doing-it-wrong' );
+			const block = blocks.registerBlock( 'doing-it-wrong' );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
-			expect( isRegistered ).to.eql( false );
+			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
-			const isRegistered = blocks.registerBlock( 'still/_doing_it_wrong' );
+			const block = blocks.registerBlock( 'still/_doing_it_wrong' );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
-			expect( isRegistered ).to.eql( false );
+			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should accept valid block names', () => {
-			const isRegistered = blocks.registerBlock( 'my-plugin/fancy-block-4' );
+			const block = blocks.registerBlock( 'my-plugin/fancy-block-4' );
 			expect( console.error ).to.not.have.been.called();
-			expect( isRegistered ).to.eql( true );
+			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4' } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
 			blocks.registerBlock( 'core/test-block' );
-			const isRegistered = blocks.registerBlock( 'core/test-block' );
+			const block = blocks.registerBlock( 'core/test-block' );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is already registered.' );
-			expect( isRegistered ).to.eql( false );
+			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should store a copy of block settings', () => {

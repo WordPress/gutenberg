@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * Block settings keyed by block slug.
  *
@@ -10,29 +12,30 @@ const blocks = {};
  *
  * @param {string} slug     Block slug
  * @param {Object} settings Block settings
- * @return {Boolean}        Whether the block has been successfuly registered
+ * @return {?WPBlock}        Whether the block has been successfuly registered
  */
 export function registerBlock( slug, settings ) {
 	if ( typeof slug !== 'string' ) {
-		console.error( // eslint-disable-line no-console
+		console.error(
 			'Block slugs must be strings.'
 		);
-		return false;
+		return;
 	}
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( slug ) ) {
-		console.error( // eslint-disable-line no-console
+		console.error(
 			'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block'
 		);
-		return false;
+		return;
 	}
 	if ( blocks[ slug ] ) {
-		console.error( // eslint-disable-line no-console
+		console.error(
 			'Block "' + slug + '" is already registered.'
 		);
-		return false;
+		return;
 	}
-	blocks[ slug ] = Object.assign( { slug }, settings );
-	return true;
+	const block = Object.assign( { slug }, settings );
+	blocks[ slug ] = block;
+	return block;
 }
 
 /**
