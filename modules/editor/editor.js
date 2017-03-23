@@ -3,6 +3,13 @@ export default class Editor {
 		const blocks = wp.blocks.parse( settings.content );
 		console.log( blocks ); // eslint-disable-line no-console
 
-		document.getElementById( id ).innerHTML = settings.content;
+		if ( ! blocks.length ) {
+			return;
+		}
+
+		wp.element.render(
+			wp.blocks.createBlockElement( blocks[ 1 ] ),
+			document.getElementById( id )
+		);
 	}
 }
