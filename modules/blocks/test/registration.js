@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import * as blocks from '../';
+import * as blocks from '../registration';
 
 describe( 'blocks API', () => {
 	// Reset block state before each test.
