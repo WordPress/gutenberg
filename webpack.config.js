@@ -91,10 +91,9 @@ switch ( process.env.NODE_ENV ) {
 		break;
 
 	case 'test':
-		config.entry = [
-			'./bootstrap-test.js',
-			...glob.sync( BASE_PATH + '/**/test/*.js' )
-		];
+		config.target = 'node';
+		config.entry = glob.sync( BASE_PATH + '/**/test/*.js' );
+		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
 			path: __dirname
