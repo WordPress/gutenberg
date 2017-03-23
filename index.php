@@ -57,7 +57,7 @@ add_action( 'init', 'gutenberg_register_scripts' );
 function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
 		// Scripts
-		wp_register_script( 'gutenberg-content', plugins_url( 'docs/shared/post-content.js', __FILE__ ) );
+		wp_register_script( 'gutenberg-content', plugins_url( 'post-content.js', __FILE__ ) );
 		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element', 'gutenberg-content' ), false, true );
 		wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', { content: window.content } );' );
 
