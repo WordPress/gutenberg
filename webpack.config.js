@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-const fs = require( 'fs' );
+const glob = require( 'glob' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
@@ -22,20 +22,11 @@ const BASE_PATH = './modules';
  *
  * @type {Object}
  */
-const entry = fs.readdirSync( BASE_PATH ).reduce( ( memo, filename ) => {
-	if ( '.' !== filename && '..' !== filename ) {
-		memo[ filename ] = BASE_PATH + '/' + filename + '/index.js';
-	}
-
+const entry = glob.sync( `${ BASE_PATH }/*/index.js` ).reduce( ( memo, filename ) => {
+	const parent = path.relative( BASE_PATH, path.dirname( filename ) );
+	memo[ parent ] = filename;
 	return memo;
 }, {} );
-
-/**
- * Whether build output should be configured to optimize for distribution.
- *
- * @type {Boolean}
- */
-const isProduction = ( 'production' === process.env.NODE_ENV );
 
 const config = {
 	entry: entry,
@@ -69,7 +60,8 @@ const config = {
 						{
 							loader: 'sass-loader',
 							query: {
-								outputStyle: isProduction ? 'compressed' : 'nested'
+								outputStyle: 'production' === process.env.NODE_ENV ?
+									'compressed' : 'nested'
 							}
 						}
 					]
@@ -93,10 +85,24 @@ const config = {
 	]
 };
 
-if ( isProduction ) {
-	config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-} else {
-	config.devtool = 'source-map';
+switch ( process.env.NODE_ENV ) {
+	case 'production':
+		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
+		break;
+
+	case 'test':
+		config.entry = [
+			'./bootstrap-test.js',
+			...glob.sync( BASE_PATH + '/**/test/*.js' )
+		];
+		config.output = {
+			filename: 'build/test.js',
+			path: __dirname
+		};
+		break;
+
+	default:
+		config.devtool = 'source-map';
 }
 
 module.exports = config;
