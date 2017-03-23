@@ -47,6 +47,6 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "hpq": "^1.0.1"
+    "hpq": "^1.1.0"
   }
 }
