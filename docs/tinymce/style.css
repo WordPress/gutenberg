@@ -27,7 +27,9 @@ body #editor a {
 	color: #009fd4;
 }
 
-a[data-mce-selected] {
+a[data-mce-selected],
+em[data-mce-selected],
+code[data-mce-selected] {
 	padding: 0 2px;
 	margin: 0 -2px;
 	background: #dcf2f8;
