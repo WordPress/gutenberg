@@ -12,7 +12,8 @@ const blocks = {};
  *
  * @param  {string}   slug     Block slug
  * @param  {Object}   settings Block settings
- * @return {?WPBlock}          Whether the block has been successfuly registered
+ * @return {?WPBlock}          The block, if it has been successfully
+ *                             registered; otherwise `undefined`.
  */
 export function registerBlock( slug, settings ) {
 	if ( typeof slug !== 'string' ) {
