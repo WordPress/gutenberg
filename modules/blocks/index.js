@@ -1,5 +1,11 @@
 /* eslint-disable no-console */
 
+/**
+ * External dependencies
+ */
+import * as query from 'hpq';
+
+export { query };
 export { default as Editable } from './components/editable';
 export { parse } from './post.pegjs';
 
@@ -78,4 +84,34 @@ export function getBlockSettings( slug ) {
  */
 export function getBlocks() {
 	return Object.values( blocks );
+}
+
+/**
+ * Returns the element of a registered block node given a context and its
+ * parsed metadata.
+ *
+ * @param  {Object}     blockNode Parsed block node
+ * @param  {String}     context   Render context ("edit", "save")
+ * @return {?WPElement}           Block element, or undefined if type unknown
+ */
+export function createBlockElement( blockNode, context = 'edit' ) {
+	const { blockType, rawContent } = blockNode;
+
+	// Verify block is of known type
+	const block = getBlockSettings( blockType );
+	if ( ! block ) {
+		return;
+	}
+
+	// Merge attributes from parse with block implementation
+	let { attrs } = blockNode;
+	if ( 'function' === typeof block.attributes ) {
+		attrs = { ...attrs, ...block.attributes( rawContent ) };
+	} else if ( block.attributes ) {
+		attrs = { ...attrs, ...query.parse( rawContent, block.attributes ) };
+	}
+
+	if ( 'function' === typeof block[ context ] ) {
+		return block[ context ]( attrs );
+	}
 }

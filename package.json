@@ -45,5 +45,8 @@
     "style-loader": "^0.14.1",
     "webpack": "^2.2.1",
     "webpack-node-externals": "^1.5.4"
+  },
+  "dependencies": {
+    "hpq": "^1.0.1"
   }
 }
