@@ -117,6 +117,70 @@ class Tests_Multisite_Get_Blog_Details extends WP_UnitTestCase {
 		$site = get_blog_details( array( 'path' => '/foo/' ) );
 		$this->assertFalse( $site );
 	}
+
+	/**
+	 * @dataProvider data_get_all
+	 *
+	 * @ticket 40228
+	 */
+	public function test_get_blog_details_get_object_vars( $get_all ) {
+		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/' ), $get_all );
+
+		$result = array_keys( get_object_vars( $site ) );
+
+		$this->assertEqualSets( $this->get_fields( $get_all ), $result );
+	}
+
+	/**
+	 * @dataProvider data_get_all
+	 *
+	 * @ticket 40228
+	 */
+	public function test_get_blog_details_iterate_over_result( $get_all ) {
+		$site = get_blog_details( array( 'domain' => 'wordpress.org', 'path' => '/' ), $get_all );
+
+		$result = array();
+		foreach ( $site as $key => $value ) {
+			$result[] = $key;
+		}
+
+		$this->assertEqualSets( $this->get_fields( $get_all ), $result );
+	}
+
+	public function data_get_all() {
+		return array(
+			array( false ),
+			array( true ),
+		);
+	}
+
+	protected function get_fields( $all = false ) {
+		$fields = array(
+			'blog_id',
+			'domain',
+			'path',
+			'site_id',
+			'registered',
+			'last_updated',
+			'public',
+			'archived',
+			'mature',
+			'spam',
+			'deleted',
+			'lang_id',
+		);
+
+		if ( $all ) {
+			$fields = array_merge( $fields, array(
+				'blogname',
+				'siteurl',
+				'post_count',
+				'home',
+			) );
+		}
+
+		return $fields;
+	}
 }
 
 endif;
