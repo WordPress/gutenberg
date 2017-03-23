@@ -1,5 +1,5 @@
 export { default as Editable } from './components/editable';
-export { parse } from './grammar';
+export { parse } from './post.pegjs';
 
 /**
  * Block settings keyed by block slug.

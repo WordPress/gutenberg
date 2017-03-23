@@ -22,33 +22,33 @@ WP_Block_Html
     return {
       blockType: 'html',
       attrs: {},
-      rawContent: ts.join('')
+      rawContent: ts.join( '' )
     }
   }
 
 WP_Block_Start
   = "<!--" __ "wp:" blockType:WP_Block_Type attrs:WP_Block_Attribute_List _? "-->"
   { return {
-    blockType,
-    attrs
+    blockType: blockType,
+    attrs: attrs
   } }
 
 WP_Block_End
   = "<!--" __ "/wp:" blockType:WP_Block_Type __ "-->"
   { return {
-		blockType
+    blockType: blockType
   } }
 
 WP_Block_Type
   = head:ASCII_Letter tail:WP_Block_Type_Char*
-  { return [ head ].concat( tail ).join('')  }
+  { return [ head ].concat( tail ).join( '' ) }
 
 WP_Block_Attribute_List
   = as:(_+ attr:WP_Block_Attribute { return attr })*
-  { return as.reduce( ( attrs, [ name, value ] ) => Object.assign(
-    attrs,
-    { [ name ]: value }
-  ), {} ) }
+  { return as.reduce( function( attrs, pair ) {
+    attrs[ pair.name ] = [ pair.value ];
+    return attrs;
+  }, {} ) }
 
 WP_Block_Attribute
   = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
@@ -56,11 +56,11 @@ WP_Block_Attribute
 
 WP_Block_Attribute_Name
   = head:ASCII_Letter tail:ASCII_AlphaNumeric*
-  { return [ head ].concat( tail ).join('')  }
+  { return [ head ].concat( tail ).join( '' )  }
 
 WP_Block_Attribute_Value
   = head:ASCII_Letter tail:WP_Block_Attribute_Value_Char*
-  { return [ head ].concat( tail ).join('') }
+  { return [ head ].concat( tail ).join( '' ) }
 
 WP_Block_Type_Char
  = ASCII_AlphaNumeric
