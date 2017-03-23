@@ -28,11 +28,21 @@ body #editor a {
 }
 
 a[data-mce-selected],
-em[data-mce-selected],
-code[data-mce-selected] {
+em[data-mce-selected] {
 	padding: 0 2px;
 	margin: 0 -2px;
 	background: #dcf2f8;
 	border-radius: 2px;
 	box-shadow: 0 0 0 1px #dcf2f8;
+}
+
+code {
+	color: #00924b;
+	font-family: Menlo, Monaco, Andale Mono, Courier New, monospace;
+	font-size: 14px;
+	padding: 2px 4px;
+	border-radius: 2px;
+}
+code[data-mce-selected] {
+	background: #e8f0ec;
 }
