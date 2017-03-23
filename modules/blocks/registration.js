@@ -10,24 +10,29 @@ const blocks = {};
  *
  * @param {string} slug     Block slug
  * @param {Object} settings Block settings
+ * @return {Boolean}        Whether the block has been successfuly registered
  */
 export function registerBlock( slug, settings ) {
 	if ( typeof slug !== 'string' ) {
-		throw new Error(
+		console.error( // eslint-disable-line no-console
 			'Block slugs must be strings.'
 		);
+		return false;
 	}
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( slug ) ) {
-		throw new Error(
-			'Block slugs must contain a namespace prefix.  Example:  my-plugin/my-custom-block'
+		console.error( // eslint-disable-line no-console
+			'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block'
 		);
+		return false;
 	}
 	if ( blocks[ slug ] ) {
-		throw new Error(
+		console.error( // eslint-disable-line no-console
 			'Block "' + slug + '" is already registered.'
 		);
+		return false;
 	}
 	blocks[ slug ] = Object.assign( { slug }, settings );
+	return true;
 }
 
 /**
