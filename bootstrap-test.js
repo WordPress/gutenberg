@@ -1,9 +1,15 @@
-/**
- * External dependencies
- */
-import chai from 'chai';
-import dirtyChai from 'dirty-chai';
-import sinonChai from 'sinon-chai';
+// Chai plugins
+require( 'chai' )
+	.use( require( 'dirty-chai' ) )
+	.use( require( 'sinon-chai' ) );
 
-chai.use( dirtyChai );
-chai.use( sinonChai );
+// Fake DOM
+global.document = require( 'jsdom' ).jsdom( '', {
+	features: {
+		FetchExternalResources: false,
+		ProcessExternalResources: false,
+		SkipExternalResources: true
+	}
+} );
+global.window = document.defaultView;
+global.navigator = window.navigator;

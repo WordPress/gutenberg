@@ -1,11 +1,18 @@
+const { query, html } = wp.blocks.query;
+
 wp.blocks.registerBlock( 'wp/text', {
-	edit( state, onChange ) {
+	attributes: {
+		value: query( 'p', html() )
+	},
+
+	edit( attributes, onChange ) {
 		return wp.element.createElement( wp.blocks.Editable, {
-			value: state.value,
+			value: attributes.value,
 			onChange: ( value ) => onChange( { value } )
 		} );
 	},
-	save( state ) {
-		return wp.element.createElement( 'p', null, state.value );
+
+	save( attributes ) {
+		return wp.element.createElement( 'p', null, attributes.value );
 	}
 } );

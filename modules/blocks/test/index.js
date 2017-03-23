@@ -11,7 +11,7 @@ import sinon from 'sinon';
  */
 import * as blocks from '../';
 
-describe( 'blocks API', () => {
+describe( 'blocks', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
 		blocks.getBlocks().forEach( block => {
@@ -24,7 +24,7 @@ describe( 'blocks API', () => {
 		console.error.restore();
 	} );
 
-	describe( 'registerBlock', () => {
+	describe( 'registerBlock()', () => {
 		it( 'should reject numbers', () => {
 			const block = blocks.registerBlock( 999 );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must be strings.' );
@@ -67,7 +67,7 @@ describe( 'blocks API', () => {
 		} );
 	} );
 
-	describe( 'unregisterBlock', () => {
+	describe( 'unregisterBlock()', () => {
 		it( 'should fail if a block is not registered', () => {
 			const oldBlock = blocks.unregisterBlock( 'core/test-block' );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is not registered.' );
@@ -86,7 +86,7 @@ describe( 'blocks API', () => {
 		} );
 	} );
 
-	describe( 'getBlockSettings', () => {
+	describe( 'getBlockSettings()', () => {
 		it( 'should return { slug } for blocks with no settings', () => {
 			blocks.registerBlock( 'core/test-block' );
 			expect( blocks.getBlockSettings( 'core/test-block' ) ).to.eql( {
@@ -104,7 +104,7 @@ describe( 'blocks API', () => {
 		} );
 	} );
 
-	describe( 'getBlocks', () => {
+	describe( 'getBlocks()', () => {
 		it( 'should return an empty array at first', () => {
 			expect( blocks.getBlocks() ).to.eql( [] );
 		} );
@@ -117,6 +117,72 @@ describe( 'blocks API', () => {
 				{ slug: 'core/test-block' },
 				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
 			] );
+		} );
+	} );
+
+	describe( 'createBlockElement()', () => {
+		it( 'should return undefined if block is not registered', () => {
+			const element = blocks.createBlockElement( {
+				blockType: 'core/test-block',
+				attrs: {},
+				rawContent: 'Ribs'
+			}, 'edit' );
+
+			expect( element ).to.be.undefined();
+		} );
+
+		it( 'should return undefined if render context is not valid', () => {
+			blocks.registerBlock( 'core/test-block', {} );
+
+			const element = blocks.createBlockElement( {
+				blockType: 'core/test-block',
+				attrs: {},
+				rawContent: 'Ribs'
+			}, 'edit' );
+
+			expect( element ).to.be.undefined();
+		} );
+
+		it( 'should merge attributes from function implementation', () => {
+			blocks.registerBlock( 'core/test-block', {
+				attributes: function( rawContent ) {
+					return {
+						content: rawContent + ' & Chicken'
+					};
+				},
+				edit: function( attributes ) {
+					return attributes.content;
+				}
+			} );
+
+			const element = blocks.createBlockElement( {
+				blockType: 'core/test-block',
+				attrs: {},
+				rawContent: 'Ribs'
+			}, 'edit' );
+
+			expect( element ).to.equal( 'Ribs & Chicken' );
+		} );
+
+		it( 'should merge attributes from query object implementation', () => {
+			const { text } = blocks.query;
+
+			blocks.registerBlock( 'core/test-block', {
+				attributes: {
+					emphasis: text( 'strong' )
+				},
+				edit: function( attributes ) {
+					return attributes.emphasis;
+				}
+			} );
+
+			const element = blocks.createBlockElement( {
+				blockType: 'core/test-block',
+				attrs: {},
+				rawContent: '<span>Ribs <strong>& Chicken</strong></span>'
+			}, 'edit' );
+
+			expect( element ).to.equal( '& Chicken' );
 		} );
 	} );
 } );

@@ -1,5 +1,6 @@
 {
 	"root": true,
+	"parser": "babel-eslint",
 	"extends": "wordpress",
 	"env": {
 		"browser": true,

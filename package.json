@@ -11,7 +11,7 @@
     "editor"
   ],
   "scripts": {
-    "test-unit": "cross-env NODE_ENV=test webpack && mocha build",
+    "test-unit": "cross-env NODE_ENV=test webpack && mocha build --require bootstrap-test.js",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint modules",
     "dev": "webpack --watch",
@@ -20,7 +20,9 @@
   "devDependencies": {
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.0",
+    "babel-eslint": "^7.2.0",
     "babel-loader": "^6.4.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-latest": "^6.24.0",
     "chai": "^3.5.0",
@@ -30,6 +32,7 @@
     "eslint-config-wordpress": "^1.1.0",
     "extract-text-webpack-plugin": "^2.1.0",
     "glob": "^7.1.1",
+    "jsdom": "^9.12.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "pegjs": "^0.10.0",
@@ -40,6 +43,10 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
     "style-loader": "^0.14.1",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "webpack-node-externals": "^1.5.4"
+  },
+  "dependencies": {
+    "hpq": "^1.1.0"
   }
 }
