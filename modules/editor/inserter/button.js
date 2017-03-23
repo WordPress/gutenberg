@@ -1,13 +1,16 @@
+/**
+ * Internal dependencies
+ */
 import Inserter from './';
 
-const h = wp.element.createElement;
+const el = wp.element.createElement;
 
 const InserterButton = ( { opened, onClick } ) => {
-	return h( 'div', { className: 'inserter__button' },
-		h( 'a', { onClick },
-			h( 'span', { className: 'dashicons dashicons-plus' } )
+	return el( 'div', { className: 'inserter__button' },
+		el( 'a', { className: 'inserter__button-toggle', onClick },
+			el( 'span', { className: 'dashicons dashicons-plus' } )
 		),
-		opened && h( Inserter )
+		opened && el( Inserter )
 	);
 };
 

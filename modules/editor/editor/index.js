@@ -1,20 +1,13 @@
-import InserterButton from './inserter/button';
+/**
+ * Internal dependencies
+ */
+import EditorComponent from './editor';
 
-const h = wp.element.createElement;
-
-const EditorComponent = ( { state: { inserter, blocks }, toggleInserter } ) => {
-	return h( 'div', {},
-		h( 'div', { contentEditable: true },
-			wp.blocks.createBlockElement( blocks[ 1 ] )
-		),
-		h( InserterButton, { onClick: toggleInserter, opened: inserter.opened } )
-	);
-};
+const el = wp.element.createElement;
 
 export default class Editor {
 	constructor( id, settings ) {
 		this.toggleInserter = this.toggleInserter.bind( this );
-
 		this.id = id;
 		this.settings = settings;
 		this.state = {
@@ -38,7 +31,7 @@ export default class Editor {
 
 	render() {
 		wp.element.render(
-			h( EditorComponent, {
+			el( EditorComponent, {
 				state: this.state,
 				toggleInserter: this.toggleInserter
 			} ),
