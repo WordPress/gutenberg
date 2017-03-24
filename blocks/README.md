@@ -61,6 +61,8 @@ function RandomImage( props ) {
 wp.blocks.registerBlock( 'myplugin/random-image', {
 	title: 'Random Image',
 
+	icon: 'format-image',
+
 	attributes: {
 		category: query.attr( 'img', 'alt' )
 	},
@@ -122,6 +124,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
+- `icon: string | WPElement` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element if you choose to render your own SVG.
 - `edit( attributes: Object, setAttributes: Function ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( attributes: Object ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
 - `tagName: string` - An alternative to defining `edit` and `save` behaviors, if passed a [tag name](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement#Parameters), delegates default behavior of an editable field on that node type. Typically used for simple, text-heavy elements (paragraphs, headings) to avoid excess meta storage of text.
