@@ -12,7 +12,6 @@ You may find yourself asking, "Why an abstraction layer?". For a few reasons:
 On the `wp.element` global object, you will find the following, ordered roughly be likelihood you'll encounter it in your code:
 
 - [`createElement`](https://facebook.github.io/react/docs/react-api.html#createelement)
-- [`Component`](https://facebook.github.io/react/docs/react-api.html#react.component)
 - [`render`](https://facebook.github.io/react/docs/react-dom.html#render)
 
 ## Example
@@ -41,7 +40,7 @@ Refer to the [official React Quick Start guide](https://facebook.github.io/react
 
 At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../blocks/README.md), we observe the following technical requirements:
 
-- An understanding of a block in terms of its underlying values (in the [Gravatar example](../blocks/README.md#example), an email address)
+- An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
 - A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
