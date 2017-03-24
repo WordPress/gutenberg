@@ -124,6 +124,7 @@ Registers a new block provided a unique slug and an object defining its behavior
 - `save( attributes: Object ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
 - `tagName: string` - An alternative to defining `edit` and `save` behaviors, if passed a [tag name](https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement#Parameters), delegates default behavior of an editable field on that node type. Typically used for simple, text-heavy elements (paragraphs, headings) to avoid excess meta storage of text.
 - `controls: string[]` - Slugs for controls to be made available to block. See also: [`wp.blocks.registerControl`](#wpblocksregistercontrol-slug-string-settings-object-)
+- `encodeAttributes( attributes: Object ): Object` - Called before save, this function allows you to control which attributes are to be saved in the block comment metadata. By default, all attribute values not defined in the block's `attributes` property are serialized to the comment metadata.
 
 ### `wp.blocks.registerControl( slug: string, settings: Object )`
 
