@@ -1,6 +1,9 @@
 const { query, html } = wp.blocks.query;
 
 wp.blocks.registerBlock( 'wp/text', {
+	title: 'Text',
+	icon: 'text',
+
 	attributes: {
 		value: query( 'p', html() )
 	},
