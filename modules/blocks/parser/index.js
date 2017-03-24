@@ -33,26 +33,20 @@ export function getBlockAttributes( blockNode, blockSettings ) {
 /**
  * Returns a list of blocks extracted from the Post Content
  *
- * @param  {String} postContent The post content
- * @return {Array}              Block list
+ * @param  {String} content The post content
+ * @return {Array}          Block list
  */
-const parse = ( postContent ) => {
-	const nodeBlocks = grammarParse( postContent );
+export default function parse( content ) {
+	return grammarParse( content ).reduce( ( memo, blockNode ) => {
+		const settings = getBlockSettings( blockNode.blockType );
 
-	return nodeBlocks
-		.map( ( blockNode ) => {
-			return {
-				blockSettings: getBlockSettings( blockNode.blockType ),
-				blockNode
-			};
-		} )
-		.filter( ( { blockSettings } ) => !! blockSettings )
-		.map( ( { blockNode, blockSettings } ) => {
-			return {
+		if ( settings ) {
+			memo.push( {
 				blockType: blockNode.blockType,
-				attributes: getBlockAttributes( blockNode, blockSettings )
-			};
-		} );
-};
+				attributes: getBlockAttributes( blockNode, settings )
+			} );
+		}
 
-export default parse;
+		return memo;
+	}, [] );
+}
