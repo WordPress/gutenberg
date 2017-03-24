@@ -13,7 +13,7 @@
   "scripts": {
     "test-unit": "cross-env NODE_ENV=test webpack && mocha build --require bootstrap-test.js",
     "build": "cross-env NODE_ENV=production webpack",
-    "lint": "eslint editor blocks element",
+    "lint": "eslint .",
     "dev": "webpack --watch",
     "test": "npm run lint && npm run test-unit"
   },
