@@ -48,7 +48,10 @@ const config = {
 			},
 			{
 				test: /\.js$/,
-				exclude: /node_modules/,
+				include: [
+					__dirname + '/modules',
+					__dirname + '/node_modules/hpq'
+				],
 				use: 'babel-loader'
 			},
 			{
