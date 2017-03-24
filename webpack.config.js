@@ -22,10 +22,10 @@ const BASE_PATH = './modules';
  *
  * @type {Object}
  */
-const entry = glob.sync( `${ BASE_PATH }/*/index.js` ).reduce( ( memo, filename ) => {
-	const parent = path.relative( BASE_PATH, path.dirname( filename ) );
-	memo[ parent ] = filename;
-	return memo;
+const entry = [ 'blocks', 'editor', 'element' ].reduce( ( memo, submodule ) => {
+	return Object.assign( memo, {
+		[ submodule ]: [ BASE_PATH, submodule, 'index.js' ].join( '/' )
+	} );
 }, {} );
 
 const config = {
