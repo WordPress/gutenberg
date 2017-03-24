@@ -3,26 +3,18 @@
  */
 
 const glob = require( 'glob' );
-const path = require( 'path' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
-/**
- * Base path from which modules are to be discovered.
- *
- * @type {String}
- */
-const BASE_PATH = './modules';
-
 const config = {
 	entry: {
-		blocks: BASE_PATH + '/blocks/index.js',
-		editor: BASE_PATH + '/editor/index.js',
-		element: BASE_PATH + '/element/index.js'
+		blocks: './blocks/index.js',
+		editor: './editor/index.js',
+		element: './element/index.js'
 	},
 	output: {
 		filename: '[name]/build/index.js',
-		path: path.resolve( BASE_PATH ),
+		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this'
 	},
@@ -82,7 +74,7 @@ switch ( process.env.NODE_ENV ) {
 
 	case 'test':
 		config.target = 'node';
-		config.entry = glob.sync( BASE_PATH + '/**/test/*.js' );
+		config.entry = glob.sync( `./{${ Object.keys( config.entry ).join() }}/test/*.js` );
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',

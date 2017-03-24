@@ -40,8 +40,8 @@ function gutenberg_register_scripts() {
 	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@15/dist/react-dom' . $suffix . '.js', array( 'react' ) );
 
 	// Editor
-	wp_register_script( 'wp-element', plugins_url( 'modules/element/build/index.js', __FILE__ ), array( 'react', 'react-dom' ) );
-	wp_register_script( 'wp-blocks', plugins_url( 'modules/blocks/build/index.js', __FILE__ ), array( 'wp-element' ) );
+	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom' ) );
+	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element' ) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );
 
@@ -58,11 +58,11 @@ function gutenberg_scripts_and_styles( $hook ) {
 	if ( 'toplevel_page_gutenberg' === $hook ) {
 		// Scripts
 		wp_register_script( 'gutenberg-content', plugins_url( 'post-content.js', __FILE__ ) );
-		wp_enqueue_script( 'wp-editor', plugins_url( 'modules/editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element', 'gutenberg-content' ), false, true );
+		wp_enqueue_script( 'wp-editor', plugins_url( 'editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element', 'gutenberg-content' ), false, true );
 		wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', { content: window.content } );' );
 
 		// Styles
-		wp_enqueue_style( 'wp-editor', plugins_url( 'modules/editor/build/style.css', __FILE__ ) );
+		wp_enqueue_style( 'wp-editor', plugins_url( 'editor/build/style.css', __FILE__ ) );
 	}
 }
 
