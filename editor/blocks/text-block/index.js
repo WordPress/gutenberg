@@ -1,4 +1,5 @@
 const { query, html } = wp.blocks.query;
+const Editable = wp.blocks.Editable;
 
 wp.blocks.registerBlock( 'wp/text', {
 	title: 'Text',
@@ -9,13 +10,15 @@ wp.blocks.registerBlock( 'wp/text', {
 	},
 
 	edit( attributes, onChange ) {
-		return wp.element.createElement( wp.blocks.Editable, {
-			value: attributes.value,
-			onChange: ( value ) => onChange( { value } )
-		} );
+		return (
+			<Editable
+				value={ attributes.value }
+				onChange={ ( value ) => onChange( { value } ) }
+			/>
+		);
 	},
 
 	save( attributes ) {
-		return wp.element.createElement( 'p', null, attributes.value );
+		return <p>{ attributes.value }</p>;
 	}
 } );

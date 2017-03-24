@@ -3,14 +3,18 @@
  */
 import Inserter from './';
 
-const el = wp.element.createElement;
-
 const InserterButton = ( { opened, onClick } ) => {
-	return el( 'div', { className: 'inserter__button' },
-		el( 'a', { className: 'inserter__button-toggle', onClick },
-			el( 'span', { className: 'dashicons dashicons-plus' } )
-		),
-		opened && el( Inserter )
+	const toggle = ( event ) => {
+		event.preventDefault();
+		onClick();
+	};
+	return (
+		<div className="inserter__button">
+			<a href="" className="inserter__button-toggle" onClick={ toggle }>
+				<span className="dashicons dashicons-plus" />
+			</a>
+			{ opened && <Inserter /> }
+		</div>
 	);
 };
 

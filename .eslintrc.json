@@ -1,17 +1,33 @@
 {
 	"root": true,
 	"parser": "babel-eslint",
-	"extends": "wordpress",
+	"extends": [
+		"wordpress",
+		"plugin:react/recommended",
+		"plugin:jsx-a11y/recommended"
+	],
 	"env": {
 		"browser": true,
 		"node": true,
 		"mocha": true
 	},
 	"parserOptions": {
-		"sourceType": "module"
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true
+		}
 	},
 	"globals": {
 		"wp": true
+	},
+	"plugins": [
+		"react",
+		"jsx-a11y"
+	],
+	"settings": {
+		"react": {
+			"pragma": "wp"
+		}
 	},
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
@@ -57,6 +73,7 @@
 				"!": true
 			}
 		} ],
-		"valid-jsdoc": [ "error", { "requireReturn": false } ]
+		"valid-jsdoc": [ "error", { "requireReturn": false } ],
+		"react/prop-types": "off"
 	}
 }
