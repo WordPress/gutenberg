@@ -3,36 +3,18 @@
  */
 
 const glob = require( 'glob' );
-const path = require( 'path' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
-/**
- * Base path from which modules are to be discovered.
- *
- * @type {String}
- */
-const BASE_PATH = './modules';
-
-/**
- * Object of Webpack entry points consisting of modules discovered in the base
- * path subdirectory. Treating each as an independent bundle with a shared
- * configuration for library output provides a consistent authoring environment
- * and exposes each separately on the global scope (window.wp.blocks, etc.).
- *
- * @type {Object}
- */
-const entry = [ 'blocks', 'editor', 'element' ].reduce( ( memo, submodule ) => {
-	return Object.assign( memo, {
-		[ submodule ]: [ BASE_PATH, submodule, 'index.js' ].join( '/' )
-	} );
-}, {} );
-
 const config = {
-	entry: entry,
+	entry: {
+		blocks: './blocks/index.js',
+		editor: './editor/index.js',
+		element: './element/index.js'
+	},
 	output: {
 		filename: '[name]/build/index.js',
-		path: path.resolve( BASE_PATH ),
+		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this'
 	},
@@ -48,10 +30,7 @@ const config = {
 			},
 			{
 				test: /\.js$/,
-				include: [
-					__dirname + '/modules',
-					__dirname + '/node_modules/hpq'
-				],
+				exclude: /node_modules/,
 				use: 'babel-loader'
 			},
 			{
@@ -95,7 +74,7 @@ switch ( process.env.NODE_ENV ) {
 
 	case 'test':
 		config.target = 'node';
-		config.entry = glob.sync( BASE_PATH + '/**/test/*.js' );
+		config.entry = glob.sync( `./{${ Object.keys( config.entry ).join() }}/test/*.js` );
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
