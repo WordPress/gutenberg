@@ -14,22 +14,12 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
  */
 const BASE_PATH = './modules';
 
-/**
- * Object of Webpack entry points consisting of modules discovered in the base
- * path subdirectory. Treating each as an independent bundle with a shared
- * configuration for library output provides a consistent authoring environment
- * and exposes each separately on the global scope (window.wp.blocks, etc.).
- *
- * @type {Object}
- */
-const entry = [ 'blocks', 'editor', 'element' ].reduce( ( memo, submodule ) => {
-	return Object.assign( memo, {
-		[ submodule ]: [ BASE_PATH, submodule, 'index.js' ].join( '/' )
-	} );
-}, {} );
-
 const config = {
-	entry: entry,
+	entry: {
+		blocks: BASE_PATH + '/blocks/index.js',
+		editor: BASE_PATH + '/editor/index.js',
+		element: BASE_PATH + '/element/index.js'
+	},
 	output: {
 		filename: '[name]/build/index.js',
 		path: path.resolve( BASE_PATH ),
