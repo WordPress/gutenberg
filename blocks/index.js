@@ -7,6 +7,7 @@ import * as query from 'hpq';
 
 export { query };
 export { default as Editable } from './components/editable';
+export { default as EditableHeading } from './components/wp-heading';
 export { default as parse } from './parser';
 
 /**
