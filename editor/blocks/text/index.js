@@ -10,7 +10,7 @@ wp.blocks.registerBlock( 'core/text', {
 		value: html()
 	},
 
-	edit( attributes, onChange ) {
+	edit( { attributes, onChange } ) {
 		return (
 			<Editable
 				value={ attributes.value }
@@ -19,7 +19,7 @@ wp.blocks.registerBlock( 'core/text', {
 		);
 	},
 
-	save( attributes ) {
+	save( { attributes } ) {
 		return <p>{ attributes.value }</p>;
 	}
 } );
