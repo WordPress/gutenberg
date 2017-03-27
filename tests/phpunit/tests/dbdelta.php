@@ -9,6 +9,12 @@
 class Tests_dbDelta extends WP_UnitTestCase {
 
 	/**
+	 * The maximum size of an index with utf8mb4 collation and charset with a standard
+	 * byte limit of 767. floor(767/4) = 191 characters.
+	 */
+	protected $max_index_length = 191;
+
+	/**
 	 * Make sure the upgrade code is loaded before the tests are run.
 	 */
 	public static function setUpBeforeClass() {
@@ -34,8 +40,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -106,8 +112,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1)
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 			"
 		);
@@ -129,8 +135,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				id int(11) NOT NULL AUTO_INCREMENT,
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1)
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 			"
 		);
@@ -158,8 +164,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				extra_col longtext,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1)
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 			"
 		);
@@ -191,8 +197,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 			CREATE TABLE {$wpdb->prefix}dbdelta_test (
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1)
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 			"
 		);
@@ -217,8 +223,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_1 varchar(255) NOT NULL,
 				extra_col longtext,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1)
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 			"
 			, false // Don't execute.
@@ -267,8 +273,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				id bigint(20) NOT NULL AUTO_INCREMENT,
 				column_1 varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			)
 			", false
@@ -379,8 +385,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 tinytext,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -402,8 +408,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 tinyblob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -425,8 +431,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 bigtext,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -452,8 +458,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 mediumblob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -476,7 +482,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				`id` bigint(20) NOT NULL AUTO_INCREMENT,
 				`column_1` varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY compound_key (id,column_1)
+				KEY compound_key (id,column_1($this->max_index_length))
 			)
 		";
 
@@ -548,7 +554,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				`id` bigint(20) NOT NULL AUTO_INCREMENT,
 				`references` varchar(255) NOT NULL,
 				PRIMARY KEY  (`id`),
-				KEY `compound_key` (`id`,`references`)
+				KEY `compound_key` (`id`,`references`($this->max_index_length))
 			)
 		";
 
@@ -580,9 +586,9 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_3 blob,
 				`references` varchar(255) NOT NULL,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id , column_1),
-				KEY compound_key2 (id,`references`),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id , column_1($this->max_index_length)),
+				KEY compound_key2 (id,`references`($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -595,7 +601,7 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				"{$wpdb->prefix}dbdelta_test.references" => "Added column {$wpdb->prefix}dbdelta_test.references",
-				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `compound_key2` (`id`,`references`)",
+				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `compound_key2` (`id`,`references`($this->max_index_length))",
 			),
 			$updates
 		);
@@ -623,12 +629,12 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1),
-				INDEX key_2 (column_1),
-				UNIQUE KEY key_3 (column_1),
-				UNIQUE INDEX key_4 (column_1),
+				INDEX key_2 (column_1($this->max_index_length)),
+				UNIQUE KEY key_3 (column_1($this->max_index_length)),
+				UNIQUE INDEX key_4 (column_1($this->max_index_length)),
 				FULLTEXT INDEX key_5 (column_1),
 			) ENGINE=MyISAM
 		";
@@ -636,9 +642,9 @@ class Tests_dbDelta extends WP_UnitTestCase {
 		$creates = dbDelta( $schema );
 		$this->assertSame(
 			array(
-				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `key_2` (`column_1`)",
-				1 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_3` (`column_1`)",
-				2 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_4` (`column_1`)",
+				0 => "Added index {$wpdb->prefix}dbdelta_test KEY `key_2` (`column_1`($this->max_index_length))",
+				1 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_3` (`column_1`($this->max_index_length))",
+				2 => "Added index {$wpdb->prefix}dbdelta_test UNIQUE KEY `key_4` (`column_1`($this->max_index_length))",
 				3 => "Added index {$wpdb->prefix}dbdelta_test FULLTEXT KEY `key_5` (`column_1`)",
 			),
 			$creates
@@ -662,8 +668,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				INDEX key_1 (column_1),
-				INDEX compound_key (id,column_1),
+				INDEX key_1 (column_1($this->max_index_length)),
+				INDEX compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT INDEX fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -685,8 +691,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1),
 				KEY key_2 (column_1(10)),
 				KEY key_3 (column_2(100),column_1(10)),
@@ -720,8 +726,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1 DESC),
-				KEY compound_key (id,column_1 ASC),
+				KEY key_1 (column_1($this->max_index_length) DESC),
+				KEY compound_key (id,column_1($this->max_index_length) ASC),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -744,8 +750,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -768,8 +774,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1        (         column_1),
-				KEY compound_key (id,      column_1),
+				KEY key_1        (         column_1($this->max_index_length)),
+				KEY compound_key (id,      column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -792,8 +798,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				key key_1 (column_1),
-				key compound_key (id,column_1),
+				key key_1 (column_1($this->max_index_length)),
+				key compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			"
@@ -816,8 +822,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY KEY_1 (column_1),
-				KEY compOUND_key (id,column_1),
+				KEY KEY_1 (column_1($this->max_index_length)),
+				KEY compOUND_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY FULLtext_kEY (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -839,8 +845,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1(255)),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1({$this->max_index_length})),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
 			", false );
@@ -862,8 +868,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				KEY changing_key_length (column_1(20)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
@@ -881,8 +887,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				KEY changing_key_length (column_1(50)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
@@ -898,8 +904,8 @@ class Tests_dbDelta extends WP_UnitTestCase {
 				column_2 text,
 				column_3 blob,
 				PRIMARY KEY  (id),
-				KEY key_1 (column_1),
-				KEY compound_key (id,column_1),
+				KEY key_1 (column_1($this->max_index_length)),
+				KEY compound_key (id,column_1($this->max_index_length)),
 				KEY changing_key_length (column_1(1)),
 				FULLTEXT KEY fulltext_key (column_1)
 			) ENGINE=MyISAM
