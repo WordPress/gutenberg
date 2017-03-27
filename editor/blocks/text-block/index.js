@@ -1,7 +1,7 @@
 const { query, html } = wp.blocks.query;
 const Editable = wp.blocks.Editable;
 
-wp.blocks.registerBlock( 'wp/text', {
+wp.blocks.registerBlock( 'core/text', {
 	title: 'Text',
 	icon: 'text',
 
