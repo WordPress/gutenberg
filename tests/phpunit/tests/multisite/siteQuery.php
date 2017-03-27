@@ -47,7 +47,7 @@ class Tests_Multisite_Site_Query extends WP_UnitTestCase {
 			'www.w.org/'                  => array( 'domain' => 'www.w.org',          'path' => '/' ),
 			'www.w.org/foo/'              => array( 'domain' => 'www.w.org',          'path' => '/foo/' ),
 			'www.w.org/foo/bar/'          => array( 'domain' => 'www.w.org',          'path' => '/foo/bar/' ),
-			'www.w.org/make/'             => array( 'domain' => 'www.w.org',          'path' => '/make/' ),
+			'www.w.org/make/'             => array( 'domain' => 'www.w.org',          'path' => '/make/', 'meta' => array( 'public' => 1, 'lang_id' => 1 ) ),
 		);
 
 		foreach ( self::$site_ids as &$id ) {
@@ -429,6 +429,92 @@ class Tests_Multisite_Site_Query extends WP_UnitTestCase {
 		) );
 
 		$this->assertEqualSets( array_values( self::$site_ids ), $found );
+	}
+
+	public function test_wp_site_query_by_lang_id_with_zero() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields'       => 'ids',
+			// Exclude main site since we don't have control over it here.
+			'site__not_in' => array( 1 ),
+			'lang_id'      => 0,
+		) );
+
+		$this->assertEqualSets( array_diff( array_values( self::$site_ids ), array( self::$site_ids['www.w.org/make/'] ) ), $found );
+	}
+
+	public function test_wp_site_query_by_lang_id() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields'       => 'ids',
+			'lang_id'      => 1,
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_lang_id_with_no_results() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields'       => 'ids',
+			'lang_id'      => 2,
+		) );
+
+		$this->assertEmpty( $found );
+	}
+
+	public function test_wp_site_query_by_lang__in() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'lang__in' => array( 1 ),
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_lang__in_with_multiple_ids() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			// Exclude main site since we don't have control over it here.
+			'site__not_in' => array( 1 ),
+			'lang__in' => array( 0, 1 ),
+		) );
+
+		$this->assertEqualSets( array_values( self::$site_ids ), $found );
+	}
+
+	public function test_wp_site_query_by_lang__not_in() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'lang__not_in' => array( 0 ),
+		) );
+
+		$expected = array(
+			self::$site_ids['www.w.org/make/'],
+		);
+
+		$this->assertEqualSets( $expected, $found );
+	}
+
+	public function test_wp_site_query_by_lang__not_in_with_multiple_ids() {
+		$q = new WP_Site_Query();
+		$found = $q->query( array(
+			'fields' => 'ids',
+			'lang__not_in' => array( 0, 1 ),
+		) );
+
+		$this->assertEmpty( $found );
 	}
 
 	public function test_wp_site_query_by_search_with_text_in_domain() {
