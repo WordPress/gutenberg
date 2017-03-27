@@ -17,7 +17,9 @@ export { default as parse } from './parser';
 const blocks = {};
 
 /**
- * Registers a block.
+ * Registers a new block provided a unique slug and an object defining its
+ * behavior. Once registered, the block is made available as an option to any
+ * editor interface where blocks are implemented.
  *
  * @param  {string}   slug     Block slug
  * @param  {Object}   settings Block settings
@@ -68,7 +70,7 @@ export function unregisterBlock( slug ) {
 }
 
 /**
- * Returns settings associated with a block.
+ * Returns settings associated with a registered block.
  *
  * @param  {string}  slug Block slug
  * @return {?Object}      Block settings
