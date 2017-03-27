@@ -9,9 +9,9 @@
 	"plugins": [
 		"transform-runtime",
 		"transform-object-rest-spread",
-		["transform-react-jsx", {
+		[ "transform-react-jsx", {
 			"pragma": "wp.element.createElement"
-		}]
+		} ]
 	],
 	"env": {
 		"test": {
