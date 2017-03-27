@@ -1,6 +1,6 @@
 const { query, html, prop } = wp.blocks.query;
 
-wp.blocks.registerBlock( 'wp/heading', {
+wp.blocks.registerBlock( 'core/heading', {
 	title: 'Heading',
 	icon: 'heading',
 
