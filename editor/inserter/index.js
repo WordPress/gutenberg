@@ -1,21 +1,21 @@
-const el = wp.element.createElement;
-
 const Inserter = () => {
 	const blocks = wp.blocks.getBlocks();
 
-	return el( 'div', { className: 'inserter' },
-		el( 'div', { className: 'inserter__arrow' } ),
-		el( 'div', { className: 'inserter__content' },
-			el( 'div', { className: 'inserter__category-blocks' },
-				blocks.map( ( { slug, title, icon } ) => (
-					el( 'div', { key: slug, className: 'inserter__block' },
-						el( 'span', { className: 'dashicons dashicons-' + icon } ),
-						title
-					)
-				) )
-			)
-		),
-		el( 'input', { className: 'inserter__search', type: 'search', placeholder: 'Search...' } )
+	return (
+		<div className="inserter">
+			<div className="inserter__arrow" />
+			<div className="inserter__content">
+				<div className="inserter__Category-blocks">
+					{ blocks.map( ( { slug, title, icon } ) => (
+						<div key={ slug } className="inserter__block">
+							<span className={ 'dashicons dashicons-' + icon } />
+							{ title }
+						</div>
+					) ) }
+				</div>
+			</div>
+			<input className="inserter__search" type="search" placeholder="Search..." />
+		</div>
 	);
 };
 
