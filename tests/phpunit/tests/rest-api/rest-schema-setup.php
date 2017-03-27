@@ -293,11 +293,8 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			}
 		}
 
-		if ( is_multisite() ) {
-			echo "Skipping generation of API client fixtures in multisite mode.\n";
-		} else if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
-			echo "Skipping generation of API client fixtures due to unsupported JSON_* constants.\n";
-		} else {
+		// Only generate API client fixtures in single site and when required JSON_* constants are supported.
+		if ( ! is_multisite() && version_compare( PHP_VERSION, '5.4', '>=' ) ) {
 			// Save the route object for QUnit tests.
 			$file = './tests/qunit/fixtures/wp-api-generated.js';
 			file_put_contents( $file, $mocked_responses );
