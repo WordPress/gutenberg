@@ -10,9 +10,13 @@ const InserterButton = ( { opened, onClick } ) => {
 	};
 	return (
 		<div className="inserter__button">
-			<a href="" className="inserter__button-toggle" onClick={ toggle }>
+			<button
+				className="inserter__button-toggle"
+				onClick={ toggle }
+				aria-label="Add a block"
+			>
 				<span className="dashicons dashicons-plus" />
-			</a>
+			</button>
 			{ opened && <Inserter /> }
 		</div>
 	);
