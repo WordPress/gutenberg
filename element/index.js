@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement as reactCreateElement } from 'react';
+import { createElement as reactCreateElement, Component as ReactComponent } from 'react';
 import { render as reactRender } from 'react-dom';
 
 /**
@@ -28,3 +28,8 @@ export function createElement( type, props, ...children ) {
 export function render( element, target ) {
 	reactRender( element, target );
 }
+
+/**
+ * A base class to create WordPress Components (Refs, state and lifecycle hooks)
+ */
+export const Component = ReactComponent;
