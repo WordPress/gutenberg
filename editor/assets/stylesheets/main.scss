@@ -1,7 +1,10 @@
 @import '../../inserter/style';
 
-.gutenberg {
+body.toplevel_page_gutenberg {
 	background: #fff;
+}
+
+.gutenberg {
 	margin: -20px 0 0 -20px;
 	padding: 60px;
 
