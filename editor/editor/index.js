@@ -3,8 +3,6 @@
  */
 import EditorComponent from './editor';
 
-const el = wp.element.createElement;
-
 export default class Editor {
 	constructor( id, settings ) {
 		this.toggleInserter = this.toggleInserter.bind( this );
@@ -31,10 +29,7 @@ export default class Editor {
 
 	render() {
 		wp.element.render(
-			el( EditorComponent, {
-				state: this.state,
-				toggleInserter: this.toggleInserter
-			} ),
+			<EditorComponent state={ this.state} toggleInserter={ this.toggleInserter } />,
 			document.getElementById( this.id )
 		);
 	}
