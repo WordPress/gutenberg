@@ -14,6 +14,12 @@ WordPress already supports a large amount of "blocks", but doesn't surface them 
 - <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
 
+## Plugin
+
+If you'd like to try the plugin we're building, or contribute to it, you can check out this entire repository into your `wp-content/plugins` folder, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
+
+Then, in a terminal, type `npm install`. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. 
+
 ## Prototypes
 
 - <a href="https://wordpress.github.io/gutenberg/">UI prototype</a>.
