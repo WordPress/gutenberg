@@ -124,7 +124,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
-- `icon: string | WPElement` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element if you choose to render your own SVG.
+- `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
 - `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
 - `edit( attributes: Object, setAttributes: Function ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( attributes: Object ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
@@ -136,7 +136,7 @@ Registers a new block provided a unique slug and an object defining its behavior
 Registers a new block-level control. Controls appear in a block's toolbar when it receives focus if it is included in the block's `controls` option.
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the control. Shown in help tooltips.
-- `icon: string | WPElement` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element if you choose to render your own SVG.
+- `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
 - `onClick( attributes: Object, setAttributes: Function )` - Click behavior for control. Use this to change or toggle an attribute of the block.
 - `isVisible( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `false` to prevent the control's button from being shown. If this option is not defined for a control, the button will always be shown.
 - `isActive( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `true` to apply an active effect to the control's button, in the case that the control's behavior is a toggle. 
