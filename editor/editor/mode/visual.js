@@ -3,7 +3,7 @@
  */
 import InserterButton from '../../inserter/button';
 
-const Blocks = ( { blocks, onChange } ) => {
+function Blocks( { blocks, onChange } ) {
 	const onChangeBlock = ( index ) => ( changes ) => {
 		const newBlock = {
 			...blocks[ index ],

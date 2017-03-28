@@ -1,4 +1,4 @@
-const Inserter = () => {
+function Inserter() {
 	const blocks = wp.blocks.getBlocks();
 
 	return (
