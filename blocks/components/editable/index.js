@@ -4,8 +4,6 @@ export default class Editable extends wp.element.Component {
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onFocusIn = this.onFocusIn.bind( this );
-		this.onFocusOut = this.onFocusOut.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 	}
 
@@ -32,8 +30,7 @@ export default class Editable extends wp.element.Component {
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusIn', this.onFocusIn );
-		editor.on( 'focusout', this.onFocusOut );
+		editor.on( 'focusout', this.onChange );
 	}
 
 	onInit() {
@@ -49,28 +46,14 @@ export default class Editable extends wp.element.Component {
 		this.props.onChange( value );
 	}
 
-	onFocusIn() {
-		this.isFocused = true;
-	}
-
-	onFocusOut() {
-		this.isFocused = false;
-		this.onChange();
-	}
-
 	bindNode( ref ) {
 		this.node = ref;
 	}
 
 	updateContent() {
-		let bookmark;
-		if ( this.isFocused ) {
-			bookmark = this.editor.selection.getBookmark( 2, true );
-		}
+		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.editor.setContent( this.props.value );
-		if ( this.isFocused ) {
-			this.editor.selection.moveToBookmark( bookmark );
-		}
+		this.editor.selection.moveToBookmark( bookmark );
 	}
 
 	componentWillUnmount() {
