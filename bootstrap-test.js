@@ -13,3 +13,8 @@ global.document = require( 'jsdom' ).jsdom( '', {
 } );
 global.window = document.defaultView;
 global.navigator = window.navigator;
+global.wp = {
+	element: {
+		Component: function() {}
+	}
+};
