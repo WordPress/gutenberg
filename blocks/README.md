@@ -162,6 +162,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 The following props are made available:
 
 - `inline: boolean` - If true, only inline elements are allowed to be used in inserted into the text, effectively disabling the behavior of the "Enter" key.
+- `placeholder: string` - A text hint to be shown to the user when the field value is empty, similar to the [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute)
 - `value: string` - Markup value of the editable field. Only valid markup is allowed, as determined by `inline` value and available controls.
 - `onChange: Function` - Callback handler when the value of the field changes, passing the new value as its only argument.
 
