@@ -74,7 +74,19 @@ switch ( process.env.NODE_ENV ) {
 
 	case 'test':
 		config.target = 'node';
-		config.entry = glob.sync( `./{${ Object.keys( config.entry ).join() }}/test/*.js` );
+		config.module.rules = [
+			...config.module.rules,
+			...[ 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
+				test: require.resolve( './' + entry + '/index.js' ),
+				use: 'expose-loader?wp.' + entry
+			} ) )
+		];
+		config.entry = [
+			'./element/index.js',
+			'./blocks/index.js',
+			'./editor/index.js',
+			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/test/*.js` )
+		];
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
