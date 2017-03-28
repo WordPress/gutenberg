@@ -6,7 +6,7 @@ import InserterButton from '../inserter/button';
 const Editor = ( { state: { blocks, inserter }, toggleInserter } ) => {
 	return (
 		<div>
-			<div contentEditable>
+			<div>
 				{ blocks.map( ( block, index ) =>
 					<div key={ index }>
 						{ wp.blocks.getBlockSettings( block.blockType ).edit( block.attributes ) }
