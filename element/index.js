@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { createElement as reactCreateElement } from 'react';
-import { render as reactRender } from 'react-dom';
+import { createElement, Component } from 'react';
+import { render } from 'react-dom';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -15,9 +15,7 @@ import { render as reactRender } from 'react-dom';
  * @param  {...wp.Element}      children Descendant elements
  * @return {wp.Element}                  Element
  */
-export function createElement( type, props, ...children ) {
-	return reactCreateElement( type, props, ...children );
-}
+export { createElement };
 
 /**
  * Renders a given element into the target DOM node.
@@ -25,6 +23,9 @@ export function createElement( type, props, ...children ) {
  * @param {wp.Element} element Element to render
  * @param {Element}    target  DOM node into which element should be rendered
  */
-export function render( element, target ) {
-	reactRender( element, target );
-}
+export { render };
+
+/**
+ * A base class to create WordPress Components (Refs, state and lifecycle hooks)
+ */
+export { Component };

@@ -1,4 +1,4 @@
-const { query, html } = wp.blocks.query;
+const { html } = wp.blocks.query;
 const Editable = wp.blocks.Editable;
 
 wp.blocks.registerBlock( 'core/text', {
@@ -6,7 +6,7 @@ wp.blocks.registerBlock( 'core/text', {
 	icon: 'text',
 
 	attributes: {
-		value: query( 'p', html() )
+		value: html()
 	},
 
 	edit( attributes, onChange ) {

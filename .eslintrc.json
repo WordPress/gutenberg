@@ -18,7 +18,8 @@
 		}
 	},
 	"globals": {
-		"wp": true
+		"wp": true,
+		"tinymce": true
 	},
 	"plugins": [
 		"react",
