@@ -125,6 +125,25 @@ class Tests_Multisite_Site_Details extends WP_UnitTestCase {
 
 		$this->assertNotFalse( $cached_result );
 	}
+
+	/**
+	 * @ticket 40247
+	 */
+	public function test_site_details_cached_including_false_values() {
+		$id = self::factory()->blog->create();
+
+		$site = get_site( $id );
+
+		// Trigger retrieving site details (post_count is not set on new sites)
+		$post_count = $site->post_count;
+
+		$cached_details = wp_cache_get( $site->id, 'site-details' );
+
+		wpmu_delete_blog( $id, true );
+		wp_update_network_site_counts();
+
+		$this->assertNotFalse( $cached_details );
+	}
 }
 
 endif;
