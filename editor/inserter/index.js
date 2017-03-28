@@ -17,6 +17,6 @@ function Inserter() {
 			<input className="inserter__search" type="search" placeholder="Search..." />
 		</div>
 	);
-};
+}
 
 export default Inserter;

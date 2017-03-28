@@ -29,6 +29,6 @@ function Blocks( { blocks, onChange } ) {
 			<InserterButton />
 		</div>
 	);
-};
+}
 
 export default Blocks;
