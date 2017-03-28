@@ -13,11 +13,11 @@ function Inserter() {
 			<div className="inserter__arrow" />
 			<div className="inserter__content">
 				{ categories
-					.filter( ( category ) => !! blocksByCategory[ category.id ] )
+					.filter( ( category ) => !! blocksByCategory[ category.slug ] )
 					.map( ( category ) =>
-						<div key={ category.id } className="inserter__Category-blocks">
-							<div className="inserter__separator">{ category.label }</div>
-							{ blocksByCategory[ category.id ].map( ( { slug, title, icon } ) => (
+						<div key={ category.slug } className="inserter__Category-blocks">
+							<div className="inserter__separator">{ category.title }</div>
+							{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
 								<div key={ slug } className="inserter__block">
 									<span className={ 'dashicons dashicons-' + icon } />
 									{ title }

@@ -5,7 +5,7 @@
  * @var {Array} categories
  */
 const categories = [
-	{ id: 'common', label: 'Common' }
+	{ slug: 'common', title: 'Common' }
 ];
 
 /**
