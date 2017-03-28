@@ -94,32 +94,24 @@ class Tests_Multisite_Bootstrap extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 37217
-	 * @dataProvider data_get_network_by_path_not_using_paths
+	 * @dataProvider data_get_network_by_path_with_zero_path_segments
 	 *
 	 * @param string $expected_key The array key associated with expected data for the test.
 	 * @param string $domain       The requested domain.
 	 * @param string $path         The requested path.
 	 * @param string $message      The message to pass for failed tests.
 	 */
-	public function test_get_network_by_path_not_using_paths( $expected_key, $domain, $path, $message ) {
-		if ( ! wp_using_ext_object_cache() ) {
-			$this->markTestSkipped( 'Only testable with an external object cache.' );
-		}
-
-		// Temporarily store original object cache and using paths values.
-		$using_paths_orig = wp_cache_get( 'networks_have_paths', 'site-options' );
-
-		wp_cache_set( 'networks_have_paths', 0, 'site-options'  );
+	public function test_get_network_by_path_with_zero_path_segments( $expected_key, $domain, $path, $message ) {
+		add_filter( 'network_by_path_segments_count', '__return_zero' );
 
 		$network = get_network_by_path( $domain, $path );
 
-		// Restore original object cache and using paths values.
-		wp_cache_set( 'networks_have_paths', $using_paths_orig, 'site-options' );
+		remove_filter( 'network_by_path_segments_count', '__return_zero' );
 
 		$this->assertEquals( self::$network_ids[ $expected_key ], $network->id, $message );
 	}
 
-	public function data_get_network_by_path_not_using_paths() {
+	public function data_get_network_by_path_with_zero_path_segments() {
 		return array(
 			array( 'wordpress.org/',         'wordpress.org',       '/',          'A standard domain and path request should work.' ),
 			array( 'wordpress.net/',         'wordpress.net',       '/notapath/', 'A network matching a top level domain should be found regardless of path.' ),
