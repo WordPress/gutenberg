@@ -111,7 +111,7 @@ Let's briefly review a few items you might observe in the implementation:
 - We only change the attributes of a block by calling the `setAttributes` helper. Never assign a value on the attributes object directly.
 - React provides conveniences for working with `select` element with [`value` and `onChange` props](https://facebook.github.io/react/docs/forms.html#the-select-tag).
 
-By concerning yourself only with describing the markup of a block given its attributes, you need not worry about maintaining the state of the page, or how your block interacts in the context of the surrounding editor. 
+By concerning yourself only with describing the markup of a block given its attributes, you need not worry about maintaining the state of the page, or how your block interacts in the context of the surrounding editor.
 
 But how does the markup become an object of attributes? We need a pattern for encoding the values into the published post's markup, and then retrieving them the next time the post is edited. This is the motivation for the block's `attributes` property. The shape of this object matches that of the attributes object we'd like to receive, where each value is a [__matcher__](http://github.com/aduth/hpq) which tries to find the desired value from the markup of the block.
 
@@ -138,7 +138,7 @@ Registers a new block-level control. Controls appear in a block's toolbar when i
 - `icon: string | WPElement` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element if you choose to render your own SVG.
 - `onClick( attributes: Object, setAttributes: Function )` - Click behavior for control. Use this to change or toggle an attribute of the block.
 - `isVisible( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `false` to prevent the control's button from being shown. If this option is not defined for a control, the button will always be shown.
-- `isActive( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `true` to apply an active effect to the control's button, in the case that the control's behavior is a toggle. 
+- `isActive( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `true` to apply an active effect to the control's button, in the case that the control's behavior is a toggle.
 
 Inline controls for [`Editable`](#editable) elements are identical for every block and cannot be modified.
 

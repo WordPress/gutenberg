@@ -22,7 +22,7 @@ Let's render a customized greeting into an empty element:
 <div id="greeting"></div>
 <script>
 function Greeting( props ) {
-	return wp.element.createElement( 'span', null, 
+	return wp.element.createElement( 'span', null,
 		'Hello ' + props.toWhom + '!'
 	);
 }
