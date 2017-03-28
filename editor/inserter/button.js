@@ -12,8 +12,7 @@ class InserterButton extends wp.element.Component {
 		};
 	}
 
-	toggle( event ) {
-		event.preventDefault();
+	toggle() {
 		this.setState( {
 			opened: ! this.state.opened
 		} );
@@ -27,6 +26,7 @@ class InserterButton extends wp.element.Component {
 				<button
 					className="inserter__button-toggle"
 					onClick={ this.toggle }
+					type="button"
 					aria-label="Add a block"
 				>
 					<span className="dashicons dashicons-plus" />

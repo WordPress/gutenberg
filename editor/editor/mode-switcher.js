@@ -7,8 +7,7 @@ class ModeSwitcher extends wp.element.Component {
 		};
 	}
 
-	toggle( event ) {
-		event.preventDefault();
+	toggle() {
 		this.setState( {
 			opened: ! this.state.opened
 		} );
@@ -40,7 +39,7 @@ class ModeSwitcher extends wp.element.Component {
 					<div className="editor-mode-switcher__content">
 						<div className="editor-mode-switcher__arrow" />
 						{ modes.map( ( mode ) =>
-							<button key={ mode.value } onClick={ switchMode( mode.value ) }>
+							<button key={ mode.value } type="button" onClick={ switchMode( mode.value ) }>
 								{ mode.label }
 							</button>
 						) }

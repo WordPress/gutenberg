@@ -12,7 +12,7 @@ export default class Editor {
 
 	render() {
 		wp.element.render(
-			<EditorLayout content={ this.settings.content } />,
+			<EditorLayout initialContent={ this.settings.content } />,
 			document.getElementById( this.id )
 		);
 	}

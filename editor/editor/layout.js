@@ -6,23 +6,16 @@ import EditorText from './mode/text';
 import EditorVisual from './mode/visual';
 
 class Layout extends wp.element.Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 		this.switchMode = this.switchMode.bind( this );
 		this.changeHtml = this.changeHtml.bind( this );
 		this.changeBlocks = this.changeBlocks.bind( this );
 		this.state = {
 			mode: 'visual',
-			html: '',
-			blocks: []
+			html: props.initialContent,
+			blocks: wp.blocks.parse( this.props.initialContent )
 		};
-	}
-
-	componentDidMount() {
-		this.setState( {
-			html: this.props.content,
-			blocks: wp.blocks.parse( this.props.content )
-		} );
 	}
 
 	switchMode( newMode ) {
