@@ -1,28 +1,21 @@
-let editorInstance = 1;
-
 export default class Editable extends wp.element.Component {
-	constructor( ...args ) {
-		super( ...args );
+	constructor() {
+		super( ...arguments );
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onFocusIn = this.onFocusIn.bind( this );
 		this.onFocusOut = this.onFocusOut.bind( this );
-		this.id = `tinymce-instance-${ editorInstance }`;
-		editorInstance++;
+		this.bindNode = this.bindNode.bind( this );
 	}
 
 	componentDidMount() {
 		this.initialize();
-		if ( this.props.focusConfig ) {
-			this.focus();
-		}
 	}
 
 	initialize() {
 		const config = {
-			mode: 'exact',
-			elements: this.id,
+			target: this.node,
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -48,11 +41,11 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onChange() {
-		const value = this.editor.getContent();
-		if ( value === this.props.value ) {
+		if ( ! this.editor.isDirty() ) {
 			return;
 		}
-
+		const value = this.editor.getContent();
+		this.editor.save();
 		this.props.onChange( value );
 	}
 
@@ -63,6 +56,10 @@ export default class Editable extends wp.element.Component {
 	onFocusOut() {
 		this.isFocused = false;
 		this.onChange();
+	}
+
+	bindNode( ref ) {
+		this.node = ref;
 	}
 
 	updateContent() {
@@ -84,11 +81,11 @@ export default class Editable extends wp.element.Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== prevProps.value ) {
-			this.updateContent( !! prevProps.focusConfig );
+			this.updateContent();
 		}
 	}
 
 	render() {
-		return <div id={ this.id } contentEditable />;
+		return <div ref={ this.bindNode } />;
 	}
 }
