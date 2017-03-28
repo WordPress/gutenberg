@@ -17,6 +17,7 @@ export default class Editable extends wp.element.Component {
 			theme: false,
 			inline: true,
 			toolbar: false,
+			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			setup: this.onSetup,
 			formats: {
