@@ -1,0 +1,85 @@
+.editor__header {
+	padding: 10px;
+	border-bottom: 1px solid $light-gray;
+}
+
+.editor-mode-switcher {
+	position: relative;
+}
+
+.editor-mode-switcher__toggle {
+	color: $gray;
+	padding: 8px;
+	align-items: center;
+	cursor: pointer;
+	border: none;
+	background: none;
+	border-right: 1px solid $light-gray;
+	vertical-align: middle;
+	line-height: 20px;
+	outline: none;
+}
+
+.editor-mode-switcher__content {
+	position: absolute;
+	top: 40px;
+	border: 1px solid $light-gray;
+	color: $gray;
+	min-width: 100px;
+
+	button {
+		padding: 8px;
+		display: block;
+		border: none;
+		background: white;
+		outline: none;
+		cursor: pointer;
+		width: 100%;
+	}
+}
+
+.editor-mode-switcher__arrow {
+	border: 10px dashed $light-gray;
+	height: 0;
+	line-height: 0;
+	position: absolute;
+	width: 0;
+	z-index: 1;
+	top: -10px;
+	left: 50%;
+	margin-left: -10px;
+	border-bottom-style: solid;
+	border-top: none;
+	border-left-color: transparent;
+	border-right-color: transparent;
+
+	&:before {
+		top: 2px;
+		border: 10px solid white;
+		content: " ";
+		position: absolute;
+		left: 50%;
+		margin-left: -10px;
+		border-bottom-style: solid;
+		border-top: none;
+		border-left-color: transparent;
+		border-right-color: transparent;
+	}
+}
+
+.editor-mode-text {
+	padding: 60px;
+	width: 700px;
+	margin: 0 auto;
+
+	textarea {
+		width: 100%;
+		min-height: 300px;
+	}
+}
+
+.editor-mode-visual {
+	padding: 60px;
+	width: 700px;
+	margin: 0 auto;
+}
