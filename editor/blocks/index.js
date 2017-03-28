@@ -1,2 +1,2 @@
 import './text';
-import './quote-block';
+import './quote';
