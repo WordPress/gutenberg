@@ -50,12 +50,31 @@ describe( 'block parser', () => {
 
 			const blockNode = {
 				blockType: 'core/test-block',
-				attrs: {},
+				attrs: {
+					align: 'left'
+				},
 				rawContent: '<span>Ribs <strong>& Chicken</strong></span>'
 			};
 
 			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
+				align: 'left',
 				emphasis: '& Chicken'
+			} );
+		} );
+
+		it( 'should return parsed attributes for block without attributes defined', () => {
+			const blockSettings = {};
+
+			const blockNode = {
+				blockType: 'core/test-block',
+				attrs: {
+					align: 'left'
+				},
+				rawContent: '<span>Ribs <strong>& Chicken</strong></span>'
+			};
+
+			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
+				align: 'left'
 			} );
 		} );
 	} );
