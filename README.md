@@ -14,12 +14,6 @@ WordPress already supports a large amount of "blocks", but doesn't surface them 
 - <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
 
-## Plugin
-
-If you'd like to try the plugin we're building, or contribute to it, you can check out this entire repository into your `wp-content/plugins` folder, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
-
-Then, in a terminal, type `npm install`. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. 
-
 ## Prototypes
 
 - <a href="https://wordpress.github.io/gutenberg/">UI prototype</a>.
@@ -29,6 +23,12 @@ Then, in a terminal, type `npm install`. Once that finishes, you can type `npm r
 ## Parser
 
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post grammar parser</a>.
+
+## How Developers Can Contribute
+
+If you'd like to try the plugin we're building, or contribute to it, you can clone this repo into your `wp-content/plugins` directory, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
+
+Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. Then pick among the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a> and enjoy hacking away at making the world better.
 
 ## How Designers Can Contribute
 
@@ -46,4 +46,4 @@ Grab the Sketch file so you don't have to start from scratch:
 
 ## Mockups
 
-You can see **<a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">all mockups collected on this demo page</a>**. 
+You can see **<a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">all mockups collected on this demo page</a>**.
