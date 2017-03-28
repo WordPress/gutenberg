@@ -125,6 +125,7 @@ Registers a new block provided a unique slug and an object defining its behavior
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
 - `icon: string | WPElement` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element if you choose to render your own SVG.
+- `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
 - `edit( attributes: Object, setAttributes: Function ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( attributes: Object ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
 - `controls: string[]` - Slugs for controls to be made available to block. See also: [`wp.blocks.registerControl`](#wpblocksregistercontrol-slug-string-settings-object-)
