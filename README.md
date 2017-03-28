@@ -38,6 +38,10 @@ Grab the Sketch file so you don't have to start from scratch:
 
 **<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated Mar. 15th.</a>**
 
+
+## How Developers Can Contribute
+Thus far this project is a wordpress plugin. You may clone this repo into your plugins directory for starters. Then run `npm install` to get the dependencies all set up and then `npm run build` or `npm run dev`. Then pick among the tikets and enjoy hacking away at making the world better.
+
 ## Mockups
 
 You can see **<a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">all mockups collected on this demo page</a>**. 
