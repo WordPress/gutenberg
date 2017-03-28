@@ -122,6 +122,32 @@ class Tests_Multisite_Site extends WP_UnitTestCase {
 		$this->assertEquals( 2, (int) get_blog_count() );
 	}
 
+	public function test_site_caches_should_invalidate_when_invalidation_is_not_suspended() {
+		$site_id = self::factory()->blog->create();
+
+		$details = get_site( $site_id );
+
+		$suspend = wp_suspend_cache_invalidation( false );
+		update_blog_details( $site_id, array( 'path' => '/a-non-random-test-path/' ) );
+		$new_details = get_site( $site_id );
+		wp_suspend_cache_invalidation( $suspend );
+
+		$this->assertNotEquals( $details->path, $new_details->path );
+	}
+
+	public function test_site_caches_should_not_invalidate_when_invalidation_is_suspended() {
+		$site_id = self::factory()->blog->create();
+
+		$details = get_site( $site_id );
+
+		$suspend = wp_suspend_cache_invalidation();
+		update_blog_details( $site_id, array( 'path' => '/a-non-random-test-path/' ) );
+		$new_details = get_site( $site_id );
+		wp_suspend_cache_invalidation( $suspend );
+
+		$this->assertEquals( $details->path, $new_details->path );
+	}
+
 	/**
 	 * When a site is flagged as 'deleted', its data should be cleared from cache.
 	 */
