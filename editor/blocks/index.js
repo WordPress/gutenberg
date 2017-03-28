@@ -1,2 +1,2 @@
 import './text';
-import './heading-block';
+import './heading';

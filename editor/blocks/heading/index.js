@@ -1,7 +1,7 @@
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
-function Heading( { nodeName = 'H1', children } ) {
+function Heading( { nodeName = 'H2', children } ) {
 	// nodeName.toLowerCase() is used to map DOM nodeName values to proper tag.
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
@@ -17,7 +17,7 @@ wp.blocks.registerBlock( 'core/heading', {
 	},
 
 	edit( attributes, onChange ) {
-		const { headingType = 'H1', value } = attributes;
+		const { headingType = 'H2', value } = attributes;
 
 		return (
 			<Heading nodeName={ headingType }>
@@ -29,7 +29,7 @@ wp.blocks.registerBlock( 'core/heading', {
 	},
 
 	save( attributes ) {
-		const { headingType = 'H1', value } = attributes;
+		const { headingType = 'H2', value } = attributes;
 		return <Heading nodeName={ headingType }>{ value }</Heading>;
 	}
 } );
