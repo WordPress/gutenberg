@@ -1,1 +1,1 @@
-import './text-block';
+import './text';
