@@ -13,11 +13,18 @@ wp.blocks.registerBlock( 'core/quote', {
 
 	edit( attributes, onChange ) {
 		const { value, citation } = attributes;
+
+		// Concat strings parsed by hpq from paragraph values into one string.
+		const combinedValue = value.join( '' );
 		return (
 			<blockquote>
-				<Editable value={ value } onChange={ onChange } />
+				<Editable
+					value={ combinedValue }
+					onChange={ ( newValue ) => onChange( { newValue } ) } />
 				<cite>
-					<Editable value={ citation } onChange={ onChange } />
+					<Editable
+						value={ citation }
+						onChange={ ( newValue ) => onChange( { newValue } ) } />
 				</cite>
 			</blockquote>
 		);
