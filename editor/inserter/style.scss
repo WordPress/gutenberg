@@ -12,21 +12,23 @@
 	color: #87919d;
 	background: none;
 	cursor: pointer;
-	border-radius: 12px;
+	border-radius: 50%;
 	border: 2px solid #87919d;
-	width: 24px;
-	height: 24px;
+	width: 26px;
+	height: 26px;
 	padding: 0;
 	margin: 0;
 	outline: none;
+	transition: color .2s ease, border-color .2s ease;
 
 	.dashicons {
-		padding: 1px 0;
+		line-height: 24px;
+		text-align: center;
 	}
 
 	&:hover {
-		color: #12181e;
-		border-color: #12181e;
+		color: #00aadc;
+		border-color: #00aadc;
 	}
 }
 
@@ -35,8 +37,8 @@
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
 	position: absolute;
-	left: -130px;
-	bottom: 40px;
+	left: -127px;
+	bottom: 42px;
 	background: #fff;
 }
 
