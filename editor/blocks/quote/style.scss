@@ -1,0 +1,24 @@
+#editor blockquote {
+	margin: 2em;
+	box-shadow: inset 0px 0px 0px 0px #e0e5e9;
+	transition: all .2s ease;
+	font-size: 20px;
+	border-left: 4px solid black;
+	padding-left: 1em;
+	font-style: italic;
+}
+
+#editor blockquote footer {
+	color: #86909b;
+	font-size: 0.9em;
+	font-style: normal;
+	margin-left: 1.3em;
+	position: relative;
+}
+
+#editor blockquote footer:after {
+	content: '— ';
+	position: absolute;
+	left: -1.3em;
+	top: 0;
+}
