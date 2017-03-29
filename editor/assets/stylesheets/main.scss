@@ -1,21 +1,28 @@
+@import './variables';
 @import '../../inserter/style';
+@import '../../editor/style';
 
 body.toplevel_page_gutenberg {
 	background: #fff;
+
+	#update-nag, .update-nag {
+		position: absolute;
+		right: 0;
+		top: 50px;
+	}
+
+	#wpcontent {
+		padding-left: 0;
+	}
 }
 
 .gutenberg {
-	margin: -20px 0 0 -20px;
-	padding: 60px;
-
 	* {
 		box-sizing: border-box;
 	}
 }
 
 .gutenberg__editor {
-	max-width: 700px;
-	margin: 0 auto;
 	position: relative;
 	img {
 		max-width: 100%;

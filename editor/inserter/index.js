@@ -1,4 +1,4 @@
-const Inserter = () => {
+function Inserter() {
 	const blocks = wp.blocks.getBlocks();
 
 	return (
@@ -17,6 +17,6 @@ const Inserter = () => {
 			<input className="inserter__search" type="search" placeholder="Search..." />
 		</div>
 	);
-};
+}
 
 export default Inserter;
