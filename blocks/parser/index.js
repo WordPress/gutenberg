@@ -7,7 +7,7 @@ import * as query from 'hpq';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings } from '../';
+import { getBlockSettings } from '../registration';
 
 /**
  * Returns the block attributes of a registered block node given its settings.

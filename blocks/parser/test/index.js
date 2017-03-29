@@ -8,7 +8,7 @@ import { text } from 'hpq';
  * Internal dependencies
  */
 import { default as parse, getBlockAttributes } from '../';
-import * as blocks from '../../';
+import * as blocks from '../../registration';
 
 describe( 'block parser', () => {
 	describe( 'getBlockAttributes()', () => {
