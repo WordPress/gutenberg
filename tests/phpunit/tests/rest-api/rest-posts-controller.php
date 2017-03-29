@@ -2835,7 +2835,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request->set_param( 'force', 'false' );
 		$response = $this->server->dispatch( $request );
 
-		$this->assertNotInstanceOf( 'WP_Error', $response );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'Deleted post', $data['title']['raw'] );
@@ -2850,7 +2849,6 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$request['force'] = true;
 		$response = $this->server->dispatch( $request );
 
-		$this->assertNotInstanceOf( 'WP_Error', $response );
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertTrue( $data['deleted'] );
