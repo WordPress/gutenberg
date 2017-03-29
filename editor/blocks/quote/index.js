@@ -1,31 +1,29 @@
 const Editable = wp.blocks.Editable;
-const { query, html } = wp.blocks.query;
+const { html } = wp.blocks.query;
 
 wp.blocks.registerBlock( 'core/quote', {
 	title: 'Quote',
 	icon: 'format-quote',
-	category: 'quote',
+	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote', html( 'p' ) ),
-		citation: html( 'cite,footer' )
+		value: html( 'blockquote > p' ),
+		citation: html( 'footer' )
 	},
 
 	edit( attributes, onChange ) {
 		const { value, citation } = attributes;
 
-		// Concat strings parsed by hpq from paragraph values into one string.
-		const combinedValue = value.join( '' );
 		return (
 			<blockquote>
 				<Editable
-					value={ combinedValue }
-					onChange={ ( newValue ) => onChange( { newValue } ) } />
-				<cite>
+					value={ value }
+					onChange={ ( newValue ) => onChange( { value: newValue } ) } />
+				<footer>
 					<Editable
 						value={ citation }
-						onChange={ ( newValue ) => onChange( { newValue } ) } />
-				</cite>
+						onChange={ ( newValue ) => onChange( { citation: newValue } ) } />
+				</footer>
 			</blockquote>
 		);
 	},
@@ -35,9 +33,9 @@ wp.blocks.registerBlock( 'core/quote', {
 		return (
 			<blockquote>
 				{ value }
-				<cite>
+				<footer>
 					{ citation }
-				</cite>
+				</footer>
 			</blockquote>
 		);
 	}
