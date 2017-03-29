@@ -13,8 +13,7 @@ function Inserter() {
 			<div className="inserter__arrow" />
 			<div className="inserter__content">
 				{ categories
-					.filter( ( category ) => !! blocksByCategory[ category.slug ] )
-					.map( ( category ) =>
+					.map( ( category ) => !! blocksByCategory[ category.slug ] && (
 						<div key={ category.slug } className="inserter__Category-blocks">
 							<div className="inserter__separator">{ category.title }</div>
 							{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
@@ -24,7 +23,7 @@ function Inserter() {
 								</div>
 							) ) }
 						</div>
-					)
+					) )
 				}
 			</div>
 			<input className="inserter__search" type="search" placeholder="Search..." />
