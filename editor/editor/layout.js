@@ -9,8 +9,6 @@ class Layout extends wp.element.Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.switchMode = this.switchMode.bind( this );
-		this.changeHtml = this.changeHtml.bind( this );
-		this.changeBlocks = this.changeBlocks.bind( this );
 		this.state = {
 			mode: 'visual',
 			html: props.initialContent,
@@ -29,16 +27,8 @@ class Layout extends wp.element.Component {
 		} );
 	}
 
-	changeHtml( html ) {
-		this.setState( {
-			html
-		} );
-	}
-
-	changeBlocks( blocks ) {
-		this.setState( {
-			blocks
-		} );
+	createChangeHandler( type ) {
+		return ( value ) => this.setState( { [ type ]: value } );
 	}
 
 	render() {
@@ -49,8 +39,8 @@ class Layout extends wp.element.Component {
 					<ModeSwitcher mode={ mode } onSwitch={ this.switchMode } />
 				</div>
 				<div className="editor__body">
-					{ mode === 'text' && <EditorText html={ html } onChange={ this.changeHtml } /> }
-					{ mode === 'visual' && <EditorVisual blocks={ blocks } onChange={ this.changeBlocks } /> }
+					{ mode === 'text' && <EditorText html={ html } onChange={ this.createChangeHandler( 'html' ) } /> }
+					{ mode === 'visual' && <EditorVisual blocks={ blocks } onChange={ this.createChangeHandler( 'blocks' ) } /> }
 				</div>
 			</div>
 		);
