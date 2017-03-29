@@ -7,7 +7,6 @@
 		} ]
 	],
 	"plugins": [
-		"lodash",
 		"transform-runtime",
 		"transform-object-rest-spread",
 		[ "transform-react-jsx", {
