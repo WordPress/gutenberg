@@ -191,4 +191,66 @@ class Tests_Term_GetTheTerms extends WP_UnitTestCase {
 		$this->assertSame( $num_queries, $wpdb->num_queries );
 
 	}
+
+	/**
+	 * @ticket 40306
+	 */
+	public function test_term_cache_should_be_invalidated_on_set_object_terms() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		// Temporarily disable term counting, which performs its own cache invalidation.
+		wp_defer_term_counting( true );
+
+		// Create Test Category.
+		$term_id = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$post_id = self::factory()->post->create();
+
+		// Prime cache.
+		get_the_terms( $post_id, 'wptests_tax' );
+
+		wp_set_object_terms( $post_id, $term_id, 'wptests_tax' );
+
+		$terms = get_the_terms( $post_id, 'wptests_tax' );
+
+		// Re-activate term counting so this doesn't affect other tests.
+		wp_defer_term_counting( false );
+
+		$this->assertTrue( is_array( $terms ) );
+		$this->assertSame( array( $term_id ), wp_list_pluck( $terms, 'term_id' ) );
+	}
+
+	/**
+	 * @ticket 40306
+	 */
+	public function test_term_cache_should_be_invalidated_on_remove_object_terms() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		// Create Test Category.
+		$term_ids = self::factory()->term->create_many( 2, array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		$post_id = self::factory()->post->create();
+
+		wp_set_object_terms( $post_id, $term_ids, 'wptests_tax' );
+
+		// Prime cache.
+		get_the_terms( $post_id, 'wptests_tax' );
+
+		// Temporarily disable term counting, which performs its own cache invalidation.
+		wp_defer_term_counting( true );
+
+		wp_remove_object_terms( $post_id, $term_ids[0], 'wptests_tax' );
+
+		$terms = get_the_terms( $post_id, 'wptests_tax' );
+
+		// Re-activate term counting so this doesn't affect other tests.
+		wp_defer_term_counting( false );
+
+		$this->assertTrue( is_array( $terms ) );
+		$this->assertSame( array( $term_ids[1] ), wp_list_pluck( $terms, 'term_id' ) );
+	}
 }
