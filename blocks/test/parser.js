@@ -80,7 +80,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parse()', () => {
-		it( 'should parse the post content properly and ignore unknown blocks', () => {
+		it( 'should parse the post content properly', () => {
 			const blockSettings = {
 				attributes: function( rawContent ) {
 					return {
@@ -93,12 +93,20 @@ describe( 'block parser', () => {
 			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
 
-			expect( parse( postContent ) ).to.eql( [ {
-				blockType: 'core/test-block',
-				attributes: {
-					content: 'Ribs & Chicken'
+			expect( parse( postContent ) ).to.eql( [
+				{
+					blockType: 'core/test-block',
+					attributes: {
+						content: 'Ribs & Chicken'
+					},
+					rawContent: 'Ribs'
+				},
+				{
+					blockType: 'core/unknown-block',
+					attributes: {},
+					rawContent: 'Ribs'
 				}
-			} ] );
+			] );
 		} );
 	} );
 } );
