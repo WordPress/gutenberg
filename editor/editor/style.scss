@@ -1,13 +1,4 @@
 /**
- * Editor Styles
- */
-
-* {
-	box-sizing: border-box;
-}
-
-
-/**
  * General Layout
  */
 
@@ -111,9 +102,4 @@
 			line-height: $editor-line-height;
 		}
 	}
-}
-
-/* Hide footer */
-#wpfooter {
-	display: none;
 }
