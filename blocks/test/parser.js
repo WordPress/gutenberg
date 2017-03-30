@@ -7,10 +7,16 @@ import { text } from 'hpq';
 /**
  * Internal dependencies
  */
-import { default as parse, getBlockAttributes } from '../';
-import * as blocks from '../../';
+import { default as parse, getBlockAttributes } from '../parser';
+import { getBlocks, unregisterBlock, registerBlock } from '../registration';
 
 describe( 'block parser', () => {
+	beforeEach( () => {
+		getBlocks().forEach( ( block ) => {
+			unregisterBlock( block.slug );
+		} );
+	} );
+
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes from function implementation', () => {
 			const blockSettings = {
@@ -63,7 +69,7 @@ describe( 'block parser', () => {
 					};
 				}
 			};
-			blocks.registerBlock( 'core/test-block', blockSettings );
+			registerBlock( 'core/test-block', blockSettings );
 
 			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';

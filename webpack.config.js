@@ -85,7 +85,7 @@ switch ( process.env.NODE_ENV ) {
 			'./element/index.js',
 			'./blocks/index.js',
 			'./editor/index.js',
-			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/test/*.js` )
+			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` )
 		];
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
