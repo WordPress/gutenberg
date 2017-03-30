@@ -4,15 +4,15 @@
 import EditorLayout from './layout';
 
 export default class Editor {
-	constructor( id, settings ) {
+	constructor( id, post ) {
 		this.id = id;
-		this.settings = settings;
+		this.post = post;
 		this.render();
 	}
 
 	render() {
 		wp.element.render(
-			<EditorLayout initialContent={ this.settings.content } />,
+			<EditorLayout initialContent={ this.post.content.raw } />,
 			document.getElementById( this.id )
 		);
 	}

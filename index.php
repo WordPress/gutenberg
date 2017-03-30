@@ -56,16 +56,76 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * @since 0.1.0
  */
 function gutenberg_scripts_and_styles( $hook ) {
-	if ( 'toplevel_page_gutenberg' === $hook ) {
-		// Scripts
-		wp_register_script( 'gutenberg-content', plugins_url( 'post-content.js', __FILE__ ) );
-		wp_enqueue_script( 'wp-editor', plugins_url( 'editor/build/index.js', __FILE__ ), array( 'wp-blocks', 'wp-element', 'gutenberg-content' ), false, true );
-		wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', { content: window.content } );' );
-
-		// Styles
-		wp_enqueue_style( 'wp-editor-font', 'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i', false );
-		wp_enqueue_style( 'wp-editor', plugins_url( 'editor/build/style.css', __FILE__ ) );
+	if ( 'toplevel_page_gutenberg' !== $hook ) {
+		return;
 	}
+
+	/**
+	 * Scripts
+	 */
+
+	// The editor code itself
+	wp_enqueue_script(
+		'wp-editor',
+		plugins_url( 'editor/build/index.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'gutenberg-content' ),
+		false, // $ver
+		true   // $in_footer
+	);
+
+	// Temporary test content
+	wp_register_script(
+		'gutenberg-content',
+		plugins_url( 'post-content.js', __FILE__ )
+	);
+
+	// Load an actual post if an ID is specified
+	$post_to_edit = null;
+	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
+		$request = new WP_REST_Request(
+			'GET',
+			sprintf( '/wp/v2/posts/%d', (int) $_GET['post_id'] )
+		);
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		if ( 200 === $response->get_status() ) {
+			$post_to_edit = $response->get_data();
+		}
+	}
+
+	// Initialize the post data...
+	if ( $post_to_edit ) {
+		// ...with a real post
+		wp_add_inline_script(
+			'wp-editor',
+			'wp.editor.post = ' . json_encode( $post_to_edit )
+		);
+	} else {
+		// ...with some test content
+		wp_add_inline_script(
+			'wp-editor',
+			'wp.editor.post = { content: { raw: window.content } };'
+		);
+	}
+
+	// Initialize the editor
+	wp_add_inline_script(
+		'wp-editor',
+		'wp.editor.createEditorInstance( \'editor\', wp.editor.post );'
+	);
+
+	/**
+	 * Styles
+	 */
+
+	wp_enqueue_style(
+		'wp-editor-font',
+		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
+	);
+	wp_enqueue_style(
+		'wp-editor',
+		plugins_url( 'editor/build/style.css', __FILE__ )
+	);
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
