@@ -1,4 +1,18 @@
+/**
+ * Editor Styles
+ */
+
+* {
+	box-sizing: border-box;
+}
+
+
+/**
+ * General Layout
+ */
+
 .editor__header {
+	height: 56px;
 	padding: 10px;
 	border-bottom: 1px solid $light-gray-500;
 }
@@ -79,6 +93,7 @@
 		resize: none;
 		padding: 0;
 		overflow: hidden;
+		font-family: $editor-html-font;
 	}
 }
 
@@ -96,4 +111,9 @@
 			line-height: $editor-line-height;
 		}
 	}
+}
+
+/* Hide footer */
+#wpfooter {
+	display: none;
 }
