@@ -11,6 +11,12 @@ import { default as parse, getBlockAttributes } from '../parser';
 import { getBlocks, unregisterBlock, registerBlock } from '../registration';
 
 describe( 'block parser', () => {
+	beforeEach( () => {
+		getBlocks().forEach( ( block ) => {
+			unregisterBlock( block.slug );
+		} );
+	} );
+
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes from function implementation', () => {
 			const blockSettings = {
