@@ -15,14 +15,16 @@ function Inserter() {
 			<div className="inserter__content">
 				{ categories
 					.map( ( category ) => !! blocksByCategory[ category.slug ] && (
-						<div key={ category.slug } className="inserter__Category-blocks">
+						<div key={ category.slug }>
 							<div className="inserter__separator">{ category.title }</div>
-							{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
-								<div key={ slug } className="inserter__block">
-									<span className={ 'dashicons dashicons-' + icon } />
-									{ title }
-								</div>
-							) ) }
+							<div className="inserter__category-blocks">
+								{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
+									<div key={ slug } className="inserter__block">
+										<span className={ 'dashicons dashicons-' + icon } />
+										{ title }
+									</div>
+								) ) }
+							</div>
 						</div>
 					) )
 				}
