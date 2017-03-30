@@ -10,7 +10,11 @@ function Text( { html, onChange } ) {
 
 	return (
 		<div className="editor-mode-text">
-			<Textarea value={ html } onChange={ changeValue } />
+			<Textarea
+				value={ html }
+				onChange={ changeValue }
+				useCacheForDOMMeasurements
+			/>
 		</div>
 	);
 }
