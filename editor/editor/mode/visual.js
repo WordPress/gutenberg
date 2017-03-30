@@ -23,8 +23,17 @@ function Blocks( { blocks, onChange } ) {
 				{ blocks.map( ( block, index ) => {
 					const settings = wp.blocks.getBlockSettings( block.blockType );
 
+					let Edit;
+					if ( settings ) {
+						Edit = settings.edit || settings.save;
+					}
+
+					if ( ! Edit ) {
+						Edit = () => <div dangerouslySetInnerHTML={ { __html: block.rawContent } } />;
+					}
+
 					return (
-						<settings.edit
+						<Edit
 							key={ index }
 							attributes={ block.attributes }
 							onChange={ onChangeBlock( index ) } />
