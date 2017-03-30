@@ -74,7 +74,10 @@
 
 	textarea {
 		width: 100%;
-		min-height: 300px;
+		border: none;
+		outline: none;
+		box-shadow: none;
+		resize: none;
 	}
 }
 
