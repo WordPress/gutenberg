@@ -70,6 +70,11 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		return <div ref={ this.bindNode } />;
+		const Tag = this.props.nodeName;
+		return <Tag ref={ this.bindNode } />;
 	}
+}
+
+Editable.defaultProps = {
+	nodeName: 'div'
 }

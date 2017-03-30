@@ -1,1 +1,3 @@
 import './text';
+import './heading';
+
