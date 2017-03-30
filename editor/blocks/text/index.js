@@ -4,6 +4,7 @@ const Editable = wp.blocks.Editable;
 wp.blocks.registerBlock( 'core/text', {
 	title: 'Text',
 	icon: 'text',
+	category: 'common',
 
 	attributes: {
 		value: html()
