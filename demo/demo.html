@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <title>Block Types Demo</title>
 
@@ -9,16 +10,16 @@
   <script src="../blocks/build/index.js"></script>
 
   <script src="https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js"></script>
-   
-   <link rel="Stylesheet" href="../editor/build/style.css">
+
+  <link rel="Stylesheet" href="../editor/build/style.css">
 
   <script src="../editor/build/index.js"></script>
-  
+
   <script>
     const setupBlock = (slug, attributes) => {
       let row = document.querySelector('tr.' + slug);
       let settings = wp.blocks.getBlockSettings('core/' + slug);
-      let comp = settings.edit(attributes, () => {});
+      let comp = settings.edit(attributes, () => { });
       ReactDOM.render(comp, row.querySelector('.editor'));
       let saved = settings.save(attributes);
       ReactDOM.render(saved, row.querySelector('.saved'));
@@ -31,50 +32,59 @@
     var go = function () {
       setupBlock('text', { value: 'This is text' })
       setupBlock('heading', { nodeName: 'h2', value: 'This is a heading' });
-      setupBlock('list', { })
+      setupBlock('list', { nodeName: 'ol', items: ['item1', 'item2', 'item3' ] })
     };
   </script>
 
   <style>
-  table {
-    width: 100%;
-    border: 1px solid black;
-    border-collapse: collapse;
-  }
+    table {
+      width: 100%;
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
 
-  table td {
-    width: 50%;
-    border: 1px solid black;
-  }
+    table td {
+      width: 50%;
+      border: 1px solid black;
+    }
   </style>
 </head>
 
 <body onload="go();">
-
-
-<table>
-  <thead>
-    <tr>
-      <th>Editable View</th>
-      <th>Saved View</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr class="text">
-      <td><div class="editor" /></td>
-      <td><div class="saved" /></td>
-    </tr>
-    <tr class="heading">
-      <td><div class="editor" /></td>
-      <td><div class="saved" /></td>
-    </tr>
-    <tr class="list">
-      <td><div class="editor" /></td>
-      <td><div class="saved" /></td>
-    </tr>
-  </tbody>
-</table>
-
+  <table>
+    <thead>
+      <tr>
+        <th>Editable View</th>
+        <th>Saved View</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="text">
+        <td>
+          <div class="editor" />
+        </td>
+        <td>
+          <div class="saved" />
+        </td>
+      </tr>
+      <tr class="heading">
+        <td>
+          <div class="editor" />
+        </td>
+        <td>
+          <div class="saved" />
+        </td>
+      </tr>
+      <tr class="list">
+        <td>
+          <div class="editor" />
+        </td>
+        <td>
+          <div class="saved" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </body>
 
 </html>
