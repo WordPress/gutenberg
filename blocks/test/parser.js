@@ -75,6 +75,7 @@ describe( 'block parser', () => {
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
 
 			expect( parse( postContent ) ).to.eql( [ {
+				uid: '1',
 				blockType: 'core/test-block',
 				attributes: {
 					content: 'Ribs & Chicken'

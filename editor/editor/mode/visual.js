@@ -1,13 +1,22 @@
 /**
+ * External dependencies
+ */
+import { findIndex } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import InserterButton from '../../inserter/button';
 
 function Blocks( { blocks, onChange } ) {
-	const onChangeBlock = ( index ) => ( changes ) => {
+	const onChangeBlock = ( uid ) => ( changes ) => {
+		const index = findIndex( blocks, { uid } );
 		const newBlock = {
 			...blocks[ index ],
-			changes
+			attributes: {
+				...blocks[ index ].attributes,
+				...changes
+			}
 		};
 
 		onChange( [
@@ -20,9 +29,9 @@ function Blocks( { blocks, onChange } ) {
 	return (
 		<div className="editor-mode-visual">
 			<div>
-				{ blocks.map( ( block, index ) =>
-					<div key={ index }>
-						{ wp.blocks.getBlockSettings( block.blockType ).edit( block.attributes, onChangeBlock( index ) ) }
+				{ blocks.map( ( block ) =>
+					<div key={ block.uid }>
+						{ wp.blocks.getBlockSettings( block.blockType ).edit( block.attributes, onChangeBlock( block.uid ) ) }
 					</div>
 				) }
 			</div>

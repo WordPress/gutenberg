@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as query from 'hpq';
+import { uniqueId } from 'lodash';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ export default function parse( content ) {
 
 		if ( settings ) {
 			memo.push( {
+				uid: uniqueId(),
 				blockType: blockNode.blockType,
 				attributes: getBlockAttributes( blockNode, settings )
 			} );

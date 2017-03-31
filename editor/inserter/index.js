@@ -1,12 +1,11 @@
+/**
+ * External dependencies
+ */
+import { groupBy } from 'lodash';
+
 function Inserter() {
 	const blocks = wp.blocks.getBlocks();
-	const blocksByCategory = blocks.reduce( ( groups, block ) => {
-		if ( ! groups[ block.category ] ) {
-			groups[ block.category ] = [];
-		}
-		groups[ block.category ].push( block );
-		return groups;
-	}, {} );
+	const blocksByCategory = groupBy( blocks, 'category' );
 	const categories = wp.blocks.getCategories();
 
 	return (
