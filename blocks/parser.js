@@ -7,7 +7,7 @@ import * as query from 'hpq';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings } from './registration';
+import { getBlockSettings, getUnknownTypeHandler } from './registration';
 
 /**
  * Returns the block attributes of a registered block node given its settings.
@@ -39,14 +39,26 @@ export function getBlockAttributes( blockNode, blockSettings ) {
  * @return {Array}          Block list
  */
 export default function parse( content ) {
-	return grammarParse( content ).map( ( blockNode ) => {
-		const settings = getBlockSettings( blockNode.blockType );
-		const { blockType, rawContent } = blockNode;
+	return grammarParse( content ).reduce( ( memo, blockNode ) => {
+		// Use type from block node, otherwise find unknown handler
+		let { blockType = getUnknownTypeHandler() } = blockNode;
 
-		return {
-			blockType,
-			rawContent,
-			attributes: getBlockAttributes( blockNode, settings )
-		};
-	} );
+		// Try finding settings for known block type, else again fall back
+		let settings = getBlockSettings( blockType );
+		if ( ! settings ) {
+			blockType = getUnknownTypeHandler();
+			settings = getBlockSettings( blockType );
+		}
+
+		// Include in set only if settings were determined
+		if ( settings ) {
+			memo.push( {
+				blockType,
+				rawContent: blockNode.rawContent,
+				attributes: getBlockAttributes( blockNode, settings )
+			} );
+		}
+
+		return memo;
+	}, [] );
 }

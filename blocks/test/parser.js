@@ -8,10 +8,11 @@ import { text } from 'hpq';
  * Internal dependencies
  */
 import { default as parse, getBlockAttributes } from '../parser';
-import { getBlocks, unregisterBlock, registerBlock } from '../registration';
+import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
 
 describe( 'block parser', () => {
-	beforeEach( () => {
+	afterEach( () => {
+		setUnknownTypeHandler( undefined );
 		getBlocks().forEach( ( block ) => {
 			unregisterBlock( block.slug );
 		} );
@@ -80,33 +81,39 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parse()', () => {
-		it( 'should parse the post content properly', () => {
-			const blockSettings = {
+		it( 'should parse the post content, ignoring unknown blocks', () => {
+			registerBlock( 'core/test-block', {
 				attributes: function( rawContent ) {
 					return {
 						content: rawContent + ' & Chicken'
 					};
 				}
-			};
-			registerBlock( 'core/test-block', blockSettings );
+			} );
 
 			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
 
-			expect( parse( postContent ) ).to.eql( [
-				{
-					blockType: 'core/test-block',
-					attributes: {
-						content: 'Ribs & Chicken'
-					},
-					rawContent: 'Ribs'
+			expect( parse( postContent ) ).to.eql( [ {
+				blockType: 'core/test-block',
+				attributes: {
+					content: 'Ribs & Chicken'
 				},
-				{
-					blockType: 'core/unknown-block',
-					attributes: {},
-					rawContent: 'Ribs'
-				}
-			] );
+				rawContent: 'Ribs'
+			} ] );
+		} );
+
+		it( 'should parse the post content, using unknown block handler', () => {
+			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/unknown-block', {} );
+
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
+
+			expect( parse( postContent ) ).to.have.lengthOf( 3 );
 		} );
 	} );
 } );
