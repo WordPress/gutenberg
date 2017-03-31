@@ -12,6 +12,7 @@ import {
 	html,
 	blocks,
 	mode,
+	selectedBlockUid,
 	createReduxStore
 } from '../state';
 
@@ -111,6 +112,31 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'selectedBlockUid()', () => {
+		it( 'should return null by default', () => {
+			const state = selectedBlockUid( undefined, {} );
+
+			expect( state ).to.be.null();
+		} );
+
+		it( 'should return selected block uid', () => {
+			const state = selectedBlockUid( null, {
+				type: 'SELECT_BLOCK',
+				uid: 'bananas'
+			} );
+
+			expect( state ).to.equal( 'bananas' );
+		} );
+
+		it( 'should return null on unselecting', () => {
+			const state = selectedBlockUid( 'bananas', {
+				type: 'CLEAR_SELECTED_BLOCK'
+			} );
+
+			expect( state ).to.be.null();
+		} );
+	} );
+
 	describe( 'createReduxStore()', () => {
 		it( 'should return a redux store', () => {
 			const store = createReduxStore();
@@ -126,7 +152,8 @@ describe( 'state', () => {
 			expect( Object.keys( state ) ).to.have.members( [
 				'html',
 				'blocks',
-				'mode'
+				'mode',
+				'selectedBlockUid'
 			] );
 		} );
 	} );

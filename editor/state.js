@@ -78,6 +78,25 @@ export function mode( state = 'visual', action ) {
 }
 
 /**
+ * Reducer returning currently selected block UID.
+ *
+ * @param  {?string} state  Current state
+ * @param  {Object}  action Dispatched action
+ * @return {?string}        Updated state
+ */
+export function selectedBlockUid( state = null, action ) {
+	switch ( action.type ) {
+		case 'SELECT_BLOCK':
+			return action.uid;
+
+		case 'CLEAR_SELECTED_BLOCK':
+			return null;
+	}
+
+	return state;
+}
+
+/**
  * Creates a new instance of a Redux store.
  *
  * @return {Redux.Store} Redux store
@@ -86,7 +105,8 @@ export function createReduxStore() {
 	const reducer = combineReducers( {
 		html,
 		blocks,
-		mode
+		mode,
+		selectedBlockUid
 	} );
 
 	return createStore(

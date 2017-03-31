@@ -22,6 +22,7 @@
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.0",
     "babel-loader": "^6.4.1",
+    "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -54,7 +55,7 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "babel-plugin-lodash": "^3.2.11",
+    "classnames": "^2.2.5",
     "hpq": "^1.1.1",
     "lodash": "^4.17.4",
     "react-redux": "^5.0.3",
