@@ -20,7 +20,7 @@
 	border: 2px solid transparent;
 	transition: 0.2s border-color;
 
-	&:hover {
+	&.is-hovered {
 		border-left: 2px solid $light-gray-500;
 	}
 
