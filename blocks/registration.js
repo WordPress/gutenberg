@@ -77,9 +77,10 @@ export function setUnknownTypeHandler( slug ) {
 }
 
 /**
- * Retrieves slug of block handling unknown block types.
+ * Retrieves slug of block handling unknown block types, or undefined if no
+ * handler has been defined.
  *
- * @return {string} Blog slug
+ * @return {?string} Blog slug
  */
 export function getUnknownTypeHandler() {
 	return unknownTypeHandler;
