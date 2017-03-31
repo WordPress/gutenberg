@@ -1,7 +1,7 @@
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
-function List( { nodeName = 'ol', children } ) {
+function List( { nodeName, children } ) {
 	// nodeName.toLowerCase() is used to map DOM nodeName values to proper tag.
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
@@ -12,27 +12,34 @@ wp.blocks.registerBlock( 'core/list', {
 	category: 'common',
 
 	attributes: {
-	  value: html( 'ol,ul' ),
-	  listType: prop( 'ol,ul', 'nodeName' )
+	  listType: prop( 'ol,ul', 'nodeName' ),
+		items: wp.blocks.query.query(
+			'li',
+			{
+				value: html()
+			}
+		)
 	},
 
 	edit( attributes, onChange ) {
-	  const { listType = 'ol', items } = attributes;
-	  const lis = items.map( i => {
-		  return `<li>${i}</li>`
-	  })
+	  const { listType = 'ol', items=[] } = attributes;
+	  const value = items.map( i => {
+		  return `<li>${i.value}</li>`
+	  }).join('')
 
 
 	  return (
 		<Editable
 			nodeName={ listType }
-			value={ lis.join('') }
-			onChange={ ( nextValue ) => onChange( { value: nextValue } ) } />
+			value={ value }
+			onChange ={ onChange } />
 	  );
 	},
 
 	save( attributes ) {
-	  const { listType = 'ol', value } = attributes;
-      return <List nodeName={listType}>{value}</List>
+		const { listType = 'ol', items = [ ] } = attributes;
+		const children = items.map((i, index) => <li key={index}>{i.value}</li>);
+		return <List nodeName={listType}>{children}</List>
 	}
 } );
+

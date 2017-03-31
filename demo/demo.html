@@ -30,9 +30,18 @@
     };
 
     var go = function () {
+      wp.editor.createEditorInstance( 'editor', { content: 'I am here', addBlock: function () {
+        debugger;
+      }});
       setupBlock('text', { value: 'This is text' })
       setupBlock('heading', { nodeName: 'h2', value: 'This is a heading' });
-      setupBlock('list', { nodeName: 'ol', items: ['item1', 'item2', 'item3' ] })
+      setupBlock('list', {
+        nodeName: 'ol',
+        items: [
+          { value: 'hi' },
+          { value: 'there' }
+        ]
+      })
     };
   </script>
 
@@ -51,6 +60,7 @@
 </head>
 
 <body onload="go();">
+  <div id="editor"></div>
   <table>
     <thead>
       <tr>
