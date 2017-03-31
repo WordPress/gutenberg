@@ -7,24 +7,26 @@ import * as query from 'hpq';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings } from './registration';
+import { getBlockSettings, getUnknownTypeHandler } from './registration';
 
 /**
  * Returns the block attributes of a registered block node given its settings.
  *
- * @param  {Object}   blockNode     Parsed block node
- * @param  {Object}   blockSettings Block settings
- * @return {Object}                 Block state, or undefined if type unknown
+ * @param  {Object} blockNode     Parsed block node
+ * @param  {Object} blockSettings Block settings
+ * @return {Object}               Block attributes
  */
 export function getBlockAttributes( blockNode, blockSettings ) {
 	const { rawContent } = blockNode;
 
 	// Merge attributes from parse with block implementation
 	let { attrs } = blockNode;
-	if ( 'function' === typeof blockSettings.attributes ) {
-		attrs = { ...attrs, ...blockSettings.attributes( rawContent ) };
-	} else if ( blockSettings.attributes ) {
-		attrs = { ...attrs, ...query.parse( rawContent, blockSettings.attributes ) };
+	if ( blockSettings ) {
+		if ( 'function' === typeof blockSettings.attributes ) {
+			attrs = { ...attrs, ...blockSettings.attributes( rawContent ) };
+		} else if ( blockSettings.attributes ) {
+			attrs = { ...attrs, ...query.parse( rawContent, blockSettings.attributes ) };
+		}
 	}
 
 	return attrs;
@@ -38,11 +40,21 @@ export function getBlockAttributes( blockNode, blockSettings ) {
  */
 export default function parse( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const settings = getBlockSettings( blockNode.blockType );
+		// Use type from block node, otherwise find unknown handler
+		let { blockType = getUnknownTypeHandler() } = blockNode;
 
+		// Try finding settings for known block type, else again fall back
+		let settings = getBlockSettings( blockType );
+		if ( ! settings ) {
+			blockType = getUnknownTypeHandler();
+			settings = getBlockSettings( blockType );
+		}
+
+		// Include in set only if settings were determined
 		if ( settings ) {
 			memo.push( {
-				blockType: blockNode.blockType,
+				blockType,
+				rawContent: blockNode.rawContent,
 				attributes: getBlockAttributes( blockNode, settings )
 			} );
 		}

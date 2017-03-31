@@ -3,9 +3,16 @@
 /**
  * Block settings keyed by block slug.
  *
- * @var {Object} blocks
+ * @type {Object}
  */
 const blocks = {};
+
+/**
+ * Slug of block handling unknown types.
+ *
+ * @type {?string}
+ */
+let unknownTypeHandler;
 
 /**
  * Registers a new block provided a unique slug and an object defining its
@@ -58,6 +65,25 @@ export function unregisterBlock( slug ) {
 	const oldBlock = blocks[ slug ];
 	delete blocks[ slug ];
 	return oldBlock;
+}
+
+/**
+ * Assigns slug of block handling unknown block types.
+ *
+ * @param {string} slug Block slug
+ */
+export function setUnknownTypeHandler( slug ) {
+	unknownTypeHandler = slug;
+}
+
+/**
+ * Retrieves slug of block handling unknown block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog slug
+ */
+export function getUnknownTypeHandler() {
+	return unknownTypeHandler;
 }
 
 /**

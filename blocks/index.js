@@ -7,4 +7,11 @@ export { query };
 export { default as Editable } from './components/editable';
 export { default as parse } from './parser';
 export { getCategories } from './categories';
-export { registerBlock, unregisterBlock, getBlockSettings, getBlocks } from './registration';
+export {
+	registerBlock,
+	unregisterBlock,
+	setUnknownTypeHandler,
+	getUnknownTypeHandler,
+	getBlockSettings,
+	getBlocks
+} from './registration';

@@ -19,13 +19,25 @@ function Blocks( { blocks, onChange } ) {
 
 	return (
 		<div className="editor-mode-visual">
-			<div>
-				{ blocks.map( ( block, index ) =>
-					<div key={ index }>
-						{ wp.blocks.getBlockSettings( block.blockType ).edit( block.attributes, onChangeBlock( index ) ) }
-					</div>
-				) }
-			</div>
+			{ blocks.map( ( block, index ) => {
+				const settings = wp.blocks.getBlockSettings( block.blockType );
+
+				let BlockEdit;
+				if ( settings ) {
+					BlockEdit = settings.edit || settings.save;
+				}
+
+				if ( ! BlockEdit ) {
+					return;
+				}
+
+				return (
+					<BlockEdit
+						key={ index }
+						attributes={ block.attributes }
+						onChange={ onChangeBlock( index ) } />
+				);
+			} ) }
 			<InserterButton />
 		</div>
 	);

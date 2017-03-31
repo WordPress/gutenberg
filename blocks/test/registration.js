@@ -9,18 +9,26 @@ import sinon from 'sinon';
 /**
  * Internal dependencies
  */
-import { getBlocks, unregisterBlock, registerBlock, getBlockSettings } from '../registration';
+import {
+	registerBlock,
+	unregisterBlock,
+	setUnknownTypeHandler,
+	getUnknownTypeHandler,
+	getBlockSettings,
+	getBlocks
+} from '../registration';
 
 describe( 'blocks', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
-		getBlocks().forEach( block => {
-			unregisterBlock( block.slug );
-		} );
 		sinon.stub( console, 'error' );
 	} );
 
 	afterEach( () => {
+		getBlocks().forEach( block => {
+			unregisterBlock( block.slug );
+		} );
+		setUnknownTypeHandler( undefined );
 		console.error.restore();
 	} );
 
@@ -83,6 +91,20 @@ describe( 'blocks', () => {
 			expect( console.error ).to.not.have.been.called();
 			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
 			expect( getBlocks() ).to.eql( [] );
+		} );
+	} );
+
+	describe( 'setUnknownTypeHandler()', () => {
+		it( 'assigns unknown type handler', () => {
+			setUnknownTypeHandler( 'core/test-block' );
+
+			expect( getUnknownTypeHandler() ).to.equal( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getUnknownTypeHandler()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getUnknownTypeHandler() ).to.be.undefined();
 		} );
 	} );
 
