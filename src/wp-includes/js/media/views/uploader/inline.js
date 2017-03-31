@@ -119,9 +119,18 @@ UploaderInline = View.extend({
 	},
 	show: function() {
 		this.$el.removeClass( 'hidden' );
+		if ( this.controller.$uploaderToggler.length ) {
+			this.controller.$uploaderToggler.attr( 'aria-expanded', 'true' );
+		}
 	},
 	hide: function() {
 		this.$el.addClass( 'hidden' );
+		if ( this.controller.$uploaderToggler.length ) {
+			this.controller.$uploaderToggler
+				.attr( 'aria-expanded', 'false' )
+				// Move focus back to the toggle button when closing the uploader.
+				.focus();
+		}
 	}
 
 });
