@@ -1,7 +1,7 @@
 /**
  * Temporary test post content
  */
-var _wpGutenbergPost = {
+window._wpGutenbergPost = {
 	content: {
 		raw: [
 			'<!-- wp:core/heading -->',
