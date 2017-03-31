@@ -90,11 +90,13 @@ describe( 'block parser', () => {
 				}
 			} );
 
-			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+			const parsed = parse(
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
+				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+			);
 
-			expect( parse( postContent ) ).to.eql( [ {
+			expect( parsed ).to.eql( [ {
 				blockType: 'core/test-block',
 				attributes: {
 					content: 'Ribs & Chicken'
@@ -109,11 +111,18 @@ describe( 'block parser', () => {
 
 			setUnknownTypeHandler( 'core/unknown-block' );
 
-			const postContent = '<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+			const parsed = parse(
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->';
+				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+			);
 
-			expect( parse( postContent ) ).to.have.lengthOf( 3 );
+			expect( parsed ).to.have.lengthOf( 3 );
+			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
+				'core/test-block',
+				'core/unknown-block',
+				'core/unknown-block'
+			] );
 		} );
 	} );
 } );
