@@ -69,13 +69,13 @@ wp.blocks.registerBlock( 'myplugin/random-image', {
 		category: query.attr( 'img', 'alt' )
 	},
 
-	edit: function( attributes, setAttributes ) {
-		var category = attributes.category,
+	edit: function( block ) {
+		var category = block.attributes.category,
 			children;
 
 		function setCategory( event ) {
 			var selected = event.target.querySelector( 'option:checked' );
-			setAttributes( { category: selected.value } );
+			block.setAttributes( { category: selected.value } );
 			event.preventDefault();
 		}
 
@@ -96,8 +96,8 @@ wp.blocks.registerBlock( 'myplugin/random-image', {
 		return el( 'form', { onSubmit: setCategory }, children );
 	},
 
-	save: function( attributes ) {
-		return RandomImage( { category: attributes.category } );
+	save: function( block ) {
+		return RandomImage( { category: block.attributes.category } );
 	}
 } );
 ```
@@ -129,8 +129,8 @@ Registers a new block provided a unique slug and an object defining its behavior
 - `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
 - `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
 - `category: string` - Slug of the block's category. The category is used to organize the blocks in the block inserter.
-- `edit( attributes: Object, setAttributes: Function ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
-- `save( attributes: Object ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
+- `edit( { attributes: Object, setAttributes: Function } ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
+- `save( { attributes: Object } ): WPElement` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
 - `controls: string[]` - Slugs for controls to be made available to block. See also: [`wp.blocks.registerControl`](#wpblocksregistercontrol-slug-string-settings-object-)
 - `encodeAttributes( attributes: Object ): Object` - Called when save markup is generated, this function allows you to control which attributes are to be encoded in the block comment metadata. By default, all attribute values not defined in the block's `attributes` property are serialized to the comment metadata. If defined, this function should return the subset of attributes to encode, or `null` to bypass default behavior.
 
