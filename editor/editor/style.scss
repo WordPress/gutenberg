@@ -1,6 +1,11 @@
+/**
+ * General Layout
+ */
+
 .editor__header {
+	height: 56px;
 	padding: 10px;
-	border-bottom: 1px solid $light-gray;
+	border-bottom: 1px solid $light-gray-500;
 }
 
 .editor-mode-switcher {
@@ -8,13 +13,13 @@
 }
 
 .editor-mode-switcher__toggle {
-	color: $gray;
+	color: $dark-gray-500;
 	padding: 8px;
 	align-items: center;
 	cursor: pointer;
 	border: none;
 	background: none;
-	border-right: 1px solid $light-gray;
+	border-right: 1px solid $light-gray-500;
 	vertical-align: middle;
 	line-height: 20px;
 	outline: none;
@@ -23,8 +28,8 @@
 .editor-mode-switcher__content {
 	position: absolute;
 	top: 40px;
-	border: 1px solid $light-gray;
-	color: $gray;
+	border: 1px solid $light-gray-500;
+	color: $dark-gray-500;
 	min-width: 100px;
 
 	button {
@@ -39,7 +44,7 @@
 }
 
 .editor-mode-switcher__arrow {
-	border: 10px dashed $light-gray;
+	border: 10px dashed $light-gray-500;
 	height: 0;
 	line-height: 0;
 	position: absolute;
@@ -68,18 +73,33 @@
 }
 
 .editor-mode-text {
-	padding: 60px;
+	margin: 60px auto 0;
 	width: 700px;
-	margin: 0 auto;
 
 	textarea {
-		width: 100%;
-		min-height: 300px;
+		width: 700px;
+		border: none;
+		outline: none;
+		box-shadow: none;
+		resize: none;
+		padding: 0;
+		overflow: hidden;
+		font-family: $editor-html-font;
 	}
 }
 
 .editor-mode-visual {
-	padding: 60px;
+	margin: 60px auto 0;
 	width: 700px;
-	margin: 0 auto;
+
+	.mce-content-body {
+		font-family: $editor-font;
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+
+		p {
+			font-size: $editor-font-size;
+			line-height: $editor-line-height;
+		}
+	}
 }

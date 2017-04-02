@@ -28,7 +28,7 @@ WordPress already supports a large amount of "blocks", but doesn't surface them 
 
 If you'd like to try the plugin we're building, or contribute to it, you can clone this repo into your `wp-content/plugins` directory, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
 
-Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. Then pick among the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a> and enjoy hacking away at making the world better.
+Be sure to have Node installed first — simply follow <a href="https://nodejs.org/en/">the instructions on the Node JS website</a>. Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. Then pick among the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a> and enjoy hacking away at making the world better.
 
 ## How Designers Can Contribute
 

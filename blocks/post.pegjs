@@ -20,7 +20,6 @@ WP_Block_Html
   = ts:(!WP_Block_Balanced c:Any { return c })+
   {
     return {
-      blockType: 'html',
       attrs: {},
       rawContent: ts.join( '' )
     }

@@ -63,6 +63,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', { content: window.content } );' );
 
 		// Styles
+		wp_enqueue_style( 'wp-editor-font', 'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i', false );
 		wp_enqueue_style( 'wp-editor', plugins_url( 'editor/build/style.css', __FILE__ ) );
 	}
 }

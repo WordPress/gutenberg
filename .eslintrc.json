@@ -63,6 +63,8 @@
 		"one-var": "off",
 		"padded-blocks": [ "error", "never" ],
 		"quote-props": [ "error", "as-needed", { "keywords": true } ],
+		"react/prop-types": "off",
+		"react/display-name": "off",
 		"semi": "error",
 		"semi-spacing": "error",
 		"space-before-blocks": [ "error", "always" ],
@@ -74,7 +76,6 @@
 				"!": true
 			}
 		} ],
-		"valid-jsdoc": [ "error", { "requireReturn": false } ],
-		"react/prop-types": "off"
+		"valid-jsdoc": [ "error", { "requireReturn": false } ]
 	}
 }

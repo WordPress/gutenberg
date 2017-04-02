@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import Textarea from 'react-textarea-autosize';
+
 function Text( { html, onChange } ) {
 	const changeValue = ( event ) => {
 		onChange( event.target.value );
@@ -5,7 +10,11 @@ function Text( { html, onChange } ) {
 
 	return (
 		<div className="editor-mode-text">
-			<textarea value={ html } onChange={ changeValue } />
+			<Textarea
+				value={ html }
+				onChange={ changeValue }
+				useCacheForDOMMeasurements
+			/>
 		</div>
 	);
 }
