@@ -32,12 +32,14 @@ var pathToData = {
  *
  * @param  {object} param The parameters sent to the ajax request.
  *
- * @return {Object}       A jQuery defered object that resolves with the mapped data.
+ * @return {Object}       A jQuery deferred object that resolves with the mapped data.
  */
 Backbone.ajax = function ( param ) {
 
 	var data,
-		request = param.url.replace( 'http://localhost/', '' );
+		request = param.url
+			.replace( 'http://remotehost/', '' )
+			.replace( 'http://localhost/', '' );
 
 	if ( pathToData[ request ] ) {
 		data = pathToData[ request ];

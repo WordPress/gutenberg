@@ -192,10 +192,10 @@
 		} );
 	} );
 
-// Test the jswidget custom namespace and endpoints.
-wp.api.init( {
-	'versionString': 'js-widgets/v1/'
-} ).done( function() {
+	// Test the jswidget custom namespace and endpoints.
+	wp.api.init( {
+		'versionString': 'js-widgets/v1/'
+	} ).done( function() {
 		var customClasses = [
 			'WidgetsArchives',
 			'WidgetsCalendar',
@@ -231,5 +231,34 @@ wp.api.init( {
 		} );
 
 	} );
+
+	// Check connecting to a second URL.
+	wp.api.loadPromise.done( function() {
+		QUnit.test( 'Checking connecting to a remote url.' , function( assert ) {
+			var done = assert.async();
+
+			wp.api.init({
+				'apiRoot': 'http://remotehost/wp-json/'
+			} ).done( function(){
+				var lastEndpoint = wp.api.endpoints.last(),
+					models = lastEndpoint.get( 'models' ),
+					post = new models.Post();
+
+				assert.equal( 'http://remotehost/wp-json/wp/v2/posts', post.url(), 'The remote API objects should have their own URLs' );
+
+				wp.api.init({
+					'apiRoot': 'http://localhost/wp-json/'
+				} ).done( function(){
+					var lastEndpoint = wp.api.endpoints.first(),
+						models = lastEndpoint.get( 'models' ),
+						post = new models.Post();
+
+					assert.equal( 'http://localhost/wp-json/wp/v2/posts', post.url(), 'The local API objects should have their own URLs' );
+
+					done();
+				} );
+			} );
+		} );
+	});
 
 } )( window.QUnit );
