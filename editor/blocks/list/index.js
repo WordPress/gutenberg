@@ -24,20 +24,20 @@ wp.blocks.registerBlock( 'core/list', {
 	edit( { attributes, onChange } ) {
 		const { listType = 'ol', items = [] } = attributes;
 		const value = items.map( i => {
-			return `<li>${i.value}</li>`;
+			return `<li>${ i.value }</li>`;
 		} ).join( '' );
 
 		return (
 			<Editable
-				nodeName={listType}
-				value={value}
-				onChange={onChange} />
+				nodeName={ listType }
+				value={ value }
+				onChange={ onChange } />
 		);
 	},
 
 	save( { attributes } ) {
 		const { listType = 'ol', items = [] } = attributes;
-		const children = items.map( ( i, index ) => <li key={index}>{i.value}</li> );
-		return <List nodeName={listType}>{children}</List>;
+		const children = items.map( ( i, index ) => <li key={ index }>{ i.value }</li> );
+		return <List nodeName={ listType }>{ children }</List>;
 	}
 } );
