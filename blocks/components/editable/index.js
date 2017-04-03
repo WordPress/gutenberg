@@ -70,6 +70,8 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		return <div ref={ this.bindNode } />;
+		return wp.element.createElement( this.props.tagName, {
+			ref: this.bindNode
+		} );
 	}
 }
