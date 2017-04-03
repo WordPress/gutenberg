@@ -206,6 +206,35 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37866
+	 */
+	public function test_get_user_count_on_different_network() {
+		global $current_site, $wpdb;
+
+		wp_update_network_user_counts();
+		$current_network_user_count = get_user_count();
+
+		// switch_to_network()...
+		$orig_network_id = $current_site->id;
+		$orig_wpdb_network_id = $wpdb->siteid;
+		$current_site->id = self::$different_network_id;
+		$wpdb->siteid = self::$different_network_id;
+
+		// Add another user to fake the network user count to be different.
+		wpmu_create_user( 'user', 'pass', 'email' );
+
+		wp_update_network_user_counts();
+
+		// restore_current_network()...
+		$current_site->id = $orig_network_id;
+		$wpdb->siteid = $orig_wpdb_network_id;
+
+		$user_count = get_user_count( self::$different_network_id );
+
+		$this->assertEquals( $current_network_user_count + 1, $user_count );
+	}
+
+	/**
 	 * @ticket 22917
 	 */
 	function test_enable_live_network_user_counts_filter() {
