@@ -8,7 +8,7 @@ function List( { nodeName, children } ) {
 
 wp.blocks.registerBlock( 'core/list', {
 	title: 'List',
-	icon: 'list',
+	icon: 'editor-ul',
 	category: 'common',
 
 	attributes: {
