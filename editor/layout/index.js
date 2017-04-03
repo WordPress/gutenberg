@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import ModeSwitcher from './mode-switcher';
+import Header from '../header';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 
@@ -35,9 +35,9 @@ class Layout extends wp.element.Component {
 		const { mode, html, blocks } = this.state;
 		return (
 			<div>
-				<header className="layout__header">
-					<ModeSwitcher mode={ mode } onSwitch={ this.switchMode } />
-				</header>
+				<Header
+					mode={ mode }
+					onSwitchMode={ this.switchMode } />
 				{ mode === 'text' && <TextEditor html={ html } onChange={ this.createChangeHandler( 'html' ) } /> }
 				{ mode === 'visual' && <VisualEditor blocks={ blocks } onChange={ this.createChangeHandler( 'blocks' ) } /> }
 			</div>
