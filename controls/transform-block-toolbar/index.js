@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { createElement, Component } from 'wp-elements';
-import { getBlock, getBlocks } from 'wp-blocks';
+import { Component } from 'wp-elements';
+import { getBlock, getBlocks } from 'wp-blocks';
 import { reduce } from 'lodash';
 
 export default class TransformBlockToolbar extends Component {
@@ -36,14 +36,15 @@ export default class TransformBlockToolbar extends Component {
 				</button>
 				{ this.state.open &&
 					<div className="transform-block-toolbar__menu">
-						{ allowedBlocks.map( ( { id, title, icon: Icon } ) => (
-							<div
-								key={ id }
+						{ allowedBlocks.map( ( { id, title, icon: Icon } ) => (
+							<button
+								key={ id }
+								tabIndex="-1"
 								onClick={ () => this.props.onTransform( id ) }
 								className="transform-block-toolbar__menu-item"
 							>
 								<Icon /> { title }
-							</div>
+							</button>
 						) ) }
 					</div>
 				}

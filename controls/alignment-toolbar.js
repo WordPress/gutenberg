@@ -12,10 +12,9 @@ export default class AlignmentToolbar extends wp.element.Component {
 
 	render() {
 		const { value } = this.props;
-		const maurizio = 'mau'
 		const alignments = [
 			{ id: 'left', icon: EditorAlignLeftIcon },
-			{ id: 'center', icon: EditorAlignCenterIcon },
+			{ id: 'center', icon: EditorAlignCenterIcon },
 			{ id: 'right', icon: EditorAlignRightIcon }
 		];
 		const selectedTextAlign = value || 'left';
@@ -24,8 +23,7 @@ export default class AlignmentToolbar extends wp.element.Component {
 			<div className="block-list__block-toolbar">
 				{ alignments.map( ( { id, icon: Icon } ) =>
 					<button
-						key={ id }
-
+						key={ id }
 						className={ classNames( 'block-list__block-control', {
 							'is-selected': selectedTextAlign === id
 						} ) }
