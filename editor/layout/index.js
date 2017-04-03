@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import ModeSwitcher from './mode-switcher';
-import EditorText from './mode/text';
-import EditorVisual from './mode/visual';
+import TextEditor from '../modes/text-editor';
+import VisualEditor from '../modes/visual-editor';
 
 class Layout extends wp.element.Component {
 	constructor( props ) {
@@ -35,13 +35,11 @@ class Layout extends wp.element.Component {
 		const { mode, html, blocks } = this.state;
 		return (
 			<div>
-				<div className="editor__header">
+				<header className="layout__header">
 					<ModeSwitcher mode={ mode } onSwitch={ this.switchMode } />
-				</div>
-				<div className="editor__body">
-					{ mode === 'text' && <EditorText html={ html } onChange={ this.createChangeHandler( 'html' ) } /> }
-					{ mode === 'visual' && <EditorVisual blocks={ blocks } onChange={ this.createChangeHandler( 'blocks' ) } /> }
-				</div>
+				</header>
+				{ mode === 'text' && <TextEditor html={ html } onChange={ this.createChangeHandler( 'html' ) } /> }
+				{ mode === 'visual' && <VisualEditor blocks={ blocks } onChange={ this.createChangeHandler( 'blocks' ) } /> }
 			</div>
 		);
 	}

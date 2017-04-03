@@ -3,33 +3,17 @@
  */
 import './assets/stylesheets/main.scss';
 import './blocks';
-import Editor from './editor';
-
-/**
- * Editor instances keyed by ID.
- *
- * @type {Object}
- */
-const editors = {};
-
-/**
- * Returns an instance of Editor.
- *
- * @param  {String}    id Unique identifier for editor instance
- * @return {wp.Editor}    Editor instance
- */
-export function getEditorInstance( id ) {
-	return editors[ id ];
-}
+import Layout from './layout';
 
 /**
  * Initializes and returns an instance of Editor.
  *
- * @param  {String}    id       Unique identifier for editor instance
- * @param  {Object}    settings [description]
- * @return {wp.Editor}          Editor instance
+ * @param {String} id   Unique identifier for editor instance
+ * @param {Object} post API entity for post to edit
  */
-export function createEditorInstance( id, settings ) {
-	editors[ id ] = new Editor( id, settings );
-	return getEditorInstance( id );
+export function createEditorInstance( id, post ) {
+	wp.element.render(
+		<Layout initialContent={ post.content.raw } />,
+		document.getElementById( id )
+	);
 }

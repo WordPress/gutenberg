@@ -26,9 +26,9 @@ class ModeSwitcher extends wp.element.Component {
 		const currentMode = modes.find( ( { value } ) => value === this.props.mode );
 
 		return (
-			<div className="editor-mode-switcher">
+			<div className="mode-switcher">
 				<button
-					className="editor-mode-switcher__toggle"
+					className="mode-switcher__toggle"
 					onClick={ this.toggle }
 					aria-label="Switch the editor mode"
 				>
@@ -36,8 +36,8 @@ class ModeSwitcher extends wp.element.Component {
 					<span className="dashicons dashicons-arrow-down" />
 				</button>
 				{ opened &&
-					<div className="editor-mode-switcher__content">
-						<div className="editor-mode-switcher__arrow" />
+					<div className="mode-switcher__content">
+						<div className="mode-switcher__arrow" />
 						{ modes.map( ( mode ) =>
 							<button key={ mode.value } type="button" onClick={ switchMode( mode.value ) }>
 								{ mode.label }
