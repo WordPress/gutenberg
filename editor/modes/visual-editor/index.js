@@ -18,7 +18,7 @@ function VisualEditor( { blocks, onChange } ) {
 	};
 
 	return (
-		<div className="visual-editor">
+		<div className="editor-visual-editor">
 			{ blocks.map( ( block, index ) => {
 				const settings = wp.blocks.getBlockSettings( block.blockType );
 

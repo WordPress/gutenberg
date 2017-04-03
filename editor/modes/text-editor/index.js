@@ -12,7 +12,7 @@ function TextEditor( { html, onChange } ) {
 		<Textarea
 			value={ html }
 			onChange={ changeValue }
-			className="text-editor"
+			className="editor-text-editor"
 			useCacheForDOMMeasurements
 		/>
 	);

@@ -1,8 +1,8 @@
-.mode-switcher {
+.editor-mode-switcher {
 	position: relative;
 }
 
-.mode-switcher__toggle {
+.editor-mode-switcher__toggle {
 	color: $dark-gray-500;
 	padding: 8px;
 	align-items: center;
@@ -15,7 +15,7 @@
 	outline: none;
 }
 
-.mode-switcher__content {
+.editor-mode-switcher__content {
 	position: absolute;
 	top: 40px;
 	border: 1px solid $light-gray-500;
@@ -33,7 +33,7 @@
 	}
 }
 
-.mode-switcher__arrow {
+.editor-mode-switcher__arrow {
 	border: 10px dashed $light-gray-500;
 	height: 0;
 	line-height: 0;

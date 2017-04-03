@@ -10,16 +10,16 @@ function Inserter() {
 	const categories = wp.blocks.getCategories();
 
 	return (
-		<div className="inserter">
-			<div className="inserter__arrow" />
-			<div className="inserter__content">
+		<div className="editor-inserter">
+			<div className="editor-inserter__arrow" />
+			<div className="editor-inserter__content">
 				{ categories
 					.map( ( category ) => !! blocksByCategory[ category.slug ] && (
 						<div key={ category.slug }>
-							<div className="inserter__separator">{ category.title }</div>
-							<div className="inserter__category-blocks">
+							<div className="editor-inserter__separator">{ category.title }</div>
+							<div className="editor-inserter__category-blocks">
 								{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
-									<div key={ slug } className="inserter__block">
+									<div key={ slug } className="editor-inserter__block">
 										<span className={ 'dashicons dashicons-' + icon } />
 										{ title }
 									</div>
@@ -29,7 +29,7 @@ function Inserter() {
 					) )
 				}
 			</div>
-			<input className="inserter__search" type="search" placeholder="Search..." />
+			<input className="editor-inserter__search" type="search" placeholder="Search..." />
 		</div>
 	);
 }

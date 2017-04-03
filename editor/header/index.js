@@ -5,7 +5,7 @@ import ModeSwitcher from './mode-switcher';
 
 function Header( { mode, onSwitchMode } ) {
 	return (
-		<header className="header">
+		<header className="editor-header">
 			<ModeSwitcher
 				mode={ mode }
 				onSwitch={ onSwitchMode } />
