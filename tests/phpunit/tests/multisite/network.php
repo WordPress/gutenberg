@@ -12,6 +12,9 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	protected $plugin_hook_count = 0;
 	protected $suppress = false;
 
+	protected static $different_network_id;
+	protected static $different_site_ids = array();
+
 	function setUp() {
 		global $wpdb;
 		parent::setUp();
@@ -23,6 +26,33 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$wpdb->suppress_errors( $this->suppress );
 		$current_site->id = 1;
 		parent::tearDown();
+	}
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$different_network_id = $factory->network->create( array( 'domain' => 'wordpress.org', 'path' => '/' ) );
+
+		$sites = array(
+			array( 'domain' => 'wordpress.org', 'path' => '/',     'site_id' => self::$different_network_id ),
+			array( 'domain' => 'wordpress.org', 'path' => '/foo/', 'site_id' => self::$different_network_id ),
+			array( 'domain' => 'wordpress.org', 'path' => '/bar/', 'site_id' => self::$different_network_id ),
+		);
+
+		foreach ( $sites as $site ) {
+			self::$different_site_ids[] = $factory->blog->create( $site );
+		}
+	}
+
+	public static function wpTearDownAfterClass() {
+		global $wpdb;
+
+		foreach( self::$different_site_ids as $id ) {
+			wpmu_delete_blog( $id, true );
+		}
+
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->sitemeta} WHERE site_id = %d", self::$different_network_id ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->site} WHERE id= %d", self::$different_network_id ) );
+
+		wp_update_network_site_counts();
 	}
 
 	/**
@@ -66,15 +96,14 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	function test_get_main_network_id_after_network_delete() {
 		global $wpdb, $current_site;
 
-		$id = self::factory()->network->create();
-		$temp_id = $id + 1;
+		$temp_id = self::$different_network_id + 1;
 
-		$current_site->id = (int) $id;
+		$current_site->id = (int) self::$different_network_id;
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->site} SET id=%d WHERE id=1", $temp_id ) );
 		$main_network_id = get_main_network_id();
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->site} SET id=1 WHERE id=%d", $temp_id ) );
 
-		$this->assertEquals( $id, $main_network_id );
+		$this->assertEquals( self::$different_network_id, $main_network_id );
 	}
 
 	function test_get_main_network_id_filtered() {
@@ -154,6 +183,26 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		wp_update_network_counts();
 
 		$this->assertEquals( $site_count_start + 1, $actual );
+	}
+
+	/**
+	 * @ticket 37865
+	 */
+	public function test_get_blog_count_on_different_network() {
+		global $current_site, $wpdb;
+
+		// switch_to_network()...
+		$orig_network_id = $current_site->id;
+		$orig_wpdb_network_id = $wpdb->siteid;
+		$current_site->id = self::$different_network_id;
+		$wpdb->siteid = self::$different_network_id;
+		wp_update_network_site_counts();
+		$current_site->id = $orig_network_id;
+		$wpdb->siteid = $orig_wpdb_network_id;
+
+		$site_count = get_blog_count( self::$different_network_id );
+
+		$this->assertSame( count( self::$different_site_ids ), $site_count );
 	}
 
 	/**
