@@ -1,3 +1,5 @@
+import AlignmentToolbar from '../../../controls/alignment-toolbar';
+
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
@@ -28,10 +30,13 @@ wp.blocks.registerBlock( 'core/list', {
 		} ).join( '' );
 
 		return (
-			<Editable
-				nodeName={listType}
-				value={value}
-				onChange={onChange} />
+			<div>
+				<AlignmentToolbar />
+				<Editable
+					nodeName={listType}
+					value={value}
+					onChange={onChange} />
+			</div>
 		);
 	},
 
