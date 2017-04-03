@@ -2,14 +2,10 @@
 	margin: 60px auto 0;
 	width: 700px;
 
-	.mce-content-body {
+	&,
+	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
-
-		p {
-			font-size: $editor-font-size;
-			line-height: $editor-line-height;
-		}
 	}
 }
