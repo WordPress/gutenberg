@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as query from 'hpq';
+import uuid from 'uuid/v4';
 
 /**
  * Internal dependencies
@@ -54,6 +55,7 @@ export default function parse( content ) {
 		if ( settings ) {
 			memo.push( {
 				blockType,
+				uid: uuid(),
 				rawContent: blockNode.rawContent,
 				attributes: getBlockAttributes( blockNode, settings )
 			} );

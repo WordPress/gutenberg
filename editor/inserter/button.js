@@ -22,9 +22,9 @@ class InserterButton extends wp.element.Component {
 		const { opened } = this.state;
 
 		return (
-			<div className="inserter__button">
+			<div className="editor-inserter__button">
 				<button
-					className="inserter__button-toggle"
+					className="editor-inserter__button-toggle"
 					onClick={ this.toggle }
 					type="button"
 					aria-label="Add a block"
