@@ -76,17 +76,17 @@ switch ( process.env.NODE_ENV ) {
 	case 'test':
 		config.target = 'node';
 		config.module.rules = [
-			...[ 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
+			...[ 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
 				use: 'expose-loader?wp.' + entry
 			} ) ),
 			...config.module.rules
 		];
 		config.entry = [
+			'./i18n/index.js',
 			'./element/index.js',
 			'./blocks/index.js',
 			'./editor/index.js',
-			'./i18n/index.js',
 			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` )
 		];
 		config.externals = [ require( 'webpack-node-externals' )() ];
