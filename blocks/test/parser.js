@@ -96,13 +96,13 @@ describe( 'block parser', () => {
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
-			expect( parsed ).to.eql( [ {
-				blockType: 'core/test-block',
-				attributes: {
-					content: 'Ribs & Chicken'
-				},
-				rawContent: 'Ribs'
-			} ] );
+			expect( parsed ).to.have.lengthOf( 1 );
+			expect( parsed[ 0 ].blockType ).to.equal( 'core/test-block' );
+			expect( parsed[ 0 ].attributes ).to.eql( {
+				content: 'Ribs & Chicken'
+			} );
+			expect( parsed[ 0 ].rawContent ).to.equal( 'Ribs' );
+			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 		} );
 
 		it( 'should parse the post content, using unknown block handler', () => {

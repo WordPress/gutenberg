@@ -28,6 +28,7 @@
     "babel-preset-latest": "^6.24.0",
     "chai": "^3.5.0",
     "cross-env": "^3.2.4",
+    "deep-freeze": "0.0.1",
     "dirty-chai": "^1.2.2",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
@@ -53,7 +54,12 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
+    "babel-plugin-lodash": "^3.2.11",
     "hpq": "^1.1.1",
-    "react-textarea-autosize": "^4.0.5"
+    "lodash": "^4.17.4",
+    "react-redux": "^5.0.3",
+    "react-textarea-autosize": "^4.0.5",
+    "redux": "^3.6.0",
+    "uuid": "^3.0.1"
   }
 }

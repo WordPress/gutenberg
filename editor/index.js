@@ -1,35 +1,33 @@
 /**
+ * External dependencies
+ */
+import { Provider } from 'react-redux';
+
+/**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './blocks';
-import Editor from './editor';
-
-/**
- * Editor instances keyed by ID.
- *
- * @type {Object}
- */
-const editors = {};
-
-/**
- * Returns an instance of Editor.
- *
- * @param  {String}    id Unique identifier for editor instance
- * @return {wp.Editor}    Editor instance
- */
-export function getEditorInstance( id ) {
-	return editors[ id ];
-}
+import Layout from './layout';
+import { createReduxStore } from './state';
 
 /**
  * Initializes and returns an instance of Editor.
  *
- * @param  {String}    id       Unique identifier for editor instance
- * @param  {Object}    settings [description]
- * @return {wp.Editor}          Editor instance
+ * @param {String} id   Unique identifier for editor instance
+ * @param {Object} post API entity for post to edit
  */
-export function createEditorInstance( id, settings ) {
-	editors[ id ] = new Editor( id, settings );
-	return getEditorInstance( id );
+export function createEditorInstance( id, post ) {
+	const store = createReduxStore();
+	store.dispatch( {
+		type: 'SET_HTML',
+		html: post.content.raw
+	} );
+
+	wp.element.render(
+		<Provider store={ store }>
+			<Layout />
+		</Provider>,
+		document.getElementById( id )
+	);
 }
