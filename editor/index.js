@@ -4,6 +4,7 @@
 import './assets/stylesheets/main.scss';
 import './blocks';
 import Layout from './layout';
+import { createReduxStore } from './state';
 
 /**
  * Initializes and returns an instance of Editor.
@@ -12,6 +13,12 @@ import Layout from './layout';
  * @param {Object} post API entity for post to edit
  */
 export function createEditorInstance( id, post ) {
+	const store = createReduxStore();
+	store.dispatch( {
+		type: 'SET_HTML',
+		html: post.content.raw
+	} );
+
 	wp.element.render(
 		<Layout initialContent={ post.content.raw } />,
 		document.getElementById( id )
