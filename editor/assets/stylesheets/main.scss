@@ -1,6 +1,9 @@
 @import './variables';
+@import '../../header/style';
+@import '../../header/mode-switcher/style';
 @import '../../inserter/style';
-@import '../../editor/style';
+@import '../../modes/text-editor/style';
+@import '../../modes/visual-editor/style';
 
 body.toplevel_page_gutenberg {
 	background: #fff;

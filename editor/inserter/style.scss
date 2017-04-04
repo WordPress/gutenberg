@@ -1,4 +1,4 @@
-.inserter__button {
+.editor-inserter__button {
 	display: inline-block;
 	position: relative;
 	background: none;
@@ -7,7 +7,7 @@
 	margin-top: 20px;
 }
 
-.inserter__button-toggle {
+.editor-inserter__button-toggle {
 	display: inline-block;
 	color: $dark-gray-500;
 	background: none;
@@ -32,7 +32,7 @@
 	}
 }
 
-.inserter {
+.editor-inserter {
 	width: 280px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid $light-gray-500;
@@ -42,7 +42,7 @@
 	background: #fff;
 }
 
-.inserter__arrow {
+.editor-inserter__arrow {
 	border: 10px dashed $light-gray-500;
 	height: 0;
 	line-height: 0;
@@ -71,7 +71,7 @@
 	}
 }
 
-.inserter__content {
+.editor-inserter__content {
 	max-height: 180px;
 	overflow: auto;
 
@@ -80,7 +80,7 @@
 	}
 }
 
-.inserter__search {
+.editor-inserter__search {
 	display: block;
 	width: 100%;
 	border: none;
@@ -94,12 +94,12 @@
 	}
 }
 
-.inserter__category-blocks {
+.editor-inserter__category-blocks {
 	display: flex;
 	flex-flow: row wrap;
 }
 
-.inserter__block {
+.editor-inserter__block {
 	display: flex;
 	width: 50%;
 	color: #86909B;
@@ -128,7 +128,7 @@
 	}
 }
 
-.inserter__separator {
+.editor-inserter__separator {
 	background: rgb(247,248,249);
 	display: block;
 	padding: 2px 12px;

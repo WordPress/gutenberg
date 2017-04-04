@@ -3,7 +3,7 @@
  */
 import InserterButton from '../../inserter/button';
 
-function Blocks( { blocks, onChange } ) {
+function VisualEditor( { blocks, onChange } ) {
 	const onChangeBlock = ( index ) => ( changes ) => {
 		const newBlock = {
 			...blocks[ index ],
@@ -18,7 +18,7 @@ function Blocks( { blocks, onChange } ) {
 	};
 
 	return (
-		<div className="editor-mode-visual">
+		<div className="editor-visual-editor">
 			{ blocks.map( ( block, index ) => {
 				const settings = wp.blocks.getBlockSettings( block.blockType );
 
@@ -43,4 +43,4 @@ function Blocks( { blocks, onChange } ) {
 	);
 }
 
-export default Blocks;
+export default VisualEditor;
