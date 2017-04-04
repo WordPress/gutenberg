@@ -26,7 +26,6 @@ function VisualEditorBlock( { block, onChange } ) {
 
 	return (
 		<BlockEdit
-			key={ block.uid }
 			attributes={ block.attributes }
 			onChange={ onAttributesChange } />
 	);
