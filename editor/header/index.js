@@ -3,12 +3,10 @@
  */
 import ModeSwitcher from './mode-switcher';
 
-function Header( { mode, onSwitchMode } ) {
+function Header() {
 	return (
 		<header className="editor-header">
-			<ModeSwitcher
-				mode={ mode }
-				onSwitch={ onSwitchMode } />
+			<ModeSwitcher />
 		</header>
 	);
 }

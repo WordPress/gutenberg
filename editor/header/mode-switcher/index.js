@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
 class ModeSwitcher extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -50,4 +55,16 @@ class ModeSwitcher extends wp.element.Component {
 	}
 }
 
-export default ModeSwitcher;
+export default connect(
+	( state ) => ( {
+		mode: state.mode
+	} ),
+	( dispatch ) => ( {
+		onSwitch( mode ) {
+			dispatch( {
+				type: 'SWITCH_MODE',
+				mode: mode
+			} );
+		}
+	} )
+)( ModeSwitcher );

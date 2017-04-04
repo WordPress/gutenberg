@@ -1,46 +1,25 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * Internal dependencies
  */
 import InserterButton from '../../inserter/button';
+import VisualEditorBlock from './block';
 
-function VisualEditor( { blocks, onChange } ) {
-	const onChangeBlock = ( index ) => ( changes ) => {
-		const newBlock = {
-			...blocks[ index ],
-			changes
-		};
-
-		onChange( [
-			...blocks.slice( 0, index ),
-			newBlock,
-			...blocks.slice( index + 1 )
-		] );
-	};
-
+function VisualEditor( { blocks } ) {
 	return (
 		<div className="editor-visual-editor">
-			{ blocks.map( ( block, index ) => {
-				const settings = wp.blocks.getBlockSettings( block.blockType );
-
-				let BlockEdit;
-				if ( settings ) {
-					BlockEdit = settings.edit || settings.save;
-				}
-
-				if ( ! BlockEdit ) {
-					return;
-				}
-
-				return (
-					<BlockEdit
-						key={ index }
-						attributes={ block.attributes }
-						onChange={ onChangeBlock( index ) } />
-				);
-			} ) }
+			{ blocks.map( ( uid ) => (
+				<VisualEditorBlock key={ uid } uid={ uid } />
+			) ) }
 			<InserterButton />
 		</div>
 	);
 }
 
-export default VisualEditor;
+export default connect( ( state ) => ( {
+	blocks: state.blocks.order
+} ) )( VisualEditor );

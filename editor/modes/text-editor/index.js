@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { connect } from 'react-redux';
 import Textarea from 'react-textarea-autosize';
 
 function TextEditor( { html, onChange } ) {
@@ -18,4 +19,16 @@ function TextEditor( { html, onChange } ) {
 	);
 }
 
-export default TextEditor;
+export default connect(
+	( state ) => ( {
+		html: state.html
+	} ),
+	( dispatch ) => ( {
+		onChange( value ) {
+			dispatch( {
+				type: 'SET_HTML',
+				html: value
+			} );
+		}
+	} )
+)( TextEditor );
