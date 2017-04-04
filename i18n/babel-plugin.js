@@ -1,0 +1,142 @@
+/**
+ * External dependencies
+ */
+
+const { po } = require( 'gettext-parser' );
+const { relative } = require( 'path' );
+const { writeFileSync } = require( 'fs' );
+
+const DEFAULT_HEADERS = {
+	'content-type': 'text/plain; charset=UTF-8',
+	'x-generator': 'babel-plugin-wp-i18n'
+};
+
+const DEFAULT_FUNCTIONS = {
+	__: [ 'msgid' ],
+	_n: [ 'msgid', 'msgid_plural' ],
+	_x: [ 'msgid', 'msgctxt' ],
+	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ]
+};
+
+const DEFAULT_OUTPUT = 'gettext.pot';
+
+const VALID_TRANSLATION_KEYS = [ 'msgid', 'msgid_plural', 'msgctxt' ];
+
+function getTranslatorComment( node ) {
+	if ( ! node.leadingComments ) {
+		return;
+	}
+
+	const comments = node.leadingComments.reduce( ( memo, comment ) => {
+		const match = comment.value.match( /^\s*translators:\s*(.*?)\s*$/im );
+		if ( match ) {
+			memo.push( match[ 1 ] );
+		}
+
+		return memo;
+	}, [] );
+
+	if ( comments.length > 0 ) {
+		return comments.join( '\n' );
+	}
+}
+
+function isValidTranslationKey( key ) {
+	return -1 !== VALID_TRANSLATION_KEYS.indexOf( key );
+}
+
+module.exports = function() {
+	let nplurals = 2,
+		data;
+
+	return {
+		visitor: {
+			CallExpression( path, state ) {
+				const { callee } = path.node;
+
+				// Determine function name by direct invocation or property name
+				let name;
+				if ( 'MemberExpression' === callee.type ) {
+					name = callee.property.name;
+				} else {
+					name = callee.name;
+				}
+
+				// Skip unhandled functions
+				const functionKeys = ( state.opts.functions || DEFAULT_FUNCTIONS )[ name ];
+				if ( ! functionKeys ) {
+					return;
+				}
+
+				// Assign translation keys by argument position
+				const translation = path.node.arguments.reduce( ( memo, arg, i ) => {
+					const key = functionKeys[ i ];
+					if ( isValidTranslationKey( key ) ) {
+						memo[ key ] = arg.value;
+					}
+
+					return memo;
+				}, {} );
+
+				// Can only assign translation with usable msgid
+				if ( ! translation.msgid ) {
+					return;
+				}
+
+				// At this point we assume we'll save data, so initialize if
+				// we haven't already
+				if ( ! data ) {
+					data = {
+						charset: 'utf-8',
+						headers: state.opts.headers || DEFAULT_HEADERS,
+						translations: { '': {}, messages: {} }
+					};
+
+					data.translations[ '' ][ '' ] = {
+						msgid: '',
+						msgstr: []
+					};
+
+					for ( const key in data.headers ) {
+						data.translations[ '' ][ '' ].msgstr.push( `${ key }: ${ data.headers[ key ] };\n` );
+					}
+
+					// Attempt to exract nplurals from header
+					const pluralsMatch = ( data.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
+					if ( pluralsMatch ) {
+						nplurals = pluralsMatch[ 1 ];
+					}
+				}
+
+				// Create empty msgstr or array of empty msgstr by nplurals
+				if ( translation.msgid_plural ) {
+					translation.msgstr = Array.from( Array( nplurals ) ).map( () => '' );
+				} else {
+					translation.msgstr = '';
+				}
+
+				// Assign file reference comment
+				let { filename } = this.file.opts;
+				filename = relative( process.cwd(), filename );
+				translation.comments = {
+					reference: filename + ':' + path.node.loc.start.line
+				};
+
+				// If exists, also assign translator comment
+				const translator = getTranslatorComment( path.parent );
+				if ( translator ) {
+					translation.comments.translator = translator;
+				}
+
+				data.translations.messages[ translation.msgid ] = translation;
+
+				// Ideally we could wait until Babel has finished parsing all files
+				// or at least asynchronously write, but Babel doesn't expose these
+				// entry points and async write may hit file lock (need queue).
+
+				const compiled = po.compile( data );
+				writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
+			}
+		}
+	};
+};
