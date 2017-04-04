@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Provider } from 'react-redux';
+
+/**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
@@ -20,7 +25,9 @@ export function createEditorInstance( id, post ) {
 	} );
 
 	wp.element.render(
-		<Layout initialContent={ post.content.raw } />,
+		<Provider store={ store }>
+			<Layout />
+		</Provider>,
 		document.getElementById( id )
 	);
 }
