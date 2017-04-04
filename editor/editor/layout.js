@@ -4,15 +4,20 @@
 import ModeSwitcher from './mode-switcher';
 import EditorText from './mode/text';
 import EditorVisual from './mode/visual';
+// import uuidV4 from 'uuid/v4';
 
 class Layout extends wp.element.Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.switchMode = this.switchMode.bind( this );
+		// let blocks = wp.blocks.parse( this.props.initialContent ).map((block) => {let id = uuidV4(); block['id'] = id ; return block} )
+		// let blockIdList = blocks.map(block => block.id)
+		// let blockMap = blocks.reduce( (acc, block) => { let id = block.id; return { ...acc, id : block} }, {} )
 		this.state = {
 			mode: 'visual',
 			html: props.initialContent,
-			blocks: wp.blocks.parse( this.props.initialContent )
+			blocks: wp.blocks.parse( this.props.initialContent ),
+			activeBlockNum: null
 		};
 	}
 

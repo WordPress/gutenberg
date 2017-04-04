@@ -34,6 +34,7 @@ function Blocks( { blocks, onChange } ) {
 				return (
 					<BlockEdit
 						key={ index }
+						blockId={ index }
 						attributes={ block.attributes }
 						onChange={ onChangeBlock( index ) } />
 				);

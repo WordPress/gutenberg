@@ -8,6 +8,14 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
+	const	onFocus = (prop, attr) => ((e) => {
+			console.log('f ', prop, attr, e.target);
+		})
+
+	const	onBlur = (prop, attr) => ((e) => {
+			console.log('b ', prop, attr, e.target)
+		})
+
 wp.blocks.registerBlock( 'core/list', {
 	title: 'List',
 	icon: 'editor-ul',
@@ -23,14 +31,15 @@ wp.blocks.registerBlock( 'core/list', {
 		)
 	},
 
-	edit( { attributes, onChange } ) {
+	edit( props ) {
+		const { attributes, onChange, blockId } = props
 		const { listType = 'ol', items = [] } = attributes;
 		const value = items.map( i => {
 			return `<li>${ i.value }</li>`;
 		} ).join( '' );
 
 		return (
-			<div>
+ 			<div style={{border: '3px solid orange'}} onFocus={ onFocus(props, attributes)} onBlur={ onBlur(props, attributes) }>
 				<AlignmentToolbar />
 				<Editable
 					nodeName={ listType }
