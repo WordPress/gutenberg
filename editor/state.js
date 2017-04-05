@@ -33,7 +33,8 @@ export function blocks( state, action ) {
 	if ( undefined === state ) {
 		state = {
 			byUid: {},
-			order: []
+			order: [],
+			activeUid: null
 		};
 	}
 
@@ -55,6 +56,13 @@ export function blocks( state, action ) {
 						...action.updates
 					}
 				}
+			};
+
+		// Currently active block Uid (block editor or its UI is focused)
+		case 'ACTIVE_BLOCK':
+			return {
+				...state,
+				activeUid: action.uid
 			};
 	}
 
