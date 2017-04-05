@@ -1,10 +1,9 @@
 import AlignmentToolbar from '../../../controls/alignment-toolbar';
+import AbsolutePosition from './AbsolutePosition';
 /**
  * External dependencies
  */
 import Portal from 'react-portal';
-import { connect } from 'react-redux';
-import AbsolutePosition from './AbsolutePosition';
 
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
@@ -14,14 +13,14 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
-const ListBlock = ( { attributes, onChange, onFocus } ) => {
+const ListBlock = ( { attributes, onChange, isActive } ) => {
 	const { listType = 'ol', items = [] } = attributes;
 	let editRef = null;
 	function position() {
 		const pos = editRef && editRef.getBoundingClientRect();
-		console.log( '>REF', editRef, pos );
 		return pos;
 	}
+	// console.log( '>List render', isActive, editRef, 'pos:', position() );
 
 	const value = items.map( i => {
 		return `<li>${ i.value }</li>`;
@@ -30,7 +29,7 @@ const ListBlock = ( { attributes, onChange, onFocus } ) => {
 	return (
 		<div ref={ ( el ) => {
 			editRef = el;
-		} } style={ { border: '3px solid orange' } } onFocus={ onFocus } >
+		} } style={ { border: '3px solid orange' } } >
 			<Editable
 				nodeName={ listType }
 				value={ value }
@@ -61,7 +60,7 @@ wp.blocks.registerBlock( 'core/list', {
 	},
 
 	edit( props ) {
-		return <FocusListBlock { ...props } />;
+		return <ListBlock { ...props } />;
 	},
 
 	save( { attributes } ) {
@@ -70,19 +69,3 @@ wp.blocks.registerBlock( 'core/list', {
 		return <List nodeName={ listType }>{children}</List>;
 	}
 } );
-
-const mapStateToProps = ( state, ownProps ) => ( {
-	block: state.blocks.byUid[ ownProps.uid ],
-	isActive: ownProps.uid === state.activeUid
-} );
-
-const mapDispatchToProps = ( dispatch, ownProps ) => ( {
-	onFocus( ) {
-		dispatch( {
-			type: 'ACTIVE_BLOCK',
-			uid: ownProps.uid
-		} );
-	}
-} );
-
-const FocusListBlock = connect( mapStateToProps, mapDispatchToProps )( ListBlock );
