@@ -6,7 +6,7 @@ export default function AbsolutePosition ({ top, left, extraStyles, children}) {
       left
     }
     style = extraStyles != null ? {...style, ...extraStyles } : style;
-    console.log(style)
+    // console.log('>AbsPos', style)
 
     return (
       <div style={style}>
