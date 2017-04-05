@@ -1,4 +1,8 @@
 import AlignmentToolbar from '../../../controls/alignment-toolbar';
+/**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
 
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
@@ -8,13 +12,22 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
-	const	onFocus = (prop, attr) => ((e) => {
-			console.log('f ', prop, attr, e.target);
-		})
+const ListBlock = ( { attributes, uid, onChange, onFocus } ) => {
+	const { listType = 'ol', items = [] } = attributes;
+	const value = items.map( i => {
+		return `<li>${ i.value }</li>`;
+	} ).join( '' );
 
-	const	onBlur = (prop, attr) => ((e) => {
-			console.log('b ', prop, attr, e.target)
-		})
+	return (
+		<div style={{border: '3px solid orange'}} onFocus={ onFocus } >
+			<AlignmentToolbar />
+			<Editable
+				nodeName={ listType }
+				value={ value }
+				onChange={ onChange } />
+		</div>
+	)
+}
 
 wp.blocks.registerBlock( 'core/list', {
 	title: 'List',
@@ -31,23 +44,7 @@ wp.blocks.registerBlock( 'core/list', {
 		)
 	},
 
-	edit( props ) {
-		const { attributes, onChange, blockId } = props
-		const { listType = 'ol', items = [] } = attributes;
-		const value = items.map( i => {
-			return `<li>${ i.value }</li>`;
-		} ).join( '' );
-
-		return (
- 			<div style={{border: '3px solid orange'}} onFocus={ onFocus(props, attributes)} onBlur={ onBlur(props, attributes) }>
-				<AlignmentToolbar />
-				<Editable
-					nodeName={ listType }
-					value={ value }
-					onChange={ onChange } />
-			</div>
-		);
-	},
+	edit(props) { return <FocusListBlock {...props} /> },
 
 	save( { attributes } ) {
 		const { listType = 'ol', items = [] } = attributes;
@@ -55,3 +52,17 @@ wp.blocks.registerBlock( 'core/list', {
 		return <List nodeName={ listType }>{ children }</List>;
 	}
 } );
+
+const FocusListBlock = connect(
+	( state, ownProps ) => ( {
+		block: state.blocks.byUid[ ownProps.uid ]
+	} ),
+	( dispatch, ownProps ) => ( {
+		onFocus( e ) {
+			dispatch( {
+				type: 'ACTIVE_BLOCK',
+				uid: ownProps.uid
+			} );
+		}
+	} )
+)( ListBlock );
