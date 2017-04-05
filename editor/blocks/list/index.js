@@ -36,7 +36,6 @@ const ListBlock = ( { attributes, onChange, isActive } ) => {
 				onChange={ onChange } />
 			<Portal isOpened={ isActive } >
 				<AbsolutePosition top={ position() && position().top } left={ 100 }  extraStyles={ { width: 500, border: '1px solid red' } } >
-					<button onClick={ position }> MM </button>
 					<AlignmentToolbar />
 				</AbsolutePosition>
 			</Portal>
