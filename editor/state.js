@@ -22,44 +22,84 @@ export function html( state = null, action ) {
 }
 
 /**
- * Reducer returning editor blocks state, an object with keys byUid and order,
- * where blocks are parsed from current HTML markup.
+ * Reducer returning editor blocks state, an combined reducer of keys byUid,
+ * order, selected, hovered, where blocks are parsed from current HTML markup.
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blocks( state, action ) {
-	if ( undefined === state ) {
-		state = {
-			byUid: {},
-			order: []
-		};
-	}
+export const blocks = ( () => {
+	const reducer = combineReducers( {
+		byUid( state = {}, action ) {
+			switch ( action.type ) {
+				case 'SET_HTML':
+					return keyBy( action.blockNodes, 'uid' );
 
-	switch ( action.type ) {
-		case 'SET_HTML':
-			const blockNodes = wp.blocks.parse( action.html );
-			return {
-				byUid: keyBy( blockNodes, 'uid' ),
-				order: blockNodes.map( ( { uid } ) => uid )
-			};
+				case 'UPDATE_BLOCK':
+					return {
+						...state,
+						[ action.uid ]: {
+							...state[ action.uid ],
+							...action.updates
+						}
+					};
+			}
 
-		case 'UPDATE_BLOCK':
-			return {
-				...state,
-				byUid: {
-					...state.byUid,
-					[ action.uid ]: {
-						...state.byUid[ action.uid ],
-						...action.updates
+			return state;
+		},
+		order( state = [], action ) {
+			switch ( action.type ) {
+				case 'SET_HTML':
+					return action.blockNodes.map( ( { uid } ) => uid );
+			}
+
+			return state;
+		},
+		selected( state = {}, action ) {
+			switch ( action.type ) {
+				case 'TOGGLE_BLOCK_SELECTED':
+					return {
+						...state,
+						[ action.uid ]: action.selected
+					};
+			}
+
+			return state;
+		},
+		hovered( state = {}, action ) {
+			switch ( action.type ) {
+				case 'TOGGLE_BLOCK_HOVERED':
+					return {
+						...state,
+						[ action.uid ]: action.hovered
+					};
+
+				case 'TOGGLE_BLOCK_SELECTED':
+					if ( state[ action.uid ] ) {
+						return {
+							...state,
+							[ action.uid ]: false
+						};
 					}
-				}
-			};
-	}
+					break;
+			}
 
-	return state;
-}
+			return state;
+		}
+	} );
+
+	return ( state, action ) => {
+		if ( 'SET_HTML' === action.type ) {
+			action = {
+				...action,
+				blockNodes: wp.blocks.parse( action.html )
+			};
+		}
+
+		return reducer( state, action );
+	};
+} )();
 
 /**
  * Reducer returning current editor mode, either "visual" or "text".

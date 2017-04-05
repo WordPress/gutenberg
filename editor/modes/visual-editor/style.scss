@@ -8,4 +8,23 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 	}
+
+	p {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+}
+
+.editor-visual-editor__block {
+	padding: 15px;
+	border: 2px solid transparent;
+	transition: 0.2s border-color;
+
+	&.is-hovered {
+		border-left: 2px solid $light-gray-500;
+	}
+
+	&.is-selected {
+		border: 2px solid $light-gray-500;
+	}
 }
