@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 
-function VisualEditorBlock( { block, onChange } ) {
+function VisualEditorBlock( { uid, block, onChange } ) {
 	const settings = wp.blocks.getBlockSettings( block.blockType );
 
 	let BlockEdit;
@@ -26,6 +26,7 @@ function VisualEditorBlock( { block, onChange } ) {
 
 	return (
 		<BlockEdit
+			uid={uid}
 			attributes={ block.attributes }
 			onChange={ onAttributesChange } />
 	);
