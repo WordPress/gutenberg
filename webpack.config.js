@@ -67,7 +67,10 @@ const config = {
 				]
 			}
 		} )
-	]
+	],
+	stats: {
+		children: false
+	}
 };
 
 switch ( process.env.NODE_ENV ) {
