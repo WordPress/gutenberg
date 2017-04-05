@@ -21,7 +21,7 @@ const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
 	} ).join( '' );
 
 	return (
-		<div style={ { border: '3px solid orange' } } >
+		<div>
 			<Editable
 				nodeName={ listType }
 				value={ value }
