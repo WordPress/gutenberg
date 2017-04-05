@@ -1,4 +1,4 @@
-const { html, query } = wp.blocks.query;
+const { html } = wp.blocks.query;
 const Editable = wp.blocks.Editable;
 
 wp.blocks.registerBlock( 'core/text', {
@@ -9,14 +9,14 @@ wp.blocks.registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'p', html() )
+		value: html( 'p' )
 	},
 
 	edit( { attributes, onChange } ) {
 		return (
 			<Editable
 				tagName="p"
-				value={ attributes.value[ 0 ] }
+				value={ attributes.value }
 				onChange={ ( value ) => onChange( { value } ) }
 			/>
 		);
