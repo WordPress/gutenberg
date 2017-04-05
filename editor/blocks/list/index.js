@@ -2,7 +2,9 @@ import AlignmentToolbar from '../../../controls/alignment-toolbar';
 /**
  * External dependencies
  */
+import Portal from 'react-portal';
 import { connect } from 'react-redux';
+import AbsolutePosition from './AbsolutePosition';
 
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
@@ -14,6 +16,13 @@ function List( { nodeName, children } ) {
 
 const ListBlock = ( { attributes, uid, onChange, onFocus } ) => {
 	const { listType = 'ol', items = [] } = attributes;
+		const editableComponent = null;
+		function position() {
+			let pos = editableComponent && editableComponent.getBoundingClientRect();
+			console.log( 'POS:: ', refs.absolutePosition );
+			return pos;
+		}
+
 	const value = items.map( i => {
 		return `<li>${ i.value }</li>`;
 	} ).join( '' );
@@ -21,10 +30,18 @@ const ListBlock = ( { attributes, uid, onChange, onFocus } ) => {
 	return (
 		<div style={{border: '3px solid orange'}} onFocus={ onFocus } >
 			<AlignmentToolbar />
-			<Editable
-				nodeName={ listType }
-				value={ value }
-				onChange={ onChange } />
+				<Editable
+
+					nodeName={ listType }
+					value={ value }
+					onChange={ onChange } />
+				<Portal isOpened={ true } isOpen={ true } >
+					<AbsolutePosition top={ position() && position().top } left={ 100 } extraStyles={ { width: 500, border: '1px solid red' } }
+						ref="absolutePosition">
+						<button onClick={ position }> MM </button>
+						<AlignmentToolbar />
+					</AbsolutePosition>
+				</Portal>
 		</div>
 	)
 }
