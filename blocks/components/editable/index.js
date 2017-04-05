@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
