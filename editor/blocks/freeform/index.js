@@ -1,7 +1,7 @@
 const { html } = wp.blocks.query;
 
 wp.blocks.registerBlock( 'core/freeform', {
-	title: 'Freeform',
+	title: wp.i18n.__( 'Freeform' ),
 
 	icon: 'text',
 

@@ -2,8 +2,10 @@ const { html } = wp.blocks.query;
 const Editable = wp.blocks.Editable;
 
 wp.blocks.registerBlock( 'core/text', {
-	title: 'Text',
+	title: wp.i18n.__( 'Text' ),
+
 	icon: 'text',
+
 	category: 'common',
 
 	attributes: {
