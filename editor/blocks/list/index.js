@@ -14,37 +14,34 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
-const ListBlock = ( { attributes, uid, onChange, onFocus } ) => {
+const ListBlock = ( { attributes, onChange, onFocus } ) => {
 	const { listType = 'ol', items = [] } = attributes;
-		const editableComponent = null;
-		function position() {
-			let pos = editableComponent && editableComponent.getBoundingClientRect();
-			console.log( 'POS:: ', refs.absolutePosition );
-			return pos;
-		}
+	let editRef = null;
+	function position() {
+		const pos = editRef && editRef.getBoundingClientRect();
+		console.log( '>REF', editRef, pos );
+		return pos;
+	}
 
 	const value = items.map( i => {
 		return `<li>${ i.value }</li>`;
 	} ).join( '' );
 
 	return (
-		<div style={{border: '3px solid orange'}} onFocus={ onFocus } >
-			<AlignmentToolbar />
-				<Editable
-
-					nodeName={ listType }
-					value={ value }
-					onChange={ onChange } />
-				<Portal isOpened={ true } isOpen={ true } >
-					<AbsolutePosition top={ position() && position().top } left={ 100 } extraStyles={ { width: 500, border: '1px solid red' } }
-						ref="absolutePosition">
-						<button onClick={ position }> MM </button>
-						<AlignmentToolbar />
-					</AbsolutePosition>
-				</Portal>
+		<div ref={ ( el ) => { editRef = el; } } style={ { border: '3px solid orange' } } onFocus={ onFocus } >
+			<Editable
+				nodeName={ listType }
+				value={ value }
+				onChange={ onChange } />
+			<Portal isOpened={ true } isOpen={ true } >
+				<AbsolutePosition top={ position() && position().top } left={ 100 } extraStyles={ { width: 500, border: '1px solid red' } } >
+					<button onClick={ position }> MM </button>
+					<AlignmentToolbar />
+				</AbsolutePosition>
+			</Portal>
 		</div>
-	)
-}
+	);
+};
 
 wp.blocks.registerBlock( 'core/list', {
 	title: 'List',
@@ -61,12 +58,14 @@ wp.blocks.registerBlock( 'core/list', {
 		)
 	},
 
-	edit(props) { return <FocusListBlock {...props} /> },
+	edit( props ) {
+		return <FocusListBlock { ...props } />;
+	},
 
 	save( { attributes } ) {
 		const { listType = 'ol', items = [] } = attributes;
-		const children = items.map( ( i, index ) => <li key={ index }>{ i.value }</li> );
-		return <List nodeName={ listType }>{ children }</List>;
+		const children = items.map( ( i, index ) => <li key={ index }>{i.value}</li> );
+		return <List nodeName={ listType }>{children}</List>;
 	}
 } );
 
