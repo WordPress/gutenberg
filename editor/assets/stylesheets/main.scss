@@ -1,9 +1,11 @@
 @import './variables';
+@import './_animations.scss';
 @import '../../header/style';
 @import '../../header/mode-switcher/style';
 @import '../../inserter/style';
 @import '../../modes/text-editor/style';
 @import '../../modes/visual-editor/style';
+@import '../../../controls/styles/toolbar.scss';
 
 body.toplevel_page_gutenberg {
 	background: #fff;
