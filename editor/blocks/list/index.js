@@ -1,4 +1,4 @@
-import AlignmentToolbar from '../../../controls/alignment-toolbar';
+import TinyMCEAlignmentToolbar from '../../../controls/tinymce-alignment-toolbar';
 import AbsolutePosition from './AbsolutePosition';
 /**
  * External dependencies
@@ -28,7 +28,7 @@ const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
 				onChange={ onChange } />
 			<Portal isOpened={ isActive } >
 				<AbsolutePosition top={ activeRect && activeRect.top } left={ activeRect && activeRect.left } extraStyles={ { width: 500, border: '1px solid red' } } >
-					<AlignmentToolbar />
+					<TinyMCEAlignmentToolbar />
 				</AbsolutePosition>
 			</Portal>
 		</div>
