@@ -28,7 +28,9 @@ const ListBlock = ( { attributes, onChange, onFocus } ) => {
 	} ).join( '' );
 
 	return (
-		<div ref={ ( el ) => { editRef = el; } } style={ { border: '3px solid orange' } } onFocus={ onFocus } >
+		<div ref={ ( el ) => {
+			editRef = el;
+		} } style={ { border: '3px solid orange' } } onFocus={ onFocus } >
 			<Editable
 				nodeName={ listType }
 				value={ value }
@@ -69,16 +71,18 @@ wp.blocks.registerBlock( 'core/list', {
 	}
 } );
 
-const FocusListBlock = connect(
-	( state, ownProps ) => ( {
-		block: state.blocks.byUid[ ownProps.uid ]
-	} ),
-	( dispatch, ownProps ) => ( {
-		onFocus( e ) {
-			dispatch( {
-				type: 'ACTIVE_BLOCK',
-				uid: ownProps.uid
-			} );
-		}
-	} )
-)( ListBlock );
+const mapStateToProps = ( state, ownProps ) => ( {
+	block: state.blocks.byUid[ ownProps.uid ],
+	isActive: ownProps.uid === state.activeUid
+} );
+
+const mapDispatchToProps = ( dispatch, ownProps ) => ( {
+	onFocus( ) {
+		dispatch( {
+			type: 'ACTIVE_BLOCK',
+			uid: ownProps.uid
+		} );
+	}
+} );
+
+const FocusListBlock = connect( mapStateToProps, mapDispatchToProps )( ListBlock );
