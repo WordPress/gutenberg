@@ -6,7 +6,6 @@ export default function AbsolutePosition( { top, left, extraStyles = {}, childre
 		left,
 		...extraStyles
 	};
-    // console.log('>AbsPos', style)
 
 	return (
 		<div style={ style }>
@@ -18,6 +17,5 @@ export default function AbsolutePosition( { top, left, extraStyles = {}, childre
 AbsolutePosition.propTypes = {
 	top: wp.element.PropTypes.number,
 	left: wp.element.PropTypes.number,
-	extraStyles: wp.element.PropTypes.object,
-  // closePortal: wp.element.PropTypes.func,
+	extraStyles: wp.element.PropTypes.object
 };

@@ -13,29 +13,21 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
-const ListBlock = ( { attributes, onChange, isActive } ) => {
+const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
 	const { listType = 'ol', items = [] } = attributes;
-	let editRef = null;
-	function position() {
-		const pos = editRef && editRef.getBoundingClientRect();
-		return pos;
-	}
-	// console.log( '>List render', isActive, editRef, 'pos:', position() );
 
 	const value = items.map( i => {
 		return `<li>${ i.value }</li>`;
 	} ).join( '' );
 
 	return (
-		<div ref={ ( el ) => {
-			editRef = el;
-		} } style={ { border: '3px solid orange' } } >
+		<div style={ { border: '3px solid orange' } } >
 			<Editable
 				nodeName={ listType }
 				value={ value }
 				onChange={ onChange } />
 			<Portal isOpened={ isActive } >
-				<AbsolutePosition top={ position() && position().top } left={ 100 } extraStyles={ { width: 500, border: '1px solid red' } } >
+				<AbsolutePosition top={ activeRect && activeRect.top } left={ activeRect && activeRect.left } extraStyles={ { width: 500, border: '1px solid red' } } >
 					<AlignmentToolbar />
 				</AbsolutePosition>
 			</Portal>
@@ -68,3 +60,13 @@ wp.blocks.registerBlock( 'core/list', {
 		return <List nodeName={ listType }>{children}</List>;
 	}
 } );
+
+ListBlock.propTypes = {
+	attributes: wp.element.PropTypes.object,
+	isActive: wp.element.PropTypes.bool,
+	activeRect: wp.element.PropTypes.shape( {
+		top: wp.element.PropTypes.number,
+		left: wp.element.PropTypes.number
+	} ),
+	onChange: wp.element.PropTypes.func
+};
