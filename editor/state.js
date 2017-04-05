@@ -34,7 +34,8 @@ export function blocks( state, action ) {
 		state = {
 			byUid: {},
 			order: [],
-			activeUid: null
+			activeUid: null,
+			activeRect: null
 		};
 	}
 
@@ -62,7 +63,8 @@ export function blocks( state, action ) {
 		case 'ACTIVE_BLOCK':
 			return {
 				...state,
-				activeUid: action.uid
+				activeUid: action.uid,
+				activeRect: action.activeRect
 			};
 	}
 
