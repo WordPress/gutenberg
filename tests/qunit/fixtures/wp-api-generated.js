@@ -1990,7 +1990,10 @@ mockedApiResponse.Schema = {
                         "slug": {
                             "required": false,
                             "description": "Limit result set to terms with a specific slug.",
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 },
@@ -2225,7 +2228,10 @@ mockedApiResponse.Schema = {
                         "slug": {
                             "required": false,
                             "description": "Limit result set to terms with a specific slug.",
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 },
