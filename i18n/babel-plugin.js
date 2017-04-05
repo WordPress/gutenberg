@@ -159,13 +159,22 @@ module.exports = function() {
 				}
 
 				data.translations.messages[ translation.msgid ] = translation;
+				this.hasPendingWrite = true;
+			},
+			Program: {
+				exit( path, state ) {
+					if ( ! this.hasPendingWrite ) {
+						return;
+					}
 
-				// Ideally we could wait until Babel has finished parsing all files
-				// or at least asynchronously write, but Babel doesn't expose these
-				// entry points and async write may hit file lock (need queue).
-
-				const compiled = po.compile( data );
-				writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
+					// Ideally we could wait until Babel has finished parsing
+					// all files or at least asynchronously write, but Babel
+					// doesn't expose these entry points and async write may
+					// hit file lock (need queue).
+					const compiled = po.compile( data );
+					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
+					this.hasPendingWrite = false;
+				}
 			}
 		}
 	};
