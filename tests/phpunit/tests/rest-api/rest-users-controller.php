@@ -574,6 +574,68 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( $id2, $data[0]['id'] );
 	}
 
+	public function test_get_items_slug_array_query() {
+		wp_set_current_user( self::$user );
+		$id1 = $this->factory->user->create( array(
+			'display_name' => 'Taco',
+			'user_login'   => 'taco'
+		) );
+		$id2 = $this->factory->user->create( array(
+			'display_name' => 'Enchilada',
+			'user_login'   => 'enchilada'
+		) );
+		$id3 = $this->factory->user->create( array(
+			'display_name' => 'Burrito',
+			'user_login'   => 'burrito'
+		) );
+		$this->factory->user->create( array(
+			'display_name' => 'Hon Pizza',
+			'user_login'   => 'pizza'
+		) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'slug', array(
+			'taco',
+			'burrito',
+			'enchilada',
+		) );
+		$request->set_param( 'orderby', 'slug' );
+		$request->set_param( 'order', 'asc' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$slugs = wp_list_pluck( $data, 'slug' );
+		$this->assertEquals( array( 'burrito', 'enchilada', 'taco' ), $slugs );
+	}
+
+	public function test_get_items_slug_csv_query() {
+		wp_set_current_user( self::$user );
+		$id1 = $this->factory->user->create( array(
+			'display_name' => 'Taco',
+			'user_login'   => 'taco'
+		) );
+		$id2 = $this->factory->user->create( array(
+			'display_name' => 'Enchilada',
+			'user_login'   => 'enchilada'
+		) );
+		$id3 = $this->factory->user->create( array(
+			'display_name' => 'Burrito',
+			'user_login'   => 'burrito'
+		) );
+		$this->factory->user->create( array(
+			'display_name' => 'Hon Pizza',
+			'user_login'   => 'pizza'
+		) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'slug', 'taco,burrito , enchilada');
+		$request->set_param( 'orderby', 'slug' );
+		$request->set_param( 'order', 'desc' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$slugs = wp_list_pluck( $data, 'slug' );
+		$this->assertEquals( array( 'taco', 'enchilada', 'burrito' ), $slugs );
+	}
+
 	// Note: Do not test using editor role as there is an editor role created in testing and it makes it hard to test this functionality.
 	public function test_get_items_roles() {
 		wp_set_current_user( self::$user );
