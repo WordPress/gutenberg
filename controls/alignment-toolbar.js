@@ -6,9 +6,6 @@ import {
 } from './dashicons';
 
 export default class AlignmentToolbar extends wp.element.Component {
-	// onClick( id ) {
-	// 	this.props.onChange( id );
-	// };
 
 	render() {
 		const { value, actions } = this.props;
