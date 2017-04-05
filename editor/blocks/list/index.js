@@ -27,7 +27,7 @@ const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
 				value={ value }
 				onChange={ onChange } />
 			<Portal isOpened={ isActive } >
-				<AbsolutePosition top={ activeRect && activeRect.top } left={ activeRect && activeRect.left } >
+				<AbsolutePosition top={ activeRect && ( activeRect.top - 36 + window.scrollY ) } left={ activeRect && activeRect.left } >
 					<AlignmentToolbar />
 				</AbsolutePosition>
 			</Portal>
