@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component } from 'react';
+import { createElement, Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 
 /**
@@ -29,3 +29,11 @@ export { render };
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)
  */
 export { Component };
+
+/**
+ * Collection of methods that allow declaration and validation of props that are
+ * supplied to React components.
+ *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+ *   decl := PropTypes.{type}(.isRequired)?
+ */
+export { PropTypes };
