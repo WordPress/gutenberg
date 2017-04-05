@@ -27,7 +27,7 @@ class InserterButton extends wp.element.Component {
 					className="editor-inserter__button-toggle"
 					onClick={ this.toggle }
 					type="button"
-					aria-label="Add a block"
+					aria-label={ wp.i18n.__( 'Add a block' ) }
 				>
 					<span className="dashicons dashicons-plus" />
 				</button>

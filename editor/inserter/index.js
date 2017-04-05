@@ -29,7 +29,10 @@ function Inserter() {
 					) )
 				}
 			</div>
-			<input className="editor-inserter__search" type="search" placeholder="Search..." />
+			<input
+				type="search"
+				placeholder={ wp.i18n.__( 'Search…' ) }
+				className="editor-inserter__search" />
 		</div>
 	);
 }
