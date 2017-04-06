@@ -9,31 +9,12 @@ import { values } from 'lodash';
  * Internal dependencies
  */
 import {
-	html,
 	blocks,
 	mode,
 	createReduxStore
 } from '../state';
 
 describe( 'state', () => {
-	describe( 'html()', () => {
-		it( 'should return null by default', () => {
-			const state = html( undefined, {} );
-
-			expect( state ).to.be.null();
-		} );
-
-		it( 'should return set html', () => {
-			const markup = '<!-- wp:core/test-block -->Bananas<!-- /wp:core/test-block -->';
-			const state = html( null, {
-				type: 'SET_HTML',
-				html: markup
-			} );
-
-			expect( state ).to.be.equal( markup );
-		} );
-	} );
-
 	describe( 'blocks()', () => {
 		before( () => {
 			wp.blocks.registerBlock( 'core/test-block', {} );
@@ -54,7 +35,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should key set html blocks', () => {
+		it( 'should key by replaced blocks uid', () => {
 			const original = deepFreeze( {
 				byUid: {},
 				order: [],
@@ -62,12 +43,13 @@ describe( 'state', () => {
 				hovered: {}
 			} );
 			const state = blocks( original, {
-				type: 'SET_HTML',
-				html: '<!-- wp:core/test-block -->Bananas<!-- /wp:core/test-block -->'
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ { uid: 'bananas' } ]
 			} );
 
 			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
-			expect( values( state.byUid )[ 0 ].blockType ).to.equal( 'core/test-block' );
+			expect( values( state.byUid )[ 0 ].uid ).to.equal( 'bananas' );
+			expect( state.order ).to.eql( [ 'bananas' ] );
 		} );
 
 		it( 'should return with block updates', () => {
@@ -174,7 +156,6 @@ describe( 'state', () => {
 			const state = store.getState();
 
 			expect( Object.keys( state ) ).to.have.members( [
-				'html',
 				'blocks',
 				'mode'
 			] );
