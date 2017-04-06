@@ -4,8 +4,8 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
-function VisualEditorBlock( props ) {
-	const { block } = props;
+const VisualEditorBlock = ( props ) => {
+	const { block, onChange } = props;
 	const settings = wp.blocks.getBlockSettings( block.blockType );
 	let _ref = null; // closure on the ref of this dom element
 
@@ -16,15 +16,6 @@ function VisualEditorBlock( props ) {
 
 	if ( ! BlockEdit ) {
 		return null;
-	}
-
-	function onAttributesChange( attributes ) {
-		props.onChange( {
-			attributes: {
-				...block.attributes,
-				...attributes
-			}
-		} );
 	}
 
 	const { isSelected, isHovered } = props;
@@ -53,11 +44,11 @@ function VisualEditorBlock( props ) {
 				rect={ rect }
 				isFocused={ isFocused }
 				attributes={ block.attributes }
-				onChange={ onAttributesChange } />
+				onChange={ ( attributes ) => onChange( { attributes: { ...block.attributes, ...attributes } } ) } />
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
-}
+};
 
 const rectToPlainObj = ( rect ) => (
 	{
