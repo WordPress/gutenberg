@@ -6,13 +6,34 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import { default as serialize } from '../serializer';
+import serialize, { getSaveContent } from '../serializer';
 import { getBlocks, registerBlock, unregisterBlock } from '../registration';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
 		getBlocks().forEach( block => {
 			unregisterBlock( block.slug );
+		} );
+	} );
+
+	describe( 'getSaveContent()', () => {
+		it( 'should return string verbatim', () => {
+			const saved = getSaveContent(
+				( { attributes } ) => attributes.fruit,
+				{ fruit: 'Bananas' }
+			);
+
+			expect( saved ).to.equal( 'Bananas' );
+		} );
+
+		it( 'should return element as string if save returns element', () => {
+			const { createElement } = wp.element;
+			const saved = getSaveContent(
+				( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+				{ fruit: 'Bananas' }
+			);
+
+			expect( saved ).to.equal( '<div>Bananas</div>' );
 		} );
 	} );
 

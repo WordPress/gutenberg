@@ -9,6 +9,26 @@ import * as query from 'hpq';
 import { getBlockSettings } from './registration';
 
 /**
+ * Given a block's save render implementation and attributes, returns the
+ * static markup to be saved.
+ *
+ * @param  {Function} save       Save render implementation
+ * @param  {Object}   attributes Block attributes
+ * @return {string}              Save content
+ */
+export function getSaveContent( save, attributes ) {
+	const rawContent = save( { attributes } );
+
+	// Support string return values from save, e.g. raw HTML attribute value
+	if ( 'string' === typeof rawContent ) {
+		return rawContent;
+	}
+
+	// Otherwise, infer as element
+	return wp.element.renderToString( rawContent );
+}
+
+/**
  * Takes a block list and returns the serialized post content
  *
  * @param  {Array}  blocks Block list
@@ -17,21 +37,19 @@ import { getBlockSettings } from './registration';
 export default function serialize( blocks ) {
 	return blocks.reduce( ( memo, block ) => {
 		const blockType = block.blockType;
-		const blockSettings = getBlockSettings( blockType );
+		const settings = getBlockSettings( blockType );
 
-		// static content, to be rendered inside the block comment
-		const rawContent = wp.element.renderToString(
-			blockSettings.save( { attributes: block.attributes } )
-		);
+		// Static content, to be rendered inside the block comment
+		const rawContent = getSaveContent( settings.save, block.attributes );
 
 		// To compute the blocks attributes we need serialize as comment attributes
 		// We take all the block attributes and exclude the block attributes computed
 		// using the `attributes` from the Block Settings.
 		let contentAttributes = {};
-		if ( 'function' === typeof blockSettings.attributes ) {
-			contentAttributes = blockSettings.attributes( rawContent );
-		} else if ( blockSettings.attributes ) {
-			contentAttributes = query.parse( rawContent, blockSettings.attributes );
+		if ( 'function' === typeof settings.attributes ) {
+			contentAttributes = settings.attributes( rawContent );
+		} else if ( settings.attributes ) {
+			contentAttributes = query.parse( rawContent, settings.attributes );
 		}
 		const commentAttributes = Object.keys( block.attributes ).reduce( ( attrs, attribute ) => {
 			if ( attribute in contentAttributes ) {

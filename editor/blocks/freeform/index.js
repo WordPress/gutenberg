@@ -12,11 +12,11 @@ wp.blocks.registerBlock( 'core/freeform', {
 	},
 
 	edit( { attributes } ) {
-		return <div contentEditable dangerouslySetInnerHTML={ { __html: attributes.html } } />;
+		return <div contentEditable>{ attributes.html }</div>;
 	},
 
 	save( { attributes } ) {
-		return <div dangerouslySetInnerHTML={ { __html: attributes.html } } />;
+		return attributes.html;
 	}
 } );
 
