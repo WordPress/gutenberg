@@ -10,14 +10,10 @@ import Textarea from 'react-textarea-autosize';
 import './style.scss';
 
 function TextEditor( { blocks, onChange } ) {
-	const changeValue = ( event ) => {
-		onChange( event.target.value );
-	};
-
 	return (
 		<Textarea
 			defaultValue={ wp.blocks.serialize( blocks ) }
-			onChange={ changeValue }
+			onBlur={ ( event ) => onChange( event.target.value ) }
 			className="editor-text-editor"
 			useCacheForDOMMeasurements
 		/>
