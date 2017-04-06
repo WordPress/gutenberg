@@ -28,6 +28,10 @@ body.toplevel_page_gutenberg {
 	* {
 		box-sizing: border-box;
 	}
+
+	svg {
+		fill: currentColor;
+	}
 }
 
 .gutenberg__editor {

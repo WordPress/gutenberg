@@ -10,9 +10,9 @@
 	border: none;
 	background: none;
 	border-right: 1px solid $light-gray-500;
-	vertical-align: middle;
-	line-height: 20px;
 	outline: none;
+	display: flex;
+	align-items: center;
 }
 
 .editor-mode-switcher__content {
