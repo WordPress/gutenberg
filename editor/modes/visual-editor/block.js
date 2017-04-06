@@ -71,6 +71,7 @@ function VisualEditorBlock( props ) {
 					} ) ) } />
 			) : null }
 			<BlockEdit
+				isSelected={ isSelected }
 				attributes={ block.attributes }
 				setAttributes={ setAttributes } />
 		</div>
