@@ -84,7 +84,3 @@ export default class Editable extends wp.element.Component {
 		);
 	}
 }
-
-Editable.defaultProps = {
-	nodeName: 'div'
-};
