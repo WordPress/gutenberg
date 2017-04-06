@@ -1,7 +1,6 @@
 import AlignmentToolbar from './alignment-toolbar';
 
 const command = ( name ) => () => {
-	console.log( '>command:', name );
 	tinymce.execCommand( name );
 };
 
