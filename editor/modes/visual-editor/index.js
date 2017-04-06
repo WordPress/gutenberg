@@ -11,7 +11,7 @@ import VisualEditorBlock from './block';
 
 class VisualEditor extends wp.element.Component {
 	blurWithDomEl( e, onBlur ) {
-		return onBlur( e.relatedTarget, this._domElement );
+		return onBlur( e, this._domElement );
 	}
 
 	render() {
@@ -33,16 +33,14 @@ const mapStateToProps = ( state ) => ( {
 } );
 
 const mapDispatchToProps = 	( dispatch ) => ( {
-	onBlur( focusedEl, containerEl ) {
-		// if the VisualEditor gets a blur event, and if the document activeElement is not inside
-		// the VisualEditor, then it has lost focus
-		if ( ! focusedEl || ( containerEl && ! containerEl.contains( focusedEl ) ) ) {
-			console.log( '>losing focus', focusedEl );
+	onBlur( { relatedTarget }, containerEl ) {
+		// if the VisualEditor gets a blur event, and if the new focus is not inside
+		// the VisualEditor, then the editor has lost focus
+		// - on Blur, relatedTarget = event target receiving focus.
+		if ( ! relatedTarget || ( containerEl && ! containerEl.contains( relatedTarget ) ) ) {
 			dispatch( {
 				type: 'FOCUS_LOST'
 			} );
-		} else {
-			console.log( '>not losing focus', focusedEl );
 		}
 	} } );
 
