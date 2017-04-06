@@ -32,7 +32,7 @@ function VisualEditorBlock( props ) {
 		'is-hovered': isHovered
 	} );
 
-	const { onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
+	const { rect, onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
 
 	// Disable reason: Each block can receive focus but must be able to contain
 	// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -49,6 +49,8 @@ function VisualEditorBlock( props ) {
 			className={ className }
 		>
 			<BlockEdit
+				rect={ rect }
+				isSelected={ isSelected }
 				attributes={ block.attributes }
 				onChange={ onAttributesChange } />
 		</div>
@@ -71,7 +73,8 @@ const rectToPlainObj = ( rect ) => (
 const mapStateToProps = ( state, ownProps ) => ( {
 	block: state.blocks.byUid[ ownProps.uid ],
 	isSelected: !! state.blocks.selected[ ownProps.uid ],
-	isHovered: !! state.blocks.hovered[ ownProps.uid ]
+	isHovered: !! state.blocks.hovered[ ownProps.uid ],
+	rect: state.blocks.rect[ ownProps.uid ]
 } );
 
 const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
