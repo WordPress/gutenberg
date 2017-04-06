@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { difference } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { getBlockSettings } from './registration';
@@ -25,6 +30,29 @@ export function getSaveContent( save, attributes ) {
 }
 
 /**
+ * Returns comment attributes as serialized string, determined by subset of
+ * difference between actual attributes of a block and those expected based
+ * on its settings.
+ *
+ * @param  {Object} realAttributes     Actual block attributes
+ * @param  {Object} expectedAttributes Expected block attributes
+ * @return {string}                    Comment attributes
+ */
+export function getCommentAttributes( realAttributes, expectedAttributes ) {
+	// Find difference and build into object subset of attributes.
+	const keys = difference(
+		Object.keys( realAttributes ),
+		Object.keys( expectedAttributes )
+	);
+
+	// Serialize the comment attributes
+	return keys.reduce( ( memo, key ) => {
+		const value = realAttributes[ key ];
+		return memo + `${ key }:${ value } `;
+	}, '' );
+}
+
+/**
  * Takes a block list and returns the serialized post content
  *
  * @param  {Array}  blocks Block list
@@ -35,24 +63,19 @@ export default function serialize( blocks ) {
 		const blockType = block.blockType;
 		const settings = getBlockSettings( blockType );
 
-		// Static content, to be rendered inside the block comment
-		const rawContent = getSaveContent( settings.save, block.attributes );
-
-		// To compute the blocks attributes we need serialize as comment
-		// attributes. We take all the block attributes and exclude the block
-		// attributes computed using the `attributes` from the Block Settings.
-		const contentAttributes = getBlockAttributes( block, settings );
-		const commentAttributes = Object.keys( block.attributes ).reduce( ( attrs, attribute ) => {
-			if ( attribute in contentAttributes ) {
-				return attrs;
-			}
-			attrs.push( { key: attribute, value: block.attributes[ attribute ] } );
-			return attrs;
-		}, [] );
-
-		// serialize the comment attributes
-		const serializedCommentAttributes = commentAttributes.map( ( { key, value } ) => `${ key }:${ value } ` ).join( '' );
-
-		return memo + `<!-- wp:${ blockType } ${ serializedCommentAttributes }-->${ rawContent }<!-- /wp:${ blockType } -->`;
+		return memo + (
+			'<!-- wp:' +
+			blockType +
+			' ' +
+			getCommentAttributes(
+				block.attributes,
+				getBlockAttributes( block, settings )
+			) +
+			'-->' +
+			getSaveContent( settings.save, block.attributes ) +
+			'<!-- /wp:' +
+			blockType +
+			' -->'
+		);
 	}, '' );
 }

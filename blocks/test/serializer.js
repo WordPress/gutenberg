@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import serialize, { getSaveContent } from '../serializer';
+import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
 import { getBlocks, registerBlock, unregisterBlock } from '../registration';
 
 describe( 'block serializer', () => {
@@ -34,6 +34,26 @@ describe( 'block serializer', () => {
 			);
 
 			expect( saved ).to.equal( '<div>Bananas</div>' );
+		} );
+	} );
+
+	describe( 'getCommentAttributes()', () => {
+		it( 'should return empty string if no difference', () => {
+			const attributes = getCommentAttributes( {}, {} );
+
+			expect( attributes ).to.equal( '' );
+		} );
+
+		it( 'should return joined string of key:value pairs by difference subset', () => {
+			const attributes = getCommentAttributes( {
+				fruit: 'bananas',
+				category: 'food',
+				ripeness: 'ripe'
+			}, {
+				fruit: 'bananas'
+			} );
+
+			expect( attributes ).to.equal( 'category:food ripeness:ripe ' );
 		} );
 	} );
 
