@@ -13,9 +13,8 @@ function List( { nodeName, children } ) {
 	return wp.element.createElement( nodeName.toLowerCase(), null, children );
 }
 
-const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
+const ListBlock = ( { attributes, isSelected, rect, onChange } ) => {
 	const { listType = 'ol', items = [] } = attributes;
-
 	const value = items.map( i => {
 		return `<li>${ i.value }</li>`;
 	} ).join( '' );
@@ -26,8 +25,8 @@ const ListBlock = ( { attributes, isActive, activeRect, onChange } ) => {
 				nodeName={ listType }
 				value={ value }
 				onChange={ onChange } />
-			<Portal isOpened={ isActive } >
-				<AbsolutePosition top={ activeRect && ( activeRect.top - 36 + window.scrollY ) } left={ activeRect && activeRect.left } >
+			<Portal isOpened={ isSelected } >
+				<AbsolutePosition top={ rect && ( rect.top - 36 + window.scrollY ) } left={ rect && rect.left } >
 					<TinyMCEAlignmentToolbar />
 				</AbsolutePosition>
 			</Portal>
@@ -63,8 +62,8 @@ wp.blocks.registerBlock( 'core/list', {
 
 ListBlock.propTypes = {
 	attributes: wp.element.PropTypes.object,
-	isActive: wp.element.PropTypes.bool,
-	activeRect: wp.element.PropTypes.shape( {
+	isSelected: wp.element.PropTypes.bool,
+	rect: wp.element.PropTypes.shape( {
 		top: wp.element.PropTypes.number,
 		left: wp.element.PropTypes.number
 	} ),
