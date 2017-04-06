@@ -69,13 +69,13 @@ export const blocks = ( () => {
 		},
 		focused( state = {}, action ) {
 			switch ( action.type ) {
-				case 'FOCUSED_BLOCK':
+				case 'FOCUS_BLOCK':
 					return {
 						...state,
 						uid: action.uid,
 						rect: action.rect
 					};
-				case 'EDITOR_LOST_FOCUS':
+				case 'FOCUS_LOST':
 					return {
 						...state,
 						uid: null,

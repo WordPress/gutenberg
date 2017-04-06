@@ -1,21 +1,20 @@
 
-export default function AbsolutePosition( { top, left, extraStyles = {}, children } ) {
-	const style = {
-		position: 'absolute',
-		top,
-		left,
-		...extraStyles
-	};
+const AbsolutePosition = ( { top, left, extraStyles = {}, children } ) => (
+	<div role="presentation"
+		style={ {
+			position: 'absolute',
+			top,
+			left,
+			...extraStyles
+		} }>
+		{ children }
+	</div>
+);
 
-	return (
-		<div style={ style }>
-			{ children }
-		</div>
-	);
-}
+export default AbsolutePosition;
 
 AbsolutePosition.propTypes = {
-	top: wp.element.PropTypes.number,
-	left: wp.element.PropTypes.number,
+	top: wp.element.PropTypes.number.isRequired,
+	left: wp.element.PropTypes.number.isRequired,
 	extraStyles: wp.element.PropTypes.object
 };

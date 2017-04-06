@@ -1,9 +1,5 @@
 import TinyMCEAlignmentToolbar from '../../../controls/tinymce-alignment-toolbar';
 import AbsolutePosition from './AbsolutePosition';
-/**
- * External dependencies
- */
-import Portal from 'react-portal';
 
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
@@ -25,11 +21,10 @@ const ListBlock = ( { attributes, isFocused, rect, onChange } ) => {
 				nodeName={ listType }
 				value={ value }
 				onChange={ onChange } />
-			<Portal isOpened={ isFocused } >
-				<AbsolutePosition top={ rect && ( rect.top - 36 + window.scrollY ) } left={ rect && rect.left } >
+			{ isFocused && rect &&
+				<AbsolutePosition top={ rect.top - 36 + window.scrollY } left={ rect.left } >
 					<TinyMCEAlignmentToolbar />
-				</AbsolutePosition>
-			</Portal>
+				</AbsolutePosition> }
 		</div>
 	);
 };
@@ -61,8 +56,8 @@ wp.blocks.registerBlock( 'core/list', {
 } );
 
 ListBlock.propTypes = {
-	attributes: wp.element.PropTypes.object,
-	isFocused: wp.element.PropTypes.bool,
+	attributes: wp.element.PropTypes.object.isRequired,
+	isFocused: wp.element.PropTypes.bool.isRequired,
 	rect: wp.element.PropTypes.shape( {
 		top: wp.element.PropTypes.number,
 		left: wp.element.PropTypes.number

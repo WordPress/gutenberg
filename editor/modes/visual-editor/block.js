@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 
 function VisualEditorBlock( props ) {
+	let _element = null;
+
 	const { block } = props;
 	const settings = wp.blocks.getBlockSettings( block.blockType );
 
@@ -41,7 +43,8 @@ function VisualEditorBlock( props ) {
 	return (
 		<div
 			tabIndex="0"
-			onFocus={ onSelect }
+			ref={ ( el ) => ( _element = el ) }
+			onFocus={ ( e ) => ( onSelect( e, _element ) ) }
 			onBlur={ onDeselect }
 			onKeyDown={ onDeselect }
 			onMouseEnter={ onMouseEnter }
@@ -86,17 +89,24 @@ const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
 			updates
 		} );
 	},
-	onSelect( e ) {
+	onSelect( e, domid ) {
+		const to = e.target;
+		const from = e.relatedTarget;
 		dispatch( {
 			type: 'TOGGLE_BLOCK_SELECTED',
 			selected: true,
 			uid: ownProps.uid
 		} );
+		console.log( '>focus \ndom=', domid, '\ntar=', e.target, '\nrel=', e.relatedTarget, '\neve=', e );
+		// if anything in the containing block gets focus then
+		// - set the focused uid and rect to that of the containing block
+		if ( domid && e.target && domid.contains( e.target ) ) {
 		dispatch( {
-			type: 'FOCUSED_BLOCK',
+				type: 'FOCUS_BLOCK',
 			uid: ownProps.uid,
-			rect: rectToPlainObj( e.target.getBoundingClientRect() )
+				rect: rectToPlainObj( domid.getBoundingClientRect() )
 		} );
+		}
 	},
 	onDeselect( ) {
 		dispatch( {

@@ -10,15 +10,15 @@ import InserterButton from '../../inserter/button';
 import VisualEditorBlock from './block';
 
 class VisualEditor extends wp.element.Component {
-	blurWithDomEl( onBlur ) {
-		return onBlur( this._domElement );
+	blurWithDomEl( e, onBlur ) {
+		return onBlur( e.relatedTarget, this._domElement );
 	}
 
 	render() {
 		const { blocks, onBlur } = this.props;
 
 		return (
-			<div className="editor-visual-editor" onBlur={ () => this.blurWithDomEl( onBlur ) } ref={ ( el ) => this._domElement = el } >
+			<div className="editor-visual-editor" onBlur={ ( e ) => this.blurWithDomEl( e, onBlur ) } ref={ ( el ) => this._domElement = el } >
 				{ blocks.map( ( uid ) => (
 					<VisualEditorBlock key={ uid } uid={ uid } />
 				) ) }
@@ -33,13 +33,16 @@ const mapStateToProps = ( state ) => ( {
 } );
 
 const mapDispatchToProps = 	( dispatch ) => ( {
-	onBlur( containerEl ) {
+	onBlur( focusedEl, containerEl ) {
 		// if the VisualEditor gets a blur event, and if the document activeElement is not inside
 		// the VisualEditor, then it has lost focus
-		if ( ! document.activeElement || ( containerEl && ! containerEl.contains( document.activeElement ) ) ) {
+		if ( ! focusedEl || ( containerEl && ! containerEl.contains( focusedEl ) ) ) {
+			console.log( '>losing focus', focusedEl );
 			dispatch( {
-				type: 'EDITOR_LOST_FOCUS'
+				type: 'FOCUS_LOST'
 			} );
+		} else {
+			console.log( '>not losing focus', focusedEl );
 		}
 	} } );
 
