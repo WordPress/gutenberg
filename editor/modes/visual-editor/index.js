@@ -9,24 +9,18 @@ import { connect } from 'react-redux';
 import InserterButton from '../../inserter/button';
 import VisualEditorBlock from './block';
 
-class VisualEditor extends wp.element.Component {
-	blurWithDomEl( e, onBlur ) {
-		return onBlur( e, this._domElement );
-	}
+const VisualEditor = ( { blocks, onBlur } ) => {
+	let _ref = null; // closure for dom element ref
 
-	render() {
-		const { blocks, onBlur } = this.props;
-
-		return (
-			<div className="editor-visual-editor" onBlur={ ( e ) => this.blurWithDomEl( e, onBlur ) } ref={ ( el ) => this._domElement = el } >
-				{ blocks.map( ( uid ) => (
-					<VisualEditorBlock key={ uid } uid={ uid } />
+	return (
+		<div className="editor-visual-editor" onBlur={ ( e ) => onBlur( e, _ref ) } ref={ ( el ) => _ref = el } >
+			{ blocks.map( ( uid ) => (
+				<VisualEditorBlock key={ uid } uid={ uid } />
 				) ) }
-				<InserterButton />
-			</div>
-		);
-	}
-}
+			<InserterButton />
+		</div>
+	);
+};
 
 const mapStateToProps = ( state ) => ( {
 	blocks: state.blocks.order
