@@ -56,47 +56,62 @@ function VisualEditorBlock( props ) {
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
-export default connect(
-	( state, ownProps ) => ( {
-		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: !! state.blocks.selected[ ownProps.uid ],
-		isHovered: !! state.blocks.hovered[ ownProps.uid ]
-	} ),
-	( dispatch, ownProps ) => ( {
-		onChange( updates ) {
-			dispatch( {
-				type: 'UPDATE_BLOCK',
-				uid: ownProps.uid,
-				updates
-			} );
-		},
-		onSelect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: true,
-				uid: ownProps.uid
-			} );
-		},
-		onDeselect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: false,
-				uid: ownProps.uid
-			} );
-		},
-		onMouseEnter() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: true,
-				uid: ownProps.uid
-			} );
-		},
-		onMouseLeave() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: false,
-				uid: ownProps.uid
-			} );
-		}
-	} )
-)( VisualEditorBlock );
+const rectToPlainObj = ( rect ) => (
+	{
+		top: rect.top,
+		right: rect.right,
+		bottom: rect.bottom,
+		left: rect.left,
+		width: rect.width,
+		height: rect.height,
+		x: rect.x,
+		y: rect.y
+	} );
+
+const mapStateToProps = ( state, ownProps ) => ( {
+	block: state.blocks.byUid[ ownProps.uid ],
+	isSelected: !! state.blocks.selected[ ownProps.uid ],
+	isHovered: !! state.blocks.hovered[ ownProps.uid ]
+} );
+
+const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
+	onChange( updates ) {
+		dispatch( {
+			type: 'UPDATE_BLOCK',
+			uid: ownProps.uid,
+			updates
+		} );
+	},
+	onSelect( e ) {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_SELECTED',
+			selected: true,
+			rect: rectToPlainObj( e.target.getBoundingClientRect() ),
+			uid: ownProps.uid
+		} );
+	},
+	onDeselect( e ) {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_SELECTED',
+			selected: false,
+			rect: rectToPlainObj( e.target.getBoundingClientRect() ),
+			uid: ownProps.uid
+		} );
+	},
+	onMouseEnter() {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_HOVERED',
+			hovered: true,
+			uid: ownProps.uid
+		} );
+	},
+	onMouseLeave() {
+		dispatch( {
+			type: 'TOGGLE_BLOCK_HOVERED',
+			hovered: false,
+			uid: ownProps.uid
+		} );
+	}
+} );
+
+export default connect( mapStateToProps, mapDispatchToProps )( VisualEditorBlock );
