@@ -3,6 +3,12 @@
  */
 import { connect } from 'react-redux';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import Dashicon from '../../components/dashicon';
+
 class ModeSwitcher extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -21,8 +27,8 @@ class ModeSwitcher extends wp.element.Component {
 	render() {
 		const { opened } = this.state;
 		const modes = [
-			{ value: 'visual', label: 'Visual' },
-			{ value: 'text', label: 'Text' },
+			{ value: 'visual', label: wp.i18n.__( 'Visual' ) },
+			{ value: 'text', label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' ) },
 		];
 		const switchMode = ( mode ) => () => {
 			this.setState( { opened: false } );
@@ -35,10 +41,10 @@ class ModeSwitcher extends wp.element.Component {
 				<button
 					className="editor-mode-switcher__toggle"
 					onClick={ this.toggle }
-					aria-label="Switch the editor mode"
+					aria-label={ wp.i18n.__( 'Switch the editor mode' ) }
 				>
 					{ currentMode.label }
-					<span className="dashicons dashicons-arrow-down" />
+					<Dashicon icon="arrow-down" />
 				</button>
 				{ opened &&
 					<div className="editor-mode-switcher__content">

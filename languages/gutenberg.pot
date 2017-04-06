@@ -1,0 +1,29 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Generator: babel-plugin-wp-i18n\n"
+
+#: editor/header/mode-switcher/index.js:31
+msgctxt "Name for the Text editor tab (formerly HTML)"
+msgid "Text"
+msgstr ""
+
+#: editor/blocks/freeform/index.js:4
+msgid "Freeform"
+msgstr ""
+
+#: editor/header/mode-switcher/index.js:30
+msgid "Visual"
+msgstr ""
+
+#: editor/header/mode-switcher/index.js:44
+msgid "Switch the editor mode"
+msgstr ""
+
+#: editor/inserter/button.js:31
+msgid "Add a block"
+msgstr ""
+
+#: editor/inserter/index.js:40
+msgid "Search…"
+msgstr ""

@@ -22,6 +22,7 @@
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.0",
     "babel-loader": "^6.4.1",
+    "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -36,6 +37,7 @@
     "eslint-plugin-react": "^6.10.3",
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
+    "gettext-parser": "^1.2.2",
     "glob": "^7.1.1",
     "jsdom": "^9.12.0",
     "mocha": "^3.2.0",
@@ -54,8 +56,9 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "babel-plugin-lodash": "^3.2.11",
+    "classnames": "^2.2.5",
     "hpq": "^1.1.1",
+    "jed": "^1.1.1",
     "lodash": "^4.17.4",
     "react-redux": "^5.0.3",
     "react-textarea-autosize": "^4.0.5",
