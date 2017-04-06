@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import * as query from 'hpq';
-
-/**
  * Internal dependencies
  */
 import { getBlockSettings } from './registration';
+import { getBlockAttributes } from './parser';
 
 /**
  * Given a block's save render implementation and attributes, returns the
@@ -42,15 +38,10 @@ export default function serialize( blocks ) {
 		// Static content, to be rendered inside the block comment
 		const rawContent = getSaveContent( settings.save, block.attributes );
 
-		// To compute the blocks attributes we need serialize as comment attributes
-		// We take all the block attributes and exclude the block attributes computed
-		// using the `attributes` from the Block Settings.
-		let contentAttributes = {};
-		if ( 'function' === typeof settings.attributes ) {
-			contentAttributes = settings.attributes( rawContent );
-		} else if ( settings.attributes ) {
-			contentAttributes = query.parse( rawContent, settings.attributes );
-		}
+		// To compute the blocks attributes we need serialize as comment
+		// attributes. We take all the block attributes and exclude the block
+		// attributes computed using the `attributes` from the Block Settings.
+		const contentAttributes = getBlockAttributes( block, settings );
 		const commentAttributes = Object.keys( block.attributes ).reduce( ( attrs, attribute ) => {
 			if ( attribute in contentAttributes ) {
 				return attrs;
