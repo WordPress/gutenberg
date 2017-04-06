@@ -32,7 +32,7 @@ function VisualEditorBlock( props ) {
 		'is-hovered': isHovered
 	} );
 
-	const { rect, onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
+	const { isFocused, rect, onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
 
 	// Disable reason: Each block can receive focus but must be able to contain
 	// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -50,7 +50,7 @@ function VisualEditorBlock( props ) {
 		>
 			<BlockEdit
 				rect={ rect }
-				isSelected={ isSelected }
+				isFocused={ isFocused }
 				attributes={ block.attributes }
 				onChange={ onAttributesChange } />
 		</div>
@@ -74,7 +74,8 @@ const mapStateToProps = ( state, ownProps ) => ( {
 	block: state.blocks.byUid[ ownProps.uid ],
 	isSelected: !! state.blocks.selected[ ownProps.uid ],
 	isHovered: !! state.blocks.hovered[ ownProps.uid ],
-	rect: state.blocks.rect[ ownProps.uid ]
+	isFocused: ownProps.uid === state.blocks.focused.uid,
+	rect: state.blocks.focused.rect
 } );
 
 const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
@@ -89,15 +90,18 @@ const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_SELECTED',
 			selected: true,
-			rect: rectToPlainObj( e.target.getBoundingClientRect() ),
 			uid: ownProps.uid
 		} );
+		dispatch( {
+			type: 'FOCUSED_BLOCK',
+			uid: ownProps.uid,
+			rect: rectToPlainObj( e.target.getBoundingClientRect() )
+		} );
 	},
-	onDeselect( e ) {
+	onDeselect( ) {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_SELECTED',
 			selected: false,
-			rect: rectToPlainObj( e.target.getBoundingClientRect() ),
 			uid: ownProps.uid
 		} );
 	},
