@@ -58,21 +58,28 @@ export const blocks = ( () => {
 		},
 		selected( state = {}, action ) {
 			switch ( action.type ) {
-				case 'TOGGLE_BLOCK_SELECTED':
+				case 'SET_BLOCK_SELECTED':
 					return {
 						...state,
-						[ action.uid ]: action.selected,
+						selected: action.selected,
 					};
 			}
 
 			return state;
 		},
-		rect( state = {}, action ) {
+		focused( state = {}, action ) {
 			switch ( action.type ) {
-				case 'TOGGLE_BLOCK_SELECTED':
+				case 'FOCUSED_BLOCK':
 					return {
 						...state,
-						[ action.uid ]: action.rect,
+						uid: action.uid,
+						rect: action.rect
+					};
+				case 'EDITOR_LOST_FOCUS':
+					return {
+						...state,
+						uid: null,
+						rect: null
 					};
 			}
 
