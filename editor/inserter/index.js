@@ -1,3 +1,9 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import Dashicon from '../components/dashicon';
+
 function Inserter() {
 	const blocks = wp.blocks.getBlocks();
 	const blocksByCategory = blocks.reduce( ( groups, block ) => {
@@ -20,7 +26,7 @@ function Inserter() {
 							<div className="editor-inserter__category-blocks">
 								{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
 									<div key={ slug } className="editor-inserter__block">
-										<span className={ 'dashicons dashicons-' + icon } />
+										<Dashicon icon={ icon } />
 										{ title }
 									</div>
 								) ) }

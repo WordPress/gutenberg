@@ -43,6 +43,7 @@ function gutenberg_register_scripts() {
 	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ) );
 	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom' ) );
 	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ) );
+	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );
 
@@ -206,7 +207,8 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 	wp_enqueue_style(
 		'wp-editor',
-		plugins_url( 'editor/build/style.css', __FILE__ )
+		plugins_url( 'editor/build/style.css', __FILE__ ),
+		array( 'wp-blocks' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );

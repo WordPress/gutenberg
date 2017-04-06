@@ -20,8 +20,8 @@ import { createReduxStore } from './state';
 export function createEditorInstance( id, post ) {
 	const store = createReduxStore();
 	store.dispatch( {
-		type: 'SET_HTML',
-		html: post.content.raw
+		type: 'REPLACE_BLOCKS',
+		blockNodes: wp.blocks.parse( post.content.raw )
 	} );
 
 	wp.element.render(

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import Inserter from './';
+import Dashicon from '../components/dashicon';
 
 class InserterButton extends wp.element.Component {
 	constructor() {
@@ -29,7 +30,7 @@ class InserterButton extends wp.element.Component {
 					type="button"
 					aria-label={ wp.i18n.__( 'Add a block' ) }
 				>
-					<span className="dashicons dashicons-plus" />
+					<Dashicon icon="plus" />
 				</button>
 				{ opened && <Inserter /> }
 			</div>

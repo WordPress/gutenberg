@@ -9,12 +9,13 @@ wp.blocks.registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		value: html()
+		value: html( 'p' )
 	},
 
 	edit( { attributes, onChange } ) {
 		return (
 			<Editable
+				tagName="p"
 				value={ attributes.value }
 				onChange={ ( value ) => onChange( { value } ) }
 			/>
@@ -22,6 +23,6 @@ wp.blocks.registerBlock( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		return <p>{ attributes.value }</p>;
+		return <p dangerouslySetInnerHTML={ { __html: attributes.value } } />;
 	}
 } );

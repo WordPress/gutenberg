@@ -42,7 +42,7 @@ With regards to specific changes to the design, the details & execution (like co
 
 Grab the Sketch file so you don't have to start from scratch:
 
-**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated Mar. 15th.</a>**
+**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated April 6th.</a>**
 
 ## Mockups
 

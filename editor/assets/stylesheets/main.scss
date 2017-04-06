@@ -38,6 +38,11 @@ body.toplevel_page_gutenberg {
 	ol {
 		list-style-type: decimal;
 	}
+	
+	svg {
+		fill: currentColor;
+	}
+
 }
 
 .gutenberg__editor {
