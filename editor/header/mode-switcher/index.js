@@ -3,6 +3,11 @@
  */
 import { connect } from 'react-redux';
 
+/**
+ * Internal dependencies
+ */
+import Dashicon from '../../components/dashicon';
+
 class ModeSwitcher extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -38,7 +43,7 @@ class ModeSwitcher extends wp.element.Component {
 					aria-label={ wp.i18n.__( 'Switch the editor mode' ) }
 				>
 					{ currentMode.label }
-					<span className="dashicons dashicons-arrow-down" />
+					<Dashicon icon="arrow-down" />
 				</button>
 				{ opened &&
 					<div className="editor-mode-switcher__content">
