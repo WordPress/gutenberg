@@ -11,6 +11,18 @@ msgstr ""
 msgid "List"
 msgstr ""
 
+#: editor/blocks/text/index.js:19
+msgid "Align left"
+msgstr ""
+
+#: editor/blocks/text/index.js:27
+msgid "Align center"
+msgstr ""
+
+#: editor/blocks/text/index.js:35
+msgid "Align right"
+msgstr ""
+
 #: editor/header/mode-switcher/index.js:30
 msgid "Visual"
 msgstr ""
