@@ -17,23 +17,41 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'getSaveContent()', () => {
-		it( 'should return string verbatim', () => {
-			const saved = getSaveContent(
-				( { attributes } ) => attributes.fruit,
-				{ fruit: 'Bananas' }
-			);
+		context( 'function save', () => {
+			it( 'should return string verbatim', () => {
+				const saved = getSaveContent(
+					( { attributes } ) => attributes.fruit,
+					{ fruit: 'Bananas' }
+				);
 
-			expect( saved ).to.equal( 'Bananas' );
+				expect( saved ).to.equal( 'Bananas' );
+			} );
+
+			it( 'should return element as string if save returns element', () => {
+				const { createElement } = wp.element;
+				const saved = getSaveContent(
+					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div>Bananas</div>' );
+			} );
 		} );
 
-		it( 'should return element as string if save returns element', () => {
-			const { createElement } = wp.element;
-			const saved = getSaveContent(
-				( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-				{ fruit: 'Bananas' }
-			);
+		context( 'component save', () => {
+			it( 'should return element as string', () => {
+				const { Component, createElement } = wp.element;
+				const saved = getSaveContent(
+					class extends Component {
+						render() {
+							return createElement( 'div', null, this.props.attributes.fruit );
+						}
+					},
+					{ fruit: 'Bananas' }
+				);
 
-			expect( saved ).to.equal( '<div>Bananas</div>' );
+				expect( saved ).to.equal( '<div>Bananas</div>' );
+			} );
 		} );
 	} );
 

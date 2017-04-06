@@ -13,16 +13,22 @@ import { getBlockAttributes } from './parser';
  * Given a block's save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Function} save       Save render implementation
- * @param  {Object}   attributes Block attributes
- * @return {string}              Save content
+ * @param  {Function|WPComponent} save       Save render implementation
+ * @param  {Object}               attributes Block attributes
+ * @return {string}                          Save content
  */
 export function getSaveContent( save, attributes ) {
-	const rawContent = save( { attributes } );
+	let rawContent;
 
-	// Support string return values from save, e.g. raw HTML attribute value
-	if ( 'string' === typeof rawContent ) {
-		return rawContent;
+	if ( save.prototype instanceof wp.element.Component ) {
+		rawContent = wp.element.createElement( save, { attributes } );
+	} else {
+		rawContent = save( { attributes } );
+
+		// Special-case function render implementation to allow raw HTML return
+		if ( 'string' === typeof rawContent ) {
+			return rawContent;
+		}
 	}
 
 	// Otherwise, infer as element
