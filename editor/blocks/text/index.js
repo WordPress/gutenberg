@@ -23,6 +23,6 @@ wp.blocks.registerBlock( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		return <p>{ attributes.value }</p>;
+		return <p dangerouslySetInnerHTML={ { __html: attributes.value } } />;
 	}
 } );

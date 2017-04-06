@@ -9,15 +9,11 @@ import Textarea from 'react-textarea-autosize';
  */
 import './style.scss';
 
-function TextEditor( { html, onChange } ) {
-	const changeValue = ( event ) => {
-		onChange( event.target.value );
-	};
-
+function TextEditor( { blocks, onChange } ) {
 	return (
 		<Textarea
-			value={ html }
-			onChange={ changeValue }
+			defaultValue={ wp.blocks.serialize( blocks ) }
+			onBlur={ ( event ) => onChange( event.target.value ) }
 			className="editor-text-editor"
 			useCacheForDOMMeasurements
 		/>
@@ -26,13 +22,15 @@ function TextEditor( { html, onChange } ) {
 
 export default connect(
 	( state ) => ( {
-		html: state.html
+		blocks: state.blocks.order.map( ( uid ) => (
+			state.blocks.byUid[ uid ]
+		) )
 	} ),
 	( dispatch ) => ( {
 		onChange( value ) {
 			dispatch( {
-				type: 'SET_HTML',
-				html: value
+				type: 'REPLACE_BLOCKS',
+				blockNodes: wp.blocks.parse( value )
 			} );
 		}
 	} )
