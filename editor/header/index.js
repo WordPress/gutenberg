@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import ModeSwitcher from './mode-switcher';
 
 function Header() {

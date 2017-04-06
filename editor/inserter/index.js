@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import Dashicon from '../components/dashicon';
 
 function Inserter() {

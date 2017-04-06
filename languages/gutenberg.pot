@@ -7,16 +7,16 @@ msgstr ""
 msgid "Freeform"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:30
+#: editor/header/mode-switcher/index.js:31
 msgctxt "Name for the Text editor tab (formerly HTML)"
 msgid "Text"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:29
+#: editor/header/mode-switcher/index.js:30
 msgid "Visual"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:43
+#: editor/header/mode-switcher/index.js:44
 msgid "Switch the editor mode"
 msgstr ""
 
@@ -24,6 +24,6 @@ msgstr ""
 msgid "Add a block"
 msgstr ""
 
-#: editor/inserter/index.js:39
+#: editor/inserter/index.js:40
 msgid "Search…"
 msgstr ""

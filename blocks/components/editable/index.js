@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -70,6 +75,12 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		return <div ref={ this.bindNode } />;
+		const { tagName: Tag = 'div' } = this.props;
+
+		return (
+			<Tag
+				ref={ this.bindNode }
+				className="blocks-editable" />
+		);
 	}
 }

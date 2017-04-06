@@ -4,6 +4,11 @@
 import { connect } from 'react-redux';
 import Textarea from 'react-textarea-autosize';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 function TextEditor( { html, onChange } ) {
 	const changeValue = ( event ) => {
 		onChange( event.target.value );
