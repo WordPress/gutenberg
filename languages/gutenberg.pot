@@ -7,6 +7,14 @@ msgstr ""
 msgid "Freeform"
 msgstr ""
 
+#: editor/blocks/image/index.js:26
+msgid "Write caption…"
+msgstr ""
+
+#: editor/blocks/image/index.js:5
+msgid "Image"
+msgstr ""
+
 #: editor/blocks/list/index.js:5
 msgid "List"
 msgstr ""
