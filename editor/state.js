@@ -61,7 +61,18 @@ export const blocks = ( () => {
 				case 'TOGGLE_BLOCK_SELECTED':
 					return {
 						...state,
-						[ action.uid ]: action.selected
+						[ action.uid ]: action.selected,
+					};
+			}
+
+			return state;
+		},
+		rect( state = {}, action ) {
+			switch ( action.type ) {
+				case 'TOGGLE_BLOCK_SELECTED':
+					return {
+						...state,
+						[ action.uid ]: action.rect,
 					};
 			}
 
