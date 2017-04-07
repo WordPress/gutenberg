@@ -30,7 +30,7 @@ class InserterButton extends wp.element.Component {
 					type="button"
 					aria-label={ wp.i18n.__( 'Add a block' ) }
 				>
-					<Dashicon icon="plus" />
+					<Dashicon icon="plus-alt" />
 				</button>
 				{ opened && <Inserter /> }
 			</div>
