@@ -9,17 +9,17 @@ wp.blocks.registerBlock( 'core/image', {
 	category: 'common',
 
 	attributes: {
-		src: attr( 'img', 'src' ),
+		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
 		caption: html( 'figcaption' )
 	},
 
 	edit( { attributes, isSelected, setAttributes } ) {
-		const { src, alt, caption } = attributes;
+		const { url, alt, caption } = attributes;
 
 		return (
 			<figure>
-				<img src={ src } alt={ alt } />
+				<img src={ url } alt={ alt } />
 				{ caption || isSelected ? (
 					<Editable
 						tagName="figcaption"
@@ -32,11 +32,11 @@ wp.blocks.registerBlock( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { src, alt, caption } = attributes;
+		const { url, alt, caption } = attributes;
 
 		return (
 			<figure>
-				<img src={ src } alt={ alt } />
+				<img src={ url } alt={ alt } />
 				{ caption ? (
 					<figcaption dangerouslySetInnerHTML={ { __html: caption } } />
 				) : null }
