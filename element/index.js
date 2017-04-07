@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component } from 'react';
+import { createElement, Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 
@@ -38,3 +38,11 @@ export { Component };
  * @return {String}            HTML
  */
 export const renderToString = ReactDOMServer.renderToStaticMarkup;
+
+/**
+ * Collection of methods that allow declaration and validation of props that are
+ * supplied to React components.
+ *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+ *   decl := PropTypes.{type}(.isRequired)?
+ */
+export { PropTypes };

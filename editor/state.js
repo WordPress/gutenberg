@@ -43,6 +43,23 @@ export const blocks = combineReducers( {
 			case 'TOGGLE_BLOCK_SELECTED':
 				return {
 					...state,
+					[ action.uid ]: action.selected,
+				};
+		}
+
+		return state;
+	},
+	focused( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FOCUS_BLOCK':
+				return {
+					...state,
+					uid: action.uid,
+					rect: action.rect
+				};
+			case 'FOCUS_LOST':
+				return {
+					...state,
 					[ action.uid ]: action.selected
 				};
 		}

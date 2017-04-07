@@ -31,7 +31,8 @@ describe( 'state', () => {
 				byUid: {},
 				order: [],
 				selected: {},
-				hovered: {}
+				hovered: {},
+				focused: {}
 			} );
 		} );
 
