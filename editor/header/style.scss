@@ -1,8 +1,66 @@
 .editor-header {
 	height: 56px;
-	padding: 10px;
+	padding: $item-spacing;
 	border-bottom: 1px solid $light-gray-500;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+}
+
+.editor-saved-state {
+	display: flex;
+	align-items: center;
+	margin-right: $item-spacing;
+
+	.dashicon {
+		margin-right: 4px;
+	}
+}
+
+.editor-tools {
+	margin: 0 0 0 auto;
+	display: flex;
+	align-items: center;
+}
+
+.editor-tools__tabs {
+	margin: 0 $item-spacing;
+	padding: 0 0 0 $item-spacing;
+	border-left: 1px solid $light-gray-500;
+	border-right: 1px solid $light-gray-500;
+	display: flex;
+	align-items: center;
+
+	button {
+		display: flex;
+		align-items: center;
+		border: none;
+		background: none;
+		color: $dark-gray-500;
+		margin-right: $item-spacing;
+		cursor: pointer;
+
+		&:hover {
+			color: $blue-medium;
+		}
+	}
+
+	button .dashicon {
+		margin-right: 4px;
+	}
+}
+
+.editor-icon-button {
+	display: flex;
+	align-items: center;
+	width: 36px;
+	height: 36px;
+	border: none;
+	background: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+
+	&:hover {
+		color: $blue-medium;
+	}
 }
