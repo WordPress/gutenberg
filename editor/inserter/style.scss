@@ -8,27 +8,22 @@
 }
 
 .editor-inserter__button-toggle {
-	display: inline-block;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
 	color: $dark-gray-500;
 	background: none;
 	cursor: pointer;
-	border-radius: 50%;
-	border: 2px solid $dark-gray-500;
-	width: 26px;
-	height: 26px;
-	padding: 0;
-	margin: 0;
+	border: none;
+	width: 36px;
+	height: 36px;
 	outline: none;
-	transition: color .2s ease, border-color .2s ease;
-
-	.dashicons {
-		line-height: 24px;
-		text-align: center;
-	}
+	padding: 0;
+	margin: 0 0 15px 15px;
+	transition: color .2s ease;
 
 	&:hover {
 		color: #00aadc;
-		border-color: #00aadc;
 	}
 }
 

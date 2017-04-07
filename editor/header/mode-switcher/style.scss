@@ -1,10 +1,11 @@
 .editor-mode-switcher {
 	position: relative;
+	margin-right: $item-spacing;
 }
 
 .editor-mode-switcher__toggle {
 	color: $dark-gray-500;
-	padding: 8px;
+	padding: $item-spacing;
 	align-items: center;
 	cursor: pointer;
 	border: none;

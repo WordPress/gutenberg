@@ -1,0 +1,14 @@
+.editor-icon-button {
+	display: flex;
+	align-items: center;
+	width: 36px;
+	height: 36px;
+	border: none;
+	background: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+
+	&:hover {
+		color: $blue-medium;
+	}
+}
