@@ -33,6 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
+const { fromPairs, sortBy, toPairs } = require( 'lodash' );
 const { relative } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -166,6 +167,16 @@ module.exports = function() {
 					if ( ! this.hasPendingWrite ) {
 						return;
 					}
+
+					// By spec, enumeration order of object keys cannot be
+					// guaranteed, but in practice most runtimes respect order
+					// in which keys are inserted. We rely on this to specify
+					// ordering alphabetically by file, line. A better solution
+					// is to support or reimplement translations as array.
+					data.translations.messages = fromPairs( sortBy(
+						toPairs( data.translations.messages ),
+						( [ , translation ] ) => translation.comments.reference
+					) );
 
 					// Ideally we could wait until Babel has finished parsing
 					// all files or at least asynchronously write, but Babel
