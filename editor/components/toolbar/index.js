@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../dashicon';
+import Dashicon from 'components/dashicon';
 
 function Toolbar( { controls } ) {
 	if ( ! controls || ! controls.length ) {
