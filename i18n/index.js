@@ -8,6 +8,8 @@ let i18n;
 /**
  * Creates a new Jed instance with specified locale data configuration.
  *
+ * @see http://messageformat.github.io/Jed/
+ *
  * @param {Object} data Locale data configuration
  */
 export function setLocaleData( data ) {
@@ -31,6 +33,8 @@ export function getI18n() {
 /**
  * Retrieve the translation of text.
  *
+ * @see https://developer.wordpress.org/reference/functions/__/
+ *
  * @param  {string} text Text to translate
  * @return {string}      Translated text
  */
@@ -40,6 +44,8 @@ export function __( text ) {
 
 /**
  * Retrieve translated string with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_x/
  *
  * @param  {string} text    Text to translate
  * @param  {string} context Context information for the translators
@@ -52,6 +58,8 @@ export function _x( text, context ) {
 /**
  * Translates and retrieves the singular or plural form based on the supplied
  * number.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_n/
  *
  * @param  {string} single The text to be used if the number is singular
  * @param  {string} plural The text to be used if the number is plural
@@ -66,6 +74,8 @@ export function _n( single, plural, number ) {
 /**
  * Translates and retrieves the singular or plural form based on the supplied
  * number, with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_nx/
  *
  * @param  {string} single  The text to be used if the number is singular
  * @param  {string} plural  The text to be used if the number is plural
