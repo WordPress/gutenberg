@@ -2,7 +2,7 @@ const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
 wp.blocks.registerBlock( 'core/list', {
-	title: 'List',
+	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
