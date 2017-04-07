@@ -32,9 +32,14 @@ window._wpGutenbergPost = {
 			'<p>By shipping early and often you have the unique competitive advantage of hearing from real people what they think of your work, which in best case helps you anticipate market direction, and in worst case gives you a few people rooting for you that you can email when your team pivots to a new idea. Nothing can recreate the crucible of real usage.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/list -->',
+			'<ul><li>Ship early</li><li>Ship often</li><li>Listen to feedback from real people</li><li>Anticipate market direction</li></ul>',
+			'<!-- /wp:core/list -->',
+
 			'<!-- wp:core/embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
 			'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
 			'<!-- /wp:core/embed -->',
 		].join( '' ),
 	},
 };
+

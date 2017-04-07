@@ -25,6 +25,14 @@ body.toplevel_page_gutenberg {
 	svg {
 		fill: currentColor;
 	}
+
+	ul {
+		list-style-type: disc;
+	}
+
+	ol {
+		list-style-type: decimal;
+	}
 }
 
 .gutenberg__editor {

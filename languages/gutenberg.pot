@@ -3,13 +3,17 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
+#: editor/header/mode-switcher/index.js:31
+msgctxt "Name for the Text editor tab (formerly HTML)"
+msgid "Text"
+msgstr ""
+
 #: editor/blocks/freeform/index.js:4
 msgid "Freeform"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:31
-msgctxt "Name for the Text editor tab (formerly HTML)"
-msgid "Text"
+#: editor/blocks/list/index.js:5
+msgid "List"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:30
