@@ -18,7 +18,7 @@ add_action( 'admin_enqueue_scripts', 'myplugin_enqueue_scripts' );
 
 The script dependency will add a new `wp.i18n` object to your browser's global scope when loaded. In most cases you'll find parallels between [WordPress PHP localization functions](https://codex.wordpress.org/I18n_for_WordPress_Developers#Strings_for_Translation) and those on the `wp.i18n` object:
 
-```
+```js
 wp.i18n.sprintf( wp.i18n._n( '%d hat', '%d hats', 4 ), 4 )
 // 4 hats
 ```
@@ -29,9 +29,11 @@ Note that you will not need to specify [domain](https://codex.wordpress.org/I18n
 
 Included is a [custom Babel plugin](./babel-plugin.js) which, when integrated into a Babel configuration, will scan all processed JavaScript files for use of localization functions. It then compiles these into a [gettext POT formatted](https://en.wikipedia.org/wiki/Gettext) file as a template for translation. By default the output file will be written to `gettext.pot` of the root project directory. This can be overridden using the `"output"` option of the plugin:
 
+```json
 [ "babel-plugin-wp-i18n", {
 	"output": "languages/myplugin.pot"
 } ]
+```
 
 If you include the `.pot` file in your project's repository, you should be sure to rebuild it with every commit that introduces or modifies localized strings. When handling merge conflicts on the `.pot` file, you can assume that simply rebuilding will generate a file that is up to date with the current files of the project.
 
