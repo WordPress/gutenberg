@@ -227,6 +227,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_network_options' => array(),
 			'delete_site'            => array(),
 
+			'setup_network'          => array( 'administrator' ),
 			'upload_plugins'         => array( 'administrator' ),
 			'upload_themes'          => array( 'administrator' ),
 			'customize'              => array( 'administrator' ),
@@ -254,6 +255,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'manage_network_plugins' => array(),
 			'manage_network_themes'  => array(),
 			'manage_network_options' => array(),
+			'setup_network'          => array(),
 			'upload_plugins'         => array(),
 			'upload_themes'          => array(),
 			'edit_css'               => array(),
