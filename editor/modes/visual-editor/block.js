@@ -88,11 +88,11 @@ const mapDispatchToProps = 	( dispatch, ownProps ) => ( {
 		// if something in this block gets focus (eg, the focus target)
 		// - set the focused uid and rect to that of the containing block
 		if ( domEl && target && domEl.contains( target ) ) {
-		dispatch( {
+			dispatch( {
 				type: 'FOCUS_BLOCK',
-			uid: ownProps.uid,
+				uid: ownProps.uid,
 				rect: rectToPlainObj( domEl.getBoundingClientRect() )
-		} );
+			} );
 		}
 	},
 	onDeselect( ) {
