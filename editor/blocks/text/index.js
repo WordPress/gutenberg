@@ -12,12 +12,12 @@ wp.blocks.registerBlock( 'core/text', {
 		value: html( 'p' )
 	},
 
-	edit( { attributes, onChange } ) {
+	edit( { attributes, setAttributes } ) {
 		return (
 			<Editable
 				tagName="p"
 				value={ attributes.value }
-				onChange={ ( value ) => onChange( { value } ) }
+				onChange={ ( value ) => setAttributes( { value } ) }
 			/>
 		);
 	},

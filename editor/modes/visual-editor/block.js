@@ -17,7 +17,7 @@ function VisualEditorBlock( props ) {
 		return null;
 	}
 
-	function onAttributesChange( attributes ) {
+	function setAttributes( attributes ) {
 		props.onChange( {
 			attributes: {
 				...block.attributes,
@@ -50,7 +50,7 @@ function VisualEditorBlock( props ) {
 		>
 			<BlockEdit
 				attributes={ block.attributes }
-				onChange={ onAttributesChange } />
+				setAttributes={ setAttributes } />
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
