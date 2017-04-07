@@ -33,13 +33,16 @@ wp.blocks.registerBlock( 'core/image', {
 
 	save( { attributes } ) {
 		const { url, alt, caption } = attributes;
+		const img = <img src={ url } alt={ alt } />;
+
+		if ( ! caption ) {
+			return img;
+		}
 
 		return (
 			<figure>
-				<img src={ url } alt={ alt } />
-				{ caption ? (
-					<figcaption dangerouslySetInnerHTML={ { __html: caption } } />
-				) : null }
+				{ img }
+				<figcaption dangerouslySetInnerHTML={ { __html: caption } } />
 			</figure>
 		);
 	}
