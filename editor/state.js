@@ -58,10 +58,10 @@ export const blocks = combineReducers( {
 					rect: action.rect
 				};
 			case 'FOCUS_LOST':
-			return {
-				...state,
-				[ action.uid ]: action.selected
-			};
+				return {
+					...state,
+					[ action.uid ]: action.selected
+				};
 		}
 
 		return state;
