@@ -44,6 +44,35 @@ msgstr ""
 msgid "Switch the editor mode"
 msgstr ""
 
+#: editor/header/saved-state/index.js:11
+msgid "Saved"
+msgstr ""
+
+#: editor/header/tools/index.js:12
+msgid "Undo"
+msgstr ""
+
+#: editor/header/tools/index.js:13
+msgid "Redo"
+msgstr ""
+
+#: editor/header/tools/index.js:14
+msgid "Insert block"
+msgstr ""
+
+#: editor/header/tools/index.js:18
+msgctxt "imperative verb"
+msgid "Preview"
+msgstr ""
+
+#: editor/header/tools/index.js:22
+msgid "Post Settings"
+msgstr ""
+
+#: editor/header/tools/index.js:26
+msgid "Publish"
+msgstr ""
+
 #: editor/inserter/button.js:31
 msgid "Add a block"
 msgstr ""
