@@ -30,7 +30,7 @@ const ListBlock = ( { attributes, isFocused, rect, onChange } ) => {
 };
 
 wp.blocks.registerBlock( 'core/list', {
-	title: 'List',
+	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
@@ -50,8 +50,8 @@ wp.blocks.registerBlock( 'core/list', {
 
 	save( { attributes } ) {
 		const { listType = 'ol', items = [] } = attributes;
-		const children = items.map( ( i, index ) => <li key={ index }>{i.value}</li> );
-		return <List nodeName={ listType }>{children}</List>;
+		const children = items.map( ( item, index ) => <li key={ index }>{ item.value }</li> );
+		return wp.element.createElement( listType.toLowerCase(), null, children );
 	}
 } );
 
