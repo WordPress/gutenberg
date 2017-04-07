@@ -4,11 +4,6 @@ import AbsolutePosition from './AbsolutePosition';
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
-function List( { nodeName, children } ) {
-	// nodeName.toLowerCase() is used to map DOM nodeName values to proper tag.
-	return wp.element.createElement( nodeName.toLowerCase(), null, children );
-}
-
 const ListBlock = ( { attributes, isFocused, rect, onChange } ) => {
 	const { listType = 'ol', items = [] } = attributes;
 	const value = items.map( i => {

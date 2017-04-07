@@ -12,7 +12,7 @@ msgstr ""
 msgid "Freeform"
 msgstr ""
 
-#: editor/blocks/list/index.js:5
+#: editor/blocks/list/index.js:28
 msgid "List"
 msgstr ""
 
