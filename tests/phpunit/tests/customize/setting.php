@@ -48,6 +48,46 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 		$this->assertEquals( false, $setting->dirty );
 	}
 
+	/**
+	 * A test validate callback function.
+	 *
+	 * @param mixed                $value   The setting value.
+	 * @param WP_Customize_Setting $setting The setting object.
+	 */
+	public function validate_callback_for_tests( $value, $setting ) {
+		return $value . ':validate_callback';
+	}
+
+	/**
+	 * A test sanitize callback function.
+	 *
+	 * @param mixed                $value   The setting value.
+	 * @param WP_Customize_Setting $setting The setting object.
+	 */
+	public function sanitize_callback_for_tests( $value, $setting ) {
+		return $value . ':sanitize_callback';
+	}
+
+	/**
+	 * A test sanitize JS callback function.
+	 *
+	 * @param mixed                $value   The setting value.
+	 * @param WP_Customize_Setting $setting The setting object.
+	 */
+	public function sanitize_js_callback_for_tests( $value, $setting ) {
+		return $value . ':sanitize_js_callback';
+	}
+
+	/**
+	 * Sanitize JS callback for base64 encoding.
+	 *
+	 * @param mixed                $value   The setting value.
+	 * @param WP_Customize_Setting $setting The setting object.
+	 */
+	function sanitize_js_callback_base64_for_testing( $value, $setting ) {
+		return base64_encode( $value );
+	}
+
 	function test_constructor_with_args() {
 		$args = array(
 			'type' => 'option',
@@ -55,9 +95,9 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			'theme_supports' => 'widgets',
 			'default' => 'barbar',
 			'transport' => 'postMessage',
-			'validate_callback' => create_function( '$value', 'return $value . ":validate_callback";' ),
-			'sanitize_callback' => create_function( '$value', 'return $value . ":sanitize_callback";' ),
-			'sanitize_js_callback' => create_function( '$value', 'return $value . ":sanitize_js_callback";' ),
+			'validate_callback' => array( $this, 'validate_callback_for_tests' ),
+			'sanitize_callback' => array( $this, 'sanitize_callback_for_tests' ),
+			'sanitize_js_callback' => array( $this, 'sanitize_js_callback_for_tests' ),
 		);
 		$setting = new WP_Customize_Setting( $this->manager, 'bar', $args );
 		$this->assertEquals( 'bar', $setting->id );
@@ -615,7 +655,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 			'default' => $default,
 			'transport' => 'postMessage',
 			'dirty' => true,
-			'sanitize_js_callback' => create_function( '$value', 'return base64_encode( $value );' ),
+			'sanitize_js_callback' => array( $this, 'sanitize_js_callback_base64_for_testing' ),
 		);
 		$setting = new WP_Customize_Setting( $this->manager, 'name', $args );
 

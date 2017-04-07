@@ -46,6 +46,20 @@ class Tests_Image_Editor extends WP_Image_UnitTestCase {
 	}
 
 	/**
+	 * Return integer of 95 for testing.
+	 */
+	public function return_integer_95() {
+		return 95;
+	}
+
+	/**
+	 * Return integer of 100 for testing.
+	 */
+	public function return_integer_100() {
+		return 100;
+	}
+
+	/**
 	 * Test test_quality
 	 * @ticket 6821
 	 */
@@ -59,11 +73,11 @@ class Tests_Image_Editor extends WP_Image_UnitTestCase {
 		$this->assertEquals( 82, $editor->get_quality() );
 
 		// Ensure the quality filters do not have precedence if created after editor instantiation.
-		$func_100_percent = create_function( '', "return 100;" );
+		$func_100_percent = array( $this, 'return_integer_100' );
 		add_filter( 'wp_editor_set_quality', $func_100_percent );
 		$this->assertEquals( 82, $editor->get_quality() );
 
-		$func_95_percent = create_function( '', "return 95;" );
+		$func_95_percent = array( $this, 'return_integer_95' );
 		add_filter( 'jpeg_quality', $func_95_percent );
 		$this->assertEquals( 82, $editor->get_quality() );
 
