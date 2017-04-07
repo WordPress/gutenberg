@@ -75,11 +75,12 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName: Tag = 'div' } = this.props;
+		const { tagName: Tag = 'div', style } = this.props;
 
 		return (
 			<Tag
 				ref={ this.bindNode }
+				style={ style }
 				className="blocks-editable" />
 		);
 	}

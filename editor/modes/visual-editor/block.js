@@ -4,6 +4,11 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
+/**
+ * Internal dependencies
+ */
+import Toolbar from '../../components/toolbar';
+
 function VisualEditorBlock( props ) {
 	const { block } = props;
 	const settings = wp.blocks.getBlockSettings( block.blockType );
@@ -17,8 +22,17 @@ function VisualEditorBlock( props ) {
 		return null;
 	}
 
-	function onAttributesChange( attributes ) {
-		props.onChange( {
+	const { isHovered } = props;
+	const isSelected = props.isSelected;
+	const className = classnames( 'editor-visual-editor__block', {
+		'is-selected': isSelected,
+		'is-hovered': isHovered
+	} );
+
+	const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
+
+	function setAttributes( attributes ) {
+		onChange( {
 			attributes: {
 				...block.attributes,
 				...attributes
@@ -26,13 +40,13 @@ function VisualEditorBlock( props ) {
 		} );
 	}
 
-	const { isSelected, isHovered } = props;
-	const className = classnames( 'editor-visual-editor__block', {
-		'is-selected': isSelected,
-		'is-hovered': isHovered
-	} );
-
-	const { onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
+	function maybeDeselect( event ) {
+		// Annoyingly React does not support focusOut and we're forced to check
+		// related target to ensure it's not a child when blur fires.
+		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+			onDeselect();
+		}
+	}
 
 	// Disable reason: Each block can receive focus but must be able to contain
 	// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -42,15 +56,23 @@ function VisualEditorBlock( props ) {
 		<div
 			tabIndex="0"
 			onFocus={ onSelect }
-			onBlur={ onDeselect }
+			onBlur={ maybeDeselect }
 			onKeyDown={ onDeselect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			className={ className }
 		>
+			{ isSelected && settings.controls ? (
+				<Toolbar
+					controls={ settings.controls.map( ( control ) => ( {
+						...control,
+						onClick: () => control.onClick( block.attributes, setAttributes ),
+						isActive: () => control.isActive( block.attributes )
+					} ) ) } />
+			) : null }
 			<BlockEdit
 				attributes={ block.attributes }
-				onChange={ onAttributesChange } />
+				setAttributes={ setAttributes } />
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

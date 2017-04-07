@@ -16,7 +16,7 @@ wp.blocks.registerBlock( 'core/list', {
 		)
 	},
 
-	edit( { attributes, onChange } ) {
+	edit( { attributes } ) {
 		const { listType = 'ol', items = [] } = attributes;
 		const value = items.map( item => {
 			return `<li>${ item.value }</li>`;
@@ -25,8 +25,7 @@ wp.blocks.registerBlock( 'core/list', {
 		return (
 			<Editable
 				tagName={ listType }
-				value={ value }
-				onChange={ onChange } />
+				value={ value } />
 		);
 	},
 

@@ -16,6 +16,7 @@
 }
 
 .editor-visual-editor__block {
+	position: relative;
 	padding: 15px;
 	border: 2px solid transparent;
 	transition: 0.2s border-color;
@@ -27,4 +28,11 @@
 	&.is-selected {
 		border: 2px solid $light-gray-500;
 	}
+}
+
+.editor-visual-editor__block .editor-toolbar {
+	position: absolute;
+	bottom: 100%;
+	margin-bottom: -4px;
+	left: 8px;
 }
