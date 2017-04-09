@@ -1,7 +1,8 @@
 ModuleLoader.require([
 	"tinymce/caret/CaretContainer",
+	"tinymce/text/Zwsp",
 	"tinymce/Env"
-], function(CaretContainer, Env) {
+], function(CaretContainer, Zwsp, Env) {
 	module("tinymce.dom.Selection", {
 		setupModule: function() {
 			QUnit.stop();
@@ -503,8 +504,8 @@ ModuleLoader.require([
 		editor.setContent('<p contentEditable="false">1</p>');
 		CaretContainer.insertBlock('p', editor.$('p')[0], true);
 		rng = editor.dom.createRng();
-		rng.setStart(editor.$('p')[0].firstChild, 0);
-		rng.setEnd(editor.$('p')[0].firstChild, 1);
+		rng.setStart(editor.$('p')[0], 0);
+		rng.setEnd(editor.$('p')[0], 0);
 		editor.selection.setRng(rng);
 		bookmark = editor.selection.getBookmark(2);
 		editor.setContent('<p contentEditable="false">1</p>');
@@ -846,6 +847,21 @@ ModuleLoader.require([
 			equal(rng.startOffset, 0);
 		});
 
+		test('normalize lean left from br into formatter caret container', function() {
+			var rng;
+
+			editor.getBody().innerHTML = '<p><span id="_mce_caret">' + Zwsp.ZWSP + '</span><br /></p>';
+			rng = editor.dom.createRng();
+			rng.setStartBefore(editor.getBody().firstChild.lastChild);
+			rng.setEndBefore(editor.getBody().firstChild.lastChild);
+			editor.selection.setRng(rng);
+			editor.selection.normalize();
+
+			rng = editor.selection.getRng(true);
+			equal(rng.startContainer.nodeType, 3);
+			equal(rng.startOffset, 1);
+		});
+
 		test('normalize don\'t lean left into empty inline elements if there is a br element after caret', function() {
 			var rng;
 
@@ -1054,6 +1070,72 @@ ModuleLoader.require([
 		equal(rng.startOffset, 0);
 		equal(rng.endContainer.nodeName, '#text');
 		equal(rng.endOffset, 1);
+	});
+
+	test('getRng should return null if win.document is not defined or null', function() {
+		var win = editor.selection.win,
+			rng = editor.dom.createRng();
+
+		editor.setContent('<p>x</p>');
+
+		rng.setStart(editor.$('p')[0].firstChild, 0);
+		rng.setEnd(editor.$('p')[0].firstChild, 1);
+
+		editor.selection.setRng(rng);
+		editor.selection.setRng(null);
+
+		editor.selection.win = {};
+		rng = editor.selection.getRng(true);
+		equal(rng, null);
+
+		editor.selection.win = {document:null};
+		rng = editor.selection.getRng(true);
+		equal(rng, null);
+
+		editor.selection.win = win;
+	});
+
+	test('image selection webkit bug', function() {
+		var testImageSelection = function (inputHtml, expectedContainerName, expectedOffset) {
+			editor.setContent(inputHtml);
+			editor.selection.select(editor.dom.select('img')[0]);
+
+			var rng = editor.selection.getRng(true);
+			equal(rng.startContainer.nodeName, 'P');
+			equal(rng.startOffset, expectedOffset);
+			equal(rng.startContainer.nodeName, 'P');
+			equal(rng.endOffset, expectedOffset + 1);
+			equal(editor.selection.getNode().nodeName, 'IMG');
+			equal(editor.selection.getStart().nodeName, 'IMG');
+			equal(editor.selection.getEnd().nodeName, 'IMG');
+
+			var nativeRng = editor.selection.getSel().getRangeAt(0);
+			equal(nativeRng.startContainer.nodeName, 'P');
+			equal(nativeRng.startOffset, expectedOffset);
+			equal(nativeRng.startContainer.nodeName, 'P');
+			equal(nativeRng.endOffset, expectedOffset + 1);
+		};
+
+		testImageSelection('<p><img src="#"></p>', 'P', 0);
+		testImageSelection('<p><img src="#">abc</p>', 'P', 0);
+		testImageSelection('<p>abc<img src="#"></p>', 'P', 1);
+		testImageSelection('<p>abc<img src="#">def</p>', 'P', 1);
+		testImageSelection('<p><img style="float: right;" src="#"></p>', 'P', 0);
+		testImageSelection('<p><img style="float: right;" src="#">abc</p>', 'P', 0);
+		testImageSelection('<p>abc<img style="float: right;" src="#"></p>', 'P', 1);
+		testImageSelection('<p>abc<img style="float: right;" src="#">def</p>', 'P', 1);
+		testImageSelection('<p><img style="float: left;" src="#"></p>', 'P', 0);
+		testImageSelection('<p><img style="float: left;" src="#">abc</p>', 'P', 0);
+		testImageSelection('<p>abc<img style="float: left;" src="#"></p>', 'P', 1);
+		testImageSelection('<p>abc<img style="float: left;" src="#">def</p>', 'P', 1);
+		testImageSelection('<p dir="rtl"><img style="float: right;" src="#"></p>', 'P', 0);
+		testImageSelection('<p dir="rtl"><img style="float: right;" src="#">abc</p>', 'P', 0);
+		testImageSelection('<p dir="rtl">abc<img style="float: right;" src="#"></p>', 'P', 1);
+		testImageSelection('<p dir="rtl">abc<img style="float: right;" src="#">def</p>', 'P', 1);
+		testImageSelection('<p dir="rtl"><img style="float: left;" src="#"></p>', 'P', 0);
+		testImageSelection('<p dir="rtl"><img style="float: left;" src="#">abc</p>', 'P', 0);
+		testImageSelection('<p dir="rtl">abc<img style="float: left;" src="#"></p>', 'P', 1);
+		testImageSelection('<p dir="rtl">abc<img style="float: left;" src="#">def</p>', 'P', 1);
 	});
 });
 

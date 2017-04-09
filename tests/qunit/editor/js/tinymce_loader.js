@@ -4,4 +4,6 @@ document.write('<script src="../../../src/wp-includes/js/tinymce/tinymce.js"></s
 var wpPlugins = 'charmap colorpicker hr lists media paste tabfocus textcolor ' +
 			'fullscreen wordpress wpautoresize wpeditimage wpgallery wplink wpdialogs wpview';
 
+var $ = window.jQuery;
+
 getUserSetting = setUserSetting = function() {}
