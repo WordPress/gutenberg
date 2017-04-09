@@ -15,23 +15,23 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
+#: editor/blocks/list/index.js:22
+msgid "Align left"
+msgstr ""
+
+#: editor/blocks/list/index.js:30
+msgid "Align center"
+msgstr ""
+
+#: editor/blocks/list/index.js:38
+msgid "Align right"
+msgstr ""
+
 #: editor/blocks/list/index.js:5
 msgid "List"
 msgstr ""
 
-#: editor/blocks/text/index.js:19
-msgid "Align left"
-msgstr ""
-
-#: editor/blocks/text/index.js:27
-msgid "Align center"
-msgstr ""
-
-#: editor/blocks/text/index.js:35
-msgid "Align right"
-msgstr ""
-
-#: editor/header/mode-switcher/index.js:20
+#: editor/header/mode-switcher/index.js:30
 msgid "Visual"
 msgstr ""
 
