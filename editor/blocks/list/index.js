@@ -53,7 +53,7 @@ wp.blocks.registerBlock( 'core/list', {
 			<Editable
 				tagName={ listType }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ align ? { textAlign: align } : null }
+				style={ align ? { textAlign: align, listStylePosition: 'inside' } : null }
 				value={ content } />
 		);
 	},
