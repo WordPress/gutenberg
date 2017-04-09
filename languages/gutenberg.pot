@@ -27,6 +27,10 @@ msgstr ""
 msgid "Align right"
 msgstr ""
 
+#: editor/blocks/list/index.js:46
+msgid "Justify"
+msgstr ""
+
 #: editor/blocks/list/index.js:5
 msgid "List"
 msgstr ""

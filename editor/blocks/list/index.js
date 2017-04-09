@@ -40,6 +40,14 @@ wp.blocks.registerBlock( 'core/list', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'right' } );
 			}
+		},
+		{
+			icon: 'editor-justify',
+			title: wp.i18n.__( 'Justify' ),
+			isActive: ( { align } ) => 'justify' === align,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { align: 'justify' } );
+			}
 		}
 	],
 
@@ -48,12 +56,15 @@ wp.blocks.registerBlock( 'core/list', {
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
+		const defaultListStyles = { listStylePosition: 'inside' };
+		const alignment = align ? { textAlign: align } : {};
+		const style = { ...alignment, ...defaultListStyles };
 
 		return (
 			<Editable
 				tagName={ listType }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ align ? { textAlign: align, listStylePosition: 'inside' } : null }
+				style={ style }
 				value={ content } />
 		);
 	},
