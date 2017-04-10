@@ -65,7 +65,6 @@ wp.blocks.registerBlock( 'core/list', {
 		return (
 			<Editable
 				tagName={ listType }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
 				style={ align ? { textAlign: align } : null }
 				value={ content }
 				className="blocks-list" />
