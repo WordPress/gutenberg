@@ -1,64 +1,36 @@
 .editor-mode-switcher {
 	position: relative;
 	margin-right: $item-spacing;
-}
-
-.editor-mode-switcher__toggle {
+	padding-right: $item-spacing;
 	color: $dark-gray-500;
-	padding: $item-spacing;
 	align-items: center;
 	cursor: pointer;
-	border: none;
-	background: none;
 	border-right: 1px solid $light-gray-500;
 	outline: none;
 	display: flex;
 	align-items: center;
-}
 
-.editor-mode-switcher__content {
-	position: absolute;
-	top: 40px;
-	border: 1px solid $light-gray-500;
-	color: $dark-gray-500;
-	min-width: 100px;
-
-	button {
-		padding: 8px;
-		display: block;
-		border: none;
-		background: white;
+	.editor-mode-switcher__input {
+		background: transparent;
+		line-height: 1;
+		border: 0;
+		border-radius: 0;
+		-webkit-appearance: none;
 		outline: none;
 		cursor: pointer;
-		width: 100%;
+		box-shadow: none;
+		padding-right: 24px;
 	}
-}
 
-.editor-mode-switcher__arrow {
-	border: 10px dashed $light-gray-500;
-	height: 0;
-	line-height: 0;
-	position: absolute;
-	width: 0;
-	z-index: 1;
-	top: -10px;
-	left: 50%;
-	margin-left: -10px;
-	border-bottom-style: solid;
-	border-top: none;
-	border-left-color: transparent;
-	border-right-color: transparent;
+	.dashicon {
+		position: relative;
+		z-index: -1;
+		margin-left: -24px;
+		margin-top: -1px;
+	}
 
-	&:before {
-		top: 2px;
-		border: 10px solid white;
-		content: " ";
-		position: absolute;
-		left: 50%;
-		margin-left: -10px;
-		border-bottom-style: solid;
-		border-top: none;
-		border-left-color: transparent;
-		border-right-color: transparent;
+	&:hover,
+	select:hover {
+		color: $dark-gray-900;
 	}
 }
