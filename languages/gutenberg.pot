@@ -31,11 +31,11 @@ msgstr ""
 msgid "Align right"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:29
+#: editor/header/mode-switcher/index.js:20
 msgid "Visual"
 msgstr ""
 
-#: editor/header/mode-switcher/index.js:30
+#: editor/header/mode-switcher/index.js:24
 msgctxt "Name for the Text editor tab (formerly HTML)"
 msgid "Text"
 msgstr ""
