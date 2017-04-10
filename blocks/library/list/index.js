@@ -2,23 +2,20 @@
  * Internal dependencies
  */
 import './style.scss';
+import { registerBlock, query, Editable } from 'api';
 
-const Editable = wp.blocks.Editable;
-const { html, prop } = wp.blocks.query;
+const { html, prop } = query;
 
-wp.blocks.registerBlock( 'core/list', {
+registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
 	attributes: {
 		listType: prop( 'ol,ul', 'nodeName' ),
-		items: wp.blocks.query.query(
-			'li',
-			{
-				value: html()
-			}
-		)
+		items: query.query( 'li', {
+			value: html()
+		} )
 	},
 
 	controls: [

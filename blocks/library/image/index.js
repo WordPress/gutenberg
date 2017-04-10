@@ -1,7 +1,11 @@
-const { attr, html } = wp.blocks.query;
-const Editable = wp.blocks.Editable;
+/**
+ * Internal dependencies
+ */
+import { registerBlock, query, Editable } from 'api';
 
-wp.blocks.registerBlock( 'core/image', {
+const { attr, html } = query;
+
+registerBlock( 'core/image', {
 	title: wp.i18n.__( 'Image' ),
 
 	icon: 'format-image',

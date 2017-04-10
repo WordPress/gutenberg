@@ -3,38 +3,38 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
-#: editor/blocks/freeform/index.js:4
+#: blocks/library/freeform/index.js:9
 msgid "Freeform"
 msgstr ""
 
-#: editor/blocks/image/index.js:26
+#: blocks/library/image/index.js:30
 msgid "Write caption…"
 msgstr ""
 
-#: editor/blocks/image/index.js:5
+#: blocks/library/image/index.js:9
 msgid "Image"
 msgstr ""
 
-#: editor/blocks/list/index.js:10
+#: blocks/library/list/index.js:10
 msgid "List"
 msgstr ""
 
-#: editor/blocks/list/index.js:27
-#: editor/blocks/text/index.js:19
+#: blocks/library/list/index.js:24
+#: blocks/library/text/index.js:23
 msgid "Align left"
 msgstr ""
 
-#: editor/blocks/list/index.js:35
-#: editor/blocks/text/index.js:27
+#: blocks/library/list/index.js:32
+#: blocks/library/text/index.js:31
 msgid "Align center"
 msgstr ""
 
-#: editor/blocks/list/index.js:43
-#: editor/blocks/text/index.js:35
+#: blocks/library/list/index.js:40
+#: blocks/library/text/index.js:39
 msgid "Align right"
 msgstr ""
 
-#: editor/blocks/list/index.js:51
+#: blocks/library/list/index.js:48
 msgid "Justify"
 msgstr ""
 

@@ -1,6 +1,11 @@
-const { html } = wp.blocks.query;
+/**
+ * Internal dependencies
+ */
+import { registerBlock, query, setUnknownTypeHandler } from 'api';
 
-wp.blocks.registerBlock( 'core/freeform', {
+const { html } = query;
+
+registerBlock( 'core/freeform', {
 	title: wp.i18n.__( 'Freeform' ),
 
 	icon: 'text',
@@ -27,4 +32,4 @@ wp.blocks.registerBlock( 'core/freeform', {
 	}
 } );
 
-wp.blocks.setUnknownTypeHandler( 'core/freeform' );
+setUnknownTypeHandler( 'core/freeform' );

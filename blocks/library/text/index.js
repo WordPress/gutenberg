@@ -1,7 +1,11 @@
-const { html, prop } = wp.blocks.query;
-const Editable = wp.blocks.Editable;
+/**
+ * Internal dependencies
+ */
+import { registerBlock, query, Editable } from 'api';
 
-wp.blocks.registerBlock( 'core/text', {
+const { html, prop } = query;
+
+registerBlock( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
 
 	icon: 'text',

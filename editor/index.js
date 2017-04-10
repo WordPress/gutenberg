@@ -7,7 +7,6 @@ import { Provider } from 'react-redux';
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
-import './blocks';
 import Layout from './layout';
 import { createReduxStore } from './state';
 
