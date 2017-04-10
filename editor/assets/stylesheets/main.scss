@@ -33,6 +33,11 @@ body.toplevel_page_gutenberg {
 	ol {
 		list-style-type: decimal;
 	}
+
+	select {
+		font-size: 13px;
+		color: $dark-gray-500;
+	}
 }
 
 .gutenberg__editor {

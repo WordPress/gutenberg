@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './style.scss';
+import Dashicon from '../../components/dashicon';
 
 class ModeSwitcher extends wp.element.Component {
 	constructor() {
@@ -39,6 +40,7 @@ class ModeSwitcher extends wp.element.Component {
 						</option>
 					) }
 				</select>
+				<Dashicon icon="arrow-down" />
 			</div>
 		);
 	}
