@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { fromPairs, sortBy, toPairs } = require( 'lodash' );
+const { pick, uniq, fromPairs, sortBy, toPairs, isEqual } = require( 'lodash' );
 const { relative } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -74,6 +74,13 @@ function getTranslatorComment( node ) {
 
 function isValidTranslationKey( key ) {
 	return -1 !== VALID_TRANSLATION_KEYS.indexOf( key );
+}
+
+function isSameTranslation( a, b ) {
+	return isEqual(
+		pick( a, VALID_TRANSLATION_KEYS ),
+		pick( b, VALID_TRANSLATION_KEYS )
+	);
 }
 
 module.exports = function() {
@@ -159,7 +166,18 @@ module.exports = function() {
 					translation.comments.translator = translator;
 				}
 
-				data.translations.messages[ translation.msgid ] = translation;
+				const { messages } = data.translations;
+
+				// Test whether equivalent translation already exists. If so,
+				// merge into references of existing translation.
+				if ( isSameTranslation( translation, messages[ translation.msgid ] ) ) {
+					translation.comments.reference = uniq( [
+						...messages[ translation.msgid ].comments.reference.split( '\n' ),
+						translation.comments.reference
+					] ).sort().join( '\n' );
+				}
+
+				messages[ translation.msgid ] = translation;
 				this.hasPendingWrite = true;
 			},
 			Program: {
