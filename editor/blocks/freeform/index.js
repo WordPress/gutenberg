@@ -12,7 +12,14 @@ wp.blocks.registerBlock( 'core/freeform', {
 	},
 
 	edit( { attributes } ) {
-		return <div contentEditable>{ attributes.html }</div>;
+		return (
+			<div
+				contentEditable
+				suppressContentEditableWarning
+			>
+				{ attributes.html }
+			</div>
+		);
 	},
 
 	save( { attributes } ) {
