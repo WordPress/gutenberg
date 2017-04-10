@@ -37,6 +37,7 @@ function ModeSwitcher( { mode, onSwitch } ) {
 			<select
 				value={ mode }
 				onChange={ ( event ) => onSwitch( event.target.value ) }
+				className="editor-mode-switcher__input"
 			>
 				{ MODES.map( ( { value, label } ) =>
 					<option key={ value } value={ value }>

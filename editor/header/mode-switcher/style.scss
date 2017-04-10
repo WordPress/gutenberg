@@ -10,19 +10,19 @@
 	display: flex;
 	align-items: center;
 
-	select {
+	.editor-mode-switcher__input {
 		background: transparent;
-	    line-height: 1;
-	    border: 0;
-	    border-radius: 0;
-	    -webkit-appearance: none;
+		line-height: 1;
+		border: 0;
+		border-radius: 0;
+		-webkit-appearance: none;
 		outline: none;
 		cursor: pointer;
 		box-shadow: none;
 		padding-right: 24px;
 	}
 
-	svg {
+	.dashicon {
 		position: relative;
 		z-index: -1;
 		margin-left: -24px;
