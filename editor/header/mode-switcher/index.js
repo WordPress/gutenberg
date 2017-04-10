@@ -7,55 +7,38 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
 
 class ModeSwitcher extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
-		this.toggle = this.toggle.bind( this );
 		this.state = {
-			opened: false
+			value: this.props.mode
 		};
+
+		this.switchMode = this.switchMode.bind( this );
 	}
 
-	toggle() {
-		this.setState( {
-			opened: ! this.state.opened
-		} );
+	switchMode( mode ) {
+		this.setState( { value: mode.target.value } );
+		this.props.onSwitch( mode.target.value );
 	}
 
 	render() {
-		const { opened } = this.state;
 		const modes = [
 			{ value: 'visual', label: wp.i18n.__( 'Visual' ) },
 			{ value: 'text', label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' ) },
 		];
-		const switchMode = ( mode ) => () => {
-			this.setState( { opened: false } );
-			this.props.onSwitch( mode );
-		};
-		const currentMode = modes.find( ( { value } ) => value === this.props.mode );
+		//const currentMode = modes.find( ( { value } ) => value === this.props.mode );
 
 		return (
 			<div className="editor-mode-switcher">
-				<button
-					className="editor-mode-switcher__toggle"
-					onClick={ this.toggle }
-					aria-label={ wp.i18n.__( 'Switch the editor mode' ) }
-				>
-					{ currentMode.label }
-					<Dashicon icon="arrow-down" />
-				</button>
-				{ opened &&
-					<div className="editor-mode-switcher__content">
-						<div className="editor-mode-switcher__arrow" />
-						{ modes.map( ( mode ) =>
-							<button key={ mode.value } type="button" onClick={ switchMode( mode.value ) }>
-								{ mode.label }
-							</button>
-						) }
-					</div>
-				}
+				<select value={ this.state.value } onChange={ this.switchMode }>
+					{ modes.map( ( mode ) =>
+						<option key={ mode.value } value={ mode.value }>
+							{ mode.label }
+						</option>
+					) }
+				</select>
 			</div>
 		);
 	}
