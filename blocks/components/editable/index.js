@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -75,13 +80,14 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName: Tag = 'div', style } = this.props;
+		const { tagName: Tag = 'div', style, className } = this.props;
+		const classes = classnames( 'blocks-editable', className );
 
 		return (
 			<Tag
 				ref={ this.bindNode }
 				style={ style }
-				className="blocks-editable" />
+				className={ classes } />
 		);
 	}
 }

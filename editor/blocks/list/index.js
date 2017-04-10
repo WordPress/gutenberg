@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
@@ -16,16 +21,53 @@ wp.blocks.registerBlock( 'core/list', {
 		)
 	},
 
+	controls: [
+		{
+			icon: 'editor-alignleft',
+			title: wp.i18n.__( 'Align left' ),
+			isActive: ( { align } ) => ! align || 'left' === align,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { align: undefined } );
+			}
+		},
+		{
+			icon: 'editor-aligncenter',
+			title: wp.i18n.__( 'Align center' ),
+			isActive: ( { align } ) => 'center' === align,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { align: 'center' } );
+			}
+		},
+		{
+			icon: 'editor-alignright',
+			title: wp.i18n.__( 'Align right' ),
+			isActive: ( { align } ) => 'right' === align,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { align: 'right' } );
+			}
+		},
+		{
+			icon: 'editor-justify',
+			title: wp.i18n.__( 'Justify' ),
+			isActive: ( { align } ) => 'justify' === align,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { align: 'justify' } );
+			}
+		}
+	],
+
 	edit( { attributes } ) {
-		const { listType = 'ol', items = [] } = attributes;
-		const value = items.map( item => {
+		const { listType = 'ol', items = [], align } = attributes;
+		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
 
 		return (
 			<Editable
 				tagName={ listType }
-				value={ value } />
+				style={ align ? { textAlign: align } : null }
+				value={ content }
+				className="blocks-list" />
 		);
 	},
 
