@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import Inserter from './';
-import Dashicon from '../components/dashicon';
+import Dashicon from 'components/dashicon';
 
 class InserterButton extends wp.element.Component {
 	constructor() {

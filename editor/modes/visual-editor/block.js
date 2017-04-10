@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import Toolbar from '../../components/toolbar';
+import Toolbar from 'components/toolbar';
 
 function VisualEditorBlock( props ) {
 	const { block } = props;
