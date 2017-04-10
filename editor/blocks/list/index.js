@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 const Editable = wp.blocks.Editable;
 const { html, prop } = wp.blocks.query;
 
@@ -56,16 +61,14 @@ wp.blocks.registerBlock( 'core/list', {
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
-		const defaultListStyles = { listStylePosition: 'inside' };
-		const alignment = align ? { textAlign: align } : {};
-		const style = { ...alignment, ...defaultListStyles };
 
 		return (
 			<Editable
 				tagName={ listType }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ style }
-				value={ content } />
+				style={ align ? { textAlign: align } : null }
+				value={ content }
+				className="blocks-list" />
 		);
 	},
 
