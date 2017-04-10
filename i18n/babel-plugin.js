@@ -37,11 +37,23 @@ const { pick, uniq, fromPairs, sortBy, toPairs, isEqual } = require( 'lodash' );
 const { relative } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
+/**
+ * Default output headers if none specified in plugin options.
+ *
+ * @type {Object}
+ */
 const DEFAULT_HEADERS = {
 	'content-type': 'text/plain; charset=UTF-8',
 	'x-generator': 'babel-plugin-wp-i18n'
 };
 
+/**
+ * Default functions to parse if none specified in plugin options. Each key is
+ * a CallExpression name (or member name) and the value an array corresponding
+ * to translation key argument position.
+ *
+ * @type {Object}
+ */
 const DEFAULT_FUNCTIONS = {
 	__: [ 'msgid' ],
 	_n: [ 'msgid', 'msgid_plural' ],
@@ -49,10 +61,26 @@ const DEFAULT_FUNCTIONS = {
 	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ]
 };
 
+/**
+ * Default file output if none specified.
+ *
+ * @type {string}
+ */
 const DEFAULT_OUTPUT = 'gettext.pot';
 
+/**
+ * Set of keys which are valid to be assigned into a translation object.
+ *
+ * @type {string[]}
+ */
 const VALID_TRANSLATION_KEYS = [ 'msgid', 'msgid_plural', 'msgctxt' ];
 
+/**
+ * Returns translator comment for a given AST node if one exists.
+ *
+ * @param  {Object}  node AST node
+ * @return {?string}      Translator comment
+ */
 function getTranslatorComment( node ) {
 	if ( ! node.leadingComments ) {
 		return;
@@ -72,10 +100,25 @@ function getTranslatorComment( node ) {
 	}
 }
 
+/**
+ * Returns true if the specified key of a function is valid for assignment in
+ * the translation object.
+ *
+ * @param  {string}  key Key to test
+ * @return {Boolean}     Whether key is valid for assignment
+ */
 function isValidTranslationKey( key ) {
 	return -1 !== VALID_TRANSLATION_KEYS.indexOf( key );
 }
 
+/**
+ * Given two translation objects, returns true if valid translation keys match,
+ * or false otherwise.
+ *
+ * @param  {Object}  a First translation object
+ * @param  {Object}  b Second translation object
+ * @return {Boolean}   Whether valid translation keys match
+ */
 function isSameTranslation( a, b ) {
 	return isEqual(
 		pick( a, VALID_TRANSLATION_KEYS ),
@@ -208,3 +251,6 @@ module.exports = function() {
 		}
 	};
 };
+
+module.exports.isValidTranslationKey = isValidTranslationKey;
+module.exports.isSameTranslation = isSameTranslation;
