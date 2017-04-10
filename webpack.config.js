@@ -2,46 +2,10 @@
  * External dependencies
  */
 
-const path = require( 'path' );
 const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
-
-/**
- * Webpack plugin that adds the containing directory of each entry point as an
- * effective `resolve.modules` root for all module resolution within that path.
- */
-class EntryResolvePlugin {
-	apply( compiler ) {
-		// Map entries into array of absolute paths
-		const entryRoots = Object.keys( compiler.options.entry ).map( ( entry ) => {
-			return path.dirname( path.resolve( compiler.options.entry[ entry ] ) );
-		} );
-
-		compiler.plugin( 'after-resolvers', () => {
-			compiler.resolvers.normal.apply( {
-				apply( resolver ) {
-					resolver.plugin( 'module', ( request, callback ) => {
-						// Find entry root which contains the requesting path
-						const resolvePath = entryRoots.find( ( entryRoot ) => {
-							return request.path.startsWith( entryRoot );
-						} );
-
-						if ( ! resolvePath ) {
-							return callback();
-						}
-
-						// Add entry root as resolve base path
-						resolver.doResolve( 'resolve', Object.assign( {}, request, {
-							path: resolvePath,
-							request: './' + request.request
-						} ), '', callback );
-					} );
-				}
-			} );
-		} );
-	}
-}
+const ResolveEntryModulesPlugin = require( 'resolve-entry-modules-webpack-plugin' );
 
 const config = {
 	entry: {
@@ -92,7 +56,7 @@ const config = {
 		]
 	},
 	plugins: [
-		new EntryResolvePlugin(),
+		new ResolveEntryModulesPlugin(),
 		new ExtractTextPlugin( {
 			filename: './[name]/build/style.css'
 		} ),
