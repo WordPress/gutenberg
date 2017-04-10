@@ -56,7 +56,7 @@ wp.blocks.registerBlock( 'core/list', {
 		}
 	],
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes } ) {
 		const { listType = 'ol', items = [], align } = attributes;
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
