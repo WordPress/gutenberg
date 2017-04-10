@@ -13,6 +13,10 @@ wp.blocks.registerBlock( 'core/list', {
 
 	attributes: {
 		listType: prop( 'ol,ul', 'nodeName' ),
+		content: () => {
+			debugger;
+			return html( 'li' );
+		},
 		items: wp.blocks.query.query(
 			'li',
 			{
@@ -53,14 +57,20 @@ wp.blocks.registerBlock( 'core/list', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'justify' } );
 			}
+		},
+		{
+			icon: 'editor-ol',
+			title: wp.i18n.__( 'Ordered list' ),
+			isActive: ( { } ) => false,
+			onClick( attributes, setAttributes ) {
+				debugger;
+				setAttributes( { listType: 'ol' } );
+			}
 		}
 	],
 
 	edit( { attributes } ) {
-		const { listType = 'ol', items = [], align } = attributes;
-		const content = items.map( item => {
-			return `<li>${ item.value }</li>`;
-		} ).join( '' );
+		const { listType = 'ol', align, content } = attributes;
 
 		return (
 			<Editable
@@ -72,10 +82,11 @@ wp.blocks.registerBlock( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { listType = 'ol', items = [] } = attributes;
-		const children = items.map( ( item, index ) => (
-			<li key={ index } dangerouslySetInnerHTML={ { __html: item.value } } />
-		) );
-		return wp.element.createElement( listType.toLowerCase(), null, children );
+		const { listType = 'ol', align, content } = attributes;
+		const ListElement = listType.toLocaleLowerCase();
+		return (
+			<ListElement style={ align ? { textAlign: align } : null } dangerouslySetInnerHTML={ { __html: content } }>
+			</ListElement>
+		);
 	}
 } );
