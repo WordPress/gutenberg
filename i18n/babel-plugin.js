@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, uniq, fromPairs, sortBy, toPairs, isEqual } = require( 'lodash' );
+const { pick, reduce, uniq, forEach, sortBy, isEqual, merge } = require( 'lodash' );
 const { relative } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -127,8 +127,9 @@ function isSameTranslation( a, b ) {
 }
 
 module.exports = function() {
+	const strings = {};
 	let nplurals = 2,
-		data;
+		baseData;
 
 	return {
 		visitor: {
@@ -166,24 +167,26 @@ module.exports = function() {
 
 				// At this point we assume we'll save data, so initialize if
 				// we haven't already
-				if ( ! data ) {
-					data = {
+				if ( ! baseData ) {
+					baseData = {
 						charset: 'utf-8',
 						headers: state.opts.headers || DEFAULT_HEADERS,
-						translations: { '': {}, messages: {} }
+						translations: {
+							'': {
+								'': {
+									msgid: '',
+									msgstr: []
+								}
+							}
+						}
 					};
 
-					data.translations[ '' ][ '' ] = {
-						msgid: '',
-						msgstr: []
-					};
-
-					for ( const key in data.headers ) {
-						data.translations[ '' ][ '' ].msgstr.push( `${ key }: ${ data.headers[ key ] };\n` );
+					for ( const key in baseData.headers ) {
+						baseData.translations[ '' ][ '' ].msgstr.push( `${ key }: ${ baseData.headers[ key ] };\n` );
 					}
 
 					// Attempt to exract nplurals from header
-					const pluralsMatch = ( data.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
+					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
 					if ( pluralsMatch ) {
 						nplurals = pluralsMatch[ 1 ];
 					}
@@ -197,10 +200,9 @@ module.exports = function() {
 				}
 
 				// Assign file reference comment
-				let { filename } = this.file.opts;
-				filename = relative( process.cwd(), filename );
+				const { filename } = this.file.opts;
 				translation.comments = {
-					reference: filename + ':' + path.node.loc.start.line
+					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line
 				};
 
 				// If exists, also assign translator comment
@@ -209,35 +211,45 @@ module.exports = function() {
 					translation.comments.translator = translator;
 				}
 
-				const { messages } = data.translations;
-
-				// Test whether equivalent translation already exists. If so,
-				// merge into references of existing translation.
-				if ( isSameTranslation( translation, messages[ translation.msgid ] ) ) {
-					translation.comments.reference = uniq( [
-						...messages[ translation.msgid ].comments.reference.split( '\n' ),
-						translation.comments.reference
-					] ).sort().join( '\n' );
-				}
-
-				messages[ translation.msgid ] = translation;
-				this.hasPendingWrite = true;
+				strings[ filename ].push( translation );
 			},
 			Program: {
+				enter() {
+					strings[ this.file.opts.filename ] = [];
+				},
 				exit( path, state ) {
-					if ( ! this.hasPendingWrite ) {
+					if ( ! strings[ this.file.opts.filename ].length ) {
+						delete strings[ this.file.opts.filename ];
 						return;
 					}
 
-					// By spec, enumeration order of object keys cannot be
-					// guaranteed, but in practice most runtimes respect order
-					// in which keys are inserted. We rely on this to specify
-					// ordering alphabetically by file, line. A better solution
-					// is to support or reimplement translations as array.
-					data.translations.messages = fromPairs( sortBy(
-						toPairs( data.translations.messages ),
-						( [ , translation ] ) => translation.comments.reference
-					) );
+					// Sort translations by filename for deterministic output
+					const files = Object.keys( strings ).sort();
+
+					const translations = reduce( files, ( memo, file ) => {
+						// Within the same file, sort translations by line
+						forEach( sortBy( strings[ file ], 'comments.reference' ), ( translation ) => {
+							const { msgctxt = '', msgid } = translation;
+							if ( ! memo.hasOwnProperty( msgctxt ) ) {
+								memo[ msgctxt ] = {};
+							}
+
+							// Merge references if translation already exists
+							if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
+								translation.comments.reference = uniq( [
+									memo[ msgctxt ][ msgid ].comments.reference,
+									translation.comments.reference
+								].join( '\n' ).split( '\n' ) ).join( '\n' );
+							}
+
+							memo[ msgctxt ][ msgid ] = translation;
+						} );
+
+						return memo;
+					}, {} );
+
+					// Merge translations from individual files into headers
+					const data = merge( {}, baseData, { translations } );
 
 					// Ideally we could wait until Babel has finished parsing
 					// all files or at least asynchronously write, but Babel
