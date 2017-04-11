@@ -66,6 +66,15 @@ wp.blocks.registerBlock( 'core/list', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { listType: 'ul' } );
 			}
+		},
+
+		{
+			icon: 'editor-ol',
+			title: wp.i18n.__( 'Convert to ordered' ),
+			isActive: ( { } ) => false, // To be implemented
+			onClick( attributes, setAttributes ) {
+				setAttributes( { listType: 'ol' } );
+			}
 		}
 
 	],
