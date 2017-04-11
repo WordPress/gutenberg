@@ -2,10 +2,9 @@
  * Internal dependencies
  */
 import './style.scss';
-import * as hpqQuery from 'hpq';
 
 const Editable = wp.blocks.Editable;
-const { html, prop, query, text } = wp.blocks.query;
+const { html, prop, query, parse } = wp.blocks.query;
 
 const parseAttrs = {
 	listType: prop( 'ol,ul', 'nodeName' ),
@@ -58,7 +57,17 @@ wp.blocks.registerBlock( 'core/list', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'justify' } );
 			}
+		},
+
+		{
+			icon: 'editor-ul',
+			title: wp.i18n.__( 'Convert to unordered' ),
+			isActive: ( { } ) => false, // To be implemented
+			onClick( attributes, setAttributes ) {
+				setAttributes( { listType: 'ul' } );
+			}
 		}
+
 	],
 
 	edit( { attributes, setAttributes } ) {
@@ -66,14 +75,15 @@ wp.blocks.registerBlock( 'core/list', {
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
-
 		return (
 			<Editable
 				tagName={ listType }
 				style={ align ? { textAlign: align } : null }
 				onChange={ ( v, node ) => {
-					const attrs = hpqQuery.parse('<' + node.nodeName + '>' +  v + '</'  + node.nodeName + '>', parseAttrs );
-					console.log('attrs', attrs);
+					// The node is getting passed through from Tiny.
+					// Is there a way to parse this with hpq that doesn't
+					// involve a string?
+					const attrs = parse( '<' + node.nodeName + '>' + v + '</' + node.nodeName + '>', parseAttrs );
 					setAttributes( attrs );
 				} }
 				value={ content }
@@ -82,11 +92,8 @@ wp.blocks.registerBlock( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { listType = 'ol', items = [], content } = attributes;
+		const { listType = 'ol', items = [] } = attributes;
 		const ListType = listType.toLowerCase();
-		console.log( items );
-		console.log( content );
-		debugger;
 		const inner = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
