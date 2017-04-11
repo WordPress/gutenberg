@@ -11,8 +11,4 @@ Such a crucial step is handled by the grammar parsing which takes the serialized
 
 The *visual editor* is thus a component that contains and renders the list of block nodes from the internal state into the page. This removes any trace of imperative handling when it comes to finding a block and manipulating a block. As a matter of fact, the visual editor or the text editor are just two different—equally valid—views of the same representation of state. The internal representation of the post content is updated as blocks are updated and it is serialized back to be saved in `post_content`.
 
-@todo: rename `VisualEditorBlock` in the code to just `VisualBlock`
-
 Individual blocks are handled by the `VisualBlock` component, which attaches event handlers and renders the `edit` function of a block definition to the document with the corresponding attributes and local state. The `edit` function is the markup shape of a component while in editing mode.
-
-@todo: consider renaming settings.edit and settings.save
