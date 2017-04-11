@@ -15,7 +15,7 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: editor/blocks/list/index.js:10
+#: editor/blocks/list/index.js:22
 msgid "List"
 msgstr ""
 
@@ -35,8 +35,12 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: editor/blocks/list/index.js:63
-msgid "Ordered list"
+#: editor/blocks/list/index.js:64
+msgid "Convert to unordered"
+msgstr ""
+
+#: editor/blocks/list/index.js:72
+msgid "Convert to ordered"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:20
