@@ -2,6 +2,8 @@
 
 Prototyping since 1440.
 
+![Text block](https://wpcoredesign.mystagingwebsite.com/gutenberg/gutenberg.png)
+
 This is the development and prototyping hub for the editor focus in core.
 Gutenberg is the project name. Conversations and discussions take place in #core-editor in Slack. This is our kickoff goal:
 
