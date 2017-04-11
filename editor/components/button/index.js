@@ -4,7 +4,7 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { type = 'button', isPrimary, isLarge, onClick, className, children } ) {
+function Button( { isPrimary, isLarge, className, ...additionalProps } ) {
 	const classes = classnames( 'editor-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
@@ -13,11 +13,9 @@ function Button( { type = 'button', isPrimary, isLarge, onClick, className, chil
 
 	return (
 		<button
-			type={ type }
-			onClick={ onClick }
-			className={ classes }>
-			{ children }
-		</button>
+			type="button"
+			{ ...additionalProps }
+			className={ classes } />
 	);
 }
 
