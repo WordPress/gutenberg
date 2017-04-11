@@ -627,7 +627,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * Check each of the WP_Query is_* functions/properties against expected boolean value.
 	 *
-	 * Any properties that are listed by name as parameters will be expected to be true; any others are
+	 * Any properties that are listed by name as parameters will be expected to be true; all others are
 	 * expected to be false. For example, assertQueryTrue('is_single', 'is_feed') means is_single()
 	 * and is_feed() must be true and everything else must be false to pass.
 	 *
@@ -668,32 +668,29 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$true = func_get_args();
 
 		foreach ( $true as $true_thing ) {
-			$this->assertContains( $true_thing, $all, "{$true_thing}() is not handled by assertQueryTrue()." );
+			$this->assertContains( $true_thing, $all, "Unknown conditional: {$true_thing}." );
 		}
 
 		$passed = true;
-		$not_false = $not_true = array(); // properties that were not set to expected values
+		$message = '';
 
 		foreach ( $all as $query_thing ) {
 			$result = is_callable( $query_thing ) ? call_user_func( $query_thing ) : $wp_query->$query_thing;
 
 			if ( in_array( $query_thing, $true ) ) {
 				if ( ! $result ) {
-					array_push( $not_true, $query_thing );
+					$message .= $query_thing . ' is false but is expected to be true. ' . PHP_EOL;
 					$passed = false;
 				}
 			} else if ( $result ) {
-				array_push( $not_false, $query_thing );
+				$message .= $query_thing . ' is true but is expected to be false. ' . PHP_EOL;
 				$passed = false;
 			}
 		}
 
-		$message = '';
-		if ( count($not_true) )
-			$message .= implode( $not_true, ', ' ) . ' is expected to be true. ';
-		if ( count($not_false) )
-			$message .= implode( $not_false, ', ' ) . ' is expected to be false.';
-		$this->assertTrue( $passed, $message );
+		if ( ! $passed ) {
+			$this->fail( $message );
+		}
 	}
 
 	function unlink( $file ) {
