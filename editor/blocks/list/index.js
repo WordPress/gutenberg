@@ -2,28 +2,29 @@
  * Internal dependencies
  */
 import './style.scss';
+import * as hpqQuery from 'hpq';
 
 const Editable = wp.blocks.Editable;
-const { html, prop } = wp.blocks.query;
+const { html, prop, query, text } = wp.blocks.query;
+
+const parseAttrs = {
+	listType: prop( 'ol,ul', 'nodeName' ),
+	items: query(
+		'li',
+		{
+			value: ( node ) => {
+				return html()( node );
+			}
+		}
+	)
+};
 
 wp.blocks.registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
-	attributes: {
-		listType: prop( 'ol,ul', 'nodeName' ),
-		content: () => {
-			debugger;
-			return html( 'li' );
-		},
-		items: wp.blocks.query.query(
-			'li',
-			{
-				value: html()
-			}
-		)
-	},
+	attributes: parseAttrs,
 
 	controls: [
 		{
@@ -57,36 +58,42 @@ wp.blocks.registerBlock( 'core/list', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'justify' } );
 			}
-		},
-		{
-			icon: 'editor-ol',
-			title: wp.i18n.__( 'Ordered list' ),
-			isActive: ( { } ) => false,
-			onClick( attributes, setAttributes ) {
-				debugger;
-				setAttributes( { listType: 'ol' } );
-			}
 		}
 	],
 
-	edit( { attributes } ) {
-		const { listType = 'ol', align, content } = attributes;
+	edit( { attributes, setAttributes } ) {
+		const { listType = 'ol', items = [], align } = attributes;
+		const content = items.map( item => {
+			return `<li>${ item.value }</li>`;
+		} ).join( '' );
 
 		return (
 			<Editable
 				tagName={ listType }
 				style={ align ? { textAlign: align } : null }
+				onChange={ ( v, node ) => {
+					const attrs = hpqQuery.parse('<' + node.nodeName + '>' +  v + '</'  + node.nodeName + '>', parseAttrs );
+					console.log('attrs', attrs);
+					setAttributes( attrs );
+				} }
 				value={ content }
 				className="blocks-list" />
 		);
 	},
 
 	save( { attributes } ) {
-		const { listType = 'ol', align, content } = attributes;
-		const ListElement = listType.toLocaleLowerCase();
+		const { listType = 'ol', items = [], content } = attributes;
+		const ListType = listType.toLowerCase();
+		console.log( items );
+		console.log( content );
+		debugger;
+		const inner = items.map( item => {
+			return `<li>${ item.value }</li>`;
+		} ).join( '' );
+
 		return (
-			<ListElement style={ align ? { textAlign: align } : null } dangerouslySetInnerHTML={ { __html: content } }>
-			</ListElement>
+			<ListType
+				dangerouslySetInnerHTML={ { __html: inner } } />
 		);
 	}
 } );

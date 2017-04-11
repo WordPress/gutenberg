@@ -54,7 +54,7 @@ export default class Editable extends wp.element.Component {
 		}
 		const value = this.editor.getContent();
 		this.editor.save();
-		this.props.onChange( value );
+		this.props.onChange( value, this.node );
 	}
 
 	bindNode( ref ) {
