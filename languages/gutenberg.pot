@@ -38,6 +38,14 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
+#: editor/components/inserter/index.js:29
+msgid "Insert block"
+msgstr ""
+
+#: editor/components/inserter/menu.js:40
+msgid "Search…"
+msgstr ""
+
 #: editor/header/mode-switcher/index.js:20
 msgid "Visual"
 msgstr ""
@@ -51,35 +59,23 @@ msgstr ""
 msgid "Saved"
 msgstr ""
 
-#: editor/header/tools/index.js:12
+#: editor/header/tools/index.js:13
 msgid "Undo"
 msgstr ""
 
-#: editor/header/tools/index.js:13
+#: editor/header/tools/index.js:14
 msgid "Redo"
 msgstr ""
 
-#: editor/header/tools/index.js:14
-msgid "Insert block"
-msgstr ""
-
-#: editor/header/tools/index.js:18
+#: editor/header/tools/index.js:19
 msgctxt "imperative verb"
 msgid "Preview"
 msgstr ""
 
-#: editor/header/tools/index.js:22
+#: editor/header/tools/index.js:23
 msgid "Post Settings"
 msgstr ""
 
-#: editor/header/tools/index.js:26
+#: editor/header/tools/index.js:27
 msgid "Publish"
-msgstr ""
-
-#: editor/inserter/button.js:31
-msgid "Add a block"
-msgstr ""
-
-#: editor/inserter/index.js:40
-msgid "Search…"
 msgstr ""
