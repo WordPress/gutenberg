@@ -15,27 +15,35 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: editor/blocks/list/index.js:10
+#: editor/blocks/list/index.js:22
 msgid "List"
 msgstr ""
 
-#: editor/blocks/list/index.js:27
+#: editor/blocks/list/index.js:31
 #: editor/blocks/text/index.js:19
 msgid "Align left"
 msgstr ""
 
-#: editor/blocks/list/index.js:35
+#: editor/blocks/list/index.js:39
 #: editor/blocks/text/index.js:27
 msgid "Align center"
 msgstr ""
 
-#: editor/blocks/list/index.js:43
+#: editor/blocks/list/index.js:47
 #: editor/blocks/text/index.js:35
 msgid "Align right"
 msgstr ""
 
-#: editor/blocks/list/index.js:51
+#: editor/blocks/list/index.js:55
 msgid "Justify"
+msgstr ""
+
+#: editor/blocks/list/index.js:63
+msgid "Convert to unordered"
+msgstr ""
+
+#: editor/blocks/list/index.js:71
+msgid "Convert to ordered"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:20

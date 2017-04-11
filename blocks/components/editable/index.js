@@ -54,7 +54,9 @@ export default class Editable extends wp.element.Component {
 		}
 		const value = this.editor.getContent();
 		this.editor.save();
-		this.props.onChange( value );
+		// We need the node itself to parse the content and being
+		// able to correctly swap tags.
+		this.props.onChange( value, this.node );
 	}
 
 	bindNode( ref ) {
@@ -74,6 +76,13 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		// TinyMCE wouldn't be aware of the fact that
+		// its root node has been replaced.
+		if ( prevProps.tagName !== this.props.tagName ) {
+			this.editor.destroy();
+			this.initialize();
+		}
+
 		if ( this.props.value !== prevProps.value ) {
 			this.updateContent();
 		}
