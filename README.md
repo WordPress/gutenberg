@@ -2,48 +2,58 @@
 
 Prototyping since 1440.
 
+![Text block](https://wpcoredesign.mystagingwebsite.com/gutenberg/gutenberg.png)
+
 This is the development and prototyping hub for the editor focus in core.
-Gutenberg is the project name. Conversations and discussions take place in #core-editor in Slack.
+Gutenberg is the project name. Conversations and discussions take place in #core-editor in Slack. This is our kickoff goal:
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
 
 WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor give them many rich layout options. By embracing the blocky nature, we can hopefully surface blocks that already exist, as well as attach more advanced layout options to each of them, allowing you to easily write richer posts.
 
+In the end you should be able to start up a new post, _type type type_ then _click click click_ and effortlessly end up with a rich post like this: <a href="http://moc.co/sandbox/example-post/">Example Post</a>.
+
 ## Overview
 
-- <a href="https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of">What are little blocks made of?</a>
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
-
-## Prototypes
-
-- <a href="https://wordpress.github.io/gutenberg/">UI prototype</a>.
-- <a href="https://calypso.live/blocks?branch=try/block-parsing-extension">Parsing HTML comments and separate TinyMCE instances</a>.
-- <a href="http://fiddle.tinymce.com/block/">TinyMCE block concept</a>.
-
-## Parser
-
+- <a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">Editor Mockups</a>
+- <a href="https://wordpress.github.io/gutenberg/">Prototypes</a>.
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post grammar parser</a>.
 
 ## How Developers Can Contribute
 
-If you'd like to try the plugin we're building, or contribute to it, you can clone this repo into your `wp-content/plugins` directory, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
+If you'd like to try or contribute to the plugin, you can clone this repo into your `wp-content/plugins` directory, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
 
-Be sure to have Node installed first — simply follow <a href="https://nodejs.org/en/">the instructions on the Node JS website</a>. Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. Then pick among the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a> and enjoy hacking away at making the world better.
+Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it. You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Task">Good First Task</a>.
 
 ## How Designers Can Contribute
 
-The editor we're building means to make the editing experience better for every WordPress user, by creating an interface that "makes writing rich posts effortless, and has 'blocks' to make it easy what today might take shortcodes, custom HTML, or 'mystery meat' embed discovery", to quote the kickoff goal.
+If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">Design</a>. We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. If you use <a href="https://www.sketchapp.com/">Sketch</a>, you can grab <a href="https://cloudup.com/cMPXM8Va2cy">the source file for the mockups</a> (updated April 6th).
 
-That is difficult. So your designer eyes and help is appreciated, in what capacity you'd like to contribute.
+## Why
 
-A good place to start is having a look at <a href="https://github.com/WordPress/gutenberg#mockups">the current mockups</a> and <a href="https://wordpress.github.io/gutenberg/">the UI prototype</a>. We also have a GitHub repository, where <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">anything labelled "Design"</a> could use thoughtful replies, mockups, animatics, sketches, doodles.
+One thing sets WordPress apart from other systems, is that it allows you to create as rich a post layout as you can imagine. But only if you know HTML & CSS and building your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create gorgeous playful layouts, hopefully we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
 
-With regards to specific changes to the design, the details & execution (like colors, borders, shadows), those are best done as minimal and specific iterations on the work that precedes it, so we can ideally compare. That doesn't preclude wild ideas, but should be considered for precise tasks like "give the pressed buttons more contrast", things in that vein.
+## Ingredients
 
-Grab the Sketch file so you don't have to start from scratch:
+**The Block**
 
-**<a href="https://cloudup.com/cMPXM8Va2cy">Download, Updated April 6th.</a>**
+The web is mostly a vertical flow of content, as dictated by the document markup underneath. By surfacing each section of the document as a block to manipulate, we can contextually attach features that are unique to each block. Inspired by desktop layout apps, it's a way to add a breadth of advanced features without weighing down the UI.
 
-## Mockups
+By showing critical UI in the body of the content, many can get their basic blogging done, with rich layouts, without ever having to see the post settings.
 
-You can see **<a href="https://wpcoredesign.mystagingwebsite.com/gutenberg/">all mockups collected on this demo page</a>**.
+**Advanced Formatting**
+
+When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default you'll see all your metaboxes right there.
+
+Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
+
+**The Newline as your Commandline**
+
+When your cursor is on a new line, you can either start typing, or you can use one of these commands to do cool things:
+
+- Type `/` to invoke the inserter.
+- Type `-` to start a list, other Markdown tricks work too.
+- Type `#` for headlines. Note the space.
+
+Some of these work already, but the idea can be extended in the future. For example `#tagname` (no space) might let you add tags in the body of the content.
