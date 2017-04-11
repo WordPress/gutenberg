@@ -5,6 +5,7 @@
 const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const ResolveEntryModulesPlugin = require( 'resolve-entry-modules-webpack-plugin' );
 
 const config = {
 	entry: {
@@ -55,6 +56,7 @@ const config = {
 		]
 	},
 	plugins: [
+		new ResolveEntryModulesPlugin(),
 		new ExtractTextPlugin( {
 			filename: './[name]/build/style.css'
 		} ),

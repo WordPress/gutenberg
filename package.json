@@ -48,6 +48,7 @@
     "raw-loader": "^0.5.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "resolve-entry-modules-webpack-plugin": "^1.0.0",
     "sass-loader": "^6.0.3",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
@@ -60,7 +61,7 @@
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
     "lodash": "^4.17.4",
-    "react-redux": "^5.0.3",
+    "react-redux": "^5.0.4",
     "react-textarea-autosize": "^4.0.5",
     "redux": "^3.6.0",
     "uuid": "^3.0.1"

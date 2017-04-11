@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../components/dashicon';
+import Dashicon from 'components/dashicon';
 
 function Inserter() {
 	const blocks = wp.blocks.getBlocks();
