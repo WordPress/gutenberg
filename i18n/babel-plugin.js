@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, reduce, uniq, forEach, sortBy, isEqual, merge } = require( 'lodash' );
+const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -211,39 +211,54 @@ module.exports = function() {
 					translation.comments.translator = translator;
 				}
 
-				strings[ filename ].push( translation );
+				// Create context grouping for translation if not yet exists
+				const { msgctxt = '', msgid } = translation;
+				if ( ! strings[ filename ].hasOwnProperty( msgctxt ) ) {
+					strings[ filename ][ msgctxt ] = {};
+				}
+
+				strings[ filename ][ msgctxt ][ msgid ] = translation;
 			},
 			Program: {
 				enter() {
-					strings[ this.file.opts.filename ] = [];
+					strings[ this.file.opts.filename ] = {};
 				},
 				exit( path, state ) {
-					if ( ! strings[ this.file.opts.filename ].length ) {
-						delete strings[ this.file.opts.filename ];
+					const { filename } = this.file.opts;
+					if ( isEmpty( strings[ filename ] ) ) {
+						delete strings[ filename ];
 						return;
 					}
 
 					// Sort translations by filename for deterministic output
 					const files = Object.keys( strings ).sort();
 
+					// Combine translations from each file grouped by context
 					const translations = reduce( files, ( memo, file ) => {
-						// Within the same file, sort translations by line
-						forEach( sortBy( strings[ file ], 'comments.reference' ), ( translation ) => {
-							const { msgctxt = '', msgid } = translation;
-							if ( ! memo.hasOwnProperty( msgctxt ) ) {
-								memo[ msgctxt ] = {};
-							}
+						for ( const context in strings[ file ] ) {
+							// Within the same file, sort translations by line
+							const sortedTranslations = sortBy(
+								strings[ file ][ context ],
+								'comments.reference'
+							);
 
-							// Merge references if translation already exists
-							if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
-								translation.comments.reference = uniq( [
-									memo[ msgctxt ][ msgid ].comments.reference,
-									translation.comments.reference
-								].join( '\n' ).split( '\n' ) ).join( '\n' );
-							}
+							forEach( sortedTranslations, ( translation ) => {
+								const { msgctxt = '', msgid } = translation;
+								if ( ! memo.hasOwnProperty( msgctxt ) ) {
+									memo[ msgctxt ] = {};
+								}
 
-							memo[ msgctxt ][ msgid ] = translation;
-						} );
+								// Merge references if translation already exists
+								if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
+									translation.comments.reference = uniq( [
+										memo[ msgctxt ][ msgid ].comments.reference,
+										translation.comments.reference
+									].join( '\n' ).split( '\n' ) ).join( '\n' );
+								}
+
+								memo[ msgctxt ][ msgid ] = translation;
+							} );
+						}
 
 						return memo;
 					}, {} );
@@ -252,9 +267,9 @@ module.exports = function() {
 					const data = merge( {}, baseData, { translations } );
 
 					// Ideally we could wait until Babel has finished parsing
-					// all files or at least asynchronously write, but Babel
-					// doesn't expose these entry points and async write may
-					// hit file lock (need queue).
+					// all files or at least asynchronously write, but the
+					// Babel loader doesn't expose these entry points and async
+					// write may hit file lock (need queue).
 					const compiled = po.compile( data );
 					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
 					this.hasPendingWrite = false;
