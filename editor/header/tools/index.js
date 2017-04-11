@@ -4,6 +4,7 @@
 import './style.scss';
 import Dashicon from '../../components/dashicon';
 import IconButton from '../../components/icon-button';
+import Inserter from '../../components/inserter';
 import Button from '../../components/button';
 
 function Tools() {
@@ -11,7 +12,7 @@ function Tools() {
 		<div className="editor-tools">
 			<IconButton icon="undo" label={ wp.i18n.__( 'Undo' ) } />
 			<IconButton icon="redo" label={ wp.i18n.__( 'Redo' ) } />
-			<IconButton icon="plus-alt" label={ wp.i18n.__( 'Insert block' ) } />
+			<Inserter />
 			<div className="editor-tools__tabs">
 				<Button>
 					<Dashicon icon="visibility" />
