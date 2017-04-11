@@ -67,7 +67,6 @@ wp.blocks.registerBlock( 'core/list', {
 				setAttributes( { listType: 'ul' } );
 			}
 		},
-
 		{
 			icon: 'editor-ol',
 			title: wp.i18n.__( 'Convert to ordered' ),
