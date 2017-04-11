@@ -38,8 +38,9 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: editor/components/inserter/index.js:31
-msgid "Add a block"
+#: editor/components/inserter/index.js:29
+#: editor/header/tools/index.js:14
+msgid "Insert block"
 msgstr ""
 
 #: editor/components/inserter/menu.js:40
@@ -65,10 +66,6 @@ msgstr ""
 
 #: editor/header/tools/index.js:13
 msgid "Redo"
-msgstr ""
-
-#: editor/header/tools/index.js:14
-msgid "Insert block"
 msgstr ""
 
 #: editor/header/tools/index.js:18

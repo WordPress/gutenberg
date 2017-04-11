@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import Dashicon from 'components/dashicon';
+import IconButton from 'components/icon-button';
 
 class Inserter extends wp.element.Component {
 	constructor() {
@@ -24,14 +24,11 @@ class Inserter extends wp.element.Component {
 
 		return (
 			<div className="editor-inserter">
-				<button
-					className="editor-inserter__toggle"
+				<IconButton
+					icon="plus-alt"
+					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
-					type="button"
-					aria-label={ wp.i18n.__( 'Add a block' ) }
-				>
-					<Dashicon icon="plus-alt" />
-				</button>
+					className="editor-inserter__toggle" />
 				{ opened && <InserterMenu /> }
 			</div>
 		);
