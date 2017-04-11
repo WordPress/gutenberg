@@ -58,7 +58,6 @@ wp.blocks.registerBlock( 'core/list', {
 				setAttributes( { align: 'justify' } );
 			}
 		},
-
 		{
 			icon: 'editor-ul',
 			title: wp.i18n.__( 'Convert to unordered' ),

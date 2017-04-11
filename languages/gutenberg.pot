@@ -35,21 +35,28 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: editor/blocks/list/index.js:64
+#: editor/blocks/list/index.js:63
+msgid "Ordered list"
+msgstr ""
+
+#: editor/blocks/list/index.js:63
 msgid "Convert to unordered"
 msgstr ""
 
-#: editor/blocks/list/index.js:72
+#: editor/blocks/list/index.js:64
+msgid "swap to ul"
+msgstr ""
+
+#: editor/blocks/list/index.js:71
 msgid "Convert to ordered"
+msgstr ""
+
+#: editor/blocks/text/index.js:5
+msgid "Text"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:20
 msgid "Visual"
-msgstr ""
-
-#: editor/header/mode-switcher/index.js:24
-msgctxt "Name for the Text editor tab (formerly HTML)"
-msgid "Text"
 msgstr ""
 
 #: editor/header/saved-state/index.js:11
