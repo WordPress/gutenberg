@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './style.scss';
-import InserterButton from 'components/inserter/button';
+import Inserter from 'components/inserter';
 import VisualEditorBlock from './block';
 
 function VisualEditor( { blocks } ) {
@@ -16,7 +16,7 @@ function VisualEditor( { blocks } ) {
 			{ blocks.map( ( uid ) => (
 				<VisualEditorBlock key={ uid } uid={ uid } />
 			) ) }
-			<InserterButton />
+			<Inserter />
 		</div>
 	);
 }

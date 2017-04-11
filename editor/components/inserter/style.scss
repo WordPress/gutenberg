@@ -1,4 +1,4 @@
-.editor-inserter__button {
+.editor-inserter {
 	display: inline-block;
 	position: relative;
 	background: none;
@@ -7,7 +7,7 @@
 	margin-top: 20px;
 }
 
-.editor-inserter__button-toggle {
+.editor-inserter__toggle {
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
@@ -27,7 +27,7 @@
 	}
 }
 
-.editor-inserter {
+.editor-inserter__menu {
 	width: 280px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid $light-gray-500;
