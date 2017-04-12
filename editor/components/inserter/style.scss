@@ -4,6 +4,10 @@
 	background: none;
 	border: none;
 	padding: 0;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+  z-index: 1;
 }
 
 .editor-inserter__toggle {
@@ -31,8 +35,61 @@
 	border: 1px solid $light-gray-500;
 	position: absolute;
 	left: -122px;
-	bottom: 42px;
 	background: #fff;
+
+	&.is-top {
+		bottom: 42px;
+
+		.editor-inserter__arrow {
+			bottom: -10px;
+			left: 50%;
+			margin-left: -10px;
+			border-top-style: solid;
+			border-bottom: none;
+			border-left-color: transparent;
+			border-right-color: transparent;
+
+			&:before {
+				bottom: 2px;
+				border: 10px solid white;
+				content: " ";
+				position: absolute;
+				left: 50%;
+				margin-left: -10px;
+				border-top-style: solid;
+				border-bottom: none;
+				border-left-color: transparent;
+				border-right-color: transparent;
+			}
+		}
+	}
+
+	&.is-bottom {
+		top: 42px;
+
+		.editor-inserter__arrow {
+			top: -10px;
+			left: 50%;
+			margin-left: -10px;
+			border-bottom-style: solid;
+			border-top: none;
+			border-left-color: transparent;
+			border-right-color: transparent;
+
+			&:before {
+				top: 2px;
+				border: 10px solid $light-gray-200;
+				content: " ";
+				position: absolute;
+				left: 50%;
+				margin-left: -10px;
+				border-bottom-style: solid;
+				border-top: none;
+				border-left-color: transparent;
+				border-right-color: transparent;
+			}
+		}
+	}
 }
 
 .editor-inserter__arrow {
@@ -42,26 +99,6 @@
 	position: absolute;
 	width: 0;
 	z-index: 1;
-	bottom: -10px;
-	left: 50%;
-	margin-left: -10px;
-	border-top-style: solid;
-	border-bottom: none;
-	border-left-color: transparent;
-	border-right-color: transparent;
-
-	&:before {
-		bottom: 2px;
-		border: 10px solid white;
-		content: " ";
-		position: absolute;
-		left: 50%;
-		margin-left: -10px;
-		border-top-style: solid;
-		border-bottom: none;
-		border-left-color: transparent;
-		border-right-color: transparent;
-	}
 }
 
 .editor-inserter__content {
@@ -115,14 +152,14 @@
 		color: #3e444c;
 	}
 
-	.dashicons {
+	.dashicon {
 		color: #191e23;
 		margin-right: 8px;
 	}
 }
 
 .editor-inserter__separator {
-	background: rgb(247,248,249);
+	background: $light-gray-200;
 	display: block;
 	padding: 2px 12px;
 	letter-spacing: 1px;

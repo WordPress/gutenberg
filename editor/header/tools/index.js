@@ -12,7 +12,7 @@ function Tools() {
 		<div className="editor-tools">
 			<IconButton icon="undo" label={ wp.i18n.__( 'Undo' ) } />
 			<IconButton icon="redo" label={ wp.i18n.__( 'Redo' ) } />
-			<Inserter />
+			<Inserter position="bottom" />
 			<div className="editor-tools__tabs">
 				<Button>
 					<Dashicon icon="visibility" />
