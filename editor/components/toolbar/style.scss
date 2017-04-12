@@ -7,7 +7,7 @@
 
 .editor-toolbar__control {
 	display: inline-flex;
-	margin: 2px;
+	margin: 3px;
 	margin-left: 0;
 	padding: 6px;
 	background: none;
@@ -17,7 +17,7 @@
 	cursor: pointer;
 
 	&:first-child {
-		margin-left: 2px;
+		margin-left: 3px;
 	}
 
 	&.is-active,
