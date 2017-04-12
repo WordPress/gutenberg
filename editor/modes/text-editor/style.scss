@@ -1,19 +1,14 @@
 .editor-text-editor__formatting {
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
-	height: 36px;
-
-	div {
-		max-width: 700px;
-		margin: 0 auto;
-	}
+	min-height: 36px;
 
 	button {
 		height: 30px;
 		border: none;
 		background: none;
 		padding: 0 8px;
-		margin: 3px 4px 0 4px;
+		margin: 3px 4px;
 		text-align: center;
 		cursor: pointer;
 		font-family: $editor-html-font;
@@ -51,18 +46,53 @@
 
 .editor-text-editor {
 	display: block;
-	margin: 60px auto 0;
-	width: 700px;
+	padding-top: 60px;
+	padding-bottom: 0;
+	margin: 0;
+	width: 100%;
 	border: none;
 	outline: none;
 	box-shadow: none;
 	resize: none;
-	padding: 0;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	line-height: 150%;
+	transition: padding .2s linear;
 
 	&:focus {
 		box-shadow: none;
+	}
+}
+
+/* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
+.editor-text-editor__formatting div,
+.editor-text-editor {
+	padding-left: $item-spacing * 2;
+	padding-right: $item-spacing * 2;
+	max-width: 1440px;
+	margin: 0 auto;
+}
+
+@media only screen and ( min-width: 960px ) {
+	.editor-text-editor__formatting div,
+	.editor-text-editor {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+}
+
+@media only screen and ( min-width: 1280px ) {
+	.editor-text-editor__formatting div,
+	.editor-text-editor {
+		padding-left: 15%;
+		padding-right: 15%;
+	}
+}
+
+@media only screen and ( min-width: 1440px ) {
+	.editor-text-editor__formatting div,
+	.editor-text-editor {
+		padding-left: 200px;
+		padding-right: 200px;
 	}
 }
