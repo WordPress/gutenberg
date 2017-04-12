@@ -1,8 +1,68 @@
 .editor-header {
-	height: 56px;
+	height: $header-height;
 	padding: $item-spacing;
 	border-bottom: 1px solid $light-gray-500;
+	background: $white;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	position: fixed;
+	z-index: 1;
+	top: 32px;
+	left: 160px;
+	right: 0;
+
+	/* Responsive and folded */
+	body.folded & {
+		left: 36px;
+	}
+
+	/* RTL */
+	body.rtl & {
+		left: 0;
+		right: 160px;
+	}
+
+	body.rtl.folded & {
+		left: 0;
+		right: 36px;
+	}
+}
+
+@media only screen and ( max-width: 960px ) {
+	body.auto-fold .editor-header {
+		left: 36px;
+	}
+
+	body.rtl.auto-fold .editor-header {
+		left: 0;
+		right: 36px;
+	}
+}
+
+@media only screen and ( max-width: 782px ) {
+
+	body.auto-fold .editor-header {
+		left: 0;
+	}
+
+	body.rtl.auto-fold .editor-header {
+		left: 0;
+		right: 0;
+	}
+
+	body.auto-fold .wp-responsive-open .editor-header {
+		left: 190px;
+		right: -190px;
+	}
+
+	body.rtl.auto-fold .wp-responsive-open .editor-header {
+		left: -190px;
+		right: 190px;
+	}
+
+	.editor-header {
+		top: 46px;
+	}
+
 }
