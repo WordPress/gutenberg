@@ -51,7 +51,7 @@
 
 			&:before {
 				bottom: 2px;
-				border: 10px solid white;
+				border: 10px solid $white;
 				content: " ";
 				position: absolute;
 				left: 50%;
@@ -78,7 +78,7 @@
 
 			&:before {
 				top: 2px;
-				border: 10px solid $light-gray-200;
+				border: 10px solid $light-gray-100;
 				content: " ";
 				position: absolute;
 				left: 50%;
@@ -110,11 +110,12 @@
 	}
 }
 
-.editor-inserter__search {
+input[type=search].editor-inserter__search {
 	display: block;
 	width: 100%;
 	border: none;
 	margin: 0;
+	box-shadow: none;
 	border-top: 1px solid $light-gray-500;
 	padding: 8px 16px;
 	font-size: 13px;
@@ -127,44 +128,43 @@
 .editor-inserter__category-blocks {
 	display: flex;
 	flex-flow: row wrap;
+	padding: 3px;
 }
 
 .editor-inserter__block {
 	display: flex;
 	width: 50%;
-	color: #86909B;
+	font-size: 12px;
+	color: $dark-gray-500;
 	padding: 8px;
-	font-size: 11px;
 	align-items: center;
 	cursor: pointer;
 	border: 1px solid transparent;
 
 	&:hover {
-		background: #f8f9f9;
-		border: 1px solid #6d7882;
+		border: 1px solid $dark-gray-500;
 		position: relative;
 	}
 
+	&:active,
 	&.is-active {
-		background: #eef0f0;
-		border: 1px solid #6d7882;
+		background: $dark-gray-500;
 		position: relative;
-		color: #3e444c;
+		color: $white;
 	}
 
 	.dashicon {
-		color: #191e23;
 		margin-right: 8px;
 	}
 }
 
 .editor-inserter__separator {
-	background: $light-gray-200;
 	display: block;
-	padding: 2px 12px;
-	letter-spacing: 1px;
-	text-transform: uppercase;
+	padding: 4px 8px;
 	font-size: 11px;
-	font-weight: 500;
-	color: #9ea7af;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	background: $light-gray-100;
+	border-bottom: 1px solid $light-gray-500;
 }
