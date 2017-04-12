@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
-import IconButton from '../../components/icon-button';
-import Inserter from '../../components/inserter';
-import Button from '../../components/button';
+import Dashicon from '../../../components/dashicon';
+import IconButton from '../../../components/icon-button';
+import Inserter from 'inserter';
+import Button from '../../../components/button';
 
 function Tools() {
 	return (

@@ -38,14 +38,6 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: editor/components/inserter/index.js:29
-msgid "Insert block"
-msgstr ""
-
-#: editor/components/inserter/menu.js:40
-msgid "Search…"
-msgstr ""
-
 #: editor/header/mode-switcher/index.js:20
 msgid "Visual"
 msgstr ""
@@ -78,4 +70,12 @@ msgstr ""
 
 #: editor/header/tools/index.js:27
 msgid "Publish"
+msgstr ""
+
+#: editor/inserter/index.js:29
+msgid "Insert block"
+msgstr ""
+
+#: editor/inserter/menu.js:40
+msgid "Search…"
 msgstr ""

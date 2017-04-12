@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import IconButton from 'components/icon-button';
+import IconButton from '../../components/icon-button';
 
 class Inserter extends wp.element.Component {
 	constructor() {
