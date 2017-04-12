@@ -10,6 +10,8 @@ import { values } from 'lodash';
  */
 import {
 	blocks,
+	hoveredBlock,
+	selectedBlock,
 	mode,
 	createReduxStore
 } from '../state';
@@ -24,23 +26,19 @@ describe( 'state', () => {
 			wp.blocks.unregisterBlock( 'core/test-block' );
 		} );
 
-		it( 'should return empty byUid, order, selected, hovered by default', () => {
+		it( 'should return empty byUid, order by default', () => {
 			const state = blocks( undefined, {} );
 
 			expect( state ).to.eql( {
 				byUid: {},
-				order: [],
-				selected: null,
-				hovered: null
+				order: []
 			} );
 		} );
 
 		it( 'should key by replaced blocks uid', () => {
 			const original = deepFreeze( {
 				byUid: {},
-				order: [],
-				selected: null,
-				hovered: null
+				order: []
 			} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
@@ -61,9 +59,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'kumquat' ],
-				selected: null,
-				hovered: null
+				order: [ 'kumquat' ]
 			} );
 			const state = blocks( original, {
 				type: 'UPDATE_BLOCK',
@@ -78,52 +74,7 @@ describe( 'state', () => {
 			expect( state.byUid.kumquat.attributes.updated ).to.be.true();
 		} );
 
-		it( 'should return with block uid as hovered', () => {
-			const original = deepFreeze( {
-				byUid: {
-					kumquat: {
-						uid: 'kumquat',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'kumquat' ],
-				selected: null,
-				hovered: null
-			} );
-			const state = blocks( original, {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				uid: 'kumquat',
-				hovered: true
-			} );
-
-			expect( state.hovered ).to.equal( 'kumquat' );
-		} );
-
-		it( 'should return with block uid as selected, clearing hover', () => {
-			const original = deepFreeze( {
-				byUid: {
-					kumquat: {
-						uid: 'kumquat',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'kumquat' ],
-				selected: null,
-				hovered: 'kumquat'
-			} );
-			const state = blocks( original, {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				uid: 'kumquat',
-				selected: true
-			} );
-
-			expect( state.hovered ).to.be.null();
-			expect( state.selected ).to.equal( 'kumquat' );
-		} );
-
-		it( 'should insert and select block', () => {
+		it( 'should insert block', () => {
 			const original = deepFreeze( {
 				byUid: {
 					kumquat: {
@@ -132,9 +83,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'chicken' ],
-				selected: null,
-				hovered: null
+				order: [ 'chicken' ]
 			} );
 			const state = blocks( original, {
 				type: 'INSERT_BLOCK',
@@ -147,11 +96,9 @@ describe( 'state', () => {
 			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 2 );
 			expect( values( state.byUid )[ 1 ].uid ).to.equal( 'ribs' );
 			expect( state.order ).to.eql( [ 'chicken', 'ribs' ] );
-			expect( state.hovered ).to.be.null();
-			expect( state.selected ).to.equal( 'ribs' );
 		} );
 
-		it( 'should move the block up and select it', () => {
+		it( 'should move the block up', () => {
 			const original = deepFreeze( {
 				byUid: {
 					chicken: {
@@ -165,9 +112,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'chicken', 'ribs' ],
-				selected: {},
-				hovered: {}
+				order: [ 'chicken', 'ribs' ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_UP',
@@ -175,7 +120,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
-			expect( state.selected ).to.eql( 'ribs' );
 		} );
 
 		it( 'should not move the first block up', () => {
@@ -192,9 +136,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'chicken', 'ribs' ],
-				selected: {},
-				hovered: {}
+				order: [ 'chicken', 'ribs' ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_UP',
@@ -204,7 +146,7 @@ describe( 'state', () => {
 			expect( state.order ).to.equal( original.order );
 		} );
 
-		it( 'should move the block down and select it', () => {
+		it( 'should move the block down', () => {
 			const original = deepFreeze( {
 				byUid: {
 					chicken: {
@@ -218,9 +160,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'chicken', 'ribs' ],
-				selected: {},
-				hovered: {}
+				order: [ 'chicken', 'ribs' ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_DOWN',
@@ -228,7 +168,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
-			expect( state.selected ).to.eql( 'chicken' );
 		} );
 
 		it( 'should not move the last block down', () => {
@@ -245,9 +184,7 @@ describe( 'state', () => {
 						attributes: {}
 					}
 				},
-				order: [ 'chicken', 'ribs' ],
-				selected: {},
-				hovered: {}
+				order: [ 'chicken', 'ribs' ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_DOWN',
@@ -255,6 +192,70 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order ).to.equal( original.order );
+		} );
+	} );
+
+	describe( 'hoveredBlock()', () => {
+		it( 'should return with block uid as hovered', () => {
+			const state = hoveredBlock( null, {
+				type: 'TOGGLE_BLOCK_HOVERED',
+				uid: 'kumquat',
+				hovered: true
+			} );
+
+			expect( state ).to.equal( 'kumquat' );
+		} );
+
+		it( 'should return null when a block is selected', () => {
+			const state = hoveredBlock( 'kumquat', {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: true
+			} );
+
+			expect( state ).to.be.null();
+		} );
+	} );
+
+	describe( 'selectedBlock()', () => {
+		it( 'should return with block uid as selected', () => {
+			const state = selectedBlock( undefined, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: true
+			} );
+
+			expect( state ).to.equal( 'kumquat' );
+		} );
+
+		it( 'should return with inserted block', () => {
+			const state = selectedBlock( undefined, {
+				type: 'INSERT_BLOCK',
+				block: {
+					uid: 'ribs',
+					blockType: 'core/freeform'
+				}
+			} );
+
+			expect( state ).to.equal( 'ribs' );
+		} );
+
+		it( 'should return with block moved up', () => {
+			const state = selectedBlock( undefined, {
+				type: 'MOVE_BLOCK_UP',
+				uid: 'ribs'
+			} );
+
+			expect( state ).to.equal( 'ribs' );
+		} );
+
+		it( 'should return with block moved down', () => {
+			const state = selectedBlock( undefined, {
+				type: 'MOVE_BLOCK_DOWN',
+				uid: 'chicken'
+			} );
+
+			expect( state ).to.equal( 'chicken' );
 		} );
 	} );
 
@@ -289,6 +290,8 @@ describe( 'state', () => {
 
 			expect( Object.keys( state ) ).to.have.members( [
 				'blocks',
+				'selectedBlock',
+				'hoveredBlock',
 				'mode'
 			] );
 		} );
