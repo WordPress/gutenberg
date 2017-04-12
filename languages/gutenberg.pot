@@ -38,6 +38,10 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
+#: blocks/library/text/index.js:10
+msgid "Text"
+msgstr ""
+
 #: editor/components/inserter/index.js:30
 msgid "Insert block"
 msgstr ""
@@ -48,11 +52,6 @@ msgstr ""
 
 #: editor/header/mode-switcher/index.js:20
 msgid "Visual"
-msgstr ""
-
-#: editor/header/mode-switcher/index.js:24
-msgctxt "Name for the Text editor tab (formerly HTML)"
-msgid "Text"
 msgstr ""
 
 #: editor/header/saved-state/index.js:11
@@ -67,15 +66,20 @@ msgstr ""
 msgid "Redo"
 msgstr ""
 
-#: editor/header/tools/index.js:19
-msgctxt "imperative verb"
-msgid "Preview"
-msgstr ""
-
 #: editor/header/tools/index.js:23
 msgid "Post Settings"
 msgstr ""
 
 #: editor/header/tools/index.js:27
 msgid "Publish"
+msgstr ""
+
+#: editor/header/mode-switcher/index.js:24
+msgctxt "Name for the Text editor tab (formerly HTML)"
+msgid "Text"
+msgstr ""
+
+#: editor/header/tools/index.js:19
+msgctxt "imperative verb"
+msgid "Preview"
 msgstr ""
