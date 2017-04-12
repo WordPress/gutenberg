@@ -11,6 +11,7 @@ const config = {
 	entry: {
 		i18n: './i18n/index.js',
 		blocks: './blocks/index.js',
+		components: './components/index.js',
 		editor: './editor/index.js',
 		element: './element/index.js'
 	},
