@@ -8,7 +8,6 @@
 	],
 	"plugins": [
 		"lodash",
-		"transform-runtime",
 		"transform-object-rest-spread",
 		[ "transform-react-jsx", {
 			"pragma": "wp.element.createElement"
@@ -18,6 +17,11 @@
 		} ]
 	],
 	"env": {
+		"default": {
+			"plugins": [
+				"transform-runtime"
+			]
+		},
 		"test": {
 			"presets": [ "latest" ]
 		}
