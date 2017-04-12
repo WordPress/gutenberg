@@ -20,7 +20,7 @@ class Tests_XMLRPC_wp_getPageList extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getPageList( array( 1, 'username', 'password' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -28,7 +28,7 @@ class Tests_XMLRPC_wp_getPageList extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'contributor' );
 
 		$result = $this->myxmlrpcserver->wp_getPageList( array( 1, 'contributor', 'contributor' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 401, $result->code );
 	}
 
@@ -36,7 +36,7 @@ class Tests_XMLRPC_wp_getPageList extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'editor' );
 
 		$results = $this->myxmlrpcserver->wp_getPageList( array( 1, 'editor', 'editor' ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		foreach( $results as $result ) {
 			$page = get_post( $result->page_id );

@@ -11,7 +11,7 @@ class Tests_XMLRPC_Basic extends WP_XMLRPC_UnitTestCase {
 	function test_enabled() {
 		$result = $this->myxmlrpcserver->wp_getOptions( array( 1, 'username', 'password' ) );
 
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		// If disabled, 405 would result.
 		$this->assertEquals( 403, $result->code );
 	}

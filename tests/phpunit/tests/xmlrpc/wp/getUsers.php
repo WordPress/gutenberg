@@ -8,7 +8,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'username', 'password' ) );
-		$this->assertInstanceOf( 'IXR_Error', $results );
+		$this->assertIXRError( $results );
 		$this->assertEquals( 403, $results->code );
 	}
 
@@ -16,7 +16,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'subscriber' );
 
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'subscriber', 'subscriber' ) );
-		$this->assertInstanceOf( 'IXR_Error', $results );
+		$this->assertIXRError( $results );
 		$this->assertEquals( 401, $results->code );
 	}
 
@@ -24,7 +24,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'administrator' );
 
 		$result = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator' ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertNotIXRError( $result );
 
 		// check data types
 		$this->assertInternalType( 'string', $result[0]['user_id'] );
@@ -49,7 +49,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 
 		$filter = array( 'role' => 'invalidrole' );
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator', $filter ) );
-		$this->assertInstanceOf( 'IXR_Error', $results );
+		$this->assertIXRError( $results );
 		$this->assertEquals( 403, $results->code );
 	}
 
@@ -63,14 +63,14 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 		// test a single role ('editor')
 		$filter = array( 'role' => 'editor' );
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator', $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 		$this->assertCount( 1, $results );
 		$this->assertEquals( $editor_id, $results[0]['user_id'] );
 
 		// test 'authors', which should return all non-subscribers
 		$filter2 = array( 'who' => 'authors' );
 		$results2 = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator', $filter2 ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results2 );
+		$this->assertNotIXRError( $results2 );
 		$this->assertCount( 3, array_intersect( array( $author_id, $editor_id, $administrator_id ), wp_list_pluck( $results2, 'user_id' ) ) );
 	}
 
@@ -104,7 +104,7 @@ class Tests_XMLRPC_wp_getUsers extends WP_XMLRPC_UnitTestCase {
 
 		$filter = array( 'orderby' => 'email', 'order' => 'ASC' );
 		$results = $this->myxmlrpcserver->wp_getUsers( array( 1, 'administrator', 'administrator', $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		$last_email = '';
 		foreach ( $results as $user ) {

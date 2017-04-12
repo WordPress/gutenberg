@@ -438,6 +438,17 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		$this->assertNotInstanceOf( 'WP_Error', $actual, $message );
 	}
 
+	function assertIXRError( $actual, $message = '' ) {
+		$this->assertInstanceOf( 'IXR_Error', $actual, $message );
+	}
+
+	function assertNotIXRError( $actual, $message = '' ) {
+		if ( $actual instanceof IXR_Error && '' === $message ) {
+			$message = $actual->message;
+		}
+		$this->assertNotInstanceOf( 'IXR_Error', $actual, $message );
+	}
+
 	function assertEqualFields( $object, $fields ) {
 		foreach( $fields as $field_name => $field_value ) {
 			if ( $object->$field_name != $field_value ) {

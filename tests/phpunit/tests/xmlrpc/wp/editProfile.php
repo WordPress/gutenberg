@@ -8,7 +8,7 @@ class Tests_XMLRPC_wp_editProfile extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_editProfile( array( 1, 'username', 'password', array() ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -25,7 +25,7 @@ class Tests_XMLRPC_wp_editProfile extends WP_XMLRPC_UnitTestCase {
             'bio' => rand_str(200)
         );
         $result = $this->myxmlrpcserver->wp_editProfile( array( 1, 'subscriber', 'subscriber', $new_data ) );
-        $this->assertNotInstanceOf( 'IXR_Error', $result );
+        $this->assertNotIXRError( $result );
         $this->assertTrue( $result );
 
         // verify that the new values were stored
@@ -45,7 +45,7 @@ class Tests_XMLRPC_wp_editProfile extends WP_XMLRPC_UnitTestCase {
         $new_data = array( 'password' => $new_pass );
 
         $result = $this->myxmlrpcserver->wp_editProfile( array( 1, 'author', 'author', $new_data ) );
-        $this->assertNotInstanceOf( 'IXR_Error', $result );
+        $this->assertNotIXRError( $result );
         $this->assertTrue( $result );
 
         $auth_old = wp_authenticate( 'author', 'author' );
@@ -60,7 +60,7 @@ class Tests_XMLRPC_wp_editProfile extends WP_XMLRPC_UnitTestCase {
         $new_data = array( 'email' => $new_email );
 
         $result = $this->myxmlrpcserver->wp_editProfile( array( 1, 'editor', 'editor', $new_data ) );
-        $this->assertNotInstanceOf( 'IXR_Error', $result );
+        $this->assertNotIXRError( $result );
         $this->assertTrue( $result );
 
         $user_data = get_userdata( $editor_id );

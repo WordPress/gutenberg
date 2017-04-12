@@ -26,7 +26,7 @@ class Tests_XMLRPC_wp_getPages extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getPages( array( 1, 'username', 'password' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -34,13 +34,13 @@ class Tests_XMLRPC_wp_getPages extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'contributor' );
 
 		$result = $this->myxmlrpcserver->wp_getPages( array( 1, 'contributor', 'contributor' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 401, $result->code );
 	}
 
 	function test_capable_user() {
 		$results = $this->myxmlrpcserver->wp_getPages( array( 1, 'administrator', 'administrator' ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		foreach( $results as $result ) {
 			$page = get_post( $result['page_id'] );
@@ -65,12 +65,12 @@ class Tests_XMLRPC_wp_getPages extends WP_XMLRPC_UnitTestCase {
 		add_filter( 'map_meta_cap', array( $this, 'remove_editor_edit_page_cap') , 10, 4 );
 
 		$results = $this->myxmlrpcserver->wp_getPages( array( 1, 'editor', 'editor' ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		$found_incapable = false;
 		foreach( $results as $result ) {
 			// WP#20629
-			$this->assertNotInstanceOf( 'IXR_Error', $result );
+			$this->assertNotIXRError( $result );
 
 			if ( $result['page_id'] == self::$post_id ) {
 				$found_incapable = true;

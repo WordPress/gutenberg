@@ -8,7 +8,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getComments( array( 1, 'username', 'password', array() ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -16,7 +16,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'contributor' );
 
 		$result = $this->myxmlrpcserver->wp_getComments( array( 1, 'contributor', 'contributor', array() ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 401, $result->code );
 	}
 
@@ -27,7 +27,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'editor' );
 
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array() ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		foreach( $results as $result ) {
 			$comment = get_comment( $result['comment_id'], ARRAY_A );
@@ -44,7 +44,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array(
 			'post_id' => $this->post_id
 		) ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		foreach( $results as $result ) {
 			$this->assertEquals( $this->post_id, $result['post_id'] );
@@ -60,7 +60,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$results = $this->myxmlrpcserver->wp_getComments( array( 1, 'editor', 'editor', array(
 			'post_id' => $this->post_id,
 		) ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		// if no 'number' filter is specified, default should be 10
 		$this->assertCount( 10, $results );
@@ -69,7 +69,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 			'post_id' => $this->post_id,
 			'number' => 5
 		) ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results2 );
+		$this->assertNotIXRError( $results2 );
 		$this->assertCount( 5, $results2 );
 	}
 
@@ -104,7 +104,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		) );
 
 		$result = $this->myxmlrpcserver->wp_getComments( array( 1, 'contributor', 'contributor' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 401, $result->code );
 	}
 
@@ -140,7 +140,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$result1 = $this->myxmlrpcserver->wp_getComments( array( 1, 'author', 'author', array(
 			'post_id' => $author_post_id
 		) ) );
-		$this->assertInstanceOf( 'IXR_Error', $result1 );
+		$this->assertIXRError( $result1 );
 
 		$result2 = $this->myxmlrpcserver->wp_getComments( array( 1, 'author', 'author', array(
 			'status' => 'approve',
@@ -153,7 +153,7 @@ class Tests_XMLRPC_wp_getComments extends WP_XMLRPC_UnitTestCase {
 		$result3 = $this->myxmlrpcserver->wp_getComments( array( 1, 'author', 'author', array(
 			'post_id' => $editor_post_id
 		) ) );
-		$this->assertInstanceOf( 'IXR_Error', $result3 );
+		$this->assertIXRError( $result3 );
 
 		$result4 = $this->myxmlrpcserver->wp_getComments( array( 1, 'author', 'author', array(
 			'status' => 'approve',

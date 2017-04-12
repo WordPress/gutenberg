@@ -13,7 +13,7 @@ class Tests_XMLRPC_wp_newComment extends WP_XMLRPC_UnitTestCase {
 			'content' => rand_str( 100 )
 		) ) );
  
-		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertNotIXRError( $result );
 	}
  
 	function test_empty_comment() {
@@ -24,7 +24,7 @@ class Tests_XMLRPC_wp_newComment extends WP_XMLRPC_UnitTestCase {
 			'content' => ''
 		) ) );
  
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -40,7 +40,7 @@ class Tests_XMLRPC_wp_newComment extends WP_XMLRPC_UnitTestCase {
 			'content' => rand_str( 100 ),
 		) ) );
 
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -54,12 +54,12 @@ class Tests_XMLRPC_wp_newComment extends WP_XMLRPC_UnitTestCase {
 
 		// First time it's a valid comment
 		$result = $this->myxmlrpcserver->wp_newComment( $comment_args  );
-		$this->assertNotInstanceOf( 'IXR_Error', $result );
+		$this->assertNotIXRError( $result );
 
 		// Run second time for duplication error
 		$result = $this->myxmlrpcserver->wp_newComment( $comment_args );
 
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 

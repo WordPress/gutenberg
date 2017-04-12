@@ -7,7 +7,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 
 	function test_invalid_username_password() {
 		$result = $this->myxmlrpcserver->wp_getTerms( array( 1, 'username', 'password', 'category' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 	}
 
@@ -15,7 +15,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'editor' );
 
 		$result = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', '' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
@@ -24,7 +24,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'editor' );
 
 		$result = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'not_existing' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 403, $result->code );
 		$this->assertEquals( __( 'Invalid taxonomy.' ), $result->message );
 	}
@@ -33,7 +33,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'subscriber' );
 
 		$result = $this->myxmlrpcserver->wp_getTerms( array( 1, 'subscriber', 'subscriber', 'category' ) );
-		$this->assertInstanceOf( 'IXR_Error', $result );
+		$this->assertIXRError( $result );
 		$this->assertEquals( 401, $result->code );
 		$this->assertEquals( __( 'Sorry, you are not allowed to assign terms in this taxonomy.' ), $result->message );
 	}
@@ -45,7 +45,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		$cat = wp_insert_term( 'term_' . __FUNCTION__ , 'category' );
 
 		$results = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'category' ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		foreach( $results as $term ) {
 			$this->assertInternalType( 'int', $term['count'] );
@@ -71,7 +71,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 
 		// test fetching all terms
 		$results = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', $tax_name ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 
 		$this->assertEquals( $num_terms, count( $results ) );
 		foreach ( $results as $term ) {
@@ -81,20 +81,20 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		// test paged results
 		$filter = array( 'number' => 5 );
 		$results2 = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', $tax_name, $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 		$this->assertEquals( 5, count( $results2 ) );
 		$this->assertEquals( $results[1]['term_id'], $results2[1]['term_id'] ); // check one of the terms
 
 		$filter['offset'] = 10;
 		$results3 = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', $tax_name, $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results3 );
+		$this->assertNotIXRError( $results3 );
 		$this->assertEquals( $num_terms - 10, count( $results3 ) );
 		$this->assertEquals( $results[11]['term_id'], $results3[1]['term_id'] );
 
 		// test hide_empty (since none have been attached to posts yet, all should be hidden
 		$filter = array( 'hide_empty' => true );
 		$results4 = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', $tax_name, $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results4 );
+		$this->assertNotIXRError( $results4 );
 		$this->assertEquals( 0, count( $results4 ) );
 
 		unset($GLOBALS['wp_taxonomies'][$tax_name]);
@@ -111,7 +111,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 
 		$filter = array( 'orderby' => 'count', 'order' => 'DESC' );
 		$results = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'category', $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 		$this->assertNotEquals( 0, count( $results ) );
 
 		foreach( $results as $term ) {
@@ -133,7 +133,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		// search by full name
 		$filter = array( 'search' => $name );
 		$results = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'category', $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results );
+		$this->assertNotIXRError( $results );
 		$this->assertEquals( 1, count( $results ) );
 		$this->assertEquals( $name, $results[0]['name'] );
 		$this->assertEquals( $name_id, $results[0]['term_id'] );
@@ -141,7 +141,7 @@ class Tests_XMLRPC_wp_getTerms extends WP_XMLRPC_UnitTestCase {
 		// search by partial name
 		$filter = array( 'search' => substr( $name, 0, 10 ) );
 		$results2 = $this->myxmlrpcserver->wp_getTerms( array( 1, 'editor', 'editor', 'category', $filter ) );
-		$this->assertNotInstanceOf( 'IXR_Error', $results2 );
+		$this->assertNotIXRError( $results2 );
 		$this->assertEquals( 1, count( $results2 ) );
 		$this->assertEquals( $name, $results2[0]['name'] );
 		$this->assertEquals( $name_id, $results2[0]['term_id'] );
