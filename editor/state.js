@@ -2,7 +2,113 @@
  * External dependencies
  */
 import { combineReducers, createStore } from 'redux';
-import { keyBy, last } from 'lodash';
+import { includes, keyBy, last } from 'lodash';
+
+/**
+ * Reducer enhancer which transforms the result of the original reducer into an
+ * object tracking its own history (past, present, future).
+ *
+ * @param  {Function} reducer            Original reducer
+ * @param  {?Object}  options            Optional options
+ * @param  {?Number}  options.limit      Maximum length of past history
+ * @param  {?Array}   options.resetTypes Action types upon which to clear past
+ * @return {Function}                    Enhanced reducer
+ */
+export function undoable( reducer, options ) {
+	const initialState = {
+		past: [],
+		present: reducer( undefined, {} ),
+		future: []
+	};
+
+	options = {
+		limit: 10,
+		...options
+	};
+
+	return ( state = initialState, action ) => {
+		const { past, present, future } = state;
+
+		switch ( action.type ) {
+			case 'UNDO':
+				return {
+					past: past.slice( 0, past.length - 1 ),
+					present: past[ past.length - 1 ],
+					future: [ present, ...future ]
+				};
+
+			case 'REDO':
+				return {
+					past: [ ...past, present ],
+					present: future[ 0 ],
+					future: future.slice( 1 )
+				};
+		}
+
+		const nextPresent = reducer( present, action );
+
+		if ( includes( options.resetTypes, action.type ) ) {
+			return {
+				past: [],
+				present: nextPresent,
+				future: []
+			};
+		}
+
+		if ( present === nextPresent ) {
+			return state;
+		}
+
+		return {
+			past: [ ...past, present ].slice( -1 * options.limit ),
+			present: nextPresent,
+			future: []
+		};
+	};
+}
+
+/**
+ * A wrapper for combineReducers which applies an undo history to the combined
+ * reducer. As a convenience, properties of the reducers object are accessible
+ * via object getters, with history assigned to a nested history property.
+ *
+ * @see undoable
+ *
+ * @param  {Object}   reducers Object of reducers
+ * @param  {?Object}  options  Optional options
+ * @return {Function}          Combined reducer
+ */
+export function combineUndoableReducers( reducers, options ) {
+	const reducer = undoable( combineReducers( reducers ), options );
+
+	function withGetters( history ) {
+		const state = { history };
+		const keys = Object.getOwnPropertyNames( history.present );
+		const getters = keys.reduce( ( memo, key ) => {
+			memo[ key ] = {
+				get: function() {
+					return this.history.present[ key ];
+				}
+			};
+
+			return memo;
+		}, {} );
+		Object.defineProperties( state, getters );
+
+		return state;
+	}
+
+	const initialState = withGetters( reducer( undefined, {} ) );
+
+	return ( state = initialState, action ) => {
+		const nextState = reducer( state.history, action );
+		if ( nextState === state.history.present ) {
+			return state;
+		}
+
+		return withGetters( nextState );
+	};
+}
 
 /**
  * Reducer returning editor blocks state, an combined reducer of keys byUid,
@@ -12,7 +118,7 @@ import { keyBy, last } from 'lodash';
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const blocks = combineReducers( {
+export const blocks = combineUndoableReducers( {
 	byUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'REPLACE_BLOCKS':
@@ -78,7 +184,7 @@ export const blocks = combineReducers( {
 
 		return state;
 	}
-} );
+}, { resetTypes: [ 'REPLACE_BLOCKS' ] } );
 
 /**
  * Reducer returning selected block state.

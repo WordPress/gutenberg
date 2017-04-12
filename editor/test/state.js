@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { expect } from 'chai';
-import deepFreeze from 'deep-freeze';
 import { values } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import {
+	undoable,
+	combineUndoableReducers,
 	blocks,
 	hoveredBlock,
 	selectedBlock,
@@ -17,6 +18,122 @@ import {
 } from '../state';
 
 describe( 'state', () => {
+	describe( 'undoable()', () => {
+		const counter = ( state = 0, { type } ) => (
+			type === 'INCREMENT' ? state + 1 : state
+		);
+
+		it( 'should return a new reducer', () => {
+			const reducer = undoable( counter );
+
+			expect( reducer ).to.be.a( 'function' );
+			expect( reducer( undefined, {} ) ).to.eql( {
+				past: [],
+				present: 0,
+				future: []
+			} );
+		} );
+
+		it( 'should track history', () => {
+			const reducer = undoable( counter );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+
+			expect( state ).to.eql( {
+				past: [ 0 ],
+				present: 1,
+				future: []
+			} );
+		} );
+
+		it( 'should perform undo', () => {
+			const reducer = undoable( counter );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'UNDO' } );
+
+			expect( state ).to.eql( {
+				past: [],
+				present: 0,
+				future: [ 1 ]
+			} );
+		} );
+
+		it( 'should perform redo', () => {
+			const reducer = undoable( counter );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'UNDO' } );
+			state = reducer( state, { type: 'REDO' } );
+
+			expect( state ).to.eql( {
+				past: [ 0 ],
+				present: 1,
+				future: []
+			} );
+		} );
+
+		it( 'should allow limiting history by options.limit', () => {
+			const reducer = undoable( counter, { limit: 2 } );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'INCREMENT' } );
+
+			expect( state ).to.eql( {
+				past: [ 2, 3 ],
+				present: 4,
+				future: []
+			} );
+		} );
+
+		it( 'should reset history by options.resetTypes', () => {
+			const reducer = undoable( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
+
+			let state;
+			state = reducer( undefined, {} );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'RESET_HISTORY' } );
+			state = reducer( state, { type: 'INCREMENT' } );
+			state = reducer( state, { type: 'INCREMENT' } );
+
+			expect( state ).to.eql( {
+				past: [ 1, 2 ],
+				present: 3,
+				future: []
+			} );
+		} );
+	} );
+
+	describe( 'combineUndoableReducers()', () => {
+		it( 'should return a combined reducer with getters', () => {
+			const reducer = combineUndoableReducers( {
+				count: ( state = 0 ) => state
+			} );
+			const state = reducer( undefined, {} );
+
+			expect( reducer ).to.be.a( 'function' );
+			expect( state ).to.have.keys( 'history' );
+			expect( state.count ).to.equal( 0 );
+			expect( state.history ).to.eql( {
+				past: [],
+				present: {
+					count: 0
+				},
+				future: []
+			} );
+		} );
+	} );
+
 	describe( 'blocks()', () => {
 		before( () => {
 			wp.blocks.registerBlock( 'core/test-block', {} );
@@ -26,20 +143,16 @@ describe( 'state', () => {
 			wp.blocks.unregisterBlock( 'core/test-block' );
 		} );
 
-		it( 'should return empty byUid, order by default', () => {
+		it( 'should return empty byUid, order, history by default', () => {
 			const state = blocks( undefined, {} );
 
-			expect( state ).to.eql( {
-				byUid: {},
-				order: []
-			} );
+			expect( state.byUid ).to.eql( {} );
+			expect( state.order ).to.eql( [] );
+			expect( state ).to.have.keys( 'history' );
 		} );
 
 		it( 'should key by replaced blocks uid', () => {
-			const original = deepFreeze( {
-				byUid: {},
-				order: []
-			} );
+			const original = blocks( undefined, {} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				blockNodes: [ { uid: 'bananas' } ]
@@ -51,15 +164,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return with block updates', () => {
-			const original = deepFreeze( {
-				byUid: {
-					kumquat: {
-						uid: 'kumquat',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'kumquat' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'kumquat',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'UPDATE_BLOCK',
@@ -75,15 +185,13 @@ describe( 'state', () => {
 		} );
 
 		it( 'should insert block', () => {
-			const original = deepFreeze( {
-				byUid: {
-					kumquat: {
-						uid: 'chicken',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'chicken' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'INSERT_BLOCK',
@@ -99,20 +207,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should move the block up', () => {
-			const original = deepFreeze( {
-				byUid: {
-					chicken: {
-						uid: 'chicken',
-						blockType: 'core/test-block',
-						attributes: {}
-					},
-					ribs: {
-						uid: 'ribs',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'chicken', 'ribs' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_UP',
@@ -123,20 +228,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should not move the first block up', () => {
-			const original = deepFreeze( {
-				byUid: {
-					chicken: {
-						uid: 'chicken',
-						blockType: 'core/test-block',
-						attributes: {}
-					},
-					ribs: {
-						uid: 'ribs',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'chicken', 'ribs' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_UP',
@@ -147,20 +249,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should move the block down', () => {
-			const original = deepFreeze( {
-				byUid: {
-					chicken: {
-						uid: 'chicken',
-						blockType: 'core/test-block',
-						attributes: {}
-					},
-					ribs: {
-						uid: 'ribs',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'chicken', 'ribs' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_DOWN',
@@ -171,20 +270,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should not move the last block down', () => {
-			const original = deepFreeze( {
-				byUid: {
-					chicken: {
-						uid: 'chicken',
-						blockType: 'core/test-block',
-						attributes: {}
-					},
-					ribs: {
-						uid: 'ribs',
-						blockType: 'core/test-block',
-						attributes: {}
-					}
-				},
-				order: [ 'chicken', 'ribs' ]
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCK_DOWN',
