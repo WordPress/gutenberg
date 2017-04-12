@@ -140,6 +140,7 @@ input[type=search].editor-inserter__search {
 	align-items: center;
 	cursor: pointer;
 	border: 1px solid transparent;
+	background: none;
 
 	&:hover {
 		border: 1px solid $dark-gray-500;

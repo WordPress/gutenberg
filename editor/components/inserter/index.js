@@ -8,6 +8,7 @@ class Inserter extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
+		this.close = this.close.bind( this );
 		this.state = {
 			opened: false
 		};
@@ -16,6 +17,12 @@ class Inserter extends wp.element.Component {
 	toggle() {
 		this.setState( {
 			opened: ! this.state.opened
+		} );
+	}
+
+	close() {
+		this.setState( {
+			opened: false
 		} );
 	}
 
@@ -30,7 +37,7 @@ class Inserter extends wp.element.Component {
 					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle" />
-				{ opened && <InserterMenu position={ position } /> }
+				{ opened && <InserterMenu position={ position } onSelect={ this.close } /> }
 			</div>
 		);
 	}
