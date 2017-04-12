@@ -26,6 +26,12 @@ export const blocks = combineReducers( {
 						...action.updates
 					}
 				};
+
+			case 'INSERT_BLOCK':
+				return {
+					...state,
+					[ action.block.uid ]: action.block
+				};
 		}
 
 		return state;
@@ -62,35 +68,50 @@ export const blocks = combineReducers( {
 					action.uid,
 					...state.slice( index + 2 )
 				];
+
+			case 'INSERT_BLOCK':
+				return [
+					...state,
+					action.block.uid
+				];
 		}
 
 		return state;
 	},
-	selected( state = {}, action ) {
+	selected( state = null, action ) {
 		switch ( action.type ) {
 			case 'TOGGLE_BLOCK_SELECTED':
-				return {
-					...state,
-					[ action.uid ]: action.selected
-				};
+				if ( action.selected ) {
+					return action.uid;
+				}
+
+				if ( ! action.selected && action.uid === state ) {
+					return null;
+				}
+
+				return state;
+			case 'INSERT_BLOCK':
+				return action.block.uid;
 		}
 
 		return state;
 	},
-	hovered( state = {}, action ) {
+	hovered( state = null, action ) {
 		switch ( action.type ) {
 			case 'TOGGLE_BLOCK_HOVERED':
-				return {
-					...state,
-					[ action.uid ]: action.hovered
-				};
+				if ( action.hovered ) {
+					return action.uid;
+				}
+
+				if ( ! action.hovered && action.uid === state ) {
+					return null;
+				}
+
+				return state;
 
 			case 'TOGGLE_BLOCK_SELECTED':
-				if ( state[ action.uid ] ) {
-					return {
-						...state,
-						[ action.uid ]: false
-					};
+				if ( state === action.uid ) {
+					return null;
 				}
 				break;
 		}
