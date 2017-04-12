@@ -183,11 +183,12 @@ For each compatibility object, we have a few ways to identify content:
 
 - `tagName`: Identify elements of a particular tag
 - `shortcode`: Identify shortcodes of a particular shortcode name
+- `blockType`: Enable conversion of an instance of another block type to this type
 
 Not shown in this example, but you can also define an `initialize` function which accepts the parsed content as an argument and is expected to return attributes of a block instance corresponding with the matched content. If omitted as is the case here, the block's default `attributes` property takes effect (in this case matching the HTML of the paragraph tag).
 
 ```
-initialize( node: HTMLElement|WPShortcode ): ?Object
+initialize( node: HTMLElement|WPShortcode|WPBlockNode ): ?Object
 ```
 
 If the `initialize` function returns `null` or `undefined`, it's assumed that the block does not support the content. This is especially useful in cases where your block may be compatible with elements of a particular tag name, but only when specific conditions apply.
