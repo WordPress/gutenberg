@@ -1,3 +1,54 @@
+.editor-text-editor__formatting {
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	height: 36px;
+
+	div {
+		max-width: 700px;
+		margin: 0 auto;
+	}
+
+	button {
+		height: 30px;
+		border: none;
+		background: none;
+		padding: 0 8px;
+		margin: 3px 4px 0 4px;
+		text-align: center;
+		cursor: pointer;
+		font-family: $editor-html-font;
+		color: $dark-gray-500;
+		border: 1px solid transparent;
+	}
+
+	button:first-child {
+		margin-left: 0;
+	}
+
+	button:hover {
+		border: 1px solid $dark-gray-500;
+	}
+
+	button:focus {
+		outline: none;
+	}
+
+	.editor-text-editor__bold {
+		font-weight: bold;
+	}
+
+	.editor-text-editor__italic {
+		font-style: italic;
+	}
+	.editor-text-editor__link {
+		text-decoration: underline;
+		color: $blue-medium;
+	}
+	.editor-text-editor__del {
+		text-decoration:line-through;
+	}
+}
+
 .editor-text-editor {
 	display: block;
 	margin: 60px auto 0;
@@ -9,4 +60,9 @@
 	padding: 0;
 	overflow: hidden;
 	font-family: $editor-html-font;
+	line-height: 150%;
+
+	&:focus {
+		box-shadow: none;
+	}
 }
