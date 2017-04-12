@@ -6,9 +6,12 @@
 	border: none;
 	background: none;
 	color: $dark-gray-500;
-	cursor: pointer;
 
-	&:hover {
-		color: $blue-medium;
+	&:not( :disabled ) {
+		cursor: pointer;
+
+		&:hover {
+			color: $blue-medium;
+		}
 	}
 }
