@@ -124,6 +124,110 @@ describe( 'state', () => {
 			expect( state.hovered.kumquat ).to.be.false();
 			expect( state.selected.kumquat ).to.be.true();
 		} );
+
+		it( 'should move the block up', () => {
+			const original = deepFreeze( {
+				byUid: {
+					chicken: {
+						uid: 'chicken',
+						blockType: 'core/test-block',
+						attributes: {}
+					},
+					ribs: {
+						uid: 'ribs',
+						blockType: 'core/test-block',
+						attributes: {}
+					}
+				},
+				order: [ 'chicken', 'ribs' ],
+				selected: {},
+				hovered: {}
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCK_UP',
+				uid: 'ribs'
+			} );
+
+			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should not move the first block up', () => {
+			const original = deepFreeze( {
+				byUid: {
+					chicken: {
+						uid: 'chicken',
+						blockType: 'core/test-block',
+						attributes: {}
+					},
+					ribs: {
+						uid: 'ribs',
+						blockType: 'core/test-block',
+						attributes: {}
+					}
+				},
+				order: [ 'chicken', 'ribs' ],
+				selected: {},
+				hovered: {}
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCK_UP',
+				uid: 'chicken'
+			} );
+
+			expect( state.order ).to.equal( original.order );
+		} );
+
+		it( 'should move the block down', () => {
+			const original = deepFreeze( {
+				byUid: {
+					chicken: {
+						uid: 'chicken',
+						blockType: 'core/test-block',
+						attributes: {}
+					},
+					ribs: {
+						uid: 'ribs',
+						blockType: 'core/test-block',
+						attributes: {}
+					}
+				},
+				order: [ 'chicken', 'ribs' ],
+				selected: {},
+				hovered: {}
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCK_DOWN',
+				uid: 'chicken'
+			} );
+
+			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should not move the last block down', () => {
+			const original = deepFreeze( {
+				byUid: {
+					chicken: {
+						uid: 'chicken',
+						blockType: 'core/test-block',
+						attributes: {}
+					},
+					ribs: {
+						uid: 'ribs',
+						blockType: 'core/test-block',
+						attributes: {}
+					}
+				},
+				order: [ 'chicken', 'ribs' ],
+				selected: {},
+				hovered: {}
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCK_DOWN',
+				uid: 'ribs'
+			} );
+
+			expect( state.order ).to.equal( original.order );
+		} );
 	} );
 
 	describe( 'mode()', () => {

@@ -1,0 +1,23 @@
+.editor-arrangement-toolbar {
+	position: absolute;
+	top: 10px;
+	left: 0;
+
+	.editor-arrangement-toolbar__control {
+		display: block;
+		padding: 0;
+		border: none;
+		outline: none;
+		background: none;
+		color: $light-gray-600;
+		cursor: pointer;
+
+		&.is-disabled {
+			color: $light-gray-100;
+		}
+
+		.dashicon {
+			display: block;
+		}
+	}
+}

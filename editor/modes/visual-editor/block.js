@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import Toolbar from 'components/toolbar';
+import ArrangementToolbar from 'components/arrangement-toolbar';
 
 function VisualEditorBlock( props ) {
 	const { block } = props;
@@ -62,6 +63,7 @@ function VisualEditorBlock( props ) {
 			onMouseLeave={ onMouseLeave }
 			className={ className }
 		>
+			{ ( isSelected || isHovered ) && <ArrangementToolbar uid={ block.uid } /> }
 			{ isSelected && settings.controls ? (
 				<Toolbar
 					controls={ settings.controls.map( ( control ) => ( {
@@ -70,10 +72,12 @@ function VisualEditorBlock( props ) {
 						isActive: () => control.isActive( block.attributes )
 					} ) ) } />
 			) : null }
-			<BlockEdit
-				isSelected={ isSelected }
-				attributes={ block.attributes }
-				setAttributes={ setAttributes } />
+			<div className="editor-visual-editor__block-edit">
+				<BlockEdit
+					isSelected={ isSelected }
+					attributes={ block.attributes }
+					setAttributes={ setAttributes } />
+			</div>
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
