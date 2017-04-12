@@ -10,15 +10,11 @@ import './style.scss';
 import Button from '../button';
 import Dashicon from '../dashicon';
 
-function IconButton( { icon, label, onClick, className } ) {
+function IconButton( { icon, label, className, ...additionalProps } ) {
 	const classes = classnames( 'editor-icon-button', className );
 
 	return (
-		<Button
-			title={ label }
-			onClick={ onClick }
-			className={ classes }
-		>
+		<Button { ...additionalProps } aria-label={ label } className={ classes }>
 			<Dashicon icon={ icon } />
 		</Button>
 	);

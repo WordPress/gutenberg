@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from 'components/dashicon';
+import IconButton from 'components/icon-button';
 
 function Toolbar( { controls } ) {
 	if ( ! controls || ! controls.length ) {
@@ -17,19 +17,17 @@ function Toolbar( { controls } ) {
 	return (
 		<ul className="editor-toolbar">
 			{ controls.map( ( control, index ) => (
-				<button
+				<IconButton
 					key={ index }
-					className={ classNames( 'editor-toolbar__control', {
-						'is-active': control.isActive && control.isActive()
-					} ) }
-					title={ control.title }
+					icon={ control.icon }
+					label={ control.title }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						control.onClick();
 					} }
-				>
-					<Dashicon icon={ control.icon } />
-				</button>
+					className={ classNames( 'editor-toolbar__control', {
+						'is-active': control.isActive && control.isActive()
+					} ) } />
 			) ) }
 		</ul>
 	);
