@@ -39,10 +39,13 @@ msgid "Justify"
 msgstr ""
 
 #: editor/components/inserter/index.js:29
+#: editor/components/inserter/index.js:30
 msgid "Insert block"
 msgstr ""
 
 #: editor/components/inserter/menu.js:40
+#: editor/components/inserter/menu.js:41
+#: editor/components/inserter/menu.js:42
 msgid "Search…"
 msgstr ""
 

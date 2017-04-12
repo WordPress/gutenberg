@@ -4,7 +4,7 @@
 import './style.scss';
 import Dashicon from 'components/dashicon';
 
-function InserterMenu() {
+function InserterMenu( { position = 'top' } ) {
 	const blocks = wp.blocks.getBlocks();
 	const blocksByCategory = blocks.reduce( ( groups, block ) => {
 		if ( ! groups[ block.category ] ) {
@@ -16,7 +16,7 @@ function InserterMenu() {
 	const categories = wp.blocks.getCategories();
 
 	return (
-		<div className="editor-inserter__menu">
+		<div className={ `editor-inserter__menu is-${ position }` }>
 			<div className="editor-inserter__arrow" />
 			<div className="editor-inserter__content">
 				{ categories

@@ -21,6 +21,7 @@ class Inserter extends wp.element.Component {
 
 	render() {
 		const { opened } = this.state;
+		const { position } = this.props;
 
 		return (
 			<div className="editor-inserter">
@@ -29,7 +30,7 @@ class Inserter extends wp.element.Component {
 					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle" />
-				{ opened && <InserterMenu /> }
+				{ opened && <InserterMenu position={ position } /> }
 			</div>
 		);
 	}
