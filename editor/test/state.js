@@ -235,6 +235,33 @@ describe( 'state', () => {
 
 			expect( state ).to.equal( 'chicken' );
 		} );
+
+		it( 'should insert after the specified block uid', () => {
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'kumquat',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'kumquat2',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
+			} );
+
+			const state = blocks( original, {
+				type: 'INSERT_BLOCK',
+				after: 'kumquat',
+				block: {
+					uid: 'kumquat3',
+					blockType: 'core/freeform'
+				}
+			} );
+
+			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 3 );
+			expect( state.order ).to.eql( [ 'kumquat', 'kumquat3', 'kumquat2' ] );
+		} );
 	} );
 
 	describe( 'mode()', () => {

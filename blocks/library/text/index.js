@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import uuid from 'uuid/v4';
+
+/**
  * Internal dependencies
  */
 import { registerBlock, query } from 'api';
@@ -45,15 +50,24 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes, setAttributes, insertBlockAfter } ) {
 		const { content, align } = attributes;
 
 		return (
 			<Editable
-				tagName="p"
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				style={ align ? { textAlign: align } : null }
+				onSplit={ ( before, after ) => {
+					setAttributes( { content: before } );
+					insertBlockAfter( {
+						uid: uuid(),
+						blockType: 'core/text',
+						attributes: {
+							content: after
+						}
+					} );
+				} }
 			/>
 		);
 	},

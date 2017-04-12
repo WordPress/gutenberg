@@ -30,7 +30,7 @@ function VisualEditorBlock( props ) {
 		'is-hovered': isHovered
 	} );
 
-	const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave } = props;
+	const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = props;
 
 	function setAttributes( attributes ) {
 		onChange( {
@@ -75,7 +75,9 @@ function VisualEditorBlock( props ) {
 			<BlockEdit
 				isSelected={ isSelected }
 				attributes={ block.attributes }
-				setAttributes={ setAttributes } />
+				setAttributes={ setAttributes }
+				insertBlockAfter={ onInsertAfter }
+			/>
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -121,6 +123,13 @@ export default connect(
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: false,
 				uid: ownProps.uid
+			} );
+		},
+		onInsertAfter( block ) {
+			dispatch( {
+				type: 'INSERT_BLOCK',
+				after: ownProps.uid,
+				block
 			} );
 		}
 	} )
