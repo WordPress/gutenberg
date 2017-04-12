@@ -12,6 +12,10 @@
 		color: $light-gray-600;
 		cursor: pointer;
 
+		&:hover {
+			color: $dark-gray-900;
+		}
+
 		&.is-disabled {
 			color: $light-gray-100;
 		}
