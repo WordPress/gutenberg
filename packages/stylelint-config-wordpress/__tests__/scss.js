@@ -9,7 +9,7 @@ const invalidScss = fs.readFileSync("./__tests__/scss-invalid.scss", "utf-8")
 test("There are no warnings with values SCSS", async t => {
   const data = await stylelint.lint({
     code: validScss,
-    config: config,
+    config,
     syntax: "scss",
   })
 
@@ -22,7 +22,7 @@ test("There are no warnings with values SCSS", async t => {
 test("There are warnings with invalid values SCSS", async t => {
   const data = await stylelint.lint({
     code: invalidScss,
-    config: config,
+    config,
     syntax: "scss",
   })
 

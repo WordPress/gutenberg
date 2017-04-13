@@ -8,7 +8,7 @@ const validCss = fs.readFileSync("./__tests__/vendor-prefixes-valid.css", "utf-8
 test("There are no warnings with vendor prefixes CSS", async t => {
   const data = await stylelint.lint({
     code: validCss,
-    config: config,
+    config,
   })
 
   const { errored, results } = data
