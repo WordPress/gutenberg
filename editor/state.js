@@ -5,14 +5,19 @@ import { combineReducers, createStore } from 'redux';
 import { keyBy, last } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { combineUndoableReducers } from 'utils/undoable-reducer';
+
+/**
  * Reducer returning editor blocks state, an combined reducer of keys byUid,
- * order, selected, hovered, where blocks are parsed from current HTML markup.
+ * order, where blocks are parsed from current HTML markup.
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const blocks = combineReducers( {
+export const blocks = combineUndoableReducers( {
 	byUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'REPLACE_BLOCKS':
@@ -77,51 +82,53 @@ export const blocks = combineReducers( {
 		}
 
 		return state;
-	},
-	selected( state = null, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_BLOCK_SELECTED':
-				if ( action.selected ) {
-					return action.uid;
-				}
-
-				if ( ! action.selected && action.uid === state ) {
-					return null;
-				}
-
-				return state;
-			case 'MOVE_BLOCK_UP':
-			case 'MOVE_BLOCK_DOWN':
-				return action.uid;
-			case 'INSERT_BLOCK':
-				return action.block.uid;
-		}
-
-		return state;
-	},
-	hovered( state = null, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_BLOCK_HOVERED':
-				if ( action.hovered ) {
-					return action.uid;
-				}
-
-				if ( ! action.hovered && action.uid === state ) {
-					return null;
-				}
-
-				return state;
-
-			case 'TOGGLE_BLOCK_SELECTED':
-				if ( state === action.uid ) {
-					return null;
-				}
-				break;
-		}
-
-		return state;
 	}
-} );
+}, { resetTypes: [ 'REPLACE_BLOCKS' ] } );
+
+/**
+ * Reducer returning selected block state.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function selectedBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_SELECTED':
+			return action.selected ? action.uid : null;
+
+		case 'MOVE_BLOCK_UP':
+		case 'MOVE_BLOCK_DOWN':
+			return action.uid;
+
+		case 'INSERT_BLOCK':
+			return action.block.uid;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning hovered block state.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function hoveredBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HOVERED':
+			return action.hovered ? action.uid : null;
+
+		case 'TOGGLE_BLOCK_SELECTED':
+			if ( action.selected ) {
+				return null;
+			}
+			break;
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning current editor mode, either "visual" or "text".
@@ -147,6 +154,8 @@ export function mode( state = 'visual', action ) {
 export function createReduxStore() {
 	const reducer = combineReducers( {
 		blocks,
+		selectedBlock,
+		hoveredBlock,
 		mode
 	} );
 

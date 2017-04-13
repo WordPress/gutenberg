@@ -1,4 +1,8 @@
 .editor-button {
 	background: none;
 	border: none;
+
+	&:disabled {
+		opacity: 0.6;
+	}
 }

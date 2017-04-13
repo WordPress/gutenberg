@@ -58,19 +58,19 @@ msgstr ""
 msgid "Saved"
 msgstr ""
 
-#: editor/header/tools/index.js:13
+#: editor/header/tools/index.js:20
 msgid "Undo"
 msgstr ""
 
-#: editor/header/tools/index.js:14
+#: editor/header/tools/index.js:25
 msgid "Redo"
 msgstr ""
 
-#: editor/header/tools/index.js:23
+#: editor/header/tools/index.js:36
 msgid "Post Settings"
 msgstr ""
 
-#: editor/header/tools/index.js:27
+#: editor/header/tools/index.js:40
 msgid "Publish"
 msgstr ""
 
@@ -79,7 +79,7 @@ msgctxt "Name for the Text editor tab (formerly HTML)"
 msgid "Text"
 msgstr ""
 
-#: editor/header/tools/index.js:19
+#: editor/header/tools/index.js:32
 msgctxt "imperative verb"
 msgid "Preview"
 msgstr ""

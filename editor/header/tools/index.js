@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -7,11 +12,19 @@ import IconButton from '../../components/icon-button';
 import Inserter from '../../components/inserter';
 import Button from '../../components/button';
 
-function Tools() {
+function Tools( { undo, redo, hasUndo, hasRedo } ) {
 	return (
 		<div className="editor-tools">
-			<IconButton icon="undo" label={ wp.i18n.__( 'Undo' ) } />
-			<IconButton icon="redo" label={ wp.i18n.__( 'Redo' ) } />
+			<IconButton
+				icon="undo"
+				label={ wp.i18n.__( 'Undo' ) }
+				disabled={ ! hasUndo }
+				onClick={ undo } />
+			<IconButton
+				icon="redo"
+				label={ wp.i18n.__( 'Redo' ) }
+				disabled={ ! hasRedo }
+				onClick={ redo } />
 			<Inserter position="bottom" />
 			<div className="editor-tools__tabs">
 				<Button>
@@ -30,4 +43,13 @@ function Tools() {
 	);
 }
 
-export default Tools;
+export default connect(
+	( state ) => ( {
+		hasUndo: state.blocks.history.past.length > 0,
+		hasRedo: state.blocks.history.future.length > 0
+	} ),
+	( dispatch ) => ( {
+		undo: () => dispatch( { type: 'UNDO' } ),
+		redo: () => dispatch( { type: 'REDO' } )
+	} )
+)( Tools );

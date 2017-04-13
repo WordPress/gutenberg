@@ -84,8 +84,8 @@ function VisualEditorBlock( props ) {
 export default connect(
 	( state, ownProps ) => ( {
 		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: state.blocks.selected === ownProps.uid,
-		isHovered: state.blocks.hovered === ownProps.uid
+		isSelected: state.selectedBlock === ownProps.uid,
+		isHovered: state.hoveredBlock === ownProps.uid
 	} ),
 	( dispatch, ownProps ) => ( {
 		onChange( updates ) {
