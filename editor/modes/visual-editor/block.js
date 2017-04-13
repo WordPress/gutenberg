@@ -63,7 +63,7 @@ function VisualEditorBlock( props ) {
 			onMouseLeave={ onMouseLeave }
 			className={ className }
 		>
-			{ ( isSelected || isHovered || true ) && <ArrangementToolbar uid={ block.uid } /> }
+			{ ( isSelected || isHovered ) && <ArrangementToolbar uid={ block.uid } /> }
 			{ isSelected && settings.controls ? (
 				<Toolbar
 					controls={ settings.controls.map( ( control ) => ( {
