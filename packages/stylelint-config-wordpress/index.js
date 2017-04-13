@@ -1,7 +1,7 @@
 module.exports = {
   "rules": {
     "at-rule-empty-line-before": [ "always", {
-      except: ["blockless-group"],
+      except: ["blockless-after-blockless"],
       ignore: ["after-comment"],
     } ],
     "at-rule-name-case": "lower",
@@ -51,7 +51,6 @@ module.exports = {
     } ],
     "media-feature-colon-space-after": "always",
     "media-feature-colon-space-before": "never",
-    "media-feature-no-missing-punctuation": true,
     "media-feature-range-operator-space-after": "always",
     "media-feature-range-operator-space-before": "always",
     "media-query-list-comma-newline-after": "always-multi-line",
@@ -65,10 +64,7 @@ module.exports = {
     "number-no-trailing-zeros": true,
     "property-case": "lower",
     "property-no-unknown": true,
-    "rule-nested-empty-line-before": [ "always", {
-      ignore: ["after-comment"],
-    } ],
-    "rule-non-nested-empty-line-before": [ "always", {
+    "rule-empty-line-before": [ "always", {
       ignore: ["after-comment"],
     } ],
     "selector-attribute-brackets-space-inside": "never",
@@ -92,7 +88,6 @@ module.exports = {
     "selector-list-comma-newline-after": "always",
     "selector-list-comma-space-before": "never",
     "selector-max-empty-lines": 0,
-    "selector-no-empty": true,
     "selector-pseudo-class-case": "lower",
     "selector-pseudo-class-no-unknown": true,
     "selector-pseudo-class-parentheses-space-inside": "never",
