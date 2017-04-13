@@ -151,7 +151,7 @@ describe( 'state', () => {
 			expect( state.selected ).to.equal( 'ribs' );
 		} );
 
-		it( 'should move the block up', () => {
+		it( 'should move the block up and select it', () => {
 			const original = deepFreeze( {
 				byUid: {
 					chicken: {
@@ -175,6 +175,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+			expect( state.selected ).to.eql( 'ribs' );
 		} );
 
 		it( 'should not move the first block up', () => {
@@ -203,7 +204,7 @@ describe( 'state', () => {
 			expect( state.order ).to.equal( original.order );
 		} );
 
-		it( 'should move the block down', () => {
+		it( 'should move the block down and select it', () => {
 			const original = deepFreeze( {
 				byUid: {
 					chicken: {
@@ -227,6 +228,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+			expect( state.selected ).to.eql( 'chicken' );
 		} );
 
 		it( 'should not move the last block down', () => {
