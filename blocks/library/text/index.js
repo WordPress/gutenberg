@@ -19,8 +19,8 @@ registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: html( 'p' ),
-		align: prop( 'p', 'style.textAlign' )
+		content: html( 'div' ),
+		align: prop( 'div', 'style.textAlign' )
 	},
 
 	controls: [
@@ -76,9 +76,10 @@ registerBlock( 'core/text', {
 		const { align, content } = attributes;
 
 		return (
-			<p
+			<div
 				style={ align ? { textAlign: align } : null }
-				dangerouslySetInnerHTML={ { __html: content } } />
+				dangerouslySetInnerHTML={ { __html: content } }
+			/>
 		);
 	}
 } );

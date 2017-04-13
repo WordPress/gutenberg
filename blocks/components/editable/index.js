@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -61,25 +62,36 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
-		if ( ! this.props.tagName && event.keyCode === 13 ) {
-			// Wait for the event to propagate
-			setTimeout( () => {
-				// Getting the content before and after the cursor
-				this.editor.selection.getStart();
-				const childNodes = Array.from( this.editor.getBody().childNodes );
-				const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
-				const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
-				const beforeNodes = childNodes.slice( 0, splitIndex );
-				const before = getHtml( beforeNodes );
-				const after = getHtml( childNodes.slice( splitIndex ) );
-
-				// Splitting into two blocks
-				this.editor.setContent( this.props.value );
-				const hasAfter = !! childNodes.slice( splitIndex )
-					.reduce( ( memo, node ) => memo + node.textContent, '' );
-				this.props.onSplit( before, hasAfter ? after : '' );
-			} );
+		if ( this.props.tagName || event.keyCode !== 13 ) {
+			return;
 		}
+
+		// Wait for the event to propagate
+		setTimeout( () => {
+			// Getting the content before and after the cursor
+			this.editor.selection.getStart();
+			const childNodes = Array.from( this.editor.getBody().childNodes );
+			const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
+			const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
+			const beforeNodes = childNodes.slice( 0, splitIndex );
+			const lastNodeBeforeCursor = last( beforeNodes );
+			// Avoid splitting on single enter
+			if (
+				! lastNodeBeforeCursor ||
+				lastNodeBeforeCursor.childNodes.length !== 1 ||
+				lastNodeBeforeCursor.firstChild.tagName !== 'BR'
+			) {
+				return;
+			}
+			const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
+			const after = getHtml( childNodes.slice( splitIndex ) );
+
+			// Splitting into two blocks
+			this.editor.setContent( this.props.value );
+			const hasAfter = !! childNodes.slice( splitIndex )
+				.reduce( ( memo, node ) => memo + node.textContent, '' );
+			this.props.onSplit( before, hasAfter ? after : '' );
+		} );
 	}
 
 	bindNode( ref ) {
