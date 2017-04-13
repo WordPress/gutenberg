@@ -10,20 +10,14 @@ import { includes, keyBy, last } from 'lodash';
  *
  * @param  {Function} reducer            Original reducer
  * @param  {?Object}  options            Optional options
- * @param  {?Number}  options.limit      Maximum length of past history
  * @param  {?Array}   options.resetTypes Action types upon which to clear past
  * @return {Function}                    Enhanced reducer
  */
-export function undoable( reducer, options ) {
+export function undoable( reducer, options = {} ) {
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
 		future: []
-	};
-
-	options = {
-		limit: 10,
-		...options
 	};
 
 	return ( state = initialState, action ) => {
@@ -60,7 +54,7 @@ export function undoable( reducer, options ) {
 		}
 
 		return {
-			past: [ ...past, present ].slice( -1 * options.limit ),
+			past: [ ...past, present ],
 			present: nextPresent,
 			future: []
 		};

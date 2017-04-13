@@ -79,23 +79,6 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should allow limiting history by options.limit', () => {
-			const reducer = undoable( counter, { limit: 2 } );
-
-			let state;
-			state = reducer( undefined, {} );
-			state = reducer( state, { type: 'INCREMENT' } );
-			state = reducer( state, { type: 'INCREMENT' } );
-			state = reducer( state, { type: 'INCREMENT' } );
-			state = reducer( state, { type: 'INCREMENT' } );
-
-			expect( state ).to.eql( {
-				past: [ 2, 3 ],
-				present: 4,
-				future: []
-			} );
-		} );
-
 		it( 'should reset history by options.resetTypes', () => {
 			const reducer = undoable( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
 
