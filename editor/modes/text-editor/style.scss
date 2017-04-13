@@ -65,7 +65,7 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor__formatting div,
+.editor-text-editor__formatting,
 .editor-text-editor {
 	padding-left: $item-spacing * 2;
 	padding-right: $item-spacing * 2;
@@ -74,7 +74,7 @@
 }
 
 @media only screen and ( min-width: 960px ) {
-	.editor-text-editor__formatting div,
+	.editor-text-editor__formatting,
 	.editor-text-editor {
 		padding-left: 10%;
 		padding-right: 10%;
@@ -82,7 +82,7 @@
 }
 
 @media only screen and ( min-width: 1280px ) {
-	.editor-text-editor__formatting div,
+	.editor-text-editor__formatting,
 	.editor-text-editor {
 		padding-left: 15%;
 		padding-right: 15%;
@@ -90,7 +90,7 @@
 }
 
 @media only screen and ( min-width: 1440px ) {
-	.editor-text-editor__formatting div,
+	.editor-text-editor__formatting,
 	.editor-text-editor {
 		padding-left: 200px;
 		padding-right: 200px;
