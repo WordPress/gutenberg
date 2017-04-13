@@ -16,7 +16,6 @@ cache:
 node_js:
   - '7'
   - '6'
-  - '4'
 
 before_install:
   # remove outdated deps, assists with cache maintenance

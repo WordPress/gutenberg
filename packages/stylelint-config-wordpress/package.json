@@ -33,7 +33,7 @@
     "scss.js"
   ],
   "engines": {
-    "node": ">=4.2.1"
+    "node": ">=6.9.1"
   },
   "devDependencies": {
     "ava": "^0.17.0",
