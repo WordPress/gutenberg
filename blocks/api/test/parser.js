@@ -101,7 +101,6 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].attributes ).to.eql( {
 				content: 'Ribs & Chicken'
 			} );
-			expect( parsed[ 0 ].rawContent ).to.equal( 'Ribs' );
 			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 		} );
 

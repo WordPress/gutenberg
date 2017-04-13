@@ -2,13 +2,13 @@
  * External dependencies
  */
 import * as query from 'hpq';
-import uuid from 'uuid/v4';
 
 /**
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockSettings, getUnknownTypeHandler } from './registration';
+import { createBlock } from './factory';
 
 /**
  * Returns the block attributes of a registered block node given its settings.
@@ -53,12 +53,9 @@ export default function parse( content ) {
 
 		// Include in set only if settings were determined
 		if ( settings ) {
-			memo.push( {
-				blockType,
-				uid: uuid(),
-				rawContent: blockNode.rawContent,
-				attributes: getBlockAttributes( blockNode, settings )
-			} );
+			memo.push(
+				createBlock( blockType, getBlockAttributes( blockNode, settings ) )
+			);
 		}
 
 		return memo;
