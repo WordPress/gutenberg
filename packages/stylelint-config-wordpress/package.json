@@ -42,9 +42,9 @@
     "eslint-plugin-ava": "^4.0.0",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
-    "remark-cli": "^2.0.0",
-    "remark-preset-lint-consistent": "^1.0.0",
-    "remark-preset-lint-recommended": "^1.0.0",
+    "remark-cli": "^3.0.0",
+    "remark-preset-lint-consistent": "^2.0.0",
+    "remark-preset-lint-recommended": "^2.0.0",
     "stylelint": "^7.5.0"
   },
   "peerDependencies": {
