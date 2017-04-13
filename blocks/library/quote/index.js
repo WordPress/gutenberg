@@ -13,7 +13,9 @@ registerBlock( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: ( node ) => query( 'blockquote > p', html() )( node ).join(),
+		value: ( node ) => query( 'blockquote > p', html() )( node )
+			.map( innerHTML => `<p>${ innerHTML }</p>` )
+			.join( '' ),
 		citation: html( 'footer' )
 	},
 
@@ -36,15 +38,13 @@ registerBlock( 'core/quote', {
 
 	save( attributes ) {
 		const { value, citation } = attributes;
-		return (
-			<blockquote>
-				{ value }
-				{ !! citation &&
-					<footer>
-						{ citation }
-					</footer>
-				}
-			</blockquote>
-		);
+		return [
+			'<blockquote>',
+			value,
+			citation
+				? `<footer>${ citation }</footer>`
+				: '',
+			'</blockquote>'
+		].join( '' );
 	}
 } );
