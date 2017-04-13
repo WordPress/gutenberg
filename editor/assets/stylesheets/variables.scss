@@ -40,6 +40,11 @@ $editor-font-size: 16px;
 $editor-line-height: 1.8em;
 $item-spacing: 10px;
 $header-height: 56px;
+$admin-bar-height: 32px;
+$admin-bar-height-big: 46px;
+$admin-sidebar-width: 160px;
+$admin-sidebar-width-big: 190px;
+$admin-sidebar-width-collapsed: 36px;
 
 /* Media Queries */
 
@@ -78,5 +83,5 @@ $break-huge: 1440px;
 $break-wide: 1280px;
 $break-large: 960px;
 $break-medium: 782px;
-$break-small: 640px;
+$break-small: 600px;
 $break-mobile: 480px;

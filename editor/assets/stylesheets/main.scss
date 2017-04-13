@@ -42,8 +42,12 @@ body.toplevel_page_gutenberg {
 
 .gutenberg__editor {
 	position: relative;
-	padding-top: $header-height;
+
 	img {
 		max-width: 100%;
+	}
+
+	@include break-small() {
+		padding-top: $header-height;
 	}
 }

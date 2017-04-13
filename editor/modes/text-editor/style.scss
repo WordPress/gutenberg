@@ -1,8 +1,10 @@
 .editor-text-editor__formatting {
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
-	min-height: 36px;
-	position: fixed;
+	min-height: $admin-sidebar-width-collapsed;
+	top: $admin-bar-height-big + $header-height;
+	left: 0;
+	right: 0;
 
 	button {
 		height: 30px;
@@ -28,6 +30,10 @@
 	button:focus {
 		outline: none;
 	}
+
+	@include break-small() {
+		position: fixed;
+	}
 }
 
 .editor-text-editor__formatting .editor-text-editor__bold {
@@ -47,6 +53,22 @@
 	text-decoration:line-through;
 }
 
+.auto-fold .editor-text-editor__formatting {
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+		top: $admin-bar-height + $header-height;
+	}
+
+	@include break-large() {
+		left: $admin-sidebar-width;
+	}
+}
+
+.folded .editor-text-editor__formatting {
+	left: $admin-sidebar-width-collapsed;
+}
+
+
 .editor-text-editor {
 	display: block;
 	padding-top: 60px;
@@ -61,6 +83,14 @@
 	font-family: $editor-html-font;
 	line-height: 150%;
 	transition: padding .2s linear;
+
+	@include break-small() {
+		padding-top: 60px + $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		padding-top: 60px + $admin-bar-height;
+	}
 
 	&:focus {
 		box-shadow: none;
