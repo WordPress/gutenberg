@@ -27,21 +27,21 @@
 	button:focus {
 		outline: none;
 	}
+}
 
-	.editor-text-editor__bold {
-		font-weight: bold;
-	}
+.editor-text-editor__bold {
+	font-weight: bold;
+}
 
-	.editor-text-editor__italic {
-		font-style: italic;
-	}
-	.editor-text-editor__link {
-		text-decoration: underline;
-		color: $blue-medium;
-	}
-	.editor-text-editor__del {
-		text-decoration:line-through;
-	}
+.editor-text-editor__italic {
+	font-style: italic;
+}
+.editor-text-editor__link {
+	text-decoration: underline;
+	color: $blue-medium;
+}
+.editor-text-editor__del {
+	text-decoration:line-through;
 }
 
 .editor-text-editor {
