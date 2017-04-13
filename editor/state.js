@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers, createStore } from 'redux';
-import { keyBy } from 'lodash';
+import { keyBy, last } from 'lodash';
 
 /**
  * Reducer returning editor blocks state, an combined reducer of keys byUid,
@@ -31,9 +31,37 @@ export const blocks = combineReducers( {
 		return state;
 	},
 	order( state = [], action ) {
+		let index;
+		let swappedUid;
 		switch ( action.type ) {
 			case 'REPLACE_BLOCKS':
 				return action.blockNodes.map( ( { uid } ) => uid );
+
+			case 'MOVE_BLOCK_UP':
+				if ( action.uid === state[ 0 ] ) {
+					return state;
+				}
+				index = state.indexOf( action.uid );
+				swappedUid = state[ index - 1 ];
+				return [
+					...state.slice( 0, index - 1 ),
+					action.uid,
+					swappedUid,
+					...state.slice( index + 1 )
+				];
+
+			case 'MOVE_BLOCK_DOWN':
+				if ( action.uid === last( state ) ) {
+					return state;
+				}
+				index = state.indexOf( action.uid );
+				swappedUid = state[ index + 1 ];
+				return [
+					...state.slice( 0, index ),
+					swappedUid,
+					action.uid,
+					...state.slice( index + 2 )
+				];
 		}
 
 		return state;

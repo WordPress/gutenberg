@@ -1,0 +1,29 @@
+.editor-block-mover {
+	position: absolute;
+	top: 10px;
+	left: 0;
+}
+
+.editor-block-mover__control {
+	display: block;
+	padding: 0;
+	border: none;
+	outline: none;
+	background: none;
+	color: $light-gray-600;
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+
+	&:hover {
+		color: $dark-gray-900;
+	}
+
+	&.is-disabled {
+		color: $light-gray-100;
+	}
+
+	.dashicon {
+		display: block;
+	}
+}

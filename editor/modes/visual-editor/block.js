@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import Toolbar from 'components/toolbar';
+import BlockMover from 'components/block-mover';
 
 function VisualEditorBlock( props ) {
 	const { block } = props;
@@ -62,6 +63,7 @@ function VisualEditorBlock( props ) {
 			onMouseLeave={ onMouseLeave }
 			className={ className }
 		>
+			{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
 			{ isSelected && settings.controls ? (
 				<Toolbar
 					controls={ settings.controls.map( ( control ) => ( {

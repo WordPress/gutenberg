@@ -17,16 +17,29 @@
 
 .editor-visual-editor__block {
 	position: relative;
-	padding: 15px;
 	border: 2px solid transparent;
 	transition: 0.2s border-color;
+	margin-left: -35px;
+	padding: 15px 15px 15px 50px;
 
-	&.is-hovered {
-		border-left: 2px solid $light-gray-500;
+	&:before {
+		z-index: -1;
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 33px;
+		right: 0;
+		border: 2px solid transparent;
+		transition: 0.2s border-color;
 	}
 
-	&.is-selected {
-		border: 2px solid $light-gray-500;
+	&.is-hovered:before {
+		border-left-color: $light-gray-500;
+	}
+
+	&.is-selected:before {
+		border-color: $light-gray-500;
 	}
 }
 
@@ -34,7 +47,7 @@
 	position: absolute;
 	bottom: 100%;
 	margin-bottom: -4px;
-	left: 8px;
+	left: 43px;
 }
 
 .editor-visual-editor .editor-inserter {
