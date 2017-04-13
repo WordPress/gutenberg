@@ -36,7 +36,7 @@
     "node": ">=6.9.1"
   },
   "devDependencies": {
-    "ava": "^0.17.0",
+    "ava": "^0.19.1",
     "eslint": "^3.0.0",
     "eslint-config-stylelint": "^6.0.0",
     "eslint-plugin-ava": "^4.0.0",
