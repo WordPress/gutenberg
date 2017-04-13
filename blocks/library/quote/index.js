@@ -5,7 +5,10 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { html, query } = hpq;
+const { parse, html, query } = hpq;
+
+const fromValueToParagraphs = ( value ) => value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' );
+const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -13,9 +16,7 @@ registerBlock( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: ( node ) => query( 'blockquote > p', html() )( node )
-			.map( innerHTML => `<p>${ innerHTML }</p>` )
-			.join( '' ),
+		value: query( 'blockquote > p', html() ),
 		citation: html( 'footer' )
 	},
 
@@ -25,12 +26,20 @@ registerBlock( 'core/quote', {
 		return (
 			<blockquote className="blocks-quote">
 				<Editable
-					value={ value }
-					onChange={ ( newValue ) => setAttributes( { value: newValue } ) } />
+					value={ fromValueToParagraphs( value ) }
+					onChange={
+						( paragraphs ) => setAttributes( {
+							value: fromParagraphsToValue( paragraphs )
+						} )
+					} />
 				<footer>
 					<Editable
 						value={ citation }
-						onChange={ ( newValue ) => setAttributes( { citation: newValue } ) } />
+						onChange={
+							( newValue ) => setAttributes( {
+								citation: newValue
+							} )
+						} />
 				</footer>
 			</blockquote>
 		);
@@ -38,13 +47,20 @@ registerBlock( 'core/quote', {
 
 	save( attributes ) {
 		const { value, citation } = attributes;
-		return [
-			'<blockquote>',
-			value,
-			citation
-				? `<footer>${ citation }</footer>`
-				: '',
-			'</blockquote>'
-		].join( '' );
+
+		return (
+			<blockquote>
+				{ value.map( ( paragraph, i ) => (
+					<p
+						key={ i }
+						dangerouslySetInnerHTML={ {
+							__html: paragraph
+						} } />
+				) ) }
+				<footer dangerouslySetInnerHTML={ {
+					__html: citation
+				} } />
+			</blockquote>
+		);
 	}
 } );

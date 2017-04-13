@@ -38,7 +38,7 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: blocks/library/quote/index.js:11
+#: blocks/library/quote/index.js:14
 msgid "Quote"
 msgstr ""
 
