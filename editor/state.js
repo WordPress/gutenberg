@@ -90,6 +90,9 @@ export const blocks = combineReducers( {
 				}
 
 				return state;
+			case 'MOVE_BLOCK_UP':
+			case 'MOVE_BLOCK_DOWN':
+				return action.uid;
 			case 'INSERT_BLOCK':
 				return action.block.uid;
 		}
