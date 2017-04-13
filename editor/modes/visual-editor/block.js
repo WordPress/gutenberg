@@ -72,12 +72,10 @@ function VisualEditorBlock( props ) {
 						isActive: () => control.isActive( block.attributes )
 					} ) ) } />
 			) : null }
-			<div className="editor-visual-editor__block-edit">
-				<BlockEdit
-					isSelected={ isSelected }
-					attributes={ block.attributes }
-					setAttributes={ setAttributes } />
-			</div>
+			<BlockEdit
+				isSelected={ isSelected }
+				attributes={ block.attributes }
+				setAttributes={ setAttributes } />
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

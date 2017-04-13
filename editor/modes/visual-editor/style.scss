@@ -20,10 +20,7 @@
 	border: 2px solid transparent;
 	transition: 0.2s border-color;
 	margin-left: -35px;
-
-	.editor-visual-editor__block-edit {
-		padding: 15px 15px 15px 50px;
-	}
+	padding: 15px 15px 15px 50px;
 
 	&:before {
 		z-index: -1;
