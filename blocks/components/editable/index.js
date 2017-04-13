@@ -45,7 +45,8 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onInit() {
-		this.editor.setContent( this.props.value );
+		const { value = '' } = this.props;
+		this.editor.setContent( value );
 	}
 
 	onChange() {

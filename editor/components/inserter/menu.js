@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import uuid from 'uuid/v4';
 
 /**
  * Internal dependencies
@@ -29,6 +28,7 @@ class InserterMenu extends wp.element.Component {
 		return () => {
 			this.props.onInsertBlock( slug );
 			this.props.onSelect();
+			this.setState( { filterValue: '' } );
 		};
 	}
 
@@ -89,11 +89,7 @@ export default connect(
 		onInsertBlock( slug ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
-				block: {
-					uid: uuid(),
-					blockType: slug,
-					attributes: {}
-				}
+				block: wp.blocks.createBlock( slug )
 			} );
 		}
 	} )
