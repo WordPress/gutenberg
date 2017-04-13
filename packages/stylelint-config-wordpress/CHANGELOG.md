@@ -6,6 +6,10 @@
 -   Added:  `selector-no-empty` rule.
 -   Fixed:  Removed `@debug` from `ignoreAtRules` array of `at-rule-no-unknown` rule in `stylelint-config-wordpress/scss` chared config.
 -   Added:  `scss/selector-no-redundant-nesting-selector` rule in `stylelint-config-wordpress/scss` chared config.
+-   Deprecated `blockless-group` option for `at-rule-empty-line-before` rule. Use the new `blockless-after-blockless` option instead.
+-   Deprecated `rule-nested-empty-line-before` and `rule-non-nested-empty-line-before` rules. Use the new `rule-empty-line-before` rule instead.
+-   Deprecated `media-feature-no-missing-punctuation` rule.
+-   Deprecated `selector-no-empty` rule.
 
 # 9.1.1
 
