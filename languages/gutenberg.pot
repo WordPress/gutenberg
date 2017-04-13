@@ -38,6 +38,10 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
+#: blocks/library/quote/index.js:11
+msgid "Quote"
+msgstr ""
+
 #: blocks/library/text/index.js:10
 msgid "Text"
 msgstr ""
