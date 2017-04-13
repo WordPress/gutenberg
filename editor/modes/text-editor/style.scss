@@ -1,12 +1,98 @@
+.editor-text-editor__formatting {
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	min-height: 36px;
+
+	button {
+		height: 30px;
+		border: none;
+		background: none;
+		padding: 0 8px;
+		margin: 3px 4px;
+		text-align: center;
+		cursor: pointer;
+		font-family: $editor-html-font;
+		color: $dark-gray-500;
+		border: 1px solid transparent;
+	}
+
+	button:first-child {
+		margin-left: 0;
+	}
+
+	button:hover {
+		border: 1px solid $dark-gray-500;
+	}
+
+	button:focus {
+		outline: none;
+	}
+}
+
+.editor-text-editor__bold {
+	font-weight: bold;
+}
+
+.editor-text-editor__italic {
+	font-style: italic;
+}
+.editor-text-editor__link {
+	text-decoration: underline;
+	color: $blue-medium;
+}
+.editor-text-editor__del {
+	text-decoration:line-through;
+}
+
 .editor-text-editor {
 	display: block;
-	margin: 60px auto 0;
-	width: 700px;
+	padding-top: 60px;
+	padding-bottom: 0;
+	margin: 0;
+	width: 100%;
 	border: none;
 	outline: none;
 	box-shadow: none;
 	resize: none;
-	padding: 0;
 	overflow: hidden;
 	font-family: $editor-html-font;
+	line-height: 150%;
+	transition: padding .2s linear;
+
+	&:focus {
+		box-shadow: none;
+	}
+}
+
+/* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
+.editor-text-editor__formatting,
+.editor-text-editor {
+	padding-left: $item-spacing * 2;
+	padding-right: $item-spacing * 2;
+	max-width: 1440px;
+	margin: 0 auto;
+}
+
+@media only screen and ( min-width: 960px ) {
+	.editor-text-editor__formatting,
+	.editor-text-editor {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+}
+
+@media only screen and ( min-width: 1280px ) {
+	.editor-text-editor__formatting,
+	.editor-text-editor {
+		padding-left: 15%;
+		padding-right: 15%;
+	}
+}
+
+@media only screen and ( min-width: 1440px ) {
+	.editor-text-editor__formatting,
+	.editor-text-editor {
+		padding-left: 200px;
+		padding-right: 200px;
+	}
 }
