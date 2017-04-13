@@ -11,16 +11,16 @@ import { first, last } from 'lodash';
 import './style.scss';
 import IconButton from 'components/icon-button';
 
-function BlockArrangement( { onMoveUp, onMoveDown, isFirst, isLast } ) {
+function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (
-		<div className="editor-arrangement-toolbar">
+		<div className="editor-block-mover">
 			<IconButton
-				className={ classnames( 'editor-arrangement-toolbar__control', { 'is-disabled': isFirst } ) }
+				className={ classnames( 'editor-block-mover__control', { 'is-disabled': isFirst } ) }
 				onClick={ onMoveUp }
 				icon="arrow-up-alt2"
 			/>
 			<IconButton
-				className={ classnames( 'editor-arrangement-toolbar__control', { 'is-disabled': isLast } ) }
+				className={ classnames( 'editor-block-mover__control', { 'is-disabled': isLast } ) }
 				onClick={ onMoveDown }
 				icon="arrow-down-alt2"
 			/>
@@ -47,4 +47,4 @@ export default connect(
 			} );
 		}
 	} )
-)( BlockArrangement );
+)( BlockMover );
