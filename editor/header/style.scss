@@ -8,61 +8,47 @@
 	align-items: center;
 	position: fixed;
 	z-index: 1;
-	top: 32px;
-	left: 160px;
+	top: 46px;
+	left: 0;
 	right: 0;
+}
 
-	/* Responsive and folded */
-	body.folded & {
+.auto-fold .editor-header {
+	@include break-medium() {
 		left: 36px;
+		top: 32px;
 	}
 
-	/* RTL */
-	body.rtl & {
+	@include break-large() {
+		left: 160px;
+	}
+}
+
+/* Sidebar manually collapsed */
+.folded .editor-header {
+	left: 36px;
+}
+
+/* Mobile menu opened */
+.auto-fold .wp-responsive-open .editor-header {
+	left: 190px;
+	right: -190px;
+}
+
+/* RTL */
+.rtl.auto-fold .editor-header {
+	@include break-medium() {
+		left: 0;
+		right: 36px;
+	}
+
+	@include break-large() {
 		left: 0;
 		right: 160px;
 	}
-
-	body.rtl.folded & {
-		left: 0;
-		right: 36px;
-	}
 }
 
-@media only screen and ( max-width: 960px ) {
-	body.auto-fold .editor-header {
-		left: 36px;
-	}
-
-	body.rtl.auto-fold .editor-header {
-		left: 0;
-		right: 36px;
-	}
-}
-
-@media only screen and ( max-width: 782px ) {
-
-	body.auto-fold .editor-header {
-		left: 0;
-	}
-
-	body.rtl.auto-fold .editor-header {
-		left: 0;
-		right: 0;
-	}
-
-	body.auto-fold .wp-responsive-open .editor-header {
-		left: 190px;
-		right: -190px;
-	}
-
-	body.rtl.auto-fold .wp-responsive-open .editor-header {
-		left: -190px;
-		right: 190px;
-	}
-
-	.editor-header {
-		top: 46px;
-	}
-
+.rtl.auto-fold .wp-responsive-open .editor-header {
+	left: -190px;
+	right: 190px;
 }

@@ -2,6 +2,7 @@
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
 	min-height: 36px;
+	position: fixed;
 
 	button {
 		height: 30px;
@@ -29,18 +30,20 @@
 	}
 }
 
-.editor-text-editor__bold {
+.editor-text-editor__formatting .editor-text-editor__bold {
 	font-weight: bold;
 }
 
-.editor-text-editor__italic {
+.editor-text-editor__formatting .editor-text-editor__italic {
 	font-style: italic;
 }
-.editor-text-editor__link {
+
+.editor-text-editor__formatting .editor-text-editor__link {
 	text-decoration: underline;
 	color: $blue-medium;
 }
-.editor-text-editor__del {
+
+.editor-text-editor__formatting .editor-text-editor__del {
 	text-decoration:line-through;
 }
 
@@ -65,7 +68,7 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor__formatting,
+.editor-text-editor__formatting-inner,
 .editor-text-editor {
 	padding-left: $item-spacing * 2;
 	padding-right: $item-spacing * 2;
