@@ -69,29 +69,20 @@
 .editor-text-editor {
 	padding-left: $item-spacing * 2;
 	padding-right: $item-spacing * 2;
-	max-width: 1440px;
+	max-width: $break-huge;
 	margin: 0 auto;
-}
 
-@media only screen and ( min-width: 960px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
+	@include break-large() {
 		padding-left: 10%;
 		padding-right: 10%;
 	}
-}
 
-@media only screen and ( min-width: 1280px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
+	@include break-wide() {
 		padding-left: 15%;
 		padding-right: 15%;
 	}
-}
 
-@media only screen and ( min-width: 1440px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
+	@include break-huge() {
 		padding-left: 200px;
 		padding-right: 200px;
 	}

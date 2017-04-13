@@ -40,3 +40,43 @@ $editor-font-size: 16px;
 $editor-line-height: 1.8em;
 $item-spacing: 10px;
 $header-height: 56px;
+
+/* Media Queries */
+
+/* All media queries currently in WordPress:
+
+min-width: 2000px
+min-width: 1680px
+min-width: 1250px
+max-width: 1120px *
+max-width: 1000px
+min-width: 769px and max-width: 1000px
+max-width: 960px *
+max-width: 900px
+max-width: 850px
+min-width: 800px and max-width: 1499px
+max-width: 800px
+max-width: 799px
+max-width: 782px *
+max-width: 768px
+max-width: 640px *
+max-width: 600px *
+max-width: 520px
+max-width: 500px
+max-width: 480px *
+max-width: 400px *
+max-width: 380px
+max-width: 320px *
+
+Those marked * seem to be more commonly used than the others.
+
+Let's try and use as few of these as possible, and be mindful about adding new ones, so we don't make the situation worse
+
+*/
+
+$break-huge: 1440px;
+$break-wide: 1280px;
+$break-large: 960px;
+$break-medium: 782px;
+$break-small: 640px;
+$break-mobile: 480px;
