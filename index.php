@@ -119,9 +119,8 @@ function gutenberg_get_jed_locale_data( $domain ) {
 		)
 	);
 
-	$plural_forms = $translations->headers['Plural-Forms'];
-	if ( ! empty( $plural_forms ) ) {
-		$locale['locale_data'][ $domain ]['']['plural_forms'] = $plural_forms;
+	if ( ! empty( $translations->headers['Plural-Forms'] ) ) {
+		$locale['locale_data'][ $domain ]['']['plural_forms'] = $translations->headers['Plural-Forms'];
 	}
 
 	foreach ( $translations->entries as $msgid => $entry ) {
