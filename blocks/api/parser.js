@@ -45,6 +45,24 @@ export function getBlockAttributes( blockNode, blockSettings ) {
 	return attrs;
 }
 
+function htmlEscape(str) {
+	return str
+		.replace( /&/g, '&amp;' )
+		.replace( /"/g, '&quot;' )
+		.replace( /'/g, '&#39;' )
+		.replace( /</g, '&lt;' )
+		.replace( />/g, '&gt;' );
+}
+
+function htmlUnescape(str){
+	return str
+		.replace( /&quot;/g, '"' )
+		.replace( /&#39;/g, "'" )
+		.replace( /&lt;/g, '<' )
+		.replace( /&gt;/g, '>' )
+		.replace( /&amp;/g, '&' );
+}
+
 /**
  * Returns a list of blocks extracted from the Post Content
  *
@@ -52,24 +70,101 @@ export function getBlockAttributes( blockNode, blockSettings ) {
  * @return {Array}          Block list
  */
 export default function parse( content ) {
-	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		// Use type from block node, otherwise find unknown handler
-		let { blockType = getUnknownTypeHandler() } = blockNode;
-
-		// Try finding settings for known block type, else again fall back
-		let settings = getBlockSettings( blockType );
-		if ( ! settings ) {
-			blockType = getUnknownTypeHandler();
-			settings = getBlockSettings( blockType );
+	// First, convert comment delimiters into temporary <wp-block> "tags" so
+	// that TinyMCE can parse them.  Examples:
+	//   In  : <!-- wp:core/text -->
+	//   Out : <wp-block slug="core/text">
+	//   In  : <!-- /wp:core/text -->
+	//   Out : </wp-block>
+	//   In  : <!-- wp:core/embed url:youtube.com/xxx& -->
+	//   Out : <wp-block slug="core/embed" attributes="url:youtube.com/xxx&amp;">
+	content = content.replace(
+		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+:[^\s]+)*)\s*-->/g,
+		function( match, closingSlash, slug, attributes ) {
+			if ( closingSlash ) {
+				return '</wp-block>';
+			} else {
+				if ( attributes ) {
+					attributes = ' attributes="' + htmlEscape( attributes.trim() ) + '"';
+				}
+				return '<wp-block slug="' + slug + '"' + attributes + '>';
+			}
 		}
+	);
 
-		// Include in set only if settings were determined
-		if ( settings ) {
-			memo.push(
-				createBlock( blockType, getBlockAttributes( blockNode, settings ) )
-			);
+	// Create a custom HTML schema
+	const schema = new tinymce.html.Schema();
+	// Add <wp-block> "tags" to our schema
+	schema.addCustomElements( 'wp-block' );
+	// Add valid <wp-block> "attributes" also
+	schema.addValidElements( 'wp-block[slug|attributes]' );
+	// Initialize the parser with our custom schema
+	const parser = new tinymce.html.DomParser( { validate: true }, schema );
+
+	// Parse the content into an object tree
+	const tree = parser.parse( content );
+	window.tree = tree;
+
+	// Create a serializer that we will use to pass strings to blocks.
+	// TODO: pass parse trees instead, and verify them against the markup
+	// shapes that each block can accept.
+	const serializer = new tinymce.html.Serializer( { validate: true }, schema );
+
+	// Walk the tree and initialize blocks
+	const blocks = [];
+
+	// Store markup we found in between blocks
+	let betweenBlocks = new tinymce.html.Node( 'body', 11 );
+
+	let currentNode = tree.firstChild;
+	do {
+		if ( currentNode.name === 'wp-block' ) {
+			// set node type to document fragment so that the TinyMCE
+			// serializer doesn't output its markup
+			currentNode.type = 11;
+
+			const nodeAttributes = currentNode.attributes.reduce( ( memo, attr ) => {
+				memo[ attr.name ] = attr.value;
+				return memo;
+			}, {} );
+
+			// Use type from block node, otherwise find unknown handler
+			let blockType = nodeAttributes.slug || getUnknownTypeHandler();
+
+			// Try finding settings for known block type, else again fall back
+			let settings = getBlockSettings( blockType );
+			if ( ! settings ) {
+				blockType = getUnknownTypeHandler();
+				settings = getBlockSettings( blockType );
+			}
+
+			// Include in set only if settings were determined
+			if ( settings ) {
+				const rawContent = serializer.serialize( currentNode );
+				const blockAttributes = htmlUnescape( nodeAttributes.attributes || '' )
+					.split( /\s+/ )
+					.reduce( ( memo, attrString ) => {
+						const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
+						if ( pieces ) {
+							memo[ pieces[ 1 ] ] = pieces[ 2 ];
+						}
+						return memo;
+					}, {} );
+
+				// TODO: allow blocks to opt-in to receiving a tree instead of
+				// a string.  Gradually convert all blocks to this new format,
+				// then remove the string serialization.
+				const blockNode = { rawContent, attrs: blockAttributes };
+				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
+				console.log( rawContent, block );
+				blocks.push( block );
+			}
+		} else {
+			// TODO: store HTML outside of blocks and pass it off to a "freeform" block
+			// TODO: later on, match these nodes against block markup
+			console.log( 'root-level node not wp-block', currentNode );
 		}
+	} while ( currentNode = currentNode.next );
 
-		return memo;
-	}, [] );
+	return blocks;
 }
