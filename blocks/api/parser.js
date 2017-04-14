@@ -102,7 +102,6 @@ export default function parse( content ) {
 
 	// Parse the content into an object tree
 	const tree = parser.parse( content );
-	window.tree = tree;
 
 	// Create a serializer that we will use to pass strings to blocks.
 	// TODO: pass parse trees instead, and verify them against the markup
@@ -155,7 +154,6 @@ export default function parse( content ) {
 				// then remove the string serialization.
 				const blockNode = { rawContent, attrs: blockAttributes };
 				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
-				console.log( rawContent, block );
 				blocks.push( block );
 			}
 		} else {
