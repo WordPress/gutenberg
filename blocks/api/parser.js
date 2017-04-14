@@ -6,7 +6,6 @@ import * as query from 'hpq';
 /**
  * Internal dependencies
  */
-import { parse as grammarParse } from './post.pegjs';
 import { getBlockSettings, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
 
