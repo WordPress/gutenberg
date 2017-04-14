@@ -1,7 +1,7 @@
 .editor-icon-button {
 	display: flex;
 	align-items: center;
-	width: 36px;
+	min-width: 36px;
 	height: 36px;
 	border: none;
 	background: none;
@@ -13,5 +13,9 @@
 		&:hover {
 			color: $blue-medium;
 		}
+	}
+
+	span {
+		font-size: 12px;
 	}
 }

@@ -20,6 +20,7 @@ function Toolbar( { controls } ) {
 				<IconButton
 					key={ index }
 					icon={ control.icon }
+					text={ control.text }
 					label={ control.title }
 					onClick={ ( event ) => {
 						event.stopPropagation();

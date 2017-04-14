@@ -20,30 +20,15 @@ registerBlock( 'core/heading', {
 	},
 
 	controls: [
-		{
-			icon: 'editor-alignleft',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => ! align || 'left' === align,
+		...'123456'.split( '' ).map( ( level ) => ( {
+			icon: 'editor-alignleft', // TODO
+			text: level,
+			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+			isActive: ( { tag } ) => 'H' + level === tag,
 			onClick( attributes, setAttributes ) {
-				setAttributes( { align: undefined } );
+				setAttributes( { tag: 'H' + level } );
 			}
-		},
-		{
-			icon: 'editor-aligncenter',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'center' } );
-			}
-		},
-		{
-			icon: 'editor-alignright',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'right' } );
-			}
-		}
+		} ) )
 	],
 
 	edit( { attributes, setAttributes } ) {
@@ -60,8 +45,7 @@ registerBlock( 'core/heading', {
 	},
 
 	save( { attributes } ) {
-		const { align, tag, content } = attributes;
-		const Tag = tag;
+		const { align, tag: Tag, content } = attributes;
 
 		return (
 			<Tag

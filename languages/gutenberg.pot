@@ -11,6 +11,18 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: blocks/library/heading/index.js:26
+msgid "Heading %s"
+msgstr ""
+
+#: blocks/library/image/index.js:10
+msgid "Image"
+msgstr ""
+
+#: blocks/library/image/index.js:31
+msgid "Write caption…"
+msgstr ""
+
 #: blocks/library/heading/index.js:25
 #: blocks/library/list/index.js:25
 #: blocks/library/text/index.js:24
@@ -27,14 +39,6 @@ msgstr ""
 #: blocks/library/list/index.js:41
 #: blocks/library/text/index.js:40
 msgid "Align right"
-msgstr ""
-
-#: blocks/library/image/index.js:10
-msgid "Image"
-msgstr ""
-
-#: blocks/library/image/index.js:31
-msgid "Write caption…"
 msgstr ""
 
 #: blocks/library/list/index.js:11
