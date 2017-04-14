@@ -44,7 +44,7 @@ export function getBlockAttributes( blockNode, blockSettings ) {
 	return attrs;
 }
 
-function htmlEscape(str) {
+function htmlEscape( str ) {
 	return str
 		.replace( /&/g, '&amp;' )
 		.replace( /"/g, '&quot;' )
@@ -53,10 +53,10 @@ function htmlEscape(str) {
 		.replace( />/g, '&gt;' );
 }
 
-function htmlUnescape(str){
+function htmlUnescape( str ) {
 	return str
 		.replace( /&quot;/g, '"' )
-		.replace( /&#39;/g, "'" )
+		.replace( /&#39;/g, '\'' )
 		.replace( /&lt;/g, '<' )
 		.replace( /&gt;/g, '>' )
 		.replace( /&amp;/g, '&' );
@@ -82,12 +82,12 @@ export default function parse( content ) {
 		function( match, closingSlash, slug, attributes ) {
 			if ( closingSlash ) {
 				return '</wp-block>';
-			} else {
-				if ( attributes ) {
-					attributes = ' attributes="' + htmlEscape( attributes.trim() ) + '"';
-				}
-				return '<wp-block slug="' + slug + '"' + attributes + '>';
 			}
+
+			if ( attributes ) {
+				attributes = ' attributes="' + htmlEscape( attributes.trim() ) + '"';
+			}
+			return '<wp-block slug="' + slug + '"' + attributes + '>';
 		}
 	);
 
@@ -112,7 +112,7 @@ export default function parse( content ) {
 	const blocks = [];
 
 	// Store markup we found in between blocks
-	let betweenBlocks = new tinymce.html.Node( 'body', 11 );
+	// let betweenBlocks = new tinymce.html.Node( 'body', 11 );
 
 	let currentNode = tree.firstChild;
 	do {
@@ -159,9 +159,11 @@ export default function parse( content ) {
 		} else {
 			// TODO: store HTML outside of blocks and pass it off to a "freeform" block
 			// TODO: later on, match these nodes against block markup
-			console.log( 'root-level node not wp-block', currentNode );
+			console.log( 'root-level node not wp-block', currentNode ); // eslint-disable-line no-console
 		}
-	} while ( currentNode = currentNode.next );
+
+		currentNode = currentNode.next;
+	} while ( currentNode );
 
 	return blocks;
 }
