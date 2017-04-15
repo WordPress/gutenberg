@@ -1,6 +1,6 @@
 # HEAD
 
--   Removed:  `stylelint < 7.5.0` compatibility.
+-   Removed:  `stylelint < 7.10.1` compatibility.
 -   Removed:  NodeJS 4.x support, `stylelint` and `stylelint-config-wordpress` now require NodeJS > 6.9.1 LTS or greater
 -   Added:  NodeJS 7.x.x support
 -   Added:  `selector-no-empty` rule.
