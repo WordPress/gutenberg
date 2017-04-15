@@ -1,37 +1,174 @@
-import fs from "fs"
-import config from "../scss.js"
-import stylelint from "stylelint"
-import test from "ava"
+"use strict"
+
+const fs = require("fs")
+const config = require("../scss.js")
+const stylelint = require("stylelint")
 
 const validScss = fs.readFileSync("./__tests__/selectors-valid.scss", "utf-8")
 const invalidScss = fs.readFileSync("./__tests__/selectors-invalid.scss", "utf-8")
 
-test("There are no warnings with values SCSS", async t => {
-  const data = await stylelint.lint({
-    code: validScss,
-    config,
-    syntax: "scss",
+describe("flags no warnings with valid selectors scss", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: validScss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.falsy(errored, "no errored")
-  t.is(warnings.length, 0, "flags no warnings")
+  it("did not error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeFalsy()
+    ))
+  })
+
+  it("flags no warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(0)
+    ))
+  })
 })
 
-test("There are warnings with invalid values SCSS", async t => {
-  const data = await stylelint.lint({
-    code: invalidScss,
-    config,
-    syntax: "scss",
+describe("flags warnings with invalid selectors scss", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: invalidScss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.truthy(errored, "errored")
-  t.is(warnings.length, 4, "flags one warning")
-  t.is(warnings[0].text, "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)", "correct warning text")
-  t.is(warnings[1].text, "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)", "correct warning text")
-  t.is(warnings[2].text, "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)", "correct warning text")
-  t.is(warnings[3].text, "Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)", "correct warning text")
+  it("did error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeTruthy()
+    ))
+  })
+
+  it("flags four warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(4)
+    ))
+  })
+
+  it("correct first warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].text).toBe("Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)")
+    ))
+  })
+
+  it("correct first warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].rule).toBe("scss/selector-no-redundant-nesting-selector")
+    ))
+  })
+
+  it("correct first warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].severity).toBe("error")
+    ))
+  })
+
+  it("correct first warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].line).toBe(3)
+    ))
+  })
+
+  it("correct first warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].column).toBe(2)
+    ))
+  })
+
+  it("correct second warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].text).toBe("Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)")
+    ))
+  })
+
+  it("correct second warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].rule).toBe("scss/selector-no-redundant-nesting-selector")
+    ))
+  })
+
+  it("correct second warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].severity).toBe("error")
+    ))
+  })
+
+  it("correct second warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].line).toBe(9)
+    ))
+  })
+
+  it("correct second warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].column).toBe(2)
+    ))
+  })
+
+  it("correct third warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].text).toBe("Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)")
+    ))
+  })
+
+  it("correct third warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].rule).toBe("scss/selector-no-redundant-nesting-selector")
+    ))
+  })
+
+  it("correct third warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].severity).toBe("error")
+    ))
+  })
+
+  it("correct third warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].line).toBe(14)
+    ))
+  })
+
+  it("correct third warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].column).toBe(2)
+    ))
+  })
+
+  it("correct forth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].text).toBe("Unnecessary nesting selector (&) (scss/selector-no-redundant-nesting-selector)")
+    ))
+  })
+
+  it("correct forth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].rule).toBe("scss/selector-no-redundant-nesting-selector")
+    ))
+  })
+
+  it("correct forth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].severity).toBe("error")
+    ))
+  })
+
+  it("correct forth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].line).toBe(19)
+    ))
+  })
+
+  it("correct forth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].column).toBe(2)
+    ))
+  })
 })

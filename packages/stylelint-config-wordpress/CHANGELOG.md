@@ -10,6 +10,7 @@
 -   Deprecated `rule-nested-empty-line-before` and `rule-non-nested-empty-line-before` rules. Use the new `rule-empty-line-before` rule instead.
 -   Deprecated `media-feature-no-missing-punctuation` rule.
 -   Deprecated `selector-no-empty` rule.
+-   Refactor:  Switch from AVA to Jest for tests.
 
 # 9.1.1
 

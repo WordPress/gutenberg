@@ -1,39 +1,294 @@
-import fs from "fs"
-import config from "../"
-import stylelint from "stylelint"
-import test from "ava"
+"use strict"
+
+const fs = require("fs")
+const config = require("../")
+const stylelint = require("stylelint")
 
 const validCss = fs.readFileSync("./__tests__/values-valid.css", "utf-8")
 const invalidCss = fs.readFileSync("./__tests__/values-invalid.css", "utf-8")
 
-test("There are no warnings with values CSS", async t => {
-  const data = await stylelint.lint({
-    code: validCss,
-    config,
+describe("flags no warnings with valid values css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: validCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.falsy(errored, "no errored")
-  t.is(warnings.length, 0, "flags no warnings")
+  it("did not error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeFalsy()
+    ))
+  })
+
+  it("flags no warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(0)
+    ))
+  })
 })
 
-test("There are warnings with invalid values CSS", async t => {
-  const data = await stylelint.lint({
-    code: invalidCss,
-    config,
+describe("flags warnings with invalid values css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: invalidCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.truthy(errored, "errored")
-  t.is(warnings.length, 8, "flags eight warnings")
-  t.is(warnings[0].text, "Expected a trailing semicolon (declaration-block-trailing-semicolon)", "correct warning text")
-  t.is(warnings[1].text, "Expected single space after \":\" with a single-line declaration (declaration-colon-space-after)", "correct warning text")
-  t.is(warnings[2].text, "Expected quotes around \"Times New Roman\" (font-family-name-quotes)", "correct warning text")
-  t.is(warnings[3].text, "Expected numeric font-weight notation (font-weight-notation)", "correct warning text")
-  t.is(warnings[4].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-  t.is(warnings[5].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-  t.is(warnings[6].text, "Unexpected unit (length-zero-no-unit)", "correct warning text")
-  t.is(warnings[7].text, "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)", "correct warning text")
+  it("did error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeTruthy()
+    ))
+  })
+
+  it("flags eight warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(8)
+    ))
+  })
+
+  it("correct first warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].text).toBe("Expected a trailing semicolon (declaration-block-trailing-semicolon)")
+    ))
+  })
+
+  it("correct first warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].rule).toBe("declaration-block-trailing-semicolon")
+    ))
+  })
+
+  it("correct first warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].severity).toBe("error")
+    ))
+  })
+
+  it("correct first warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].line).toBe(2)
+    ))
+  })
+
+  it("correct first warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].column).toBe(16)
+    ))
+  })
+
+  it("correct second warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].text).toBe("Expected single space after \":\" with a single-line declaration (declaration-colon-space-after)")
+    ))
+  })
+
+  it("correct second warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].rule).toBe("declaration-colon-space-after")
+    ))
+  })
+
+  it("correct second warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].severity).toBe("error")
+    ))
+  })
+
+  it("correct second warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].line).toBe(2)
+    ))
+  })
+
+  it("correct second warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].column).toBe(13)
+    ))
+  })
+
+  it("correct third warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].text).toBe("Expected quotes around \"Times New Roman\" (font-family-name-quotes)")
+    ))
+  })
+
+  it("correct third warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].rule).toBe("font-family-name-quotes")
+    ))
+  })
+
+  it("correct third warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].severity).toBe("error")
+    ))
+  })
+
+  it("correct third warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].line).toBe(10)
+    ))
+  })
+
+  it("correct third warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].column).toBe(15)
+    ))
+  })
+
+  it("correct forth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].text).toBe("Expected numeric font-weight notation (font-weight-notation)")
+    ))
+  })
+
+  it("correct forth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].rule).toBe("font-weight-notation")
+    ))
+  })
+
+  it("correct forth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].severity).toBe("error")
+    ))
+  })
+
+  it("correct forth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].line).toBe(11)
+    ))
+  })
+
+  it("correct forth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].column).toBe(15)
+    ))
+  })
+
+  it("correct fifth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].text).toBe("Unexpected unit (length-zero-no-unit)")
+    ))
+  })
+
+  it("correct fifth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].rule).toBe("length-zero-no-unit")
+    ))
+  })
+
+  it("correct fifth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].severity).toBe("error")
+    ))
+  })
+
+  it("correct fifth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].line).toBe(6)
+    ))
+  })
+
+  it("correct fifth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].column).toBe(11)
+    ))
+  })
+
+  it("correct sixth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].text).toBe("Unexpected unit (length-zero-no-unit)")
+    ))
+  })
+
+  it("correct sixth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].rule).toBe("length-zero-no-unit")
+    ))
+  })
+
+  it("correct sixth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].severity).toBe("error")
+    ))
+  })
+
+  it("correct sixth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].line).toBe(6)
+    ))
+  })
+
+  it("correct sixth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].column).toBe(15)
+    ))
+  })
+
+  it("correct seventh warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[6].text).toBe("Unexpected unit (length-zero-no-unit)")
+    ))
+  })
+
+  it("correct seventh warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[6].rule).toBe("length-zero-no-unit")
+    ))
+  })
+
+  it("correct seventh warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[6].severity).toBe("error")
+    ))
+  })
+
+  it("correct seventh warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[6].line).toBe(6)
+    ))
+  })
+
+  it("correct seventh warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[6].column).toBe(24)
+    ))
+  })
+
+  it("correct eighth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[7].text).toBe("Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)")
+    ))
+  })
+
+  it("correct eighth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[7].rule).toBe("shorthand-property-no-redundant-values")
+    ))
+  })
+
+  it("correct eighth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[7].severity).toBe("error")
+    ))
+  })
+
+  it("correct eighth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[7].line).toBe(6)
+    ))
+  })
+
+  it("correct eighth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[7].column).toBe(2)
+    ))
+  })
 })

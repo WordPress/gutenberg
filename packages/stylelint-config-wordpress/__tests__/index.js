@@ -1,32 +1,84 @@
-import fs from "fs"
-import config from "../"
-import stylelint from "stylelint"
-import test from "ava"
+"use strict"
+
+const fs = require("fs")
+const config = require("../")
+const stylelint = require("stylelint")
 
 const validCss = fs.readFileSync("./__tests__/css-valid.css", "utf-8")
 const invalidCss = fs.readFileSync("./__tests__/css-invalid.css", "utf-8")
 
-test("no warnings with valid css", async t => {
-  const data = await stylelint.lint({
-    code: validCss,
-    config,
+describe("flags no warnings with valid css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: validCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.falsy(errored, "no errored")
-  t.is(warnings.length, 0, "flags no warnings")
+  it("did not error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeFalsy()
+    ))
+  })
+
+  it("flags no warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(0)
+    ))
+  })
 })
 
-test("a warning with invalid css", async t => {
-  const data = await stylelint.lint({
-    code: invalidCss,
-    config,
+describe("flags warnings with invalid css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: invalidCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.truthy(errored, "errored")
-  t.is(warnings.length, 1, "flags one warning")
-  t.is(warnings[0].text, "Expected a leading zero (number-leading-zero)", "correct warning text")
+  it("did error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeTruthy()
+    ))
+  })
+
+  it("flags one warning", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(1)
+    ))
+  })
+
+  it("correct warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].text).toBe("Expected a leading zero (number-leading-zero)")
+    ))
+  })
+
+  it("correct rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].rule).toBe("number-leading-zero")
+    ))
+  })
+
+  it("correct severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].severity).toBe("error")
+    ))
+  })
+
+  it("correct line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].line).toBe(2)
+    ))
+  })
+
+  it("correct column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].column).toBe(7)
+    ))
+  })
 })

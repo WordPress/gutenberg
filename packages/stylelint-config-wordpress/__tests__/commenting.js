@@ -1,34 +1,144 @@
-import fs from "fs"
-import config from "../"
-import stylelint from "stylelint"
-import test from "ava"
+"use strict"
+
+const fs = require("fs")
+const config = require("../")
+const stylelint = require("stylelint")
 
 const validCss = fs.readFileSync("./__tests__/commenting-valid.css", "utf-8")
 const invalidCss = fs.readFileSync("./__tests__/commenting-invalid.css", "utf-8")
 
-test("There are no warnings with commenting CSS", async t => {
-  const data = await stylelint.lint({
-    code: validCss,
-    config,
+describe("flags no warnings with valid commenting css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: validCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.falsy(errored, "no errored")
-  t.is(warnings.length, 0, "flags no warnings")
+  it("did not error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeFalsy()
+    ))
+  })
+
+  it("flags no warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(0)
+    ))
+  })
 })
 
-test("There are warnings with invalid commenting CSS", async t => {
-  const data = await stylelint.lint({
-    code: invalidCss,
-    config,
+describe("flags warnings with invalid commenting css", () => {
+  let result
+
+  beforeEach(() => {
+    result = stylelint.lint({
+      code: invalidCss,
+      config,
+    })
   })
 
-  const { errored, results } = data
-  const { warnings } = results[0]
-  t.truthy(errored, "errored")
-  t.is(warnings.length, 3, "flags three warnings")
-  t.is(warnings[0].text, "Expected empty line before comment (comment-empty-line-before)", "correct warning text")
-  t.is(warnings[1].text, "Expected empty line before comment (comment-empty-line-before)", "correct warning text")
-  t.is(warnings[2].text, "Expected line length to be no more than 80 characters (max-line-length)", "correct warning text")
+  it("did error", () => {
+    return result.then(data => (
+      expect(data.errored).toBeTruthy()
+    ))
+  })
+
+  it("flags three warnings", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings.length).toBe(3)
+    ))
+  })
+
+  it("correct first warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].text).toBe("Expected empty line before comment (comment-empty-line-before)")
+    ))
+  })
+
+  it("correct first warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].rule).toBe("comment-empty-line-before")
+    ))
+  })
+
+  it("correct first warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].severity).toBe("error")
+    ))
+  })
+
+  it("correct first warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].line).toBe(9)
+    ))
+  })
+
+  it("correct first warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[0].column).toBe(1)
+    ))
+  })
+
+  it("correct second warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].text).toBe("Expected empty line before comment (comment-empty-line-before)")
+    ))
+  })
+
+  it("correct second warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].rule).toBe("comment-empty-line-before")
+    ))
+  })
+
+  it("correct second warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].severity).toBe("error")
+    ))
+  })
+
+  it("correct second warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].line).toBe(18)
+    ))
+  })
+
+  it("correct second warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[1].column).toBe(1)
+    ))
+  })
+
+  it("correct third warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].text).toBe("Expected line length to be no more than 80 characters (max-line-length)")
+    ))
+  })
+
+  it("correct third warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].rule).toBe("max-line-length")
+    ))
+  })
+
+  it("correct third warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].severity).toBe("error")
+    ))
+  })
+
+  it("correct third warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].line).toBe(24)
+    ))
+  })
+
+  it("correct third warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].column).toBe(131)
+    ))
+  })
 })

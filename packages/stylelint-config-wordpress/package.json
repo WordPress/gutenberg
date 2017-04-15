@@ -36,10 +36,10 @@
     "node": ">=6.9.1"
   },
   "devDependencies": {
-    "ava": "^0.19.1",
     "eslint": "^3.0.0",
     "eslint-config-stylelint": "^6.0.0",
     "eslint-plugin-ava": "^4.0.0",
+    "jest": "^19.0.2",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
     "remark-cli": "^3.0.0",
@@ -51,18 +51,13 @@
     "stylelint": "^7.5.0"
   },
   "scripts": {
-    "ava": "ava --verbose \"__tests__/**/*.js\"",
     "lint:js": "eslint . --ignore-path .gitignore",
     "lint:md": "remark . --quiet --frail",
     "lint": "npm-run-all --parallel lint:*",
     "pretest": "npm run lint",
     "release": "npmpub --verbose",
-    "test": "npm run ava"
-  },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
+    "test": "jest",
+    "watch": "jest --watch"
   },
   "eslintConfig": {
     "parserOptions": {
@@ -72,9 +67,15 @@
       "ava"
     ],
     "extends": [
-      "stylelint",
-      "plugin:ava/recommended"
-    ]
+      "stylelint"
+    ],
+    "env": {
+      "jest": true
+    }
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true
   },
   "remarkConfig": {
     "presets": [

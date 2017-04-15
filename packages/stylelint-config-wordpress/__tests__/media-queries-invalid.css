@@ -33,7 +33,7 @@
 	/* Your selectors */
 }
 
-@media screen and (color), projection and (color) {}
+@media screen and (color) , projection and (color) {}
 
 @media screen and (color) ,
 	projection and (color) {}
