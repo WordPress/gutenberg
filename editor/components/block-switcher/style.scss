@@ -1,0 +1,89 @@
+.editor-block-switcher {
+	border: 1px solid $light-gray-500;
+	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
+	background-color: $white;
+	margin-right: 10px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+}
+
+.editor-block-switcher__toggle {
+	width: auto;
+	margin: 3px;
+}
+
+.editor-block-switcher__arrow {
+	display: inline-flex;
+	border: 6px dashed $dark-gray-500;
+	margin-left: 5px;
+	height: 0;
+	line-height: 0;
+	width: 0;
+	z-index: 1;
+	border-top-style: solid;
+	border-bottom: none;
+	border-left-color: transparent;
+	border-right-color: transparent;
+}
+
+.editor-block-switcher__menu {
+	position: absolute;
+	top: 50px;
+	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
+	border: 1px solid #e0e5e9;
+	background: #fff;
+	z-index: 1;
+
+	input {
+		font-size: 13px;
+	}
+}
+
+.editor-block-switcher__menu-arrow {
+	border: 10px dashed $light-gray-500;
+	height: 0;
+	line-height: 0;
+	position: absolute;
+	width: 0;
+	z-index: 1;
+	top: -10px;
+	left: 50%;
+	margin-left: -10px;
+	border-bottom-style: solid;
+	border-top: none;
+	border-left-color: transparent;
+	border-right-color: transparent;
+
+	&:before {
+		top: 2px;
+		border: 10px solid $white;
+		content: " ";
+		position: absolute;
+		left: 50%;
+		margin-left: -10px;
+		border-bottom-style: solid;
+		border-top: none;
+		border-left-color: transparent;
+		border-right-color: transparent;
+	}
+}
+
+.editor-block-switcher__menu-item {
+	width: auto;
+	margin: 3px;
+	padding: 6px;
+	background: none;
+	border: 1px solid transparent;
+	outline: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+
+	&:hover {
+		border-color: $dark-gray-500;
+	}
+
+	.dashicon {
+		margin-right: 5px;
+	}
+}

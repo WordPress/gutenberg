@@ -37,6 +37,12 @@ export const blocks = combineUndoableReducers( {
 					...state,
 					[ action.block.uid ]: action.block
 				};
+
+			case 'SWITCH_BLOCK_TYPE':
+				return {
+					...state,
+					[ action.uid ]: action.block
+				};
 		}
 
 		return state;

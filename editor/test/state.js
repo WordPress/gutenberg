@@ -88,6 +88,28 @@ describe( 'state', () => {
 			expect( state.order ).to.eql( [ 'chicken', 'ribs' ] );
 		} );
 
+		it( 'should switch the block', () => {
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
+			} );
+			const state = blocks( original, {
+				type: 'SWITCH_BLOCK_TYPE',
+				uid: 'chicken',
+				block: {
+					uid: 'chicken',
+					blockType: 'core/freeform'
+				}
+			} );
+
+			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
+			expect( values( state.byUid )[ 0 ].blockType ).to.equal( 'core/freeform' );
+		} );
+
 		it( 'should move the block up', () => {
 			const original = blocks( undefined, {
 				type: 'REPLACE_BLOCKS',

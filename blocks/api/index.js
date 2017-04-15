@@ -4,7 +4,7 @@
 import * as query from 'hpq';
 
 export { query };
-export { createBlock } from './factory';
+export { createBlock, switchToBlockType } from './factory';
 export { default as parse } from './parser';
 export { default as serialize } from './serializer';
 export { getCategories } from './categories';

@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import Toolbar from 'components/toolbar';
 import BlockMover from 'components/block-mover';
+import BlockSwitcher from 'components/block-switcher';
 
 function VisualEditorBlock( props ) {
 	const { block } = props;
@@ -64,14 +65,17 @@ function VisualEditorBlock( props ) {
 			className={ className }
 		>
 			{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
-			{ isSelected && settings.controls ? (
-				<Toolbar
-					controls={ settings.controls.map( ( control ) => ( {
-						...control,
-						onClick: () => control.onClick( block.attributes, setAttributes ),
-						isActive: () => control.isActive( block.attributes )
-					} ) ) } />
-			) : null }
+			<div className="editor-visual-editor__block_controls">
+				{ isSelected && <BlockSwitcher uid={ block.uid } /> }
+				{ isSelected && settings.controls ? (
+					<Toolbar
+						controls={ settings.controls.map( ( control ) => ( {
+							...control,
+							onClick: () => control.onClick( block.attributes, setAttributes ),
+							isActive: () => control.isActive( block.attributes )
+						} ) ) } />
+				) : null }
+			</div>
 			<BlockEdit
 				isSelected={ isSelected }
 				attributes={ block.attributes }

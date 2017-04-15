@@ -6,9 +6,17 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import { createBlock } from '../factory';
+import { createBlock, switchToBlockType } from '../factory';
+import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
 
 describe( 'block factory', () => {
+	afterEach( () => {
+		setUnknownTypeHandler( undefined );
+		getBlocks().forEach( ( block ) => {
+			unregisterBlock( block.slug );
+		} );
+	} );
+
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType and attributes', () => {
 			const block = createBlock( 'core/test-block', {
@@ -20,6 +28,57 @@ describe( 'block factory', () => {
 				align: 'left'
 			} );
 			expect( block.uid ).to.be.a( 'string' );
+		} );
+	} );
+
+	describe( 'switchBlockType()', () => {
+		it( 'should switch the blockType of a block', () => {
+			registerBlock( 'core/updated-text-block', {
+				transformations: [ {
+					blocks: [ 'core/text-block' ],
+					transform: ( { value } ) => {
+						return {
+							value: 'chicken ' + value
+						};
+					}
+				} ]
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updateBlock ).to.eql( {
+				uid: 1,
+				blockType: 'core/updated-text-block',
+				attributes: {
+					value: 'chicken ribs'
+				}
+			} );
+		} );
+
+		it( 'should return null if no transformation is found', () => {
+			registerBlock( 'core/updated-text-block', {
+				transformations: []
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updateBlock ).to.be.null();
 		} );
 	} );
 } );
