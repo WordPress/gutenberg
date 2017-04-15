@@ -46,9 +46,9 @@ describe("flags warnings with invalid scss", () => {
     ))
   })
 
-  it("flags two warnings", () => {
+  it("flags six warnings", () => {
     return result.then(data => (
-      expect(data.results[0].warnings.length).toBe(2)
+      expect(data.results[0].warnings.length).toBe(6)
     ))
   })
 
@@ -109,6 +109,126 @@ describe("flags warnings with invalid scss", () => {
   it("correct second warning column number", () => {
     return result.then(data => (
       expect(data.results[0].warnings[1].column).toBe(2)
+    ))
+  })
+
+  it("correct third warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].text).toBe("Expected single space before \"{\" (block-opening-brace-space-before)")
+    ))
+  })
+
+  it("correct third warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].rule).toBe("block-opening-brace-space-before")
+    ))
+  })
+
+  it("correct third warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].severity).toBe("error")
+    ))
+  })
+
+  it("correct third warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].line).toBe(14)
+    ))
+  })
+
+  it("correct third warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].column).toBe(5)
+    ))
+  })
+
+  it("correct forth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].text).toBe("Unxpected empty line before @else (scss/at-else-empty-line-before)")
+    ))
+  })
+
+  it("correct forth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].rule).toBe("scss/at-else-empty-line-before")
+    ))
+  })
+
+  it("correct forth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].severity).toBe("error")
+    ))
+  })
+
+  it("correct forth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].line).toBe(14)
+    ))
+  })
+
+  it("correct forth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[3].column).toBe(1)
+    ))
+  })
+
+  it("correct fifth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].text).toBe("Unexpected newline after \"}\" of @if statement (scss/at-if-closing-brace-newline-after)")
+    ))
+  })
+
+  it("correct fifth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].rule).toBe("scss/at-if-closing-brace-newline-after")
+    ))
+  })
+
+  it("correct fifth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].severity).toBe("error")
+    ))
+  })
+
+  it("correct fifth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].line).toBe(12)
+    ))
+  })
+
+  it("correct fifth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[4].column).toBe(2)
+    ))
+  })
+
+  it("correct sixth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].text).toBe("Expected single space after \"}\" of @if statement (scss/at-if-closing-brace-space-after)")
+    ))
+  })
+
+  it("correct sixth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].rule).toBe("scss/at-if-closing-brace-space-after")
+    ))
+  })
+
+  it("correct sixth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].severity).toBe("error")
+    ))
+  })
+
+  it("correct sixth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].line).toBe(12)
+    ))
+  })
+
+  it("correct sixth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[5].column).toBe(2)
     ))
   })
 })

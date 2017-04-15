@@ -18,8 +18,6 @@ $map: (
 
 @if $foo == block {
 	display: block;
-}
-
-@else {
+} @else {
 	display: inline-block;
 }

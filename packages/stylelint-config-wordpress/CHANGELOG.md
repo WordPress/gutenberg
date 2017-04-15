@@ -6,6 +6,7 @@
 -   Removed:  NodeJS 4.x support, `stylelint` and `stylelint-config-wordpress` now require NodeJS > 6.9.1 LTS or greater
 -   Added:  NodeJS 7.x.x support
 -   Added:  `selector-no-empty` rule.
+-   Fixed:  Added `stylelint-scss` plugin @if/@else placement rules.
 -   Fixed:  Removed `@debug` from `ignoreAtRules` array of `at-rule-no-unknown` rule in `stylelint-config-wordpress/scss` chared config.
 -   Added:  `scss/selector-no-redundant-nesting-selector` rule in `stylelint-config-wordpress/scss` chared config.
 -   Deprecated `blockless-group` option for `at-rule-empty-line-before` rule. Use the new `blockless-after-blockless` option instead.
