@@ -38,11 +38,20 @@
 	}
 }
 
-.editor-visual-editor__block .editor-toolbar {
+.editor-visual-editor__block_controls {
 	position: absolute;
 	bottom: 100%;
 	margin-bottom: -4px;
 	left: 43px;
+	display: flex;
+}
+
+.editor-visual-editor__block_controls .editor-toolbar {
+	display: inline-flex;
+}
+
+.editor-visual-editor__block_controls .editor-block-switcher {
+	display: inline-flex;
 }
 
 .editor-visual-editor .editor-inserter {
