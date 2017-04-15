@@ -1,5 +1,7 @@
 # HEAD
 
+
+-   Removed:  `stylelint-scss < 1.4.4` compatibility.
 -   Removed:  `stylelint < 7.10.1` compatibility.
 -   Removed:  NodeJS 4.x support, `stylelint` and `stylelint-config-wordpress` now require NodeJS > 6.9.1 LTS or greater
 -   Added:  NodeJS 7.x.x support
