@@ -9,16 +9,18 @@ env:
     - WP_TRAVISCI=travis:phpunit
 matrix:
   include:
-  - php: 7.0
+  - php: 7.1
     env: WP_TRAVISCI=travis:js
-  - php: 5.2
-  - php: 5.3
-  - php: 5.4
-  - php: 5.5
+  - php: 7.1
+  - php: 7.0
   - php: 5.6
   - php: 5.6
     env: WP_TRAVIS_OBJECT_CACHE=true
     services: memcached
+  - php: 5.5
+  - php: 5.4
+  - php: 5.3
+  - php: 5.2
   - php: hhvm
     sudo: required
     dist: trusty
@@ -29,8 +31,6 @@ matrix:
         - mysql-server-5.6
         - mysql-client-core-5.6
         - mysql-client-5.6
-  - php: 7.0
-  - php: 7.1
   - php: nightly
   allow_failures:
   - php: hhvm
