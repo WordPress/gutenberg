@@ -38,7 +38,7 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-stylelint": "^6.0.0",
-    "eslint-plugin-ava": "^4.0.0",
+    "eslint-plugin-jest": "^19.0.1",
     "jest": "^19.0.2",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
@@ -64,10 +64,11 @@
       "ecmaVersion": 8
     },
     "plugins": [
-      "ava"
+      "jest"
     ],
     "extends": [
-      "stylelint"
+      "stylelint",
+      "plugin:jest/recommended"
     ],
     "env": {
       "jest": true

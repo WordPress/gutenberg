@@ -13,6 +13,7 @@
 -   Deprecated `media-feature-no-missing-punctuation` rule.
 -   Deprecated `selector-no-empty` rule.
 -   Refactor:  Switch from AVA to Jest for tests.
+-   Refactor:  Switch from eslint-plugin-ava to eslint-plugin-jest.
 
 # 9.1.1
 
