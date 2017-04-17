@@ -11,6 +11,23 @@ import { getBlockSettings, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
 
 /**
+ * Returns the block attributes parsed from raw content.
+ *
+ * @param  {String} rawContent    Raw block content
+ * @param  {Object} blockSettings Block settings
+ * @return {Object}               Block attributes
+ */
+export function parseBlockAttributes( rawContent, blockSettings ) {
+	if ( 'function' === typeof blockSettings.attributes ) {
+		return blockSettings.attributes( rawContent );
+	} else if ( blockSettings.attributes ) {
+		return query.parse( rawContent, blockSettings.attributes );
+	}
+
+	return {};
+}
+
+/**
  * Returns the block attributes of a registered block node given its settings.
  *
  * @param  {Object} blockNode     Parsed block node
@@ -19,15 +36,10 @@ import { createBlock } from './factory';
  */
 export function getBlockAttributes( blockNode, blockSettings ) {
 	const { rawContent } = blockNode;
-
 	// Merge attributes from parse with block implementation
 	let { attrs } = blockNode;
 	if ( blockSettings ) {
-		if ( 'function' === typeof blockSettings.attributes ) {
-			attrs = { ...attrs, ...blockSettings.attributes( rawContent ) };
-		} else if ( blockSettings.attributes ) {
-			attrs = { ...attrs, ...query.parse( rawContent, blockSettings.attributes ) };
-		}
+		attrs = { ...attrs, ...parseBlockAttributes( rawContent, blockSettings ) };
 	}
 
 	return attrs;

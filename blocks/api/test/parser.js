@@ -7,7 +7,7 @@ import { text } from 'hpq';
 /**
  * Internal dependencies
  */
-import { default as parse, getBlockAttributes } from '../parser';
+import { default as parse, getBlockAttributes, parseBlockAttributes } from '../parser';
 import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
 
 describe( 'block parser', () => {
@@ -18,8 +18,45 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'parseBlockAttributes()', () => {
+		it( 'should use the function implementation', () => {
+			const blockSettings = {
+				attributes: function( rawContent ) {
+					return {
+						content: rawContent + ' & Chicken'
+					};
+				}
+			};
+
+			expect( parseBlockAttributes( 'Ribs', blockSettings ) ).to.eql( {
+				content: 'Ribs & Chicken'
+			} );
+		} );
+
+		it( 'should use the query object implementation', () => {
+			const blockSettings = {
+				attributes: {
+					emphasis: text( 'strong' )
+				}
+			};
+
+			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
+
+			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {
+				emphasis: '& Chicken'
+			} );
+		} );
+
+		it( 'should return an empty object if no attributes defined', () => {
+			const blockSettings = {};
+			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
+
+			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {} );
+		} );
+	} );
+
 	describe( 'getBlockAttributes()', () => {
-		it( 'should merge attributes from function implementation', () => {
+		it( 'should merge attributes with the parsed attributes', () => {
 			const blockSettings = {
 				attributes: function( rawContent ) {
 					return {
@@ -39,43 +76,6 @@ describe( 'block parser', () => {
 			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
 				align: 'left',
 				content: 'Ribs & Chicken'
-			} );
-		} );
-
-		it( 'should merge attributes from query object implementation', () => {
-			const blockSettings = {
-				attributes: {
-					emphasis: text( 'strong' )
-				}
-			};
-
-			const blockNode = {
-				blockType: 'core/test-block',
-				attrs: {
-					align: 'left'
-				},
-				rawContent: '<span>Ribs <strong>& Chicken</strong></span>'
-			};
-
-			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
-				align: 'left',
-				emphasis: '& Chicken'
-			} );
-		} );
-
-		it( 'should return parsed attributes for block without attributes defined', () => {
-			const blockSettings = {};
-
-			const blockNode = {
-				blockType: 'core/test-block',
-				attrs: {
-					align: 'left'
-				},
-				rawContent: '<span>Ribs <strong>& Chicken</strong></span>'
-			};
-
-			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
-				align: 'left'
 			} );
 		} );
 	} );
