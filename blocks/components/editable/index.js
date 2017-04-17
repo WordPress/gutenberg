@@ -68,6 +68,12 @@ export default class Editable extends wp.element.Component {
 		this.editor.selection.moveToBookmark( bookmark );
 	}
 
+	componentWillUpdate( nextProps ) {
+		if ( this.editor && this.props.tagName !== nextProps.tagName ) {
+			this.editor.destroy();
+		}
+	}
+
 	componentWillUnmount() {
 		if ( this.editor ) {
 			this.editor.destroy();
