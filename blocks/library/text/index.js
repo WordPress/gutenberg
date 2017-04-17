@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import uuid from 'uuid/v4';
-
-/**
  * Internal dependencies
  */
 import { registerBlock, query } from 'api';
