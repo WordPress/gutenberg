@@ -68,6 +68,12 @@ export default class Editable extends wp.element.Component {
 		this.editor.selection.moveToBookmark( bookmark );
 	}
 
+	componentWillUpdate( nextProps ) {
+		if ( this.editor && this.props.tagName !== nextProps.tagName ) {
+			this.editor.destroy();
+		}
+	}
+
 	componentWillUnmount() {
 		if ( this.editor ) {
 			this.editor.destroy();
@@ -75,7 +81,9 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.value !== prevProps.value ) {
+		if ( this.props.tagName !== prevProps.tagName ) {
+			this.initialize();
+		} else if ( this.props.value !== prevProps.value ) {
 			this.updateContent();
 		}
 	}

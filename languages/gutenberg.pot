@@ -7,6 +7,14 @@ msgstr ""
 msgid "Freeform"
 msgstr ""
 
+#: blocks/library/heading/index.js:10
+msgid "Heading"
+msgstr ""
+
+#: blocks/library/heading/index.js:26
+msgid "Heading %s"
+msgstr ""
+
 #: blocks/library/image/index.js:10
 msgid "Image"
 msgstr ""

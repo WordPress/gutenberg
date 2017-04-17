@@ -27,7 +27,9 @@ function Toolbar( { controls } ) {
 					} }
 					className={ classNames( 'editor-toolbar__control', {
 						'is-active': control.isActive && control.isActive()
-					} ) } />
+					} ) }>
+					{ control.text }
+				</IconButton>
 			) ) }
 		</ul>
 	);
