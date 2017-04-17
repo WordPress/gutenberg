@@ -7,7 +7,7 @@ import { difference } from 'lodash';
  * Internal dependencies
  */
 import { getBlockSettings } from './registration';
-import { getBlockAttributes } from './parser';
+import { parseBlockAttributes } from './parser';
 
 /**
  * Given a block's save render implementation and attributes, returns the
@@ -68,6 +68,7 @@ export default function serialize( blocks ) {
 	return blocks.reduce( ( memo, block ) => {
 		const blockType = block.blockType;
 		const settings = getBlockSettings( blockType );
+		const saveContent = getSaveContent( settings.save, block.attributes );
 
 		return memo + (
 			'<!-- wp:' +
@@ -75,10 +76,10 @@ export default function serialize( blocks ) {
 			' ' +
 			getCommentAttributes(
 				block.attributes,
-				getBlockAttributes( block, settings )
+				parseBlockAttributes( saveContent, settings )
 			) +
 			'-->' +
-			getSaveContent( settings.save, block.attributes ) +
+			saveContent +
 			'<!-- /wp:' +
 			blockType +
 			' -->'
