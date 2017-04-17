@@ -60,13 +60,9 @@ registerBlock( 'core/text', {
 				style={ align ? { textAlign: align } : null }
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( {
-						uid: uuid(),
-						blockType: 'core/text',
-						attributes: {
-							content: after
-						}
-					} );
+					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
+						content: after
+					} ) );
 				} }
 			/>
 		);
