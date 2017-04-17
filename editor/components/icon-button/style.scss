@@ -14,8 +14,13 @@
 			color: $blue-medium;
 		}
 	}
+}
 
-	span {
-		font-size: 12px;
-	}
+.editor-icon-button__level {
+	font-family: $default-font;
+	font-size: 10px;
+	font-weight: bold;
+	position: absolute;
+	bottom: 8px;
+	right: 4px;
 }
