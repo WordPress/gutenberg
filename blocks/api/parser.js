@@ -112,7 +112,20 @@ export default function parse( content ) {
 	const blocks = [];
 
 	// Store markup we found in between blocks
-	// let betweenBlocks = new tinymce.html.Node( 'body', 11 );
+	let contentBetweenBlocks = null;
+	function flushContentBetweenBlocks() {
+		if ( contentBetweenBlocks && contentBetweenBlocks.firstChild ) {
+			const blockType = getUnknownTypeHandler();
+			const settings = getBlockSettings( blockType );
+			if ( settings ) {
+				const rawContent = serializer.serialize( contentBetweenBlocks );
+				const blockNode = { rawContent, attrs: {} };
+				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
+				blocks.push( block );
+			}
+		}
+		contentBetweenBlocks = new tinymce.html.Node( 'body', 11 );
+	}
 
 	let currentNode = tree.firstChild;
 	do {
@@ -137,7 +150,12 @@ export default function parse( content ) {
 			}
 
 			// Include in set only if settings were determined
+			// TODO when would this fail? error handling?
 			if ( settings ) {
+				// If we have any pending content outside of block delimiters,
+				// add it as a block now.
+				flushContentBetweenBlocks();
+
 				const rawContent = serializer.serialize( currentNode );
 				const blockAttributes = htmlUnescape( nodeAttributes.attributes || '' )
 					.split( /\s+/ )
@@ -156,14 +174,20 @@ export default function parse( content ) {
 				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
 				blocks.push( block );
 			}
-		} else {
-			// TODO: store HTML outside of blocks and pass it off to a "freeform" block
-			// TODO: later on, match these nodes against block markup
-			console.log( 'root-level node not wp-block', currentNode ); // eslint-disable-line no-console
-		}
 
-		currentNode = currentNode.next;
+			currentNode = currentNode.next;
+		} else {
+			// We have some HTML content outside of block delimiters.  Save it
+			// so that we can initialize it using `getUnknownTypeHandler`.
+			const toAppend = currentNode;
+			// Advance the DOM tree pointer before calling `append` because
+			// this is a destructive operation.
+			currentNode = currentNode.next;
+			contentBetweenBlocks.append( toAppend );
+		}
 	} while ( currentNode );
+
+	flushContentBetweenBlocks();
 
 	return blocks;
 }

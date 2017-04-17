@@ -120,7 +120,29 @@ describe( 'block parser', () => {
 			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
 				'core/test-block',
 				'core/unknown-block',
-				'core/unknown-block'
+				'core/unknown-block',
+			] );
+		} );
+
+		it( 'should parse the post content, using unknown block handler at the end of the block', () => {
+			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/unknown-block', {} );
+
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const parsed = parse(
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Romanesco</p>'
+			);
+
+			expect( parsed ).to.have.lengthOf( 4 );
+			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
+				'core/test-block',
+				'core/unknown-block',
+				'core/test-block',
+				'core/unknown-block',
 			] );
 		} );
 	} );
