@@ -244,7 +244,7 @@ describe( 'state', () => {
 					blockType: 'core/test-block',
 					attributes: {}
 				}, {
-					uid: 'kumquat2',
+					uid: 'loquat',
 					blockType: 'core/test-block',
 					attributes: {}
 				} ]
@@ -254,13 +254,13 @@ describe( 'state', () => {
 				type: 'INSERT_BLOCK',
 				after: 'kumquat',
 				block: {
-					uid: 'kumquat3',
+					uid: 'persimmon',
 					blockType: 'core/freeform'
 				}
 			} );
 
 			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 3 );
-			expect( state.order ).to.eql( [ 'kumquat', 'kumquat3', 'kumquat2' ] );
+			expect( state.order ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 	} );
 
