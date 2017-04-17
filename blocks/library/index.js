@@ -3,3 +3,4 @@ import './heading';
 import './image';
 import './text';
 import './list';
+import './quote';

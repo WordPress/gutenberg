@@ -1,0 +1,24 @@
+.blocks-quote {
+	margin: 0;
+	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
+	transition: all .2s ease;
+	font-size: 20px;
+	border-left: 4px solid $black;
+	padding-left: 1em;
+	font-style: italic;
+
+	footer {
+		color: $dark-gray-100;
+		font-size: 0.9em;
+		font-style: normal;
+		margin-left: 1.3em;
+		position: relative;
+
+		&:before {
+			content: '— ';
+			position: absolute;
+			left: -1.3em;
+			top: 0;
+		}
+	}
+}
