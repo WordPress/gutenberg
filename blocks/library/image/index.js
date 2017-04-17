@@ -21,24 +21,25 @@ registerBlock( 'core/image', {
 
 	edit( { attributes, setAttributes, focus, updateFocus } ) {
 		const { url, alt, caption } = attributes;
-		const focusCaption = () => updateFocus( { editable: 'caption' } );
 
-		/* eslint-disable */
+		// Disable reason: Clicking the image should set the focus to its caption
+
+		/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/onclick-has-role, jsx-a11y/no-static-element-interactions */
 		return (
 			<figure>
-				<img src={ url } alt={ alt } onClick={ focusCaption } />
+				<img src={ url } alt={ alt } onClick={ updateFocus } />
 				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : null }
-						onFocus={ focusCaption }
+						focus={ focus }
+						onFocus={ updateFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) } />
 				) : null }
 			</figure>
 		);
-		/* eslint-enable */
+		/* eslint-enable jsx-a11y/click-events-have-key-events, jsx-a11y/onclick-has-role, jsx-a11y/no-static-element-interactions */
 	},
 
 	save( { attributes } ) {
