@@ -33,7 +33,7 @@ class Inserter extends wp.element.Component {
 		return (
 			<div className="editor-inserter">
 				<IconButton
-					icon="plus-alt"
+					icon="insert"
 					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle" />
