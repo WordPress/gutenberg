@@ -78,8 +78,7 @@ export default class Editable extends wp.element.Component {
 			// Avoid splitting on single enter
 			if (
 				! lastNodeBeforeCursor ||
-				lastNodeBeforeCursor.childNodes.length !== 1 ||
-				lastNodeBeforeCursor.firstChild.tagName !== 'BR'
+				!! lastNodeBeforeCursor.textContent
 			) {
 				return;
 			}
