@@ -21,7 +21,7 @@ registerBlock( 'core/heading', {
 
 	controls: [
 		...'123456'.split( '' ).map( ( level ) => ( {
-			icon: 'editor-alignleft', // TODO
+			icon: 'heading',
 			text: level,
 			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
 			isActive: ( { tag } ) => 'H' + level === tag,
