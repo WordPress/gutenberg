@@ -75,13 +75,13 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected } = this.props;
+		const { isHovered, isSelected, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': isSelected,
 			'is-hovered': isHovered
 		} );
 
-		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
+		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter, onFocus } = this.props;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -112,9 +112,11 @@ class VisualEditorBlock extends wp.element.Component {
 				</div>
 				<BlockEdit
 					isSelected={ isSelected }
+					focus={ focus }
 					attributes={ block.attributes }
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
+					updateFocus={ onFocus }
 				/>
 			</div>
 		);
@@ -127,7 +129,8 @@ export default connect(
 		order: state.blocks.order.indexOf( ownProps.uid ),
 		block: state.blocks.byUid[ ownProps.uid ],
 		isSelected: state.selectedBlock === ownProps.uid,
-		isHovered: state.hoveredBlock === ownProps.uid
+		isHovered: state.hoveredBlock === ownProps.uid,
+		focus: state.focus.uid === ownProps.uid ? state.focus.config : null
 	} ),
 	( dispatch, ownProps ) => ( {
 		onChange( updates ) {
@@ -165,11 +168,20 @@ export default connect(
 				uid: ownProps.uid
 			} );
 		},
+
 		onInsertAfter( block ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
 				after: ownProps.uid,
 				block
+			} );
+		},
+
+		onFocus( config = {} ) {
+			dispatch( {
+				type: 'UPDATE_FOCUS',
+				uid: ownProps.uid,
+				config
 			} );
 		}
 	} )

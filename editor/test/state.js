@@ -9,6 +9,7 @@ import { values } from 'lodash';
  */
 import {
 	blocks,
+	focus,
 	hoveredBlock,
 	selectedBlock,
 	mode,
@@ -320,6 +321,30 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'focus()', () => {
+		it( 'should return an empty object by default', () => {
+			const state = focus( undefined, {} );
+			expect( state ).to.eql( {} );
+		} );
+
+		it( 'should update the focused block', () => {
+			const state = focus( null, {
+				type: 'UPDATE_FOCUS',
+				uid: 'chicken',
+				config: {
+					editable: 'ribs'
+				}
+			} );
+
+			expect( state ).to.eql( {
+				uid: 'chicken',
+				config: {
+					editable: 'ribs'
+				}
+			} );
+		} );
+	} );
+
 	describe( 'createReduxStore()', () => {
 		it( 'should return a redux store', () => {
 			const store = createReduxStore();
@@ -337,7 +362,8 @@ describe( 'state', () => {
 				'selectedBlock',
 				'hoveredBlock',
 				'mode',
-				'isSidebarOpened'
+				'isSidebarOpened',
+				'focus'
 			] );
 		} );
 	} );

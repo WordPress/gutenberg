@@ -19,21 +19,26 @@ registerBlock( 'core/image', {
 		caption: html( 'figcaption' )
 	},
 
-	edit( { attributes, isSelected, setAttributes } ) {
+	edit( { attributes, setAttributes, focus, updateFocus } ) {
 		const { url, alt, caption } = attributes;
+		const focusCaption = () => updateFocus( { editable: 'caption' } );
 
+		/* eslint-disable */
 		return (
 			<figure>
-				<img src={ url } alt={ alt } />
-				{ caption || isSelected ? (
+				<img src={ url } alt={ alt } onClick={ focusCaption } />
+				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
+						focus={ focus && focus.editable === 'caption' ? focus : null }
+						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) } />
 				) : null }
 			</figure>
 		);
+		/* eslint-enable */
 	},
 
 	save( { attributes } ) {

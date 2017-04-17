@@ -139,6 +139,25 @@ export function hoveredBlock( state = null, action ) {
 }
 
 /**
+ * Reducer returning the focused block state.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function focus( state = {}, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_FOCUS':
+			return {
+				uid: action.uid,
+				config: action.config
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning current editor mode, either "visual" or "text".
  *
  * @param  {string} state  Current state
@@ -171,6 +190,7 @@ export function isSidebarOpened( state = false, action ) {
 export function createReduxStore() {
 	const reducer = combineReducers( {
 		blocks,
+		focus,
 		selectedBlock,
 		hoveredBlock,
 		mode,
