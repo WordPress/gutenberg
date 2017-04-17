@@ -10,13 +10,13 @@ import './style.scss';
 import Button from '../button';
 import Dashicon from '../dashicon';
 
-function IconButton( { icon, text, label, className, ...additionalProps } ) {
+function IconButton( { icon, children, label, className, ...additionalProps } ) {
 	const classes = classnames( 'editor-icon-button', className );
 
 	return (
 		<Button { ...additionalProps } aria-label={ label } className={ classes }>
 			<Dashicon icon={ icon } />
-			{ text ? <span>{ text }</span> : null }
+			{ children ? <span>{ children }</span> : null }
 		</Button>
 	);
 }

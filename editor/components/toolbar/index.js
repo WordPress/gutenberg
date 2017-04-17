@@ -20,7 +20,6 @@ function Toolbar( { controls } ) {
 				<IconButton
 					key={ index }
 					icon={ control.icon }
-					text={ control.text }
 					label={ control.title }
 					onClick={ ( event ) => {
 						event.stopPropagation();
@@ -28,7 +27,9 @@ function Toolbar( { controls } ) {
 					} }
 					className={ classNames( 'editor-toolbar__control', {
 						'is-active': control.isActive && control.isActive()
-					} ) } />
+					} ) }>
+					{ control.text }
+				</IconButton>
 			) ) }
 		</ul>
 	);
