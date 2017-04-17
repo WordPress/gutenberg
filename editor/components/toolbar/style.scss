@@ -15,6 +15,7 @@
 	outline: none;
 	color: $dark-gray-500;
 	cursor: pointer;
+	position: relative;
 
 	&:first-child {
 		margin-left: 3px;
@@ -29,6 +30,17 @@
 		background-color: $dark-gray-500;
 		color: $white;
 	}
+
+	/* Optional number, e.g. for headings */
+	span {
+		font-family: $default-font;
+		font-size: 10px;
+		font-weight: bold;
+		position: absolute;
+		bottom: 8px;
+		right: 4px;
+	}
+
 }
 
 .editor-toolbar__control .dashicon {
