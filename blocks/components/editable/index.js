@@ -62,7 +62,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
-		if ( this.props.tagName || event.keyCode !== 13 ) {
+		if ( this.props.tagName || event.keyCode !== 13 || ! this.props.onSplit ) {
 			return;
 		}
 
@@ -136,7 +136,3 @@ export default class Editable extends wp.element.Component {
 		);
 	}
 }
-
-Editable.defaultProps = {
-	onSplit: () => {}
-};
