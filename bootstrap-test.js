@@ -12,4 +12,5 @@ global.document = require( 'jsdom' ).jsdom( '', {
 	}
 } );
 global.window = document.defaultView;
+global.requestAnimationFrame = setTimeout;
 global.navigator = window.navigator;
