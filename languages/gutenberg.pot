@@ -19,7 +19,7 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: blocks/library/image/index.js:34
+#: blocks/library/image/index.js:31
 msgid "Write caption…"
 msgstr ""
 

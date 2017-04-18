@@ -22,12 +22,9 @@ registerBlock( 'core/image', {
 	edit( { attributes, setAttributes, focus, updateFocus } ) {
 		const { url, alt, caption } = attributes;
 
-		// Disable reason: Clicking the image should set the focus to its caption
-
-		/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/onclick-has-role, jsx-a11y/no-static-element-interactions */
 		return (
 			<figure>
-				<img src={ url } alt={ alt } onClick={ updateFocus } />
+				<img src={ url } alt={ alt } />
 				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -39,7 +36,6 @@ registerBlock( 'core/image', {
 				) : null }
 			</figure>
 		);
-		/* eslint-enable jsx-a11y/click-events-have-key-events, jsx-a11y/onclick-has-role, jsx-a11y/no-static-element-interactions */
 	},
 
 	save( { attributes } ) {

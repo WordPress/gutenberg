@@ -75,13 +75,13 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, focus } = this.props;
+		const { isHovered, isSelected, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
-			'is-selected': isSelected,
+			'is-selected': isSelected && ! isTyping,
 			'is-hovered': isHovered
 		} );
 
-		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter, onFocus } = this.props;
+		const { onSelect, onStartTyping, onMouseMove, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -93,15 +93,15 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onDeselect }
-				onMouseEnter={ onMouseEnter }
+				onKeyDown={ onStartTyping }
+				onMouseMove={ onMouseMove }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 			>
-				{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				<div className="editor-visual-editor__block-controls">
-					{ isSelected && <BlockSwitcher uid={ block.uid } /> }
-					{ isSelected && settings.controls ? (
+					{ isSelected && ! isTyping && <BlockSwitcher uid={ block.uid } /> }
+					{ isSelected && ! isTyping && settings.controls ? (
 						<Toolbar
 							controls={ settings.controls.map( ( control ) => ( {
 								...control,
@@ -111,7 +111,6 @@ class VisualEditorBlock extends wp.element.Component {
 					) : null }
 				</div>
 				<BlockEdit
-					isSelected={ isSelected }
 					focus={ focus }
 					attributes={ block.attributes }
 					setAttributes={ this.setAttributes }
@@ -128,9 +127,10 @@ export default connect(
 	( state, ownProps ) => ( {
 		order: state.blocks.order.indexOf( ownProps.uid ),
 		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: state.selectedBlock === ownProps.uid,
+		isSelected: state.selectedBlock.uid === ownProps.uid,
 		isHovered: state.hoveredBlock === ownProps.uid,
-		focus: state.focus.uid === ownProps.uid ? state.focus.config : null
+		focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
+		isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
 	} ),
 	( dispatch, ownProps ) => ( {
 		onChange( updates ) {
@@ -154,7 +154,13 @@ export default connect(
 				uid: ownProps.uid
 			} );
 		},
-		onMouseEnter() {
+		onStartTyping() {
+			dispatch( {
+				type: 'START_TYPING',
+				uid: ownProps.uid
+			} );
+		},
+		onMouseMove() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
