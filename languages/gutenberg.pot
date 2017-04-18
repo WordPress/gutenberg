@@ -11,7 +11,7 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
-#: blocks/library/heading/index.js:26
+#: blocks/library/heading/index.js:25
 msgid "Heading %s"
 msgstr ""
 
