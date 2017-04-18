@@ -15,7 +15,7 @@ export default class Editable extends wp.element.Component {
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 	}
 
@@ -44,7 +44,7 @@ export default class Editable extends wp.element.Component {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
-		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'NewBlock', this.onNewBlock );
 	}
 
 	onInit() {
@@ -61,39 +61,33 @@ export default class Editable extends wp.element.Component {
 		this.props.onChange( value );
 	}
 
-	onKeyDown( event ) {
-		if ( this.props.tagName || event.keyCode !== 13 || ! this.props.onSplit ) {
+	onNewBlock() {
+		if ( this.props.tagName || ! this.props.onSplit ) {
 			return;
 		}
 
-		// Wait for the event to propagate
-		setTimeout( () => {
-			if ( ! this.editor ) {
-				return;
-			}
-			// Getting the content before and after the cursor
-			const childNodes = Array.from( this.editor.getBody().childNodes );
-			const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
-			const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
-			const beforeNodes = childNodes.slice( 0, splitIndex );
-			const lastNodeBeforeCursor = last( beforeNodes );
-			// Avoid splitting on single enter
-			if (
-				! lastNodeBeforeCursor ||
-				beforeNodes.length < 2 ||
-				!! lastNodeBeforeCursor.textContent
-			) {
-				return;
-			}
-			const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
-			const after = getHtml( childNodes.slice( splitIndex ) );
+		// Getting the content before and after the cursor
+		const childNodes = Array.from( this.editor.getBody().childNodes );
+		const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
+		const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
+		const beforeNodes = childNodes.slice( 0, splitIndex );
+		const lastNodeBeforeCursor = last( beforeNodes );
+		// Avoid splitting on single enter
+		if (
+			! lastNodeBeforeCursor ||
+			beforeNodes.length < 2 ||
+			!! lastNodeBeforeCursor.textContent
+		) {
+			return;
+		}
+		const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
+		const after = getHtml( childNodes.slice( splitIndex ) );
 
-			// Splitting into two blocks
-			this.editor.setContent( this.props.value || '' );
-			const hasAfter = !! childNodes.slice( splitIndex )
-				.reduce( ( memo, node ) => memo + node.textContent, '' );
-			this.props.onSplit( before, hasAfter ? after : '' );
-		} );
+		// Splitting into two blocks
+		this.editor.setContent( this.props.value || '' );
+		const hasAfter = !! childNodes.slice( splitIndex )
+			.reduce( ( memo, node ) => memo + node.textContent, '' );
+		this.props.onSplit( before, hasAfter ? after : '' );
 	}
 
 	bindNode( ref ) {
