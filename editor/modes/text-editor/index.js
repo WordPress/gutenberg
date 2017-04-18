@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import Textarea from 'react-textarea-autosize';
+import Textarea from 'react-autosize-textarea';
 
 /**
  * Internal dependencies
@@ -32,7 +32,6 @@ function TextEditor( { blocks, onChange } ) {
 				defaultValue={ wp.blocks.serialize( blocks ) }
 				onBlur={ ( event ) => onChange( event.target.value ) }
 				className="editor-text-editor"
-				useCacheForDOMMeasurements
 			/>
 		</div>
 	);

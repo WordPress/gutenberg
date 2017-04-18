@@ -59,10 +59,10 @@
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
     "lodash": "^4.17.4",
-    "react": "^16.0.0-alpha.9",
-    "react-dom": "^16.0.0-alpha.9",
+    "react": "^15.5.4",
+    "react-autosize-textarea": "^0.4.2",
+    "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
-    "react-textarea-autosize": "^4.0.5",
     "redux": "^3.6.0",
     "uuid": "^3.0.1"
   }
