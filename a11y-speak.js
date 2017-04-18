@@ -1,4 +1,4 @@
-var containerPolite, containerAssertive;
+var containerPolite, containerAssertive, previousMessage = "";
 
 /**
  * Build the live regions markup.
@@ -14,7 +14,7 @@ var addContainer = function( ariaLive ) {
 	container.id = "a11y-speak-" + ariaLive;
 	container.className = "a11y-speak-region";
 
-	var screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden;";
+	var screenReaderTextStyle = "clip: rect(1px, 1px, 1px, 1px); position: absolute; height: 1px; width: 1px; overflow: hidden; word-wrap: normal;";
 	container.setAttribute( "style", screenReaderTextStyle );
 
 	container.setAttribute( "aria-live", ariaLive );
@@ -84,6 +84,12 @@ var A11ySpeak = function( message, ariaLive ) {
 	 * spaces natively.
 	 */
 	message = message.replace( /<[^<>]+>/g, " " );
+
+	if ( previousMessage === message ) {
+		message = message + "\u00A0";
+	}
+
+	previousMessage = message;
 
 	if ( containerAssertive && "assertive" === ariaLive ) {
 		containerAssertive.textContent = message;
