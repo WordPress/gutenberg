@@ -21,15 +21,14 @@ function Toolbar( { controls } ) {
 					key={ index }
 					icon={ control.icon }
 					label={ control.title }
+					data-level={ control.level }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						control.onClick();
 					} }
 					className={ classNames( 'editor-toolbar__control', {
 						'is-active': control.isActive && control.isActive()
-					} ) }>
-					{ control.text }
-				</IconButton>
+					} ) } />
 			) ) }
 		</ul>
 	);

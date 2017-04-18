@@ -30,6 +30,16 @@
 		background-color: $dark-gray-500;
 		color: $white;
 	}
+
+	&[data-level]:after {
+		content: attr( data-level );
+		font-family: $default-font;
+		font-size: 10px;
+		font-weight: bold;
+		position: absolute;
+		bottom: 8px;
+		right: 5px;
+	}
 }
 
 .editor-toolbar__control .dashicon {
