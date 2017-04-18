@@ -1,8 +1,16 @@
 # Contributing
 
-If you'd like to try or contribute to the plugin, you can clone this repo into your `wp-content/plugins` directory, then activate the plugin. You'll get a separate WordPress menu item called Gutenberg.
+## Installing & Building the Plugin
 
-Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. Then, in a terminal, type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build` to make the plugin functional, or `npm run dev` to keep the plugin building in the background as you work on it.
+Gutenberg is a node based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. 
+
+To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node.
+
+To do that, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin. You'll get a separate WordPress menu item called Gutenberg.
+
+If you have a local WordPress environment, you can clone this repository into your `wp-content/plugins` directory directly. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
+
+Some good options for a local WordPress development environment include <a href="https://varyingvagrantvagrants.org/">VVV</a> and <a href="https://www.mamp.info/">Mamp</a>.
 
 ## Workflow
 
