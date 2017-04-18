@@ -29,7 +29,7 @@ function VisualEditorBlock( props ) {
 	const className = classnames( 'editor-visual-editor__block', {
 		'is-selected': isSelected,
 		'is-hovered': isHovered
-	} );
+	}, block.attributes.position && `align${ block.attributes.position }` );
 
 	const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = props;
 
@@ -50,6 +50,8 @@ function VisualEditorBlock( props ) {
 		}
 	}
 
+	const controls = wp.blocks.controls.concat( settings.controls || [] );
+
 	// Disable reason: Each block can receive focus but must be able to contain
 	// block children. Tab keyboard navigation enabled by tabIndex assignment.
 
@@ -67,9 +69,9 @@ function VisualEditorBlock( props ) {
 			{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
 			<div className="editor-visual-editor__block-controls">
 				{ isSelected && <BlockSwitcher uid={ block.uid } /> }
-				{ isSelected && settings.controls ? (
+				{ isSelected && controls ? (
 					<Toolbar
-						controls={ settings.controls.map( ( control ) => ( {
+						controls={ controls.map( ( control ) => ( {
 							...control,
 							onClick: () => control.onClick( block.attributes, setAttributes ),
 							isActive: () => control.isActive( block.attributes )

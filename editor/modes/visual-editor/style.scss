@@ -57,3 +57,19 @@
 .editor-visual-editor .editor-inserter {
 	margin: $item-spacing;
 }
+
+.editor-visual-editor .alignright,
+.editor-visual-editor .alignleft,
+.editor-visual-editor .aligncenter {
+	z-index: 1;
+}
+
+// Temporary styling before having the possibility
+// to edit the block width
+.editor-visual-editor .alignright,
+.editor-visual-editor .alignleft {
+	max-width: 50%;
+	img {
+		max-width: 100%;
+	}
+}

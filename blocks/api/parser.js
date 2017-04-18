@@ -37,12 +37,17 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockSettings, rawContent, attributes ) {
+	// Handle global controls
+	const contentToParse = attributes.position
+		? query.parse( rawContent, query.html( 'div' ) )
+		: rawContent;
+
 	// Merge any attributes from comment delimiters with block implementation
 	attributes = attributes || {};
 	if ( blockSettings ) {
 		attributes = {
 			...attributes,
-			...parseBlockAttributes( rawContent, blockSettings ),
+			...parseBlockAttributes( contentToParse, blockSettings ),
 		};
 	}
 

@@ -3,6 +3,22 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
+#: blocks/controls/index.js:11
+msgid "Position left"
+msgstr ""
+
+#: blocks/controls/index.js:17
+msgid "Position center"
+msgstr ""
+
+#: blocks/controls/index.js:23
+msgid "Position right"
+msgstr ""
+
+#: blocks/controls/index.js:29
+msgid "No positionning"
+msgstr ""
+
 #: blocks/library/freeform/index.js:9
 msgid "Freeform"
 msgstr ""

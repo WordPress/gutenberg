@@ -69,6 +69,9 @@ export default function serialize( blocks ) {
 		const blockType = block.blockType;
 		const settings = getBlockSettings( blockType );
 		const saveContent = getSaveContent( settings.save, block.attributes );
+		const wrappedSavedContent = block.attributes.position
+			? `<div classname="align${ block.attributes.position }">${ saveContent }</div>`
+			: saveContent;
 
 		return memo + (
 			'<!-- wp:' +
@@ -79,7 +82,7 @@ export default function serialize( blocks ) {
 				parseBlockAttributes( saveContent, settings )
 			) +
 			'-->' +
-			saveContent +
+			wrappedSavedContent +
 			'<!-- /wp:' +
 			blockType +
 			' -->'
