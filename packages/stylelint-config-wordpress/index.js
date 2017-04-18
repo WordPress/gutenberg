@@ -40,7 +40,9 @@ module.exports = {
     "function-comma-space-before": "never",
     "function-linear-gradient-no-nonstandard-direction": true,
     "function-max-empty-lines": 1,
-    "function-name-case": "lower",
+    "function-name-case": [ "lower", {
+      ignoreFunctions: ["/^DXImageTransform.Microsoft.*$/"],
+    } ],
     "function-parentheses-space-inside": "never",
     "function-url-quotes": "never",
     "function-whitespace-after": "always",
