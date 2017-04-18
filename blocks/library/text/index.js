@@ -70,6 +70,7 @@ registerBlock( 'core/text', {
 	save( { attributes } ) {
 		const { align, content } = attributes;
 
+		// Todo: Remove the temporary <div> wrapper once the serializer supports returning an array
 		return (
 			<div>
 				{ content && content.map( ( paragraph, i ) => (
