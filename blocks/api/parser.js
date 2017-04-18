@@ -51,20 +51,20 @@ export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} blockSlug  Block slug
+ * @param  {?String} blockType  Block type slug
  * @param  {String}  rawContent Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( blockSlug, rawContent, attributes ) {
+export function createBlockWithFallback( blockType, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler
-	blockSlug = blockSlug || getUnknownTypeHandler();
+	blockType = blockType || getUnknownTypeHandler();
 
 	// Try finding settings for known block type, else again fall back
-	let blockSettings = getBlockSettings( blockSlug );
+	let blockSettings = getBlockSettings( blockType );
 	if ( ! blockSettings ) {
-		blockSlug = getUnknownTypeHandler();
-		blockSettings = getBlockSettings( blockSlug );
+		blockType = getUnknownTypeHandler();
+		blockSettings = getBlockSettings( blockType );
 	}
 
 	// Include in set only if settings were determined
@@ -74,7 +74,7 @@ export function createBlockWithFallback( blockSlug, rawContent, attributes ) {
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			blockSlug,
+			blockType,
 			getBlockAttributes( blockSettings, rawContent, attributes )
 		);
 		return block;
