@@ -68,8 +68,10 @@ export default class Editable extends wp.element.Component {
 
 		// Wait for the event to propagate
 		setTimeout( () => {
+			if ( ! this.editor ) {
+				return;
+			}
 			// Getting the content before and after the cursor
-			this.editor.selection.getStart();
 			const childNodes = Array.from( this.editor.getBody().childNodes );
 			const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
 			const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
@@ -78,6 +80,7 @@ export default class Editable extends wp.element.Component {
 			// Avoid splitting on single enter
 			if (
 				! lastNodeBeforeCursor ||
+				beforeNodes.length < 2 ||
 				!! lastNodeBeforeCursor.textContent
 			) {
 				return;
@@ -86,7 +89,7 @@ export default class Editable extends wp.element.Component {
 			const after = getHtml( childNodes.slice( splitIndex ) );
 
 			// Splitting into two blocks
-			this.editor.setContent( this.props.value );
+			this.editor.setContent( this.props.value || '' );
 			const hasAfter = !! childNodes.slice( splitIndex )
 				.reduce( ( memo, node ) => memo + node.textContent, '' );
 			this.props.onSplit( before, hasAfter ? after : '' );

@@ -1,10 +1,13 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from 'api';
+import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { html, prop } = query;
+const { html, parse, query } = hpq;
+
+const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
+const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
 registerBlock( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
@@ -14,8 +17,7 @@ registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: html( 'div' ),
-		align: prop( 'div', 'style.textAlign' )
+		content: query( 'p', html() ),
 	},
 
 	controls: [
@@ -50,13 +52,15 @@ registerBlock( 'core/text', {
 
 		return (
 			<Editable
-				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				value={ fromValueToParagraphs( content ) }
+				onChange={ ( paragraphs ) => setAttributes( {
+					content: fromParagraphsToValue( paragraphs )
+				} ) }
 				style={ align ? { textAlign: align } : null }
 				onSplit={ ( before, after ) => {
-					setAttributes( { content: before } );
+					setAttributes( { content: fromParagraphsToValue( before ) } );
 					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
-						content: after
+						content: fromParagraphsToValue( after )
 					} ) );
 				} }
 			/>
@@ -67,10 +71,16 @@ registerBlock( 'core/text', {
 		const { align, content } = attributes;
 
 		return (
-			<div
-				style={ align ? { textAlign: align } : null }
-				dangerouslySetInnerHTML={ { __html: content } }
-			/>
+			<div>
+				{ content && content.map( ( paragraph, i ) => (
+					<p
+						key={ i }
+						style={ align ? { textAlign: align } : null }
+						dangerouslySetInnerHTML={ {
+							__html: paragraph
+						} } />
+				) ) }
+			</div>
 		);
 	}
 } );
