@@ -45,7 +45,7 @@ function VisualEditorBlock( props ) {
 		// Annoyingly React does not support focusOut and we're forced to check
 		// related target to ensure it's not a child when blur fires.
 		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			onDeselect();
+			//onDeselect();
 		}
 	}
 

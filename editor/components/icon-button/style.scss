@@ -14,13 +14,14 @@
 			color: $blue-medium;
 		}
 	}
-}
 
-.editor-icon-button__level {
-	font-family: $default-font;
-	font-size: 10px;
-	font-weight: bold;
-	position: absolute;
-	bottom: 8px;
-	right: 4px;
+	&:after {
+		content: attr( data-level );
+		font-family: $default-font;
+		font-size: 10px;
+		font-weight: bold;
+		position: absolute;
+		bottom: 8px;
+		right: 4px;
+	}
 }
