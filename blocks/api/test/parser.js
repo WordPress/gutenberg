@@ -65,15 +65,10 @@ describe( 'block parser', () => {
 				}
 			};
 
-			const blockNode = {
-				blockType: 'core/test-block',
-				attrs: {
-					align: 'left'
-				},
-				rawContent: 'Ribs'
-			};
+			const rawContent = 'Ribs';
+			const attrs = { align: 'left' };
 
-			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
+			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
 				align: 'left',
 				content: 'Ribs & Chicken'
 			} );

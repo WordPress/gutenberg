@@ -30,19 +30,55 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
 /**
  * Returns the block attributes of a registered block node given its settings.
  *
- * @param  {Object} blockNode     Parsed block node
- * @param  {Object} blockSettings Block settings
- * @return {Object}               Block attributes
+ * @param  {?Object} blockSettings Block settings
+ * @param  {string}  rawContent    Raw block content
+ * @param  {?Object} attributes    Known block attributes (from delimiters)
+ * @return {Object}                All block attributes
  */
-export function getBlockAttributes( blockNode, blockSettings ) {
-	const { rawContent } = blockNode;
-	// Merge attributes from parse with block implementation
-	let { attrs } = blockNode;
+export function getBlockAttributes( blockSettings, rawContent, attributes ) {
+	// Merge any attributes from comment delimiters with block implementation
+	attributes = attributes || {};
 	if ( blockSettings ) {
-		attrs = { ...attrs, ...parseBlockAttributes( rawContent, blockSettings ) };
+		attributes = {
+			...attributes,
+			...parseBlockAttributes( rawContent, blockSettings ),
+		};
 	}
 
-	return attrs;
+	return attributes;
+}
+
+/**
+ * Creates a block with fallback to the unknown type handler.
+ *
+ * @param  {?String} blockSlug  Block slug
+ * @param  {String}  rawContent Raw block content
+ * @param  {?Object} attributes Attributes obtained from block delimiters
+ * @return {?Object}            An initialized block object (if possible)
+ */
+export function createBlockWithFallback( blockSlug, rawContent, attributes ) {
+	// Use type from block content, otherwise find unknown handler
+	blockSlug = blockSlug || getUnknownTypeHandler();
+
+	// Try finding settings for known block type, else again fall back
+	let blockSettings = getBlockSettings( blockSlug );
+	if ( ! blockSettings ) {
+		blockSlug = getUnknownTypeHandler();
+		blockSettings = getBlockSettings( blockSlug );
+	}
+
+	// Include in set only if settings were determined
+	// TODO do we ever expect there to not be an unknown type handler?
+	if ( blockSettings ) {
+		// TODO allow blocks to opt-in to receiving a tree instead of a string.
+		// Gradually convert all blocks to this new format, then remove the
+		// string serialization.
+		const block = createBlock(
+			blockSlug,
+			getBlockAttributes( blockSettings, rawContent, attributes )
+		);
+		return block;
+	}
 }
 
 /**
@@ -98,12 +134,12 @@ export default function parse( content ) {
 	let contentBetweenBlocks = null;
 	function flushContentBetweenBlocks() {
 		if ( contentBetweenBlocks && contentBetweenBlocks.firstChild ) {
-			const blockType = getUnknownTypeHandler();
-			const settings = getBlockSettings( blockType );
-			if ( settings ) {
-				const rawContent = serializer.serialize( contentBetweenBlocks );
-				const blockNode = { rawContent, attrs: {} };
-				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
+			const block = createBlockWithFallback(
+				null, // default: unknown type handler
+				serializer.serialize( contentBetweenBlocks ),
+				null  // no known attributes
+			);
+			if ( block ) {
 				blocks.push( block );
 			}
 		}
@@ -113,48 +149,38 @@ export default function parse( content ) {
 	let currentNode = tree.firstChild;
 	do {
 		if ( currentNode.name === 'wp-block' ) {
-			// set node type to document fragment so that the TinyMCE
+			// Set node type to document fragment so that the TinyMCE
 			// serializer doesn't output its markup
 			currentNode.type = 11;
 
+			// Serialize the content
+			const rawContent = serializer.serialize( currentNode );
+
+			// Retrieve the attributes from the <wp-block> tag
 			const nodeAttributes = currentNode.attributes.reduce( ( memo, attr ) => {
 				memo[ attr.name ] = attr.value;
 				return memo;
 			}, {} );
 
-			// Use type from block node, otherwise find unknown handler
-			let blockType = nodeAttributes.slug || getUnknownTypeHandler();
+			// Retrieve the block attributes from the original delimiters
+			const blockAttributes = unescape( nodeAttributes.attributes || '' )
+				.split( /\s+/ )
+				.reduce( ( memo, attrString ) => {
+					const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
+					if ( pieces ) {
+						memo[ pieces[ 1 ] ] = pieces[ 2 ];
+					}
+					return memo;
+				}, {} );
 
-			// Try finding settings for known block type, else again fall back
-			let settings = getBlockSettings( blockType );
-			if ( ! settings ) {
-				blockType = getUnknownTypeHandler();
-				settings = getBlockSettings( blockType );
-			}
-
-			// Include in set only if settings were determined
-			// TODO when would this fail? error handling?
-			if ( settings ) {
-				// If we have any pending content outside of block delimiters,
-				// add it as a block now.
+			// Try to create the block
+			const block = createBlockWithFallback(
+				nodeAttributes.slug,
+				rawContent,
+				blockAttributes
+			);
+			if ( block ) {
 				flushContentBetweenBlocks();
-
-				const rawContent = serializer.serialize( currentNode );
-				const blockAttributes = unescape( nodeAttributes.attributes || '' )
-					.split( /\s+/ )
-					.reduce( ( memo, attrString ) => {
-						const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
-						if ( pieces ) {
-							memo[ pieces[ 1 ] ] = pieces[ 2 ];
-						}
-						return memo;
-					}, {} );
-
-				// TODO: allow blocks to opt-in to receiving a tree instead of
-				// a string.  Gradually convert all blocks to this new format,
-				// then remove the string serialization.
-				const blockNode = { rawContent, attrs: blockAttributes };
-				const block = createBlock( blockType, getBlockAttributes( blockNode, settings ) );
 				blocks.push( block );
 			}
 
