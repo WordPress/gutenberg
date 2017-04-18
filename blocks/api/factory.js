@@ -2,6 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -32,8 +33,15 @@ export function createBlock( blockType, attributes = {} ) {
  */
 export function switchToBlockType( block, blockType ) {
 	const destinationSettings = getBlockSettings( blockType );
-	const transformation = destinationSettings.transformations
-		.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
+	const sourceSettings = getBlockSettings( block.blockType );
+	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
+	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
+
+	// Find the from transformation
+	const transformation =
+		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 ) ||
+		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 );
+
 	if ( ! transformation ) {
 		return null;
 	}

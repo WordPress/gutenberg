@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { reduce } from 'lodash';
+import { uniq, get, reduce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -36,11 +36,19 @@ class BlockSwitcher extends wp.element.Component {
 
 	render() {
 		const blockSettings = wp.blocks.getBlockSettings( this.props.block.blockType );
-		const allowedBlocks = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
-			const transformation = block.transformations &&
-				block.transformations.find( t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
-			return transformation ? memo.concat( [ block ] ) : memo;
+		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
+			const transformFrom = get( block, 'transforms.from', [] );
+			const transformation = transformFrom.find( t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
+			return transformation ? memo.concat( [ block.slug ] ) : memo;
 		}, [] );
+		const blocksToBeTransformedTo = get( blockSettings, 'transforms.to', [] )
+			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
+		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
+			.reduce( ( memo, blockType ) => {
+				const block = wp.blocks.getBlockSettings( blockType );
+				return !! block ? memo.concat( block ) : memo;
+			}, [] );
+
 		if ( ! allowedBlocks.length ) {
 			return null;
 		}

@@ -83,16 +83,5 @@ registerBlock( 'core/text', {
 				) ) }
 			</div>
 		);
-	},
-
-	transformations: [
-		{
-			blocks: [ 'core/list' ],
-			transform: ( { items } ) => {
-				return {
-					content: items.map( item => `<p>${ item.value }</p>` ).join( '' )
-				};
-			}
-		}
-	],
+	}
 } );
