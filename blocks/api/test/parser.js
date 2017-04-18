@@ -151,7 +151,14 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, using unknown block handler at the end of the block', () => {
 			registerBlock( 'core/test-block', {} );
-			registerBlock( 'core/unknown-block', {} );
+			registerBlock( 'core/unknown-block', {
+				// Currently this is the only way to test block content parsing?
+				attributes: function( rawContent ) {
+					return {
+						content: rawContent,
+					};
+				}
+			} );
 
 			setUnknownTypeHandler( 'core/unknown-block' );
 
@@ -169,6 +176,8 @@ describe( 'block parser', () => {
 				'core/test-block',
 				'core/unknown-block',
 			] );
+			expect( parsed[ 1 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
+			expect( parsed[ 3 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
 		} );
 	} );
 } );
