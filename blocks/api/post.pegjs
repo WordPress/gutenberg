@@ -45,13 +45,13 @@ WP_Block_Type
 WP_Block_Attribute_List
   = as:(_+ attr:WP_Block_Attribute { return attr })*
   { return as.reduce( function( attrs, pair ) {
-    attrs[ pair.name ] = [ pair.value ];
+    attrs[ pair.name ] = pair.value;
     return attrs;
   }, {} ) }
 
 WP_Block_Attribute
   = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
-  { return [ name, value ] }
+  { return { name, value }; }
 
 WP_Block_Attribute_Name
   = head:ASCII_Letter tail:ASCII_AlphaNumeric*
