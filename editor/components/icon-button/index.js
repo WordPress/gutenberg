@@ -14,9 +14,8 @@ function IconButton( { icon, children, label, className, ...additionalProps } ) 
 	const classes = classnames( 'editor-icon-button', className );
 
 	return (
-		<Button { ...additionalProps } aria-label={ label } className={ classes }>
+		<Button { ...additionalProps } aria-label={ label } className={ classes } data-level={ children ? children : null }>
 			<Dashicon icon={ icon } />
-			{ children ? <span>{ children }</span> : null }
 		</Button>
 	);
 }
