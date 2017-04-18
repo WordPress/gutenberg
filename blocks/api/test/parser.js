@@ -7,8 +7,18 @@ import { text } from 'hpq';
 /**
  * Internal dependencies
  */
-import { default as parse, getBlockAttributes, parseBlockAttributes } from '../parser';
-import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
+import {
+	getBlockAttributes,
+	parseBlockAttributes,
+	createBlockWithFallback,
+	default as parse,
+} from '../parser';
+import {
+	registerBlock,
+	unregisterBlock,
+	getBlocks,
+	setUnknownTypeHandler,
+} from '../registration';
 
 describe( 'block parser', () => {
 	afterEach( () => {
@@ -72,6 +82,55 @@ describe( 'block parser', () => {
 				align: 'left',
 				content: 'Ribs & Chicken'
 			} );
+		} );
+	} );
+
+	describe( 'createBlockWithFallback', () => {
+		it( 'should create the requested block if it exists', () => {
+			registerBlock( 'core/test-block', {} );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'content',
+				{ attr: 'value' }
+			);
+			expect( block.blockType ).to.eql( 'core/test-block' );
+			expect( block.attributes ).to.eql( { attr: 'value' } );
+		} );
+
+		it( 'should create the requested block with no attributes if it exists', () => {
+			registerBlock( 'core/test-block', {} );
+
+			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			expect( block.blockType ).to.eql( 'core/test-block' );
+			expect( block.attributes ).to.eql( {} );
+		} );
+
+		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
+			registerBlock( 'core/unknown-block', {} );
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'content',
+				{ attr: 'value' }
+			);
+			expect( block.blockType ).to.eql( 'core/unknown-block' );
+			expect( block.attributes ).to.eql( { attr: 'value' } );
+		} );
+
+		it( 'should fall back to the unknown type handler if block type not specified', () => {
+			registerBlock( 'core/unknown-block', {} );
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const block = createBlockWithFallback( null, 'content' );
+			expect( block.blockType ).to.eql( 'core/unknown-block' );
+			expect( block.attributes ).to.eql( {} );
+		} );
+
+		it( 'should not create a block if no unknown type handler', () => {
+			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			expect( block ).to.be.undefined();
 		} );
 	} );
 
