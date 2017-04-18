@@ -83,12 +83,12 @@ export function createBlockWithFallback( blockType, rawContent, attributes ) {
 }
 
 /**
- * Returns a list of blocks extracted from the Post Content
+ * Parses the post content with TinyMCE and returns a list of blocks.
  *
  * @param  {String} content The post content
  * @return {Array}          Block list
  */
-export default function parse( content ) {
+export function parseWithTinyMCE( content ) {
 	// First, convert comment delimiters into temporary <wp-block> "tags" so
 	// that TinyMCE can parse them.  Examples:
 	//   In  : <!-- wp:core/text -->
@@ -202,3 +202,22 @@ export default function parse( content ) {
 
 	return blocks;
 }
+
+/**
+ * Parses the post content with a PegJS grammar and returns a list of blocks.
+ *
+ * @param  {String} content The post content
+ * @return {Array}          Block list
+ */
+export function parseWithGrammar( content ) {
+	return grammarParse( content ).reduce( ( memo, blockNode ) => {
+		const { blockType, rawContent, attrs } = blockNode;
+		const block = createBlockWithFallback( blockType, rawContent, attrs );
+		if ( block ) {
+			memo.push( block );
+		}
+		return memo;
+	}, [] );
+}
+
+export default parseWithTinyMCE;
