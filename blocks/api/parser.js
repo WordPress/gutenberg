@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as query from 'hpq';
+import { escape, unescape } from 'lodash';
 
 /**
  * Internal dependencies
@@ -44,24 +45,6 @@ export function getBlockAttributes( blockNode, blockSettings ) {
 	return attrs;
 }
 
-function htmlEscape( str ) {
-	return str
-		.replace( /&/g, '&amp;' )
-		.replace( /"/g, '&quot;' )
-		.replace( /'/g, '&#39;' )
-		.replace( /</g, '&lt;' )
-		.replace( />/g, '&gt;' );
-}
-
-function htmlUnescape( str ) {
-	return str
-		.replace( /&quot;/g, '"' )
-		.replace( /&#39;/g, '\'' )
-		.replace( /&lt;/g, '<' )
-		.replace( /&gt;/g, '>' )
-		.replace( /&amp;/g, '&' );
-}
-
 /**
  * Returns a list of blocks extracted from the Post Content
  *
@@ -85,7 +68,7 @@ export default function parse( content ) {
 			}
 
 			if ( attributes ) {
-				attributes = ' attributes="' + htmlEscape( attributes.trim() ) + '"';
+				attributes = ' attributes="' + escape( attributes.trim() ) + '"';
 			}
 			return '<wp-block slug="' + slug + '"' + attributes + '>';
 		}
@@ -157,7 +140,7 @@ export default function parse( content ) {
 				flushContentBetweenBlocks();
 
 				const rawContent = serializer.serialize( currentNode );
-				const blockAttributes = htmlUnescape( nodeAttributes.attributes || '' )
+				const blockAttributes = unescape( nodeAttributes.attributes || '' )
 					.split( /\s+/ )
 					.reduce( ( memo, attrString ) => {
 						const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
