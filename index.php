@@ -35,7 +35,7 @@ function gutenberg_register_scripts() {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 	// Vendor
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '' ) . $suffix;
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 	wp_register_script( 'react', 'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js' );
 	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js', array( 'react' ) );
 	wp_register_script( 'react-dom-server', 'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js', array( 'react' ) );
