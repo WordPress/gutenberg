@@ -145,6 +145,7 @@ export default function parse( content ) {
 		}
 		contentBetweenBlocks = new tinymce.html.Node( 'body', 11 );
 	}
+	flushContentBetweenBlocks();
 
 	let currentNode = tree.firstChild;
 	do {

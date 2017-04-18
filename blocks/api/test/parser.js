@@ -144,7 +144,7 @@ describe( 'block parser', () => {
 			] );
 		} );
 
-		it( 'should parse the post content, using unknown block handler at the end of the block', () => {
+		it( 'should parse the post content, including raw HTML at each end', () => {
 			registerBlock( 'core/test-block', {} );
 			registerBlock( 'core/unknown-block', {
 				// Currently this is the only way to test block content parsing?
@@ -158,21 +158,24 @@ describe( 'block parser', () => {
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const parsed = parse(
+				'<p>Cauliflower</p>' +
 				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'<p>Romanesco</p>'
 			);
 
-			expect( parsed ).to.have.lengthOf( 4 );
+			expect( parsed ).to.have.lengthOf( 5 );
 			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
+				'core/unknown-block',
 				'core/test-block',
 				'core/unknown-block',
 				'core/test-block',
 				'core/unknown-block',
 			] );
-			expect( parsed[ 1 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
-			expect( parsed[ 3 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
+			expect( parsed[ 0 ].attributes.content ).to.eql( '<p>Cauliflower</p>' );
+			expect( parsed[ 2 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
+			expect( parsed[ 4 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
 		} );
 	} );
 } );
