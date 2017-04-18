@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { html, prop, parse, query } = hpq;
+const { html, prop, query } = hpq;
 
 registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
@@ -75,23 +75,5 @@ registerBlock( 'core/list', {
 			<li key={ index } dangerouslySetInnerHTML={ { __html: item.value } } />
 		) );
 		return wp.element.createElement( listType.toLowerCase(), null, children );
-	},
-
-	transformations: [
-		{
-			blocks: [ 'core/text' ],
-			transform: ( { content } ) => {
-				const items = parse( content, query( 'p', html() ) )
-					.map( value => {
-						return {
-							value
-						};
-					} );
-				return {
-					listType: 'ul',
-					items
-				};
-			}
-		}
-	],
+	}
 } );

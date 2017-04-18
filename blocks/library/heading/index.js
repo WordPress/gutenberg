@@ -52,5 +52,33 @@ registerBlock( 'core/heading', {
 				style={ align ? { textAlign: align } : null }
 				dangerouslySetInnerHTML={ { __html: content } } />
 		);
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content, align } ) => {
+					return {
+						tag: 'H2',
+						content,
+						align
+					};
+				}
+			}
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content, align } ) => {
+					return {
+						content,
+						align
+					};
+				}
+			}
+		]
 	}
 } );
