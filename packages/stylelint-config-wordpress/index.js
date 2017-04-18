@@ -34,7 +34,9 @@ module.exports = {
     "declaration-colon-space-after": "always-single-line",
     "declaration-colon-space-before": "never",
     "font-family-name-quotes": "always-where-recommended",
-    "font-weight-notation": "numeric",
+    "font-weight-notation": [ "numeric", {
+      ignore: ["relative"],
+    } ],
     "function-calc-no-unspaced-operator": true,
     "function-comma-space-after": "always",
     "function-comma-space-before": "never",
