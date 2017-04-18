@@ -35,8 +35,9 @@ function gutenberg_register_scripts() {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 	// Vendor
-	wp_register_script( 'react', 'https://unpkg.com/react@15/dist/react' . $suffix . '.js' );
-	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@15/dist/react-dom' . $suffix . '.js', array( 'react' ) );
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '' ) . $suffix;
+	wp_register_script( 'react', 'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js' );
+	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js', array( 'react' ) );
 
 	// Editor
 	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js' );
