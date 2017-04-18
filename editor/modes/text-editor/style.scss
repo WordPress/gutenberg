@@ -5,6 +5,9 @@
 	top: $admin-bar-height-big + $header-height;
 	left: 0;
 	right: 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 
 	button {
 		height: 30px;
@@ -98,7 +101,6 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor__formatting-inner,
 .editor-text-editor {
 	padding-left: $item-spacing * 2;
 	padding-right: $item-spacing * 2;
@@ -118,5 +120,40 @@
 	@include break-huge() {
 		padding-left: 200px;
 		padding-right: 200px;
+	}
+}
+
+.editor-text-editor__formatting {
+	&:before,
+	&:after {
+		content: "";
+		display: block;
+		margin: 0;
+		flex: 0 1 $item-spacing * 2;
+	}
+
+	&:after {
+		margin-left: auto;
+	}
+
+	@include break-large() {
+		&:before,
+		&:after {
+			flex: 0 1 10%;
+		}
+	}
+
+	@include break-wide() {
+		&:before,
+		&:after {
+			flex: 0 1 15%;
+		}
+	}
+
+	@include break-huge() {
+		&:before,
+		&:after {
+			flex: 0 1 200px;
+		}
 	}
 }
