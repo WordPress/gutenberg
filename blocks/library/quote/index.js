@@ -7,7 +7,7 @@ import Editable from 'components/editable';
 
 const { parse, html, query } = hpq;
 
-const fromValueToParagraphs = ( value ) => value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' );
+const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
 const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
 registerBlock( 'core/quote', {
@@ -50,7 +50,7 @@ registerBlock( 'core/quote', {
 
 		return (
 			<blockquote>
-				{ value.map( ( paragraph, i ) => (
+				{ value && value.map( ( paragraph, i ) => (
 					<p
 						key={ i }
 						dangerouslySetInnerHTML={ {
