@@ -22,7 +22,8 @@ const config = {
 	},
 	externals: {
 		react: 'React',
-		'react-dom': 'ReactDOM'
+		'react-dom': 'ReactDOM',
+		'react-dom/server': 'ReactDOMServer'
 	},
 	module: {
 		rules: [
