@@ -79,7 +79,7 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, align } ) => {
 					return {
-						content,
+						content: [ content ],
 						align
 					};
 				}
