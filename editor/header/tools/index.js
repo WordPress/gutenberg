@@ -31,7 +31,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 					<Dashicon icon="visibility" />
 					{ wp.i18n._x( 'Preview', 'imperative verb' ) }
 				</Button>
-				<Button onClick={ toggleSidebar } isActive={ isSidebarOpened }>
+				<Button onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
 					<Dashicon icon="admin-generic" />
 					{ wp.i18n.__( 'Post Settings' ) }
 				</Button>

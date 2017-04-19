@@ -4,12 +4,12 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { isPrimary, isLarge, isActive, className, ...additionalProps } ) {
+function Button( { isPrimary, isLarge, isToggled, className, ...additionalProps } ) {
 	const classes = classnames( 'editor-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
 		'button-large': isLarge,
-		'is-toggled': isActive
+		'is-toggled': isToggled
 	} );
 
 	return (
