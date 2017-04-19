@@ -7,8 +7,18 @@ import { text } from 'hpq';
 /**
  * Internal dependencies
  */
-import { default as parse, getBlockAttributes, parseBlockAttributes } from '../parser';
-import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
+import {
+	getBlockAttributes,
+	parseBlockAttributes,
+	createBlockWithFallback,
+	default as parse,
+} from '../parser';
+import {
+	registerBlock,
+	unregisterBlock,
+	getBlocks,
+	setUnknownTypeHandler,
+} from '../registration';
 
 describe( 'block parser', () => {
 	afterEach( () => {
@@ -65,22 +75,91 @@ describe( 'block parser', () => {
 				}
 			};
 
-			const blockNode = {
-				blockType: 'core/test-block',
-				attrs: {
-					align: 'left'
-				},
-				rawContent: 'Ribs'
-			};
+			const rawContent = 'Ribs';
+			const attrs = { align: 'left' };
 
-			expect( getBlockAttributes( blockNode, blockSettings ) ).to.eql( {
+			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
 				align: 'left',
 				content: 'Ribs & Chicken'
 			} );
 		} );
 	} );
 
+	describe( 'createBlockWithFallback', () => {
+		it( 'should create the requested block if it exists', () => {
+			registerBlock( 'core/test-block', {} );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'content',
+				{ attr: 'value' }
+			);
+			expect( block.blockType ).to.eql( 'core/test-block' );
+			expect( block.attributes ).to.eql( { attr: 'value' } );
+		} );
+
+		it( 'should create the requested block with no attributes if it exists', () => {
+			registerBlock( 'core/test-block', {} );
+
+			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			expect( block.blockType ).to.eql( 'core/test-block' );
+			expect( block.attributes ).to.eql( {} );
+		} );
+
+		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
+			registerBlock( 'core/unknown-block', {} );
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const block = createBlockWithFallback(
+				'core/test-block',
+				'content',
+				{ attr: 'value' }
+			);
+			expect( block.blockType ).to.eql( 'core/unknown-block' );
+			expect( block.attributes ).to.eql( { attr: 'value' } );
+		} );
+
+		it( 'should fall back to the unknown type handler if block type not specified', () => {
+			registerBlock( 'core/unknown-block', {} );
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const block = createBlockWithFallback( null, 'content' );
+			expect( block.blockType ).to.eql( 'core/unknown-block' );
+			expect( block.attributes ).to.eql( {} );
+		} );
+
+		it( 'should not create a block if no unknown type handler', () => {
+			const block = createBlockWithFallback( 'core/test-block', 'content' );
+			expect( block ).to.be.undefined();
+		} );
+	} );
+
 	describe( 'parse()', () => {
+		it( 'should parse the post content, including block attributes', () => {
+			registerBlock( 'core/test-block', {
+				// Currently this is the only way to test block content parsing?
+				attributes: function( rawContent ) {
+					return {
+						content: rawContent,
+					};
+				}
+			} );
+
+			const parsed = parse(
+				'<!-- wp:core/test-block smoked:yes -->' +
+				'Brisket' +
+				'<!-- /wp:core/test-block -->'
+			);
+
+			expect( parsed ).to.have.lengthOf( 1 );
+			expect( parsed[ 0 ].blockType ).to.equal( 'core/test-block' );
+			expect( parsed[ 0 ].attributes ).to.eql( {
+				content: 'Brisket',
+				smoked: 'yes',
+			} );
+			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
+		} );
+
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlock( 'core/test-block', {
 				attributes: function( rawContent ) {
@@ -120,8 +199,42 @@ describe( 'block parser', () => {
 			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
 				'core/test-block',
 				'core/unknown-block',
-				'core/unknown-block'
+				'core/unknown-block',
 			] );
+		} );
+
+		it( 'should parse the post content, including raw HTML at each end', () => {
+			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/unknown-block', {
+				// Currently this is the only way to test block content parsing?
+				attributes: function( rawContent ) {
+					return {
+						content: rawContent,
+					};
+				}
+			} );
+
+			setUnknownTypeHandler( 'core/unknown-block' );
+
+			const parsed = parse(
+				'<p>Cauliflower</p>' +
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<p>Romanesco</p>'
+			);
+
+			expect( parsed ).to.have.lengthOf( 5 );
+			expect( parsed.map( ( { blockType } ) => blockType ) ).to.eql( [
+				'core/unknown-block',
+				'core/test-block',
+				'core/unknown-block',
+				'core/test-block',
+				'core/unknown-block',
+			] );
+			expect( parsed[ 0 ].attributes.content ).to.eql( '<p>Cauliflower</p>' );
+			expect( parsed[ 2 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
+			expect( parsed[ 4 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
 		} );
 	} );
 } );

@@ -14,3 +14,11 @@ global.document = require( 'jsdom' ).jsdom( '', {
 global.window = document.defaultView;
 global.requestAnimationFrame = setTimeout;
 global.navigator = window.navigator;
+
+// These are necessary to load TinyMCE successfully
+global.URL = window.URL;
+global.window.tinyMCEPreInit = {
+	// Without this, TinyMCE tries to determine its URL by looking at the
+	// <script> tag where it was loaded from, which of course fails here.
+	baseURL: 'about:blank',
+};
