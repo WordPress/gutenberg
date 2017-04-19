@@ -3,19 +3,19 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
-#: blocks/controls/index.js:11
+#: blocks/controls/index.js:12
 msgid "Position left"
 msgstr ""
 
-#: blocks/controls/index.js:17
+#: blocks/controls/index.js:19
 msgid "Position center"
 msgstr ""
 
-#: blocks/controls/index.js:23
+#: blocks/controls/index.js:26
 msgid "Position right"
 msgstr ""
 
-#: blocks/controls/index.js:29
+#: blocks/controls/index.js:33
 msgid "No positionning"
 msgstr ""
 
@@ -35,7 +35,7 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: blocks/library/image/index.js:31
+#: blocks/library/image/index.js:38
 msgid "Write caption…"
 msgstr ""
 

@@ -19,6 +19,13 @@ registerBlock( 'core/image', {
 		caption: html( 'figcaption' )
 	},
 
+	controls: [
+		'core/position-left',
+		'core/position-center',
+		'core/position-right',
+		'core/position-none'
+	],
+
 	edit( { attributes, isSelected, setAttributes } ) {
 		const { url, alt, caption } = attributes;
 

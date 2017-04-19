@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { isString, compact } from 'lodash';
 
 /**
  * Internal dependencies
@@ -50,7 +51,14 @@ function VisualEditorBlock( props ) {
 		}
 	}
 
-	const controls = wp.blocks.controls.concat( settings.controls || [] );
+	const controls = settings.controls && compact(
+		settings.controls.map( ( control ) => {
+			if ( isString( control ) ) {
+				return wp.blocks.controls.find( ctrl => ctrl.slug === control );
+			}
+			return control;
+		} )
+	);
 
 	// Disable reason: Each block can receive focus but must be able to contain
 	// block children. Tab keyboard navigation enabled by tabIndex assignment.
