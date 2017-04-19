@@ -6,63 +6,52 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	position: fixed;
 	z-index: 1;
-	top: 32px;
-	left: 160px;
+	top: $admin-bar-height-big;
+	left: 0;
 	right: 0;
 
-	/* Responsive and folded */
-	body.folded & {
-		left: 36px;
-	}
-
-	/* RTL */
-	body.rtl & {
-		left: 0;
-		right: 160px;
-	}
-
-	body.rtl.folded & {
-		left: 0;
-		right: 36px;
+	@include break-small() {
+		position: fixed;
 	}
 }
 
-@media only screen and ( max-width: 960px ) {
-	body.auto-fold .editor-header {
-		left: 36px;
+.auto-fold .editor-header {
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+		top: $admin-bar-height;
 	}
 
-	body.rtl.auto-fold .editor-header {
-		left: 0;
-		right: 36px;
+	@include break-large() {
+		left: $admin-sidebar-width;
 	}
 }
 
-@media only screen and ( max-width: 782px ) {
+/* Sidebar manually collapsed */
+.folded .editor-header {
+	left: $admin-sidebar-width-collapsed;
+}
 
-	body.auto-fold .editor-header {
+/* Mobile menu opened */
+.auto-fold .wp-responsive-open .editor-header {
+	left: $admin-sidebar-width-big;
+	right: -$admin-sidebar-width-big;
+}
+
+/* RTL */
+.rtl.auto-fold .editor-header {
+	@include break-medium() {
 		left: 0;
+		right: $admin-sidebar-width-collapsed;
 	}
 
-	body.rtl.auto-fold .editor-header {
+	@include break-large() {
 		left: 0;
-		right: 0;
+		right: $admin-sidebar-width;
 	}
+}
 
-	body.auto-fold .wp-responsive-open .editor-header {
-		left: 190px;
-		right: -190px;
-	}
-
-	body.rtl.auto-fold .wp-responsive-open .editor-header {
-		left: -190px;
-		right: 190px;
-	}
-
-	.editor-header {
-		top: 46px;
-	}
-
+.rtl.auto-fold .wp-responsive-open .editor-header {
+	left: -$admin-sidebar-width-big;
+	right: $admin-sidebar-width-big;
 }

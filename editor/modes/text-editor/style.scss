@@ -1,7 +1,13 @@
 .editor-text-editor__formatting {
 	background: $white;
 	border-bottom: 1px solid $light-gray-500;
-	min-height: 36px;
+	min-height: $admin-sidebar-width-collapsed;
+	top: $admin-bar-height-big + $header-height;
+	left: 0;
+	right: 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 
 	button {
 		height: 30px;
@@ -27,22 +33,44 @@
 	button:focus {
 		outline: none;
 	}
+
+	@include break-small() {
+		position: fixed;
+	}
 }
 
-.editor-text-editor__bold {
+.editor-text-editor__formatting .editor-text-editor__bold {
 	font-weight: bold;
 }
 
-.editor-text-editor__italic {
+.editor-text-editor__formatting .editor-text-editor__italic {
 	font-style: italic;
 }
-.editor-text-editor__link {
+
+.editor-text-editor__formatting .editor-text-editor__link {
 	text-decoration: underline;
 	color: $blue-medium;
 }
-.editor-text-editor__del {
+
+.editor-text-editor__formatting .editor-text-editor__del {
 	text-decoration:line-through;
 }
+
+.auto-fold .editor-text-editor__formatting {
+	@include break-medium() {
+		left: $admin-sidebar-width-collapsed;
+		top: $admin-bar-height + $header-height;
+	}
+
+	@include break-large() {
+		left: $admin-sidebar-width;
+	}
+}
+
+.folded .editor-text-editor__formatting {
+	left: $admin-sidebar-width-collapsed;
+}
+
 
 .editor-text-editor {
 	display: block;
@@ -59,40 +87,34 @@
 	line-height: 150%;
 	transition: padding .2s linear;
 
+	@include break-small() {
+		padding-top: 60px + $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		padding-top: 60px + $admin-bar-height;
+	}
+
 	&:focus {
 		box-shadow: none;
 	}
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor__formatting,
+$text-editor-max-width: 760px;
+
 .editor-text-editor {
-	padding-left: $item-spacing * 2;
-	padding-right: $item-spacing * 2;
-	max-width: 1440px;
+	padding-left: 20px;
+	padding-right: 20px;
+
+	@include break-large() {
+		padding-left: calc( 50% - #{ $text-editor-max-width / 2 } );
+		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
+	}
+}
+
+.editor-text-editor__formatting-group {
+	width: 100%;
+	max-width: $text-editor-max-width;
 	margin: 0 auto;
-}
-
-@media only screen and ( min-width: 960px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
-		padding-left: 10%;
-		padding-right: 10%;
-	}
-}
-
-@media only screen and ( min-width: 1280px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
-		padding-left: 15%;
-		padding-right: 15%;
-	}
-}
-
-@media only screen and ( min-width: 1440px ) {
-	.editor-text-editor__formatting,
-	.editor-text-editor {
-		padding-left: 200px;
-		padding-right: 200px;
-	}
 }
