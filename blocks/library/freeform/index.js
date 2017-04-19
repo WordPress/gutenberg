@@ -5,11 +5,9 @@ import { registerBlock, query, setUnknownTypeHandler } from 'api';
 
 const { html } = query;
 
-registerBlock( 'core/freeform', {
+const blockSettings = {
 	title: wp.i18n.__( 'Freeform' ),
-
 	icon: 'text',
-
 	category: 'common',
 
 	attributes: {
@@ -30,6 +28,7 @@ registerBlock( 'core/freeform', {
 	save( { attributes } ) {
 		return attributes.html;
 	}
-} );
+};
 
+registerBlock( 'core/freeform', blockSettings );
 setUnknownTypeHandler( 'core/freeform' );

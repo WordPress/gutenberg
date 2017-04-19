@@ -9,11 +9,9 @@ const { html, parse, query } = hpq;
 const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
 const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
-registerBlock( 'core/text', {
+const blockSettings = {
 	title: wp.i18n.__( 'Text' ),
-
 	icon: 'text',
-
 	category: 'common',
 
 	attributes: {
@@ -84,4 +82,6 @@ registerBlock( 'core/text', {
 			</div>
 		);
 	}
-} );
+};
+
+registerBlock( 'core/text', blockSettings );
