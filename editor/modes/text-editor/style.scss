@@ -101,23 +101,20 @@
 }
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
-.editor-text-editor,
-.editor-text-editor__formatting {
-	padding-left: 20px;
-	padding-right: 20px;
-	margin: 0 auto;
-}
+$text-editor-max-width: 760px;
 
 .editor-text-editor {
+	padding-left: 20px;
+	padding-right: 20px;
+
 	@include break-large() {
-		padding-left: calc( 50% - 400px + 20px );		// 50% minus half of the max-width of the main column
-		padding-right:  calc( 50% - 400px + 20px );
+		padding-left: calc( 50% - #{ $text-editor-max-width / 2 } );
+		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
 	}
 }
 
-.editor-text-editor__formatting {
-	@include break-large() {
-		padding-left: calc( 50% - 400px + 20px - 80px );		// 50% minus half of the max-width of the main column, minus half of the left offset
-		padding-right:  calc( 50% - 400px + 20px - 80px );
-	}
+.editor-text-editor__formatting-group {
+	width: 100%;
+	max-width: $text-editor-max-width;
+	margin: 0 auto;
 }
