@@ -124,7 +124,7 @@ class VisualEditorBlock extends wp.element.Component {
 					attributes={ block.attributes }
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
-					updateFocus={ onFocus }
+					setFocus={ onFocus }
 				/>
 			</div>
 		);

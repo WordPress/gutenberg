@@ -142,7 +142,7 @@ export default class Editable extends wp.element.Component {
 			this.initialize();
 		}
 
-		if ( this.props.focus !== prevProps.focus && this.props.focus ) {
+		if ( !! this.props.focus && ! prevProps.focus ) {
 			this.focus();
 		}
 
