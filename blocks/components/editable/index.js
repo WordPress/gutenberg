@@ -45,7 +45,7 @@ export default class Editable extends wp.element.Component {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
-		editor.on( 'NewBlock', this.onNewBlock )
+		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 	}
 

@@ -31,7 +31,7 @@ registerBlock( 'core/heading', {
 		} ) )
 	],
 
-	edit( { attributes, setAttributes, focus, updateFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { content, tag, align } = attributes;
 
 		return (
@@ -39,7 +39,7 @@ registerBlock( 'core/heading', {
 				tagName={ tag }
 				value={ content }
 				focus={ focus }
-				onFocus={ updateFocus }
+				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				style={ align ? { textAlign: align } : null }
 			/>

@@ -183,7 +183,7 @@ export default connect(
 			} );
 		},
 
-		onFocus( config = {} ) {
+		onFocus( config ) {
 			dispatch( {
 				type: 'UPDATE_FOCUS',
 				uid: ownProps.uid,

@@ -19,7 +19,7 @@ registerBlock( 'core/image', {
 		caption: html( 'figcaption' )
 	},
 
-	edit( { attributes, setAttributes, focus, updateFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
 
 		return (
@@ -31,7 +31,7 @@ registerBlock( 'core/image', {
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
 						focus={ focus }
-						onFocus={ updateFocus }
+						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) } />
 				) : null }
 			</figure>

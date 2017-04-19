@@ -20,7 +20,7 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
-	edit( { attributes, setAttributes, focus, updateFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { value, citation } = attributes;
 
 		return (
@@ -33,7 +33,7 @@ registerBlock( 'core/quote', {
 						} )
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ () => updateFocus( { editable: 'value' } ) }
+					onFocus={ () => setFocus( { editable: 'value' } ) }
 				/>
 				{ ( citation || !! focus ) &&
 					<footer>
@@ -45,7 +45,7 @@ registerBlock( 'core/quote', {
 								} )
 							}
 							focus={ focus && focus.editable === 'citation' ? focus : null }
-							onFocus={ () => updateFocus( { editable: 'citation' } ) }
+							onFocus={ () => setFocus( { editable: 'citation' } ) }
 						/>
 					</footer>
 				}

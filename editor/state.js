@@ -127,7 +127,7 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				uid: action.uid,
 				typing: state.uid === action.uid ? state.typing : false,
-				focus: action.config
+				focus: action.config || {}
 			};
 
 		case 'START_TYPING':

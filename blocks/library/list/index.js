@@ -54,7 +54,7 @@ registerBlock( 'core/list', {
 		}
 	],
 
-	edit( { attributes, focus, updateFocus } ) {
+	edit( { attributes, focus, setFocus } ) {
 		const { listType = 'ol', items = [], align } = attributes;
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
@@ -66,7 +66,7 @@ registerBlock( 'core/list', {
 				style={ align ? { textAlign: align } : null }
 				value={ content }
 				focus={ focus }
-				onFocus={ updateFocus }
+				onFocus={ setFocus }
 				className="blocks-list" />
 		);
 	},
