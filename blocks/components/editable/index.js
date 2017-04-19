@@ -68,7 +68,14 @@ export default class Editable extends wp.element.Component {
 
 		// Getting the content before and after the cursor
 		const childNodes = Array.from( this.editor.getBody().childNodes );
-		const splitIndex = childNodes.indexOf( this.editor.selection.getStart() );
+		let selectedChild = this.editor.selection.getStart();
+		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
+			selectedChild = selectedChild.parentNode;
+		}
+		const splitIndex = childNodes.indexOf( selectedChild );
+		if ( splitIndex === -1 ) {
+			return;
+		}
 		const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
 		const beforeNodes = childNodes.slice( 0, splitIndex );
 		const lastNodeBeforeCursor = last( beforeNodes );
