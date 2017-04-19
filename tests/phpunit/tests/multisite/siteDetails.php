@@ -144,6 +144,49 @@ class Tests_Multisite_Site_Details extends WP_UnitTestCase {
 
 		$this->assertNotFalse( $cached_details );
 	}
+
+	public function test_site_details_filter_with_blogname() {
+		add_filter( 'site_details', array( $this, '_filter_site_details_blogname' ) );
+		$site = get_site();
+		$blogname = $site->blogname;
+		remove_filter( 'site_details', array( $this, '_filter_site_details_blogname' ) );
+
+		$this->assertSame( 'Foo Bar', $blogname );
+	}
+
+	public function _filter_site_details_blogname( $details ) {
+		$details->blogname = 'Foo Bar';
+		return $details;
+	}
+
+	/**
+	 * @ticket 40458
+	 */
+	public function test_site_details_filter_with_custom_value_isetter() {
+		add_filter( 'site_details', array( $this, '_filter_site_details_custom_value' ) );
+		$site = get_site();
+		$custom_value_isset = isset( $site->custom_value );
+		remove_filter( 'site_details', array( $this, '_filter_site_details_custom_value' ) );
+
+		$this->assertTrue( $custom_value_isset );
+	}
+
+	/**
+	 * @ticket 40458
+	 */
+	public function test_site_details_filter_with_custom_value_getter() {
+		add_filter( 'site_details', array( $this, '_filter_site_details_custom_value' ) );
+		$site = get_site();
+		$custom_value = $site->custom_value;
+		remove_filter( 'site_details', array( $this, '_filter_site_details_custom_value' ) );
+
+		$this->assertSame( 'foo', $custom_value );
+	}
+
+	public function _filter_site_details_custom_value( $details ) {
+		$details->custom_value = 'foo';
+		return $details;
+	}
 }
 
 endif;
