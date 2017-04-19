@@ -60,6 +60,11 @@ registerBlock( 'core/heading', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content, align } ) => {
+					if ( Array.isArray( content ) ) {
+						// TODO this appears to always be true?
+						// TODO reject the switch if more than one paragraph
+						content = content[ 0 ];
+					}
 					return {
 						tag: 'H2',
 						content,
