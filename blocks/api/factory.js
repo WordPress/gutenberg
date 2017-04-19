@@ -32,15 +32,14 @@ export function createBlock( blockType, attributes = {} ) {
  * @return {Object?}           Block object
  */
 export function switchToBlockType( block, blockType ) {
+	// Find the right transformation by giving priority to the "to" transformation
 	const destinationSettings = getBlockSettings( blockType );
 	const sourceSettings = getBlockSettings( block.blockType );
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
 	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
-
-	// Find the from transformation
 	const transformation =
-		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 ) ||
-		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 );
+		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 ) ||
+		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
 
 	if ( ! transformation ) {
 		return null;

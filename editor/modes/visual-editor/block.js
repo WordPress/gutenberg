@@ -65,7 +65,7 @@ function VisualEditorBlock( props ) {
 			className={ className }
 		>
 			{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
-			<div className="editor-visual-editor__block_controls">
+			<div className="editor-visual-editor__block-controls">
 				{ isSelected && <BlockSwitcher uid={ block.uid } /> }
 				{ isSelected && settings.controls ? (
 					<Toolbar
