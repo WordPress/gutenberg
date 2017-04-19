@@ -376,6 +376,38 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$dashboard_blog = get_dashboard_blog();
 		$this->assertEquals( $blog_id, $dashboard_blog->blog_id );
 	}
+
+	/**
+	 * @ticket 37528
+	 */
+	function test_wp_update_network_site_counts() {
+		update_network_option( null, 'blog_count', 40 );
+
+		$expected = get_sites( array(
+			'network_id' => get_current_network_id(),
+			'spam'       => 0,
+			'deleted'    => 0,
+			'archived'   => 0,
+			'count'      => true,
+		) );
+
+		wp_update_network_site_counts();
+
+		$result = get_blog_count();
+		$this->assertEquals( $expected, $result );
+	}
+
+	/**
+	 * @ticket 37528
+	 */
+	function test_wp_update_network_site_counts_on_different_network() {
+		update_network_option( self::$different_network_id, 'blog_count', 40 );
+
+		wp_update_network_site_counts( self::$different_network_id );
+
+		$result = get_blog_count( self::$different_network_id );
+		$this->assertEquals( 3, $result );
+	}
 }
 
 endif;
