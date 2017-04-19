@@ -13,9 +13,9 @@ import Sidebar from 'sidebar';
 import TextEditor from 'modes/text-editor';
 import VisualEditor from 'modes/visual-editor';
 
-function Layout( { mode, sidebarOpened } ) {
+function Layout( { mode, isSidebarOpened } ) {
 	const className = classnames( 'editor-layout', {
-		'sidebar-opened': sidebarOpened
+		'is-sidebar-opened': isSidebarOpened
 	} );
 
 	return (
@@ -25,12 +25,12 @@ function Layout( { mode, sidebarOpened } ) {
 				{ mode === 'text' && <TextEditor /> }
 				{ mode === 'visual' && <VisualEditor /> }
 			</div>
-			{ sidebarOpened && <Sidebar /> }
+			{ isSidebarOpened && <Sidebar /> }
 		</div>
 	);
 }
 
 export default connect( ( state ) => ( {
 	mode: state.mode,
-	sidebarOpened: state.sidebar.opened
+	isSidebarOpened: state.isSidebarOpened
 } ) )( Layout );

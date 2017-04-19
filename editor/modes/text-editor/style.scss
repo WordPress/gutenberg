@@ -36,6 +36,10 @@
 
 	@include break-small() {
 		position: fixed;
+
+		.editor-layout.is-sidebar-opened & {
+			margin-right: $sidebar-width;
+		}
 	}
 }
 

@@ -148,10 +148,10 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function sidebar( state = { opened: false }, action ) {
+export function isSidebarOpened( state = false, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
-			return { opened: ! state.opened };
+			return ! state;
 	}
 
 	return state;
@@ -168,7 +168,7 @@ export function createReduxStore() {
 		selectedBlock,
 		hoveredBlock,
 		mode,
-		sidebar
+		isSidebarOpened
 	} );
 
 	return createStore(

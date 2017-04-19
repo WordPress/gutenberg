@@ -9,7 +9,7 @@ function Button( { isPrimary, isLarge, isActive, className, ...additionalProps }
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
 		'button-large': isLarge,
-		'is-active': isActive
+		'is-toggled': isActive
 	} );
 
 	return (

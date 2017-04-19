@@ -12,7 +12,7 @@ import {
 	hoveredBlock,
 	selectedBlock,
 	mode,
-	sidebar,
+	isSidebarOpened,
 	createReduxStore
 } from '../state';
 
@@ -282,19 +282,19 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'sidebar()', () => {
+	describe( 'isSidebarOpened()', () => {
 		it( 'should be closed by default', () => {
-			const state = sidebar( undefined, {} );
+			const state = isSidebarOpened( undefined, {} );
 
-			expect( state.opened ).to.be.false();
+			expect( state ).to.be.false();
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
-			const state = sidebar( { opened: false }, {
+			const state = isSidebarOpened( false, {
 				type: 'TOGGLE_SIDEBAR'
 			} );
 
-			expect( state.opened ).to.be.true();
+			expect( state ).to.be.true();
 		} );
 	} );
 
@@ -315,7 +315,7 @@ describe( 'state', () => {
 				'selectedBlock',
 				'hoveredBlock',
 				'mode',
-				'sidebar'
+				'isSidebarOpened'
 			] );
 		} );
 	} );

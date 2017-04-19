@@ -12,7 +12,7 @@ import IconButton from '../../components/icon-button';
 import Inserter from '../../components/inserter';
 import Button from '../../components/button';
 
-function Tools( { undo, redo, hasUndo, hasRedo, sidebarOpened, toggleSidebar } ) {
+function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
 		<div className="editor-tools">
 			<IconButton
@@ -31,7 +31,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, sidebarOpened, toggleSidebar } )
 					<Dashicon icon="visibility" />
 					{ wp.i18n._x( 'Preview', 'imperative verb' ) }
 				</Button>
-				<Button onClick={ toggleSidebar } isActive={ sidebarOpened }>
+				<Button onClick={ toggleSidebar } isActive={ isSidebarOpened }>
 					<Dashicon icon="admin-generic" />
 					{ wp.i18n.__( 'Post Settings' ) }
 				</Button>
@@ -47,7 +47,7 @@ export default connect(
 	( state ) => ( {
 		hasUndo: state.blocks.history.past.length > 0,
 		hasRedo: state.blocks.history.future.length > 0,
-		sidebarOpened: state.sidebar.opened,
+		isSidebarOpened: state.isSidebarOpened,
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
