@@ -10,7 +10,7 @@ const { parse, html, query } = hpq;
 const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
 const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
-registerBlock( 'core/quote', {
+const blockSettings = {
 	title: wp.i18n.__( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',
@@ -63,4 +63,6 @@ registerBlock( 'core/quote', {
 			</blockquote>
 		);
 	}
-} );
+};
+
+registerBlock( 'core/quote', blockSettings );

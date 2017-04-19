@@ -6,11 +6,9 @@ import Editable from 'components/editable';
 
 const { attr, html } = query;
 
-registerBlock( 'core/image', {
+const blockSettings = {
 	title: wp.i18n.__( 'Image' ),
-
 	icon: 'format-image',
-
 	category: 'common',
 
 	attributes: {
@@ -51,4 +49,6 @@ registerBlock( 'core/image', {
 			</figure>
 		);
 	}
-} );
+};
+
+registerBlock( 'core/image', blockSettings );

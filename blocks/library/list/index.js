@@ -7,7 +7,7 @@ import Editable from 'components/editable';
 
 const { html, prop, query } = hpq;
 
-registerBlock( 'core/list', {
+const blockSettings = {
 	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
@@ -76,4 +76,6 @@ registerBlock( 'core/list', {
 		) );
 		return wp.element.createElement( listType.toLowerCase(), null, children );
 	}
-} );
+};
+
+registerBlock( 'core/list', blockSettings );

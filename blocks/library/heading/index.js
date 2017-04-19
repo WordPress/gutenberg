@@ -6,11 +6,9 @@ import Editable from 'components/editable';
 
 const { html, prop } = query;
 
-registerBlock( 'core/heading', {
+export const blockSettings = {
 	title: wp.i18n.__( 'Heading' ),
-
 	icon: 'heading',
-
 	category: 'common',
 
 	attributes: {
@@ -86,4 +84,6 @@ registerBlock( 'core/heading', {
 			}
 		]
 	}
-} );
+};
+
+registerBlock( 'core/heading', blockSettings );
