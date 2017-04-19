@@ -20,6 +20,9 @@
 		color: $dark-gray-500;
 		margin-right: $item-spacing;
 		cursor: pointer;
+		height: 30px;
+		padding: 0 10px;
+		border-radius: 3px;
 
 		&:hover {
 			color: $blue-medium;
