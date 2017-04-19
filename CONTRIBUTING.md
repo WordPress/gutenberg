@@ -2,7 +2,7 @@
 
 ## Installing & Building the Plugin
 
-Gutenberg is a node based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. 
+Gutenberg is a node based project, built primarily in JavaScript. Be sure to have <a href="https://nodejs.org/en/">Node installed first</a>. If you already have node installed, make sure it's version 6.10.3 or higher for this plugin to work correctly. You can check your node version by typing `node -v` in the Terminal prompt.
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node.
 
