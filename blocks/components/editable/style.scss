@@ -1,3 +1,13 @@
-.blocks-editable:focus {
-	outline: none;
+.blocks-editable {
+	> p:first-child {
+		margin-top: 0;
+	}
+
+	> p:last-child {
+		margin-bottom: 0;
+	}
+
+	&:focus {
+		outline: none;
+	}
 }

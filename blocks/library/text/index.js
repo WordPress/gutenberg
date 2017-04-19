@@ -1,10 +1,13 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from 'api';
+import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { html, prop } = query;
+const { html, parse, query } = hpq;
+
+const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
+const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
 
 registerBlock( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
@@ -14,8 +17,7 @@ registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: html( 'p' ),
-		align: prop( 'p', 'style.textAlign' )
+		content: query( 'p', html() ),
 	},
 
 	controls: [
@@ -45,15 +47,22 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes, setAttributes, insertBlockAfter } ) {
 		const { content, align } = attributes;
 
 		return (
 			<Editable
-				tagName="p"
-				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				value={ fromValueToParagraphs( content ) }
+				onChange={ ( paragraphs ) => setAttributes( {
+					content: fromParagraphsToValue( paragraphs )
+				} ) }
 				style={ align ? { textAlign: align } : null }
+				onSplit={ ( before, after ) => {
+					setAttributes( { content: fromParagraphsToValue( before ) } );
+					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
+						content: fromParagraphsToValue( after )
+					} ) );
+				} }
 			/>
 		);
 	},
@@ -61,10 +70,18 @@ registerBlock( 'core/text', {
 	save( { attributes } ) {
 		const { align, content } = attributes;
 
+		// Todo: Remove the temporary <div> wrapper once the serializer supports returning an array
 		return (
-			<p
-				style={ align ? { textAlign: align } : null }
-				dangerouslySetInnerHTML={ { __html: content } } />
+			<div>
+				{ content && content.map( ( paragraph, i ) => (
+					<p
+						key={ i }
+						style={ align ? { textAlign: align } : null }
+						dangerouslySetInnerHTML={ {
+							__html: paragraph
+						} } />
+				) ) }
+			</div>
 		);
 	}
 } );

@@ -48,6 +48,14 @@ export const blocks = combineUndoableReducers( {
 			case 'REPLACE_BLOCKS':
 				return action.blockNodes.map( ( { uid } ) => uid );
 
+			case 'INSERT_BLOCK':
+				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
+				return [
+					...state.slice( 0, position ),
+					action.block.uid,
+					...state.slice( position )
+				];
+
 			case 'MOVE_BLOCK_UP':
 				if ( action.uid === state[ 0 ] ) {
 					return state;
@@ -72,12 +80,6 @@ export const blocks = combineUndoableReducers( {
 					swappedUid,
 					action.uid,
 					...state.slice( index + 2 )
-				];
-
-			case 'INSERT_BLOCK':
-				return [
-					...state,
-					action.block.uid
 				];
 		}
 
