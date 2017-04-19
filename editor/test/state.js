@@ -12,6 +12,7 @@ import {
 	hoveredBlock,
 	selectedBlock,
 	mode,
+	isSidebarOpened,
 	createReduxStore
 } from '../state';
 
@@ -303,6 +304,22 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'isSidebarOpened()', () => {
+		it( 'should be closed by default', () => {
+			const state = isSidebarOpened( undefined, {} );
+
+			expect( state ).to.be.false();
+		} );
+
+		it( 'should toggle the sidebar open flag', () => {
+			const state = isSidebarOpened( false, {
+				type: 'TOGGLE_SIDEBAR'
+			} );
+
+			expect( state ).to.be.true();
+		} );
+	} );
+
 	describe( 'createReduxStore()', () => {
 		it( 'should return a redux store', () => {
 			const store = createReduxStore();
@@ -319,7 +336,8 @@ describe( 'state', () => {
 				'blocks',
 				'selectedBlock',
 				'hoveredBlock',
-				'mode'
+				'mode',
+				'isSidebarOpened'
 			] );
 		} );
 	} );

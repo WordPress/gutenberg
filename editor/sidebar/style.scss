@@ -1,0 +1,9 @@
+.editor-sidebar {
+	position: fixed;
+	right: 0;
+	top: 32px + $header-height;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: 1px solid $light-gray-500;
+	background: $light-gray-300;
+}
