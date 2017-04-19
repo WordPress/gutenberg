@@ -17,6 +17,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
+		this.maybeHover = this.maybeHover.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -42,6 +43,13 @@ class VisualEditorBlock extends wp.element.Component {
 				...attributes
 			}
 		} );
+	}
+
+	maybeHover() {
+		const { isTyping, isHovered, onHover } = this.props;
+		if ( isTyping && ! isHovered ) {
+			onHover();
+		}
 	}
 
 	maybeDeselect( event ) {
@@ -81,7 +89,7 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered
 		} );
 
-		const { onSelect, onStartTyping, onMouseMove, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -94,7 +102,8 @@ class VisualEditorBlock extends wp.element.Component {
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
 				onKeyDown={ onStartTyping }
-				onMouseMove={ onMouseMove }
+				onMouseEnter={ onHover }
+				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 			>
@@ -160,7 +169,7 @@ export default connect(
 				uid: ownProps.uid
 			} );
 		},
-		onMouseMove() {
+		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
