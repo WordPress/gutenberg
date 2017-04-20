@@ -11,84 +11,116 @@ import Toolbar from 'components/toolbar';
 import BlockMover from 'components/block-mover';
 import BlockSwitcher from 'components/block-switcher';
 
-function VisualEditorBlock( props ) {
-	const { block } = props;
-	const settings = wp.blocks.getBlockSettings( block.blockType );
-
-	let BlockEdit;
-	if ( settings ) {
-		BlockEdit = settings.edit || settings.save;
+class VisualEditorBlock extends wp.element.Component {
+	constructor() {
+		super( ...arguments );
+		this.bindBlockNode = this.bindBlockNode.bind( this );
 	}
 
-	if ( ! BlockEdit ) {
-		return null;
+	bindBlockNode( node ) {
+		this.node = node;
 	}
 
-	const { isHovered } = props;
-	const isSelected = props.isSelected;
-	const className = classnames( 'editor-visual-editor__block', {
-		'is-selected': isSelected,
-		'is-hovered': isHovered
-	} );
-
-	const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = props;
-
-	function setAttributes( attributes ) {
-		onChange( {
-			attributes: {
-				...block.attributes,
-				...attributes
-			}
-		} );
-	}
-
-	function maybeDeselect( event ) {
-		// Annoyingly React does not support focusOut and we're forced to check
-		// related target to ensure it's not a child when blur fires.
-		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			onDeselect();
+	componentWillReceiveProps( newProps ) {
+		if (
+			this.props.order !== newProps.order &&
+			this.props.isSelected &&
+			newProps.isSelected
+		) {
+			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
 	}
 
-	// Disable reason: Each block can receive focus but must be able to contain
-	// block children. Tab keyboard navigation enabled by tabIndex assignment.
+	componentDidUpdate() {
+		if ( this.previousOffset ) {
+			window.scrollTo(
+				window.scrollX,
+				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
+			);
+			this.previousOffset = false;
+		}
+	}
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
-	return (
-		<div
-			tabIndex="0"
-			onFocus={ onSelect }
-			onBlur={ maybeDeselect }
-			onKeyDown={ onDeselect }
-			onMouseEnter={ onMouseEnter }
-			onMouseLeave={ onMouseLeave }
-			className={ className }
-		>
-			{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
-			<div className="editor-visual-editor__block-controls">
-				{ isSelected && <BlockSwitcher uid={ block.uid } /> }
-				{ isSelected && settings.controls ? (
-					<Toolbar
-						controls={ settings.controls.map( ( control ) => ( {
-							...control,
-							onClick: () => control.onClick( block.attributes, setAttributes ),
-							isActive: () => control.isActive( block.attributes )
-						} ) ) } />
-				) : null }
+	render() {
+		const { block } = this.props;
+		const settings = wp.blocks.getBlockSettings( block.blockType );
+
+		let BlockEdit;
+		if ( settings ) {
+			BlockEdit = settings.edit || settings.save;
+		}
+
+		if ( ! BlockEdit ) {
+			return null;
+		}
+
+		const { isHovered, isSelected } = this.props;
+		const className = classnames( 'editor-visual-editor__block', {
+			'is-selected': isSelected,
+			'is-hovered': isHovered
+		} );
+
+		const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
+
+		function setAttributes( attributes ) {
+			onChange( {
+				attributes: {
+					...block.attributes,
+					...attributes
+				}
+			} );
+		}
+
+		function maybeDeselect( event ) {
+			// Annoyingly React does not support focusOut and we're forced to check
+			// related target to ensure it's not a child when blur fires.
+			if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+				onDeselect();
+			}
+		}
+
+		// Disable reason: Each block can receive focus but must be able to contain
+		// block children. Tab keyboard navigation enabled by tabIndex assignment.
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		return (
+			<div
+				ref={ this.bindBlockNode }
+				tabIndex="0"
+				onFocus={ onSelect }
+				onBlur={ maybeDeselect }
+				onKeyDown={ onDeselect }
+				onMouseEnter={ onMouseEnter }
+				onMouseLeave={ onMouseLeave }
+				className={ className }
+			>
+				{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
+				<div className="editor-visual-editor__block-controls">
+					{ isSelected && <BlockSwitcher uid={ block.uid } /> }
+					{ isSelected && settings.controls ? (
+						<Toolbar
+							controls={ settings.controls.map( ( control ) => ( {
+								...control,
+								onClick: () => control.onClick( block.attributes, setAttributes ),
+								isActive: () => control.isActive( block.attributes )
+							} ) ) } />
+					) : null }
+				</div>
+				<BlockEdit
+					isSelected={ isSelected }
+					attributes={ block.attributes }
+					setAttributes={ setAttributes }
+					insertBlockAfter={ onInsertAfter }
+				/>
 			</div>
-			<BlockEdit
-				isSelected={ isSelected }
-				attributes={ block.attributes }
-				setAttributes={ setAttributes }
-				insertBlockAfter={ onInsertAfter }
-			/>
-		</div>
-	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
+		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
+	}
 }
 
 export default connect(
 	( state, ownProps ) => ( {
+		order: state.blocks.order.findIndex( uid => ownProps.uid === uid ),
 		block: state.blocks.byUid[ ownProps.uid ],
 		isSelected: state.selectedBlock === ownProps.uid,
 		isHovered: state.hoveredBlock === ownProps.uid
