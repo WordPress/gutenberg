@@ -53,10 +53,7 @@ function VisualEditorBlock( props ) {
 
 	const controls = settings.controls && compact(
 		settings.controls.map( ( control ) => {
-			if ( isString( control ) ) {
-				return wp.blocks.controls.find( ctrl => ctrl.slug === control );
-			}
-			return control;
+			return isString( control ) ? wp.blocks.controls[ control ] : control;
 		} )
 	);
 
