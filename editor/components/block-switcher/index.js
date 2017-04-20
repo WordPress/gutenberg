@@ -38,17 +38,23 @@ class BlockSwitcher extends wp.element.Component {
 		const { block } = this.props;
 
 		const blockSettings = wp.blocks.getBlockSettings( block.blockType );
-		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
-			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = transformFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
-			return transformation ? memo.concat( [ block.slug ] ) : memo;
-		}, [] );
+		const blocksToBeTransformedFrom = reduce(
+			wp.blocks.getBlocks(),
+			( memo, candidateBlock ) => {
+				const transformFrom = get( candidateBlock, 'transforms.from', [] );
+				const transformation = transformFrom.find(
+					t => t.blocks.indexOf( candidateBlock.blockType ) !== -1
+				);
+				return transformation ? memo.concat( [ candidateBlock.slug ] ) : memo;
+			},
+			[]
+		);
 		const blocksToBeTransformedTo = get( blockSettings, 'transforms.to', [] )
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
 		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 			.reduce( ( memo, blockType ) => {
-				const block = wp.blocks.getBlockSettings( blockType );
-				return !! block ? memo.concat( block ) : memo;
+				const settings = wp.blocks.getBlockSettings( blockType );
+				return !! settings ? memo.concat( settings ) : memo;
 			}, [] );
 
 		if ( ! allowedBlocks.length ) {

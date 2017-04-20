@@ -25,7 +25,7 @@ registerBlock( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
+				transform: ( { content } ) => {
 					return {
 						value: content,
 					};
