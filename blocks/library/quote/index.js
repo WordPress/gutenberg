@@ -38,9 +38,7 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, citation } ) => {
 					if ( citation ) {
-						return new Error(
-							'Quote citation would be lost on transform.'
-						);
+						content = ( content || [] ).concat( citation );
 					}
 					return {
 						content,
