@@ -31,32 +31,6 @@ registerBlock( 'core/heading', {
 		} ) )
 	],
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { content, nodeName = 'H2', align } = attributes;
-
-		return (
-			<Editable
-				tagName={ nodeName.toLowerCase() }
-				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ align ? { textAlign: align } : null }
-			/>
-		);
-	},
-
-	save( { attributes } ) {
-		const { align, nodeName = 'H2', content } = attributes;
-		const Tag = nodeName.toLowerCase();
-
-		return (
-			<Tag style={ align ? { textAlign: align } : null }>
-				{ content }
-			</Tag>
-		);
-	},
-
 	transforms: {
 		from: [
 			{
@@ -88,5 +62,38 @@ registerBlock( 'core/heading', {
 				}
 			}
 		]
-	}
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: wp.element.concatValues( attributes.content, attributesToMerge.content )
+		};
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+		const { content, nodeName = 'H2', align } = attributes;
+
+		return (
+			<Editable
+				tagName={ nodeName.toLowerCase() }
+				value={ content }
+				focus={ focus }
+				onFocus={ setFocus }
+				onChange={ ( value ) => setAttributes( { content: value } ) }
+				style={ align ? { textAlign: align } : null }
+				onMerge={ mergeWithPrevious }
+			/>
+		);
+	},
+
+	save( { attributes } ) {
+		const { align, nodeName = 'H2', content } = attributes;
+		const Tag = nodeName.toLowerCase();
+
+		return (
+			<Tag style={ align ? { textAlign: align } : null }>
+				{ content }
+			</Tag>
+		);
+	},
 } );

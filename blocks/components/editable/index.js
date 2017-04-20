@@ -15,6 +15,7 @@ import './style.scss';
  // as we're doing here; instead, we should consider a common components path.
 import Toolbar from '../../../editor/components/toolbar';
 
+const KEYCODE_BACKSPACE = 8;
 const htmlToReactParser = new HtmlToReactParser();
 const formatMap = {
 	strong: 'bold',
@@ -51,7 +52,7 @@ export default class Editable extends wp.element.Component {
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
-
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.state = {
 			formats: {}
 		};
@@ -85,6 +86,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
+		editor.on( 'keydown', this.onKeyDown );
 	}
 
 	onInit() {
@@ -108,6 +110,32 @@ export default class Editable extends wp.element.Component {
 
 		this.editor.save();
 		this.props.onChange( this.getContent() );
+	}
+
+	isStartOfEditor() {
+		const range = this.editor.selection.getRng();
+		if ( range.startOffset !== 0 || ! range.collapsed ) {
+			return false;
+		}
+		const start = range.startContainer;
+		const body = this.editor.getBody();
+		let element = start;
+		do {
+			const child = element;
+			element = element.parentNode;
+			if ( element.childNodes[ 0 ] !== child ) {
+				return false;
+			}
+		} while ( element !== body );
+		return true;
+	}
+
+	onKeyDown( event ) {
+		if ( this.props.onMerge && event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) {
+			event.preventDefault();
+			this.onChange();
+			this.props.onMerge( this.editor.getContent() );
+		}
 	}
 
 	onNewBlock() {
