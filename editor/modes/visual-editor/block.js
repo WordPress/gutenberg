@@ -15,6 +15,9 @@ class VisualEditorBlock extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
+		this.setAttributes = this.setAttributes.bind( this );
+		this.maybeDeselect = this.maybeDeselect.bind( this );
+		this.previousOffset = null;
 	}
 
 	bindBlockNode( node ) {
@@ -31,13 +34,31 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	setAttributes( attributes ) {
+		const { block, onChange } = this.props;
+		onChange( {
+			attributes: {
+				...block.attributes,
+				...attributes
+			}
+		} );
+	}
+
+	maybeDeselect( event ) {
+		// Annoyingly React does not support focusOut and we're forced to check
+		// related target to ensure it's not a child when blur fires.
+		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+			this.props.onDeselect();
+		}
+	}
+
 	componentDidUpdate() {
 		if ( this.previousOffset ) {
 			window.scrollTo(
 				window.scrollX,
 				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
 			);
-			this.previousOffset = false;
+			this.previousOffset = null;
 		}
 	}
 
@@ -60,24 +81,7 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered
 		} );
 
-		const { onChange, onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
-
-		function setAttributes( attributes ) {
-			onChange( {
-				attributes: {
-					...block.attributes,
-					...attributes
-				}
-			} );
-		}
-
-		function maybeDeselect( event ) {
-			// Annoyingly React does not support focusOut and we're forced to check
-			// related target to ensure it's not a child when blur fires.
-			if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-				onDeselect();
-			}
-		}
+		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -88,7 +92,7 @@ class VisualEditorBlock extends wp.element.Component {
 				ref={ this.bindBlockNode }
 				tabIndex="0"
 				onFocus={ onSelect }
-				onBlur={ maybeDeselect }
+				onBlur={ this.maybeDeselect }
 				onKeyDown={ onDeselect }
 				onMouseEnter={ onMouseEnter }
 				onMouseLeave={ onMouseLeave }
@@ -101,7 +105,7 @@ class VisualEditorBlock extends wp.element.Component {
 						<Toolbar
 							controls={ settings.controls.map( ( control ) => ( {
 								...control,
-								onClick: () => control.onClick( block.attributes, setAttributes ),
+								onClick: () => control.onClick( block.attributes, this.setAttributes ),
 								isActive: () => control.isActive( block.attributes )
 							} ) ) } />
 					) : null }
@@ -109,7 +113,7 @@ class VisualEditorBlock extends wp.element.Component {
 				<BlockEdit
 					isSelected={ isSelected }
 					attributes={ block.attributes }
-					setAttributes={ setAttributes }
+					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
 				/>
 			</div>
@@ -120,7 +124,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		order: state.blocks.order.findIndex( uid => ownProps.uid === uid ),
+		order: state.blocks.order.indexOf( ownProps.uid ),
 		block: state.blocks.byUid[ ownProps.uid ],
 		isSelected: state.selectedBlock === ownProps.uid,
 		isHovered: state.hoveredBlock === ownProps.uid
