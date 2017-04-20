@@ -43,7 +43,7 @@ class BlockSwitcher extends wp.element.Component {
 			( memo, candidateBlock ) => {
 				const transformFrom = get( candidateBlock, 'transforms.from', [] );
 				const transformation = transformFrom.find(
-					t => t.blocks.indexOf( candidateBlock.blockType ) !== -1
+					t => t.blocks.indexOf( block.blockType ) !== -1
 				);
 				return transformation ? memo.concat( [ candidateBlock.slug ] ) : memo;
 			},
