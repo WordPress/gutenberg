@@ -408,6 +408,38 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$result = get_blog_count( self::$different_network_id );
 		$this->assertEquals( 3, $result );
 	}
+
+	/**
+	 * @ticket 40349
+	 */
+	public function test_wp_update_network_user_counts() {
+		global $wpdb;
+
+		update_network_option( null, 'user_count', 40 );
+
+		$expected = $wpdb->get_var( "SELECT COUNT(ID) as c FROM $wpdb->users WHERE spam = '0' AND deleted = '0'" );
+
+		wp_update_network_user_counts();
+
+		$result = get_user_count();
+		$this->assertEquals( $expected, $result );
+	}
+
+	/**
+	 * @ticket 40349
+	 */
+	public function test_wp_update_network_user_counts_on_different_network() {
+		global $wpdb;
+
+		update_network_option( self::$different_network_id, 'user_count', 40 );
+
+		$expected = $wpdb->get_var( "SELECT COUNT(ID) as c FROM $wpdb->users WHERE spam = '0' AND deleted = '0'" );
+
+		wp_update_network_user_counts( self::$different_network_id );
+
+		$result = get_user_count( self::$different_network_id );
+		$this->assertEquals( $expected, $result );
+	}
 }
 
 endif;
