@@ -17,6 +17,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
+		this.maybeHover = this.maybeHover.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -42,6 +43,13 @@ class VisualEditorBlock extends wp.element.Component {
 				...attributes
 			}
 		} );
+	}
+
+	maybeHover() {
+		const { isTyping, isHovered, onHover } = this.props;
+		if ( isTyping && ! isHovered ) {
+			onHover();
+		}
 	}
 
 	maybeDeselect( event ) {
@@ -75,13 +83,13 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected } = this.props;
+		const { isHovered, isSelected, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
-			'is-selected': isSelected,
+			'is-selected': isSelected && ! isTyping,
 			'is-hovered': isHovered
 		} );
 
-		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
+		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -93,15 +101,16 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onDeselect }
-				onMouseEnter={ onMouseEnter }
+				onKeyDown={ onStartTyping }
+				onMouseEnter={ onHover }
+				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 			>
-				{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				<div className="editor-visual-editor__block-controls">
-					{ isSelected && <BlockSwitcher uid={ block.uid } /> }
-					{ isSelected && settings.controls ? (
+					{ isSelected && ! isTyping && <BlockSwitcher uid={ block.uid } /> }
+					{ isSelected && ! isTyping && settings.controls ? (
 						<Toolbar
 							controls={ settings.controls.map( ( control ) => ( {
 								...control,
@@ -111,10 +120,11 @@ class VisualEditorBlock extends wp.element.Component {
 					) : null }
 				</div>
 				<BlockEdit
-					isSelected={ isSelected }
+					focus={ focus }
 					attributes={ block.attributes }
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
+					setFocus={ onFocus }
 				/>
 			</div>
 		);
@@ -126,8 +136,10 @@ export default connect(
 	( state, ownProps ) => ( {
 		order: state.blocks.order.indexOf( ownProps.uid ),
 		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: state.selectedBlock === ownProps.uid,
-		isHovered: state.hoveredBlock === ownProps.uid
+		isSelected: state.selectedBlock.uid === ownProps.uid,
+		isHovered: state.hoveredBlock === ownProps.uid,
+		focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
+		isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
 	} ),
 	( dispatch, ownProps ) => ( {
 		onChange( updates ) {
@@ -151,7 +163,13 @@ export default connect(
 				uid: ownProps.uid
 			} );
 		},
-		onMouseEnter() {
+		onStartTyping() {
+			dispatch( {
+				type: 'START_TYPING',
+				uid: ownProps.uid
+			} );
+		},
+		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
@@ -165,11 +183,20 @@ export default connect(
 				uid: ownProps.uid
 			} );
 		},
+
 		onInsertAfter( block ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
 				after: ownProps.uid,
 				block
+			} );
+		},
+
+		onFocus( config ) {
+			dispatch( {
+				type: 'UPDATE_FOCUS',
+				uid: ownProps.uid,
+				config
 			} );
 		}
 	} )

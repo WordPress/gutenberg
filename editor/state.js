@@ -100,17 +100,49 @@ export const blocks = combineUndoableReducers( {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function selectedBlock( state = null, action ) {
+export function selectedBlock( state = {}, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_BLOCK_SELECTED':
-			return action.selected ? action.uid : null;
+			if ( ! action.selected ) {
+				return state.uid === action.uid ? {} : state;
+			}
+			return action.uid === state.uid
+				? state
+				: { uid: action.uid, typing: false, focus: {} };
 
 		case 'MOVE_BLOCK_UP':
 		case 'MOVE_BLOCK_DOWN':
-			return action.uid;
+			return action.uid === state.uid
+				? state
+				: { uid: action.uid, typing: false, focus: {} };
 
 		case 'INSERT_BLOCK':
-			return action.block.uid;
+			return {
+				uid: action.block.uid,
+				typing: false,
+				focus: {}
+			};
+
+		case 'UPDATE_FOCUS':
+			return {
+				uid: action.uid,
+				typing: state.uid === action.uid ? state.typing : false,
+				focus: action.config || {}
+			};
+
+		case 'START_TYPING':
+			if ( action.uid !== state.uid ) {
+				return {
+					uid: action.uid,
+					typing: true,
+					focus: {}
+				};
+			}
+
+			return {
+				...state,
+				typing: true
+			};
 	}
 
 	return state;
@@ -133,6 +165,8 @@ export function hoveredBlock( state = null, action ) {
 				return null;
 			}
 			break;
+		case 'START_TYPING':
+			return null;
 	}
 
 	return state;

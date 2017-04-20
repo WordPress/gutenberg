@@ -20,7 +20,7 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { value, citation } = attributes;
 
 		return (
@@ -31,16 +31,24 @@ registerBlock( 'core/quote', {
 						( paragraphs ) => setAttributes( {
 							value: fromParagraphsToValue( paragraphs )
 						} )
-					} />
-				<footer>
-					<Editable
-						value={ citation }
-						onChange={
-							( newValue ) => setAttributes( {
-								citation: newValue
-							} )
-						} />
-				</footer>
+					}
+					focus={ focus && focus.editable === 'value' ? focus : null }
+					onFocus={ () => setFocus( { editable: 'value' } ) }
+				/>
+				{ ( citation || !! focus ) &&
+					<footer>
+						<Editable
+							value={ citation }
+							onChange={
+								( newValue ) => setAttributes( {
+									citation: newValue
+								} )
+							}
+							focus={ focus && focus.editable === 'citation' ? focus : null }
+							onFocus={ () => setFocus( { editable: 'citation' } ) }
+						/>
+					</footer>
+				}
 			</blockquote>
 		);
 	},

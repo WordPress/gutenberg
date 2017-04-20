@@ -31,13 +31,15 @@ registerBlock( 'core/heading', {
 		} ) )
 	],
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { content, tag, align } = attributes;
 
 		return (
 			<Editable
 				tagName={ tag }
 				value={ content }
+				focus={ focus }
+				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				style={ align ? { textAlign: align } : null }
 			/>

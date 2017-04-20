@@ -17,6 +17,7 @@ export default class Editable extends wp.element.Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 	}
 
 	componentDidMount() {
@@ -45,11 +46,22 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
+		editor.on( 'focusin', this.onFocus );
 	}
 
 	onInit() {
 		const { value = '' } = this.props;
 		this.editor.setContent( value );
+		this.focus();
+	}
+
+	onFocus() {
+		if ( ! this.props.onFocus ) {
+			return;
+		}
+
+		// TODO: We need a way to save the focus position ( bookmark maybe )
+		this.props.onFocus();
 	}
 
 	onChange() {
@@ -107,6 +119,12 @@ export default class Editable extends wp.element.Component {
 		this.editor.selection.moveToBookmark( bookmark );
 	}
 
+	focus() {
+		if ( this.props.focus ) {
+			this.editor.focus();
+		}
+	}
+
 	componentWillUpdate( nextProps ) {
 		if ( this.editor && this.props.tagName !== nextProps.tagName ) {
 			this.editor.destroy();
@@ -122,7 +140,16 @@ export default class Editable extends wp.element.Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.tagName !== prevProps.tagName ) {
 			this.initialize();
-		} else if ( this.props.value !== prevProps.value ) {
+		}
+
+		if ( !! this.props.focus && ! prevProps.focus ) {
+			this.focus();
+		}
+
+		if (
+			this.props.tagName === prevProps.tagName &&
+			this.props.value !== prevProps.value
+		) {
 			this.updateContent();
 		}
 	}

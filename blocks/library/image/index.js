@@ -19,17 +19,19 @@ registerBlock( 'core/image', {
 		caption: html( 'figcaption' )
 	},
 
-	edit( { attributes, isSelected, setAttributes } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
 
 		return (
 			<figure>
 				<img src={ url } alt={ alt } />
-				{ caption || isSelected ? (
+				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
+						focus={ focus }
+						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) } />
 				) : null }
 			</figure>

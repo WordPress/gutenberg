@@ -47,7 +47,7 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes, insertBlockAfter } ) {
+	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus } ) {
 		const { content, align } = attributes;
 
 		return (
@@ -56,6 +56,8 @@ registerBlock( 'core/text', {
 				onChange={ ( paragraphs ) => setAttributes( {
 					content: fromParagraphsToValue( paragraphs )
 				} ) }
+				focus={ focus }
+				onFocus={ setFocus }
 				style={ align ? { textAlign: align } : null }
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: fromParagraphsToValue( before ) } );

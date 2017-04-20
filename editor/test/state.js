@@ -3,6 +3,7 @@
  */
 import { expect } from 'chai';
 import { values } from 'lodash';
+import deepFreeze from 'deep-freeze';
 
 /**
  * Internal dependencies
@@ -226,7 +227,40 @@ describe( 'state', () => {
 				selected: true
 			} );
 
-			expect( state ).to.equal( 'kumquat' );
+			expect( state ).to.eql( { uid: 'kumquat', typing: false, focus: {} } );
+		} );
+
+		it( 'should not update the state if already selected', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: true, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: true
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should unselect the block if currently selected', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: true, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: false
+			} );
+
+			expect( state ).to.eql( {} );
+		} );
+
+		it( 'should not unselect the block if another block is selected', () => {
+			const original = deepFreeze( { uid: 'loquat', typing: true, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: false
+			} );
+
+			expect( state ).to.equal( original );
 		} );
 
 		it( 'should return with inserted block', () => {
@@ -238,7 +272,7 @@ describe( 'state', () => {
 				}
 			} );
 
-			expect( state ).to.equal( 'ribs' );
+			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
 		} );
 
 		it( 'should return with block moved up', () => {
@@ -247,7 +281,7 @@ describe( 'state', () => {
 				uid: 'ribs'
 			} );
 
-			expect( state ).to.equal( 'ribs' );
+			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
 		} );
 
 		it( 'should return with block moved down', () => {
@@ -256,7 +290,57 @@ describe( 'state', () => {
 				uid: 'chicken'
 			} );
 
-			expect( state ).to.equal( 'chicken' );
+			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
+		} );
+
+		it( 'should not update the state if the block moved is already selected', () => {
+			const original = deepFreeze( { uid: 'ribs', typing: true, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'MOVE_BLOCK_UP',
+				uid: 'ribs'
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should update the focus and selects the block', () => {
+			const state = selectedBlock( undefined, {
+				type: 'UPDATE_FOCUS',
+				uid: 'chicken',
+				config: { editable: 'citation' }
+			} );
+
+			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: { editable: 'citation' } } );
+		} );
+
+		it( 'should update the focus and merge the existing state', () => {
+			const original = deepFreeze( { uid: 'ribs', typing: true, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'UPDATE_FOCUS',
+				uid: 'ribs',
+				config: { editable: 'citation' }
+			} );
+
+			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
+		} );
+
+		it( 'should set the typing flag and selects the block', () => {
+			const state = selectedBlock( undefined, {
+				type: 'START_TYPING',
+				uid: 'chicken'
+			} );
+
+			expect( state ).to.eql( { uid: 'chicken', typing: true, focus: {} } );
+		} );
+
+		it( 'should set the typing flag and merge the existing state', () => {
+			const original = deepFreeze( { uid: 'ribs', typing: false, focus: { editable: 'citation' } } );
+			const state = selectedBlock( original, {
+				type: 'START_TYPING',
+				uid: 'ribs'
+			} );
+
+			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
 		} );
 
 		it( 'should insert after the specified block uid', () => {
