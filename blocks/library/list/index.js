@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { html, prop, query } = hpq;
+const { children, prop, query } = hpq;
 
 registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
@@ -15,7 +15,7 @@ registerBlock( 'core/list', {
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
 		items: query( 'li', {
-			value: html()
+			value: children()
 		} )
 	},
 
@@ -56,9 +56,9 @@ registerBlock( 'core/list', {
 
 	edit( { attributes, focus, setFocus } ) {
 		const { nodeName = 'OL', items = [], align } = attributes;
-		const content = items.map( item => {
-			return `<li>${ item.value }</li>`;
-		} ).join( '' );
+		const content = items.map( ( item, i ) => {
+			return <li key={ i }>{ item.value }</li>;
+		} );
 
 		return (
 			<Editable
@@ -73,9 +73,13 @@ registerBlock( 'core/list', {
 
 	save( { attributes } ) {
 		const { nodeName = 'OL', items = [] } = attributes;
-		const children = items.map( ( item, index ) => (
-			<li key={ index } dangerouslySetInnerHTML={ { __html: item.value } } />
-		) );
-		return wp.element.createElement( nodeName.toLowerCase(), null, children );
+
+		return wp.element.createElement(
+			listType.toLowerCase(),
+			null,
+			items.map( ( item, index ) => (
+				<li key={ index }>{ item.value }</li>
+			) )
+		);
 	}
 } );

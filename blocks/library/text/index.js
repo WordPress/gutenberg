@@ -1,13 +1,10 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query as hpq } from 'api';
+import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
-const { html, parse, query } = hpq;
-
-const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
-const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
+const { children } = query;
 
 registerBlock( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
@@ -17,7 +14,7 @@ registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: query( 'p', html() ),
+		content: children(),
 	},
 
 	controls: [
@@ -48,21 +45,23 @@ registerBlock( 'core/text', {
 	],
 
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus } ) {
-		const { content, align } = attributes;
+		const { content = <p />, align } = attributes;
 
 		return (
 			<Editable
-				value={ fromValueToParagraphs( content ) }
-				onChange={ ( paragraphs ) => setAttributes( {
-					content: fromParagraphsToValue( paragraphs )
-				} ) }
+				value={ content }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent
+					} );
+				} }
 				focus={ focus }
 				onFocus={ setFocus }
 				style={ align ? { textAlign: align } : null }
 				onSplit={ ( before, after ) => {
-					setAttributes( { content: fromParagraphsToValue( before ) } );
+					setAttributes( { content: before } );
 					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
-						content: fromParagraphsToValue( after )
+						content: after
 					} ) );
 				} }
 			/>
@@ -70,20 +69,35 @@ registerBlock( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
+		// An empty block will have an undefined content field. Return early
+		// as an empty string.
+		let { content } = attributes;
+		if ( ! content ) {
+			return '';
+		}
 
-		// Todo: Remove the temporary <div> wrapper once the serializer supports returning an array
-		return (
-			<div>
-				{ content && content.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						style={ align ? { textAlign: align } : null }
-						dangerouslySetInnerHTML={ {
-							__html: paragraph
-						} } />
-				) ) }
-			</div>
-		);
+		// Content can be in the following shapes, so we normalize to an array:
+		// - Single paragraph: Object
+		// - Multiple paragraph: Array of objects
+		if ( ! Array.isArray( content ) ) {
+			content = [ content ];
+		}
+
+		// We only need to transform content if we need to apply the alignment
+		// style. Otherwise we can return unmodified.
+		const { align } = attributes;
+		if ( ! align ) {
+			return content;
+		}
+
+		return content.map( ( paragraph ) => {
+			if ( 'string' === typeof paragraph ) {
+				return null;
+			}
+
+			return wp.element.cloneElement( paragraph, {
+				style: { textAlign: align }
+			} );
+		} );
 	}
 } );

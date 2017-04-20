@@ -4,7 +4,7 @@
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
-const { attr, html } = query;
+const { attr, children } = query;
 
 registerBlock( 'core/image', {
 	title: wp.i18n.__( 'Image' ),
@@ -16,7 +16,7 @@ registerBlock( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: html( 'figcaption' )
+		caption: children( 'figcaption' )
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -49,7 +49,7 @@ registerBlock( 'core/image', {
 		return (
 			<figure>
 				{ img }
-				<figcaption dangerouslySetInnerHTML={ { __html: caption } } />
+				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
 	}

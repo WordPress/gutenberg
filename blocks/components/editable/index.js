@@ -3,11 +3,14 @@
  */
 import classnames from 'classnames';
 import { last } from 'lodash';
+import { Parser as HtmlToReactParser } from 'html-to-react';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
+const htmlToReactParser = new HtmlToReactParser();
 
 export default class Editable extends wp.element.Component {
 	constructor() {
@@ -50,8 +53,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onInit() {
-		const { value = '' } = this.props;
-		this.editor.setContent( value );
+		this.setContent( this.props.value );
 		this.focus();
 	}
 
@@ -68,9 +70,9 @@ export default class Editable extends wp.element.Component {
 		if ( ! this.editor.isDirty() ) {
 			return;
 		}
-		const value = this.editor.getContent();
+
 		this.editor.save();
-		this.props.onChange( value );
+		this.props.onChange( this.getContent() );
 	}
 
 	onNewBlock() {
@@ -100,15 +102,21 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 		const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
-		const after = getHtml( childNodes.slice( splitIndex ) );
 
 		// Splitting into two blocks
-		this.editor.setContent( this.props.value || '' );
+		this.setContent( this.props.value );
 		const hasAfter = !! childNodes.slice( splitIndex )
 			.reduce( ( memo, node ) => memo + node.textContent, '' );
 
+		const after = hasAfter ? getHtml( childNodes.slice( splitIndex ) ) : '';
+
 		// The setTimeout fixes the focus jump to the original block
-		setTimeout( () => this.props.onSplit( before, hasAfter ? after : '' ) );
+		setTimeout( () => {
+			this.props.onSplit(
+				htmlToReactParser.parse( before ),
+				htmlToReactParser.parse( after )
+			);
+		} );
 	}
 
 	bindNode( ref ) {
@@ -117,11 +125,26 @@ export default class Editable extends wp.element.Component {
 
 	updateContent() {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.editor.setContent( this.props.value );
+		this.setContent( this.props.value );
 		this.editor.selection.moveToBookmark( bookmark );
 		// Saving the editor on updates avoid unecessary onChanges calls
 		// These calls can make the focus jump
 		this.editor.save();
+	}
+
+	setContent( content ) {
+		if ( ! content ) {
+			content = '';
+		}
+
+		content = wp.element.renderToString( content );
+		this.editor.setContent( content );
+	}
+
+	getContent() {
+		const content = this.editor.getContent();
+
+		return htmlToReactParser.parse( content );
 	}
 
 	focus() {

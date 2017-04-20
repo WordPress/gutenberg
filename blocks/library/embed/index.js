@@ -4,7 +4,7 @@
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
-const { attr, html } = query;
+const { attr, children } = query;
 
 registerBlock( 'core/embed', {
 	title: wp.i18n.__( 'Embed' ),
@@ -16,7 +16,7 @@ registerBlock( 'core/embed', {
 	attributes: {
 		url: attr( 'iframe', 'src' ),
 		title: attr( 'iframe', 'title' ),
-		caption: html( 'figcaption' )
+		caption: children( 'figcaption' )
 	},
 
 	edit( { attributes, isSelected, setAttributes } ) {
@@ -47,7 +47,7 @@ registerBlock( 'core/embed', {
 		return (
 			<figure>
 				{ iframe }
-				<figcaption dangerouslySetInnerHTML={ { __html: caption } } />
+				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
 	}
