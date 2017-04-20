@@ -63,6 +63,18 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: blocks/library/text/index.js:50
+msgid "Bold"
+msgstr ""
+
+#: blocks/library/text/index.js:55
+msgid "Italic"
+msgstr ""
+
+#: blocks/library/text/index.js:60
+msgid "Strikethrough"
+msgstr ""
+
 #: editor/components/inserter/index.js:37
 msgid "Insert block"
 msgstr ""

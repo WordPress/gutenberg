@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { isEqual } from 'lodash';
 
 /**
  * Internal dependencies
@@ -18,11 +19,34 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
+		this.onFormatChange = this.onFormatChange.bind( this );
+		this.toggleFormat = this.toggleFormat.bind( this );
 		this.previousOffset = null;
+		this.state = {
+			formats: {}
+		};
 	}
 
 	bindBlockNode( node ) {
 		this.node = node;
+	}
+
+	onFormatChange( formats ) {
+		if ( ! isEqual( formats, this.state.formats ) ) {
+			this.setState( ( prevState ) => {
+				return Object.assign( {}, prevState, { formats } );
+			} );
+		}
+	}
+
+	toggleFormat( format ) {
+		this.setState( ( prevState ) => {
+			return Object.assign( {}, prevState, {
+				formats: Object.assign( {}, prevState.formats, {
+					[ format ]: ! prevState.formats[ format ]
+				} )
+			} );
+		} );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -119,6 +143,14 @@ class VisualEditorBlock extends wp.element.Component {
 									isActive: () => control.isActive( block.attributes )
 								} ) ) } />
 						) }
+						{ settings.formatting ? (
+							<Toolbar
+								controls={ settings.formatting.map( ( control ) => ( {
+									...control,
+									onClick: () => this.toggleFormat( control.format ),
+									isActive: () => !! this.state.formats[ control.format ]
+								} ) ) } />
+						) : null }
 					</div>
 				}
 				<BlockEdit
@@ -127,6 +159,8 @@ class VisualEditorBlock extends wp.element.Component {
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
 					setFocus={ onFocus }
+					onFormatChange={ this.onFormatChange }
+					formats={ this.state.formats }
 				/>
 			</div>
 		);

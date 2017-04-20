@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
+import { compact, forEach, last, zipObject } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
 
 /**
@@ -11,6 +11,11 @@ import { Parser as HtmlToReactParser } from 'html-to-react';
 import './style.scss';
 
 const htmlToReactParser = new HtmlToReactParser();
+const formatMap = {
+	strong: 'bold',
+	em: 'italic',
+	del: 'strikethrough'
+};
 
 export default class Editable extends wp.element.Component {
 	constructor() {
@@ -21,6 +26,7 @@ export default class Editable extends wp.element.Component {
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.formats = {};
 	}
 
 	componentDidMount() {
@@ -50,6 +56,17 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
+
+		if ( this.props.onFormatChange ) {
+			editor.on( 'nodechange', ( { parents } ) => {
+				const path = compact( parents.map( node =>
+					formatMap[ node.nodeName.toLowerCase() ]
+				) );
+
+				this.formats = zipObject( path, path.map( () => true ) );
+				this.props.onFormatChange( this.formats );
+			} );
+		}
 	}
 
 	onInit() {
@@ -181,6 +198,22 @@ export default class Editable extends wp.element.Component {
 		) {
 			this.updateContent();
 		}
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		forEach( nextProps.formats, ( state, format ) => {
+			const currentState = this.formats[ format ] || false;
+
+			if ( state !== currentState ) {
+				if ( state ) {
+					this.editor.focus();
+					this.editor.formatter.apply( format );
+				} else {
+					this.editor.focus();
+					this.editor.formatter.remove( format );
+				}
+			}
+		} );
 	}
 
 	render() {
