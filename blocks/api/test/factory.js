@@ -32,7 +32,7 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'switchBlockType()', () => {
-		it( 'should switch the blockType of a block using the "transform form"', () => {
+		it( 'should switch the blockType of a block using the "transform from"', () => {
 			registerBlock( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
@@ -115,6 +115,31 @@ describe( 'block factory', () => {
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
 
 			expect( updateBlock ).to.be.null();
+		} );
+
+		it( 'should allow blocks to abort a transformation', () => {
+			registerBlock( 'core/updated-text-block', {} );
+			registerBlock( 'core/text-block', {
+				transforms: {
+					to: [ {
+						blocks: [ 'core/updated-text-block' ],
+						transform: () => new Error( 'no soup for you' ),
+					} ]
+				}
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updateBlock ).to.be.an.instanceof( Error );
+			expect( updateBlock.message ).to.eql( 'no soup for you' );
 		} );
 	} );
 } );
