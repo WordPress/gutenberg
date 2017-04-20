@@ -20,6 +20,36 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content, align } ) => {
+					return {
+						value: content,
+					};
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { value, citation } ) => {
+					if ( citation ) {
+						return new Error(
+							'Quote citation would be lost on transform.'
+						);
+					}
+					return {
+						content: value,
+					};
+				},
+			},
+		],
+	},
+
 	edit( { attributes, setAttributes } ) {
 		const { value, citation } = attributes;
 
