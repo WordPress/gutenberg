@@ -73,6 +73,18 @@ describe( 'block serializer', () => {
 
 			expect( attributes ).to.equal( 'category:food ripeness:ripe ' );
 		} );
+
+		it( 'should not append an undefined attribute value', () => {
+			const attributes = getCommentAttributes( {
+				fruit: 'bananas',
+				category: 'food',
+				ripeness: undefined
+			}, {
+				fruit: 'bananas'
+			} );
+
+			expect( attributes ).to.equal( 'category:food ' );
+		} );
 	} );
 
 	describe( 'serialize()', () => {

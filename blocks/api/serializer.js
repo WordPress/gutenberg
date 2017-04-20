@@ -54,6 +54,10 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 	// Serialize the comment attributes
 	return keys.reduce( ( memo, key ) => {
 		const value = realAttributes[ key ];
+		if ( undefined === value ) {
+			return memo;
+		}
+
 		return memo + `${ key }:${ value } `;
 	}, '' );
 }
