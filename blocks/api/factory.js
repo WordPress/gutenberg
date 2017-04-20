@@ -29,7 +29,7 @@ export function createBlock( blockType, attributes = {} ) {
  *
  * @param  {Object} block      Block object
  * @param  {string} blockType  BlockType
- * @return {Object?}           Block object
+ * @return {?Object|Error}     Block object, null, or error with failure message
  */
 export function switchToBlockType( block, blockType ) {
 	// Find the right transformation by giving priority to the "to" transformation
@@ -45,9 +45,15 @@ export function switchToBlockType( block, blockType ) {
 		return null;
 	}
 
+	const attributes = transformation.transform( block.attributes );
+	if ( attributes instanceof Error ) {
+		// Blocks can perform validation and cancel transformations if needed.
+		return attributes;
+	}
+
 	return Object.assign( {
 		uid: block.uid,
-		attributes: transformation.transform( block.attributes ),
-		blockType
+		attributes,
+		blockType,
 	} );
 }

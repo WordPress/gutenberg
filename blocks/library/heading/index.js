@@ -38,8 +38,11 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, align } ) => {
 					if ( Array.isArray( content ) ) {
-						// TODO this appears to always be true?
-						// TODO reject the switch if more than one paragraph
+						if ( content.length > 1 ) {
+							return new Error(
+								'Block has more than one paragraph.'
+							);
+						}
 						content = content[ 0 ];
 					}
 					return {
