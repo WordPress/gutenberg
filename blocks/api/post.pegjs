@@ -39,8 +39,7 @@ WP_Block_End
   } }
 
 WP_Block_Type
-  = head:ASCII_Letter tail:WP_Block_Type_Char*
-  { return [ head ].concat( tail ).join( '' ) }
+  = $(ASCII_Letter WP_Block_Type_Char*)
 
 WP_Block_Attribute_List
   = as:(_+ attr:WP_Block_Attribute { return attr })*
@@ -54,12 +53,10 @@ WP_Block_Attribute
   { return { name: name, value: value }; }
 
 WP_Block_Attribute_Name
-  = head:ASCII_Letter tail:ASCII_AlphaNumeric*
-  { return [ head ].concat( tail ).join( '' )  }
+  = $(ASCII_Letter ASCII_AlphaNumeric*)
 
 WP_Block_Attribute_Value
-  = head:ASCII_Letter tail:WP_Block_Attribute_Value_Char*
-  { return [ head ].concat( tail ).join( '' ) }
+  = $(ASCII_Letter WP_Block_Attribute_Value_Char*)
 
 WP_Block_Type_Char
  = ASCII_AlphaNumeric
