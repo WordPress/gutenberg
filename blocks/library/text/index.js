@@ -44,7 +44,13 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus } ) {
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: wp.element.concatValues( attributes.content, attributesToMerge.content )
+		};
+	},
+
+	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeWithPrevious } ) {
 		const { content = <p />, align } = attributes;
 
 		return (
@@ -64,6 +70,7 @@ registerBlock( 'core/text', {
 						content: after
 					} ) );
 				} }
+				onMerge={ mergeWithPrevious }
 			/>
 		);
 	},

@@ -4,6 +4,7 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { isString } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -64,4 +65,21 @@ export function renderToString( element ) {
 	}
 
 	return renderToStaticMarkup( element );
+}
+
+export function concatValues( value1, value2 ) {
+	const toArray = value => Array.isArray( value ) ? Children.toArray( value ) : [ value ];
+
+	return toArray( value1 )
+		.concat( toArray( value2 ) )
+		.map( ( elt, index ) => {
+			if ( isString( elt ) ) {
+				return elt;
+			}
+
+			return {
+				...elt,
+				key: index
+			};
+		} );
 }

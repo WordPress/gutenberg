@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers, createStore } from 'redux';
-import { keyBy, last } from 'lodash';
+import { keyBy, last, omit, without } from 'lodash';
 
 /**
  * Internal dependencies
@@ -43,6 +43,9 @@ export const blocks = combineUndoableReducers( {
 					...state,
 					[ action.uid ]: action.block
 				};
+
+			case 'REMOVE_BLOCK':
+				return omit( state, action.uid );
 		}
 
 		return state;
@@ -87,6 +90,9 @@ export const blocks = combineUndoableReducers( {
 					action.uid,
 					...state.slice( index + 2 )
 				];
+
+			case 'REMOVE_BLOCK':
+				return without( state, action.uid );
 		}
 
 		return state;

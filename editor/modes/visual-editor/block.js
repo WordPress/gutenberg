@@ -19,6 +19,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
+		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -38,7 +39,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
-		onChange( {
+		onChange( block.uid, {
 			attributes: {
 				...block.attributes,
 				...attributes
@@ -59,6 +60,44 @@ class VisualEditorBlock extends wp.element.Component {
 		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
 			this.props.onDeselect();
 		}
+	}
+
+	mergeWithPrevious() {
+		const { block, previousBlock, onRemove, onChange } = this.props;
+
+		// Do nothing when it's the first block
+		if ( ! previousBlock ) {
+			return;
+		}
+
+		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
+
+		// Remove the previous block if it's not mergeable
+		if ( ! previousBlockSettings.merge ) {
+			onRemove( previousBlock.uid );
+			return;
+		}
+
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first
+		const blockWithTheSameType = previousBlock.blockType === block.blockType
+			? block
+			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
+
+		// If the block types can not match, do nothing
+		if ( ! blockWithTheSameType ) {
+			return;
+		}
+
+		// Calling the merge to update the attributes and remove the block to be merged
+		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blockWithTheSameType.attributes );
+		onChange( previousBlock.uid, {
+			attributes: {
+				...previousBlock.attributes,
+				...updatedAttributes
+			}
+		} );
+		onRemove( block.uid );
 	}
 
 	componentDidUpdate() {
@@ -137,6 +176,7 @@ class VisualEditorBlock extends wp.element.Component {
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
 					setFocus={ onFocus }
+					mergeWithPrevious={ this.mergeWithPrevious }
 				/>
 			</div>
 		);
@@ -145,19 +185,23 @@ class VisualEditorBlock extends wp.element.Component {
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		order: state.blocks.order.indexOf( ownProps.uid ),
-		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: state.selectedBlock.uid === ownProps.uid,
-		isHovered: state.hoveredBlock === ownProps.uid,
-		focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
-		isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
-	} ),
+	( state, ownProps ) => {
+		const order = state.blocks.order.indexOf( ownProps.uid );
+		return {
+			previousBlock: order === 0 ? null : state.blocks.byUid[ state.blocks.order[ order - 1 ] ],
+			block: state.blocks.byUid[ ownProps.uid ],
+			isSelected: state.selectedBlock.uid === ownProps.uid,
+			isHovered: state.hoveredBlock === ownProps.uid,
+			focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
+			isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
+			order
+		};
+	},
 	( dispatch, ownProps ) => ( {
-		onChange( updates ) {
+		onChange( uid, updates ) {
 			dispatch( {
 				type: 'UPDATE_BLOCK',
-				uid: ownProps.uid,
+				uid,
 				updates
 			} );
 		},
@@ -209,6 +253,13 @@ export default connect(
 				type: 'UPDATE_FOCUS',
 				uid: ownProps.uid,
 				config
+			} );
+		},
+
+		onRemove( uid ) {
+			dispatch( {
+				type: 'REMOVE_BLOCK',
+				uid
 			} );
 		}
 	} )
