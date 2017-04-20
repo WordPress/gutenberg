@@ -31,6 +31,39 @@ registerBlock( 'core/heading', {
 		} ) )
 	],
 
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content, align } ) => {
+					if ( Array.isArray( content ) ) {
+						// TODO this appears to always be true?
+						// TODO reject the switch if more than one paragraph
+						content = content[ 0 ];
+					}
+					return {
+						tag: 'H2',
+						content,
+						align,
+					};
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content, align } ) => {
+					return {
+						content: [ content ],
+						align,
+					};
+				},
+			},
+		]
+	},
+
 	edit( { attributes, setAttributes } ) {
 		const { content, tag, align } = attributes;
 
@@ -53,37 +86,4 @@ registerBlock( 'core/heading', {
 				dangerouslySetInnerHTML={ { __html: content } } />
 		);
 	},
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
-					if ( Array.isArray( content ) ) {
-						// TODO this appears to always be true?
-						// TODO reject the switch if more than one paragraph
-						content = content[ 0 ];
-					}
-					return {
-						tag: 'H2',
-						content,
-						align
-					};
-				}
-			}
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
-					return {
-						content: [ content ],
-						align
-					};
-				}
-			}
-		]
-	}
 } );
