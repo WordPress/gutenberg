@@ -3,6 +3,15 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
+#: blocks/library/embed/index.js:10
+msgid "Embed"
+msgstr ""
+
+#: blocks/library/embed/index.js:31
+#: blocks/library/image/index.js:31
+msgid "Write caption…"
+msgstr ""
+
 #: blocks/library/freeform/index.js:9
 msgid "Freeform"
 msgstr ""
@@ -17,10 +26,6 @@ msgstr ""
 
 #: blocks/library/image/index.js:10
 msgid "Image"
-msgstr ""
-
-#: blocks/library/image/index.js:31
-msgid "Write caption…"
 msgstr ""
 
 #: blocks/library/list/index.js:11

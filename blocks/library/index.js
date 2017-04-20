@@ -1,3 +1,4 @@
+import './embed';
 import './freeform';
 import './heading';
 import './image';
