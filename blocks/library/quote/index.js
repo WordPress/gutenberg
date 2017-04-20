@@ -16,7 +16,7 @@ registerBlock( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', html() ),
+		content: query( 'blockquote > p', html() ),
 		citation: html( 'footer' )
 	},
 
@@ -27,7 +27,7 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						value: content,
+						content,
 					};
 				},
 			},
@@ -36,14 +36,14 @@ registerBlock( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { value, citation } ) => {
+				transform: ( { content, citation } ) => {
 					if ( citation ) {
 						return new Error(
 							'Quote citation would be lost on transform.'
 						);
 					}
 					return {
-						content: value,
+						content,
 					};
 				},
 			},
@@ -51,15 +51,15 @@ registerBlock( 'core/quote', {
 	},
 
 	edit( { attributes, setAttributes } ) {
-		const { value, citation } = attributes;
+		const { content, citation } = attributes;
 
 		return (
 			<blockquote className="blocks-quote">
 				<Editable
-					value={ fromValueToParagraphs( value ) }
+					value={ fromValueToParagraphs( content ) }
 					onChange={
 						( paragraphs ) => setAttributes( {
-							value: fromParagraphsToValue( paragraphs )
+							content: fromParagraphsToValue( paragraphs )
 						} )
 					} />
 				<footer>
@@ -76,11 +76,11 @@ registerBlock( 'core/quote', {
 	},
 
 	save( attributes ) {
-		const { value, citation } = attributes;
+		const { content, citation } = attributes;
 
 		return (
 			<blockquote>
-				{ value && value.map( ( paragraph, i ) => (
+				{ content && content.map( ( paragraph, i ) => (
 					<p
 						key={ i }
 						dangerouslySetInnerHTML={ {
