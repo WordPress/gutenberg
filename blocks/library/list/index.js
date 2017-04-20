@@ -75,7 +75,7 @@ registerBlock( 'core/list', {
 		const { nodeName = 'OL', items = [] } = attributes;
 
 		return wp.element.createElement(
-			listType.toLowerCase(),
+			nodeName.toLowerCase(),
 			null,
 			items.map( ( item, index ) => (
 				<li key={ index }>{ item.value }</li>

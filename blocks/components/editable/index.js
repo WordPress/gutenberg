@@ -142,7 +142,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getContent() {
-		const content = this.editor.getContent();
+		const content = this.editor.getContent( { format: 'raw' } );
 
 		return htmlToReactParser.parse( content );
 	}

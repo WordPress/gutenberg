@@ -90,14 +90,10 @@ registerBlock( 'core/text', {
 			return content;
 		}
 
-		return content.map( ( paragraph ) => {
-			if ( 'string' === typeof paragraph ) {
-				return null;
-			}
-
-			return wp.element.cloneElement( paragraph, {
+		return content.map( ( paragraph ) => (
+			wp.element.cloneElement( paragraph, {
 				style: { textAlign: align }
-			} );
-		} );
+			} )
+		) );
 	}
 } );
