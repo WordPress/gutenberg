@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { uniq, get, reduce } from 'lodash';
+import { uniq, get, reduce, noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -35,18 +35,26 @@ class BlockSwitcher extends wp.element.Component {
 	}
 
 	render() {
-		const blockSettings = wp.blocks.getBlockSettings( this.props.block.blockType );
-		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
-			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = transformFrom.find( t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
-			return transformation ? memo.concat( [ block.slug ] ) : memo;
-		}, [] );
+		const { block } = this.props;
+
+		const blockSettings = wp.blocks.getBlockSettings( block.blockType );
+		const blocksToBeTransformedFrom = reduce(
+			wp.blocks.getBlocks(),
+			( memo, candidateBlock ) => {
+				const transformFrom = get( candidateBlock, 'transforms.from', [] );
+				const transformation = transformFrom.find(
+					t => t.blocks.indexOf( block.blockType ) !== -1
+				);
+				return transformation ? memo.concat( [ candidateBlock.slug ] ) : memo;
+			},
+			[]
+		);
 		const blocksToBeTransformedTo = get( blockSettings, 'transforms.to', [] )
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
 		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 			.reduce( ( memo, blockType ) => {
-				const block = wp.blocks.getBlockSettings( blockType );
-				return !! block ? memo.concat( block ) : memo;
+				const settings = wp.blocks.getBlockSettings( blockType );
+				return !! settings ? memo.concat( settings ) : memo;
 			}, [] );
 
 		if ( ! allowedBlocks.length ) {
@@ -65,19 +73,34 @@ class BlockSwitcher extends wp.element.Component {
 				{ this.state.open &&
 					<div className="editor-block-switcher__menu">
 						<div className="editor-block-switcher__menu-arrow" />
-						{ allowedBlocks.map( ( { slug, title, icon } ) => (
-							<IconButton
-								key={ slug }
-								onClick={ this.switchBlockType( slug ) }
-								className="editor-block-switcher__menu-item"
-								icon={ icon }
-							>
-								{ title }
-							</IconButton>
-						) ) }
+						{ allowedBlocks.map(
+							newBlock => this.renderAllowedBlock( block, newBlock )
+						) }
 					</div>
 				}
 			</div>
+		);
+	}
+
+	renderAllowedBlock( currentBlock, newBlockSettings ) {
+		const newBlockAttributes = wp.blocks.switchToBlockType(
+			currentBlock,
+			newBlockSettings.slug
+		);
+		const disabled = ( newBlockAttributes instanceof Error );
+		const disabledMessage = disabled ? newBlockAttributes.message : null;
+		const { slug, title, icon } = newBlockSettings;
+		return (
+			<IconButton
+				key={ slug }
+				onClick={ disabled ? noop : this.switchBlockType( slug ) }
+				className="editor-block-switcher__menu-item"
+				icon={ icon }
+				disabled={ disabled }
+				tooltip={ disabledMessage }
+			>
+				{ title }
+			</IconButton>
 		);
 	}
 }
@@ -88,10 +111,14 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {
+			block = wp.blocks.switchToBlockType( block, blockType );
+			if ( block instanceof Error ) {
+				return;
+			}
 			dispatch( {
 				type: 'SWITCH_BLOCK_TYPE',
 				uid: ownProps.uid,
-				block: wp.blocks.switchToBlockType( block, blockType )
+				block,
 			} );
 		}
 	} )
