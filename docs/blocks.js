@@ -235,7 +235,7 @@ var imageAlignNone = queryFirst( '.block-image__no-align' );
 var imageAlignLeft = queryFirst( '.block-image__align-left' );
 var imageAlignRight = queryFirst( '.block-image__align-right' );
 
-// Contants
+// Constants
 var KEY_ENTER = 13;
 var KEY_ARROW_LEFT = 37;
 var KEY_ARROW_UP = 38;
