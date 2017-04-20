@@ -440,6 +440,36 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 		$result = get_user_count( self::$different_network_id );
 		$this->assertEquals( $expected, $result );
 	}
+
+	/**
+	 * @ticket 40386
+	 */
+	public function test_wp_update_network_counts() {
+		delete_network_option( null, 'site_count' );
+		delete_network_option( null, 'user_count' );
+
+		wp_update_network_counts();
+
+		$site_count = (int) get_blog_count();
+		$user_count = (int) get_user_count();
+
+		$this->assertTrue( $site_count > 0 && $user_count > 0 );
+	}
+
+	/**
+	 * @ticket 40386
+	 */
+	public function test_wp_update_network_counts_on_different_network() {
+		delete_network_option( self::$different_network_id, 'site_count' );
+		delete_network_option( self::$different_network_id, 'user_count' );
+
+		wp_update_network_counts( self::$different_network_id );
+
+		$site_count = (int) get_blog_count( self::$different_network_id );
+		$user_count = (int) get_user_count( self::$different_network_id );
+
+		$this->assertTrue( $site_count > 0 && $user_count > 0 );
+	}
 }
 
 endif;
