@@ -21,7 +21,8 @@ function gutenberg_menu() {
 		'Gutenberg',
 		'manage_options',
 		'gutenberg',
-		'the_gutenberg_project'
+		'the_gutenberg_project',
+		'dashicons-edit'
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
