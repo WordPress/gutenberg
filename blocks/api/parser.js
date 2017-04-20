@@ -38,7 +38,7 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
  */
 export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 	// Handle global controls
-	const contentToParse = attributes.position
+	const contentToParse = attributes && attributes.position
 		? query.parse( rawContent, query.html( 'div' ) )
 		: rawContent;
 
