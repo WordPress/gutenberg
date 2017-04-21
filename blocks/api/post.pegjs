@@ -51,7 +51,7 @@ WP_Block_Attribute_List
 
 WP_Block_Attribute
   = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
-  { return { name, value }; }
+  { return { name: name, value: value }; }
 
 WP_Block_Attribute_Name
   = head:ASCII_Letter tail:ASCII_AlphaNumeric*
