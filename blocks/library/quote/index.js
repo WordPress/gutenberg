@@ -20,7 +20,6 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' ),
 		style: node => {
 			const value = attr( 'blockquote', 'class' )( node );
-			console.log( value );
 			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
 			return match ? +match[ 1 ] : null;
 		},
