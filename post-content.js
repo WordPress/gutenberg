@@ -21,7 +21,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote -->',
-			'<blockquote><p>Real artists ship.</p><footer><p><a href="http://www.folklore.org/StoryView.py?story=Real_Artists_Ship.txt">Steve Jobs, 1983</a></p></footer></blockquote>',
+			'<blockquote class="blocks-quote-style-2"><p>Real artists ship.</p><footer><p><a href="http://www.folklore.org/StoryView.py?story=Real_Artists_Ship.txt">Steve Jobs, 1983</a></p></footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/image -->',

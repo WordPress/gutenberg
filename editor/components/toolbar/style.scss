@@ -31,8 +31,8 @@
 		color: $white;
 	}
 
-	&[data-level]:after {
-		content: attr( data-level );
+	&[data-subscript]:after {
+		content: attr( data-subscript );
 		font-family: $default-font;
 		font-size: 10px;
 		font-weight: bold;

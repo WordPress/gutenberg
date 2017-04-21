@@ -27,7 +27,7 @@ registerBlock( 'core/heading', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'H' + level } );
 			},
-			level
+			subscript: level
 		} ) )
 	],
 
