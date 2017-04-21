@@ -15,7 +15,7 @@ registerBlock( 'core/heading', {
 
 	attributes: {
 		content: html( 'h1,h2,h3,h4,h5,h6' ),
-		tag: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
+		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 		align: prop( 'h1,h2,h3,h4,h5,h6', 'style.textAlign' )
 	},
 
@@ -23,20 +23,20 @@ registerBlock( 'core/heading', {
 		...'123456'.split( '' ).map( ( level ) => ( {
 			icon: 'heading',
 			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
-			isActive: ( { tag } ) => 'H' + level === tag,
+			isActive: ( { nodeName } ) => 'H' + level === nodeName,
 			onClick( attributes, setAttributes ) {
-				setAttributes( { tag: 'H' + level } );
+				setAttributes( { nodeName: 'H' + level } );
 			},
 			level
 		} ) )
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { content, tag, align } = attributes;
+		const { content, nodeName = 'H2', align } = attributes;
 
 		return (
 			<Editable
-				tagName={ tag }
+				tagName={ nodeName.toLowerCase() }
 				value={ content }
 				focus={ focus }
 				onFocus={ setFocus }
@@ -47,7 +47,8 @@ registerBlock( 'core/heading', {
 	},
 
 	save( { attributes } ) {
-		const { align, tag: Tag, content } = attributes;
+		const { align, nodeName = 'H2', content } = attributes;
+		const Tag = nodeName.toLowerCase();
 
 		return (
 			<Tag
@@ -68,7 +69,7 @@ registerBlock( 'core/heading', {
 						content = content[ 0 ];
 					}
 					return {
-						tag: 'H2',
+						nodeName: 'H2',
 						content,
 						align
 					};

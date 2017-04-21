@@ -13,7 +13,7 @@ registerBlock( 'core/list', {
 	category: 'common',
 
 	attributes: {
-		listType: prop( 'ol,ul', 'nodeName' ),
+		nodeName: prop( 'ol,ul', 'nodeName' ),
 		items: query( 'li', {
 			value: html()
 		} )
@@ -55,14 +55,14 @@ registerBlock( 'core/list', {
 	],
 
 	edit( { attributes, focus, setFocus } ) {
-		const { listType = 'ol', items = [], align } = attributes;
+		const { nodeName = 'OL', items = [], align } = attributes;
 		const content = items.map( item => {
 			return `<li>${ item.value }</li>`;
 		} ).join( '' );
 
 		return (
 			<Editable
-				tagName={ listType }
+				tagName={ nodeName.toLowerCase() }
 				style={ align ? { textAlign: align } : null }
 				value={ content }
 				focus={ focus }
@@ -72,10 +72,10 @@ registerBlock( 'core/list', {
 	},
 
 	save( { attributes } ) {
-		const { listType = 'ol', items = [] } = attributes;
+		const { nodeName = 'OL', items = [] } = attributes;
 		const children = items.map( ( item, index ) => (
 			<li key={ index } dangerouslySetInnerHTML={ { __html: item.value } } />
 		) );
-		return wp.element.createElement( listType.toLowerCase(), null, children );
+		return wp.element.createElement( nodeName.toLowerCase(), null, children );
 	}
 } );
