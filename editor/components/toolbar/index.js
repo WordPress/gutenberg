@@ -21,7 +21,7 @@ function Toolbar( { controls } ) {
 					key={ index }
 					icon={ control.icon }
 					label={ control.title }
-					data-level={ control.level }
+					data-subscript={ control.subscript }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						control.onClick();

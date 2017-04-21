@@ -23,11 +23,11 @@ registerBlock( 'core/quote', {
 	controls: [ '1', '2' ].map( ( variation ) => ( {
 		icon: 'format-quote',
 		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %s' ), variation ),
-		isActive: ( { style = '1' } ) => style === style,
+		isActive: ( { style = '1' } ) => style === variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
-		level: variation
+		subscript: variation
 	} ) ),
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {

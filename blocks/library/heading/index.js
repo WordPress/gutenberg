@@ -27,7 +27,7 @@ registerBlock( 'core/heading', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { tag: 'H' + level } );
 			},
-			level
+			subscript: level
 		} ) )
 	],
 
