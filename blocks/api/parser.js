@@ -363,16 +363,18 @@ function simpleTrampoline( f ) {
 }
 
 export function parseWithRegExp( content ) {
-	const [ doc, /* remaining */ ] = simpleTrampoline( regExpParser( content ) );
+	const [ doc, remaining ] = simpleTrampoline( regExpParser( content ) );
 
-	return doc.reduce( ( memo, blockNode ) => {
-		const { blockType, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockType, rawContent, attrs );
-		if ( block ) {
-			memo.push( block );
-		}
-		return memo;
-	}, [] );
+	return doc
+		.concat( { attrs: {}, rawContent: remaining } )
+		.reduce( ( memo, blockNode ) => {
+			const { blockType, rawContent, attrs } = blockNode;
+			const block = createBlockWithFallback( blockType, rawContent, attrs );
+			if ( block ) {
+				memo.push( block );
+			}
+			return memo;
+		}, [] );
 }
 
 export default parseWithRegExp;
