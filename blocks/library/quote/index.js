@@ -20,11 +20,21 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
+	controls: [ '1', '2' ].map( ( level ) => ( {
+		icon: 'format-quote',
+		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %s' ), level ),
+		isActive: ( { style = '1' } ) => style === level,
+		onClick( attributes, setAttributes ) {
+			setAttributes( { style: level } );
+		},
+		level
+	} ) ),
+
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation } = attributes;
+		const { value, citation, style = '1' } = attributes;
 
 		return (
-			<blockquote className="blocks-quote">
+			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
 				<Editable
 					value={ fromValueToParagraphs( value ) }
 					onChange={
@@ -54,10 +64,10 @@ registerBlock( 'core/quote', {
 	},
 
 	save( attributes ) {
-		const { value, citation } = attributes;
+		const { value, citation, style = '1' } = attributes;
 
 		return (
-			<blockquote>
+			<blockquote className={ `blocks-quote-style-${ style }` }>
 				{ value && value.map( ( paragraph, i ) => (
 					<p
 						key={ i }
