@@ -220,4 +220,82 @@ export function parseWithGrammar( content ) {
 	}, [] );
 }
 
-export default parseWithTinyMCE;
+const blockOpenerPattern = (
+//             (alphanumeric with /pieces)      (attrs)
+//   <!--   wp:core/image                       url:blarg    -->
+	/<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?!-->).)*-->/ig
+);
+
+const blockCloserPattern = (
+	/<!--\s*\/wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+-->/ig
+);
+
+/*
+ * Yeah it's recursive but it's tail-call recursive
+ * and can be trivially optimized. This is a prototype
+ */
+export function regExpParser( content, output = [], remaining = '', openBlock = null ) {
+	blockOpenerPattern.lastIndex = 0;
+	blockCloserPattern.lastIndex = 0;
+	const firstOpen = blockOpenerPattern.exec( content );
+	const firstClose = blockCloserPattern.exec( content );
+
+	if ( ! content ) {
+		return [ output, remaining ];
+	}
+
+	// no blocks at all
+	if ( ! firstOpen && ! firstClose ) {
+		if ( openBlock ) {
+			throw new SyntaxError( 'Cannot leave a block unclosed' );
+		}
+
+		return [ output.concat[ { attrs: {}, rawContent: content } ], remaining ];
+	}
+
+	// closing a non-existent block
+	if ( firstClose && firstOpen && firstClose.index < firstOpen.index && ! openBlock ) {
+		throw new SyntaxError( 'Cannot close a block that isn\'t open' );
+	}
+
+	// closing an existing block
+	if ( firstClose && ( ! firstOpen || firstClose.index < firstOpen.index ) ) {
+		return regExpParser(
+			content.slice( blockCloserPattern.lastIndex ),
+			output.concat( { ...openBlock, rawContent: content.slice( 0, firstClose.index ) } ),
+			content.slice( blockCloserPattern.lastIndex ),
+			null
+		);
+	}
+
+	// open a block
+	if ( firstOpen ) {
+		const [ /* fullMatch */, blockType, /* attrs */ ] = firstOpen;
+
+		const [ inside, nextRemaining ] = regExpParser(
+			content.slice( blockOpenerPattern.lastIndex ),
+			[],
+			content.slice( blockOpenerPattern.lastIndex ),
+			{ blockType, attrs: {} }
+		);
+
+		return [ output.concat( inside ), nextRemaining ];
+	}
+
+	return [ output, remaining ];
+}
+
+export function parseWithRegExp( content ) {
+	const [ doc, /* remaining */ ] = regExpParser( content );
+
+	return doc.reduce( ( memo, blockNode ) => {
+		const { blockType, rawContent, attrs } = blockNode;
+		const block = createBlockWithFallback( blockType, rawContent, attrs );
+		if ( block ) {
+			memo.push( block );
+		}
+		return memo;
+	}, [] );
+}
+
+export default parseWithRegExp;
