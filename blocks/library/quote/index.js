@@ -20,10 +20,10 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
-	controls: [ '1', '2' ].map( ( variation ) => ( {
+	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %s' ), variation ),
-		isActive: ( { style = '1' } ) => style === variation,
+		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %d' ), variation ),
+		isActive: ( { style = 1 } ) => +style === +variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
@@ -31,7 +31,8 @@ registerBlock( 'core/quote', {
 	} ) ),
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation, style = '1' } = attributes;
+		const { value, citation } = attributes;
+		const style = +attributes.style || 1;
 
 		return (
 			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
@@ -64,7 +65,8 @@ registerBlock( 'core/quote', {
 	},
 
 	save( attributes ) {
-		const { value, citation, style = '1' } = attributes;
+		const { value, citation } = attributes;
+		const style = +attributes.style || 1;
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>

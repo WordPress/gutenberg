@@ -56,7 +56,7 @@ msgid "Quote"
 msgstr ""
 
 #: blocks/library/quote/index.js:25
-msgid "Quote %s"
+msgid "Quote %d"
 msgstr ""
 
 #: blocks/library/text/index.js:13
