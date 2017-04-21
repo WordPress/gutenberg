@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement } from 'react';
+import { createElement, Component, cloneElement, Children } from 'react';
 import { render } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -39,6 +39,8 @@ export { Component };
  * @return {WPElement}         Cloned element
  */
 export { cloneElement };
+
+export { Children };
 
 /**
  * Renders a given element into a string

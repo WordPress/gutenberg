@@ -71,16 +71,9 @@ registerBlock( 'core/text', {
 	save( { attributes } ) {
 		// An empty block will have an undefined content field. Return early
 		// as an empty string.
-		let { content } = attributes;
+		const { content } = attributes;
 		if ( ! content ) {
 			return '';
-		}
-
-		// Content can be in the following shapes, so we normalize to an array:
-		// - Single paragraph: Object
-		// - Multiple paragraph: Array of objects
-		if ( ! Array.isArray( content ) ) {
-			content = [ content ];
 		}
 
 		// We only need to transform content if we need to apply the alignment
@@ -90,7 +83,7 @@ registerBlock( 'core/text', {
 			return content;
 		}
 
-		return content.map( ( paragraph ) => (
+		return wp.element.Children.map( content, ( paragraph ) => (
 			wp.element.cloneElement( paragraph, {
 				style: { textAlign: align }
 			} )
