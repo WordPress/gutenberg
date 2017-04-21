@@ -20,14 +20,14 @@ registerBlock( 'core/quote', {
 		citation: html( 'footer' )
 	},
 
-	controls: [ '1', '2' ].map( ( level ) => ( {
+	controls: [ '1', '2' ].map( ( variation ) => ( {
 		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %s' ), level ),
-		isActive: ( { style = '1' } ) => style === level,
+		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %s' ), variation ),
+		isActive: ( { style = '1' } ) => style === style,
 		onClick( attributes, setAttributes ) {
-			setAttributes( { style: level } );
+			setAttributes( { style: variation } );
 		},
-		level
+		level: variation
 	} ) ),
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
