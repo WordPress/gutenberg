@@ -220,23 +220,69 @@ export function parseWithGrammar( content ) {
 	}, [] );
 }
 
-const blockOpenerPattern = (
-//             (alphanumeric with /pieces)      (attrs)
-//   <!--   wp:core/image                       url:blarg    -->
-	/<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?!-->).)*-->/ig
-);
+/**
+ * Matches opening block comments
+ *
+ *   <!-- wp:block/type arg:14 value:something -->
+ *
+ * This includes the global flag so that we can
+ * track not only where the string begins but also
+ * where it ends with the `.lastIndex` property
+ *
+ * @type {RegExp}
+ */
+const blockOpenerPattern = /<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?!-->).)*-->/ig;
 
-const blockCloserPattern = (
-	/<!--\s*\/wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+-->/ig
-);
+/**
+ * Matches closing block comments
+ *
+ *   <!-- /wp:block/type -->
+ *
+ * This includes the global flag so that we can
+ * track not only where the string begins but also
+ * where it ends with the `.lastIndex` property
+ *
+ * @type {RegExp}
+ */
+const blockCloserPattern = /<!--\s*\/wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+-->/ig;
 
-/*
- * Yeah it's recursive but it's tail-call recursive
- * and can be trivially optimized. This is a prototype
+/**
+ * Parses the post content with a RegExp based parser
+ * and returns a list of block data structures
+ *
+ * Scans the content to find block opening and block closing
+ * comments. When we find an opening, push the accumulated
+ * content into the output, track the opening, and descend
+ * into the remaining content and repeat. When we find a
+ * closing comment, fill in the accumulated content into the
+ * passed partial block and append into the output, and repeat.
+ * If any content remains past the last closing comment return
+ * as the remainder to be later appended to the output as a
+ * free-form block.
+ *
+ * @TODO: This messes up nested nodes; fix by handling children
+ *        in another accumulator and merging on close to preserve
+ *        the tail-call recursion. Note that blocks are not yet
+ *        nested so right now it's not a problem.
+ *
+ * @example
+ * content    output           remaining openBlock
+ *
+ * A(Sub)Expr []               (Sub)Expr .
+ * Sub)Expr   [{A}]            Sub)Expr  {}
+ * )Expr      [{A}{Sub}]       )Expr     .
+ * Expr       [{A}{Sub}]       Expr      {}
+ *            [{A}{Sub}{Expr}]
+ *
+ * @param {String} content running post content to parse
+ * @param {Array<Object>} [output=[]] running total output of parser
+ * @param {String} [remaining=''] running remaining content to parse not captured by parser
+ * @param {?Object} openBlock partial block information to carry along if opening a block
+ * @returns {Array<Object>|Function} final parsed content or a continuation thunk for recursion
  */
 export function regExpParser( content, output = [], remaining = '', openBlock = null ) {
-	blockOpenerPattern.lastIndex = 0;
-	blockCloserPattern.lastIndex = 0;
+	blockOpenerPattern.lastIndex = 0; // RegExp with `g` flag (which we need to read lastIndex)
+	blockCloserPattern.lastIndex = 0; // must be reset or we will get skewed indices
 	const firstOpen = blockOpenerPattern.exec( content );
 	const firstClose = blockCloserPattern.exec( content );
 
@@ -260,7 +306,7 @@ export function regExpParser( content, output = [], remaining = '', openBlock = 
 
 	// closing an existing block
 	if ( firstClose && ( ! firstOpen || firstClose.index < firstOpen.index ) ) {
-		return regExpParser(
+		return () => regExpParser(
 			content.slice( blockCloserPattern.lastIndex ),
 			output.concat( { ...openBlock, rawContent: content.slice( 0, firstClose.index ) } ),
 			content.slice( blockCloserPattern.lastIndex ),
@@ -272,21 +318,52 @@ export function regExpParser( content, output = [], remaining = '', openBlock = 
 	if ( firstOpen ) {
 		const [ /* fullMatch */, blockType, /* attrs */ ] = firstOpen;
 
-		const [ inside, nextRemaining ] = regExpParser(
+		return () => regExpParser(
 			content.slice( blockOpenerPattern.lastIndex ),
-			[],
+			output,
 			content.slice( blockOpenerPattern.lastIndex ),
 			{ blockType, attrs: {} }
 		);
-
-		return [ output.concat( inside ), nextRemaining ];
 	}
 
 	return [ output, remaining ];
 }
 
+/**
+ * Run tail-call-recursive functions in constant stack space
+ *
+ * Cannot be used in this form to eventually return a function!
+ * If you need to return a function this requires a slight
+ * modification to the transformed function such that it always
+ * returns a pair: [ next thunk or stop, value of accumulators ]
+ *
+ * This method has been chosen because it is simpler to implement
+ * and read and keeps some noise out of the wrapped functions.
+ *
+ * @see https://en.wikipedia.org/wiki/Tail_call#Through_trampolining
+ *
+ * @example
+ * // stack overflow
+ * const factorial = ( n, a = 1 ) => n > 1 ? factorial( n - 1, n * a ) : a;
+ * factorial( 20000 );
+ *
+ * // safe
+ * const factorial = ( n, a = 1 ) => n > 1 ? () => factorial( n - 1, n * a ) : a;
+ * trampoline( factorial( 20000 ) );
+ *
+ * @param {*} f trampolined function to call, or a non-function value
+ * @returns {*} non-function value returned by trampoline
+ */
+function simpleTrampoline( f ) {
+	while ( 'function' === typeof f ) {
+		f = f();
+	}
+
+	return f;
+}
+
 export function parseWithRegExp( content ) {
-	const [ doc, /* remaining */ ] = regExpParser( content );
+	const [ doc, /* remaining */ ] = simpleTrampoline( regExpParser( content ) );
 
 	return doc.reduce( ( memo, blockNode ) => {
 		const { blockType, rawContent, attrs } = blockNode;
