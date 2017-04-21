@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { parse, html, query } = hpq;
+const { parse, html, query, attr } = hpq;
 
 const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
 const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
@@ -17,7 +17,13 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', html() ),
-		citation: html( 'footer' )
+		citation: html( 'footer' ),
+		style: node => {
+			const value = attr( 'blockquote', 'class' )( node );
+			console.log( value );
+			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
+			return match ? +match[ 1 ] : null;
+		},
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
