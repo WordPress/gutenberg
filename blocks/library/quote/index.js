@@ -22,7 +22,7 @@ registerBlock( 'core/quote', {
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote %d' ), variation ),
+		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
 		isActive: ( { style = 1 } ) => +style === +variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
