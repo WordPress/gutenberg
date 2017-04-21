@@ -1,4 +1,4 @@
-# HEAD
+# 10.0.0
 
 -   Added: `scss/selector-no-redundant-nesting-selector` rule in `stylelint-config-wordpress/scss` chared config.
 -   Added: `selector-no-empty` rule.
