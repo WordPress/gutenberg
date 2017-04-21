@@ -106,7 +106,9 @@ export default class Editable extends wp.element.Component {
 		this.editor.setContent( this.props.value || '' );
 		const hasAfter = !! childNodes.slice( splitIndex )
 			.reduce( ( memo, node ) => memo + node.textContent, '' );
-		this.props.onSplit( before, hasAfter ? after : '' );
+
+		// The setTimeout fixes the focus jump to the original block
+		setTimeout( () => this.props.onSplit( before, hasAfter ? after : '' ) );
 	}
 
 	bindNode( ref ) {
@@ -117,6 +119,9 @@ export default class Editable extends wp.element.Component {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.editor.setContent( this.props.value );
 		this.editor.selection.moveToBookmark( bookmark );
+		// Saving the editor on updates avoid unecessary onChanges calls
+		// These calls can make the focus jump
+		this.editor.save();
 	}
 
 	focus() {
