@@ -1,3 +1,7 @@
+# HEAD
+
+-   Removed: `rule-non-nested-empty-line-before` rule from SCSS config. This rule is deprecated in stylelint v8, the new `rule-empty-line-before` rule already exists in the primary config.
+
 # 10.0.0
 
 -   Added: `scss/selector-no-redundant-nesting-selector` rule in `stylelint-config-wordpress/scss` chared config.
