@@ -107,6 +107,7 @@ before_script:
 - grunt --version
 - git --version
 - svn --version
+- locale -a
 script: grunt $WP_TRAVISCI
 notifications:
   slack:
