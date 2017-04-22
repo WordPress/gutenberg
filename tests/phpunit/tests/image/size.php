@@ -8,9 +8,6 @@
 class Tests_Image_Size extends WP_UnitTestCase {
 
 	function test_constrain_dims_zero() {
-		if (!is_callable('wp_constrain_dimensions'))
-			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
-
 		// no constraint - should have no effect
 		$out = wp_constrain_dimensions(640, 480, 0, 0);
 		$this->assertSame( array( 640, 480 ), $out );
@@ -26,9 +23,6 @@ class Tests_Image_Size extends WP_UnitTestCase {
 	}
 
 	function test_constrain_dims_smaller() {
-		if (!is_callable('wp_constrain_dimensions'))
-			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
-
 		// image size is smaller than the constraint - no effect
 		$out = wp_constrain_dimensions(500, 600, 1024, 768);
 		$this->assertSame( array( 500, 600 ), $out );
@@ -41,9 +35,6 @@ class Tests_Image_Size extends WP_UnitTestCase {
 	}
 
 	function test_constrain_dims_equal() {
-		if (!is_callable('wp_constrain_dimensions'))
-			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
-
 		// image size is equal to the constraint - no effect
 		$out = wp_constrain_dimensions(1024, 768, 1024, 768);
 		$this->assertSame( array( 1024, 768 ), $out );
@@ -56,9 +47,6 @@ class Tests_Image_Size extends WP_UnitTestCase {
 	}
 
 	function test_constrain_dims_larger() {
-		if (!is_callable('wp_constrain_dimensions'))
-			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
-
 		// image size is larger than the constraint - result should be constrained
 		$out = wp_constrain_dimensions(1024, 768, 500, 600);
 		$this->assertSame( array( 500, 375 ), $out );
@@ -81,9 +69,6 @@ class Tests_Image_Size extends WP_UnitTestCase {
 	}
 
 	function test_constrain_dims_boundary() {
-		if (!is_callable('wp_constrain_dimensions'))
-			$this->markTestSkipped('wp_constrain_dimensions() is not callable.');
-
 		// one dimension is larger than the constraint, one smaller - result should be constrained
 		$out = wp_constrain_dimensions(1024, 768, 500, 800);
 		$this->assertSame( array( 500, 375 ), $out );

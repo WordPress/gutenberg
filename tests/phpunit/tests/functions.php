@@ -61,9 +61,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	function test_path_is_absolute() {
-		if ( !is_callable('path_is_absolute') )
-			$this->markTestSkipped();
-
 		$absolute_paths = array(
 			'/',
 			'/foo/',
@@ -81,9 +78,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	}
 
 	function test_path_is_not_absolute() {
-		if ( !is_callable('path_is_absolute') )
-			$this->markTestSkipped();
-
 		$relative_paths = array(
 			'',
 			'.',
