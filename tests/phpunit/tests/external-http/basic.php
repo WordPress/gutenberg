@@ -14,7 +14,7 @@ class Tests_External_HTTP_Basic extends WP_UnitTestCase {
 
 		$response = wp_remote_get( 'https://secure.php.net/supported-versions.php' );
 		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
-			$this->markTestSkipped( 'Could not contact PHP.net to check versions.' );
+			$this->fail( 'Could not contact PHP.net to check versions.' );
 		}
 		$php = wp_remote_retrieve_body( $response );
 
@@ -26,7 +26,7 @@ class Tests_External_HTTP_Basic extends WP_UnitTestCase {
 
 		$response = wp_remote_get( "https://dev.mysql.com/doc/relnotes/mysql/{$matches[1]}/en/" );
 		if ( 200 != wp_remote_retrieve_response_code( $response ) ) {
-			$this->markTestSkipped( 'Could not contact dev.MySQL.com to check versions.' );
+			$this->fail( 'Could not contact dev.MySQL.com to check versions.' );
 		}
 		$mysql = wp_remote_retrieve_body( $response );
 
