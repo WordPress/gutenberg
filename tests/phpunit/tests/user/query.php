@@ -552,7 +552,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @group ms-required
+	 * @group ms-excluded
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_blog_id_on_nonms() {
 		if ( is_multisite() ) {
