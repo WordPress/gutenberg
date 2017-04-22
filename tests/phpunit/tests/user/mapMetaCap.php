@@ -213,8 +213,10 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 	}
 
 	function test_unfiltered_html_cap() {
-		if ( defined( 'DISALLOW_UNFILTERED_HTML' ) && DISALLOW_UNFILTERED_HTML )
-			$this->markTestSkipped( 'DISALLOW_UNFILTERED_HTML is defined.' );
+		if ( defined( 'DISALLOW_UNFILTERED_HTML' ) ) {
+			$this->assertFalse( DISALLOW_UNFILTERED_HTML );
+		}
+
 		if ( is_multisite() ) {
 			$this->assertEquals( array( 'do_not_allow' ), map_meta_cap( 'unfiltered_html', 0 ) );
 			$this->assertEquals( array( 'unfiltered_html' ), map_meta_cap( 'unfiltered_html', self::$user_id ) );
@@ -227,16 +229,14 @@ class Tests_User_MapMetaCap extends WP_UnitTestCase {
 	 * @ticket 20488
 	 */
 	function test_file_edit_caps_not_reliant_on_unfiltered_html_constant() {
-		if ( defined( 'DISALLOW_FILE_MODS' ) || defined( 'DISALLOW_FILE_EDIT' ) )
-			$this->markTestSkipped('DISALLOW_FILE_MODS or DISALLOW_FILE_EDIT is defined.');
+		$this->assertFalse( defined( 'DISALLOW_FILE_MODS' ) );
+		$this->assertFalse( defined( 'DISALLOW_FILE_EDIT' ) );
 
-		if ( defined( 'DISALLOW_UNFILTERED_HTML' ) ) {
-			if ( ! DISALLOW_UNFILTERED_HTML )
-				$this->markTestSkipped( 'DISALLOW_UNFILTERED_HTML is defined.' );
-		} else {
+		if ( ! defined( 'DISALLOW_UNFILTERED_HTML' ) ) {
 			define( 'DISALLOW_UNFILTERED_HTML', true );
 		}
 
+		$this->assertTrue( DISALLOW_UNFILTERED_HTML );
 		$this->assertEquals( array( 'update_core' ), map_meta_cap( 'update_core', self::$user_id ) );
 		$this->assertEquals( array( 'edit_plugins' ), map_meta_cap( 'edit_plugins', self::$user_id ) );
 	}
