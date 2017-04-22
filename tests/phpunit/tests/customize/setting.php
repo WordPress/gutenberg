@@ -561,6 +561,7 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 *
 	 * @ticket 31428
 	 * @group multisite
+	 * @group ms-required
 	 */
 	function test_previewing_with_switch_to_blog() {
 		if ( ! is_multisite() ) {

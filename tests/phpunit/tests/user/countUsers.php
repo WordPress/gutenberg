@@ -9,6 +9,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	 * @ticket 22993
 	 *
 	 * @dataProvider data_count_users_strategies
+	 * @group ms-excluded
 	 */
 	public function test_count_users_is_accurate( $strategy ) {
 
@@ -57,6 +58,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	/**
 	 * @ticket 22993
 	 * @group multisite
+	 * @group ms-required
 	 *
 	 * @dataProvider data_count_users_strategies
 	 */

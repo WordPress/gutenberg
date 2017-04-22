@@ -72,6 +72,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 25162
+	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role() {
 		if ( is_multisite() ) {
@@ -100,6 +101,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 25162
+	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_role() {
 		if ( is_multisite() ) {
@@ -131,6 +133,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 25162
 	 * @group multisite
+	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_blog() {
 		if ( ! is_multisite() ) {
@@ -181,6 +184,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 25162
 	 * @group multisite
+	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_network() {
 		if ( ! is_multisite() ) {
@@ -425,6 +429,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 37949
+	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_role() {
 		if ( is_multisite() ) {
@@ -445,6 +450,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 37949
+	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role() {
 		if ( is_multisite() ) {
@@ -467,6 +473,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	/**
 	 * @ticket 37949
 	 * @group multisite
+	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role_in_multisite() {
 		if ( ! is_multisite() ) {
@@ -586,6 +593,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39082
+	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user() {
 		if ( ! is_multisite() ) {
@@ -604,6 +612,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39082
+	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_super_admin() {
 		if ( ! is_multisite() ) {
@@ -624,6 +633,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39082
+	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user_with_network_caps() {
 		global $current_user;

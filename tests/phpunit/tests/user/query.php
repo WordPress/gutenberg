@@ -551,6 +551,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( array( 'author' => true ), $user->caps );
 	}
 
+	/**
+	 * @group ms-required
+	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_blog_id_on_nonms() {
 		if ( is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' is a non-multisite-only test.' );
@@ -569,6 +572,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( array( 'author' => true ), $user->caps );
 	}
 
+	/**
+	 * @group ms-required
+	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_current_blog_id_on_ms() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
@@ -587,6 +593,9 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( array( 'author' => true ), $user->caps );
 	}
 
+	/**
+	 * @group ms-required
+	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_different_blog_id_on_ms_when_fields_all_with_meta() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
@@ -612,6 +621,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 31878
+	 * @group ms-required
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_different_blog_id_on_ms_when_fields_all() {
 		if ( ! is_multisite() ) {
@@ -637,6 +647,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 32019
+	 * @group ms-required
 	 */
 	public function test_who_authors() {
 		if ( ! is_multisite() ) {
@@ -663,6 +674,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 32019
+	 * @group ms-required
 	 */
 	public function test_who_authors_should_work_alongside_meta_query() {
 		if ( ! is_multisite() ) {
@@ -698,6 +710,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 36724
+	 * @group ms-required
 	 */
 	public function test_who_authors_should_work_alongside_meta_params() {
 		if ( ! is_multisite() ) {
@@ -791,6 +804,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 32250
+	 * @group ms-required
 	 */
 	public function test_has_published_posts_should_respect_blog_id() {
 		if ( ! is_multisite() ) {
@@ -1358,6 +1372,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22212
+	 * @group ms-required
 	 */
 	public function test_blog_id_should_restrict_by_blog_without_requiring_a_named_role() {
 		if ( ! is_multisite() ) {
@@ -1380,6 +1395,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	/**
 	 * @ticket 22212
 	 * @ticket 21119
+	 * @group ms-required
 	 */
 	public function test_calling_prepare_query_a_second_time_should_not_add_another_cap_query_on_multisite() {
 		if ( ! is_multisite() ) {

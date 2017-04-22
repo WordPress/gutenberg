@@ -145,6 +145,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * Enable a single theme on a network.
 	 *
 	 * @ticket 30594
+	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_single_theme() {
 		if ( ! is_multisite() ) {
@@ -165,6 +166,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * Enable multiple themes on a network.
 	 *
 	 * @ticket 30594
+	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_multiple_themes() {
 		if ( ! is_multisite() ) {
@@ -185,6 +187,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * Disable a single theme on a network.
 	 *
 	 * @ticket 30594
+	 * @group ms-required
 	 */
 	function test_network_disable_single_theme() {
 		if ( ! is_multisite() ) {
@@ -209,6 +212,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * Disable multiple themes on a network.
 	 *
 	 * @ticket 30594
+	 * @group ms-required
 	 */
 	function test_network_disable_multiple_themes() {
 		if ( ! is_multisite() ) {

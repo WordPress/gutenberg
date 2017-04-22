@@ -253,6 +253,7 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 
 	/**
 	 * @group multisite
+	 * @group ms-required
 	 */
 	function test_request_ms_child_in_root_blog() {
 		if ( ! is_multisite() ) {

@@ -38,6 +38,7 @@ class Tests_Link_GetDashboardUrl extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39065
+	 * @group ms-required
 	 */
 	public function test_get_dashboard_url_for_network_administrator_with_no_sites() {
 		if ( ! is_multisite() ) {
@@ -58,6 +59,7 @@ class Tests_Link_GetDashboardUrl extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39065
+	 * @group ms-required
 	 */
 	public function test_get_dashboard_url_for_administrator_of_different_site() {
 		if ( ! is_multisite() ) {

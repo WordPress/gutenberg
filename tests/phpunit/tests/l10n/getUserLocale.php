@@ -66,6 +66,9 @@ class Tests_Get_User_Locale extends WP_UnitTestCase {
 		$this->assertSame( 'en_US', get_locale() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
 	public function test_user_locale_is_same_across_network() {
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped( __METHOD__ . ' requires multisite' );
