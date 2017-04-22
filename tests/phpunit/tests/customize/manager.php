@@ -2027,15 +2027,6 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test is_ios() method.
-	 *
-	 * @see WP_Customize_Manager::is_ios()
-	 */
-	function test_is_ios() {
-		$this->markTestSkipped( 'WP_Customize_Manager::is_ios() cannot be tested because it uses wp_is_mobile() which contains a static var.' );
-	}
-
-	/**
 	 * Test get_document_title_template() method.
 	 *
 	 * @see WP_Customize_Manager::get_document_title_template()
