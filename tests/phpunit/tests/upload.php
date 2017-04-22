@@ -8,10 +8,6 @@ class Tests_Upload extends WP_UnitTestCase {
 	var $siteurl;
 
 	function setUp() {
-		if ( is_multisite() ) {
-			$this->knownUTBug( 35 );
-		}
-
 		$this->_reset_options();
 		parent::setUp();
 	}

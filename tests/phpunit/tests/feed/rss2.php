@@ -162,9 +162,6 @@ class Tests_Feeds_RSS2 extends WP_UnitTestCase {
 		$this->assertNotContains( 'Tue_Translated', $pubdate[0]['content'] );
 	}
 
-	/**
-	 * @ticket UT32
-	 */
 	function test_item_elements() {
 		$this->go_to( '/?feed=rss2' );
 		$feed = $this->do_rss2();

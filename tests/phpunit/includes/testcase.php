@@ -562,10 +562,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		foreach ( $tickets as $ticket ) {
 			if ( is_numeric( $ticket ) ) {
 				$this->knownWPBug( $ticket );
-			} elseif ( 'UT' == substr( $ticket, 0, 2 ) ) {
-				$ticket = substr( $ticket, 2 );
-				if ( $ticket && is_numeric( $ticket ) )
-					$this->knownUTBug( $ticket );
 			} elseif ( 'Plugin' == substr( $ticket, 0, 6 ) ) {
 				$ticket = substr( $ticket, 6 );
 				if ( $ticket && is_numeric( $ticket ) )
@@ -585,13 +581,10 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Skips the current test if there is an open unit tests ticket with id $ticket_id
+	 * @deprecated No longer used since the unit test Trac was merged into Core's.
 	 */
 	function knownUTBug( $ticket_id ) {
-		if ( WP_TESTS_FORCE_KNOWN_BUGS || in_array( 'UT' . $ticket_id, self::$forced_tickets ) )
-			return;
-		if ( ! TracTickets::isTracTicketClosed( 'https://unit-tests.trac.wordpress.org', $ticket_id ) )
-			$this->markTestSkipped( sprintf( 'Unit Tests Ticket #%d is not fixed', $ticket_id ) );
+		return;
 	}
 
 	/**
