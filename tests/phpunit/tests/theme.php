@@ -189,7 +189,7 @@ class Tests_Theme extends WP_UnitTestCase {
 	function test_default_theme_in_default_theme_list() {
 		$latest_default_theme = WP_Theme::get_core_default_theme();
 		if ( ! $latest_default_theme->exists() || 'twenty' !== substr( $latest_default_theme->get_stylesheet(), 0, 6 ) ) {
-			$this->markTestSkipped( 'No Twenty* series default themes are installed' ); 
+			$this->fail( 'No Twenty* series default themes are installed' ); 
 		}
 		$this->assertContains( $latest_default_theme->get_stylesheet(), $this->default_themes );
 	}

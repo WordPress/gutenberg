@@ -87,7 +87,7 @@ class Tests_DB extends WP_UnitTestCase {
 		// Switch to Russian
 		$flag = setlocale( LC_ALL, 'ru_RU.utf8', 'rus', 'fr_FR.utf8', 'fr_FR', 'de_DE.utf8', 'de_DE', 'es_ES.utf8', 'es_ES' );
 		if ( false === $flag )
-			$this->markTestSkipped( 'No European languages available for testing' );
+			$this->fail( 'No European languages available for testing' );
 
 		// Try an update query
 		$wpdb->suppress_errors( true );
