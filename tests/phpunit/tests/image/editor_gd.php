@@ -468,7 +468,7 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 */
 	public function test_image_preserves_alpha_on_resize() {
 		if ( ! ( imagetypes() & IMG_PNG ) ) {
-			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+			$this->fail( 'This test requires PHP to be compiled with PNG support.' );
 		}
 
 		$file = DIR_TESTDATA . '/images/transparent.png';
@@ -495,7 +495,7 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 */
 	public function test_image_preserves_alpha() {
 		if ( ! ( imagetypes() & IMG_PNG ) ) {
-			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+			$this->fail( 'This test requires PHP to be compiled with PNG support.' );
 		}
 
 		$file = DIR_TESTDATA . '/images/transparent.png';
@@ -521,7 +521,7 @@ class Tests_Image_Editor_GD extends WP_Image_UnitTestCase {
 	 */
 	public function test_image_preserves_alpha_on_rotate() {
 		if ( ! ( imagetypes() & IMG_PNG ) ) {
-			$this->markTestSkipped( 'This test requires PHP to be compiled with PNG support.' );
+			$this->fail( 'This test requires PHP to be compiled with PNG support.' );
 		}
 
 		$file = DIR_TESTDATA . '/images/transparent.png';

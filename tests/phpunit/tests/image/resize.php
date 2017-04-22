@@ -42,8 +42,7 @@ abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase 
 		$image = $this->resize_helper( DIR_TESTDATA.'/images/test-image.png', 25, 25 );
 
 		if ( ! is_string( $image ) ) {  // WP_Error, stop GLib-GObject-CRITICAL assertion
-			$this->markTestSkipped( sprintf( 'No PNG support in the editor engine %s on this system', $this->editor_engine ) );
-			return;
+			$this->fail( sprintf( 'No PNG support in the editor engine %s on this system', $this->editor_engine ) );
 		}
 
 		$this->assertEquals( 'test-image-25x25.png', basename( $image ) );
@@ -59,8 +58,7 @@ abstract class WP_Tests_Image_Resize_UnitTestCase extends WP_Image_UnitTestCase 
 		$image = $this->resize_helper( DIR_TESTDATA.'/images/test-image.gif', 25, 25 );
 
 		if ( ! is_string( $image ) ) {  // WP_Error, stop GLib-GObject-CRITICAL assertion
-			$this->markTestSkipped( sprintf( 'No GIF support in the editor engine %s on this system', $this->editor_engine ) );
-			return;
+			$this->fail( sprintf( 'No GIF support in the editor engine %s on this system', $this->editor_engine ) );
 		}
 
 		$this->assertEquals( 'test-image-25x25.gif', basename( $image ) );
