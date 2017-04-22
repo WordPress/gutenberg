@@ -426,23 +426,23 @@ module.exports = function(grunt) {
 		phpunit: {
 			'default': {
 				cmd: 'phpunit',
-				args: ['-c', 'phpunit.xml.dist']
+				args: ['--verbose', '-c', 'phpunit.xml.dist']
 			},
 			ajax: {
 				cmd: 'phpunit',
-				args: ['-c', 'phpunit.xml.dist', '--group', 'ajax']
+				args: ['--verbose', '-c', 'phpunit.xml.dist', '--group', 'ajax']
 			},
 			multisite: {
 				cmd: 'phpunit',
-				args: ['-c', 'tests/phpunit/multisite.xml']
+				args: ['--verbose', '-c', 'tests/phpunit/multisite.xml']
 			},
 			'external-http': {
 				cmd: 'phpunit',
-				args: ['-c', 'phpunit.xml.dist', '--group', 'external-http']
+				args: ['--verbose', '-c', 'phpunit.xml.dist', '--group', 'external-http']
 			},
 			'restapi-jsclient': {
 				cmd: 'phpunit',
-				args: ['-c', 'phpunit.xml.dist', '--group', 'restapi-jsclient']
+				args: ['--verbose', '-c', 'phpunit.xml.dist', '--group', 'restapi-jsclient']
 			}
 		},
 		uglify: {
