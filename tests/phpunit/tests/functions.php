@@ -941,6 +941,7 @@ class Tests_Functions extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 39550
+	 * @group ms-excluded
 	 */
 	function test_wp_check_filetype_and_ext_with_filtered_svg() {
 		if ( ! extension_loaded( 'fileinfo' ) ) {

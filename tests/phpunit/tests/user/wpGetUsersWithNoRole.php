@@ -7,6 +7,7 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 22993
+	 * @group ms-excluded
 	 */
 	public function test_get_users_with_no_role_is_accurate() {
 
@@ -41,6 +42,7 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 	/**
 	 * @ticket 22993
 	 * @group multisite
+	 * @group ms-required
 	 */
 	public function test_get_users_with_no_role_multisite_is_accurate() {
 
