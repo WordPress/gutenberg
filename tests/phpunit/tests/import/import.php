@@ -18,7 +18,7 @@ class Tests_Import_Import extends WP_Import_UnitTestCase {
 		add_filter( 'import_allow_create_users', '__return_true' );
 
 		if ( ! file_exists( DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php' ) ) {
-			$this->markTestSkipped( 'WordPress Importer plugin is not installed.' );
+			$this->fail( 'WordPress Importer plugin is not installed.' );
 		}
 
 		require_once DIR_TESTDATA . '/plugins/wordpress-importer/wordpress-importer.php';
