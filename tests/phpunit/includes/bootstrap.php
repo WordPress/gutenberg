@@ -3,6 +3,12 @@
  * Installs WordPress for running the tests and loads WordPress and the test libraries
  */
 
+/**
+ * Compatibility with PHPUnit 6+
+ */
+if ( class_exists( 'PHPUnit\Runner\Version' ) ) {
+	require_once dirname( __FILE__ ) . '/phpunit6-compat.php';
+}
 
 $config_file_path = dirname( dirname( __FILE__ ) );
 if ( ! file_exists( $config_file_path . '/wp-tests-config.php' ) ) {

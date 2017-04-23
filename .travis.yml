@@ -67,7 +67,11 @@ before_script:
   # Install the specified version of PHPUnit depending on the PHP version:
   if [[ "$WP_TRAVISCI" == "travis:phpunit" ]]; then
     case "$TRAVIS_PHP_VERSION" in
-      7.1|7.0|hhvm|nightly)
+      7.1|7.0|nightly)
+        echo "Using PHPUnit 6.1"
+        composer global require "phpunit/phpunit=6.1.*"
+        ;;
+      hhvm)
         echo "Using PHPUnit 5.7"
         composer global require "phpunit/phpunit=5.7.*"
         ;;
