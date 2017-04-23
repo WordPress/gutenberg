@@ -57,7 +57,7 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 	public function test_gzdeflate() {
 
 		if ( !function_exists( 'gzdeflate' ) ) {
-			$this->markTestSkipped( 'gzdeflate function not available' );
+			$this->fail( 'gzdeflate function not available' );
 		}
 
 		// Become an administrator
@@ -84,7 +84,7 @@ class Tests_Ajax_CompressionTest extends WP_Ajax_UnitTestCase {
 	public function test_gzencode() {
 
 		if ( !function_exists('gzencode') ) {
-			$this->markTestSkipped( 'gzencode function not available' );
+			$this->fail( 'gzencode function not available' );
 		}
 
 		// Become an administrator

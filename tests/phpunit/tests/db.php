@@ -507,7 +507,7 @@ class Tests_DB extends WP_UnitTestCase {
 
 		if ( count( $wpdb->get_results( 'SHOW CREATE PROCEDURE `test_mysqli_flush_sync_procedure`' ) ) < 1 ) {
 			$wpdb->suppress_errors( $suppress );
-			$this->markTestSkipped( 'procedure could not be created (missing privileges?)' );
+			$this->fail( 'procedure could not be created (missing privileges?)' );
 		}
 
 		$post_id = self::factory()->post->create();
