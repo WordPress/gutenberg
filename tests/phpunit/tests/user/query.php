@@ -555,9 +555,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_blog_id_on_nonms() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' is a non-multisite-only test.' );
-		}
+		$this->skipWithMultisite();
 
 		$query = new WP_User_Query( array(
 			'include' => self::$author_ids[0],
@@ -576,9 +574,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_current_blog_id_on_ms() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$query = new WP_User_Query( array(
 			'include' => self::$author_ids[0],
@@ -597,9 +593,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_different_blog_id_on_ms_when_fields_all_with_meta() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$b = self::factory()->blog->create();
 
@@ -624,9 +618,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_roles_and_caps_should_be_populated_for_explicit_value_of_different_blog_id_on_ms_when_fields_all() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' is a multisite-only test.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$b = self::factory()->blog->create();
 		add_user_to_blog( $b, self::$author_ids[0], 'author' );
@@ -650,9 +642,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_who_authors() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$b = self::factory()->blog->create();
 
@@ -677,9 +667,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_who_authors_should_work_alongside_meta_query() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$b = self::factory()->blog->create();
 
@@ -713,9 +701,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_who_authors_should_work_alongside_meta_params() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$b = self::factory()->blog->create();
 
@@ -807,9 +793,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_has_published_posts_should_respect_blog_id() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$blogs = self::factory()->blog->create_many( 2 );
 
@@ -1375,9 +1359,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_blog_id_should_restrict_by_blog_without_requiring_a_named_role() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$sites = self::factory()->blog->create_many( 2 );
 
@@ -1398,9 +1380,7 @@ class Tests_User_Query extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_calling_prepare_query_a_second_time_should_not_add_another_cap_query_on_multisite() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires Multisite.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$site_id = get_current_blog_id();
 		add_user_to_blog( $site_id, self::$author_ids[0], 'author' );

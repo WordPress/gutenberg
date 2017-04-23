@@ -148,9 +148,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_single_theme() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$theme = 'testtheme-1';
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
@@ -169,9 +167,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_multiple_themes() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$themes = array( 'testtheme-2', 'testtheme-3' );
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
@@ -190,9 +186,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_network_disable_single_theme() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 
@@ -215,9 +209,7 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_network_disable_multiple_themes() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 

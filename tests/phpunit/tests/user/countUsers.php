@@ -12,10 +12,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_count_users_is_accurate( $strategy ) {
-
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run on multisite' );
-		}
+		$this->skipWithMultisite();
 
 		// Setup users
 		$admin = self::factory()->user->create( array(
@@ -63,10 +60,7 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	 * @dataProvider data_count_users_strategies
 	 */
 	public function test_count_users_multisite_is_accurate( $strategy ) {
-
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		// Setup users
 		$admin = self::factory()->user->create( array(

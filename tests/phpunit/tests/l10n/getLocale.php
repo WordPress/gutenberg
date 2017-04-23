@@ -21,9 +21,7 @@ class Tests_L10n_GetLocale extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_local_option_should_take_precedence_on_multisite() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( __METHOD__ . ' requires Multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		global $locale;
 		$old_locale = $locale;

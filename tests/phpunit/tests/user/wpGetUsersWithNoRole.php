@@ -10,10 +10,7 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_get_users_with_no_role_is_accurate() {
-
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run on multisite' );
-		}
+		$this->skipWithMultisite();
 
 		// Setup users
 		$admin = self::factory()->user->create( array(
@@ -45,10 +42,7 @@ class Tests_User_GetUsersWithNoRole extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_get_users_with_no_role_multisite_is_accurate() {
-
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		// Setup users
 		$admin = self::factory()->user->create( array(

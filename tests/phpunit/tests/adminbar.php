@@ -75,9 +75,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run in multisite' );
-		}
+		$this->skipWithMultisite();
 
 		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
 
@@ -104,9 +102,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_role() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run in multisite' );
-		}
+		$this->skipWithMultisite();
 
 		$this->assertTrue( user_can( self::$editor_id, 'read' ) );
 
@@ -136,9 +132,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_blog() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$blog_id = self::factory()->blog->create( array(
 			'user_id' => self::$admin_id,
@@ -187,9 +181,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_network() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$this->assertTrue( user_can( self::$admin_id, 'read' ) );
 		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
@@ -432,9 +424,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_role() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run in multisite' );
-		}
+		$this->skipWithMultisite();
 
 		wp_set_current_user( self::$editor_id );
 
@@ -453,9 +443,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Test does not run in multisite' );
-		}
+		$this->skipWithMultisite();
 
 		wp_set_current_user( self::$no_role_id );
 
@@ -476,9 +464,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role_in_multisite() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		// User is not a member of a site.
 		remove_user_from_blog( self::$no_role_id, get_current_blog_id() );
@@ -596,9 +582,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		wp_set_current_user( self::$editor_id );
 
@@ -615,9 +599,7 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_super_admin() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		wp_set_current_user( self::$editor_id );
 
@@ -636,11 +618,9 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user_with_network_caps() {
-		global $current_user;
+		$this->skipWithoutMultisite();
 
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test only runs in multisite' );
-		}
+		global $current_user;
 
 		$network_user_caps = array( 'manage_network', 'manage_network_themes', 'manage_network_plugins' );
 

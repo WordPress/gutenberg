@@ -47,11 +47,10 @@ class Tests_Option_SiteTransient extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_set_site_transient_is_not_stored_as_autoload_option() {
+		$this->skipWithMultisite();
+
 		$key = 'not_autoloaded';
 
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Does not apply when used in multisite.' );
-		}
 		set_site_transient( $key, 'Not an autoload option' );
 
 		$options = wp_load_alloptions();

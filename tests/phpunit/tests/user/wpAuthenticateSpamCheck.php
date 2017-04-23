@@ -9,9 +9,7 @@ class Tests_User_WpAuthenticateSpamCheck extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	function test_wp_authenticate_spam_check_returns_user_when_single_site() {
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'This test applies to single site only.' );
-		}
+		$this->skipWithMultisite();
 
 		$user_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
 		$user = new WP_User( $user_id );
@@ -25,9 +23,7 @@ class Tests_User_WpAuthenticateSpamCheck extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_authenticate_spam_check_returns_user_when_not_flagged() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test applies to multisite only.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$user_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
 		$user = new WP_User( $user_id );
@@ -41,9 +37,7 @@ class Tests_User_WpAuthenticateSpamCheck extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_authenticate_spam_check_returns_wp_error_when_flagged() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'This test applies to multisite only.' );
-		}
+		$this->skipWithoutMultisite();
 
 		$user_id = self::factory()->user->create( array( 'role' => 'contributor' ) );
 		update_user_status( $user_id, 'spam', 1 );

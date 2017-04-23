@@ -16,9 +16,7 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_add_network_option_not_available_on_other_network() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$id = self::factory()->network->create();
 		$option = __FUNCTION__;
@@ -32,9 +30,7 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_add_network_option_available_on_same_network() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$id = self::factory()->network->create();
 		$option = __FUNCTION__;
@@ -48,9 +44,7 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_delete_network_option_on_only_one_network() {
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped( 'Test requires multisite' );
-		}
+		$this->skipWithoutMultisite();
 
 		$id = self::factory()->network->create();
 		$option = __FUNCTION__;
@@ -67,11 +61,9 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_add_network_option_is_not_stored_as_autoload_option() {
-		$key = __FUNCTION__;
+		$this->skipWithMultisite();
 
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Does not apply when used in multisite.' );
-		}
+		$key = __FUNCTION__;
 
 		add_network_option( null, $key, 'Not an autoload option' );
 
@@ -85,11 +77,9 @@ class Tests_Option_NetworkOption extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_update_network_option_is_not_stored_as_autoload_option() {
-		$key = __FUNCTION__;
+		$this->skipWithMultisite();
 
-		if ( is_multisite() ) {
-			$this->markTestSkipped( 'Does not apply when used in multisite.' );
-		}
+		$key = __FUNCTION__;
 
 		update_network_option( null, $key, 'Not an autoload option' );
 

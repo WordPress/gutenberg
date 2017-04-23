@@ -198,6 +198,28 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Allow tests to be skipped when Multisite is not in use.
+	 *
+	 * Use in conjunction with the ms-required group.
+	 */
+	public function skipWithoutMultisite() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped( 'Test only runs on Multisite' );
+		}
+	}
+
+	/**
+	 * Allow tests to be skipped when Multisite is in use.
+	 *
+	 * Use in conjunction with the ms-excluded group.
+	 */
+	public function skipWithMultisite() {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( 'Test does not run on Multisite' );
+		}
+	}
+
+	/**
 	 * Unregister existing post types and register defaults.
 	 *
 	 * Run before each test in order to clean up the global scope, in case
