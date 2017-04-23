@@ -2,6 +2,7 @@
 	bootstrap="tests/phpunit/includes/bootstrap.php"
         backupGlobals="false"
         colors="true"
+        beStrictAboutTestsThatDoNotTestAnything="true"
         >
     <testsuites>
         <!-- Default test suite to run all tests -->

@@ -2,6 +2,7 @@
 		bootstrap="includes/bootstrap.php"
         backupGlobals="false"
         colors="true"
+        beStrictAboutTestsThatDoNotTestAnything="true"
         >
     <php>
         <const name="WP_TESTS_MULTISITE" value="1" />
