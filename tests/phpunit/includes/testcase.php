@@ -388,9 +388,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$errors[] = "Unexpected incorrect usage notice for $unexpected";
 		}
 
-		if ( ! empty( $errors ) ) {
-			$this->fail( implode( "\n", $errors ) );
-		}
+		$this->assertEmpty( $errors, implode( "\n", $errors ) );
 	}
 
 	/**
