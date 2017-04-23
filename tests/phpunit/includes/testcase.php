@@ -388,8 +388,11 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 			$errors[] = "Unexpected incorrect usage notice for $unexpected";
 		}
 
-		// Perform an assertion, but only if there are expected deprecated calls or expected wrongdoings
-		if ( ! empty( $this->expected_deprecated ) || ! empty( $this->expected_doing_it_wrong ) ) {
+		// Perform an assertion, but only if there are expected or unexpected deprecated calls or wrongdoings
+		if ( ! empty( $this->expected_deprecated ) ||
+			! empty( $this->expected_doing_it_wrong ) ||
+			! empty( $this->caught_deprecated ) ||
+			! empty( $this->caught_doing_it_wrong ) ) {
 			$this->assertEmpty( $errors, implode( "\n", $errors ) );
 		}
 	}
