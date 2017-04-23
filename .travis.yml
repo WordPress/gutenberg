@@ -4,6 +4,8 @@ cache:
   apt: true
   directories:
     - node_modules
+    - vendor
+    - $HOME/.composer/cache
 env:
   global:
     - WP_TRAVISCI=travis:phpunit
