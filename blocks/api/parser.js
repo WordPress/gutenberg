@@ -231,7 +231,7 @@ export function parseWithGrammar( content ) {
  *
  * @type {RegExp}
  */
-const blockOpenerPattern = /<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?!-->).)*-->/ig;
+const blockOpenerPattern = /<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?:(?!-->).)*)-->/ig;
 
 /**
  * Matches closing block comments
@@ -245,6 +245,39 @@ const blockOpenerPattern = /<!--\s*wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+((?!-->).
  * @type {RegExp}
  */
 const blockCloserPattern = /<!--\s*\/wp:([a-z](?:[a-z0-9/][a-z0-9]+)*)\s+-->/ig;
+
+/**
+ * Splits a string once at a given delimiter
+ *
+ * @param {String} delimiter pattern at which to split string
+ * @param {String} s input string to split
+ * @returns {[String,String]} [part before delimiter, part after delimiter]
+ */
+function splitAt( delimiter, s ) {
+	const [ name, ...values ] = s.split( delimiter );
+
+	return [ name, values.join( '' ) ];
+}
+
+/**
+ * Takes a string containing block comment attributes and
+ * returns an object of key/value pairs representing same
+ *
+ * Note: The last of a repeating definition of an attribute
+ *       for a given key will be the value of the attribute
+ *       in the returned object.
+ *
+ * @param {String} attrs e.g. "   id:14 url:https://s0.wp.com/thing
+ * @returns {Object<String,String>} key/value pairs of attributes
+ */
+function regexParseAttrs( attrs ) {
+	return attrs
+		.trim()
+		.split( /\s+/ )
+		.map( s => splitAt( ':', s ) )
+		.filter( ( [ name, /* value */ ] ) => !! name )
+		.reduce( ( o, [ name, value ] ) => ( { ...o, [ name ]: value } ), {} );
+}
 
 /**
  * Parses the post content with a RegExp based parser
@@ -316,13 +349,14 @@ export function regExpParser( content, output = [], remaining = '', openBlock = 
 
 	// open a block
 	if ( firstOpen ) {
-		const [ /* fullMatch */, blockType, /* attrs */ ] = firstOpen;
+		const [ /* fullMatch */, blockType, rawAttrs ] = firstOpen;
+		const attrs = regexParseAttrs( rawAttrs );
 
 		return () => regExpParser(
 			content.slice( blockOpenerPattern.lastIndex ),
 			output,
 			content.slice( blockOpenerPattern.lastIndex ),
-			{ blockType, attrs: {} }
+			{ blockType, attrs }
 		);
 	}
 
