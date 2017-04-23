@@ -415,27 +415,6 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		array_push( $this->expected_doing_it_wrong, $doing_it_wrong );
 	}
 
-	/**
-	 * PHPUnit 6+ compatibility shim.
-	 *
-	 * @param mixed      $exception
-	 * @param string     $message
-	 * @param int|string $code
-	 */
-	public function setExpectedException( $exception, $message = '', $code = null ) {
-		if ( is_callable( 'parent::setExpectedException' ) ) {
-			parent::setExpectedException( $exception, $message, $code );
-		} else {
-			$this->expectException( $exception );
-			if ( '' !== $message ) {
-				$this->expectExceptionMessage( $message );
-			}
-			if ( null !== $code ) {
-				$this->expectExceptionCode( $code );
-			}
-		}
-	}
-
 	function deprecated_function_run( $function ) {
 		if ( ! in_array( $function, $this->caught_deprecated ) )
 			$this->caught_deprecated[] = $function;

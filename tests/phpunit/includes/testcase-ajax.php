@@ -200,4 +200,25 @@ abstract class WP_Ajax_UnitTestCase extends WP_UnitTestCase {
 		if ( !empty( $buffer ) )
 			$this->_last_response = $buffer;
 	}
+
+	/**
+	 * PHPUnit 6+ compatibility shim.
+	 *
+	 * @param mixed      $exception
+	 * @param string     $message
+	 * @param int|string $code
+	 */
+	public function setExpectedException( $exception, $message = '', $code = null ) {
+		if ( is_callable( 'parent::setExpectedException' ) ) {
+			parent::setExpectedException( $exception, $message, $code );
+		} else {
+			$this->expectException( $exception );
+			if ( '' !== $message ) {
+				$this->expectExceptionMessage( $message );
+			}
+			if ( null !== $code ) {
+				$this->expectExceptionCode( $code );
+			}
+		}
+	}
 }
