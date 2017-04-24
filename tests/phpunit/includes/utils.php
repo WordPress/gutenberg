@@ -157,7 +157,7 @@ class testXMLParser {
 	}
 
 	function parse($in) {
-		$parse = xml_parse($this->xml, $in, sizeof($in));
+		$parse = xml_parse($this->xml, $in, true);
 		if (!$parse) {
 			trigger_error(sprintf("XML error: %s at line %d",
 			xml_error_string(xml_get_error_code($this->xml)),
