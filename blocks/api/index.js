@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as query from 'hpq';
+import * as query from './query';
 
 export { query };
 export { createBlock, switchToBlockType } from './factory';

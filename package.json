@@ -58,6 +58,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "hpq": "^1.2.0",
+    "html-to-react": "^1.2.7",
     "jed": "^1.1.1",
     "lodash": "^4.17.4",
     "react": "^15.5.4",

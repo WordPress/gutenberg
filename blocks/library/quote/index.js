@@ -5,10 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { parse, html, query, attr } = hpq;
-
-const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
-const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
+const { children, query, attr } = hpq;
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -16,13 +13,13 @@ registerBlock( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', html() ),
-		citation: html( 'footer' ),
+		value: query( 'blockquote > p', children() ),
+		citation: children( 'footer' ),
 		style: node => {
 			const value = attr( 'blockquote', 'class' )( node );
 			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
 			return match ? +match[ 1 ] : null;
-		},
+		}
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
@@ -42,29 +39,29 @@ registerBlock( 'core/quote', {
 		return (
 			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
 				<Editable
-					value={ fromValueToParagraphs( value ) }
+					value={ value }
 					onChange={
-						( paragraphs ) => setAttributes( {
-							value: fromParagraphsToValue( paragraphs )
+						( nextValue ) => setAttributes( {
+							value: nextValue
 						} )
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
 				/>
-				{ ( citation || !! focus ) &&
+				{ ( citation || !! focus ) && (
 					<footer>
 						<Editable
 							value={ citation }
 							onChange={
-								( newValue ) => setAttributes( {
-									citation: newValue
+								( nextCitation ) => setAttributes( {
+									citation: nextCitation
 								} )
 							}
 							focus={ focus && focus.editable === 'citation' ? focus : null }
 							onFocus={ () => setFocus( { editable: 'citation' } ) }
 						/>
 					</footer>
-				}
+				) }
 			</blockquote>
 		);
 	},
@@ -76,15 +73,9 @@ registerBlock( 'core/quote', {
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
 				{ value && value.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						dangerouslySetInnerHTML={ {
-							__html: paragraph
-						} } />
+					<p key={ i }>{ paragraph }</p>
 				) ) }
-				<footer dangerouslySetInnerHTML={ {
-					__html: citation
-				} } />
+				<footer>{ citation }</footer>
 			</blockquote>
 		);
 	}

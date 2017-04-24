@@ -4,7 +4,7 @@
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
-const { html, prop } = query;
+const { children, prop } = query;
 
 registerBlock( 'core/heading', {
 	title: wp.i18n.__( 'Heading' ),
@@ -14,7 +14,7 @@ registerBlock( 'core/heading', {
 	category: 'common',
 
 	attributes: {
-		content: html( 'h1,h2,h3,h4,h5,h6' ),
+		content: children( 'h1,h2,h3,h4,h5,h6' ),
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 		align: prop( 'h1,h2,h3,h4,h5,h6', 'style.textAlign' )
 	},
@@ -51,9 +51,9 @@ registerBlock( 'core/heading', {
 		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag
-				style={ align ? { textAlign: align } : null }
-				dangerouslySetInnerHTML={ { __html: content } } />
+			<Tag style={ align ? { textAlign: align } : null }>
+				{ content }
+			</Tag>
 		);
 	},
 

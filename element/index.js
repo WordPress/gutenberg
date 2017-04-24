@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import { createElement, Component } from 'react';
+import { createElement, Component, cloneElement, Children } from 'react';
 import { render } from 'react-dom';
-import ReactDOMServer from 'react-dom/server';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -13,16 +13,16 @@ import ReactDOMServer from 'react-dom/server';
  * @param  {Object}             props    Element properties, either attribute
  *                                       set to apply to DOM node or values to
  *                                       pass through to element creator
- * @param  {...wp.Element}      children Descendant elements
- * @return {wp.Element}                  Element
+ * @param  {...WPElement}       children Descendant elements
+ * @return {WPElement}                   Element
  */
 export { createElement };
 
 /**
  * Renders a given element into the target DOM node.
  *
- * @param {wp.Element} element Element to render
- * @param {Element}    target  DOM node into which element should be rendered
+ * @param {WPElement} element Element to render
+ * @param {Element}   target  DOM node into which element should be rendered
  */
 export { render };
 
@@ -32,9 +32,36 @@ export { render };
 export { Component };
 
 /**
+ * Creates a copy of an element with extended props.
+ *
+ * @param  {WPElement} element Element
+ * @param  {?Object}   props   Props to apply to cloned element
+ * @return {WPElement}         Cloned element
+ */
+export { cloneElement };
+
+export { Children };
+
+/**
  * Renders a given element into a string
  *
- * @param {wp.Element} element Element to render
+ * @param  {WPElement} element Element to render
  * @return {String}            HTML
  */
-export const renderToString = ReactDOMServer.renderToStaticMarkup;
+export function renderToString( element ) {
+	if ( ! element ) {
+		return '';
+	}
+
+	if ( 'string' === typeof element ) {
+		return element;
+	}
+
+	if ( Array.isArray( element ) ) {
+		return renderToStaticMarkup(
+			createElement( 'div', null, ...element )
+		).slice( 5, -6 );
+	}
+
+	return renderToStaticMarkup( element );
+}
