@@ -32,20 +32,17 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	onFormatChange( formats ) {
-		if ( ! isEqual( formats, this.state.formats ) ) {
-			this.setState( ( prevState ) => {
-				return Object.assign( {}, prevState, { formats } );
-			} );
-		}
+		this.setState( { formats } );
 	}
 
 	toggleFormat( format ) {
-		this.setState( ( prevState ) => {
-			return Object.assign( {}, prevState, {
-				formats: Object.assign( {}, prevState.formats, {
-					[ format ]: ! prevState.formats[ format ]
-				} )
-			} );
+		const { formats } = this.state;
+
+		this.setState( {
+			formats: {
+				...formats,
+				[ format ]: ! formats[ format ]
+			}
 		} );
 	}
 
