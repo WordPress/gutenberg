@@ -123,7 +123,7 @@ export default class Editable extends wp.element.Component {
 		do {
 			const child = element;
 			element = element.parentNode;
-			if ( element.childNodes[ 0 ] !== child ) {
+			if ( element.firstChild !== child ) {
 				return false;
 			}
 		} while ( element !== body );
