@@ -35,18 +35,20 @@ add_action( 'admin_menu', 'gutenberg_menu' );
 function gutenberg_register_scripts() {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
-	// Vendor
+	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 	wp_register_script( 'react', 'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js' );
 	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js', array( 'react' ) );
 	wp_register_script( 'react-dom-server', 'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js', array( 'react' ) );
 
-	// Editor
+	// Editor Scripts.
 	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js' );
-	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ) );
-	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ) );
-	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ) );
-	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ) );
+	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
+	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
+	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
+
+	// Editor Styles.
+	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' ) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );
 
