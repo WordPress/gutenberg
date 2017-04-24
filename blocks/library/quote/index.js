@@ -17,6 +17,9 @@ registerBlock( 'core/quote', {
 		citation: children( 'footer' ),
 		style: node => {
 			const value = attr( 'blockquote', 'class' )( node );
+			if ( ! value ) {
+				return 1;
+			}
 			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
 			return match ? +match[ 1 ] : null;
 		}
