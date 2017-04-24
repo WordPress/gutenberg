@@ -208,11 +208,11 @@ export default class Editable extends wp.element.Component {
 			const currentState = this.formats[ format ] || false;
 
 			if ( state !== currentState ) {
+				this.editor.focus();
+
 				if ( state ) {
-					this.editor.focus();
 					this.editor.formatter.apply( format );
 				} else {
-					this.editor.focus();
 					this.editor.formatter.remove( format );
 				}
 			}
