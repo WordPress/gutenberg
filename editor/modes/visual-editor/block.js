@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { isEqual } from 'lodash';
 
 /**
  * Internal dependencies
