@@ -44,24 +44,6 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	formatting: [
-		{
-			icon: 'editor-bold',
-			title: wp.i18n.__( 'Bold' ),
-			format: 'bold'
-		},
-		{
-			icon: 'editor-italic',
-			title: wp.i18n.__( 'Italic' ),
-			format: 'italic'
-		},
-		{
-			icon: 'editor-strikethrough',
-			title: wp.i18n.__( 'Strikethrough' ),
-			format: 'strikethrough'
-		}
-	],
-
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, onFormatChange, formats } ) {
 		const { content = <p />, align } = attributes;
 

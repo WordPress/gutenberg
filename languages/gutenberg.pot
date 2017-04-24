@@ -63,18 +63,6 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: blocks/library/text/index.js:50
-msgid "Bold"
-msgstr ""
-
-#: blocks/library/text/index.js:55
-msgid "Italic"
-msgstr ""
-
-#: blocks/library/text/index.js:60
-msgid "Strikethrough"
-msgstr ""
-
 #: editor/components/inserter/index.js:37
 msgid "Insert block"
 msgstr ""
@@ -105,6 +93,18 @@ msgstr ""
 
 #: editor/header/tools/index.js:40
 msgid "Publish"
+msgstr ""
+
+#: editor/modes/visual-editor/block.js:17
+msgid "Bold"
+msgstr ""
+
+#: editor/modes/visual-editor/block.js:22
+msgid "Italic"
+msgstr ""
+
+#: editor/modes/visual-editor/block.js:27
+msgid "Strikethrough"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:24

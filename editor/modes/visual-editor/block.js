@@ -11,6 +11,24 @@ import Toolbar from 'components/toolbar';
 import BlockMover from 'components/block-mover';
 import BlockSwitcher from 'components/block-switcher';
 
+const formattingControls = [
+	{
+		icon: 'editor-bold',
+		title: wp.i18n.__( 'Bold' ),
+		format: 'bold'
+	},
+	{
+		icon: 'editor-italic',
+		title: wp.i18n.__( 'Italic' ),
+		format: 'italic'
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: wp.i18n.__( 'Strikethrough' ),
+		format: 'strikethrough'
+	}
+];
+
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -31,6 +49,10 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	onFormatChange( formats ) {
+		if ( ! this.state.hasEditable ) {
+			this.setState( { hasEditable: true } );
+		}
+
 		this.setState( { formats } );
 	}
 
@@ -139,14 +161,14 @@ class VisualEditorBlock extends wp.element.Component {
 									isActive: () => control.isActive( block.attributes )
 								} ) ) } />
 						) }
-						{ settings.formatting ? (
+						{ this.state.hasEditable && (
 							<Toolbar
-								controls={ settings.formatting.map( ( control ) => ( {
+								controls={ formattingControls.map( ( control ) => ( {
 									...control,
 									onClick: () => this.toggleFormat( control.format ),
 									isActive: () => !! this.state.formats[ control.format ]
 								} ) ) } />
-						) : null }
+						) }
 					</div>
 				}
 				<BlockEdit
