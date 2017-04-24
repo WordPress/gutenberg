@@ -2,4 +2,4 @@ language: node_js
 node_js:
   - "node"
 before_script:
-  - "npm run build"
+  - "npm run travis-builds"
