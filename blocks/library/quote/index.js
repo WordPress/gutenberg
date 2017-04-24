@@ -15,20 +15,25 @@ registerBlock( 'core/quote', {
 	attributes: {
 		value: query( 'blockquote > p', children() ),
 		citation: children( 'footer' ),
-		style: node => {
+		style: ( node ) => {
 			const value = attr( 'blockquote', 'class' )( node );
 			if ( ! value ) {
-				return 1;
+				return;
 			}
+
 			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
-			return match ? +match[ 1 ] : null;
+			if ( ! match ) {
+				return;
+			}
+
+			return Number( match[ 1 ] );
 		}
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
 		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => +style === +variation,
+		isActive: ( { style = 1 } ) => style === variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
@@ -36,8 +41,7 @@ registerBlock( 'core/quote', {
 	} ) ),
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation } = attributes;
-		const style = +attributes.style || 1;
+		const { value, citation, style = 1 } = attributes;
 
 		return (
 			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
@@ -70,8 +74,7 @@ registerBlock( 'core/quote', {
 	},
 
 	save( attributes ) {
-		const { value, citation } = attributes;
-		const style = +attributes.style || 1;
+		const { value, citation, style = 1 } = attributes;
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
