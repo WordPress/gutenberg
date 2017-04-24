@@ -44,7 +44,7 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus } ) {
+	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, onFormatChange, formats } ) {
 		const { content = <p />, align } = attributes;
 
 		return (
@@ -64,6 +64,8 @@ registerBlock( 'core/text', {
 						content: after
 					} ) );
 				} }
+				onFormatChange={ onFormatChange }
+				formats={ formats }
 			/>
 		);
 	},

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
+import { forEach, last } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
 
 /**
@@ -11,6 +11,11 @@ import { Parser as HtmlToReactParser } from 'html-to-react';
 import './style.scss';
 
 const htmlToReactParser = new HtmlToReactParser();
+const formatMap = {
+	strong: 'bold',
+	em: 'italic',
+	del: 'strikethrough'
+};
 
 export default class Editable extends wp.element.Component {
 	constructor() {
@@ -21,6 +26,8 @@ export default class Editable extends wp.element.Component {
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onNodeChange = this.onNodeChange.bind( this );
+		this.formats = {};
 	}
 
 	componentDidMount() {
@@ -50,6 +57,10 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
+
+		if ( this.props.onFormatChange ) {
+			editor.on( 'nodechange', this.onNodeChange );
+		}
 	}
 
 	onInit() {
@@ -119,6 +130,20 @@ export default class Editable extends wp.element.Component {
 		} );
 	}
 
+	onNodeChange( { parents } ) {
+		this.formats = parents.reduce( ( result, node ) => {
+			const tag = node.nodeName.toLowerCase();
+
+			if ( formatMap.hasOwnProperty( tag ) ) {
+				result[ formatMap[ tag ] ] = true;
+			}
+
+			return result;
+		}, {} );
+
+		this.props.onFormatChange( this.formats );
+	}
+
 	bindNode( ref ) {
 		this.node = ref;
 	}
@@ -181,6 +206,22 @@ export default class Editable extends wp.element.Component {
 		) {
 			this.updateContent();
 		}
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		forEach( nextProps.formats, ( state, format ) => {
+			const currentState = this.formats[ format ] || false;
+
+			if ( state !== currentState ) {
+				this.editor.focus();
+
+				if ( state ) {
+					this.editor.formatter.apply( format );
+				} else {
+					this.editor.formatter.remove( format );
+				}
+			}
+		} );
 	}
 
 	render() {

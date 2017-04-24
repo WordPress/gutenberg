@@ -95,6 +95,18 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
+#: editor/modes/visual-editor/block.js:17
+msgid "Bold"
+msgstr ""
+
+#: editor/modes/visual-editor/block.js:22
+msgid "Italic"
+msgstr ""
+
+#: editor/modes/visual-editor/block.js:27
+msgid "Strikethrough"
+msgstr ""
+
 #: editor/header/mode-switcher/index.js:24
 msgctxt "Name for the Text editor tab (formerly HTML)"
 msgid "Text"
