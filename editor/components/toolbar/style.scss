@@ -22,11 +22,14 @@
 	}
 
 	&.is-active,
-	&:hover {
+	&:hover,
+	&:not(:disabled):hover {
 		border-color: $dark-gray-500;
+		color: $dark-gray-500;
 	}
 
-	&.is-active {
+	&.is-active,
+	&.is-active:hover {
 		background-color: $dark-gray-500;
 		color: $white;
 	}
