@@ -64,7 +64,6 @@ class BlockSwitcher extends wp.element.Component {
 				</IconButton>
 				{ this.state.open &&
 					<div className="editor-block-switcher__menu">
-						<div className="editor-block-switcher__menu-arrow" />
 						{ allowedBlocks.map( ( { slug, title, icon } ) => (
 							<IconButton
 								key={ slug }

@@ -11,6 +11,7 @@
 .editor-block-switcher__toggle {
 	width: auto;
 	margin: 3px;
+	padding: 6px;
 }
 
 .editor-block-switcher__arrow {
@@ -25,11 +26,16 @@
 	border-bottom: none;
 	border-left-color: transparent;
 	border-right-color: transparent;
+
+	.editor-block-switcher__toggle:hover & {
+		border-top-color: $blue-medium;
+	}
 }
 
 .editor-block-switcher__menu {
 	position: absolute;
-	top: 50px;
+	top: 43px;
+	margin-left: -1px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
 	background: #fff;
@@ -37,35 +43,6 @@
 
 	input {
 		font-size: 13px;
-	}
-}
-
-.editor-block-switcher__menu-arrow {
-	border: 10px dashed $light-gray-500;
-	height: 0;
-	line-height: 0;
-	position: absolute;
-	width: 0;
-	z-index: 1;
-	top: -10px;
-	left: 50%;
-	margin-left: -10px;
-	border-bottom-style: solid;
-	border-top: none;
-	border-left-color: transparent;
-	border-right-color: transparent;
-
-	&:before {
-		top: 2px;
-		border: 10px solid $white;
-		content: " ";
-		position: absolute;
-		left: 50%;
-		margin-left: -10px;
-		border-bottom-style: solid;
-		border-top: none;
-		border-left-color: transparent;
-		border-right-color: transparent;
 	}
 }
 
@@ -79,7 +56,9 @@
 	color: $dark-gray-500;
 	cursor: pointer;
 
-	&:hover {
+	&:hover,
+	&:not(:disabled):hover {
+		color: $dark-gray-500;
 		border-color: $dark-gray-500;
 	}
 

@@ -1,4 +1,7 @@
 .blocks-editable {
+	position: relative;
+	z-index: -1;
+
 	> p:first-child {
 		margin-top: 0;
 	}
