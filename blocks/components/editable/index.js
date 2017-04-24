@@ -26,6 +26,7 @@ export default class Editable extends wp.element.Component {
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onNodeChange = this.onNodeChange.bind( this );
 		this.formats = {};
 	}
 
@@ -58,14 +59,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusin', this.onFocus );
 
 		if ( this.props.onFormatChange ) {
-			editor.on( 'nodechange', ( { parents } ) => {
-				const path = compact( parents.map( node =>
-					formatMap[ node.nodeName.toLowerCase() ]
-				) );
-
-				this.formats = zipObject( path, path.map( () => true ) );
-				this.props.onFormatChange( this.formats );
-			} );
+			editor.on( 'nodechange', this.onNodeChange );
 		}
 	}
 
@@ -134,6 +128,15 @@ export default class Editable extends wp.element.Component {
 				htmlToReactParser.parse( after )
 			);
 		} );
+	}
+
+	onNodeChange( { parents } ) {
+		const path = compact( parents.map( node =>
+			formatMap[ node.nodeName.toLowerCase() ]
+		) );
+
+		this.formats = zipObject( path, path.map( () => true ) );
+		this.props.onFormatChange( this.formats );
 	}
 
 	bindNode( ref ) {
