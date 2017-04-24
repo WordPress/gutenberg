@@ -23,19 +23,8 @@ matrix:
   - php: 5.4
   - php: 5.3
   - php: 5.2
-  - php: hhvm
-    sudo: required
-    dist: trusty
-    group: edge
-    addons:
-      apt:
-        packages:
-        - mysql-server-5.6
-        - mysql-client-core-5.6
-        - mysql-client-5.6
   - php: nightly
   allow_failures:
-  - php: hhvm
   - php: nightly
 before_install:
 - |
@@ -54,7 +43,7 @@ before_install:
   fi
 before_script:
 - |
-  # Remove Xdebug for a huge performance increase, but not from nightly or hhvm:
+  # Remove Xdebug for a huge performance increase, but not from nightly:
   stable='^[0-9\.]+$'
   if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then
     phpenv config-rm xdebug.ini
@@ -72,10 +61,6 @@ before_script:
       7.1|7.0|nightly)
         echo "Using PHPUnit 6.1"
         composer global require "phpunit/phpunit=6.1.*"
-        ;;
-      hhvm)
-        echo "Using PHPUnit 5.7"
-        composer global require "phpunit/phpunit=5.7.*"
         ;;
       5.6|5.5|5.4|5.3)
         echo "Using PHPUnit 4.8"
@@ -100,11 +85,7 @@ before_script:
 - mysql --version
 - phpenv versions
 - php --version
-- |
-  # Debug PHP extensions, but not on HHVM because the command hangs indefinitely:
-  if [[ "$TRAVIS_PHP_VERSION" != 'hhvm' ]]; then
-    php -m
-  fi
+- php -m
 - npm --version
 - node --version
 - which phpunit
