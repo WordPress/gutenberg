@@ -108,17 +108,19 @@ class VisualEditorBlock extends wp.element.Component {
 				className={ className }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
-				<div className="editor-visual-editor__block-controls">
-					{ isSelected && ! isTyping && <BlockSwitcher uid={ block.uid } /> }
-					{ isSelected && ! isTyping && settings.controls ? (
-						<Toolbar
-							controls={ settings.controls.map( ( control ) => ( {
-								...control,
-								onClick: () => control.onClick( block.attributes, this.setAttributes ),
-								isActive: () => control.isActive( block.attributes )
-							} ) ) } />
-					) : null }
-				</div>
+				{ isSelected && ! isTyping &&
+					<div className="editor-visual-editor__block-controls">
+						<BlockSwitcher uid={ block.uid } />
+						{ !! settings.controls && (
+							<Toolbar
+								controls={ settings.controls.map( ( control ) => ( {
+									...control,
+									onClick: () => control.onClick( block.attributes, this.setAttributes ),
+									isActive: () => control.isActive( block.attributes )
+								} ) ) } />
+						) }
+					</div>
+				}
 				<BlockEdit
 					focus={ focus }
 					attributes={ block.attributes }
