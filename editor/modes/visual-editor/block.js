@@ -158,7 +158,7 @@ class VisualEditorBlock extends wp.element.Component {
 								controls={ settings.controls.map( ( control ) => ( {
 									...control,
 									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: () => control.isActive( block.attributes )
+									isActive: control.isActive( block.attributes )
 								} ) ) } />
 						) }
 						{ this.state.hasEditable && (
@@ -166,7 +166,7 @@ class VisualEditorBlock extends wp.element.Component {
 								controls={ formattingControls.map( ( control ) => ( {
 									...control,
 									onClick: () => this.toggleFormat( control.format ),
-									isActive: () => !! this.state.formats[ control.format ]
+									isActive: !! this.state.formats[ control.format ]
 								} ) ) } />
 						) }
 					</div>
