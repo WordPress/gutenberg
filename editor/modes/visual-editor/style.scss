@@ -39,6 +39,7 @@
 }
 
 .editor-visual-editor__block-controls {
+	@include animate_fade;
 	position: absolute;
 	bottom: 100%;
 	margin-bottom: -4px;
