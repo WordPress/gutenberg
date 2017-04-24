@@ -1,5 +1,5 @@
 language: node_js
 node_js:
   - "node"
-before_script:
-  - "npm run travis-builds"
+script:
+  - "npm run ci"
