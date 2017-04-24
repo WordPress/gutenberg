@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { compact, forEach, last, zipObject } from 'lodash';
+import { forEach, last } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
 
 /**
@@ -131,11 +131,16 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { parents } ) {
-		const path = compact( parents.map( node =>
-			formatMap[ node.nodeName.toLowerCase() ]
-		) );
+		this.formats = parents.reduce( ( result, node ) => {
+			const tag = node.nodeName.toLowerCase();
 
-		this.formats = zipObject( path, path.map( () => true ) );
+			if ( formatMap.hasOwnProperty( tag ) ) {
+				result[ formatMap[ tag ] ] = true;
+			}
+
+			return result;
+		}, {} );
+
 		this.props.onFormatChange( this.formats );
 	}
 
