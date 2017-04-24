@@ -40,6 +40,52 @@ registerBlock( 'core/quote', {
 		subscript: variation
 	} ) ),
 
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content } ) => {
+					return {
+						value: content
+					};
+				}
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content = '' } ) => {
+					return {
+						value: [ content ]
+					};
+				}
+			}
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { value, citation } ) => {
+					let content = value ? value : [];
+					content = citation && citation.trim() ? content.concat( citation ) : content;
+					return {
+						content
+					};
+				}
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { value } ) => {
+					return {
+						nodeName: 'H2',
+						content: value && value[ 0 ]
+					};
+				}
+			}
+		]
+	},
+
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
