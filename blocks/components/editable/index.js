@@ -138,6 +138,7 @@ export default class Editable extends wp.element.Component {
 
 	componentWillUnmount() {
 		if ( this.editor ) {
+			this.onChange();
 			this.editor.destroy();
 		}
 	}
