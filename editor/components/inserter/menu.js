@@ -55,10 +55,21 @@ class InserterMenu extends wp.element.Component {
 					{ categories
 						.map( ( category ) => !! blocksByCategory[ category.slug ] && (
 							<div key={ category.slug }>
-								<div className="editor-inserter__separator">{ category.title }</div>
-								<div className="editor-inserter__category-blocks">
+								<div
+									className="editor-inserter__separator"
+									id={ `editor-inserter__separator-${ category.slug }` }
+									aria-hidden="true"
+								>
+									{ category.title }
+								</div>
+								<div
+									className="editor-inserter__category-blocks"
+									role="menu"
+									aria-labelledby={ `editor-inserter__separator-${ category.slug }` }
+								>
 									{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
 										<button
+											role="menuitem"
 											key={ slug }
 											className="editor-inserter__block"
 											onClick={ this.selectBlock( slug ) }
@@ -72,7 +83,11 @@ class InserterMenu extends wp.element.Component {
 						) )
 					}
 				</div>
+				<label htmlFor={ `editor-inserter__search-${ position }` } className="screen-reader-text">
+					{ wp.i18n.__( 'Search blocks' ) }
+				</label>
 				<input
+					id={ `editor-inserter__search-${ position }` }
 					type="search"
 					placeholder={ wp.i18n.__( 'Search…' ) }
 					className="editor-inserter__search"
