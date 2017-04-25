@@ -188,7 +188,7 @@ export default connect(
 	( state, ownProps ) => {
 		const order = state.blocks.order.indexOf( ownProps.uid );
 		return {
-			previousBlock: order === 0 ? null : state.blocks.byUid[ state.blocks.order[ order - 1 ] ],
+			previousBlock: state.blocks.byUid[ state.blocks.order[ order - 1 ] ] || null,
 			block: state.blocks.byUid[ ownProps.uid ],
 			isSelected: state.selectedBlock.uid === ownProps.uid,
 			isHovered: state.hoveredBlock === ownProps.uid,
