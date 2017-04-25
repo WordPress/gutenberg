@@ -27,7 +27,7 @@ function Toolbar( { controls } ) {
 						control.onClick();
 					} }
 					className={ classNames( 'editor-toolbar__control', {
-						'is-active': control.isActive && control.isActive()
+						'is-active': control.isActive
 					} ) } />
 			) ) }
 		</ul>
