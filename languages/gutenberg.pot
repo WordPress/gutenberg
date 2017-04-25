@@ -95,15 +95,23 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:17
+#: editor/modes/visual-editor/format-controls.js:56
+msgid "Link"
+msgstr ""
+
+#: editor/modes/visual-editor/format-controls.js:66
+msgid "Add Link"
+msgstr ""
+
+#: editor/modes/visual-editor/format-controls.js:78
 msgid "Bold"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:22
+#: editor/modes/visual-editor/format-controls.js:86
 msgid "Italic"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:27
+#: editor/modes/visual-editor/format-controls.js:94
 msgid "Strikethrough"
 msgstr ""
 

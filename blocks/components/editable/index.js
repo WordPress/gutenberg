@@ -131,7 +131,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { parents } ) {
-		this.formats = parents.reduce( ( result, node ) => {
+		const formats = parents.reduce( ( result, node ) => {
 			const tag = node.nodeName.toLowerCase();
 
 			if ( formatMap.hasOwnProperty( tag ) ) {
@@ -140,6 +140,14 @@ export default class Editable extends wp.element.Component {
 
 			return result;
 		}, {} );
+
+		// Link format
+		const link = parents.find( parent => parent.nodeName === 'A' );
+		if ( link ) {
+			formats.link = link.getAttribute( 'href' );
+		}
+
+		this.formats = formats;
 
 		this.props.onFormatChange( this.formats );
 	}
@@ -215,7 +223,9 @@ export default class Editable extends wp.element.Component {
 			if ( state !== currentState ) {
 				this.editor.focus();
 
-				if ( state ) {
+				if ( format === 'link' ) {
+					this.editor.execCommand( 'mceInsertLink', true, state );
+				} else if ( state ) {
 					this.editor.formatter.apply( format );
 				} else {
 					this.editor.formatter.remove( format );
