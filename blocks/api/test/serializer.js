@@ -8,6 +8,9 @@ import { expect } from 'chai';
  */
 import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
 import { getBlocks, registerBlock, unregisterBlock } from '../registration';
+import {
+	edit
+} from './function-refs';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
@@ -97,7 +100,8 @@ describe( 'block serializer', () => {
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
-				}
+				},
+				edit
 			};
 			registerBlock( 'core/test-block', blockSettings );
 			const blockList = [

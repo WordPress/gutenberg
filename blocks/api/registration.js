@@ -43,6 +43,13 @@ export function registerBlock( slug, settings ) {
 		);
 		return;
 	}
+	if ( true !== validateBlockSettings( settings ) ) {
+		console.error(
+			'Block not registered.'
+		);
+		// Return the block even though it was not registered.
+		return Object.assign( { slug }, settings );
+	}
 	const block = Object.assign( { slug }, settings );
 	blocks[ slug ] = block;
 	return block;
@@ -103,4 +110,35 @@ export function getBlockSettings( slug ) {
  */
 export function getBlocks() {
 	return Object.values( blocks );
+}
+
+/**
+ * Validates the block settings.
+ *
+ * @param  {Object}  settings Block settings.
+ * @return {Boolean} Whether the block settings are valid.
+ */
+export function validateBlockSettings( settings ) {
+	if ( ! settings ) {
+		console.error(
+			'Block settings must specify a save() and edit() method for each block.'
+		);
+		return false;
+	}
+
+	if ( ! settings.save || 'function' !== typeof settings.save ) {
+		console.error(
+			'Block settings must specify a save() method for each block.'
+		);
+		return false;
+	}
+
+	if ( ! settings.edit || 'function' !== typeof settings.edit ) {
+		console.error(
+			'Block settings must specify a edit() method for each block.'
+		);
+		return false;
+	}
+
+	return true;
 }

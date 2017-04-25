@@ -19,6 +19,10 @@ import {
 	getBlocks,
 	setUnknownTypeHandler,
 } from '../registration';
+import {
+	edit,
+	save
+} from './function-refs.js';
 
 describe( 'block parser', () => {
 	afterEach( () => {
@@ -87,7 +91,10 @@ describe( 'block parser', () => {
 
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
@@ -99,7 +106,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
 
 			const block = createBlockWithFallback( 'core/test-block', 'content' );
 			expect( block.blockType ).to.eql( 'core/test-block' );
@@ -107,7 +117,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlock( 'core/unknown-block', {} );
+			registerBlock( 'core/unknown-block', {
+				edit: edit,
+				save: save
+			} );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
@@ -120,7 +133,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlock( 'core/unknown-block', {} );
+			registerBlock( 'core/unknown-block', {
+				edit: edit,
+				save: save
+			} );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
@@ -142,7 +158,9 @@ describe( 'block parser', () => {
 					return {
 						content: rawContent,
 					};
-				}
+				},
+				edit: edit,
+				save: save
 			} );
 
 			const parsed = parse(
@@ -166,7 +184,9 @@ describe( 'block parser', () => {
 					return {
 						content: rawContent + ' & Chicken'
 					};
-				}
+				},
+				edit: edit,
+				save: save
 			} );
 
 			const parsed = parse(
@@ -184,8 +204,14 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should parse the post content, using unknown block handler', () => {
-			registerBlock( 'core/test-block', {} );
-			registerBlock( 'core/unknown-block', {} );
+			registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
+			registerBlock( 'core/unknown-block', {
+				edit: edit,
+				save: save
+			} );
 
 			setUnknownTypeHandler( 'core/unknown-block' );
 
@@ -204,14 +230,19 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should parse the post content, including raw HTML at each end', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
 			registerBlock( 'core/unknown-block', {
 				// Currently this is the only way to test block content parsing?
 				attributes: function( rawContent ) {
 					return {
 						content: rawContent,
 					};
-				}
+				},
+				edit: edit,
+				save: save
 			} );
 
 			setUnknownTypeHandler( 'core/unknown-block' );
