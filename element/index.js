@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createElement, Component, cloneElement, Children } from 'react';
-import { render } from 'react-dom';
+import { render, findDOMNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 /**
@@ -41,6 +41,8 @@ export { Component };
 export { cloneElement };
 
 export { Children };
+
+export { findDOMNode };
 
 /**
  * Renders a given element into a string

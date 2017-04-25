@@ -2,13 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { forEach, last } from 'lodash';
+import { last } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
+import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
+ // TODO: We mustn't import by relative path traversing from blocks to editor
+ // as we're doing here; instead, we should consider a common components path.
+import Toolbar from '../../../editor/components/toolbar';
 
 const htmlToReactParser = new HtmlToReactParser();
 const formatMap = {
@@ -17,17 +22,43 @@ const formatMap = {
 	del: 'strikethrough'
 };
 
+const formattingControls = [
+	{
+		icon: 'editor-bold',
+		title: wp.i18n.__( 'Bold' ),
+		format: 'bold'
+	},
+	{
+		icon: 'editor-italic',
+		title: wp.i18n.__( 'Italic' ),
+		format: 'italic'
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: wp.i18n.__( 'Strikethrough' ),
+		format: 'strikethrough'
+	}
+];
+
 export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onFocusOut = this.onFocusOut.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
-		this.formats = {};
+
+		this.nodes = {};
+
+		this.state = {
+			isFocused: false,
+			formats: {}
+		};
 	}
 
 	componentDidMount() {
@@ -36,7 +67,7 @@ export default class Editable extends wp.element.Component {
 
 	initialize() {
 		const config = {
-			target: this.node,
+			target: this.nodes.editor,
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -54,13 +85,10 @@ export default class Editable extends wp.element.Component {
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
+		editor.on( 'focusout', this.onFocusOut );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
-
-		if ( this.props.onFormatChange ) {
-			editor.on( 'nodechange', this.onNodeChange );
-		}
+		editor.on( 'nodechange', this.onNodeChange );
 	}
 
 	onInit() {
@@ -75,6 +103,29 @@ export default class Editable extends wp.element.Component {
 
 		// TODO: We need a way to save the focus position ( bookmark maybe )
 		this.props.onFocus();
+
+		this.setState( {
+			isFocused: true
+		} );
+	}
+
+	onFocusOut( event ) {
+		this.onChange();
+
+		// Disable reason: In this case we explicitly want to test that the DOM
+		// node to which focus is being transfered is not the rendered element.
+
+		/* eslint-disable react/no-find-dom-node */
+		const { toolbar } = this.nodes;
+		if ( toolbar && wp.element.findDOMNode( toolbar ).contains( event.relatedTarget ) ) {
+			event.preventDefault();
+			return;
+		}
+		/* eslint-enable react/no-find-dom-node */
+
+		this.setState( {
+			isFocused: false
+		} );
 	}
 
 	onChange() {
@@ -131,7 +182,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { parents } ) {
-		this.formats = parents.reduce( ( result, node ) => {
+		const formats = parents.reduce( ( result, node ) => {
 			const tag = node.nodeName.toLowerCase();
 
 			if ( formatMap.hasOwnProperty( tag ) ) {
@@ -141,11 +192,13 @@ export default class Editable extends wp.element.Component {
 			return result;
 		}, {} );
 
-		this.props.onFormatChange( this.formats );
+		this.setState( { formats } );
 	}
 
-	bindNode( ref ) {
-		this.node = ref;
+	bindNode( name ) {
+		return ( ref ) => {
+			this.nodes[ name ] = ref;
+		};
 	}
 
 	updateContent() {
@@ -208,31 +261,45 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		forEach( nextProps.formats, ( state, format ) => {
-			const currentState = this.formats[ format ] || false;
+	isFormatActive( format ) {
+		return !! this.state.formats[ format ];
+	}
 
-			if ( state !== currentState ) {
-				this.editor.focus();
-
-				if ( state ) {
-					this.editor.formatter.apply( format );
-				} else {
-					this.editor.formatter.remove( format );
-				}
-			}
-		} );
+	toggleFormat( format ) {
+		if ( this.isFormatActive( format ) ) {
+			this.editor.formatter.remove( format );
+		} else {
+			this.editor.formatter.apply( format );
+		}
 	}
 
 	render() {
 		const { tagName: Tag = 'div', style, className } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
-		return (
+		let element = (
 			<Tag
-				ref={ this.bindNode }
+				ref={ this.bindNode( 'editor' ) }
 				style={ style }
-				className={ classes } />
+				className={ classes }
+				key="editor" />
 		);
+
+		if ( this.state.isFocused ) {
+			element = [
+				<Fill name="Formatting.Toolbar" key="fill">
+					<Toolbar
+						ref={ this.bindNode( 'toolbar' ) }
+						controls={ formattingControls.map( ( control ) => ( {
+							...control,
+							onClick: () => this.toggleFormat( control.format ),
+							isActive: this.isFormatActive( control.format )
+						} ) ) } />
+				</Fill>,
+				element
+			];
+		}
+
+		return element;
 	}
 }

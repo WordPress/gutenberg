@@ -25,6 +25,13 @@ const config = {
 		'react-dom': 'ReactDOM',
 		'react-dom/server': 'ReactDOMServer'
 	},
+	resolve: {
+		alias: {
+			// There are currently resolution errors on RSF's "mitt" dependency
+			// when imported as native ES module
+			'react-slot-fill': 'react-slot-fill/lib/rsf.js'
+		}
+	},
 	module: {
 		rules: [
 			{
