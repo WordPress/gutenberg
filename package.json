@@ -28,7 +28,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-latest": "^6.24.0",
+    "babel-preset-env": "^1.4.0",
     "chai": "^3.5.0",
     "concurrently": "^3.4.0",
     "cross-env": "^3.2.4",
