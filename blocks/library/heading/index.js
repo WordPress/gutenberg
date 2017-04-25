@@ -66,7 +66,7 @@ registerBlock( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatValues( attributes.content, attributesToMerge.content )
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
 		};
 	},
 

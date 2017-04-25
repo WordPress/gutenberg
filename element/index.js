@@ -67,19 +67,34 @@ export function renderToString( element ) {
 	return renderToStaticMarkup( element );
 }
 
-export function concatValues( value1, value2 ) {
-	const toArray = value => Array.isArray( value ) ? Children.toArray( value ) : [ value ];
+/**
+ * Concat two React children objects
+ *
+ * @param  {?Object} children1 First children value
+ * @param  {?Object} children2 Second children value
+ *
+ * @return {Array}             The concatenation
+ */
+export function concatChildren( children1, children2 ) {
+	const toArray = ( children ) => {
+		if ( ! children ) {
+			return [];
+		}
 
-	return toArray( value1 )
-		.concat( toArray( value2 ) )
-		.map( ( elt, index ) => {
-			if ( isString( elt ) ) {
-				return elt;
-			}
+		return Array.isArray( children ) ? Children.toArray( children ) : [ children ];
+	};
 
-			return {
-				...elt,
-				key: index
-			};
-		} );
+	return [
+		...toArray( children1 ),
+		...toArray( children2 )
+	].map( ( elt, index ) => {
+		if ( isString( elt ) ) {
+			return elt;
+		}
+
+		return {
+			...elt,
+			key: index
+		};
+	} );
 }
