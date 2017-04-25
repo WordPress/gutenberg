@@ -10,24 +10,7 @@ import classnames from 'classnames';
 import Toolbar from 'components/toolbar';
 import BlockMover from 'components/block-mover';
 import BlockSwitcher from 'components/block-switcher';
-
-const formattingControls = [
-	{
-		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
-		format: 'bold'
-	},
-	{
-		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
-		format: 'italic'
-	},
-	{
-		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
-		format: 'strikethrough'
-	}
-];
+import formattingControls from './format-controls';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -37,7 +20,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
-		this.toggleFormat = this.toggleFormat.bind( this );
+		this.setFormats = this.setFormats.bind( this );
 		this.previousOffset = null;
 		this.state = {
 			formats: {}
@@ -56,13 +39,13 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setState( { formats } );
 	}
 
-	toggleFormat( format ) {
+	setFormats( newFormats ) {
 		const { formats } = this.state;
 
 		this.setState( {
 			formats: {
 				...formats,
-				[ format ]: ! formats[ format ]
+				...newFormats
 			}
 		} );
 	}
@@ -143,7 +126,6 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onStartTyping }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -155,31 +137,31 @@ class VisualEditorBlock extends wp.element.Component {
 						<BlockSwitcher uid={ block.uid } />
 						{ !! settings.controls && (
 							<Toolbar
-								controls={ settings.controls.map( ( control ) => ( {
-									...control,
-									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: () => control.isActive( block.attributes )
-								} ) ) } />
+								controls={ settings.controls }
+								attributes={ block.attributes }
+								setAttributes={ this.setAttributes }
+							/>
 						) }
 						{ this.state.hasEditable && (
 							<Toolbar
-								controls={ formattingControls.map( ( control ) => ( {
-									...control,
-									onClick: () => this.toggleFormat( control.format ),
-									isActive: () => !! this.state.formats[ control.format ]
-								} ) ) } />
+								controls={ formattingControls }
+								attributes={ this.state.formats }
+								setAttributes={ this.setFormats }
+							/>
 						) }
 					</div>
 				}
-				<BlockEdit
-					focus={ focus }
-					attributes={ block.attributes }
-					setAttributes={ this.setAttributes }
-					insertBlockAfter={ onInsertAfter }
-					setFocus={ onFocus }
-					onFormatChange={ this.onFormatChange }
-					formats={ this.state.formats }
-				/>
+				<div onKeyDown={ onStartTyping }>
+					<BlockEdit
+						focus={ focus }
+						attributes={ block.attributes }
+						setAttributes={ this.setAttributes }
+						insertBlockAfter={ onInsertAfter }
+						setFocus={ onFocus }
+						onFormatChange={ this.onFormatChange }
+						formats={ this.state.formats }
+					/>
+				</div>
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
