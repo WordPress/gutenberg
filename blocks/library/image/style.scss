@@ -15,6 +15,24 @@
 		float: right;
 		margin-left: 15px;
 	}
+
+	&[data-align="wide"] {
+		left: 0;
+		padding-left: 0;
+		padding-right: 0;
+		width: 100%;
+		max-width: none;
+
+		&:before {
+			left: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
 }
 
 .blocks-image {
@@ -22,5 +40,6 @@
 
 	img {
 		display: block;
+		width: 100%;
 	}
 }
