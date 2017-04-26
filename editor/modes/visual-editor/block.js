@@ -138,10 +138,15 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = settings.getEditWrapperProps( block.attributes );
 		}
 
-		const toolbars = reduce( settings.controls, ( memo, toolbar ) => (
+		// Normalize controls as an array of arrays (toolbars of controls)
+		const toolbars = reduce( settings.controls, ( result, toolbar ) => (
 			Array.isArray( toolbar )
-				? [ ...memo, toolbar ]
-				: [ ...memo.slice( 0, -1 ), [ ...( last( memo ) || [] ), toolbar ] ]
+				// Array entry is simply concatenated into normalized value
+				//  Example: [ [ 1, 2 ], [ 3, 4 ] ] => [ [ 1, 2 ], [ 3, 4 ] ]
+				? [ ...result, toolbar ]
+				// Singular values are appended to the last array in the result
+				//  Example: [ 1, 2, 3, 4 ] => [ [ 1, 2, 3, 4 ] ]
+				: [ ...result.slice( 0, -1 ), [ ...( last( result ) || [] ), toolbar ] ]
 		), [] );
 
 		// Disable reason: Each block can receive focus but must be able to contain
