@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { reduce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -28,6 +29,24 @@ const formattingControls = [
 		format: 'strikethrough'
 	}
 ];
+
+/**
+ * Returns an object of block attributes to be assigned as data-* attribute
+ * props on the block's wrapper element.
+ *
+ * @param  {Object} attributes Block attributes
+ * @return {Object}            Wrapper element props
+ */
+export function getBlockAttributesAsProps( attributes ) {
+	return reduce( attributes, ( result, value, key ) => {
+		const type = typeof value;
+		if ( 'string' === type || 'number' === type || 'boolean' === type ) {
+			result[ 'data-' + key ] = String( value );
+		}
+
+		return result;
+	}, {} );
+}
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -148,6 +167,8 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
+				data-type={ block.blockType }
+				{ ...getBlockAttributesAsProps( block.attributes ) }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ isSelected && ! isTyping &&

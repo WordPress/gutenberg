@@ -1,22 +1,11 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
 const { attr, children } = query;
-
-/**
- * Component returning an image element.
- *
- * @param  {string}    props.url   Image source
- * @param  {string}    props.alt   Image alt
- * @param  {?string}   props.align Optional alignment
- * @return {WPElement}             Image element
- */
-function Image( { url, alt, align = 'none' } ) {
-	return <img src={ url } alt={ alt } className={ `align${ align }` } />;
-}
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -74,11 +63,11 @@ registerBlock( 'core/image', {
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, align, caption } = attributes;
+		const { url, alt, caption } = attributes;
 
 		return (
-			<figure>
-				<Image url={ url } alt={ alt } align={ align } />
+			<figure className="blocks-image">
+				<img src={ url } alt={ alt } />
 				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -93,8 +82,8 @@ registerBlock( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, align, caption } = attributes;
-		const img = <Image url={ url } alt={ alt } align={ align } />;
+		const { url, alt, caption, align = 'none' } = attributes;
+		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
 		if ( ! caption ) {
 			return img;

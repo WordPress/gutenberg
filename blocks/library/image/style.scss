@@ -1,0 +1,26 @@
+.editor-visual-editor__block[data-type="core/image"] {
+	&[data-align="left"],
+	&[data-align="right"] {
+		// Without z-index, won't be clickable as "above" adjacent content
+		z-index: 10;
+		max-width: 370px;
+	}
+
+	&[data-align="left"] {
+		float: left;
+		margin-right: 15px;
+	}
+
+	&[data-align="right"] {
+		float: right;
+		margin-left: 15px;
+	}
+}
+
+.blocks-image {
+	margin: 0;
+
+	img {
+		display: block;
+	}
+}
