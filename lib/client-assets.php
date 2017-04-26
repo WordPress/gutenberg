@@ -467,14 +467,18 @@ function gutenberg_scripts_and_styles( $hook ) {
 		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
+
+	/**
+	 * Fires after block assets have been enqueued for the editing interface.
+	 *
+	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
-/**
- * Handles the enqueueing of front end scripts and styles from Gutenberg.
- */
-function gutenberg_frontend_scripts_and_styles() {
-	// Enqueue basic styles built out of Gutenberg through npm build.
-	wp_enqueue_style( 'wp-blocks' );
-}
-add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
