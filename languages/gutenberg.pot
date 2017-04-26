@@ -3,6 +3,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
+#: blocks/components/editable/index.js:28
+msgid "Bold"
+msgstr ""
+
+#: blocks/components/editable/index.js:33
+msgid "Italic"
+msgstr ""
+
+#: blocks/components/editable/index.js:38
+msgid "Strikethrough"
+msgstr ""
+
 #: blocks/library/embed/index.js:10
 msgid "Embed"
 msgstr ""
@@ -100,18 +112,6 @@ msgstr ""
 
 #: editor/header/tools/index.js:40
 msgid "Publish"
-msgstr ""
-
-#: editor/modes/visual-editor/block.js:17
-msgid "Bold"
-msgstr ""
-
-#: editor/modes/visual-editor/block.js:22
-msgid "Italic"
-msgstr ""
-
-#: editor/modes/visual-editor/block.js:27
-msgid "Strikethrough"
 msgstr ""
 
 #: editor/header/mode-switcher/index.js:24
