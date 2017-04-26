@@ -159,7 +159,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
 		array( 'wp-i18n', 'wp-blocks', 'wp-element' ),
-		false, // $ver
+		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true   // $in_footer
 	);
 
@@ -212,7 +212,8 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_style(
 		'wp-editor',
 		plugins_url( 'editor/build/style.css', __FILE__ ),
-		array( 'wp-blocks' )
+		array( 'wp-blocks' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/style.css' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
