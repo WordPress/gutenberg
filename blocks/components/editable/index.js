@@ -48,15 +48,11 @@ export default class Editable extends wp.element.Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.bindNode = this.bindNode.bind( this );
+		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
-		this.onFocusOut = this.onFocusOut.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 
-		this.nodes = {};
-
 		this.state = {
-			isFocused: false,
 			formats: {}
 		};
 	}
@@ -67,7 +63,7 @@ export default class Editable extends wp.element.Component {
 
 	initialize() {
 		const config = {
-			target: this.nodes.editor,
+			target: this.editorNode,
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -85,7 +81,7 @@ export default class Editable extends wp.element.Component {
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onFocusOut );
+		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
@@ -103,29 +99,6 @@ export default class Editable extends wp.element.Component {
 
 		// TODO: We need a way to save the focus position ( bookmark maybe )
 		this.props.onFocus();
-
-		this.setState( {
-			isFocused: true
-		} );
-	}
-
-	onFocusOut( event ) {
-		this.onChange();
-
-		// Disable reason: In this case we explicitly want to test that the DOM
-		// node to which focus is being transfered is not the rendered element.
-
-		/* eslint-disable react/no-find-dom-node */
-		const { toolbar } = this.nodes;
-		if ( toolbar && wp.element.findDOMNode( toolbar ).contains( event.relatedTarget ) ) {
-			event.preventDefault();
-			return;
-		}
-		/* eslint-enable react/no-find-dom-node */
-
-		this.setState( {
-			isFocused: false
-		} );
 	}
 
 	onChange() {
@@ -195,10 +168,8 @@ export default class Editable extends wp.element.Component {
 		this.setState( { formats } );
 	}
 
-	bindNode( name ) {
-		return ( ref ) => {
-			this.nodes[ name ] = ref;
-		};
+	bindEditorNode( ref ) {
+		this.editorNode = ref;
 	}
 
 	updateContent() {
@@ -274,22 +245,21 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName: Tag = 'div', style, className } = this.props;
+		const { tagName: Tag = 'div', style, focus, className } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
 		let element = (
 			<Tag
-				ref={ this.bindNode( 'editor' ) }
+				ref={ this.bindEditorNode }
 				style={ style }
 				className={ classes }
 				key="editor" />
 		);
 
-		if ( this.state.isFocused ) {
+		if ( focus ) {
 			element = [
 				<Fill name="Formatting.Toolbar" key="fill">
 					<Toolbar
-						ref={ this.bindNode( 'toolbar' ) }
 						controls={ formattingControls.map( ( control ) => ( {
 							...control,
 							onClick: () => this.toggleFormat( control.format ),
