@@ -1,10 +1,25 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
 
 const { attr, children } = query;
+
+/**
+ * Returns an attribute setter with behavior that if the target value is
+ * already the assigned attribute value, it will be set to undefined.
+ *
+ * @param  {string}   align Alignment value
+ * @return {Function}       Attribute setter
+ */
+function applyOrUnset( align ) {
+	return ( attributes, setAttributes ) => {
+		const nextAlign = attributes.align === align ? undefined : align;
+		setAttributes( { align: nextAlign } );
+	};
+}
 
 registerBlock( 'core/image', {
 	title: wp.i18n.__( 'Image' ),
@@ -16,14 +31,49 @@ registerBlock( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
+		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ]
+	},
+
+	controls: [
+		{
+			icon: 'align-left',
+			title: wp.i18n.__( 'Align left' ),
+			isActive: ( { align } ) => 'left' === align,
+			onClick: applyOrUnset( 'left' )
+		},
+		{
+			icon: 'align-center',
+			title: wp.i18n.__( 'Align center' ),
+			isActive: ( { align } ) => 'center' === align,
+			onClick: applyOrUnset( 'center' )
+		},
+		{
+			icon: 'align-right',
+			title: wp.i18n.__( 'Align right' ),
+			isActive: ( { align } ) => 'right' === align,
+			onClick: applyOrUnset( 'right' )
+		},
+		{
+			icon: 'align-none',
+			title: wp.i18n.__( 'No alignment' ),
+			isActive: ( { align } ) => ! align || 'none' === align,
+			onClick: applyOrUnset( 'none' )
+		}
+	],
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
 
 		return (
-			<figure>
+			<figure className="blocks-image">
 				<img src={ url } alt={ alt } />
 				{ caption || !! focus ? (
 					<Editable
@@ -39,8 +89,8 @@ registerBlock( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption } = attributes;
-		const img = <img src={ url } alt={ alt } />;
+		const { url, alt, caption, align = 'none' } = attributes;
+		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
 		if ( ! caption ) {
 			return img;

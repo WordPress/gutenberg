@@ -133,6 +133,12 @@ class VisualEditorBlock extends wp.element.Component {
 
 		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
+		// Determine whether the block has props to apply to the wrapper
+		let wrapperProps;
+		if ( settings.getEditWrapperProps ) {
+			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		}
+
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
 
@@ -148,6 +154,8 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
+				data-type={ block.blockType }
+				{ ...wrapperProps }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ isSelected && ! isTyping &&
