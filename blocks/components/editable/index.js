@@ -133,9 +133,13 @@ export default class Editable extends wp.element.Component {
 	onKeyDown( event ) {
 		if ( this.props.onMerge && event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) {
 			this.onChange();
+			this.props.onMerge( this.editor.getContent() );
 
-			// Debouncing this call avoids TinyMCE error while handling `keydown` event
-			setTimeout( () => this.props.onMerge( this.editor.getContent() ) );
+			// If merge causes editor to be removed, stop other callbacks from
+			// trying to handle the event
+			if ( this.editor.removed ) {
+				event.stopImmediatePropagation();
+			}
 		}
 	}
 
