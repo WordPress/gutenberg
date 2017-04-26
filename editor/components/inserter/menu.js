@@ -19,7 +19,7 @@ class InserterMenu extends wp.element.Component {
 		this.filter = this.filter.bind( this );
 	}
 
-	handleClickOutside( e ) {
+	handleClickOutside() {
 		this.props.onClickOutside();
 	}
 
