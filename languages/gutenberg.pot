@@ -42,18 +42,21 @@ msgstr ""
 
 #: blocks/library/image/index.js:41
 #: blocks/library/list/index.js:25
+#: blocks/library/quote/index.js:38
 #: blocks/library/text/index.js:23
 msgid "Align left"
 msgstr ""
 
 #: blocks/library/image/index.js:47
 #: blocks/library/list/index.js:33
+#: blocks/library/quote/index.js:46
 #: blocks/library/text/index.js:31
 msgid "Align center"
 msgstr ""
 
 #: blocks/library/image/index.js:53
 #: blocks/library/list/index.js:41
+#: blocks/library/quote/index.js:54
 #: blocks/library/text/index.js:39
 msgid "Align right"
 msgstr ""
@@ -74,7 +77,7 @@ msgstr ""
 msgid "Quote"
 msgstr ""
 
-#: blocks/library/quote/index.js:35
+#: blocks/library/quote/index.js:63
 msgid "Quote style %d"
 msgstr ""
 

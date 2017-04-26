@@ -4,6 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
+import { first } from 'lodash';
 
 /**
  * Internal dependencies
@@ -137,6 +138,10 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = settings.getEditWrapperProps( block.attributes );
 		}
 
+		const toolbars = settings.controls && settings.controls.length && ! Array.isArray( first( settings.controls ) )
+			? [ settings.controls ]
+			: settings.controls;
+
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
 
@@ -159,14 +164,15 @@ class VisualEditorBlock extends wp.element.Component {
 				{ isSelected && ! isTyping &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
-						{ !! settings.controls && (
+						{ !! toolbars && toolbars.map( ( controls, index ) => (
 							<Toolbar
-								controls={ settings.controls.map( ( control ) => ( {
+								key={ index }
+								controls={ controls.map( ( control ) => ( {
 									...control,
 									onClick: () => control.onClick( block.attributes, this.setAttributes ),
 									isActive: control.isActive( block.attributes )
 								} ) ) } />
-						) }
+						) ) }
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
