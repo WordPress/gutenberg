@@ -239,6 +239,8 @@ export default class Editable extends wp.element.Component {
 	}
 
 	toggleFormat( format ) {
+		this.editor.focus();
+
 		if ( this.isFormatActive( format ) ) {
 			this.editor.formatter.remove( format );
 		} else {
