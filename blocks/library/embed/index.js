@@ -19,17 +19,19 @@ registerBlock( 'core/embed', {
 		caption: children( 'figcaption' )
 	},
 
-	edit( { attributes, isSelected, setAttributes } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, title, caption } = attributes;
 
 		return (
 			<figure>
 				<iframe src={ url } title={ title } />
-				{ caption || isSelected ? (
+				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
+						focus={ focus }
+						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) } />
 				) : null }
 			</figure>
