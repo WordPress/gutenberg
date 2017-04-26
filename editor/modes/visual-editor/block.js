@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { first } from 'lodash';
+import { reduce, last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -138,9 +138,11 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = settings.getEditWrapperProps( block.attributes );
 		}
 
-		const toolbars = settings.controls && settings.controls.length && ! Array.isArray( first( settings.controls ) )
-			? [ settings.controls ]
-			: settings.controls;
+		const toolbars = reduce( settings.controls, ( memo, toolbar ) => (
+			Array.isArray( toolbar )
+				? [ ...memo, toolbar ]
+				: [ ...memo.slice( 0, -1 ), [ ...( last( memo ) || [] ), toolbar ] ]
+		), [] );
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
@@ -164,7 +166,7 @@ class VisualEditorBlock extends wp.element.Component {
 				{ isSelected && ! isTyping &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
-						{ !! toolbars && toolbars.map( ( controls, index ) => (
+						{ toolbars.map( ( controls, index ) => (
 							<Toolbar
 								key={ index }
 								controls={ controls.map( ( control ) => ( {
