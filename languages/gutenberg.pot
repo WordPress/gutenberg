@@ -8,7 +8,6 @@ msgid "Embed"
 msgstr ""
 
 #: blocks/library/embed/index.js:33
-#: blocks/library/embed/index.js:31
 #: blocks/library/image/index.js:81
 msgid "Write caption…"
 msgstr ""
