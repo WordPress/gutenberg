@@ -24,7 +24,9 @@ registerBlock( 'core/embed', {
 
 		return (
 			<figure>
-				<iframe src={ url } title={ title } />
+				<div className="iframe-overlay">
+					<iframe src={ url } title={ title } />
+				</div>
 				{ caption || !! focus ? (
 					<Editable
 						tagName="figcaption"
