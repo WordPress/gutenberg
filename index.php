@@ -214,6 +214,17 @@ function gutenberg_scripts_and_styles( $hook ) {
 		plugins_url( 'editor/build/style.css', __FILE__ ),
 		array( 'wp-blocks' )
 	);
+
+	/**
+	 * Fires after base styles have been enqueued for Gutenberg.
+	 *
+	 * Make sure to `add_action()` on any hook before 'admin_enqueue_scripts'
+	 * In the function call you supply, simply use wp_enqueue_style() to add
+	 * additional styles to the gutenberg editor.
+	 *
+	 * @since 0.1.0
+	 */
+	do_action( 'enqueue_gutenberg_editor_styles' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
