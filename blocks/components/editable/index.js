@@ -120,13 +120,13 @@ export default class Editable extends wp.element.Component {
 		const start = range.startContainer;
 		const body = this.editor.getBody();
 		let element = start;
-		do {
+		while ( element !== body ) {
 			const child = element;
 			element = element.parentNode;
 			if ( element.firstChild !== child ) {
 				return false;
 			}
-		} while ( element !== body );
+		}
 		return true;
 	}
 
