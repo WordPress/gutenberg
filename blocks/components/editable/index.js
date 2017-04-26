@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
+import { last, isEqual } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
 import { Fill } from 'react-slot-fill';
 
@@ -165,7 +165,9 @@ export default class Editable extends wp.element.Component {
 			return result;
 		}, {} );
 
-		this.setState( { formats } );
+		if ( ! isEqual( this.state.formats, formats ) ) {
+			this.setState( { formats } );
+		}
 	}
 
 	bindEditorNode( ref ) {
