@@ -261,7 +261,8 @@ export default class Editable extends wp.element.Component {
 
 		if (
 			this.props.tagName === prevProps.tagName &&
-			this.props.value !== prevProps.value
+			this.props.value !== prevProps.value &&
+			! isEqual( this.props.value, prevProps.value )
 		) {
 			this.updateContent();
 		}
