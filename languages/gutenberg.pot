@@ -8,7 +8,7 @@ msgid "Embed"
 msgstr ""
 
 #: blocks/library/embed/index.js:31
-#: blocks/library/image/index.js:74
+#: blocks/library/image/index.js:81
 msgid "Write caption…"
 msgstr ""
 
@@ -102,15 +102,15 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:18
+#: editor/modes/visual-editor/block.js:17
 msgid "Bold"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:23
+#: editor/modes/visual-editor/block.js:22
 msgid "Italic"
 msgstr ""
 
-#: editor/modes/visual-editor/block.js:28
+#: editor/modes/visual-editor/block.js:27
 msgid "Strikethrough"
 msgstr ""
 

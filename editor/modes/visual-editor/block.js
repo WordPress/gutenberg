@@ -3,7 +3,6 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { reduce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -29,24 +28,6 @@ const formattingControls = [
 		format: 'strikethrough'
 	}
 ];
-
-/**
- * Returns an object of block attributes to be assigned as data-* attribute
- * props on the block's wrapper element.
- *
- * @param  {Object} attributes Block attributes
- * @return {Object}            Wrapper element props
- */
-export function getBlockAttributesAsProps( attributes ) {
-	return reduce( attributes, ( result, value, key ) => {
-		const type = typeof value;
-		if ( 'string' === type || 'number' === type || 'boolean' === type ) {
-			result[ 'data-' + key ] = String( value );
-		}
-
-		return result;
-	}, {} );
-}
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -152,6 +133,12 @@ class VisualEditorBlock extends wp.element.Component {
 
 		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
+		// Determine whether the block has props to apply to the wrapper
+		let wrapperProps;
+		if ( settings.getEditWrapperProps ) {
+			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		}
+
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
 
@@ -168,7 +155,7 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
-				{ ...getBlockAttributesAsProps( block.attributes ) }
+				{ ...wrapperProps }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ isSelected && ! isTyping &&
