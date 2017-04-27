@@ -2,8 +2,9 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize } from 'lodash';
+import { last, isEqual, capitalize, map } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
+import { nodeToReact } from './dom-to-react';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -256,9 +257,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getContent() {
-		const content = this.editor.getContent( { format: 'raw' } );
-
-		return htmlToReactParser.parse( content );
+		return map( this.editorNode.childNodes, nodeToReact );
 	}
 
 	focus() {
