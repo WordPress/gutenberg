@@ -6,13 +6,11 @@ import classNames from 'classnames';
 /**
  * Internal dependencies
  */
-import './style.scss';
-
  // TODO: We mustn't import by relative path traversing from blocks to editor
  // as we're doing here; instead, we should consider a common components path.
 import IconButton from '../../../editor/components/icon-button';
 
-const formattingControls = [
+const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: wp.i18n.__( 'Bold' ),
@@ -85,12 +83,12 @@ class FormatToolbar extends wp.element.Component {
 		const { formats, focusPosition } = this.props;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
-			: {};
+			: null;
 
 		return (
 			<div>
 				<ul className="editable-format-toolbar editor-toolbar">
-					{ formattingControls.map( ( control, index ) => (
+					{ FORMATTING_CONTROLS.map( ( control, index ) => (
 						<IconButton
 							key={ index }
 							icon={ control.icon }
@@ -116,7 +114,7 @@ class FormatToolbar extends wp.element.Component {
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
 						<input type="url" value={ this.state.linkValue } onChange={ this.updateLinkValue } />
-						<IconButton icon="editor-break" onClick={ this.submitLink } />
+						<IconButton icon="editor-break" type="submit" />
 						<IconButton icon="trash" onClick={ this.dropLink } />
 					</form>
 				}

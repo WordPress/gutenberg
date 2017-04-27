@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy } from 'lodash';
+import { last, isEqual, capitalize, omitBy, forEach } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -319,8 +319,7 @@ export default class Editable extends wp.element.Component {
 	changeFormats( formats ) {
 		this.editor.focus();
 
-		Object.keys( formats ).forEach( format => {
-			const formatValue = formats[ format ];
+		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
 				if ( formatValue !== undefined ) {
 					this.editor.execCommand( 'mceInsertLink', true, formatValue );

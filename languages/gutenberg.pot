@@ -3,19 +3,19 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
-#: blocks/components/editable/format-toolbar.js:105
+#: blocks/components/editable/format-toolbar.js:103
 msgid "Link"
 msgstr ""
 
-#: blocks/components/editable/format-toolbar.js:18
+#: blocks/components/editable/format-toolbar.js:16
 msgid "Bold"
 msgstr ""
 
-#: blocks/components/editable/format-toolbar.js:23
+#: blocks/components/editable/format-toolbar.js:21
 msgid "Italic"
 msgstr ""
 
-#: blocks/components/editable/format-toolbar.js:28
+#: blocks/components/editable/format-toolbar.js:26
 msgid "Strikethrough"
 msgstr ""
 
