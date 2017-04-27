@@ -47,12 +47,12 @@ describe( 'element', () => {
 
 		it( 'should concat the object arrays and rewrite keys', () => {
 			const concat = concatChildren(
-				[ createElement( 'strong', null, 'Courgette' ) ],
-				createElement( 'strong', null, 'Concombre' )
+				[ createElement( 'strong', {}, 'Courgette' ) ],
+				createElement( 'strong', {}, 'Concombre' )
 			);
 			expect( concat.length ).to.equal( 2 );
-			expect( concat[ 0 ].key = 0 );
-			expect( concat[ 1 ].key = 1 );
+			expect( concat[ 0 ].key ).to.equal( '0,0' );
+			expect( concat[ 1 ].key ).to.equal( '1,0' );
 		} );
 	} );
 } );

@@ -3,15 +3,15 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
-#: blocks/components/editable/index.js:28
+#: blocks/components/editable/index.js:29
 msgid "Bold"
 msgstr ""
 
-#: blocks/components/editable/index.js:33
+#: blocks/components/editable/index.js:34
 msgid "Italic"
 msgstr ""
 
-#: blocks/components/editable/index.js:38
+#: blocks/components/editable/index.js:39
 msgid "Strikethrough"
 msgstr ""
 
