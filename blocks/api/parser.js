@@ -42,6 +42,7 @@ export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 	if ( blockSettings ) {
 		attributes = {
 			...attributes,
+			...blockSettings.defaultAttributes,
 			...parseBlockAttributes( rawContent, blockSettings ),
 		};
 	}
