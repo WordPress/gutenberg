@@ -7,10 +7,18 @@ export function nodeToReact( node, index ) {
 		return node.nodeValue;
 	}
 
+	if ( node.getAttribute( 'data-mce-bogus' ) === 'all' ) {
+		return null;
+	}
+
 	const type = node.nodeName.toLowerCase();
 	const children = map( node.childNodes || [], nodeToReact );
 	const props = reduce( node.attributes, ( result, { name, value } ) => {
 		let key = camelCaseAttrMap[ name.replace( /[-:]/, '' ) ] || name;
+
+		if ( key.startsWith( 'data-mce-' ) ) {
+			return result;
+		}
 
 		if ( key === 'style' ) {
 			return result;
