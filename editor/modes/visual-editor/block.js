@@ -164,7 +164,7 @@ class VisualEditorBlock extends wp.element.Component {
 				{ isSelected && ! isTyping &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
-						{ toolbars.map( ( controls, index ) => (
+						{ !! toolbars && toolbars.map( ( controls, index ) => (
 							<Toolbar
 								key={ index }
 								controls={ controls.map( ( control ) => ( {
