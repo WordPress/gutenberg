@@ -2,13 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { forEach, last } from 'lodash';
+import { last, isEqual } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
+import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+
+ // TODO: We mustn't import by relative path traversing from blocks to editor
+ // as we're doing here; instead, we should consider a common components path.
+import Toolbar from '../../../editor/components/toolbar';
 
 const htmlToReactParser = new HtmlToReactParser();
 const formatMap = {
@@ -17,17 +22,39 @@ const formatMap = {
 	del: 'strikethrough'
 };
 
+const formattingControls = [
+	{
+		icon: 'editor-bold',
+		title: wp.i18n.__( 'Bold' ),
+		format: 'bold'
+	},
+	{
+		icon: 'editor-italic',
+		title: wp.i18n.__( 'Italic' ),
+		format: 'italic'
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: wp.i18n.__( 'Strikethrough' ),
+		format: 'strikethrough'
+	}
+];
+
 export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.bindNode = this.bindNode.bind( this );
+		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
-		this.formats = {};
+
+		this.state = {
+			formats: {}
+		};
 	}
 
 	componentDidMount() {
@@ -36,7 +63,7 @@ export default class Editable extends wp.element.Component {
 
 	initialize() {
 		const config = {
-			target: this.node,
+			target: this.editorNode,
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -57,10 +84,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
-
-		if ( this.props.onFormatChange ) {
-			editor.on( 'nodechange', this.onNodeChange );
-		}
+		editor.on( 'nodechange', this.onNodeChange );
 	}
 
 	onInit() {
@@ -131,7 +155,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { parents } ) {
-		this.formats = parents.reduce( ( result, node ) => {
+		const formats = parents.reduce( ( result, node ) => {
 			const tag = node.nodeName.toLowerCase();
 
 			if ( formatMap.hasOwnProperty( tag ) ) {
@@ -141,11 +165,13 @@ export default class Editable extends wp.element.Component {
 			return result;
 		}, {} );
 
-		this.props.onFormatChange( this.formats );
+		if ( ! isEqual( this.state.formats, formats ) ) {
+			this.setState( { formats } );
+		}
 	}
 
-	bindNode( ref ) {
-		this.node = ref;
+	bindEditorNode( ref ) {
+		this.editorNode = ref;
 	}
 
 	updateContent() {
@@ -208,31 +234,46 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		forEach( nextProps.formats, ( state, format ) => {
-			const currentState = this.formats[ format ] || false;
+	isFormatActive( format ) {
+		return !! this.state.formats[ format ];
+	}
 
-			if ( state !== currentState ) {
-				this.editor.focus();
+	toggleFormat( format ) {
+		this.editor.focus();
 
-				if ( state ) {
-					this.editor.formatter.apply( format );
-				} else {
-					this.editor.formatter.remove( format );
-				}
-			}
-		} );
+		if ( this.isFormatActive( format ) ) {
+			this.editor.formatter.remove( format );
+		} else {
+			this.editor.formatter.apply( format );
+		}
 	}
 
 	render() {
-		const { tagName: Tag = 'div', style, className } = this.props;
+		const { tagName: Tag = 'div', style, focus, className } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
-		return (
+		let element = (
 			<Tag
-				ref={ this.bindNode }
+				ref={ this.bindEditorNode }
 				style={ style }
-				className={ classes } />
+				className={ classes }
+				key="editor" />
 		);
+
+		if ( focus ) {
+			element = [
+				<Fill name="Formatting.Toolbar" key="fill">
+					<Toolbar
+						controls={ formattingControls.map( ( control ) => ( {
+							...control,
+							onClick: () => this.toggleFormat( control.format ),
+							isActive: this.isFormatActive( control.format )
+						} ) ) } />
+				</Fill>,
+				element
+			];
+		}
+
+		return element;
 	}
 }

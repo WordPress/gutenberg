@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { Slot } from 'react-slot-fill';
 
 /**
  * Internal dependencies
@@ -11,24 +12,6 @@ import Toolbar from 'components/toolbar';
 import BlockMover from 'components/block-mover';
 import BlockSwitcher from 'components/block-switcher';
 
-const formattingControls = [
-	{
-		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
-		format: 'bold'
-	},
-	{
-		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
-		format: 'italic'
-	},
-	{
-		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
-		format: 'strikethrough'
-	}
-];
-
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -36,35 +19,11 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
-		this.onFormatChange = this.onFormatChange.bind( this );
-		this.toggleFormat = this.toggleFormat.bind( this );
 		this.previousOffset = null;
-		this.state = {
-			formats: {}
-		};
 	}
 
 	bindBlockNode( node ) {
 		this.node = node;
-	}
-
-	onFormatChange( formats ) {
-		if ( ! this.state.hasEditable ) {
-			this.setState( { hasEditable: true } );
-		}
-
-		this.setState( { formats } );
-	}
-
-	toggleFormat( format ) {
-		const { formats } = this.state;
-
-		this.setState( {
-			formats: {
-				...formats,
-				[ format ]: ! formats[ format ]
-			}
-		} );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -133,6 +92,12 @@ class VisualEditorBlock extends wp.element.Component {
 
 		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
+		// Determine whether the block has props to apply to the wrapper
+		let wrapperProps;
+		if ( settings.getEditWrapperProps ) {
+			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		}
+
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
 
@@ -148,6 +113,8 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
+				data-type={ block.blockType }
+				{ ...wrapperProps }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ isSelected && ! isTyping &&
@@ -161,14 +128,7 @@ class VisualEditorBlock extends wp.element.Component {
 									isActive: control.isActive( block.attributes )
 								} ) ) } />
 						) }
-						{ this.state.hasEditable && (
-							<Toolbar
-								controls={ formattingControls.map( ( control ) => ( {
-									...control,
-									onClick: () => this.toggleFormat( control.format ),
-									isActive: !! this.state.formats[ control.format ]
-								} ) ) } />
-						) }
+						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
 				<BlockEdit
@@ -177,8 +137,6 @@ class VisualEditorBlock extends wp.element.Component {
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
 					setFocus={ onFocus }
-					onFormatChange={ this.onFormatChange }
-					formats={ this.state.formats }
 				/>
 			</div>
 		);

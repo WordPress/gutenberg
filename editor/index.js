@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Provider } from 'react-redux';
+import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as SlotFillProvider } from 'react-slot-fill';
 
 /**
  * Internal dependencies
@@ -24,9 +25,11 @@ export function createEditorInstance( id, post ) {
 	} );
 
 	wp.element.render(
-		<Provider store={ store }>
-			<Layout />
-		</Provider>,
+		<ReduxProvider store={ store }>
+			<SlotFillProvider>
+				<Layout />
+			</SlotFillProvider>
+		</ReduxProvider>,
 		document.getElementById( id )
 	);
 }

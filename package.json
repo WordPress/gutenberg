@@ -68,6 +68,7 @@
     "react-click-outside": "^2.3.0",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
+    "react-slot-fill": "^1.0.0-alpha.11",
     "redux": "^3.6.0",
     "uuid": "^3.0.1"
   }
