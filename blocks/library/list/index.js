@@ -54,11 +54,15 @@ registerBlock( 'core/list', {
 		}
 	],
 
-	edit( { attributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { nodeName = 'OL', items = [], align } = attributes;
 		const content = items.map( ( item, i ) => {
 			return <li key={ i }>{ item.value }</li>;
 		} );
+
+		const itemsFromContent = ( listContents ) => {
+			return listContents.map( ( listContent ) => ( { value: listContent.props.children } ) );
+		};
 
 		return (
 			<Editable
@@ -66,6 +70,11 @@ registerBlock( 'core/list', {
 				style={ align ? { textAlign: align } : null }
 				value={ content }
 				focus={ focus }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						items: itemsFromContent( nextContent )
+					} );
+				} }
 				onFocus={ setFocus }
 				className="blocks-list" />
 		);
