@@ -72,9 +72,8 @@ class VisualEditorBlock extends wp.element.Component {
 
 		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
 
-		// Remove the previous block if it's not mergeable
+		// Do nothing if the previous block is not mergeable
 		if ( ! previousBlockSettings.merge ) {
-			onRemove( previousBlock.uid );
 			return;
 		}
 
