@@ -66,12 +66,15 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should merge attributes with the parsed attributes', () => {
+		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockSettings = {
 				attributes: function( rawContent ) {
 					return {
 						content: rawContent + ' & Chicken'
 					};
+				},
+				defaultAttributes: {
+					topic: 'none'
 				}
 			};
 
@@ -80,6 +83,7 @@ describe( 'block parser', () => {
 
 			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
 				align: 'left',
+				topic: 'none',
 				content: 'Ribs & Chicken'
 			} );
 		} );
