@@ -65,6 +65,7 @@ class InserterMenu extends wp.element.Component {
 								<div
 									className="editor-inserter__category-blocks"
 									role="menu"
+									tabIndex="0"
 									aria-labelledby={ `editor-inserter__separator-${ category.slug }` }
 								>
 									{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
