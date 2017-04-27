@@ -17,6 +17,10 @@ registerBlock( 'core/text', {
 		content: children(),
 	},
 
+	defaultAttributes: {
+		content: <p />
+	},
+
 	controls: [
 		{
 			icon: 'editor-alignleft',
@@ -51,7 +55,7 @@ registerBlock( 'core/text', {
 	},
 
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeWithPrevious } ) {
-		const { content = <p />, align } = attributes;
+		const { content, align } = attributes;
 
 		return (
 			<Editable

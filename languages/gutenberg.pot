@@ -42,19 +42,19 @@ msgstr ""
 
 #: blocks/library/image/index.js:41
 #: blocks/library/list/index.js:25
-#: blocks/library/text/index.js:23
+#: blocks/library/text/index.js:27
 msgid "Align left"
 msgstr ""
 
 #: blocks/library/image/index.js:47
 #: blocks/library/list/index.js:33
-#: blocks/library/text/index.js:31
+#: blocks/library/text/index.js:35
 msgid "Align center"
 msgstr ""
 
 #: blocks/library/image/index.js:53
 #: blocks/library/list/index.js:41
-#: blocks/library/text/index.js:39
+#: blocks/library/text/index.js:43
 msgid "Align right"
 msgstr ""
 
