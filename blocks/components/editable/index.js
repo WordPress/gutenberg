@@ -3,7 +3,7 @@
  */
 import classnames from 'classnames';
 import { last, isEqual, capitalize, map } from 'lodash';
-import { nodeToReact } from './dom-to-react';
+import { nodeToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 
 /**
