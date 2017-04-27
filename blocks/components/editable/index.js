@@ -5,12 +5,13 @@ import classnames from 'classnames';
 import { last, isEqual, capitalize, omitBy } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
+import 'element-closest';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-
+import FormatToolbar from './format-toolbar';
  // TODO: We mustn't import by relative path traversing from blocks to editor
  // as we're doing here; instead, we should consider a common components path.
 import Toolbar from '../../../editor/components/toolbar';
@@ -21,24 +22,6 @@ const formatMap = {
 	em: 'italic',
 	del: 'strikethrough'
 };
-
-const FORMATTING_CONTROLS = [
-	{
-		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
-		format: 'bold'
-	},
-	{
-		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
-		format: 'italic'
-	},
-	{
-		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
-		format: 'strikethrough'
-	}
-];
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -86,6 +69,7 @@ export default class Editable extends wp.element.Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.changeFormats = this.changeFormats.bind( this );
 		this.state = {
 			formats: {},
 			alignment: null
@@ -145,6 +129,15 @@ export default class Editable extends wp.element.Component {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
+	}
+
+	getRelativePosition( node ) {
+		const editorPosition = this.editorNode.closest( '.editor-visual-editor__block' ).getBoundingClientRect();
+		const position = node.getBoundingClientRect();
+		return {
+			top: position.top - editorPosition.top + 40 + ( position.height ),
+			left: position.left - editorPosition.left - 157
+		};
 	}
 
 	isStartOfEditor() {
@@ -225,15 +218,16 @@ export default class Editable extends wp.element.Component {
 		} );
 	}
 
-	onNodeChange( { parents } ) {
+	onNodeChange( { element, parents } ) {
 		let alignment = null;
 		const formats = {};
-
 		parents.forEach( ( node ) => {
 			const tag = node.nodeName.toLowerCase();
 
 			if ( formatMap.hasOwnProperty( tag ) ) {
 				formats[ formatMap[ tag ] ] = true;
+			} else if ( tag === 'a' ) {
+				formats.link = node.getAttribute( 'href' );
 			}
 
 			if ( tag === 'p' ) {
@@ -241,12 +235,8 @@ export default class Editable extends wp.element.Component {
 			}
 		} );
 
-		if (
-			this.state.alignment !== alignment ||
-			! isEqual( this.state.formats, formats )
-		) {
-			this.setState( { alignment, formats } );
-		}
+		const focusPosition = this.getRelativePosition( element );
+		this.setState( { alignment, formats, focusPosition } );
 	}
 
 	bindEditorNode( ref ) {
@@ -326,14 +316,26 @@ export default class Editable extends wp.element.Component {
 		return !! this.state.formats[ format ];
 	}
 
-	toggleFormat( format ) {
+	changeFormats( formats ) {
 		this.editor.focus();
 
-		if ( this.isFormatActive( format ) ) {
-			this.editor.formatter.remove( format );
-		} else {
-			this.editor.formatter.apply( format );
-		}
+		Object.keys( formats ).forEach( format => {
+			const formatValue = formats[ format ];
+			if ( format === 'link' ) {
+				if ( formatValue !== undefined ) {
+					this.editor.execCommand( 'mceInsertLink', true, formatValue );
+				} else {
+					this.editor.execCommand( 'Unlink' );
+				}
+			} else {
+				const isActive = this.isFormatActive( format );
+				if ( isActive && ! formatValue ) {
+					this.editor.formatter.remove( format );
+				} else if ( ! isActive && formatValue ) {
+					this.editor.formatter.apply( format );
+				}
+			}
+		} );
 	}
 
 	isAlignmentActive( align ) {
@@ -373,13 +375,7 @@ export default class Editable extends wp.element.Component {
 								isActive: this.isAlignmentActive( control.align )
 							} ) ) } />
 					}
-
-					<Toolbar
-						controls={ FORMATTING_CONTROLS.map( ( control ) => ( {
-							...control,
-							onClick: () => this.toggleFormat( control.format ),
-							isActive: this.isFormatActive( control.format )
-						} ) ) } />
+					<FormatToolbar focusPosition={ this.state.focusPosition } formats={ this.state.formats } onChange={ this.changeFormats } />
 				</Fill>,
 				element
 			];

@@ -147,7 +147,6 @@ class VisualEditorBlock extends wp.element.Component {
 				onClick={ onSelect }
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onStartTyping }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -171,14 +170,16 @@ class VisualEditorBlock extends wp.element.Component {
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<BlockEdit
-					focus={ focus }
-					attributes={ block.attributes }
-					setAttributes={ this.setAttributes }
-					insertBlockAfter={ onInsertAfter }
-					setFocus={ partial( onFocus, block.uid ) }
-					mergeWithPrevious={ this.mergeWithPrevious }
-				/>
+				<div onKeyDown={ onStartTyping }>
+					<BlockEdit
+						focus={ focus }
+						attributes={ block.attributes }
+						setAttributes={ this.setAttributes }
+						insertBlockAfter={ onInsertAfter }
+						setFocus={ partial( onFocus, block.uid ) }
+						mergeWithPrevious={ this.mergeWithPrevious }
+					/>
+				</div>
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
