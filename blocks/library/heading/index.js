@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isString } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { registerBlock, query } from 'api';
@@ -37,9 +42,9 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					if ( Array.isArray( content ) ) {
-						// TODO this appears to always be true?
-						// TODO reject the switch if more than one paragraph
-						content = content[ 0 ];
+						content = wp.element.concatChildren( content.map( ( elt ) =>
+							! elt || isString( elt ) || elt.type !== 'p' ? elt : elt.props.children
+						) );
 					}
 					return {
 						nodeName: 'H2',
@@ -54,7 +59,7 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						content: [ content ]
+						content
 					};
 				}
 			}

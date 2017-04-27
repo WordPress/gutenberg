@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isString } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -54,9 +59,9 @@ registerBlock( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
-				transform: ( { content = '' } ) => {
+				transform: ( { content } ) => {
 					return {
-						value: [ content ]
+						value: content
 					};
 				}
 			}
@@ -66,20 +71,23 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
-					let content = value ? value : [];
-					content = citation && citation.trim() ? content.concat( citation ) : content;
 					return {
-						content
+						content: wp.element.concatChildren( value, citation )
 					};
 				}
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
-				transform: ( { value } ) => {
+				transform: ( { value, citation } ) => {
+					if ( Array.isArray( value ) ) {
+						value = wp.element.concatChildren( value.map( ( elt ) =>
+							! elt || isString( elt ) || elt.type !== 'p' ? elt : elt.props.children
+						) );
+					}
 					return {
 						nodeName: 'H2',
-						content: value && value[ 0 ]
+						content: wp.element.concatChildren( value, citation )
 					};
 				}
 			}
