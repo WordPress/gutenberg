@@ -16,6 +16,7 @@ class InserterMenu extends wp.element.Component {
 			filterValue: ''
 		};
 		this.filter = this.filter.bind( this );
+		this.instanceId = this.constructor.instances++;
 	}
 
 	filter( event ) {
@@ -57,7 +58,7 @@ class InserterMenu extends wp.element.Component {
 							<div key={ category.slug }>
 								<div
 									className="editor-inserter__separator"
-									id={ `editor-inserter__separator-${ category.slug }` }
+									id={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
 									aria-hidden="true"
 								>
 									{ category.title }
@@ -66,7 +67,7 @@ class InserterMenu extends wp.element.Component {
 									className="editor-inserter__category-blocks"
 									role="menu"
 									tabIndex="0"
-									aria-labelledby={ `editor-inserter__separator-${ category.slug }` }
+									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
 								>
 									{ blocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
 										<button
@@ -84,11 +85,11 @@ class InserterMenu extends wp.element.Component {
 						) )
 					}
 				</div>
-				<label htmlFor={ `editor-inserter__search-${ position }` } className="screen-reader-text">
+				<label htmlFor={ `editor-inserter__search-${ this.instanceId }` } className="screen-reader-text">
 					{ wp.i18n.__( 'Search blocks' ) }
 				</label>
 				<input
-					id={ `editor-inserter__search-${ position }` }
+					id={ `editor-inserter__search-${ this.instanceId }` }
 					type="search"
 					placeholder={ wp.i18n.__( 'Search…' ) }
 					className="editor-inserter__search"
@@ -98,6 +99,8 @@ class InserterMenu extends wp.element.Component {
 		);
 	}
 }
+
+InserterMenu.instances = 0;
 
 export default connect(
 	undefined,
