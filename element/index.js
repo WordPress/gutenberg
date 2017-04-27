@@ -4,7 +4,6 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { isString } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -68,33 +67,23 @@ export function renderToString( element ) {
 }
 
 /**
- * Concat two React children objects
+ * Concatenate two or more React children objects
  *
- * @param  {?Object} children1 First children value
- * @param  {?Object} children2 Second children value
- *
- * @return {Array}             The concatenation
+ * @param  {...?Object} childrens Set of children to concatenate
+ * @return {Array}                The concatenated value
  */
-export function concatChildren( children1, children2 ) {
-	const toArray = ( children ) => {
-		if ( ! children ) {
-			return [];
-		}
+export function concatChildren( ...childrens ) {
+	return childrens.reduce( ( memo, children, i ) => {
+		Children.forEach( children, ( child, j ) => {
+			if ( 'string' !== typeof child ) {
+				child = cloneElement( child, {
+					key: [ i, j ].join()
+				} );
+			}
 
-		return Array.isArray( children ) ? Children.toArray( children ) : [ children ];
-	};
+			memo.push( child );
+		} );
 
-	return [
-		...toArray( children1 ),
-		...toArray( children2 )
-	].map( ( elt, index ) => {
-		if ( isString( elt ) ) {
-			return elt;
-		}
-
-		return {
-			...elt,
-			key: index
-		};
-	} );
+		return memo;
+	}, [] );
 }
