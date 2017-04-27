@@ -4,7 +4,6 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { reduce, last } from 'lodash';
 
 /**
  * Internal dependencies
@@ -139,15 +138,9 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 
 		// Normalize controls as an array of arrays (toolbars of controls)
-		const toolbars = reduce( settings.controls, ( result, toolbar ) => (
-			Array.isArray( toolbar )
-				// Array entry is simply concatenated into normalized value
-				//  Example: [ [ 1, 2 ], [ 3, 4 ] ] => [ [ 1, 2 ], [ 3, 4 ] ]
-				? [ ...result, toolbar ]
-				// Singular values are appended to the last array in the result
-				//  Example: [ 1, 2, 3, 4 ] => [ [ 1, 2, 3, 4 ] ]
-				: [ ...result.slice( 0, -1 ), [ ...( last( result ) || [] ), toolbar ] ]
-		), [] );
+		const toolbars = settings.controls && settings.controls.length && ! Array.isArray( settings.controls[ 0 ] )
+			? [ settings.controls ]
+			: settings.controls;
 
 		// Disable reason: Each block can receive focus but must be able to contain
 		// block children. Tab keyboard navigation enabled by tabIndex assignment.
