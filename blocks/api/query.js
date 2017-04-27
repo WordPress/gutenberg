@@ -1,13 +1,27 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
-import { html } from 'hpq';
-import { Parser } from 'html-to-react';
+import { map } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { nodeToReact } from '../components/editable/dom-to-react'; // temp
 
 export * from 'hpq';
 
-const parser = new Parser();
 export function children( selector ) {
-	return flow( html( selector ), parser.parse );
+	return ( node ) => {
+		let match = node;
+
+		if ( selector ) {
+			match = node.querySelector( selector );
+		}
+
+		if ( match ) {
+			return map( match.childNodes || [], nodeToReact );
+		}
+
+		return [];
+	};
 }

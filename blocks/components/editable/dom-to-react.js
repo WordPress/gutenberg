@@ -3,6 +3,10 @@ import { map, reduce } from 'lodash';
 import camelCaseAttrMap from 'html-to-react/lib/camel-case-attribute-names';
 
 export function nodeToReact( node, index ) {
+	if ( ! node ) {
+		return null;
+	}
+
 	if ( node.nodeName === '#text' ) {
 		return node.nodeValue;
 	}
