@@ -54,11 +54,11 @@ msgstr ""
 msgid "Freeform"
 msgstr ""
 
-#: blocks/library/heading/index.js:10
+#: blocks/library/heading/index.js:15
 msgid "Heading"
 msgstr ""
 
-#: blocks/library/heading/index.js:24
+#: blocks/library/heading/index.js:29
 msgid "Heading %s"
 msgstr ""
 
@@ -90,11 +90,11 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: blocks/library/quote/index.js:11
+#: blocks/library/quote/index.js:16
 msgid "Quote"
 msgstr ""
 
-#: blocks/library/quote/index.js:35
+#: blocks/library/quote/index.js:40
 msgid "Quote style %d"
 msgstr ""
 
