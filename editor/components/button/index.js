@@ -16,6 +16,7 @@ function Button( { isPrimary, isLarge, isToggled, className, ...additionalProps 
 		<button
 			type="button"
 			{ ...additionalProps }
+			ref={ additionalProps.buttonRef }
 			className={ classes } />
 	);
 }

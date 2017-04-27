@@ -12,6 +12,7 @@ import IconButton from 'components/icon-button';
 class Inserter extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
+		this.nodes = {};
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
@@ -20,6 +21,10 @@ class Inserter extends wp.element.Component {
 	}
 
 	toggle() {
+		if ( this.state.opened === true ) {
+			this.nodes.toggle.focus();
+		}
+
 		this.setState( {
 			opened: ! this.state.opened
 		} );
@@ -51,8 +56,9 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
+					buttonRef={ ( node ) => this.nodes.toggle = node }
 					aria-expanded={ opened ? 'true' : 'false' } />
-				{ opened && <InserterMenu position={ position } onSelect={ this.close } /> }
+				{ opened && <InserterMenu position={ position } onSelect={ this.close } closeMenu={ this.toggle } /> }
 			</div>
 		);
 	}
