@@ -8,36 +8,53 @@ class Inserter extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
-		this.close = this.close.bind( this );
+		this.update = true;
+
 		this.state = {
-			opened: false
+			toggle: false
 		};
 	}
 
-	toggle() {
-		this.setState( {
-			opened: true
-		} );
+	shouldComponentUpdate( nextProps, nextState ) {
+		if ( nextState.toggle && ! this.update ) {
+			this.update = true;
+
+			this.setState( {
+				toggle: false
+			} );
+
+			return false;
+		}
+
+		return true;
 	}
 
-	close() {
-		this.setState( {
-			opened: false
+	toggle( e ) {
+		const toggle = this.inserter.getElementsByClassName( 'editor-inserter__toggle' );
+
+		if ( 'undefined' !== typeof e.currentTarget && toggle[ 0 ] === e.currentTarget.activeElement ) {
+			this.update = false;
+		}
+
+		this.setState( ( prevState ) => {
+			return {
+				toggle: ! prevState.toggle
+			};
 		} );
 	}
 
 	render() {
-		const { opened } = this.state;
+		const { toggle } = this.state;
 		const { position } = this.props;
 
 		return (
-			<div className="editor-inserter">
+			<div className="editor-inserter" ref={ ( inserter ) => { this.inserter = inserter; } }>
 				<IconButton
 					icon="insert"
 					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle" />
-				{ opened && <InserterMenu position={ position } onSelect={ this.close } onClickOutside={ this.close } /> }
+				{ ( toggle ) && <InserterMenu position={ position } onToggle={ this.toggle } /> }
 			</div>
 		);
 	}

@@ -19,8 +19,8 @@ class InserterMenu extends wp.element.Component {
 		this.filter = this.filter.bind( this );
 	}
 
-	handleClickOutside() {
-		this.props.onClickOutside();
+	handleClickOutside( e ) {
+		this.props.onToggle( e );
 	}
 
 	filter( event ) {
@@ -30,9 +30,9 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	selectBlock( slug ) {
-		return () => {
+		return ( e ) => {
 			this.props.onInsertBlock( slug );
-			this.props.onSelect();
+			this.props.onToggle( e );
 			this.setState( { filterValue: '' } );
 		};
 	}
