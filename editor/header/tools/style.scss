@@ -4,13 +4,26 @@
 	align-items: center;
 }
 
+.editor-tools__undo,
+.editor-tools__redo {
+	display: none;
+
+	@include break-mobile {
+		display: flex;
+	}
+}
+
 .editor-tools__tabs {
 	margin: 0 $item-spacing;
-	padding: 0 0 0 $item-spacing;
+	padding: 0;
 	border-left: 1px solid $light-gray-500;
 	border-right: 1px solid $light-gray-500;
 	display: flex;
 	align-items: center;
+
+	@include break-medium {
+		padding: 0 0 0 $item-spacing;
+	}
 
 	.editor-button {
 		display: flex;
@@ -20,7 +33,7 @@
 		border: none;
 		background: none;
 		color: $dark-gray-500;
-		margin-right: $item-spacing;
+		margin-right: 0;
 		cursor: pointer;
 		height: 30px;
 		padding: 0 10px;
@@ -34,6 +47,7 @@
 
 		@include break-medium() {
 			width: auto;
+			margin-right: $item-spacing;
 		}
 	}
 
