@@ -171,12 +171,19 @@ export default class Editable extends wp.element.Component {
 		}
 		const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
 
+		// Removing empty nodes from the beginning of the "after"
+		// avoids empty paragraphs at the beginning of newly created blocks.
+		const after = getHtml( childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
+			if ( ! memo.length && ! node.textContent ) {
+				return memo;
+			}
+
+			memo.push( node );
+			return memo;
+		}, [] ) );
+
 		// Splitting into two blocks
 		this.setContent( this.props.value );
-		const hasAfter = !! childNodes.slice( splitIndex )
-			.reduce( ( memo, node ) => memo + node.textContent, '' );
-
-		const after = hasAfter ? getHtml( childNodes.slice( splitIndex ) ) : '';
 
 		// The setTimeout fixes the focus jump to the original block
 		setTimeout( () => {
