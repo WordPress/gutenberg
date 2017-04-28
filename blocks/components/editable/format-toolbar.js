@@ -29,23 +29,31 @@ const FORMATTING_CONTROLS = [
 ];
 
 class FormatToolbar extends wp.element.Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			linkValue: ''
+			linkValue: props.formats.link ? props.formats.link.value : '',
+			isEditingLink: false
 		};
 		this.addLink = this.addLink.bind( this );
+		this.editLink = this.editLink.bind( this );
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.updateLinkValue = this.updateLinkValue.bind( this );
 	}
 
-	componentWillMount() {
-		this.setState( { linkValue: this.props.formats.link } );
-	}
-
 	componentWillReceiveProps( nextProps ) {
-		this.setState( { linkValue: nextProps.formats.link } );
+		const newState = {
+			linkValue: nextProps.formats.link ? nextProps.formats.link.value : ''
+		};
+		if (
+			! this.props.formats.link ||
+			! nextProps.formats.link ||
+			this.props.formats.link.node !== nextProps.formats.link.node
+		) {
+			newState.isEditingLink = false;
+		}
+		this.setState( newState );
 	}
 
 	toggleFormat( format ) {
@@ -60,7 +68,7 @@ class FormatToolbar extends wp.element.Component {
 	addLink() {
 		if ( ! this.props.formats.link ) {
 			// TODO find a way to add an empty link to TinyMCE
-			this.props.onChange( { link: 'http://wordpress.org' } );
+			this.props.onChange( { link: { value: 'http://wordpress.org' } } );
 		}
 	}
 
@@ -68,9 +76,19 @@ class FormatToolbar extends wp.element.Component {
 		this.props.onChange( { link: undefined } );
 	}
 
+	editLink( event ) {
+		event.preventDefault();
+		this.setState( {
+			isEditingLink: true
+		} );
+	}
+
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: this.state.linkValue } );
+		this.props.onChange( { link: { value: this.state.linkValue } } );
+		this.setState( {
+			isEditingLink: false
+		} );
 	}
 
 	updateLinkValue( event ) {
@@ -108,15 +126,24 @@ class FormatToolbar extends wp.element.Component {
 					/>
 				</ul>
 
-				{ !! formats.link &&
+				{ !! formats.link && this.state.isEditingLink &&
 					<form
 						className="editable-format-toolbr__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
 						<input type="url" value={ this.state.linkValue } onChange={ this.updateLinkValue } />
 						<IconButton icon="editor-break" type="submit" />
-						<IconButton icon="trash" onClick={ this.dropLink } />
 					</form>
+				}
+
+				{ !! formats.link && ! this.state.isEditingLink &&
+					<div className="editable-format-toolbr__link-modal" style={ linkStyle }>
+						<a href="" onClick={ this.editLink }>
+							{ decodeURI( this.state.linkValue ) }
+						</a>
+						<IconButton icon="edit" onClick={ this.editLink } />
+						<IconButton icon="trash" onClick={ this.dropLink } />
+					</div>
 				}
 			</div>
 		);
