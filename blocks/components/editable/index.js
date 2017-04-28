@@ -2,8 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, map } from 'lodash';
-import { nodeToReact } from 'dom-react';
+import { last, isEqual, capitalize, map, omitBy } from 'lodash';
+import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -57,6 +57,22 @@ const ALIGNMENT_CONTROLS = [
 		align: 'right'
 	}
 ];
+
+function createElement( type, props, ...children ) {
+	if ( props['data-mce-bogus'] === 'all' ) {
+		return null;
+	}
+
+	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
+		return children;
+	}
+
+	return wp.element.createElement(
+		type,
+		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
+		...children
+	);
+}
 
 export default class Editable extends wp.element.Component {
 	constructor() {
@@ -202,8 +218,8 @@ export default class Editable extends wp.element.Component {
 		// The setTimeout fixes the focus jump to the original block
 		setTimeout( () => {
 			this.props.onSplit(
-				map( before, nodeToReact ),
-				map( after, nodeToReact )
+				nodeListToReact( before, createElement ),
+				nodeListToReact( after, createElement )
 			);
 		} );
 	}
@@ -255,7 +271,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getContent() {
-		return map( this.editorNode.childNodes, nodeToReact );
+		return nodeListToReact( this.editorNode.childNodes || [], createElement );
 	}
 
 	focus() {

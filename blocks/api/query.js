@@ -2,11 +2,7 @@
  * External dependencies
  */
 import { map } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import { nodeToReact } from 'dom-react';
+import { nodeListToReact } from 'dom-react';
 
 export * from 'hpq';
 
@@ -19,7 +15,7 @@ export function children( selector ) {
 		}
 
 		if ( match ) {
-			return map( match.childNodes || [], nodeToReact );
+			return nodeListToReact( match.childNodes || [], wp.element.createElement );
 		}
 
 		return [];
