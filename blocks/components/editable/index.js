@@ -72,7 +72,8 @@ export default class Editable extends wp.element.Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.state = {
 			formats: {},
-			alignment: null
+			alignment: null,
+			bookmark: null
 		};
 	}
 
@@ -227,7 +228,7 @@ export default class Editable extends wp.element.Component {
 			if ( formatMap.hasOwnProperty( tag ) ) {
 				formats[ formatMap[ tag ] ] = true;
 			} else if ( tag === 'a' ) {
-				formats.link = node.getAttribute( 'href' );
+				formats.link = { value: node.getAttribute( 'href' ), node };
 			}
 
 			if ( tag === 'p' ) {
@@ -236,7 +237,8 @@ export default class Editable extends wp.element.Component {
 		} );
 
 		const focusPosition = this.getRelativePosition( element );
-		this.setState( { alignment, formats, focusPosition } );
+		const bookmark = this.editor.selection.getBookmark( 2, true );
+		this.setState( { alignment, bookmark, formats, focusPosition } );
 	}
 
 	bindEditorNode( ref ) {
@@ -317,12 +319,14 @@ export default class Editable extends wp.element.Component {
 	}
 
 	changeFormats( formats ) {
-		this.editor.focus();
+		if ( this.state.bookmark ) {
+			this.editor.selection.moveToBookmark( this.state.bookmark );
+		}
 
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
 				if ( formatValue !== undefined ) {
-					this.editor.execCommand( 'mceInsertLink', true, formatValue );
+					this.editor.execCommand( 'mceInsertLink', true, formatValue.value );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
