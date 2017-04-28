@@ -112,9 +112,13 @@ export function selectedBlock( state = {}, action ) {
 			if ( ! action.selected ) {
 				return state.uid === action.uid ? {} : state;
 			}
-			return action.uid === state.uid
+			return action.uid === state.uid && ! state.typing
 				? state
-				: { uid: action.uid, typing: false, focus: {} };
+				: {
+					uid: action.uid,
+					typing: false,
+					focus: action.uid === state.uid ? state.focus : {}
+				};
 
 		case 'MOVE_BLOCK_UP':
 		case 'MOVE_BLOCK_DOWN':

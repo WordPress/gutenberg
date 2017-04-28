@@ -258,8 +258,8 @@ describe( 'state', () => {
 			expect( state ).to.eql( { uid: 'kumquat', typing: false, focus: {} } );
 		} );
 
-		it( 'should not update the state if already selected', () => {
-			const original = deepFreeze( { uid: 'kumquat', typing: true, focus: {} } );
+		it( 'should not update the state if already selected and not typing', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: false, focus: {} } );
 			const state = selectedBlock( original, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
@@ -267,6 +267,21 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).to.equal( original );
+		} );
+
+		it( 'should update the state if already selected and typing', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: true, focus: { editable: 'content' } } );
+			const state = selectedBlock( original, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+				uid: 'kumquat',
+				selected: true
+			} );
+
+			expect( state ).to.eql( {
+				uid: 'kumquat',
+				typing: false,
+				focus: { editable: 'content' }
+			} );
 		} );
 
 		it( 'should unselect the block if currently selected', () => {
