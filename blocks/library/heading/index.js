@@ -15,8 +15,7 @@ registerBlock( 'core/heading', {
 
 	attributes: {
 		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-		align: prop( 'h1,h2,h3,h4,h5,h6', 'style.textAlign' )
+		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' )
 	},
 
 	controls: [
@@ -36,7 +35,7 @@ registerBlock( 'core/heading', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
+				transform: ( { content } ) => {
 					if ( Array.isArray( content ) ) {
 						// TODO this appears to always be true?
 						// TODO reject the switch if more than one paragraph
@@ -44,8 +43,7 @@ registerBlock( 'core/heading', {
 					}
 					return {
 						nodeName: 'H2',
-						content,
-						align
+						content
 					};
 				}
 			}
@@ -54,10 +52,9 @@ registerBlock( 'core/heading', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
+				transform: ( { content } ) => {
 					return {
-						content: [ content ],
-						align
+						content: [ content ]
 					};
 				}
 			}
@@ -71,7 +68,7 @@ registerBlock( 'core/heading', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
-		const { content, nodeName = 'H2', align } = attributes;
+		const { content, nodeName = 'H2' } = attributes;
 
 		return (
 			<Editable
@@ -80,18 +77,17 @@ registerBlock( 'core/heading', {
 				focus={ focus }
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ align ? { textAlign: align } : null }
 				onMerge={ mergeWithPrevious }
 			/>
 		);
 	},
 
 	save( { attributes } ) {
-		const { align, nodeName = 'H2', content } = attributes;
+		const { nodeName = 'H2', content } = attributes;
 		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag style={ align ? { textAlign: align } : null }>
+			<Tag>
 				{ content }
 			</Tag>
 		);
