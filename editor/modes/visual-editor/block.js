@@ -138,15 +138,13 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = settings.getEditWrapperProps( block.attributes );
 		}
 
-		// Disable reason: Each block can receive focus but must be able to contain
-		// block children. Tab keyboard navigation enabled by tabIndex assignment.
+		// Disable reason: Each block can be selected by clicking on it
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role */
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				tabIndex="0"
-				onFocus={ onSelect }
+				onClick={ onSelect }
 				onBlur={ this.maybeDeselect }
 				onKeyDown={ onStartTyping }
 				onMouseEnter={ onHover }
