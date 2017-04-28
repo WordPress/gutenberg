@@ -14,6 +14,8 @@
 
 	.editor-button {
 		display: flex;
+		flex-wrap: nowrap;
+		white-space: nowrap;
 		align-items: center;
 		border: none;
 		background: none;
@@ -23,13 +25,24 @@
 		height: 30px;
 		padding: 0 10px;
 		border-radius: 3px;
+		width: 40px;
+		overflow: hidden;
 
 		&:hover {
 			color: $blue-medium;
 		}
+
+		@include break-medium() {
+			width: auto;
+		}
 	}
 
 	.editor-button .dashicon {
-		margin-right: 4px;
+		margin-right: 10px;
+		flex-shrink: 0;
+
+		@include break-medium() {
+			margin-right: 4px;
+		}
 	}
 }
