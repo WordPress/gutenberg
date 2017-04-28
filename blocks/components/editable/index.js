@@ -180,7 +180,7 @@ export default class Editable extends wp.element.Component {
 
 			memo.push( node );
 			return memo;
-		} ), [] );
+		}, [] ) );
 
 		// Splitting into two blocks
 		this.setContent( this.props.value );
