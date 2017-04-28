@@ -16,9 +16,7 @@ function VisualEditor( { blocks } ) {
 			{ blocks.map( ( uid ) => (
 				<VisualEditorBlock key={ uid } uid={ uid } />
 			) ) }
-			<div className="editor-visual-editor__container">
-				<Inserter />
-			</div>
+			<Inserter />
 		</div>
 	);
 }

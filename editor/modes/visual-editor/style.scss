@@ -1,5 +1,6 @@
 .editor-visual-editor {
-	margin-top: 60px;
+	margin: 60px auto 0;
+	max-width: 700px;
 
 	&,
 	& p {
@@ -7,12 +8,6 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 	}
-}
-
-.editor-visual-editor__block,
-.editor-visual-editor__container {
-	max-width: 700px;
-	margin: 0 auto;
 }
 
 .editor-visual-editor__block {
