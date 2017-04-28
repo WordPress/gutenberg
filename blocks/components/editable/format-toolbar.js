@@ -69,6 +69,9 @@ class FormatToolbar extends wp.element.Component {
 		if ( ! this.props.formats.link ) {
 			// TODO find a way to add an empty link to TinyMCE
 			this.props.onChange( { link: { value: 'http://wordpress.org' } } );
+
+			// Debounce the call to avoid the reset in willReceiveProps
+			setTimeout( () => this.setState( { isEditingLink: true } ) );
 		}
 	}
 
@@ -104,8 +107,8 @@ class FormatToolbar extends wp.element.Component {
 			: null;
 
 		return (
-			<div>
-				<ul className="editable-format-toolbar editor-toolbar">
+			<div className="editable-format-toolbar">
+				<ul className="editor-toolbar">
 					{ FORMATTING_CONTROLS.map( ( control, index ) => (
 						<IconButton
 							key={ index }
@@ -131,7 +134,11 @@ class FormatToolbar extends wp.element.Component {
 						className="editable-format-toolbr__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<input type="url" value={ this.state.linkValue } onChange={ this.updateLinkValue } />
+						<input
+							type="url"
+							value={ this.state.linkValue }
+							onChange={ this.updateLinkValue }
+						/>
 						<IconButton icon="editor-break" type="submit" />
 					</form>
 				}
