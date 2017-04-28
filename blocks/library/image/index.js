@@ -58,12 +58,6 @@ registerBlock( 'core/image', {
 			onClick: applyOrUnset( 'right' )
 		},
 		{
-			icon: 'align-none',
-			title: wp.i18n.__( 'No alignment' ),
-			isActive: ( { align } ) => ! align || 'none' === align,
-			onClick: applyOrUnset( 'none' )
-		},
-		{
 			icon: 'align-full-width',
 			title: wp.i18n.__( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
