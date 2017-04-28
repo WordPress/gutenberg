@@ -65,3 +65,25 @@ export function renderToString( element ) {
 
 	return renderToStaticMarkup( element );
 }
+
+/**
+ * Concatenate two or more React children objects
+ *
+ * @param  {...?Object} childrens Set of children to concatenate
+ * @return {Array}                The concatenated value
+ */
+export function concatChildren( ...childrens ) {
+	return childrens.reduce( ( memo, children, i ) => {
+		Children.forEach( children, ( child, j ) => {
+			if ( 'string' !== typeof child ) {
+				child = cloneElement( child, {
+					key: [ i, j ].join()
+				} );
+			}
+
+			memo.push( child );
+		} );
+
+		return memo;
+	}, [] );
+}

@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import { createElement, renderToString } from '../';
+import { createElement, renderToString, concatChildren } from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
@@ -33,6 +33,26 @@ describe( 'element', () => {
 			expect( renderToString(
 				createElement( 'strong', null, 'Courgette' )
 			) ).to.equal( '<strong>Courgette</strong>' );
+		} );
+	} );
+
+	describe( 'concatChildren', () => {
+		it( 'should return an empty array for undefined children', () => {
+			expect( concatChildren() ).to.eql( [] );
+		} );
+
+		it( 'should concat the string arrays', () => {
+			expect( concatChildren( [ 'a' ], 'b' ) ).to.eql( [ 'a', 'b' ] );
+		} );
+
+		it( 'should concat the object arrays and rewrite keys', () => {
+			const concat = concatChildren(
+				[ createElement( 'strong', {}, 'Courgette' ) ],
+				createElement( 'strong', {}, 'Concombre' )
+			);
+			expect( concat.length ).to.equal( 2 );
+			expect( concat[ 0 ].key ).to.equal( '0,0' );
+			expect( concat[ 1 ].key ).to.equal( '1,0' );
 		} );
 	} );
 } );

@@ -17,6 +17,10 @@ registerBlock( 'core/text', {
 		content: children(),
 	},
 
+	defaultAttributes: {
+		content: <p />
+	},
+
 	controls: [
 		{
 			icon: 'editor-alignleft',
@@ -44,8 +48,14 @@ registerBlock( 'core/text', {
 		}
 	],
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus } ) {
-		const { content = <p />, align } = attributes;
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+		};
+	},
+
+	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeWithPrevious } ) {
+		const { content, align } = attributes;
 
 		return (
 			<Editable
@@ -64,6 +74,7 @@ registerBlock( 'core/text', {
 						content: after
 					} ) );
 				} }
+				onMerge={ mergeWithPrevious }
 			/>
 		);
 	},

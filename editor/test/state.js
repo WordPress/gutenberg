@@ -195,6 +195,34 @@ describe( 'state', () => {
 
 			expect( state.order ).to.equal( original.order );
 		} );
+
+		it( 'should remove the block', () => {
+			const original = blocks( undefined, {
+				type: 'REPLACE_BLOCKS',
+				blockNodes: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
+			} );
+			const state = blocks( original, {
+				type: 'REMOVE_BLOCK',
+				uid: 'chicken'
+			} );
+
+			expect( state.order ).to.eql( [ 'ribs' ] );
+			expect( state.byUid ).to.eql( {
+				ribs: {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {}
+				}
+			} );
+		} );
 	} );
 
 	describe( 'hoveredBlock()', () => {
