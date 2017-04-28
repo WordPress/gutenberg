@@ -17,10 +17,6 @@ registerBlock( 'core/text', {
 		content: children(),
 	},
 
-	defaultAttributes: {
-		content: <p />,
-	},
-
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),

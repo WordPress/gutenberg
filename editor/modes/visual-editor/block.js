@@ -16,11 +16,13 @@ import Toolbar from 'components/toolbar';
  */
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
+import Inserter from '../../inserter';
 import {
 	getPreviousBlock,
 	getBlock,
 	getBlockFocus,
 	getBlockOrder,
+	isNewBlock,
 	isBlockHovered,
 	isBlockSelected,
 	isTypingInBlock,
@@ -180,7 +182,7 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isNew, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': isSelected && ! isTyping,
 			'is-hovered': isHovered,
@@ -212,7 +214,12 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ isNew && isSelected && (
+					<Inserter className="editor-visual-editor__empty-block-inserter" />
+				) }
+				{ ! isNew && ( ( isSelected && ! isTyping ) || isHovered ) && (
+					<BlockMover uid={ block.uid } />
+				) }
 				{ isSelected && ! isTyping &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
@@ -260,6 +267,7 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
+			isNew: isNewBlock( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
 			order: getBlockOrder( state, ownProps.uid ),
