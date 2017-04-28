@@ -4,6 +4,9 @@
 import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
+// TODO: Revisit when we have a common components solution
+import Dashicon from '../../../editor/components/dashicon';
+import Button from '../../../editor/components/button';
 
 const { attr, children } = query;
 
@@ -77,6 +80,23 @@ registerBlock( 'core/image', {
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
+
+		if ( ! url ) {
+			return (
+				<div className="blocks-image is-placeholder">
+					<div className="blocks-image__placeholder-label">
+						<Dashicon icon="format-image" />
+						{ wp.i18n.__( 'Image' ) }
+					</div>
+					<div className="blocks-image__placeholder-instructions">
+						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					</div>
+					<Button isLarge>
+						{ wp.i18n.__( 'Insert from Media Library' ) }
+					</Button>
+				</div>
+			);
+		}
 
 		return (
 			<figure className="blocks-image">
