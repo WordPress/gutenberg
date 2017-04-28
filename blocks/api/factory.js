@@ -2,7 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get } from 'lodash';
+import { get, castArray } from 'lodash';
 
 /**
  * Internal dependencies
@@ -25,11 +25,11 @@ export function createBlock( blockType, attributes = {} ) {
 }
 
 /**
- * Switch Block Type and returns the updated block
+ * Switch a block into one or more blocks of the new block type
  *
  * @param  {Object} block      Block object
  * @param  {string} blockType  BlockType
- * @return {Object?}           Block object
+ * @return {Array}             Block object
  */
 export function switchToBlockType( block, blockType ) {
 	// Find the right transformation by giving priority to the "to" transformation
@@ -45,9 +45,13 @@ export function switchToBlockType( block, blockType ) {
 		return null;
 	}
 
-	return Object.assign( {
-		uid: block.uid,
-		attributes: transformation.transform( block.attributes ),
-		blockType
-	} );
+	const transformtionResult = castArray( transformation.transform( block.attributes ) );
+
+	return transformtionResult.map( ( attributes, index ) =>
+		Object.assign( {
+			uid: index === 0 ? block.uid : uuid(),
+			attributes,
+			blockType
+		} )
+	);
 }

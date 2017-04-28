@@ -31,7 +31,7 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( 'switchBlockType()', () => {
+	describe( 'switchToBlockType()', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlock( 'core/updated-text-block', {
 				transforms: {
@@ -57,13 +57,13 @@ describe( 'block factory', () => {
 
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updateBlock ).to.eql( {
+			expect( updateBlock ).to.eql( [ {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs'
 				}
-			} );
+			} ] );
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
@@ -91,13 +91,13 @@ describe( 'block factory', () => {
 
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updateBlock ).to.eql( {
+			expect( updateBlock ).to.eql( [ {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs'
 				}
-			} );
+			} ] );
 		} );
 
 		it( 'should return null if no transformation is found', () => {
