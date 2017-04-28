@@ -61,7 +61,15 @@ registerBlock( 'core/list', {
 		} );
 
 		const itemsFromContent = ( listContents ) => {
-			return listContents.map( ( listContent ) => ( { value: listContent.props.children } ) );
+			if ( Array.isArray( listContents ) ) {
+				return listContents.map( ( listContent ) => ( { value: listContent.props.children } ) );
+			}
+
+			if ( null === listContents ) {
+				return [];
+			}
+
+			return [ { value: listContents.props.children } ];
 		};
 
 		return (
