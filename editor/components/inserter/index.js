@@ -48,13 +48,15 @@ class Inserter extends wp.element.Component {
 		const { position } = this.props;
 
 		return (
-			<div className="editor-inserter" ref={ ( inserter ) => { this.inserter = inserter; } }>
+			<div className="editor-inserter" ref={ ( inserter ) => {
+				this.inserter = inserter;
+			} }>
 				<IconButton
 					icon="insert"
 					label={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle" />
-				{ ( toggle ) && <InserterMenu position={ position } onToggle={ this.toggle } /> }
+				{ toggle && <InserterMenu position={ position } onToggle={ this.toggle } /> }
 			</div>
 		);
 	}
