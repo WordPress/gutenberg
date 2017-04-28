@@ -25,6 +25,11 @@
 	margin-right: auto;
 }
 
+.editor-visual-editor__blocks {
+	display: flex;
+	flex-direction: column;
+}
+
 .editor-visual-editor__block {
 	position: relative;
 	left: -#{ $block-padding + $block-mover-margin };	/* Make room for the mover */
