@@ -64,7 +64,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	mergeWithPrevious() {
-		const { block, previousBlock, onRemove, onChange, onFocus } = this.props;
+		const { block, previousBlock, onFocus, replaceBlocks } = this.props;
 
 		// Do nothing when it's the first block
 		if ( ! previousBlock ) {
@@ -80,25 +80,31 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blockWithTheSameType = previousBlock.blockType === block.blockType
+		const blocksWithTheSameType = previousBlock.blockType === block.blockType
 			? block
 			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
 
 		// If the block types can not match, do nothing
-		if ( ! blockWithTheSameType ) {
+		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
 			return;
 		}
 
 		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blockWithTheSameType.attributes );
+		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
 		onFocus( previousBlock.uid, { offset: -1 } );
-		onChange( previousBlock.uid, {
-			attributes: {
-				...previousBlock.attributes,
-				...updatedAttributes
-			}
-		} );
-		onRemove( block.uid );
+		replaceBlocks(
+			[ previousBlock.uid, block.uid ],
+			[
+				{
+					...previousBlock,
+					attributes: {
+						...previousBlock.attributes,
+						...updatedAttributes
+					}
+				},
+				...blocksWithTheSameType.slice( 1 )
+			]
+		);
 	}
 
 	componentDidUpdate() {
@@ -262,6 +268,14 @@ export default connect(
 			dispatch( {
 				type: 'REMOVE_BLOCK',
 				uid
+			} );
+		},
+
+		replaceBlocks( uids, blocks ) {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				uids,
+				blocks
 			} );
 		}
 	} )

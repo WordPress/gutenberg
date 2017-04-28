@@ -48,8 +48,8 @@ export default connect(
 	( dispatch ) => ( {
 		onChange( value ) {
 			dispatch( {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: wp.blocks.parse( value )
+				type: 'RESET_BLOCKS',
+				blocks: wp.blocks.parse( value )
 			} );
 		}
 	} )

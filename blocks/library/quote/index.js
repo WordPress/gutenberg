@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isString } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import './style.scss';
@@ -80,15 +75,15 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation } ) => {
-					if ( Array.isArray( value ) ) {
-						value = wp.element.concatChildren( value.map( ( elt ) =>
-							! elt || isString( elt ) || elt.type !== 'p' ? elt : elt.props.children
-						) );
-					}
-					return {
+					return wp.element.Children.map( value, ( elt ) => {
+						return {
+							nodeName: 'H2',
+							content: elt
+						};
+					} ).concat( [ {
 						nodeName: 'H2',
-						content: wp.element.concatChildren( value, citation )
-					};
+						content: citation
+					} ] );
 				}
 			}
 		]

@@ -20,8 +20,8 @@ import { combineUndoableReducers } from 'utils/undoable-reducer';
 export const blocks = combineUndoableReducers( {
 	byUid( state = {}, action ) {
 		switch ( action.type ) {
-			case 'REPLACE_BLOCKS':
-				return keyBy( action.blockNodes, 'uid' );
+			case 'RESET_BLOCKS':
+				return keyBy( action.blocks, 'uid' );
 
 			case 'UPDATE_BLOCK':
 				return {
@@ -38,11 +38,16 @@ export const blocks = combineUndoableReducers( {
 					[ action.block.uid ]: action.block
 				};
 
-			case 'SWITCH_BLOCK_TYPE':
-				return {
-					...state,
-					[ action.uid ]: action.block
-				};
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks ) {
+					return state;
+				}
+				return action.blocks.reduce( ( memo, block ) => {
+					return {
+						...memo,
+						[ block.uid ]: block
+					};
+				}, omit( state, action.uids ) );
 
 			case 'REMOVE_BLOCK':
 				return omit( state, action.uid );
@@ -54,8 +59,8 @@ export const blocks = combineUndoableReducers( {
 		let index;
 		let swappedUid;
 		switch ( action.type ) {
-			case 'REPLACE_BLOCKS':
-				return action.blockNodes.map( ( { uid } ) => uid );
+			case 'RESET_BLOCKS':
+				return action.blocks.map( ( { uid } ) => uid );
 
 			case 'INSERT_BLOCK':
 				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
@@ -91,13 +96,28 @@ export const blocks = combineUndoableReducers( {
 					...state.slice( index + 2 )
 				];
 
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks ) {
+					return state;
+				}
+				index = state.indexOf( action.uids[ 0 ] );
+				return state.reduce( ( memo, uid ) => {
+					if ( uid === action.uids[ 0 ] ) {
+						return memo.concat( action.blocks.map( ( block ) => block.uid ) );
+					}
+					if ( action.uids.indexOf( uid ) === -1 ) {
+						memo.push( uid );
+					}
+					return memo;
+				}, [] );
+
 			case 'REMOVE_BLOCK':
 				return without( state, action.uid );
 		}
 
 		return state;
 	}
-}, { resetTypes: [ 'REPLACE_BLOCKS' ] } );
+}, { resetTypes: [ 'RESET_BLOCKS' ] } );
 
 /**
  * Reducer returning selected block state.
@@ -153,6 +173,17 @@ export function selectedBlock( state = {}, action ) {
 				...state,
 				typing: true
 			};
+
+		case 'REPLACE_BLOCKS':
+			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.uid ) === -1 ) {
+				return state;
+			}
+
+			return {
+				uid: action.blocks[ 0 ].uid,
+				typing: false,
+				focus: {}
+			};
 	}
 
 	return state;
@@ -175,8 +206,16 @@ export function hoveredBlock( state = null, action ) {
 				return null;
 			}
 			break;
+
 		case 'START_TYPING':
 			return null;
+
+		case 'REPLACE_BLOCKS':
+			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
+				return state;
+			}
+
+			return action.blocks[ 0 ].uid;
 	}
 
 	return state;
