@@ -252,6 +252,7 @@ export default class Editable extends wp.element.Component {
 		this.editor.selection.moveToBookmark( bookmark );
 		// Saving the editor on updates avoid unecessary onChanges calls
 		// These calls can make the focus jump
+
 		this.editor.save();
 	}
 

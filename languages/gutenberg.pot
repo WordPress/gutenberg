@@ -3,7 +3,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-wp-i18n\n"
 
-#: blocks/components/editable/format-toolbar.js:121
+#: blocks/components/editable/format-toolbar.js:124
 msgid "Link"
 msgstr ""
 
