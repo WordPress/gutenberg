@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 
 export * from 'hpq';

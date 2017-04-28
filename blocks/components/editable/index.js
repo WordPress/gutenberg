@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, map, omitBy } from 'lodash';
+import { last, isEqual, capitalize, omitBy } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 
@@ -59,7 +59,7 @@ const ALIGNMENT_CONTROLS = [
 ];
 
 function createElement( type, props, ...children ) {
-	if ( props['data-mce-bogus'] === 'all' ) {
+	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
 
