@@ -21,3 +21,6 @@ $map: (
 } @else {
 	display: inline-block;
 }
+
+@import "../some/url";
+@import "../another/url";

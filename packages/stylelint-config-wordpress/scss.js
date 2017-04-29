@@ -17,7 +17,7 @@ module.exports = {
     } ],
     "at-rule-empty-line-before": [
       "always", {
-        "ignoreAtRules": ["else"],
+        "ignoreAtRules": [ "else", "import" ],
       },
     ],
     "block-opening-brace-space-before": "always",

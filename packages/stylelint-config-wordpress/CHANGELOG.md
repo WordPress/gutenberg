@@ -1,3 +1,7 @@
+# HEAD
+
+-   Added: Added `import` to `ignoreAtRules` option in `at-rule-empty-line-before` rule for SCSS config.
+
 # 10.0.1
 
 -   Removed: `rule-non-nested-empty-line-before` rule from SCSS config. This rule is deprecated in stylelint v8, the new `rule-empty-line-before` rule already exists in the primary config.
