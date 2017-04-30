@@ -171,6 +171,31 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * @ticket 29785
+	 *
+	 * @dataProvider data_count_users_strategies
+	 */
+	public function test_count_users_should_not_count_users_who_are_not_in_posts_table( $strategy ) {
+		global $wpdb;
+
+		// Get a 'before' count for comparison.
+		$count = count_users( $strategy );
+
+		$u = self::factory()->user->create( array(
+			'role' => 'editor',
+		) );
+
+		// Manually delete the user, but leave the capabilities usermeta.
+		$wpdb->delete( $wpdb->users, array(
+			'ID' => $u,
+		) );
+
+		$count2 = count_users( $strategy );
+
+		$this->assertEqualSets( $count, $count2 );
+	}
+
 	function data_count_users_strategies() {
 		return array(
 			array(
