@@ -194,7 +194,6 @@ class Tests_Template extends WP_UnitTestCase {
 	}
 
 	public function test_page_template_hierarchy() {
-		$this->assertEquals( 'templates/page.php', get_page_template_slug( self::$page ) );
 		$this->assertTemplateHierarchy( get_permalink( self::$page ), array(
 			'templates/page.php',
 			'page-page-name-😀.php',
@@ -209,7 +208,6 @@ class Tests_Template extends WP_UnitTestCase {
 	 * @ticket 18375
 	 */
 	public function test_single_template_hierarchy_for_post() {
-		$this->assertEquals( 'templates/post.php', get_page_template_slug( self::$post ) );
 		$this->assertTemplateHierarchy( get_permalink( self::$post ), array(
 			'templates/post.php',
 			'single-post-post-name-😀.php',
@@ -245,7 +243,6 @@ class Tests_Template extends WP_UnitTestCase {
 		) );
 		add_post_meta( $cpt->ID, '_wp_page_template', 'templates/cpt.php' );
 
-		$this->assertEquals( 'templates/cpt.php', get_page_template_slug( $cpt ) );
 		$this->assertTemplateHierarchy( get_permalink( $cpt ), array(
 			'templates/cpt.php',
 			'single-cpt-cpt-name-😀.php',
@@ -285,11 +282,9 @@ class Tests_Template extends WP_UnitTestCase {
 			'post_mime_type' => 'image/jpeg',
 		) );
 
-		add_post_meta( $attachment->ID, '_wp_page_template', 'templates/attachment.php' );
+		add_post_meta( $attachment, '_wp_page_template', 'templates/cpt.php' );
 
-		$this->assertEquals( 'templates/attachment.php', get_page_template_slug( $attachment ) );
 		$this->assertTemplateHierarchy( get_permalink( $attachment ), array(
-			'templates/attachment.php',
 			'image-jpeg.php',
 			'jpeg.php',
 			'image.php',
