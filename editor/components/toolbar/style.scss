@@ -7,9 +7,9 @@
 
 .editor-toolbar__control.editor-button {
 	display: inline-flex;
+	align-items: flex-end;
 	margin: 3px;
 	margin-left: 0;
-	padding: 6px;
 	background: none;
 	border: 1px solid transparent;
 	outline: none;
@@ -39,9 +39,9 @@
 		font-family: $default-font;
 		font-size: 10px;
 		font-weight: bold;
-		position: absolute;
-		bottom: 8px;
-		right: 5px;
+		position: relative;
+		top: -1px;
+		margin-left: -3px;
 	}
 }
 

@@ -18,18 +18,11 @@
 	background: none;
 	cursor: pointer;
 	border: none;
-	width: 36px;
-	height: 36px;
 	outline: none;
-	padding: 0;
 	transition: color .2s ease;
 
 	&:hover {
 		color: $blue-medium;
-	}
-
-	.dashicon.insert {
-		margin: 0 auto; // Fixes horizontal alignment in Safari 10.
 	}
 }
 
