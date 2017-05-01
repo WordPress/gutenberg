@@ -41,12 +41,10 @@ function PublishButton( {
 		} else {
 			buttonText = wp.i18n.__( 'Update failed' );
 		}
+	} else if ( post && post.id ) {
+		buttonText = wp.i18n.__( 'Update' );
 	} else {
-		if ( post && post.id ) {
-			buttonText = wp.i18n.__( 'Update' );
-		} else {
-			buttonText = wp.i18n.__( 'Publish' );
-		}
+		buttonText = wp.i18n.__( 'Publish' );
 	}
 
 	if ( post && post.id ) {
