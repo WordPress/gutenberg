@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual } from 'lodash';
+import { last, isEqual, capitalize } from 'lodash';
 import { Parser as HtmlToReactParser } from 'html-to-react';
 import { Fill } from 'react-slot-fill';
 
@@ -23,7 +23,7 @@ const formatMap = {
 	del: 'strikethrough'
 };
 
-const formattingControls = [
+const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: wp.i18n.__( 'Bold' ),
@@ -41,6 +41,24 @@ const formattingControls = [
 	}
 ];
 
+const ALIGNMENT_CONTROLS = [
+	{
+		icon: 'editor-alignleft',
+		title: wp.i18n.__( 'Align left' ),
+		align: 'left'
+	},
+	{
+		icon: 'editor-aligncenter',
+		title: wp.i18n.__( 'Align center' ),
+		align: 'center'
+	},
+	{
+		icon: 'editor-alignright',
+		title: wp.i18n.__( 'Align right' ),
+		align: 'right'
+	}
+];
+
 export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -54,7 +72,8 @@ export default class Editable extends wp.element.Component {
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.state = {
-			formats: {}
+			formats: {},
+			alignment: null
 		};
 	}
 
@@ -195,18 +214,26 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { parents } ) {
-		const formats = parents.reduce( ( result, node ) => {
+		let alignment = null;
+		const formats = {};
+
+		parents.forEach( ( node ) => {
 			const tag = node.nodeName.toLowerCase();
 
 			if ( formatMap.hasOwnProperty( tag ) ) {
-				result[ formatMap[ tag ] ] = true;
+				formats[ formatMap[ tag ] ] = true;
 			}
 
-			return result;
-		}, {} );
+			if ( tag === 'p' ) {
+				alignment = node.style.textAlign || 'left';
+			}
+		} );
 
-		if ( ! isEqual( this.state.formats, formats ) ) {
-			this.setState( { formats } );
+		if (
+			this.state.alignment !== alignment ||
+			! isEqual( this.state.formats, formats )
+		) {
+			this.setState( { alignment, formats } );
 		}
 	}
 
@@ -289,8 +316,22 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
+	isAlignmentActive( align ) {
+		return this.state.alignment === align;
+	}
+
+	toggleAlignment( align ) {
+		this.editor.focus();
+
+		if ( this.isAlignmentActive( align ) ) {
+			this.editor.execCommand( 'JustifyNone' );
+		} else {
+			this.editor.execCommand( 'Justify' + capitalize( align ) );
+		}
+	}
+
 	render() {
-		const { tagName: Tag = 'div', style, focus, className } = this.props;
+		const { tagName: Tag = 'div', style, focus, className, showAlignments = false } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
 		let element = (
@@ -304,8 +345,17 @@ export default class Editable extends wp.element.Component {
 		if ( focus ) {
 			element = [
 				<Fill name="Formatting.Toolbar" key="fill">
+					{ showAlignments &&
+						<Toolbar
+							controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
+								...control,
+								onClick: () => this.toggleAlignment( control.align ),
+								isActive: this.isAlignmentActive( control.align )
+							} ) ) } />
+					}
+
 					<Toolbar
-						controls={ formattingControls.map( ( control ) => ( {
+						controls={ FORMATTING_CONTROLS.map( ( control ) => ( {
 							...control,
 							onClick: () => this.toggleFormat( control.format ),
 							isActive: this.isFormatActive( control.format )

@@ -54,6 +54,7 @@ registerBlock( 'core/quote', {
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
+					showAlignments
 				/>
 				{ ( citation || !! focus ) && (
 					<footer>

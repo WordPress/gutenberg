@@ -21,33 +21,6 @@ registerBlock( 'core/text', {
 		content: <p />
 	},
 
-	controls: [
-		{
-			icon: 'editor-alignleft',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => ! align || 'left' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: undefined } );
-			}
-		},
-		{
-			icon: 'editor-aligncenter',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'center' } );
-			}
-		},
-		{
-			icon: 'editor-alignright',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'right' } );
-			}
-		}
-	],
-
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
@@ -55,7 +28,7 @@ registerBlock( 'core/text', {
 	},
 
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeWithPrevious } ) {
-		const { content, align } = attributes;
+		const { content } = attributes;
 
 		return (
 			<Editable
@@ -67,7 +40,6 @@ registerBlock( 'core/text', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
-				style={ align ? { textAlign: align } : null }
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
 					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
@@ -75,29 +47,13 @@ registerBlock( 'core/text', {
 					} ) );
 				} }
 				onMerge={ mergeWithPrevious }
+				showAlignments
 			/>
 		);
 	},
 
 	save( { attributes } ) {
-		// An empty block will have an undefined content field. Return early
-		// as an empty string.
 		const { content } = attributes;
-		if ( ! content ) {
-			return '';
-		}
-
-		// We only need to transform content if we need to apply the alignment
-		// style. Otherwise we can return unmodified.
-		const { align } = attributes;
-		if ( ! align ) {
-			return content;
-		}
-
-		return wp.element.Children.map( content, ( paragraph ) => (
-			wp.element.cloneElement( paragraph, {
-				style: { textAlign: align }
-			} )
-		) );
+		return content;
 	}
 } );
