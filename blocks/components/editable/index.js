@@ -142,8 +142,9 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
+		this.savedContent = this.getContent();
 		this.editor.save();
-		this.props.onChange( this.getContent() );
+		this.props.onChange( this.savedContent );
 	}
 
 	isStartOfEditor() {
@@ -254,7 +255,8 @@ export default class Editable extends wp.element.Component {
 
 	updateContent() {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setContent( this.props.value );
+		this.savedContent = this.props.value;
+		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
 		// Saving the editor on updates avoid unecessary onChanges calls
 		// These calls can make the focus jump
@@ -308,10 +310,13 @@ export default class Editable extends wp.element.Component {
 			this.focus();
 		}
 
+		// The savedContent var allows us to avoid updating the content right after an onChange call
 		if (
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			! isEqual( this.props.value, prevProps.value )
+			this.props.value !== this.savedContent &&
+			! isEqual( this.props.value, prevProps.value ) &&
+			! isEqual( this.props.value, this.savedContent )
 		) {
 			this.updateContent();
 		}
