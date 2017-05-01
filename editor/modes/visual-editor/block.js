@@ -144,6 +144,7 @@ class VisualEditorBlock extends wp.element.Component {
 			<div
 				ref={ this.bindBlockNode }
 				onClick={ onSelect }
+				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
 				onKeyDown={ onStartTyping }
 				onMouseEnter={ onHover }
@@ -151,6 +152,7 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
+				tabIndex="0"
 				{ ...wrapperProps }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
