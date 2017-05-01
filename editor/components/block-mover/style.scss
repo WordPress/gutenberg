@@ -19,8 +19,9 @@
 		color: $dark-gray-900;
 	}
 
-	&.is-disabled {
-		color: $light-gray-100;
+	&[disabled] {
+		cursor: default;
+		color: $light-gray-300;
 	}
 
 	.dashicon {
