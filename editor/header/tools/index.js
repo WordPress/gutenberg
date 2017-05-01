@@ -11,6 +11,7 @@ import Dashicon from '../../components/dashicon';
 import IconButton from '../../components/icon-button';
 import Inserter from '../../components/inserter';
 import Button from '../../components/button';
+import PublishButton from './publish-button';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
@@ -38,9 +39,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 					{ wp.i18n.__( 'Post Settings' ) }
 				</Button>
 			</div>
-			<Button isPrimary isLarge>
-				{ wp.i18n.__( 'Publish' ) }
-			</Button>
+			<PublishButton />
 		</div>
 	);
 }
