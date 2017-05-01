@@ -237,15 +237,11 @@ function gutenberg_asset_cache_version( $file = null ) {
 	} else {
 		$version = get_transient( 'gutenberg_version' );
 
-		if ( ! $version ) {
-			if ( function_exists( 'get_plugin_data' ) ) {
-				$plugin = get_plugin_data( __FILE__, false );
+		if ( ! $version && function_exists( 'get_plugin_data' ) ) {
+			$plugin = get_plugin_data( __FILE__, false );
 
-				if ( isset( $plugin['Version'] ) ) {
-					$version = $plugin['Version'];
-				}
-			} else {
-				$version = false;
+			if ( ! empty( $plugin['Version'] ) ) {
+				$version = $plugin['Version'];
 			}
 
 			set_transient( 'gutenberg_version', $version, DAY_IN_SECONDS );
