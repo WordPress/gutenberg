@@ -4,6 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
+import { partial } from 'lodash';
 
 /**
  * Internal dependencies
@@ -63,7 +64,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	mergeWithPrevious() {
-		const { block, previousBlock, onRemove, onChange } = this.props;
+		const { block, previousBlock, onRemove, onChange, onFocus } = this.props;
 
 		// Do nothing when it's the first block
 		if ( ! previousBlock ) {
@@ -90,6 +91,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Calling the merge to update the attributes and remove the block to be merged
 		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blockWithTheSameType.attributes );
+		onFocus( previousBlock.uid, { offset: -1 } );
 		onChange( previousBlock.uid, {
 			attributes: {
 				...previousBlock.attributes,
@@ -174,7 +176,7 @@ class VisualEditorBlock extends wp.element.Component {
 					attributes={ block.attributes }
 					setAttributes={ this.setAttributes }
 					insertBlockAfter={ onInsertAfter }
-					setFocus={ onFocus }
+					setFocus={ partial( onFocus, block.uid ) }
 					mergeWithPrevious={ this.mergeWithPrevious }
 				/>
 			</div>
@@ -247,10 +249,10 @@ export default connect(
 			} );
 		},
 
-		onFocus( config ) {
+		onFocus( uid, config ) {
 			dispatch( {
 				type: 'UPDATE_FOCUS',
-				uid: ownProps.uid,
+				uid,
 				config
 			} );
 		},
