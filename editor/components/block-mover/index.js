@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 import { first, last } from 'lodash';
 
 /**
@@ -15,14 +14,16 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (
 		<div className="editor-block-mover">
 			<IconButton
-				className={ classnames( 'editor-block-mover__control', { 'is-disabled': isFirst } ) }
+				className="editor-block-mover__control"
 				onClick={ onMoveUp }
 				icon="arrow-up-alt2"
+				disabled={ isFirst }
 			/>
 			<IconButton
-				className={ classnames( 'editor-block-mover__control', { 'is-disabled': isLast } ) }
+				className="editor-block-mover__control"
 				onClick={ onMoveDown }
 				icon="arrow-down-alt2"
+				disabled={ isLast }
 			/>
 		</div>
 	);
