@@ -122,8 +122,6 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_url_to_postid_of_http_site_when_current_site_uses_https() {
-		$this->skipWithoutMultisite();
-
 		$_SERVER['HTTPS'] = 'on';
 
 		$network_home = home_url();
@@ -317,8 +315,6 @@ class Tests_Rewrite extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_url_to_postid_ms_home_url_collision() {
-		$this->skipWithoutMultisite();
-
 		$blog_id = self::factory()->blog->create( array( 'path' => '/example' ) );
 		switch_to_blog( $blog_id );
 

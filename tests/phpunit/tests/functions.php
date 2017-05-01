@@ -938,8 +938,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	function test_wp_check_filetype_and_ext_with_filtered_svg() {
-		$this->skipWithMultisite();
-
 		if ( ! extension_loaded( 'fileinfo' ) ) {
 			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
 		}
@@ -965,8 +963,6 @@ class Tests_Functions extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	function test_wp_check_filetype_and_ext_with_filtered_woff() {
-		$this->skipWithMultisite();
-
 		if ( ! extension_loaded( 'fileinfo' ) ) {
 			$this->markTestSkipped( 'The fileinfo PHP extension is not loaded.' );
 		}

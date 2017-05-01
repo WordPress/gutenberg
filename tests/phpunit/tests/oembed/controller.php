@@ -256,8 +256,6 @@ class Test_oEmbed_Controller extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_request_ms_child_in_root_blog() {
-		$this->skipWithoutMultisite();
-
 		$child = self::factory()->blog->create();
 		switch_to_blog( $child );
 

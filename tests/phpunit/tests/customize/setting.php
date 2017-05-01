@@ -564,8 +564,6 @@ class Tests_WP_Customize_Setting extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_previewing_with_switch_to_blog() {
-		$this->skipWithoutMultisite();
-
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$type = 'option';
 		$name = 'blogdescription';

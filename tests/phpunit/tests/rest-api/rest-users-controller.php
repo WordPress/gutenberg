@@ -996,8 +996,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_create_new_network_user_on_site_does_not_add_user_to_sub_site() {
-		$this->skipWithoutMultisite();
-
 		$this->allow_user_to_manage_multisite();
 
 		$params = array(
@@ -1026,8 +1024,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_create_new_network_user_on_sub_site_adds_user_to_site() {
-		$this->skipWithoutMultisite();
-
 		$this->allow_user_to_manage_multisite();
 
 		$params = array(
@@ -1060,8 +1056,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_create_existing_network_user_on_sub_site_has_error() {
-		$this->skipWithoutMultisite();
-
 		$this->allow_user_to_manage_multisite();
 
 		$params = array(
@@ -1448,8 +1442,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-excluded
 	 */
 	public function test_update_user_role_invalid_privilege_deescalation() {
-		$this->skipWithMultisite();
-
 		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 
 		wp_set_current_user( $user_id );
@@ -1479,8 +1471,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_user_role_privilege_deescalation_multisite() {
-		$this->skipWithoutMultisite();
-
 		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 
 		wp_set_current_user( $user_id );
@@ -2228,8 +2218,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_get_item_from_different_site_as_site_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -2248,8 +2236,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_get_item_from_different_site_as_network_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -2268,8 +2254,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_item_from_different_site_as_site_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -2290,8 +2274,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_item_from_different_site_as_network_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -2312,8 +2294,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_delete_item_from_different_site_as_site_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',
@@ -2334,8 +2314,6 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_delete_item_from_different_site_as_network_administrator() {
-		$this->skipWithoutMultisite();
-
 		switch_to_blog( self::$site );
 		$user_id = $this->factory->user->create( array(
 			'role' => 'author',

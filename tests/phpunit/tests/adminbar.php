@@ -75,8 +75,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role() {
-		$this->skipWithMultisite();
-
 		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
 
 		wp_set_current_user( self::$no_role_id );
@@ -102,8 +100,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_role() {
-		$this->skipWithMultisite();
-
 		$this->assertTrue( user_can( self::$editor_id, 'read' ) );
 
 		wp_set_current_user( self::$editor_id );
@@ -132,8 +128,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_blog() {
-		$this->skipWithoutMultisite();
-
 		$blog_id = self::factory()->blog->create( array(
 			'user_id' => self::$admin_id,
 		) );
@@ -181,8 +175,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_links_for_users_with_no_role_on_network() {
-		$this->skipWithoutMultisite();
-
 		$this->assertTrue( user_can( self::$admin_id, 'read' ) );
 		$this->assertFalse( user_can( self::$no_role_id, 'read' ) );
 
@@ -424,8 +416,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_role() {
-		$this->skipWithMultisite();
-
 		wp_set_current_user( self::$editor_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
@@ -443,8 +433,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role() {
-		$this->skipWithMultisite();
-
 		wp_set_current_user( self::$no_role_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
@@ -464,8 +452,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_admin_bar_contains_correct_about_link_for_users_with_no_role_in_multisite() {
-		$this->skipWithoutMultisite();
-
 		// User is not a member of a site.
 		remove_user_from_blog( self::$no_role_id, get_current_blog_id() );
 
@@ -582,8 +568,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user() {
-		$this->skipWithoutMultisite();
-
 		wp_set_current_user( self::$editor_id );
 
 		$wp_admin_bar = $this->get_standard_admin_bar();
@@ -599,8 +583,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_super_admin() {
-		$this->skipWithoutMultisite();
-
 		wp_set_current_user( self::$editor_id );
 
 		grant_super_admin( self::$editor_id );
@@ -618,8 +600,6 @@ class Tests_AdminBar extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_my_sites_network_menu_for_regular_user_with_network_caps() {
-		$this->skipWithoutMultisite();
-
 		global $current_user;
 
 		$network_user_caps = array( 'manage_network', 'manage_network_themes', 'manage_network_plugins' );

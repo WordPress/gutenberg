@@ -41,8 +41,6 @@ class Tests_Link_GetDashboardUrl extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_get_dashboard_url_for_network_administrator_with_no_sites() {
-		$this->skipWithoutMultisite();
-
 		grant_super_admin( self::$user_id );
 
 		add_filter( 'get_blogs_of_user', '__return_empty_array' );
@@ -60,8 +58,6 @@ class Tests_Link_GetDashboardUrl extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	public function test_get_dashboard_url_for_administrator_of_different_site() {
-		$this->skipWithoutMultisite();
-
 		$site_id = self::factory()->blog->create( array( 'user_id' => self::$user_id ) );
 
 		remove_user_from_blog( self::$user_id, get_current_blog_id() );

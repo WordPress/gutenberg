@@ -148,8 +148,6 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_single_theme() {
-		$this->skipWithoutMultisite();
-
 		$theme = 'testtheme-1';
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 		WP_Theme::network_enable_theme( $theme );
@@ -167,8 +165,6 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_wp_theme_network_enable_multiple_themes() {
-		$this->skipWithoutMultisite();
-
 		$themes = array( 'testtheme-2', 'testtheme-3' );
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 		WP_Theme::network_enable_theme( $themes );
@@ -186,8 +182,6 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_network_disable_single_theme() {
-		$this->skipWithoutMultisite();
-
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 
 		$allowed_themes = array( 'existing-1' => true, 'existing-2' => true, 'existing-3' => true );
@@ -209,8 +203,6 @@ class Tests_Theme_WPTheme extends WP_UnitTestCase {
 	 * @group ms-required
 	 */
 	function test_network_disable_multiple_themes() {
-		$this->skipWithoutMultisite();
-
 		$current_allowed_themes = get_site_option( 'allowedthemes' );
 
 		$allowed_themes = array( 'existing-4' => true, 'existing-5' => true, 'existing-6' => true );

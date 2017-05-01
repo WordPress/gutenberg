@@ -12,8 +12,6 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	 * @group ms-excluded
 	 */
 	public function test_count_users_is_accurate( $strategy ) {
-		$this->skipWithMultisite();
-
 		// Setup users
 		$admin = self::factory()->user->create( array(
 			'role' => 'administrator',
@@ -60,8 +58,6 @@ class Tests_User_CountUsers extends WP_UnitTestCase {
 	 * @dataProvider data_count_users_strategies
 	 */
 	public function test_count_users_multisite_is_accurate( $strategy ) {
-		$this->skipWithoutMultisite();
-
 		// Setup users
 		$admin = self::factory()->user->create( array(
 			'role' => 'administrator',

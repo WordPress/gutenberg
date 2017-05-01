@@ -577,6 +577,17 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	protected function checkRequirements() {
 		parent::checkRequirements();
 
+		$annotations = $this->getAnnotations();
+
+		if ( ! empty( $annotations['group'] ) ) {
+			if ( in_array( 'ms-required', $annotations['group'], true ) ) {
+				$this->skipWithoutMultisite();
+			}
+			if ( in_array( 'ms-excluded', $annotations['group'], true ) ) {
+				$this->skipWithMultisite();
+			}
+		}
+
 		// Core tests no longer check against open Trac tickets, but others using WP_UnitTestCase may do so.
 		if ( defined( 'WP_RUN_CORE_TESTS' ) && WP_RUN_CORE_TESTS ) {
 			return;
