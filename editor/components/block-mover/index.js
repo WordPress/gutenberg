@@ -17,13 +17,13 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 				className="editor-block-mover__control"
 				onClick={ onMoveUp }
 				icon="arrow-up-alt2"
-				disabled={ !! isFirst }
+				disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ onMoveDown }
 				icon="arrow-down-alt2"
-				disabled={ !! isLast }
+				disabled={ isLast }
 			/>
 		</div>
 	);
