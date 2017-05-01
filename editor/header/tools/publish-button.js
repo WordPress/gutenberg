@@ -80,6 +80,14 @@ function savePost( dispatch, post ) {
 			post: newPost,
 			isNew,
 		} );
+		if ( isNew && window.history.replaceState ) {
+			window.history.replaceState(
+				{},
+				'Post ' + newPost.id,
+				window.location.href.replace( /&post_id=[^&]*$/, '' )
+					+ '&post_id=' + newPost.id
+			);
+		}
 	} ).fail( ( err ) => {
 		dispatch( {
 			type: 'POST_UPDATE_REQUEST_FAILURE',
