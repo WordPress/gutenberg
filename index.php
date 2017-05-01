@@ -27,6 +27,75 @@ function gutenberg_menu() {
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
+
+$registered_blocks = array();
+
+/**
+ * Registers a block.
+ *
+ * @param  string   $name   Block name including namespace.
+ * @param  function $render Render function called to generate the HTML output
+ */
+function register_block( $name, $render ) {
+	global $registered_blocks;
+	$registered_blocks[ $name ] = $render;
+}
+
+/**
+ * Extract the block attributes from the block's attributes string
+ *
+ * @since 0.1.0
+ *
+ * @param  string $attr_string Attributes string
+
+ * @return array
+ */
+function parse_block_attributes( $attr_string ) {
+	$attributes_matcher = '/([^\s]+):([^\s]+)\s*/';
+	preg_match_all( $attributes_matcher, $attr_string, $matches );
+	$attributes = array();
+	foreach ( $matches[ 1 ] as $index => $attribute_match ) {
+		$attributes[ $attribute_match ] = $matches[ 2 ][ $index ];
+	}
+
+	return $attributes;
+}
+
+/**
+ * Renders the dynamic blocks into the post content
+ *
+ * @since 0.1.0
+ *
+ * @param  string $content Post content
+
+ * @return string          Updated post content
+ */
+function do_dynamic_blocks( $content ) {
+	global $registered_blocks;
+	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)-->.*<!--\s*\/wp:\g1\s+-->/';
+	preg_match_all( $open_matcher, $content, $matches, PREG_OFFSET_CAPTURE );
+	$replacements = array();
+	$offset = 0;
+	$new_content = $content;
+	foreach ( $matches[ 0 ] as $index => $block_match ) {
+		$block_name = $matches[ 1 ][ $index ][ 0 ];
+		if ( isset( $registered_blocks[ $block_name ] ) ) {
+			$block_length = mb_strlen( $block_match[ 0 ] );
+			$block_position = $block_match[ 1 ];
+			$block_attributes = parse_block_attributes( $matches[ 2 ][ $index ][ 0 ] );
+			$output = $registered_blocks[ $block_name ]( $block_attributes );
+			$new_content =
+				mb_substr( $new_content, 0, $block_position + $offset ) .
+				$output .
+				mb_substr( $new_content, $block_position + $block_length + $offset );
+			$offset += mb_strlen( $output ) - mb_strlen( $block_length );
+		}
+	}
+
+	return $new_content;
+}
+add_filter( 'the_content', 'do_dynamic_blocks', 10 ); // BEFORE do_shortcode()
+
 /**
  * Registers common scripts to be used as dependencies of the editor and plugins.
  *
@@ -250,3 +319,7 @@ function the_gutenberg_project() {
 	</div>
 	<?php
 }
+
+register_block( 'core/html', function( $attributes ) {
+	return 'THIS IS AWESOME';
+} );
