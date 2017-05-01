@@ -42,6 +42,7 @@ registerBlock( 'core/quote', {
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { value, citation, style = 1 } = attributes;
+		const focusedEditable = focus ? focus.editable || 'value' : null;
 
 		return (
 			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
@@ -52,7 +53,7 @@ registerBlock( 'core/quote', {
 							value: nextValue
 						} )
 					}
-					focus={ focus && focus.editable === 'value' ? focus : null }
+					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
 					showAlignments
 				/>
@@ -65,7 +66,7 @@ registerBlock( 'core/quote', {
 									citation: nextCitation
 								} )
 							}
-							focus={ focus && focus.editable === 'citation' ? focus : null }
+							focus={ focusedEditable === 'citation' ? focus : null }
 							onFocus={ () => setFocus( { editable: 'citation' } ) }
 						/>
 					</footer>
