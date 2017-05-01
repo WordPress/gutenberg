@@ -67,8 +67,7 @@ class FormatToolbar extends wp.element.Component {
 
 	addLink() {
 		if ( ! this.props.formats.link ) {
-			// TODO find a way to add an empty link to TinyMCE
-			this.props.onChange( { link: { value: 'http://wordpress.org' } } );
+			this.props.onChange( { link: { value: '' } } );
 
 			// Debounce the call to avoid the reset in willReceiveProps
 			setTimeout( () => this.setState( { isEditingLink: true } ) );
@@ -131,25 +130,28 @@ class FormatToolbar extends wp.element.Component {
 
 				{ !! formats.link && this.state.isEditingLink &&
 					<form
-						className="editable-format-toolbr__link-modal"
+						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
 						<input
+							className="editable-format-toolbar__link-input"
 							type="url"
+							required
 							value={ this.state.linkValue }
 							onChange={ this.updateLinkValue }
+							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
 					</form>
 				}
 
 				{ !! formats.link && ! this.state.isEditingLink &&
-					<div className="editable-format-toolbr__link-modal" style={ linkStyle }>
-						<a href="" onClick={ this.editLink }>
+					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
+						<a className="editable-format-toolbar__link-value" href="" onClick={ this.editLink }>
 							{ decodeURI( this.state.linkValue ) }
 						</a>
 						<IconButton icon="edit" onClick={ this.editLink } />
-						<IconButton icon="trash" onClick={ this.dropLink } />
+						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
 					</div>
 				}
 			</div>
