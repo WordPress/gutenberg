@@ -28,6 +28,9 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 				return action.post || state;
+
+			case 'POST_UPDATE_REQUEST_SUCCESS':
+				return action.post;
 		}
 
 		return state;
@@ -280,6 +283,44 @@ export function isSidebarOpened( state = false, action ) {
 }
 
 /**
+ * Reducer returning current network request state (whether a request to the WP
+ * REST API is in progress, successful, or failed).
+ *
+ * @param  {string} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {string}        Updated state
+ */
+export function api( state = {}, action ) {
+	switch ( action.type ) {
+		case 'POST_UPDATE_REQUEST':
+			return {
+				requesting: true,
+				successful: false,
+				error: null,
+				isNew: action.isNew,
+			};
+
+		case 'POST_UPDATE_REQUEST_SUCCESS':
+			return {
+				requesting: false,
+				successful: true,
+				error: null,
+				isNew: action.isNew,
+			};
+
+		case 'POST_UPDATE_REQUEST_FAILURE':
+			return {
+				requesting: false,
+				successful: true,
+				error: action.error,
+				isNew: action.isNew,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Creates a new instance of a Redux store.
  *
  * @return {Redux.Store} Redux store
@@ -290,7 +331,8 @@ export function createReduxStore() {
 		selectedBlock,
 		hoveredBlock,
 		mode,
-		isSidebarOpened
+		isSidebarOpened,
+		api,
 	} );
 
 	return createStore(

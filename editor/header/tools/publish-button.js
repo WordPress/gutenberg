@@ -2,19 +2,56 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import Button from '../../components/button';
+import Button from 'components/button';
 
-function PublishButton( { blocks, post, onUpdate, onPublish } ) {
+function PublishButton( {
+	blocks,
+	post,
+	isSuccessful,
+	isRequesting,
+	isError,
+	requestIsNewPost,
+	onUpdate,
+	onPublish
+} ) {
+	let buttonEnabled = true;
 	let buttonText, saveCallback;
+
+	if ( isRequesting ) {
+		buttonEnabled = false;
+		if ( requestIsNewPost ) {
+			buttonText = wp.i18n.__( 'Publishing...' );
+		} else {
+			buttonText = wp.i18n.__( 'Updating...' );
+		}
+	} else if ( isSuccessful ) {
+		if ( requestIsNewPost ) {
+			buttonText = wp.i18n.__( 'Published!' );
+		} else {
+			buttonText = wp.i18n.__( 'Updated!' );
+		}
+	} else if ( isError ) {
+		if ( requestIsNewPost ) {
+			buttonText = wp.i18n.__( 'Publish failed' );
+		} else {
+			buttonText = wp.i18n.__( 'Update failed' );
+		}
+	} else {
+		if ( post && post.id ) {
+			buttonText = wp.i18n.__( 'Update' );
+		} else {
+			buttonText = wp.i18n.__( 'Publish' );
+		}
+	}
+
 	if ( post && post.id ) {
-		buttonText = wp.i18n.__( 'Update' );
 		saveCallback = onUpdate;
 	} else {
-		buttonText = wp.i18n.__( 'Publish' );
 		saveCallback = onPublish;
 	}
 
@@ -23,10 +60,37 @@ function PublishButton( { blocks, post, onUpdate, onPublish } ) {
 			isPrimary
 			isLarge
 			onClick={ () => saveCallback( post, blocks ) }
+			disabled={ ! buttonEnabled }
 		>
 			{ buttonText }
 		</Button>
 	);
+}
+
+function savePost( dispatch, post ) {
+	const isNew = ! post.id;
+	dispatch( {
+		type: 'POST_UPDATE_REQUEST',
+		post,
+		isNew,
+	} );
+	new wp.api.models.Post( post ).save().done( ( newPost ) => {
+		dispatch( {
+			type: 'POST_UPDATE_REQUEST_SUCCESS',
+			post: newPost,
+			isNew,
+		} );
+	} ).fail( ( err ) => {
+		dispatch( {
+			type: 'POST_UPDATE_REQUEST_FAILURE',
+			error: get( err, 'responseJSON', {
+				code: 'unknown_error',
+				message: wp.i18n.__( 'An unknown error occurred.' ),
+			} ),
+			post,
+			isNew,
+		} );
+	} );
 }
 
 export default connect(
@@ -35,22 +99,21 @@ export default connect(
 			state.editor.blocksByUid[ uid ]
 		) ),
 		post: state.editor.post,
+		isRequesting: state.api.requesting,
+		isSuccessful: state.api.successful,
+		isError: !! state.api.error,
+		requestIsNewPost: state.api.isNew,
 	} ),
 	( dispatch ) => ( {
 		onUpdate( post, blocks ) {
 			post.content.raw = wp.blocks.serialize( blocks );
-			dispatch( {
-				type: 'UPDATE_POST',
-				post,
-			} );
+			savePost( dispatch, post );
 		},
+
 		onPublish( post, blocks ) {
 			post.content.raw = wp.blocks.serialize( blocks );
 			post.status = 'publish'; // TODO draft first?
-			dispatch( {
-				type: 'PUBLISH_NEW_POST',
-				post,
-			} );
+			savePost( dispatch, post );
 		},
 	} )
 )( PublishButton );

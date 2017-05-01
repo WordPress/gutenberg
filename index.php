@@ -158,7 +158,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true   // $in_footer
 	);
