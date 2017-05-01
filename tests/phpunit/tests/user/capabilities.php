@@ -1564,6 +1564,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 16956
+	 * @expectedIncorrectUsage map_meta_cap
 	 */
 	function test_require_edit_others_posts_if_post_type_doesnt_exist() {
 		register_post_type( 'existed' );
@@ -1573,7 +1574,6 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		$subscriber_id = self::$users['subscriber']->ID;
 		$editor_id = self::$users['editor']->ID;
 
-		$this->setExpectedIncorrectUsage( 'map_meta_cap' );
 		foreach ( array( 'delete_post', 'edit_post', 'read_post', 'publish_post' ) as $cap ) {
 			wp_set_current_user( $subscriber_id );
 			$this->assertSame( array( 'edit_others_posts' ), map_meta_cap( $cap, $subscriber_id, $post_id ) );
@@ -1640,6 +1640,10 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 		foreach ( $caps as $cap => $roles ) {
 			$this->assertFalse( current_user_can( $cap ), "Non-logged-in user should not have the {$cap} capability" );
 		}
+
+		// Special cases for link manager and unfiltered uploads:
+		$this->assertFalse( current_user_can( 'manage_links' ), "Non-logged-in user should not have the manage_links capability" );
+		$this->assertFalse( current_user_can( 'unfiltered_upload' ), "Non-logged-in user should not have the unfiltered_upload capability" );
 
 		$this->assertFalse( current_user_can( 'start_a_fire' ), "Non-logged-in user should not have a custom capability" );
 		$this->assertFalse( current_user_can( 'do_not_allow' ), "Non-logged-in user should not have the do_not_allow capability" );
