@@ -58,7 +58,7 @@ class VisualEditorBlock extends wp.element.Component {
 		// Annoyingly React does not support focusOut and we're forced to check
 		// related target to ensure it's not a child when blur fires.
 		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			this.props.onDeselect();
+			// this.props.onDeselect();
 		}
 	}
 

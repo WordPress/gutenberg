@@ -13,3 +13,13 @@
 		outline: none;
 	}
 }
+
+figcaption.blocks-editable {
+	margin-top: 0.5em;
+	color: $dark-gray-100;
+	text-align: center;
+
+	p {
+		font-size: $default-font-size;
+	}
+}
