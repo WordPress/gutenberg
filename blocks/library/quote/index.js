@@ -74,12 +74,12 @@ registerBlock( 'core/quote', {
 		);
 	},
 
-	save( attributes ) {
+	save( { attributes } ) {
 		const { value, citation, style = 1 } = attributes;
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value && value.map( ( paragraph, i ) => (
+				{ value && wp.element.Children.map( value, ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
 				<footer>{ citation }</footer>

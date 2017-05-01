@@ -153,12 +153,8 @@ export default class Editable extends wp.element.Component {
 		if ( this.props.onMerge && event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) {
 			this.onChange();
 			this.props.onMerge( this.editor.getContent() );
-
-			// If merge causes editor to be removed, stop other callbacks from
-			// trying to handle the event
-			if ( this.editor.removed ) {
-				event.stopImmediatePropagation();
-			}
+			event.preventDefault();
+			event.stopImmediatePropagation();
 		}
 	}
 
@@ -266,8 +262,14 @@ export default class Editable extends wp.element.Component {
 	}
 
 	focus() {
-		if ( this.props.focus ) {
+		const { focus } = this.props;
+		if ( focus ) {
 			this.editor.focus();
+			// Offset = -1 means we should focus the end of the editable
+			if ( focus.offset === -1 ) {
+				this.editor.selection.select( this.editor.getBody(), true );
+				this.editor.selection.collapse( false );
+			}
 		}
 	}
 
