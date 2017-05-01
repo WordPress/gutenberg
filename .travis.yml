@@ -34,7 +34,7 @@ before_install:
       sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
       sed -i "s/yourusernamehere/root/" wp-tests-config.php
       sed -i "s/yourpasswordhere//" wp-tests-config.php
-      svn checkout https://plugins.svn.wordpress.org/wordpress-importer/trunk tests/phpunit/data/plugins/wordpress-importer
+      svn checkout https://plugins.svn.wordpress.org/wordpress-importer/tags/0.6.3/ tests/phpunit/data/plugins/wordpress-importer
   fi
 - |
   if [[ "$WP_TRAVIS_OBJECT_CACHE" == "true" ]]; then
