@@ -47,8 +47,8 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 
 export default connect(
 	( state ) => ( {
-		hasUndo: state.blocks.history.past.length > 0,
-		hasRedo: state.blocks.history.future.length > 0,
+		hasUndo: state.editor.history.past.length > 0,
+		hasRedo: state.editor.history.future.length > 0,
 		isSidebarOpened: state.isSidebarOpened,
 	} ),
 	( dispatch ) => ( {

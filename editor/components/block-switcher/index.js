@@ -92,7 +92,7 @@ class BlockSwitcher extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: state.blocks.byUid[ ownProps.uid ]
+		block: state.editor.blocksByUid[ ownProps.uid ]
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {

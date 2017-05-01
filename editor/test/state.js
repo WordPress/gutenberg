@@ -9,7 +9,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	blocks,
+	editor,
 	hoveredBlock,
 	selectedBlock,
 	mode,
@@ -18,7 +18,7 @@ import {
 } from '../state';
 
 describe( 'state', () => {
-	describe( 'blocks()', () => {
+	describe( 'editor()', () => {
 		before( () => {
 			wp.blocks.registerBlock( 'core/test-block', {} );
 		} );
@@ -27,35 +27,35 @@ describe( 'state', () => {
 			wp.blocks.unregisterBlock( 'core/test-block' );
 		} );
 
-		it( 'should return empty byUid, order, history by default', () => {
-			const state = blocks( undefined, {} );
+		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
+			const state = editor( undefined, {} );
 
-			expect( state.byUid ).to.eql( {} );
-			expect( state.order ).to.eql( [] );
+			expect( state.blocksByUid ).to.eql( {} );
+			expect( state.blockOrder ).to.eql( [] );
 			expect( state ).to.have.keys( 'history' );
 		} );
 
 		it( 'should key by replaced blocks uid', () => {
-			const original = blocks( undefined, {} );
-			const state = blocks( original, {
+			const original = editor( undefined, {} );
+			const state = editor( original, {
 				type: 'RESET_BLOCKS',
 				blocks: [ { uid: 'bananas' } ]
 			} );
 
-			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
-			expect( values( state.byUid )[ 0 ].uid ).to.equal( 'bananas' );
-			expect( state.order ).to.eql( [ 'bananas' ] );
+			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
+			expect( values( state.blocksByUid )[ 0 ].uid ).to.equal( 'bananas' );
+			expect( state.blockOrder ).to.eql( [ 'bananas' ] );
 		} );
 
 		it( 'should return with block updates', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'kumquat',
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'UPDATE_BLOCK',
 				uid: 'kumquat',
 				updates: {
@@ -65,11 +65,11 @@ describe( 'state', () => {
 				}
 			} );
 
-			expect( state.byUid.kumquat.attributes.updated ).to.be.true();
+			expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
 		} );
 
 		it( 'should insert block', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -77,7 +77,7 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'INSERT_BLOCK',
 				block: {
 					uid: 'ribs',
@@ -85,13 +85,13 @@ describe( 'state', () => {
 				}
 			} );
 
-			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 2 );
-			expect( values( state.byUid )[ 1 ].uid ).to.equal( 'ribs' );
-			expect( state.order ).to.eql( [ 'chicken', 'ribs' ] );
+			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 2 );
+			expect( values( state.blocksByUid )[ 1 ].uid ).to.equal( 'ribs' );
+			expect( state.blockOrder ).to.eql( [ 'chicken', 'ribs' ] );
 		} );
 
 		it( 'should replace the block', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -99,7 +99,7 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks: [ {
@@ -108,14 +108,14 @@ describe( 'state', () => {
 				} ]
 			} );
 
-			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
-			expect( values( state.byUid )[ 0 ].blockType ).to.equal( 'core/freeform' );
-			expect( values( state.byUid )[ 0 ].uid ).to.equal( 'wings' );
-			expect( state.order ).to.eql( [ 'wings' ] );
+			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
+			expect( values( state.blocksByUid )[ 0 ].blockType ).to.equal( 'core/freeform' );
+			expect( values( state.blocksByUid )[ 0 ].uid ).to.equal( 'wings' );
+			expect( state.blockOrder ).to.eql( [ 'wings' ] );
 		} );
 
 		it( 'should move the block up', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -127,16 +127,16 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'MOVE_BLOCK_UP',
 				uid: 'ribs'
 			} );
 
-			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should not move the first block up', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -148,16 +148,16 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'MOVE_BLOCK_UP',
 				uid: 'chicken'
 			} );
 
-			expect( state.order ).to.equal( original.order );
+			expect( state.blockOrder ).to.equal( original.blockOrder );
 		} );
 
 		it( 'should move the block down', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -169,16 +169,16 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'MOVE_BLOCK_DOWN',
 				uid: 'chicken'
 			} );
 
-			expect( state.order ).to.eql( [ 'ribs', 'chicken' ] );
+			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should not move the last block down', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -190,16 +190,16 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'MOVE_BLOCK_DOWN',
 				uid: 'ribs'
 			} );
 
-			expect( state.order ).to.equal( original.order );
+			expect( state.blockOrder ).to.equal( original.blockOrder );
 		} );
 
 		it( 'should remove the block', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
@@ -211,13 +211,13 @@ describe( 'state', () => {
 					attributes: {}
 				} ]
 			} );
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'REMOVE_BLOCK',
 				uid: 'chicken'
 			} );
 
-			expect( state.order ).to.eql( [ 'ribs' ] );
-			expect( state.byUid ).to.eql( {
+			expect( state.blockOrder ).to.eql( [ 'ribs' ] );
+			expect( state.blocksByUid ).to.eql( {
 				ribs: {
 					uid: 'ribs',
 					blockType: 'core/test-block',
@@ -227,7 +227,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should insert after the specified block uid', () => {
-			const original = blocks( undefined, {
+			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'kumquat',
@@ -240,7 +240,7 @@ describe( 'state', () => {
 				} ]
 			} );
 
-			const state = blocks( original, {
+			const state = editor( original, {
 				type: 'INSERT_BLOCK',
 				after: 'kumquat',
 				block: {
@@ -249,8 +249,8 @@ describe( 'state', () => {
 				}
 			} );
 
-			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 3 );
-			expect( state.order ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 3 );
+			expect( state.blockOrder ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 	} );
 
@@ -516,7 +516,7 @@ describe( 'state', () => {
 			const state = store.getState();
 
 			expect( Object.keys( state ) ).to.have.members( [
-				'blocks',
+				'editor',
 				'selectedBlock',
 				'hoveredBlock',
 				'mode',

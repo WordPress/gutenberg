@@ -22,5 +22,5 @@ function VisualEditor( { blocks } ) {
 }
 
 export default connect( ( state ) => ( {
-	blocks: state.blocks.order
+	blocks: state.editor.blockOrder
 } ) )( VisualEditor );

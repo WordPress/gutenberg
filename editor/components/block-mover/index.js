@@ -31,8 +31,8 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 
 export default connect(
 	( state, ownProps ) => ( {
-		isFirst: first( state.blocks.order ) === ownProps.uid,
-		isLast: last( state.blocks.order ) === ownProps.uid
+		isFirst: first( state.editor.blockOrder ) === ownProps.uid,
+		isLast: last( state.editor.blockOrder ) === ownProps.uid
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
