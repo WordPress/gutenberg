@@ -43,12 +43,12 @@ function gutenberg_register_scripts() {
 
 	// Editor Scripts.
 	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js' );
-	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
-	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
-	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
+	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), gutenberg_asset_cache_version( 'i18n/build/index.js' ) );
+	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), gutenberg_asset_cache_version( 'element/build/index.js' ) );
+	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), gutenberg_asset_cache_version( 'blocks/build/index.js' ) );
 
 	// Editor Styles.
-	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' ) );
+	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), gutenberg_asset_cache_version( 'blocks/build/style.css' ) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );
 
@@ -159,7 +159,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
 		array( 'wp-i18n', 'wp-blocks', 'wp-element' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
+		gutenberg_asset_cache_version( 'editor/build/index.js' ),
 		true   // $in_footer
 	);
 
@@ -213,10 +213,47 @@ function gutenberg_scripts_and_styles( $hook ) {
 		'wp-editor',
 		plugins_url( 'editor/build/style.css', __FILE__ ),
 		array( 'wp-blocks' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/style.css' )
+		gutenberg_asset_cache_version( 'editor/build/style.css' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+
+/**
+ * Set's a script/style version for cache busting.
+ *
+ * 0.1.0
+ *
+ * @param string $file The file path relative to the plugin's root.
+ *
+ * @return string
+ */
+function gutenberg_asset_cache_version( $file = null ) {
+	$version = false;
+
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $file ) {
+		if ( file_exists( plugin_dir_path( __FILE__ ) . $file ) ) {
+			$version = filemtime( plugin_dir_path( __FILE__ ) . $file );
+		}
+	} else {
+		$version = get_transient( 'gutenberg_version' );
+
+		if ( ! $version ) {
+			if ( function_exists( 'get_plugin_data' ) ) {
+				$plugin = get_plugin_data( __FILE__, false );
+
+				if ( isset( $plugin['Version'] ) ) {
+					$version = $plugin['Version'];
+				}
+			} else {
+				$version = false;
+			}
+
+			set_transient( 'gutenberg_version', $version, DAY_IN_SECONDS );
+		}
+	}
+
+	return $version;
+}
 
 /**
  * Load plugin text domain for translations.
