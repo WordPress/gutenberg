@@ -1,14 +1,10 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * Internal dependencies
  */
  // TODO: We mustn't import by relative path traversing from blocks to editor
  // as we're doing here; instead, we should consider a common components path.
 import IconButton from '../../../editor/components/icon-button';
+import Toolbar from '../../../editor/components/toolbar';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -42,6 +38,12 @@ class FormatToolbar extends wp.element.Component {
 		this.updateLinkValue = this.updateLinkValue.bind( this );
 	}
 
+	componentWillUnmout() {
+		if ( this.editTimeout ) {
+			clearTimeout( this.editTimeout );
+		}
+	}
+
 	componentWillReceiveProps( nextProps ) {
 		const newState = {
 			linkValue: nextProps.formats.link ? nextProps.formats.link.value : ''
@@ -57,8 +59,7 @@ class FormatToolbar extends wp.element.Component {
 	}
 
 	toggleFormat( format ) {
-		return ( event ) => {
-			event.stopPropagation();
+		return () => {
 			this.props.onChange( {
 				[ format ]: ! this.props.formats[ format ]
 			} );
@@ -70,7 +71,7 @@ class FormatToolbar extends wp.element.Component {
 			this.props.onChange( { link: { value: '' } } );
 
 			// Debounce the call to avoid the reset in willReceiveProps
-			setTimeout( () => this.setState( { isEditingLink: true } ) );
+			this.editTimeout = setTimeout( () => this.setState( { isEditingLink: true } ) );
 		}
 	}
 
@@ -107,26 +108,22 @@ class FormatToolbar extends wp.element.Component {
 
 		return (
 			<div className="editable-format-toolbar">
-				<ul className="editor-toolbar">
-					{ FORMATTING_CONTROLS.map( ( control, index ) => (
-						<IconButton
-							key={ index }
-							icon={ control.icon }
-							label={ control.title }
-							onClick={ this.toggleFormat( control.format ) }
-							className={ classNames( 'editor-toolbar__control', {
-								'is-active': !! formats[ control.format ]
-							} ) } />
-					) ) }
-					<IconButton
-						icon="admin-links"
-						label={ wp.i18n.__( 'Link' ) }
-						onClick={ this.addLink }
-						className={ classNames( 'editor-toolbar__control', {
-							'is-active': !! formats.link
-						} ) }
-					/>
-				</ul>
+				<Toolbar
+					controls={
+						FORMATTING_CONTROLS
+							.map( ( control ) => ( {
+								...control,
+								onClick: this.toggleFormat( control.format ),
+								isActive: !! formats[ control.format ]
+							} ) )
+							.concat( [ {
+								icon: 'admin-links',
+								title: wp.i18n.__( 'Link' ),
+								onClick: this.addLink,
+								isActive: !! formats.link
+							} ] )
+					}
+				/>
 
 				{ !! formats.link && this.state.isEditingLink &&
 					<form

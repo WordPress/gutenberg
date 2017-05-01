@@ -347,7 +347,7 @@ export default class Editable extends wp.element.Component {
 		} );
 
 		this.setState( {
-			formats: merge( this.state.formats, formats )
+			formats: merge( {}, this.state.formats, formats )
 		} );
 	}
 

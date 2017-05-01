@@ -140,7 +140,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Disable reason: Each block can be selected by clicking on it
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role */
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindBlockNode }
