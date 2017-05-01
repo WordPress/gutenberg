@@ -1,13 +1,22 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
-import { html } from 'hpq';
-import { Parser } from 'html-to-react';
+import { nodeListToReact } from 'dom-react';
 
 export * from 'hpq';
 
-const parser = new Parser();
 export function children( selector ) {
-	return flow( html( selector ), parser.parse );
+	return ( node ) => {
+		let match = node;
+
+		if ( selector ) {
+			match = node.querySelector( selector );
+		}
+
+		if ( match ) {
+			return nodeListToReact( match.childNodes || [], wp.element.createElement );
+		}
+
+		return [];
+	};
 }

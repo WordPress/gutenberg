@@ -2,8 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize } from 'lodash';
-import { Parser as HtmlToReactParser } from 'html-to-react';
+import { last, isEqual, capitalize, omitBy } from 'lodash';
+import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -16,7 +16,6 @@ import './style.scss';
 import Toolbar from '../../../editor/components/toolbar';
 
 const KEYCODE_BACKSPACE = 8;
-const htmlToReactParser = new HtmlToReactParser();
 const formatMap = {
 	strong: 'bold',
 	em: 'italic',
@@ -58,6 +57,22 @@ const ALIGNMENT_CONTROLS = [
 		align: 'right'
 	}
 ];
+
+function createElement( type, props, ...children ) {
+	if ( props[ 'data-mce-bogus' ] === 'all' ) {
+		return null;
+	}
+
+	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
+		return children;
+	}
+
+	return wp.element.createElement(
+		type,
+		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
+		...children
+	);
+}
 
 export default class Editable extends wp.element.Component {
 	constructor() {
@@ -173,7 +188,6 @@ export default class Editable extends wp.element.Component {
 		if ( splitIndex === -1 ) {
 			return;
 		}
-		const getHtml = ( nodes ) => nodes.reduce( ( memo, node ) => memo + node.outerHTML, '' );
 		const beforeNodes = childNodes.slice( 0, splitIndex );
 		const lastNodeBeforeCursor = last( beforeNodes );
 		// Avoid splitting on single enter
@@ -184,18 +198,19 @@ export default class Editable extends wp.element.Component {
 		) {
 			return;
 		}
-		const before = getHtml( beforeNodes.slice( 0, beforeNodes.length - 1 ) );
+
+		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
 
 		// Removing empty nodes from the beginning of the "after"
 		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = getHtml( childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
+		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
 			if ( ! memo.length && ! node.textContent ) {
 				return memo;
 			}
 
 			memo.push( node );
 			return memo;
-		}, [] ) );
+		}, [] );
 
 		// Splitting into two blocks
 		this.setContent( this.props.value );
@@ -203,8 +218,8 @@ export default class Editable extends wp.element.Component {
 		// The setTimeout fixes the focus jump to the original block
 		setTimeout( () => {
 			this.props.onSplit(
-				htmlToReactParser.parse( before ),
-				htmlToReactParser.parse( after )
+				nodeListToReact( before, createElement ),
+				nodeListToReact( after, createElement )
 			);
 		} );
 	}
@@ -256,9 +271,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getContent() {
-		const content = this.editor.getContent( { format: 'raw' } );
-
-		return htmlToReactParser.parse( content );
+		return nodeListToReact( this.editorNode.childNodes || [], createElement );
 	}
 
 	focus() {
