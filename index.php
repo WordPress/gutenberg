@@ -180,7 +180,10 @@ function gutenberg_scripts_and_styles( $hook ) {
 	// Initialize the post data...
 	if ( $post_to_edit ) {
 		// ...with a real post
-		wp_localize_script( 'wp-editor', '_wpGutenbergPost', $post_to_edit );
+		wp_add_inline_script(
+			'wp-editor',
+			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+		);
 	} else {
 		// ...with some test content
 		// TODO: replace this with error handling
