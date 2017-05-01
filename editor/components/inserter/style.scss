@@ -25,7 +25,7 @@
 	transition: color .2s ease;
 
 	&:hover {
-		color: #00aadc;
+		color: $blue-medium;
 	}
 }
 
@@ -35,7 +35,7 @@
 	border: 1px solid $light-gray-500;
 	position: absolute;
 	left: -122px;
-	background: #fff;
+	background: $white;
 
 	&.is-top {
 		bottom: 42px;

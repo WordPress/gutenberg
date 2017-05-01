@@ -37,8 +37,8 @@
 	top: 43px;
 	margin-left: -1px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
-	border: 1px solid #e0e5e9;
-	background: #fff;
+	border: 1px solid $light-gray-500;
+	background: $white;
 
 	input {
 		font-size: 13px;
