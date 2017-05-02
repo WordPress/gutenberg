@@ -33,10 +33,12 @@ registerBlock( 'core/embed', {
 						<Dashicon icon="cloud" />
 						{ wp.i18n.__( 'Embed URL' ) }
 					</div>
-					<input type="url" className="blocks-embed__placeholder-input" placeholder={ wp.i18n.__( 'Enter URL to embed here.' ) } />
-					<Button isLarge>
-						{ wp.i18n.__( 'Embed the link above.' ) }
-					</Button>
+					<div className="blocks-embed__placeholder-fieldset">
+						<input type="url" className="blocks-embed__placeholder-input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+						<Button isLarge>
+							{ wp.i18n.__( 'Embed' ) }
+						</Button>
+					</div>
 				</div>
 			);
 		}

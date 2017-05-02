@@ -2,26 +2,32 @@
 	align-items: center;
 	display: flex;
 	flex-direction: column;
-	margin: -15px;
 	padding: 6em 0;
 	text-align: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background: $light-gray-100;
 }
 
 .blocks-embed__placeholder-label {
 	display: flex;
-	align-items: center;
 	justify-content: center;
 	font-weight: bold;
+	margin-bottom: 1em;
 
 	.dashicon {
 		margin-right: 1ch;
 	}
 }
 
+.blocks-embed__placeholder-fieldset {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	max-width: 280px;
+}
+
 .blocks-embed__placeholder-input {
-	border-radius: 4px;
-	margin: 1.62em 0 1em;
-	min-width: 280px;
-	padding: 0.62em;
-	text-align: center;
+	margin-right: 8px;
+	flex: 1 1 auto;
 }
