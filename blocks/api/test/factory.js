@@ -58,9 +58,9 @@ describe( 'block factory', () => {
 				}
 			};
 
-			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updateBlock ).to.eql( [ {
+			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
@@ -95,9 +95,9 @@ describe( 'block factory', () => {
 				}
 			};
 
-			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updateBlock ).to.eql( [ {
+			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
@@ -118,9 +118,76 @@ describe( 'block factory', () => {
 				}
 			};
 
-			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
-			expect( updateBlock ).to.be.null();
+			expect( updatedBlock ).to.be.null();
+		} );
+
+		it( 'should reject single transformations that do not include block types', () => {
+			registerBlock( 'core/updated-text-block', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+						transform: ( { value } ) => {
+							return {
+								attributes: {
+									value: 'chicken ' + value
+								}
+							};
+						}
+					} ]
+				}
+			} );
+			registerBlock( 'core/text-block', {} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.be.null();
+		} );
+
+		it( 'should reject array transformations that do not include block types', () => {
+			registerBlock( 'core/updated-text-block', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+						transform: ( { value } ) => {
+							return [
+								{
+									blockType: 'core/updated-text-block',
+									attributes: {
+										value: 'chicken ' + value
+									}
+								}, {
+									attributes: {
+										value: 'chicken ' + value
+									}
+								}
+							];
+						}
+					} ]
+				}
+			} );
+			registerBlock( 'core/text-block', {} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.be.null();
 		} );
 	} );
 } );
