@@ -17,7 +17,7 @@ function PublishButton( {
 	isError,
 	requestIsNewPost,
 	onUpdate,
-	onPublish
+	onSaveDraft,
 } ) {
 	let buttonEnabled = true;
 	let buttonText, saveCallback;
@@ -25,26 +25,26 @@ function PublishButton( {
 	if ( isRequesting ) {
 		buttonEnabled = false;
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Publishing...' )
+			? wp.i18n.__( 'Saving...' )
 			: wp.i18n.__( 'Updating...' );
 	} else if ( isSuccessful ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Published!' )
+			? wp.i18n.__( 'Saved!' )
 			: wp.i18n.__( 'Updated!' );
 	} else if ( isError ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Publish failed' )
+			? wp.i18n.__( 'Save failed' )
 			: wp.i18n.__( 'Update failed' );
 	} else if ( post && post.id ) {
 		buttonText = wp.i18n.__( 'Update' );
 	} else {
-		buttonText = wp.i18n.__( 'Publish' );
+		buttonText = wp.i18n.__( 'Save draft' );
 	}
 
 	if ( post && post.id ) {
 		saveCallback = onUpdate;
 	} else {
-		saveCallback = onPublish;
+		saveCallback = onSaveDraft;
 	}
 
 	return (
@@ -110,9 +110,9 @@ export default connect(
 			savePost( dispatch, post );
 		},
 
-		onPublish( post, blocks ) {
+		onSaveDraft( post, blocks ) {
 			post.content.raw = wp.blocks.serialize( blocks );
-			post.status = 'publish'; // TODO draft first?
+			post.status = 'draft'; // TODO change this after status controls
 			savePost( dispatch, post );
 		},
 	} )
