@@ -24,23 +24,17 @@ function PublishButton( {
 
 	if ( isRequesting ) {
 		buttonEnabled = false;
-		if ( requestIsNewPost ) {
-			buttonText = wp.i18n.__( 'Publishing...' );
-		} else {
-			buttonText = wp.i18n.__( 'Updating...' );
-		}
+		buttonText = requestIsNewPost
+			? wp.i18n.__( 'Publishing...' )
+			: wp.i18n.__( 'Updating...' );
 	} else if ( isSuccessful ) {
-		if ( requestIsNewPost ) {
-			buttonText = wp.i18n.__( 'Published!' );
-		} else {
-			buttonText = wp.i18n.__( 'Updated!' );
-		}
+		buttonText = requestIsNewPost
+			? wp.i18n.__( 'Published!' )
+			: wp.i18n.__( 'Updated!' );
 	} else if ( isError ) {
-		if ( requestIsNewPost ) {
-			buttonText = wp.i18n.__( 'Publish failed' );
-		} else {
-			buttonText = wp.i18n.__( 'Update failed' );
-		}
+		buttonText = requestIsNewPost
+			? wp.i18n.__( 'Publish failed' )
+			: wp.i18n.__( 'Update failed' );
 	} else if ( post && post.id ) {
 		buttonText = wp.i18n.__( 'Update' );
 	} else {
