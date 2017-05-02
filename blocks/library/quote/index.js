@@ -74,22 +74,30 @@ registerBlock( 'core/quote', {
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
-				transform: ( { value, citation } ) => {
-					return wp.element.Children.map( value, ( elt ) => {
-						return {
+				transform: ( { value, citation, ...attrs } ) => {
+					if ( Array.isArray( value ) || citation ) {
+						const heading = {
 							nodeName: 'H2',
-							content: elt
+							content: Array.isArray( value ) ? value[ 0 ] : value
 						};
-					} ).concat( [ {
+						const quote = {
+							...attrs,
+							citation,
+							value: Array.isArray( value ) ? value.slice( 1 ) : ''
+						};
+
+						return [ heading, quote ];
+					}
+					return {
 						nodeName: 'H2',
-						content: citation
-					} ] );
+						content: value
+					};
 				}
 			}
 		]
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -104,6 +112,7 @@ registerBlock( 'core/quote', {
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
 				{ ( citation || !! focus ) && (

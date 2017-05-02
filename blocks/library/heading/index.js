@@ -35,14 +35,23 @@ registerBlock( 'core/heading', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content } ) => {
+				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						return content.map( ( elt ) => {
-							return {
-								nodeName: 'H2',
-								content: elt
+						const heading = {
+							nodeName: 'H2',
+							content: content[ 0 ]
+						};
+						const blocks = [ heading ];
+
+						if ( content.slice( 1 ).length ) {
+							const text = {
+								...attrs,
+								content: content.slice( 1 )
 							};
-						} );
+							blocks.push( text );
+						}
+
+						return blocks;
 					}
 					return {
 						nodeName: 'H2',
