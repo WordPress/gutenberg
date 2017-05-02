@@ -2,9 +2,7 @@ body.toplevel_page_gutenberg {
 	background: $white;
 
 	#update-nag, .update-nag {
-		position: absolute;
-		right: 0;
-		top: 50px;
+		display: none;
 	}
 
 	#wpcontent {
