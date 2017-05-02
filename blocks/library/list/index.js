@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { children, prop, query } = hpq;
+const { children, prop } = hpq;
 
 registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
@@ -14,72 +14,53 @@ registerBlock( 'core/list', {
 
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
-		items: query( 'li', {
-			value: children()
-		} )
+		values: children( 'ol,ul' )
 	},
 
 	controls: [
 		{
-			icon: 'editor-alignleft',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => ! align || 'left' === align,
+			icon: 'editor-ul',
+			title: wp.i18n.__( 'Convert to unordered' ),
+			isActive: ( { nodeName = 'OL' } ) => nodeName === 'UL',
 			onClick( attributes, setAttributes ) {
-				setAttributes( { align: undefined } );
+				setAttributes( { nodeName: 'UL' } );
 			}
 		},
 		{
-			icon: 'editor-aligncenter',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
+			icon: 'editor-ol',
+			title: wp.i18n.__( 'Convert to ordered' ),
+			isActive: ( { nodeName = 'OL' } ) => nodeName === 'OL',
 			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'center' } );
-			}
-		},
-		{
-			icon: 'editor-alignright',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'right' } );
-			}
-		},
-		{
-			icon: 'editor-justify',
-			title: wp.i18n.__( 'Justify' ),
-			isActive: ( { align } ) => 'justify' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'justify' } );
+				setAttributes( { nodeName: 'OL' } );
 			}
 		}
 	],
 
-	edit( { attributes, focus, setFocus } ) {
-		const { nodeName = 'OL', items = [], align } = attributes;
-		const content = items.map( ( item, i ) => {
-			return <li key={ i }>{ item.value }</li>;
-		} );
+	
 
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { nodeName = 'OL', values = [], align } = attributes;
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
-				style={ align ? { textAlign: align } : null }
-				value={ content }
+				onChange={ ( values ) => {
+					setAttributes( { values } );
+				} }
+				value={ values }
 				focus={ focus }
 				onFocus={ setFocus }
+				showAlignments
 				className="blocks-list" />
 		);
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'OL', items = [] } = attributes;
+		const { nodeName = 'OL', values = [] } = attributes;
 
 		return wp.element.createElement(
 			nodeName.toLowerCase(),
 			null,
-			items.map( ( item, index ) => (
-				<li key={ index }>{ item.value }</li>
-			) )
+			values
 		);
 	}
 } );
