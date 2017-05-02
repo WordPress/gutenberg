@@ -91,6 +91,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Calling the merge to update the attributes and remove the block to be merged
 		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
+
 		onFocus( previousBlock.uid, { offset: -1 } );
 		replaceBlocks(
 			[ previousBlock.uid, block.uid ],

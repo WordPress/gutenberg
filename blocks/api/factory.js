@@ -47,11 +47,11 @@ export function switchToBlockType( block, blockType ) {
 
 	const transformtionResult = castArray( transformation.transform( block.attributes ) );
 
-	return transformtionResult.map( ( attributes, index ) =>
-		Object.assign( {
+	return transformtionResult.map( ( attributes, index ) => {
+		return {
 			uid: index === 0 ? block.uid : uuid(),
-			attributes,
-			blockType
-		} )
-	);
+			blockType: index === 0 ? blockType : block.blockType,
+			attributes
+		};
+	} );
 }
