@@ -48,11 +48,17 @@ export function switchToBlockType( block, blockType ) {
 	const transformationResults = castArray( transformation.transform( block.attributes ) );
 	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockType === blockType );
 
-	return transformationResults.map( ( result, index ) => {
+	const transformedBlocks = transformationResults.map( ( result, index ) => {
 		return {
 			uid: index === firstSwitchedBlock ? block.uid : uuid(),
 			blockType: result.blockType,
 			attributes: result.attributes
 		};
 	} );
+
+	if ( transformedBlocks.some( ( block ) => ! getBlockSettings( block.blockType ) ) ) {
+		return null;
+	}
+
+	return transformedBlocks;
 }
