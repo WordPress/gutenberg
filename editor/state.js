@@ -290,7 +290,7 @@ export function isSidebarOpened( state = false, action ) {
  * @param  {Object} action Dispatched action
  * @return {string}        Updated state
  */
-export function api( state = {}, action ) {
+export function saving( state = {}, action ) {
 	switch ( action.type ) {
 		case 'POST_UPDATE_REQUEST':
 			return {
@@ -332,7 +332,7 @@ export function createReduxStore() {
 		hoveredBlock,
 		mode,
 		isSidebarOpened,
-		api,
+		saving,
 	} );
 
 	return createStore(

@@ -65,10 +65,10 @@ export default connect(
 			state.editor.blocksByUid[ uid ]
 		) ),
 		post: state.editor.post,
-		isRequesting: state.api.requesting,
-		isSuccessful: state.api.successful,
-		isError: !! state.api.error,
-		requestIsNewPost: state.api.isNew,
+		isRequesting: state.saving.requesting,
+		isSuccessful: state.saving.successful,
+		isError: !! state.saving.error,
+		requestIsNewPost: state.saving.isNew,
 	} ),
 	( dispatch ) => ( {
 		onUpdate( post, blocks ) {

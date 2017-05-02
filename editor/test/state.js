@@ -521,7 +521,7 @@ describe( 'state', () => {
 				'hoveredBlock',
 				'mode',
 				'isSidebarOpened',
-				'api',
+				'saving',
 			] );
 		} );
 	} );
