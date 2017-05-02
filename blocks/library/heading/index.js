@@ -46,12 +46,13 @@ registerBlock( 'core/heading', {
 						};
 						const blocks = [ heading ];
 
-						if ( content.slice( 1 ).length ) {
+						const remainingContent = content.slice( 1 );
+						if ( remainingContent.length ) {
 							const text = {
 								blockType: 'core/text',
 								attributes: {
 									...attrs,
-									content: content.slice( 1 )
+									content: remainingContent
 								}
 							};
 							blocks.push( text );
