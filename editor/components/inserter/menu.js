@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import clickOutside from 'react-click-outside';
 
 /**
  * Internal dependencies
@@ -18,6 +19,10 @@ class InserterMenu extends wp.element.Component {
 		this.filter = this.filter.bind( this );
 	}
 
+	handleClickOutside( e ) {
+		this.props.onToggle( e );
+	}
+
 	filter( event ) {
 		this.setState( {
 			filterValue: event.target.value
@@ -25,9 +30,9 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	selectBlock( slug ) {
-		return () => {
+		return ( e ) => {
 			this.props.onInsertBlock( slug );
-			this.props.onSelect();
+			this.props.onToggle( e );
 			this.setState( { filterValue: '' } );
 		};
 	}
@@ -93,4 +98,4 @@ export default connect(
 			} );
 		}
 	} )
-)( InserterMenu );
+)( clickOutside( InserterMenu ) );

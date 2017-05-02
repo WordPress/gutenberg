@@ -94,11 +94,11 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: editor/components/inserter/index.js:37
+#: editor/components/inserter/index.js:56
 msgid "Insert block"
 msgstr ""
 
-#: editor/components/inserter/menu.js:77
+#: editor/components/inserter/menu.js:82
 msgid "Search…"
 msgstr ""
 
