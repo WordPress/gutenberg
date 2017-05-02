@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { uniq, get, reduce } from 'lodash';
+import clickOutside from 'react-click-outside';
 
 /**
  * Internal dependencies
@@ -17,6 +18,14 @@ class BlockSwitcher extends wp.element.Component {
 		this.state = {
 			open: false
 		};
+	}
+
+	handleClickOutside() {
+		if ( ! this.state.open ) {
+			return;
+		}
+
+		this.toggleMenu();
 	}
 
 	toggleMenu() {
@@ -94,4 +103,4 @@ export default connect(
 			} );
 		}
 	} )
-)( BlockSwitcher );
+)( clickOutside( BlockSwitcher ) );
