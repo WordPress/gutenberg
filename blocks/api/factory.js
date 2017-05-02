@@ -2,7 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get, castArray } from 'lodash';
+import { get, castArray, findIndex } from 'lodash';
 
 /**
  * Internal dependencies
@@ -45,13 +45,14 @@ export function switchToBlockType( block, blockType ) {
 		return null;
 	}
 
-	const transformtionResult = castArray( transformation.transform( block.attributes ) );
+	const transformationResults = castArray( transformation.transform( block.attributes ) );
+	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockType === blockType );
 
-	return transformtionResult.map( ( attributes, index ) => {
+	return transformationResults.map( ( result, index ) => {
 		return {
-			uid: index === 0 ? block.uid : uuid(),
-			blockType: index === 0 ? blockType : block.blockType,
-			attributes
+			uid: index === firstSwitchedBlock ? block.uid : uuid(),
+			blockType: result.blockType,
+			attributes: result.attributes
 		};
 	} );
 }

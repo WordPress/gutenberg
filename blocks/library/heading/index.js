@@ -38,15 +38,21 @@ registerBlock( 'core/heading', {
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
 						const heading = {
-							nodeName: 'H2',
-							content: content[ 0 ]
+							blockType: 'core/heading',
+							attributes: {
+								nodeName: 'H2',
+								content: content[ 0 ]
+							}
 						};
 						const blocks = [ heading ];
 
 						if ( content.slice( 1 ).length ) {
 							const text = {
-								...attrs,
-								content: content.slice( 1 )
+								blockType: 'core/text',
+								attributes: {
+									...attrs,
+									content: content.slice( 1 )
+								}
 							};
 							blocks.push( text );
 						}
@@ -54,8 +60,11 @@ registerBlock( 'core/heading', {
 						return blocks;
 					}
 					return {
-						nodeName: 'H2',
-						content
+						blockType: 'core/heading',
+						attributes: {
+							nodeName: 'H2',
+							content
+						}
 					};
 				}
 			}
@@ -66,7 +75,10 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						content
+						blockType: 'core/text',
+						attributes: {
+							content
+						}
 					};
 				}
 			}
