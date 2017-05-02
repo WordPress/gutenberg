@@ -59,12 +59,18 @@ registerBlock( 'core/image', {
 			title: wp.i18n.__( 'No alignment' ),
 			isActive: ( { align } ) => ! align || 'none' === align,
 			onClick: applyOrUnset( 'none' )
+		},
+		{
+			icon: 'align-full-width',
+			title: wp.i18n.__( 'Wide width' ),
+			isActive: ( { align } ) => 'wide' === align,
+			onClick: applyOrUnset( 'wide' )
 		}
 	],
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align ) {
+		if ( 'left' === align || 'right' === align || 'wide' === align ) {
 			return { 'data-align': align };
 		}
 	},

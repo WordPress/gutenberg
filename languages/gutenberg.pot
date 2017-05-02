@@ -46,7 +46,7 @@ msgid "Embed"
 msgstr ""
 
 #: blocks/library/embed/index.js:33
-#: blocks/library/image/index.js:81
+#: blocks/library/image/index.js:87
 msgid "Write caption…"
 msgstr ""
 
@@ -68,6 +68,10 @@ msgstr ""
 
 #: blocks/library/image/index.js:59
 msgid "No alignment"
+msgstr ""
+
+#: blocks/library/image/index.js:65
+msgid "Wide width"
 msgstr ""
 
 #: blocks/library/list/index.js:11

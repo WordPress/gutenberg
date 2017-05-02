@@ -15,6 +15,70 @@
 		float: right;
 		margin-left: 15px;
 	}
+
+	&[data-align="wide"] {
+		// Here be dragons...
+		//
+		// Variable offsets:
+		//  - Left sidebar
+		//   - Hidden at small viewports
+		//   - Foldable
+		//   - Expanded at medium and above
+		//  - Post settings
+		//   - Collapsed
+		//   - Expanded
+
+		left: 50%;
+		right: 50%;
+		margin-left: -50vw;
+		margin-right: -50vw;
+		width: 100vw;
+		padding-left: 0;
+		padding-right: 0;
+		max-width: none;
+
+		.editor-layout.is-sidebar-opened & {
+			margin-left: calc( -50vw + #{ $sidebar-width / 2 } );
+			margin-right: calc( -50vw + #{ $sidebar-width / 2 } );
+			width: calc( 100vw - #{ $sidebar-width } );
+		}
+
+		@include break-medium() {
+			margin-left: calc( -50vw + 80px );
+			margin-right: calc( -50vw + 80px );
+			width: calc( 100vw - 160px );
+
+			.auto-fold &,
+			.folded & {
+				margin-left: calc( -50vw + 18px );
+				margin-right: calc( -50vw + 18px );
+				width: calc( 100vw - 36px );
+			}
+
+			.editor-layout.is-sidebar-opened & {
+				margin-left: calc( -50vw + 80px + #{ $sidebar-width / 2 } );
+				margin-right: calc( -50vw + 80px + #{ $sidebar-width / 2 } );
+				width: calc( 100vw - 160px - #{ $sidebar-width } );
+
+				.auto-fold &,
+				.folded & {
+					margin-left: calc( -50vw + 18px + #{ $sidebar-width / 2 } );
+					margin-right: calc( -50vw + 18px + #{ $sidebar-width / 2 } );
+					width: calc( 100vw - 36px - #{ $sidebar-width } );
+				}
+			}
+		}
+
+		&:before {
+			left: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
 }
 
 .blocks-image {
@@ -22,5 +86,6 @@
 
 	img {
 		display: block;
+		width: 100%;
 	}
 }
