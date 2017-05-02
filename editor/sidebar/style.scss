@@ -1,13 +1,13 @@
 .editor-sidebar {
 	position: fixed;
 	right: 0;
-	top: $admin-bar-height + $header-height;
+	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
 	width: $sidebar-width-small;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
 
-	@include break-large() {
-		width: $sidebar-width;
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
 	}
 }

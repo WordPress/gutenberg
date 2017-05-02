@@ -14,9 +14,15 @@
 }
 
 .editor-layout.is-sidebar-opened .editor-sidebar {
-	display: none;	/* Hide sidebar on mobile breakpoint */
+	/* Sidebar covers screen on mobile */
+	width: 100%;
 
+	/* Sidebar sits on the side on larger breakpoints */
 	@include break-medium() {
-		display: block;		/* Show sidebar on larger breakpoint */
+		width: $sidebar-width-small;
+	}
+
+	@include break-large() {
+		width: $sidebar-width;
 	}
 }
