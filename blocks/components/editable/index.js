@@ -329,7 +329,7 @@ export default class Editable extends wp.element.Component {
 		} else {
 			this.editor.formatter.apply( format );
 		}
-		this.editor.setDirty(true);
+		this.editor.setDirty( true );
 	}
 
 	isAlignmentActive( align ) {

@@ -36,15 +36,13 @@ registerBlock( 'core/list', {
 		}
 	],
 
-	
-
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { nodeName = 'OL', values = [], align } = attributes;
+		const { nodeName = 'OL', values = [] } = attributes;
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
-				onChange={ ( values ) => {
-					setAttributes( { values } );
+				onChange={ ( nextValues ) => {
+					setAttributes( { values: nextValues } );
 				} }
 				value={ values }
 				focus={ focus }
