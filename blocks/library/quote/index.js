@@ -47,7 +47,10 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						value: content
+						blockType: 'core/quote',
+						attributes: {
+							value: content
+						}
 					};
 				}
 			},
@@ -56,7 +59,10 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return {
-						value: content
+						blockType: 'core/quote',
+						attributes: {
+							value: content
+						}
 					};
 				}
 			}
@@ -67,7 +73,10 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
 					return {
-						content: wp.element.concatChildren( value, citation )
+						blockType: 'core/text',
+						attributes: {
+							content: wp.element.concatChildren( value, citation )
+						}
 					};
 				}
 			},
@@ -77,20 +86,29 @@ registerBlock( 'core/quote', {
 				transform: ( { value, citation, ...attrs } ) => {
 					if ( Array.isArray( value ) || citation ) {
 						const heading = {
-							nodeName: 'H2',
-							content: Array.isArray( value ) ? value[ 0 ] : value
+							blockType: 'core/heading',
+							attributes: {
+								nodeName: 'H2',
+								content: Array.isArray( value ) ? value[ 0 ] : value
+							}
 						};
 						const quote = {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : ''
+							blockType: 'core/quote',
+							attributes: {
+								...attrs,
+								citation,
+								value: Array.isArray( value ) ? value.slice( 1 ) : ''
+							}
 						};
 
 						return [ heading, quote ];
 					}
 					return {
-						nodeName: 'H2',
-						content: value
+						blockType: 'core/heading',
+						attributes: {
+							nodeName: 'H2',
+							content: value
+						}
 					};
 				}
 			}

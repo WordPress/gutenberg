@@ -39,7 +39,10 @@ describe( 'block factory', () => {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return {
-								value: 'chicken ' + value
+								blockType: 'core/updated-text-block',
+								attributes: {
+									value: 'chicken ' + value
+								}
 							};
 						}
 					} ]
@@ -74,7 +77,10 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return {
-								value: 'chicken ' + value
+								blockType: 'core/updated-text-block',
+								attributes: {
+									value: 'chicken ' + value
+								}
 							};
 						}
 					} ]

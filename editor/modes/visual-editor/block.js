@@ -81,7 +81,7 @@ class VisualEditorBlock extends wp.element.Component {
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = previousBlock.blockType === block.blockType
-			? block
+			? [ block ]
 			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
 
 		// If the block types can not match, do nothing
