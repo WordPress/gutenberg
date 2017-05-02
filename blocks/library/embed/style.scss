@@ -1,0 +1,27 @@
+.blocks-embed.is-placeholder {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	margin: -15px;
+	padding: 6em 0;
+	text-align: center;
+}
+
+.blocks-embed__placeholder-label {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+
+	.dashicon {
+		margin-right: 1ch;
+	}
+}
+
+.blocks-embed__placeholder-input {
+	border-radius: 4px;
+	margin: 1.62em 0 1em;
+	min-width: 280px;
+	padding: 0.62em;
+	text-align: center;
+}
