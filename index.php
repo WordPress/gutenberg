@@ -33,12 +33,12 @@ $registered_blocks = array();
 /**
  * Registers a block.
  *
- * @param  string   $name   Block name including namespace.
- * @param  function $render Render function called to generate the HTML output
+ * @param  string   $name     Block name including namespace.
+ * @param  array    $settings Block settings
  */
-function register_block( $name, $render ) {
+function register_block( $name, $settings ) {
 	global $registered_blocks;
-	$registered_blocks[ $name ] = $render;
+	$registered_blocks[ $name ] = $settings;
 }
 
 /**
@@ -70,31 +70,41 @@ function parse_block_attributes( $attr_string ) {
 
  * @return string          Updated post content
  */
-function do_dynamic_blocks( $content ) {
+function do_blocks( $content ) {
 	global $registered_blocks;
+
+	// Extract the blocks from the post content
 	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)-->.*<!--\s*\/wp:\g1\s+-->/';
 	preg_match_all( $open_matcher, $content, $matches, PREG_OFFSET_CAPTURE );
-	$replacements = array();
+
 	$offset = 0;
 	$new_content = $content;
 	foreach ( $matches[ 0 ] as $index => $block_match ) {
 		$block_name = $matches[ 1 ][ $index ][ 0 ];
-		if ( isset( $registered_blocks[ $block_name ] ) ) {
-			$block_length = mb_strlen( $block_match[ 0 ] );
-			$block_position = $block_match[ 1 ];
-			$block_attributes = parse_block_attributes( $matches[ 2 ][ $index ][ 0 ] );
-			$output = $registered_blocks[ $block_name ]( $block_attributes );
-			$new_content =
-				mb_substr( $new_content, 0, $block_position + $offset ) .
-				$output .
-				mb_substr( $new_content, $block_position + $block_length + $offset );
-			$offset += mb_strlen( $output ) - mb_strlen( $block_length );
+		// do nothing if the block is not registered
+		if ( ! isset( $registered_blocks[ $block_name ] ) ) {
+			continue;
 		}
+
+		$block_length = mb_strlen( $block_match[ 0 ] );
+		$block_position = $block_match[ 1 ];
+		$block_attributes_string = $matches[ 2 ][ $index ][ 0 ];
+		$block_attributes = parse_block_attributes( $block_attributes_string );
+
+		// Call the block's render function to generate the dynamic output
+		$output = call_user_func( $registered_blocks[ $block_name ][ 'render' ], $block_attributes );
+
+		// Replace the matched block with the dynamic output
+		$new_content =
+			mb_substr( $new_content, 0, $block_position + $offset ) .
+			$output .
+			mb_substr( $new_content, $block_position + $block_length + $offset );
+		$offset += mb_strlen( $output ) - mb_strlen( $block_length );
 	}
 
 	return $new_content;
 }
-add_filter( 'the_content', 'do_dynamic_blocks', 10 ); // BEFORE do_shortcode()
+add_filter( 'the_content', 'do_blocks', 10 ); // BEFORE do_shortcode()
 
 /**
  * Registers common scripts to be used as dependencies of the editor and plugins.
@@ -320,6 +330,10 @@ function the_gutenberg_project() {
 	<?php
 }
 
-register_block( 'core/html', function( $attributes ) {
+function render_html_block( $attributes ) {
 	return 'THIS IS AWESOME';
-} );
+}
+
+register_block( 'core/html', array(
+	'render' => 'render_html_block'
+) );
