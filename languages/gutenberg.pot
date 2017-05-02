@@ -94,7 +94,7 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: editor/components/inserter/index.js:37
+#: editor/components/inserter/index.js:50
 msgid "Insert block"
 msgstr ""
 

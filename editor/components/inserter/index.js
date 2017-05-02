@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clickOutside from 'react-click-outside';
+
+/**
  * Internal dependencies
  */
 import InserterMenu from './menu';
@@ -26,6 +31,14 @@ class Inserter extends wp.element.Component {
 		} );
 	}
 
+	handleClickOutside() {
+		if ( ! this.state.opened ) {
+			return;
+		}
+
+		this.close();
+	}
+
 	render() {
 		const { opened } = this.state;
 		const { position } = this.props;
@@ -43,4 +56,4 @@ class Inserter extends wp.element.Component {
 	}
 }
 
-export default Inserter;
+export default clickOutside( Inserter );
