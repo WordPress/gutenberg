@@ -71,7 +71,7 @@ registerBlock( 'core/pullquote', {
 		return (
 			<blockquote className={ `blocks-pullquote blocks-pullquote-bg-${ bg } blocks-pullquote-style-${ style }` }>
 				<Editable
-					value={ value || 'Write Quote' }
+					value={ value || 'Write quote...' }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: nextValue
@@ -84,7 +84,7 @@ registerBlock( 'core/pullquote', {
 				{ ( citation || !! focus ) && (
 					<footer>
 						<Editable
-							value={ citation || 'Write Citation' }
+							value={ citation || 'Write citation...' }
 							onChange={
 								( nextCitation ) => setAttributes( {
 									citation: nextCitation

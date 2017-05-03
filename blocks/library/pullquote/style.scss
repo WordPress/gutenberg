@@ -1,75 +1,23 @@
-$c1: #29A188;
-$c2: #FCB740;
-$c3: #F03D56;
-
 .blocks-pullquote {
-
-	color: $white;
-	background-color: inherit;
-	box-shadow: none;
-
-	// replace with full-width, 700px = editor size, 160px = sidebar
-	width: calc(100vw - 160px);
-	margin-top: 0;
-	margin-bottom: 0;
-	margin-left: calc((700px - 100vw)/2 + 60px ); // not quite sure why 60px works
-	margin-right: calc((700px - 100vw)/2 );
-
-
-	padding: 4em 25%;
+	color: $light-gray-900;
+	padding: 2em;
 	text-align: center;
 
 	footer {
-		color: $black;
-		margin-left: 1.3em;
+		color: $dark-gray-900;
 		position: relative;
-
-		p {
-			font-size: 22px;
-			font-style: normal;
-		}
-
 	}
-}
 
-.blocks-pullquote-bg-1 {
-	background-color: $c1;
-}
-
-.blocks-pullquote-bg-2 {
-	background-color: $c2;
-}
-
-.blocks-pullquote-bg-3 {
-	background-color: $c3;
+	footer p {
+		font-size: 16px;
+		font-family: $default-font;
+	}
 }
 
 .editor-visual-editor .blocks-pullquote-style-1 {
 	& > .blocks-editable p {
-		font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-		font-size: 36px;
-		font-weight: 700;
-		line-height: 38px;
+		font-family: $default-font;
+		font-size: 48px;
+		font-weight: 900;
 	}
-}
-
-.editor-visual-editor .blocks-pullquote-style-2 {
-	& > .blocks-editable p {
-		font-size: 36px;
-		font-style: italic;
-		line-height: 38px;
-	}
-}
-
-// color icon controls
-.editor-toolbar__control.editor-button.color1 {
-	color: $c1;
-}
-
-.editor-toolbar__control.editor-button.color2 {
-	color: $c2;
-}
-
-.editor-toolbar__control.editor-button.color3 {
-	color: $c3;
 }
