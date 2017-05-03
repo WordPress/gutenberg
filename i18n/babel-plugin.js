@@ -34,7 +34,7 @@
 
 const { po } = require( 'gettext-parser' );
 const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
-const { relative } = require( 'path' );
+const { relative } = require( 'path' ).posix;
 const { writeFileSync } = require( 'fs' );
 
 /**
