@@ -1,0 +1,46 @@
+.blocks-pullquote {
+
+	color: $white;
+	background-color: #BBB;
+	box-shadow: none;
+
+	// replace with full-width, 700px = editor size, 160px = sidebar
+	width: calc(100vw - 160px);
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: calc((700px - 100vw)/2 + 60px ); // not quite sure why 60px works
+	margin-right: calc((700px - 100vw)/2 );
+
+
+	padding: 4em 25%;
+	text-align: center;
+
+	footer {
+		color: $black;
+		margin-left: 1.3em;
+		position: relative;
+
+		p {
+			font-size: 22px;
+			font-style: normal;
+		}
+
+	}
+}
+
+.editor-visual-editor .blocks-pullquote-style-1 {
+	& > .blocks-editable p {
+		font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+		font-size: 36px;
+		font-weight: 700;
+		line-height: 38px;
+	}
+}
+
+.editor-visual-editor .blocks-pullquote-style-2 {
+	& > .blocks-editable p {
+		font-size: 36px;
+		font-style: italic;
+		line-height: 38px;
+	}
+}
