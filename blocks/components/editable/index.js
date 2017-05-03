@@ -284,6 +284,7 @@ export default class Editable extends wp.element.Component {
 
 	componentWillUpdate( nextProps ) {
 		if ( this.editor && this.props.tagName !== nextProps.tagName ) {
+			this.onChange();
 			this.editor.destroy();
 		}
 	}
