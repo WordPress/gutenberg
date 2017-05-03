@@ -128,9 +128,7 @@ describe( 'block factory', () => {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
-						transform: ( { value } ) => {
-							return null;
-						}
+						transform: () => null
 					} ]
 				}
 			} );
@@ -149,15 +147,12 @@ describe( 'block factory', () => {
 			expect( updatedBlock ).to.be.null();
 		} );
 
-
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlock( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
-						transform: ( { value } ) => {
-							return [];
-						}
+						transform: () => []
 					} ]
 				}
 			} );
