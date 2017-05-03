@@ -7,7 +7,7 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	z-index: 1;
+	z-index: z-index( '.editor-inserter' );
 }
 
 .editor-inserter__toggle {
@@ -96,7 +96,7 @@
 	line-height: 0;
 	position: absolute;
 	width: 0;
-	z-index: 1;
+	z-index: z-index( '.editor-inserter__arrow' );
 }
 
 .editor-inserter__content {
