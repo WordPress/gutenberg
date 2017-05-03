@@ -167,7 +167,7 @@ describe( 'block factory', () => {
 									}
 								}, {
 									attributes: {
-										value: 'chicken ' + value
+										value: 'smoked ' + value
 									}
 								}
 							];
@@ -188,6 +188,75 @@ describe( 'block factory', () => {
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
 
 			expect( updatedBlock ).to.be.null();
+		} );
+
+		it( 'should reject single transformations with unexpected block types', () => {
+			registerBlock( 'core/updated-text-block', {} );
+			registerBlock( 'core/text-block', {
+				transforms: {
+					to: [ {
+						blocks: [ 'core/updated-text-block' ],
+						transform: ( { value } ) => {
+							return {
+								blockType: 'core/text-block',
+								attributes: {
+									value: 'chicken ' + value
+								}
+							};
+						}
+					} ]
+				}
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.eql( null );
+		} );
+
+		it( 'should reject array transformations with unexpected block types', () => {
+			registerBlock( 'core/updated-text-block', {} );
+			registerBlock( 'core/text-block', {
+				transforms: {
+					to: [ {
+						blocks: [ 'core/updated-text-block' ],
+						transform: ( { value } ) => {
+							return [
+								{
+									blockType: 'core/text-block',
+									attributes: {
+										value: 'chicken ' + value
+									}
+								}, {
+									blockType: 'core/text-block',
+									attributes: {
+										value: 'smoked ' + value
+									}
+								}
+							];
+						}
+					} ]
+				}
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.eql( null );
 		} );
 	} );
 } );
