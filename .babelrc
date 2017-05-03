@@ -11,9 +11,6 @@
 		"transform-object-rest-spread",
 		[ "transform-react-jsx", {
 			"pragma": "wp.element.createElement"
-		} ],
-		[ "./i18n/babel-plugin", {
-			"output": "languages/gutenberg.pot"
 		} ]
 	],
 	"env": {
@@ -24,6 +21,13 @@
 		},
 		"test": {
 			"presets": [ "latest" ]
+		},
+		"gettext": {
+			"plugins": [
+				[ "./i18n/babel-plugin", {
+					"output": "languages/gutenberg.pot"
+				} ]
+			]
 		}
 	}
 }

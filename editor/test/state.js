@@ -38,8 +38,8 @@ describe( 'state', () => {
 		it( 'should key by replaced blocks uid', () => {
 			const original = blocks( undefined, {} );
 			const state = blocks( original, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ { uid: 'bananas' } ]
+				type: 'RESET_BLOCKS',
+				blocks: [ { uid: 'bananas' } ]
 			} );
 
 			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
@@ -49,8 +49,8 @@ describe( 'state', () => {
 
 		it( 'should return with block updates', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'kumquat',
 					attributes: {}
 				} ]
@@ -70,8 +70,8 @@ describe( 'state', () => {
 
 		it( 'should insert block', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -90,32 +90,34 @@ describe( 'state', () => {
 			expect( state.order ).to.eql( [ 'chicken', 'ribs' ] );
 		} );
 
-		it( 'should switch the block', () => {
+		it( 'should replace the block', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
 				} ]
 			} );
 			const state = blocks( original, {
-				type: 'SWITCH_BLOCK_TYPE',
-				uid: 'chicken',
-				block: {
-					uid: 'chicken',
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'wings',
 					blockType: 'core/freeform'
-				}
+				} ]
 			} );
 
 			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 1 );
 			expect( values( state.byUid )[ 0 ].blockType ).to.equal( 'core/freeform' );
+			expect( values( state.byUid )[ 0 ].uid ).to.equal( 'wings' );
+			expect( state.order ).to.eql( [ 'wings' ] );
 		} );
 
 		it( 'should move the block up', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -135,8 +137,8 @@ describe( 'state', () => {
 
 		it( 'should not move the first block up', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -156,8 +158,8 @@ describe( 'state', () => {
 
 		it( 'should move the block down', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -177,8 +179,8 @@ describe( 'state', () => {
 
 		it( 'should not move the last block down', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -198,8 +200,8 @@ describe( 'state', () => {
 
 		it( 'should remove the block', () => {
 			const original = blocks( undefined, {
-				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
 					attributes: {}
@@ -223,6 +225,33 @@ describe( 'state', () => {
 				}
 			} );
 		} );
+
+		it( 'should insert after the specified block uid', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'kumquat',
+					blockType: 'core/test-block',
+					attributes: {}
+				}, {
+					uid: 'loquat',
+					blockType: 'core/test-block',
+					attributes: {}
+				} ]
+			} );
+
+			const state = blocks( original, {
+				type: 'INSERT_BLOCK',
+				after: 'kumquat',
+				block: {
+					uid: 'persimmon',
+					blockType: 'core/freeform'
+				}
+			} );
+
+			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 3 );
+			expect( state.order ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
+		} );
 	} );
 
 	describe( 'hoveredBlock()', () => {
@@ -244,6 +273,32 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).to.be.null();
+		} );
+
+		it( 'should replace the hovered block', () => {
+			const state = hoveredBlock( 'chicken', {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'wings',
+					blockType: 'core/freeform'
+				} ]
+			} );
+
+			expect( state ).to.equal( 'wings' );
+		} );
+
+		it( 'should keep the hovered block', () => {
+			const state = hoveredBlock( 'chicken', {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'ribs' ],
+				blocks: [ {
+					uid: 'wings',
+					blockType: 'core/freeform'
+				} ]
+			} );
+
+			expect( state ).to.equal( 'chicken' );
 		} );
 	} );
 
@@ -386,31 +441,32 @@ describe( 'state', () => {
 			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
 		} );
 
-		it( 'should insert after the specified block uid', () => {
-			const original = blocks( undefined, {
+		it( 'should replace the selected block', () => {
+			const original = deepFreeze( { uid: 'chicken', typing: false, focus: { editable: 'citation' } } );
+			const state = selectedBlock( original, {
 				type: 'REPLACE_BLOCKS',
-				blockNodes: [ {
-					uid: 'kumquat',
-					blockType: 'core/test-block',
-					attributes: {}
-				}, {
-					uid: 'loquat',
-					blockType: 'core/test-block',
-					attributes: {}
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'wings',
+					blockType: 'core/freeform'
 				} ]
 			} );
 
-			const state = blocks( original, {
-				type: 'INSERT_BLOCK',
-				after: 'kumquat',
-				block: {
-					uid: 'persimmon',
+			expect( state ).to.eql( { uid: 'wings', typing: false, focus: {} } );
+		} );
+
+		it( 'should keep the selected block', () => {
+			const original = deepFreeze( { uid: 'chicken', typing: false, focus: { editable: 'citation' } } );
+			const state = selectedBlock( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'ribs' ],
+				blocks: [ {
+					uid: 'wings',
 					blockType: 'core/freeform'
-				}
+				} ]
 			} );
 
-			expect( Object.keys( state.byUid ) ).to.have.lengthOf( 3 );
-			expect( state.order ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( state ).to.equal( original );
 		} );
 	} );
 
