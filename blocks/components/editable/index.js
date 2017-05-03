@@ -12,6 +12,7 @@ import 'element-closest';
  */
 import './style.scss';
 import FormatToolbar from './format-toolbar';
+import TinyMCE from './tinymce';
  // TODO: We mustn't import by relative path traversing from blocks to editor
  // as we're doing here; instead, we should consider a common components path.
 import Toolbar from '../../../editor/components/toolbar';
@@ -61,10 +62,10 @@ export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -76,36 +77,18 @@ export default class Editable extends wp.element.Component {
 		};
 	}
 
-	componentDidMount() {
-		this.initialize();
-		this.focus();
-	}
-
-	initialize() {
-		const config = {
-			target: this.editorNode,
-			theme: false,
-			inline: true,
-			toolbar: false,
-			browser_spellcheck: true,
-			entity_encoding: 'raw',
-			convert_urls: false,
-			setup: this.onSetup,
-			formats: {
-				strikethrough: { inline: 'del' }
-			}
-		};
-
-		tinymce.init( config );
-	}
-
 	onSetup( editor ) {
 		this.editor = editor;
+		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+	}
+
+	onInit() {
+		this.focus();
 	}
 
 	onFocus() {
@@ -128,7 +111,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getRelativePosition( node ) {
-		const editorPosition = this.editorNode.closest( '.editor-visual-editor__block' ).getBoundingClientRect();
+		const editorPosition = this.editor.getBody().closest( '.editor-visual-editor__block' ).getBoundingClientRect();
 		const position = node.getBoundingClientRect();
 		return {
 			top: position.top - editorPosition.top + 40 + ( position.height ),
@@ -233,10 +216,6 @@ export default class Editable extends wp.element.Component {
 		this.setState( { alignment, bookmark, formats, focusPosition } );
 	}
 
-	bindEditorNode( ref ) {
-		this.editorNode = ref;
-	}
-
 	updateContent() {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.savedContent = this.props.value;
@@ -258,7 +237,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getContent() {
-		return nodeListToReact( this.editorNode.childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
 	}
 
 	focus() {
@@ -357,23 +336,18 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const {
-			tagName = 'div',
-			value,
-			style,
-			focus,
-			className,
-			showAlignments = false,
-			formattingControls
-		} = this.props;
+		const { tagName, style, value, focus, className, showAlignments = false, formattingControls } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
-		let element = wp.element.createElement( tagName, {
-			ref: this.bindEditorNode,
-			style: style,
-			className: classes,
-			key: 'editor'
-		}, ...wp.element.Children.toArray( value ) );
+		let element = (
+			<TinyMCE
+				tagName={ tagName }
+				onSetup={ this.onSetup }
+				style={ style }
+				className={ classes }
+				defaultValue={ value }
+				key="editor" />
+		);
 
 		if ( focus ) {
 			element = [
