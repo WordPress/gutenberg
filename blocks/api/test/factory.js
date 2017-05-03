@@ -258,5 +258,63 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( null );
 		} );
+
+		it( 'should accept valid array transformations', () => {
+			registerBlock( 'core/updated-text-block', {} );
+			registerBlock( 'core/text-block', {
+				transforms: {
+					to: [ {
+						blocks: [ 'core/updated-text-block' ],
+						transform: ( { value } ) => {
+							return [
+								{
+									blockType: 'core/text-block',
+									attributes: {
+										value: 'chicken ' + value
+									}
+								}, {
+									blockType: 'core/updated-text-block',
+									attributes: {
+										value: 'smoked ' + value
+									}
+								}
+							];
+						}
+					} ]
+				}
+			} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			// Make sure the block UIDs are set as expected: the first
+			// transformed block whose type matches the "destination" type gets
+			// to keep the existing block's UID.
+			expect( updatedBlock ).to.have.lengthOf( 2 );
+			expect( updatedBlock[ 0 ].uid ).to.exist().and.not.eql( 1 );
+			expect( updatedBlock[ 1 ].uid ).to.eql( 1 );
+			updatedBlock[ 0 ].uid = 2;
+
+			expect( updatedBlock ).to.eql( [ {
+				uid: 2,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'chicken ribs'
+				}
+			}, {
+				uid: 1,
+				blockType: 'core/updated-text-block',
+				attributes: {
+					value: 'smoked ribs'
+				}
+			} ] );
+		} );
 	} );
 } );
