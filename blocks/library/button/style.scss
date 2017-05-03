@@ -1,0 +1,33 @@
+.blocks-button {
+	font-family: $default-font;
+	display: inline-block;
+	text-decoration: none;
+	font-size: 17px;
+	line-height: 1.5;
+	margin: 0;
+	padding: 6px 14px;
+	cursor: default;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 2px;
+	white-space: nowrap;
+	box-sizing: border-box;
+	background: $blue-medium;
+	color: $white;
+	border-color: $blue-wordpress;
+	vertical-align: top;
+
+	&:hover {
+		color: $white;
+	}
+}
+
+.editor-visual-editor__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		text-align: right;
+	}
+}
