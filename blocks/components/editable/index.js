@@ -366,7 +366,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName: Tag = 'div', style, focus, className, showAlignments = false } = this.props;
+		const { tagName: Tag = 'div', style, focus, className, showAlignments = false, formattingControls } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
 		let element = (
@@ -388,7 +388,12 @@ export default class Editable extends wp.element.Component {
 								isActive: this.isAlignmentActive( control.align )
 							} ) ) } />
 					}
-					<FormatToolbar focusPosition={ this.state.focusPosition } formats={ this.state.formats } onChange={ this.changeFormats } />
+					<FormatToolbar
+						focusPosition={ this.state.focusPosition }
+						formats={ this.state.formats }
+						onChange={ this.changeFormats }
+						enabledControls={ formattingControls }
+					/>
 				</Fill>,
 				element
 			];
