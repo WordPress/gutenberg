@@ -56,7 +56,15 @@ export function switchToBlockType( block, blockType ) {
 		};
 	} );
 
+	// Ensure that every block object returned by the transformation has a
+	// block type
 	if ( transformedBlocks.some( ( block ) => ! getBlockSettings( block.blockType ) ) ) {
+		return null;
+	}
+
+	// Ensure that at least one block object returned by the transformation has
+	// the expected "destination" block type
+	if ( ! transformedBlocks.some( ( block ) => block.blockType === blockType ) ) {
 		return null;
 	}
 
