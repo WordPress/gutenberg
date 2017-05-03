@@ -55,8 +55,6 @@ function register_block( $slug, $settings ) {
 	}
 
 	if ( isset( $registered_blocks[ $slug ] ) ) {
-		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
-		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return;
 	}
 
@@ -64,6 +62,23 @@ function register_block( $slug, $settings ) {
 	$registered_blocks[ $slug ] = $settings;
 
 	return $settings;
+}
+
+/**
+ * Unregisters a block.
+ *
+ * @param  string   slug Block slug
+ * @return array         The previous block value, if it has been
+ *                         successfully unregistered; otherwise `null`.
+ */
+function unregister_block( $slug ) {
+	global $registered_blocks;
+	if ( ! isset( $registered_blocks[ $slug ] ) ) {
+		$message = sprintf( __( 'Block "%s" is not registered.' ), $slug );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return;
+	}
+	unset( $registered_blocks[ $slug ] );
 }
 
 /**
@@ -99,7 +114,7 @@ function do_blocks( $content ) {
 	global $registered_blocks;
 
 	// Extract the blocks from the post content
-	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)-->.*<!--\s*\/wp:\g1\s+-->/';
+	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)--><!--\s*\/wp:\g1\s+-->/';
 	preg_match_all( $open_matcher, $content, $matches, PREG_OFFSET_CAPTURE );
 
 	$new_content = $content;
