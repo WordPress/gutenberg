@@ -150,7 +150,7 @@ describe( 'block parser', () => {
 			} );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block smoked:yes -->' +
+				'<!-- wp:core/test-block smoked="yes" url="http://google.com" -->' +
 				'Brisket' +
 				'<!-- /wp:core/test-block -->'
 			);
@@ -160,6 +160,7 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].attributes ).to.eql( {
 				content: 'Brisket',
 				smoked: 'yes',
+				url: 'http://google.com'
 			} );
 			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 		} );

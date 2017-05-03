@@ -49,7 +49,7 @@ WP_Block_Attribute_List
   }, {} ) }
 
 WP_Block_Attribute
-  = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
+  = name:WP_Block_Attribute_Name '="' value:WP_Block_Attribute_Value '"'
   { return { name: name, value: value }; }
 
 WP_Block_Attribute_Name
@@ -68,7 +68,7 @@ ASCII_AlphaNumeric
   / Special_Chars
 
 WP_Block_Attribute_Value_Char
-  = [^ \t\r\n]
+  = [^"]
 
 ASCII_Letter
   = [a-zA-Z]
