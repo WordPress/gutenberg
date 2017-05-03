@@ -32,7 +32,8 @@ export function createBlock( blockType, attributes = {} ) {
  * @return {Array}             Block object
  */
 export function switchToBlockType( block, blockType ) {
-	// Find the right transformation by giving priority to the "to" transformation
+	// Find the right transformation by giving priority to the "to"
+	// transformation.
 	const destinationSettings = getBlockSettings( blockType );
 	const sourceSettings = getBlockSettings( block.blockType );
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
@@ -41,6 +42,7 @@ export function switchToBlockType( block, blockType ) {
 		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 ) ||
 		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
 
+	// If no valid transformation, stop.  (How did we get here?)
 	if ( ! transformation ) {
 		return null;
 	}
@@ -73,6 +75,8 @@ export function switchToBlockType( block, blockType ) {
 
 	return transformationResults.map( ( result, index ) => {
 		return {
+			// The first transformed block whose type matches the "destination"
+			// type gets to keep the existing block's UID.
 			uid: index === firstSwitchedBlock ? block.uid : uuid(),
 			blockType: result.blockType,
 			attributes: result.attributes
