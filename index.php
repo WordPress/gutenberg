@@ -42,7 +42,7 @@ function gutenberg_register_scripts() {
 	wp_register_script( 'react-dom-server', 'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js', array( 'react' ) );
 
 	// Editor Scripts.
-	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js' );
+	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js' );
 	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
 	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
 	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
