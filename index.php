@@ -33,12 +33,37 @@ $registered_blocks = array();
 /**
  * Registers a block.
  *
- * @param  string   $name     Block name including namespace.
+ * @param  string   $slug     Block slug including namespace.
  * @param  array    $settings Block settings
+
+ * @return array              The block, if it has been successfully registered.
  */
-function register_block( $name, $settings ) {
+function register_block( $slug, $settings ) {
 	global $registered_blocks;
-	$registered_blocks[ $name ] = $settings;
+
+	if ( ! is_string( $slug ) ) {
+		$message = __( 'Block slugs must be strings.' );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return;
+	}
+
+	$slug_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
+	if ( ! preg_match( $slug_matcher, $slug ) ) {
+		$message = __( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return;
+	}
+
+	if ( isset( $registered_blocks[ $slug ] ) ) {
+		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return;
+	}
+
+	$settings[ 'slug' ] = $slug;
+	$registered_blocks[ $slug ] = $settings;
+
+	return $settings;
 }
 
 /**
