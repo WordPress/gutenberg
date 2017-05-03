@@ -1,28 +1,3 @@
 .editor-layout__content {
 	overflow: hidden;
-	.editor-layout.is-sidebar-opened & {
-		margin-right: $sidebar-width-small;
-
-		@include break-medium() {
-			margin-right: $sidebar-width-small;
-		}
-
-		@include break-large() {
-			margin-right: $sidebar-width;
-		}
-	}
-}
-
-.editor-layout.is-sidebar-opened .editor-sidebar {
-	/* Sidebar covers screen on mobile */
-	width: 100%;
-
-	/* Sidebar sits on the side on larger breakpoints */
-	@include break-medium() {
-		width: $sidebar-width-small;
-	}
-
-	@include break-large() {
-		width: $sidebar-width;
-	}
 }

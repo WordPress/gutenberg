@@ -3,11 +3,25 @@
 	right: 0;
 	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
-	width: $sidebar-width-small;
+	width: $sidebar-width;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
 
 	@include break-medium() {
 		top: $admin-bar-height + $header-height;
+	}
+}
+
+.editor-layout.is-sidebar-opened .editor-layout__content {
+	margin-right: $sidebar-width;
+}
+
+.editor-layout.is-sidebar-opened .editor-sidebar {
+	/* Sidebar covers screen on mobile */
+	width: 100%;
+
+	/* Sidebar sits on the side on larger breakpoints */
+	@include break-medium() {
+		width: $sidebar-width;
 	}
 }
