@@ -33,27 +33,27 @@ describe( 'block parser', () => {
 			const blockSettings = {
 				attributes: function( rawContent ) {
 					return {
-						content: rawContent + ' & Chicken'
+						content: rawContent + ' & Chicken',
 					};
-				}
+				},
 			};
 
 			expect( parseBlockAttributes( 'Ribs', blockSettings ) ).to.eql( {
-				content: 'Ribs & Chicken'
+				content: 'Ribs & Chicken',
 			} );
 		} );
 
 		it( 'should use the query object implementation', () => {
 			const blockSettings = {
 				attributes: {
-					emphasis: text( 'strong' )
-				}
+					emphasis: text( 'strong' ),
+				},
 			};
 
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
 			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {
-				emphasis: '& Chicken'
+				emphasis: '& Chicken',
 			} );
 		} );
 
@@ -70,12 +70,12 @@ describe( 'block parser', () => {
 			const blockSettings = {
 				attributes: function( rawContent ) {
 					return {
-						content: rawContent + ' & Chicken'
+						content: rawContent + ' & Chicken',
 					};
 				},
 				defaultAttributes: {
-					topic: 'none'
-				}
+					topic: 'none',
+				},
 			};
 
 			const rawContent = 'Ribs';
@@ -84,7 +84,7 @@ describe( 'block parser', () => {
 			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
 				align: 'left',
 				topic: 'none',
-				content: 'Ribs & Chicken'
+				content: 'Ribs & Chicken',
 			} );
 		} );
 	} );
@@ -146,7 +146,7 @@ describe( 'block parser', () => {
 					return {
 						content: rawContent,
 					};
-				}
+				},
 			} );
 
 			const parsed = parse(
@@ -168,9 +168,9 @@ describe( 'block parser', () => {
 			registerBlock( 'core/test-block', {
 				attributes: function( rawContent ) {
 					return {
-						content: rawContent + ' & Chicken'
+						content: rawContent + ' & Chicken',
 					};
-				}
+				},
 			} );
 
 			const parsed = parse(
@@ -182,7 +182,7 @@ describe( 'block parser', () => {
 			expect( parsed ).to.have.lengthOf( 1 );
 			expect( parsed[ 0 ].blockType ).to.equal( 'core/test-block' );
 			expect( parsed[ 0 ].attributes ).to.eql( {
-				content: 'Ribs & Chicken'
+				content: 'Ribs & Chicken',
 			} );
 			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 		} );
@@ -215,7 +215,7 @@ describe( 'block parser', () => {
 					return {
 						content: rawContent,
 					};
-				}
+				},
 			} );
 
 			setUnknownTypeHandler( 'core/unknown-block' );

@@ -27,7 +27,7 @@ registerBlock( 'core/quote', {
 			}
 
 			return Number( match[ 1 ] );
-		}
+		},
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
@@ -37,7 +37,7 @@ registerBlock( 'core/quote', {
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
-		subscript: variation
+		subscript: variation,
 	} ) ),
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -50,7 +50,7 @@ registerBlock( 'core/quote', {
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue
+							value: nextValue,
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
@@ -63,7 +63,7 @@ registerBlock( 'core/quote', {
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
-									citation: nextCitation
+									citation: nextCitation,
 								} )
 							}
 							focus={ focusedEditable === 'citation' ? focus : null }
@@ -86,5 +86,5 @@ registerBlock( 'core/quote', {
 				<footer>{ citation }</footer>
 			</blockquote>
 		);
-	}
+	},
 } );

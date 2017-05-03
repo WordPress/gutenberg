@@ -15,7 +15,7 @@ registerBlock( 'core/heading', {
 
 	attributes: {
 		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' )
+		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
 	controls: [
@@ -26,8 +26,8 @@ registerBlock( 'core/heading', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'H' + level } );
 			},
-			subscript: level
-		} ) )
+			subscript: level,
+		} ) ),
 	],
 
 	transforms: {
@@ -43,10 +43,10 @@ registerBlock( 'core/heading', {
 					}
 					return {
 						nodeName: 'H2',
-						content
+						content,
 					};
-				}
-			}
+				},
+			},
 		],
 		to: [
 			{
@@ -54,16 +54,16 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						content: [ content ]
+						content: [ content ],
 					};
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 

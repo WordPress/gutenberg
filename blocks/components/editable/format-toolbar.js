@@ -10,18 +10,18 @@ const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: wp.i18n.__( 'Bold' ),
-		format: 'bold'
+		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
 		title: wp.i18n.__( 'Italic' ),
-		format: 'italic'
+		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
 		title: wp.i18n.__( 'Strikethrough' ),
-		format: 'strikethrough'
-	}
+		format: 'strikethrough',
+	},
 ];
 
 class FormatToolbar extends wp.element.Component {
@@ -29,7 +29,7 @@ class FormatToolbar extends wp.element.Component {
 		super( ...arguments );
 		this.state = {
 			linkValue: props.formats.link ? props.formats.link.value : '',
-			isEditingLink: false
+			isEditingLink: false,
 		};
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
@@ -46,7 +46,7 @@ class FormatToolbar extends wp.element.Component {
 
 	componentWillReceiveProps( nextProps ) {
 		const newState = {
-			linkValue: nextProps.formats.link ? nextProps.formats.link.value : ''
+			linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
 		};
 		if (
 			! this.props.formats.link ||
@@ -61,7 +61,7 @@ class FormatToolbar extends wp.element.Component {
 	toggleFormat( format ) {
 		return () => {
 			this.props.onChange( {
-				[ format ]: ! this.props.formats[ format ]
+				[ format ]: ! this.props.formats[ format ],
 			} );
 		};
 	}
@@ -82,7 +82,7 @@ class FormatToolbar extends wp.element.Component {
 	editLink( event ) {
 		event.preventDefault();
 		this.setState( {
-			isEditingLink: true
+			isEditingLink: true,
 		} );
 	}
 
@@ -90,13 +90,13 @@ class FormatToolbar extends wp.element.Component {
 		event.preventDefault();
 		this.props.onChange( { link: { value: this.state.linkValue } } );
 		this.setState( {
-			isEditingLink: false
+			isEditingLink: false,
 		} );
 	}
 
 	updateLinkValue( event ) {
 		this.setState( {
-			linkValue: event.target.value
+			linkValue: event.target.value,
 		} );
 	}
 
@@ -114,13 +114,13 @@ class FormatToolbar extends wp.element.Component {
 							.map( ( control ) => ( {
 								...control,
 								onClick: this.toggleFormat( control.format ),
-								isActive: !! formats[ control.format ]
+								isActive: !! formats[ control.format ],
 							} ) )
 							.concat( [ {
 								icon: 'admin-links',
 								title: wp.i18n.__( 'Link' ),
 								onClick: this.addLink,
-								isActive: !! formats.link
+								isActive: !! formats.link,
 							} ] )
 					}
 				/>

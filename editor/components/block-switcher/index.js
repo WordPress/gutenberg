@@ -16,7 +16,7 @@ class BlockSwitcher extends wp.element.Component {
 		super( ...arguments );
 		this.toggleMenu = this.toggleMenu.bind( this );
 		this.state = {
-			open: false
+			open: false,
 		};
 	}
 
@@ -30,14 +30,14 @@ class BlockSwitcher extends wp.element.Component {
 
 	toggleMenu() {
 		this.setState( {
-			open: ! this.state.open
+			open: ! this.state.open,
 		} );
 	}
 
 	switchBlockType( blockType ) {
 		return () => {
 			this.setState( {
-				open: false
+				open: false,
 			} );
 			this.props.onTransform( this.props.block, blockType );
 		};
@@ -92,15 +92,15 @@ class BlockSwitcher extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: state.blocks.byUid[ ownProps.uid ]
+		block: state.blocks.byUid[ ownProps.uid ],
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {
 			dispatch( {
 				type: 'SWITCH_BLOCK_TYPE',
 				uid: ownProps.uid,
-				block: wp.blocks.switchToBlockType( block, blockType )
+				block: wp.blocks.switchToBlockType( block, blockType ),
 			} );
-		}
+		},
 	} )
 )( clickOutside( BlockSwitcher ) );

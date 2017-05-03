@@ -32,20 +32,20 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 export default connect(
 	( state, ownProps ) => ( {
 		isFirst: first( state.blocks.order ) === ownProps.uid,
-		isLast: last( state.blocks.order ) === ownProps.uid
+		isLast: last( state.blocks.order ) === ownProps.uid,
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			dispatch( {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMoveUp() {
 			dispatch( {
 				type: 'MOVE_BLOCK_UP',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
-		}
+		},
 	} )
 )( BlockMover );

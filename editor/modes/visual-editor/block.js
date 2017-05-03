@@ -43,8 +43,8 @@ class VisualEditorBlock extends wp.element.Component {
 		onChange( block.uid, {
 			attributes: {
 				...block.attributes,
-				...attributes
-			}
+				...attributes,
+			},
 		} );
 	}
 
@@ -95,8 +95,8 @@ class VisualEditorBlock extends wp.element.Component {
 		onChange( previousBlock.uid, {
 			attributes: {
 				...previousBlock.attributes,
-				...updatedAttributes
-			}
+				...updatedAttributes,
+			},
 		} );
 		onRemove( block.uid );
 	}
@@ -127,7 +127,7 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isHovered, isSelected, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': isSelected && ! isTyping,
-			'is-hovered': isHovered
+			'is-hovered': isHovered,
 		} );
 
 		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
@@ -164,7 +164,7 @@ class VisualEditorBlock extends wp.element.Component {
 								controls={ settings.controls.map( ( control ) => ( {
 									...control,
 									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: control.isActive( block.attributes )
+									isActive: control.isActive( block.attributes ),
 								} ) ) } />
 						) }
 						<Slot name="Formatting.Toolbar" />
@@ -196,7 +196,7 @@ export default connect(
 			isHovered: state.hoveredBlock === ownProps.uid,
 			focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
 			isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
-			order
+			order,
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -204,41 +204,41 @@ export default connect(
 			dispatch( {
 				type: 'UPDATE_BLOCK',
 				uid,
-				updates
+				updates,
 			} );
 		},
 		onSelect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onDeselect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: false,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onStartTyping() {
 			dispatch( {
 				type: 'START_TYPING',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMouseLeave() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: false,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 
@@ -246,7 +246,7 @@ export default connect(
 			dispatch( {
 				type: 'INSERT_BLOCK',
 				after: ownProps.uid,
-				block
+				block,
 			} );
 		},
 
@@ -254,15 +254,15 @@ export default connect(
 			dispatch( {
 				type: 'UPDATE_FOCUS',
 				uid,
-				config
+				config,
 			} );
 		},
 
 		onRemove( uid ) {
 			dispatch( {
 				type: 'REMOVE_BLOCK',
-				uid
+				uid,
 			} );
-		}
+		},
 	} )
 )( VisualEditorBlock );

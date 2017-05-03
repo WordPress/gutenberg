@@ -43,14 +43,14 @@ export default connect(
 	( state ) => ( {
 		blocks: state.blocks.order.map( ( uid ) => (
 			state.blocks.byUid[ uid ]
-		) )
+		) ),
 	} ),
 	( dispatch ) => ( {
 		onChange( value ) {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
-				blockNodes: wp.blocks.parse( value )
+				blockNodes: wp.blocks.parse( value ),
 			} );
-		}
+		},
 	} )
 )( TextEditor );

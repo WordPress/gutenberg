@@ -13,14 +13,14 @@ class InserterMenu extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			filterValue: ''
+			filterValue: '',
 		};
 		this.filter = this.filter.bind( this );
 	}
 
 	filter( event ) {
 		this.setState( {
-			filterValue: event.target.value
+			filterValue: event.target.value,
 		} );
 	}
 
@@ -89,8 +89,8 @@ export default connect(
 		onInsertBlock( slug ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
-				block: wp.blocks.createBlock( slug )
+				block: wp.blocks.createBlock( slug ),
 			} );
-		}
+		},
 	} )
 )( InserterMenu );

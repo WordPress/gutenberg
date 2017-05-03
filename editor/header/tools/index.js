@@ -54,6 +54,6 @@ export default connect(
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),
 		redo: () => dispatch( { type: 'REDO' } ),
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } )
+		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
 	} )
 )( Tools );
