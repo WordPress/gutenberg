@@ -17,7 +17,7 @@ export function undoable( reducer, options = {} ) {
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
-		future: []
+		future: [],
 	};
 
 	return ( state = initialState, action ) => {
@@ -28,14 +28,14 @@ export function undoable( reducer, options = {} ) {
 				return {
 					past: past.slice( 0, past.length - 1 ),
 					present: past[ past.length - 1 ],
-					future: [ present, ...future ]
+					future: [ present, ...future ],
 				};
 
 			case 'REDO':
 				return {
 					past: [ ...past, present ],
 					present: future[ 0 ],
-					future: future.slice( 1 )
+					future: future.slice( 1 ),
 				};
 		}
 
@@ -45,7 +45,7 @@ export function undoable( reducer, options = {} ) {
 			return {
 				past: [],
 				present: nextPresent,
-				future: []
+				future: [],
 			};
 		}
 
@@ -56,7 +56,7 @@ export function undoable( reducer, options = {} ) {
 		return {
 			past: [ ...past, present ],
 			present: nextPresent,
-			future: []
+			future: [],
 		};
 	};
 }
@@ -82,7 +82,7 @@ export function combineUndoableReducers( reducers, options ) {
 			memo[ key ] = {
 				get: function() {
 					return this.history.present[ key ];
-				}
+				},
 			};
 
 			return memo;

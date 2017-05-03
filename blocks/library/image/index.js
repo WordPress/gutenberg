@@ -35,7 +35,7 @@ registerBlock( 'core/image', {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
 		caption: children( 'figcaption' ),
-		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ]
+		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ],
 	},
 
 	controls: [
@@ -43,32 +43,32 @@ registerBlock( 'core/image', {
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' )
+			onClick: applyOrUnset( 'left' ),
 		},
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' )
+			onClick: applyOrUnset( 'center' ),
 		},
 		{
 			icon: 'align-right',
 			title: wp.i18n.__( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' )
+			onClick: applyOrUnset( 'right' ),
 		},
 		{
 			icon: 'align-none',
 			title: wp.i18n.__( 'No alignment' ),
 			isActive: ( { align } ) => ! align || 'none' === align,
-			onClick: applyOrUnset( 'none' )
+			onClick: applyOrUnset( 'none' ),
 		},
 		{
 			icon: 'align-full-width',
 			title: wp.i18n.__( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
-			onClick: applyOrUnset( 'wide' )
-		}
+			onClick: applyOrUnset( 'wide' ),
+		},
 	],
 
 	getEditWrapperProps( attributes ) {
@@ -128,5 +128,5 @@ registerBlock( 'core/image', {
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
-	}
+	},
 } );

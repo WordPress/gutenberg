@@ -20,7 +20,7 @@ export function createBlock( blockType, attributes = {} ) {
 	return {
 		uid: uuid(),
 		blockType,
-		attributes
+		attributes,
 	};
 }
 
@@ -48,6 +48,6 @@ export function switchToBlockType( block, blockType ) {
 	return Object.assign( {
 		uid: block.uid,
 		attributes: transformation.transform( block.attributes ),
-		blockType
+		blockType,
 	} );
 }

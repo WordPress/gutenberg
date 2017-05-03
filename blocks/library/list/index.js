@@ -15,8 +15,8 @@ registerBlock( 'core/list', {
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
 		items: query( 'li', {
-			value: children()
-		} )
+			value: children(),
+		} ),
 	},
 
 	controls: [
@@ -26,7 +26,7 @@ registerBlock( 'core/list', {
 			isActive: ( { align } ) => ! align || 'left' === align,
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: undefined } );
-			}
+			},
 		},
 		{
 			icon: 'editor-aligncenter',
@@ -34,7 +34,7 @@ registerBlock( 'core/list', {
 			isActive: ( { align } ) => 'center' === align,
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'center' } );
-			}
+			},
 		},
 		{
 			icon: 'editor-alignright',
@@ -42,7 +42,7 @@ registerBlock( 'core/list', {
 			isActive: ( { align } ) => 'right' === align,
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'right' } );
-			}
+			},
 		},
 		{
 			icon: 'editor-justify',
@@ -50,8 +50,8 @@ registerBlock( 'core/list', {
 			isActive: ( { align } ) => 'justify' === align,
 			onClick( attributes, setAttributes ) {
 				setAttributes( { align: 'justify' } );
-			}
-		}
+			},
+		},
 	],
 
 	edit( { attributes, focus, setFocus } ) {
@@ -81,5 +81,5 @@ registerBlock( 'core/list', {
 				<li key={ index }>{ item.value }</li>
 			) )
 		);
-	}
+	},
 } );

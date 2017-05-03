@@ -20,12 +20,12 @@ describe( 'block factory', () => {
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType and attributes', () => {
 			const block = createBlock( 'core/test-block', {
-				align: 'left'
+				align: 'left',
 			} );
 
 			expect( block.blockType ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {
-				align: 'left'
+				align: 'left',
 			} );
 			expect( block.uid ).to.be.a( 'string' );
 		} );
@@ -39,11 +39,11 @@ describe( 'block factory', () => {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return {
-								value: 'chicken ' + value
+								value: 'chicken ' + value,
 							};
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -51,8 +51,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -61,8 +61,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
-					value: 'chicken ribs'
-				}
+					value: 'chicken ribs',
+				},
 			} );
 		} );
 
@@ -74,19 +74,19 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return {
-								value: 'chicken ' + value
+								value: 'chicken ' + value,
 							};
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 
 			const block = {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -95,8 +95,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
-					value: 'chicken ribs'
-				}
+					value: 'chicken ribs',
+				},
 			} );
 		} );
 
@@ -108,8 +108,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updateBlock = switchToBlockType( block, 'core/updated-text-block' );

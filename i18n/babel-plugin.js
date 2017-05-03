@@ -44,7 +44,7 @@ const { writeFileSync } = require( 'fs' );
  */
 const DEFAULT_HEADERS = {
 	'content-type': 'text/plain; charset=UTF-8',
-	'x-generator': 'babel-plugin-wp-i18n'
+	'x-generator': 'babel-plugin-wp-i18n',
 };
 
 /**
@@ -58,7 +58,7 @@ const DEFAULT_FUNCTIONS = {
 	__: [ 'msgid' ],
 	_n: [ 'msgid', 'msgid_plural' ],
 	_x: [ 'msgid', 'msgctxt' ],
-	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ]
+	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ],
 };
 
 /**
@@ -175,10 +175,10 @@ module.exports = function() {
 							'': {
 								'': {
 									msgid: '',
-									msgstr: []
-								}
-							}
-						}
+									msgstr: [],
+								},
+							},
+						},
 					};
 
 					for ( const key in baseData.headers ) {
@@ -202,7 +202,7 @@ module.exports = function() {
 				// Assign file reference comment
 				const { filename } = this.file.opts;
 				translation.comments = {
-					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line
+					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line,
 				};
 
 				// If exists, also assign translator comment
@@ -252,7 +252,7 @@ module.exports = function() {
 								if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
 									translation.comments.reference = uniq( [
 										memo[ msgctxt ][ msgid ].comments.reference,
-										translation.comments.reference
+										translation.comments.reference,
 									].join( '\n' ).split( '\n' ) ).join( '\n' );
 								}
 
@@ -273,9 +273,9 @@ module.exports = function() {
 					const compiled = po.compile( data );
 					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
 					this.hasPendingWrite = false;
-				}
-			}
-		}
+				},
+			},
+		},
 	};
 };
 

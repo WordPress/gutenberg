@@ -20,25 +20,25 @@ const KEYCODE_BACKSPACE = 8;
 const formatMap = {
 	strong: 'bold',
 	em: 'italic',
-	del: 'strikethrough'
+	del: 'strikethrough',
 };
 
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
 		title: wp.i18n.__( 'Align left' ),
-		align: 'left'
+		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
 		title: wp.i18n.__( 'Align center' ),
-		align: 'center'
+		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
 		title: wp.i18n.__( 'Align right' ),
-		align: 'right'
-	}
+		align: 'right',
+	},
 ];
 
 function createElement( type, props, ...children ) {
@@ -73,7 +73,7 @@ export default class Editable extends wp.element.Component {
 		this.state = {
 			formats: {},
 			alignment: null,
-			bookmark: null
+			bookmark: null,
 		};
 	}
 
@@ -92,8 +92,8 @@ export default class Editable extends wp.element.Component {
 			convert_urls: false,
 			setup: this.onSetup,
 			formats: {
-				strikethrough: { inline: 'del' }
-			}
+				strikethrough: { inline: 'del' },
+			},
 		};
 
 		tinymce.init( config );
@@ -138,7 +138,7 @@ export default class Editable extends wp.element.Component {
 		const position = node.getBoundingClientRect();
 		return {
 			top: position.top - editorPosition.top + 40 + ( position.height ),
-			left: position.left - editorPosition.left - 157
+			left: position.left - editorPosition.left - 157,
 		};
 	}
 
@@ -347,7 +347,7 @@ export default class Editable extends wp.element.Component {
 		} );
 
 		this.setState( {
-			formats: merge( {}, this.state.formats, formats )
+			formats: merge( {}, this.state.formats, formats ),
 		} );
 	}
 
@@ -385,12 +385,12 @@ export default class Editable extends wp.element.Component {
 							controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
 								...control,
 								onClick: () => this.toggleAlignment( control.align ),
-								isActive: this.isAlignmentActive( control.align )
+								isActive: this.isAlignmentActive( control.align ),
 							} ) ) } />
 					}
 					<FormatToolbar focusPosition={ this.state.focusPosition } formats={ this.state.formats } onChange={ this.changeFormats } />
 				</Fill>,
-				element
+				element,
 			];
 		}
 
