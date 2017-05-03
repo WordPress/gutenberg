@@ -23,7 +23,7 @@ const config = {
 	externals: {
 		react: 'React',
 		'react-dom': 'ReactDOM',
-		'react-dom/server': 'ReactDOMServer',
+		'react-dom/server': 'ReactDOMServer'
 	},
 	resolve: {
 		alias: {
@@ -104,10 +104,7 @@ switch ( process.env.NODE_ENV ) {
 			'./editor/index.js',
 			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` )
 		];
-		config.externals = [
-			require( 'webpack-node-externals' )(),
-			require( 'webpack-rxjs-externals' )()
-		];
+		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
 			path: __dirname

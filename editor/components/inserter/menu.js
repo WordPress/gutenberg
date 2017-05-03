@@ -2,16 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/filter';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import Dashicon from 'components/dashicon';
-import { focusNextFocusableRef, focusPreviousFocusableRef, listVisibleBlocksByCategory } from './helpers';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -29,6 +25,126 @@ class InserterMenu extends wp.element.Component {
 		this.changeMenuSelection = this.changeMenuSelection.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.bindReferenceNode = this.bindReferenceNode.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.listVisibleBlocksByCategory = this.listVisibleBlocksByCategory.bind( this );
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'keydown', this.onKeyDown );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'keydown', this.onKeyDown );
+	}
+
+	isShown( filterValue, string ) {
+		return string.toLowerCase().indexOf( filterValue.toLowerCase() ) !== -1;
+	}
+
+	isShownBlock( filterValue, block ) {
+		return this.isShown( filterValue, block.title );
+	}
+
+	visibleFocusables( nodes, filterValue ) {
+		const focusables = [];
+
+		for ( const refName in nodes ) {
+			if ( this.isShown( filterValue, refName ) && 'search' !== refName ) {
+				focusables.push( refName );
+			}
+		}
+
+		// Add search regardless at the end.
+		focusables.push( 'search' );
+
+		return focusables;
+	}
+
+	nextFocusableRef( component ) {
+		const focusables = this.visibleFocusables( component.nodes, component.state.filterValue );
+
+		// Initiate the menu with the first block.
+		if ( null === component.state.focusedElementRef ) {
+			return focusables[ 0 ];
+		}
+
+		const currentIndex = focusables.findIndex( ( elementRef ) => elementRef === component.state.focusedElementRef );
+		return this.nextFocusInList( currentIndex, focusables );
+	}
+
+	previousFocusableRef( component ) {
+		const focusables = this.visibleFocusables( component.nodes, component.state.filterValue );
+
+		// Initiate the menu with the first block.
+		if ( null === component.state.focusedElementRef ) {
+			return focusables[ 0 ];
+		}
+
+		const currentIndex = focusables.findIndex( ( elementRef ) => elementRef === component.state.focusedElementRef );
+		return this.previousFocusInList( currentIndex, focusables );
+	}
+
+	/**
+	 * Get the next focusable element in list.
+	 *
+	 * @param {int} currentIndex Current index in the list.
+	 * @param {array} focusables List of focusable elements attached to node references.
+	 * @return {string} Name of the next focus.
+	 */
+	nextFocusInList( currentIndex, focusables ) {
+		const nextIndex = currentIndex + 1;
+		const highestIndex = focusables.length - 1;
+
+		// Check boundary so that the index is does not exceed the length.
+		if ( nextIndex > highestIndex ) {
+			// Cycle back to other end.
+			return focusables[ 0 ];
+		}
+
+		return focusables[ nextIndex ];
+	}
+
+	/**
+	 * Get the previousFocusInList.
+	 *
+	 * @param {int} currentIndex Current index in the list.
+	 * @param {array} focusables List of focusable elements attached to node references.
+	 * @return {string} Name of the previous focus.
+	 */
+	previousFocusInList( currentIndex, focusables ) {
+		const nextIndex = currentIndex - 1;
+		const lowestIndex = 0;
+
+		// Check boundary so that the index is does not exceed the length.
+		if ( nextIndex < lowestIndex ) {
+			// Cycle back to other end.
+			return focusables[ focusables.length - 1 ];
+		}
+
+		return focusables[ nextIndex ];
+	}
+
+	focusNextFocusableRef( component ) {
+		const next = component.nextFocusableRef( component );
+		component.changeMenuSelection( next );
+	}
+
+	focusPreviousFocusableRef( component ) {
+		const previous = component.previousFocusableRef( component );
+		component.changeMenuSelection( previous );
+	}
+
+	listVisibleBlocksByCategory( blocks ) {
+		return blocks.reduce( ( groups, block ) => {
+			if ( ! this.isShownBlock( this.state.filterValue, block ) ) {
+				return groups;
+			}
+			if ( ! groups[ block.category ] ) {
+				groups[ block.category ] = [];
+			}
+			groups[ block.category ].push( block );
+			return groups;
+		}, {} );
 	}
 
 	bindReferenceNode( nodeName ) {
@@ -38,58 +154,26 @@ class InserterMenu extends wp.element.Component {
 		return binder;
 	}
 
-	componentDidMount() {
-		// Build a stream of keydown events on component mount.
-		this.keyStream$ = Observable.fromEvent( document, 'keydown' );
-
-		// Out of keydown stream build a stream matching arrow down and arrow right.
-		this.focusNextFocusableRef$ = this.keyStream$.filter( keydown => keydown.code === 'ArrowDown' || keydown.code === 'ArrowRight' || ( keydown.code === 'Tab' && keydown.shiftKey === false ) );
-
-		// Out of keydown stream build a stream matching arrow left and arrow up.
-		this.focusPreviousFocusableRef$ = this.keyStream$.filter( keydown => keydown.code === 'ArrowUp' || keydown.code === 'ArrowLeft' || ( keydown.code === 'Tab' && keydown.shiftKey === true ) );
-
-		// Get escape key presses.
-		this.closeInserter$ = this.keyStream$.filter( keydown => keydown.code === 'Escape' );
-
-		// Create subscriptions for our next and previous blockType focus actions.
-		this.nextBlockSubscription = this.focusNextFocusableRef$.subscribe( ( keydown ) => {
-			keydown.preventDefault();
-			focusNextFocusableRef( this );
-		} );
-		this.previousBlockSubscription = this.focusPreviousFocusableRef$.subscribe( ( keydown ) => {
-			keydown.preventDefault();
-			focusPreviousFocusableRef( this );
-		} );
-		this.closeInserterSubscription = this.closeInserter$.subscribe( () => {
-			this.props.closeMenu();
-		} );
+	isNextKeydown( keydown ) {
+		return keydown.code === 'ArrowDown'
+			|| keydown.code === 'ArrowRight'
+			|| ( keydown.code === 'Tab' && keydown.shiftKey === false );
 	}
 
-	componentWillUnmount() {
-		// Unsubscribe from the stream.
-		this.nextBlockSubscription.unsubscribe();
-		this.previousBlockSubscription.unsubscribe();
-		this.closeInserterSubscription.unsubscribe();
+	isPreviousKeydown( keydown ) {
+		return keydown.code === 'ArrowUp'
+			|| keydown.code === 'ArrowLeft'
+			|| ( keydown.code === 'Tab' && keydown.shiftKey === true );
+	}
 
-		// These deletes are most likely not necessary but memory leaks can be pretty ugly.
-		delete this.nextBlockSubscription;
-		delete this.previousBlockSubscription;
-		delete this.closeInserterSubscription;
-		delete this.closeInserter$;
-		delete this.focusPreviousFocusableRef$;
-		delete this.focusNextFocusableRef$;
-		delete this.keyStreamSubscription;
-		delete this.keyStream$;
+	isEscapeKey( keydown ) {
+		return keydown.code === 'Escape';
 	}
 
 	filter( event ) {
 		this.setState( {
 			filterValue: event.target.value
 		} );
-	}
-
-	isShownBlock( block ) {
-		return block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
 	}
 
 	selectBlock( slug ) {
@@ -101,6 +185,22 @@ class InserterMenu extends wp.element.Component {
 				focusedElementRef: null
 			} );
 		};
+	}
+
+	onKeyDown( keydown ) {
+		keydown.preventDefault();
+
+		if ( this.isNextKeydown( keydown ) ) {
+			this.focusNextFocusableRef( this );
+		}
+
+		if ( this.isPreviousKeydown( keydown ) ) {
+			this.focusPreviousFocusableRef( this );
+		}
+
+		if ( this.isEscapeKey( keydown ) ) {
+			this.props.closeMenu();
+		}
 	}
 
 	changeMenuSelection( refName ) {
@@ -119,7 +219,7 @@ class InserterMenu extends wp.element.Component {
 	render() {
 		const { position = 'top' } = this.props;
 		const blocks = this.blockTypes;
-		const visibleBlocksByCategory = listVisibleBlocksByCategory( this.state )( blocks );
+		const visibleBlocksByCategory = this.listVisibleBlocksByCategory( blocks );
 		const categories = this.categories;
 
 		return (
