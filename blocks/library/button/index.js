@@ -4,6 +4,7 @@
 import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
+import Dashicon from '../../../editor/components/dashicon';
 
 const { attr, children } = query;
 
@@ -64,19 +65,23 @@ registerBlock( 'core/button', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { text, title } = attributes;
+		const { text, url, title } = attributes;
 
 		return (
-			<a className="blocks-button" title={ title }>
+			<span className="blocks-button" title={ title }>
 				<Editable
 					tagName="span"
 					placeholder={ wp.i18n.__( 'Write some text…' ) }
 					value={ text }
-					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 				/>
-			</a>
+				{ focus &&
+					<a className="blocks-button__link" href={ url } target="_blank">
+						<Dashicon icon="external" />
+					</a>
+				}
+			</span>
 		);
 	},
 

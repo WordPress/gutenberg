@@ -8,6 +8,10 @@ window._wpGutenbergPost = {
 			'<h1>1.0 Is The Loneliest Number</h1>',
 			'<!-- /wp:core/heading -->',
 
+			'<!-- wp:core/button -->',
+			'<div class="aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Gutenberg on GitHub</span></a></div>',
+			'<!-- /wp:core/button -->',
+
 			'<!-- wp:core/text -->',
 			'<p>I imagine prior to the launch of the iPod, or the iPhone, there were teams saying the same thing: the copy + paste guys are <em>so close</em> to being ready and we know Walt Mossberg is going to ding us for this so let\'s just not ship to the manufacturers in China for just a few more weeks… The Apple teams were probably embarrassed. But <strong>if you\'re not embarrassed when you ship your first version you waited too long</strong>.</p>',
 			'<!-- /wp:core/text -->',

@@ -16,9 +16,26 @@
 	color: $white;
 	border-color: $blue-wordpress;
 	vertical-align: top;
+	position: relative;
 
 	&:hover {
 		color: $white;
+	}
+}
+
+.blocks-button__link {
+	position: absolute;
+	right: -32px;
+	top: 5px;
+	color: $dark-gray-500;
+	text-decoration: none;
+
+	&:hover {
+		color: $dark-gray-300;
+	}
+
+	.dashicon {
+		vertical-align: middle;
 	}
 }
 
