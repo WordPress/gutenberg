@@ -21,30 +21,55 @@ registerBlock( 'core/pullquote', {
 				return;
 			}
 
-			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
+			const match = value.match( /\bblocks-pullquote-style-(\d+)\b/ );
 			if ( ! match ) {
 				return;
 			}
 
 			return Number( match[ 1 ] );
-		}
+		},
+		bg: ( node ) => {
+			const value = attr( 'blockquote', 'class' )( node );
+			if ( ! value ) {
+				return;
+			}
+
+			const match = value.match( /\bblocks-pullquote-bg-(\d+)\b/ );
+			if ( ! match ) {
+				return;
+			}
+
+			return Number( match[ 1 ] );
+		},
 	},
 
-	controls: [ 1, 2 ].map( ( variation ) => ( {
-		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => style === variation,
-		onClick( attributes, setAttributes ) {
-			setAttributes( { style: variation } );
-		},
-		subscript: variation
-	} ) ),
+	controls: [
+		...[ 1, 2 ].map( ( variation ) => ( {
+			icon: 'format-quote',
+			title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
+			isActive: ( { style = 1 } ) => style === variation,
+			onClick( attributes, setAttributes ) {
+				setAttributes( { style: variation } );
+			},
+			subscript: variation
+		} ) ),
+		...[ 1, 2, 3 ].map( ( variation ) => ( {
+			icon: 'art',
+			title: wp.i18n.sprintf( wp.i18n.__( 'Background Color %d' ), variation ),
+			onClick( attributes, setAttributes ) {
+				setAttributes( { bg: variation } );
+			},
+			isActive: () => false,
+			subscript: variation,
+			classNames: [ `color${ variation }` ] // icon color
+		} ) ),
+	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation, style = 1 } = attributes;
+		const { value, citation, style = 1, bg = 1 } = attributes;
 
 		return (
-			<blockquote className={ `blocks-pullquote blocks-pullquote-style-${ style }` }>
+			<blockquote className={ `blocks-pullquote blocks-pullquote-bg-${ bg } blocks-pullquote-style-${ style }` }>
 				<Editable
 					value={ value || 'Write Quote' }
 					onChange={
@@ -75,10 +100,10 @@ registerBlock( 'core/pullquote', {
 	},
 
 	save( { attributes } ) {
-		const { value, citation, style = 1 } = attributes;
+		const { value, citation, style = 1, bg = 1 } = attributes;
 
 		return (
-			<blockquote className={ `blocks-pullquote-style-${ style }` }>
+			<blockquote className={ `blocks-pullquote-style-${ style } blocks-pullquote-bg-${ bg }` }>
 				{ value && wp.element.Children.map( value, ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }

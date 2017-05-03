@@ -1,7 +1,11 @@
+$c1: #29A188;
+$c2: #FCB740;
+$c3: #F03D56;
+
 .blocks-pullquote {
 
 	color: $white;
-	background-color: #BBB;
+	background-color: inherit;
 	box-shadow: none;
 
 	// replace with full-width, 700px = editor size, 160px = sidebar
@@ -28,6 +32,18 @@
 	}
 }
 
+.blocks-pullquote-bg-1 {
+	background-color: $c1;
+}
+
+.blocks-pullquote-bg-2 {
+	background-color: $c2;
+}
+
+.blocks-pullquote-bg-3 {
+	background-color: $c3;
+}
+
 .editor-visual-editor .blocks-pullquote-style-1 {
 	& > .blocks-editable p {
 		font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
@@ -43,4 +59,17 @@
 		font-style: italic;
 		line-height: 38px;
 	}
+}
+
+// color icon controls
+.editor-toolbar__control.editor-button.color1 {
+	color: $c1;
+}
+
+.editor-toolbar__control.editor-button.color2 {
+	color: $c2;
+}
+
+.editor-toolbar__control.editor-button.color3 {
+	color: $c3;
 }
