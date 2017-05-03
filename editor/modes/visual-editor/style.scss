@@ -1,6 +1,6 @@
 .editor-visual-editor {
 	margin: 60px auto 0;
-	width: 700px;
+	max-width: 700px;
 
 	&,
 	& p {
@@ -12,10 +12,9 @@
 
 .editor-visual-editor__block {
 	position: relative;
-	border: 2px solid transparent;
-	transition: 0.2s border-color;
-	margin-left: -35px;
+	left: -35px;
 	padding: 15px 15px 15px 50px;
+	transition: 0.2s border-color;
 
 	&:before {
 		z-index: -1;
@@ -23,7 +22,7 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: 33px;
+		left: 35px;
 		right: 0;
 		border: 2px solid transparent;
 		transition: 0.2s border-color;

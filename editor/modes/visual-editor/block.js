@@ -138,22 +138,21 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = settings.getEditWrapperProps( block.attributes );
 		}
 
-		// Disable reason: Each block can receive focus but must be able to contain
-		// block children. Tab keyboard navigation enabled by tabIndex assignment.
+		// Disable reason: Each block can be selected by clicking on it
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				tabIndex="0"
+				onClick={ onSelect }
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onStartTyping }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
+				tabIndex="0"
 				{ ...wrapperProps }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
@@ -171,14 +170,16 @@ class VisualEditorBlock extends wp.element.Component {
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<BlockEdit
-					focus={ focus }
-					attributes={ block.attributes }
-					setAttributes={ this.setAttributes }
-					insertBlockAfter={ onInsertAfter }
-					setFocus={ partial( onFocus, block.uid ) }
-					mergeWithPrevious={ this.mergeWithPrevious }
-				/>
+				<div onKeyDown={ onStartTyping }>
+					<BlockEdit
+						focus={ focus }
+						attributes={ block.attributes }
+						setAttributes={ this.setAttributes }
+						insertBlockAfter={ onInsertAfter }
+						setFocus={ partial( onFocus, block.uid ) }
+						mergeWithPrevious={ this.mergeWithPrevious }
+					/>
+				</div>
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
