@@ -61,7 +61,6 @@ export default class Editable extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
@@ -79,6 +78,7 @@ export default class Editable extends wp.element.Component {
 
 	componentDidMount() {
 		this.initialize();
+		this.focus();
 	}
 
 	initialize() {
@@ -101,17 +101,11 @@ export default class Editable extends wp.element.Component {
 
 	onSetup( editor ) {
 		this.editor = editor;
-		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
-	}
-
-	onInit() {
-		this.setContent( this.props.value );
-		this.focus();
 	}
 
 	onFocus() {
@@ -363,16 +357,23 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName: Tag = 'div', style, focus, className, showAlignments = false, formattingControls } = this.props;
+		const {
+			tagName = 'div',
+			value,
+			style,
+			focus,
+			className,
+			showAlignments = false,
+			formattingControls
+		} = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
-		let element = (
-			<Tag
-				ref={ this.bindEditorNode }
-				style={ style }
-				className={ classes }
-				key="editor" />
-		);
+		let element = wp.element.createElement( tagName, {
+			ref: this.bindEditorNode,
+			style: style,
+			className: classes,
+			key: 'editor'
+		}, ...wp.element.Children.toArray( value ) );
 
 		if ( focus ) {
 			element = [
