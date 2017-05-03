@@ -12,6 +12,7 @@
 	}
 }
 
+/* Visual and Text editor both */
 .editor-layout.is-sidebar-opened .editor-layout__content {
 	margin-right: $sidebar-width;
 }
@@ -24,4 +25,9 @@
 	@include break-medium() {
 		width: $sidebar-width;
 	}
+}
+
+/* Text Editor specific */
+.editor-layout.is-sidebar-opened .editor-text-editor__formatting {
+	margin-right: $sidebar-width;
 }
