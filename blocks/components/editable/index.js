@@ -211,13 +211,10 @@ export default class Editable extends wp.element.Component {
 		// Splitting into two blocks
 		this.setContent( this.props.value );
 
-		// The setTimeout fixes the focus jump to the original block
-		setTimeout( () => {
-			this.props.onSplit(
-				nodeListToReact( before, createElement ),
-				nodeListToReact( after, createElement )
-			);
-		} );
+		this.props.onSplit(
+			nodeListToReact( before, createElement ),
+			nodeListToReact( after, createElement )
+		);
 	}
 
 	onNodeChange( { element, parents } ) {
