@@ -102,7 +102,6 @@ function do_blocks( $content ) {
 	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)-->.*<!--\s*\/wp:\g1\s+-->/';
 	preg_match_all( $open_matcher, $content, $matches, PREG_OFFSET_CAPTURE );
 
-	$offset = 0;
 	$new_content = $content;
 	foreach ( $matches[ 0 ] as $index => $block_match ) {
 		$block_name = $matches[ 1 ][ $index ][ 0 ];
@@ -111,7 +110,7 @@ function do_blocks( $content ) {
 			continue;
 		}
 
-		$block_length = mb_strlen( $block_match[ 0 ] );
+		$block_markup = $block_match[ 0 ];
 		$block_position = $block_match[ 1 ];
 		$block_attributes_string = $matches[ 2 ][ $index ][ 0 ];
 		$block_attributes = parse_block_attributes( $block_attributes_string );
@@ -120,11 +119,7 @@ function do_blocks( $content ) {
 		$output = call_user_func( $registered_blocks[ $block_name ][ 'render' ], $block_attributes );
 
 		// Replace the matched block with the dynamic output
-		$new_content =
-			mb_substr( $new_content, 0, $block_position + $offset ) .
-			$output .
-			mb_substr( $new_content, $block_position + $block_length + $offset );
-		$offset += mb_strlen( $output ) - mb_strlen( $block_length );
+		$new_content = str_replace( $block_markup, $output, $new_content );
 	}
 
 	return $new_content;
