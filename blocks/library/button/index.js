@@ -4,7 +4,7 @@
 import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
-import Dashicon from '../../../editor/components/dashicon';
+import IconButton from '../../../editor/components/icon-button';
 
 const { attr, children } = query;
 
@@ -77,9 +77,19 @@ registerBlock( 'core/button', {
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 				/>
 				{ focus &&
-					<a className="blocks-button__link" href={ url } target="_blank">
-						<Dashicon icon="external" />
-					</a>
+					<form
+						className="editable-format-toolbar__link-modal"
+						onSubmit={ ( event ) => event.preventDefault() }>
+						<input
+							className="editable-format-toolbar__link-input"
+							type="url"
+							required
+							value={ url }
+							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
+							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+						/>
+						<IconButton icon="editor-break" type="submit" />
+					</form>
 				}
 			</span>
 		);

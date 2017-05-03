@@ -21,6 +21,11 @@
 	&:hover {
 		color: $white;
 	}
+
+	.editable-format-toolbar__link-modal {
+		top: -1px;
+		left: calc( 100% + 12px );
+	}
 }
 
 .blocks-button__link {
@@ -46,5 +51,11 @@
 
 	&[data-align="right"] {
 		text-align: right;
+
+		.editable-format-toolbar__link-modal {
+			top: -1px;
+			left: auto;
+			right: calc( 100% + 12px );
+		}
 	}
 }
