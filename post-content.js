@@ -29,7 +29,7 @@ window._wpGutenbergPost = {
 			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully you\'ll find aspects like adding captions or going full-width with your pictures much easier and robust than before.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/image -->',
+			'<!-- wp:core/image align="center" -->',
 			'<figure><img src="https://cldup.com/E4PzNdrFSQ.jpg" class="aligncenter"/><figcaption><p>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</p></figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
@@ -57,7 +57,7 @@ window._wpGutenbergPost = {
 			'<p>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/button -->',
+			'<!-- wp:core/button align="center" -->',
 			'<div class="aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
 			'<!-- /wp:core/button -->',
 
@@ -73,7 +73,7 @@ window._wpGutenbergPost = {
 			'<p>A huge benefit of blocks is that you can edit them in place and manipulate you content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/quote -->',
+			'<!-- wp:core/quote style="1" -->',
 			'<blockquote class="blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer><p>Matt Mullenweg, 2017</p></footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
@@ -85,7 +85,7 @@ window._wpGutenbergPost = {
 			'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/quote -->',
+			'<!-- wp:core/quote style="2" -->',
 			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer><p>Maya Angelou</p></footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 

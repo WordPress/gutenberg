@@ -34,8 +34,7 @@ registerBlock( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
-		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ]
+		caption: children( 'figcaption' )
 	},
 
 	controls: [

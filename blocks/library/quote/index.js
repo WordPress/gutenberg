@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { children, query, attr } = hpq;
+const { children, query } = hpq;
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -14,26 +14,13 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
-		style: ( node ) => {
-			const value = attr( 'blockquote', 'class' )( node );
-			if ( ! value ) {
-				return;
-			}
-
-			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
-			if ( ! match ) {
-				return;
-			}
-
-			return Number( match[ 1 ] );
-		}
+		citation: children( 'footer' )
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
 		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => style === variation,
+		isActive: ( { style = 1 } ) => Number( style ) === variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},

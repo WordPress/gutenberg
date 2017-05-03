@@ -32,8 +32,7 @@ registerBlock( 'core/button', {
 	attributes: {
 		url: attr( 'a', 'href' ),
 		title: attr( 'a', 'title' ),
-		text: children( 'a' ),
-		align: ( node ) => ( node.className.match( /\balign(\S+)/ ) || [] )[ 1 ]
+		text: children( 'a' )
 	},
 
 	controls: [
