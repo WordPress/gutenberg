@@ -24,6 +24,9 @@ const FORMATTING_CONTROLS = [
 	}
 ];
 
+// Default controls shown if no `enabledControls` prop provided
+const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+
 class FormatToolbar extends wp.element.Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -101,29 +104,31 @@ class FormatToolbar extends wp.element.Component {
 	}
 
 	render() {
-		const { formats, focusPosition } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
 
+		const toolbarControls = FORMATTING_CONTROLS
+			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
+			.map( ( control ) => ( {
+				...control,
+				onClick: this.toggleFormat( control.format ),
+				isActive: !! formats[ control.format ]
+			} ) );
+
+		if ( enabledControls.indexOf( 'link' ) !== -1 ) {
+			toolbarControls.push( {
+				icon: 'admin-links',
+				title: wp.i18n.__( 'Link' ),
+				onClick: this.addLink,
+				isActive: !! formats.link
+			} );
+		}
+
 		return (
 			<div className="editable-format-toolbar">
-				<Toolbar
-					controls={
-						FORMATTING_CONTROLS
-							.map( ( control ) => ( {
-								...control,
-								onClick: this.toggleFormat( control.format ),
-								isActive: !! formats[ control.format ]
-							} ) )
-							.concat( [ {
-								icon: 'admin-links',
-								title: wp.i18n.__( 'Link' ),
-								onClick: this.addLink,
-								isActive: !! formats.link
-							} ] )
-					}
-				/>
+				<Toolbar controls={ toolbarControls } />
 
 				{ !! formats.link && this.state.isEditingLink &&
 					<form
