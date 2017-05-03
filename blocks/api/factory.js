@@ -46,27 +46,26 @@ export function switchToBlockType( block, blockType ) {
 	}
 
 	const transformationResults = castArray( transformation.transform( block.attributes ) );
+
+	// Ensure that every block object returned by the transformation has a
+	// valid block type.
+	if ( transformationResults.some( ( result ) => ! getBlockSettings( result.blockType ) ) ) {
+		return null;
+	}
+
 	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockType === blockType );
 
-	const transformedBlocks = transformationResults.map( ( result, index ) => {
+	// Ensure that at least one block object returned by the transformation has
+	// the expected "destination" block type.
+	if ( firstSwitchedBlock < 0 ) {
+		return null;
+	}
+
+	return transformationResults.map( ( result, index ) => {
 		return {
 			uid: index === firstSwitchedBlock ? block.uid : uuid(),
 			blockType: result.blockType,
 			attributes: result.attributes
 		};
 	} );
-
-	// Ensure that every block object returned by the transformation has a
-	// block type
-	if ( transformedBlocks.some( ( block ) => ! getBlockSettings( block.blockType ) ) ) {
-		return null;
-	}
-
-	// Ensure that at least one block object returned by the transformation has
-	// the expected "destination" block type
-	if ( ! transformedBlocks.some( ( block ) => block.blockType === blockType ) ) {
-		return null;
-	}
-
-	return transformedBlocks;
 }
