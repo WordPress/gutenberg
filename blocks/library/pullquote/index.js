@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, query as hpq } from 'api';
 import Editable from 'components/editable';
 
-const { children, query, attr } = hpq;
+const { children, query } = hpq;
 
 registerBlock( 'core/pullquote', {
 	title: wp.i18n.__( 'Pullquote' ),
