@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { flow } from 'lodash';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ class InserterMenu extends wp.element.Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			focusedElementRef: null
+			currentFocus: null
 		};
 		this.filter = this.filter.bind( this );
 		this.instanceId = this.constructor.instances++;
@@ -26,7 +27,10 @@ class InserterMenu extends wp.element.Component {
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.bindReferenceNode = this.bindReferenceNode.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.listVisibleBlocksByCategory = this.listVisibleBlocksByCategory.bind( this );
+		this.getVisibleBlocks = this.getVisibleBlocks.bind( this );
+		this.getVisibleBlocksByCategory = this.getVisibleBlocksByCategory.bind( this );
+		this.getCategoryIndex = this.getCategoryIndex.bind( this );
+		this.sortBlocksByCategory = this.sortBlocksByCategory.bind( this );
 	}
 
 	componentDidMount() {
@@ -37,114 +41,8 @@ class InserterMenu extends wp.element.Component {
 		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
-	isShown( filterValue, string ) {
-		return string.toLowerCase().indexOf( filterValue.toLowerCase() ) !== -1;
-	}
-
-	isShownBlock( filterValue, block ) {
-		return this.isShown( filterValue, block.title );
-	}
-
-	visibleFocusables( nodes, filterValue ) {
-		const focusables = [];
-
-		for ( const refName in nodes ) {
-			if ( this.isShown( filterValue, refName ) && 'search' !== refName ) {
-				focusables.push( refName );
-			}
-		}
-
-		// Add search regardless at the end.
-		focusables.push( 'search' );
-
-		return focusables;
-	}
-
-	nextFocusableRef( component ) {
-		const focusables = this.visibleFocusables( component.nodes, component.state.filterValue );
-
-		// Initiate the menu with the first block.
-		if ( null === component.state.focusedElementRef ) {
-			return focusables[ 0 ];
-		}
-
-		const currentIndex = focusables.findIndex( ( elementRef ) => elementRef === component.state.focusedElementRef );
-		return this.nextFocusInList( currentIndex, focusables );
-	}
-
-	previousFocusableRef( component ) {
-		const focusables = this.visibleFocusables( component.nodes, component.state.filterValue );
-
-		// Initiate the menu with the first block.
-		if ( null === component.state.focusedElementRef ) {
-			return focusables[ 0 ];
-		}
-
-		const currentIndex = focusables.findIndex( ( elementRef ) => elementRef === component.state.focusedElementRef );
-		return this.previousFocusInList( currentIndex, focusables );
-	}
-
-	/**
-	 * Get the next focusable element in list.
-	 *
-	 * @param {int} currentIndex Current index in the list.
-	 * @param {array} focusables List of focusable elements attached to node references.
-	 * @return {string} Name of the next focus.
-	 */
-	nextFocusInList( currentIndex, focusables ) {
-		const nextIndex = currentIndex + 1;
-		const highestIndex = focusables.length - 1;
-
-		// Check boundary so that the index is does not exceed the length.
-		if ( nextIndex > highestIndex ) {
-			// Cycle back to other end.
-			return focusables[ 0 ];
-		}
-
-		return focusables[ nextIndex ];
-	}
-
-	/**
-	 * Get the previousFocusInList.
-	 *
-	 * @param {int} currentIndex Current index in the list.
-	 * @param {array} focusables List of focusable elements attached to node references.
-	 * @return {string} Name of the previous focus.
-	 */
-	previousFocusInList( currentIndex, focusables ) {
-		const nextIndex = currentIndex - 1;
-		const lowestIndex = 0;
-
-		// Check boundary so that the index is does not exceed the length.
-		if ( nextIndex < lowestIndex ) {
-			// Cycle back to other end.
-			return focusables[ focusables.length - 1 ];
-		}
-
-		return focusables[ nextIndex ];
-	}
-
-	focusNextFocusableRef( component ) {
-		const next = component.nextFocusableRef( component );
-		component.changeMenuSelection( next );
-	}
-
-	focusPreviousFocusableRef( component ) {
-		const previous = component.previousFocusableRef( component );
-		component.changeMenuSelection( previous );
-	}
-
-	listVisibleBlocksByCategory( blocks ) {
-		return blocks.reduce( ( groups, block ) => {
-			if ( ! this.isShownBlock( this.state.filterValue, block ) ) {
-				return groups;
-			}
-			if ( ! groups[ block.category ] ) {
-				groups[ block.category ] = [];
-			}
-			groups[ block.category ].push( block );
-			return groups;
-		}, {} );
+	isShownBlock( block ) {
+		return block.title.toLowerCase().indexOf( this.state.filterValue.toLowerCase() ) !== -1;
 	}
 
 	bindReferenceNode( nodeName ) {
@@ -182,30 +80,146 @@ class InserterMenu extends wp.element.Component {
 			this.props.onSelect();
 			this.setState( {
 				filterValue: '',
-				focusedElementRef: null
+				currentFocus: null
 			} );
 		};
 	}
 
-	onKeyDown( keydown ) {
-		keydown.preventDefault();
+	getVisibleBlocks( blockTypes ) {
+		return blockTypes.filter( this.isShownBlock );
+	}
 
+	getCategoryIndex( item ) {
+		const categories = this.categories;
+		return categories.findIndex( ( category ) => category.slug === item.slug );
+	}
+
+	sortBlocksByCategory( blockTypes ) {
+		return blockTypes.sort( ( a, b ) => {
+			return this.getCategoryIndex( a ) - this.getCategoryIndex( b );
+		} );
+	}
+
+	groupByCategory( blockTypes ) {
+		return blockTypes.reduce( ( accumulator, block ) => {
+			// If already an array push block on else add array of block.
+			if ( Array.isArray( accumulator[ block.category ] ) ) {
+				accumulator[ block.category ].push( block );
+				return accumulator;
+			}
+
+			accumulator[ block.category ] = [ block ];
+			return accumulator;
+		}, {} );
+	}
+
+	getVisibleBlocksByCategory( blockTypes ) {
+		return flow(
+			this.getVisibleBlocks,
+			this.sortBlocksByCategory,
+			this.groupByCategory
+		)( blockTypes );
+	}
+
+	findNext( currentBlock, blockTypes ) {
+		/**
+		 * 'search' or null are the values that will trigger iterating back to
+		 * the top of the list of block types.
+		 */
+		if ( null === currentBlock || 'search' === currentBlock ) {
+			return blockTypes[ 0 ].slug;
+		}
+
+		const currentIndex = blockTypes.findIndex( ( blockType ) => currentBlock === blockType.slug );
+		const nextIndex = currentIndex + 1;
+		const highestIndex = blockTypes.length - 1;
+
+		/**
+		 * Default currently for going past the blocks is search, may need to be
+		 * revised in the future as more focusable elements are added.
+		 */
+		if ( nextIndex > highestIndex ) {
+			return 'search';
+		}
+
+		// Return the slug of the next block type.
+		return blockTypes[ nextIndex ].slug;
+	}
+
+	findPrevious( currentBlock, blockTypes ) {
+		/**
+		 * null will trigger iterating back to the top of the list of block
+		 * types.
+		 */
+		if ( null === currentBlock ) {
+			return blockTypes[ 0 ].slug;
+		}
+
+		const highestIndex = blockTypes.length - 1;
+
+		// If the search bar is focused navigate to the bottom of the block list.
+		if ( 'search' === currentBlock ) {
+			return blockTypes[ highestIndex ].slug;
+		}
+
+		const currentIndex = blockTypes.findIndex( ( blockType ) => currentBlock === blockType.slug );
+		const previousIndex = currentIndex - 1;
+		const lowestIndex = 0;
+
+		/**
+		 * Default currently for going past the blocks is search, may need to be
+		 * revised in the future as more non block focusable elements are added.
+		 */
+		if ( previousIndex < lowestIndex ) {
+			return 'search';
+		}
+
+		// Return the slug of the next block type.
+		return blockTypes[ previousIndex ].slug;
+	}
+
+	focusNext( component ) {
+		const sortedByCategory = flow(
+			this.getVisibleBlocks,
+			this.sortBlocksByCategory,
+		)( component.blockTypes );
+		const currentBlock = component.state.currentFocus;
+
+		const nextBlock = this.findNext( currentBlock, sortedByCategory );
+		this.changeMenuSelection( nextBlock );
+	}
+
+	focusPrevious( component ) {
+		const sortedByCategory = flow(
+			this.getVisibleBlocks,
+			this.sortBlocksByCategory,
+		)( component.blockTypes );
+		const currentBlock = component.state.currentFocus;
+
+		const nextBlock = this.findPrevious( currentBlock, sortedByCategory );
+		this.changeMenuSelection( nextBlock );
+	}
+
+	onKeyDown( keydown ) {
 		if ( this.isNextKeydown( keydown ) ) {
-			this.focusNextFocusableRef( this );
+			keydown.preventDefault();
+			this.focusNext( this );
 		}
 
 		if ( this.isPreviousKeydown( keydown ) ) {
-			this.focusPreviousFocusableRef( this );
+			keydown.preventDefault();
+			this.focusPrevious( this );
 		}
 
 		if ( this.isEscapeKey( keydown ) ) {
+			keydown.preventDefault();
 			this.props.closeMenu();
 		}
 	}
 
 	changeMenuSelection( refName ) {
 		this.setState( {
-			focusedElementRef: refName
+			currentFocus: refName
 		} );
 
 		// Focus the DOM node.
@@ -219,7 +233,7 @@ class InserterMenu extends wp.element.Component {
 	render() {
 		const { position = 'top' } = this.props;
 		const blocks = this.blockTypes;
-		const visibleBlocksByCategory = this.listVisibleBlocksByCategory( blocks );
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( blocks );
 		const categories = this.categories;
 
 		return (
