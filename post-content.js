@@ -5,7 +5,7 @@ window._wpGutenbergPost = {
 	content: {
 		raw: [
 			'<!-- wp:core/heading -->',
-			'<h1>1.0 Is The Loneliest Number</h1>',
+			'<h1>Welcome to the Gutenberg Editor</h1>',
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/button -->',
@@ -13,25 +13,53 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/button -->',
 
 			'<!-- wp:core/text -->',
-			'<p>I imagine prior to the launch of the iPod, or the iPhone, there were teams saying the same thing: the copy + paste guys are <em>so close</em> to being ready and we know Walt Mossberg is going to ding us for this so let\'s just not ship to the manufacturers in China for just a few more weeks… The Apple teams were probably embarrassed. But <strong>if you\'re not embarrassed when you ship your first version you waited too long</strong>.</p>',
+			'<p>The goal of the new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to Lego bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
+			'<p>What you are reading now is a <strong>text</strong> <strong>block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/text -->',
+			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/heading -->',
+			'<h2>The <em>Inserter</em> Tool</h2>',
+			'<!-- /wp:core/heading -->',
+
+			'<!-- wp:core/text -->',
+			'<p>(Headings are separate blocks as well.)</p><p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember shortcode syntax. That\'s the spirit behind the inserter—the (+) button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes will be able to register their own. Go give it a try, you may discover things WordPress can insert into your posts that you didn\'t know about.</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/list -->',
+			'<ul><li>Text</li><li>Headings</li><li>Images</li><li>Galleries</li><li>Embeds</li><li>Oh, and Lists of course :)</li></ul>',
+			'<!-- /wp:core/list -->',
+
 			'<!-- wp:core/separator -->',
-			'<hr />',
+			'<hr/>',
 			'<!-- /wp:core/separator -->',
 
+			'<!-- wp:core/heading -->',
+			'<h2>A picture is worth a thousand words</h2>',
+			'<!-- /wp:core/heading -->',
+
+			'<!-- wp:core/text -->',
+			'<p>Or so the saying goes. Working well with images and media is a primary focus of the new editor. Hopefully you\'ll find aspects like adding captions or going full-width with your images much easier and robust.</p>',
+			'<!-- /wp:core/text -->',
+
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/Bc9YxmqFnJ.jpg" /></figure>',
+			'<figure><img src="https://cldup.com/Bc9YxmqFnJ.jpg" class="aligncenter"/><figcaption><p>Check out the &quot;really wide&quot; option on the image settings</p></figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
-			'<p>A beautiful thing about Apple is <em>how quickly</em> they obsolete their own products. I imagine this also makes the discipline of getting things out there easier. Like I mentioned before, the longer it’s been since the last release the more pressure there is, but if you know that if your bit of code doesn’t make this version but there’s the +0.1 coming out in 6 weeks, then it’s not that bad.</p>',
-			'<p>It’s like flights from San Francisco to LA, if you miss one you know there’s another one an hour later so it’s not a big deal. Amazon has done a fantastic job of this with the Kindle as well, with a new model every year.</p>',
+			'<p>Another benefit of blocks is that you can edit them in place and manipulate you content directly. Try editing the following quote:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote -->',
-			'<blockquote><p>Real artists ship.</p><footer><p><a href="http://www.folklore.org/StoryView.py?story=Real_Artists_Ship.txt">Steve Jobs, 1983</a></p></footer></blockquote>',
+			'<blockquote class="blocks-quote-style-1"><p>Real artists ship.</p><footer><p><a href="http://www.folklore.org/StoryView.py?story=Real_Artists_Ship.txt">Steve Jobs, 1983</a></p></footer></blockquote>',
 			'<!-- /wp:core/quote -->',
+
+			'<!-- wp:core/text -->',
+			'<p>Fields like the source of the quote are separate, and even if you remove it you can get it back.</p>',
+			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image -->',
 			'<figure><img src="https://cldup.com/vuGcj2VB8M.jpg" /><figcaption>Beautiful landscape</figcaption></figure>',
