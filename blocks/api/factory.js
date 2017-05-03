@@ -2,7 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get, castArray, findIndex } from 'lodash';
+import { get, castArray, findIndex, isObjectLike } from 'lodash';
 
 /**
  * Internal dependencies
@@ -45,7 +45,17 @@ export function switchToBlockType( block, blockType ) {
 		return null;
 	}
 
-	const transformationResults = castArray( transformation.transform( block.attributes ) );
+	let transformationResults = transformation.transform( block.attributes );
+
+	// Ensure that the transformation function returned an object or an array
+	// of objects.
+	if ( ! isObjectLike( transformationResults ) ) {
+		return null;
+	}
+
+	// If the transformation function returned a single object, we want to work
+	// with an array instead.
+	transformationResults = castArray( transformationResults );
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.

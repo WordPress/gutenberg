@@ -123,6 +123,59 @@ describe( 'block factory', () => {
 			expect( updatedBlock ).to.be.null();
 		} );
 
+		it( 'should reject transformations that return null', () => {
+			registerBlock( 'core/updated-text-block', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+						transform: ( { value } ) => {
+							return null;
+						}
+					} ]
+				}
+			} );
+			registerBlock( 'core/text-block', {} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.be.null();
+		} );
+
+
+		it( 'should reject transformations that return an empty array', () => {
+			registerBlock( 'core/updated-text-block', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+						transform: ( { value } ) => {
+							return [];
+						}
+					} ]
+				}
+			} );
+			registerBlock( 'core/text-block', {} );
+
+			const block = {
+				uid: 1,
+				blockType: 'core/text-block',
+				attributes: {
+					value: 'ribs'
+				}
+			};
+
+			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
+
+			expect( updatedBlock ).to.be.null();
+		} );
+
 		it( 'should reject single transformations that do not include block types', () => {
 			registerBlock( 'core/updated-text-block', {
 				transforms: {
