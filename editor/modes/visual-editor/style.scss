@@ -1,7 +1,7 @@
 .editor-visual-editor {
 	margin: 0 auto;
 	max-width: 700px;
-	padding: 10px;	/* Floating up/down arrows invisible */
+	padding: 50px 10px;	/* Floating up/down arrows invisible */
 
 	&,
 	& p {
@@ -11,7 +11,7 @@
 	}
 
 	@include break-small() {
-		padding: 30px 40px;	/* Floating up/down appear */
+		padding: 50px 40px;	/* Floating up/down appear */
 	}
 
 	@include break-large() {
