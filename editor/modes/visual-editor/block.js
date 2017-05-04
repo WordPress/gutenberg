@@ -21,6 +21,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
+		this.removeOnBackspace = this.removeOnBackspace.bind( this );
 		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
 		this.previousOffset = null;
 	}
@@ -73,6 +74,13 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isTyping, isSelected, onStartTyping } = this.props;
 		if ( ! isTyping && isSelected ) {
 			onStartTyping();
+		}
+	}
+
+	removeOnBackspace( event ) {
+		const { keyCode, target } = event;
+		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
+			this.props.onRemove( this.props.uid );
 		}
 	}
 
@@ -167,6 +175,7 @@ class VisualEditorBlock extends wp.element.Component {
 				onClick={ onSelect }
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
+				onKeyDown={ this.removeOnBackspace }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
