@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import { parse, stringify } from 'querystring';
 
 export function savePost( dispatch, post ) {
 	const isNew = ! post.id;
@@ -17,12 +18,13 @@ export function savePost( dispatch, post ) {
 			isNew,
 		} );
 		if ( isNew && window.history.replaceState ) {
-			window.history.replaceState(
-				{},
-				'Post ' + newPost.id,
-				window.location.href.replace( /&post_id=[^&]*$/, '' )
-					+ '&post_id=' + newPost.id
-			);
+			const urlPieces = window.location.href.split( '?' );
+			const qs = parse( urlPieces[ 1 ] || '' );
+			const newUrl = urlPieces[ 0 ] + '?' + stringify( {
+				...qs,
+				post_id: newPost.id,
+			} );
+			window.history.replaceState( {}, 'Post ' + newPost.id, newUrl );
 		}
 	} ).fail( ( err ) => {
 		dispatch( {
