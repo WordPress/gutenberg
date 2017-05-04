@@ -4,7 +4,7 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { isPrimary, isLarge, isToggled, className, ...additionalProps } ) {
+function Button( { isPrimary, isLarge, isToggled, className, buttonRef, ...additionalProps } ) {
 	const classes = classnames( 'editor-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
@@ -16,7 +16,7 @@ function Button( { isPrimary, isLarge, isToggled, className, ...additionalProps 
 		<button
 			type="button"
 			{ ...additionalProps }
-			ref={ additionalProps.buttonRef }
+			ref={ buttonRef }
 			className={ classes } />
 	);
 }

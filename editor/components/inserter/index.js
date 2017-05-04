@@ -21,8 +21,8 @@ class Inserter extends wp.element.Component {
 	}
 
 	toggle() {
-		if ( this.state.opened === true ) {
-			this.nodes.toggle.focus();
+		if ( this.state.opened ) {
+			this.toggleNode.focus();
 		}
 
 		this.setState( {
@@ -56,7 +56,7 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
-					buttonRef={ ( node ) => this.nodes.toggle = node }
+					buttonRef={ ( node ) => this.toggleNode = node }
 					aria-expanded={ opened ? 'true' : 'false' } />
 				{ opened && <InserterMenu position={ position } onSelect={ this.close } closeMenu={ this.toggle } /> }
 			</div>

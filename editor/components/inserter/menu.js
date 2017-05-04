@@ -23,13 +23,9 @@ class InserterMenu extends wp.element.Component {
 		this.filter = this.filter.bind( this );
 		this.instanceId = this.constructor.instances++;
 		this.isShownBlock = this.isShownBlock.bind( this );
-		this.changeMenuSelection = this.changeMenuSelection.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
-		this.bindReferenceNode = this.bindReferenceNode.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.getVisibleBlocks = this.getVisibleBlocks.bind( this );
-		this.getVisibleBlocksByCategory = this.getVisibleBlocksByCategory.bind( this );
-		this.getCategoryIndex = this.getCategoryIndex.bind( this );
 		this.sortBlocksByCategory = this.sortBlocksByCategory.bind( this );
 	}
 
@@ -46,10 +42,7 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	bindReferenceNode( nodeName ) {
-		const binder = ( node ) => this.nodes[ nodeName ] = node;
-		binder.bind( this );
-
-		return binder;
+		return ( node ) => this.nodes[ nodeName ] = node;
 	}
 
 	isNextKeydown( keydown ) {
@@ -89,14 +82,13 @@ class InserterMenu extends wp.element.Component {
 		return blockTypes.filter( this.isShownBlock );
 	}
 
-	getCategoryIndex( item ) {
-		const categories = this.categories;
-		return categories.findIndex( ( category ) => category.slug === item.slug );
-	}
-
 	sortBlocksByCategory( blockTypes ) {
+		const getCategoryIndex = ( item ) => {
+			return this.categories.findIndex( ( category ) => category.slug === item.slug );
+		};
+
 		return blockTypes.sort( ( a, b ) => {
-			return this.getCategoryIndex( a ) - this.getCategoryIndex( b );
+			return getCategoryIndex( a ) - getCategoryIndex( b );
 		} );
 	}
 
@@ -136,10 +128,12 @@ class InserterMenu extends wp.element.Component {
 
 		/**
 		 * Default currently for going past the blocks is search, may need to be
-		 * revised in the future as more focusable elements are added.
+		 * revised in the future as more focusable elements are added. This
+		 * returns a null value, which currently implies that search will be set
+		 * as the next focus.
 		 */
 		if ( nextIndex > highestIndex ) {
-			return 'search';
+			return null;
 		}
 
 		// Return the slug of the next block type.
@@ -168,10 +162,12 @@ class InserterMenu extends wp.element.Component {
 
 		/**
 		 * Default currently for going past the blocks is search, may need to be
-		 * revised in the future as more non block focusable elements are added.
+		 * revised in the future as more focusable elements are added. This
+		 * returns a null value, which currently implies that search will be set
+		 * as the next focus.
 		 */
 		if ( previousIndex < lowestIndex ) {
-			return 'search';
+			return null;
 		}
 
 		// Return the slug of the next block type.
@@ -185,7 +181,12 @@ class InserterMenu extends wp.element.Component {
 		)( component.blockTypes );
 		const currentBlock = component.state.currentFocus;
 
-		const nextBlock = this.findNext( currentBlock, sortedByCategory );
+		let nextBlock = this.findNext( currentBlock, sortedByCategory );
+
+		if ( nextBlock === null ) {
+			nextBlock = 'search';
+		}
+
 		this.changeMenuSelection( nextBlock );
 	}
 
@@ -196,7 +197,12 @@ class InserterMenu extends wp.element.Component {
 		)( component.blockTypes );
 		const currentBlock = component.state.currentFocus;
 
-		const nextBlock = this.findPrevious( currentBlock, sortedByCategory );
+		let nextBlock = this.findPrevious( currentBlock, sortedByCategory );
+
+		if ( nextBlock === null ) {
+			nextBlock = 'search';
+		}
+
 		this.changeMenuSelection( nextBlock );
 	}
 
