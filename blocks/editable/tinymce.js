@@ -3,7 +3,11 @@ export default class TinyMCE extends wp.element.Component {
 		this.initialize();
 	}
 
-	shouldComponentUpdate() {
+	shouldComponentUpdate( nextProps ) {
+		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== nextProps.isEmpty ) {
+			this.editorNode.setAttribute( 'data-is-empty', nextProps.isEmpty );
+		}
+
 		// We must prevent rerenders because TinyMCE will modify the DOM, thus
 		// breaking React's ability to reconcile changes.
 		//
@@ -47,7 +51,7 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue } = this.props;
+		const { tagName = 'div', style, defaultValue, placeholder } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -62,7 +66,8 @@ export default class TinyMCE extends wp.element.Component {
 			contentEditable: true,
 			suppressContentEditableWarning: true,
 			className: 'blocks-editable__tinymce',
-			style
+			style,
+			'data-placeholder': placeholder
 		}, children );
 	}
 }

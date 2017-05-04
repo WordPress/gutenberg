@@ -83,7 +83,7 @@ export default class Editable extends wp.element.Component {
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
+		editor.on( 'input', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
@@ -104,13 +104,9 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
+		if ( this.props.onChange ) {
+			this.props.onChange( this.getContent() );
 		}
-
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.savedContent );
 	}
 
 	getRelativePosition( node ) {
@@ -339,6 +335,27 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
+	isEmpty( value ) {
+		// Empty array.
+		if ( ! value.length ) {
+			return true;
+		}
+
+		const props = value[ 0 ].props;
+
+		// Empty string.
+		if ( ! props && ! value[ 0 ].length ) {
+			return true;
+		}
+
+		// Empty React Object.
+		if ( props && props.children && ! props.children.length ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -349,7 +366,8 @@ export default class Editable extends wp.element.Component {
 			showAlignments = false,
 			inlineToolbar = false,
 			inline,
-			formattingControls
+			formattingControls,
+			placeholder
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -397,6 +415,8 @@ export default class Editable extends wp.element.Component {
 					settings={ {
 						forced_root_block: inline ? false : 'p'
 					} }
+					isEmpty={ String( this.isEmpty( value ) ) }
+					placeholder={ placeholder }
 					key={ key } />
 			</div>
 		);
