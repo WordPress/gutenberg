@@ -21,9 +21,9 @@ export function savePost( dispatch, postId, edits ) {
 			isNew,
 		} );
 		if ( isNew && window.history.replaceState ) {
-			const urlPieces = window.location.href.split( '?' );
-			const qs = parse( urlPieces[ 1 ] || '' );
-			const newUrl = urlPieces[ 0 ] + '?' + stringify( {
+			const [ baseUrl, query ] = window.location.href.split( '?' );
+			const qs = parse( query || '' );
+			const newUrl = baseUrl + '?' + stringify( {
 				...qs,
 				post_id: newPost.id,
 			} );
