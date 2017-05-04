@@ -1,7 +1,7 @@
 .editor-visual-editor {
 	margin: 0 auto;
 	max-width: 700px;
-	padding: 10px;	/* Floating up/down arrows invisible */
+	padding: 50px 10px;	/* Floating up/down arrows invisible */
 
 	&,
 	& p {
@@ -11,7 +11,7 @@
 	}
 
 	@include break-small() {
-		padding: 30px 40px;	/* Floating up/down appear */
+		padding: 50px 40px;	/* Floating up/down appear */
 	}
 
 	@include break-large() {
@@ -21,8 +21,8 @@
 
 .editor-visual-editor__block {
 	position: relative;
-	left: -35px;
-	padding: 15px 15px 15px 50px;
+	left: -#{ $block-padding + $block-mover-margin };	// make room for the mover
+	padding: $block-padding $block-padding $block-padding #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover
 	transition: 0.2s border-color;
 
 	&:before {
@@ -31,7 +31,7 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: 35px;
+		left: #{ $block-padding + $block-mover-margin };	// compensate for mover
 		right: 0;
 		border: 2px solid transparent;
 		transition: 0.2s border-color;
@@ -69,7 +69,7 @@
 	position: absolute;
 	bottom: 100%;
 	margin-bottom: -4px;
-	left: 43px;
+	left: #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover, and indent same as padding
 	display: flex;
 	z-index: 1;
 }

@@ -6,16 +6,4 @@
 	&:disabled {
 		opacity: 0.6;
 	}
-
-	.editor-tools__tabs & {
-		&.is-toggled {
-			background: $dark-gray-500;
-			color: $white;
-		}
-
-		&.is-toggled:hover {
-			color: $white;
-			background: $dark-gray-400;
-		}
-	}
 }
