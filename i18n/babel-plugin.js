@@ -34,7 +34,7 @@
 
 const { po } = require( 'gettext-parser' );
 const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
-const { relative } = require( 'path' ).posix;
+const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
 /**
@@ -199,10 +199,12 @@ module.exports = function() {
 					translation.msgstr = '';
 				}
 
-				// Assign file reference comment
+				// Assign file reference comment, ensuring consistent pathname
+				// reference between Win32 and POSIX
 				const { filename } = this.file.opts;
+				const pathname = relative( '.', filename ).split( sep ).join( '/' );
 				translation.comments = {
-					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line
+					reference: pathname + ':' + path.node.loc.start.line
 				};
 
 				// If exists, also assign translator comment
