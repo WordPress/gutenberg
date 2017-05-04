@@ -331,7 +331,7 @@ export function saving( state = {}, action ) {
 		case 'REQUEST_POST_UPDATE_FAILURE':
 			return {
 				requesting: false,
-				successful: true,
+				successful: false,
 				error: action.error,
 				isNew: action.isNew,
 			};
