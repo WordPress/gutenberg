@@ -23,7 +23,7 @@ registerBlock( 'core/pullquote', {
 		return (
 			<blockquote className="blocks-pullquote">
 				<Editable
-					value={ value || 'Write quote...' }
+					value={ value || wp.i18n.__( 'Write Quote…' ) }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: nextValue
@@ -36,7 +36,7 @@ registerBlock( 'core/pullquote', {
 				{ ( citation || !! focus ) && (
 					<footer>
 						<Editable
-							value={ citation || 'Write citation...' }
+							value={ citation || wp.i18n.__( 'Write caption…' ) }
 							onChange={
 								( nextCitation ) => setAttributes( {
 									citation: nextCitation
