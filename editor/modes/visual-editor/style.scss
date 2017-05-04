@@ -69,7 +69,7 @@
 	display: flex;
 	position: sticky;
 	z-index: 1;
-	margin-top: -56px;
+	margin-top: -46px - $item-spacing;	// 46 is toolbar height
 	margin-bottom: $item-spacing;
 
 	top: $header-height + $admin-bar-height-big + $item-spacing;
