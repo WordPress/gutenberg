@@ -4,14 +4,17 @@
 import { get } from 'lodash';
 import { parse, stringify } from 'querystring';
 
-export function savePost( dispatch, post ) {
-	const isNew = ! post.id;
+export function savePost( dispatch, postId, edits ) {
+	const toSend = postId ? { id: postId, ...edits } : edits;
+	const isNew = ! postId;
+
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE',
-		post,
+		edits,
 		isNew,
 	} );
-	new wp.api.models.Post( post ).save().done( ( newPost ) => {
+
+	new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 		dispatch( {
 			type: 'REQUEST_POST_UPDATE_SUCCESS',
 			post: newPost,
@@ -33,7 +36,7 @@ export function savePost( dispatch, post ) {
 				code: 'unknown_error',
 				message: wp.i18n.__( 'An unknown error occurred.' ),
 			} ),
-			post,
+			edits,
 			isNew,
 		} );
 	} );

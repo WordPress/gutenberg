@@ -517,6 +517,7 @@ describe( 'state', () => {
 
 			expect( Object.keys( state ) ).to.have.members( [
 				'editor',
+				'currentPost',
 				'selectedBlock',
 				'hoveredBlock',
 				'mode',

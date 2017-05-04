@@ -14,8 +14,8 @@ import { combineUndoableReducers } from 'utils/undoable-reducer';
  * from current HTML markup.
  *
  * Handles the following state keys:
- *  - post: an object describing the current post, in the format used by the WP
- *  REST API
+ *  - edits: an object describing changes to be made to the current post, in
+ *           the format accepted by the WP REST API
  *  - blocksByUid: post content blocks keyed by UID
  *  - blockOrder: list of block UIDs in order
  *
@@ -24,13 +24,13 @@ import { combineUndoableReducers } from 'utils/undoable-reducer';
  * @return {Object}        Updated state
  */
 export const editor = combineUndoableReducers( {
-	post( state = {}, action ) {
+	edits( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RESET_BLOCKS':
-				return action.post || state;
-
-			case 'REQUEST_POST_UPDATE_SUCCESS':
-				return action.post;
+			case 'EDIT_POST':
+				return {
+					...state,
+					...action.post,
+				};
 		}
 
 		return state;
@@ -154,6 +154,26 @@ export const editor = combineUndoableReducers( {
 		return state;
 	}
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );
+
+/**
+ * Reducer returning the last-known state of the current post, in the format
+ * returned by the WP REST API.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function currentPost( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RESET_BLOCKS':
+			return action.post || state;
+
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return action.post;
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning selected block state.
@@ -328,6 +348,7 @@ export function saving( state = {}, action ) {
 export function createReduxStore() {
 	const reducer = combineReducers( {
 		editor,
+		currentPost,
 		selectedBlock,
 		hoveredBlock,
 		mode,

@@ -10,8 +10,9 @@ import Button from 'components/button';
 import { savePost } from 'actions';
 
 function PublishButton( {
-	blocks,
 	post,
+	edits,
+	blocks,
 	isSuccessful,
 	isRequesting,
 	isError,
@@ -51,7 +52,7 @@ function PublishButton( {
 		<Button
 			isPrimary
 			isLarge
-			onClick={ () => saveCallback( post, blocks ) }
+			onClick={ () => saveCallback( post, edits, blocks ) }
 			disabled={ ! buttonEnabled }
 		>
 			{ buttonText }
@@ -61,25 +62,30 @@ function PublishButton( {
 
 export default connect(
 	( state ) => ( {
+		post: state.currentPost,
+		edits: state.editor.edits,
 		blocks: state.editor.blockOrder.map( ( uid ) => (
 			state.editor.blocksByUid[ uid ]
 		) ),
-		post: state.editor.post,
 		isRequesting: state.saving.requesting,
 		isSuccessful: state.saving.successful,
 		isError: !! state.saving.error,
 		requestIsNewPost: state.saving.isNew,
 	} ),
 	( dispatch ) => ( {
-		onUpdate( post, blocks ) {
-			post.content.raw = wp.blocks.serialize( blocks );
-			savePost( dispatch, post );
+		onUpdate( post, edits, blocks ) {
+			savePost( dispatch, post.id, {
+				content: wp.blocks.serialize( blocks ),
+				...edits,
+			} );
 		},
 
-		onSaveDraft( post, blocks ) {
-			post.content.raw = wp.blocks.serialize( blocks );
-			post.status = 'draft'; // TODO change this after status controls
-			savePost( dispatch, post );
+		onSaveDraft( post, edits, blocks ) {
+			savePost( dispatch, null /* is a new post */, {
+				content: wp.blocks.serialize( blocks ),
+				status: 'draft', // TODO change this after status controls
+				...edits,
+			} );
 		},
 	} )
 )( PublishButton );
