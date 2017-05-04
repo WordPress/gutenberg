@@ -88,7 +88,7 @@ Let's try and use as few of these as possible, and be mindful about adding new o
 
 $break-huge: 1440px;
 $break-wide: 1280px;
-$break-large: 960px;
-$break-medium: 782px;
+$break-large: 960px;	// admin sidebar auto folds
+$break-medium: 782px;	// adminbar goes big
 $break-small: 600px;
 $break-mobile: 480px;

@@ -66,12 +66,17 @@
 
 .editor-visual-editor__block-controls {
 	@include animate_fade;
-	position: absolute;
-	bottom: 100%;
-	margin-bottom: -4px;
-	left: #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover, and indent same as padding
 	display: flex;
+	position: sticky;
 	z-index: 1;
+	margin-top: -56px;
+	margin-bottom: $item-spacing;
+
+	top: $header-height + $admin-bar-height-big + $item-spacing;
+
+	@include break-medium() {
+		top: $header-height + $admin-bar-height + $item-spacing;
+	}
 }
 
 .editor-visual-editor__block-controls .components-toolbar {
