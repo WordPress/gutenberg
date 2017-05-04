@@ -1,8 +1,12 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, query } from 'api';
 import Editable from 'components/editable';
+// TODO: Revisit when we have a common components solution
+import Dashicon from '../../../editor/components/dashicon';
+import Button from '../../../editor/components/button';
 
 const { attr, children } = query;
 
@@ -21,6 +25,23 @@ registerBlock( 'core/embed', {
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, title, caption } = attributes;
+
+		if ( ! url ) {
+			return (
+				<div className="blocks-embed is-placeholder">
+					<div className="blocks-embed__placeholder-label">
+						<Dashicon icon="cloud" />
+						{ wp.i18n.__( 'Embed URL' ) }
+					</div>
+					<div className="blocks-embed__placeholder-fieldset">
+						<input type="url" className="blocks-embed__placeholder-input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+						<Button isLarge>
+							{ wp.i18n.__( 'Embed' ) }
+						</Button>
+					</div>
+				</div>
+			);
+		}
 
 		return (
 			<figure>

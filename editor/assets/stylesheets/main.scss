@@ -48,4 +48,25 @@ body.toplevel_page_gutenberg {
 	@include break-small() {
 		padding-top: $header-height;
 	}
+
+	input, textarea {
+		border-radius: 4px;
+		border-color: $light-gray-500;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 10px;
+
+		&::-webkit-input-placeholder {
+			color: $dark-gray-100;
+		}
+		&::-moz-placeholder {
+			color: $dark-gray-100;
+		}
+		&:-ms-input-placeholder {
+			color: $dark-gray-100;
+		}
+		&:-moz-placeholder {
+			color: $dark-gray-100;
+		}
+	}
 }
