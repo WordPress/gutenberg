@@ -1,5 +1,5 @@
 export default class TinyMCE extends wp.element.Component {
-	componentDidMount() {
+	initialize() {
 		tinymce.init( {
 			target: this.editorNode,
 			theme: false,
@@ -19,12 +19,22 @@ export default class TinyMCE extends wp.element.Component {
 		}
 	}
 
-	shouldComponentUpdate() {
+	componentDidMount() {
+		this.initialize();
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.tagName !== prevProps.tagName ) {
+			this.initialize();
+		}
+	}
+
+	shouldComponentUpdate( nextProps ) {
 		// We must prevent rerenders because TinyMCE will modify the DOM, thus
 		// breaking React's ability to reconcile changes.
 		//
 		// See: https://github.com/facebook/react/issues/6802
-		return false;
+		return nextProps.tagName !== this.props.tagName;
 	}
 
 	render() {
