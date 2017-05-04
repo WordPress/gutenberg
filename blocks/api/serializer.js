@@ -83,10 +83,10 @@ export default function serialize( blocks ) {
 				parseBlockAttributes( saveContent, settings )
 			) +
 			'-->' +
-			saveContent +
+			( saveContent ? '\n' + saveContent + '\n' : '' ) +
 			'<!-- /wp:' +
 			blockType +
 			' -->'
-		);
+		) + '\n\n';
 	}, '' );
 }
