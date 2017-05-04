@@ -326,6 +326,11 @@ export default class Editable extends wp.element.Component {
 		const { tagName, style, value, focus, className, showAlignments = false, formattingControls } = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
+		// Generating a key that includes `tagName` ensures that if the tag
+		// changes, we unmount (+ destroy) the previous TinyMCE element, then
+		// mount (+ initialize) a new child element in its place.
+		const key = [ 'editor', tagName ].join();
+
 		let element = (
 			<TinyMCE
 				tagName={ tagName }
@@ -333,7 +338,7 @@ export default class Editable extends wp.element.Component {
 				style={ style }
 				className={ classes }
 				defaultValue={ value }
-				key={ [ 'editor', tagName ].join() } />
+				key={ key } />
 		);
 
 		if ( focus ) {
