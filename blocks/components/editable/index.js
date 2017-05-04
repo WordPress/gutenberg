@@ -333,7 +333,7 @@ export default class Editable extends wp.element.Component {
 				style={ style }
 				className={ classes }
 				defaultValue={ value }
-				key="editor" />
+				key={ [ 'editor', tagName ].join() } />
 		);
 
 		if ( focus ) {
