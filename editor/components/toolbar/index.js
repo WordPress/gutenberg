@@ -29,7 +29,7 @@ function Toolbar( { controls } ) {
 					className={ classNames( 'editor-toolbar__control', {
 						'is-active': control.isActive
 					} ) }
-					aria-pressed={ control.isActive ? 'true' : 'false' }
+					aria-pressed={ control.isActive }
 				/>
 			) ) }
 		</ul>
