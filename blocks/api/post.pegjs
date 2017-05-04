@@ -43,10 +43,14 @@ WP_Block_Type
 
 HTML_Attribute_List
   = as:(_+ a:HTML_Attribute_Item { return a })*
-  { return as.reduce( ( attrs, [ name, value ] ) => Object.assign(
-    attrs,
-    { [ name ]: value }
-  ), {} ) }
+  { return as.reduce( function( attrs, currentAttribute ) {
+			var currentAttrs = {};
+			currentAttrs[ currentAttribute[ 0 ] ] = currentAttribute[ 1 ];
+			return Object.assign(
+				attrs,
+				currentAttrs
+			);
+	}, {} ) }
 
 HTML_Attribute_Item
   = HTML_Attribute_Quoted
