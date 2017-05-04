@@ -121,18 +121,18 @@ registerBlock( 'core/quote', {
 					showAlignments
 				/>
 				{ ( citation || !! focus ) && (
-					<footer>
-						<Editable
-							value={ citation }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation
-								} )
-							}
-							focus={ focusedEditable === 'citation' ? focus : null }
-							onFocus={ () => setFocus( { editable: 'citation' } ) }
-						/>
-					</footer>
+					<Editable
+						tagName="footer"
+						value={ citation }
+						onChange={
+							( nextCitation ) => setAttributes( {
+								citation: nextCitation
+							} )
+						}
+						focus={ focusedEditable === 'citation' ? focus : null }
+						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						inline
+					/>
 				) }
 			</blockquote>
 		);

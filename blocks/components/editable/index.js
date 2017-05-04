@@ -320,7 +320,16 @@ export default class Editable extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName, style, value, focus, className, showAlignments = false, formattingControls } = this.props;
+		const {
+			tagName,
+			style,
+			value,
+			focus,
+			className,
+			showAlignments = false,
+			inline,
+			formattingControls
+		} = this.props;
 		const classes = classnames( 'blocks-editable', className );
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -335,6 +344,9 @@ export default class Editable extends wp.element.Component {
 				style={ style }
 				className={ classes }
 				defaultValue={ value }
+				settings={ {
+					forced_root_block: inline ? false : 'p'
+				} }
 				key={ key } />
 		);
 

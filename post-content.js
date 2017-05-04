@@ -74,7 +74,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote style="1" -->',
-			'<blockquote class="blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer><p>Matt Mullenweg, 2017</p></footer></blockquote>',
+			'<blockquote class="blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/text -->',
@@ -86,7 +86,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote style="2" -->',
-			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer><p>Maya Angelou</p></footer></blockquote>',
+			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/separator -->',

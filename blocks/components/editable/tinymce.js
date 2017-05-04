@@ -21,6 +21,8 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	initialize() {
+		const { settings, focus } = this.props;
+
 		tinymce.init( {
 			target: this.editorNode,
 			theme: false,
@@ -35,10 +37,11 @@ export default class TinyMCE extends wp.element.Component {
 			},
 			formats: {
 				strikethrough: { inline: 'del' }
-			}
+			},
+			...settings
 		} );
 
-		if ( this.props.focus ) {
+		if ( focus ) {
 			this.editorNode.focus();
 		}
 	}
