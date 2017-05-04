@@ -29,7 +29,7 @@ export const editor = combineUndoableReducers( {
 			case 'RESET_BLOCKS':
 				return action.post || state;
 
-			case 'POST_UPDATE_REQUEST_SUCCESS':
+			case 'REQUEST_POST_UPDATE_SUCCESS':
 				return action.post;
 		}
 
@@ -292,7 +292,7 @@ export function isSidebarOpened( state = false, action ) {
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
-		case 'POST_UPDATE_REQUEST':
+		case 'REQUEST_POST_UPDATE':
 			return {
 				requesting: true,
 				successful: false,
@@ -300,7 +300,7 @@ export function saving( state = {}, action ) {
 				isNew: action.isNew,
 			};
 
-		case 'POST_UPDATE_REQUEST_SUCCESS':
+		case 'REQUEST_POST_UPDATE_SUCCESS':
 			return {
 				requesting: false,
 				successful: true,
@@ -308,7 +308,7 @@ export function saving( state = {}, action ) {
 				isNew: action.isNew,
 			};
 
-		case 'POST_UPDATE_REQUEST_FAILURE':
+		case 'REQUEST_POST_UPDATE_FAILURE':
 			return {
 				requesting: false,
 				successful: true,

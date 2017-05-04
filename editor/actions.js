@@ -6,13 +6,13 @@ import { get } from 'lodash';
 export function savePost( dispatch, post ) {
 	const isNew = ! post.id;
 	dispatch( {
-		type: 'POST_UPDATE_REQUEST',
+		type: 'REQUEST_POST_UPDATE',
 		post,
 		isNew,
 	} );
 	new wp.api.models.Post( post ).save().done( ( newPost ) => {
 		dispatch( {
-			type: 'POST_UPDATE_REQUEST_SUCCESS',
+			type: 'REQUEST_POST_UPDATE_SUCCESS',
 			post: newPost,
 			isNew,
 		} );
@@ -26,7 +26,7 @@ export function savePost( dispatch, post ) {
 		}
 	} ).fail( ( err ) => {
 		dispatch( {
-			type: 'POST_UPDATE_REQUEST_FAILURE',
+			type: 'REQUEST_POST_UPDATE_FAILURE',
 			error: get( err, 'responseJSON', {
 				code: 'unknown_error',
 				message: wp.i18n.__( 'An unknown error occurred.' ),
