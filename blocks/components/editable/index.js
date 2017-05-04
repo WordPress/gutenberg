@@ -17,10 +17,11 @@ import FormatToolbar from './format-toolbar';
 import Toolbar from '../../../editor/components/toolbar';
 
 const KEYCODE_BACKSPACE = 8;
-const formatMap = {
-	strong: 'bold',
-	em: 'italic',
-	del: 'strikethrough'
+
+const alignmentMap = {
+	alignleft: 'left',
+	alignright: 'right',
+	aligncenter: 'center'
 };
 
 const ALIGNMENT_CONTROLS = [
@@ -221,21 +222,17 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onNodeChange( { element, parents } ) {
-		let alignment = null;
 		const formats = {};
 		parents.forEach( ( node ) => {
 			const tag = node.nodeName.toLowerCase();
-
-			if ( formatMap.hasOwnProperty( tag ) ) {
-				formats[ formatMap[ tag ] ] = true;
-			} else if ( tag === 'a' ) {
+			if ( tag === 'a' ) {
 				formats.link = { value: node.getAttribute( 'href' ), node };
 			}
-
-			if ( tag === 'p' ) {
-				alignment = node.style.textAlign || 'left';
-			}
 		} );
+		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
+		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
+		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
+		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
@@ -350,8 +347,6 @@ export default class Editable extends wp.element.Component {
 		this.setState( {
 			formats: merge( {}, this.state.formats, formats )
 		} );
-
-		this.editor.setDirty( true );
 	}
 
 	isAlignmentActive( align ) {
