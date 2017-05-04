@@ -20,11 +20,10 @@ function PublishButton( {
 	onUpdate,
 	onSaveDraft,
 } ) {
-	let buttonEnabled = true;
+	const buttonEnabled = ! isRequesting;
 	let buttonText, saveCallback;
 
 	if ( isRequesting ) {
-		buttonEnabled = false;
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saving...' )
 			: wp.i18n.__( 'Updating...' );
