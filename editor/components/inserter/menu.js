@@ -47,13 +47,19 @@ class InserterMenu extends wp.element.Component {
 
 	isNextKeydown( keydown ) {
 		return keydown.code === 'ArrowDown'
-			|| keydown.code === 'ArrowRight'
 			|| ( keydown.code === 'Tab' && keydown.shiftKey === false );
+	}
+
+	isArrowRight( keydown ) {
+		return keydown.code === 'ArrowRight';
+	}
+
+	isArrowLeft( keydown ) {
+		return keydown.code === 'ArrowLeft';
 	}
 
 	isPreviousKeydown( keydown ) {
 		return keydown.code === 'ArrowUp'
-			|| keydown.code === 'ArrowLeft'
 			|| ( keydown.code === 'Tab' && keydown.shiftKey === true );
 	}
 
@@ -115,10 +121,10 @@ class InserterMenu extends wp.element.Component {
 
 	findNext( currentBlock, blockTypes ) {
 		/**
-		 * 'search' or null are the values that will trigger iterating back to
+		 * null is the value that will trigger iterating back to
 		 * the top of the list of block types.
 		 */
-		if ( null === currentBlock || 'search' === currentBlock ) {
+		if ( null === currentBlock ) {
 			return blockTypes[ 0 ].slug;
 		}
 
@@ -179,14 +185,15 @@ class InserterMenu extends wp.element.Component {
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
 		)( component.blockTypes );
-		const currentBlock = component.state.currentFocus;
 
-		let nextBlock = this.findNext( currentBlock, sortedByCategory );
-
-		if ( nextBlock === null ) {
-			nextBlock = 'search';
+		// If the block list is empty return early.
+		if ( ! sortedByCategory.length ) {
+			return;
 		}
 
+		const currentBlock = component.state.currentFocus;
+
+		const nextBlock = this.findNext( currentBlock, sortedByCategory );
 		this.changeMenuSelection( nextBlock );
 	}
 
@@ -197,12 +204,12 @@ class InserterMenu extends wp.element.Component {
 		)( component.blockTypes );
 		const currentBlock = component.state.currentFocus;
 
-		let nextBlock = this.findPrevious( currentBlock, sortedByCategory );
-
-		if ( nextBlock === null ) {
-			nextBlock = 'search';
+		// If the block list is empty return early.
+		if ( ! sortedByCategory.length ) {
+			return;
 		}
 
+		const nextBlock = this.findPrevious( currentBlock, sortedByCategory );
 		this.changeMenuSelection( nextBlock );
 	}
 
@@ -217,6 +224,24 @@ class InserterMenu extends wp.element.Component {
 			this.focusPrevious( this );
 		}
 
+		/**
+		 * Left and right arrow keys need to be handled seperately so that
+		 * default cursor behavior can be handled in the search field.
+		 */
+		if ( this.isArrowRight( keydown ) ) {
+			if ( this.state.currentFocus === 'search' ) {
+				return;
+			}
+			this.focusNext( this );
+		}
+
+		if ( this.isArrowLeft( keydown ) ) {
+			if ( this.state.currentFocus === 'search' ) {
+				return;
+			}
+			this.focusPrevious( this );
+		}
+
 		if ( this.isEscapeKey( keydown ) ) {
 			keydown.preventDefault();
 			this.props.closeMenu();
@@ -224,6 +249,10 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	changeMenuSelection( refName ) {
+		if ( refName === null ) {
+			refName = 'search';
+		}
+
 		this.setState( {
 			currentFocus: refName
 		} );
@@ -291,6 +320,7 @@ class InserterMenu extends wp.element.Component {
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
 					ref={ this.bindReferenceNode( 'search' ) }
+					tabIndex="-1"
 				/>
 			</div>
 		);

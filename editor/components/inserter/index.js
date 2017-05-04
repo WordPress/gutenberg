@@ -12,7 +12,6 @@ import IconButton from 'components/icon-button';
 class Inserter extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
-		this.nodes = {};
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
