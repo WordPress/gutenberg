@@ -12,6 +12,10 @@ window._wpGutenbergPost = {
 			'<p>I imagine prior to the launch of the iPod, or the iPhone, there were teams saying the same thing: the copy + paste guys are <em>so close</em> to being ready and we know Walt Mossberg is going to ding us for this so let\'s just not ship to the manufacturers in China for just a few more weeks… The Apple teams were probably embarrassed. But <strong>if you\'re not embarrassed when you ship your first version you waited too long</strong>.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/separator -->',
+			'<hr />',
+			'<!-- /wp:core/separator -->',
+
 			'<!-- wp:core/image -->',
 			'<figure><img src="https://cldup.com/Bc9YxmqFnJ.jpg" /></figure>',
 			'<!-- /wp:core/image -->',

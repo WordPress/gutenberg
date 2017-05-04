@@ -5,7 +5,7 @@
  * @var {Array} categories
  */
 const categories = [
-	{ slug: 'common', title: 'Common' }
+	{ slug: 'common', title: 'Common blocks' }
 ];
 
 /**

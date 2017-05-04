@@ -79,7 +79,7 @@ export function renderToString( element ) {
 export function concatChildren( ...childrens ) {
 	return childrens.reduce( ( memo, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
-			if ( 'string' !== typeof child ) {
+			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
 					key: [ i, j ].join()
 				} );

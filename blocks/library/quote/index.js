@@ -40,7 +40,82 @@ registerBlock( 'core/quote', {
 		subscript: variation
 	} ) ),
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content } ) => {
+					return {
+						blockType: 'core/quote',
+						attributes: {
+							value: content
+						}
+					};
+				}
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content } ) => {
+					return {
+						blockType: 'core/quote',
+						attributes: {
+							value: content
+						}
+					};
+				}
+			}
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { value, citation } ) => {
+					return {
+						blockType: 'core/text',
+						attributes: {
+							content: wp.element.concatChildren( value, citation )
+						}
+					};
+				}
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { value, citation, ...attrs } ) => {
+					if ( Array.isArray( value ) || citation ) {
+						const heading = {
+							blockType: 'core/heading',
+							attributes: {
+								nodeName: 'H2',
+								content: Array.isArray( value ) ? value[ 0 ] : value
+							}
+						};
+						const quote = {
+							blockType: 'core/quote',
+							attributes: {
+								...attrs,
+								citation,
+								value: Array.isArray( value ) ? value.slice( 1 ) : ''
+							}
+						};
+
+						return [ heading, quote ];
+					}
+					return {
+						blockType: 'core/heading',
+						attributes: {
+							nodeName: 'H2',
+							content: value
+						}
+					};
+				}
+			}
+		]
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -55,6 +130,7 @@ registerBlock( 'core/quote', {
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
 				{ ( citation || !! focus ) && (

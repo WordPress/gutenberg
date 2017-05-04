@@ -35,15 +35,37 @@ registerBlock( 'core/heading', {
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content } ) => {
+				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						// TODO this appears to always be true?
-						// TODO reject the switch if more than one paragraph
-						content = content[ 0 ];
+						const heading = {
+							blockType: 'core/heading',
+							attributes: {
+								nodeName: 'H2',
+								content: content[ 0 ]
+							}
+						};
+						const blocks = [ heading ];
+
+						const remainingContent = content.slice( 1 );
+						if ( remainingContent.length ) {
+							const text = {
+								blockType: 'core/text',
+								attributes: {
+									...attrs,
+									content: remainingContent
+								}
+							};
+							blocks.push( text );
+						}
+
+						return blocks;
 					}
 					return {
-						nodeName: 'H2',
-						content
+						blockType: 'core/heading',
+						attributes: {
+							nodeName: 'H2',
+							content
+						}
 					};
 				}
 			}
@@ -54,7 +76,10 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return {
-						content: [ content ]
+						blockType: 'core/text',
+						attributes: {
+							content
+						}
 					};
 				}
 			}

@@ -24,29 +24,37 @@ msgid "Strikethrough"
 msgstr ""
 
 #: blocks/components/editable/index.js:29
-#: blocks/library/image/index.js:44
+#: blocks/library/image/index.js:41
 #: blocks/library/list/index.js:25
 msgid "Align left"
 msgstr ""
 
 #: blocks/components/editable/index.js:34
-#: blocks/library/image/index.js:50
+#: blocks/library/image/index.js:47
 #: blocks/library/list/index.js:33
 msgid "Align center"
 msgstr ""
 
 #: blocks/components/editable/index.js:39
-#: blocks/library/image/index.js:56
+#: blocks/library/image/index.js:53
 #: blocks/library/list/index.js:41
 msgid "Align right"
 msgstr ""
 
-#: blocks/library/embed/index.js:10
+#: blocks/library/embed/index.js:34
+msgid "Embed URL"
+msgstr ""
+
+#: blocks/library/embed/index.js:37
+msgid "Enter URL to embed here..."
+msgstr ""
+
+#: blocks/library/embed/index.js:39
 msgid "Embed"
 msgstr ""
 
-#: blocks/library/embed/index.js:33
-#: blocks/library/image/index.js:107
+#: blocks/library/embed/index.js:54
+#: blocks/library/image/index.js:81
 msgid "Write caption…"
 msgstr ""
 
@@ -62,24 +70,12 @@ msgstr ""
 msgid "Heading %s"
 msgstr ""
 
-#: blocks/library/image/index.js:62
-msgid "No alignment"
-msgstr ""
-
-#: blocks/library/image/index.js:68
-msgid "Wide width"
-msgstr ""
-
-#: blocks/library/image/index.js:89
+#: blocks/library/image/index.js:25
 msgid "Image"
 msgstr ""
 
-#: blocks/library/image/index.js:92
-msgid "Drag image here or insert from media library"
-msgstr ""
-
-#: blocks/library/image/index.js:95
-msgid "Insert from Media Library"
+#: blocks/library/image/index.js:59
+msgid "No alignment"
 msgstr ""
 
 #: blocks/library/list/index.js:11
@@ -102,7 +98,7 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: editor/components/inserter/index.js:50
+#: editor/components/inserter/index.js:37
 msgid "Insert block"
 msgstr ""
 

@@ -97,9 +97,9 @@ export default connect(
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {
 			dispatch( {
-				type: 'SWITCH_BLOCK_TYPE',
-				uid: ownProps.uid,
-				block: wp.blocks.switchToBlockType( block, blockType )
+				type: 'REPLACE_BLOCKS',
+				uids: [ ownProps.uid ],
+				blocks: wp.blocks.switchToBlockType( block, blockType )
 			} );
 		}
 	} )

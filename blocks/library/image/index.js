@@ -17,7 +17,7 @@ const { attr, children } = query;
  * @param  {string}   align Alignment value
  * @return {Function}       Attribute setter
  */
-function applyOrUnset( align ) {
+function toggleAlignment( align ) {
 	return ( attributes, setAttributes ) => {
 		const nextAlign = attributes.align === align ? undefined : align;
 		setAttributes( { align: nextAlign } );
@@ -43,31 +43,25 @@ registerBlock( 'core/image', {
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' )
+			onClick: toggleAlignment( 'left' )
 		},
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' )
+			onClick: toggleAlignment( 'center' )
 		},
 		{
 			icon: 'align-right',
 			title: wp.i18n.__( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' )
-		},
-		{
-			icon: 'align-none',
-			title: wp.i18n.__( 'No alignment' ),
-			isActive: ( { align } ) => ! align || 'none' === align,
-			onClick: applyOrUnset( 'none' )
+			onClick: toggleAlignment( 'right' )
 		},
 		{
 			icon: 'align-full-width',
 			title: wp.i18n.__( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
-			onClick: applyOrUnset( 'wide' )
+			onClick: toggleAlignment( 'wide' )
 		}
 	],
 
