@@ -252,17 +252,8 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	componentWillUpdate( nextProps ) {
-		if ( this.editor && this.props.tagName !== nextProps.tagName ) {
-			this.editor.destroy();
-		}
-	}
-
 	componentWillUnmount() {
-		if ( this.editor ) {
-			this.onChange();
-			this.editor.destroy();
-		}
+		this.onChange();
 	}
 
 	componentDidUpdate( prevProps ) {
