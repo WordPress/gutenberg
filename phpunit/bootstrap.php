@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Guttenberg
+ * @package Gutenberg
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
