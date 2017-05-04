@@ -1,0 +1,8 @@
+.blocks-table {
+  border-collapse: collapse;
+  border: 1px solid $light-gray-500;
+  td {
+    border: 1px solid $light-gray-500;
+    padding: 15px 7px;
+  }
+}

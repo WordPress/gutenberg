@@ -7,6 +7,14 @@ import Editable from 'components/editable';
 
 const { children, prop } = hpq;
 
+let editable = null;
+
+function execCommand( commandId ) {
+	const editorNode = editable !== null ? editable.editorNode : null;
+	const editor = tinymce.editors.find( ( e ) => e.targetElm === editorNode );
+	editor.execCommand( commandId, false, editor );
+}
+
 registerBlock( 'core/table', {
 	title: wp.i18n.__( 'Table' ),
 	icon: 'editor-table',
@@ -14,28 +22,39 @@ registerBlock( 'core/table', {
 
 	attributes: {
 		nodeName: prop( 'table', 'nodeName' ),
-		values: children( 'tr' )
+		rows: children( 'tr' )
 	},
 
 	controls: [
-		// {
-		// 	icon: 'editor-table',
-		// 	title: wp.i18n.__( 'Convert to unordered' ),
-		// 	isActive: ( { nodeName = 'OL' } ) => nodeName === 'UL',
-		// 	onClick( attributes, setAttributes ) {
-		// 	}
-		// },
+		{
+			icon: 'editor-table',
+			title: wp.i18n.__( 'Insert Row Before' ),
+			isActive: () => false, //TODO
+			onClick() {
+				execCommand( 'mceTableInsertRowBefore', false );
+			}
+		},
+		{
+			icon: 'editor-table',
+			title: wp.i18n.__( 'Insert Row After' ),
+			isActive: () => false, //TODO
+			onClick() {
+				execCommand( 'mceTableInsertRowAfter', false );
+			}
+		},
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { nodeName = 'TABLE', values = [] } = attributes;
+		const { nodeName = 'TABLE', rows = [ <tr key="1"><td><br /></td><td><br /></td></tr>, <tr key="2"><td><br /></td><td><br /></td></tr> ] } = attributes;
 		return (
 			<Editable
+				ref={ ( e ) => editable = e }
 				tagName={ nodeName.toLowerCase() }
-				onChange={ ( nextValues ) => {
-					setAttributes( { values: nextValues } );
+				style={ { width: '100%' } }
+				onChange={ ( nextRows ) => {
+					setAttributes( { rows: nextRows } );
 				} }
-				value={ values }
+				value={ rows }
 				focus={ focus }
 				onFocus={ setFocus }
 				showAlignments
@@ -44,12 +63,12 @@ registerBlock( 'core/table', {
 	},
 
 	save( { attributes } ) {
-		const { nodeName = 'TABLE', values = [] } = attributes;
+		const { rows = [ <tr key="1"><td><br /></td><td><br /></td></tr>, <tr key="2"><td><br /></td><td><br /></td></tr> ] } = attributes;
 
-		return wp.element.createElement(
-			nodeName.toLowerCase(),
-			null,
-			values
+		return (
+			<table className="blocks-table" style={ { width: '100%' } }>
+				{ rows }
+			</table>
 		);
 	}
 } );
