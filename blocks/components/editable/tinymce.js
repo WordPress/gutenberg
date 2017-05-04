@@ -1,4 +1,42 @@
 export default class TinyMCE extends wp.element.Component {
+	componentDidMount() {
+		this.initialize();
+	}
+
+	shouldComponentUpdate( nextProps ) {
+		// We must prevent rerenders because TinyMCE will modify the DOM, thus
+		// breaking React's ability to reconcile changes.
+		//
+		// See: https://github.com/facebook/react/issues/6802
+		return nextProps.tagName !== this.props.tagName;
+	}
+
+	componentWillUpdate( nextProps ) {
+		if ( ! this.editor ) {
+			return;
+		}
+
+		if ( nextProps.tagName !== this.props.tagName ) {
+			this.editor.destroy();
+			this.editor = null;
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.tagName !== prevProps.tagName ) {
+			this.initialize();
+		}
+	}
+
+	componentWillUnmount() {
+		if ( ! this.editor ) {
+			return;
+		}
+
+		this.editor.destroy();
+		this.editor = null;
+	}
+
 	initialize() {
 		tinymce.init( {
 			target: this.editorNode,
@@ -8,7 +46,10 @@ export default class TinyMCE extends wp.element.Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
-			setup: this.props.onSetup,
+			setup: ( editor ) => {
+				this.editor = editor;
+				this.props.onSetup( editor );
+			},
 			formats: {
 				strikethrough: { inline: 'del' }
 			}
@@ -17,24 +58,6 @@ export default class TinyMCE extends wp.element.Component {
 		if ( this.props.focus ) {
 			this.editorNode.focus();
 		}
-	}
-
-	componentDidMount() {
-		this.initialize();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.tagName !== prevProps.tagName ) {
-			this.initialize();
-		}
-	}
-
-	shouldComponentUpdate( nextProps ) {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return nextProps.tagName !== this.props.tagName;
 	}
 
 	render() {
