@@ -29,7 +29,6 @@ export const blocks = combineUndoableReducers( {
 			case 'MOVE_BLOCK_UP':
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCK':
-			case 'SWITCH_BLOCK_TYPE':
 				return true;
 		}
 
