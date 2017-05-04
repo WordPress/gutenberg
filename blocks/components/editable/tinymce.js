@@ -12,13 +12,8 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	componentWillUpdate( nextProps ) {
-		if ( ! this.editor ) {
-			return;
-		}
-
 		if ( nextProps.tagName !== this.props.tagName ) {
-			this.editor.destroy();
-			this.editor = null;
+			this.destroy();
 		}
 	}
 
@@ -29,12 +24,7 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	componentWillUnmount() {
-		if ( ! this.editor ) {
-			return;
-		}
-
-		this.editor.destroy();
-		this.editor = null;
+		this.destroy();
 	}
 
 	initialize() {
@@ -58,6 +48,15 @@ export default class TinyMCE extends wp.element.Component {
 		if ( this.props.focus ) {
 			this.editorNode.focus();
 		}
+	}
+
+	destroy() {
+		if ( ! this.editor ) {
+			return;
+		}
+
+		this.editor.destroy();
+		delete this.editor;
 	}
 
 	render() {
