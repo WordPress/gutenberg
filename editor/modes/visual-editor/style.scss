@@ -1,12 +1,21 @@
 .editor-visual-editor {
-	margin: 60px auto 0;
+	margin: 0 auto;
 	max-width: 700px;
+	padding: 10px;	/* Floating up/down arrows invisible */
 
 	&,
 	& p {
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
+	}
+
+	@include break-small() {
+		padding: 30px 40px;	/* Floating up/down appear */
+	}
+
+	@include break-large() {
+		padding: 60px 30px;
 	}
 }
 
