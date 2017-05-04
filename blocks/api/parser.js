@@ -99,7 +99,7 @@ export function parseWithTinyMCE( content ) {
 	//   In  : <!-- wp:core/embed url:youtube.com/xxx& -->
 	//   Out : <wp-block slug="core/embed" attributes="url:youtube.com/xxx&amp;">
 	content = content.replace(
-		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+="[^"]*")*)\s*-->/g,
+		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+(="[^"]*")?)*)\s*-->/g,
 		function( match, closingSlash, slug, attributes ) {
 			if ( closingSlash ) {
 				return '</wp-block>';
@@ -166,13 +166,13 @@ export function parseWithTinyMCE( content ) {
 			}, {} );
 
 			// Retrieve the block attributes from the original delimiters
-			const attributesMatcher = /([a-z0-9_-]+)="([^"]*)"/g;
+			const attributesMatcher = /([a-z0-9_-]+)(="([^"]*)")?/g;
 			const blockAttributes = {};
 			let match;
 			do {
 				match = attributesMatcher.exec( unescape( nodeAttributes.attributes || '' ) );
 				if ( match ) {
-					blockAttributes[ match[ 1 ] ] = match[ 2 ];
+					blockAttributes[ match[ 1 ] ] = !! match[ 2 ] ? match[ 3 ] : true;
 				}
 			} while ( !! match );
 
@@ -221,4 +221,4 @@ export function parseWithGrammar( content ) {
 	}, [] );
 }
 
-export default parseWithGrammar;
+export default parseWithTinyMCE;
