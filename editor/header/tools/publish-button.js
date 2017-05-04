@@ -25,8 +25,8 @@ function PublishButton( {
 
 	if ( isRequesting ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Saving...' )
-			: wp.i18n.__( 'Updating...' );
+			? wp.i18n.__( 'Saving…' )
+			: wp.i18n.__( 'Updating…' );
 	} else if ( isSuccessful ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saved!' )
