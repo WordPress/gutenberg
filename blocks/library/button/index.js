@@ -27,7 +27,7 @@ registerBlock( 'core/button', {
 
 	icon: 'marker',
 
-	category: 'common',
+	category: 'layout',
 
 	attributes: {
 		url: attr( 'a', 'href' ),
