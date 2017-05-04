@@ -42,7 +42,7 @@ registerBlock( 'core/heading', {
 							blockType: 'core/heading',
 							attributes: {
 								nodeName: 'H2',
-								content: content[ 0 ]
+								content: content[ 0 ].props.children
 							}
 						};
 						const blocks = [ heading ];
