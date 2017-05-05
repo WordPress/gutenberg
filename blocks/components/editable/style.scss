@@ -12,6 +12,14 @@
 	&:focus {
 		outline: none;
 	}
+
+	a[data-mce-selected] {
+		padding: 0 2px;
+		margin: 0 -2px;
+		background: #dcf2f8;
+		border-radius: 2px;
+		box-shadow: 0 0 0 1px #dcf2f8;
+	}
 }
 
 figcaption.blocks-editable {
