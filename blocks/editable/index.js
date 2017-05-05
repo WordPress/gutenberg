@@ -363,6 +363,8 @@ export default class Editable extends wp.element.Component {
 	}
 
 	changeFormats( formats ) {
+		this.editor.focus();
+
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
 				if ( formatValue !== undefined ) {
