@@ -51,8 +51,9 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
-      phpunit
-      WP_MULTISITE=1 phpunit
+      npm run build || exit 1
+      phpunit || exit 1
+      WP_MULTISITE=1 phpunit || exit 1
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
@@ -64,6 +65,6 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
-      npm install
-      npm run ci
+      npm install || exit 1
+      npm run ci || exit 1
     fi
