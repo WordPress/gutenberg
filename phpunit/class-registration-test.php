@@ -24,8 +24,6 @@ class Registration_Test extends WP_UnitTestCase {
 
 	/**
 	 * The block slug should have a namespace
-	 *
-	 * @expectedIncorrectUsage register_block
 	 */
 	function test_invalid_slugs_without_namespace() {
 		register_block( 'text', array() );
