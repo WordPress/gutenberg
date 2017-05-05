@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
-import 'element-closest';
 
 /**
  * Internal dependencies
@@ -140,15 +139,8 @@ class VisualEditorBlock extends wp.element.Component {
 			this.previousOffset = null;
 		}
 
-		// Focusing the block node if no inner element is focused
-		if (
-			!! this.props.focus &&
-			! prevProps.focus &&
-			(
-				! document.activeElement ||
-				document.activeElement.closest( '.editor-visual-editor__block' ) !== this.node
-			)
-		) {
+		// Focus node when focus state is programmatically transferred
+		if ( this.props.focus && ! prevProps.focus ) {
 			this.node.focus();
 		}
 	}
