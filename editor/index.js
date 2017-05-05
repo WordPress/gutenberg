@@ -11,9 +11,6 @@ import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
 
-// Unused import: lint error
-import util from 'util';
-
 /**
  * Initializes and returns an instance of Editor.
  *
