@@ -20,7 +20,7 @@
 
 /* "Hassle-free full bleed" from CSS Tricks */
 .editor-visual-editor > *:not( [data-align="wide"] ) {
-	max-width: 700px;
+	max-width: $visual-editor-max-width;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -88,7 +88,7 @@
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
-	margin-right: 10px;
+	margin-right: $item-spacing;
 }
 
 .editor-visual-editor__block-controls .editor-block-switcher {
@@ -96,5 +96,5 @@
 }
 
 .editor-visual-editor .editor-inserter {
-	margin: $item-spacing;
+	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
 }
