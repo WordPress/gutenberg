@@ -252,6 +252,56 @@ describe( 'state', () => {
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 3 );
 			expect( state.blockOrder ).to.eql( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
+
+		describe( 'edits()', () => {
+			it( 'should save newly edited properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					post: {
+						status: 'draft',
+						title: 'post title',
+					}
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					post: {
+						tags: [ 1 ],
+					},
+				} );
+
+				expect( state.edits ).to.eql( {
+					status: 'draft',
+					title: 'post title',
+					tags: [ 1 ],
+				} );
+			} );
+
+			it( 'should save modified properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					post: {
+						status: 'draft',
+						title: 'post title',
+						tags: [ 1 ],
+					}
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					post: {
+						title: 'modified title',
+						tags: [ 2 ],
+					},
+				} );
+
+				expect( state.edits ).to.eql( {
+					status: 'draft',
+					title: 'modified title',
+					tags: [ 2 ],
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'hoveredBlock()', () => {
