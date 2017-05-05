@@ -92,10 +92,12 @@ registerBlock( 'core/image', {
 			);
 		}
 
+		const hasCaption = caption && caption.length;
+
 		return (
 			<figure className="blocks-image">
 				<img src={ url } alt={ alt } />
-				{ caption || !! focus ? (
+				{ hasCaption || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
@@ -112,7 +114,7 @@ registerBlock( 'core/image', {
 		const { url, alt, caption, align = 'none' } = attributes;
 		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
-		if ( ! caption ) {
+		if ( ! caption || ! caption.length ) {
 			return img;
 		}
 
