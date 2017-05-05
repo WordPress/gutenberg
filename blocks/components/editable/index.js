@@ -228,7 +228,7 @@ export default class Editable extends wp.element.Component {
 		}
 
 		content = wp.element.renderToString( content );
-		this.editor.setContent( content );
+		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
