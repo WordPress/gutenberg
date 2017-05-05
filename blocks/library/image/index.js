@@ -113,7 +113,7 @@ registerBlock( 'core/image', {
 		const { url, alt, caption, align = 'none' } = attributes;
 		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
-		if ( ! caption ) {
+		if ( ! caption.length ) {
 			return img;
 		}
 

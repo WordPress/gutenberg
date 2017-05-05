@@ -67,7 +67,7 @@ registerBlock( 'core/embed', {
 		const { url, title, caption } = attributes;
 		const iframe = <iframe src={ url } title={ title } />;
 
-		if ( ! caption ) {
+		if ( ! caption.length ) {
 			return iframe;
 		}
 
