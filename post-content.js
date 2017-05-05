@@ -38,11 +38,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/heading -->',
-			'<h1>The <em>Inserter</em> Tool</h1>',
+			'<h2>The <em>Inserter</em> Tool</h2>',
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the (+) button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of posibilities for rich editing and publishing.<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
+			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of posibilities for rich editing and publishing.<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/list -->',
@@ -62,7 +62,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/heading -->',
-			'<h1>Visual Editing</h1>',
+			'<h2>Visual Editing</h2>',
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
@@ -81,20 +81,49 @@ window._wpGutenbergPost = {
 			'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/quote -->',
+			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer><p>Maya Angelou</p></footer></blockquote>',
+			'<!-- /wp:core/quote -->',
+
+			'<!-- wp:core/separator -->',
+			'<hr/>',
+			'<!-- /wp:core/separator -->',
+
+			'<!-- wp:core/heading -->',
+			'<h2>Sea id autem nominavi deseruisse</h2>',
+			'<!-- /wp:core/heading -->',
+
 			'<!-- wp:core/text -->',
-			'<p style="text-align:center;">Use fancy quote here...</p>',
+			'<p>Ea veniam homero eam. Ex inimicus molestiae cum, debet scaevola at eos. Vis assum veritus ut, has ea nostrud accusata, offendit appareat comprehensam ea pro. Ad quo quem veritus appellantur, te est quas phaedrum, eum alia habeo ad. Ei est erroribus imperdiet, omnis dicam propriae sed no. His vitae oratio fierent ne, cu duo tota eligendi, electram rationibus in qui.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/vuGcj2VB8M.jpg" /><figcaption>Beautiful landscape</figcaption></figure>',
+			'<figure><img src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
-			'<p>By shipping early and often you have the unique competitive advantage of hearing from real people what they think of your work, which in best case helps you anticipate market direction, and in worst case gives you a few people rooting for you that you can email when your team pivots to a new idea. Nothing can recreate the crucible of real usage.</p>',
+			'<p>Est quis reque cetero ad. Sea id autem nominavi deseruisse. <strong>Veniam qualisque definitionem pri id</strong>, ea autem feugiat delenit ius, mei at loem affert accumsan. Dicat eruditi cu est, te pro dicant pericula conclusionemque, ei vim detracto euripidis intellegam. Eius postea volumus mei ad.</p>',
+			'<p>Prima ridens denique his te, ferri illum volumus an his. Eu vel dicat homero qualisqu, vitae regione deserunt vis ei. Graeci incorrupte liberavisse no mea, saepe voluptaria usu ex, vis dicant euismod id. At dolor reprimique eos, quo altera detraxit moderatius id. Quo iudico utinam eu, ad alia munere mel.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/image -->',
+			'<figure><img src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
+			'<!-- /wp:core/image -->',
+
+			'<!-- wp:core/image -->',
+			'<figure><img src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
+			'<!-- /wp:core/image -->',
+
+			'<!-- wp:core/text -->',
+			'<p><Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/heading -->',
+			'<h6>Loem</h6>',
+			'<!-- /wp:core/heading -->',
+
 			'<!-- wp:core/list -->',
-			'<ul><li>Ship early</li><li>Ship often</li><li>Listen to feedback from real people</li><li>Anticipate market direction</li></ul>',
+			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
 
 			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
@@ -103,4 +132,3 @@ window._wpGutenbergPost = {
 		].join( '' ),
 	},
 };
-
