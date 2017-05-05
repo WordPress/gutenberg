@@ -37,7 +37,7 @@ window._wpGutenbergPost = {
 			'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
+			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
 			'<figure><iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption><p>State of the Word 2016</p></figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
