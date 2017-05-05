@@ -176,7 +176,7 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		if ( ! this.content.length > 1 ) {
+		if ( this.content.length < 2 ) {
 			return;
 		}
 
