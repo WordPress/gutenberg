@@ -33,20 +33,18 @@ registerBlock( 'core/pullquote', {
 					onFocus={ () => setFocus( { editable: 'value' } ) }
 				/>
 				{ ( citation || !! focus ) && (
-					<footer>
-						<Editable
-							tagName="footer"
-							value={ citation || wp.i18n.__( 'Write caption…' ) }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation
-								} )
-							}
-							focus={ focus && focus.editable === 'citation' ? focus : null }
-							onFocus={ () => setFocus( { editable: 'citation' } ) }
-							inline
-						/>
-					</footer>
+					<Editable
+						tagName="footer"
+						value={ citation || wp.i18n.__( 'Write caption…' ) }
+						onChange={
+							( nextCitation ) => setAttributes( {
+								citation: nextCitation
+							} )
+						}
+						focus={ focus && focus.editable === 'citation' ? focus : null }
+						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						inline
+					/>
 				) }
 			</blockquote>
 		);
