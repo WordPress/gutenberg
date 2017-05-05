@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
+import 'element-closest';
 
 /**
  * Internal dependencies
@@ -96,6 +97,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Do nothing if the previous block is not mergeable
 		if ( ! previousBlockSettings.merge ) {
+			onFocus( previousBlock.uid );
 			return;
 		}
 
@@ -129,13 +131,25 @@ class VisualEditorBlock extends wp.element.Component {
 		);
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps ) {
 		if ( this.previousOffset ) {
 			window.scrollTo(
 				window.scrollX,
 				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
 			);
 			this.previousOffset = null;
+		}
+
+		// Focusing the block node if no inner element is focused
+		if (
+			!! this.props.focus &&
+			! prevProps.focus &&
+			(
+				! document.activeElement ||
+				document.activeElement.closest( '.editor-visual-editor__block' ) !== this.node
+			)
+		) {
+			this.node.focus();
 		}
 	}
 
