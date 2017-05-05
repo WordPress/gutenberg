@@ -30,7 +30,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image align="center" -->',
-			'<figure><img src="https://cldup.com/E4PzNdrFSQ.jpg" class="aligncenter"/><figcaption><p>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</p></figcaption></figure>',
+			'<figure><img src="https://cldup.com/E4PzNdrFSQ.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -38,7 +38,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure><iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption><p>State of the Word 2016</p></figcaption></figure>',
+			'<figure><iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption>State of the Word 2016</figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/heading -->',
