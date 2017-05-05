@@ -51,15 +51,21 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
-      phpunit
-      WP_MULTISITE=1 phpunit
+      npm install || exit 1
+      npm run build || exit 1
+      phpunit || exit 1
+      WP_MULTISITE=1 phpunit || exit 1
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
+      find . \
+        -not \( -path './node_modules' \) \
+        -not \( -path './vendor' \) \
+        -name '*.php' \
+      | xargs -d'\n' phpcs --standard=phpcs.ruleset.xml -s
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
-      npm install
-      npm run ci
+      npm install || exit 1
+      npm run ci || exit 1
     fi
