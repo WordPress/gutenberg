@@ -18,7 +18,7 @@ registerBlock( 'core/text', {
 	},
 
 	defaultAttributes: {
-		content: <p />
+		content: []
 	},
 
 	merge( attributes, attributesToMerge ) {
