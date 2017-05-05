@@ -4,7 +4,4 @@
 
 	<rule ref="WordPress-Core" />
 	<rule ref="WordPress-Docs" />
-
-	<exclude-pattern>*/node_modules/*</exclude-pattern>
-	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
