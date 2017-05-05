@@ -38,36 +38,25 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						const heading = {
-							blockType: 'core/heading',
-							attributes: {
-								nodeName: 'H2',
-								content: content[ 0 ].props.children
-							}
-						};
+						const heading = wp.blocks.createBlock( 'core/heading', {
+							content: content[ 0 ].props.children
+						} );
 						const blocks = [ heading ];
 
 						const remainingContent = content.slice( 1 );
 						if ( remainingContent.length ) {
-							const text = {
-								blockType: 'core/text',
-								attributes: {
-									...attrs,
-									content: remainingContent
-								}
-							};
+							const text = wp.blocks.createBlock( 'core/text', {
+								...attrs,
+								content: remainingContent
+							} );
 							blocks.push( text );
 						}
 
 						return blocks;
 					}
-					return {
-						blockType: 'core/heading',
-						attributes: {
-							nodeName: 'H2',
-							content
-						}
-					};
+					return wp.blocks.createBlock( 'core/heading', {
+						content
+					} );
 				}
 			}
 		],
@@ -76,12 +65,9 @@ registerBlock( 'core/heading', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/text',
-						attributes: {
-							content
-						}
-					};
+					return wp.blocks.createBlock( 'core/text', {
+						content
+					} );
 				}
 			}
 		]

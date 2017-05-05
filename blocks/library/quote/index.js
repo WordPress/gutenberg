@@ -33,24 +33,18 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/quote',
-						attributes: {
-							value: content
-						}
-					};
+					return wp.blocks.createBlock( 'core/quote', {
+						value: content
+					} );
 				}
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/quote',
-						attributes: {
-							value: content
-						}
-					};
+					return wp.blocks.createBlock( 'core/quote', {
+						value: content
+					} );
 				}
 			}
 		],
@@ -59,12 +53,9 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
-					return {
-						blockType: 'core/text',
-						attributes: {
-							content: wp.element.concatChildren( value, citation )
-						}
-					};
+					return wp.blocks.createBlock( 'core/text', {
+						content: wp.element.concatChildren( value, citation )
+					} );
 				}
 			},
 			{
@@ -72,31 +63,20 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
 					if ( Array.isArray( value ) || citation ) {
-						const heading = {
-							blockType: 'core/heading',
-							attributes: {
-								nodeName: 'H2',
-								content: Array.isArray( value ) ? value[ 0 ] : value
-							}
-						};
-						const quote = {
-							blockType: 'core/quote',
-							attributes: {
-								...attrs,
-								citation,
-								value: Array.isArray( value ) ? value.slice( 1 ) : ''
-							}
-						};
+						const heading = wp.blocks.createBlock( 'core/heading', {
+							content: Array.isArray( value ) ? value[ 0 ] : value
+						} );
+						const quote = wp.blocks.createBlock( 'core/quote', {
+							...attrs,
+							citation,
+							value: Array.isArray( value ) ? value.slice( 1 ) : ''
+						} );
 
 						return [ heading, quote ];
 					}
-					return {
-						blockType: 'core/heading',
-						attributes: {
-							nodeName: 'H2',
-							content: value
-						}
-					};
+					return wp.blocks.createBlock( 'core/heading', {
+						content: value
+					} );
 				}
 			}
 		]
