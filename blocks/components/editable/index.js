@@ -340,7 +340,6 @@ export default class Editable extends wp.element.Component {
 			inline,
 			formattingControls
 		} = this.props;
-		const classes = classnames( 'blocks-editable', className );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount (+ destroy) the previous TinyMCE element, then
