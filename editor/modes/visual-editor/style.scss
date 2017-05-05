@@ -10,11 +10,11 @@
 	}
 
 	@include break-small() {
-		padding: 50px 40px;	/* Floating up/down appear */
+		padding: 50px 0 50px #{ $block-padding + $block-mover-margin };		/* Floating up/down appear, also compensate for mover */
 	}
 
 	@include break-large() {
-		padding: 60px 30px;
+		padding: 60px 0 60px #{ $block-padding + $block-mover-margin };		/* Compensate for mover on the left side */
 	}
 }
 
@@ -27,8 +27,9 @@
 
 .editor-visual-editor__block {
 	position: relative;
-	left: -#{ $block-padding + $block-mover-margin };	// make room for the mover
-	padding: $block-padding $block-padding $block-padding #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover
+	left: -#{ $block-padding + $block-mover-margin };	/* Make room for the mover */
+	padding: $block-padding $block-padding  $block-padding #{ $block-padding * 2 + $block-mover-margin };	/* Compensate for mover */
+	margin-right: #{ $block-padding + $block-mover-margin };
 	transition: 0.2s border-color;
 
 	&:before {
@@ -37,7 +38,7 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: #{ $block-padding + $block-mover-margin };	// compensate for mover
+		left: #{ $block-padding + $block-mover-margin };	/* Compensate for mover */
 		right: 0;
 		border: 2px solid transparent;
 		transition: 0.2s border-color;
