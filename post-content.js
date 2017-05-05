@@ -45,7 +45,7 @@ window._wpGutenbergPost = {
 			'<ul><li>Ship early</li><li>Ship often</li><li>Listen to feedback from real people</li><li>Anticipate market direction</li></ul>',
 			'<!-- /wp:core/list -->',
 
-			'<!-- wp:core/embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
+			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
 			'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
 			'<!-- /wp:core/embed -->',
 		].join( '' ),
