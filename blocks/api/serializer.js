@@ -59,7 +59,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 			return memo;
 		}
 
-		return memo + `${ key }:${ value } `;
+		return memo + `${ key }="${ value }" `;
 	}, '' );
 }
 
