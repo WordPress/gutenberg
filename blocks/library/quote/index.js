@@ -120,7 +120,7 @@ registerBlock( 'core/quote', {
 					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
-				{ ( citation || !! focus ) && (
+				{ ( citation.length > 0 || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }

@@ -48,7 +48,7 @@ registerBlock( 'core/embed', {
 				<div className="iframe-overlay">
 					<iframe src={ url } title={ title } />
 				</div>
-				{ caption || !! focus ? (
+				{ caption.length > 0 || !! focus ? (
 					<Editable
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
