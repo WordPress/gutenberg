@@ -57,10 +57,13 @@ registerBlock( 'core/pullquote', {
 
 		return (
 			<blockquote className="blocks-pullquote">
-				{ value && wp.element.Children.map( value, ( paragraph, i ) => (
+				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
-				<footer>{ citation }</footer>
+
+				{ citation && citation.length > 0 && (
+					<footer>{ citation }</footer>
+				) }
 			</blockquote>
 		);
 	}
