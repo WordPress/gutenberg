@@ -212,15 +212,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getChildIndex( child ) {
-		const parentNode = child.parentNode;
-		const childNodes = parentNode.childNodes;
-		let i = childNodes.length;
-
-		while ( i-- ) {
-			if ( child === childNodes[ i ] ) {
-				return i;
-			}
-		}
+		return Array.from( child.parentNode.childNodes ).indexOf( child );
 	}
 
 	getSelection() {
