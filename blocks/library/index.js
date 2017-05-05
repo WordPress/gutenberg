@@ -6,3 +6,4 @@ import './text';
 import './list';
 import './quote';
 import './separator';
+import './button';

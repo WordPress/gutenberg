@@ -18,6 +18,22 @@ import { combineUndoableReducers } from 'utils/undoable-reducer';
  * @return {Object}        Updated state
  */
 export const blocks = combineUndoableReducers( {
+	dirty( state = false, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return false;
+
+			case 'UPDATE_BLOCK':
+			case 'INSERT_BLOCK':
+			case 'MOVE_BLOCK_DOWN':
+			case 'MOVE_BLOCK_UP':
+			case 'REPLACE_BLOCKS':
+			case 'REMOVE_BLOCK':
+				return true;
+		}
+
+		return state;
+	},
 	byUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':

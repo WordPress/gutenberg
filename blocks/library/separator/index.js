@@ -9,7 +9,7 @@ registerBlock( 'core/separator', {
 
 	icon: 'minus',
 
-	category: 'common',
+	category: 'layout',
 
 	edit() {
 		return <hr className="blocks-separator" />;

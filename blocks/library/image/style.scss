@@ -8,12 +8,12 @@
 
 	&[data-align="left"] {
 		float: left;
-		margin-right: 15px;
+		margin-right: $block-padding;
 	}
 
 	&[data-align="right"] {
 		float: right;
-		margin-left: 15px;
+		margin-left: $block-padding;
 	}
 
 	&[data-align="wide"] {
@@ -91,7 +91,7 @@
 }
 
 .blocks-image.is-placeholder {
-	margin: -15px;
+	margin: -$block-padding;
 	padding: 6em 0;
 	border: 2px solid $light-gray-500;
 	text-align: center;

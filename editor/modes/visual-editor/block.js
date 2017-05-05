@@ -20,6 +20,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
+		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
 		this.previousOffset = null;
 	}
@@ -60,6 +61,18 @@ class VisualEditorBlock extends wp.element.Component {
 		// related target to ensure it's not a child when blur fires.
 		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
 			this.props.onDeselect();
+		}
+	}
+
+	maybeStartTyping() {
+		// We do not want to dispatch start typing if...
+		//  - State value already reflects that we're typing (dispatch noise)
+		//  - The current block is not selected (e.g. after a split occurs,
+		//    we'll still receive the keyDown event, but the focus has since
+		//    shifted to the newly created block)
+		const { isTyping, isSelected, onStartTyping } = this.props;
+		if ( ! isTyping && isSelected ) {
+			onStartTyping();
 		}
 	}
 
@@ -137,7 +150,7 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered
 		} );
 
-		const { onSelect, onStartTyping, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper
 		let wrapperProps;
@@ -177,7 +190,7 @@ class VisualEditorBlock extends wp.element.Component {
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<div onKeyDown={ isTyping ? null : onStartTyping }>
+				<div onKeyDown={ this.maybeStartTyping }>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
