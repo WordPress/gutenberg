@@ -15,8 +15,13 @@ import {
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
 	getBlockSettings,
-	getBlocks
+	getBlocks,
+	validateBlockSettings
 } from '../registration';
+import {
+	edit,
+	save
+} from './function-refs';
 
 describe( 'blocks', () => {
 	// Reset block state before each test.
@@ -52,25 +57,44 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should accept valid block names', () => {
-			const block = registerBlock( 'my-plugin/fancy-block-4' );
+			const block = registerBlock( 'my-plugin/fancy-block-4', {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			} );
 			expect( console.error ).to.not.have.been.called();
-			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4' } );
+			expect( block ).to.eql( {
+				slug: 'my-plugin/fancy-block-4',
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			} );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
-			registerBlock( 'core/test-block' );
+			registerBlock( 'core/test-block', {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			} );
 			const block = registerBlock( 'core/test-block' );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is already registered.' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should store a copy of block settings', () => {
-			const blockSettings = { settingName: 'settingValue' };
+			const blockSettings = {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			};
 			registerBlock( 'core/test-block-with-settings', blockSettings );
 			blockSettings.mutated = true;
 			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
+				edit: edit,
+				save: save
 			} );
 		} );
 	} );
@@ -83,13 +107,27 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should unregister existing blocks', () => {
-			registerBlock( 'core/test-block' );
-			expect( getBlocks() ).to.eql( [
-				{ slug: 'core/test-block' },
+			registerBlock( 'core/test-block', {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			} );
+			expect( getBlocks() ).to.deep.equal( [
+				{
+					slug: 'core/test-block',
+					settingName: 'settingValue',
+					edit: edit,
+					save: save
+				}
 			] );
 			const oldBlock = unregisterBlock( 'core/test-block' );
 			expect( console.error ).to.not.have.been.called();
-			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
+			expect( oldBlock ).to.deep.eql( {
+				slug: 'core/test-block',
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			} );
 			expect( getBlocks() ).to.eql( [] );
 		} );
 	} );
@@ -109,19 +147,18 @@ describe( 'blocks', () => {
 	} );
 
 	describe( 'getBlockSettings()', () => {
-		it( 'should return { slug } for blocks with no settings', () => {
-			registerBlock( 'core/test-block' );
-			expect( getBlockSettings( 'core/test-block' ) ).to.eql( {
-				slug: 'core/test-block',
-			} );
-		} );
-
 		it( 'should return all block settings', () => {
-			const blockSettings = { settingName: 'settingValue' };
+			const blockSettings = {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			};
 			registerBlock( 'core/test-block-with-settings', blockSettings );
 			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
+				edit: edit,
+				save: save
 			} );
 		} );
 	} );
@@ -132,13 +169,78 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should return all registered blocks', () => {
-			registerBlock( 'core/test-block' );
-			const blockSettings = { settingName: 'settingValue' };
+			registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
+			const blockSettings = {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			};
 			registerBlock( 'core/test-block-with-settings', blockSettings );
 			expect( getBlocks() ).to.eql( [
-				{ slug: 'core/test-block' },
-				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
+				{
+					slug: 'core/test-block',
+					edit: edit,
+					save: save
+				},
+				{
+					slug: 'core/test-block-with-settings',
+					settingName: 'settingValue',
+					edit: edit,
+					save: save
+				},
 			] );
+		} );
+	} );
+
+	describe( 'validateBlockSettings()', () => {
+		it( 'should return true when edit() and save() are present', () => {
+			const blockSettings = {
+				settingName: 'settingValue',
+				edit: edit,
+				save: save
+			};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( true );
+		} );
+		it( 'should return false when settings is falsy', () => {
+			const blockSettings = {};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( false );
+		} );
+		it( 'should return false when settings does not contain save()', () => {
+			const blockSettings = {
+				setting: 'settingValue',
+				edit: edit
+			};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( false );
+			expect( console.error ).to.have.been.called();
+		} );
+		it( 'should return false when settings does not contain edit()', () => {
+			const blockSettings = {
+				setting: 'settingValue',
+				save: save
+			};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( false );
+			expect( console.error ).to.have.been.called();
+		} );
+		it( 'should return false when save is not a function', () => {
+			const blockSettings = {
+				setting: 'settingValue',
+				edit: edit,
+				save: 'notAFunction'
+			};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( false );
+			expect( console.error ).to.have.been.called();
+		} );
+		it( 'should return false when edit is not a function', () => {
+			const blockSettings = {
+				setting: 'settingValue',
+				save: save,
+				edit: 'notAFunction'
+			};
+			expect( validateBlockSettings( blockSettings ) ).to.eql( false );
+			expect( console.error ).to.have.been.called();
 		} );
 	} );
 } );

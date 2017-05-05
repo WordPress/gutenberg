@@ -8,6 +8,7 @@ import { expect } from 'chai';
  */
 import { createBlock, switchToBlockType } from '../factory';
 import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
+import { edit, save } from './function-refs';
 
 describe( 'block factory', () => {
 	afterEach( () => {
@@ -46,9 +47,14 @@ describe( 'block factory', () => {
 							};
 						}
 					} ]
-				}
+				},
+				edit: edit,
+				save: save
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlock( 'core/text-block', {
+				edit: edit,
+				save: save
+			} );
 
 			const block = {
 				uid: 1,
@@ -70,7 +76,10 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
-			registerBlock( 'core/updated-text-block', {} );
+			registerBlock( 'core/updated-text-block', {
+				edit: edit,
+				save: save
+			} );
 			registerBlock( 'core/text-block', {
 				transforms: {
 					to: [ {
@@ -84,7 +93,9 @@ describe( 'block factory', () => {
 							};
 						}
 					} ]
-				}
+				},
+				edit: edit,
+				save: save
 			} );
 
 			const block = {
@@ -107,8 +118,14 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should return null if no transformation is found', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {} );
+			registerBlock( 'core/updated-text-block', {
+				edit: edit,
+				save: save
+			} );
+			registerBlock( 'core/text-block', {
+				edit: edit,
+				save: save
+			} );
 
 			const block = {
 				uid: 1,

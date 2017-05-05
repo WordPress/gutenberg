@@ -16,11 +16,18 @@ import {
 	isSidebarOpened,
 	createReduxStore
 } from '../state';
+import {
+	edit,
+	save
+} from '../../blocks/api/test/function-refs';
 
 describe( 'state', () => {
 	describe( 'blocks()', () => {
 		before( () => {
-			wp.blocks.registerBlock( 'core/test-block', {} );
+			wp.blocks.registerBlock( 'core/test-block', {
+				edit: edit,
+				save: save
+			} );
 		} );
 
 		after( () => {
