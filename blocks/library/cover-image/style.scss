@@ -1,0 +1,113 @@
+.editor-visual-editor__block[data-type="core/image"] {
+	&[data-align="left"],
+	&[data-align="right"] {
+		// Without z-index, won't be clickable as "above" adjacent content
+		z-index: 10;
+		max-width: 370px;
+	}
+
+	&[data-align="left"] {
+		float: left;
+		margin-right: $block-padding;
+	}
+
+	&[data-align="right"] {
+		float: right;
+		margin-left: $block-padding;
+	}
+
+	&[data-align="wide"] {
+		// Here be dragons...
+		//
+		// Variable offsets:
+		//  - Left sidebar
+		//   - Hidden at small viewports
+		//   - Foldable
+		//   - Expanded at medium and above
+		//  - Post settings
+		//   - Collapsed
+		//   - Expanded
+
+		left: 50%;
+		right: 50%;
+		margin-left: -50vw;
+		margin-right: -50vw;
+		width: 100vw;
+		padding-left: 0;
+		padding-right: 0;
+		max-width: none;
+
+		.editor-layout.is-sidebar-opened & {
+			margin-left: calc( -50vw + #{ $sidebar-width / 2 } );
+			margin-right: calc( -50vw + #{ $sidebar-width / 2 } );
+			width: calc( 100vw - #{ $sidebar-width } );
+		}
+
+		@include break-medium() {
+			margin-left: calc( -50vw + 80px );
+			margin-right: calc( -50vw + 80px );
+			width: calc( 100vw - 160px );
+
+			.auto-fold &,
+			.folded & {
+				margin-left: calc( -50vw + 18px );
+				margin-right: calc( -50vw + 18px );
+				width: calc( 100vw - 36px );
+			}
+
+			.editor-layout.is-sidebar-opened & {
+				margin-left: calc( -50vw + 80px + #{ $sidebar-width / 2 } );
+				margin-right: calc( -50vw + 80px + #{ $sidebar-width / 2 } );
+				width: calc( 100vw - 160px - #{ $sidebar-width } );
+
+				.auto-fold &,
+				.folded & {
+					margin-left: calc( -50vw + 18px + #{ $sidebar-width / 2 } );
+					margin-right: calc( -50vw + 18px + #{ $sidebar-width / 2 } );
+					width: calc( 100vw - 36px - #{ $sidebar-width } );
+				}
+			}
+		}
+
+		&:before {
+			left: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
+}
+
+.blocks-image {
+	margin: 0;
+
+	img {
+		display: block;
+		width: 100%;
+	}
+}
+
+.blocks-image.is-placeholder {
+	margin: -$block-padding;
+	padding: 6em 0;
+	border: 2px solid $light-gray-500;
+	text-align: center;
+}
+
+.blocks-image__placeholder-label {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+
+	.dashicon {
+		margin-right: 1ch;
+	}
+}
+
+.blocks-image__placeholder-instructions {
+	margin: 1.8em 0;
+}
