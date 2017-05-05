@@ -215,42 +215,30 @@ export default class Editable extends wp.element.Component {
 		return Array.from( child.parentNode.childNodes ).indexOf( child );
 	}
 
+	fillPath( path, node, rootNode ) {
+		while ( node !== rootNode ) {
+			path.unshift( this.getChildIndex( node ) );
+			node = node.parentNode;
+		}
+
+		return path;
+	}
+
 	getSelection() {
-		const range = this.editor.selection.getRng();
-		let startNode = this.editor.selection.getStart();
-		let endNode = this.editor.selection.getEnd();
-		const isCollapsed = this.editor.selection.isCollapsed();
+		const {
+			startOffset,
+			startContainer,
+			endOffset,
+			endContainer,
+			collapsed
+		} = this.editor.selection.getRng();
 		const rootNode = this.editor.getBody();
-		const start = [];
-		const end = [];
 
-		if ( range.startContainer !== rootNode ) {
-			start.push( range.startOffset );
-		}
-
-		if ( range.endContainer !== rootNode ) {
-			end.push( range.endOffset );
-		}
-
-		if ( range.startContainer.nodeType === 3 ) {
-			startNode = range.startContainer;
-		}
-
-		if ( range.endContainer.nodeType === 3 ) {
-			endNode = range.endContainer;
-		}
-
-		while ( startNode !== rootNode ) {
-			start.unshift( this.getChildIndex( startNode ) );
-			startNode = startNode.parentNode;
-		}
-
-		while ( endNode !== rootNode ) {
-			end.unshift( this.getChildIndex( endNode ) );
-			endNode = endNode.parentNode;
-		}
-
-		return { start, end, isCollapsed };
+		return {
+			start: this.fillPath( [ startOffset ], startContainer, rootNode ),
+			end: this.fillPath( [ endOffset ], endContainer, rootNode ),
+			isCollapsed: collapsed
+		};
 	}
 
 	findNodeWithPath( path, rootNode ) {
