@@ -89,7 +89,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onInit() {
-		this.focus();
+		this.updateFocus();
 	}
 
 	onFocus() {
@@ -235,7 +235,7 @@ export default class Editable extends wp.element.Component {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
 	}
 
-	focus() {
+	updateFocus() {
 		const { focus } = this.props;
 		if ( focus ) {
 			this.editor.focus();
@@ -244,6 +244,8 @@ export default class Editable extends wp.element.Component {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
+		} else {
+			this.editor.getBody().blur();
 		}
 	}
 
@@ -252,8 +254,8 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( !! this.props.focus && ! prevProps.focus ) {
-			this.focus();
+		if ( this.props.focus !== prevProps.focus ) {
+			this.updateFocus();
 		}
 
 		// The savedContent var allows us to avoid updating the content right after an onChange call
