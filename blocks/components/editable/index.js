@@ -301,6 +301,8 @@ export default class Editable extends wp.element.Component {
 		this.setState( {
 			formats: merge( {}, this.state.formats, formats )
 		} );
+
+		this.editor.setDirty( true );
 	}
 
 	isAlignmentActive( align ) {
