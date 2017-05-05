@@ -23,7 +23,10 @@ registerBlock( 'core/text', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: [
+				...attributes.content,
+				...attributesToMerge.content
+			]
 		};
 	},
 
