@@ -51,6 +51,7 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
+      npm install || exit 1
       npm run build || exit 1
       phpunit || exit 1
       WP_MULTISITE=1 phpunit || exit 1
