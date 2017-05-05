@@ -104,6 +104,7 @@ registerBlock( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeWithPrevious }
+				inline
 			/>
 		);
 	},

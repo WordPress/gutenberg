@@ -101,7 +101,9 @@ registerBlock( 'core/image', {
 						value={ caption }
 						focus={ focus }
 						onFocus={ setFocus }
-						onChange={ ( value ) => setAttributes( { caption: value } ) } />
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						inline
+					/>
 				) : null }
 			</figure>
 		);

@@ -74,6 +74,7 @@ registerBlock( 'core/button', {
 					value={ text }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
+					inline
 				/>
 				{ focus &&
 					<form
