@@ -183,7 +183,7 @@ describe( 'block parser', () => {
 					} );
 
 					const parsed = parse(
-						'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+						'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
 						'<p>Broccoli</p>' +
 						'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 					);
@@ -232,7 +232,7 @@ describe( 'block parser', () => {
 					const parsed = parse(
 						'<p>Cauliflower</p>' +
 						'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
-						'<p>Broccoli</p>' +
+						'\n<p>Broccoli</p>\n' +
 						'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 						'<p>Romanesco</p>'
 					);

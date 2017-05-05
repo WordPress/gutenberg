@@ -73,20 +73,21 @@ export function createBlockWithFallback( blockType, rawContent, attributes ) {
 
 	// Try finding settings for known block type, else again fall back
 	let blockSettings = getBlockSettings( blockType );
+	const fallbackBlockType = getUnknownTypeHandler();
 	if ( ! blockSettings ) {
-		blockType = getUnknownTypeHandler();
+		blockType = fallbackBlockType;
 		blockSettings = getBlockSettings( blockType );
 	}
 
 	// Include in set only if settings were determined
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockSettings ) {
+	if ( blockSettings && ( rawContent.trim() || blockType !== fallbackBlockType ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
 			blockType,
-			getBlockAttributes( blockSettings, rawContent, attributes )
+			getBlockAttributes( blockSettings, rawContent.trim(), attributes )
 		);
 		return block;
 	}

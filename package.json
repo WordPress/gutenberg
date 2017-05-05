@@ -64,6 +64,7 @@
     "element-closest": "^2.0.2",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
+    "js-beautify": "^1.6.12",
     "lodash": "^4.17.4",
     "react": "^15.5.4",
     "react-autosize-textarea": "^0.4.2",
