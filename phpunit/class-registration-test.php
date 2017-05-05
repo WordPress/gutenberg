@@ -9,10 +9,6 @@
  * Test register_block
  */
 class Registration_Test extends WP_UnitTestCase {
-	function test_intentional_failure() {
-		trigger_error( 'failing on purpose, PHP ' . phpversion() );
-	}
-
 	/**
 	 * The block slug should be a string
 	 *
