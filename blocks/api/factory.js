@@ -17,10 +17,20 @@ import { getBlockSettings } from './registration';
  * @return {Object}             Block object
  */
 export function createBlock( blockType, attributes = {} ) {
+	const blockSettings = getBlockSettings( blockType );
+
+	let defaultAttributes;
+	if ( blockSettings ) {
+		defaultAttributes = blockSettings.defaultAttributes;
+	}
+
 	return {
 		uid: uuid(),
 		blockType,
-		attributes
+		attributes: {
+			...defaultAttributes,
+			...attributes
+		}
 	};
 }
 
