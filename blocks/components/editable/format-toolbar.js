@@ -150,7 +150,7 @@ class FormatToolbar extends wp.element.Component {
 				{ !! formats.link && ! this.state.isEditingLink &&
 					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
 						<a className="editable-format-toolbar__link-value" href="" onClick={ this.editLink }>
-							{ decodeURI( this.state.linkValue ) }
+							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
 						<IconButton icon="edit" onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" onClick={ this.dropLink } />

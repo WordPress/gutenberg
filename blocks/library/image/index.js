@@ -103,6 +103,7 @@ registerBlock( 'core/image', {
 						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inline
+						inlineToolbar
 					/>
 				) : null }
 			</figure>
