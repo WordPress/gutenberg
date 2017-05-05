@@ -197,12 +197,10 @@ export default class Editable extends wp.element.Component {
 
 	onNodeChange( { element, parents } ) {
 		const formats = {};
-		parents.forEach( ( node ) => {
-			const tag = node.nodeName.toLowerCase();
-			if ( tag === 'a' ) {
-				formats.link = { value: node.getAttribute( 'href' ), node };
-			}
-		} );
+		const link = parents.find( ( node ) => node.nodeName.toLowerCase() === 'a' );
+		if ( link ) {
+			formats.link = { value: link.getAttribute( 'href' ), link };
+		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
