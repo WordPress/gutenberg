@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
 		this.initialize();
@@ -56,13 +61,14 @@ export default class TinyMCE extends wp.element.Component {
 		if ( defaultValue ) {
 			children = wp.element.Children.toArray( defaultValue );
 		}
+		const classes = classnames( className, 'blocks-editable__tinymce' );
 
 		return wp.element.createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
 			contentEditable: true,
 			suppressContentEditableWarning: true,
-			style,
-			className
+			className: classes,
+			style
 		}, children );
 	}
 }

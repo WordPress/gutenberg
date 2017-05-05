@@ -112,11 +112,18 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getRelativePosition( node ) {
-		const editorPosition = this.editor.getBody().closest( '.editor-visual-editor__block' ).getBoundingClientRect();
 		const position = node.getBoundingClientRect();
+
+		// Find the parent "relative" positioned container
+		const container = this.props.inlineToolbar
+			? this.editor.getBody().closest( '.blocks-editable' )
+			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const editorPosition = container.getBoundingClientRect();
+
+		// The margins are different depending on the container
 		return {
-			top: position.top - editorPosition.top + 40 + ( position.height ),
-			left: position.left - editorPosition.left - 157
+			top: position.top - editorPosition.top + position.height + ( this.props.inlineToolbar ? 50 : 40 ),
+			left: position.left - editorPosition.left - ( this.props.inlineToolbar ? 100 : 157 )
 		};
 	}
 
@@ -329,6 +336,7 @@ export default class Editable extends wp.element.Component {
 			focus,
 			className,
 			showAlignments = false,
+			inlineToolbar = false,
 			inline,
 			formattingControls
 		} = this.props;
@@ -339,41 +347,48 @@ export default class Editable extends wp.element.Component {
 		// mount (+ initialize) a new child element in its place.
 		const key = [ 'editor', tagName ].join();
 
-		let element = (
-			<TinyMCE
-				tagName={ tagName }
-				onSetup={ this.onSetup }
-				style={ style }
-				className={ classes }
-				defaultValue={ value }
-				settings={ {
-					forced_root_block: inline ? false : 'p'
-				} }
-				key={ key } />
+		const formatToolbar = (
+			<FormatToolbar
+				focusPosition={ this.state.focusPosition }
+				formats={ this.state.formats }
+				onChange={ this.changeFormats }
+				enabledControls={ formattingControls }
+			/>
 		);
 
-		if ( focus ) {
-			element = [
-				<Fill name="Formatting.Toolbar" key="fill">
-					{ showAlignments &&
-						<Toolbar
-							controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
-								...control,
-								onClick: () => this.toggleAlignment( control.align ),
-								isActive: this.isAlignmentActive( control.align )
-							} ) ) } />
-					}
-					<FormatToolbar
-						focusPosition={ this.state.focusPosition }
-						formats={ this.state.formats }
-						onChange={ this.changeFormats }
-						enabledControls={ formattingControls }
-					/>
-				</Fill>,
-				element
-			];
-		}
+		return (
+			<div className="blocks-editable">
+				{ focus &&
+					<Fill name="Formatting.Toolbar">
+						{ showAlignments &&
+							<Toolbar
+								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
+									...control,
+									onClick: () => this.toggleAlignment( control.align ),
+									isActive: this.isAlignmentActive( control.align )
+								} ) ) } />
+						}
+						{ ! inlineToolbar && formatToolbar }
+					</Fill>
+				}
 
-		return element;
+				{ focus && inlineToolbar &&
+					<div className="block-editable__inline-toolbar">
+						{ formatToolbar }
+					</div>
+				}
+
+				<TinyMCE
+					tagName={ tagName }
+					onSetup={ this.onSetup }
+					style={ style }
+					className={ classes }
+					defaultValue={ value }
+					settings={ {
+						forced_root_block: inline ? false : 'p'
+					} }
+					key={ key } />
+			</div>
+		);
 	}
 }
