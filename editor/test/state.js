@@ -27,10 +27,6 @@ describe( 'state', () => {
 			wp.blocks.unregisterBlock( 'core/test-block' );
 		} );
 
-		it( 'should fail intentionally', () => {
-			expect( true ).to.eql( false );
-		} );
-
 		it( 'should return empty byUid, order, history by default', () => {
 			const state = blocks( undefined, {} );
 
