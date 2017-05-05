@@ -37,6 +37,10 @@ window._wpGutenbergPost = {
 			'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/embed url:https://www.youtube.com/watch?v=Nl6U7UotA-M -->',
+			'<figure><iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption><p>State of the Word 2016</p></figcaption></figure>',
+			'<!-- /wp:core/embed -->',
+
 			'<!-- wp:core/heading -->',
 			'<h2>The <em>Inserter</em> Tool</h2>',
 			'<!-- /wp:core/heading -->',
@@ -125,10 +129,6 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/list -->',
 			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
-
-			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
-			'<!-- /wp:core/embed -->',
 		].join( '' ),
 	},
 };
