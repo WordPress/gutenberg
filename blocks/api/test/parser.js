@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { expect } from 'chai';
-import { text } from 'hpq';
 
 /**
  * Internal dependencies
  */
+import { text } from '../query';
 import {
 	getBlockAttributes,
 	parseBlockAttributes,
@@ -47,7 +47,8 @@ describe( 'block parser', () => {
 		it( 'should use the query object implementation', () => {
 			const blockSettings = {
 				attributes: {
-					emphasis: text( 'strong' )
+					emphasis: text( 'strong' ),
+					ignoredDomMatcher: ( node ) => node.innerHTML
 				}
 			};
 

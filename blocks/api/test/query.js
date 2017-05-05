@@ -2,16 +2,23 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import { parse } from 'hpq';
 
 /**
  * Internal dependencies
  */
-import { parse, children } from '../query';
+import * as query from '../query';
 
 describe( 'query', () => {
+	it( 'should generate matchers which apply internal flag', () => {
+		for ( const matcherFn in query ) {
+			expect( query[ matcherFn ]()._wpBlocksKnownMatcher ).to.be.true();
+		}
+	} );
+
 	describe( 'children()', () => {
 		it( 'should return a matcher function', () => {
-			const matcher = children();
+			const matcher = query.children();
 
 			expect( matcher ).to.be.a( 'function' );
 		} );
@@ -20,7 +27,7 @@ describe( 'query', () => {
 			// Assumption here is that we can cleanly convert back and forth
 			// between a string and WPElement representation
 			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
-			const match = parse( html, children() );
+			const match = parse( html, query.children() );
 
 			expect( wp.element.renderToString( match ) ).to.equal( html );
 		} );
