@@ -10,6 +10,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	editor,
+	currentPost,
 	hoveredBlock,
 	selectedBlock,
 	mode,
@@ -300,6 +301,49 @@ describe( 'state', () => {
 					title: 'modified title',
 					tags: [ 2 ],
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'currentPost()', () => {
+		it( 'should remember a post object sent with RESET_BLOCKS', () => {
+			const original = deepFreeze( { title: 'unmodified' } );
+
+			const state = currentPost( original, {
+				type: 'RESET_BLOCKS',
+				post: {
+					title: 'new post',
+				},
+			} );
+
+			expect( state ).to.eql( {
+				title: 'new post',
+			} );
+		} );
+
+		it( 'should ignore RESET_BLOCKS without a post object', () => {
+			const original = deepFreeze( { title: 'unmodified' } );
+
+			const state = currentPost( original, {
+				type: 'RESET_BLOCKS',
+				post: null,
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should remember a post object sent with REQUEST_POST_UPDATE_SUCCESS', () => {
+			const original = deepFreeze( { title: 'unmodified' } );
+
+			const state = currentPost( original, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					title: 'updated post object from server',
+				},
+			} );
+
+			expect( state ).to.eql( {
+				title: 'updated post object from server',
 			} );
 		} );
 	} );
