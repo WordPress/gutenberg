@@ -120,7 +120,7 @@ registerBlock( 'core/quote', {
 					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
-				{ ( citation.length > 0 || !! focus ) && (
+				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
@@ -143,10 +143,10 @@ registerBlock( 'core/quote', {
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value.map( ( paragraph, i ) => (
+				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
-				{ citation.length > 0 && (
+				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }
 			</blockquote>
