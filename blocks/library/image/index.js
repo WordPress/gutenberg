@@ -91,7 +91,7 @@ registerBlock( 'core/image', {
 			);
 		}
 
-		const focusCaption = ( focusValue = {} ) => setFocus( { editable: 'caption', ...focusValue } );
+		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 		return (
 			<figure className="blocks-image">
