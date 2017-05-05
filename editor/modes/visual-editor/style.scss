@@ -1,6 +1,5 @@
 .editor-visual-editor {
 	margin: 0 auto;
-	max-width: 700px;
 	padding: 50px 10px;	/* Floating up/down arrows invisible */
 
 	&,
@@ -17,6 +16,13 @@
 	@include break-large() {
 		padding: 60px 30px;
 	}
+}
+
+/* "Hassle-free full bleed" from CSS Tricks */
+.editor-visual-editor > *:not( [data-align="wide"] ) {
+	max-width: 700px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .editor-visual-editor__block {

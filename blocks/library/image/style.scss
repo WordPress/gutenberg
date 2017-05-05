@@ -17,6 +17,18 @@
 	}
 
 	&[data-align="wide"] {
+		&:before {
+			left: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
+
+	/*&[data-align="wide"] {
 		// Here be dragons...
 		//
 		// Variable offsets:
@@ -78,7 +90,7 @@
 		.editor-block-mover {
 			display: none;
 		}
-	}
+	}*/
 }
 
 .blocks-image {
