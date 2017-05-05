@@ -15,6 +15,7 @@ import {
 	selectedBlock,
 	mode,
 	isSidebarOpened,
+	saving,
 	createReduxStore
 } from '../state';
 
@@ -594,6 +595,54 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).to.be.true();
+		} );
+	} );
+
+	describe( 'saving()', () => {
+		it( 'should update when a request is started', () => {
+			const state = saving( null, {
+				type: 'REQUEST_POST_UPDATE',
+				isNew: true,
+			} );
+			expect( state ).to.eql( {
+				requesting: true,
+				successful: false,
+				error: null,
+				isNew: true,
+			} );
+		} );
+
+		it( 'should update when a request succeeds', () => {
+			const state = saving( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				isNew: true,
+			} );
+			expect( state ).to.eql( {
+				requesting: false,
+				successful: true,
+				error: null,
+				isNew: true,
+			} );
+		} );
+
+		it( 'should update when a request fails', () => {
+			const state = saving( null, {
+				type: 'REQUEST_POST_UPDATE_FAILURE',
+				isNew: true,
+				error: {
+					code: 'pretend_error',
+					message: 'update failed',
+				}
+			} );
+			expect( state ).to.eql( {
+				requesting: false,
+				successful: false,
+				error: {
+					code: 'pretend_error',
+					message: 'update failed',
+				},
+				isNew: true,
+			} );
 		} );
 	} );
 
