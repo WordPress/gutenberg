@@ -7,8 +7,6 @@ import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
-const { tinymce } = window;
-
 /**
  * WordPress dependencies
  */
@@ -113,7 +111,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	isActive() {
-		return tinymce.EditorManager.activeEditor.id === this.editor.id;
+		return this.editor.editorManager.activeEditor.id === this.editor.id;
 	}
 
 	onSelectionChange() {
