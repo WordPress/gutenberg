@@ -346,6 +346,7 @@ export default class Editable extends wp.element.Component {
 		// changes, we unmount (+ destroy) the previous TinyMCE element, then
 		// mount (+ initialize) a new child element in its place.
 		const key = [ 'editor', tagName ].join();
+		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -357,7 +358,7 @@ export default class Editable extends wp.element.Component {
 		);
 
 		return (
-			<div className="blocks-editable">
+			<div className={ classes }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
 						{ showAlignments &&
