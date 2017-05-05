@@ -31,6 +31,6 @@ function SavedState( { isDirty } ) {
 
 export default connect(
 	( state ) => ( {
-		isDirty: state.blocks.dirty,
+		isDirty: state.editor.dirty,
 	} )
 )( SavedState );

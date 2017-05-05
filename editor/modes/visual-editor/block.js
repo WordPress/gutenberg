@@ -217,10 +217,10 @@ class VisualEditorBlock extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => {
-		const order = state.blocks.order.indexOf( ownProps.uid );
+		const order = state.editor.blockOrder.indexOf( ownProps.uid );
 		return {
-			previousBlock: state.blocks.byUid[ state.blocks.order[ order - 1 ] ] || null,
-			block: state.blocks.byUid[ ownProps.uid ],
+			previousBlock: state.editor.blocksByUid[ state.editor.blockOrder[ order - 1 ] ] || null,
+			block: state.editor.blocksByUid[ ownProps.uid ],
 			isSelected: state.selectedBlock.uid === ownProps.uid,
 			isHovered: state.hoveredBlock === ownProps.uid,
 			focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,

@@ -158,7 +158,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true   // $in_footer
 	);
@@ -180,7 +180,10 @@ function gutenberg_scripts_and_styles( $hook ) {
 	// Initialize the post data...
 	if ( $post_to_edit ) {
 		// ...with a real post
-		wp_localize_script( 'wp-editor', '_wpGutenbergPost', $post_to_edit );
+		wp_add_inline_script(
+			'wp-editor',
+			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+		);
 	} else {
 		// ...with some test content
 		// TODO: replace this with error handling

@@ -10,14 +10,32 @@ import { keyBy, last, omit, without } from 'lodash';
 import { combineUndoableReducers } from 'utils/undoable-reducer';
 
 /**
- * Reducer returning editor blocks state, an combined reducer of keys byUid,
- * order, where blocks are parsed from current HTML markup.
+ * Undoable reducer returning the editor post state, including blocks parsed
+ * from current HTML markup.
+ *
+ * Handles the following state keys:
+ *  - edits: an object describing changes to be made to the current post, in
+ *           the format accepted by the WP REST API
+ *  - blocksByUid: post content blocks keyed by UID
+ *  - blockOrder: list of block UIDs in order
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const blocks = combineUndoableReducers( {
+export const editor = combineUndoableReducers( {
+	edits( state = {}, action ) {
+		switch ( action.type ) {
+			case 'EDIT_POST':
+				return {
+					...state,
+					...action.post,
+				};
+		}
+
+		return state;
+	},
+
 	dirty( state = false, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
@@ -34,7 +52,8 @@ export const blocks = combineUndoableReducers( {
 
 		return state;
 	},
-	byUid( state = {}, action ) {
+
+	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 				return keyBy( action.blocks, 'uid' );
@@ -71,7 +90,8 @@ export const blocks = combineUndoableReducers( {
 
 		return state;
 	},
-	order( state = [], action ) {
+
+	blockOrder( state = [], action ) {
 		let index;
 		let swappedUid;
 		switch ( action.type ) {
@@ -134,6 +154,26 @@ export const blocks = combineUndoableReducers( {
 		return state;
 	}
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );
+
+/**
+ * Reducer returning the last-known state of the current post, in the format
+ * returned by the WP REST API.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function currentPost( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RESET_BLOCKS':
+			return action.post || state;
+
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return action.post;
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning selected block state.
@@ -263,17 +303,57 @@ export function isSidebarOpened( state = false, action ) {
 }
 
 /**
+ * Reducer returning current network request state (whether a request to the WP
+ * REST API is in progress, successful, or failed).
+ *
+ * @param  {string} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {string}        Updated state
+ */
+export function saving( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_UPDATE':
+			return {
+				requesting: true,
+				successful: false,
+				error: null,
+				isNew: action.isNew,
+			};
+
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return {
+				requesting: false,
+				successful: true,
+				error: null,
+				isNew: action.isNew,
+			};
+
+		case 'REQUEST_POST_UPDATE_FAILURE':
+			return {
+				requesting: false,
+				successful: false,
+				error: action.error,
+				isNew: action.isNew,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Creates a new instance of a Redux store.
  *
  * @return {Redux.Store} Redux store
  */
 export function createReduxStore() {
 	const reducer = combineReducers( {
-		blocks,
+		editor,
+		currentPost,
 		selectedBlock,
 		hoveredBlock,
 		mode,
-		isSidebarOpened
+		isSidebarOpened,
+		saving,
 	} );
 
 	return createStore(

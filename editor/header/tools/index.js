@@ -11,6 +11,7 @@ import Dashicon from '../../components/dashicon';
 import IconButton from '../../components/icon-button';
 import Inserter from '../../components/inserter';
 import Button from '../../components/button';
+import PublishButton from './publish-button';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
@@ -38,17 +39,15 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 					{ wp.i18n.__( 'Post Settings' ) }
 				</Button>
 			</div>
-			<Button isPrimary isLarge>
-				{ wp.i18n.__( 'Publish' ) }
-			</Button>
+			<PublishButton />
 		</div>
 	);
 }
 
 export default connect(
 	( state ) => ( {
-		hasUndo: state.blocks.history.past.length > 0,
-		hasRedo: state.blocks.history.future.length > 0,
+		hasUndo: state.editor.history.past.length > 0,
+		hasRedo: state.editor.history.future.length > 0,
 		isSidebarOpened: state.isSidebarOpened,
 	} ),
 	( dispatch ) => ( {
