@@ -73,17 +73,26 @@ class BlockSwitcher extends wp.element.Component {
 					className="editor-block-switcher__toggle"
 					icon={ blockSettings.icon }
 					onClick={ this.toggleMenu }
+					aria-haspopup="true"
+					aria-expanded={ this.state.open }
+					label={ wp.i18n.__( 'Change block content type' ) }
 				>
 					<div className="editor-block-switcher__arrow" />
 				</IconButton>
 				{ this.state.open &&
-					<div className="editor-block-switcher__menu">
+					<div
+						className="editor-block-switcher__menu"
+						role="menu"
+						tabIndex="0"
+						aria-label={ wp.i18n.__( 'Content types' ) }
+					>
 						{ allowedBlocks.map( ( { slug, title, icon } ) => (
 							<IconButton
 								key={ slug }
 								onClick={ this.switchBlockType( slug ) }
 								className="editor-block-switcher__menu-item"
 								icon={ icon }
+								role="menuitem"
 							>
 								{ title }
 							</IconButton>
