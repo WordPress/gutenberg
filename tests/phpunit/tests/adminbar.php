@@ -530,6 +530,98 @@ class Tests_AdminBar extends WP_UnitTestCase {
 		$this->assertNull( $node );
 	}
 
+	public function map_meta_cap_grant_create_users( $caps, $cap ) {
+		if ( 'create_users' === $cap ) {
+			$caps = array( 'exist' );
+		}
+
+		return $caps;
+	}
+
+	public function map_meta_cap_deny_create_users( $caps, $cap ) {
+		if ( 'create_users' === $cap ) {
+			$caps = array( 'do_not_allow' );
+		}
+
+		return $caps;
+	}
+
+	public function map_meta_cap_grant_promote_users( $caps, $cap ) {
+		if ( 'promote_users' === $cap ) {
+			$caps = array( 'exist' );
+		}
+
+		return $caps;
+	}
+
+	public function map_meta_cap_deny_promote_users( $caps, $cap ) {
+		if ( 'promote_users' === $cap ) {
+			$caps = array( 'do_not_allow' );
+		}
+
+		return $caps;
+	}
+
+	/**
+	 * @ticket 39252
+	 */
+	public function test_new_user_link_exists_for_user_with_create_users() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_grant_create_users' ), 10, 2 );
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_deny_promote_users' ), 10, 2 );
+
+		$this->assertTrue( current_user_can( 'create_users' ) );
+		$this->assertFalse( current_user_can( 'promote_users' ) );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'new-user' );
+
+		// 'create_users' is sufficient in single- and multisite.
+		$this->assertNotEmpty( $node );
+	}
+
+	/**
+	 * @ticket 39252
+	 */
+	public function test_new_user_link_existence_for_user_with_promote_users() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_deny_create_users' ), 10, 2 );
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_grant_promote_users' ), 10, 2 );
+
+		$this->assertFalse( current_user_can( 'create_users' ) );
+		$this->assertTrue( current_user_can( 'promote_users' ) );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'new-user' );
+
+		if ( is_multisite() ) {
+			$this->assertNotEmpty( $node );
+		} else {
+			// 'promote_users' is insufficient in single-site.
+			$this->assertNull( $node );
+		}
+	}
+
+	/**
+	 * @ticket 39252
+	 */
+	public function test_new_user_link_does_not_exist_for_user_without_create_or_promote_users() {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_deny_create_users' ), 10, 2 );
+		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_deny_promote_users' ), 10, 2 );
+
+		$this->assertFalse( current_user_can( 'create_users' ) );
+		$this->assertFalse( current_user_can( 'promote_users' ) );
+
+		$wp_admin_bar = $this->get_standard_admin_bar();
+		$node         = $wp_admin_bar->get_node( 'new-user' );
+
+		$this->assertNull( $node );
+	}
+
 	/**
 	 * @ticket 30937
 	 * @covers ::wp_admin_bar_customize_menu
