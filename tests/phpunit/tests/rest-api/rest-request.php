@@ -30,6 +30,14 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$this->assertNull( $this->request->get_header( 'missing' ) );
 		$this->assertNull( $this->request->get_header_as_array( 'missing' ) );
 	}
+	
+	public function test_remove_header() {
+		$this->request->add_header( 'Test-Header', 'value' );
+		$this->assertEquals( 'value', $this->request->get_header( 'Test-Header' ) );
+		
+		$this->request->remove_header( 'Test-Header' );
+		$this->assertNull( $this->request->get_header( 'Test-Header' ) );
+	}
 
 	public function test_header_multiple() {
 		$value1 = 'application/x-wp-example-1';
