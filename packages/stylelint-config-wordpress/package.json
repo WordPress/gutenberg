@@ -38,7 +38,7 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-stylelint": "^6.0.0",
-    "eslint-plugin-jest": "^19.0.1",
+    "eslint-plugin-jest": "^20.0.0",
     "jest": "^19.0.2",
     "npm-run-all": "^4.0.0",
     "npmpub": "^3.0.3",
