@@ -4,8 +4,10 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== nextProps.isEmpty ) {
-			this.editorNode.setAttribute( 'data-is-empty', nextProps.isEmpty );
+		const isEmpty = String( nextProps.isEmpty );
+
+		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
+			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
 		}
 
 		// We must prevent rerenders because TinyMCE will modify the DOM, thus

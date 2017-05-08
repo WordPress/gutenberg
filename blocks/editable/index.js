@@ -120,6 +120,10 @@ export default class Editable extends wp.element.Component {
 		return this.editor.editorManager.activeEditor.id === this.editor.id;
 	}
 
+	shouldChange( prevContent ) {
+		return this.isEmpty( prevContent ) !== this.isEmpty( this.content );
+	}
+
 	onSelectionChange() {
 		// We must check this because selectionChange is a global event.
 		if ( ! this.isActive() ) {
@@ -132,10 +136,12 @@ export default class Editable extends wp.element.Component {
 			this.editor.getBody().normalize();
 		}
 
+		const prevContent = this.content;
+
 		this.content = this.getContent();
 		this.selection = this.getSelection();
 
-		if ( this.change ) {
+		if ( this.change || this.shouldChange( prevContent ) ) {
 			this.change = false;
 			this.props.onFocus( this.selection );
 			this.props.onChange( this.content );
@@ -407,25 +413,8 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	isEmpty( value ) {
-		// Empty array.
-		if ( ! value.length ) {
-			return true;
-		}
-
-		const props = value[ 0 ].props;
-
-		// Empty string.
-		if ( ! props && ! value[ 0 ].length ) {
-			return true;
-		}
-
-		// Empty React Object.
-		if ( props && props.children && ! props.children.length ) {
-			return true;
-		}
-
-		return false;
+	isEmpty( content ) {
+		return ! content.length;
 	}
 
 	render() {
@@ -487,7 +476,7 @@ export default class Editable extends wp.element.Component {
 					settings={ {
 						forced_root_block: inline ? false : 'p'
 					} }
-					isEmpty={ String( this.isEmpty( value ) ) }
+					isEmpty={ this.isEmpty( value ) }
 					placeholder={ placeholder }
 					key={ key } />
 			</div>
