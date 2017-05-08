@@ -13,13 +13,31 @@
 		outline: none;
 	}
 
+	a {
+		color: $blue-medium;
+	}
+
 	a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
-		background: #dcf2f8;
 		border-radius: 2px;
-		box-shadow: 0 0 0 1px #dcf2f8;
+		box-shadow: 0 0 0 1px $blue-medium-100;
+		background: $blue-medium-100;
 	}
+
+	code {
+		padding: 0 2px;
+		margin: 0 -2px;
+		border-radius: 2px;
+		color: $dark-gray-800;
+		background: $light-gray-100;
+		font-family: $editor-html-font;
+		font-size: 14px;
+	}
+	code[data-mce-selected] {
+		background: $light-gray-400;
+	}
+
 }
 
 figcaption.blocks-editable {
