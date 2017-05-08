@@ -30,13 +30,15 @@ function TextEditor( { blocks, onChange } ) {
 					<button>close tags</button>
 				</div>
 			</header>
-			<PostTitle />
-			<Textarea
-				autoComplete="off"
-				defaultValue={ wp.blocks.serialize( blocks ) }
-				onBlur={ ( event ) => onChange( event.target.value ) }
-				className="editor-text-editor__textarea"
-			/>
+			<div className="editor-text-editor__body">
+				<PostTitle />
+				<Textarea
+					autoComplete="off"
+					defaultValue={ wp.blocks.serialize( blocks ) }
+					onBlur={ ( event ) => onChange( event.target.value ) }
+					className="editor-text-editor__textarea"
+				/>
+			</div>
 		</div>
 	);
 }
