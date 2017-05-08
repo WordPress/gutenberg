@@ -1,5 +1,6 @@
-( function( $, QUnit, tinymce, setTimeout ) {
+( function( $, QUnit, tinymce ) {
 	var editor,
+		text,
 		count = 0;
 
 	QUnit.module( 'tinymce.obsolete', {
@@ -283,4 +284,4 @@
 		equal( editor.getContent(), testString, text );
 	});
 
-} )( window.jQuery, window.QUnit, window.tinymce, window.setTimeout );
+} )( window.jQuery, window.QUnit, window.tinymce );
