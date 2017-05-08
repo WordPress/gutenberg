@@ -73,12 +73,14 @@ export default class Editable extends wp.element.Component {
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.onChange = this.onChange.bind( this );
 
 		this.state = {
 			formats: {},
 			alignment: null
 		};
 
+		this.change = false;
 		this.content = props.value;
 		this.selection = {
 			start: [],
@@ -91,9 +93,10 @@ export default class Editable extends wp.element.Component {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'focus', this.onFocus );
+		editor.on( 'change', this.onChange );
 		editor.on( 'selectionChange', this.onSelectionChange );
 	}
 
@@ -106,8 +109,11 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
+		this.props.onFocus( this.selection );
+	}
+
+	onChange() {
+		this.change = true;
 	}
 
 	isActive() {
@@ -120,14 +126,18 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
+		// Make sure text nodes are normalized before passing the content and selection.
+		// Normalized means that text nodes are merged were possible.
+		if ( this.change ) {
+			this.editor.getBody().normalize();
+		}
+
 		this.content = this.getContent();
 		this.selection = this.getSelection();
 
-		if ( ! this.props.onChange ) {
-			return;
-		}
-
-		if ( ! isEqual( this.props.value, this.content ) ) {
+		if ( this.change ) {
+			this.change = false;
+			this.props.onFocus( this.selection );
 			this.props.onChange( this.content );
 		}
 	}
@@ -248,13 +258,13 @@ export default class Editable extends wp.element.Component {
 
 		const node = rootNode.childNodes[ index ];
 
-		if ( ! node || node.nodeType === 3 ) {
+		if ( ! node ) {
 			return;
 		}
 
 		const newPath = drop( path );
 
-		if ( newPath.length ) {
+		if ( newPath.length && node.nodeType !== 3 ) {
 			return this.findNodeWithPath( newPath, node );
 		}
 
@@ -262,7 +272,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	setSelection( { start, end } ) {
-		if ( ! start.length ) {
+		if ( ! start || ! start.length ) {
 			return;
 		}
 
@@ -339,9 +349,12 @@ export default class Editable extends wp.element.Component {
 			this.setSelection( this.selection );
 		}
 
-		if ( this.props.onChange && ! isEqual( this.props.value, this.content ) ) {
+		if ( this.props.onChange && ! isEqual( this.props.value, prevProps.value ) ) {
 			this.setContent( this.props.value );
-			this.setSelection( this.selection );
+
+			if ( this.props.focus ) {
+				this.setSelection( this.props.focus );
+			}
 		}
 	}
 
@@ -373,11 +386,11 @@ export default class Editable extends wp.element.Component {
 			}
 		} );
 
+		this.onChange();
+
 		this.setState( {
 			formats: merge( {}, this.state.formats, formats )
 		} );
-
-		this.editor.setDirty( true );
 	}
 
 	isAlignmentActive( align ) {
