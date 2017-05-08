@@ -13,13 +13,31 @@
 		outline: none;
 	}
 
+	a {
+		color: $blue-medium;
+	}
+
 	a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
-		background: #dcf2f8;
 		border-radius: 2px;
-		box-shadow: 0 0 0 1px #dcf2f8;
+		box-shadow: 0 0 0 1px $blue-medium-100;
+		background: $blue-medium-100;
 	}
+
+	code {
+		padding: 0 2px;
+		margin: 0 -2px;
+		border-radius: 2px;
+		color: $dark-gray-800;
+		background: $light-gray-200;
+		font-family: $editor-html-font;
+		font-size: 14px;
+	}
+	code[data-mce-selected] {
+		background: $light-gray-400;
+	}
+
 }
 
 figcaption.blocks-editable {
@@ -68,4 +86,45 @@ input.editable-format-toolbar__link-input {
 .editable-format-toolbar__link-value {
 	padding: 10px;
 	flex-grow: 1;
+}
+
+/* Block Placeholders */
+.editor-visual-editor__block .is-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 1em;
+	min-height: 200px;
+	text-align: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background: $light-gray-100;
+}
+
+.placeholder__label {
+	display: flex;
+	justify-content: center;
+	font-weight: bold;
+	margin-bottom: 1em;
+
+	.dashicon {
+		margin-right: 1ch;
+	}
+}
+
+.placeholder__fieldset {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	max-width: 280px;
+}
+
+.placeholder__input {
+	margin-right: 8px;
+	flex: 1 1 auto;
+}
+
+.placeholder__instructions {
+	margin-bottom: 1em;
 }
