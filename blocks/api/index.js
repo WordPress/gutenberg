@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import * as query from './query';
-
-export { query };
+export { default as query } from './query';
 export { createBlock, switchToBlockType } from './factory';
 export { default as parse } from './parser';
 export { default as serialize } from './serializer';

@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { difference } from 'lodash';
+import { reduce } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
  * Internal dependencies
  */
 import { getBlockSettings } from './registration';
-import { parseBlockAttributes } from './parser';
 
 /**
  * Given a block's save render implementation and attributes, returns the
@@ -37,29 +36,21 @@ export function getSaveContent( save, attributes ) {
 }
 
 /**
- * Returns comment attributes as serialized string, determined by subset of
- * difference between actual attributes of a block and those expected based
- * on its settings.
+ * Returns comment attributes as serialized string
  *
- * @param  {Object} realAttributes     Actual block attributes
- * @param  {Object} expectedAttributes Expected block attributes
- * @return {string}                    Comment attributes
+ * @param  {Object} settings    Block settings
+ * @param  {Object} attributes  Block attributes
+ * @return {string}             Comment attributes
  */
-export function getCommentAttributes( realAttributes, expectedAttributes ) {
-	// Find difference and build into object subset of attributes.
-	const keys = difference(
-		Object.keys( realAttributes ),
-		Object.keys( expectedAttributes )
-	);
-
+export function getCommentAttributes( settings, attributes ) {
 	// Serialize the comment attributes
-	return keys.reduce( ( memo, key ) => {
-		const value = realAttributes[ key ];
-		if ( undefined === value ) {
-			return memo;
+	return reduce( settings.attributes, ( memo, attribute, key ) => {
+		const value = attributes[ key ];
+		if ( attribute.source === 'metadata' && value !== undefined ) {
+			return memo + `${ attribute.name || key }="${ value }" `;
 		}
 
-		return memo + `${ key }="${ value }" `;
+		return memo;
 	}, '' );
 }
 
@@ -84,8 +75,8 @@ export default function serialize( blocks ) {
 			blockType +
 			' ' +
 			getCommentAttributes(
+				settings,
 				block.attributes,
-				parseBlockAttributes( saveContent, settings )
 			) +
 			'-->' +
 			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +

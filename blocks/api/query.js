@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { flow } from 'lodash';
 import {
 	attr as originalAttr,
 	prop as originalProp,
@@ -10,27 +9,9 @@ import {
 	text as originalText,
 	query as originalQuery
 } from 'hpq';
+import { reduce } from 'lodash';
 
-/**
- * Given a matcher function creator, returns a new function which applies an
- * internal flag to the created matcher.
- *
- * @param  {Function} fn Original matcher function creator
- * @return {Function}    Modified matcher function creator
- */
-function withKnownMatcherFlag( fn ) {
-	return flow( fn, ( matcher ) => {
-		matcher._wpBlocksKnownMatcher = true;
-		return matcher;
-	} );
-}
-
-export const attr = withKnownMatcherFlag( originalAttr );
-export const prop = withKnownMatcherFlag( originalProp );
-export const html = withKnownMatcherFlag( originalHtml );
-export const text = withKnownMatcherFlag( originalText );
-export const query = withKnownMatcherFlag( originalQuery );
-export const children = withKnownMatcherFlag( ( selector ) => {
+export const originalChildren = ( selector ) => {
 	return ( node ) => {
 		let match = node;
 
@@ -44,4 +25,39 @@ export const children = withKnownMatcherFlag( ( selector ) => {
 
 		return [];
 	};
-} );
+};
+
+const addDescriptor = ( description ) => ( memo ) => {
+	return Object.assign( memo, description );
+};
+
+const attr = ( ...args ) => addDescriptor( { source: 'content', parse: originalAttr( ...args ) } );
+const prop = ( ...args ) => addDescriptor( { source: 'content', parse: originalProp( ...args ) } );
+const html = ( ...args ) => addDescriptor( { source: 'content', parse: originalHtml( ...args ) } );
+const text = ( ...args ) => addDescriptor( { source: 'content', parse: originalText( ...args ) } );
+const children = ( ...args ) => addDescriptor( { source: 'content', parse: originalChildren( ...args ) } );
+const metadata = ( name ) => addDescriptor( { source: 'metadata', name } );
+const query = ( selector, descriptor ) => {
+	return addDescriptor( {
+		source: 'content',
+		parse: originalQuery( selector, descriptor.__description.parse )
+	} );
+};
+
+const accumulateOn = ( description ) => {
+	return reduce( { attr, prop, html, text, query, children, metadata }, ( memo, fct, key ) => {
+		const wrappedFct = ( ...args ) => {
+			const accumulator = fct( ...args );
+			const newDescription = accumulator( description || {} );
+			return {
+				...accumulateOn( newDescription ),
+				__description: newDescription
+			};
+		};
+
+		memo[ key ] = wrappedFct;
+		return memo;
+	}, {} );
+};
+
+export default accumulateOn();

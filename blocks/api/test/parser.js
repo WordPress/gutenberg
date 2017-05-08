@@ -2,14 +2,14 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import { text } from 'hpq';
 
 /**
  * Internal dependencies
  */
-import { text } from '../query';
+import query from '../query';
 import {
 	getBlockAttributes,
-	parseBlockAttributes,
 	createBlockWithFallback,
 	parseWithGrammar,
 	parseWithTinyMCE
@@ -29,71 +29,42 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'parseBlockAttributes()', () => {
-		it( 'should use the function implementation', () => {
-			const blockSettings = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken'
-					};
-				}
-			};
-
-			expect( parseBlockAttributes( 'Ribs', blockSettings ) ).to.eql( {
-				content: 'Ribs & Chicken'
-			} );
-		} );
-
-		it( 'should use the query object implementation', () => {
-			const blockSettings = {
-				attributes: {
-					emphasis: text( 'strong' ),
-					ignoredDomMatcher: ( node ) => node.innerHTML
-				}
-			};
-
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
-
-			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {
-				emphasis: '& Chicken'
-			} );
-		} );
-
-		it( 'should return an empty object if no attributes defined', () => {
-			const blockSettings = {};
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
-
-			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {} );
-		} );
-	} );
-
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockSettings = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken'
-					};
+				attributes: {
+					content: {
+						source: 'content',
+						parse: text( 'strong' )
+					},
+					align: {
+						source: 'metadata',
+						name: 'alignment'
+					}
 				},
 				defaultAttributes: {
 					topic: 'none'
 				}
 			};
 
-			const rawContent = 'Ribs';
-			const attrs = { align: 'left' };
+			const rawContent = '<strong>Ribs</strong>';
+			const attrs = { alignment: 'left' };
 
 			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
 				align: 'left',
 				topic: 'none',
-				content: 'Ribs & Chicken'
+				content: 'Ribs'
 			} );
 		} );
 	} );
 
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlock( 'core/test-block', {
+				attributes: {
+					attr: query.metadata( 'attr' )
+				}
+			} );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
@@ -122,7 +93,7 @@ describe( 'block parser', () => {
 				{ attr: 'value' }
 			);
 			expect( block.blockType ).to.eql( 'core/unknown-block' );
-			expect( block.attributes ).to.eql( { attr: 'value' } );
+			expect( block.attributes ).to.eql( {} );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
@@ -148,16 +119,18 @@ describe( 'block parser', () => {
 				it( 'should parse the post content, including block attributes', () => {
 					registerBlock( 'core/test-block', {
 						// Currently this is the only way to test block content parsing?
-						attributes: function( rawContent ) {
-							return {
-								content: rawContent,
-							};
+						attributes: {
+							content: query.text( 'strong' ),
+							smoked: query.metadata( 'smoked' ),
+							url: query.metadata( 'url' ),
+							chicken: query.metadata( 'chicken' ),
+							checked: query.metadata( 'checked' )
 						}
 					} );
 
 					const parsed = parse(
 						'<!-- wp:core/test-block smoked="yes" url="http://google.com" chicken="ribs & \'wings\'" checked -->' +
-						'Brisket' +
+						'<strong>Brisket</strong>' +
 						'<!-- /wp:core/test-block -->'
 					);
 
@@ -175,15 +148,13 @@ describe( 'block parser', () => {
 
 				it( 'should parse the post content, ignoring unknown blocks', () => {
 					registerBlock( 'core/test-block', {
-						attributes: function( rawContent ) {
-							return {
-								content: rawContent + ' & Chicken'
-							};
+						attributes: {
+							content: query.text( 'strong' ),
 						}
 					} );
 
 					const parsed = parse(
-						'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
+						'<!-- wp:core/test-block -->\n<strong>Ribs</strong>\n<!-- /wp:core/test-block -->' +
 						'<p>Broccoli</p>' +
 						'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 					);
@@ -191,7 +162,7 @@ describe( 'block parser', () => {
 					expect( parsed ).to.have.lengthOf( 1 );
 					expect( parsed[ 0 ].blockType ).to.equal( 'core/test-block' );
 					expect( parsed[ 0 ].attributes ).to.eql( {
-						content: 'Ribs & Chicken'
+						content: 'Ribs'
 					} );
 					expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 				} );
@@ -219,11 +190,8 @@ describe( 'block parser', () => {
 				it( 'should parse the post content, including raw HTML at each end', () => {
 					registerBlock( 'core/test-block', {} );
 					registerBlock( 'core/unknown-block', {
-						// Currently this is the only way to test block content parsing?
-						attributes: function( rawContent ) {
-							return {
-								content: rawContent,
-							};
+						attributes: {
+							content: query.html(),
 						}
 					} );
 
