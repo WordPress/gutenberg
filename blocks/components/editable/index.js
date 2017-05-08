@@ -382,7 +382,6 @@ export default class Editable extends wp.element.Component {
 					tagName={ tagName }
 					onSetup={ this.onSetup }
 					style={ style }
-					className={ classes }
 					defaultValue={ value }
 					settings={ {
 						forced_root_block: inline ? false : 'p'
