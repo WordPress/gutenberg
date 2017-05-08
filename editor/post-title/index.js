@@ -18,6 +18,7 @@ function PostTitle( { title, onUpdate } ) {
 				type="text"
 				value={ title }
 				onChange={ onChange }
+				placeholder={ wp.i18n.__( 'Enter title here' ) }
 			/>
 		</h1>
 	);
