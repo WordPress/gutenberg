@@ -1,10 +1,8 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
- // TODO: We mustn't import by relative path traversing from blocks to editor
- // as we're doing here; instead, we should consider a common components path.
-import IconButton from '../../../editor/components/icon-button';
-import Toolbar from '../../../editor/components/toolbar';
+import IconButton from 'editor/components/icon-button';
+import Toolbar from 'editor/components/toolbar';
 
 const FORMATTING_CONTROLS = [
 	{

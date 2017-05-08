@@ -5,7 +5,6 @@
 const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
-const ResolveEntryModulesPlugin = require( 'resolve-entry-modules-webpack-plugin' );
 
 const config = {
 	entry: {
@@ -26,6 +25,10 @@ const config = {
 		'react-dom/server': 'ReactDOMServer'
 	},
 	resolve: {
+		modules: [
+			__dirname,
+			'node_modules'
+		],
 		alias: {
 			// There are currently resolution errors on RSF's "mitt" dependency
 			// when imported as native ES module
@@ -64,7 +67,6 @@ const config = {
 		]
 	},
 	plugins: [
-		new ResolveEntryModulesPlugin(),
 		new ExtractTextPlugin( {
 			filename: './[name]/build/style.css'
 		} ),

@@ -8,14 +8,16 @@ import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
+ * WordPress dependencies
+ */
+import Toolbar from 'editor/components/toolbar';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
- // TODO: We mustn't import by relative path traversing from blocks to editor
- // as we're doing here; instead, we should consider a common components path.
-import Toolbar from '../../../editor/components/toolbar';
 
 const KEYCODE_BACKSPACE = 8;
 

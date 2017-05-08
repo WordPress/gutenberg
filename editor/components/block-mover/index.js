@@ -8,7 +8,7 @@ import { first, last } from 'lodash';
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from 'components/icon-button';
+import IconButton from '../icon-button';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (

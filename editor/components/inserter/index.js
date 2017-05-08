@@ -7,7 +7,7 @@ import clickOutside from 'react-click-outside';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import IconButton from 'components/icon-button';
+import IconButton from '../icon-button';
 
 class Inserter extends wp.element.Component {
 	constructor() {

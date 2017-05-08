@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from 'components/icon-button';
+import IconButton from '../icon-button';
 
 function Toolbar( { controls } ) {
 	if ( ! controls || ! controls.length ) {
