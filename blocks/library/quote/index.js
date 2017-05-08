@@ -120,7 +120,7 @@ registerBlock( 'core/quote', {
 					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
-				{ ( citation || !! focus ) && (
+				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
@@ -143,10 +143,12 @@ registerBlock( 'core/quote', {
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value && wp.element.Children.map( value, ( paragraph, i ) => (
+				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
-				<footer>{ citation }</footer>
+				{ citation && citation.length > 0 && (
+					<footer>{ citation }</footer>
+				) }
 			</blockquote>
 		);
 	}
