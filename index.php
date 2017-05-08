@@ -55,6 +55,9 @@ function register_block( $slug, $settings ) {
 	}
 
 	if ( isset( $registered_blocks[ $slug ] ) ) {
+		/* translators: 1: block slug */
+		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return;
 	}
 
