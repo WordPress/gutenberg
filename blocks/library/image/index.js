@@ -77,11 +77,11 @@ registerBlock( 'core/image', {
 		if ( ! url ) {
 			return (
 				<div className="blocks-image is-placeholder">
-					<div className="blocks-image__placeholder-label">
+					<div className="placeholder__label">
 						<Dashicon icon="format-image" />
 						{ wp.i18n.__( 'Image' ) }
 					</div>
-					<div className="blocks-image__placeholder-instructions">
+					<div className="placeholder__instructions">
 						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
 					</div>
 					<Button isLarge>
