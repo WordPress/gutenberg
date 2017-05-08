@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flow } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,8 +13,6 @@ import Dashicon from '../dashicon';
 class InserterMenu extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
-		this.blockTypes = wp.blocks.getBlocks();
-		this.categories = wp.blocks.getCategories();
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
@@ -45,28 +43,6 @@ class InserterMenu extends wp.element.Component {
 		return ( node ) => this.nodes[ nodeName ] = node;
 	}
 
-	isNextKeydown( keydown ) {
-		return keydown.code === 'ArrowDown'
-			|| ( keydown.code === 'Tab' && keydown.shiftKey === false );
-	}
-
-	isArrowRight( keydown ) {
-		return keydown.code === 'ArrowRight';
-	}
-
-	isArrowLeft( keydown ) {
-		return keydown.code === 'ArrowLeft';
-	}
-
-	isPreviousKeydown( keydown ) {
-		return keydown.code === 'ArrowUp'
-			|| ( keydown.code === 'Tab' && keydown.shiftKey === true );
-	}
-
-	isEscapeKey( keydown ) {
-		return keydown.code === 'Escape';
-	}
-
 	filter( event ) {
 		this.setState( {
 			filterValue: event.target.value
@@ -85,30 +61,19 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	getVisibleBlocks( blockTypes ) {
-		return blockTypes.filter( this.isShownBlock );
+		return filter( blockTypes, this.isShownBlock );
 	}
 
 	sortBlocksByCategory( blockTypes ) {
 		const getCategoryIndex = ( item ) => {
-			return this.categories.findIndex( ( category ) => category.slug === item.slug );
+			return findIndex( wp.blocks.getCategories(), ( category ) => category.slug === item.category );
 		};
 
-		return blockTypes.sort( ( a, b ) => {
-			return getCategoryIndex( a ) - getCategoryIndex( b );
-		} );
+		return sortBy( blockTypes, getCategoryIndex );
 	}
 
 	groupByCategory( blockTypes ) {
-		return blockTypes.reduce( ( accumulator, block ) => {
-			// If already an array push block on else add array of block.
-			if ( Array.isArray( accumulator[ block.category ] ) ) {
-				accumulator[ block.category ].push( block );
-				return accumulator;
-			}
-
-			accumulator[ block.category ] = [ block ];
-			return accumulator;
-		}, {} );
+		return groupBy( blockTypes, ( blockType ) => blockType.category );
 	}
 
 	getVisibleBlocksByCategory( blockTypes ) {
@@ -119,140 +84,127 @@ class InserterMenu extends wp.element.Component {
 		)( blockTypes );
 	}
 
-	findNext( currentBlock, blockTypes ) {
-		/**
-		 * null is the value that will trigger iterating back to
-		 * the top of the list of block types.
-		 */
-		if ( null === currentBlock ) {
-			return blockTypes[ 0 ].slug;
-		}
+	findByIncrement( blockTypes, increment = 1 ) {
+		// Add on a fake search block to the list to cycle through.
+		const list = blockTypes.concat( { slug: 'search' } );
 
-		const currentIndex = blockTypes.findIndex( ( blockType ) => currentBlock === blockType.slug );
-		const nextIndex = currentIndex + 1;
-		const highestIndex = blockTypes.length - 1;
-
-		/**
-		 * Default currently for going past the blocks is search, may need to be
-		 * revised in the future as more focusable elements are added. This
-		 * returns a null value, which currently implies that search will be set
-		 * as the next focus.
-		 */
-		if ( nextIndex > highestIndex ) {
-			return null;
-		}
-
-		// Return the slug of the next block type.
-		return blockTypes[ nextIndex ].slug;
-	}
-
-	findPrevious( currentBlock, blockTypes ) {
-		/**
-		 * null will trigger iterating back to the top of the list of block
-		 * types.
-		 */
-		if ( null === currentBlock ) {
-			return blockTypes[ 0 ].slug;
-		}
-
-		const highestIndex = blockTypes.length - 1;
-
-		// If the search bar is focused navigate to the bottom of the block list.
-		if ( 'search' === currentBlock ) {
-			return blockTypes[ highestIndex ].slug;
-		}
-
-		const currentIndex = blockTypes.findIndex( ( blockType ) => currentBlock === blockType.slug );
-		const previousIndex = currentIndex - 1;
+		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.slug );
+		const nextIndex = currentIndex + increment;
+		const highestIndex = list.length - 1;
 		const lowestIndex = 0;
 
-		/**
-		 * Default currently for going past the blocks is search, may need to be
-		 * revised in the future as more focusable elements are added. This
-		 * returns a null value, which currently implies that search will be set
-		 * as the next focus.
-		 */
-		if ( previousIndex < lowestIndex ) {
-			return null;
+		if ( nextIndex > highestIndex ) {
+			return list[ lowestIndex ].slug;
+		}
+
+		if ( nextIndex < lowestIndex ) {
+			return list[ highestIndex ].slug;
 		}
 
 		// Return the slug of the next block type.
-		return blockTypes[ previousIndex ].slug;
+		return list[ nextIndex ].slug;
 	}
 
-	focusNext( component ) {
+	findNext( blockTypes ) {
+		/**
+		 * null is the initial state value and triggers start at beginning.
+		 */
+		if ( null === this.state.currentFocus ) {
+			return blockTypes[ 0 ].slug;
+		}
+
+		return this.findByIncrement( blockTypes, 1 );
+	}
+
+	findPrevious( blockTypes ) {
+		/**
+		 * null is the initial state value and triggers start at beginning.
+		 */
+		if ( null === this.state.currentFocus ) {
+			return blockTypes[ 0 ].slug;
+		}
+
+		return this.findByIncrement( blockTypes, -1 );
+	}
+
+	focusNext() {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( component.blockTypes );
+		)( wp.blocks.getBlocks() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
 			return;
 		}
 
-		const currentBlock = component.state.currentFocus;
-
-		const nextBlock = this.findNext( currentBlock, sortedByCategory );
+		const nextBlock = this.findNext( sortedByCategory );
 		this.changeMenuSelection( nextBlock );
 	}
 
-	focusPrevious( component ) {
+	focusPrevious() {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( component.blockTypes );
-		const currentBlock = component.state.currentFocus;
+		)( wp.blocks.getBlocks() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
 			return;
 		}
 
-		const nextBlock = this.findPrevious( currentBlock, sortedByCategory );
+		const nextBlock = this.findPrevious( sortedByCategory );
 		this.changeMenuSelection( nextBlock );
 	}
 
 	onKeyDown( keydown ) {
-		if ( this.isNextKeydown( keydown ) ) {
-			keydown.preventDefault();
-			this.focusNext( this );
-		}
+		switch ( keydown.keyCode ) {
+			case 9 : /* Tab */
+				if ( keydown.shiftKey ) {
+					// Previous.
+					keydown.preventDefault();
+					this.focusPrevious( this );
+					break;
+				}
+				// Next.
+				keydown.preventDefault();
+				this.focusNext( this );
+				break;
+			case 27 : /* Escape */
+				keydown.preventDefault();
+				this.props.closeMenu();
 
-		if ( this.isPreviousKeydown( keydown ) ) {
-			keydown.preventDefault();
-			this.focusPrevious( this );
-		}
+				break;
+			case 37 : /* ArrowLeft */
+				if ( this.state.currentFocus === 'search' ) {
+					return;
+				}
+				this.focusPrevious( this );
 
-		/**
-		 * Left and right arrow keys need to be handled seperately so that
-		 * default cursor behavior can be handled in the search field.
-		 */
-		if ( this.isArrowRight( keydown ) ) {
-			if ( this.state.currentFocus === 'search' ) {
-				return;
-			}
-			this.focusNext( this );
-		}
+				break;
+			case 38 : /* ArrowUp */
+				keydown.preventDefault();
+				this.focusPrevious( this );
 
-		if ( this.isArrowLeft( keydown ) ) {
-			if ( this.state.currentFocus === 'search' ) {
-				return;
-			}
-			this.focusPrevious( this );
-		}
+				break;
+			case 39 : /* ArrowRight */
+				if ( this.state.currentFocus === 'search' ) {
+					return;
+				}
+				this.focusNext( this );
 
-		if ( this.isEscapeKey( keydown ) ) {
-			keydown.preventDefault();
-			this.props.closeMenu();
+				break;
+			case 40 : /* ArrowDown */
+				keydown.preventDefault();
+				this.focusNext( this );
+
+				break;
+			default :
+				break;
 		}
 	}
 
 	changeMenuSelection( refName ) {
-		if ( refName === null ) {
-			refName = 'search';
-		}
-
 		this.setState( {
 			currentFocus: refName
 		} );
@@ -267,15 +219,13 @@ class InserterMenu extends wp.element.Component {
 
 	render() {
 		const { position = 'top' } = this.props;
-		const blocks = this.blockTypes;
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( blocks );
-		const categories = this.categories;
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlocks() );
 
 		return (
 			<div className={ `editor-inserter__menu is-${ position }` } tabIndex="0">
 				<div className="editor-inserter__arrow" />
 				<div role="menu" className="editor-inserter__content">
-					{ categories
+					{ wp.blocks.getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 							<div key={ category.slug }>
 								<div
