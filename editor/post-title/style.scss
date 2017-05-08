@@ -2,8 +2,14 @@
 	font-size: $editor-font-size;
 
 	.editor-text-editor & {
-		margin: 0 auto;
-		max-width: $text-editor-max-width;
+		padding-left: 20px;
+		padding-right: 20px;
+
+		@include break-large() {
+			max-width: $text-editor-max-width;
+			margin: 0 auto;
+			padding: 0;
+		}
 	}
 }
 
