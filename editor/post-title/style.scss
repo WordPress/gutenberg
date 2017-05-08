@@ -1,0 +1,28 @@
+.editor-post-title {
+	font-size: $editor-font-size;
+
+	.editor-text-editor & {
+		margin: 0 auto;
+		max-width: $text-editor-max-width;
+	}
+}
+
+input.editor-post-title__input {
+	font-size: 2em;
+	font-family: $editor-font;
+	line-height: $editor-line-height;
+	outline: none;
+	border: none;
+	box-shadow: none;
+	width: 100%;
+	padding: 10px;
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+
+	.editor-text-editor & {
+		padding: 0;
+	}
+}

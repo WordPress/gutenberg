@@ -9,10 +9,12 @@ import { connect } from 'react-redux';
 import './style.scss';
 import Inserter from 'components/inserter';
 import VisualEditorBlock from './block';
+import PostTitle from 'post-title';
 
 function VisualEditor( { blocks } ) {
 	return (
 		<div className="editor-visual-editor">
+			<PostTitle />
 			{ blocks.map( ( uid ) => (
 				<VisualEditorBlock key={ uid } uid={ uid } />
 			) ) }

@@ -8,10 +8,11 @@ import Textarea from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
+import PostTitle from 'post-title';
 
 function TextEditor( { blocks, onChange } ) {
 	return (
-		<div>
+		<div className="editor-text-editor">
 			<header className="editor-text-editor__formatting">
 				<div className="editor-text-editor__formatting-group">
 					<button className="editor-text-editor__bold">b</button>
@@ -29,11 +30,12 @@ function TextEditor( { blocks, onChange } ) {
 					<button>close tags</button>
 				</div>
 			</header>
+			<PostTitle />
 			<Textarea
 				autoComplete="off"
 				defaultValue={ wp.blocks.serialize( blocks ) }
 				onBlur={ ( event ) => onChange( event.target.value ) }
-				className="editor-text-editor"
+				className="editor-text-editor__textarea"
 			/>
 		</div>
 	);
