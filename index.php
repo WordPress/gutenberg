@@ -82,7 +82,10 @@ function unregister_block( $slug ) {
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return;
 	}
+	$unregistered_block = $registered_blocks[ $slug ];
 	unset( $registered_blocks[ $slug ] );
+
+	return $unregistered_block;
 }
 
 /**
