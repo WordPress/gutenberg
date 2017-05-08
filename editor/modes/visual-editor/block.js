@@ -81,6 +81,9 @@ class VisualEditorBlock extends wp.element.Component {
 		const { keyCode, target } = event;
 		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
 			this.props.onRemove( this.props.uid );
+			if ( this.props.previousBlock ) {
+				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
+			}
 		}
 	}
 
