@@ -118,12 +118,21 @@ export default class Editable extends wp.element.Component {
 		const container = this.props.inlineToolbar
 			? this.editor.getBody().closest( '.blocks-editable' )
 			: this.editor.getBody().closest( '.editor-visual-editor__block' );
-		const editorPosition = container.getBoundingClientRect();
+		const containerPosition = container.getBoundingClientRect();
+		const blockPadding = 14;
+		const blockMoverMargin = 18;
 
-		// The margins are different depending on the container
+		// These offsets are necessary because the toolbar where the link modal lives
+		// is absolute positioned and it's not shown when we compute the position here
+		// so we compute the position about its parent relative position and adds the offset
+		const toolbarOffset = this.props.inlineToolbar
+			? { top: 50, left: 0 }
+			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 250;
+
 		return {
-			top: position.top - editorPosition.top + position.height + ( this.props.inlineToolbar ? 50 : 40 ),
-			left: position.left - editorPosition.left - ( this.props.inlineToolbar ? 100 : 157 )
+			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
+			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left
 		};
 	}
 
