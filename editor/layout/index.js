@@ -7,10 +7,10 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import Header from 'header';
-import Sidebar from 'sidebar';
-import TextEditor from 'modes/text-editor';
-import VisualEditor from 'modes/visual-editor';
+import Header from '../header';
+import Sidebar from '../sidebar';
+import TextEditor from '../modes/text-editor';
+import VisualEditor from '../modes/visual-editor';
 
 function Layout( { mode, isSidebarOpened } ) {
 	const className = classnames( 'editor-layout', {
