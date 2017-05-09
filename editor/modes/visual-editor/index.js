@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './style.scss';
-import Inserter from '../../components/inserter';
+import Inserter from '../../inserter';
 import VisualEditorBlock from './block';
 import PostTitle from '../../post-title';
 

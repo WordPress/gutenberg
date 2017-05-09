@@ -14,7 +14,7 @@ import Button from 'components/button';
  * Internal dependencies
  */
 import './style.scss';
-import Inserter from '../../components/inserter';
+import Inserter from '../../inserter';
 import PublishButton from './publish-button';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
