@@ -88,7 +88,13 @@
 
 .editor-visual-editor__block-controls + div {
 	margin-top: -100px;
-	padding: .05px;	// this prevents collapsing margins on all child elements
+
+	// prevent collapsing margins between the block and the toolbar
+	&:before {
+		content: "";
+		display: table;
+		clear: both;
+	}
 }
 
 .editor-visual-editor__block-controls .components-toolbar {
