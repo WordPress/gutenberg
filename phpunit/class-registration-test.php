@@ -44,6 +44,7 @@ class Registration_Test extends WP_UnitTestCase {
 	 * Should accept valid block names
 	 */
 	function test_register_block() {
+		global $wp_registered_blocks;
 		$settings = array(
 			'icon' => 'text',
 		);
@@ -52,6 +53,7 @@ class Registration_Test extends WP_UnitTestCase {
 			'icon' => 'text',
 			'slug' => 'core/text',
 		) );
+		$this->assertEquals( $updated_settings, $wp_registered_blocks['core/text'] );
 	}
 
 	/**
@@ -67,6 +69,7 @@ class Registration_Test extends WP_UnitTestCase {
 	 * Should unregister existing blocks
 	 */
 	function test_unregister_block() {
+		global $wp_registered_blocks;
 		$settings = array(
 			'icon' => 'text',
 		);
@@ -76,5 +79,6 @@ class Registration_Test extends WP_UnitTestCase {
 			'icon' => 'text',
 			'slug' => 'core/text',
 		) );
+		$this->assertFalse( isset( $wp_registered_blocks['core/text'] ) );
 	}
 }
