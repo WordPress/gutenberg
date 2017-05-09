@@ -419,7 +419,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	isEmpty( content ) {
-		return ! content.length;
+		return ! content || ! content.length;
 	}
 
 	render() {
