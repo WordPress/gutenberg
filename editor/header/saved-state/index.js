@@ -13,7 +13,7 @@ import Dashicon from 'components/dashicon';
  * Internal dependencies
  */
 import './style.scss';
-import { isEditedPostDirty } from 'selectors';
+import { isEditedPostDirty } from '../../selectors';
 
 function SavedState( { isDirty } ) {
 	const classes = classNames( 'editor-saved-state', {

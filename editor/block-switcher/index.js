@@ -14,7 +14,7 @@ import IconButton from 'components/icon-button';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlock } from 'selectors';
+import { getBlock } from '../selectors';
 
 class BlockSwitcher extends wp.element.Component {
 	constructor() {

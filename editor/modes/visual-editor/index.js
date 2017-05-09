@@ -10,7 +10,7 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlock from './block';
 import PostTitle from '../../post-title';
-import { getBlockUids } from 'selectors';
+import { getBlockUids } from '../../selectors';
 
 function VisualEditor( { blocks } ) {
 	return (

@@ -24,7 +24,7 @@ import {
 	isBlockHovered,
 	isBlockSelected,
 	isTypingInBlock
-} from 'selectors';
+} from '../../selectors';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {

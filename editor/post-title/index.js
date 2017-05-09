@@ -8,7 +8,7 @@ import Textarea from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostTitle } from 'selectors';
+import { getEditedPostTitle } from '../selectors';
 
 /**
  * Constants

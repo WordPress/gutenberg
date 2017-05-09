@@ -9,7 +9,7 @@ import Textarea from 'react-autosize-textarea';
  */
 import './style.scss';
 import PostTitle from 'post-title';
-import { getBlocks } from 'selectors';
+import { getBlocks } from '../../selectors';
 
 function TextEditor( { blocks, onChange } ) {
 	return (

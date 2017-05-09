@@ -12,7 +12,7 @@ import IconButton from 'components/icon-button';
  * Internal dependencies
  */
 import './style.scss';
-import { isFirstBlock, isLastBlock } from 'selectors';
+import { isFirstBlock, isLastBlock } from '../selectors';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (

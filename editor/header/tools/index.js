@@ -16,7 +16,7 @@ import Button from 'components/button';
 import './style.scss';
 import Inserter from '../../inserter';
 import PublishButton from './publish-button';
-import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from 'selectors';
+import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selectors';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
