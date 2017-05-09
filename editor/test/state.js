@@ -259,7 +259,7 @@ describe( 'state', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
-					post: {
+					edits: {
 						status: 'draft',
 						title: 'post title',
 					}
@@ -267,7 +267,7 @@ describe( 'state', () => {
 
 				const state = editor( original, {
 					type: 'EDIT_POST',
-					post: {
+					edits: {
 						tags: [ 1 ],
 					},
 				} );
@@ -282,7 +282,7 @@ describe( 'state', () => {
 			it( 'should save modified properties', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
-					post: {
+					edits: {
 						status: 'draft',
 						title: 'post title',
 						tags: [ 1 ],
@@ -291,7 +291,7 @@ describe( 'state', () => {
 
 				const state = editor( original, {
 					type: 'EDIT_POST',
-					post: {
+					edits: {
 						title: 'modified title',
 						tags: [ 2 ],
 					},
