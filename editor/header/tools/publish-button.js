@@ -12,6 +12,7 @@ import { savePost } from '../../actions';
 function PublishButton( {
 	post,
 	edits,
+	dirty,
 	blocks,
 	isSuccessful,
 	isRequesting,
@@ -27,11 +28,11 @@ function PublishButton( {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saving…' )
 			: wp.i18n.__( 'Updating…' );
-	} else if ( isSuccessful ) {
+	} else if ( ! dirty && isSuccessful ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saved!' )
 			: wp.i18n.__( 'Updated!' );
-	} else if ( isError ) {
+	} else if ( ! dirty && isError ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Save failed' )
 			: wp.i18n.__( 'Update failed' );
@@ -63,6 +64,7 @@ export default connect(
 	( state ) => ( {
 		post: state.currentPost,
 		edits: state.editor.edits,
+		dirty: state.editor.dirty,
 		blocks: state.editor.blockOrder.map( ( uid ) => (
 			state.editor.blocksByUid[ uid ]
 		) ),
