@@ -77,13 +77,17 @@
 	position: sticky;
 	z-index: 1;
 	margin-top: -46px - $item-spacing;	// 46 is toolbar height
-	margin-bottom: $item-spacing;
+	margin-bottom: $item-spacing + 100px;
 
 	top: $header-height + $admin-bar-height-big + $item-spacing;
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
 	}
+}
+
+.editor-visual-editor__block-controls + div {
+	margin-top: -100px;
 }
 
 .editor-visual-editor__block-controls .components-toolbar {
