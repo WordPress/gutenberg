@@ -20,6 +20,10 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		return $attributes['value'];
 	}
 
+	function tearDown() {
+		$GLOBALS['wp_registered_blocks'] = array();
+	}
+
 	/**
 	 * Successfull dynamic block rendering
 	 */
@@ -39,7 +43,6 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			'after';
 
 		$updated_post_content = do_blocks( $post_content );
-		unregister_block( 'core/dummy' );
 		$this->assertEquals( $updated_post_content,
 			'before' .
 			'b1' .
