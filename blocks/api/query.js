@@ -31,6 +31,11 @@ const addDescriptor = ( description ) => ( memo ) => {
 	return Object.assign( memo, description );
 };
 
+// Source descriptors
+// Each one of these functions defines how to retrieve the attribute value
+//
+//  - the descriptor sets "source: content" and a parse function for attributes parsed from block content
+//  - the descriptor sets "source: metadata" and an attribute name for attributes stored in the block comment
 const attr = ( ...args ) => addDescriptor( { source: 'content', parse: originalAttr( ...args ) } );
 const prop = ( ...args ) => addDescriptor( { source: 'content', parse: originalProp( ...args ) } );
 const html = ( ...args ) => addDescriptor( { source: 'content', parse: originalHtml( ...args ) } );
@@ -44,13 +49,20 @@ const query = ( selector, descriptor ) => {
 	} );
 };
 
-const accumulateOn = ( description ) => {
+/**
+ * Takes an argument description and returns a chainable API to describe the current attribute
+ *
+ * @param  {?Object} description The argument description
+ *
+ * @return {Object}              descriptors chainable API
+ */
+const getChainableAPI = ( description ) => {
 	return reduce( { attr, prop, html, text, query, children, metadata }, ( memo, fct, key ) => {
 		const wrappedFct = ( ...args ) => {
 			const accumulator = fct( ...args );
 			const newDescription = accumulator( description || {} );
 			return {
-				...accumulateOn( newDescription ),
+				...getChainableAPI( newDescription ),
 				__description: newDescription
 			};
 		};
@@ -60,4 +72,4 @@ const accumulateOn = ( description ) => {
 	}, {} );
 };
 
-export default accumulateOn();
+export default getChainableAPI();

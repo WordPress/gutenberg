@@ -20,6 +20,9 @@ import { createBlock } from './factory';
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockSettings, rawContent, attributes ) {
+	// The blockSettings.attributes contains the definition of each attribute
+	// depending on its "source", we retrieve its value from the comment attribute
+	// or by parsing the block content
 	const computedAttributes = reduce( blockSettings.attributes, ( memo, attribute, key ) => {
 		if ( attribute.source === 'metadata' ) {
 			memo[ key ] = attributes[ attribute.name || key ];
