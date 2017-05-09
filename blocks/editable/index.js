@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, drop, pick, compact } from 'lodash';
+import { isEqual, capitalize, omitBy, forEach, merge, drop, pick, compact } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -82,11 +82,7 @@ export default class Editable extends wp.element.Component {
 
 		this.change = false;
 		this.content = props.value;
-		this.selection = {
-			start: [],
-			end: [],
-			isCollapsed: true
-		};
+		this.selection = props.selection;
 	}
 
 	onSetup( editor ) {
@@ -270,11 +266,18 @@ export default class Editable extends wp.element.Component {
 
 		const newPath = drop( path );
 
-		if ( newPath.length && node.nodeType !== 3 ) {
+		if ( node.nodeType === 3 ) {
+			return { node, index: newPath[ 0 ] || 0 };
+		}
+
+		if ( newPath.length ) {
 			return this.findNodeWithPath( newPath, node );
 		}
 
-		return node;
+		return {
+			node: node.parentNode,
+			index: this.getChildIndex( node )
+		};
 	}
 
 	setSelection( { start, end } ) {
@@ -283,36 +286,21 @@ export default class Editable extends wp.element.Component {
 		}
 
 		const rootNode = this.editor.getBody();
-
-		let startNode = this.findNodeWithPath( start, rootNode ) || rootNode.firstChild;
-		let endNode = this.findNodeWithPath( end, rootNode ) || rootNode.firstChild;
-		let startOffset = 0;
-		let endOffset = 0;
-
 		const range = this.editor.dom.createRng();
 		const currentRange = this.editor.selection.getRng();
-
-		if ( startNode.nodeType === 3 ) {
-			startOffset = last( start );
-		} else {
-			startOffset = this.getChildIndex( startNode );
-			startNode = startNode.parentNode;
-		}
-
-		if ( endNode.nodeType === 3 ) {
-			endOffset = last( end );
-		} else {
-			endOffset = this.getChildIndex( endNode ) + 1;
-			endNode = endNode.parentNode;
-		}
-
-		range.setStart( startNode, startOffset );
-		range.setEnd( endNode, endOffset );
-
+		const startSet = this.findNodeWithPath( start, rootNode );
+		const endSet = this.findNodeWithPath( end, rootNode );
 		const propsToCompare = [
 			'startOffset', 'endOffset',
 			'startContainer', 'endContainer'
 		];
+
+		if ( ! startSet || ! endSet ) {
+			return;
+		}
+
+		range.setStart( startSet.node, startSet.index );
+		range.setEnd( endSet.node, endSet.index );
 
 		if ( ! isEqual( pick( currentRange, propsToCompare ), pick( range, propsToCompare ) ) ) {
 			this.editor.selection.lastFocusBookmark = null;
