@@ -6,10 +6,14 @@ import { uniq, get, reduce } from 'lodash';
 import clickOutside from 'react-click-outside';
 
 /**
+ * WordPress dependencies
+ */
+import IconButton from 'components/icon-button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from '../icon-button';
 
 class BlockSwitcher extends wp.element.Component {
 	constructor() {

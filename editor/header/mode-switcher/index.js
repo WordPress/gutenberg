@@ -4,10 +4,14 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
 
 /**
  * Set of available mode options.

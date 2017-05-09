@@ -15,7 +15,7 @@ function Toolbar( { controls } ) {
 	}
 
 	return (
-		<ul className="editor-toolbar">
+		<ul className="components-toolbar">
 			{ controls.map( ( control, index ) => (
 				<IconButton
 					key={ index }
@@ -26,7 +26,7 @@ function Toolbar( { controls } ) {
 						event.stopPropagation();
 						control.onClick();
 					} }
-					className={ classNames( 'editor-toolbar__control', {
+					className={ classNames( 'components-toolbar__control', {
 						'is-active': control.isActive
 					} ) }
 					aria-pressed={ control.isActive }

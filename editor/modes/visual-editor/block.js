@@ -7,9 +7,13 @@ import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import Toolbar from 'components/toolbar';
+
+/**
  * Internal dependencies
  */
-import Toolbar from '../../components/toolbar';
 import BlockMover from '../../components/block-mover';
 import BlockSwitcher from '../../components/block-switcher';
 

@@ -4,13 +4,17 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+import IconButton from 'components/icon-button';
+import Button from 'components/button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
-import IconButton from '../../components/icon-button';
 import Inserter from '../../components/inserter';
-import Button from '../../components/button';
 import PublishButton from './publish-button';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {

@@ -5,10 +5,14 @@ import { connect } from 'react-redux';
 import { first, last } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import IconButton from 'components/icon-button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from '../icon-button';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (
