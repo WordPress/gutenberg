@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlock, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
 const { children, prop } = query;
@@ -38,14 +38,14 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						const heading = wp.blocks.createBlock( 'core/heading', {
+						const heading = createBlock( 'core/heading', {
 							content: content[ 0 ].props.children
 						} );
 						const blocks = [ heading ];
 
 						const remainingContent = content.slice( 1 );
 						if ( remainingContent.length ) {
-							const text = wp.blocks.createBlock( 'core/text', {
+							const text = createBlock( 'core/text', {
 								...attrs,
 								content: remainingContent
 							} );
@@ -54,7 +54,7 @@ registerBlock( 'core/heading', {
 
 						return blocks;
 					}
-					return wp.blocks.createBlock( 'core/heading', {
+					return createBlock( 'core/heading', {
 						content
 					} );
 				}
@@ -65,7 +65,7 @@ registerBlock( 'core/heading', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return wp.blocks.createBlock( 'core/text', {
+					return createBlock( 'core/text', {
 						content
 					} );
 				}

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlock, createBlock, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
@@ -33,7 +33,7 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return wp.blocks.createBlock( 'core/quote', {
+					return createBlock( 'core/quote', {
 						value: content
 					} );
 				}
@@ -42,7 +42,7 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
-					return wp.blocks.createBlock( 'core/quote', {
+					return createBlock( 'core/quote', {
 						value: content
 					} );
 				}
@@ -53,7 +53,7 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
-					return wp.blocks.createBlock( 'core/text', {
+					return createBlock( 'core/text', {
 						content: wp.element.concatChildren( value, citation )
 					} );
 				}
@@ -63,10 +63,10 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
 					if ( Array.isArray( value ) || citation ) {
-						const heading = wp.blocks.createBlock( 'core/heading', {
+						const heading = createBlock( 'core/heading', {
 							content: Array.isArray( value ) ? value[ 0 ] : value
 						} );
-						const quote = wp.blocks.createBlock( 'core/quote', {
+						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
 							value: Array.isArray( value ) ? value.slice( 1 ) : ''
@@ -74,7 +74,7 @@ registerBlock( 'core/quote', {
 
 						return [ heading, quote ];
 					}
-					return wp.blocks.createBlock( 'core/heading', {
+					return createBlock( 'core/heading', {
 						content: value
 					} );
 				}
