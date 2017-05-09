@@ -3,7 +3,7 @@
  */
 import './style.scss';
 import { registerBlock, query as hpq } from '../../api';
-import Editable from '../../components/editable';
+import Editable from '../../editable';
 
 const { children, prop } = hpq;
 

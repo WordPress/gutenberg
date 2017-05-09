@@ -9,7 +9,7 @@ import Button from 'components/button';
  */
 import './style.scss';
 import { registerBlock, query } from '../../api';
-import Editable from '../../components/editable';
+import Editable from '../../editable';
 
 const { attr, children } = query;
 

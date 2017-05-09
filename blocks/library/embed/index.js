@@ -8,7 +8,7 @@ import Button from 'components/button';
  * Internal dependencies
  */
 import { registerBlock, query } from '../../api';
-import Editable from '../../components/editable';
+import Editable from '../../editable';
 
 const { attr, children } = query;
 

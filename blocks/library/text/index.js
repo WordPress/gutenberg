@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { registerBlock, createBlock, query } from '../../api';
-import Editable from '../../components/editable';
+import Editable from '../../editable';
 
 const { children } = query;
 
