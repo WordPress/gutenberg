@@ -19,12 +19,18 @@ describe( 'block factory', () => {
 
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType and attributes', () => {
+			registerBlock( 'core/test-block', {
+				defaultAttributes: {
+					includesDefault: true
+				}
+			} );
 			const block = createBlock( 'core/test-block', {
 				align: 'left'
 			} );
 
 			expect( block.blockType ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {
+				includesDefault: true,
 				align: 'left'
 			} );
 			expect( block.uid ).to.be.a( 'string' );
