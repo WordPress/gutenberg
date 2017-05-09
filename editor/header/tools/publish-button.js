@@ -12,6 +12,15 @@ import Button from 'components/button';
  * Internal dependencies
  */
 import { savePost } from '../../actions';
+import {
+	getCurrentPost,
+	getPostEdits,
+	getBlocks,
+	isSavingPost,
+	isPostSaveRequestSuccessful,
+	isPostSaveRequestFailed,
+	isSavingNewPost
+} from 'selectors';
 
 function PublishButton( {
 	post,
@@ -66,16 +75,14 @@ function PublishButton( {
 
 export default connect(
 	( state ) => ( {
-		post: state.currentPost,
-		edits: state.editor.edits,
-		dirty: state.editor.dirty,
-		blocks: state.editor.blockOrder.map( ( uid ) => (
-			state.editor.blocksByUid[ uid ]
-		) ),
-		isRequesting: state.saving.requesting,
-		isSuccessful: state.saving.successful,
-		isError: !! state.saving.error,
-		requestIsNewPost: state.saving.isNew,
+		post: getCurrentPost( state ),
+		edits: getPostEdits( state ),
+		dirty: isEditedPostDirty( state ),
+		blocks: getBlocks( state ),
+		isRequesting: isSavingPost( state ),
+		isSuccessful: isPostSaveRequestSuccessful( state ),
+		isError: !! isPostSaveRequestFailed( state ),
+		requestIsNewPost: isSavingNewPost( state ),
 	} ),
 	( dispatch ) => ( {
 		onUpdate( post, edits, blocks ) {
