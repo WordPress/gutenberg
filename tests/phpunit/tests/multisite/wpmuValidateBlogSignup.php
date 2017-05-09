@@ -14,6 +14,8 @@ class Tests_Multisite_WpmuValidateBlogSignup extends WP_UnitTestCase {
 	protected static $existing_blog_name = 'existingsitefoo';
 	protected static $existing_blog_id;
 
+	protected $minimum_site_name_length = 4;
+
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$super_admin_id = $factory->user->create();
 		grant_super_admin( self::$super_admin_id );
@@ -85,6 +87,42 @@ class Tests_Multisite_WpmuValidateBlogSignup extends WP_UnitTestCase {
 	public function test_validate_blogname_from_same_existing_user() {
 		$result = wpmu_validate_blog_signup( self::$existing_user_login, 'Foo Site Title', get_userdata( self::$existing_user_id ) );
 		$this->assertEmpty( $result['errors']->get_error_codes() );
+	}
+
+	/**
+	 * @ticket 39676
+	 *
+	 * @dataProvider data_filter_minimum_site_name_length
+	 */
+	public function test_filter_minimum_site_name_length( $site_name, $minimum_length, $expect_error ) {
+		$this->minimum_site_name_length = $minimum_length;
+		add_filter( 'minimum_site_name_length', array( $this, 'filter_minimum_site_name_length' ) );
+
+		$result = wpmu_validate_blog_signup( $site_name, 'Site Title', get_userdata( self::$super_admin_id ) );
+
+		remove_filter( 'minimum_site_name_length', array( $this, 'filter_minimum_site_name_length' ) );
+		$this->minimum_site_name_length = 4;
+
+		if ( $expect_error ) {
+			$this->assertContains( 'blogname', $result['errors']->get_error_codes() );
+		} else {
+			$this->assertEmpty( $result['errors']->get_error_codes() );
+		}
+	}
+
+	public function data_filter_minimum_site_name_length() {
+		return array(
+			array( 'fooo', 5, true ),
+			array( 'foooo', 5, false ),
+			array( 'foo', 4, true ),
+			array( 'fooo', 4, false ),
+			array( 'fo', 3, true ),
+			array( 'foo', 3, false ),
+		);
+	}
+
+	public function filter_minimum_site_name_length() {
+		return $this->minimum_site_name_length;
 	}
 }
 
