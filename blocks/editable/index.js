@@ -117,7 +117,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	isActive() {
-		return this.editor.editorManager.activeEditor.id === this.editor.id;
+		return document.activeElement === this.editor.getBody();
 	}
 
 	shouldChange( prevContent ) {
