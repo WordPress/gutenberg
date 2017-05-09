@@ -33,8 +33,8 @@ export function getPostEdits( state ) {
 
 export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
-			? state.currentPost.title.raw
-			: state.editor.edits.title;
+		? state.currentPost.title.raw
+		: state.editor.edits.title;
 }
 
 export function getBlock( state, uid ) {
