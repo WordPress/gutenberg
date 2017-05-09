@@ -6,7 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { serialize } from 'blocks';
 import Button from 'components/button';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -40,20 +42,20 @@ function PublishButton( {
 
 	if ( isRequesting ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Saving…' )
-			: wp.i18n.__( 'Updating…' );
+			? __( 'Saving…' )
+			: __( 'Updating…' );
 	} else if ( ! dirty && isSuccessful ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Saved!' )
-			: wp.i18n.__( 'Updated!' );
+			? __( 'Saved!' )
+			: __( 'Updated!' );
 	} else if ( ! dirty && isError ) {
 		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Save failed' )
-			: wp.i18n.__( 'Update failed' );
+			? __( 'Save failed' )
+			: __( 'Update failed' );
 	} else if ( post && post.id ) {
-		buttonText = wp.i18n.__( 'Update' );
+		buttonText = __( 'Update' );
 	} else {
-		buttonText = wp.i18n.__( 'Save draft' );
+		buttonText = __( 'Save draft' );
 	}
 
 	if ( post && post.id ) {
@@ -88,14 +90,14 @@ export default connect(
 	( dispatch ) => ( {
 		onUpdate( post, edits, blocks ) {
 			savePost( dispatch, post.id, {
-				content: wp.blocks.serialize( blocks ),
+				content: serialize( blocks ),
 				...edits,
 			} );
 		},
 
 		onSaveDraft( post, edits, blocks ) {
 			savePost( dispatch, null /* is a new post */, {
-				content: wp.blocks.serialize( blocks ),
+				content: serialize( blocks ),
 				status: 'draft', // TODO change this after status controls
 				...edits,
 			} );

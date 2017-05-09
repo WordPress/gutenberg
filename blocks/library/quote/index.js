@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { concatChildren } from 'element';
+import { __, sprintf } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -8,7 +14,7 @@ import Editable from '../../editable';
 const { children, query } = hpq;
 
 registerBlock( 'core/quote', {
-	title: wp.i18n.__( 'Quote' ),
+	title: __( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',
 
@@ -19,7 +25,7 @@ registerBlock( 'core/quote', {
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
+		title: sprintf( __( 'Quote style %d' ), variation ),
 		isActive: ( { style = 1 } ) => Number( style ) === variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
@@ -54,7 +60,7 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
 					return createBlock( 'core/text', {
-						content: wp.element.concatChildren( value, citation )
+						content: concatChildren( value, citation )
 					} );
 				}
 			},

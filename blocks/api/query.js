@@ -12,6 +12,11 @@ import {
 } from 'hpq';
 
 /**
+ * WordPress dependencies
+ */
+import { createElement } from 'element';
+
+/**
  * Given a matcher function creator, returns a new function which applies an
  * internal flag to the created matcher.
  *
@@ -39,7 +44,7 @@ export const children = withKnownMatcherFlag( ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], wp.element.createElement );
+			return nodeListToReact( match.childNodes || [], createElement );
 		}
 
 		return [];

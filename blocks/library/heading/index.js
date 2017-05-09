@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { concatChildren } from 'element';
+import { __, sprintf } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -8,7 +14,7 @@ import Editable from '../../editable';
 const { children, prop } = query;
 
 registerBlock( 'core/heading', {
-	title: wp.i18n.__( 'Heading' ),
+	title: __( 'Heading' ),
 
 	icon: 'heading',
 
@@ -22,7 +28,7 @@ registerBlock( 'core/heading', {
 	controls: [
 		...'123456'.split( '' ).map( ( level ) => ( {
 			icon: 'heading',
-			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+			title: sprintf( __( 'Heading %s' ), level ),
 			isActive: ( { nodeName } ) => 'H' + level === nodeName,
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'H' + level } );
@@ -75,7 +81,7 @@ registerBlock( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: concatChildren( attributes.content, attributesToMerge.content )
 		};
 	},
 

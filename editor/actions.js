@@ -4,6 +4,11 @@
 import { get } from 'lodash';
 import { parse, stringify } from 'querystring';
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
 export function savePost( dispatch, postId, edits ) {
 	const toSend = postId ? { id: postId, ...edits } : edits;
 	const isNew = ! postId;
@@ -34,7 +39,7 @@ export function savePost( dispatch, postId, edits ) {
 			type: 'REQUEST_POST_UPDATE_FAILURE',
 			error: get( err, 'responseJSON', {
 				code: 'unknown_error',
-				message: wp.i18n.__( 'An unknown error occurred.' ),
+				message: __( 'An unknown error occurred.' ),
 			} ),
 			edits,
 			isNew,

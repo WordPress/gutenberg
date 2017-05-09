@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import Dashicon from 'components/dashicon';
 import IconButton from 'components/icon-button';
 import Button from 'components/button';
+import { __, _x } from 'i18n';
 
 /**
  * Internal dependencies
@@ -24,24 +25,24 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
-				label={ wp.i18n.__( 'Undo' ) }
+				label={ __( 'Undo' ) }
 				disabled={ ! hasUndo }
 				onClick={ undo } />
 			<IconButton
 				className="editor-tools__redo"
 				icon="redo"
-				label={ wp.i18n.__( 'Redo' ) }
+				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
 			<Inserter position="bottom" />
 			<div className="editor-tools__tabs">
 				<Button>
 					<Dashicon icon="visibility" />
-					{ wp.i18n._x( 'Preview', 'imperative verb' ) }
+					{ _x( 'Preview', 'imperative verb' ) }
 				</Button>
 				<Button onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
 					<Dashicon icon="admin-generic" />
-					{ wp.i18n.__( 'Post Settings' ) }
+					{ __( 'Post Settings' ) }
 				</Button>
 			</div>
 			<PublishButton />

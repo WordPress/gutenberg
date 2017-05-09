@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import Button from 'components/button';
 import Placeholder from 'components/placeholder';
 
@@ -28,7 +29,7 @@ function toggleAlignment( align ) {
 }
 
 registerBlock( 'core/image', {
-	title: wp.i18n.__( 'Image' ),
+	title: __( 'Image' ),
 
 	icon: 'format-image',
 
@@ -43,25 +44,25 @@ registerBlock( 'core/image', {
 	controls: [
 		{
 			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
+			title: __( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
 			onClick: toggleAlignment( 'left' )
 		},
 		{
 			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
+			title: __( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
 			onClick: toggleAlignment( 'center' )
 		},
 		{
 			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
+			title: __( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
 			onClick: toggleAlignment( 'right' )
 		},
 		{
 			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
+			title: __( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' )
 		}
@@ -80,12 +81,12 @@ registerBlock( 'core/image', {
 		if ( ! url ) {
 			return (
 				<Placeholder
-					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
-					label={ wp.i18n.__( 'Image' ) }
+					label={ __( 'Image' ) }
 					className="blocks-image">
 					<Button isLarge>
-						{ wp.i18n.__( 'Insert from Media Library' ) }
+						{ __( 'Insert from Media Library' ) }
 					</Button>
 				</Placeholder>
 			);
@@ -99,7 +100,7 @@ registerBlock( 'core/image', {
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
-						placeholder={ wp.i18n.__( 'Write caption…' ) }
+						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }

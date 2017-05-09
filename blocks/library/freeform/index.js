@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import { registerBlock, query, setUnknownTypeHandler } from '../../api';
@@ -6,7 +11,7 @@ import { registerBlock, query, setUnknownTypeHandler } from '../../api';
 const { html } = query;
 
 registerBlock( 'core/freeform', {
-	title: wp.i18n.__( 'Freeform' ),
+	title: __( 'Freeform' ),
 
 	icon: 'text',
 

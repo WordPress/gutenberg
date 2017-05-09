@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import IconButton from 'components/icon-button';
 
 /**
@@ -27,7 +28,7 @@ function applyOrUnset( align ) {
 }
 
 registerBlock( 'core/button', {
-	title: wp.i18n.__( 'Button' ),
+	title: __( 'Button' ),
 
 	icon: 'marker',
 
@@ -42,19 +43,19 @@ registerBlock( 'core/button', {
 	controls: [
 		{
 			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
+			title: __( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
 			onClick: applyOrUnset( 'left' )
 		},
 		{
 			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
+			title: __( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
 			onClick: applyOrUnset( 'center' )
 		},
 		{
 			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
+			title: __( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
 			onClick: applyOrUnset( 'right' )
 		}
@@ -74,7 +75,7 @@ registerBlock( 'core/button', {
 			<span className="blocks-button" title={ title }>
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write some text…' ) }
+					placeholder={ __( 'Write some text…' ) }
 					value={ text }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
@@ -90,7 +91,7 @@ registerBlock( 'core/button', {
 							required
 							value={ url }
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+							placeholder={ __( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
 					</form>

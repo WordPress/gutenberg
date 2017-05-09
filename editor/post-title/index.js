@@ -5,6 +5,11 @@ import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -27,7 +32,7 @@ function PostTitle( { title, onUpdate } ) {
 				className="editor-post-title__input"
 				value={ title }
 				onChange={ onChange }
-				placeholder={ wp.i18n.__( 'Enter title here' ) }
+				placeholder={ __( 'Enter title here' ) }
 			/>
 		</h1>
 	);

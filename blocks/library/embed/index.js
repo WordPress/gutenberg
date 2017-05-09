@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import Button from 'components/button';
 import Placeholder from 'components/placeholder';
 
@@ -13,7 +14,7 @@ import Editable from '../../editable';
 const { attr, children } = query;
 
 registerBlock( 'core/embed', {
-	title: wp.i18n.__( 'Embed' ),
+	title: __( 'Embed' ),
 
 	icon: 'video-alt3',
 
@@ -30,10 +31,10 @@ registerBlock( 'core/embed', {
 
 		if ( ! url ) {
 			return (
-				<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
-					<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+				<Placeholder icon="cloud" label={ __( 'Embed URL' ) } className="blocks-embed">
+					<input type="url" className="placeholder__input" placeholder={ __( 'Enter URL to embed here...' ) } />
 					<Button isLarge>
-						{ wp.i18n.__( 'Embed' ) }
+						{ __( 'Embed' ) }
 					</Button>
 				</Placeholder>
 			);
@@ -47,7 +48,7 @@ registerBlock( 'core/embed', {
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
-						placeholder={ wp.i18n.__( 'Write caption…' ) }
+						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						focus={ focus }
 						onFocus={ setFocus }

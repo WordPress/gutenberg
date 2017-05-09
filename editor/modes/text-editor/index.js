@@ -5,6 +5,11 @@ import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { serialize, parse } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -35,7 +40,7 @@ function TextEditor( { blocks, onChange } ) {
 				<PostTitle />
 				<Textarea
 					autoComplete="off"
-					defaultValue={ wp.blocks.serialize( blocks ) }
+					defaultValue={ serialize( blocks ) }
 					onBlur={ ( event ) => onChange( event.target.value ) }
 					className="editor-text-editor__textarea"
 				/>
@@ -52,7 +57,7 @@ export default connect(
 		onChange( value ) {
 			dispatch( {
 				type: 'RESET_BLOCKS',
-				blocks: wp.blocks.parse( value )
+				blocks: parse( value )
 			} );
 		}
 	} )
