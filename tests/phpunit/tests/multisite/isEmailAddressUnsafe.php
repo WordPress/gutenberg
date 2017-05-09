@@ -120,6 +120,22 @@ class Tests_Multisite_IsEmailAddressUnsafe extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	public function test_email_with_only_top_level_domain_returns_safe() {
+		update_site_option( 'banned_email_domains', 'bar.com' );
+		$safe = is_email_address_unsafe( 'email@localhost' );
+		delete_site_option( 'banned_email_domains' );
+
+		$this->assertFalse( $safe );
+	}
+
+	public function test_invalid_email_without_domain_returns_safe() {
+		update_site_option( 'banned_email_domains', 'bar.com' );
+		$safe = is_email_address_unsafe( 'invalid-email' );
+		delete_site_option( 'bar.com' );
+
+		$this->assertFalse( $safe );
+	}
 }
 
 endif;
