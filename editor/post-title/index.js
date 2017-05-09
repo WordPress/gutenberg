@@ -2,20 +2,28 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import Textarea from 'react-autosize-textarea';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
+/**
+ * Constants
+ */
+const REGEXP_NEWLINES = /[\r\n]+/g;
+
 function PostTitle( { title, onUpdate } ) {
-	const onChange = ( event ) => onUpdate( event.target.value );
+	const onChange = ( event ) => {
+		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
+		onUpdate( newTitle );
+	};
 
 	return (
 		<h1 className="editor-post-title">
-			<input
+			<Textarea
 				className="editor-post-title__input"
-				type="text"
 				value={ title }
 				onChange={ onChange }
 				placeholder={ wp.i18n.__( 'Enter title here' ) }
