@@ -1,11 +1,11 @@
-.editor-toolbar {
+.components-toolbar {
 	margin: 0;
 	border: 1px solid $light-gray-500;
 	box-shadow: $shadow-popover;
 	background-color: $white;
 }
 
-.editor-toolbar__control.editor-button {
+.components-toolbar__control.components-button {
 	display: inline-flex;
 	align-items: flex-end;
 	margin: 3px;
@@ -45,6 +45,6 @@
 	}
 }
 
-.editor-toolbar__control .dashicon {
+.components-toolbar__control .dashicon {
 	display: block;
 }

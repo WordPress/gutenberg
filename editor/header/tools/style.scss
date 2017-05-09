@@ -25,7 +25,7 @@
 		padding: 0 0 0 $item-spacing;
 	}
 
-	.editor-button {
+	.components-button {
 		display: flex;
 		flex-wrap: nowrap;
 		white-space: nowrap;
@@ -51,7 +51,7 @@
 		}
 	}
 
-	.editor-button .dashicon {
+	.components-button .dashicon {
 		margin-right: 10px;
 		flex-shrink: 0;
 
@@ -60,7 +60,7 @@
 		}
 	}
 
-	.editor-button {
+	.components-button {
 		&.is-toggled {
 			background: $dark-gray-500;
 			color: $white;
