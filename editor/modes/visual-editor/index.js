@@ -10,6 +10,7 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlock from './block';
 import PostTitle from '../../post-title';
+import { getBlockUids } from '../../selectors';
 
 function VisualEditor( { blocks } ) {
 	return (
@@ -24,5 +25,5 @@ function VisualEditor( { blocks } ) {
 }
 
 export default connect( ( state ) => ( {
-	blocks: state.editor.blockOrder
+	blocks: getBlockUids( state )
 } ) )( VisualEditor );

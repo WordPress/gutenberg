@@ -9,6 +9,7 @@ import Textarea from 'react-autosize-textarea';
  */
 import './style.scss';
 import PostTitle from '../../post-title';
+import { getBlocks } from '../../selectors';
 
 function TextEditor( { blocks, onChange } ) {
 	return (
@@ -45,9 +46,7 @@ function TextEditor( { blocks, onChange } ) {
 
 export default connect(
 	( state ) => ( {
-		blocks: state.editor.blockOrder.map( ( uid ) => (
-			state.editor.blocksByUid[ uid ]
-		) )
+		blocks: getBlocks( state )
 	} ),
 	( dispatch ) => ( {
 		onChange( value ) {

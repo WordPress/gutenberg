@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +12,7 @@ import IconButton from 'components/icon-button';
  * Internal dependencies
  */
 import './style.scss';
+import { isFirstBlock, isLastBlock } from '../selectors';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	return (
@@ -35,8 +35,8 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 
 export default connect(
 	( state, ownProps ) => ( {
-		isFirst: first( state.editor.blockOrder ) === ownProps.uid,
-		isLast: last( state.editor.blockOrder ) === ownProps.uid
+		isFirst: isFirstBlock( state, ownProps.uid ),
+		isLast: isLastBlock( state, ownProps.uid )
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {

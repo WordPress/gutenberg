@@ -14,6 +14,7 @@ import IconButton from 'components/icon-button';
  * Internal dependencies
  */
 import './style.scss';
+import { getBlock } from '../selectors';
 
 class BlockSwitcher extends wp.element.Component {
 	constructor() {
@@ -96,7 +97,7 @@ class BlockSwitcher extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: state.editor.blocksByUid[ ownProps.uid ]
+		block: getBlock( state, ownProps.uid )
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {

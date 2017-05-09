@@ -16,6 +16,7 @@ import Button from 'components/button';
 import './style.scss';
 import Inserter from '../../inserter';
 import PublishButton from './publish-button';
+import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selectors';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
@@ -50,9 +51,9 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 
 export default connect(
 	( state ) => ( {
-		hasUndo: state.editor.history.past.length > 0,
-		hasRedo: state.editor.history.future.length > 0,
-		isSidebarOpened: state.isSidebarOpened,
+		hasUndo: hasEditorUndo( state ),
+		hasRedo: hasEditorRedo( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),

@@ -12,6 +12,7 @@ import Dashicon from 'components/dashicon';
  * Internal dependencies
  */
 import './style.scss';
+import { getEditorMode } from '../../selectors';
 
 /**
  * Set of available mode options.
@@ -57,7 +58,7 @@ function ModeSwitcher( { mode, onSwitch } ) {
 
 export default connect(
 	( state ) => ( {
-		mode: state.mode
+		mode: getEditorMode( state )
 	} ),
 	( dispatch ) => ( {
 		onSwitch( mode ) {

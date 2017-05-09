@@ -8,6 +8,7 @@ import Textarea from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
+import { getEditedPostTitle } from '../selectors';
 
 /**
  * Constants
@@ -34,9 +35,7 @@ function PostTitle( { title, onUpdate } ) {
 
 export default connect(
 	( state ) => ( {
-		title: state.editor.edits.title === undefined
-			? state.currentPost.title.raw
-			: state.editor.edits.title,
+		title: getEditedPostTitle( state ),
 	} ),
 	( dispatch ) => {
 		return {
