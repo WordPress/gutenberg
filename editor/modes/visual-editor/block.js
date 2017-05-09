@@ -14,8 +14,8 @@ import Toolbar from 'components/toolbar';
 /**
  * Internal dependencies
  */
-import BlockMover from '../../components/block-mover';
-import BlockSwitcher from '../../components/block-switcher';
+import BlockMover from '../../block-mover';
+import BlockSwitcher from '../../block-switcher';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
