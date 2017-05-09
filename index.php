@@ -44,21 +44,21 @@ function register_block( $slug, $settings ) {
 	if ( ! is_string( $slug ) ) {
 		$message = __( 'Block slugs must be strings.' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return;
+		return false;
 	}
 
 	$slug_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
 	if ( ! preg_match( $slug_matcher, $slug ) ) {
 		$message = __( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return;
+		return false;
 	}
 
 	if ( isset( $wp_registered_blocks[ $slug ] ) ) {
 		/* translators: 1: block slug */
 		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return;
+		return false;
 	}
 
 	$settings['slug'] = $slug;
@@ -80,7 +80,7 @@ function unregister_block( $slug ) {
 		/* translators: 1: block slug */
 		$message = sprintf( __( 'Block "%s" is not registered.' ), $slug );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
-		return;
+		return false;
 	}
 	$unregistered_block = $wp_registered_blocks[ $slug ];
 	unset( $wp_registered_blocks[ $slug ] );

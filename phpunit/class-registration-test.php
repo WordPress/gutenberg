@@ -19,7 +19,8 @@ class Registration_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage register_block
 	 */
 	function test_invalid_non_string_slugs() {
-		register_block( 1, array() );
+		$result = register_block( 1, array() );
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -28,7 +29,8 @@ class Registration_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage register_block
 	 */
 	function test_invalid_slugs_without_namespace() {
-		register_block( 'text', array() );
+		$result = register_block( 'text', array() );
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -37,7 +39,8 @@ class Registration_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage register_block
 	 */
 	function test_invlalid_characters() {
-		register_block( 'still/_doing_it_wrong', array() );
+		$result = register_block( 'still/_doing_it_wrong', array() );
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -65,8 +68,10 @@ class Registration_Test extends WP_UnitTestCase {
 		$settings = array(
 			'icon' => 'text',
 		);
-		register_block( 'core/text', $settings );
-		register_block( 'core/text', $settings );
+		$result = register_block( 'core/text', $settings );
+		$this->assertNotFalse( $result );
+		$result = register_block( 'core/text', $settings );
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -75,7 +80,8 @@ class Registration_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage unregister_block
 	 */
 	function test_unregister_not_registered_block() {
-		unregister_block( 'core/unregistered' );
+		$result = unregister_block( 'core/unregistered' );
+		$this->assertFalse( $result );
 	}
 
 	/**
