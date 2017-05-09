@@ -5,10 +5,14 @@ import { connect } from 'react-redux';
 import { flow } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../dashicon';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {

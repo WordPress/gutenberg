@@ -4,9 +4,13 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import Button from 'components/button';
+
+/**
  * Internal dependencies
  */
-import Button from '../../components/button';
 import { savePost } from '../../actions';
 
 function PublishButton( {

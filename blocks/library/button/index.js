@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import IconButton from 'editor/components/icon-button';
+import IconButton from 'components/icon-button';
 
 /**
  * Internal dependencies

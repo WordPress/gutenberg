@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'editor/components/dashicon';
-import Button from 'editor/components/button';
+import Dashicon from 'components/dashicon';
+import Button from 'components/button';
 
 /**
  * Internal dependencies
