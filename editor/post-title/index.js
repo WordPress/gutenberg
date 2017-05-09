@@ -35,7 +35,7 @@ export default connect(
 			onUpdate( title ) {
 				dispatch( {
 					type: 'EDIT_POST',
-					post: { title }
+					edits: { title }
 				} );
 			}
 		};
