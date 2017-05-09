@@ -57,6 +57,19 @@ class Registration_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should fail to re-register the same block
+	 *
+	 * @expectedIncorrectUsage register_block
+	 */
+	function test_register_block_twice() {
+		$settings = array(
+			'icon' => 'text',
+		);
+		register_block( 'core/text', $settings );
+		register_block( 'core/text', $settings );
+	}
+
+	/**
 	 * Unregistering should fail if a block is not registered
 	 *
 	 * @expectedIncorrectUsage unregister_block
