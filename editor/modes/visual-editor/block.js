@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { Slot } from 'react-slot-fill';
+import { Fill, Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 
 /**
@@ -237,6 +237,16 @@ class VisualEditorBlock extends wp.element.Component {
 						mergeWithPrevious={ this.mergeWithPrevious }
 					/>
 				</div>
+				{ isSelected &&
+					<Fill name="Sidebar.Inspector">
+						<div>{ block.blockType } settings...</div>
+						<ul>
+							{ Object.keys( block.attributes ).map( ( attribute, index ) => (
+								<li key={ index }>{ attribute }: { block.attributes[ attribute ] }</li>
+							) ) }
+						</ul>
+					</Fill>
+				}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
