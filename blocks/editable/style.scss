@@ -100,7 +100,7 @@ input.editable-format-toolbar__link-input {
 }
 
 /* Block Placeholders */
-.editor-visual-editor__block .is-placeholder {
+.editor-visual-editor__block .placeholder {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -111,31 +111,4 @@ input.editable-format-toolbar__link-input {
 	font-family: $default-font;
 	font-size: $default-font-size;
 	background: $light-gray-100;
-}
-
-.placeholder__label {
-	display: flex;
-	justify-content: center;
-	font-weight: bold;
-	margin-bottom: 1em;
-
-	.dashicon {
-		margin-right: 1ch;
-	}
-}
-
-.placeholder__fieldset {
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	max-width: 280px;
-}
-
-.placeholder__input {
-	margin-right: 8px;
-	flex: 1 1 auto;
-}
-
-.placeholder__instructions {
-	margin-bottom: 1em;
 }

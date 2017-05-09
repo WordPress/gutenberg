@@ -1,0 +1,27 @@
+.placeholder__label {
+	display: flex;
+	justify-content: center;
+	font-weight: bold;
+	margin-bottom: 1em;
+
+	.dashicon {
+		margin-right: 1ch;
+	}
+}
+
+.placeholder__fieldset {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	width: 100%;
+	max-width: 280px;
+}
+
+.placeholder__input {
+	margin-right: 8px;
+	flex: 1 1 auto;
+}
+
+.placeholder__instructions {
+	margin-bottom: 1em;
+}
