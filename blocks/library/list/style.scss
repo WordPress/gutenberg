@@ -1,3 +1,4 @@
-.blocks-list {
-	list-style-position: inside;
+.blocks-list, .blocks-list ul, .blocks-list ol {
+	padding-left: 20px;
+	margin-left: 0;
 }
