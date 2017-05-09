@@ -13,6 +13,7 @@ import Button from 'components/button';
  */
 import { savePost } from '../../actions';
 import {
+	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
 	getBlocks,
