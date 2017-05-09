@@ -9,6 +9,10 @@
  * Test register_block
  */
 class Registration_Test extends WP_UnitTestCase {
+	function tearDown() {
+		$GLOBALS['wp_registered_blocks'] = array();
+	}
+
 	/**
 	 * Should reject numbers
 	 *
@@ -48,7 +52,6 @@ class Registration_Test extends WP_UnitTestCase {
 			'icon' => 'text',
 			'slug' => 'core/text',
 		) );
-		unregister_block( 'core/text' );
 	}
 
 	/**
