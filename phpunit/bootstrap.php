@@ -11,7 +11,7 @@ $_tests_dir = getenv( 'WP_TESTS_DIR' );
 // See if we're installed inside an existing WP dev instance
 if ( ! $_tests_dir ) {
 	$_try_tests_dir = __DIR__ . '/../../../../../tests/phpunit';
-	if ( file_exists( $_tests_dir ) . '/includes/functions.php' ) {
+	if ( file_exists( $_try_tests_dir . '/includes/functions.php' ) ) {
 		$_tests_dir = $_try_tests_dir;
 	}
 }
