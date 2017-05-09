@@ -28,7 +28,7 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 
-$registered_blocks = array();
+$wp_registered_blocks = array();
 
 /**
  * Registers a block.
@@ -39,7 +39,7 @@ $registered_blocks = array();
  * @return array            The block, if it has been successfully registered.
  */
 function register_block( $slug, $settings ) {
-	global $registered_blocks;
+	global $wp_registered_blocks;
 
 	if ( ! is_string( $slug ) ) {
 		$message = __( 'Block slugs must be strings.' );
@@ -54,7 +54,7 @@ function register_block( $slug, $settings ) {
 		return;
 	}
 
-	if ( isset( $registered_blocks[ $slug ] ) ) {
+	if ( isset( $wp_registered_blocks[ $slug ] ) ) {
 		/* translators: 1: block slug */
 		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
@@ -62,7 +62,7 @@ function register_block( $slug, $settings ) {
 	}
 
 	$settings['slug'] = $slug;
-	$registered_blocks[ $slug ] = $settings;
+	$wp_registered_blocks[ $slug ] = $settings;
 
 	return $settings;
 }
@@ -75,15 +75,15 @@ function register_block( $slug, $settings ) {
  *                        successfully unregistered; otherwise `null`.
  */
 function unregister_block( $slug ) {
-	global $registered_blocks;
-	if ( ! isset( $registered_blocks[ $slug ] ) ) {
+	global $wp_registered_blocks;
+	if ( ! isset( $wp_registered_blocks[ $slug ] ) ) {
 		/* translators: 1: block slug */
 		$message = sprintf( __( 'Block "%s" is not registered.' ), $slug );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return;
 	}
-	$unregistered_block = $registered_blocks[ $slug ];
-	unset( $registered_blocks[ $slug ] );
+	$unregistered_block = $wp_registered_blocks[ $slug ];
+	unset( $wp_registered_blocks[ $slug ] );
 
 	return $unregistered_block;
 }
@@ -118,7 +118,7 @@ function parse_block_attributes( $attr_string ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	global $registered_blocks;
+	global $wp_registered_blocks;
 
 	// Extract the blocks from the post content.
 	$open_matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)-->.*?<!--\s*\/wp:\g1\s+-->/';
@@ -128,7 +128,7 @@ function do_blocks( $content ) {
 	foreach ( $matches[0] as $index => $block_match ) {
 		$block_name = $matches[1][ $index ][0];
 		// do nothing if the block is not registered.
-		if ( ! isset( $registered_blocks[ $block_name ] ) ) {
+		if ( ! isset( $wp_registered_blocks[ $block_name ] ) ) {
 			continue;
 		}
 
@@ -138,7 +138,7 @@ function do_blocks( $content ) {
 		$block_attributes = parse_block_attributes( $block_attributes_string );
 
 		// Call the block's render function to generate the dynamic output.
-		$output = call_user_func( $registered_blocks[ $block_name ]['render'], $block_attributes );
+		$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
 
 		// Replace the matched block with the dynamic output.
 		$new_content = str_replace( $block_markup, $output, $new_content );
