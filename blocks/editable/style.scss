@@ -67,6 +67,11 @@ figcaption.blocks-editable__tinymce {
 	color: $dark-gray-100;
 	text-align: center;
 	font-size: $default-font-size;
+
+	&:before {
+		left: 50%;
+		transform: translateX( -50% );
+	}
 }
 
 
