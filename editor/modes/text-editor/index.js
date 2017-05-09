@@ -8,7 +8,7 @@ import Textarea from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
-import PostTitle from 'post-title';
+import PostTitle from '../../post-title';
 
 function TextEditor( { blocks, onChange } ) {
 	return (

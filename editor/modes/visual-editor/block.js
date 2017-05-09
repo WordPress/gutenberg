@@ -9,9 +9,9 @@ import { partial } from 'lodash';
 /**
  * Internal dependencies
  */
-import Toolbar from 'components/toolbar';
-import BlockMover from 'components/block-mover';
-import BlockSwitcher from 'components/block-switcher';
+import Toolbar from '../../components/toolbar';
+import BlockMover from '../../components/block-mover';
+import BlockSwitcher from '../../components/block-switcher';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {

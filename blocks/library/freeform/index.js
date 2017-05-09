@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query, setUnknownTypeHandler } from 'api';
+import { registerBlock, query, setUnknownTypeHandler } from '../../api';
 
 const { html } = query;
 

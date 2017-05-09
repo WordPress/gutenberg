@@ -1,12 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'editor/components/dashicon';
+import Button from 'editor/components/button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
-// TODO: Revisit when we have a common components solution
-import Dashicon from '../../../editor/components/dashicon';
-import Button from '../../../editor/components/button';
+import { registerBlock, query } from '../../api';
+import Editable from '../../components/editable';
 
 const { attr, children } = query;
 

@@ -8,7 +8,7 @@ import { flow } from 'lodash';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from 'components/dashicon';
+import Dashicon from '../dashicon';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {

@@ -7,7 +7,7 @@ import { keyBy, last, omit, without } from 'lodash';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from 'utils/undoable-reducer';
+import { combineUndoableReducers } from './utils/undoable-reducer';
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed

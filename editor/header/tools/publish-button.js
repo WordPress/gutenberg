@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import Button from 'components/button';
-import { savePost } from 'actions';
+import Button from '../../components/button';
+import { savePost } from '../../actions';
 
 function PublishButton( {
 	post,

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from 'components/dashicon';
+import Dashicon from '../../components/dashicon';
 
 /**
  * Set of available mode options.
