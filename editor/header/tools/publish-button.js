@@ -18,8 +18,8 @@ import {
 	getPostEdits,
 	getBlocks,
 	isSavingPost,
-	isPostSaveRequestSuccessful,
-	isPostSaveRequestFailed,
+	didPostSaveRequestSucceed,
+	didPostSaveRequestFail,
 	isSavingNewPost
 } from '../../selectors';
 
@@ -81,8 +81,8 @@ export default connect(
 		dirty: isEditedPostDirty( state ),
 		blocks: getBlocks( state ),
 		isRequesting: isSavingPost( state ),
-		isSuccessful: isPostSaveRequestSuccessful( state ),
-		isError: !! isPostSaveRequestFailed( state ),
+		isSuccessful: didPostSaveRequestSucceed( state ),
+		isError: !! didPostSaveRequestFail( state ),
 		requestIsNewPost: isSavingNewPost( state ),
 	} ),
 	( dispatch ) => ( {

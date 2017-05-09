@@ -27,8 +27,8 @@ import {
 	getBlockFocus,
 	isTypingInBlock,
 	isSavingPost,
-	isPostSaveRequestSuccessful,
-	isPostSaveRequestFailed,
+	didPostSaveRequestSucceed,
+	didPostSaveRequestFail,
 	isSavingNewPost
 } from '../selectors';
 
@@ -428,7 +428,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isPostSaveRequestSuccessful', () => {
+	describe( 'didPostSaveRequestSucceed', () => {
 		it( 'should return true if the post save request is successful', () => {
 			const state = {
 				saving: {
@@ -436,7 +436,7 @@ describe( 'selectors', () => {
 				}
 			};
 
-			expect( isPostSaveRequestSuccessful( state ) ).to.be.true();
+			expect( didPostSaveRequestSucceed( state ) ).to.be.true();
 		} );
 
 		it( 'should return true if the post save request has failed', () => {
@@ -446,11 +446,11 @@ describe( 'selectors', () => {
 				}
 			};
 
-			expect( isPostSaveRequestSuccessful( state ) ).to.be.false();
+			expect( didPostSaveRequestSucceed( state ) ).to.be.false();
 		} );
 	} );
 
-	describe( 'isPostSaveRequestFailed', () => {
+	describe( 'didPostSaveRequestFail', () => {
 		it( 'should return true if the post save request has failed', () => {
 			const state = {
 				saving: {
@@ -458,7 +458,7 @@ describe( 'selectors', () => {
 				}
 			};
 
-			expect( isPostSaveRequestFailed( state ) ).to.be.true();
+			expect( didPostSaveRequestFail( state ) ).to.be.true();
 		} );
 
 		it( 'should return true if the post save request is successful', () => {
@@ -468,7 +468,7 @@ describe( 'selectors', () => {
 				}
 			};
 
-			expect( isPostSaveRequestFailed( state ) ).to.be.false();
+			expect( didPostSaveRequestFail( state ) ).to.be.false();
 		} );
 	} );
 

@@ -88,11 +88,11 @@ export function isSavingPost( state ) {
 	return state.saving.requesting;
 }
 
-export function isPostSaveRequestSuccessful( state ) {
+export function didPostSaveRequestSucceed( state ) {
 	return state.saving.successful;
 }
 
-export function isPostSaveRequestFailed( state ) {
+export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
 }
 
