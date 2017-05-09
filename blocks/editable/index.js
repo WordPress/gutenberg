@@ -323,7 +323,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	setContent( content ) {
-		this.content = content || '';
+		this.content = content || [];
 		this.editor.setContent( wp.element.renderToString( this.content ) );
 	}
 
@@ -340,6 +340,7 @@ export default class Editable extends wp.element.Component {
 			if ( focus.offset === -1 ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
+				this.selection = this.getSelection();
 			}
 		} else {
 			this.editor.getBody().blur();
@@ -359,7 +360,11 @@ export default class Editable extends wp.element.Component {
 			this.setContent( this.props.value );
 
 			if ( this.props.focus ) {
-				this.setSelection( this.props.focus );
+				if ( this.props.focus.offset === -1 ) {
+					this.setSelection( this.selection );
+				} else {
+					this.setSelection( this.props.focus );
+				}
 			}
 		}
 	}

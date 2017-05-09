@@ -130,7 +130,6 @@ class VisualEditorBlock extends wp.element.Component {
 		// Calling the merge to update the attributes and remove the block to be merged
 		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
 
-		onFocus( previousBlock.uid, { offset: -1 } );
 		replaceBlocks(
 			[ previousBlock.uid, block.uid ],
 			[
@@ -142,7 +141,8 @@ class VisualEditorBlock extends wp.element.Component {
 					}
 				},
 				...blocksWithTheSameType.slice( 1 )
-			]
+			],
+			{ offset: -1 }
 		);
 	}
 
@@ -315,11 +315,12 @@ export default connect(
 			} );
 		},
 
-		replaceBlocks( uids, blocks ) {
+		replaceBlocks( uids, blocks, focus ) {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				uids,
-				blocks
+				blocks,
+				focus
 			} );
 		}
 	} )
