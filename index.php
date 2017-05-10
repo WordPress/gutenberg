@@ -164,30 +164,9 @@ function gutenberg_register_scripts() {
 
 	// Editor Scripts.
 	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js' );
-	wp_register_script(
-		'wp-esnext-polyfill',
-		plugins_url( 'polyfill/build/index.js', __FILE__ ),
-		array(),
-		filemtime( plugin_dir_path( __FILE__ ) . 'polyfill/build/index.js' )
-	);
-	wp_register_script(
-		'wp-i18n',
-		plugins_url( 'i18n/build/index.js', __FILE__ ),
-		array( 'wp-esnext-polyfill' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' )
-	);
-	wp_register_script(
-		'wp-element',
-		plugins_url( 'element/build/index.js', __FILE__ ),
-		array( 'wp-esnext-polyfill', 'react', 'react-dom', 'react-dom-server' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' )
-	);
-	wp_register_script(
-		'wp-blocks',
-		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-esnext-polyfill', 'wp-element', 'tinymce-nightly' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
-	);
+	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
+	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
+	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
 
 	// Editor Styles.
 	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' ) );
@@ -308,7 +287,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-esnext-polyfill', 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
