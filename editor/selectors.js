@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { first, last } from 'lodash';
-import qs from 'qs';
+
+/**
+ * Internal dependencies
+ */
+import { addQueryArgs } from './utils/url';
 
 export function getEditorMode( state ) {
 	return state.mode;
@@ -44,12 +48,7 @@ export function getEditedPostPreviewLink( state ) {
 		return null;
 	}
 
-	const queryStringPosition = link.indexOf( '?' );
-	const baseUrl = queryStringPosition !== -1 ? link.substring( 0, queryStringPosition ) : link;
-	const args = queryStringPosition !== -1 ? qs.parse( link.substring( queryStringPosition + 1 ) ) : {};
-	args.preview = 'true';
-
-	return `${ baseUrl }?${ qs.stringify( args ) }`;
+	return addQueryArgs( link, { preview: 'true' } );
 }
 
 export function getBlock( state, uid ) {
