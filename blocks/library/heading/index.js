@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlock, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
 const { children, prop } = query;
@@ -38,36 +38,25 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						const heading = {
-							blockType: 'core/heading',
-							attributes: {
-								nodeName: 'H2',
-								content: content[ 0 ].props.children
-							}
-						};
+						const heading = createBlock( 'core/heading', {
+							content: content[ 0 ].props.children
+						} );
 						const blocks = [ heading ];
 
 						const remainingContent = content.slice( 1 );
 						if ( remainingContent.length ) {
-							const text = {
-								blockType: 'core/text',
-								attributes: {
-									...attrs,
-									content: remainingContent
-								}
-							};
+							const text = createBlock( 'core/text', {
+								...attrs,
+								content: remainingContent
+							} );
 							blocks.push( text );
 						}
 
 						return blocks;
 					}
-					return {
-						blockType: 'core/heading',
-						attributes: {
-							nodeName: 'H2',
-							content
-						}
-					};
+					return createBlock( 'core/heading', {
+						content
+					} );
 				}
 			}
 		],
@@ -76,12 +65,9 @@ registerBlock( 'core/heading', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/text',
-						attributes: {
-							content
-						}
-					};
+					return createBlock( 'core/text', {
+						content
+					} );
 				}
 			}
 		]

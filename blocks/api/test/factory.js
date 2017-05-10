@@ -44,12 +44,9 @@ describe( 'block factory', () => {
 					from: [ {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/updated-text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
+							return createBlock( 'core/updated-text-block', {
+								value: 'chicken ' + value
+							} );
 						}
 					} ]
 				}
@@ -82,12 +79,9 @@ describe( 'block factory', () => {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/updated-text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
+							return createBlock( 'core/updated-text-block', {
+								value: 'chicken ' + value
+							} );
 						}
 					} ]
 				}
@@ -214,12 +208,10 @@ describe( 'block factory', () => {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return [
+								createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value
+								} ),
 								{
-									blockType: 'core/updated-text-block',
-									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
 									attributes: {
 										value: 'smoked ' + value
 									}
@@ -251,12 +243,9 @@ describe( 'block factory', () => {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
+							return createBlock( 'core/text-block', {
+								value: 'chicken ' + value
+							} );
 						}
 					} ]
 				}
@@ -283,17 +272,12 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [
-								{
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'smoked ' + value
-									}
-								}
+								createBlock( 'core/text-block', {
+									value: 'chicken ' + value
+								} ),
+								createBlock( 'core/text-block', {
+									value: 'smoked ' + value
+								} )
 							];
 						}
 					} ]
@@ -321,17 +305,12 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [
-								{
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
-									blockType: 'core/updated-text-block',
-									attributes: {
-										value: 'smoked ' + value
-									}
-								}
+								createBlock( 'core/text-block', {
+									value: 'chicken ' + value
+								} ),
+								createBlock( 'core/updated-text-block', {
+									value: 'smoked ' + value
+								} )
 							];
 						}
 					} ]
