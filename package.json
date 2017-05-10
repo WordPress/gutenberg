@@ -26,7 +26,9 @@
     "dev": "cross-env BABEL_ENV=default webpack --watch",
     "test": "npm run lint && npm run test-unit",
     "ci": "concurrently \"npm run build\" \"npm test\"",
-    "build-plugin": "rm -f gutenberg.zip && npm install && npm run build && cat \"$(npm pack)\" | tar xzf - && cd package && zip -r ../gutenberg.zip * && cd - && rm -r package gutenberg*.tgz"
+    "prepackage-plugin": "rm -f gutenberg.zip && npm install && npm run build",
+    "package-plugin": "cat \"$(npm pack)\" | tar xzf - && cd package && zip -r ../gutenberg.zip *",
+    "postpackage-plugin": "rm -r package gutenberg*.tgz"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",
