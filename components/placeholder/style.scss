@@ -25,9 +25,15 @@
 .components-placeholder__fieldset {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 	justify-content: center;
 	width: 100%;
 	max-width: 280px;
+
+	.components-placeholder__error {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
 }
 
 .components-placeholder__input {

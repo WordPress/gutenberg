@@ -58,25 +58,25 @@ registerBlock( 'core/tweet', {
 
 			if ( ! html ) {
 				return (
-					<Placeholder instructions={ wp.i18n.__( 'Please paste the URL of the tweet here!' ) } icon="twitter" label={ wp.i18n.__( 'Tweet' ) } className="blocks-tweet">
-						<div>
-							<input
-								type="text"
-								value={ url }
-								onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
-							{ ! fetching ?
-								(
-									<Button
-										isLarge
-										onClick={ this.fetchTweet }>
-										{ wp.i18n.__( 'Get Tweet' ) }
-									</Button>
-								) : (
-									<span className="spinner is-active" />
-								)
-							}
-						</div>
-						{ error && ( <div>{ wp.i18n.__( 'Sorry, we couldn\'t fetch that tweet.' ) }</div> ) }
+					<Placeholder icon="twitter" label={ wp.i18n.__( 'Twitter' ) } className="blocks-tweet">
+						<input
+							type="text"
+							className="components-placeholder__input"
+							value={ url }
+							placeholder={ wp.i18n.__( 'Enter tweet URL to embed...' ) }
+							onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
+						{ ! fetching ?
+							(
+								<Button
+									isLarge
+									onClick={ this.fetchTweet }>
+									{ wp.i18n.__( 'Embed' ) }
+								</Button>
+							) : (
+								<span className="spinner is-active" />
+							)
+						}
+						{ error && ( <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we couldn\'t fetch that tweet.' ) }</p> ) }
 					</Placeholder>
 				);
 			}
