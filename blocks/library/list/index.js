@@ -7,11 +7,10 @@ import Editable from '../../editable';
 
 const { children, prop } = hpq;
 
-function activeEditorExecCommand( command ) {
-	return () => {
-		const ed = tinymce.activeEditor;
-		if ( ed ) {
-			ed.execCommand( command );
+function execCommand( command ) {
+	return ( { editor } ) => {
+		if ( editor ) {
+			editor.execCommand( command );
 		}
 	};
 }
@@ -23,16 +22,23 @@ function listIsActive( listType ) {
 }
 
 function listSetType( listType, editorCommand ) {
-	return ( { internalListType }, setAttributes ) => {
+	return ( { internalListType, editor }, setAttributes ) => {
 		if ( internalListType ) {
 			// only change list types, don't toggle off internal lists
 			if ( internalListType !== listType )	{
-				activeEditorExecCommand( editorCommand )();
+				if ( editor ) {
+					editor.execCommand( editorCommand );
+				}
 			}
 		} else {
 			setAttributes( { nodeName: listType } );
 		}
 	};
+}
+
+function findInternalListType( { parents } ) {
+	const list = parents.find( ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
+	return list ? list.nodeName : null;
 }
 
 registerBlock( 'core/list', {
@@ -62,33 +68,33 @@ registerBlock( 'core/list', {
 			icon: 'editor-outdent',
 			title: wp.i18n.__( 'Outdent list item' ),
 			isActive: () => false,
-			onClick: activeEditorExecCommand( 'Outdent' )
+			onClick: execCommand( 'Outdent' )
 		},
 		{
 			icon: 'editor-indent',
 			title: wp.i18n.__( 'Indent list item' ),
 			isActive: () => false,
-			onClick: activeEditorExecCommand( 'Indent' )
+			onClick: execCommand( 'Indent' )
 		},
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const onNodeChange = ( { parents } ) => {
-			const list = parents.find( ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
-			const internalListType = list ? list.nodeName : null;
-			setAttributes( { internalListType } );
-		};
 		const { nodeName = 'OL', values = [] } = attributes;
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
+				onSetup={ ( nextEditor ) => {
+					setAttributes( { editor: nextEditor } );
+				}	}
 				onChange={ ( nextValues ) => {
 					setAttributes( { values: nextValues } );
+				} }
+				onNodeChange={ ( nodeInfo ) => {
+					setAttributes( { internalListType: findInternalListType( nodeInfo ) } );
 				} }
 				value={ values }
 				focus={ focus }
 				onFocus={ setFocus }
-				onNodeChange={ onNodeChange }
 				showAlignments
 				className="blocks-list" />
 		);

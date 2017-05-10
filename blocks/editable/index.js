@@ -88,6 +88,10 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+
+		if ( this.props.onSetup ) {
+			this.props.onSetup( editor );
+		}
 	}
 
 	onInit() {
