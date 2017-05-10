@@ -41,7 +41,7 @@
 		width: 40px;
 		overflow: hidden;
 
-		&:hover {
+		&:hover:not(.is-toggled) {
 			color: $blue-medium;
 		}
 
