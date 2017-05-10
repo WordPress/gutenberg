@@ -202,7 +202,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 
 		$site_count = get_blog_count( self::$different_network_id );
 
-		$this->assertSame( count( self::$different_site_ids ), $site_count );
+		$this->assertEquals( count( self::$different_site_ids ), $site_count );
 	}
 
 	/**
