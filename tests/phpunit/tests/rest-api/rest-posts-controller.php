@@ -2914,6 +2914,106 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertArrayHasKey( 'categories', $properties );
 	}
 
+	/**
+	 * @ticket 39805
+	 */
+	public function test_get_post_view_context_properties() {
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_param( 'context', 'view' );
+		$response = $this->server->dispatch( $request );
+		$keys = array_keys( $response->get_data() );
+		sort( $keys );
+
+		$expected_keys = array(
+			'author',
+			'categories',
+			'comment_status',
+			'content',
+			'date',
+			'date_gmt',
+			'excerpt',
+			'featured_media',
+			'format',
+			'guid',
+			'id',
+			'link',
+			'meta',
+			'modified',
+			'modified_gmt',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'tags',
+			'template',
+			'title',
+			'type',
+		);
+
+		$this->assertEquals( $expected_keys, $keys );
+	}
+
+	public function test_get_post_edit_context_properties() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_param( 'context', 'edit' );
+		$response = $this->server->dispatch( $request );
+		$keys = array_keys( $response->get_data() );
+		sort( $keys );
+
+		$expected_keys = array(
+			'author',
+			'categories',
+			'comment_status',
+			'content',
+			'date',
+			'date_gmt',
+			'excerpt',
+			'featured_media',
+			'format',
+			'guid',
+			'id',
+			'link',
+			'meta',
+			'modified',
+			'modified_gmt',
+			'password',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'tags',
+			'template',
+			'title',
+			'type',
+		);
+
+		$this->assertEquals( $expected_keys, $keys );
+	}
+
+	public function test_get_post_embed_context_properties() {
+		$request = new WP_REST_Request( 'GET', sprintf( '/wp/v2/posts/%d', self::$post_id ) );
+		$request->set_param( 'context', 'embed' );
+		$response = $this->server->dispatch( $request );
+		$keys = array_keys( $response->get_data() );
+		sort( $keys );
+
+		$expected_keys = array(
+			'author',
+			'date',
+			'excerpt',
+			'featured_media',
+			'id',
+			'link',
+			'slug',
+			'title',
+			'type',
+		);
+
+		$this->assertEquals( $expected_keys, $keys );
+	}
+
 	public function test_status_array_enum_args() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2' );
 		$response = $this->server->dispatch( $request );
