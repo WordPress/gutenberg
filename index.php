@@ -19,7 +19,7 @@ function gutenberg_menu() {
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
-		'manage_options',
+		'edit_posts',
 		'gutenberg',
 		'the_gutenberg_project',
 		'dashicons-edit'
