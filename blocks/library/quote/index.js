@@ -62,7 +62,10 @@ registerBlock( 'core/quote', {
 					return {
 						blockType: 'core/text',
 						attributes: {
-							content: wp.element.concatChildren( value, citation )
+							content: [
+								...( value || [] ),
+								...( citation || [] )
+							]
 						}
 					};
 				}

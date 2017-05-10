@@ -18,12 +18,15 @@ registerBlock( 'core/text', {
 	},
 
 	defaultAttributes: {
-		content: <p />
+		content: []
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: [
+				...attributes.content,
+				...attributesToMerge.content
+			]
 		};
 	},
 
