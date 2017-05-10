@@ -445,7 +445,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	 * @ticket 40386
 	 */
 	public function test_wp_update_network_counts() {
-		delete_network_option( null, 'site_count' );
+		delete_network_option( null, 'blog_count' );
 		delete_network_option( null, 'user_count' );
 
 		wp_update_network_counts();
@@ -460,7 +460,7 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 	 * @ticket 40386
 	 */
 	public function test_wp_update_network_counts_on_different_network() {
-		delete_network_option( self::$different_network_id, 'site_count' );
+		delete_network_option( self::$different_network_id, 'blog_count' );
 		delete_network_option( self::$different_network_id, 'user_count' );
 
 		wp_update_network_counts( self::$different_network_id );
