@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
 import Button from 'components/button';
+import Placeholder from 'components/placeholder';
 
 /**
  * Internal dependencies
@@ -79,18 +79,15 @@ registerBlock( 'core/image', {
 
 		if ( ! url ) {
 			return (
-				<div className="blocks-image is-placeholder">
-					<div className="placeholder__label">
-						<Dashicon icon="format-image" />
-						{ wp.i18n.__( 'Image' ) }
-					</div>
-					<div className="placeholder__instructions">
-						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
-					</div>
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					icon="format-image"
+					label={ wp.i18n.__( 'Image' ) }
+					className="blocks-image">
 					<Button isLarge>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
 					</Button>
-				</div>
+				</Placeholder>
 			);
 		}
 
