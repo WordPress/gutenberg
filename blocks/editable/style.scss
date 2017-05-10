@@ -40,6 +40,16 @@
 		background: $light-gray-400;
 	}
 
+	&[data-is-empty="true"] {
+		position: relative;
+	}
+
+	&[data-is-empty="true"]:before {
+		content: attr( data-placeholder );
+		opacity: 0.5;
+		pointer-events: none;
+		position: absolute;
+	}
 }
 
 .block-editable__inline-toolbar {
@@ -57,6 +67,11 @@ figcaption.blocks-editable__tinymce {
 	color: $dark-gray-100;
 	text-align: center;
 	font-size: $default-font-size;
+
+	&:before {
+		left: 50%;
+		transform: translateX( -50% );
+	}
 }
 
 
