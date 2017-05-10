@@ -76,8 +76,9 @@
 	display: flex;
 	position: sticky;
 	z-index: 1;
-	margin-top: -46px - $item-spacing;		// 46 is toolbar height
+	margin-top: -$block-controls-height - $item-spacing;
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
+	height: $block-controls-height;
 
 	top: $header-height + $admin-bar-height-big + $item-spacing;
 
