@@ -16,6 +16,7 @@ import Button from 'components/button';
 import './style.scss';
 import Inserter from '../../inserter';
 import PublishButton from './publish-button';
+import PreviewButton from './preview-button';
 import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selectors';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
@@ -35,10 +36,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 				onClick={ redo } />
 			<Inserter position="bottom" />
 			<div className="editor-tools__tabs">
-				<Button>
-					<Dashicon icon="visibility" />
-					{ wp.i18n._x( 'Preview', 'imperative verb' ) }
-				</Button>
+				<PreviewButton />
 				<Button onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
 					<Dashicon icon="admin-generic" />
 					{ wp.i18n.__( 'Post Settings' ) }

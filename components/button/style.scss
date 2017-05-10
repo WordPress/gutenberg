@@ -2,8 +2,13 @@
 	background: none;
 	border: none;
 	outline: none;
+	text-decoration: none;
 
 	&:disabled {
 		opacity: 0.6;
+	}
+
+	&:focus {
+		box-shadow: none;
 	}
 }
