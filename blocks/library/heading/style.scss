@@ -1,16 +1,11 @@
 .editor-visual-editor__block[data-type="core/heading"] {
-	padding-top: 0;
-	padding-bottom: 0;
-
 	h1,
 	h2,
 	h3,
 	h4,
 	h5,
 	h6 {
-		// for this block only we change the block padding to reflect margin instead
 		margin: 0;
-		padding: .5em 0;
 	}
 
 	h1 {
