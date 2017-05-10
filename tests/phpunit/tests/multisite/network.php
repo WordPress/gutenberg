@@ -585,6 +585,25 @@ class Tests_Multisite_Network extends WP_UnitTestCase {
 
 		return $is_large_network;
 	}
+
+	/**
+	 * @ticket 38699
+	 */
+	public function test_wpmu_create_blog_updates_correct_network_site_count() {
+		$original_count = get_blog_count( self::$different_network_id );
+
+		$site_id = self::factory()->blog->create( array(
+			'domain'  => 'example.org',
+			'path'    => '/',
+			'site_id' => self::$different_network_id,
+		) );
+
+		$result = get_blog_count( self::$different_network_id );
+
+		wpmu_delete_blog( $site_id, true );
+
+		$this->assertEquals( $original_count + 1, $result );
+	}
 }
 
 endif;
