@@ -10,19 +10,16 @@ import './style.scss';
 import Dashicon from 'components/dashicon';
 
 function Placeholder( { icon, children, label, instructions, className, ...additionalProps } ) {
-	const classes = classnames( 'placeholder', className );
+	const classes = classnames( 'components-placeholder', className );
 
 	return (
 		<div { ...additionalProps } aria-label={ label } className={ classes }>
-			<div className="placeholder__label">
+			<div className="components-placeholder__label">
 				<Dashicon icon={ icon } />
 				{ label }
 			</div>
-			{ instructions
-				? <div className="placeholder__instructions">{ instructions }</div>
-				: ''
-			}
-			<div className="placeholder__fieldset">
+			{ !! instructions && <div className="components-placeholder__instructions">{ instructions }</div> }
+			<div className="components-placeholder__fieldset">
 				{ children }
 			</div>
 		</div>

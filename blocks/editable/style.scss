@@ -98,17 +98,3 @@ input.editable-format-toolbar__link-input {
 	padding: 10px;
 	flex-grow: 1;
 }
-
-/* Block Placeholders */
-.editor-visual-editor__block .placeholder {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 1em;
-	min-height: 200px;
-	text-align: center;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	background: $light-gray-100;
-}

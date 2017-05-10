@@ -79,7 +79,11 @@ registerBlock( 'core/image', {
 
 		if ( ! url ) {
 			return (
-				<Placeholder instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) } icon="format-image" label={ wp.i18n.__( 'Image' ) } className="blocks-image">
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					icon="format-image"
+					label={ wp.i18n.__( 'Image' ) }
+					className="blocks-image">
 					<Button isLarge>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
 					</Button>
