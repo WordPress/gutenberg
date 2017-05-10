@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { first, last } from 'lodash';
+import qs from 'qs';
 
 export function getEditorMode( state ) {
 	return state.mode;
@@ -35,6 +36,20 @@ export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
 		? state.currentPost.title.raw
 		: state.editor.edits.title;
+}
+
+export function getEditedPostPreviewLink( state ) {
+	const link = state.currentPost.link;
+	if ( ! link ) {
+		return null;
+	}
+
+	const queryStringPosition = link.indexOf( '?' );
+	const baseUrl = queryStringPosition !== -1 ? link.substring( 0, queryStringPosition ) : link;
+	const args = queryStringPosition !== -1 ? qs.parse( link.substring( queryStringPosition + 1 ) ) : {};
+	args.preview = 'true';
+
+	return `${ baseUrl }?${ qs.stringify( args ) }`;
 }
 
 export function getBlock( state, uid ) {
