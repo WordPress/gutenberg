@@ -18,6 +18,7 @@ import Toolbar from 'components/toolbar';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { rangeToState, stateToRange } from './range';
 
 const KEYCODE_BACKSPACE = 8;
 
@@ -170,7 +171,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	isStartOfEditor() {
-		return this.selection.isCollapsed && ! compact( this.selection.start ).length;
+		return this.selection.collapsed && ! compact( this.selection.start ).length;
 	}
 
 	onKeyDown( event ) {
@@ -190,7 +191,7 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		if ( ! this.selection.isCollapsed || ! this.selection.start.length ) {
+		if ( ! this.selection.collapsed || ! this.selection.start.length ) {
 			return;
 		}
 
@@ -221,86 +222,22 @@ export default class Editable extends wp.element.Component {
 		this.setState( { alignment, formats, focusPosition } );
 	}
 
-	getChildIndex( child ) {
-		return Array.from( child.parentNode.childNodes ).indexOf( child );
-	}
-
-	fillPath( path, node, rootNode ) {
-		while ( node !== rootNode ) {
-			path.unshift( this.getChildIndex( node ) );
-			node = node.parentNode;
-		}
-
-		return path;
-	}
-
 	getSelection() {
-		const {
-			startOffset,
-			startContainer,
-			endOffset,
-			endContainer,
-			collapsed
-		} = this.editor.selection.getRng();
-		const rootNode = this.editor.getBody();
-
-		return {
-			start: this.fillPath( [ startOffset ], startContainer, rootNode ),
-			end: this.fillPath( [ endOffset ], endContainer, rootNode ),
-			isCollapsed: collapsed
-		};
+		return rangeToState( this.editor.selection.getRng(), this.editor.getBody() );
 	}
 
-	findNodeWithPath( path, rootNode ) {
-		const index = path[ 0 ];
-
-		if ( index === undefined || ! rootNode.hasChildNodes() ) {
-			return;
-		}
-
-		const node = rootNode.childNodes[ index ];
-
-		if ( ! node ) {
-			return;
-		}
-
-		const newPath = drop( path );
-
-		if ( node.nodeType === 3 ) {
-			return { node, index: newPath[ 0 ] || 0 };
-		}
-
-		if ( newPath.length ) {
-			return this.findNodeWithPath( newPath, node );
-		}
-
-		return {
-			node: node.parentNode,
-			index: this.getChildIndex( node )
-		};
-	}
-
-	setSelection( { start, end } ) {
-		if ( ! start || ! start.length ) {
-			return;
-		}
-
+	setSelection( state ) {
 		const rootNode = this.editor.getBody();
-		const range = this.editor.dom.createRng();
+		const range = stateToRange( state, rootNode );
 		const currentRange = this.editor.selection.getRng();
-		const startSet = this.findNodeWithPath( start, rootNode );
-		const endSet = this.findNodeWithPath( end, rootNode );
 		const propsToCompare = [
 			'startOffset', 'endOffset',
 			'startContainer', 'endContainer'
 		];
 
-		if ( ! startSet || ! endSet ) {
+		if ( ! range ) {
 			return;
 		}
-
-		range.setStart( startSet.node, startSet.index );
-		range.setEnd( endSet.node, endSet.index );
 
 		if ( ! isEqual( pick( currentRange, propsToCompare ), pick( range, propsToCompare ) ) ) {
 			this.editor.selection.lastFocusBookmark = null;
