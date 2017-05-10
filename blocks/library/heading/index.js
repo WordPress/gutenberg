@@ -1,8 +1,9 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import './style.scss';
+import { registerBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { children, prop } = query;
 
@@ -41,7 +42,7 @@ registerBlock( 'core/heading', {
 							blockType: 'core/heading',
 							attributes: {
 								nodeName: 'H2',
-								content: content[ 0 ]
+								content: content[ 0 ].props.children
 							}
 						};
 						const blocks = [ heading ];
@@ -103,6 +104,7 @@ registerBlock( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeWithPrevious }
+				inline
 			/>
 		);
 	},

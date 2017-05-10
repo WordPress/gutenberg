@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import * as query from 'hpq';
-import { escape, unescape } from 'lodash';
+import { parse as hpqParse } from 'hpq';
+import { escape, unescape, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -19,10 +19,19 @@ import { createBlock } from './factory';
  * @return {Object}               Block attributes
  */
 export function parseBlockAttributes( rawContent, blockSettings ) {
-	if ( 'function' === typeof blockSettings.attributes ) {
-		return blockSettings.attributes( rawContent );
-	} else if ( blockSettings.attributes ) {
-		return query.parse( rawContent, blockSettings.attributes );
+	const { attributes } = blockSettings;
+	if ( 'function' === typeof attributes ) {
+		return attributes( rawContent );
+	} else if ( attributes ) {
+		// Matchers are implemented as functions that receive a DOM node from
+		// which to select data. Use of the DOM is incidental and we shouldn't
+		// guarantee a contract that this be provided, else block implementers
+		// may feel compelled to use the node. Instead, matchers are intended
+		// as a generic interface to query data from any tree shape. Here we
+		// pick only matchers which include an internal flag.
+		const knownMatchers = pickBy( attributes, '_wpBlocksKnownMatcher' );
+
+		return hpqParse( rawContent, knownMatchers );
 	}
 
 	return {};
@@ -64,20 +73,21 @@ export function createBlockWithFallback( blockType, rawContent, attributes ) {
 
 	// Try finding settings for known block type, else again fall back
 	let blockSettings = getBlockSettings( blockType );
+	const fallbackBlockType = getUnknownTypeHandler();
 	if ( ! blockSettings ) {
-		blockType = getUnknownTypeHandler();
+		blockType = fallbackBlockType;
 		blockSettings = getBlockSettings( blockType );
 	}
 
 	// Include in set only if settings were determined
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockSettings ) {
+	if ( blockSettings && ( rawContent.trim() || blockType !== fallbackBlockType ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
 			blockType,
-			getBlockAttributes( blockSettings, rawContent, attributes )
+			getBlockAttributes( blockSettings, rawContent.trim(), attributes )
 		);
 		return block;
 	}
@@ -99,7 +109,7 @@ export function parseWithTinyMCE( content ) {
 	//   In  : <!-- wp:core/embed url:youtube.com/xxx& -->
 	//   Out : <wp-block slug="core/embed" attributes="url:youtube.com/xxx&amp;">
 	content = content.replace(
-		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+:[^\s]+)*)\s*-->/g,
+		/<!--\s*(\/?)wp:([a-z0-9/-]+)((?:\s+[a-z0-9_-]+(="[^"]*")?)*)\s*-->/g,
 		function( match, closingSlash, slug, attributes ) {
 			if ( closingSlash ) {
 				return '</wp-block>';
@@ -166,15 +176,15 @@ export function parseWithTinyMCE( content ) {
 			}, {} );
 
 			// Retrieve the block attributes from the original delimiters
-			const blockAttributes = unescape( nodeAttributes.attributes || '' )
-				.split( /\s+/ )
-				.reduce( ( memo, attrString ) => {
-					const pieces = attrString.match( /^([a-z0-9_-]+):(.*)$/ );
-					if ( pieces ) {
-						memo[ pieces[ 1 ] ] = pieces[ 2 ];
-					}
-					return memo;
-				}, {} );
+			const attributesMatcher = /([a-z0-9_-]+)(="([^"]*)")?/g;
+			const blockAttributes = {};
+			let match;
+			do {
+				match = attributesMatcher.exec( unescape( nodeAttributes.attributes || '' ) );
+				if ( match ) {
+					blockAttributes[ match[ 1 ] ] = !! match[ 2 ] ? match[ 3 ] : true;
+				}
+			} while ( !! match );
 
 			// Try to create the block
 			const block = createBlockWithFallback(

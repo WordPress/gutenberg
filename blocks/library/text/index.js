@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, createBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { children } = query;
 
@@ -42,7 +42,7 @@ registerBlock( 'core/text', {
 				onFocus={ setFocus }
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
-					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
+					insertBlockAfter( createBlock( 'core/text', {
 						content: after
 					} ) );
 				} }

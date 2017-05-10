@@ -1,0 +1,23 @@
+.blocks-pullquote {
+	color: $light-gray-900;
+	padding: 2em;
+	text-align: center;
+
+	footer {
+		color: $dark-gray-900;
+		position: relative;
+	}
+
+	footer p {
+		font-size: 16px;
+		font-family: $default-font;
+	}
+}
+
+.editor-visual-editor .blocks-pullquote {
+	& > .blocks-editable p {
+		font-family: $default-font;
+		font-size: 48px;
+		font-weight: 900;
+	}
+}

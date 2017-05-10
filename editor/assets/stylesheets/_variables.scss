@@ -40,13 +40,18 @@ $editor-font-size: 16px;
 $editor-line-height: 1.8;
 $item-spacing: 10px;
 $header-height: 56px;
-$sidebar-width: 320px;
+$sidebar-width: 280px;
 $admin-bar-height: 32px;
 $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
 $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
 $shadow-popover: 0px 3px 20px rgba( $dark-gray-900, .1 ), 0px 1px 3px rgba( $dark-gray-900, .1 );
+$text-editor-max-width: 760px;
+
+/* Blocks */
+$block-padding: 14px;
+$block-mover-margin: 18px;
 
 /* Media Queries */
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { difference } from 'lodash';
+import { html as beautifyHtml } from 'js-beautify';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 			return memo;
 		}
 
-		return memo + `${ key }:${ value } `;
+		return memo + `${ key }="${ value }" `;
 	}, '' );
 }
 
@@ -73,6 +74,10 @@ export default function serialize( blocks ) {
 		const blockType = block.blockType;
 		const settings = getBlockSettings( blockType );
 		const saveContent = getSaveContent( settings.save, block.attributes );
+		const beautifyOptions = {
+			indent_inner_html: true,
+			wrap_line_length: 0
+		};
 
 		return memo + (
 			'<!-- wp:' +
@@ -83,10 +88,10 @@ export default function serialize( blocks ) {
 				parseBlockAttributes( saveContent, settings )
 			) +
 			'-->' +
-			saveContent +
+			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
 			'<!-- /wp:' +
 			blockType +
 			' -->'
-		);
+		) + '\n\n';
 	}, '' );
 }

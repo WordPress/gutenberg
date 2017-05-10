@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, query as hpq } from '../../api';
+import Editable from '../../editable';
 
-const { children, query, attr } = hpq;
+const { children, query } = hpq;
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -14,26 +14,13 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' ),
-		style: ( node ) => {
-			const value = attr( 'blockquote', 'class' )( node );
-			if ( ! value ) {
-				return;
-			}
-
-			const match = value.match( /\bblocks-quote-style-(\d+)\b/ );
-			if ( ! match ) {
-				return;
-			}
-
-			return Number( match[ 1 ] );
-		}
+		citation: children( 'footer' )
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
 		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => style === variation,
+		isActive: ( { style = 1 } ) => Number( style ) === variation,
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
@@ -133,19 +120,19 @@ registerBlock( 'core/quote', {
 					onMerge={ mergeWithPrevious }
 					showAlignments
 				/>
-				{ ( citation || !! focus ) && (
-					<footer>
-						<Editable
-							value={ citation }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation
-								} )
-							}
-							focus={ focusedEditable === 'citation' ? focus : null }
-							onFocus={ () => setFocus( { editable: 'citation' } ) }
-						/>
-					</footer>
+				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
+					<Editable
+						tagName="footer"
+						value={ citation }
+						onChange={
+							( nextCitation ) => setAttributes( {
+								citation: nextCitation
+							} )
+						}
+						focus={ focusedEditable === 'citation' ? focus : null }
+						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						inline
+					/>
 				) }
 			</blockquote>
 		);
@@ -156,10 +143,12 @@ registerBlock( 'core/quote', {
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
-				{ value && wp.element.Children.map( value, ( paragraph, i ) => (
+				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
-				<footer>{ citation }</footer>
+				{ citation && citation.length > 0 && (
+					<footer>{ citation }</footer>
+				) }
 			</blockquote>
 		);
 	}

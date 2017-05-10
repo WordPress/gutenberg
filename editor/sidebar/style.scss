@@ -1,9 +1,33 @@
 .editor-sidebar {
 	position: fixed;
 	right: 0;
-	top: 32px + $header-height;
+	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
 	width: $sidebar-width;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+}
+
+/* Visual and Text editor both */
+.editor-layout.is-sidebar-opened .editor-layout__content {
+	margin-right: $sidebar-width;
+}
+
+.editor-layout.is-sidebar-opened .editor-sidebar {
+	/* Sidebar covers screen on mobile */
+	width: 100%;
+
+	/* Sidebar sits on the side on larger breakpoints */
+	@include break-medium() {
+		width: $sidebar-width;
+	}
+}
+
+/* Text Editor specific */
+.editor-layout.is-sidebar-opened .editor-text-editor__formatting {
+	margin-right: $sidebar-width;
 }

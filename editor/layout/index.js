@@ -8,10 +8,11 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import Header from 'header';
-import Sidebar from 'sidebar';
-import TextEditor from 'modes/text-editor';
-import VisualEditor from 'modes/visual-editor';
+import Header from '../header';
+import Sidebar from '../sidebar';
+import TextEditor from '../modes/text-editor';
+import VisualEditor from '../modes/visual-editor';
+import { getEditorMode, isEditorSidebarOpened } from '../selectors';
 
 function Layout( { mode, isSidebarOpened } ) {
 	const className = classnames( 'editor-layout', {
@@ -31,6 +32,6 @@ function Layout( { mode, isSidebarOpened } ) {
 }
 
 export default connect( ( state ) => ( {
-	mode: state.mode,
-	isSidebarOpened: state.isSidebarOpened
+	mode: getEditorMode( state ),
+	isSidebarOpened: isEditorSidebarOpened( state )
 } ) )( Layout );

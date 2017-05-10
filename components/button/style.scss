@@ -1,0 +1,9 @@
+.components-button {
+	background: none;
+	border: none;
+	outline: none;
+
+	&:disabled {
+		opacity: 0.6;
+	}
+}

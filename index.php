@@ -42,7 +42,7 @@ function gutenberg_register_scripts() {
 	wp_register_script( 'react-dom-server', 'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js', array( 'react' ) );
 
 	// Editor Scripts.
-	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js' );
+	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js' );
 	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
 	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
 	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
@@ -158,7 +158,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true   // $in_footer
 	);
@@ -180,7 +180,10 @@ function gutenberg_scripts_and_styles( $hook ) {
 	// Initialize the post data...
 	if ( $post_to_edit ) {
 		// ...with a real post
-		wp_localize_script( 'wp-editor', '_wpGutenbergPost', $post_to_edit );
+		wp_add_inline_script(
+			'wp-editor',
+			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+		);
 	} else {
 		// ...with some test content
 		// TODO: replace this with error handling

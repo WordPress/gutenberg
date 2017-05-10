@@ -71,7 +71,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas'
 			} );
 
-			expect( attributes ).to.equal( 'category:food ripeness:ripe ' );
+			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
 		} );
 
 		it( 'should not append an undefined attribute value', () => {
@@ -83,7 +83,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas'
 			} );
 
-			expect( attributes ).to.equal( 'category:food ' );
+			expect( attributes ).to.equal( 'category="food" ' );
 		} );
 	} );
 
@@ -109,7 +109,7 @@ describe( 'block serializer', () => {
 					}
 				}
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align:left --><p>Ribs & Chicken</p><!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->\n\n';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );

@@ -1,0 +1,61 @@
+.blocks-button {
+	font-family: $default-font;
+	display: inline-block;
+	text-decoration: none;
+	font-size: 17px;
+	line-height: 1.5;
+	margin: 0;
+	padding: 6px 14px;
+	cursor: default;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 2px;
+	white-space: nowrap;
+	box-sizing: border-box;
+	background: $blue-medium;
+	color: $white;
+	border-color: $blue-wordpress;
+	vertical-align: top;
+	position: relative;
+
+	&:hover {
+		color: $white;
+	}
+
+	.editable-format-toolbar__link-modal {
+		top: -1px;
+		left: calc( 100% + 12px );
+	}
+}
+
+.blocks-button__link {
+	position: absolute;
+	right: -32px;
+	top: 5px;
+	color: $dark-gray-500;
+	text-decoration: none;
+
+	&:hover {
+		color: $dark-gray-300;
+	}
+
+	.dashicon {
+		vertical-align: middle;
+	}
+}
+
+.editor-visual-editor__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		text-align: right;
+
+		.editable-format-toolbar__link-modal {
+			top: -1px;
+			left: auto;
+			right: calc( 100% + 12px );
+		}
+	}
+}

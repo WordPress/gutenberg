@@ -1,7 +1,3 @@
 .editor-layout__content {
 	overflow: hidden;
-
-	.editor-layout.is-sidebar-opened & {
-		margin-right: $sidebar-width;
-	}
 }

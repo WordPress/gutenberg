@@ -8,12 +8,12 @@
 
 	&[data-align="left"] {
 		float: left;
-		margin-right: 15px;
+		margin-right: $block-padding;
 	}
 
 	&[data-align="right"] {
 		float: right;
-		margin-left: 15px;
+		margin-left: $block-padding;
 	}
 
 	&[data-align="wide"] {
@@ -88,26 +88,4 @@
 		display: block;
 		width: 100%;
 	}
-}
-
-.blocks-image.is-placeholder {
-	margin: -15px;
-	padding: 6em 0;
-	border: 2px solid $light-gray-500;
-	text-align: center;
-}
-
-.blocks-image__placeholder-label {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-weight: bold;
-
-	.dashicon {
-		margin-right: 1ch;
-	}
-}
-
-.blocks-image__placeholder-instructions {
-	margin: 1.8em 0;
 }
