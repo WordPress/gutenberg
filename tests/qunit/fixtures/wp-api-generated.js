@@ -226,12 +226,15 @@ mockedApiResponse.Schema = {
                             "required": false,
                             "default": "date",
                             "enum": [
+                                "author",
                                 "date",
-                                "relevance",
                                 "id",
                                 "include",
-                                "title",
-                                "slug"
+                                "modified",
+                                "parent",
+                                "relevance",
+                                "slug",
+                                "title"
                             ],
                             "description": "Sort collection by object attribute.",
                             "type": "string"
@@ -844,12 +847,15 @@ mockedApiResponse.Schema = {
                             "required": false,
                             "default": "date",
                             "enum": [
+                                "author",
                                 "date",
-                                "relevance",
                                 "id",
                                 "include",
-                                "title",
+                                "modified",
+                                "parent",
+                                "relevance",
                                 "slug",
+                                "title",
                                 "menu_order"
                             ],
                             "description": "Sort collection by object attribute.",
@@ -1379,12 +1385,15 @@ mockedApiResponse.Schema = {
                             "required": false,
                             "default": "date",
                             "enum": [
+                                "author",
                                 "date",
-                                "relevance",
                                 "id",
                                 "include",
-                                "title",
-                                "slug"
+                                "modified",
+                                "parent",
+                                "relevance",
+                                "slug",
+                                "title"
                             ],
                             "description": "Sort collection by object attribute.",
                             "type": "string"

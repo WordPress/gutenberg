@@ -868,4 +868,28 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 		wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
 		return $id;
 	}
+
+	/**
+	 * There's no way to change post_modified through WP functions.
+	 */
+	protected function update_post_modified( $post_id, $date ) {
+		global $wpdb;
+		return $wpdb->update(
+			$wpdb->posts,
+			array(
+				'post_modified' => $date,
+				'post_modified_gmt' => $date,
+			),
+			array(
+				'ID' => $post_id,
+			),
+			array(
+				'%s',
+				'%s',
+			),
+			array(
+				'%d',
+			)
+		);
+	}
 }

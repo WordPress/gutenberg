@@ -267,6 +267,72 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	public function test_get_items_orderby_author_query() {
+		$id2 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_author' => self::$editor_id ) );
+		$id3 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_author' => self::$editor_id ) );
+		$id1 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_author' => self::$author_id ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'include', array( $id1, $id2, $id3 ) );
+		$request->set_param( 'orderby', 'author' );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( self::$author_id, $data[0]['author'] );
+		$this->assertEquals( self::$editor_id, $data[1]['author'] );
+		$this->assertEquals( self::$editor_id, $data[2]['author'] );
+
+		$this->assertPostsOrderedBy( '{posts}.post_author DESC' );
+	}
+
+	public function test_get_items_orderby_modified_query() {
+		$id1 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+		$id3 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
+
+		$this->update_post_modified( $id1, '2016-04-20 4:26:20' );
+		$this->update_post_modified( $id2, '2016-02-01 20:24:02' );
+		$this->update_post_modified( $id3, '2016-02-21 12:24:02' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_param( 'include', array( $id1, $id2, $id3 ) );
+		$request->set_param( 'orderby', 'modified' );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( $id1, $data[0]['id'] );
+		$this->assertEquals( $id3, $data[1]['id'] );
+		$this->assertEquals( $id2, $data[2]['id'] );
+
+		$this->assertPostsOrderedBy( '{posts}.post_modified DESC' );
+	}
+
+	public function test_get_items_orderby_parent_query() {
+		$id1 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_type' => 'page' ) );
+		$id2 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_type' => 'page' ) );
+		$id3 = $this->factory->post->create( array( 'post_status' => 'publish', 'post_type' => 'page', 'post_parent' => $id1 ) );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
+		$request->set_param( 'include', array( $id1, $id2, $id3 ) );
+		$request->set_param( 'orderby', 'parent' );
+
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEquals( $id3, $data[0]['id'] );
+		// Check ordering. Default ORDER is DESC.
+		$this->assertEquals( $id1, $data[0]['parent'] );
+		$this->assertEquals( 0, $data[1]['parent'] );
+		$this->assertEquals( 0, $data[2]['parent'] );
+
+		$this->assertPostsOrderedBy( '{posts}.post_parent DESC' );
+	}
+
 	public function test_get_items_exclude_query() {
 		$id1 = $this->factory->post->create( array( 'post_status' => 'publish' ) );
 		$id2 = $this->factory->post->create( array( 'post_status' => 'publish' ) );

@@ -998,30 +998,4 @@ class Tests_Query_DateQuery extends WP_UnitTestCase {
 		$expected = array( $p1, $p4, $p5, );
 		$this->assertEqualSets( $expected, $q->posts );
 	}
-
-	/** Helpers **********************************************************/
-
-	/**
-	 * There's no way to change post_modified through the API.
-	 */
-	protected function update_post_modified( $post_id, $date ) {
-		global $wpdb;
-		return $wpdb->update(
-			$wpdb->posts,
-			array(
-				'post_modified' => $date,
-				'post_modified_gmt' => $date,
-			),
-			array(
-				'ID' => $post_id,
-			),
-			array(
-				'%s',
-				'%s',
-			),
-			array(
-				'%d',
-			)
-		);
-	}
 }
