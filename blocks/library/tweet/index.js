@@ -28,9 +28,6 @@ registerBlock( 'core/tweet', {
 				error: false,
 				fetching: false,
 			};
-			if ( this.state.url ) {
-				this.doFetch( this.state.url, this.props.setAttributes, this.setState.bind( this ) );
-			}
 		}
 		doFetch( url, setAttributes, setState ) {
 			setState( { fetching: true, error: false } );
@@ -48,6 +45,11 @@ registerBlock( 'core/tweet', {
 					setState( { fetching: false, error: false, html: msg.html } );
 				},
 			} );
+		}
+		componentDidMount() {
+			if ( this.state.url ) {
+				this.doFetch( this.state.url, this.props.setAttributes, this.setState.bind( this ) );
+			}
 		}
 		fetchTweet() {
 			const { url } = this.state;
