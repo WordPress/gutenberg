@@ -239,7 +239,7 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				uid: action.blocks[ 0 ].uid,
 				typing: false,
-				focus: {}
+				focus: action.focus || {}
 			};
 	}
 

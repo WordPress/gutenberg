@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge } from 'lodash';
+import { isEqual, capitalize, omitBy, forEach, merge, drop, pick, compact } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -18,6 +18,7 @@ import Toolbar from 'components/toolbar';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import { rangeToState, stateToRange } from './range';
 
 const KEYCODE_BACKSPACE = 8;
 
@@ -62,36 +63,42 @@ function createElement( type, props, ...children ) {
 }
 
 export default class Editable extends wp.element.Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.onDeativate = this.onDeativate.bind( this );
+
 		this.state = {
 			formats: {},
-			alignment: null,
-			bookmark: null
+			alignment: null
 		};
+
+		this.change = false;
+		this.content = props.value;
+		this.selection = props.selection;
 	}
 
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'focus', this.onFocus );
+		editor.on( 'deactivate', this.onDeativate );
+		editor.on( 'selectionChange', this.onSelectionChange );
 	}
 
 	onInit() {
-		this.updateFocus();
+		this.maybeFocus();
 	}
 
 	onFocus() {
@@ -99,18 +106,47 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
+		this.props.onFocus( this.selection );
+	}
+
+	onDeativate() {
+		this.props.onChange( this.content );
 	}
 
 	onChange() {
-		if ( ! this.editor.isDirty() ) {
+		this.change = true;
+	}
+
+	isActive() {
+		return document.activeElement === this.editor.getBody();
+	}
+
+	shouldChange( prevContent ) {
+		return this.isEmpty( prevContent ) !== this.isEmpty( this.content );
+	}
+
+	onSelectionChange() {
+		// We must check this because selectionChange is a global event.
+		if ( ! this.isActive() ) {
 			return;
 		}
 
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.savedContent );
+		// Make sure text nodes are normalized before passing the content and selection.
+		// Normalized means that text nodes are merged were possible.
+		if ( this.change ) {
+			this.editor.getBody().normalize();
+		}
+
+		const prevContent = this.content;
+
+		this.content = this.getContent();
+		this.selection = this.getSelection();
+
+		if ( this.change || this.shouldChange( prevContent ) ) {
+			this.change = false;
+			this.props.onFocus( this.selection );
+			this.props.onChange( this.content );
+		}
 	}
 
 	getRelativePosition( node ) {
@@ -139,27 +175,12 @@ export default class Editable extends wp.element.Component {
 	}
 
 	isStartOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( range.startOffset !== 0 || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.startContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.firstChild !== child ) {
-				return false;
-			}
-		}
-		return true;
+		return this.selection.collapsed && ! compact( this.selection.start ).length;
 	}
 
 	onKeyDown( event ) {
 		if ( this.props.onMerge && event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) {
-			this.onChange();
-			this.props.onMerge( this.editor.getContent() );
+			this.props.onMerge( this.content );
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
@@ -170,46 +191,23 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		// Getting the content before and after the cursor
-		const childNodes = Array.from( this.editor.getBody().childNodes );
-		let selectedChild = this.editor.selection.getStart();
-		while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-			selectedChild = selectedChild.parentNode;
-		}
-		const splitIndex = childNodes.indexOf( selectedChild );
-		if ( splitIndex === -1 ) {
-			return;
-		}
-		const beforeNodes = childNodes.slice( 0, splitIndex );
-		const lastNodeBeforeCursor = last( beforeNodes );
-		// Avoid splitting on single enter
-		if (
-			! lastNodeBeforeCursor ||
-			beforeNodes.length < 2 ||
-			!! lastNodeBeforeCursor.textContent
-		) {
+		if ( this.content.length < 2 ) {
 			return;
 		}
 
-		const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
+		if ( ! this.selection.collapsed || ! this.selection.start.length ) {
+			return;
+		}
 
-		// Removing empty nodes from the beginning of the "after"
-		// avoids empty paragraphs at the beginning of newly created blocks.
-		const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-			if ( ! memo.length && ! node.textContent ) {
-				return memo;
-			}
+		const index = this.selection.start[ 0 ];
 
-			memo.push( node );
-			return memo;
-		}, [] );
-
-		// Splitting into two blocks
-		this.setContent( this.props.value );
+		if ( compact( drop( this.selection.start ) ).length ) {
+			return;
+		}
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			this.content.slice( 0, index ),
+			this.content.slice( index )
 		);
 	}
 
@@ -225,66 +223,74 @@ export default class Editable extends wp.element.Component {
 		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
 
 		const focusPosition = this.getRelativePosition( element );
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition } );
+		this.setState( { alignment, formats, focusPosition } );
 	}
 
-	updateContent() {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
-		this.setContent( this.savedContent );
-		this.editor.selection.moveToBookmark( bookmark );
-		// Saving the editor on updates avoid unecessary onChanges calls
-		// These calls can make the focus jump
+	getSelection() {
+		return rangeToState( this.editor.selection.getRng(), this.editor.getBody() );
+	}
 
-		this.editor.save();
+	setSelection( state ) {
+		const rootNode = this.editor.getBody();
+		const range = stateToRange( state, rootNode );
+		const currentRange = this.editor.selection.getRng();
+		const propsToCompare = [
+			'startOffset', 'endOffset',
+			'startContainer', 'endContainer'
+		];
+
+		if ( ! range ) {
+			return;
+		}
+
+		if ( ! isEqual( pick( currentRange, propsToCompare ), pick( range, propsToCompare ) ) ) {
+			this.editor.selection.lastFocusBookmark = null;
+			this.editor.selection.setRng( range );
+		} else if ( document.activeElement !== rootNode ) {
+			this.editor.focus();
+		}
 	}
 
 	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = wp.element.renderToString( content );
-		this.editor.setContent( content, { format: 'raw' } );
+		this.content = content || [];
+		this.editor.setContent( wp.element.renderToString( this.content ) );
 	}
 
 	getContent() {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
 	}
 
-	updateFocus() {
+	maybeFocus() {
 		const { focus } = this.props;
+
 		if ( focus ) {
 			this.editor.focus();
 			// Offset = -1 means we should focus the end of the editable
 			if ( focus.offset === -1 ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
+				this.selection = this.getSelection();
 			}
 		} else {
 			this.editor.getBody().blur();
 		}
 	}
 
-	componentWillUnmount() {
-		this.onChange();
-	}
-
 	componentDidUpdate( prevProps ) {
 		if ( this.props.focus !== prevProps.focus ) {
-			this.updateFocus();
+			this.maybeFocus();
 		}
 
-		// The savedContent var allows us to avoid updating the content right after an onChange call
-		if (
-			this.props.tagName === prevProps.tagName &&
-			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
-		) {
-			this.updateContent();
+		if ( this.props.tagName !== prevProps.tagName ) {
+			this.setSelection( this.selection );
+		}
+
+		if ( this.props.onChange && ! isEqual( this.props.value, prevProps.value ) ) {
+			this.setContent( this.props.value );
+
+			if ( this.props.focus ) {
+				this.setSelection( this.selection );
+			}
 		}
 	}
 
@@ -293,9 +299,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	changeFormats( formats ) {
-		if ( this.state.bookmark ) {
-			this.editor.selection.moveToBookmark( this.state.bookmark );
-		}
+		this.editor.focus();
 
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
@@ -321,8 +325,6 @@ export default class Editable extends wp.element.Component {
 		this.setState( {
 			formats: merge( {}, this.state.formats, formats )
 		} );
-
-		this.editor.setDirty( true );
 	}
 
 	isAlignmentActive( align ) {
@@ -339,6 +341,10 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
+	isEmpty( content ) {
+		return ! content || ! content.length;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -349,7 +355,8 @@ export default class Editable extends wp.element.Component {
 			showAlignments = false,
 			inlineToolbar = false,
 			inline,
-			formattingControls
+			formattingControls,
+			placeholder
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -397,6 +404,8 @@ export default class Editable extends wp.element.Component {
 					settings={ {
 						forced_root_block: inline ? false : 'p'
 					} }
+					isEmpty={ this.isEmpty( value ) }
+					placeholder={ placeholder }
 					key={ key } />
 			</div>
 		);
