@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import Button from 'components/button';
-import Placeholder from 'components/placeholder';
+import Placeholder from 'editor/components/placeholder';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { attr, children } = query;
 

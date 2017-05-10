@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../dashicon';
+import Dashicon from 'components/dashicon';
 
 function Placeholder( { icon, children, label, instructions, className, ...additionalProps } ) {
 	const classes = classnames( 'placeholder', className );
