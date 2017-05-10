@@ -161,6 +161,12 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.node.focus();
+		}
+	}
+
 	render() {
 		const { block } = this.props;
 		const settings = wp.blocks.getBlockSettings( block.blockType );
