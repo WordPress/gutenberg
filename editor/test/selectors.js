@@ -199,24 +199,14 @@ describe( 'selectors', () => {
 			expect( getEditedPostPreviewLink( state ) ).to.be.null();
 		} );
 
-		it( 'should return the correct url adding a query string', () => {
+		it( 'should return the correct url adding a preview parameter to the query string', () => {
 			const state = {
 				currentPost: {
-					link: 'https://andalouses.com/beach'
-				}
+					link: 'https://andalouses.com/beach',
+				},
 			};
 
 			expect( getEditedPostPreviewLink( state ) ).to.equal( 'https://andalouses.com/beach?preview=true' );
-		} );
-
-		it( 'should return the correct url concatening the query string', () => {
-			const state = {
-				currentPost: {
-					link: 'https://andalouses.com/?p=1'
-				}
-			};
-
-			expect( getEditedPostPreviewLink( state ) ).to.equal( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 

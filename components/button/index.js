@@ -19,7 +19,7 @@ function Button( { href, isPrimary, isLarge, isToggled, className, buttonRef, ..
 		...tagProps,
 		...additionalProps,
 		className: classes,
-		ref: buttonRef
+		ref: buttonRef,
 	} );
 }
 

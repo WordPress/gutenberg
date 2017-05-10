@@ -76,7 +76,6 @@
     "jed": "^1.1.1",
     "js-beautify": "^1.6.12",
     "lodash": "^4.17.4",
-    "qs": "^6.4.0",
     "react": "^15.5.4",
     "react-autosize-textarea": "^0.4.2",
     "react-click-outside": "^2.3.0",
