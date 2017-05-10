@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { children, prop } = query;
 

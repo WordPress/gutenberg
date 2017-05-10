@@ -4,14 +4,29 @@
 import { connect } from 'react-redux';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import Button from 'components/button';
-import { savePost } from 'actions';
+
+/**
+ * Internal dependencies
+ */
+import { savePost } from '../../actions';
+import {
+	isEditedPostDirty,
+	getCurrentPost,
+	getPostEdits,
+	getBlocks,
+	isSavingPost,
+	didPostSaveRequestSucceed,
+	didPostSaveRequestFail,
+	isSavingNewPost
+} from '../../selectors';
 
 function PublishButton( {
 	post,
 	edits,
+	dirty,
 	blocks,
 	isSuccessful,
 	isRequesting,
@@ -27,11 +42,11 @@ function PublishButton( {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saving…' )
 			: wp.i18n.__( 'Updating…' );
-	} else if ( isSuccessful ) {
+	} else if ( ! dirty && isSuccessful ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saved!' )
 			: wp.i18n.__( 'Updated!' );
-	} else if ( isError ) {
+	} else if ( ! dirty && isError ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Save failed' )
 			: wp.i18n.__( 'Update failed' );
@@ -61,15 +76,14 @@ function PublishButton( {
 
 export default connect(
 	( state ) => ( {
-		post: state.currentPost,
-		edits: state.editor.edits,
-		blocks: state.editor.blockOrder.map( ( uid ) => (
-			state.editor.blocksByUid[ uid ]
-		) ),
-		isRequesting: state.saving.requesting,
-		isSuccessful: state.saving.successful,
-		isError: !! state.saving.error,
-		requestIsNewPost: state.saving.isNew,
+		post: getCurrentPost( state ),
+		edits: getPostEdits( state ),
+		dirty: isEditedPostDirty( state ),
+		blocks: getBlocks( state ),
+		isRequesting: isSavingPost( state ),
+		isSuccessful: didPostSaveRequestSucceed( state ),
+		isError: !! didPostSaveRequestFail( state ),
+		requestIsNewPost: isSavingNewPost( state ),
 	} ),
 	( dispatch ) => ( {
 		onUpdate( post, edits, blocks ) {

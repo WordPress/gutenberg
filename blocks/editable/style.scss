@@ -1,6 +1,8 @@
 .blocks-editable {
 	position: relative;
+}
 
+.blocks-editable__tinymce {
 	> p:first-child {
 		margin-top: 0;
 	}
@@ -40,7 +42,17 @@
 
 }
 
-figcaption.blocks-editable {
+.block-editable__inline-toolbar {
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	top: -50px;
+	left: 0;
+	right: 0;
+	z-index: 1;
+}
+
+figcaption.blocks-editable__tinymce {
 	margin-top: 0.5em;
 	color: $dark-gray-100;
 	text-align: center;
@@ -54,7 +66,6 @@ figcaption.blocks-editable {
 
 .editable-format-toolbar__link-modal {
 	position: absolute;
-	top: 42px;
 	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
 	background: #fff;

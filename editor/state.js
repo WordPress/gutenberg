@@ -7,7 +7,7 @@ import { keyBy, last, omit, without } from 'lodash';
 /**
  * Internal dependencies
  */
-import { combineUndoableReducers } from 'utils/undoable-reducer';
+import { combineUndoableReducers } from './utils/undoable-reducer';
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -29,7 +29,7 @@ export const editor = combineUndoableReducers( {
 			case 'EDIT_POST':
 				return {
 					...state,
-					...action.post,
+					...action.edits,
 				};
 		}
 
@@ -39,6 +39,7 @@ export const editor = combineUndoableReducers( {
 	dirty( state = false, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'REQUEST_POST_UPDATE_SUCCESS':
 				return false;
 
 			case 'UPDATE_BLOCK':

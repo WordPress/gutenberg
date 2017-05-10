@@ -5,10 +5,15 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
+import { isEditedPostDirty } from '../../selectors';
 
 function SavedState( { isDirty } ) {
 	const classes = classNames( 'editor-saved-state', {
@@ -31,6 +36,6 @@ function SavedState( { isDirty } ) {
 
 export default connect(
 	( state ) => ( {
-		isDirty: state.editor.dirty,
+		isDirty: isEditedPostDirty( state ),
 	} )
 )( SavedState );

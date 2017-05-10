@@ -6,10 +6,15 @@ import { uniq, get, reduce } from 'lodash';
 import clickOutside from 'react-click-outside';
 
 /**
+ * WordPress dependencies
+ */
+import IconButton from 'components/icon-button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from 'components/icon-button';
+import { getBlock } from '../selectors';
 
 class BlockSwitcher extends wp.element.Component {
 	constructor() {
@@ -92,7 +97,7 @@ class BlockSwitcher extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: state.editor.blocksByUid[ ownProps.uid ]
+		block: getBlock( state, ownProps.uid )
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {

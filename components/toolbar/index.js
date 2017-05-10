@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
-import IconButton from 'components/icon-button';
+import IconButton from '../icon-button';
 
 function Toolbar( { controls } ) {
 	if ( ! controls || ! controls.length ) {
@@ -15,7 +15,7 @@ function Toolbar( { controls } ) {
 	}
 
 	return (
-		<ul className="editor-toolbar">
+		<ul className="components-toolbar">
 			{ controls.map( ( control, index ) => (
 				<IconButton
 					key={ index }
@@ -26,7 +26,7 @@ function Toolbar( { controls } ) {
 						event.stopPropagation();
 						control.onClick();
 					} }
-					className={ classNames( 'editor-toolbar__control', {
+					className={ classNames( 'components-toolbar__control', {
 						'is-active': control.isActive
 					} ) }
 					aria-pressed={ control.isActive }

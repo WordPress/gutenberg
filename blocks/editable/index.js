@@ -8,14 +8,16 @@ import { Fill } from 'react-slot-fill';
 import 'element-closest';
 
 /**
+ * WordPress dependencies
+ */
+import Toolbar from 'components/toolbar';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
- // TODO: We mustn't import by relative path traversing from blocks to editor
- // as we're doing here; instead, we should consider a common components path.
-import Toolbar from '../../../editor/components/toolbar';
 
 const KEYCODE_BACKSPACE = 8;
 
@@ -112,11 +114,27 @@ export default class Editable extends wp.element.Component {
 	}
 
 	getRelativePosition( node ) {
-		const editorPosition = this.editor.getBody().closest( '.editor-visual-editor__block' ).getBoundingClientRect();
 		const position = node.getBoundingClientRect();
+
+		// Find the parent "relative" positioned container
+		const container = this.props.inlineToolbar
+			? this.editor.getBody().closest( '.blocks-editable' )
+			: this.editor.getBody().closest( '.editor-visual-editor__block' );
+		const containerPosition = container.getBoundingClientRect();
+		const blockPadding = 14;
+		const blockMoverMargin = 18;
+
+		// These offsets are necessary because the toolbar where the link modal lives
+		// is absolute positioned and it's not shown when we compute the position here
+		// so we compute the position about its parent relative position and adds the offset
+		const toolbarOffset = this.props.inlineToolbar
+			? { top: 50, left: 0 }
+			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 250;
+
 		return {
-			top: position.top - editorPosition.top + 40 + ( position.height ),
-			left: position.left - editorPosition.left - 157
+			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
+			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left
 		};
 	}
 
@@ -333,51 +351,58 @@ export default class Editable extends wp.element.Component {
 			focus,
 			className,
 			showAlignments = false,
+			inlineToolbar = false,
 			inline,
 			formattingControls
 		} = this.props;
-		const classes = classnames( 'blocks-editable', className );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount (+ destroy) the previous TinyMCE element, then
 		// mount (+ initialize) a new child element in its place.
 		const key = [ 'editor', tagName ].join();
+		const classes = classnames( className, 'blocks-editable' );
 
-		let element = (
-			<TinyMCE
-				tagName={ tagName }
-				onSetup={ this.onSetup }
-				style={ style }
-				className={ classes }
-				defaultValue={ value }
-				settings={ {
-					forced_root_block: inline ? false : 'p'
-				} }
-				key={ key } />
+		const formatToolbar = (
+			<FormatToolbar
+				focusPosition={ this.state.focusPosition }
+				formats={ this.state.formats }
+				onChange={ this.changeFormats }
+				enabledControls={ formattingControls }
+			/>
 		);
 
-		if ( focus ) {
-			element = [
-				<Fill name="Formatting.Toolbar" key="fill">
-					{ showAlignments &&
-						<Toolbar
-							controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
-								...control,
-								onClick: () => this.toggleAlignment( control.align ),
-								isActive: this.isAlignmentActive( control.align )
-							} ) ) } />
-					}
-					<FormatToolbar
-						focusPosition={ this.state.focusPosition }
-						formats={ this.state.formats }
-						onChange={ this.changeFormats }
-						enabledControls={ formattingControls }
-					/>
-				</Fill>,
-				element
-			];
-		}
+		return (
+			<div className={ classes }>
+				{ focus &&
+					<Fill name="Formatting.Toolbar">
+						{ showAlignments &&
+							<Toolbar
+								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
+									...control,
+									onClick: () => this.toggleAlignment( control.align ),
+									isActive: this.isAlignmentActive( control.align )
+								} ) ) } />
+						}
+						{ ! inlineToolbar && formatToolbar }
+					</Fill>
+				}
 
-		return element;
+				{ focus && inlineToolbar &&
+					<div className="block-editable__inline-toolbar">
+						{ formatToolbar }
+					</div>
+				}
+
+				<TinyMCE
+					tagName={ tagName }
+					onSetup={ this.onSetup }
+					style={ style }
+					defaultValue={ value }
+					settings={ {
+						forced_root_block: inline ? false : 'p'
+					} }
+					key={ key } />
+			</div>
+		);
 	}
 }

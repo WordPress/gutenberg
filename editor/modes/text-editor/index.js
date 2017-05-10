@@ -8,10 +8,12 @@ import Textarea from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
+import PostTitle from '../../post-title';
+import { getBlocks } from '../../selectors';
 
 function TextEditor( { blocks, onChange } ) {
 	return (
-		<div>
+		<div className="editor-text-editor">
 			<header className="editor-text-editor__formatting">
 				<div className="editor-text-editor__formatting-group">
 					<button className="editor-text-editor__bold">b</button>
@@ -29,21 +31,22 @@ function TextEditor( { blocks, onChange } ) {
 					<button>close tags</button>
 				</div>
 			</header>
-			<Textarea
-				autoComplete="off"
-				defaultValue={ wp.blocks.serialize( blocks ) }
-				onBlur={ ( event ) => onChange( event.target.value ) }
-				className="editor-text-editor"
-			/>
+			<div className="editor-text-editor__body">
+				<PostTitle />
+				<Textarea
+					autoComplete="off"
+					defaultValue={ wp.blocks.serialize( blocks ) }
+					onBlur={ ( event ) => onChange( event.target.value ) }
+					className="editor-text-editor__textarea"
+				/>
+			</div>
 		</div>
 	);
 }
 
 export default connect(
 	( state ) => ( {
-		blocks: state.editor.blockOrder.map( ( uid ) => (
-			state.editor.blocksByUid[ uid ]
-		) )
+		blocks: getBlocks( state )
 	} ),
 	( dispatch ) => ( {
 		onChange( value ) {

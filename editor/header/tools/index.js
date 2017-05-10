@@ -4,14 +4,19 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+import IconButton from 'components/icon-button';
+import Button from 'components/button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from '../../components/dashicon';
-import IconButton from '../../components/icon-button';
-import Inserter from '../../components/inserter';
-import Button from '../../components/button';
+import Inserter from '../../inserter';
 import PublishButton from './publish-button';
+import { isEditorSidebarOpened, hasEditorUndo, hasEditorRedo } from '../../selectors';
 
 function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar } ) {
 	return (
@@ -46,9 +51,9 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 
 export default connect(
 	( state ) => ( {
-		hasUndo: state.editor.history.past.length > 0,
-		hasRedo: state.editor.history.future.length > 0,
-		isSidebarOpened: state.isSidebarOpened,
+		hasUndo: hasEditorUndo( state ),
+		hasRedo: hasEditorRedo( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
 	} ),
 	( dispatch ) => ( {
 		undo: () => dispatch( { type: 'UNDO' } ),

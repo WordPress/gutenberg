@@ -1,12 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+import Button from 'components/button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
-// TODO: Revisit when we have a common components solution
-import Dashicon from '../../../editor/components/dashicon';
-import Button from '../../../editor/components/button';
+import { registerBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { attr, children } = query;
 
@@ -91,6 +94,8 @@ registerBlock( 'core/image', {
 			);
 		}
 
+		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+
 		return (
 			<figure className="blocks-image">
 				<img src={ url } alt={ alt } />
@@ -99,10 +104,11 @@ registerBlock( 'core/image', {
 						tagName="figcaption"
 						placeholder={ wp.i18n.__( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus }
-						onFocus={ setFocus }
+						focus={ focus && focus.editable === 'caption' ? focus : undefined }
+						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inline
+						inlineToolbar
 					/>
 				) : null }
 			</figure>

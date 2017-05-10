@@ -1,10 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import IconButton from 'components/icon-button';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
-import IconButton from '../../../editor/components/icon-button';
+import { registerBlock, query } from '../../api';
+import Editable from '../../editable';
 
 const { attr, children } = query;
 

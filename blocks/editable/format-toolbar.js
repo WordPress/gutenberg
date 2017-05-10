@@ -1,10 +1,8 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
- // TODO: We mustn't import by relative path traversing from blocks to editor
- // as we're doing here; instead, we should consider a common components path.
-import IconButton from '../../../editor/components/icon-button';
-import Toolbar from '../../../editor/components/toolbar';
+import IconButton from 'components/icon-button';
+import Toolbar from 'components/toolbar';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -150,7 +148,7 @@ class FormatToolbar extends wp.element.Component {
 				{ !! formats.link && ! this.state.isEditingLink &&
 					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
 						<a className="editable-format-toolbar__link-value" href="" onClick={ this.editLink }>
-							{ decodeURI( this.state.linkValue ) }
+							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
 						<IconButton icon="edit" onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" onClick={ this.dropLink } />

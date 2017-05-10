@@ -7,11 +7,24 @@ import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import Toolbar from 'components/toolbar';
-import BlockMover from 'components/block-mover';
-import BlockSwitcher from 'components/block-switcher';
+
+/**
+ * Internal dependencies
+ */
+import BlockMover from '../../block-mover';
+import BlockSwitcher from '../../block-switcher';
+import {
+	getPreviousBlock,
+	getBlock,
+	getBlockFocus,
+	getBlockOrder,
+	isBlockHovered,
+	isBlockSelected,
+	isTypingInBlock
+} from '../../selectors';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -226,15 +239,14 @@ class VisualEditorBlock extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => {
-		const order = state.editor.blockOrder.indexOf( ownProps.uid );
 		return {
-			previousBlock: state.editor.blocksByUid[ state.editor.blockOrder[ order - 1 ] ] || null,
-			block: state.editor.blocksByUid[ ownProps.uid ],
-			isSelected: state.selectedBlock.uid === ownProps.uid,
-			isHovered: state.hoveredBlock === ownProps.uid,
-			focus: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.focus : null,
-			isTyping: state.selectedBlock.uid === ownProps.uid ? state.selectedBlock.typing : false,
-			order
+			previousBlock: getPreviousBlock( state, ownProps.uid ),
+			block: getBlock( state, ownProps.uid ),
+			isSelected: isBlockSelected( state, ownProps.uid ),
+			isHovered: isBlockHovered( state, ownProps.uid ),
+			focus: getBlockFocus( state, ownProps.uid ),
+			isTyping: isTypingInBlock( state, ownProps.uid ),
+			order: getBlockOrder( state, ownProps.uid )
 		};
 	},
 	( dispatch, ownProps ) => ( {
