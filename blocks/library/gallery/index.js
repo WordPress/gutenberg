@@ -2,11 +2,11 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from 'api';
+import { registerBlock, query as hpq } from '../../api';
 
 // TODO: Revisit when we have a common components solution
-import Dashicon from '../../../editor/components/dashicon';
-import Button from '../../../editor/components/button';
+import Dashicon from '../../../components/dashicon';
+import Button from '../../../components/button';
 
 import GalleryImage from './gallery-image';
 
