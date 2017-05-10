@@ -77,7 +77,7 @@
 	position: sticky;
 	z-index: 1;
 	margin-top: -46px - $item-spacing;		// 46 is toolbar height
-	margin-bottom: $item-spacing + 50px;	// 50px is the offset from the bottom of the selected block where it stops sticking
+	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
 
 	top: $header-height + $admin-bar-height-big + $item-spacing;
 
@@ -87,7 +87,7 @@
 }
 
 .editor-visual-editor__block-controls + div {
-	margin-top: -50px;
+	margin-top: -20px;
 
 	// prevent collapsing margins between the block and the toolbar
 	&:before {
