@@ -9,7 +9,8 @@
  */
 const categories = [
 	{ slug: 'common', title: 'Common Blocks' },
-	{ slug: 'layout', title: 'Layout Blocks' }
+	{ slug: 'layout', title: 'Layout Blocks' },
+	{ slug: 'social', title: 'Social Media' }
 ];
 
 /**
