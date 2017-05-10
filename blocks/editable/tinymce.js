@@ -3,18 +3,20 @@ export default class TinyMCE extends wp.element.Component {
 		this.initialize();
 	}
 
-	shouldComponentUpdate( nextProps ) {
-		const isEmpty = String( nextProps.isEmpty );
-
-		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
-			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
-		}
-
+	shouldComponentUpdate() {
 		// We must prevent rerenders because TinyMCE will modify the DOM, thus
 		// breaking React's ability to reconcile changes.
 		//
 		// See: https://github.com/facebook/react/issues/6802
 		return false;
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		const isEmpty = String( nextProps.isEmpty );
+
+		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
+			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
+		}
 	}
 
 	componentWillUnmount() {
