@@ -335,4 +335,16 @@ class WP_Test_REST_Revisions_Controller extends WP_Test_REST_Controller_Testcase
 		$this->assertEquals( rest_url( '/wp/v2/' . $parent_base . '/' . $revision->post_parent ), $links['parent'][0]['href'] );
 	}
 
+	public function test_get_item_sets_up_postdata() {
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/revisions/' . $this->revision_id1 );
+		$this->server->dispatch( $request );
+
+		$post = get_post();
+		$parent_post_id = wp_is_post_revision( $post->ID );
+
+		$this->assertEquals( $post->ID, $this->revision_id1 );
+		$this->assertEquals( $parent_post_id, self::$post_id );
+	}
+
 }
