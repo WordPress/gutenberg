@@ -74,7 +74,7 @@ export default class Editable extends wp.element.Component {
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.onDeativate = this.onDeativate.bind( this );
 
 		this.state = {
 			formats: {},
@@ -93,7 +93,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'focus', this.onFocus );
-		editor.on( 'change', this.onChange );
+		editor.on( 'deactivate', this.onDeativate );
 		editor.on( 'selectionChange', this.onSelectionChange );
 	}
 
@@ -107,6 +107,10 @@ export default class Editable extends wp.element.Component {
 		}
 
 		this.props.onFocus( this.selection );
+	}
+
+	onDeativate() {
+		this.props.onChange( this.content );
 	}
 
 	onChange() {
@@ -285,11 +289,7 @@ export default class Editable extends wp.element.Component {
 			this.setContent( this.props.value );
 
 			if ( this.props.focus ) {
-				if ( this.props.focus.offset === -1 ) {
-					this.setSelection( this.selection );
-				} else {
-					this.setSelection( this.props.focus );
-				}
+				this.setSelection( this.selection );
 			}
 		}
 	}
@@ -321,8 +321,6 @@ export default class Editable extends wp.element.Component {
 				}
 			}
 		} );
-
-		this.onChange();
 
 		this.setState( {
 			formats: merge( {}, this.state.formats, formats )
