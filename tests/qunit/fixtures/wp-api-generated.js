@@ -914,7 +914,7 @@ mockedApiResponse.Schema = {
                         "parent": {
                             "required": false,
                             "default": [],
-                            "description": "Limit result set to those of particular parent IDs.",
+                            "description": "Limit result set to items with particular parent IDs.",
                             "type": "array",
                             "items": {
                                 "type": "integer"
@@ -1451,7 +1451,7 @@ mockedApiResponse.Schema = {
                         "parent": {
                             "required": false,
                             "default": [],
-                            "description": "Limit result set to those of particular parent IDs.",
+                            "description": "Limit result set to items with particular parent IDs.",
                             "type": "array",
                             "items": {
                                 "type": "integer"
@@ -3165,7 +3165,7 @@ mockedApiResponse.Schema = {
                         },
                         "password": {
                             "required": false,
-                            "description": "The password for the post if it is password protected.",
+                            "description": "The password for the parent post of the comment (if the post is password protected).",
                             "type": "string"
                         }
                     }
@@ -3267,7 +3267,7 @@ mockedApiResponse.Schema = {
                         },
                         "password": {
                             "required": false,
-                            "description": "The password for the post if it is password protected.",
+                            "description": "The password for the parent post of the comment (if the post is password protected).",
                             "type": "string"
                         }
                     }
