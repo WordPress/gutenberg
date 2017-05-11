@@ -678,4 +678,34 @@ EOF;
 
 		$this->assertEquals( $input, wp_kses( $input, $allowedposttags ) );
 	}
+
+	/**
+	 * @ticket 40680
+	 */
+	function test_wp_kses_attr_no_attributes_allowed_with_empty_array() {
+		$element = 'foo';
+		$attribute = 'title="foo" class="bar"';
+
+		$this->assertEquals( "<{$element}>", wp_kses_attr( $element, $attribute, array( 'foo' => array() ), array() ) );
+	}
+
+	/**
+	 * @ticket 40680
+	 */
+	function test_wp_kses_attr_no_attributes_allowed_with_true() {
+		$element = 'foo';
+		$attribute = 'title="foo" class="bar"';
+
+		$this->assertEquals( "<{$element}>", wp_kses_attr( $element, $attribute, array( 'foo' => true ), array() ) );
+	}
+
+	/**
+	 * @ticket 40680
+	 */
+	function test_wp_kses_attr_single_attribute_is_allowed() {
+		$element = 'foo';
+		$attribute = 'title="foo" class="bar"';
+
+		$this->assertEquals( "<{$element} title=\"foo\">", wp_kses_attr( $element, $attribute, array( 'foo' => array( 'title' => true ) ), array() ) );
+	}
 }
