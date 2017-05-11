@@ -16,6 +16,7 @@ import Toolbar from 'components/toolbar';
  */
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
+import { focusBlock, mergeBlocks } from '../../actions';
 import {
 	getPreviousBlock,
 	getBlock,
@@ -101,49 +102,14 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	mergeWithPrevious() {
-		const { block, previousBlock, onFocus, replaceBlocks } = this.props;
+		const { block, previousBlock, onMerge } = this.props;
 
 		// Do nothing when it's the first block
 		if ( ! previousBlock ) {
 			return;
 		}
 
-		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
-
-		// Do nothing if the previous block is not mergeable
-		if ( ! previousBlockSettings.merge ) {
-			onFocus( previousBlock.uid );
-			return;
-		}
-
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blocksWithTheSameType = previousBlock.blockType === block.blockType
-			? [ block ]
-			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
-
-		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			return;
-		}
-
-		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
-
-		onFocus( previousBlock.uid, { offset: -1 } );
-		replaceBlocks(
-			[ previousBlock.uid, block.uid ],
-			[
-				{
-					...previousBlock,
-					attributes: {
-						...previousBlock.attributes,
-						...updatedAttributes,
-					},
-				},
-				...blocksWithTheSameType.slice( 1 ),
-			]
-		);
+		onMerge( previousBlock, block );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -316,12 +282,8 @@ export default connect(
 			} );
 		},
 
-		onFocus( uid, config ) {
-			dispatch( {
-				type: 'UPDATE_FOCUS',
-				uid,
-				config,
-			} );
+		onFocus( ...args ) {
+			dispatch( focusBlock( ...args ) );
 		},
 
 		onRemove( uid ) {
@@ -331,12 +293,8 @@ export default connect(
 			} );
 		},
 
-		replaceBlocks( uids, blocks ) {
-			dispatch( {
-				type: 'REPLACE_BLOCKS',
-				uids,
-				blocks,
-			} );
+		onMerge( ...args ) {
+			mergeBlocks( dispatch, ...args );
 		},
 	} )
 )( VisualEditorBlock );
