@@ -175,11 +175,4 @@ EOF;
 
 		return $return;
 	}
-
-	/**
-	 * @ticket 40712
-	 */
-	function test_failing_test_notifies_slack() {
-		$this->assertTrue( false );
-	}
 }
