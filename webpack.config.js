@@ -23,7 +23,7 @@ const config = {
 		react: 'React',
 		'react-dom': 'ReactDOM',
 		'react-dom/server': 'ReactDOMServer',
-		'jquery': 'jQuery'
+		jquery: 'jQuery'
 	},
 	resolve: {
 		modules: [

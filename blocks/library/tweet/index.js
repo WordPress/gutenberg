@@ -11,9 +11,7 @@ import Placeholder from 'components/placeholder';
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from '../../api';
-
-const { prop } = query;
+import { registerBlock } from '../../api';
 
 registerBlock( 'core/tweet', {
 	title: wp.i18n.__( 'Tweet' ),
@@ -72,7 +70,7 @@ registerBlock( 'core/tweet', {
 			const { html, url, error, fetching } = this.state;
 
 			if ( html ) {
-				const author = this.state.url.split( '/' )[3];
+				const author = this.state.url.split( '/' )[ 3 ];
 				/* translators: {AUTHOR}: username of the tweet's author */
 				const __title = wp.i18n.__( 'Tweet from {AUTHOR}' );
 				const title = __title.replace( '{AUTHOR}', author );

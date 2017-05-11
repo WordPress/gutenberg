@@ -43,4 +43,4 @@ export default class Sandbox extends wp.element.Component {
 				ref={ ( node ) => this.node = node } />
 		);
 	}
-};
+}

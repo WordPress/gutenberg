@@ -168,4 +168,4 @@ export default class ResizableIframe extends wp.element.Component {
 				height={ this.props.height || this.state.height } />
 		);
 	}
-};
+}
