@@ -57,7 +57,7 @@ const config = {
 							loader: 'sass-loader',
 							query: {
 								includePaths: [ 'editor/assets/stylesheets' ],
-								data: '@import "variables"; @import "mixins"; @import "animations";',
+								data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 								outputStyle: 'production' === process.env.NODE_ENV ?
 									'compressed' : 'nested'
 							}

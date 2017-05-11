@@ -33,7 +33,7 @@
 	transition: 0.2s border-color;
 
 	&:before {
-		z-index: -1;
+		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
 		top: 0;
@@ -75,7 +75,7 @@
 	@include animate_fade;
 	display: flex;
 	position: sticky;
-	z-index: 1;
+	z-index: z-index( '.editor-visual-editor__block-controls' );
 	margin-top: -$block-controls-height - $item-spacing;
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
 	height: $block-controls-height;
