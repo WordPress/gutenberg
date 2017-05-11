@@ -32,9 +32,10 @@ body.toplevel_page_gutenberg {
 		list-style-type: decimal;
 	}
 
-	ul, ol {
+	ul,
+	ol {
 		margin: 0;
-		padding-left: 2.5em;
+		padding: 0;
 	}
 
 	select {
