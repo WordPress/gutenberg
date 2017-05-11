@@ -43,6 +43,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'/',
 			'/oembed/1.0',
 			'/oembed/1.0/embed',
+			'/oembed/1.0/proxy',
 			'/wp/v2',
 			'/wp/v2/posts',
 			'/wp/v2/posts/(?P<id>[\\d]+)',
@@ -164,6 +165,10 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			array(
 				'route' => '/oembed/1.0/embed',
 				'name'  => 'oembeds',
+			),
+			array(
+				'route' => '/oembed/1.0/proxy',
+				'name'  => 'oembedProxy',
 			),
 			array(
 				'route' => '/wp/v2/posts',

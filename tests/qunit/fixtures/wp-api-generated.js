@@ -95,6 +95,56 @@ mockedApiResponse.Schema = {
                 "self": "http://example.org/?rest_route=/oembed/1.0/embed"
             }
         },
+        "/oembed/1.0/proxy": {
+            "namespace": "oembed/1.0",
+            "methods": [
+                "GET"
+            ],
+            "endpoints": [
+                {
+                    "methods": [
+                        "GET"
+                    ],
+                    "args": {
+                        "url": {
+                            "required": true,
+                            "description": "The URL of the resource for which to fetch oEmbed data.",
+                            "type": "string"
+                        },
+                        "format": {
+                            "required": false,
+                            "default": "json",
+                            "enum": [
+                                "json",
+                                "xml"
+                            ],
+                            "description": "The oEmbed format to use.",
+                            "type": "string"
+                        },
+                        "maxwidth": {
+                            "required": false,
+                            "default": 600,
+                            "description": "The maximum width of the embed frame in pixels.",
+                            "type": "integer"
+                        },
+                        "maxheight": {
+                            "required": false,
+                            "description": "The maximum height of the embed frame in pixels.",
+                            "type": "integer"
+                        },
+                        "discover": {
+                            "required": false,
+                            "default": true,
+                            "description": "Whether to perform an oEmbed discovery request for non-whitelisted providers.",
+                            "type": "boolean"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": "http://example.org/?rest_route=/oembed/1.0/proxy"
+            }
+        },
         "/wp/v2": {
             "namespace": "wp/v2",
             "methods": [
@@ -3396,11 +3446,72 @@ mockedApiResponse.oembed = {
             "_links": {
                 "self": "http://example.org/?rest_route=/oembed/1.0/embed"
             }
+        },
+        "/oembed/1.0/proxy": {
+            "namespace": "oembed/1.0",
+            "methods": [
+                "GET"
+            ],
+            "endpoints": [
+                {
+                    "methods": [
+                        "GET"
+                    ],
+                    "args": {
+                        "url": {
+                            "required": true,
+                            "description": "The URL of the resource for which to fetch oEmbed data.",
+                            "type": "string"
+                        },
+                        "format": {
+                            "required": false,
+                            "default": "json",
+                            "enum": [
+                                "json",
+                                "xml"
+                            ],
+                            "description": "The oEmbed format to use.",
+                            "type": "string"
+                        },
+                        "maxwidth": {
+                            "required": false,
+                            "default": 600,
+                            "description": "The maximum width of the embed frame in pixels.",
+                            "type": "integer"
+                        },
+                        "maxheight": {
+                            "required": false,
+                            "description": "The maximum height of the embed frame in pixels.",
+                            "type": "integer"
+                        },
+                        "discover": {
+                            "required": false,
+                            "default": true,
+                            "description": "Whether to perform an oEmbed discovery request for non-whitelisted providers.",
+                            "type": "boolean"
+                        }
+                    }
+                }
+            ],
+            "_links": {
+                "self": "http://example.org/?rest_route=/oembed/1.0/proxy"
+            }
         }
     }
 };
 
 mockedApiResponse.oembeds = {
+    "code": "rest_missing_callback_param",
+    "message": "Missing parameter(s): url",
+    "data": {
+        "status": 400,
+        "params": [
+            "url"
+        ]
+    }
+};
+
+mockedApiResponse.oembedProxy = {
     "code": "rest_missing_callback_param",
     "message": "Missing parameter(s): url",
     "data": {
