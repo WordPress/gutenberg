@@ -77,11 +77,11 @@ export function renderToString( element ) {
  * @return {Array}                The concatenated value
  */
 export function concatChildren( ...childrens ) {
-	return childrens.reduce( ( memo, children, i ) => {
-		Children.forEach( children, ( child, j ) => {
+	return childrens.reduce( ( memo, children ) => {
+		Children.forEach( children, ( child ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
-					key: [ i, j ].join()
+					key: undefined
 				} );
 			}
 

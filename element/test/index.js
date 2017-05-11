@@ -45,14 +45,14 @@ describe( 'element', () => {
 			expect( concatChildren( [ 'a' ], 'b' ) ).to.eql( [ 'a', 'b' ] );
 		} );
 
-		it( 'should concat the object arrays and rewrite keys', () => {
+		it( 'should concat the object arrays and unset keys', () => {
 			const concat = concatChildren(
 				[ createElement( 'strong', {}, 'Courgette' ) ],
 				createElement( 'strong', {}, 'Concombre' )
 			);
 			expect( concat.length ).to.equal( 2 );
-			expect( concat[ 0 ].key ).to.equal( '0,0' );
-			expect( concat[ 1 ].key ).to.equal( '1,0' );
+			expect( concat[ 0 ].key ).to.be.null();
+			expect( concat[ 1 ].key ).to.be.null();
 		} );
 	} );
 } );
