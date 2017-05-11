@@ -20,7 +20,7 @@ class InserterMenu extends wp.element.Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			currentFocus: null
+			currentFocus: null,
 		};
 		this.filter = this.filter.bind( this );
 		this.instanceId = this.constructor.instances++;
@@ -49,7 +49,7 @@ class InserterMenu extends wp.element.Component {
 
 	filter( event ) {
 		this.setState( {
-			filterValue: event.target.value
+			filterValue: event.target.value,
 		} );
 	}
 
@@ -59,7 +59,7 @@ class InserterMenu extends wp.element.Component {
 			this.props.onSelect();
 			this.setState( {
 				filterValue: '',
-				currentFocus: null
+				currentFocus: null,
 			} );
 		};
 	}
@@ -210,7 +210,7 @@ class InserterMenu extends wp.element.Component {
 
 	changeMenuSelection( refName ) {
 		this.setState( {
-			currentFocus: refName
+			currentFocus: refName,
 		} );
 
 		// Focus the DOM node.
@@ -289,8 +289,8 @@ export default connect(
 		onInsertBlock( slug ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
-				block: wp.blocks.createBlock( slug )
+				block: wp.blocks.createBlock( slug ),
 			} );
-		}
+		},
 	} )
 )( InserterMenu );

@@ -14,7 +14,7 @@ registerBlock( 'core/list', {
 
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' )
+		values: children( 'ol,ul' ),
 	},
 
 	controls: [
@@ -24,7 +24,7 @@ registerBlock( 'core/list', {
 			isActive: ( { nodeName = 'OL' } ) => nodeName === 'UL',
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'UL' } );
-			}
+			},
 		},
 		{
 			icon: 'editor-ol',
@@ -32,8 +32,8 @@ registerBlock( 'core/list', {
 			isActive: ( { nodeName = 'OL' } ) => nodeName === 'OL',
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'OL' } );
-			}
-		}
+			},
+		},
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -60,5 +60,5 @@ registerBlock( 'core/list', {
 			null,
 			values
 		);
-	}
+	},
 } );

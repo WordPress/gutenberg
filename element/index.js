@@ -81,7 +81,7 @@ export function concatChildren( ...childrens ) {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
-					key: [ i, j ].join()
+					key: [ i, j ].join(),
 				} );
 			}
 

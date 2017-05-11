@@ -23,7 +23,7 @@ registerBlock( 'core/embed', {
 	attributes: {
 		url: attr( 'iframe', 'src' ),
 		title: attr( 'iframe', 'title' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -75,5 +75,5 @@ registerBlock( 'core/embed', {
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
-	}
+	},
 } );

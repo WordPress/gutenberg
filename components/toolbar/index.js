@@ -27,7 +27,7 @@ function Toolbar( { controls } ) {
 						control.onClick();
 					} }
 					className={ classNames( 'components-toolbar__control', {
-						'is-active': control.isActive
+						'is-active': control.isActive,
 					} ) }
 					aria-pressed={ control.isActive }
 				/>

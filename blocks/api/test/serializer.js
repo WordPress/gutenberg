@@ -66,9 +66,9 @@ describe( 'block serializer', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				category: 'food',
-				ripeness: 'ripe'
+				ripeness: 'ripe',
 			}, {
-				fruit: 'bananas'
+				fruit: 'bananas',
 			} );
 
 			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
@@ -78,9 +78,9 @@ describe( 'block serializer', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				category: 'food',
-				ripeness: undefined
+				ripeness: undefined,
 			}, {
-				fruit: 'bananas'
+				fruit: 'bananas',
 			} );
 
 			expect( attributes ).to.equal( 'category="food" ' );
@@ -92,12 +92,12 @@ describe( 'block serializer', () => {
 			const blockSettings = {
 				attributes: ( rawContent ) => {
 					return {
-						content: rawContent
+						content: rawContent,
 					};
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
-				}
+				},
 			};
 			registerBlock( 'core/test-block', blockSettings );
 			const blockList = [
@@ -105,9 +105,9 @@ describe( 'block serializer', () => {
 					blockType: 'core/test-block',
 					attributes: {
 						content: 'Ribs & Chicken',
-						align: 'left'
-					}
-				}
+						align: 'left',
+					},
+				},
 			];
 			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->\n\n';
 

@@ -29,8 +29,8 @@ export function createBlock( blockType, attributes = {} ) {
 		blockType,
 		attributes: {
 			...defaultAttributes,
-			...attributes
-		}
+			...attributes,
+		},
 	};
 }
 
@@ -89,7 +89,7 @@ export function switchToBlockType( block, blockType ) {
 			// type gets to keep the existing block's UID.
 			uid: index === firstSwitchedBlock ? block.uid : result.uid,
 			blockType: result.blockType,
-			attributes: result.attributes
+			attributes: result.attributes,
 		};
 	} );
 }

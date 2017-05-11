@@ -16,7 +16,7 @@ registerBlock( 'core/heading', {
 
 	attributes: {
 		content: children( 'h1,h2,h3,h4,h5,h6' ),
-		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' )
+		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
 	controls: [
@@ -27,8 +27,8 @@ registerBlock( 'core/heading', {
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'H' + level } );
 			},
-			subscript: level
-		} ) )
+			subscript: level,
+		} ) ),
 	],
 
 	transforms: {
@@ -39,7 +39,7 @@ registerBlock( 'core/heading', {
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
 						const heading = createBlock( 'core/heading', {
-							content: content[ 0 ].props.children
+							content: content[ 0 ].props.children,
 						} );
 						const blocks = [ heading ];
 
@@ -47,7 +47,7 @@ registerBlock( 'core/heading', {
 						if ( remainingContent.length ) {
 							const text = createBlock( 'core/text', {
 								...attrs,
-								content: remainingContent
+								content: remainingContent,
 							} );
 							blocks.push( text );
 						}
@@ -55,10 +55,10 @@ registerBlock( 'core/heading', {
 						return blocks;
 					}
 					return createBlock( 'core/heading', {
-						content
+						content,
 					} );
-				}
-			}
+				},
+			},
 		],
 		to: [
 			{
@@ -66,16 +66,16 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/text', {
-						content
+						content,
 					} );
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 

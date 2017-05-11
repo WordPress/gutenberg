@@ -64,14 +64,14 @@ export const editor = combineUndoableReducers( {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
-						...action.updates
-					}
+						...action.updates,
+					},
 				};
 
 			case 'INSERT_BLOCK':
 				return {
 					...state,
-					[ action.block.uid ]: action.block
+					[ action.block.uid ]: action.block,
 				};
 
 			case 'REPLACE_BLOCKS':
@@ -81,7 +81,7 @@ export const editor = combineUndoableReducers( {
 				return action.blocks.reduce( ( memo, block ) => {
 					return {
 						...memo,
-						[ block.uid ]: block
+						[ block.uid ]: block,
 					};
 				}, omit( state, action.uids ) );
 
@@ -104,7 +104,7 @@ export const editor = combineUndoableReducers( {
 				return [
 					...state.slice( 0, position ),
 					action.block.uid,
-					...state.slice( position )
+					...state.slice( position ),
 				];
 
 			case 'MOVE_BLOCK_UP':
@@ -117,7 +117,7 @@ export const editor = combineUndoableReducers( {
 					...state.slice( 0, index - 1 ),
 					action.uid,
 					swappedUid,
-					...state.slice( index + 1 )
+					...state.slice( index + 1 ),
 				];
 
 			case 'MOVE_BLOCK_DOWN':
@@ -130,7 +130,7 @@ export const editor = combineUndoableReducers( {
 					...state.slice( 0, index ),
 					swappedUid,
 					action.uid,
-					...state.slice( index + 2 )
+					...state.slice( index + 2 ),
 				];
 
 			case 'REPLACE_BLOCKS':
@@ -153,7 +153,7 @@ export const editor = combineUndoableReducers( {
 		}
 
 		return state;
-	}
+	},
 }, { resetTypes: [ 'RESET_BLOCKS' ] } );
 
 /**
@@ -194,7 +194,7 @@ export function selectedBlock( state = {}, action ) {
 				: {
 					uid: action.uid,
 					typing: false,
-					focus: action.uid === state.uid ? state.focus : {}
+					focus: action.uid === state.uid ? state.focus : {},
 				};
 
 		case 'MOVE_BLOCK_UP':
@@ -207,14 +207,14 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				uid: action.block.uid,
 				typing: false,
-				focus: {}
+				focus: {},
 			};
 
 		case 'UPDATE_FOCUS':
 			return {
 				uid: action.uid,
 				typing: state.uid === action.uid ? state.typing : false,
-				focus: action.config || {}
+				focus: action.config || {},
 			};
 
 		case 'START_TYPING':
@@ -222,13 +222,13 @@ export function selectedBlock( state = {}, action ) {
 				return {
 					uid: action.uid,
 					typing: true,
-					focus: {}
+					focus: {},
 				};
 			}
 
 			return {
 				...state,
-				typing: true
+				typing: true,
 			};
 
 		case 'REPLACE_BLOCKS':
@@ -239,7 +239,7 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				uid: action.blocks[ 0 ].uid,
 				typing: false,
-				focus: {}
+				focus: {},
 			};
 	}
 

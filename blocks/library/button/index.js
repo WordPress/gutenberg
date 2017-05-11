@@ -36,7 +36,7 @@ registerBlock( 'core/button', {
 	attributes: {
 		url: attr( 'a', 'href' ),
 		title: attr( 'a', 'title' ),
-		text: children( 'a' )
+		text: children( 'a' ),
 	},
 
 	controls: [
@@ -44,20 +44,20 @@ registerBlock( 'core/button', {
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' )
+			onClick: applyOrUnset( 'left' ),
 		},
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' )
+			onClick: applyOrUnset( 'center' ),
 		},
 		{
 			icon: 'align-right',
 			title: wp.i18n.__( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' )
-		}
+			onClick: applyOrUnset( 'right' ),
+		},
 	],
 
 	getEditWrapperProps( attributes ) {
@@ -109,5 +109,5 @@ registerBlock( 'core/button', {
 				</a>
 			</div>
 		);
-	}
+	},
 } );
