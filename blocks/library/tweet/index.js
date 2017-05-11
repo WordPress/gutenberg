@@ -70,9 +70,8 @@ registerBlock( 'core/tweet', {
 			const { html, url, error, fetching } = this.state;
 
 			if ( html ) {
-				const author = this.state.url.split( '/' )[ 3 ];
-				/* translators: %s: username of the tweet's author */
-				const title = wp.i18n.sprintf( wp.i18n.__( 'Tweet from %s' ), author );
+				/* translators: %s: url of the tweet */
+				const title = wp.i18n.sprintf( wp.i18n.__( 'Embedded from %s' ), url );
 				return (
 					<Sandbox
 						html={ html }
