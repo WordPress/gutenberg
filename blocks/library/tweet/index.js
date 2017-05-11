@@ -71,9 +71,8 @@ registerBlock( 'core/tweet', {
 
 			if ( html ) {
 				const author = this.state.url.split( '/' )[ 3 ];
-				/* translators: {AUTHOR}: username of the tweet's author */
-				const __title = wp.i18n.__( 'Tweet from {AUTHOR}' );
-				const title = __title.replace( '{AUTHOR}', author );
+				/* translators: %s: username of the tweet's author */
+				const title = wp.i18n.sprintf( wp.i18n.__( 'Tweet from %s' ), author );
 				return (
 					<Sandbox
 						html={ html }
