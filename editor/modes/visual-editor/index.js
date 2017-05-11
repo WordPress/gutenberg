@@ -25,5 +25,5 @@ function VisualEditor( { blocks } ) {
 }
 
 export default connect( ( state ) => ( {
-	blocks: getBlockUids( state )
+	blocks: getBlockUids( state ),
 } ) )( VisualEditor );

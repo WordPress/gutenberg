@@ -25,7 +25,7 @@ describe( 'element', () => {
 			expect( renderToString( [
 				'Zucchini ',
 				createElement( 'em', null, 'is a' ),
-				' summer squash'
+				' summer squash',
 			] ) ).to.equal( 'Zucchini <em>is a</em> summer squash' );
 		} );
 

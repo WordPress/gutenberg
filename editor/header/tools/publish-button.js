@@ -20,7 +20,7 @@ import {
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
-	isSavingNewPost
+	isSavingNewPost,
 } from '../../selectors';
 
 function PublishButton( {

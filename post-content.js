@@ -3,7 +3,7 @@
  */
 window._wpGutenbergPost = {
 	title: {
-		raw: 'Welcome to the Gutenberg Editor'
+		raw: 'Welcome to the Gutenberg Editor',
 	},
 	content: {
 		raw: [

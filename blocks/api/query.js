@@ -8,7 +8,7 @@ import {
 	prop as originalProp,
 	html as originalHtml,
 	text as originalText,
-	query as originalQuery
+	query as originalQuery,
 } from 'hpq';
 
 /**

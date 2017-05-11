@@ -18,12 +18,12 @@ registerBlock( 'core/text', {
 	},
 
 	defaultAttributes: {
-		content: <p />
+		content: <p />,
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
@@ -35,7 +35,7 @@ registerBlock( 'core/text', {
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
-						content: nextContent
+						content: nextContent,
 					} );
 				} }
 				focus={ focus }
@@ -43,7 +43,7 @@ registerBlock( 'core/text', {
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
 					insertBlockAfter( createBlock( 'core/text', {
-						content: after
+						content: after,
 					} ) );
 				} }
 				onMerge={ mergeWithPrevious }
@@ -55,5 +55,5 @@ registerBlock( 'core/text', {
 	save( { attributes } ) {
 		const { content } = attributes;
 		return content;
-	}
+	},
 } );

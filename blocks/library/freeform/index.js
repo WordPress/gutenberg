@@ -13,7 +13,7 @@ registerBlock( 'core/freeform', {
 	category: 'common',
 
 	attributes: {
-		html: html()
+		html: html(),
 	},
 
 	edit( { attributes } ) {
@@ -29,7 +29,7 @@ registerBlock( 'core/freeform', {
 
 	save( { attributes } ) {
 		return attributes.html;
-	}
+	},
 } );
 
 setUnknownTypeHandler( 'core/freeform' );

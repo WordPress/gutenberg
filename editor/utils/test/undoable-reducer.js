@@ -21,7 +21,7 @@ describe( 'undoableReducer', () => {
 			expect( reducer( undefined, {} ) ).to.eql( {
 				past: [],
 				present: 0,
-				future: []
+				future: [],
 			} );
 		} );
 
@@ -35,7 +35,7 @@ describe( 'undoableReducer', () => {
 			expect( state ).to.eql( {
 				past: [ 0 ],
 				present: 1,
-				future: []
+				future: [],
 			} );
 		} );
 
@@ -50,7 +50,7 @@ describe( 'undoableReducer', () => {
 			expect( state ).to.eql( {
 				past: [],
 				present: 0,
-				future: [ 1 ]
+				future: [ 1 ],
 			} );
 		} );
 
@@ -66,7 +66,7 @@ describe( 'undoableReducer', () => {
 			expect( state ).to.eql( {
 				past: [ 0 ],
 				present: 1,
-				future: []
+				future: [],
 			} );
 		} );
 
@@ -83,7 +83,7 @@ describe( 'undoableReducer', () => {
 			expect( state ).to.eql( {
 				past: [ 1, 2 ],
 				present: 3,
-				future: []
+				future: [],
 			} );
 		} );
 	} );
@@ -91,7 +91,7 @@ describe( 'undoableReducer', () => {
 	describe( 'combineUndoableReducers()', () => {
 		it( 'should return a combined reducer with getters', () => {
 			const reducer = combineUndoableReducers( {
-				count: ( state = 0 ) => state
+				count: ( state = 0 ) => state,
 			} );
 			const state = reducer( undefined, {} );
 
@@ -101,9 +101,9 @@ describe( 'undoableReducer', () => {
 			expect( state.history ).to.eql( {
 				past: [],
 				present: {
-					count: 0
+					count: 0,
 				},
-				future: []
+				future: [],
 			} );
 		} );
 	} );

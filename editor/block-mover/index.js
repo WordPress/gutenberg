@@ -36,20 +36,20 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 export default connect(
 	( state, ownProps ) => ( {
 		isFirst: isFirstBlock( state, ownProps.uid ),
-		isLast: isLastBlock( state, ownProps.uid )
+		isLast: isLastBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			dispatch( {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMoveUp() {
 			dispatch( {
 				type: 'MOVE_BLOCK_UP',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
-		}
+		},
 	} )
 )( BlockMover );
