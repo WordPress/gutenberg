@@ -15,6 +15,7 @@ import Dashicon from 'components/dashicon';
  * Internal dependencies
  */
 import './style.scss';
+import { replaceBlocks } from '../actions';
 import { getBlock } from '../selectors';
 
 class BlockSwitcher extends wp.element.Component {
@@ -111,11 +112,10 @@ export default connect(
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {
-			dispatch( {
-				type: 'REPLACE_BLOCKS',
-				uids: [ ownProps.uid ],
-				blocks: wp.blocks.switchToBlockType( block, blockType ),
-			} );
+			dispatch( replaceBlocks(
+				[ ownProps.uid ],
+				wp.blocks.switchToBlockType( block, blockType )
+			) );
 		},
 	} )
 )( clickOutside( BlockSwitcher ) );
