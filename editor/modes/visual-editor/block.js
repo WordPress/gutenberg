@@ -161,6 +161,12 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.node.focus();
+		}
+	}
+
 	render() {
 		const { block } = this.props;
 		const settings = wp.blocks.getBlockSettings( block.blockType );
@@ -233,7 +239,7 @@ class VisualEditorBlock extends wp.element.Component {
 				</div>
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 

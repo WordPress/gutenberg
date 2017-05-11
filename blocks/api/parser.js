@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import tinymce from 'tinymce';
 import { parse as hpqParse } from 'hpq';
 import { escape, unescape, pickBy } from 'lodash';
 

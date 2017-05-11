@@ -9,6 +9,7 @@ import clickOutside from 'react-click-outside';
  * WordPress dependencies
  */
 import IconButton from 'components/icon-button';
+import Dashicon from 'components/dashicon';
 
 /**
  * Internal dependencies
@@ -77,7 +78,7 @@ class BlockSwitcher extends wp.element.Component {
 					aria-expanded={ this.state.open }
 					label={ wp.i18n.__( 'Change block content type' ) }
 				>
-					<div className="editor-block-switcher__arrow" />
+					<Dashicon icon="arrow-down" />
 				</IconButton>
 				{ this.state.open &&
 					<div
