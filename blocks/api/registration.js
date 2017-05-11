@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { reduce } from 'lodash';
+
 /* eslint-disable no-console */
 
 /**
@@ -43,7 +48,13 @@ export function registerBlock( slug, settings ) {
 		);
 		return;
 	}
-	const block = Object.assign( { slug }, settings );
+
+	const attributes = reduce( settings ? settings.attributes : {}, ( memo, value, key ) => {
+		memo[ key ] = value.__description;
+		return memo;
+	}, {} );
+
+	const block = Object.assign( {}, settings, { slug, attributes } );
 	blocks[ slug ] = block;
 	return block;
 }

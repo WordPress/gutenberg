@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { flow } from 'lodash';
 import {
 	attr as originalAttr,
 	prop as originalProp,
@@ -10,27 +9,9 @@ import {
 	text as originalText,
 	query as originalQuery
 } from 'hpq';
+import { reduce } from 'lodash';
 
-/**
- * Given a matcher function creator, returns a new function which applies an
- * internal flag to the created matcher.
- *
- * @param  {Function} fn Original matcher function creator
- * @return {Function}    Modified matcher function creator
- */
-function withKnownMatcherFlag( fn ) {
-	return flow( fn, ( matcher ) => {
-		matcher._wpBlocksKnownMatcher = true;
-		return matcher;
-	} );
-}
-
-export const attr = withKnownMatcherFlag( originalAttr );
-export const prop = withKnownMatcherFlag( originalProp );
-export const html = withKnownMatcherFlag( originalHtml );
-export const text = withKnownMatcherFlag( originalText );
-export const query = withKnownMatcherFlag( originalQuery );
-export const children = withKnownMatcherFlag( ( selector ) => {
+export const originalChildren = ( selector ) => {
 	return ( node ) => {
 		let match = node;
 
@@ -44,4 +25,51 @@ export const children = withKnownMatcherFlag( ( selector ) => {
 
 		return [];
 	};
-} );
+};
+
+const addDescriptor = ( description ) => ( memo ) => {
+	return Object.assign( memo, description );
+};
+
+// Source descriptors
+// Each one of these functions defines how to retrieve the attribute value
+//
+//  - the descriptor sets "source: content" and a parse function for attributes parsed from block content
+//  - the descriptor sets "source: metadata" and an attribute name for attributes stored in the block comment
+const attr = ( ...args ) => addDescriptor( { source: 'content', parse: originalAttr( ...args ) } );
+const prop = ( ...args ) => addDescriptor( { source: 'content', parse: originalProp( ...args ) } );
+const html = ( ...args ) => addDescriptor( { source: 'content', parse: originalHtml( ...args ) } );
+const text = ( ...args ) => addDescriptor( { source: 'content', parse: originalText( ...args ) } );
+const children = ( ...args ) => addDescriptor( { source: 'content', parse: originalChildren( ...args ) } );
+const metadata = ( name ) => addDescriptor( { source: 'metadata', name } );
+const query = ( selector, descriptor ) => {
+	return addDescriptor( {
+		source: 'content',
+		parse: originalQuery( selector, descriptor.__description.parse )
+	} );
+};
+
+/**
+ * Takes an argument description and returns a chainable API to describe the current attribute
+ *
+ * @param  {?Object} description The argument description
+ *
+ * @return {Object}              descriptors chainable API
+ */
+const getChainableAPI = ( description ) => {
+	return reduce( { attr, prop, html, text, query, children, metadata }, ( memo, fct, key ) => {
+		const wrappedFct = ( ...args ) => {
+			const accumulator = fct( ...args );
+			const newDescription = accumulator( description || {} );
+			return {
+				...getChainableAPI( newDescription ),
+				__description: newDescription
+			};
+		};
+
+		memo[ key ] = wrappedFct;
+		return memo;
+	}, {} );
+};
+
+export default getChainableAPI();

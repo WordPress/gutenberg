@@ -3,7 +3,7 @@
  */
 import tinymce from 'tinymce';
 import { parse as hpqParse } from 'hpq';
-import { escape, unescape, pickBy } from 'lodash';
+import { escape, unescape, reduce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,32 +11,6 @@ import { escape, unescape, pickBy } from 'lodash';
 import { parse as grammarParse } from './post.pegjs';
 import { getBlockSettings, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
-
-/**
- * Returns the block attributes parsed from raw content.
- *
- * @param  {String} rawContent    Raw block content
- * @param  {Object} blockSettings Block settings
- * @return {Object}               Block attributes
- */
-export function parseBlockAttributes( rawContent, blockSettings ) {
-	const { attributes } = blockSettings;
-	if ( 'function' === typeof attributes ) {
-		return attributes( rawContent );
-	} else if ( attributes ) {
-		// Matchers are implemented as functions that receive a DOM node from
-		// which to select data. Use of the DOM is incidental and we shouldn't
-		// guarantee a contract that this be provided, else block implementers
-		// may feel compelled to use the node. Instead, matchers are intended
-		// as a generic interface to query data from any tree shape. Here we
-		// pick only matchers which include an internal flag.
-		const knownMatchers = pickBy( attributes, '_wpBlocksKnownMatcher' );
-
-		return hpqParse( rawContent, knownMatchers );
-	}
-
-	return {};
-}
 
 /**
  * Returns the block attributes of a registered block node given its settings.
@@ -47,17 +21,23 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
  * @return {Object}                All block attributes
  */
 export function getBlockAttributes( blockSettings, rawContent, attributes ) {
-	// Merge any attributes from comment delimiters with block implementation
-	attributes = attributes || {};
-	if ( blockSettings ) {
-		attributes = {
-			...attributes,
-			...blockSettings.defaultAttributes,
-			...parseBlockAttributes( rawContent, blockSettings ),
-		};
-	}
+	// The blockSettings.attributes contains the definition of each attribute
+	// depending on its "source", we retrieve its value from the comment attribute
+	// or by parsing the block content
+	const computedAttributes = reduce( blockSettings.attributes, ( memo, attribute, key ) => {
+		if ( attribute.source === 'metadata' ) {
+			memo[ key ] = attributes[ attribute.name || key ];
+		} else if ( attribute.source === 'content' ) {
+			memo[ key ] = hpqParse( rawContent, attribute.parse );
+		}
 
-	return attributes;
+		return memo;
+	}, {} );
+
+	return {
+		...blockSettings.defaultAttributes,
+		...computedAttributes,
+	};
 }
 
 /**

@@ -8,6 +8,7 @@ import { expect } from 'chai';
  */
 import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
 import { getBlocks, registerBlock, unregisterBlock } from '../registration';
+import query from '../query';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
@@ -64,36 +65,40 @@ describe( 'block serializer', () => {
 
 		it( 'should return joined string of key:value pairs by difference subset', () => {
 			const attributes = getCommentAttributes( {
+				attributes: {
+					category: { source: 'metadata', name: 'cat' },
+					ripeness: { source: 'metadata', name: 'ripeness' },
+				}
+			}, {
 				fruit: 'bananas',
 				category: 'food',
 				ripeness: 'ripe'
-			}, {
-				fruit: 'bananas'
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
+			expect( attributes ).to.equal( 'cat="food" ripeness="ripe" ' );
 		} );
 
 		it( 'should not append an undefined attribute value', () => {
 			const attributes = getCommentAttributes( {
+				attributes: {
+					category: { source: 'metadata', name: 'cat' },
+					ripeness: { source: 'metadata', name: 'ripeness' },
+				}
+			}, {
 				fruit: 'bananas',
 				category: 'food',
 				ripeness: undefined
-			}, {
-				fruit: 'bananas'
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ' );
+			expect( attributes ).to.equal( 'cat="food" ' );
 		} );
 	} );
 
 	describe( 'serialize()', () => {
 		it( 'should serialize the post content properly', () => {
 			const blockSettings = {
-				attributes: ( rawContent ) => {
-					return {
-						content: rawContent
-					};
+				attributes: {
+					align: query.metadata( 'align' )
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;

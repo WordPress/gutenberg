@@ -18,6 +18,8 @@ import {
 	getBlocks
 } from '../registration';
 
+import query from '../query';
+
 describe( 'blocks', () => {
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -54,7 +56,7 @@ describe( 'blocks', () => {
 		it( 'should accept valid block names', () => {
 			const block = registerBlock( 'my-plugin/fancy-block-4' );
 			expect( console.error ).to.not.have.been.called();
-			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4' } );
+			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4', attributes: {} } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -71,6 +73,22 @@ describe( 'blocks', () => {
 			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
+				attributes: {}
+			} );
+		} );
+
+		it( 'should compute block attributes', () => {
+			const blockSettings = { settingName: 'settingValue', attributes: {
+				align: query.metadata( 'align' )
+			} };
+			registerBlock( 'core/test-block-with-settings', blockSettings );
+			blockSettings.mutated = true;
+			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
+				slug: 'core/test-block-with-settings',
+				settingName: 'settingValue',
+				attributes: {
+					align: { source: 'metadata', name: 'align' }
+				}
 			} );
 		} );
 	} );
@@ -85,11 +103,11 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlock( 'core/test-block' );
 			expect( getBlocks() ).to.eql( [
-				{ slug: 'core/test-block' },
+				{ slug: 'core/test-block', attributes: {} },
 			] );
 			const oldBlock = unregisterBlock( 'core/test-block' );
 			expect( console.error ).to.not.have.been.called();
-			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
+			expect( oldBlock ).to.eql( { slug: 'core/test-block', attributes: {} } );
 			expect( getBlocks() ).to.eql( [] );
 		} );
 	} );
@@ -113,6 +131,7 @@ describe( 'blocks', () => {
 			registerBlock( 'core/test-block' );
 			expect( getBlockSettings( 'core/test-block' ) ).to.eql( {
 				slug: 'core/test-block',
+				attributes: {}
 			} );
 		} );
 
@@ -122,6 +141,7 @@ describe( 'blocks', () => {
 			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
+				attributes: {}
 			} );
 		} );
 	} );
@@ -136,8 +156,8 @@ describe( 'blocks', () => {
 			const blockSettings = { settingName: 'settingValue' };
 			registerBlock( 'core/test-block-with-settings', blockSettings );
 			expect( getBlocks() ).to.eql( [
-				{ slug: 'core/test-block' },
-				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
+				{ slug: 'core/test-block', attributes: {} },
+				{ slug: 'core/test-block-with-settings', settingName: 'settingValue', attributes: {} },
 			] );
 		} );
 	} );

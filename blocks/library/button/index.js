@@ -10,7 +10,7 @@ import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
 
-const { attr, children } = query;
+const { attr, children, metadata } = query;
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -36,7 +36,8 @@ registerBlock( 'core/button', {
 	attributes: {
 		url: attr( 'a', 'href' ),
 		title: attr( 'a', 'title' ),
-		text: children( 'a' )
+		text: children( 'a' ),
+		align: metadata()
 	},
 
 	controls: [

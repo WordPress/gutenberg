@@ -11,7 +11,7 @@ import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
 
-const { attr, children } = query;
+const { attr, children, metadata } = query;
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -37,7 +37,8 @@ registerBlock( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
+		align: metadata()
 	},
 
 	controls: [

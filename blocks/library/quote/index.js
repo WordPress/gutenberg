@@ -5,7 +5,7 @@ import './style.scss';
 import { registerBlock, createBlock, query as hpq } from '../../api';
 import Editable from '../../editable';
 
-const { children, query } = hpq;
+const { children, query, metadata } = hpq;
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -14,7 +14,8 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' )
+		citation: children( 'footer' ),
+		style: metadata()
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
