@@ -1,5 +1,5 @@
 # stylelint-config-wordpress
-[![NPM version](http://img.shields.io/npm/v/stylelint-config-wordpress.svg)](https://www.npmjs.org/package/stylelint-config-wordpress) [![Build Status](https://api.travis-ci.org/ntwb/stylelint-config-wordpress.svg?branch=master)](https://travis-ci.org/ntwb/stylelint-config-wordpress) [![Build status](https://ci.appveyor.com/api/projects/status/e5bv7cgn83ci69lo?svg=true)](https://ci.appveyor.com/project/ntwb/stylelint-config-wordpress)
+[![NPM version](http://img.shields.io/npm/v/stylelint-config-wordpress.svg)](https://www.npmjs.org/package/stylelint-config-wordpress) [![Build Status](https://api.travis-ci.org/WordPress-Coding-Standards/stylelint-config-wordpress.svg?branch=master)](https://travis-ci.org/WordPress-Coding-Standards/stylelint-config-wordpress) [![Build status](https://ci.appveyor.com/api/projects/status/e5bv7cgn83ci69lo?svg=true)](https://ci.appveyor.com/project/WordPress-Coding-Standards/stylelint-config-wordpress)
 
 > WordPress shareable config for stylelint.
 
@@ -81,7 +81,7 @@ For example, to change the `indentation` to four spaces and turn off the `number
 
 ## Style Guide
 
-### Structure - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#structure) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/structure.js)
+### Structure - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#structure) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/structure.js)
 
 There are plenty of different methods for structuring a stylesheet. With the CSS in core, it is important to retain a high degree of legibility. This enables subsequent contributors to have a clear understanding of the flow of the document.
 
@@ -114,7 +114,7 @@ Incorrect:
 #selector-1 { background: #fff; color: #000; }
 ```
 
-### Selectors - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#selectors) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/selectors.js)
+### Selectors - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#selectors) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/selectors.js)
 
 With specificity, comes great responsibility. Broad selectors allow us to be efficient, yet can have adverse consequences if not tested. Location-specific selectors can save us time, but will quickly lead to a cluttered stylesheet. Exercise your best judgement to create selectors that find the right balance between contributing to the overall style and layout of the DOM.
 
@@ -156,7 +156,7 @@ input[type=text] { /* Should be [type="text"] */
 }
 ```
 
-### Properties - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#properties) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/properties.js)
+### Properties - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#properties) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/properties.js)
 
 Similar to selectors, properties that are too specific will hinder the flexibility of the design. Less is more. Make sure you are not repeating styling or introducing fixed dimensions (when a fluid solution is more acceptable).
 
@@ -224,7 +224,7 @@ Example:
 }
 ```
 
-### Vendor Prefixes - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#vendor-prefixes) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/vendor-prefixes.js)
+### Vendor Prefixes - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#vendor-prefixes) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/vendor-prefixes.js)
 
 Updated on 2/13/2014, after [27174](https://core.trac.wordpress.org/changeset/27174):
 
@@ -238,7 +238,7 @@ We use [Autoprefixer](https://github.com/nDmitry/grunt-autoprefixer) as a pre-co
 }
 ```
 
-### Values - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#values) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/values.js)
+### Values - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#values) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/values.js)
 
 There are numerous ways to input values for properties. Follow the guidelines below to help us retain a high degree of consistency.
 
@@ -282,7 +282,7 @@ Incorrect:
 }
 ```
 
-### Media Queries - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#media-queries) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/media-queries.js)
+### Media Queries - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#media-queries) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/media-queries.js)
 
 Media queries allow us to gracefully degrade the DOM for different screen sizes. If you are adding any, be sure to test above and below the break-point you are targeting.
 
@@ -338,7 +338,7 @@ Incorrect:
   projection and (color) {}
 ```
 
-### Commenting - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#commenting) / [Tests](https://github.com/ntwb/stylelint-config-wordpress/blob/master/__tests__/commenting.js)
+### Commenting - [Handbook](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/#commenting) / [Tests](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/blob/master/__tests__/commenting.js)
 
 -   Comment, and comment liberally. If there are concerns about file size, utilize minified files and the `SCRIPT_DEBUG` constant. Long comments should manually break the line length at 80 characters.
 -   A table of contents should be utilized for longer stylesheets, especially those that are highly sectioned. Using an index number (1.0, 1.1, 2.0, etc.) aids in searching and jumping to a location.

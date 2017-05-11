@@ -1,3 +1,7 @@
+# HEAD
+
+-   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards
+
 # 10.0.2
 
 -   Added: Added `import` to `ignoreAtRules` option in `at-rule-empty-line-before` rule for SCSS config.
