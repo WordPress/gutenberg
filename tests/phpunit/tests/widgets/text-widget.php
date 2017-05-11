@@ -178,15 +178,15 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$expected['text'] = $instance['text'];
 		$result = $widget->update( $instance, array() );
 		$this->assertEquals( $result, $expected );
-
 		remove_filter( 'map_meta_cap', array( $this, 'grant_unfiltered_html_cap' ) );
+
 		add_filter( 'map_meta_cap', array( $this, 'revoke_unfiltered_html_cap' ), 10, 2 );
 		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
 		$instance['text'] = '<script>alert( "Howdy!" );</script>';
 		$expected['text'] = wp_kses_post( $instance['text'] );
 		$result = $widget->update( $instance, array() );
 		$this->assertEquals( $result, $expected );
-		remove_filter( 'map_meta_cap', array( $this, 'revoke_unfiltered_html_cap' ), 10, 2 );
+		remove_filter( 'map_meta_cap', array( $this, 'revoke_unfiltered_html_cap' ), 10 );
 	}
 
 	/**
