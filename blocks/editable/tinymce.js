@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import tinymce from 'tinymce';
+
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
 		this.initialize();
