@@ -220,27 +220,6 @@ class Tests_Post_Types extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @ticket 33543
-	 */
-	function test_get_post_type_labels_should_fall_back_on_defaults_when_filtered_labels_do_not_contain_the_keys() {
-		add_filter( 'post_type_labels_foo', array( $this, 'filter_post_type_labels' ) );
-		register_post_type( 'foo' );
-
-		$this->assertObjectHasAttribute( 'featured_image', get_post_type_object( 'foo' )->labels );
-		$this->assertObjectHasAttribute( 'set_featured_image', get_post_type_object( 'foo' )->labels );
-
-		_unregister_post_type( 'foo' );
-		remove_filter( 'post_type_labels_foo', array( $this, 'filter_post_type_labels' ) );
-	}
-
-	public function filter_post_type_labels( $labels ) {
-		unset( $labels->featured_image );
-		unset( $labels->set_featured_image );
-		return $labels;
-	}
-
-
-	/**
 	 * @ticket 30013
 	 */
 	public function test_get_post_type_object_with_non_scalar_values() {
