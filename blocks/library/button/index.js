@@ -29,7 +29,7 @@ function applyOrUnset( align ) {
 registerBlock( 'core/button', {
 	title: wp.i18n.__( 'Button' ),
 
-	icon: 'marker',
+	icon: 'button',
 
 	category: 'layout',
 
