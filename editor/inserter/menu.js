@@ -7,6 +7,9 @@ import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getBlocks, getCategories, createBlock } from 'blocks';
+import { Component } from 'element';
+import { __ } from 'i18n';
 import Dashicon from 'components/dashicon';
 
 /**
@@ -14,7 +17,7 @@ import Dashicon from 'components/dashicon';
  */
 import './style.scss';
 
-class InserterMenu extends wp.element.Component {
+class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodes = {};
@@ -70,7 +73,7 @@ class InserterMenu extends wp.element.Component {
 
 	sortBlocksByCategory( blockTypes ) {
 		const getCategoryIndex = ( item ) => {
-			return findIndex( wp.blocks.getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 
 		return sortBy( blockTypes, getCategoryIndex );
@@ -135,7 +138,7 @@ class InserterMenu extends wp.element.Component {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( wp.blocks.getBlocks() );
+		)( getBlocks() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -150,7 +153,7 @@ class InserterMenu extends wp.element.Component {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( wp.blocks.getBlocks() );
+		)( getBlocks() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -223,13 +226,13 @@ class InserterMenu extends wp.element.Component {
 
 	render() {
 		const { position = 'top' } = this.props;
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlocks() );
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlocks() );
 
 		return (
 			<div className={ `editor-inserter__menu is-${ position }` } tabIndex="0">
 				<div className="editor-inserter__arrow" />
 				<div role="menu" className="editor-inserter__content">
-					{ wp.blocks.getCategories()
+					{ getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 							<div key={ category.slug }>
 								<div
@@ -264,12 +267,12 @@ class InserterMenu extends wp.element.Component {
 					}
 				</div>
 				<label htmlFor={ `editor-inserter__search-${ this.instanceId }` } className="screen-reader-text">
-					{ wp.i18n.__( 'Search blocks' ) }
+					{ __( 'Search blocks' ) }
 				</label>
 				<input
 					id={ `editor-inserter__search-${ this.instanceId }` }
 					type="search"
-					placeholder={ wp.i18n.__( 'Search…' ) }
+					placeholder={ __( 'Search…' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
@@ -289,7 +292,7 @@ export default connect(
 		onInsertBlock( slug ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
-				block: wp.blocks.createBlock( slug )
+				block: createBlock( slug )
 			} );
 		}
 	} )

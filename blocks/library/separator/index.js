@@ -1,11 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlock } from '../../api';
 
 registerBlock( 'core/separator', {
-	title: wp.i18n.__( 'Separator' ),
+	title: __( 'Separator' ),
 
 	icon: 'minus',
 

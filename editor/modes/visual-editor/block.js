@@ -9,6 +9,8 @@ import { partial } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { getBlockSettings, switchToBlockType } from 'blocks';
+import { Component } from 'element';
 import Toolbar from 'components/toolbar';
 
 /**
@@ -26,7 +28,7 @@ import {
 	isTypingInBlock
 } from '../../selectors';
 
-class VisualEditorBlock extends wp.element.Component {
+class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
@@ -108,7 +110,7 @@ class VisualEditorBlock extends wp.element.Component {
 			return;
 		}
 
-		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
+		const previousBlockSettings = getBlockSettings( previousBlock.blockType );
 
 		// Do nothing if the previous block is not mergeable
 		if ( ! previousBlockSettings.merge ) {
@@ -120,7 +122,7 @@ class VisualEditorBlock extends wp.element.Component {
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = previousBlock.blockType === block.blockType
 			? [ block ]
-			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
+			: switchToBlockType( block, previousBlock.blockType );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -169,7 +171,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 	render() {
 		const { block } = this.props;
-		const settings = wp.blocks.getBlockSettings( block.blockType );
+		const settings = getBlockSettings( block.blockType );
 
 		let BlockEdit;
 		if ( settings ) {

@@ -5,6 +5,11 @@ import { expect } from 'chai';
 import { parse } from 'hpq';
 
 /**
+ * WordPress dependencies
+ */
+import { renderToString } from 'element';
+
+/**
  * Internal dependencies
  */
 import * as query from '../query';
@@ -29,7 +34,7 @@ describe( 'query', () => {
 			const html = '<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, query.children() );
 
-			expect( wp.element.renderToString( match ) ).to.equal( html );
+			expect( renderToString( match ) ).to.equal( html );
 		} );
 	} );
 } );

@@ -8,6 +8,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import Dashicon from 'components/dashicon';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -23,8 +24,8 @@ function SavedState( { isDirty } ) {
 		? 'warning'
 		: 'saved';
 	const text = isDirty
-		? wp.i18n.__( 'Unsaved changes' )
-		: wp.i18n.__( 'Saved' );
+		? __( 'Unsaved changes' )
+		: __( 'Saved' );
 
 	return (
 		<div className={ classes }>

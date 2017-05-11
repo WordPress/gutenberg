@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+import { createElement } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -8,7 +14,7 @@ import Editable from '../../editable';
 const { children, prop } = hpq;
 
 registerBlock( 'core/list', {
-	title: wp.i18n.__( 'List' ),
+	title: __( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
@@ -20,7 +26,7 @@ registerBlock( 'core/list', {
 	controls: [
 		{
 			icon: 'editor-ul',
-			title: wp.i18n.__( 'Convert to unordered' ),
+			title: __( 'Convert to unordered' ),
 			isActive: ( { nodeName = 'OL' } ) => nodeName === 'UL',
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'UL' } );
@@ -28,7 +34,7 @@ registerBlock( 'core/list', {
 		},
 		{
 			icon: 'editor-ol',
-			title: wp.i18n.__( 'Convert to ordered' ),
+			title: __( 'Convert to ordered' ),
 			isActive: ( { nodeName = 'OL' } ) => nodeName === 'OL',
 			onClick( attributes, setAttributes ) {
 				setAttributes( { nodeName: 'OL' } );
@@ -55,7 +61,7 @@ registerBlock( 'core/list', {
 	save( { attributes } ) {
 		const { nodeName = 'OL', values = [] } = attributes;
 
-		return wp.element.createElement(
+		return createElement(
 			nodeName.toLowerCase(),
 			null,
 			values

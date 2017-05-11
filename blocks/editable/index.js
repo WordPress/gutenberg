@@ -10,6 +10,8 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
+import { Component, createElement, renderToString } from 'element';
+import { __ } from 'i18n';
 import Toolbar from 'components/toolbar';
 
 /**
@@ -30,22 +32,22 @@ const alignmentMap = {
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
+		title: __( 'Align left' ),
 		align: 'left'
 	},
 	{
 		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
+		title: __( 'Align center' ),
 		align: 'center'
 	},
 	{
 		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
+		title: __( 'Align right' ),
 		align: 'right'
 	}
 ];
 
-function createElement( type, props, ...children ) {
+function createElementWithoutMCEFlags( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -54,14 +56,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class Editable extends wp.element.Component {
+export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -229,8 +231,8 @@ export default class Editable extends wp.element.Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			nodeListToReact( before, createElementWithoutMCEFlags ),
+			nodeListToReact( after, createElementWithoutMCEFlags )
 		);
 	}
 
@@ -266,7 +268,7 @@ export default class Editable extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 

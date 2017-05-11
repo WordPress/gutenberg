@@ -8,6 +8,9 @@ import clickOutside from 'react-click-outside';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
+import { Component } from 'element';
+import { getBlockSettings, getBlocks, switchToBlockType } from 'blocks';
 import IconButton from 'components/icon-button';
 import Dashicon from 'components/dashicon';
 
@@ -17,7 +20,7 @@ import Dashicon from 'components/dashicon';
 import './style.scss';
 import { getBlock } from '../selectors';
 
-class BlockSwitcher extends wp.element.Component {
+class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggleMenu = this.toggleMenu.bind( this );
@@ -50,8 +53,8 @@ class BlockSwitcher extends wp.element.Component {
 	}
 
 	render() {
-		const blockSettings = wp.blocks.getBlockSettings( this.props.block.blockType );
-		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
+		const blockSettings = getBlockSettings( this.props.block.blockType );
+		const blocksToBeTransformedFrom = reduce( getBlocks(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
 			const transformation = transformFrom.find( t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
 			return transformation ? memo.concat( [ block.slug ] ) : memo;
@@ -60,7 +63,7 @@ class BlockSwitcher extends wp.element.Component {
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
 		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
 			.reduce( ( memo, blockType ) => {
-				const block = wp.blocks.getBlockSettings( blockType );
+				const block = getBlockSettings( blockType );
 				return !! block ? memo.concat( block ) : memo;
 			}, [] );
 
@@ -76,7 +79,7 @@ class BlockSwitcher extends wp.element.Component {
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
-					label={ wp.i18n.__( 'Change block content type' ) }
+					label={ __( 'Change block type' ) }
 				>
 					<Dashicon icon="arrow-down" />
 				</IconButton>
@@ -85,7 +88,7 @@ class BlockSwitcher extends wp.element.Component {
 						className="editor-block-switcher__menu"
 						role="menu"
 						tabIndex="0"
-						aria-label={ wp.i18n.__( 'Content types' ) }
+						aria-label={ __( 'Block types' ) }
 					>
 						{ allowedBlocks.map( ( { slug, title, icon } ) => (
 							<IconButton
@@ -114,7 +117,7 @@ export default connect(
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ ownProps.uid ],
-				blocks: wp.blocks.switchToBlockType( block, blockType )
+				blocks: switchToBlockType( block, blockType )
 			} );
 		}
 	} )

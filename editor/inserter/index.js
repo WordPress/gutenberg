@@ -7,13 +7,15 @@ import clickOutside from 'react-click-outside';
  * WordPress dependencies
  */
 import IconButton from 'components/icon-button';
+import { Component } from 'element';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 
-class Inserter extends wp.element.Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
@@ -55,7 +57,7 @@ class Inserter extends wp.element.Component {
 			<div className="editor-inserter">
 				<IconButton
 					icon="insert"
-					label={ wp.i18n.__( 'Insert block' ) }
+					label={ __( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"

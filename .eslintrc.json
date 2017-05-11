@@ -18,7 +18,6 @@
 		}
 	},
 	"globals": {
-		"wp": true,
 		"tinymce": true
 	},
 	"plugins": [

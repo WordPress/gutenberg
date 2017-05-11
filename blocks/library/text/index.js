@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { concatChildren } from 'element';
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import { registerBlock, createBlock, query } from '../../api';
@@ -7,7 +13,7 @@ import Editable from '../../editable';
 const { children } = query;
 
 registerBlock( 'core/text', {
-	title: wp.i18n.__( 'Text' ),
+	title: __( 'Text' ),
 
 	icon: 'text',
 
@@ -23,7 +29,7 @@ registerBlock( 'core/text', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content )
+			content: concatChildren( attributes.content, attributesToMerge.content )
 		};
 	},
 

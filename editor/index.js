@@ -5,6 +5,12 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 
 /**
+ * WordPress dependencies
+ */
+import { render } from 'element';
+import { parse } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
@@ -22,10 +28,10 @@ export function createEditorInstance( id, post ) {
 	store.dispatch( {
 		type: 'RESET_BLOCKS',
 		post,
-		blocks: wp.blocks.parse( post.content.raw )
+		blocks: parse( post.content.raw )
 	} );
 
-	wp.element.render(
+	render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
 				<Layout />
