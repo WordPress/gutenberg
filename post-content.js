@@ -37,7 +37,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure><iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption>State of the Word 2016</figcaption></figure>',
+			'<figure><iframe src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption>State of the Word 2016</figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/heading -->',
@@ -45,7 +45,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of posibilities for rich editing and publishing.<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
+			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/list -->',

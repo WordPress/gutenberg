@@ -93,9 +93,12 @@ registerBlock( 'core/image', {
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
+		// Disable reason: Each block can be selected by clicking on it
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<figure className="blocks-image">
-				<img src={ url } alt={ alt } />
+				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -110,6 +113,7 @@ registerBlock( 'core/image', {
 				) : null }
 			</figure>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 
 	save( { attributes } ) {

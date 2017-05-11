@@ -23,7 +23,8 @@ const config = {
 		react: 'React',
 		'react-dom': 'ReactDOM',
 		'react-dom/server': 'ReactDOMServer',
-		jquery: 'jQuery'
+		jquery: 'jQuery',
+		tinymce: 'tinymce'
 	},
 	resolve: {
 		modules: [
@@ -68,6 +69,9 @@ const config = {
 		]
 	},
 	plugins: [
+		new webpack.DefinePlugin( {
+			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV )
+		} ),
 		new ExtractTextPlugin( {
 			filename: './[name]/build/style.css'
 		} ),
