@@ -373,6 +373,7 @@ export default class Editable extends wp.element.Component {
 			formattingControls,
 			placeholder
 		} = this.props;
+		const { empty } = this.state;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount (+ destroy) the previous TinyMCE element, then
@@ -390,7 +391,9 @@ export default class Editable extends wp.element.Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div
+				className={ classes }
+				data-placeholder={ empty ? placeholder : null }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
 						{ showAlignments &&
@@ -419,8 +422,6 @@ export default class Editable extends wp.element.Component {
 					settings={ {
 						forced_root_block: inline ? false : 'p'
 					} }
-					isEmpty={ this.state.empty }
-					placeholder={ placeholder }
 					key={ key } />
 			</div>
 		);
