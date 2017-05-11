@@ -456,7 +456,7 @@ module.exports = function(grunt) {
 				dest: BUILD_DIR,
 				ext: '.min.js',
 				src: [
-					'wp-admin/js/*.js',
+					'wp-admin/js/**/*.js',
 					'wp-includes/js/*.js',
 					'wp-includes/js/mediaelement/wp-mediaelement.js',
 					'wp-includes/js/mediaelement/wp-playlist.js',
