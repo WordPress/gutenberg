@@ -1,12 +1,16 @@
+$blocks-button__height: 46px;
+
 .blocks-button {
 	font-family: $default-font;
 	display: inline-block;
 	text-decoration: none;
 	font-size: $big-font-size;
 	margin: 0;
-	padding: 6px 24px;
+	padding: 0 24px;
+	height: $blocks-button__height;
+	line-height: $blocks-button__height;
 	cursor: default;
-	border-radius: 22px;
+	border-radius: $blocks-button__height / 2;
 	white-space: nowrap;
 	background: $blue-medium-400;
 	color: $white;
@@ -18,24 +22,9 @@
 	}
 
 	.editable-format-toolbar__link-modal {
-		top: -1px;
-		left: calc( 100% + 12px );
-	}
-}
-
-.blocks-button__link {
-	position: absolute;
-	right: -32px;
-	top: 5px;
-	color: $dark-gray-500;
-	text-decoration: none;
-
-	&:hover {
-		color: $dark-gray-300;
-	}
-
-	.dashicon {
-		vertical-align: middle;
+		top: $blocks-button__height + 2px;
+		left: 50%;
+		transform: translateX( -50% );
 	}
 }
 
@@ -46,11 +35,5 @@
 
 	&[data-align="right"] {
 		text-align: right;
-
-		.editable-format-toolbar__link-modal {
-			top: -1px;
-			left: auto;
-			right: calc( 100% + 12px );
-		}
 	}
 }
