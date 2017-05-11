@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { switchChildrenNodeName } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -40,6 +45,15 @@ registerBlock( 'core/quote', {
 			},
 			{
 				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: switchChildrenNodeName( values, 'p' )
+					} );
+				}
+			},
+			{
+				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
@@ -57,6 +71,20 @@ registerBlock( 'core/quote', {
 						content: wp.element.concatChildren( value, citation ),
 					} );
 				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { value, citation } ) => {
+					const valueElements = switchChildrenNodeName( value, 'li' );
+					const values = citation
+						? wp.element.concatChildren( valueElements, <li>{ citation }</li> )
+						: valueElements;
+					return createBlock( 'core/list', {
+						nodeName: 'ul',
+						values
+					} );
+				}
 			},
 			{
 				type: 'block',
