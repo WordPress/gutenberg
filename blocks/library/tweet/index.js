@@ -1,10 +1,17 @@
 /**
+ * External dependencies
+ */
+import jQuery from 'jquery';
+/**
+ * WordPress dependencies
+ */
+import Sandbox from 'components/sandbox';
+import Button from 'components/button';
+import Placeholder from 'components/placeholder';
+/**
  * Internal dependencies
  */
 import { registerBlock, query } from '../../api';
-import Sandbox from '../../../components/sandbox';
-import Button from '../../../components/button';
-import Placeholder from '../../../components/placeholder';
 
 const { prop } = query;
 
@@ -14,14 +21,16 @@ registerBlock( 'core/tweet', {
 
 	category: 'social',
 
-	attributes: {
-		url: prop( '*', 'innerHTML' ), // our html is just a div with the url in, for WP's oembed to process
+	attributes( url ) {
+		return { url };
 	},
 
 	edit: class extends wp.element.Component {
 		constructor() {
 			super( ...arguments );
 			this.fetchTweet = this.fetchTweet.bind( this );
+			// Copies the block's url so we can edit it without having the block
+			// update (i.e. refetch the tweet) every time it changes in this edit component.
 			this.state = {
 				url: this.props.attributes.url,
 				html: '',
@@ -29,40 +38,55 @@ registerBlock( 'core/tweet', {
 				fetching: false,
 			};
 		}
-		doFetch( url, setAttributes, setState ) {
-			setState( { fetching: true, error: false } );
-			jQuery.ajax( {
+		doFetch( url ) {
+			this.setState( { fetching: true, error: false } );
+			this.fetchXHR = jQuery.ajax( {
 				type: 'GET',
 				dataType: 'jsonp',
-				data: {},
 				timeout: 5000,
 				url: 'https://publish.twitter.com/oembed?url=' + encodeURI( url ),
-				error: function() {
-					setState( { fetching: false, error: true } );
-				},
-				success: function( msg ) {
-					setAttributes( { url: url } );
-					setState( { fetching: false, error: false, html: msg.html } );
+				error: () => this.setState( { fetching: false, error: true } ),
+				success: ( msg ) => {
+					this.props.setAttributes( { url } );
+					this.setState( { fetching: false, error: false, html: msg.html } );
 				},
 			} );
 		}
 		componentDidMount() {
 			if ( this.state.url ) {
-				this.doFetch( this.state.url, this.props.setAttributes, this.setState.bind( this ) );
+				this.doFetch( this.state.url );
 			}
 		}
-		fetchTweet() {
+		componentWillUnmount() {
+			if ( this.fetchXHR ) {
+				this.fetchXHR.abort();
+				delete this.fetchXHR;
+			}
+		}
+		fetchTweet( event ) {
 			const { url } = this.state;
-			this.doFetch( url, this.props.setAttributes, this.setState.bind( this ) );
+			event.preventDefault();
+			this.doFetch( url );
 		}
 		render() {
 			const { html, url, error, fetching } = this.state;
 
-			if ( ! html ) {
+			if ( html ) {
+				const author = this.state.url.split( '/' )[3];
+				/* translators: {AUTHOR}: username of the tweet's author */
+				const __title = wp.i18n.__( 'Tweet from {AUTHOR}' );
+				const title = __title.replace( '{AUTHOR}', author );
 				return (
-					<Placeholder icon="twitter" label={ wp.i18n.__( 'Twitter' ) } className="blocks-tweet">
+					<Sandbox
+						html={ html }
+						title={ title } />
+				);
+			}
+
+			return (
+				<Placeholder icon="twitter" label={ wp.i18n.__( 'Twitter' ) } className="blocks-tweet">
+					<form onSubmit={ this.fetchTweet }>
 						<input
-							type="text"
 							className="components-placeholder__input"
 							value={ url }
 							placeholder={ wp.i18n.__( 'Enter tweet URL to embed...' ) }
@@ -71,27 +95,22 @@ registerBlock( 'core/tweet', {
 							(
 								<Button
 									isLarge
-									onClick={ this.fetchTweet }>
+									type="submit">
 									{ wp.i18n.__( 'Embed' ) }
 								</Button>
 							) : (
 								<span className="spinner is-active" />
 							)
 						}
-						{ error && ( <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we couldn\'t fetch that tweet.' ) }</p> ) }
-					</Placeholder>
-				);
-			}
-			return (
-				<Sandbox html={ html } />
+					</form>
+					{ error && ( <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we couldn\'t fetch that tweet.' ) }</p> ) }
+				</Placeholder>
 			);
 		}
 	},
 
 	save( { attributes } ) {
 		const { url } = attributes;
-		return (
-			<div>{ url }</div>
-		);
+		return url;
 	}
 } );

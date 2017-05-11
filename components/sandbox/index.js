@@ -1,27 +1,18 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * Internal dependencies
  */
 import ResizableIframe from 'components/resizable-iframe';
 
-const Sandbox = React.createClass( {
-	displayName: 'Sandbox',
+export default class Sandbox extends wp.element.Component {
 
-	propTypes: {
-		html: React.PropTypes.string,
-	},
-
-	getDefaultProps: function() {
+	static get defaultProps() {
 		return {
 			html: '',
+			title: '',
 		};
-	},
+	}
 
-	componentDidMount: function() {
+	componentDidMount() {
 		const body = this.node.getFrameBody();
 		const { html } = this.props;
 
@@ -42,15 +33,14 @@ const Sandbox = React.createClass( {
 		for ( let i = 0; i < newscripts.length; i++ ) {
 			body.appendChild( newscripts[ i ] );
 		}
-	},
+	}
 
-	render: function() {
+	render() {
 		return (
 			<ResizableIframe
 				sandbox="allow-same-origin allow-scripts"
+				title={ this.props.title }
 				ref={ ( node ) => this.node = node } />
 		);
 	}
-} );
-
-export default Sandbox;
+};

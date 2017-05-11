@@ -134,7 +134,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/tweet -->',
-			'<div>https://twitter.com/automattic/status/777261837335326720</div>',
+			'https://twitter.com/automattic/status/777261837335326720',
 			'<!-- /wp:core/tweet -->',
 		].join( '' ),
 	},

@@ -5,69 +5,48 @@
 /**
  * External dependencies
  */
-import React from 'react';
-import debugFactory from 'debug';
 import { omit } from 'lodash';
-import uuid from 'uuid/v4';
 
-/**
- * Globals
- */
-const debug = debugFactory( 'gutenburg:resizable-iframe' ),
-	noop = () => {};
+export default class ResizableIframe extends wp.element.Component {
 
-export default React.createClass( {
-	displayName: 'ResizableIframe',
-
-	propTypes: {
-		src: React.PropTypes.string,
-		width: React.PropTypes.oneOfType( [
-			React.PropTypes.string,
-			React.PropTypes.number
-		] ),
-		height: React.PropTypes.oneOfType( [
-			React.PropTypes.string,
-			React.PropTypes.number
-		] ),
-		onLoad: React.PropTypes.func,
-		onResize: React.PropTypes.func,
-		title: React.PropTypes.string
-	},
-
-	getInitialState: function() {
-		return { width: 0, height: 0 };
-	},
-
-	getDefaultProps: function() {
-		return {
-			onLoad: noop,
-			onResize: noop,
-			title: uuid()
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			width: 0,
+			height: 0
 		};
-	},
+		this.getFrameBody = this.getFrameBody.bind( this );
+		this.maybeConnect = this.maybeConnect.bind( this );
+		this.isFrameAccessible = this.isFrameAccessible.bind( this );
+		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+	}
 
-	componentWillMount: function() {
-		debug( 'Mounting ' + this.constructor.displayName + ' React component.' );
-	},
+	static get defaultProps() {
+		return {
+			onLoad: () => {},
+			onResize: () => {},
+			title: ''
+		};
+	}
 
-	componentDidMount: function() {
+	componentDidMount() {
 		window.addEventListener( 'message', this.checkMessageForResize, false );
 		this.maybeConnect();
-	},
+	}
 
-	componentDidUpdate: function() {
+	componentDidUpdate() {
 		this.maybeConnect();
-	},
+	}
 
-	componentWillUnmount: function() {
+	componentWillUnmount() {
 		window.removeEventListener( 'message', this.checkMessageForResize );
-	},
+	}
 
-	getFrameBody: function() {
+	getFrameBody() {
 		return this.iframe.contentDocument.body;
-	},
+	}
 
-	maybeConnect: function() {
+	maybeConnect() {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
@@ -129,17 +108,17 @@ export default React.createClass( {
 			} )();
 		`;
 		body.appendChild( script );
-	},
+	}
 
-	isFrameAccessible: function() {
+	isFrameAccessible() {
 		try {
 			return !! this.getFrameBody();
 		} catch ( e ) {
 			return false;
 		}
-	},
+	}
 
-	checkMessageForResize: function( event ) {
+	checkMessageForResize( event ) {
 		const iframe = this.iframe;
 
 		// Attempt to parse the message data as JSON if passed as string
@@ -155,8 +134,6 @@ export default React.createClass( {
 			return;
 		}
 
-		debug( 'Received message: %o', data );
-
 		// Update the state only if the message is formatted as we expect, i.e.
 		// as an object with a 'resize' action, width, and height
 		const { action, width, height } = data;
@@ -166,15 +143,16 @@ export default React.createClass( {
 			this.setState( { width, height } );
 			this.props.onResize();
 		}
-	},
+	}
 
-	onLoad: function( event ) {
+	onLoad( event ) {
 		this.maybeConnect();
 		this.props.onLoad( event );
-	},
+	}
 
-	render: function() {
+	render() {
 		const omitProps = [ 'onResize' ];
+
 		if ( ! this.props.src ) {
 			omitProps.push( 'src' );
 		}
@@ -190,4 +168,4 @@ export default React.createClass( {
 				height={ this.props.height || this.state.height } />
 		);
 	}
-} );
+};
