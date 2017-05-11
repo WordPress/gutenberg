@@ -14,24 +14,6 @@
 	padding: 6px;
 }
 
-.editor-block-switcher__arrow {
-	display: inline-flex;
-	border: 6px dashed $dark-gray-500;
-	margin-left: 5px;
-	height: 0;
-	line-height: 0;
-	width: 0;
-	z-index: 1;
-	border-top-style: solid;
-	border-bottom: none;
-	border-left-color: transparent;
-	border-right-color: transparent;
-
-	.editor-block-switcher__toggle:hover & {
-		border-top-color: $blue-medium;
-	}
-}
-
 .editor-block-switcher__menu {
 	position: absolute;
 	top: 43px;
