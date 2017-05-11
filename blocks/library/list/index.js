@@ -67,13 +67,11 @@ registerBlock( 'core/list', {
 		{
 			icon: 'editor-outdent',
 			title: wp.i18n.__( 'Outdent list item' ),
-			isActive: () => false,
 			onClick: execCommand( 'Outdent' )
 		},
 		{
 			icon: 'editor-indent',
 			title: wp.i18n.__( 'Indent list item' ),
-			isActive: () => false,
 			onClick: execCommand( 'Indent' )
 		},
 	],
