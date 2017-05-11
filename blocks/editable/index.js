@@ -62,7 +62,7 @@ function createElement( type, props, ...children ) {
 }
 
 export default class Editable extends wp.element.Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -73,10 +73,13 @@ export default class Editable extends wp.element.Component {
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
+
 		this.state = {
 			formats: {},
 			alignment: null,
-			bookmark: null
+			bookmark: null,
+			empty: ! props.value || ! props.value.length
 		};
 	}
 
@@ -88,6 +91,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'selectionChange', this.onSelectionChange );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -105,6 +109,23 @@ export default class Editable extends wp.element.Component {
 
 		// TODO: We need a way to save the focus position ( bookmark maybe )
 		this.props.onFocus();
+	}
+
+	isActive() {
+		return document.activeElement === this.editor.getBody();
+	}
+
+	onSelectionChange() {
+		// We must check this because selectionChange is a global event.
+		if ( ! this.isActive() ) {
+			return;
+		}
+
+		const content = this.getContent();
+
+		this.setState( {
+			empty: ! content || ! content.length
+		} );
 	}
 
 	onChange() {
@@ -357,7 +378,8 @@ export default class Editable extends wp.element.Component {
 			showAlignments = false,
 			inlineToolbar = false,
 			inline,
-			formattingControls
+			formattingControls,
+			placeholder
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -405,6 +427,8 @@ export default class Editable extends wp.element.Component {
 					settings={ {
 						forced_root_block: inline ? false : 'p'
 					} }
+					isEmpty={ this.state.empty }
+					placeholder={ placeholder }
 					key={ key } />
 			</div>
 		);

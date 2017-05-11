@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import './style.scss';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';

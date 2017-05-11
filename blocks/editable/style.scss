@@ -40,6 +40,16 @@
 		background: $light-gray-400;
 	}
 
+	&[data-is-empty="true"] {
+		position: relative;
+	}
+
+	&[data-is-empty="true"]:before {
+		content: attr( data-placeholder );
+		opacity: 0.5;
+		pointer-events: none;
+		position: absolute;
+	}
 }
 
 .block-editable__inline-toolbar {
@@ -57,6 +67,11 @@ figcaption.blocks-editable__tinymce {
 	color: $dark-gray-100;
 	text-align: center;
 	font-size: $default-font-size;
+
+	&:before {
+		left: 50%;
+		transform: translateX( -50% );
+	}
 }
 
 
@@ -97,45 +112,4 @@ input.editable-format-toolbar__link-input {
 .editable-format-toolbar__link-value {
 	padding: 10px;
 	flex-grow: 1;
-}
-
-/* Block Placeholders */
-.editor-visual-editor__block .is-placeholder {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 1em;
-	min-height: 200px;
-	text-align: center;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	background: $light-gray-100;
-}
-
-.placeholder__label {
-	display: flex;
-	justify-content: center;
-	font-weight: bold;
-	margin-bottom: 1em;
-
-	.dashicon {
-		margin-right: 1ch;
-	}
-}
-
-.placeholder__fieldset {
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	max-width: 280px;
-}
-
-.placeholder__input {
-	margin-right: 8px;
-	flex: 1 1 auto;
-}
-
-.placeholder__instructions {
-	margin-bottom: 1em;
 }

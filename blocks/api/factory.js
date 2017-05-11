@@ -87,7 +87,7 @@ export function switchToBlockType( block, blockType ) {
 		return {
 			// The first transformed block whose type matches the "destination"
 			// type gets to keep the existing block's UID.
-			uid: index === firstSwitchedBlock ? block.uid : uuid(),
+			uid: index === firstSwitchedBlock ? block.uid : result.uid,
 			blockType: result.blockType,
 			attributes: result.attributes
 		};

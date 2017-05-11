@@ -101,7 +101,10 @@
 	&:focus {
 		box-shadow: none;
 	}
+}
 
+/* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
+.editor-text-editor {
 	padding-left: 20px;
 	padding-right: 20px;
 

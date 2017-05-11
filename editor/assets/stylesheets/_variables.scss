@@ -49,6 +49,11 @@ $admin-sidebar-width-collapsed: 36px;
 $shadow-popover: 0px 3px 20px rgba( $dark-gray-900, .1 ), 0px 1px 3px rgba( $dark-gray-900, .1 );
 $text-editor-max-width: 760px;
 
+/* Editor */
+$text-editor-max-width: 760px;
+$visual-editor-max-width: 700px;
+$block-controls-height: 46px;
+
 /* Blocks */
 $block-padding: 14px;
 $block-mover-margin: 18px;
@@ -88,7 +93,7 @@ Let's try and use as few of these as possible, and be mindful about adding new o
 
 $break-huge: 1440px;
 $break-wide: 1280px;
-$break-large: 960px;
-$break-medium: 782px;
+$break-large: 960px;	// admin sidebar auto folds
+$break-medium: 782px;	// adminbar goes big
 $break-small: 600px;
 $break-mobile: 480px;

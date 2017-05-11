@@ -56,6 +56,7 @@
 	cursor: pointer;
 
 	&:hover,
+	&:focus,
 	&:not(:disabled):hover {
 		color: $dark-gray-500;
 		border-color: $dark-gray-500;

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
 import Button from 'components/button';
+import Placeholder from 'components/placeholder';
 
 /**
  * Internal dependencies
@@ -30,18 +30,12 @@ registerBlock( 'core/embed', {
 
 		if ( ! url ) {
 			return (
-				<div className="blocks-embed is-placeholder">
-					<div className="placeholder__label">
-						<Dashicon icon="cloud" />
-						{ wp.i18n.__( 'Embed URL' ) }
-					</div>
-					<div className="placeholder__fieldset">
-						<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
-						<Button isLarge>
-							{ wp.i18n.__( 'Embed' ) }
-						</Button>
-					</div>
-				</div>
+				<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
+					<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+					<Button isLarge>
+						{ wp.i18n.__( 'Embed' ) }
+					</Button>
+				</Placeholder>
 			);
 		}
 
