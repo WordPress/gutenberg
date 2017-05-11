@@ -13,7 +13,8 @@ import { __ } from 'i18n';
  */
 const categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
-	{ slug: 'layout', title: __( 'Layout Blocks' ) }
+	{ slug: 'layout', title: __( 'Layout Blocks' ) },
+	{ slug: 'social', title: __( 'Social Media' ) }
 ];
 
 /**

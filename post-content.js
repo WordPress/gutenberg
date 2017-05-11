@@ -128,6 +128,14 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/list -->',
 			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
+
+			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
+			'<iframe width="560" height="315" src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe>',
+			'<!-- /wp:core/embed -->',
+
+			'<!-- wp:core/tweet -->',
+			'https://twitter.com/automattic/status/777261837335326720',
+			'<!-- /wp:core/tweet -->',
 		].join( '' ),
 	},
 };

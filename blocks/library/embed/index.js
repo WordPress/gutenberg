@@ -32,7 +32,7 @@ registerBlock( 'core/embed', {
 		if ( ! url ) {
 			return (
 				<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
-					<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+					<input type="url" className="components-placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed…' ) } />
 					<Button isLarge>
 						{ wp.i18n.__( 'Embed' ) }
 					</Button>
