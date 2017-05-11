@@ -13,6 +13,7 @@
  * @group restapi-jsclient
  */
 class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
+	const YOUTUBE_VIDEO_ID = 'i_cVJgIz_Cs';
 
 	public function setUp() {
 		parent::setUp();
@@ -21,14 +22,53 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 		global $wp_rest_server;
 		$this->server = $wp_rest_server = new Spy_REST_Server;
 		do_action( 'rest_api_init' );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_embed_request' ), 10, 3 );
 	}
 
 	public function tearDown() {
 		parent::tearDown();
-		remove_filter( 'rest_url', array( $this, 'test_rest_url_for_leading_slash' ), 10, 2 );
+
 		/** @var WP_REST_Server $wp_rest_server */
 		global $wp_rest_server;
 		$wp_rest_server = null;
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_embed_request' ), 10, 3 );
+	}
+
+	public function mock_embed_request( $preempt, $r, $url ) {
+		unset( $preempt, $r );
+
+		// Mock request to YouTube Embed.
+		if ( false !== strpos( $url, self::YOUTUBE_VIDEO_ID ) ) {
+			return array(
+				'response' => array(
+					'code' => 200,
+				),
+				'body' => wp_json_encode(
+					array(
+						'version'          => '1.0',
+						'type'             => 'video',
+						'provider_name'    => 'YouTube',
+						'provider_url'     => 'https://www.youtube.com',
+						'thumbnail_width'  => 480,
+						'width'            => 500,
+						'thumbnail_height' => 360,
+						'html'             => '<iframe width="500" height="375" src="https://www.youtube.com/embed/' . self::YOUTUBE_VIDEO_ID . '?feature=oembed" frameborder="0" allowfullscreen></iframe>',
+						'author_name'      => 'Jorge Rubira Santos',
+						'thumbnail_url'    => 'https://i.ytimg.com/vi/' . self::YOUTUBE_VIDEO_ID . '/hqdefault.jpg',
+						'title'            => 'No te olvides de poner el Where en el Delete From. (Una cancion para programadores)',
+						'height'           => 375,
+					)
+				),
+			);
+		} else {
+			return array(
+				'response' => array(
+					'code' => 404,
+				),
+			);
+		}
 	}
 
 	public function test_expected_routes_in_schema() {
@@ -109,6 +149,8 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'ID'           => $post_id,
 			'post_content' => 'Updated post content.',
 		) );
+		$post_revisions = array_values( wp_get_post_revisions( $post_id ) );
+		$post_revision_id = $post_revisions[ count( $post_revisions ) - 1 ]->ID;
 
 		$page_id = $this->factory->post->create( array(
 			'post_type'      => 'page',
@@ -124,6 +166,8 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			'ID'           => $page_id,
 			'post_content' => 'Updated page content.',
 		) );
+		$page_revisions = array_values( wp_get_post_revisions( $page_id ) );
+		$page_revision_id = $page_revisions[ count( $page_revisions ) - 1 ]->ID;
 
 		$tag_id = $this->factory->tag->create( array(
 			'name'        => 'REST API Client Fixture: Tag',
@@ -165,10 +209,16 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 			array(
 				'route' => '/oembed/1.0/embed',
 				'name'  => 'oembeds',
+				'args'  => array(
+					'url' => '?p=' . $post_id,
+				),
 			),
 			array(
 				'route' => '/oembed/1.0/proxy',
 				'name'  => 'oembedProxy',
+				'args'  => array(
+					'url' => 'https://www.youtube.com/watch?v=i_cVJgIz_Cs',
+				),
 			),
 			array(
 				'route' => '/wp/v2/posts',
@@ -183,7 +233,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 				'name'  => 'postRevisions',
 			),
 			array(
-				'route' => '/wp/v2/posts/' . $post_id . '/revisions/1',
+				'route' => '/wp/v2/posts/' . $post_id . '/revisions/' . $post_revision_id,
 				'name'  => 'revision',
 			),
 			array(
@@ -199,7 +249,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 				'name'  => 'pageRevisions',
 			),
 			array(
-				'route' => '/wp/v2/pages/'. $page_id . '/revisions/1',
+				'route' => '/wp/v2/pages/'. $page_id . '/revisions/' . $page_revision_id,
 				'name'  => 'pageRevision',
 			),
 			array(
@@ -215,7 +265,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 				'name'  => 'TypesCollection',
 			),
 			array(
-				'route' => '/wp/v2/types/',
+				'route' => '/wp/v2/types/post',
 				'name'  => 'TypeModel',
 			),
 			array(
@@ -267,7 +317,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 				'name'  => 'CommentsCollection',
 			),
 			array(
-				'route' => '/wp/v2/comments/1',
+				'route' => '/wp/v2/comments/' . $comment_id,
 				'name'  => 'CommentModel',
 			),
 			array(
@@ -285,9 +335,18 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 
 		foreach ( $routes_to_generate_data as $route ) {
 			$request = new WP_REST_Request( 'GET', $route['route'] );
+			if ( isset( $route['args'] ) ) {
+				$request->set_query_params( $route['args'] );
+			}
 			$response = $this->server->dispatch( $request );
+			$status = $response->get_status();
 			$data = $response->get_data();
 
+			$this->assertEquals(
+				200,
+				$response->get_status(),
+				"HTTP $status from $route[route]: " . json_encode( $data )
+			);
 			$this->assertTrue( ! empty( $data ), $route['name'] . ' route should return data.' );
 
 			if ( version_compare( PHP_VERSION, '5.4', '>=' ) ) {
@@ -319,6 +378,7 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 	 * how they were generated, see #39264.
 	 */
 	private static $fixture_replacements = array(
+		'oembeds.html' => '<blockquote class="wp-embedded-content">...</blockquote>',
 		'PostsCollection.0.id' => 3,
 		'PostsCollection.0.guid.rendered' => 'http://example.org/?p=3',
 		'PostsCollection.0.link' => 'http://example.org/?p=3',
@@ -331,12 +391,17 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 		'PostModel.id' => 3,
 		'PostModel.guid.rendered' => 'http://example.org/?p=3',
 		'PostModel.link' => 'http://example.org/?p=3',
-		'postRevisions.0.author' => '2',
+		'postRevisions.0.author' => 2,
 		'postRevisions.0.id' => 4,
 		'postRevisions.0.parent' => 3,
 		'postRevisions.0.slug' => '3-revision-v1',
 		'postRevisions.0.guid.rendered' => 'http://example.org/?p=4',
 		'postRevisions.0._links.parent.0.href' => 'http://example.org/?rest_route=/wp/v2/posts/3',
+		'revision.author' => 2,
+		'revision.id' => 4,
+		'revision.parent' => 3,
+		'revision.slug' => '3-revision-v1',
+		'revision.guid.rendered' => 'http://example.org/?p=4',
 		'PagesCollection.0.id' => 5,
 		'PagesCollection.0.guid.rendered' => 'http://example.org/?page_id=5',
 		'PagesCollection.0.link' => 'http://example.org/?page_id=5',
@@ -347,12 +412,17 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 		'PageModel.id' => 5,
 		'PageModel.guid.rendered' => 'http://example.org/?page_id=5',
 		'PageModel.link' => 'http://example.org/?page_id=5',
-		'pageRevisions.0.author' => '2',
+		'pageRevisions.0.author' => 2,
 		'pageRevisions.0.id' => 6,
 		'pageRevisions.0.parent' => 5,
 		'pageRevisions.0.slug' => '5-revision-v1',
 		'pageRevisions.0.guid.rendered' => 'http://example.org/?p=6',
 		'pageRevisions.0._links.parent.0.href' => 'http://example.org/?rest_route=/wp/v2/pages/5',
+		'pageRevision.author' => 2,
+		'pageRevision.id' => 6,
+		'pageRevision.parent' => 5,
+		'pageRevision.slug' => '5-revision-v1',
+		'pageRevision.guid.rendered' => 'http://example.org/?p=6',
 		'MediaCollection.0.id' => 7,
 		'MediaCollection.0.guid.rendered' => 'http://example.org/?attachment_id=7',
 		'MediaCollection.0.link' => 'http://example.org/?attachment_id=7',
@@ -377,6 +447,9 @@ class WP_Test_REST_Schema_Initialization extends WP_Test_REST_TestCase {
 		'CommentsCollection.0.link' => 'http://example.org/?p=3#comment-2',
 		'CommentsCollection.0._links.self.0.href' => 'http://example.org/?rest_route=/wp/v2/comments/2',
 		'CommentsCollection.0._links.up.0.href' => 'http://example.org/?rest_route=/wp/v2/posts/3',
+		'CommentModel.id' => 2,
+		'CommentModel.post' => 3,
+		'CommentModel.link' => 'http://example.org/?p=3#comment-2',
 	);
 
 	private function normalize_fixture( $data, $path ) {
