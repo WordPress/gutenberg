@@ -4,9 +4,8 @@
 import './style.scss';
 import { registerBlock, query as hpq } from '../../api';
 
-// TODO: Revisit when we have a common components solution
-import Dashicon from '../../../components/dashicon';
-import Button from '../../../components/button';
+import Button from 'components/button';
+import Placeholder from 'components/placeholder';
 
 import GalleryImage from './gallery-image';
 
@@ -37,19 +36,15 @@ registerBlock( 'core/gallery', {
 
 		if ( ! images ) {
 			return (
-				<div className="blocks-gallery is-placeholder">
-					<div className="blocks-gallery__placeholder-label">
-						<Dashicon icon="format-gallery" />
-						{ wp.i18n.__( 'Gallery' ) }
-					</div>
-					<div className="blocks-gallery__placeholder-instructions">
-						{ wp.i18n.__( 'Drag images here or insert from media library' ) }
-					</div>
-					<Button isLarge
-						onClick={ () => setAttributes( { images: canned } ) }>
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag images here or insert from media library' ) }
+					icon="format-gallery"
+					label={ wp.i18n.__( 'Gallery' ) }
+					className="blocks-gallery">
+					<Button isLarge onClick={ () => setAttributes( { images: canned } ) }>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
 					</Button>
-				</div>
+				</Placeholder>
 			);
 		}
 
@@ -72,5 +67,6 @@ registerBlock( 'core/gallery', {
 				) ) }
 			</div>
 		);
-	}
+	},
+
 } );
