@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import { createElement, renderToString, concatChildren } from '../';
+import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
@@ -53,6 +53,34 @@ describe( 'element', () => {
 			expect( concat.length ).to.equal( 2 );
 			expect( concat[ 0 ].key ).to.equal( '0,0' );
 			expect( concat[ 1 ].key ).to.equal( '1,0' );
+		} );
+	} );
+
+	describe( 'switchChildrenNodeName', () => {
+		it( 'should return undefined for undefined children', () => {
+			expect( switchChildrenNodeName() ).to.be.undefined();
+		} );
+
+		it( 'should switch strings', () => {
+			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
+			expect( children.length ).to.equal( 2 );
+			expect( children[ 0 ].type ).to.equal( 'strong' );
+			expect( children[ 0 ].props.children ).to.equal( 'a' );
+			expect( children[ 1 ].type ).to.equal( 'strong' );
+			expect( children[ 1 ].props.children ).to.equal( 'b' );
+		} );
+
+		it( 'should switch elements', () => {
+			const children = switchChildrenNodeName( [
+				createElement( 'strong', { align: 'left' }, 'Courgette' ),
+				createElement( 'strong', {}, 'Concombre' )
+			], 'em' );
+			expect( children.length ).to.equal( 2 );
+			expect( children[ 0 ].type ).to.equal( 'em' );
+			expect( children[ 0 ].props.children ).to.equal( 'Courgette' );
+			expect( children[ 0 ].props.align ).to.equal( 'left' );
+			expect( children[ 1 ].type ).to.equal( 'em' );
+			expect( children[ 1 ].props.children ).to.equal( 'Concombre' );
 		} );
 	} );
 } );
