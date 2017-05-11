@@ -2,19 +2,14 @@
 	font-family: $default-font;
 	display: inline-block;
 	text-decoration: none;
-	font-size: 17px;
-	line-height: 1.5;
+	font-size: $big-font-size;
 	margin: 0;
-	padding: 6px 14px;
+	padding: 6px 24px;
 	cursor: default;
-	border-width: 1px;
-	border-style: solid;
-	border-radius: 2px;
+	border-radius: 22px;
 	white-space: nowrap;
-	box-sizing: border-box;
-	background: $blue-medium;
+	background: $blue-medium-400;
 	color: $white;
-	border-color: $blue-wordpress;
 	vertical-align: top;
 	position: relative;
 
