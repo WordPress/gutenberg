@@ -32,6 +32,11 @@ body.toplevel_page_gutenberg {
 		list-style-type: decimal;
 	}
 
+	ul, ol {
+		margin: 0;
+		padding-left: 2.5em;
+	}
+
 	select {
 		font-size: 13px;
 		color: $dark-gray-500;
@@ -53,7 +58,8 @@ body.toplevel_page_gutenberg {
 .editor-sidebar,
 .editor-post-title,
 .editor-visual-editor__block {
-	input, textarea {
+	input,
+	textarea {
 		border-radius: 4px;
 		border-color: $light-gray-500;
 		font-family: $default-font;
