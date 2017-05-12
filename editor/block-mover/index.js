@@ -21,13 +21,13 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 				className="editor-block-mover__control"
 				onClick={ onMoveUp }
 				icon="arrow-up-alt2"
-				disabled={ isFirst }
+				aria-disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ onMoveDown }
 				icon="arrow-down-alt2"
-				disabled={ isLast }
+				aria-disabled={ isLast }
 			/>
 		</div>
 	);

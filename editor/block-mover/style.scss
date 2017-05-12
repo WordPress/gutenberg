@@ -19,9 +19,10 @@
 		color: $dark-gray-900;
 	}
 
-	&[disabled] {
+	&[aria-disabled="true"] {
 		cursor: default;
 		color: $light-gray-300;
+		pointer-events: none;
 	}
 
 	.dashicon {
