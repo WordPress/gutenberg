@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -224,9 +225,11 @@ class InserterMenu extends wp.element.Component {
 	render() {
 		const { position = 'top' } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlocks() );
+		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
+		const className = classnames( 'editor-inserter__menu', positionClasses );
 
 		return (
-			<div className={ `editor-inserter__menu is-${ position }` } tabIndex="0">
+			<div className={ className } tabIndex="0">
 				<div className="editor-inserter__arrow" />
 				<div role="menu" className="editor-inserter__content">
 					{ wp.blocks.getCategories()
