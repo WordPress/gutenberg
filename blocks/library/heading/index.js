@@ -79,7 +79,7 @@ registerBlock( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
 		const { content, nodeName = 'H2' } = attributes;
 
 		return (
@@ -89,7 +89,7 @@ registerBlock( 'core/heading', {
 				focus={ focus }
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
-				onMerge={ mergeWithPrevious }
+				onMerge={ mergeBlocks }
 				inline
 			/>
 		);

@@ -20,6 +20,7 @@ import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
 const KEYCODE_BACKSPACE = 8;
+const KEYCODE_DELETE = 46;
 
 const alignmentMap = {
 	alignleft: 'left',
@@ -177,10 +178,34 @@ export default class Editable extends wp.element.Component {
 		return true;
 	}
 
+	isEndOfEditor() {
+		const range = this.editor.selection.getRng();
+		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
+			return false;
+		}
+		const start = range.endContainer;
+		const body = this.editor.getBody();
+		let element = start;
+		while ( element !== body ) {
+			const child = element;
+			element = element.parentNode;
+			if ( element.lastChild !== child ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	onKeyDown( event ) {
-		if ( this.props.onMerge && event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) {
+		if (
+			this.props.onMerge && (
+				( event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) ||
+				( event.keyCode === KEYCODE_DELETE && this.isEndOfEditor() )
+			)
+		) {
+			const forward = event.keyCode === KEYCODE_DELETE;
 			this.onChange();
-			this.props.onMerge( this.editor.getContent() );
+			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
