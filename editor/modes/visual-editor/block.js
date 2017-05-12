@@ -337,7 +337,7 @@ class VisualEditorBlock extends Component {
 			'is-showing-mobile-controls': showMobileControls,
 		} );
 
-		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
+		const { onMouseLeave, onFocus, onDeselect, onInsertBlocksAfter, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -412,6 +412,7 @@ class VisualEditorBlock extends Component {
 							insertBlocksAfter={ onInsertBlocksAfter }
 							onReplace={ onReplace }
 							setFocus={ partial( onFocus, block.uid ) }
+							clearFocus={ onDeselect }
 							mergeBlocks={ this.mergeBlocks }
 							className={ className }
 							id={ block.uid }

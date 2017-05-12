@@ -63,7 +63,7 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, focus, setFocus, clearFocus, className } ) {
 		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -160,9 +160,6 @@ registerBlockType( 'core/image', {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 		} );
 
-		// Disable reason: Each block can be selected by clicking on it
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
 			controls,
 			focus && (
@@ -175,7 +172,7 @@ registerBlockType( 'core/image', {
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes }>
-				<img src={ url } alt={ alt } onClick={ setFocus } />
+				<img src={ url } alt={ alt } tabIndex="-1" />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -183,13 +180,13 @@ registerBlockType( 'core/image', {
 						value={ caption }
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
+						onBlur={ () => clearFocus() }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inlineToolbar
 					/>
 				) : null }
 			</figure>,
 		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 
 	save( { attributes } ) {
