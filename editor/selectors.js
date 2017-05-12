@@ -82,6 +82,11 @@ export function getPreviousBlock( state, uid ) {
 	return state.editor.blocksByUid[ state.editor.blockOrder[ order - 1 ] ] || null;
 }
 
+export function getNextBlock( state, uid ) {
+	const order = getBlockOrder( state, uid );
+	return state.editor.blocksByUid[ state.editor.blockOrder[ order + 1 ] ] || null;
+}
+
 export function isBlockSelected( state, uid ) {
 	return state.selectedBlock.uid === uid;
 }

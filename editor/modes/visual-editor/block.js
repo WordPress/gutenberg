@@ -19,6 +19,7 @@ import BlockSwitcher from '../../block-switcher';
 import { focusBlock, mergeBlocks } from '../../actions';
 import {
 	getPreviousBlock,
+	getNextBlock,
 	getBlock,
 	getBlockFocus,
 	getBlockOrder,
@@ -36,7 +37,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOnBackspace = this.removeOnBackspace.bind( this );
-		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
+		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -101,15 +102,22 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	mergeWithPrevious() {
-		const { block, previousBlock, onMerge } = this.props;
+	mergeBlocks( forward = false ) {
+		const { block, previousBlock, nextBlock, onMerge } = this.props;
 
 		// Do nothing when it's the first block
-		if ( ! previousBlock ) {
+		if (
+			( ! forward && ! previousBlock ) ||
+			( forward && ! nextBlock )
+		) {
 			return;
 		}
 
-		onMerge( previousBlock, block );
+		if ( forward ) {
+			onMerge( block, nextBlock );
+		} else {
+			onMerge( previousBlock, block );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -200,7 +208,7 @@ class VisualEditorBlock extends wp.element.Component {
 						setAttributes={ this.setAttributes }
 						insertBlockAfter={ onInsertAfter }
 						setFocus={ partial( onFocus, block.uid ) }
-						mergeWithPrevious={ this.mergeWithPrevious }
+						mergeBlocks={ this.mergeBlocks }
 					/>
 				</div>
 				{ isSelected &&
@@ -223,6 +231,7 @@ export default connect(
 	( state, ownProps ) => {
 		return {
 			previousBlock: getPreviousBlock( state, ownProps.uid ),
+			nextBlock: getNextBlock( state, ownProps.uid ),
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
