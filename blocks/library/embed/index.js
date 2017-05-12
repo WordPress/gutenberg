@@ -7,6 +7,7 @@ import Placeholder from 'components/placeholder';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
 
@@ -22,7 +23,7 @@ registerBlock( 'core/embed', {
 	attributes: {
 		url: attr( 'iframe', 'src' ),
 		title: attr( 'iframe', 'title' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -40,7 +41,7 @@ registerBlock( 'core/embed', {
 		}
 
 		return (
-			<figure>
+			<figure className="blocks-embed">
 				<div className="iframe-overlay">
 					<iframe src={ url } title={ title } />
 				</div>
@@ -53,6 +54,7 @@ registerBlock( 'core/embed', {
 						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inline
+						inlineToolbar
 					/>
 				) : null }
 			</figure>
@@ -73,5 +75,5 @@ registerBlock( 'core/embed', {
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
-	}
+	},
 } );

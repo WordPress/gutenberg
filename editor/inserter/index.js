@@ -19,7 +19,7 @@ class Inserter extends wp.element.Component {
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
 		this.state = {
-			opened: false
+			opened: false,
 		};
 	}
 
@@ -29,13 +29,13 @@ class Inserter extends wp.element.Component {
 		}
 
 		this.setState( {
-			opened: ! this.state.opened
+			opened: ! this.state.opened,
 		} );
 	}
 
 	close() {
 		this.setState( {
-			opened: false
+			opened: false,
 		} );
 	}
 

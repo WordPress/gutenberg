@@ -1,0 +1,14 @@
+$z-layers: (
+    '.editor-mode-switcher .dashicon': -1,
+    '.editor-block-switcher__arrow': 1,
+    '.editor-inserter__arrow': 1,
+    '.editor-inserter': 1,
+    '.editor-visual-editor__block:before': -1,
+    '.editor-visual-editor__block {core/image aligned left or right}': 10,
+    '.editor-visual-editor__block-controls': 1,
+    '.editor-header': 20,
+);
+
+@function z-index( $key ) {
+	@return map-get( $z-layers, $key );
+}

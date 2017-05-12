@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import tinymce from 'tinymce';
+
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
 		this.initialize();
@@ -45,9 +50,9 @@ export default class TinyMCE extends wp.element.Component {
 				this.props.onSetup( editor );
 			},
 			formats: {
-				strikethrough: { inline: 'del' }
+				strikethrough: { inline: 'del' },
 			},
-			...settings
+			...settings,
 		} );
 
 		if ( focus ) {
@@ -72,7 +77,7 @@ export default class TinyMCE extends wp.element.Component {
 			suppressContentEditableWarning: true,
 			className: 'blocks-editable__tinymce',
 			style,
-			'data-placeholder': placeholder
+			'data-placeholder': placeholder,
 		}, children );
 	}
 }

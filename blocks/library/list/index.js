@@ -48,7 +48,7 @@ registerBlock( 'core/list', {
 
 	attributes: {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
-		values: children( 'ol,ul' )
+		values: children( 'ol,ul' ),
 	},
 
 	controls: [
@@ -56,23 +56,23 @@ registerBlock( 'core/list', {
 			icon: 'editor-ul',
 			title: wp.i18n.__( 'Convert to unordered' ),
 			isActive: listIsActive( 'UL' ),
-			onClick: listSetType( 'UL', 'InsertUnorderedList' )
+			onClick: listSetType( 'UL', 'InsertUnorderedList' ),
 		},
 		{
 			icon: 'editor-ol',
 			title: wp.i18n.__( 'Convert to ordered' ),
 			isActive: listIsActive( 'OL' ),
-			onClick: listSetType( 'OL', 'InsertOrderedList' )
+			onClick: listSetType( 'OL', 'InsertOrderedList' ),
 		},
 		{
 			icon: 'editor-outdent',
 			title: wp.i18n.__( 'Outdent list item' ),
-			onClick: execCommand( 'Outdent' )
+			onClick: execCommand( 'Outdent' ),
 		},
 		{
 			icon: 'editor-indent',
 			title: wp.i18n.__( 'Indent list item' ),
-			onClick: execCommand( 'Indent' )
+			onClick: execCommand( 'Indent' ),
 		},
 	],
 
@@ -106,5 +106,5 @@ registerBlock( 'core/list', {
 			null,
 			values
 		);
-	}
+	},
 } );

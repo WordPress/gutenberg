@@ -24,25 +24,25 @@ const KEYCODE_BACKSPACE = 8;
 const alignmentMap = {
 	alignleft: 'left',
 	alignright: 'right',
-	aligncenter: 'center'
+	aligncenter: 'center',
 };
 
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
 		title: wp.i18n.__( 'Align left' ),
-		align: 'left'
+		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
 		title: wp.i18n.__( 'Align center' ),
-		align: 'center'
+		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
 		title: wp.i18n.__( 'Align right' ),
-		align: 'right'
-	}
+		align: 'right',
+	},
 ];
 
 function createElement( type, props, ...children ) {
@@ -79,7 +79,7 @@ export default class Editable extends wp.element.Component {
 			formats: {},
 			alignment: null,
 			bookmark: null,
-			empty: ! props.value || ! props.value.length
+			empty: ! props.value || ! props.value.length,
 		};
 	}
 
@@ -124,7 +124,7 @@ export default class Editable extends wp.element.Component {
 		const content = this.getContent();
 
 		this.setState( {
-			empty: ! content || ! content.length
+			empty: ! content || ! content.length,
 		} );
 	}
 
@@ -159,7 +159,7 @@ export default class Editable extends wp.element.Component {
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
-			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left
+			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left,
 		};
 	}
 
@@ -348,7 +348,7 @@ export default class Editable extends wp.element.Component {
 		} );
 
 		this.setState( {
-			formats: merge( {}, this.state.formats, formats )
+			formats: merge( {}, this.state.formats, formats ),
 		} );
 
 		this.editor.setDirty( true );
@@ -379,7 +379,7 @@ export default class Editable extends wp.element.Component {
 			inlineToolbar = false,
 			inline,
 			formattingControls,
-			placeholder
+			placeholder,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -406,7 +406,7 @@ export default class Editable extends wp.element.Component {
 								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
 									...control,
 									onClick: () => this.toggleAlignment( control.align ),
-									isActive: this.isAlignmentActive( control.align )
+									isActive: this.isAlignmentActive( control.align ),
 								} ) ) } />
 						}
 						{ ! inlineToolbar && formatToolbar }
@@ -425,7 +425,7 @@ export default class Editable extends wp.element.Component {
 					style={ style }
 					defaultValue={ value }
 					settings={ {
-						forced_root_block: inline ? false : 'p'
+						forced_root_block: inline ? false : 'p',
 					} }
 					isEmpty={ this.state.empty }
 					placeholder={ placeholder }

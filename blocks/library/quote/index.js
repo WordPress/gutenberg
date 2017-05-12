@@ -14,7 +14,7 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' )
+		citation: children( 'footer' ),
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
@@ -24,7 +24,7 @@ registerBlock( 'core/quote', {
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
-		subscript: variation
+		subscript: variation,
 	} ) ),
 
 	transforms: {
@@ -34,19 +34,19 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content
+						value: content,
 					} );
-				}
+				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content
+						value: content,
 					} );
-				}
-			}
+				},
+			},
 		],
 		to: [
 			{
@@ -54,9 +54,9 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
 					return createBlock( 'core/text', {
-						content: wp.element.concatChildren( value, citation )
+						content: wp.element.concatChildren( value, citation ),
 					} );
-				}
+				},
 			},
 			{
 				type: 'block',
@@ -64,22 +64,22 @@ registerBlock( 'core/quote', {
 				transform: ( { value, citation, ...attrs } ) => {
 					if ( Array.isArray( value ) || citation ) {
 						const heading = createBlock( 'core/heading', {
-							content: Array.isArray( value ) ? value[ 0 ] : value
+							content: Array.isArray( value ) ? value[ 0 ] : value,
 						} );
 						const quote = createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: Array.isArray( value ) ? value.slice( 1 ) : ''
+							value: Array.isArray( value ) ? value.slice( 1 ) : '',
 						} );
 
 						return [ heading, quote ];
 					}
 					return createBlock( 'core/heading', {
-						content: value
+						content: value,
 					} );
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
@@ -92,7 +92,7 @@ registerBlock( 'core/quote', {
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue
+							value: nextValue,
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
@@ -106,7 +106,7 @@ registerBlock( 'core/quote', {
 						value={ citation }
 						onChange={
 							( nextCitation ) => setAttributes( {
-								citation: nextCitation
+								citation: nextCitation,
 							} )
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
@@ -131,5 +131,5 @@ registerBlock( 'core/quote', {
 				) }
 			</blockquote>
 		);
-	}
+	},
 } );

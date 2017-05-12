@@ -15,7 +15,7 @@ import {
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
 	getBlockSettings,
-	getBlocks
+	getBlocks,
 } from '../registration';
 
 describe( 'blocks', () => {

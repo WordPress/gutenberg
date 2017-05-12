@@ -1,3 +1,7 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 /**
  * Block categories.
@@ -8,8 +12,8 @@
  * @var {Array} categories
  */
 const categories = [
-	{ slug: 'common', title: 'Common Blocks' },
-	{ slug: 'layout', title: 'Layout Blocks' }
+	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 ];
 
 /**

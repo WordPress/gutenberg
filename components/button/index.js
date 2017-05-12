@@ -9,7 +9,7 @@ function Button( { isPrimary, isLarge, isToggled, className, buttonRef, ...addit
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
 		'button-large': isLarge,
-		'is-toggled': isToggled
+		'is-toggled': isToggled,
 	} );
 
 	return (

@@ -9,6 +9,7 @@ import clickOutside from 'react-click-outside';
  * WordPress dependencies
  */
 import IconButton from 'components/icon-button';
+import Dashicon from 'components/dashicon';
 
 /**
  * Internal dependencies
@@ -21,7 +22,7 @@ class BlockSwitcher extends wp.element.Component {
 		super( ...arguments );
 		this.toggleMenu = this.toggleMenu.bind( this );
 		this.state = {
-			open: false
+			open: false,
 		};
 	}
 
@@ -35,14 +36,14 @@ class BlockSwitcher extends wp.element.Component {
 
 	toggleMenu() {
 		this.setState( {
-			open: ! this.state.open
+			open: ! this.state.open,
 		} );
 	}
 
 	switchBlockType( blockType ) {
 		return () => {
 			this.setState( {
-				open: false
+				open: false,
 			} );
 			this.props.onTransform( this.props.block, blockType );
 		};
@@ -77,7 +78,7 @@ class BlockSwitcher extends wp.element.Component {
 					aria-expanded={ this.state.open }
 					label={ wp.i18n.__( 'Change block content type' ) }
 				>
-					<div className="editor-block-switcher__arrow" />
+					<Dashicon icon="arrow-down" />
 				</IconButton>
 				{ this.state.open &&
 					<div
@@ -106,15 +107,15 @@ class BlockSwitcher extends wp.element.Component {
 
 export default connect(
 	( state, ownProps ) => ( {
-		block: getBlock( state, ownProps.uid )
+		block: getBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onTransform( block, blockType ) {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				uids: [ ownProps.uid ],
-				blocks: wp.blocks.switchToBlockType( block, blockType )
+				blocks: wp.blocks.switchToBlockType( block, blockType ),
 			} );
-		}
+		},
 	} )
 )( clickOutside( BlockSwitcher ) );

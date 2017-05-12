@@ -42,9 +42,9 @@ export default connect(
 			onUpdate( title ) {
 				dispatch( {
 					type: 'EDIT_POST',
-					edits: { title }
+					edits: { title },
 				} );
-			}
+			},
 		};
 	}
 )( PostTitle );

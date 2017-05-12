@@ -15,7 +15,7 @@ import { getEditorMode, isEditorSidebarOpened } from '../selectors';
 
 function Layout( { mode, isSidebarOpened } ) {
 	const className = classnames( 'editor-layout', {
-		'is-sidebar-opened': isSidebarOpened
+		'is-sidebar-opened': isSidebarOpened,
 	} );
 
 	return (
@@ -32,5 +32,5 @@ function Layout( { mode, isSidebarOpened } ) {
 
 export default connect( ( state ) => ( {
 	mode: getEditorMode( state ),
-	isSidebarOpened: isEditorSidebarOpened( state )
+	isSidebarOpened: isEditorSidebarOpened( state ),
 } ) )( Layout );
