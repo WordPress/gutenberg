@@ -26,7 +26,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Why
 
-One thing sets WordPress apart from other systems, is that it allows you to create as rich a post layout as you can imagine. But only if you know HTML & CSS and building your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create gorgeous playful layouts, hopefully we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
+One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine. But only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
 
 ## Ingredients
 
