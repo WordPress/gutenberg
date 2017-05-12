@@ -21,6 +21,7 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
+	padding: 3px 3px 0 3px;
 
 	input {
 		font-size: 13px;
@@ -28,8 +29,8 @@
 }
 
 .editor-block-switcher__menu-item {
-	width: auto;
-	margin: 3px;
+	width: 100%;
+	margin-bottom: 3px;
 	padding: 6px;
 	background: none;
 	border: 1px solid transparent;
