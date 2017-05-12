@@ -124,6 +124,7 @@ class FormatToolbar extends wp.element.Component {
 			} );
 		}
 
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editable-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
@@ -134,6 +135,7 @@ class FormatToolbar extends wp.element.Component {
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
 						<input
+							autoFocus
 							className="editable-format-toolbar__link-input"
 							type="url"
 							required
@@ -156,6 +158,7 @@ class FormatToolbar extends wp.element.Component {
 				}
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
