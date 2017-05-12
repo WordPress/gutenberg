@@ -25,14 +25,23 @@ class Inserter extends wp.element.Component {
 		};
 	}
 
-	toggle() {
+	toggle( event ) {
+		// When opening the menu, track reference to the current active element
+		// so we know where to restore focus after the menu is closed.
+		if ( ! this.state.opened ) {
+			this.toggleNode = event.currentTarget;
+		}
+
 		this.setState( {
 			opened: ! this.state.opened,
 		} );
 	}
 
 	close() {
-		this.toggleNode.focus();
+		// Restore focus to original opening active element before menu closes
+		if ( this.toggleNode ) {
+			this.toggleNode.focus();
+		}
 
 		this.setState( {
 			opened: false,
@@ -67,7 +76,6 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
-					buttonRef={ ( node ) => this.toggleNode = node }
 					aria-expanded={ opened ? 'true' : 'false' } />
 				{ opened && (
 					<InserterMenu
