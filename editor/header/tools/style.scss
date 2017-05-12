@@ -59,16 +59,4 @@
 			margin-right: 4px;
 		}
 	}
-
-	.components-button {
-		&.is-toggled {
-			background: $dark-gray-500;
-			color: $white;
-		}
-
-		&.is-toggled:hover {
-			color: $white;
-			background: $dark-gray-400;
-		}
-	}
 }
