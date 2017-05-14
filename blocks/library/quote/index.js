@@ -2,13 +2,10 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, createBlock, query as hpq } from '../../api';
+import Editable from '../../editable';
 
-const { parse, html, query } = hpq;
-
-const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
-const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
+const { children, query } = hpq;
 
 registerBlock( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
@@ -16,51 +13,123 @@ registerBlock( 'core/quote', {
 	category: 'common',
 
 	attributes: {
-		value: query( 'blockquote > p', html() ),
-		citation: html( 'footer' )
+		value: query( 'blockquote > p', children() ),
+		citation: children( 'footer' ),
 	},
 
-	edit( { attributes, setAttributes } ) {
-		const { value, citation } = attributes;
+	controls: [ 1, 2 ].map( ( variation ) => ( {
+		icon: 'format-quote',
+		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
+		isActive: ( { style = 1 } ) => Number( style ) === variation,
+		onClick( attributes, setAttributes ) {
+			setAttributes( { style: variation } );
+		},
+		subscript: variation,
+	} ) ),
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { content } ) => {
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { content } ) => {
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/text' ],
+				transform: ( { value, citation } ) => {
+					return createBlock( 'core/text', {
+						content: wp.element.concatChildren( value, citation ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: ( { value, citation, ...attrs } ) => {
+					if ( Array.isArray( value ) || citation ) {
+						const heading = createBlock( 'core/heading', {
+							content: Array.isArray( value ) ? value[ 0 ] : value,
+						} );
+						const quote = createBlock( 'core/quote', {
+							...attrs,
+							citation,
+							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+						} );
+
+						return [ heading, quote ];
+					}
+					return createBlock( 'core/heading', {
+						content: value,
+					} );
+				},
+			},
+		],
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+		const { value, citation, style = 1 } = attributes;
+		const focusedEditable = focus ? focus.editable || 'value' : null;
 
 		return (
-			<blockquote className="blocks-quote">
+			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
 				<Editable
-					value={ fromValueToParagraphs( value ) }
+					value={ value }
 					onChange={
-						( paragraphs ) => setAttributes( {
-							value: fromParagraphsToValue( paragraphs )
+						( nextValue ) => setAttributes( {
+							value: nextValue,
 						} )
-					} />
-				<footer>
+					}
+					focus={ focusedEditable === 'value' ? focus : null }
+					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onMerge={ mergeWithPrevious }
+					showAlignments
+				/>
+				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
+						tagName="footer"
 						value={ citation }
 						onChange={
-							( newValue ) => setAttributes( {
-								citation: newValue
+							( nextCitation ) => setAttributes( {
+								citation: nextCitation,
 							} )
-						} />
-				</footer>
+						}
+						focus={ focusedEditable === 'citation' ? focus : null }
+						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						inline
+					/>
+				) }
 			</blockquote>
 		);
 	},
 
-	save( attributes ) {
-		const { value, citation } = attributes;
+	save( { attributes } ) {
+		const { value, citation, style = 1 } = attributes;
 
 		return (
-			<blockquote>
+			<blockquote className={ `blocks-quote-style-${ style }` }>
 				{ value && value.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						dangerouslySetInnerHTML={ {
-							__html: paragraph
-						} } />
+					<p key={ i }>{ paragraph }</p>
 				) ) }
-				<footer dangerouslySetInnerHTML={ {
-					__html: citation
-				} } />
+				{ citation && citation.length > 0 && (
+					<footer>{ citation }</footer>
+				) }
 			</blockquote>
 		);
-	}
+	},
 } );

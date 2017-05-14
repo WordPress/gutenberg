@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Provider } from 'react-redux';
+import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as SlotFillProvider } from 'react-slot-fill';
 
 /**
  * Internal dependencies
@@ -19,14 +20,17 @@ import { createReduxStore } from './state';
 export function createEditorInstance( id, post ) {
 	const store = createReduxStore();
 	store.dispatch( {
-		type: 'REPLACE_BLOCKS',
-		blockNodes: wp.blocks.parse( post.content.raw )
+		type: 'RESET_BLOCKS',
+		post,
+		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
 	wp.element.render(
-		<Provider store={ store }>
-			<Layout />
-		</Provider>,
+		<ReduxProvider store={ store }>
+			<SlotFillProvider>
+				<Layout />
+			</SlotFillProvider>
+		</ReduxProvider>,
 		document.getElementById( id )
 	);
 }

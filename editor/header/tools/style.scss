@@ -4,32 +4,71 @@
 	align-items: center;
 }
 
+.editor-tools__undo,
+.editor-tools__redo {
+	display: none;
+
+	@include break-mobile {
+		display: flex;
+	}
+}
+
 .editor-tools__tabs {
 	margin: 0 $item-spacing;
-	padding: 0 0 0 $item-spacing;
+	padding: 0;
 	border-left: 1px solid $light-gray-500;
 	border-right: 1px solid $light-gray-500;
 	display: flex;
 	align-items: center;
 
-	.editor-button {
+	@include break-medium {
+		padding: 0 0 0 $item-spacing;
+	}
+
+	.components-button {
 		display: flex;
+		flex-wrap: nowrap;
+		white-space: nowrap;
 		align-items: center;
 		border: none;
 		background: none;
 		color: $dark-gray-500;
-		margin-right: $item-spacing;
+		margin-right: 0;
 		cursor: pointer;
 		height: 30px;
 		padding: 0 10px;
 		border-radius: 3px;
+		width: 40px;
+		overflow: hidden;
 
 		&:hover {
 			color: $blue-medium;
 		}
+
+		@include break-medium() {
+			width: auto;
+			margin-right: $item-spacing;
+		}
 	}
 
-	.editor-button .dashicon {
-		margin-right: 4px;
+	.components-button .dashicon {
+		margin-right: 10px;
+		flex-shrink: 0;
+
+		@include break-medium() {
+			margin-right: 4px;
+		}
+	}
+
+	.components-button {
+		&.is-toggled {
+			background: $dark-gray-500;
+			color: $white;
+		}
+
+		&.is-toggled:hover {
+			color: $white;
+			background: $dark-gray-400;
+		}
 	}
 }

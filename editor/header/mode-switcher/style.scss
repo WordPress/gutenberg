@@ -1,4 +1,4 @@
-.editor-mode-switcher {
+#wpbody .editor-mode-switcher {	/* #wpbody for extra specificity */
 	position: relative;
 	margin-right: $item-spacing;
 	padding-right: $item-spacing;
@@ -19,12 +19,18 @@
 		outline: none;
 		cursor: pointer;
 		box-shadow: none;
-		padding-right: 24px;
+		padding-right: 0;
+		font-size: 13px;
+		height: auto;
+
+		@include break-small {
+			padding-right: 24px;
+		}
 	}
 
 	.dashicon {
 		position: relative;
-		z-index: -1;
+		z-index: z-index( '.editor-mode-switcher .dashicon' );
 		margin-left: -24px;
 		margin-top: -1px;
 	}

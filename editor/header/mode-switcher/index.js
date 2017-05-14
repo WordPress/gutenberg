@@ -4,10 +4,15 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import Dashicon from 'components/dashicon';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import Dashicon from 'components/dashicon';
+import { getEditorMode } from '../../selectors';
 
 /**
  * Set of available mode options.
@@ -17,12 +22,12 @@ import Dashicon from 'components/dashicon';
 const MODES = [
 	{
 		value: 'visual',
-		label: wp.i18n.__( 'Visual' )
+		label: wp.i18n.__( 'Visual' ),
 	},
 	{
 		value: 'text',
-		label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' )
-	}
+		label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
+	},
 ];
 
 function ModeSwitcher( { mode, onSwitch } ) {
@@ -53,14 +58,14 @@ function ModeSwitcher( { mode, onSwitch } ) {
 
 export default connect(
 	( state ) => ( {
-		mode: state.mode
+		mode: getEditorMode( state ),
 	} ),
 	( dispatch ) => ( {
 		onSwitch( mode ) {
 			dispatch( {
 				type: 'SWITCH_MODE',
-				mode: mode
+				mode: mode,
 			} );
-		}
+		},
 	} )
 )( ModeSwitcher );

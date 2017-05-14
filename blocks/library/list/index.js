@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, query as hpq } from '../../api';
+import Editable from '../../editable';
 
-const { html, prop, query } = hpq;
+const { children, prop } = hpq;
 
 registerBlock( 'core/list', {
 	title: wp.i18n.__( 'List' ),
@@ -13,67 +13,52 @@ registerBlock( 'core/list', {
 	category: 'common',
 
 	attributes: {
-		listType: prop( 'ol,ul', 'nodeName' ),
-		items: query( 'li', {
-			value: html()
-		} )
+		nodeName: prop( 'ol,ul', 'nodeName' ),
+		values: children( 'ol,ul' ),
 	},
 
 	controls: [
 		{
-			icon: 'editor-alignleft',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => ! align || 'left' === align,
+			icon: 'editor-ul',
+			title: wp.i18n.__( 'Convert to unordered' ),
+			isActive: ( { nodeName = 'OL' } ) => nodeName === 'UL',
 			onClick( attributes, setAttributes ) {
-				setAttributes( { align: undefined } );
-			}
+				setAttributes( { nodeName: 'UL' } );
+			},
 		},
 		{
-			icon: 'editor-aligncenter',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
+			icon: 'editor-ol',
+			title: wp.i18n.__( 'Convert to ordered' ),
+			isActive: ( { nodeName = 'OL' } ) => nodeName === 'OL',
 			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'center' } );
-			}
+				setAttributes( { nodeName: 'OL' } );
+			},
 		},
-		{
-			icon: 'editor-alignright',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'right' } );
-			}
-		},
-		{
-			icon: 'editor-justify',
-			title: wp.i18n.__( 'Justify' ),
-			isActive: ( { align } ) => 'justify' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'justify' } );
-			}
-		}
 	],
 
-	edit( { attributes } ) {
-		const { listType = 'ol', items = [], align } = attributes;
-		const content = items.map( item => {
-			return `<li>${ item.value }</li>`;
-		} ).join( '' );
-
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { nodeName = 'OL', values = [] } = attributes;
 		return (
 			<Editable
-				tagName={ listType }
-				style={ align ? { textAlign: align } : null }
-				value={ content }
+				tagName={ nodeName.toLowerCase() }
+				onChange={ ( nextValues ) => {
+					setAttributes( { values: nextValues } );
+				} }
+				value={ values }
+				focus={ focus }
+				onFocus={ setFocus }
+				showAlignments
 				className="blocks-list" />
 		);
 	},
 
 	save( { attributes } ) {
-		const { listType = 'ol', items = [] } = attributes;
-		const children = items.map( ( item, index ) => (
-			<li key={ index } dangerouslySetInnerHTML={ { __html: item.value } } />
-		) );
-		return wp.element.createElement( listType.toLowerCase(), null, children );
-	}
+		const { nodeName = 'OL', values = [] } = attributes;
+
+		return wp.element.createElement(
+			nodeName.toLowerCase(),
+			null,
+			values
+		);
+	},
 } );

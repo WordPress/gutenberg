@@ -2,7 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get } from 'lodash';
+import { get, castArray, findIndex, isObjectLike } from 'lodash';
 
 /**
  * Internal dependencies
@@ -17,22 +17,33 @@ import { getBlockSettings } from './registration';
  * @return {Object}             Block object
  */
 export function createBlock( blockType, attributes = {} ) {
+	const blockSettings = getBlockSettings( blockType );
+
+	let defaultAttributes;
+	if ( blockSettings ) {
+		defaultAttributes = blockSettings.defaultAttributes;
+	}
+
 	return {
 		uid: uuid(),
 		blockType,
-		attributes
+		attributes: {
+			...defaultAttributes,
+			...attributes,
+		},
 	};
 }
 
 /**
- * Switch Block Type and returns the updated block
+ * Switch a block into one or more blocks of the new block type
  *
  * @param  {Object} block      Block object
  * @param  {string} blockType  BlockType
- * @return {Object?}           Block object
+ * @return {Array}             Block object
  */
 export function switchToBlockType( block, blockType ) {
-	// Find the right transformation by giving priority to the "to" transformation
+	// Find the right transformation by giving priority to the "to"
+	// transformation.
 	const destinationSettings = getBlockSettings( blockType );
 	const sourceSettings = getBlockSettings( block.blockType );
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
@@ -41,13 +52,44 @@ export function switchToBlockType( block, blockType ) {
 		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 ) ||
 		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
 
+	// If no valid transformation, stop.  (How did we get here?)
 	if ( ! transformation ) {
 		return null;
 	}
 
-	return Object.assign( {
-		uid: block.uid,
-		attributes: transformation.transform( block.attributes ),
-		blockType
+	let transformationResults = transformation.transform( block.attributes );
+
+	// Ensure that the transformation function returned an object or an array
+	// of objects.
+	if ( ! isObjectLike( transformationResults ) ) {
+		return null;
+	}
+
+	// If the transformation function returned a single object, we want to work
+	// with an array instead.
+	transformationResults = castArray( transformationResults );
+
+	// Ensure that every block object returned by the transformation has a
+	// valid block type.
+	if ( transformationResults.some( ( result ) => ! getBlockSettings( result.blockType ) ) ) {
+		return null;
+	}
+
+	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockType === blockType );
+
+	// Ensure that at least one block object returned by the transformation has
+	// the expected "destination" block type.
+	if ( firstSwitchedBlock < 0 ) {
+		return null;
+	}
+
+	return transformationResults.map( ( result, index ) => {
+		return {
+			// The first transformed block whose type matches the "destination"
+			// type gets to keep the existing block's UID.
+			uid: index === firstSwitchedBlock ? block.uid : result.uid,
+			blockType: result.blockType,
+			attributes: result.attributes,
+		};
 	} );
 }

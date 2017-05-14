@@ -8,8 +8,8 @@ global.document = require( 'jsdom' ).jsdom( '', {
 	features: {
 		FetchExternalResources: false,
 		ProcessExternalResources: false,
-		SkipExternalResources: true
-	}
+		SkipExternalResources: true,
+	},
 } );
 global.window = document.defaultView;
 global.requestAnimationFrame = setTimeout;

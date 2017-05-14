@@ -1,0 +1,51 @@
+.editor-block-switcher {
+	border: 1px solid $light-gray-500;
+	box-shadow: $shadow-popover;
+	background-color: $white;
+	margin-right: 10px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+}
+
+.editor-block-switcher__toggle {
+	width: auto;
+	margin: 3px;
+	padding: 6px;
+}
+
+.editor-block-switcher__menu {
+	position: absolute;
+	top: 43px;
+	left: 0;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+	padding: 3px 3px 0 3px;
+
+	input {
+		font-size: 13px;
+	}
+}
+
+.editor-block-switcher__menu-item {
+	width: 100%;
+	margin-bottom: 3px;
+	padding: 6px;
+	background: none;
+	border: 1px solid transparent;
+	outline: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+
+	&:hover,
+	&:focus,
+	&:not(:disabled):hover {
+		color: $dark-gray-500;
+		border-color: $dark-gray-500;
+	}
+
+	.dashicon {
+		margin-right: 5px;
+	}
+}

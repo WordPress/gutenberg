@@ -34,7 +34,7 @@
 
 const { po } = require( 'gettext-parser' );
 const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
-const { relative } = require( 'path' );
+const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
 /**
@@ -44,7 +44,7 @@ const { writeFileSync } = require( 'fs' );
  */
 const DEFAULT_HEADERS = {
 	'content-type': 'text/plain; charset=UTF-8',
-	'x-generator': 'babel-plugin-wp-i18n'
+	'x-generator': 'babel-plugin-wp-i18n',
 };
 
 /**
@@ -58,7 +58,7 @@ const DEFAULT_FUNCTIONS = {
 	__: [ 'msgid' ],
 	_n: [ 'msgid', 'msgid_plural' ],
 	_x: [ 'msgid', 'msgctxt' ],
-	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ]
+	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ],
 };
 
 /**
@@ -175,10 +175,10 @@ module.exports = function() {
 							'': {
 								'': {
 									msgid: '',
-									msgstr: []
-								}
-							}
-						}
+									msgstr: [],
+								},
+							},
+						},
 					};
 
 					for ( const key in baseData.headers ) {
@@ -199,10 +199,12 @@ module.exports = function() {
 					translation.msgstr = '';
 				}
 
-				// Assign file reference comment
+				// Assign file reference comment, ensuring consistent pathname
+				// reference between Win32 and POSIX
 				const { filename } = this.file.opts;
+				const pathname = relative( '.', filename ).split( sep ).join( '/' );
 				translation.comments = {
-					reference: relative( process.cwd(), filename ) + ':' + path.node.loc.start.line
+					reference: pathname + ':' + path.node.loc.start.line,
 				};
 
 				// If exists, also assign translator comment
@@ -252,7 +254,7 @@ module.exports = function() {
 								if ( isSameTranslation( translation, memo[ msgctxt ][ msgid ] ) ) {
 									translation.comments.reference = uniq( [
 										memo[ msgctxt ][ msgid ].comments.reference,
-										translation.comments.reference
+										translation.comments.reference,
 									].join( '\n' ).split( '\n' ) ).join( '\n' );
 								}
 
@@ -273,9 +275,9 @@ module.exports = function() {
 					const compiled = po.compile( data );
 					writeFileSync( state.opts.output || DEFAULT_OUTPUT, compiled );
 					this.hasPendingWrite = false;
-				}
-			}
-		}
+				},
+			},
+		},
 	};
 };
 

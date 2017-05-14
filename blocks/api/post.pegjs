@@ -26,7 +26,7 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:WP_Block_Attribute_List _? "-->"
+  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:HTML_Attribute_List _? "-->"
   { return {
     blockType: blockType,
     attrs: attrs
@@ -39,27 +39,40 @@ WP_Block_End
   } }
 
 WP_Block_Type
-  = head:ASCII_Letter tail:WP_Block_Type_Char*
-  { return [ head ].concat( tail ).join( '' ) }
+  = $(ASCII_Letter WP_Block_Type_Char*)
 
-WP_Block_Attribute_List
-  = as:(_+ attr:WP_Block_Attribute { return attr })*
-  { return as.reduce( function( attrs, pair ) {
-    attrs[ pair.name ] = pair.value;
-    return attrs;
-  }, {} ) }
+HTML_Attribute_List
+  = as:(_+ a:HTML_Attribute_Item { return a })*
+  { return as.reduce( function( attrs, currentAttribute ) {
+			var currentAttrs = {};
+			currentAttrs[ currentAttribute[ 0 ] ] = currentAttribute[ 1 ];
+			return Object.assign(
+				attrs,
+				currentAttrs
+			);
+	}, {} ) }
 
-WP_Block_Attribute
-  = name:WP_Block_Attribute_Name ":" value:WP_Block_Attribute_Value
-  { return { name, value }; }
+HTML_Attribute_Item
+  = HTML_Attribute_Quoted
+  / HTML_Attribute_Unquoted
+  / HTML_Attribute_Empty
 
-WP_Block_Attribute_Name
-  = head:ASCII_Letter tail:ASCII_AlphaNumeric*
-  { return [ head ].concat( tail ).join( '' )  }
+HTML_Attribute_Empty
+  = name:HTML_Attribute_Name
+  { return [ name, true ] }
 
-WP_Block_Attribute_Value
-  = head:ASCII_Letter tail:WP_Block_Attribute_Value_Char*
-  { return [ head ].concat( tail ).join( '' ) }
+HTML_Attribute_Unquoted
+  = name:HTML_Attribute_Name _* "=" _* value:$([a-zA-Z0-9]+)
+  { return [ name, value ] }
+
+HTML_Attribute_Quoted
+  = name:HTML_Attribute_Name _* "=" _* '"' value:$((!'"' .)*) '"'
+  { return [ name, value ] }
+  / name:HTML_Attribute_Name _* "=" _* "'" value:$((!"'" .)*) "'"
+  { return [ name, value ] }
+
+HTML_Attribute_Name
+  = $([a-zA-Z0-9:.]+)
 
 WP_Block_Type_Char
  = ASCII_AlphaNumeric
@@ -69,9 +82,6 @@ ASCII_AlphaNumeric
   = ASCII_Letter
   / ASCII_Digit
   / Special_Chars
-
-WP_Block_Attribute_Value_Char
-  = [^ \t\r\n]
 
 ASCII_Letter
   = [a-zA-Z]

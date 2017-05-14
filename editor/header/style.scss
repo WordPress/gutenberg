@@ -6,7 +6,7 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	z-index: 1;
+	z-index: z-index( '.editor-header' );
 	top: $admin-bar-height-big;
 	left: 0;
 	right: 0;
@@ -14,12 +14,21 @@
 	@include break-small() {
 		position: fixed;
 	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+	}
 }
 
-.auto-fold .editor-header {
+.sticky-menu .editor-header {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+	@include break-medium() {
+		left: $admin-sidebar-width;
+	}
+}
+
+.auto-fold .editor-header {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
-		top: $admin-bar-height;
 	}
 
 	@include break-large() {

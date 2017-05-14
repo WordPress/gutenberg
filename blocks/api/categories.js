@@ -1,11 +1,19 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 /**
- * Block categories
+ * Block categories.
+ *
+ * Group blocks together based on common traits
+ * The block "inserter" relies on these to present the list blocks
  *
  * @var {Array} categories
  */
 const categories = [
-	{ slug: 'common', title: 'Common' }
+	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 ];
 
 /**

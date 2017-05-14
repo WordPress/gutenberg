@@ -1,0 +1,18 @@
+.blocks-embed {
+	margin: 0;
+}
+
+.blocks-embed .iframe-overlay {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-bottom: 56.25%; /* 16:9 */
+}
+
+.blocks-embed iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}

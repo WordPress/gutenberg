@@ -3,13 +3,28 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { Slot } from 'react-slot-fill';
+import { partial } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import Toolbar from 'components/toolbar';
 
 /**
  * Internal dependencies
  */
-import Toolbar from 'components/toolbar';
-import BlockMover from 'components/block-mover';
-import BlockSwitcher from 'components/block-switcher';
+import BlockMover from '../../block-mover';
+import BlockSwitcher from '../../block-switcher';
+import {
+	getPreviousBlock,
+	getBlock,
+	getBlockFocus,
+	getBlockOrder,
+	isBlockHovered,
+	isBlockSelected,
+	isTypingInBlock,
+} from '../../selectors';
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -17,6 +32,10 @@ class VisualEditorBlock extends wp.element.Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeDeselect = this.maybeDeselect.bind( this );
+		this.maybeHover = this.maybeHover.bind( this );
+		this.maybeStartTyping = this.maybeStartTyping.bind( this );
+		this.removeOnBackspace = this.removeOnBackspace.bind( this );
+		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -36,12 +55,19 @@ class VisualEditorBlock extends wp.element.Component {
 
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
-		onChange( {
+		onChange( block.uid, {
 			attributes: {
 				...block.attributes,
-				...attributes
-			}
+				...attributes,
+			},
 		} );
+	}
+
+	maybeHover() {
+		const { isTyping, isHovered, onHover } = this.props;
+		if ( isTyping && ! isHovered ) {
+			onHover();
+		}
 	}
 
 	maybeDeselect( event ) {
@@ -52,13 +78,92 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	componentDidUpdate() {
+	maybeStartTyping() {
+		// We do not want to dispatch start typing if...
+		//  - State value already reflects that we're typing (dispatch noise)
+		//  - The current block is not selected (e.g. after a split occurs,
+		//    we'll still receive the keyDown event, but the focus has since
+		//    shifted to the newly created block)
+		const { isTyping, isSelected, onStartTyping } = this.props;
+		if ( ! isTyping && isSelected ) {
+			onStartTyping();
+		}
+	}
+
+	removeOnBackspace( event ) {
+		const { keyCode, target } = event;
+		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
+			this.props.onRemove( this.props.uid );
+			if ( this.props.previousBlock ) {
+				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
+			}
+		}
+	}
+
+	mergeWithPrevious() {
+		const { block, previousBlock, onFocus, replaceBlocks } = this.props;
+
+		// Do nothing when it's the first block
+		if ( ! previousBlock ) {
+			return;
+		}
+
+		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
+
+		// Do nothing if the previous block is not mergeable
+		if ( ! previousBlockSettings.merge ) {
+			onFocus( previousBlock.uid );
+			return;
+		}
+
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first
+		const blocksWithTheSameType = previousBlock.blockType === block.blockType
+			? [ block ]
+			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
+
+		// If the block types can not match, do nothing
+		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+			return;
+		}
+
+		// Calling the merge to update the attributes and remove the block to be merged
+		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
+
+		onFocus( previousBlock.uid, { offset: -1 } );
+		replaceBlocks(
+			[ previousBlock.uid, block.uid ],
+			[
+				{
+					...previousBlock,
+					attributes: {
+						...previousBlock.attributes,
+						...updatedAttributes,
+					},
+				},
+				...blocksWithTheSameType.slice( 1 ),
+			]
+		);
+	}
+
+	componentDidUpdate( prevProps ) {
 		if ( this.previousOffset ) {
 			window.scrollTo(
 				window.scrollX,
 				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
 			);
 			this.previousOffset = null;
+		}
+
+		// Focus node when focus state is programmatically transferred
+		if ( this.props.focus && ! prevProps.focus ) {
+			this.node.focus();
+		}
+	}
+
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.node.focus();
 		}
 	}
 
@@ -75,102 +180,153 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected } = this.props;
+		const { isHovered, isSelected, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
-			'is-selected': isSelected,
-			'is-hovered': isHovered
+			'is-selected': isSelected && ! isTyping,
+			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onDeselect, onMouseEnter, onMouseLeave, onInsertAfter } = this.props;
+		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
-		// Disable reason: Each block can receive focus but must be able to contain
-		// block children. Tab keyboard navigation enabled by tabIndex assignment.
+		// Determine whether the block has props to apply to the wrapper
+		let wrapperProps;
+		if ( settings.getEditWrapperProps ) {
+			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		}
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		// Disable reason: Each block can be selected by clicking on it
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				tabIndex="0"
+				onClick={ onSelect }
 				onFocus={ onSelect }
 				onBlur={ this.maybeDeselect }
-				onKeyDown={ onDeselect }
-				onMouseEnter={ onMouseEnter }
+				onKeyDown={ this.removeOnBackspace }
+				onMouseEnter={ onHover }
+				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
+				data-type={ block.blockType }
+				tabIndex="0"
+				{ ...wrapperProps }
 			>
-				{ ( isSelected || isHovered ) && <BlockMover uid={ block.uid } /> }
-				<div className="editor-visual-editor__block-controls">
-					{ isSelected && <BlockSwitcher uid={ block.uid } /> }
-					{ isSelected && settings.controls ? (
-						<Toolbar
-							controls={ settings.controls.map( ( control ) => ( {
-								...control,
-								onClick: () => control.onClick( block.attributes, this.setAttributes ),
-								isActive: () => control.isActive( block.attributes )
-							} ) ) } />
-					) : null }
+				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ isSelected && ! isTyping &&
+					<div className="editor-visual-editor__block-controls">
+						<BlockSwitcher uid={ block.uid } />
+						{ !! settings.controls && (
+							<Toolbar
+								controls={ settings.controls.map( ( control ) => ( {
+									...control,
+									onClick: () => control.onClick( block.attributes, this.setAttributes ),
+									isActive: control.isActive( block.attributes ),
+								} ) ) } />
+						) }
+						<Slot name="Formatting.Toolbar" />
+					</div>
+				}
+				<div onKeyDown={ this.maybeStartTyping }>
+					<BlockEdit
+						focus={ focus }
+						attributes={ block.attributes }
+						setAttributes={ this.setAttributes }
+						insertBlockAfter={ onInsertAfter }
+						setFocus={ partial( onFocus, block.uid ) }
+						mergeWithPrevious={ this.mergeWithPrevious }
+					/>
 				</div>
-				<BlockEdit
-					isSelected={ isSelected }
-					attributes={ block.attributes }
-					setAttributes={ this.setAttributes }
-					insertBlockAfter={ onInsertAfter }
-				/>
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
 export default connect(
-	( state, ownProps ) => ( {
-		order: state.blocks.order.indexOf( ownProps.uid ),
-		block: state.blocks.byUid[ ownProps.uid ],
-		isSelected: state.selectedBlock === ownProps.uid,
-		isHovered: state.hoveredBlock === ownProps.uid
-	} ),
+	( state, ownProps ) => {
+		return {
+			previousBlock: getPreviousBlock( state, ownProps.uid ),
+			block: getBlock( state, ownProps.uid ),
+			isSelected: isBlockSelected( state, ownProps.uid ),
+			isHovered: isBlockHovered( state, ownProps.uid ),
+			focus: getBlockFocus( state, ownProps.uid ),
+			isTyping: isTypingInBlock( state, ownProps.uid ),
+			order: getBlockOrder( state, ownProps.uid ),
+		};
+	},
 	( dispatch, ownProps ) => ( {
-		onChange( updates ) {
+		onChange( uid, updates ) {
 			dispatch( {
 				type: 'UPDATE_BLOCK',
-				uid: ownProps.uid,
-				updates
+				uid,
+				updates,
 			} );
 		},
 		onSelect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onDeselect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: false,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
-		onMouseEnter() {
+		onStartTyping() {
+			dispatch( {
+				type: 'START_TYPING',
+				uid: ownProps.uid,
+			} );
+		},
+		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMouseLeave() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: false,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
+
 		onInsertAfter( block ) {
 			dispatch( {
 				type: 'INSERT_BLOCK',
 				after: ownProps.uid,
-				block
+				block,
 			} );
-		}
+		},
+
+		onFocus( uid, config ) {
+			dispatch( {
+				type: 'UPDATE_FOCUS',
+				uid,
+				config,
+			} );
+		},
+
+		onRemove( uid ) {
+			dispatch( {
+				type: 'REMOVE_BLOCK',
+				uid,
+			} );
+		},
+
+		replaceBlocks( uids, blocks ) {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				uids,
+				blocks,
+			} );
+		},
 	} )
 )( VisualEditorBlock );

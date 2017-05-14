@@ -1,18 +1,14 @@
 .blocks-quote {
 	margin: 0;
 	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
-	transition: all .2s ease;
-	font-size: 20px;
-	border-left: 4px solid $black;
-	padding-left: 1em;
-	font-style: italic;
 
 	footer {
 		color: $dark-gray-100;
-		font-size: 0.9em;
-		font-style: normal;
 		margin-left: 1.3em;
+		margin-top: 1em;
 		position: relative;
+		font-size: $default-font-size;
+		font-style: normal;
 
 		&:before {
 			content: '— ';
@@ -20,5 +16,18 @@
 			left: -1.3em;
 			top: 0;
 		}
+	}
+}
+
+.editor-visual-editor .blocks-quote-style-1 {
+	border-left: 4px solid $black;
+	padding-left: 1em;
+}
+
+.editor-visual-editor .blocks-quote-style-2 {
+	padding: 0 1em;
+	& > .blocks-editable p {
+		font-size: 24px;
+		font-style: italic;
 	}
 }

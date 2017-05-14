@@ -1,13 +1,10 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query as hpq } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, createBlock, query } from '../../api';
+import Editable from '../../editable';
 
-const { html, parse, query } = hpq;
-
-const fromValueToParagraphs = ( value ) => value ? value.map( ( paragraph ) => `<p>${ paragraph }</p>` ).join( '' ) : '';
-const fromParagraphsToValue = ( paragraphs ) => parse( paragraphs, query( 'p', html() ) );
+const { children } = query;
 
 registerBlock( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
@@ -17,71 +14,46 @@ registerBlock( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: query( 'p', html() ),
+		content: children(),
 	},
 
-	controls: [
-		{
-			icon: 'editor-alignleft',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => ! align || 'left' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: undefined } );
-			}
-		},
-		{
-			icon: 'editor-aligncenter',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'center' } );
-			}
-		},
-		{
-			icon: 'editor-alignright',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { align: 'right' } );
-			}
-		}
-	],
+	defaultAttributes: {
+		content: <p />,
+	},
 
-	edit( { attributes, setAttributes, insertBlockAfter } ) {
-		const { content, align } = attributes;
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+		};
+	},
+
+	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeWithPrevious } ) {
+		const { content } = attributes;
 
 		return (
 			<Editable
-				value={ fromValueToParagraphs( content ) }
-				onChange={ ( paragraphs ) => setAttributes( {
-					content: fromParagraphsToValue( paragraphs )
-				} ) }
-				style={ align ? { textAlign: align } : null }
+				value={ content }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				focus={ focus }
+				onFocus={ setFocus }
 				onSplit={ ( before, after ) => {
-					setAttributes( { content: fromParagraphsToValue( before ) } );
-					insertBlockAfter( wp.blocks.createBlock( 'core/text', {
-						content: fromParagraphsToValue( after )
+					setAttributes( { content: before } );
+					insertBlockAfter( createBlock( 'core/text', {
+						content: after,
 					} ) );
 				} }
+				onMerge={ mergeWithPrevious }
+				showAlignments
 			/>
 		);
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
-
-		// Todo: Remove the temporary <div> wrapper once the serializer supports returning an array
-		return (
-			<div>
-				{ content && content.map( ( paragraph, i ) => (
-					<p
-						key={ i }
-						style={ align ? { textAlign: align } : null }
-						dangerouslySetInnerHTML={ {
-							__html: paragraph
-						} } />
-				) ) }
-			</div>
-		);
-	}
+		const { content } = attributes;
+		return content;
+	},
 } );

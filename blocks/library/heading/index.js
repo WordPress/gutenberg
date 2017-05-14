@@ -1,10 +1,11 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from 'api';
-import Editable from 'components/editable';
+import './style.scss';
+import { registerBlock, createBlock, query } from '../../api';
+import Editable from '../../editable';
 
-const { html, prop } = query;
+const { children, prop } = query;
 
 registerBlock( 'core/heading', {
 	title: wp.i18n.__( 'Heading' ),
@@ -14,76 +15,94 @@ registerBlock( 'core/heading', {
 	category: 'common',
 
 	attributes: {
-		content: html( 'h1,h2,h3,h4,h5,h6' ),
-		tag: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
-		align: prop( 'h1,h2,h3,h4,h5,h6', 'style.textAlign' )
+		content: children( 'h1,h2,h3,h4,h5,h6' ),
+		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
 	controls: [
 		...'123456'.split( '' ).map( ( level ) => ( {
 			icon: 'heading',
 			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
-			isActive: ( { tag } ) => 'H' + level === tag,
+			isActive: ( { nodeName } ) => 'H' + level === nodeName,
 			onClick( attributes, setAttributes ) {
-				setAttributes( { tag: 'H' + level } );
+				setAttributes( { nodeName: 'H' + level } );
 			},
-			level
-		} ) )
+			subscript: level,
+		} ) ),
 	],
-
-	edit( { attributes, setAttributes } ) {
-		const { content, tag, align } = attributes;
-
-		return (
-			<Editable
-				tagName={ tag }
-				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				style={ align ? { textAlign: align } : null }
-			/>
-		);
-	},
-
-	save( { attributes } ) {
-		const { align, tag: Tag, content } = attributes;
-
-		return (
-			<Tag
-				style={ align ? { textAlign: align } : null }
-				dangerouslySetInnerHTML={ { __html: content } } />
-		);
-	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
+				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
-						// TODO this appears to always be true?
-						// TODO reject the switch if more than one paragraph
-						content = content[ 0 ];
+						const heading = createBlock( 'core/heading', {
+							content: content[ 0 ].props.children,
+						} );
+						const blocks = [ heading ];
+
+						const remainingContent = content.slice( 1 );
+						if ( remainingContent.length ) {
+							const text = createBlock( 'core/text', {
+								...attrs,
+								content: remainingContent,
+							} );
+							blocks.push( text );
+						}
+
+						return blocks;
 					}
-					return {
-						tag: 'H2',
+					return createBlock( 'core/heading', {
 						content,
-						align
-					};
-				}
-			}
+					} );
+				},
+			},
 		],
 		to: [
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
-				transform: ( { content, align } ) => {
-					return {
-						content: [ content ],
-						align
-					};
-				}
-			}
-		]
-	}
+				transform: ( { content } ) => {
+					return createBlock( 'core/text', {
+						content,
+					} );
+				},
+			},
+		],
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+		};
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+		const { content, nodeName = 'H2' } = attributes;
+
+		return (
+			<Editable
+				tagName={ nodeName.toLowerCase() }
+				value={ content }
+				focus={ focus }
+				onFocus={ setFocus }
+				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onMerge={ mergeWithPrevious }
+				inline
+			/>
+		);
+	},
+
+	save( { attributes } ) {
+		const { nodeName = 'H2', content } = attributes;
+		const Tag = nodeName.toLowerCase();
+
+		return (
+			<Tag>
+				{ content }
+			</Tag>
+		);
+	},
 } );

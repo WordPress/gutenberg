@@ -1,5 +1,7 @@
 node_modules
 build
+gutenberg.pot
 .vscode
 *.log
 yarn.lock
+gutenberg.zip
