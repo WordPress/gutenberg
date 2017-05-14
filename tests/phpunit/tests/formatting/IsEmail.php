@@ -9,7 +9,8 @@ class Tests_Formatting_IsEmail extends WP_UnitTestCase {
 			"bob@example.com",
 			"phil@example.info",
 			"ace@204.32.222.14",
-			"kevin@many.subdomains.make.a.happy.man.edu"
+			"kevin@many.subdomains.make.a.happy.man.edu",
+			"a@b.co",
 			);
 		foreach ( $data as $datum ) {
 			$this->assertEquals( $datum, is_email( $datum ), $datum );
@@ -22,7 +23,8 @@ class Tests_Formatting_IsEmail extends WP_UnitTestCase {
 			'http://bob.example.com/',
 			"sif i'd give u it, spamer!1",
 			"com.exampleNOSPAMbob",
-			"bob@your mom"
+			"bob@your mom",
+			"a@b.c",
 			);
 		foreach ($data as $datum) {
 			$this->assertFalse(is_email($datum), $datum);
