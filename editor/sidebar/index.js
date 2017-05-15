@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Slot } from 'react-slot-fill';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -11,35 +10,22 @@ import { __ } from 'i18n';
 import Panel from 'components/panel';
 import PanelHeader from 'components/panel-header';
 import PanelBody from 'components/panel-body';
-import IconButton from 'components/icon-button';
 
 /**
  * Internal Dependencies
  */
+import PostSettings from './post-settings';
 import './style.scss';
 
-const Sidebar = ( { toggleSidebar } ) => {
+const Sidebar = () => {
 	return (
 		<div className="editor-sidebar">
-			<Panel>
-				<PanelHeader>
-					<strong>{ __( 'Post Settings' ) }</strong>
-					<IconButton
-						onClick={ toggleSidebar }
-						icon="no-alt"
-					/>
-				</PanelHeader>
-				<PanelBody />
-			</Panel>
+			<PostSettings />
 			<Panel>
 				<PanelHeader>
 					<strong>
 						<span className="editor-sidebar__select-post">Post</span> → Block
 					</strong>
-					<IconButton
-						onClick={ toggleSidebar }
-						icon="no-alt"
-					/>
 				</PanelHeader>
 				<PanelBody>
 					<Slot name="Sidebar.Inspector" />
@@ -49,9 +35,4 @@ const Sidebar = ( { toggleSidebar } ) => {
 	);
 };
 
-export default connect(
-	undefined,
-	( dispatch ) => ( {
-		toggleSidebar: () => dispatch( { type: 'TOGGLE_SIDEBAR' } ),
-	} )
-)( Sidebar );
+export default Sidebar;
