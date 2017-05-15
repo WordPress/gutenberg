@@ -73,7 +73,7 @@ describe( 'element', () => {
 		it( 'should switch elements', () => {
 			const children = switchChildrenNodeName( [
 				createElement( 'strong', { align: 'left' }, 'Courgette' ),
-				createElement( 'strong', {}, 'Concombre' )
+				createElement( 'strong', {}, 'Concombre' ),
 			], 'em' );
 			expect( children.length ).to.equal( 2 );
 			expect( children[ 0 ].type ).to.equal( 'em' );

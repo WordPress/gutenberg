@@ -48,9 +48,9 @@ registerBlock( 'core/quote', {
 				blocks: [ 'core/list' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: switchChildrenNodeName( values, 'p' )
+						value: switchChildrenNodeName( values, 'p' ),
 					} );
-				}
+				},
 			},
 			{
 				type: 'block',
@@ -82,9 +82,9 @@ registerBlock( 'core/quote', {
 						: valueElements;
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values
+						values,
 					} );
-				}
+				},
 			},
 			{
 				type: 'block',
