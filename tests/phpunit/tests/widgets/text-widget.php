@@ -74,8 +74,8 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 			'filter' => false,
 		);
 
-		add_filter( 'widget_text_content', array( $this, 'filter_widget_text_content' ), 10, 3 );
-		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 10, 3 );
+		add_filter( 'widget_text_content', array( $this, 'filter_widget_text_content' ), 5, 3 );
+		add_filter( 'widget_text', array( $this, 'filter_widget_text' ), 5, 3 );
 
 		// Test with filter=false.
 		ob_start();
@@ -85,6 +85,8 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertNotContains( '<br />', $output );
 		$this->assertEmpty( $this->widget_text_content_args );
 		$this->assertNotEmpty( $this->widget_text_args );
+		$this->assertContains( '[filter:widget_text]', $output );
+		$this->assertNotContains( '[filter:widget_text_content]', $output );
 
 		// Test with filter=true.
 		$instance['filter'] = true;
@@ -98,6 +100,8 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertEquals( $instance, $this->widget_text_args[1] );
 		$this->assertEquals( $widget, $this->widget_text_args[2] );
 		$this->assertEmpty( $this->widget_text_content_args );
+		$this->assertContains( '[filter:widget_text]', $output );
+		$this->assertNotContains( '[filter:widget_text_content]', $output );
 
 		// Test with filter=content, the upgraded widget.
 		$instance['filter'] = 'content';
@@ -111,9 +115,10 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertEquals( $instance, $this->widget_text_args[1] );
 		$this->assertEquals( $widget, $this->widget_text_args[2] );
 		$this->assertCount( 3, $this->widget_text_content_args );
-		$this->assertEquals( wpautop( $instance['text'] ), $this->widget_text_content_args[0] );
+		$this->assertEquals( $instance['text'] . '[filter:widget_text]', $this->widget_text_content_args[0] );
 		$this->assertEquals( $instance, $this->widget_text_content_args[1] );
 		$this->assertEquals( $widget, $this->widget_text_content_args[2] );
+		$this->assertContains( wpautop( $instance['text'] . '[filter:widget_text][filter:widget_text_content]' ), $output );
 	}
 
 	/**
@@ -127,6 +132,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	function filter_widget_text( $widget_text, $instance, $widget ) {
 		$this->widget_text_args = func_get_args();
 
+		$widget_text .= '[filter:widget_text]';
 		return $widget_text;
 	}
 
@@ -141,6 +147,7 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	function filter_widget_text_content( $widget_text, $instance, $widget ) {
 		$this->widget_text_content_args = func_get_args();
 
+		$widget_text .= '[filter:widget_text_content]';
 		return $widget_text;
 	}
 
