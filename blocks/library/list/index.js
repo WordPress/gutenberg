@@ -49,10 +49,10 @@ registerBlock( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values: switchChildrenNodeName( content, 'li' )
+						values: switchChildrenNodeName( content, 'li' ),
 					} );
-				}
-			}
+				},
+			},
 		],
 		to: [
 			{
@@ -60,11 +60,11 @@ registerBlock( 'core/list', {
 				blocks: [ 'core/text' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/text', {
-						content: switchChildrenNodeName( values, 'p' )
+						content: switchChildrenNodeName( values, 'p' ),
 					} );
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
