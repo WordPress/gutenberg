@@ -14,3 +14,10 @@ a {
 @else{
 	display: inline-block;
 }
+
+b {
+
+	@include foo;
+
+	@include bar;
+}

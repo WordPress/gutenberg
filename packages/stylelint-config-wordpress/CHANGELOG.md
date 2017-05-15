@@ -1,7 +1,8 @@
 # HEAD
 
 -   Added: `declaration-property-unit-whitelist` rule to enforce unitless `line-height` values.
--   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards
+-   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards.
+-   Fixed: Include CSS config `at-rule-empty-line-before` rules in SCSS config.
 
 # 10.0.2
 

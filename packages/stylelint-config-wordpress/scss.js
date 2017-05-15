@@ -15,11 +15,12 @@ module.exports = {
     "at-rule-no-unknown": [ true, {
       ignoreAtRules: [ "extend", "at-root", "warn", "error", "if", "else", "for", "each", "while", "mixin", "include", "content", "return", "function" ],
     } ],
-    "at-rule-empty-line-before": [
-      "always", {
-        "ignoreAtRules": [ "else", "import" ],
-      },
-    ],
+    "at-rule-empty-line-before": [ "always", {
+      except: ["blockless-after-blockless"],
+      ignore: ["after-comment"],
+      ignoreAtRules: ["else"],
+    } ],
+
     "block-opening-brace-space-before": "always",
     "block-closing-brace-newline-after": [
       "always", {

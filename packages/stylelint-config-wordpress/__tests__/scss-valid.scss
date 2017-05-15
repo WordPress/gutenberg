@@ -24,3 +24,9 @@ $map: (
 
 @import "../some/url";
 @import "../another/url";
+
+b {
+
+	@include foo;
+	@include bar;
+}
