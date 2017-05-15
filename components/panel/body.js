@@ -1,11 +1,6 @@
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 function PanelBody( { children } ) {
 	return (
-		<div className="components-panel-body">
+		<div className="components-panel__body">
 			{ children }
 		</div>
 	);

@@ -4,14 +4,10 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import PanelHeader from 'components/panel-header';
-
-/**
  * Internal dependencies
  */
 import './style.scss';
+import PanelHeader from './header';
 
 function Panel( { header, className, children } ) {
 	const classNames = classnames( className, 'components-panel' );
