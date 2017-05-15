@@ -310,13 +310,16 @@ class Test_WP_Widget_Media_Image extends WP_UnitTestCase {
 	 */
 	function test_render_media() {
 		$widget = new WP_Widget_Media_Image();
+
+		$test_image = '/tmp/canola.jpg';
+		copy( DIR_TESTDATA . '/images/canola.jpg', $test_image );
 		$attachment_id = self::factory()->attachment->create_object( array(
-			'file' => DIR_TESTDATA . '/images/canola.jpg',
+			'file' => $test_image,
 			'post_parent' => 0,
 			'post_mime_type' => 'image/jpeg',
 			'post_title' => 'Canola',
 		) );
-		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' ) );
+		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $test_image ) );
 
 		// Should be empty when there is no attachment_id.
 		ob_start();

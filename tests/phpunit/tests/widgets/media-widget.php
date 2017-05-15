@@ -128,13 +128,16 @@ class Test_WP_Widget_Media extends WP_UnitTestCase {
 	 * @covers WP_Widget_Media::is_attachment_with_mime_type
 	 */
 	function test_is_attachment_with_mime_type() {
+
+		$test_image = '/tmp/canola.jpg';
+		copy( DIR_TESTDATA . '/images/canola.jpg', $test_image );
 		$attachment_id = self::factory()->attachment->create_object( array(
-			'file' => DIR_TESTDATA . '/images/canola.jpg',
+			'file' => $test_image,
 			'post_parent' => 0,
 			'post_mime_type' => 'image/jpeg',
 			'post_title' => 'Canola',
 		) );
-		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' ) );
+		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $test_image ) );
 		$widget = $this->get_mocked_class_instance();
 
 		$this->assertFalse( $widget->is_attachment_with_mime_type( 0, 'image' ) );
