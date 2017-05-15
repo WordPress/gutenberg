@@ -1,0 +1,14 @@
+.editor-sidebar-post-status__toggle {
+	background: none;
+	border: none;
+	display: block;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0;
+	outline: none;
+	width: 100%;
+	padding: 0 0 10px 0;
+	color: $dark-gray-600;
+	cursor: pointer;
+}
