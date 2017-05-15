@@ -98,5 +98,12 @@ export default connect(
 				block: wp.blocks.createBlock( slug ),
 			} );
 		},
+	} ),
+	// In `mergeProps`, we flip the order to enable a rendering component to
+	// override the default `onInsertBlock` behavior
+	( stateProps, dispatchProps, ownProps ) => ( {
+		...stateProps,
+		...dispatchProps,
+		...ownProps,
 	} )
 )( clickOutside( Inserter ) );

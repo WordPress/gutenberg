@@ -9,6 +9,7 @@ import { partial } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createBlock } from 'blocks';
 import Toolbar from 'components/toolbar';
 
 /**
@@ -38,6 +39,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOnBackspace = this.removeOnBackspace.bind( this );
 		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
+		this.replaceNewBlock = this.replaceNewBlock.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -148,6 +150,13 @@ class VisualEditorBlock extends wp.element.Component {
 		);
 	}
 
+	replaceNewBlock( slug ) {
+		// When choosing block from inserter for a new empty block, override
+		// insert behavior to replace current block instead
+		const { uid, replaceBlocks } = this.props;
+		replaceBlocks( [ uid ], [ createBlock( slug ) ] );
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.previousOffset ) {
 			window.scrollTo(
@@ -215,7 +224,9 @@ class VisualEditorBlock extends wp.element.Component {
 				{ ...wrapperProps }
 			>
 				{ isNew && isSelected && (
-					<Inserter className="editor-visual-editor__empty-block-inserter" />
+					<Inserter
+						onInsertBlock={ this.replaceNewBlock }
+						className="editor-visual-editor__empty-block-inserter" />
 				) }
 				{ ! isNew && ( ( isSelected && ! isTyping ) || isHovered ) && (
 					<BlockMover uid={ block.uid } />
