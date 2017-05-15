@@ -46,21 +46,21 @@ describe("flags warnings with invalid selectors css", () => {
     ))
   })
 
-  it("flags two warnings", () => {
+  it("flags warnings", () => {
     return result.then(data => (
-      expect(data.results[0].warnings.length).toBe(2)
+      expect(data.results[0].warnings.length).toBe(3)
     ))
   })
 
   it("correct first warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[0].text).toBe("Selector should use lowercase and separate words with hyphens (selector-id-pattern)")
+      expect(data.results[0].warnings[0].text).toBe("Unexpected unit \"%\" for property \"line-height\" (declaration-property-unit-whitelist)")
     ))
   })
 
   it("correct first warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[0].rule).toBe("selector-id-pattern")
+      expect(data.results[0].warnings[0].rule).toBe("declaration-property-unit-whitelist")
     ))
   })
 
@@ -72,25 +72,25 @@ describe("flags warnings with invalid selectors css", () => {
 
   it("correct first warning line number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[0].line).toBe(21)
+      expect(data.results[0].warnings[0].line).toBe(18)
     ))
   })
 
   it("correct first warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[0].column).toBe(1)
+      expect(data.results[0].warnings[0].column).toBe(15)
     ))
   })
 
   it("correct second warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[1].text).toBe("Expected double quotes (string-quotes)")
+      expect(data.results[0].warnings[1].text).toBe("Selector should use lowercase and separate words with hyphens (selector-id-pattern)")
     ))
   })
 
   it("correct second warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[1].rule).toBe("string-quotes")
+      expect(data.results[0].warnings[1].rule).toBe("selector-id-pattern")
     ))
   })
 
@@ -102,13 +102,43 @@ describe("flags warnings with invalid selectors css", () => {
 
   it("correct second warning line number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[1].line).toBe(17)
+      expect(data.results[0].warnings[1].line).toBe(21)
     ))
   })
 
   it("correct second warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[1].column).toBe(12)
+      expect(data.results[0].warnings[1].column).toBe(1)
+    ))
+  })
+
+  it("correct third warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].text).toBe("Expected double quotes (string-quotes)")
+    ))
+  })
+
+  it("correct third warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].rule).toBe("string-quotes")
+    ))
+  })
+
+  it("correct third warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].severity).toBe("error")
+    ))
+  })
+
+  it("correct third warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].line).toBe(17)
+    ))
+  })
+
+  it("correct third warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[2].column).toBe(12)
     ))
   })
 })

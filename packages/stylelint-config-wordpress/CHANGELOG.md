@@ -1,5 +1,6 @@
 # HEAD
 
+-   Added: `declaration-property-unit-whitelist` rule to enforce unitless `line-height` values.
 -   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards
 
 # 10.0.2

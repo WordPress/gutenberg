@@ -33,6 +33,9 @@ module.exports = {
     "declaration-colon-newline-after": "always-multi-line",
     "declaration-colon-space-after": "always-single-line",
     "declaration-colon-space-before": "never",
+    "declaration-property-unit-whitelist": {
+      "line-height": [],
+    },
     "font-family-name-quotes": "always-where-recommended",
     "font-weight-notation": [ "numeric", {
       ignore: ["relative"],

@@ -46,9 +46,9 @@ describe("flags warnings with invalid values css", () => {
     ))
   })
 
-  it("flags eight warnings", () => {
+  it("flags warnings", () => {
     return result.then(data => (
-      expect(data.results[0].warnings.length).toBe(8)
+      expect(data.results[0].warnings.length).toBe(9)
     ))
   })
 
@@ -114,13 +114,13 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct third warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[2].text).toBe("Expected quotes around \"Times New Roman\" (font-family-name-quotes)")
+      expect(data.results[0].warnings[2].text).toBe("Unexpected unit \"em\" for property \"line-height\" (declaration-property-unit-whitelist)")
     ))
   })
 
   it("correct third warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[2].rule).toBe("font-family-name-quotes")
+      expect(data.results[0].warnings[2].rule).toBe("declaration-property-unit-whitelist")
     ))
   })
 
@@ -132,7 +132,7 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct third warning line number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[2].line).toBe(10)
+      expect(data.results[0].warnings[2].line).toBe(12)
     ))
   })
 
@@ -144,13 +144,13 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct forth warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[3].text).toBe("Expected numeric font-weight notation (font-weight-notation)")
+      expect(data.results[0].warnings[3].text).toBe("Expected quotes around \"Times New Roman\" (font-family-name-quotes)")
     ))
   })
 
   it("correct forth warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[3].rule).toBe("font-weight-notation")
+      expect(data.results[0].warnings[3].rule).toBe("font-family-name-quotes")
     ))
   })
 
@@ -162,7 +162,7 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct forth warning line number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[3].line).toBe(11)
+      expect(data.results[0].warnings[3].line).toBe(10)
     ))
   })
 
@@ -174,13 +174,13 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct fifth warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[4].text).toBe("Unexpected unit (length-zero-no-unit)")
+      expect(data.results[0].warnings[4].text).toBe("Expected numeric font-weight notation (font-weight-notation)")
     ))
   })
 
   it("correct fifth warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[4].rule).toBe("length-zero-no-unit")
+      expect(data.results[0].warnings[4].rule).toBe("font-weight-notation")
     ))
   })
 
@@ -192,13 +192,13 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct fifth warning line number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[4].line).toBe(6)
+      expect(data.results[0].warnings[4].line).toBe(11)
     ))
   })
 
   it("correct fifth warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[4].column).toBe(11)
+      expect(data.results[0].warnings[4].column).toBe(15)
     ))
   })
 
@@ -228,7 +228,7 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct sixth warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[5].column).toBe(15)
+      expect(data.results[0].warnings[5].column).toBe(11)
     ))
   })
 
@@ -258,19 +258,19 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct seventh warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[6].column).toBe(24)
+      expect(data.results[0].warnings[6].column).toBe(15)
     ))
   })
 
   it("correct eighth warning text", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[7].text).toBe("Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)")
+      expect(data.results[0].warnings[7].text).toBe("Unexpected unit (length-zero-no-unit)")
     ))
   })
 
   it("correct eighth warning rule flagged", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[7].rule).toBe("shorthand-property-no-redundant-values")
+      expect(data.results[0].warnings[7].rule).toBe("length-zero-no-unit")
     ))
   })
 
@@ -288,7 +288,37 @@ describe("flags warnings with invalid values css", () => {
 
   it("correct eighth warning column number", () => {
     return result.then(data => (
-      expect(data.results[0].warnings[7].column).toBe(2)
+      expect(data.results[0].warnings[7].column).toBe(24)
+    ))
+  })
+
+  it("correct ninth warning text", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[8].text).toBe("Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)")
+    ))
+  })
+
+  it("correct ninth warning rule flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[8].rule).toBe("shorthand-property-no-redundant-values")
+    ))
+  })
+
+  it("correct ninth warning severity flagged", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[8].severity).toBe("error")
+    ))
+  })
+
+  it("correct ninth warning line number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[8].line).toBe(6)
+    ))
+  })
+
+  it("correct ninth warning column number", () => {
+    return result.then(data => (
+      expect(data.results[0].warnings[8].column).toBe(2)
     ))
   })
 })
