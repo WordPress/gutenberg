@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Exit if any command fails
-set -e # exit on error
+set -e
 
 # Change to the expected directory
 cd "$(dirname "$0")"
