@@ -29,7 +29,7 @@ function applyOrUnset( align ) {
 registerBlock( 'core/button', {
 	title: wp.i18n.__( 'Button' ),
 
-	icon: 'marker',
+	icon: 'button',
 
 	category: 'layout',
 
@@ -74,7 +74,7 @@ registerBlock( 'core/button', {
 			<span className="blocks-button" title={ title }>
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write some text…' ) }
+					placeholder={ wp.i18n.__( 'Write label…' ) }
 					value={ text }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }

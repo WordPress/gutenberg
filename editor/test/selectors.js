@@ -15,6 +15,7 @@ import {
 	getCurrentPost,
 	getPostEdits,
 	getEditedPostTitle,
+	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
 	getBlockUids,
@@ -186,6 +187,26 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostPreviewLink', () => {
+		it( 'should return null if the post has not link yet', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getEditedPostPreviewLink( state ) ).to.be.null();
+		} );
+
+		it( 'should return the correct url adding a preview parameter to the query string', () => {
+			const state = {
+				currentPost: {
+					link: 'https://andalouses.com/beach',
+				},
+			};
+
+			expect( getEditedPostPreviewLink( state ) ).to.equal( 'https://andalouses.com/beach?preview=true' );
 		} );
 	} );
 

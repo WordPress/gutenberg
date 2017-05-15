@@ -3,6 +3,11 @@
  */
 import { first, last } from 'lodash';
 
+/**
+ * Internal dependencies
+ */
+import { addQueryArgs } from './utils/url';
+
 export function getEditorMode( state ) {
 	return state.mode;
 }
@@ -35,6 +40,15 @@ export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
 		? state.currentPost.title.raw
 		: state.editor.edits.title;
+}
+
+export function getEditedPostPreviewLink( state ) {
+	const link = state.currentPost.link;
+	if ( ! link ) {
+		return null;
+	}
+
+	return addQueryArgs( link, { preview: 'true' } );
 }
 
 export function getBlock( state, uid ) {
