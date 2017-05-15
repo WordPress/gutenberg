@@ -2,3 +2,37 @@
 	background: $white;
 	box-shadow: 0 0 0 1px $light-gray-500;
 }
+
+.components-panel__body {
+	padding: 15px;
+	box-shadow: 0 0 0 1px $light-gray-500;
+	margin-top: 1px;
+}
+
+.components-panel__body-toggle {
+	background: none;
+	border: none;
+	display: block;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0;
+	outline: none;
+	width: 100%;
+	color: $dark-gray-600;
+	cursor: pointer;
+}
+
+.components-panel__body-toggle-icon {
+	margin-right: -5px;
+}
+
+.components-panel__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: $light-gray-300;
+	padding: 0 15px;
+	height: 50px;
+	box-shadow: 0 0 0 1px $light-gray-500;
+}

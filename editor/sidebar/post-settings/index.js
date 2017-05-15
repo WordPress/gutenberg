@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from 'i18n';
 import Panel from 'components/panel';
-import PanelHeader from 'components/panel-header';
+import PanelHeader from 'components/panel/header';
 import IconButton from 'components/icon-button';
 
 /**

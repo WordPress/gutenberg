@@ -3,8 +3,8 @@
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import PanelBody from 'components/panel-body';
-import PanelBodyToggle from 'components/panel-body-toggle';
+import PanelBody from 'components/panel/body';
+import PanelBodyToggle from 'components/panel/body-toggle';
 import FormToggle from 'components/form-toggle';
 
 /**
