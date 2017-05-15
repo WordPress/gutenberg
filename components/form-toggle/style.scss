@@ -52,15 +52,6 @@
 }
 
 .components-form-toggle {
-	.accessible-focus &:focus {
-		+ .components-form-toggle__label .components-form-toggle__switch {
-			box-shadow: 0 0 0 2px $blue-medium;
-		}
-		&:checked + .components-form-toggle__label .components-form-toggle__switch {
-			box-shadow: 0 0 0 2px $blue-wordpress;
-		}
-	}
-
 	& + .components-form-toggle__label .components-form-toggle__switch {
 		background: $dark-gray-200;
 	}

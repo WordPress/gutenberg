@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +14,12 @@ import { Component } from 'element';
  */
 import './style.scss';
 
+/**
+ * Module constants
+ */
+const KEYCODE_ENTER = 13;
+const KEYCODE_SPACE = 32;
+
 class FormToggle extends Component {
 	constructor() {
 		super( ...arguments );
@@ -23,42 +30,45 @@ class FormToggle extends Component {
 	}
 
 	componentWillMount() {
-		this.id = this.constructor.idNum++;
+		this.id = this.constructor.instances++;
 	}
 
 	onKeyDown( event ) {
-		if ( this.props.disabled ) {
+		const { disabled, onChange = noop, onKeyDown = noop } = this.props;
+		if ( disabled ) {
 			return;
 		}
 
-		if ( event.key === 'Enter' || event.key === ' ' ) {
+		if ( event.keyCode === KEYCODE_ENTER || event.key === KEYCODE_SPACE ) {
 			event.preventDefault();
-			this.props.onChange();
+			onChange();
 		}
 
-		this.props.onKeyDown( event );
+		onKeyDown( event );
 	}
 
 	onClick() {
-		if ( ! this.props.disabled ) {
-			this.props.onChange();
+		const { disabled, onChange = noop } = this.props;
+		if ( ! disabled ) {
+			onChange();
 		}
 	}
 
 	onLabelClick( event ) {
-		if ( this.props.disabled ) {
+		const { disabled, onChange = noop } = this.props;
+		if ( disabled ) {
 			return;
 		}
 
 		const nodeName = event.target.nodeName.toLowerCase();
 		if ( nodeName !== 'a' && nodeName !== 'input' && nodeName !== 'select' ) {
 			event.preventDefault();
-			this.props.onChange();
+			onChange();
 		}
 	}
 
 	render() {
-		const id = this.props.id || 'toggle-' + this.id;
+		const id = 'toggle-' + this.id;
 		const wrapperClasses = classNames( 'components-form-toggle__wrapper', {
 			'is-disabled': this.props.disabled,
 		} );
@@ -95,6 +105,6 @@ class FormToggle extends Component {
 	}
 }
 
-FormToggle.idNum = 1;
+FormToggle.instances = 1;
 
 export default FormToggle;
