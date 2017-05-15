@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
 import classnames from 'classnames';
 
@@ -56,8 +55,7 @@ class InserterMenu extends wp.element.Component {
 
 	selectBlock( slug ) {
 		return () => {
-			this.props.onInsertBlock( slug );
-			this.props.onSelect();
+			this.props.onSelect( slug );
 			this.setState( {
 				filterValue: '',
 				currentFocus: null,
@@ -177,7 +175,7 @@ class InserterMenu extends wp.element.Component {
 				break;
 			case 27 : /* Escape */
 				keydown.preventDefault();
-				this.props.closeMenu();
+				this.props.onSelect( null );
 
 				break;
 			case 37 : /* ArrowLeft */
@@ -286,14 +284,4 @@ class InserterMenu extends wp.element.Component {
 
 InserterMenu.instances = 0;
 
-export default connect(
-	undefined,
-	( dispatch ) => ( {
-		onInsertBlock( slug ) {
-			dispatch( {
-				type: 'INSERT_BLOCK',
-				block: wp.blocks.createBlock( slug ),
-			} );
-		},
-	} )
-)( InserterMenu );
+export default InserterMenu;
