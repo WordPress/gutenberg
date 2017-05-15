@@ -1,0 +1,9 @@
+.components-panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: $light-gray-300;
+	padding: 0 10px 0 15px;
+	height: 50px;
+  box-shadow: 0 0 0 1px $light-gray-500;
+}
