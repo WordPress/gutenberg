@@ -42,7 +42,6 @@ class PostStatus extends Component {
 							<span>{ __( 'Pending review' ) }</span>
 							<FormToggle
 								checked={ false }
-								onChange={ () => {} }
 								aria-label={ __( 'Request review for post' ) }
 							/>
 						</div>
