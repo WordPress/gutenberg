@@ -18,8 +18,8 @@ rm -f gutenberg.zip
 zip -r gutenberg.zip \
     index.php \
     post-content.js \
-    editor/build \
-    i18n/build \
-    element/build \
     blocks/build \
+    editor/build \
+    element/build \
+    i18n/build \
     README.md
