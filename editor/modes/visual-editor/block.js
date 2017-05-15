@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { partial, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -186,7 +186,14 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const {
+			onSelect,
+			onHover,
+			onMouseLeave,
+			onFocus,
+			onInsertAfter,
+			order,
+		} = this.props;
 
 		// Determine whether the block has props to apply to the wrapper
 		let wrapperProps;
@@ -209,8 +216,9 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
-				tabIndex="0"
+				tabIndex={ order }
 				{ ...wrapperProps }
+				style={ { ...get( wrapperProps, 'style' ), order } }
 			>
 				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ isSelected && ! isTyping &&
