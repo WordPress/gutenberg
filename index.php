@@ -212,10 +212,15 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
  *
+ * @param  string $handle Name of the script.
+ * @param  string $src    Full URL of the external script.
+ * @param  array  $deps   Optional. An array of registered script handles this
+ *                        script depends on.
+ *
  * @since 0.1.0
  */
-function gutenberg_register_vendor_script( $name, $url, $deps = array() ) {
-	$filename = basename( $url );
+function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
+	$filename = basename( $src );
 	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
 
 	$needs_fetch = (
@@ -230,17 +235,17 @@ function gutenberg_register_vendor_script( $name, $url, $deps = array() ) {
 		if ( ! $f ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
-			// (Note: the `fopen` call above will have generated a warning.)
-			wp_register_script( $name, $url, $deps );
+			// Note: the `fopen` call above will have generated a warning.
+			wp_register_script( $handle, $src, $deps );
 			return;
 		}
 		fclose( $f );
-		$response = wp_remote_get( $url );
+		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			// The request failed; just enqueue the script directly from the
-			// URL.  (This will probably fail too, but surfacing the error to
-			// the browser is probably the best we can do.)
-			wp_register_script( $name, $url, $deps );
+			// URL.  This will probably fail too, but surfacing the error to
+			// the browser is probably the best we can do.
+			wp_register_script( $handle, $src, $deps );
 			return;
 		}
 		$f = fopen( $full_path, 'w' );
@@ -249,7 +254,7 @@ function gutenberg_register_vendor_script( $name, $url, $deps = array() ) {
 	}
 
 	wp_register_script(
-		$name,
+		$handle,
 		plugins_url( 'vendor/' . $filename, __FILE__ ),
 		$deps
 	);
