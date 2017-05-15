@@ -12,7 +12,7 @@ function PanelBodyToggle( { opened, label, onClick } ) {
 	return (
 		<button className="components-panel-body-toggle" onClick={ onClick }>
 			<strong>{ label }</strong>
-			<Dashicon icon={ opened ? 'arrow-down' : 'arrow-right' } />
+			<Dashicon className="components-panel-body-toggle__icon" icon={ opened ? 'arrow-down' : 'arrow-right' } />
 		</button>
 	);
 }

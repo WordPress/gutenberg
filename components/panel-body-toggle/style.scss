@@ -8,7 +8,10 @@
 	padding: 0;
 	outline: none;
 	width: 100%;
-	padding: 0 0 10px 0;
 	color: $dark-gray-600;
 	cursor: pointer;
+}
+
+.components-panel-body-toggle__icon {
+	margin-right: -5px;
 }
