@@ -8,6 +8,8 @@ To test the plugin, or to contribute to it, you can clone this repository and bu
 
 To do that, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your webserver and activate the plugin from the WordPress admin. You'll get a separate WordPress menu item called Gutenberg.
 
+You can also type `npm run package-plugin` which will run the two commands above and create a zip file automatically for you which you can use to install Gutenberg through the WordPress admin.
+
 If you have a local WordPress environment, you can clone this repository into your `wp-content/plugins` directory directly. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
 
 Some good options for a local WordPress development environment include <a href="https://varyingvagrantvagrants.org/">VVV</a> and <a href="https://www.mamp.info/">Mamp</a>.

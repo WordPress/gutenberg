@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -18,14 +19,17 @@ class Inserter extends wp.element.Component {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
+		this.insertBlock = this.insertBlock.bind( this );
 		this.state = {
 			opened: false,
 		};
 	}
 
-	toggle() {
-		if ( this.state.opened ) {
-			this.toggleNode.focus();
+	toggle( event ) {
+		// When opening the menu, track reference to the current active element
+		// so we know where to restore focus after the menu is closed by escape
+		if ( ! this.state.opened ) {
+			this.toggleNode = event.currentTarget;
 		}
 
 		this.setState( {
@@ -37,6 +41,18 @@ class Inserter extends wp.element.Component {
 		this.setState( {
 			opened: false,
 		} );
+	}
+
+	insertBlock( slug ) {
+		if ( slug ) {
+			this.props.onInsertBlock( slug );
+		} else if ( this.toggleNode ) {
+			// When menu is closed by pressing escape, restore focus to the
+			// original opening active element before menu closes
+			this.toggleNode.focus();
+		}
+
+		this.close();
 	}
 
 	handleClickOutside() {
@@ -59,12 +75,26 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
-					buttonRef={ ( node ) => this.toggleNode = node }
 					aria-expanded={ opened ? 'true' : 'false' } />
-				{ opened && <InserterMenu position={ position } onSelect={ this.close } closeMenu={ this.toggle } /> }
+				{ opened && (
+					<InserterMenu
+						position={ position }
+						onSelect={ this.insertBlock }
+					/>
+				) }
 			</div>
 		);
 	}
 }
 
-export default clickOutside( Inserter );
+export default connect(
+	undefined,
+	( dispatch ) => ( {
+		onInsertBlock( slug ) {
+			dispatch( {
+				type: 'INSERT_BLOCK',
+				block: wp.blocks.createBlock( slug ),
+			} );
+		},
+	} )
+)( clickOutside( Inserter ) );
