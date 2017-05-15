@@ -7,12 +7,12 @@ set -e
 cd "$(dirname "$0")"
 cd ..
 
-# Remove any existing build
-rm -f gutenberg.zip
-
 # Run the build
 npm install
 npm run build
+
+# Remove any existing zip file
+rm -f gutenberg.zip
 
 # Generate the plugin zip file
 zip -r gutenberg.zip \
