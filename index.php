@@ -158,23 +158,23 @@ function gutenberg_register_scripts() {
 
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-	wp_register_script(
+	gutenberg_register_vendor_script(
 		'react',
 		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
 	);
-	wp_register_script(
+	gutenberg_register_vendor_script(
 		'react-dom',
 		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
-	wp_register_script(
+	gutenberg_register_vendor_script(
 		'react-dom-server',
 		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
 		array( 'react' )
 	);
 
 	// Editor Scripts.
-	wp_register_script(
+	gutenberg_register_vendor_script(
 		'tinymce-nightly',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
 	);
@@ -206,6 +206,54 @@ function gutenberg_register_scripts() {
 	);
 }
 add_action( 'init', 'gutenberg_register_scripts' );
+
+/**
+ * Registers a vendor script from a URL, preferring a locally cached version if
+ * possible, or downloading it if the cached version is unavailable or
+ * outdated.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_register_vendor_script( $name, $url, $deps = array() ) {
+	$filename = basename( $url );
+	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
+
+	$needs_fetch = (
+		! file_exists( $full_path ) ||
+		time() - filemtime( $full_path ) >= DAY_IN_SECONDS
+	);
+
+	if ( $needs_fetch ) {
+		// Determine whether we can write to this file.  If not, don't waste
+		// time doing a network request.
+		$f = fopen( $full_path, 'a' );
+		if ( ! $f ) {
+			// Failed to open the file for writing, probably due to server
+			// permissions.  Enqueue the script directly from the URL instead.
+			// (Note: the `fopen` call above will have generated a warning.)
+			wp_register_script( $name, $url, $deps );
+			return;
+		}
+		fclose( $f );
+		$response = wp_remote_get( $url );
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			// The request failed; just enqueue the script directly from the
+			// URL.  (This will probably fail too, but surfacing the error to
+			// the browser is probably the best we can do.)
+			wp_register_script( $name, $url, $deps );
+			return;
+		}
+		$f = fopen( $full_path, 'w' );
+		fwrite( $f, wp_remote_retrieve_body( $response ) );
+		fclose( $f );
+	}
+
+	wp_register_script(
+		$name,
+		plugins_url( 'vendor/' . $filename, __FILE__ ),
+		$deps
+	);
+}
 
 /**
  * Adds the filters to register additional links for the Gutenberg editor in
