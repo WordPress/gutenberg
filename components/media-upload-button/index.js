@@ -22,6 +22,12 @@ class MediaUploadButton extends Component {
 		this.frame.on( 'select', this.onSelect );
 	}
 
+	componentDidMount() {
+		if ( !! this.props[ 'auto-open' ] ) {
+			this.frame.open();
+		}
+	}
+
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
