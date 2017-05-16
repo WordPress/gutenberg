@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import Placeholder from 'components/placeholder';
-import MediaUploadButton from 'components/media-upload-button';
 
 /**
  * Internal dependencies
@@ -10,6 +9,7 @@ import MediaUploadButton from 'components/media-upload-button';
 import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
+import MediaUploadButton from '../../media-upload-button';
 
 const { attr, children } = query;
 
