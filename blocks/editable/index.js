@@ -117,10 +117,6 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'selectionChange', this.onSelectionChange );
-
-		if ( this.props.onSetup ) {
-			this.props.onSetup( editor );
-		}
 	}
 
 	onInit() {
@@ -279,10 +275,6 @@ export default class Editable extends wp.element.Component {
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.setState( { alignment, bookmark, formats, focusPosition, list } );
-
-		if ( this.props.onNodeChange ) {
-			this.props.onNodeChange( { element, parents } );
-		}
 	}
 
 	updateContent() {
