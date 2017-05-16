@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import Button from 'components/button';
 import Placeholder from 'components/placeholder';
+import MediaUploadButton from 'components/media-upload-button';
 
 /**
  * Internal dependencies
@@ -75,76 +74,48 @@ registerBlock( 'core/image', {
 		}
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.openModal = this.openModal.bind( this );
-			this.onSelect = this.onSelect.bind( this );
-			this.frame = wp.media( {
-				title: wp.i18n.__( 'Select or Upload an image' ),
-				button: {
-					text: wp.i18n.__( 'Select' ),
-				},
-				multiple: false,
-			} );
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { url, alt, caption } = attributes;
 
-			// When an image is selected in the media frame...
-			this.frame.on( 'select', this.onSelect );
-		}
-
-		onSelect() {
-			// Get media attachment details from the frame state
-			const attachment = this.frame.state().get( 'selection' ).first().toJSON();
-			this.props.setAttributes( { url: attachment.url } );
-		}
-
-		openModal() {
-			this.frame.open();
-		}
-
-		render() {
-			const { attributes, setAttributes, focus, setFocus } = this.props;
-			const { url, alt, caption } = attributes;
-
-
-			if ( ! url ) {
-				return (
-					<Placeholder
-						instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
-						icon="format-image"
-						label={ wp.i18n.__( 'Image' ) }
-						className="blocks-image">
-						<Button isLarge onClick={ this.openModal }>
-							{ wp.i18n.__( 'Insert from Media Library' ) }
-						</Button>
-					</Placeholder>
-				);
-			}
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-
-			// Disable reason: Each block can be selected by clicking on it
-
-			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		if ( ! url ) {
+			const uploadButtonProps = { isLarge: true };
+			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
 			return (
-				<figure className="blocks-image">
-					<img src={ url } alt={ alt } onClick={ setFocus } />
-					{ ( caption && caption.length > 0 ) || !! focus ? (
-						<Editable
-							tagName="figcaption"
-							placeholder={ wp.i18n.__( 'Write caption…' ) }
-							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							inline
-							inlineToolbar
-						/>
-					) : null }
-				</figure>
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					icon="format-image"
+					label={ wp.i18n.__( 'Image' ) }
+					className="blocks-image">
+					<MediaUploadButton buttonProps={ uploadButtonProps } onSelect={ setMediaUrl }>
+						{ wp.i18n.__( 'Insert from Media Library' ) }
+					</MediaUploadButton>
+				</Placeholder>
 			);
-			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
+
+		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+
+		// Disable reason: Each block can be selected by clicking on it
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+		return (
+			<figure className="blocks-image">
+				<img src={ url } alt={ alt } onClick={ setFocus } />
+				{ ( caption && caption.length > 0 ) || !! focus ? (
+					<Editable
+						tagName="figcaption"
+						placeholder={ wp.i18n.__( 'Write caption…' ) }
+						value={ caption }
+						focus={ focus && focus.editable === 'caption' ? focus : undefined }
+						onFocus={ focusCaption }
+						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						inline
+						inlineToolbar
+					/>
+				) : null }
+			</figure>
+		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 
 	save( { attributes } ) {
