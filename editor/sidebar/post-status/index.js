@@ -9,17 +9,13 @@ import FormToggle from 'components/form-toggle';
  * Internal Dependencies
  */
 import './style.scss';
-
 function PostStatus() {
 	return (
 		<PanelBody toggle={ __( 'Status & Visibility' ) }>
 			<div>
 				<div className="editor-sidebar-post-status__row">
 					<span>{ __( 'Pending review' ) }</span>
-					<FormToggle
-						checked={ false }
-						aria-label={ __( 'Request review for post' ) }
-					/>
+					<FormToggle />
 				</div>
 			</div>
 		</PanelBody>
