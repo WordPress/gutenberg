@@ -9,11 +9,13 @@
 	&[data-align="left"] {
 		float: left;
 		margin-right: $block-padding;
+		margin-left: calc( 50% - #{ $visual-editor-max-width / 2 } );
 	}
 
 	&[data-align="right"] {
 		float: right;
 		margin-left: $block-padding;
+		margin-right: calc( 50% - #{ $visual-editor-max-width / 2 } );
 	}
 
 	&[data-align="wide"] {

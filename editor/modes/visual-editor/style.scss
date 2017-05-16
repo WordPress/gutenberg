@@ -71,13 +71,14 @@
 	}
 }
 
+$sticky-bottom-offset: 20px;
 .editor-visual-editor__block-controls {
 	@include animate_fade;
 	display: flex;
 	position: sticky;
 	z-index: z-index( '.editor-visual-editor__block-controls' );
 	margin-top: -$block-controls-height - $item-spacing;
-	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
+	margin-bottom: $item-spacing + $sticky-bottom-offset;
 	height: $block-controls-height;
 
 	top: $header-height + $admin-bar-height-big + $item-spacing;
@@ -88,14 +89,9 @@
 }
 
 .editor-visual-editor__block-controls + div {
-	margin-top: -20px;
-
-	// prevent collapsing margins between the block and the toolbar
-	&:before {
-		content: "";
-		display: table;
-		clear: both;
-	}
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
+	margin-top: -$sticky-bottom-offset - 1px;
+	padding-top: 1px;
 }
 
 .editor-visual-editor__block-controls .components-toolbar {
