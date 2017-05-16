@@ -2,6 +2,7 @@
 	background-image: url(images/bg.png);
 	font-family: "Helvetica Neue", sans-serif;
 	font-weight: 700;
+	line-height: 14px;
 }
 
 .class { /* Correct usage of zero values */

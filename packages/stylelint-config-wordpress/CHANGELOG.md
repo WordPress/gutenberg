@@ -1,6 +1,6 @@
 # HEAD
 
--   Added: `declaration-property-unit-whitelist` rule to enforce unitless `line-height` values.
+-   Added: `declaration-property-unit-whitelist` rule to allow `px` and exclude `%` and `em` units  in `line-height` values.
 -   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards.
 -   Fixed: Include CSS config `at-rule-empty-line-before` rules in SCSS config.
 
