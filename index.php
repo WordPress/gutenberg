@@ -282,6 +282,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	/**
 	 * Scripts
 	 */
+	wp_enqueue_media();
 
 	// The editor code itself.
 	wp_enqueue_script(
