@@ -86,7 +86,7 @@ export default class Editable extends wp.element.Component {
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
+		editor.on( 'change', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
@@ -130,8 +130,13 @@ export default class Editable extends wp.element.Component {
 		}
 
 		this.savedContent = this.getContent();
-		this.editor.save();
 		this.props.onChange( this.savedContent );
+
+		// Save contents to the element, but avoid events since by default the
+		// save function will incur another `change` event
+		this.editor.save( {
+			no_events: true,
+		} );
 	}
 
 	getRelativePosition( node ) {

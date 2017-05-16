@@ -20,6 +20,7 @@ import {
 	getBlocks,
 	getBlockUids,
 	getBlockOrder,
+	isNewBlock,
 	isFirstBlock,
 	isLastBlock,
 	getPreviousBlock,
@@ -264,6 +265,52 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockOrder( state, 23 ) ).to.equal( 1 );
+		} );
+	} );
+
+	describe( 'isNewBlock()', () => {
+		it( 'returns null if unknown', () => {
+			const state = {
+				editor: {
+					blocksByUid: {},
+				},
+			};
+
+			expect( isNewBlock( state, 23 ) ).to.be.null();
+		} );
+
+		it( 'returns true if new', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: {
+							blockType: 'core/text',
+							attributes: {
+								content: undefined,
+							},
+						},
+					},
+				},
+			};
+
+			expect( isNewBlock( state, 23 ) ).to.be.true();
+		} );
+
+		it( 'returns false if not new', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: {
+							blockType: 'core/text',
+							attributes: {
+								content: {},
+							},
+						},
+					},
+				},
+			};
+
+			expect( isNewBlock( state, 23 ) ).to.be.false();
 		} );
 	} );
 

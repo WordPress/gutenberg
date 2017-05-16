@@ -3,6 +3,7 @@
  */
 import clickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -65,10 +66,11 @@ class Inserter extends wp.element.Component {
 
 	render() {
 		const { opened } = this.state;
-		const { position } = this.props;
+		const { position, className } = this.props;
+		const classes = classnames( 'editor-inserter', className );
 
 		return (
-			<div className="editor-inserter">
+			<div className={ classes }>
 				<IconButton
 					icon="insert"
 					label={ wp.i18n.__( 'Insert block' ) }
@@ -96,5 +98,12 @@ export default connect(
 				block: wp.blocks.createBlock( slug ),
 			} );
 		},
+	} ),
+	// In `mergeProps`, we flip the order to enable a rendering component to
+	// override the default `onInsertBlock` behavior
+	( stateProps, dispatchProps, ownProps ) => ( {
+		...stateProps,
+		...dispatchProps,
+		...ownProps,
 	} )
 )( clickOutside( Inserter ) );

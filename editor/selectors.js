@@ -69,6 +69,32 @@ export function getBlockOrder( state, uid ) {
 	return state.editor.blockOrder.indexOf( uid );
 }
 
+/**
+ * Returns true if the block is empty, null if the block is not known, or null
+ * otherwise.
+ *
+ * @param  {Object}   state Current application state
+ * @param  {string}   uid   Block UID
+ * @return {?Boolean}       Whether block is empty, or null if unknown
+ */
+export function isNewBlock( state, uid ) {
+	const block = getBlock( state, uid );
+	if ( ! block ) {
+		return null;
+	}
+
+	// A block is considered new if it's a text block without content. Usually
+	// we'd avoid engrained knowledge of specific block types, but the behavior
+	// of text as the default new inserted block is a special case. Regardless,
+	// that we abstract this behind a generic selector enables us to refactor
+	// in the future to one with fewer specific implementation details.
+
+	return (
+		'core/text' === block.blockType &&
+		! block.attributes.content
+	);
+}
+
 export function isFirstBlock( state, uid ) {
 	return first( state.editor.blockOrder ) === uid;
 }

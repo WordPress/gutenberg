@@ -9,6 +9,7 @@ import { partial } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createBlock } from 'blocks';
 import Toolbar from 'components/toolbar';
 
 /**
@@ -16,11 +17,13 @@ import Toolbar from 'components/toolbar';
  */
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
+import Inserter from '../../inserter';
 import {
 	getPreviousBlock,
 	getBlock,
 	getBlockFocus,
 	getBlockOrder,
+	isNewBlock,
 	isBlockHovered,
 	isBlockSelected,
 	isTypingInBlock,
@@ -36,6 +39,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOnBackspace = this.removeOnBackspace.bind( this );
 		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
+		this.replaceNewBlock = this.replaceNewBlock.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -146,6 +150,13 @@ class VisualEditorBlock extends wp.element.Component {
 		);
 	}
 
+	replaceNewBlock( slug ) {
+		// When choosing block from inserter for a new empty block, override
+		// insert behavior to replace current block instead
+		const { uid, replaceBlocks } = this.props;
+		replaceBlocks( [ uid ], [ createBlock( slug ) ] );
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.previousOffset ) {
 			window.scrollTo(
@@ -180,7 +191,7 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isNew, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': isSelected && ! isTyping,
 			'is-hovered': isHovered,
@@ -212,7 +223,14 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ isNew && isSelected && (
+					<Inserter
+						onInsertBlock={ this.replaceNewBlock }
+						className="editor-visual-editor__empty-block-inserter" />
+				) }
+				{ ! isNew && ( ( isSelected && ! isTyping ) || isHovered ) && (
+					<BlockMover uid={ block.uid } />
+				) }
 				{ isSelected && ! isTyping &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
@@ -260,6 +278,7 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
+			isNew: isNewBlock( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
 			order: getBlockOrder( state, ownProps.uid ),

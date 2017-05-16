@@ -19,7 +19,9 @@ function VisualEditor( { blocks } ) {
 			{ blocks.map( ( uid ) => (
 				<VisualEditorBlock key={ uid } uid={ uid } />
 			) ) }
-			<Inserter position="top right" />
+			<Inserter
+				position="top right"
+				className="editor-visual-editor__inserter" />
 		</div>
 	);
 }
