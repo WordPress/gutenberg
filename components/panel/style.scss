@@ -44,17 +44,17 @@
 }
 
 .components-panel__body-toggle {
-	background: none;
-	border: none;
-	display: block;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0;
 	outline: none;
 	width: 100%;
-	color: $dark-gray-600;
-	cursor: pointer;
+	font-weight: 600;
+
+	.dashicon {
+		order: 2;
+	}
 }
 
 .components-panel__body-toggle-icon {
