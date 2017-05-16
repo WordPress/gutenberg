@@ -12,11 +12,9 @@ import './style.scss';
 function PostStatus() {
 	return (
 		<PanelBody title={ __( 'Status & Visibility' ) }>
-			<div>
-				<div className="editor-sidebar-post-status__row">
-					<span>{ __( 'Pending review' ) }</span>
-					<FormToggle />
-				</div>
+			<div className="editor-post-status__row">
+				<span>{ __( 'Pending review' ) }</span>
+				<FormToggle />
 			</div>
 		</PanelBody>
 	);
