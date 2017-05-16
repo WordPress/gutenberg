@@ -77,8 +77,8 @@ class Tests_WP_Customize_Widgets extends WP_UnitTestCase {
 
 	function do_customize_boot_actions() {
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		do_action( 'setup_theme' );
 		$_REQUEST['nonce'] = wp_create_nonce( 'preview-customize_' . $this->manager->theme()->get_stylesheet() );
+		do_action( 'setup_theme' );
 		do_action( 'after_setup_theme' );
 		do_action( 'init' );
 		do_action( 'wp_loaded' );
