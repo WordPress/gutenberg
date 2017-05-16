@@ -19,18 +19,18 @@ class PanelBody extends Component {
 			opened: ! this.state.opened,
 		} );
 	}
+
 	render() {
-		const { toggle, children } = this.props;
+		const { title, children } = this.props;
 		return (
 			<div className="components-panel__body">
-				{ !! toggle &&
+				{ !! title &&
 					<IconButton
 						className="components-panel__body-toggle"
 						onClick={ this.toggle }
-						opened={ this.state.opened }
 						icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
 					>
-						{ toggle }
+						{ title }
 					</IconButton>
 				}
 				{ this.state.opened && children }

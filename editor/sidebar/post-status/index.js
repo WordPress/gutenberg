@@ -11,7 +11,7 @@ import FormToggle from 'components/form-toggle';
 import './style.scss';
 function PostStatus() {
 	return (
-		<PanelBody toggle={ __( 'Status & Visibility' ) }>
+		<PanelBody title={ __( 'Status & Visibility' ) }>
 			<div>
 				<div className="editor-sidebar-post-status__row">
 					<span>{ __( 'Pending review' ) }</span>
