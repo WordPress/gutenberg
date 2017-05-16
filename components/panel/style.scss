@@ -19,6 +19,10 @@
 	}
 }
 
+.components-panel + .components-panel {
+	margin-top: -1px;
+}
+
 .components-panel__body {
 	padding: 15px;
 	border: 1px solid $light-gray-500;
