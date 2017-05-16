@@ -248,7 +248,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 			wp_register_script( $handle, $src, $deps );
 			// If our file was newly created above, it will have a size of
 			// zero, and we need to delete it so that we don't think it's
-			// alredy cached on the next request.
+			// already cached on the next request.
 			if ( ! filesize( $full_path ) ) {
 				unlink( $full_path );
 			}
