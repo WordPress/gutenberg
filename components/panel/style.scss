@@ -2,12 +2,6 @@
 	background: $white;
 	border: 1px solid $light-gray-500;
 
-	> .components-panel__header,
-	> .components-panel__body {
-		margin-left: -1px;
-		margin-right: -1px;
-	}
-
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
 		margin-top: -1px;
@@ -26,6 +20,8 @@
 .components-panel__body {
 	padding: 15px;
 	border: 1px solid $light-gray-500;
+	margin-left: -1px;
+	margin-right: -1px;
 }
 
 .components-panel__header {
@@ -36,6 +32,8 @@
 	padding: 0 15px;
 	height: 50px;
 	border: 1px solid $light-gray-500;
+	margin-left: -1px;
+	margin-right: -1px;
 }
 
 .components-panel__body + .components-panel__body,
