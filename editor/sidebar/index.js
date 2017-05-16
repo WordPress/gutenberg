@@ -17,15 +17,17 @@ import PostSettings from './post-settings';
 import './style.scss';
 
 const Sidebar = () => {
+	const header = (
+		<strong>
+			<span className="editor-sidebar__select-post">Post</span> → Block
+		</strong>
+	);
+
 	return (
 		<div className="editor-sidebar">
 			<PostSettings />
 			<Panel>
-				<PanelHeader>
-					<strong>
-						<span className="editor-sidebar__select-post">Post</span> → Block
-					</strong>
-				</PanelHeader>
+				<PanelHeader label={ header } />
 				<PanelBody>
 					<Slot name="Sidebar.Inspector" />
 				</PanelBody>
