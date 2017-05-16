@@ -1,87 +1,55 @@
-.components-form-toggle[type="checkbox"] {
-	display: none;
+.components-form-toggle {
+  position: relative;
 }
 
-.components-form-toggle__switch {
-	position: relative;
-	display: inline-block;
-	border-radius: 12px;
-	box-sizing: border-box;
-	padding: 4px;
-	width: 24px;
-	height: 16px;
-	vertical-align: middle;
-	align-self: flex-start;
-	outline: 0;
-	cursor: pointer;
-	transition: all .4s ease, box-shadow 0s;
-
-	&:before,
-	&:after {
-		position: relative;
-		display: block;
-		content: "";
-		width: 8px;
-		height: 8px;
-	}
-	&:after {
-		left: 0;
-		border-radius: 50%;
-		background: $white;
-		transition: all .2s ease;
-	}
-	&:before {
-		display: none;
-	}
-	.accessible-focus &:focus{
-		box-shadow: 0 0 0 2px $blue-wordpress;
-	}
+.components-form-toggle__input[type=checkbox] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+	margin: 0;
+	padding: 0;
 }
 
 .components-form-toggle__label {
-	cursor: pointer;
+	&:before {
+		content: '';
+		display: inline-block;
+		vertical-align: middle;
+		box-sizing: border-box;
+		background-color: $dark-gray-200;
+		width: 24px;
+		height: 16px;
+		border-radius: 8px;
+		margin-right: 5px;
 
-	.is-disabled & {
-		cursor: default;
-	}
-
-	.components-form-toggle__label-content {
-		flex: 0 1 100%;
-		margin-left: 12px;
-	}
-}
-
-.components-form-toggle {
-	& + .components-form-toggle__label .components-form-toggle__switch {
-		background: $dark-gray-200;
-	}
-
-	&:not( :disabled ) {
-		+ .components-form-toggle__label:hover .components-form-toggle__switch {
-			background: $dark-gray-100;
+		&:hover {
+			background-color: $dark-gray-100;
 		}
-	}
 
-	&:checked{
-		+ .components-form-toggle__label .components-form-toggle__switch {
-			background: $blue-medium;
+		.components-form-toggle.is-checked & {
+			background-color: $blue-wordpress;
 
-			&:after {
-				left: 8px;
+			&:hover {
+				background-color: $dark-gray-100;
 			}
 		}
 	}
 
-	&:checked:not( :disabled ) {
-		+ .components-form-toggle__label:hover .components-form-toggle__switch {
-			background: $blue-wordpress;
-		}
-	}
+	&:after {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 9px;
+		left: 4px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: $white;
+		transition: 0.3s transform ease-out;
 
-	&:disabled {
-		+ label.components-form-toggle__label span.components-form-toggle__switch {
-			opacity: 0.25;
-			cursor: default;
+
+		.components-form-toggle.is-checked & {
+			transform: translateX( 8px );
 		}
 	}
 }
