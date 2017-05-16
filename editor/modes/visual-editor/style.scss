@@ -18,8 +18,7 @@
 	}
 }
 
-/* "Hassle-free full bleed" from CSS Tricks */
-.editor-visual-editor > *:not( [data-align="wide"] ) {
+.editor-visual-editor {
 	max-width: $visual-editor-max-width;
 	margin-left: auto;
 	margin-right: auto;
@@ -105,16 +104,12 @@
 	}
 }
 
+$sticky-bottom-offset: 20px;
 .editor-visual-editor__block-controls + div {
-	margin-top: -20px;
-
-	// prevent collapsing margins between the block and the toolbar
-	&:before {
-		content: "";
-		display: table;
-		clear: both;
-	}
-}
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
+ 	margin-top: -$sticky-bottom-offset - 1px;
+	padding-top: 1px;
+ }
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
