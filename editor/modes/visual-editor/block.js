@@ -170,9 +170,25 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	isWide() {
+		return this.props.block.attributes.align === 'wide';
+	}
+
 	componentDidMount() {
 		if ( this.props.focus ) {
 			this.node.focus();
+		}
+
+		window.addEventListener( 'resize', this.updateWidth );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'resize', this.updateWidth );
+	}
+
+	updateWidth() {
+		if ( this.isWide() ) {
+			this.forceUpdate();
 		}
 	}
 
@@ -231,6 +247,17 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
+		const layout = document.querySelector( '.editor-layout__content' );
+		const editor = document.querySelector( '.editor-visual-editor' );
+		let style;
+
+		if ( layout && editor && this.isWide() ) {
+			style = {
+				width: layout.offsetWidth,
+				marginLeft: -( layout.offsetWidth / 2 ) + ( editor.offsetWidth / 2 ),
+			};
+		}
+
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -249,6 +276,7 @@ class VisualEditorBlock extends wp.element.Component {
 				className={ className }
 				data-type={ block.name }
 				tabIndex="0"
+				style={ style }
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
