@@ -523,4 +523,34 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 
 		$this->assertNotContains( 'menu-item-home', $classes );
 	}
+
+	/**
+	 * Test _wp_delete_customize_changeset_dependent_auto_drafts.
+	 *
+	 * @covers _wp_delete_customize_changeset_dependent_auto_drafts()
+	 */
+	function test_wp_delete_customize_changeset_dependent_auto_drafts() {
+		$nav_created_post_ids = $this->factory()->post->create_many(2, array(
+			'post_status' => 'auto-draft',
+		) );
+		$data = array(
+			'nav_menus_created_posts' => array(
+				'value' => $nav_created_post_ids,
+			),
+		);
+		wp_set_current_user( self::factory()->user->create( array(
+			'role' => 'administrator',
+		) ) );
+		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
+		$wp_customize = new WP_Customize_Manager();
+		do_action( 'customize_register', $wp_customize );
+		$wp_customize->save_changeset_post( array(
+			'data' => $data,
+		) );
+		$this->assertInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[0] ) );
+		$this->assertInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[1] ) );
+		wp_delete_post( $wp_customize->changeset_post_id(), true );
+		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[0] ) );
+		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[1] ) );
+	}
 }
