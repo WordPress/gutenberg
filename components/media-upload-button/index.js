@@ -6,17 +6,21 @@ import { __ } from 'i18n';
 import Button from 'components/button';
 
 class MediaUploadButton extends Component {
-	constructor( { multiple = false } ) {
+	constructor( { multiple = false, type } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
-		this.frame = wp.media( {
+		const frameConfig = {
 			title: __( 'Select or Upload a media' ),
 			button: {
 				text: __( 'Select' ),
 			},
 			multiple,
-		} );
+		};
+		if ( !! type ) {
+			frameConfig.library = { type };
+		}
+		this.frame = wp.media( frameConfig );
 
 		// When an image is selected in the media frame...
 		this.frame.on( 'select', this.onSelect );

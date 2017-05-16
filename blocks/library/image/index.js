@@ -86,7 +86,12 @@ registerBlock( 'core/image', {
 					icon="format-image"
 					label={ wp.i18n.__( 'Image' ) }
 					className="blocks-image">
-					<MediaUploadButton buttonProps={ uploadButtonProps } onSelect={ setMediaUrl } auto-open>
+					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
+						onSelect={ setMediaUrl }
+						type="image"
+						auto-open
+					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>
