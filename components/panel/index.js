@@ -13,7 +13,7 @@ function Panel( { header, className, children } ) {
 	const classNames = classnames( className, 'components-panel' );
 	return (
 		<div className={ classNames }>
-			{ header && <PanelHeader><strong>{ header }</strong></PanelHeader>}
+			{ header && <PanelHeader label={ header } /> }
 			{ children }
 		</div>
 	);

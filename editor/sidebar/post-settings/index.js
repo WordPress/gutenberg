@@ -20,8 +20,7 @@ import PostStatus from '../post-status';
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
 		<Panel>
-			<PanelHeader>
-				<strong>{ __( 'Post Settings' ) }</strong>
+			<PanelHeader label={ __( 'Post Settings' ) } >
 				<div className="editor-sidebar-post-settings__icons">
 					<IconButton icon="admin-settings" />
 					<IconButton
