@@ -98,7 +98,7 @@ function unregister_block( $slug ) {
  * @return array
  */
 function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+):([^\s]+)\s*/';
+	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
 	preg_match_all( $attributes_matcher, $attr_string, $matches );
 	$attributes = array();
 	foreach ( $matches[1] as $index => $attribute_match ) {
