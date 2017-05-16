@@ -1,4 +1,4 @@
-# HEAD
+# 11.0.0
 
 -   Added: `declaration-property-unit-whitelist` rule to allow `px` and exclude `%` and `em` units  in `line-height` values.
 -   Changed: Relocated repo to https://github.com/WordPress-Coding-Standards.
