@@ -1,5 +1,6 @@
 .blocks-embed {
 	margin: 0;
+	clear: both;	// necessary because we use responsive trickery to set width/height, and therefore the video doesn't intrinsically clear floats like an img does
 }
 
 .blocks-embed .iframe-overlay {
