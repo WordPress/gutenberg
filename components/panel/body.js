@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-
-/**
- * Internal dependencies
- */
-import PanelBodyToggle from './body-toggle';
+import IconButton from 'components/icon-button';
 
 class PanelBody extends Component {
 	constructor( props ) {
@@ -28,11 +24,14 @@ class PanelBody extends Component {
 		return (
 			<div className="components-panel__body">
 				{ !! toggle &&
-					<PanelBodyToggle
+					<IconButton
+						className="components-panel__body-toggle"
 						onClick={ this.toggle }
 						opened={ this.state.opened }
-						label={ toggle }
-					/>
+						icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
+					>
+						{ toggle }
+					</IconButton>
 				}
 				{ this.state.opened && children }
 			</div>
