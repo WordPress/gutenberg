@@ -1,11 +1,11 @@
 .components-form-toggle {
-  position: relative;
+	position: relative;
 }
 
 .components-form-toggle__input[type=checkbox] {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
 	margin: 0;
 	padding: 0;
 }
