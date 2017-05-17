@@ -9,11 +9,6 @@ import { Fill } from 'react-slot-fill';
 import Toolbar from 'components/toolbar';
 
 export default function BlockControls( { controls } ) {
-	controls = controls.map( ( control ) => ( {
-		...control,
-		isActive: !! control.isActive && control.isActive(),
-	} ) );
-
 	return (
 		<Fill name="Formatting.Toolbar">
 			<Toolbar controls={ controls } />

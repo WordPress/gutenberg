@@ -87,7 +87,7 @@ registerBlock( 'core/heading', {
 						'123456'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
 							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
-							isActive: () => 'H' + level === nodeName,
+							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
 						} ) )
