@@ -1,11 +1,31 @@
-.blocks-table {
-	border-collapse: collapse;
-	table-layout: fixed;
-	width: 100%;
-}
+.editor-visual-editor__block[data-type="core/table"] {
+	table {
+		border-collapse: collapse;
+		table-layout: fixed;
+		width: 100%;
+	}
 
-.blocks-table td,
-.blocks-table th {
-	padding: 0.5em;
-	border: 1px solid currentColor;
+	td {
+		padding: 0.5em;
+		border: 1px solid currentColor;
+	}
+
+	&[data-align="left"],
+	&[data-align="right"] {
+		max-width: 50%;
+	}
+
+	&[data-align="left"] {
+		float: left;
+		margin-right: $block-padding;
+	}
+
+	&[data-align="right"] {
+		float: right;
+		margin-left: $block-padding;
+	}
+
+	&[data-align="wide"] {
+
+	}
 }
