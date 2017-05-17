@@ -9,3 +9,4 @@ import './separator';
 import './button';
 import './pullquote';
 import './table';
+import './preformatted';
