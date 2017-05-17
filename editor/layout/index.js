@@ -11,26 +11,55 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
-import { getEditorMode, isEditorSidebarOpened } from '../selectors';
+import {
+	getEditorMode,
+	isEditorSidebarOpened,
+	getEditorWidth,
+} from '../selectors';
 
-function Layout( { mode, isSidebarOpened } ) {
-	const className = classnames( 'editor-layout', {
-		'is-sidebar-opened': isSidebarOpened,
-	} );
+class Layout extends wp.element.Component {
 
-	return (
-		<div className={ className }>
-			<Header />
-			<div className="editor-layout__content">
-				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
+	componentDidMount() {
+		window.addEventListener( 'resize', this.props.setEditorWidth );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'resize', this.props.setEditorWidth );
+	}
+
+	componentDidUpdate( newProps ) {
+		if ( this.props.isSidebarOpened !== newProps.isSidebarOpened ) {
+			this.props.setEditorWidth();
+		}
+	}
+
+	render() {
+		const { mode, isSidebarOpened } = this.props;
+
+		const className = classnames( 'editor-layout', {
+			'is-sidebar-opened': isSidebarOpened,
+		} );
+
+		return (
+			<div className={ className }>
+				<Header />
+				<div className="editor-layout__content">
+					{ mode === 'text' && <TextEditor /> }
+					{ mode === 'visual' && <VisualEditor /> }
+				</div>
+				{ isSidebarOpened && <Sidebar /> }
 			</div>
-			{ isSidebarOpened && <Sidebar /> }
-		</div>
-	);
+		);
+	}
 }
 
-export default connect( ( state ) => ( {
-	mode: getEditorMode( state ),
-	isSidebarOpened: isEditorSidebarOpened( state ),
-} ) )( Layout );
+export default connect(
+	( state ) => ( {
+		mode: getEditorMode( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
+		editorWidth: getEditorWidth( state ),
+	} ),
+	( dispatch ) => ( {
+		setEditorWidth: () => dispatch( { type: 'SET_EDITOR_WIDTH' } ),
+	} )
+)( Layout );

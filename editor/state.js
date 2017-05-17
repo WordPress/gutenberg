@@ -375,6 +375,21 @@ export function isSidebarOpened( state = false, action ) {
 	return state;
 }
 
+export function editorWidth( state = null, action ) {
+	const layout = document.querySelector( '.editor-layout__content' );
+	const innerContent = document.querySelector( '.editor-visual-editor' );
+
+	if ( layout && innerContent ) {
+		const width = [ layout.offsetWidth, innerContent.offsetWidth ];
+		switch ( action.type ) {
+			case 'SET_EDITOR_WIDTH':
+				return width;
+		}
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
@@ -429,6 +444,7 @@ export function createReduxStore() {
 		mode,
 		isSidebarOpened,
 		saving,
+		editorWidth,
 	} );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];

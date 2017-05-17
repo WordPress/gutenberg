@@ -28,6 +28,10 @@ export function isEditorSidebarOpened( state ) {
 	return state.isSidebarOpened;
 }
 
+export function getEditorWidth( state ) {
+	return state.editorWidth;
+}
+
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
  *

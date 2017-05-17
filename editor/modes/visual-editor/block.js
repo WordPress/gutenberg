@@ -37,6 +37,7 @@ import {
 	isFirstSelectedBlock,
 	getSelectedBlocks,
 	isTypingInBlock,
+	getEditorWidth,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -178,18 +179,6 @@ class VisualEditorBlock extends wp.element.Component {
 		if ( this.props.focus ) {
 			this.node.focus();
 		}
-
-		window.addEventListener( 'resize', this.updateWidth );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'resize', this.updateWidth );
-	}
-
-	updateWidth() {
-		if ( this.isWide() ) {
-			this.forceUpdate();
-		}
 	}
 
 	onFocus( event ) {
@@ -231,7 +220,7 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus, editorWidth } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
@@ -247,14 +236,12 @@ class VisualEditorBlock extends wp.element.Component {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
-		const layout = document.querySelector( '.editor-layout__content' );
-		const editor = document.querySelector( '.editor-visual-editor' );
 		let style;
 
-		if ( layout && editor && this.isWide() ) {
+		if ( this.isWide() && editorWidth ) {
 			style = {
-				width: layout.offsetWidth,
-				marginLeft: -( layout.offsetWidth / 2 ) + ( editor.offsetWidth / 2 ),
+				width: editorWidth[ 0 ],
+				marginLeft: -( editorWidth[ 0 ] / 2 ) + ( editorWidth[ 1 ] / 2 ),
 			};
 		}
 
@@ -340,6 +327,7 @@ export default connect(
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
 			order: getBlockIndex( state, ownProps.uid ),
+			editorWidth: getEditorWidth( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -349,6 +337,9 @@ export default connect(
 				uid,
 				updates,
 			} );
+
+			// we don't want to do this blindly on every change
+			dispatch( { type: 'SET_EDITOR_WIDTH' } );
 		},
 		onSelect() {
 			dispatch( {
