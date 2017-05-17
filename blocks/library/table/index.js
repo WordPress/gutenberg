@@ -32,6 +32,10 @@ registerBlock( 'core/table', {
 		foot: query( 'tfoot > tr', query( 'td,th', children() ) ),
 	},
 
+	defaultAttributes: {
+		body: [ [ [], [] ], [ [], [] ] ],
+	},
+
 	controls: [
 		{
 			icon: 'align-left',
@@ -69,18 +73,12 @@ registerBlock( 'core/table', {
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
 
-		const parts = {
-			head: attributes.head,
-			body: attributes.body || [ [ [], [] ], [ [], [] ] ],
-			foot: attributes.foot,
-		};
-
 		return (
 			<table>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					parts[ part ] && parts[ part ].length
+					attributes[ part ] && attributes[ part ].length
 						? wp.element.createElement( 't' + part, { key: part },
-							parts[ part ].map( ( rows = [], i ) =>
+							attributes[ part ].map( ( rows = [], i ) =>
 								<tr key={ i }>
 									{ rows.map( ( value = '', ii ) => {
 										const key = part + i + '.' + ii;
@@ -94,7 +92,7 @@ registerBlock( 'core/table', {
 													focus={ focussedKey === key ? focus : null }
 													onFocus={ () => setFocus( { editable: key } ) }
 													onChange={ ( nextValue ) => {
-														const nextPart = [ ...parts[ part ] ];
+														const nextPart = [ ...attributes[ part ] ];
 
 														nextPart[ i ][ ii ] = nextValue;
 
