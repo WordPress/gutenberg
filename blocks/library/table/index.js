@@ -27,7 +27,9 @@ registerBlock( 'core/table', {
 	category: 'common',
 
 	attributes: {
-		rows: query( 'tr', query( 'td', children() ) ),
+		head: query( 'thead > tr', query( 'td,th', children() ) ),
+		body: query( 'tbody > tr', query( 'td,th', children() ) ),
+		foot: query( 'tfoot > tr', query( 'td,th', children() ) ),
 	},
 
 	controls: [
@@ -65,56 +67,61 @@ registerBlock( 'core/table', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { rows = [] } = attributes;
-		const focussedKey = focus ? focus.editable || '0.0' : null;
+		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
 
 		return (
 			<table>
-				<tbody>
-					{ rows.map( ( cells = [], i ) =>
-						<tr key={ i }>
-							{ cells.map( ( value, ii ) => {
-								const key = i + '.' + ii;
+				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
+					wp.element.createElement( 't' + part, { key: part },
+						attributes[ part ].map( ( rows = [], i ) =>
+							<tr key={ i }>
+								{ rows.map( ( value = '', ii ) => {
+									const key = part + i + '.' + ii;
+									const Cell = part === 'head' ? 'th' : 'td';
 
-								return (
-									<td key={ key }>
-										<Editable
-											value={ value }
-											focus={ focussedKey === key ? focus : null }
-											onFocus={ () => setFocus( { editable: key } ) }
-											onChange={ ( nextValue ) => {
-												const nextRows = [ ...rows ];
+									return (
+										<Cell key={ key }>
+											<Editable
+												inline
+												value={ value }
+												focus={ focussedKey === key ? focus : null }
+												onFocus={ () => setFocus( { editable: key } ) }
+												onChange={ ( nextValue ) => {
+													const nextPart = [ ...attributes[ part ] ];
 
-												nextRows[ i ][ ii ] = nextValue;
+													nextPart[ i ][ ii ] = nextValue;
 
-												setAttributes( { rows: nextRows } );
-											} }
-											inline
-										/>
-									</td>
-								);
-							} ) }
-						</tr>
-					) }
-				</tbody>
+													setAttributes( { [ part ]: nextPart } );
+												} }
+											/>
+										</Cell>
+									);
+								} ) }
+							</tr>
+						)
+					)
+				) }
 			</table>
 		);
 	},
 
 	save( { attributes } ) {
-		const { rows = [] } = attributes;
-
 		return (
 			<table>
-				<tbody>
-					{ rows.map( ( cells = [], i ) =>
-						<tr key={ i }>
-							{ cells.map( ( value, ii ) =>
-								<td key={ ii }>{ value }</td>
-							) }
-						</tr>
-					) }
-				</tbody>
+				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
+					wp.element.createElement( 't' + part, { key: part },
+						attributes[ part ].map( ( rows = [], i ) =>
+							<tr key={ i }>
+								{ rows.map( ( value = '', ii ) => {
+									const key = part + i + '.' + ii;
+									const Cell = part === 'head' ? 'th' : 'td';
+
+									return <Cell key={ key }>{ value }</Cell>;
+								} ) }
+							</tr>
+						)
+					)
+				) }
 			</table>
 		);
 	},
