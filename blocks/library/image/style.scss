@@ -17,7 +17,6 @@
 	}
 
 	&[data-align="wide"] {
-		margin-left: calc(50% - 50vw);
 		padding-left: 0;
 		padding-right: 0;
 		box-sizing: border-box;
@@ -30,6 +29,16 @@
 
 		.editor-block-mover {
 			display: none;
+		}
+
+		.editor-visual-editor__block-controls {
+			max-width: $visual-editor-max-width - ( ( $block-padding + $block-padding + $block-mover-margin ) * 2 );;
+			// a block is 600px wide inside a 700px container
+			// with block mover margin, border widths and paddings, toolbars are indented 46px
+			// that's 2px border plus 10px padding plus 18px mover margin
+			// these 46px are accounted for on both sides, to make sure the block is centered
+			margin-left: auto;
+			margin-right: auto;
 		}
 	}
 }
