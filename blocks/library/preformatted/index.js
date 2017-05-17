@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
