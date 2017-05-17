@@ -69,37 +69,45 @@ registerBlock( 'core/table', {
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
 
+		const parts = {
+			head: attributes.head,
+			body: attributes.body || [ [ [], [] ], [ [] ,[] ] ],
+			foot: attributes.foot
+		};
+
 		return (
 			<table>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					wp.element.createElement( 't' + part, { key: part },
-						attributes[ part ].map( ( rows = [], i ) =>
-							<tr key={ i }>
-								{ rows.map( ( value = '', ii ) => {
-									const key = part + i + '.' + ii;
-									const Cell = part === 'head' ? 'th' : 'td';
+					parts[ part ]
+						? wp.element.createElement( 't' + part, { key: part },
+							parts[ part ].map( ( rows = [], i ) =>
+								<tr key={ i }>
+									{ rows.map( ( value = '', ii ) => {
+										const key = part + i + '.' + ii;
+										const Cell = part === 'head' ? 'th' : 'td';
 
-									return (
-										<Cell key={ key }>
-											<Editable
-												inline
-												value={ value }
-												focus={ focussedKey === key ? focus : null }
-												onFocus={ () => setFocus( { editable: key } ) }
-												onChange={ ( nextValue ) => {
-													const nextPart = [ ...attributes[ part ] ];
+										return (
+											<Cell key={ key }>
+												<Editable
+													inline
+													value={ value }
+													focus={ focussedKey === key ? focus : null }
+													onFocus={ () => setFocus( { editable: key } ) }
+													onChange={ ( nextValue ) => {
+														const nextPart = [ ...parts[ part ] ];
 
-													nextPart[ i ][ ii ] = nextValue;
+														nextPart[ i ][ ii ] = nextValue;
 
-													setAttributes( { [ part ]: nextPart } );
-												} }
-											/>
-										</Cell>
-									);
-								} ) }
-							</tr>
+														setAttributes( { [ part ]: nextPart } );
+													} }
+												/>
+											</Cell>
+										);
+									} ) }
+								</tr>
+							)
 						)
-					)
+						: null
 				) }
 			</table>
 		);
