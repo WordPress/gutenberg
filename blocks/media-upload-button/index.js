@@ -32,6 +32,10 @@ class MediaUploadButton extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.frame.remove();
+	}
+
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
