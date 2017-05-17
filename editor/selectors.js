@@ -67,6 +67,13 @@ export function getBlocks( state ) {
 	) );
 }
 
+export function getSelectedBlock( state ) {
+	if ( ! state.selectedBlock.uid ) {
+		return null;
+	}
+	return state.editor.blocksByUid[ state.selectedBlock.uid ];
+}
+
 export function getBlockUids( state ) {
 	return state.editor.blockOrder;
 }

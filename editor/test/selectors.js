@@ -19,6 +19,7 @@ import {
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
+	getSelectedBlock,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
@@ -270,6 +271,36 @@ describe( 'selectors', () => {
 				{ uid: 123, blockType: 'core/text' },
 				{ uid: 23, blockType: 'core/heading' },
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlock', () => {
+		it( 'should return null if no block is selected', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: null },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( null );
+		} );
+
+		it( 'should return the selected block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: 23 },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
 		} );
 	} );
 

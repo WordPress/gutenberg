@@ -1,39 +1,29 @@
 /**
  * External dependencies
  */
-import { Slot } from 'react-slot-fill';
-
-/**
- * WordPress dependencies
- */
-import Panel from 'components/panel';
-import PanelHeader from 'components/panel/header';
-import PanelBody from 'components/panel/body';
+import { connect } from 'react-redux';
 
 /**
  * Internal Dependencies
  */
-import PostSettings from './post-settings';
 import './style.scss';
+import PostSettings from './post-settings';
+import BlockInspector from './block-inspector';
+import { getSelectedBlock } from '../selectors';
 
-const Sidebar = () => {
-	const header = (
-		<strong>
-			<span className="editor-sidebar__select-post">Post</span> → Block
-		</strong>
-	);
-
+const Sidebar = ( { selectedBlock } ) => {
 	return (
 		<div className="editor-sidebar">
-			<PostSettings />
-			<Panel>
-				<PanelHeader label={ header } />
-				<PanelBody>
-					<Slot name="Sidebar.Inspector" />
-				</PanelBody>
-			</Panel>
+			{ ! selectedBlock && <PostSettings /> }
+			{ selectedBlock && <BlockInspector /> }
 		</div>
 	);
 };
 
-export default Sidebar;
+export default connect(
+	( state ) => {
+		return {
+			selectedBlock: getSelectedBlock( state ),
+		};
+	}
+)( Sidebar );
