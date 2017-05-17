@@ -29,7 +29,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image align="center" -->',
-			'<figure><img src="https://cldup.com/E4PzNdrFSQ.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+			'<figure><img src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
