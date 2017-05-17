@@ -1,0 +1,11 @@
+.blocks-table {
+	border-collapse: collapse;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.blocks-table td,
+.blocks-table th {
+	padding: 0.5em;
+	border: 1px solid currentColor;
+}

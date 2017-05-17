@@ -128,6 +128,10 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/list -->',
 			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
+
+			'<!-- wp:core/table -->',
+			'<table><tr><td><em>Test</em>: one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>',
+			'<!-- /wp:core/table -->',
 		].join( '' ),
 	},
 };
