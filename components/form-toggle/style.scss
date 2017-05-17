@@ -1,0 +1,55 @@
+.components-form-toggle {
+	position: relative;
+}
+
+.components-form-toggle__input[type=checkbox] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+	margin: 0;
+	padding: 0;
+}
+
+.components-form-toggle__label {
+	&:before {
+		content: '';
+		display: inline-block;
+		vertical-align: middle;
+		box-sizing: border-box;
+		background-color: $dark-gray-200;
+		width: 24px;
+		height: 16px;
+		border-radius: 8px;
+		margin-right: 5px;
+
+		&:hover {
+			background-color: $dark-gray-100;
+		}
+
+		.components-form-toggle.is-checked & {
+			background-color: $blue-wordpress;
+
+			&:hover {
+				background-color: $dark-gray-100;
+			}
+		}
+	}
+
+	&:after {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 9px;
+		left: 4px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: $white;
+		transition: 0.3s transform ease-out;
+
+
+		.components-form-toggle.is-checked & {
+			transform: translateX( 8px );
+		}
+	}
+}

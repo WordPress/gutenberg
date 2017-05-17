@@ -10,6 +10,19 @@
 	@include break-medium() {
 		top: $admin-bar-height + $header-height;
 	}
+
+	> .components-panel {
+		margin-left: -1px;
+		margin-right: -1px;
+
+		&:first-child {
+			margin-top: -1px;
+		}
+
+		&:last-child {
+			margin-bottom: -1px;
+		}
+	}
 }
 
 /* Visual and Text editor both */
@@ -32,18 +45,7 @@
 	margin-right: $sidebar-width;
 }
 
-.editor-sidebar__header {
-	padding: 16px;
-}
-
 .editor-sidebar__select-post {
 	font-weight: 600;
 	text-decoration: underline;
-}
-
-.editor-sidebar__content {
-	background: $white;
-	border-bottom: 1px solid $light-gray-500;
-	border-top: 1px solid $light-gray-500;
-	padding: 16px;
 }

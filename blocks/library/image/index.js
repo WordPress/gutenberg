@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
 import Placeholder from 'components/placeholder';
 
 /**
@@ -10,6 +9,7 @@ import Placeholder from 'components/placeholder';
 import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
+import MediaUploadButton from '../../media-upload-button';
 
 const { attr, children } = query;
 
@@ -78,15 +78,22 @@ registerBlock( 'core/image', {
 		const { url, alt, caption } = attributes;
 
 		if ( ! url ) {
+			const uploadButtonProps = { isLarge: true };
+			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
 			return (
 				<Placeholder
 					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ wp.i18n.__( 'Image' ) }
 					className="blocks-image">
-					<Button isLarge>
+					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
+						onSelect={ setMediaUrl }
+						type="image"
+						auto-open
+					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
-					</Button>
+					</MediaUploadButton>
 				</Placeholder>
 			);
 		}
