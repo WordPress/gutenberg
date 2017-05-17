@@ -36,6 +36,12 @@ export function getPostEdits( state ) {
 	return state.editor.edits;
 }
 
+export function getEditedPostStatus( state ) {
+	return state.editor.edits.status === undefined
+		? state.currentPost.status
+		: state.editor.edits.status;
+}
+
 export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
 		? state.currentPost.title.raw

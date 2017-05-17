@@ -20,6 +20,13 @@ export function replaceBlocks( uids, blocks ) {
 	};
 }
 
+export function editPost( edits ) {
+	return {
+		type: 'EDIT_POST',
+		edits,
+	};
+}
+
 export function savePost( dispatch, postId, edits ) {
 	const toSend = postId ? { id: postId, ...edits } : edits;
 	const isNew = ! postId;
