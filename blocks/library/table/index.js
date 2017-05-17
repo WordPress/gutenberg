@@ -71,14 +71,14 @@ registerBlock( 'core/table', {
 
 		const parts = {
 			head: attributes.head,
-			body: attributes.body || [ [ [], [] ], [ [] ,[] ] ],
-			foot: attributes.foot
+			body: attributes.body || [ [ [], [] ], [ [], [] ] ],
+			foot: attributes.foot,
 		};
 
 		return (
 			<table>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					parts[ part ]
+					parts[ part ] && parts[ part ].length
 						? wp.element.createElement( 't' + part, { key: part },
 							parts[ part ].map( ( rows = [], i ) =>
 								<tr key={ i }>
@@ -117,18 +117,20 @@ registerBlock( 'core/table', {
 		return (
 			<table>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
-					wp.element.createElement( 't' + part, { key: part },
-						attributes[ part ].map( ( rows = [], i ) =>
-							<tr key={ i }>
-								{ rows.map( ( value = '', ii ) => {
-									const key = part + i + '.' + ii;
-									const Cell = part === 'head' ? 'th' : 'td';
+					attributes[ part ] && attributes[ part ].length
+						? wp.element.createElement( 't' + part, { key: part },
+							attributes[ part ].map( ( rows = [], i ) =>
+								<tr key={ i }>
+									{ rows.map( ( value = '', ii ) => {
+										const key = part + i + '.' + ii;
+										const Cell = part === 'head' ? 'th' : 'td';
 
-									return <Cell key={ key }>{ value }</Cell>;
-								} ) }
-							</tr>
+										return <Cell key={ key }>{ value }</Cell>;
+									} ) }
+								</tr>
+							)
 						)
-					)
+						: null
 				) }
 			</table>
 		);
