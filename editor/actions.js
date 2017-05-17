@@ -4,6 +4,22 @@
 import { get } from 'lodash';
 import { parse, stringify } from 'querystring';
 
+export function focusBlock( uid, config ) {
+	return {
+		type: 'UPDATE_FOCUS',
+		uid,
+		config,
+	};
+}
+
+export function replaceBlocks( uids, blocks ) {
+	return {
+		type: 'REPLACE_BLOCKS',
+		uids,
+		blocks,
+	};
+}
+
 export function savePost( dispatch, postId, edits ) {
 	const toSend = postId ? { id: postId, ...edits } : edits;
 	const isNew = ! postId;
@@ -40,4 +56,43 @@ export function savePost( dispatch, postId, edits ) {
 			isNew,
 		} );
 	} );
+}
+
+export function mergeBlocks( dispatch, blockA, blockB ) {
+	const blockASettings = wp.blocks.getBlockSettings( blockA.blockType );
+
+	// Only focus the previous block if it's not mergeable
+	if ( ! blockASettings.merge ) {
+		dispatch( focusBlock( blockA.uid ) );
+		return;
+	}
+
+	// We can only merge blocks with similar types
+	// thus, we transform the block to merge first
+	const blocksWithTheSameType = blockA.blockType === blockB.blockType
+		? [ blockB ]
+		: wp.blocks.switchToBlockType( blockB, blockA.blockType );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		return;
+	}
+
+	// Calling the merge to update the attributes and remove the block to be merged
+	const updatedAttributes = blockASettings.merge( blockA.attributes, blocksWithTheSameType[ 0 ].attributes );
+
+	dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+	dispatch( replaceBlocks(
+		[ blockA.uid, blockB.uid ],
+		[
+			{
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					...updatedAttributes,
+				},
+			},
+			...blocksWithTheSameType.slice( 1 ),
+		]
+	) );
 }

@@ -110,7 +110,7 @@ registerBlock( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -125,7 +125,7 @@ registerBlock( 'core/quote', {
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
-					onMerge={ mergeWithPrevious }
+					onMerge={ mergeBlocks }
 					showAlignments
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (

@@ -23,6 +23,7 @@ import {
 	isFirstBlock,
 	isLastBlock,
 	getPreviousBlock,
+	getNextBlock,
 	isBlockSelected,
 	isBlockHovered,
 	getBlockFocus,
@@ -340,6 +341,38 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPreviousBlock( state, 123 ) ).to.be.null();
+		} );
+	} );
+
+	describe( 'getNextBlock', () => {
+		it( 'should return the following block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+					blockOrder: [ 123, 23 ],
+				},
+			};
+
+			expect( getNextBlock( state, 123 ) ).to.eql(
+				{ uid: 23, blockType: 'core/heading' },
+			);
+		} );
+
+		it( 'should return null for the last block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+					blockOrder: [ 123, 23 ],
+				},
+			};
+
+			expect( getNextBlock( state, 23 ) ).to.be.null();
 		} );
 	} );
 
