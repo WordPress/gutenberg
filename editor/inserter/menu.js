@@ -15,7 +15,7 @@ import Dashicon from 'components/dashicon';
  */
 import './style.scss';
 import { getSelectedBlock } from '../selectors';
-import { setBlockToInsert } from '../actions';
+import { setInsertionPoint, clearInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -66,13 +66,16 @@ class InserterMenu extends wp.element.Component {
 		};
 	}
 
-	hoverBlock( slug = null ) {
+	hoverBlock() {
 		return () => {
-			this.props.setBlockToInsert(
-				slug,
+			this.props.setInsertionPoint(
 				this.props.selectedBlock ? this.props.selectedBlock.uid : null
 			);
 		};
+	}
+
+	unhoverBlock() {
+		return () => this.props.clearInsertionPoint();
 	}
 
 	getVisibleBlocks( blockTypes ) {
@@ -266,8 +269,8 @@ class InserterMenu extends wp.element.Component {
 											onClick={ this.selectBlock( slug ) }
 											ref={ this.bindReferenceNode( slug ) }
 											tabIndex="-1"
-											onMouseEnter={ this.hoverBlock( slug ) }
-											onMouseLeave={ this.hoverBlock() }
+											onMouseEnter={ this.hoverBlock() }
+											onMouseLeave={ this.unhoverBlock() }
 										>
 											<Dashicon icon={ icon } />
 											{ title }
@@ -304,5 +307,5 @@ export default connect(
 			selectedBlock: getSelectedBlock( state ),
 		};
 	},
-	{ setBlockToInsert }
+	{ setInsertionPoint, clearInsertionPoint }
 )( InserterMenu );

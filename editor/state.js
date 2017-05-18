@@ -282,16 +282,23 @@ export function hoveredBlock( state = null, action ) {
 }
 
 /**
- * Reducer returning the block slug to be inserter.
+ * Reducer returning the block insertion point
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function blockToInsert( state = {}, action ) {
+export function insertionPoint( state = { show: false }, action ) {
 	switch ( action.type ) {
-		case 'SET_BLOCK_TO_INSERT':
-			return { slug: action.slug, after: action.after };
+		case 'SET_INSERTION_POINT':
+			return {
+				show: true,
+				uid: action.uid,
+			};
+		case 'CLEAR_INSERTION_POINT':
+			return {
+				show: false,
+			};
 	}
 
 	return state;
@@ -371,7 +378,7 @@ export function createReduxStore() {
 		currentPost,
 		selectedBlock,
 		hoveredBlock,
-		blockToInsert,
+		insertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,
