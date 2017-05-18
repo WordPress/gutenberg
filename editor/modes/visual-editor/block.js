@@ -37,11 +37,11 @@ class VisualEditorBlock extends wp.element.Component {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOnBackspace = this.removeOnBackspace.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -73,14 +73,6 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isTyping, isHovered, onHover } = this.props;
 		if ( isTyping && ! isHovered ) {
 			onHover();
-		}
-	}
-
-	maybeDeselect( event ) {
-		// Annoyingly React does not support focusOut and we're forced to check
-		// related target to ensure it's not a child when blur fires.
-		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			this.props.onDeselect();
 		}
 	}
 
@@ -122,6 +114,14 @@ class VisualEditorBlock extends wp.element.Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
+	}
+
+	selectAndStopPropagation( event ) {
+		this.props.onSelect();
+
+		// Visual editor infers click as intent to clear the selected block, so
+		// prevent bubbling when occurring on block where selection is intended
+		event.stopPropagation();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -178,9 +178,8 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onClick={ onSelect }
+				onClick={ this.selectAndStopPropagation }
 				onFocus={ onSelect }
-				onBlur={ this.maybeDeselect }
 				onKeyDown={ this.removeOnBackspace }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }

@@ -408,6 +408,15 @@ describe( 'state', () => {
 			expect( state ).to.eql( { uid: 'kumquat', typing: false, focus: {} } );
 		} );
 
+		it( 'returns an empty object when clearing selected block', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: false, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state ).to.eql( {} );
+		} );
+
 		it( 'should not update the state if already selected and not typing', () => {
 			const original = deepFreeze( { uid: 'kumquat', typing: false, focus: {} } );
 			const state = selectedBlock( original, {
