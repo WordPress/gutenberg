@@ -6,6 +6,10 @@
 	position: relative;
 }
 
+.editor-post-visibility__toggle:focus {
+	box-shadow: none;
+}
+
 .editor-post-visibility__dialog {
 	position: absolute;
 	top: 30px;
@@ -48,9 +52,39 @@
 .editor-post-visibility__dialog-legend {
 	font-weight: 600;
 	font-size: 0.9em;
+
+}
+
+.editor-post-visibility__dialog-info-toggle {
+	display: inline-block;
+	margin-left: 5px;
+	color: $dark-gray-100;
+
+	.dashicon {
+		vertical-align: middle;
+	}
+
+	&:hover {
+		color: $dark-gray-300;
+	}
+
+	&:focus {
+		box-shadow: none;
+	}
 }
 
 .editor-post-visibility__dialog-label {
 	display: block;
 	margin: 10px 0;
+}
+
+.editor-post-visibility__dialog-password-input {
+	width: 100%;
+}
+
+.editor-post-visibility__dialog-info {
+	color: $dark-gray-200;
+	padding-left: 20px;
+	font-style: italic;
+	margin-top: 4px;
 }
