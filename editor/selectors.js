@@ -36,10 +36,26 @@ export function getPostEdits( state ) {
 	return state.editor.edits;
 }
 
+export function getEditedPostAttribute( state, attributeName ) {
+	return state.editor.edits[ attributeName ] === undefined
+		? state.currentPost[ attributeName ]
+		: state.editor.edits[ attributeName ];
+}
+
 export function getEditedPostStatus( state ) {
-	return state.editor.edits.status === undefined
-		? state.currentPost.status
-		: state.editor.edits.status;
+	return getEditedPostAttribute( state, 'status' );
+}
+
+export function getEditedPostVisibility( state ) {
+	const status = getEditedPostStatus( state );
+	const password = getEditedPostAttribute( state, 'password' );
+
+	if ( status === 'private' ) {
+		return 'private';
+	} else if ( password !== undefined && password !== null ) {
+		return 'password';
+	}
+	return 'public';
 }
 
 export function getEditedPostTitle( state ) {

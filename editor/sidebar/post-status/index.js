@@ -14,6 +14,7 @@ import FormToggle from 'components/form-toggle';
  * Internal Dependencies
  */
 import './style.scss';
+import PostVisibility from '../post-visibility';
 import { getEditedPostStatus } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -34,6 +35,10 @@ function PostStatus( { status, onUpdateStatus } ) {
 					onChange={ onToggle }
 				/>
 			</label>
+
+			<div className="editor-post-status__row">
+				<PostVisibility />
+			</div>
 		</PanelBody>
 	);
 	/* eslint-enable jsx-a11y/label-has-for */
