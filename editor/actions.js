@@ -28,6 +28,14 @@ export function replaceBlocks( uids, blocks ) {
 	};
 }
 
+export function insertBlock( block, after ) {
+	return {
+		type: 'INSERT_BLOCK',
+		block,
+		after,
+	};
+}
+
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',

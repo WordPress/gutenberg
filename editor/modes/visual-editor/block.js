@@ -20,6 +20,7 @@ import {
 	deselectBlock,
 	focusBlock,
 	mergeBlocks,
+	insertBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -30,6 +31,7 @@ import {
 	isBlockHovered,
 	isBlockSelected,
 	isTypingInBlock,
+	isBlockBeforeInsertPoint,
 } from '../../selectors';
 
 class VisualEditorBlock extends wp.element.Component {
@@ -165,11 +167,12 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isTyping, focus, isInsertionPoint } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
 			'is-hovered': isHovered,
+			'is-insertion-point': isInsertionPoint,
 		} );
 
 		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
@@ -236,6 +239,7 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
+			isInsertionPoint: isBlockBeforeInsertPoint( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
 			order: getBlockOrder( state, ownProps.uid ),
@@ -281,11 +285,7 @@ export default connect(
 		},
 
 		onInsertAfter( block ) {
-			dispatch( {
-				type: 'INSERT_BLOCK',
-				after: ownProps.uid,
-				block,
-			} );
+			dispatch( insertBlock( block, ownProps.uid ) );
 		},
 
 		onFocus( ...args ) {
