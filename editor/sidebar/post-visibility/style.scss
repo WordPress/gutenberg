@@ -55,31 +55,14 @@
 
 }
 
-.editor-post-visibility__dialog-info-toggle {
-	display: inline-block;
-	margin-left: 5px;
-	color: $dark-gray-100;
-
-	.dashicon {
-		vertical-align: middle;
-	}
-
-	&:hover {
-		color: $dark-gray-300;
-	}
-
-	&:focus {
-		box-shadow: none;
-	}
-}
-
 .editor-post-visibility__dialog-label {
 	display: block;
 	margin: 10px 0;
 }
 
 .editor-post-visibility__dialog-password-input {
-	width: 100%;
+	width: calc( 100% - 20px );
+	margin-left: 20px;
 }
 
 .editor-post-visibility__dialog-info {
