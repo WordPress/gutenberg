@@ -73,7 +73,7 @@
 	&.is-insertion-point:after {
 		position: absolute;
 		top: 100%;
-		left: 0;
+		left: $block-mover-margin + $block-padding;
 		right: 0;
 		display: block;
 		content: '';

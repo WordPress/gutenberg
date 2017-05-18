@@ -14,7 +14,7 @@ import IconButton from 'components/icon-button';
  */
 import InserterMenu from './menu';
 import { getSelectedBlock } from '../selectors';
-import { insertBlock } from '../actions';
+import { insertBlock, setBlockToInsert } from '../actions';
 
 class Inserter extends wp.element.Component {
 	constructor() {
@@ -101,6 +101,7 @@ export default connect(
 	},
 	( dispatch ) => ( {
 		onInsertBlock( slug, after ) {
+			dispatch( setBlockToInsert() );
 			dispatch( insertBlock(
 				wp.blocks.createBlock( slug ),
 				after
