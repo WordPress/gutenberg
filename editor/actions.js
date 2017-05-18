@@ -36,11 +36,16 @@ export function insertBlock( block, after ) {
 	};
 }
 
-export function setBlockToInsert( slug, after ) {
+export function setInsertionPoint( uid ) {
 	return {
-		type: 'SET_BLOCK_TO_INSERT',
-		slug,
-		after,
+		type: 'SET_INSERTION_POINT',
+		uid,
+	};
+}
+
+export function clearInsertionPoint() {
+	return {
+		type: 'CLEAR_INSERTION_POINT',
 	};
 }
 

@@ -31,7 +31,7 @@ import {
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
-	isBlockBeforeInsertPoint,
+	getBlockInsertionPoint,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -581,55 +581,40 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockBeforeInsertPoint', () => {
-		it( 'should return true if the block is right before the insertion point', () => {
+	describe( 'getBlockInsertionPoint', () => {
+		it( 'should return the uid of the insertion point', () => {
 			const state = {
-				blockToInsert: {
-					slug: 'core/test',
-					after: 123,
+				insertionPoint: {
+					show: true,
+					uid: 123,
 				},
 			};
 
-			expect( isBlockBeforeInsertPoint( state, 123 ) ).to.be.true();
+			expect( getBlockInsertionPoint( state ) ).to.equal( 123 );
 		} );
 
-		it( 'should return false if the block is not right before the insertion point', () => {
+		it( 'should return return the last block uid if the insertion point is null', () => {
 			const state = {
-				blockToInsert: {
-					slug: 'core/test',
-					after: 23,
-				},
-			};
-
-			expect( isBlockBeforeInsertPoint( state, 123 ) ).to.be.false();
-		} );
-
-		it( 'should return true for the last block if we insert at the end of the editor', () => {
-			const state = {
-				blockToInsert: {
-					slug: 'core/test',
-					after: null,
+				insertionPoint: {
+					show: true,
+					uid: null,
 				},
 				editor: {
 					blockOrder: [ 34, 23 ],
 				},
 			};
 
-			expect( isBlockBeforeInsertPoint( state, 23 ) ).to.be.true();
+			expect( getBlockInsertionPoint( state ) ).to.equal( 23 );
 		} );
 
-		it( 'should return false if we\'re not inserting a block', () => {
+		it( 'should return null if the insertion point is not shown', () => {
 			const state = {
-				blockToInsert: {
-					slug: null,
-					after: null,
-				},
-				editor: {
-					blockOrder: [ 34, 23 ],
+				insertionPoint: {
+					show: false,
 				},
 			};
 
-			expect( isBlockBeforeInsertPoint( state, 23 ) ).to.be.false();
+			expect( getBlockInsertionPoint( state, 23 ) ).to.be.null();
 		} );
 	} );
 

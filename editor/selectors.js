@@ -132,15 +132,13 @@ export function isTypingInBlock( state, uid ) {
 	return state.selectedBlock.uid === uid ? state.selectedBlock.typing : false;
 }
 
-export function isBlockBeforeInsertPoint( state, uid ) {
-	if ( ! state.blockToInsert.slug ) {
-		return false;
+export function getBlockInsertionPoint( state ) {
+	if ( ! state.insertionPoint.show ) {
+		return null;
 	}
-	const blockToInsertAfter = state.blockToInsert.after;
+	const blockToInsertAfter = state.insertionPoint.uid;
 
-	return !! blockToInsertAfter
-		? blockToInsertAfter === uid
-		: last( state.editor.blockOrder ) === uid;
+	return blockToInsertAfter || last( state.editor.blockOrder );
 }
 
 export function isSavingPost( state ) {

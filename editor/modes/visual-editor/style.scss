@@ -69,17 +69,6 @@
 	&.is-selected .iframe-overlay:before {
 		display: none;
 	}
-
-	&.is-insertion-point:after {
-		position: absolute;
-		top: 100%;
-		left: $block-mover-margin + $block-padding;
-		right: 0;
-		display: block;
-		content: '';
-		height: 3px;
-		background: $blue-medium;
-	}
 }
 
 .editor-visual-editor__block-controls {
@@ -122,4 +111,18 @@
 
 .editor-visual-editor .editor-inserter {
 	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
+}
+
+.editor-visual-editor > .editor-visual-editor__insertion-point {
+	position: relative;
+
+	&:before {
+		position: absolute;
+		top: 2px;
+		right: #{ $block-padding + $block-mover-margin };
+		left: 0;
+		height: 3px;
+		background: $blue-medium;
+		content: '';
+	}
 }
