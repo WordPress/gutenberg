@@ -19,9 +19,6 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-const KEYCODE_BACKSPACE = 8;
-const KEYCODE_DELETE = 46;
-
 const alignmentMap = {
 	alignleft: 'left',
 	alignright: 'right',
@@ -197,13 +194,41 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
+		const { BACKSPACE, DELETE, UP, DOWN, LEFT, RIGHT } = window.tinymce.util.VK;
+		const before = event.keyCode === UP || event.keyCode === LEFT;
+		const after = event.keyCode === DOWN || event.keyCode === RIGHT;
+		const selectors = [
+			'*[contenteditable="true"]', '*[tabindex]',
+		];
+
+		if ( ( before && this.isStartOfEditor() ) || ( after && this.isEndOfEditor() ) ) {
+			const rootNode = this.editor.getBody();
+			const focusableNodes = Array.from( document.querySelectorAll( selectors.join( ',' ) ) );
+
+			if ( before ) {
+				focusableNodes.reverse();
+			}
+
+			const targetNode = focusableNodes
+				.slice( focusableNodes.indexOf( rootNode ) )
+				.reduce( ( result, node ) => {
+					return result || ( node.contains( rootNode ) ? null : node );
+				}, null );
+
+			if ( targetNode ) {
+				targetNode.focus();
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+
 		if (
 			this.props.onMerge && (
-				( event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === KEYCODE_DELETE && this.isEndOfEditor() )
+				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+				( event.keyCode === DELETE && this.isEndOfEditor() )
 			)
 		) {
-			const forward = event.keyCode === KEYCODE_DELETE;
+			const forward = event.keyCode === DELETE;
 			this.onChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
