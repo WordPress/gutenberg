@@ -27,7 +27,7 @@
 		}
 
 		.components-form-toggle.is-checked & {
-			background-color: $blue-wordpress;
+			background-color: $blue-medium;
 
 			&:hover {
 				background-color: $dark-gray-100;
@@ -45,7 +45,7 @@
 		height: 8px;
 		border-radius: 50%;
 		background: $white;
-		transition: 0.3s transform ease-out;
+		transition: 0.2s transform ease-out;
 
 
 		.components-form-toggle.is-checked & {
