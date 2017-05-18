@@ -75,9 +75,9 @@ class PostVisibility extends Component {
 		return (
 			<div className="editor-post-visibility">
 				<span>{ __( 'Visibility' ) }</span>
-				<a className="editor-post-visibility__toggle" href="" onClick={ this.toggleDialog }>
+				<button className="editor-post-visibility__toggle button-link" onClick={ this.toggleDialog }>
 					{ getVisibilityLabel( visibility ) }
-				</a>
+				</button>
 
 				{ this.state.opened &&
 					<div className="editor-post-visibility__dialog">
@@ -88,7 +88,7 @@ class PostVisibility extends Component {
 						{ visibilityOptions.map( ( { value, label, info, changeHandler } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
 								<input type="radio" value={ value } onChange={ changeHandler } checked={ value === visibility } />
-								<span>{ label }</span>
+								{ label }
 								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
 							</label>
 						) ) }

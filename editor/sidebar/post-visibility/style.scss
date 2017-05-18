@@ -6,8 +6,18 @@
 	position: relative;
 }
 
-.editor-post-visibility__toggle:focus {
-	box-shadow: none;
+.editor-post-visibility__toggle.button-link {
+	text-decoration: underline;
+	color: $blue-wordpress;
+
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:hover {
+		color: $blue-medium;
+	}
 }
 
 .editor-post-visibility__dialog {
