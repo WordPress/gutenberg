@@ -10,7 +10,6 @@ import { find } from 'lodash';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import Dashicon from 'components/dashicon';
 
 /**
  * Internal Dependencies
@@ -28,20 +27,13 @@ class PostVisibility extends Component {
 		super( ...arguments );
 		this.state = {
 			opened: false,
-			showInfo: false,
 		};
 		this.toggleDialog = this.toggleDialog.bind( this );
-		this.toggleVisibilityInfo = this.toggleVisibilityInfo.bind( this );
 	}
 
 	toggleDialog( event ) {
 		event.preventDefault();
 		this.setState( { opened: ! this.state.opened } );
-	}
-
-	toggleVisibilityInfo( event ) {
-		event.preventDefault();
-		this.setState( { showInfo: ! this.state.showInfo } );
 	}
 
 	handleClickOutside() {
@@ -78,7 +70,6 @@ class PostVisibility extends Component {
 		];
 		const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
 
-
 		// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
 		/* eslint-disable jsx-a11y/label-has-for */
 		return (
@@ -93,15 +84,12 @@ class PostVisibility extends Component {
 						<div className="editor-post-visibility__dialog-arrow" />
 						<div className="editor-post-visibility__dialog-legend">
 							{ __( 'Post Visibility' ) }
-							<a className="editor-post-visibility__dialog-info-toggle" href="" onClick={ this.toggleVisibilityInfo }>
-								<Dashicon icon="info" />
-							</a>
 						</div>
 						{ visibilityOptions.map( ( { value, label, info, changeHandler } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
 								<input type="radio" value={ value } onChange={ changeHandler } checked={ value === visibility } />
 								<span>{ label }</span>
-								{ this.state.showInfo && <div className="editor-post-visibility__dialog-info">{ info }</div> }
+								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
 							</label>
 						) ) }
 						{ visibility === 'password' &&
