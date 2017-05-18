@@ -31,6 +31,7 @@ import {
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
+	isBlockBeforeInsertPoint,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -577,6 +578,58 @@ describe( 'selectors', () => {
 			};
 
 			expect( isTypingInBlock( state, 23 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isBlockBeforeInsertPoint', () => {
+		it( 'should return true if the block is right before the insertion point', () => {
+			const state = {
+				blockToInsert: {
+					slug: 'core/test',
+					after: 123,
+				},
+			};
+
+			expect( isBlockBeforeInsertPoint( state, 123 ) ).to.be.true();
+		} );
+
+		it( 'should return false if the block is not right before the insertion point', () => {
+			const state = {
+				blockToInsert: {
+					slug: 'core/test',
+					after: 23,
+				},
+			};
+
+			expect( isBlockBeforeInsertPoint( state, 123 ) ).to.be.false();
+		} );
+
+		it( 'should return true for the last block if we insert at the end of the editor', () => {
+			const state = {
+				blockToInsert: {
+					slug: 'core/test',
+					after: null,
+				},
+				editor: {
+					blockOrder: [ 34, 23 ],
+				},
+			};
+
+			expect( isBlockBeforeInsertPoint( state, 23 ) ).to.be.true();
+		} );
+
+		it( 'should return false if we\'re not inserting a block', () => {
+			const state = {
+				blockToInsert: {
+					slug: null,
+					after: null,
+				},
+				editor: {
+					blockOrder: [ 34, 23 ],
+				},
+			};
+
+			expect( isBlockBeforeInsertPoint( state, 23 ) ).to.be.false();
 		} );
 	} );
 

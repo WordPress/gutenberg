@@ -16,6 +16,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
+	blockToInsert,
 	createReduxStore,
 } from '../state';
 
@@ -397,6 +398,21 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'blockToInsert', () => {
+		it( 'should return with block uid as hovered', () => {
+			const state = blockToInsert( {}, {
+				type: 'SET_BLOCK_TO_INSERT',
+				after: 'kumquat',
+				slug: 'core/text',
+			} );
+
+			expect( state ).to.eql( {
+				after: 'kumquat',
+				slug: 'core/text',
+			} );
+		} );
+	} );
+
 	describe( 'selectedBlock()', () => {
 		it( 'should return with block uid as selected', () => {
 			const state = selectedBlock( undefined, {
@@ -675,6 +691,7 @@ describe( 'state', () => {
 				'mode',
 				'isSidebarOpened',
 				'saving',
+				'blockToInsert',
 			] );
 		} );
 	} );

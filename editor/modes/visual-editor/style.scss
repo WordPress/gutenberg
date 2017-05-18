@@ -69,6 +69,17 @@
 	&.is-selected .iframe-overlay:before {
 		display: none;
 	}
+
+	&.is-insertion-point:after {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		display: block;
+		content: '';
+		height: 3px;
+		background: $blue-medium;
+	}
 }
 
 .editor-visual-editor__block-controls {

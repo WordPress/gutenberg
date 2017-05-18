@@ -282,6 +282,22 @@ export function hoveredBlock( state = null, action ) {
 }
 
 /**
+ * Reducer returning the block slug to be inserter.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function blockToInsert( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_TO_INSERT':
+			return { slug: action.slug, after: action.after };
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning current editor mode, either "visual" or "text".
  *
  * @param  {string} state  Current state
@@ -355,6 +371,7 @@ export function createReduxStore() {
 		currentPost,
 		selectedBlock,
 		hoveredBlock,
+		blockToInsert,
 		mode,
 		isSidebarOpened,
 		saving,

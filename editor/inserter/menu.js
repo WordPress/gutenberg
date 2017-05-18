@@ -3,6 +3,7 @@
  */
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -13,6 +14,7 @@ import Dashicon from 'components/dashicon';
  * Internal dependencies
  */
 import './style.scss';
+import { getSelectedBlock } from '../selectors';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -60,6 +62,15 @@ class InserterMenu extends wp.element.Component {
 				filterValue: '',
 				currentFocus: null,
 			} );
+		};
+	}
+
+	hoverBlock( slug = null ) {
+		return () => {
+			this.props.onUpdatedBlockToInsert(
+				slug,
+				this.props.selectedBlock ? this.props.selectedBlock.uid : null
+			);
 		};
 	}
 
@@ -254,6 +265,8 @@ class InserterMenu extends wp.element.Component {
 											onClick={ this.selectBlock( slug ) }
 											ref={ this.bindReferenceNode( slug ) }
 											tabIndex="-1"
+											onMouseEnter={ this.hoverBlock( slug ) }
+											onMouseLeave={ this.hoverBlock() }
 										>
 											<Dashicon icon={ icon } />
 											{ title }
@@ -284,4 +297,19 @@ class InserterMenu extends wp.element.Component {
 
 InserterMenu.instances = 0;
 
-export default InserterMenu;
+export default connect(
+	( state ) => {
+		return {
+			selectedBlock: getSelectedBlock( state ),
+		};
+	},
+	( dispatch ) => ( {
+		onUpdatedBlockToInsert( slug, uid ) {
+			dispatch( {
+				type: 'SET_BLOCK_TO_INSERT',
+				after: uid,
+				slug,
+			} );
+		},
+	} )
+)( InserterMenu );
