@@ -13,15 +13,23 @@ import PanelBody from 'components/panel/body';
 /**
  * Internal Dependencies
  */
+import './style.scss';
+import { deselectBlock } from '../../actions';
 import { getSelectedBlock } from '../../selectors';
 
-const BlockInspector = ( { selectedBlock } ) => {
+const BlockInspector = ( { selectedBlock, ...props } ) => {
 	if ( ! selectedBlock ) {
 		return null;
 	}
+
+	const onDeselect = ( event ) => {
+		event.preventDefault();
+		props.deselectBlock( selectedBlock.uid );
+	};
+
 	const header = (
 		<strong>
-			<span className="editor-sidebar__select-post">Post</span> → Block
+			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">Post</a> → Block
 		</strong>
 	);
 
@@ -45,5 +53,6 @@ export default connect(
 		return {
 			selectedBlock: getSelectedBlock( state ),
 		};
-	}
+	},
+	{ deselectBlock }
 )( BlockInspector );
