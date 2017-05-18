@@ -12,6 +12,14 @@ export function focusBlock( uid, config ) {
 	};
 }
 
+export function deselectBlock( uid ) {
+	return {
+		type: 'TOGGLE_BLOCK_SELECTED',
+		selected: false,
+		uid,
+	};
+}
+
 export function replaceBlocks( uids, blocks ) {
 	return {
 		type: 'REPLACE_BLOCKS',

@@ -16,7 +16,11 @@ import Toolbar from 'components/toolbar';
  */
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
-import { focusBlock, mergeBlocks } from '../../actions';
+import {
+	deselectBlock,
+	focusBlock,
+	mergeBlocks,
+} from '../../actions';
 import {
 	getPreviousBlock,
 	getNextBlock,
@@ -246,11 +250,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: false,
-				uid: ownProps.uid,
-			} );
+			dispatch( deselectBlock( ownProps.uid ) );
 		},
 		onStartTyping() {
 			dispatch( {
