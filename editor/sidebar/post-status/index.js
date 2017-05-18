@@ -23,17 +23,20 @@ function PostStatus( { status, onUpdateStatus } ) {
 		onUpdateStatus( updatedStatus );
 	};
 
+	// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
+	/* eslint-disable jsx-a11y/label-has-for */
 	return (
 		<PanelBody title={ __( 'Status & Visibility' ) }>
-			<div className="editor-post-status__row">
+			<label className="editor-post-status__row">
 				<span>{ __( 'Pending review' ) }</span>
 				<FormToggle
 					checked={ status === 'pending' }
 					onChange={ onToggle }
 				/>
-			</div>
+			</label>
 		</PanelBody>
 	);
+	/* eslint-enable jsx-a11y/label-has-for */
 }
 
 export default connect(
