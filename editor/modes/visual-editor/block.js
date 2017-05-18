@@ -205,7 +205,7 @@ class VisualEditorBlock extends wp.element.Component {
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<div onKeyDown={ this.maybeStartTyping }>
+				<div onKeyPress={ this.maybeStartTyping }>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
