@@ -36,6 +36,14 @@ export function insertBlock( block, after ) {
 	};
 }
 
+export function setBlockToInsert( slug, after ) {
+	return {
+		type: 'SET_BLOCK_TO_INSERT',
+		slug,
+		after,
+	};
+}
+
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',

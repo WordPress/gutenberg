@@ -15,6 +15,7 @@ import Dashicon from 'components/dashicon';
  */
 import './style.scss';
 import { getSelectedBlock } from '../selectors';
+import { setBlockToInsert } from '../actions';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -67,7 +68,7 @@ class InserterMenu extends wp.element.Component {
 
 	hoverBlock( slug = null ) {
 		return () => {
-			this.props.onUpdatedBlockToInsert(
+			this.props.setBlockToInsert(
 				slug,
 				this.props.selectedBlock ? this.props.selectedBlock.uid : null
 			);
@@ -303,13 +304,5 @@ export default connect(
 			selectedBlock: getSelectedBlock( state ),
 		};
 	},
-	( dispatch ) => ( {
-		onUpdatedBlockToInsert( slug, uid ) {
-			dispatch( {
-				type: 'SET_BLOCK_TO_INSERT',
-				after: uid,
-				slug,
-			} );
-		},
-	} )
+	{ setBlockToInsert }
 )( InserterMenu );
