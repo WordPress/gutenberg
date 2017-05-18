@@ -21,6 +21,13 @@
 		margin-left: 3px;
 	}
 
+	&:focus:before {
+		top: -4px;
+		right: -4px;
+		bottom: -4px;
+		left: -4px;
+	}
+
 	&.is-active,
 	&:hover,
 	&:not(:disabled):hover {
