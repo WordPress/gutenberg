@@ -112,14 +112,19 @@ registerBlock( 'core/list', {
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
-				onSetup={ ( nextEditor ) => {
-					setAttributes( { editor: nextEditor } );
+				onConfig={ ( settings ) => ( {
+					...settings,
+					plugins: ( settings.plugins || [] ).concat( 'lists' ),
+					lists_indent_on_tab: false,
+				} ) }
+				onSetup={ ( editor ) => {
+					editor.on( 'nodeChange', ( nodeInfo ) => {
+						setAttributes( { internalListType: findInternalListType( nodeInfo ) } );
+					} );
+					setAttributes( { editor } );
 				}	}
 				onChange={ ( nextValues ) => {
 					setAttributes( { values: nextValues } );
-				} }
-				onNodeChange={ ( nodeInfo ) => {
-					setAttributes( { internalListType: findInternalListType( nodeInfo ) } );
 				} }
 				value={ values }
 				focus={ focus }

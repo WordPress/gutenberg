@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge } from 'lodash';
+import { last, isEqual, capitalize, omitBy, forEach, merge, identity } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -67,6 +67,7 @@ export default class Editable extends wp.element.Component {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
+		this.onConfig = this.onConfig.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
@@ -82,6 +83,13 @@ export default class Editable extends wp.element.Component {
 			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 		};
+	}
+
+	onConfig( settings ) {
+		return ( this.props.onConfig || identity )( {
+			...settings,
+			forced_root_block: this.props.inline ? false : 'p',
+		} );
 	}
 
 	onSetup( editor ) {
@@ -402,7 +410,6 @@ export default class Editable extends wp.element.Component {
 			className,
 			showAlignments = false,
 			inlineToolbar = false,
-			inline,
 			formattingControls,
 			placeholder,
 		} = this.props;
@@ -446,12 +453,10 @@ export default class Editable extends wp.element.Component {
 
 				<TinyMCE
 					tagName={ tagName }
+					onConfig={ this.onConfig }
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }
-					settings={ {
-						forced_root_block: inline ? false : 'p',
-					} }
 					isEmpty={ this.state.empty }
 					placeholder={ placeholder }
 					key={ key } />
