@@ -71,7 +71,7 @@ class Inserter extends wp.element.Component {
 			<div className="editor-inserter">
 				<IconButton
 					icon="insert"
-					label={ wp.i18n.__( 'Insert block' ) }
+					title={ wp.i18n.__( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"

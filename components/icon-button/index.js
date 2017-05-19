@@ -10,11 +10,11 @@ import './style.scss';
 import Button from '../button';
 import Dashicon from '../dashicon';
 
-function IconButton( { icon, children, label, className, ...additionalProps } ) {
+function IconButton( { icon, children, className, ...additionalProps } ) {
 	const classes = classnames( 'components-icon-button', className );
 
 	return (
-		<Button { ...additionalProps } aria-label={ label } className={ classes }>
+		<Button { ...additionalProps } className={ classes }>
 			<Dashicon icon={ icon } />
 			{ children }
 		</Button>
