@@ -36,6 +36,7 @@ export function createEditorInstance( id, post ) {
 			title: post.title.raw,
 			...omit( post, 'title', 'content' ),
 		},
+		shouldMarkDirty: false,
 	} );
 
 	wp.element.render(

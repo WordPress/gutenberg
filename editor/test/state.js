@@ -305,6 +305,35 @@ describe( 'state', () => {
 				} );
 			} );
 		} );
+
+		describe( 'dirty()', () => {
+			it( 'should be true when the post is edited', () => {
+				const state = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				expect( state.dirty ).to.be.true();
+			} );
+
+			it( 'should be false when an unrelated action occurs', () => {
+				const state = editor( undefined, {
+					type: 'BRISKET_READY',
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+
+			it( 'should be false with shouldMarkDirty: false', () => {
+				const state = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+					shouldMarkDirty: false,
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+		} );
 	} );
 
 	describe( 'currentPost()', () => {
