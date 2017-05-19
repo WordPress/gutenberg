@@ -763,9 +763,16 @@ class Tests_REST_Server extends WP_Test_REST_TestCase {
 		$headers = $this->server->sent_headers;
 
 		foreach ( wp_get_nocache_headers() as $header => $value ) {
+			if ( empty( $value ) ) {
+				continue;
+			}
+
 			$this->assertTrue( isset( $headers[ $header ] ), sprintf( 'Header %s is not present in the response.', $header ) );
 			$this->assertEquals( $value, $headers[ $header ] );
 		}
+
+		// Last-Modified should be unset as per #WP23021
+		$this->assertFalse( isset( $headers['Last-Modified'] ), 'Last-Modified should not be sent.' );
 	}
 
 	public function test_no_nocache_headers_on_unauthenticated_requests() {

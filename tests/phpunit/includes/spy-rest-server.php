@@ -31,6 +31,10 @@ class Spy_REST_Server extends WP_REST_Server {
 		$this->sent_headers[ $header ] = $value;
 	}
 
+	public function remove_header( $header ) {
+		unset( $this->sent_headers[ $header ] );
+	}
+
 	/**
 	 * Override the dispatch method so we can get a handle on the request object.
 	 *
