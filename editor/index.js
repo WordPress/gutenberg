@@ -3,6 +3,7 @@
  */
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
+import { omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -25,14 +26,15 @@ export function createEditorInstance( id, post ) {
 		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
-	// Each property that is set in `post-content.js` (other than `content`)
-	// needs to be registered as an edit now.  Otherwise it will not be saved
-	// with the post.
+	// Each property that is set in `post-content.js` (other than `content`
+	// because it is serialized when a save is requested) needs to be
+	// registered as an edit now.  Otherwise the initial values of these
+	// properties will not be properly saved with the post.
 	store.dispatch( {
 		type: 'EDIT_POST',
 		edits: {
 			title: post.title.raw,
-			// ...omit( post, 'title', 'content' ),
+			...omit( post, 'title', 'content' ),
 		},
 	} );
 

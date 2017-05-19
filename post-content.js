@@ -5,6 +5,7 @@ window._wpGutenbergPost = {
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},
+	status: 'draft',
 	content: {
 		raw: [
 			'<!-- wp:core/text -->',
