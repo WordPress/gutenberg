@@ -42,6 +42,7 @@ registerBlock( 'core/preformatted', {
 
 		return (
 			<Editable
+				inline
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
