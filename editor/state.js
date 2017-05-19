@@ -48,6 +48,7 @@ export const editor = combineUndoableReducers( {
 			case 'MOVE_BLOCK_UP':
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCK':
+			case 'EDIT_POST':
 				return true;
 		}
 
