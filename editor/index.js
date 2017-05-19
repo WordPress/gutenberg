@@ -25,6 +25,17 @@ export function createEditorInstance( id, post ) {
 		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
+	// Each property that is set in `post-content.js` (other than `content`)
+	// needs to be registered as an edit now.  Otherwise it will not be saved
+	// with the post.
+	store.dispatch( {
+		type: 'EDIT_POST',
+		edits: {
+			title: post.title.raw,
+			// ...omit( post, 'title', 'content' ),
+		},
+	} );
+
 	wp.element.render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
