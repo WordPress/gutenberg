@@ -50,7 +50,7 @@ registerBlock( 'core/image', {
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
+			isActive: ( { align } ) => ! align || 'center' === align,
 			onClick: toggleAlignment( 'center' ),
 		},
 		{
