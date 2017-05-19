@@ -46,31 +46,6 @@ const ALIGNMENT_CONTROLS = [
 	},
 ];
 
-const LIST_CONTROLS = [
-	{
-		list: 'UL',
-		icon: 'editor-ul',
-		title: wp.i18n.__( 'Convert to unordered' ),
-		cmd: 'InsertUnorderedList',
-	},
-	{
-		list: 'OL',
-		icon: 'editor-ol',
-		title: wp.i18n.__( 'Convert to ordered' ),
-		cmd: 'InsertOrderedList',
-	},
-	{
-		icon: 'editor-outdent',
-		title: wp.i18n.__( 'Outdent list item' ),
-		cmd: 'Outdent',
-	},
-	{
-		icon: 'editor-indent',
-		title: wp.i18n.__( 'Indent list item' ),
-		cmd: 'Indent',
-	},
-];
-
 function createElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
@@ -298,12 +273,10 @@ export default class Editable extends wp.element.Component {
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
 		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
-		const aList = this.editor.dom.getParent( element, 'OL,UL' );
-		const list = aList ? { type: aList.nodeName, isInternal: aList !== this.editor.getBody() } : null;
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition, list } );
+		this.setState( { alignment, bookmark, formats, focusPosition } );
 
 		if ( this.props.onNodeChange ) {
 			this.props.onNodeChange( { element, parents } );
@@ -420,24 +393,6 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	isListActive( listType ) {
-		return this.state.list && this.state.list.type === listType;
-	}
-
-	setListType( listType, listCommand ) {
-		this.editor.focus();
-
-		if ( this.state.list ) {
-			if ( this.state.list.isInternal ) {
-				if ( this.state.list.type !== listType ) {
-					this.editor.execCommand( listCommand );
-				}
-			} else if ( this.props.onListChange ) {
-				this.props.onListChange( listType );
-			}
-		}
-	}
-
 	render() {
 		const {
 			tagName,
@@ -471,17 +426,6 @@ export default class Editable extends wp.element.Component {
 			<div className={ classes }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
-						{ this.state.list &&
-							<Toolbar
-								controls={ LIST_CONTROLS.map( ( control ) => ( {
-									...control,
-									isActive: control.list && this.isListActive( control.list ),
-									onClick: () => ( control.list ?
-									this.setListType( control.list, control.cmd ) :
-									this.editor.execCommand( control.cmd ) ),
-								} ) ) }
-								/>
-						}
 						{ showAlignments &&
 							<Toolbar
 								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
