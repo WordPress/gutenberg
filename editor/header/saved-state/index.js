@@ -18,11 +18,14 @@ import { isEditedPostNew, isEditedPostDirty } from '../../selectors';
 function SavedState( { isNew, isDirty } ) {
 	const classes = classNames( 'editor-saved-state', {
 		'is-new': isNew,
-		'is-existing-dirty': isDirty && ! isNew,
+		'is-dirty': isDirty,
 	} );
 
 	let icon, text;
-	if ( isNew ) {
+	if ( isNew && isDirty ) {
+		icon = 'warning';
+		text = wp.i18n.__( 'New post with changes' );
+	} else if ( isNew ) {
 		icon = 'edit';
 		text = wp.i18n.__( 'New post' );
 	} else if ( isDirty ) {
