@@ -12,7 +12,7 @@ class Tests_Admin_includesScreen extends WP_UnitTestCase {
 		'edit-tags.php' => array( 'base' => 'edit-tags', 'id' => 'edit-post_tag', 'post_type' => 'post', 'taxonomy' => 'post_tag' ),
 		'edit-tags.php?taxonomy=post_tag' => array( 'base' => 'edit-tags', 'id' => 'edit-post_tag', 'post_type' => 'post', 'taxonomy' => 'post_tag' ),
 		'edit-tags.php?taxonomy=category' => array( 'base' => 'edit-tags', 'id' => 'edit-category', 'post_type' => 'post', 'taxonomy' => 'category' ),
-		'upload.php' => array( 'base' => 'upload', 'id' => 'upload' ),
+		'upload.php' => array( 'base' => 'upload', 'id' => 'upload', 'post_type' => 'attachment' ),
 		'media-new.php' => array( 'action' => 'add', 'base' => 'media', 'id' => 'media' ),
 		'edit.php?post_type=page' => array( 'base' => 'edit', 'id' => 'edit-page', 'post_type' => 'page' ),
 		'link-manager.php' => array( 'base' => 'link-manager', 'id' => 'link-manager' ),
