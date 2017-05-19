@@ -14,10 +14,12 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
+	getEditedPostStatus,
 	getEditedPostTitle,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
+	getSelectedBlock,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
@@ -163,6 +165,34 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getEditedPostStatus', () => {
+		it( 'should return the post saved status if the status is not edited', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: { title: 'chicken' },
+				},
+			};
+
+			expect( getEditedPostStatus( state ) ).to.equal( 'draft' );
+		} );
+
+		it( 'should return the edited status', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: { status: 'pending' },
+				},
+			};
+
+			expect( getEditedPostStatus( state ) ).to.equal( 'pending' );
+		} );
+	} );
+
 	describe( 'getEditedPostTitle', () => {
 		it( 'should return the post saved title if the title is not edited', () => {
 			const state = {
@@ -241,6 +271,36 @@ describe( 'selectors', () => {
 				{ uid: 123, blockType: 'core/text' },
 				{ uid: 23, blockType: 'core/heading' },
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlock', () => {
+		it( 'should return null if no block is selected', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: null },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( null );
+		} );
+
+		it( 'should return the selected block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: 23 },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
 		} );
 	} );
 

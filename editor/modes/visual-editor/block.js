@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { Fill, Slot } from 'react-slot-fill';
+import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 
 /**
@@ -16,7 +16,11 @@ import Toolbar from 'components/toolbar';
  */
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
-import { focusBlock, mergeBlocks } from '../../actions';
+import {
+	deselectBlock,
+	focusBlock,
+	mergeBlocks,
+} from '../../actions';
 import {
 	getPreviousBlock,
 	getNextBlock,
@@ -33,11 +37,11 @@ class VisualEditorBlock extends wp.element.Component {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.removeOnBackspace = this.removeOnBackspace.bind( this );
+		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -72,14 +76,6 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	maybeDeselect( event ) {
-		// Annoyingly React does not support focusOut and we're forced to check
-		// related target to ensure it's not a child when blur fires.
-		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			this.props.onDeselect();
-		}
-	}
-
 	maybeStartTyping() {
 		// We do not want to dispatch start typing if...
 		//  - State value already reflects that we're typing (dispatch noise)
@@ -92,13 +88,20 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	removeOnBackspace( event ) {
+	removeOrDeselect( event ) {
 		const { keyCode, target } = event;
+
+		// Remove block on backspace
 		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
 			this.props.onRemove( this.props.uid );
 			if ( this.props.previousBlock ) {
 				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
 			}
+		}
+
+		// Deselect on escape
+		if ( 27 /* Escape */ === event.keyCode ) {
+			this.props.onDeselect();
 		}
 	}
 
@@ -118,6 +121,14 @@ class VisualEditorBlock extends wp.element.Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
+	}
+
+	selectAndStopPropagation( event ) {
+		this.props.onSelect();
+
+		// Visual editor infers click as intent to clear the selected block, so
+		// prevent bubbling when occurring on block where selection is intended
+		event.stopPropagation();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -174,10 +185,9 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onClick={ onSelect }
+				onClick={ this.selectAndStopPropagation }
 				onFocus={ onSelect }
-				onBlur={ this.maybeDeselect }
-				onKeyDown={ this.removeOnBackspace }
+				onKeyDown={ this.removeOrDeselect }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -201,7 +211,7 @@ class VisualEditorBlock extends wp.element.Component {
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<div onKeyDown={ this.maybeStartTyping }>
+				<div onKeyPress={ this.maybeStartTyping }>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
@@ -211,16 +221,6 @@ class VisualEditorBlock extends wp.element.Component {
 						mergeBlocks={ this.mergeBlocks }
 					/>
 				</div>
-				{ isSelected &&
-					<Fill name="Sidebar.Inspector">
-						<div>{ block.blockType } settings...</div>
-						<ul>
-							{ Object.keys( block.attributes ).map( ( attribute, index ) => (
-								<li key={ index }>{ attribute }: { block.attributes[ attribute ] }</li>
-							) ) }
-						</ul>
-					</Fill>
-				}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -256,11 +256,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: false,
-				uid: ownProps.uid,
-			} );
+			dispatch( deselectBlock( ownProps.uid ) );
 		},
 		onStartTyping() {
 			dispatch( {

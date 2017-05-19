@@ -62,12 +62,17 @@ function PublishButton( {
 		saveCallback = onSaveDraft;
 	}
 
+	const buttonDisabledHint = process.env.NODE_ENV === 'production'
+		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
+		: null;
+
 	return (
 		<Button
 			isPrimary
 			isLarge
 			onClick={ () => saveCallback( post, edits, blocks ) }
-			disabled={ ! buttonEnabled }
+			disabled={ ! buttonEnabled || process.env.NODE_ENV === 'production' }
+			title={ buttonDisabledHint }
 		>
 			{ buttonText }
 		</Button>

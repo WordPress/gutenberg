@@ -36,6 +36,12 @@ export function getPostEdits( state ) {
 	return state.editor.edits;
 }
 
+export function getEditedPostStatus( state ) {
+	return state.editor.edits.status === undefined
+		? state.currentPost.status
+		: state.editor.edits.status;
+}
+
 export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
 		? state.currentPost.title.raw
@@ -59,6 +65,13 @@ export function getBlocks( state ) {
 	return state.editor.blockOrder.map( ( uid ) => (
 		state.editor.blocksByUid[ uid ]
 	) );
+}
+
+export function getSelectedBlock( state ) {
+	if ( ! state.selectedBlock.uid ) {
+		return null;
+	}
+	return state.editor.blocksByUid[ state.selectedBlock.uid ];
 }
 
 export function getBlockUids( state ) {
