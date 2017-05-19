@@ -29,7 +29,7 @@ class FormatToolbar extends wp.element.Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			linkValue: props.formats.link ? props.formats.link.value : '',
+			linkValue: props.formats.link ? props.formats.link.href : '',
 			isEditingLink: false,
 		};
 		this.addLink = this.addLink.bind( this );
@@ -47,7 +47,7 @@ class FormatToolbar extends wp.element.Component {
 
 	componentWillReceiveProps( nextProps ) {
 		const newState = {
-			linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
+			linkValue: nextProps.formats.link ? nextProps.formats.link.href : '',
 		};
 		if (
 			! this.props.formats.link ||
@@ -69,7 +69,7 @@ class FormatToolbar extends wp.element.Component {
 
 	addLink() {
 		if ( ! this.props.formats.link ) {
-			this.props.onChange( { link: { value: '' } } );
+			this.props.onChange( { link: { href: '' } } );
 
 			// Debounce the call to avoid the reset in willReceiveProps
 			this.editTimeout = setTimeout( () => this.setState( { isEditingLink: true } ) );
@@ -89,7 +89,7 @@ class FormatToolbar extends wp.element.Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.linkValue } } );
+		this.props.onChange( { link: { href: this.state.linkValue } } );
 		this.setState( {
 			isEditingLink: false,
 		} );
