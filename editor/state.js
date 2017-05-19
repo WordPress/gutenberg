@@ -27,7 +27,7 @@ export const editor = combineUndoableReducers( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_POST':
+			case 'SETUP_NEW_POST':
 				return {
 					...state,
 					...action.edits,

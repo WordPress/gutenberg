@@ -307,7 +307,7 @@ describe( 'state', () => {
 
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
-					type: 'SETUP_POST',
+					type: 'SETUP_NEW_POST',
 					edits: {
 						status: 'draft',
 						title: 'post title',
@@ -341,7 +341,7 @@ describe( 'state', () => {
 
 			it( 'should be false when the post is initialized', () => {
 				const state = editor( undefined, {
-					type: 'SETUP_POST',
+					type: 'SETUP_NEW_POST',
 					edits: {},
 				} );
 
