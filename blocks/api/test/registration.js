@@ -15,7 +15,7 @@ import {
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
 	getBlockSettings,
-	getBlocks,
+	getRegisteredBlocks,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -25,7 +25,7 @@ describe( 'blocks', () => {
 	} );
 
 	afterEach( () => {
-		getBlocks().forEach( block => {
+		getRegisteredBlocks().forEach( block => {
 			unregisterBlock( block.slug );
 		} );
 		setUnknownTypeHandler( undefined );
@@ -84,13 +84,13 @@ describe( 'blocks', () => {
 
 		it( 'should unregister existing blocks', () => {
 			registerBlock( 'core/test-block' );
-			expect( getBlocks() ).to.eql( [
+			expect( getRegisteredBlocks() ).to.eql( [
 				{ slug: 'core/test-block' },
 			] );
 			const oldBlock = unregisterBlock( 'core/test-block' );
 			expect( console.error ).to.not.have.been.called();
 			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
-			expect( getBlocks() ).to.eql( [] );
+			expect( getRegisteredBlocks() ).to.eql( [] );
 		} );
 	} );
 
@@ -126,16 +126,16 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'getBlocks()', () => {
+	describe( 'getRegisteredBlocks()', () => {
 		it( 'should return an empty array at first', () => {
-			expect( getBlocks() ).to.eql( [] );
+			expect( getRegisteredBlocks() ).to.eql( [] );
 		} );
 
 		it( 'should return all registered blocks', () => {
 			registerBlock( 'core/test-block' );
 			const blockSettings = { settingName: 'settingValue' };
 			registerBlock( 'core/test-block-with-settings', blockSettings );
-			expect( getBlocks() ).to.eql( [
+			expect( getRegisteredBlocks() ).to.eql( [
 				{ slug: 'core/test-block' },
 				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
 			] );

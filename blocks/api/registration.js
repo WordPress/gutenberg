@@ -87,7 +87,7 @@ export function getUnknownTypeHandler() {
 }
 
 /**
- * Returns settings associated with a registered block.
+ * Returns a registered block and its settings.
  *
  * @param  {string}  slug Block slug
  * @return {?Object}      Block settings
@@ -101,6 +101,6 @@ export function getBlockSettings( slug ) {
  *
  * @return {Array} Block settings
  */
-export function getBlocks() {
+export function getRegisteredBlocks() {
 	return Object.values( blocks );
 }

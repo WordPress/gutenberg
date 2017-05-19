@@ -7,11 +7,11 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
-import { getBlocks, registerBlock, unregisterBlock } from '../registration';
+import { getRegisteredBlocks, registerBlock, unregisterBlock } from '../registration';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
-		getBlocks().forEach( block => {
+		getRegisteredBlocks().forEach( block => {
 			unregisterBlock( block.slug );
 		} );
 	} );
