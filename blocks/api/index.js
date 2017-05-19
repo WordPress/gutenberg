@@ -14,5 +14,5 @@ export {
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
 	getBlockSettings,
-	getBlocks,
+	getRegisteredBlocks,
 } from './registration';
