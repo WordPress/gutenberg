@@ -132,7 +132,7 @@ registerBlock( 'core/quote', {
 					<Editable
 						tagName="footer"
 						value={ citation }
-						placeholder={ wp.i18n.__( 'Add citation…' ) }
+						placeholder={ wp.i18n.__( '— Add citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
