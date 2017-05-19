@@ -71,7 +71,7 @@ class Inserter extends wp.element.Component {
 
 	render() {
 		const { opened } = this.state;
-		const { position } = this.props;
+		const { position, children } = this.props;
 
 		return (
 			<div className="editor-inserter">
@@ -81,7 +81,10 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
-					aria-expanded={ opened ? 'true' : 'false' } />
+					aria-expanded={ opened ? 'true' : 'false' }
+				>
+					{ children }
+				</IconButton>
 				{ opened && (
 					<InserterMenu
 						position={ position }
