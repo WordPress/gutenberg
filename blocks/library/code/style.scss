@@ -1,5 +1,6 @@
 div[data-type="core/code"] {
-	pre {
+	textarea {
+		box-shadow: none;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
 		color: $dark-gray-800;
@@ -8,5 +9,6 @@ div[data-type="core/code"] {
 		padding: .8em 1.6em;
 		margin: 0;
 		overflow-x: auto;
+		width: 100%;
 	}
 }

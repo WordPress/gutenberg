@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlock, query } from '../../api';
-import Editable from '../../editable';
 
-const { children } = query;
+const { prop } = query;
 
 registerBlock( 'core/code', {
 	title: wp.i18n.__( 'Code' ),
@@ -15,18 +19,15 @@ registerBlock( 'core/code', {
 	category: 'common',
 
 	attributes: {
-		content: children( 'code' ),
+		content: prop( 'code', 'textContent' ),
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, setFocus } ) {
 		return (
-			<Editable
-				tagName="pre"
-				value={ attributes.content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				focus={ focus }
+			<TextareaAutosize
+				defaultValue={ attributes.content }
 				onFocus={ setFocus }
-				formattingControls={ [] }
+				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 			/>
 		);
 	},

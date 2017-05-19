@@ -96,7 +96,6 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onInit() {
-		this.setContent( this.props.value );
 		this.updateFocus();
 	}
 
