@@ -304,6 +304,21 @@ describe( 'state', () => {
 					tags: [ 2 ],
 				} );
 			} );
+
+			it( 'should save initial post state', () => {
+				const state = editor( undefined, {
+					type: 'SETUP_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
+				} );
+
+				expect( state.edits ).to.eql( {
+					status: 'draft',
+					title: 'post title',
+				} );
+			} );
 		} );
 
 		describe( 'dirty()', () => {
@@ -324,11 +339,10 @@ describe( 'state', () => {
 				expect( state.dirty ).to.be.false();
 			} );
 
-			it( 'should be false with shouldMarkDirty: false', () => {
+			it( 'should be false when the post is initialized', () => {
 				const state = editor( undefined, {
-					type: 'EDIT_POST',
+					type: 'SETUP_POST',
 					edits: {},
-					shouldMarkDirty: false,
 				} );
 
 				expect( state.dirty ).to.be.false();

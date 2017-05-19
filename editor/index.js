@@ -31,12 +31,11 @@ export function createEditorInstance( id, post ) {
 	// registered as an edit now.  Otherwise the initial values of these
 	// properties will not be properly saved with the post.
 	store.dispatch( {
-		type: 'EDIT_POST',
+		type: 'SETUP_POST',
 		edits: {
 			title: post.title.raw,
 			...omit( post, 'title', 'content' ),
 		},
-		shouldMarkDirty: false,
 	} );
 
 	wp.element.render(

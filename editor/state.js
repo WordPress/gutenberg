@@ -27,6 +27,7 @@ export const editor = combineUndoableReducers( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
+			case 'SETUP_POST':
 				return {
 					...state,
 					...action.edits,
@@ -49,9 +50,6 @@ export const editor = combineUndoableReducers( {
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCK':
 			case 'EDIT_POST':
-				if ( action.shouldMarkDirty === false ) {
-					return false;
-				}
 				return true;
 		}
 
