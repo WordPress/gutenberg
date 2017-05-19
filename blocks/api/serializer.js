@@ -52,7 +52,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 		Object.keys( expectedAttributes )
 	);
 
-	// Serialize the comment attributes
+	// Serialize the comment attributes as `key="value"`.
 	return keys.reduce( ( memo, key ) => {
 		const value = realAttributes[ key ];
 		if ( undefined === value ) {
@@ -64,7 +64,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 }
 
 /**
- * Takes a block list and returns the serialized post content
+ * Takes a block list and returns the serialized post content.
  *
  * @param  {Array}  blocks Block list
  * @return {String}        The post content

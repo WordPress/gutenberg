@@ -10,20 +10,24 @@ import { get, castArray, findIndex, isObjectLike, find } from 'lodash';
 import { getBlockSettings } from './registration';
 
 /**
- * Returns a block object given its type and attributes
+ * Returns a block object given its type and attributes.
  *
  * @param  {String} blockType   BlockType
  * @param  {Object} attributes  Block attributes
  * @return {Object}             Block object
  */
 export function createBlock( blockType, attributes = {} ) {
+	// Get the type definition associated with a registered block.
 	const blockSettings = getBlockSettings( blockType );
 
+	// Do we need this? What purpose does it have?
 	let defaultAttributes;
 	if ( blockSettings ) {
 		defaultAttributes = blockSettings.defaultAttributes;
 	}
 
+	// Blocks are stored with a unique ID, the assigned type name,
+	// and the block attributes.
 	return {
 		uid: uuid(),
 		blockType,
@@ -35,7 +39,7 @@ export function createBlock( blockType, attributes = {} ) {
 }
 
 /**
- * Switch a block into one or more blocks of the new block type
+ * Switch a block into one or more blocks of the new block type.
  *
  * @param  {Object} block      Block object
  * @param  {string} blockType  BlockType
@@ -52,7 +56,7 @@ export function switchToBlockType( block, blockType ) {
 		find( transformationsTo, t => t.blocks.indexOf( blockType ) !== -1 ) ||
 		find( transformationsFrom, t => t.blocks.indexOf( block.blockType ) !== -1 );
 
-	// If no valid transformation, stop.  (How did we get here?)
+	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
 		return null;
 	}
