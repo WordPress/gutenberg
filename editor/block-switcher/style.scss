@@ -13,7 +13,7 @@
 	margin: 3px;
 	padding: 6px;
 
-	&:focus:before {
+	.has-accessible-focus &:focus:before {
 		top: -3px;
 		right: -3px;
 		bottom: -3px;

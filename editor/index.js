@@ -10,6 +10,7 @@ import { Provider as SlotFillProvider } from 'react-slot-fill';
 import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
+import accessibleFocus from './accessible-focus';
 
 /**
  * Initializes and returns an instance of Editor.
@@ -24,6 +25,8 @@ export function createEditorInstance( id, post ) {
 		post,
 		blocks: wp.blocks.parse( post.content.raw ),
 	} );
+
+	accessibleFocus();
 
 	wp.element.render(
 		<ReduxProvider store={ store }>
