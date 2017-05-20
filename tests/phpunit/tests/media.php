@@ -267,6 +267,18 @@ https://w.org</a>'
 		$this->assertEquals( 'image', $prepped['mime'] );
 		$this->assertEquals( 'image', $prepped['type'] );
 		$this->assertEquals( '', $prepped['subtype'] );
+
+		// Test that if author is not found, we return "(no author)" as `display_name`.
+		// The previously used test post contains no author, so we can reuse it.
+		$this->assertEquals( '(no author)', $prepped['authorName'] );
+
+		// Test that if author has HTML entities in display_name, they're decoded correctly.
+		$html_entity_author = self::factory()->user->create( array(
+			'display_name' => 'You &amp; Me',
+		) );
+		$post->post_author = $html_entity_author;
+		$prepped = wp_prepare_attachment_for_js( $post );
+		$this->assertEquals( 'You & Me', $prepped['authorName'] );
 	}
 
 	/**
