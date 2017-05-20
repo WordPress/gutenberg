@@ -32,6 +32,12 @@
 		equal( mappedProps.title, undefined, 'mapMediaToModelProps should ignore title inputs' );
 		equal( mappedProps.loop, false, 'mapMediaToModelProps should set loop' );
 		equal( mappedProps.preload, 'meta', 'mapMediaToModelProps should set preload' );
+
+		// Test isHostedVideo().
+		equal( videoWidgetControlInstance.isHostedVideo( 'https://www.youtube.com/watch?v=OQSNhk5ICTI' ), true, 'isHostedVideo should return true for full YouTube url.' );
+		equal( videoWidgetControlInstance.isHostedVideo( 'https://youtu.be/OQSNhk5ICTI' ), true, 'isHostedVideo should return true for shortened youtube url' );
+		equal( videoWidgetControlInstance.isHostedVideo( 'https://vimeo.com/190372437' ), true, 'isHostedVideo should return true for vimeo url.' );
+		equal( videoWidgetControlInstance.isHostedVideo( 'https://wordpress.org/' ), false, 'isHostedVideo should return false for non-supported video url.' );
 	});
 
 	test( 'video widget control renderPreview', function( assert ) {

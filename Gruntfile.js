@@ -329,7 +329,7 @@ module.exports = function(grunt) {
 				expand: true,
 				cwd: SOURCE_DIR,
 				src: [
-					'wp-admin/js/*.js',
+					'wp-admin/js/**/*.js',
 					'wp-includes/js/*.js',
 					// Built scripts.
 					'!wp-includes/js/media-*',
