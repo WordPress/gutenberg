@@ -34,9 +34,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		register_block( 'core/dummy', $settings );
 		$post_content =
 			'before' .
-			'<!-- wp:core/dummy value:b1 --><!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy value="b1" --><!-- /wp:core/dummy -->' .
 			'between' .
-			'<!-- wp:core/dummy value:b2 --><!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy value="b2" --><!-- /wp:core/dummy -->' .
 			'after';
 
 		$updated_post_content = do_blocks( $post_content );
@@ -59,9 +59,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		register_block( 'core/dummy', $settings );
 		$post_content =
 			'before' .
-			'<!-- wp:core/dummy value:b1 -->this should be ignored<!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy value="b1" -->this should be ignored<!-- /wp:core/dummy -->' .
 			'between' .
-			'<!-- wp:core/dummy value:b2 -->this should also be ignored<!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy value="b2" -->this should also be ignored<!-- /wp:core/dummy -->' .
 			'after';
 
 		$updated_post_content = do_blocks( $post_content );

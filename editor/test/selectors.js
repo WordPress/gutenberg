@@ -14,15 +14,19 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
+	getEditedPostStatus,
 	getEditedPostTitle,
+	getEditedPostVisibility,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
+	getSelectedBlock,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
 	isLastBlock,
 	getPreviousBlock,
+	getNextBlock,
 	isBlockSelected,
 	isBlockHovered,
 	getBlockFocus,
@@ -162,6 +166,34 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getEditedPostStatus', () => {
+		it( 'should return the post saved status if the status is not edited', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: { title: 'chicken' },
+				},
+			};
+
+			expect( getEditedPostStatus( state ) ).to.equal( 'draft' );
+		} );
+
+		it( 'should return the edited status', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: { status: 'pending' },
+				},
+			};
+
+			expect( getEditedPostStatus( state ) ).to.equal( 'pending' );
+		} );
+	} );
+
 	describe( 'getEditedPostTitle', () => {
 		it( 'should return the post saved title if the title is not edited', () => {
 			const state = {
@@ -187,6 +219,65 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostVisibility', () => {
+		it( 'should return public by default', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'public' );
+		} );
+
+		it( 'should return private for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+		} );
+
+		it( 'should return private for password for password protected posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+					password: 'chicken',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'password' );
+		} );
+
+		it( 'should use the edited status and password if edits present', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+					password: 'chicken',
+				},
+				editor: {
+					edits: {
+						status: 'private',
+						password: null,
+					},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
 		} );
 	} );
 
@@ -240,6 +331,36 @@ describe( 'selectors', () => {
 				{ uid: 123, blockType: 'core/text' },
 				{ uid: 23, blockType: 'core/heading' },
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlock', () => {
+		it( 'should return null if no block is selected', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: null },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( null );
+		} );
+
+		it( 'should return the selected block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: 23 },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
 		} );
 	} );
 
@@ -340,6 +461,38 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPreviousBlock( state, 123 ) ).to.be.null();
+		} );
+	} );
+
+	describe( 'getNextBlock', () => {
+		it( 'should return the following block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+					blockOrder: [ 123, 23 ],
+				},
+			};
+
+			expect( getNextBlock( state, 123 ) ).to.eql(
+				{ uid: 23, blockType: 'core/heading' },
+			);
+		} );
+
+		it( 'should return null for the last block', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+					blockOrder: [ 123, 23 ],
+				},
+			};
+
+			expect( getNextBlock( state, 23 ) ).to.be.null();
 		} );
 	} );
 

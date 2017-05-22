@@ -197,6 +197,9 @@ export function selectedBlock( state = {}, action ) {
 					focus: action.uid === state.uid ? state.focus : {},
 				};
 
+		case 'CLEAR_SELECTED_BLOCK':
+			return {};
+
 		case 'MOVE_BLOCK_UP':
 		case 'MOVE_BLOCK_DOWN':
 			return action.uid === state.uid

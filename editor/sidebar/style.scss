@@ -10,6 +10,19 @@
 	@include break-medium() {
 		top: $admin-bar-height + $header-height;
 	}
+
+	> .components-panel {
+		margin-left: -1px;
+		margin-right: -1px;
+
+		&:first-child {
+			margin-top: -1px;
+		}
+
+		&:last-child {
+			margin-bottom: -1px;
+		}
+	}
 }
 
 /* Visual and Text editor both */

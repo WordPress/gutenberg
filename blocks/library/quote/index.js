@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { switchChildrenNodeName } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -40,6 +45,15 @@ registerBlock( 'core/quote', {
 			},
 			{
 				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: switchChildrenNodeName( values, 'p' ),
+					} );
+				},
+			},
+			{
+				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
@@ -55,6 +69,20 @@ registerBlock( 'core/quote', {
 				transform: ( { value, citation } ) => {
 					return createBlock( 'core/text', {
 						content: wp.element.concatChildren( value, citation ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { value, citation } ) => {
+					const valueElements = switchChildrenNodeName( value, 'li' );
+					const values = citation
+						? wp.element.concatChildren( valueElements, <li>{ citation }</li> )
+						: valueElements;
+					return createBlock( 'core/list', {
+						nodeName: 'ul',
+						values,
 					} );
 				},
 			},
@@ -82,7 +110,7 @@ registerBlock( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -97,13 +125,14 @@ registerBlock( 'core/quote', {
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
-					onMerge={ mergeWithPrevious }
+					onMerge={ mergeBlocks }
 					showAlignments
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
+						placeholder={ wp.i18n.__( '— Add citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,

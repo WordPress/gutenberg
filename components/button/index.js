@@ -4,7 +4,7 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { href, isPrimary, isLarge, isToggled, className, buttonRef, ...additionalProps } ) {
+function Button( { href, isPrimary, isLarge, isToggled, className, ...additionalProps } ) {
 	const classes = classnames( 'components-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
@@ -19,7 +19,6 @@ function Button( { href, isPrimary, isLarge, isToggled, className, buttonRef, ..
 		...tagProps,
 		...additionalProps,
 		className: classes,
-		ref: buttonRef,
 	} );
 }
 

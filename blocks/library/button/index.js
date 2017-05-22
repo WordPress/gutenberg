@@ -76,9 +76,12 @@ registerBlock( 'core/button', {
 					tagName="span"
 					placeholder={ wp.i18n.__( 'Write label…' ) }
 					value={ text }
+					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					inline
+					inlineToolbar
+					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&
 					<form

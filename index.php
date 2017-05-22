@@ -98,7 +98,7 @@ function unregister_block( $slug ) {
  * @return array
  */
 function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+):([^\s]+)\s*/';
+	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
 	preg_match_all( $attributes_matcher, $attr_string, $matches );
 	$attributes = array();
 	foreach ( $matches[1] as $index => $attribute_match ) {
@@ -158,20 +158,113 @@ function gutenberg_register_scripts() {
 
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-	wp_register_script( 'react', 'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js' );
-	wp_register_script( 'react-dom', 'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js', array( 'react' ) );
-	wp_register_script( 'react-dom-server', 'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js', array( 'react' ) );
+	gutenberg_register_vendor_script(
+		'react',
+		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
+	);
+	gutenberg_register_vendor_script(
+		'react-dom',
+		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
+	);
+	gutenberg_register_vendor_script(
+		'react-dom-server',
+		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
+		array( 'react' )
+	);
 
 	// Editor Scripts.
-	wp_register_script( 'tinymce-nightly', 'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js' );
-	wp_register_script( 'wp-i18n', plugins_url( 'i18n/build/index.js', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' ) );
-	wp_register_script( 'wp-element', plugins_url( 'element/build/index.js', __FILE__ ), array( 'react', 'react-dom', 'react-dom-server' ), filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' ) );
-	wp_register_script( 'wp-blocks', plugins_url( 'blocks/build/index.js', __FILE__ ), array( 'wp-element', 'tinymce-nightly' ), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' ) );
+	gutenberg_register_vendor_script(
+		'tinymce-nightly',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
+	);
+	wp_register_script(
+		'wp-i18n',
+		plugins_url( 'i18n/build/index.js', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' )
+	);
+	wp_register_script(
+		'wp-element',
+		plugins_url( 'element/build/index.js', __FILE__ ),
+		array( 'react', 'react-dom', 'react-dom-server' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' )
+	);
+	wp_register_script(
+		'wp-blocks',
+		plugins_url( 'blocks/build/index.js', __FILE__ ),
+		array( 'wp-element', 'tinymce-nightly' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
+	);
 
 	// Editor Styles.
-	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' ) );
+	wp_register_style(
+		'wp-blocks',
+		plugins_url( 'blocks/build/style.css', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' )
+	);
 }
 add_action( 'init', 'gutenberg_register_scripts' );
+
+/**
+ * Registers a vendor script from a URL, preferring a locally cached version if
+ * possible, or downloading it if the cached version is unavailable or
+ * outdated.
+ *
+ * @param  string $handle Name of the script.
+ * @param  string $src    Full URL of the external script.
+ * @param  array  $deps   Optional. An array of registered script handles this
+ *                        script depends on.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
+	$filename = basename( $src );
+	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
+
+	$needs_fetch = (
+		! file_exists( $full_path ) ||
+		time() - filemtime( $full_path ) >= DAY_IN_SECONDS
+	);
+
+	if ( $needs_fetch ) {
+		// Determine whether we can write to this file.  If not, don't waste
+		// time doing a network request.
+		$f = fopen( $full_path, 'a' );
+		if ( ! $f ) {
+			// Failed to open the file for writing, probably due to server
+			// permissions.  Enqueue the script directly from the URL instead.
+			// Note: the `fopen` call above will have generated a warning.
+			wp_register_script( $handle, $src, $deps );
+			return;
+		}
+		fclose( $f );
+		$response = wp_remote_get( $src );
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			// The request failed; just enqueue the script directly from the
+			// URL.  This will probably fail too, but surfacing the error to
+			// the browser is probably the best we can do.
+			wp_register_script( $handle, $src, $deps );
+			// If our file was newly created above, it will have a size of
+			// zero, and we need to delete it so that we don't think it's
+			// already cached on the next request.
+			if ( ! filesize( $full_path ) ) {
+				unlink( $full_path );
+			}
+			return;
+		}
+		$f = fopen( $full_path, 'w' );
+		fwrite( $f, wp_remote_retrieve_body( $response ) );
+		fclose( $f );
+	}
+
+	wp_register_script(
+		$handle,
+		plugins_url( 'vendor/' . $filename, __FILE__ ),
+		$deps
+	);
+}
 
 /**
  * Adds the filters to register additional links for the Gutenberg editor in
@@ -282,6 +375,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	/**
 	 * Scripts
 	 */
+	wp_enqueue_media();
 
 	// The editor code itself.
 	wp_enqueue_script(
