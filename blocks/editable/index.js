@@ -6,6 +6,7 @@ import { last, isEqual, capitalize, omitBy, forEach, merge, identity } from 'lod
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -18,9 +19,6 @@ import Toolbar from 'components/toolbar';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-
-const KEYCODE_BACKSPACE = 8;
-const KEYCODE_DELETE = 46;
 
 const alignmentMap = {
 	alignleft: 'left',
@@ -209,17 +207,39 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
+		const { BACKSPACE, DELETE, ENTER } = tinymce.util.VK;
+
 		if (
 			this.props.onMerge && (
-				( event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === KEYCODE_DELETE && this.isEndOfEditor() )
+				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+				( event.keyCode === DELETE && this.isEndOfEditor() )
 			)
 		) {
-			const forward = event.keyCode === KEYCODE_DELETE;
+			const forward = event.keyCode === DELETE;
 			this.onChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
+		}
+
+		if ( this.props.inline && this.props.onSplit && event.keyCode === ENTER ) {
+			const isCollapsed = this.editor.selection.isCollapsed();
+			const node = this.editor.selection.getEnd();
+
+			if ( ! isCollapsed || node.nodeType !== 1 || node.nodeName !== 'BR' ) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopImmediatePropagation();
+
+			const childNodes = Array.from( this.editor.getBody().childNodes );
+			const splitIndex = childNodes.indexOf( node );
+			const before = nodeListToReact( childNodes.slice( 0, splitIndex ), createElement );
+			const after = nodeListToReact( childNodes.slice( splitIndex + 1 ), createElement );
+
+			this.setContent( before );
+			this.props.onSplit( before, after );
 		}
 	}
 
