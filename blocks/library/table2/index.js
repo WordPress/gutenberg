@@ -15,14 +15,14 @@ function execCommand( command ) {
 	};
 }
 
-registerBlock( 'core/table', {
+registerBlock( 'core/table2', {
 	title: wp.i18n.__( 'Table2' ),
 	icon: 'editor-table',
 	category: 'common',
 
 	attributes: {
 		nodeName: prop( 'table', 'nodeName' ),
-		rows: children( 'tr' )
+		rows: children( 'tr' ),
 	},
 
 	controls: [
@@ -30,37 +30,37 @@ registerBlock( 'core/table', {
 			icon: 'table-row-before',
 			title: wp.i18n.__( 'Insert Row Before' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableInsertRowBefore' )
+			onClick: execCommand( 'mceTableInsertRowBefore' ),
 		},
 		{
 			icon: 'table-row-after',
 			title: wp.i18n.__( 'Insert Row After' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableInsertRowAfter' )
+			onClick: execCommand( 'mceTableInsertRowAfter' ),
 		},
 		{
 			icon: 'table-row-delete',
 			title: wp.i18n.__( 'Delete Row' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableDeleteRow' )
+			onClick: execCommand( 'mceTableDeleteRow' ),
 		},
 		{
 			icon: 'table-col-before',
 			title: wp.i18n.__( 'Insert Column Before' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableInsertColBefore' )
+			onClick: execCommand( 'mceTableInsertColBefore' ),
 		},
 		{
 			icon: 'table-col-after',
 			title: wp.i18n.__( 'Insert Column After' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableInsertColAfter' )
+			onClick: execCommand( 'mceTableInsertColAfter' ),
 		},
 		{
 			icon: 'table-col-delete',
 			title: wp.i18n.__( 'Delete Column' ),
 			isActive: () => false,
-			onClick: execCommand( 'mceTableDeleteCol' )
+			onClick: execCommand( 'mceTableDeleteCol' ),
 		},
 	],
 
@@ -69,10 +69,12 @@ registerBlock( 'core/table', {
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
+				getSettings={ ( settings ) => ( {
+					...settings,
+					plugins: ( settings.plugins || [] ).concat( 'table' ),
+				} ) }
 				style={ { width: '100%' } }
-				onSetup={ ( nextEditor ) => {
-					setAttributes( { editor: nextEditor } );
-				} }
+				onSetup={ ( editor ) => setAttributes( { editor } ) }
 				onChange={ ( nextRows ) => {
 					setAttributes( { rows: nextRows } );
 				} }
@@ -92,5 +94,5 @@ registerBlock( 'core/table', {
 				{ rows }
 			</table>
 		);
-	}
+	},
 } );
