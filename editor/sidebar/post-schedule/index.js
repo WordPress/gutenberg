@@ -42,8 +42,8 @@ class PostSchedule extends Component {
 
 	render() {
 		const { date, onUpdateDate } = this.props;
-		const momentDate = date ? moment( date ) : date;
-		const label = momentDate
+		const momentDate = date ? moment( date ) : moment();
+		const label = date
 			? dateI18n( settings.formats.datetime, date )
 			: __( 'Immediately' );
 		const handleChange = ( newDate ) => {
