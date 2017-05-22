@@ -5,4 +5,7 @@
     border: 1px solid $light-gray-500;
     padding: 15px 7px;
   }
+  td[data-mce-selected="1"], th[data-mce-selected="1"] {
+    background-color: $light-gray-500;
+  }
 }
