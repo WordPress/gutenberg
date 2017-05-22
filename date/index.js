@@ -169,7 +169,7 @@ const formatMap = {
 function setupLocale( settings ) {
 	// Backup and restore current locale.
 	const currentLocale = moment.locale();
-	moment.defineLocale( settings.l10n.locale, {
+	moment.updateLocale( settings.l10n.locale, {
 		// Inherit anything missing from the default locale.
 		parentLocale: currentLocale,
 		months: settings.l10n.months,
