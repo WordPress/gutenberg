@@ -225,7 +225,7 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * @since 0.1.0
  */
 function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
-	$filename = basename( $src );
+	$filename = sanitize_file_name( $src );
 	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
 
 	$needs_fetch = (
