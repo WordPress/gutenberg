@@ -15,14 +15,16 @@ import FormToggle from 'components/form-toggle';
  */
 import './style.scss';
 import PostVisibility from '../post-visibility';
-import { getEditedPostStatus } from '../../selectors';
+import { getEditedPostStatus, getSuggestedPostFormat } from '../../selectors';
 import { editPost } from '../../actions';
 
-function PostStatus( { status, onUpdateStatus } ) {
+function PostStatus( { status, onUpdateStatus, suggestedFormat } ) {
 	const onToggle = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
 		onUpdateStatus( updatedStatus );
 	};
+
+	const format = suggestedFormat || __( 'Standard' );
 
 	// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
 	/* eslint-disable jsx-a11y/label-has-for */
@@ -35,9 +37,12 @@ function PostStatus( { status, onUpdateStatus } ) {
 					onChange={ onToggle }
 				/>
 			</label>
-
 			<div className="editor-post-status__row">
 				<PostVisibility />
+			</div>
+			<div className="editor-post-status__row">
+				<span>{ __( 'Post Format' ) }</span>
+				<span>{ format }</span>
 			</div>
 		</PanelBody>
 	);
@@ -47,6 +52,7 @@ function PostStatus( { status, onUpdateStatus } ) {
 export default connect(
 	( state ) => ( {
 		status: getEditedPostStatus( state ),
+		suggestedFormat: getSuggestedPostFormat( state ),
 	} ),
 	( dispatch ) => {
 		return {

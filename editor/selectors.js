@@ -147,3 +147,21 @@ export function didPostSaveRequestFail( state ) {
 export function isSavingNewPost( state ) {
 	return state.saving.isNew;
 }
+
+export function getSuggestedPostFormat( state ) {
+	const blocks = state.editor.blockOrder;
+
+	let type;
+	if ( blocks.length === 1 ) {
+		type = state.editor.blocksByUid[ blocks[ 0 ] ].blockType;
+	}
+
+	switch ( type ) {
+		case 'core/image':
+			return 'Image';
+		case 'core/quote':
+			return 'Quote';
+		default:
+			return false;
+	}
+}
