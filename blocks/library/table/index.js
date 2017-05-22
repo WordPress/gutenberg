@@ -2,17 +2,17 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from 'api';
-import Editable from 'components/editable';
+import { registerBlock, query as hpq } from '../../api';
+import Editable from '../../editable';
 
 const { children, prop } = hpq;
 
-let editable = null;
-
-function execCommand( commandId ) {
-	const editorNode = editable !== null ? editable.editorNode : null;
-	const editor = tinymce.editors.find( ( e ) => e.targetElm === editorNode );
-	editor.execCommand( commandId, false, editor );
+function execCommand( command ) {
+	return ( { editor } ) => {
+		if ( editor ) {
+			editor.execCommand( command );
+		}
+	};
 }
 
 registerBlock( 'core/table', {
@@ -27,20 +27,40 @@ registerBlock( 'core/table', {
 
 	controls: [
 		{
-			icon: 'editor-table',
+			icon: 'table-row-before',
 			title: wp.i18n.__( 'Insert Row Before' ),
-			isActive: () => false, //TODO
-			onClick() {
-				execCommand( 'mceTableInsertRowBefore', false );
-			}
+			isActive: () => false,
+			onClick: execCommand( 'mceTableInsertRowBefore' )
 		},
 		{
-			icon: 'editor-table',
+			icon: 'table-row-after',
 			title: wp.i18n.__( 'Insert Row After' ),
-			isActive: () => false, //TODO
-			onClick() {
-				execCommand( 'mceTableInsertRowAfter', false );
-			}
+			isActive: () => false,
+			onClick: execCommand( 'mceTableInsertRowAfter' )
+		},
+		{
+			icon: 'table-row-delete',
+			title: wp.i18n.__( 'Delete Row' ),
+			isActive: () => false,
+			onClick: execCommand( 'mceTableDeleteRow' )
+		},
+		{
+			icon: 'table-col-before',
+			title: wp.i18n.__( 'Insert Column Before' ),
+			isActive: () => false,
+			onClick: execCommand( 'mceTableInsertColBefore' )
+		},
+		{
+			icon: 'table-col-after',
+			title: wp.i18n.__( 'Insert Column After' ),
+			isActive: () => false,
+			onClick: execCommand( 'mceTableInsertColAfter' )
+		},
+		{
+			icon: 'table-col-delete',
+			title: wp.i18n.__( 'Delete Column' ),
+			isActive: () => false,
+			onClick: execCommand( 'mceTableDeleteCol' )
 		},
 	],
 
@@ -48,9 +68,11 @@ registerBlock( 'core/table', {
 		const { nodeName = 'TABLE', rows = [ <tr key="1"><td><br /></td><td><br /></td></tr>, <tr key="2"><td><br /></td><td><br /></td></tr> ] } = attributes;
 		return (
 			<Editable
-				ref={ ( e ) => editable = e }
 				tagName={ nodeName.toLowerCase() }
 				style={ { width: '100%' } }
+				onSetup={ ( nextEditor ) => {
+					setAttributes( { editor: nextEditor } );
+				} }
 				onChange={ ( nextRows ) => {
 					setAttributes( { rows: nextRows } );
 				} }

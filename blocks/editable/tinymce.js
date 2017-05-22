@@ -31,6 +31,7 @@ export default class TinyMCE extends wp.element.Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			plugins: [ 'table' ],
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
