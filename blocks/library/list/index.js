@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { switchChildrenNodeName } from 'element';
+import { find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -42,7 +43,7 @@ function listSetType( listType, editorCommand ) {
 }
 
 function findInternalListType( { parents } ) {
-	const list = parents.find( ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
+	const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
 	return list ? list.nodeName : null;
 }
 
