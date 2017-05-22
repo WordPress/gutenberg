@@ -118,7 +118,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
-			'<p><Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
+			'<p>Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/heading -->',
@@ -136,6 +136,12 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/preformatted -->',
 			'<pre>Some <em>preformatted</em> text...<br>And more!</pre>',
 			'<!-- /wp:core/preformatted -->',
+
+			'<!-- wp:core/code -->',
+			'<pre><code>export default function MyButton() {\n\
+	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
+}</code></pre>',
+			'<!-- /wp:core/code -->',
 
 		].join( '' ),
 	},

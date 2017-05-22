@@ -147,3 +147,24 @@ export function didPostSaveRequestFail( state ) {
 export function isSavingNewPost( state ) {
 	return state.saving.isNew;
 }
+
+export function getSuggestedPostFormat( state ) {
+	const blocks = state.editor.blockOrder;
+
+	let type;
+	// If there is only one block in the content of the post grab its
+	// `blockType` name so we can derive a suitable post format from it.
+	if ( blocks.length === 1 ) {
+		type = state.editor.blocksByUid[ blocks[ 0 ] ].blockType;
+	}
+
+	// We only convert to default post formats in core.
+	switch ( type ) {
+		case 'core/image':
+			return 'Image';
+		case 'core/quote':
+			return 'Quote';
+		default:
+			return false;
+	}
+}

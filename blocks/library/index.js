@@ -11,3 +11,4 @@ import './pullquote';
 import './table';
 import './table2';
 import './preformatted';
+import './code';
