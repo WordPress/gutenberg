@@ -307,11 +307,20 @@ class Tests_General_Template extends WP_UnitTestCase {
 		switch_to_blog( $blog_id );
 
 		$this->_set_custom_logo();
+
+		$custom_logo_attr = array(
+			'class'    => 'custom-logo',
+			'itemprop' => 'logo',
+		);
+
+		// If the logo alt attribute is empty, use the site title.
+		$image_alt = get_post_meta( $this->custom_logo_id, '_wp_attachment_image_alt', true );
+		if ( empty( $image_alt ) ) {
+			$custom_logo_attr['alt'] = get_bloginfo( 'name', 'display' );
+		}
+
 		$home_url = get_home_url( $blog_id, '/' );
-		$image    = wp_get_attachment_image( $this->custom_logo_id, 'full', false, array(
-			'class'     => 'custom-logo',
-			'itemprop'  => 'logo',
-		) );
+		$image    = wp_get_attachment_image( $this->custom_logo_id, 'full', false, $custom_logo_attr );
 		restore_current_blog();
 
 		$expected_custom_logo =  '<a href="' . $home_url . '" class="custom-logo-link" rel="home" itemprop="url">' . $image . '</a>';
@@ -328,9 +337,38 @@ class Tests_General_Template extends WP_UnitTestCase {
 		the_custom_logo();
 
 		$this->_set_custom_logo();
+
+		$custom_logo_attr = array(
+			'class'    => 'custom-logo',
+			'itemprop' => 'logo',
+		);
+
+		// If the logo alt attribute is empty, use the site title.
+		$image_alt = get_post_meta( $this->custom_logo_id, '_wp_attachment_image_alt', true );
+		if ( empty( $image_alt ) ) {
+			$custom_logo_attr['alt'] = get_bloginfo( 'name', 'display' );
+		}
+
+		$image = wp_get_attachment_image( $this->custom_logo_id, 'full', false, $custom_logo_attr );
+
+		$this->expectOutputString( '<a href="http://' . WP_TESTS_DOMAIN . '/" class="custom-logo-link" rel="home" itemprop="url">' . $image . '</a>' );
+		the_custom_logo();
+	}
+
+	/**
+	 * @group custom_logo
+	 * @ticket 38768
+	 */
+	function test_the_custom_logo_with_alt() {
+		$this->_set_custom_logo();
+
+		$image_alt = 'My alt attribute';
+
+		update_post_meta( $this->custom_logo_id, '_wp_attachment_image_alt', $image_alt );
+
 		$image = wp_get_attachment_image( $this->custom_logo_id, 'full', false, array(
-			'class'     => 'custom-logo',
-			'itemprop'  => 'logo',
+			'class'    => 'custom-logo',
+			'itemprop' => 'logo',
 		) );
 
 		$this->expectOutputString( '<a href="http://' . WP_TESTS_DOMAIN . '/" class="custom-logo-link" rel="home" itemprop="url">' . $image . '</a>' );
