@@ -24,6 +24,8 @@ function PostStatus( { status, onUpdateStatus, suggestedFormat } ) {
 		onUpdateStatus( updatedStatus );
 	};
 
+	// Use the suggested post format based on the blocks content of the post
+	// or the default post format setting for the site.
 	const format = suggestedFormat || __( 'Standard' );
 
 	// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
