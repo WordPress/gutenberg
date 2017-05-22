@@ -5,9 +5,9 @@ import { __ } from 'i18n';
 import Button from 'components/button';
 
 function PostScheduleClock( { is12Hour, selected, onChange } ) {
-	const minutes = selected ? selected.format( 'mm' ) : '';
-	const am = selected ? selected.format( 'A' ) : 'AM';
-	const hours = selected ? selected.format( is12Hour ? 'hh' : 'HH' ) : '';
+	const minutes = selected.format( 'mm' );
+	const am = selected.format( 'A' );
+	const hours = selected.format( is12Hour ? 'hh' : 'HH' );
 
 	const updateHours = ( event ) => {
 		const value = parseInt( event.target.value, 10 );
