@@ -5,6 +5,7 @@
 	border: none;
 	background: none;
 	color: $dark-gray-500;
+	position: relative;
 
 	&:not( :disabled ) {
 		cursor: pointer;
@@ -12,5 +13,15 @@
 		&:hover {
 			color: $blue-medium;
 		}
+	}
+
+	&:focus:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, .8);
 	}
 }

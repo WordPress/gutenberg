@@ -16,6 +16,7 @@ import {
 	getPostEdits,
 	getEditedPostStatus,
 	getEditedPostTitle,
+	getEditedPostVisibility,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -218,6 +219,65 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostVisibility', () => {
+		it( 'should return public by default', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'public' );
+		} );
+
+		it( 'should return private for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+		} );
+
+		it( 'should return private for password for password protected posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+					password: 'chicken',
+				},
+				editor: {
+					edits: {},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'password' );
+		} );
+
+		it( 'should use the edited status and password if edits present', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+					password: 'chicken',
+				},
+				editor: {
+					edits: {
+						status: 'private',
+						password: null,
+					},
+				},
+			};
+
+			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
 		} );
 	} );
 
