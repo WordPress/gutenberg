@@ -18,8 +18,7 @@
 		}
 	},
 	"globals": {
-		"wp": true,
-		"tinymce": true
+		"wp": true
 	},
 	"plugins": [
 		"react",
@@ -33,6 +32,7 @@
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
 		"brace-style": [ "error", "1tbs" ],
+		"comma-dangle": [ "error", "always-multiline" ],
 		"comma-spacing": "error",
 		"comma-style": "error",
 		"computed-property-spacing": [ "error", "always" ],

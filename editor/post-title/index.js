@@ -9,6 +9,7 @@ import Textarea from 'react-autosize-textarea';
  */
 import './style.scss';
 import { getEditedPostTitle } from '../selectors';
+import { editPost } from '../actions';
 
 /**
  * Constants
@@ -40,11 +41,8 @@ export default connect(
 	( dispatch ) => {
 		return {
 			onUpdate( title ) {
-				dispatch( {
-					type: 'EDIT_POST',
-					edits: { title }
-				} );
-			}
+				dispatch( editPost( { title } ) );
+			},
 		};
 	}
 )( PostTitle );

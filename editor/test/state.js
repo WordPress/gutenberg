@@ -16,7 +16,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
-	createReduxStore
+	createReduxStore,
 } from '../state';
 
 describe( 'state', () => {
@@ -41,7 +41,7 @@ describe( 'state', () => {
 			const original = editor( undefined, {} );
 			const state = editor( original, {
 				type: 'RESET_BLOCKS',
-				blocks: [ { uid: 'bananas' } ]
+				blocks: [ { uid: 'bananas' } ],
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
@@ -54,17 +54,17 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'kumquat',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'UPDATE_BLOCK',
 				uid: 'kumquat',
 				updates: {
 					attributes: {
-						updated: true
-					}
-				}
+						updated: true,
+					},
+				},
 			} );
 
 			expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
@@ -76,15 +76,15 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'INSERT_BLOCK',
 				block: {
 					uid: 'ribs',
-					blockType: 'core/freeform'
-				}
+					blockType: 'core/freeform',
+				},
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 2 );
@@ -98,16 +98,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform'
-				} ]
+					blockType: 'core/freeform',
+				} ],
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
@@ -122,16 +122,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs'
+				uid: 'ribs',
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
@@ -143,16 +143,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'MOVE_BLOCK_UP',
-				uid: 'chicken'
+				uid: 'chicken',
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -164,16 +164,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken'
+				uid: 'chicken',
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
@@ -185,16 +185,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: 'ribs'
+				uid: 'ribs',
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -206,16 +206,16 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'chicken',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 			const state = editor( original, {
 				type: 'REMOVE_BLOCK',
-				uid: 'chicken'
+				uid: 'chicken',
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs' ] );
@@ -223,8 +223,8 @@ describe( 'state', () => {
 				ribs: {
 					uid: 'ribs',
 					blockType: 'core/test-block',
-					attributes: {}
-				}
+					attributes: {},
+				},
 			} );
 		} );
 
@@ -234,12 +234,12 @@ describe( 'state', () => {
 				blocks: [ {
 					uid: 'kumquat',
 					blockType: 'core/test-block',
-					attributes: {}
+					attributes: {},
 				}, {
 					uid: 'loquat',
 					blockType: 'core/test-block',
-					attributes: {}
-				} ]
+					attributes: {},
+				} ],
 			} );
 
 			const state = editor( original, {
@@ -247,8 +247,8 @@ describe( 'state', () => {
 				after: 'kumquat',
 				block: {
 					uid: 'persimmon',
-					blockType: 'core/freeform'
-				}
+					blockType: 'core/freeform',
+				},
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 3 );
@@ -262,7 +262,7 @@ describe( 'state', () => {
 					edits: {
 						status: 'draft',
 						title: 'post title',
-					}
+					},
 				} );
 
 				const state = editor( original, {
@@ -286,7 +286,7 @@ describe( 'state', () => {
 						status: 'draft',
 						title: 'post title',
 						tags: [ 1 ],
-					}
+					},
 				} );
 
 				const state = editor( original, {
@@ -354,7 +354,7 @@ describe( 'state', () => {
 			const state = hoveredBlock( null, {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				uid: 'kumquat',
-				hovered: true
+				hovered: true,
 			} );
 
 			expect( state ).to.equal( 'kumquat' );
@@ -364,7 +364,7 @@ describe( 'state', () => {
 			const state = hoveredBlock( 'kumquat', {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: true
+				selected: true,
 			} );
 
 			expect( state ).to.be.null();
@@ -376,8 +376,8 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform'
-				} ]
+					blockType: 'core/freeform',
+				} ],
 			} );
 
 			expect( state ).to.equal( 'wings' );
@@ -389,8 +389,8 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform'
-				} ]
+					blockType: 'core/freeform',
+				} ],
 			} );
 
 			expect( state ).to.equal( 'chicken' );
@@ -402,10 +402,19 @@ describe( 'state', () => {
 			const state = selectedBlock( undefined, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: true
+				selected: true,
 			} );
 
 			expect( state ).to.eql( { uid: 'kumquat', typing: false, focus: {} } );
+		} );
+
+		it( 'returns an empty object when clearing selected block', () => {
+			const original = deepFreeze( { uid: 'kumquat', typing: false, focus: {} } );
+			const state = selectedBlock( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state ).to.eql( {} );
 		} );
 
 		it( 'should not update the state if already selected and not typing', () => {
@@ -413,7 +422,7 @@ describe( 'state', () => {
 			const state = selectedBlock( original, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: true
+				selected: true,
 			} );
 
 			expect( state ).to.equal( original );
@@ -424,13 +433,13 @@ describe( 'state', () => {
 			const state = selectedBlock( original, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: true
+				selected: true,
 			} );
 
 			expect( state ).to.eql( {
 				uid: 'kumquat',
 				typing: false,
-				focus: { editable: 'content' }
+				focus: { editable: 'content' },
 			} );
 		} );
 
@@ -439,7 +448,7 @@ describe( 'state', () => {
 			const state = selectedBlock( original, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: false
+				selected: false,
 			} );
 
 			expect( state ).to.eql( {} );
@@ -450,7 +459,7 @@ describe( 'state', () => {
 			const state = selectedBlock( original, {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				uid: 'kumquat',
-				selected: false
+				selected: false,
 			} );
 
 			expect( state ).to.equal( original );
@@ -461,8 +470,8 @@ describe( 'state', () => {
 				type: 'INSERT_BLOCK',
 				block: {
 					uid: 'ribs',
-					blockType: 'core/freeform'
-				}
+					blockType: 'core/freeform',
+				},
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
@@ -471,7 +480,7 @@ describe( 'state', () => {
 		it( 'should return with block moved up', () => {
 			const state = selectedBlock( undefined, {
 				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs'
+				uid: 'ribs',
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
@@ -480,7 +489,7 @@ describe( 'state', () => {
 		it( 'should return with block moved down', () => {
 			const state = selectedBlock( undefined, {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken'
+				uid: 'chicken',
 			} );
 
 			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
@@ -490,7 +499,7 @@ describe( 'state', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: true, focus: {} } );
 			const state = selectedBlock( original, {
 				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs'
+				uid: 'ribs',
 			} );
 
 			expect( state ).to.equal( original );
@@ -500,7 +509,7 @@ describe( 'state', () => {
 			const state = selectedBlock( undefined, {
 				type: 'UPDATE_FOCUS',
 				uid: 'chicken',
-				config: { editable: 'citation' }
+				config: { editable: 'citation' },
 			} );
 
 			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: { editable: 'citation' } } );
@@ -511,7 +520,7 @@ describe( 'state', () => {
 			const state = selectedBlock( original, {
 				type: 'UPDATE_FOCUS',
 				uid: 'ribs',
-				config: { editable: 'citation' }
+				config: { editable: 'citation' },
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
@@ -520,7 +529,7 @@ describe( 'state', () => {
 		it( 'should set the typing flag and selects the block', () => {
 			const state = selectedBlock( undefined, {
 				type: 'START_TYPING',
-				uid: 'chicken'
+				uid: 'chicken',
 			} );
 
 			expect( state ).to.eql( { uid: 'chicken', typing: true, focus: {} } );
@@ -530,7 +539,7 @@ describe( 'state', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: false, focus: { editable: 'citation' } } );
 			const state = selectedBlock( original, {
 				type: 'START_TYPING',
-				uid: 'ribs'
+				uid: 'ribs',
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
@@ -543,8 +552,8 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform'
-				} ]
+					blockType: 'core/freeform',
+				} ],
 			} );
 
 			expect( state ).to.eql( { uid: 'wings', typing: false, focus: {} } );
@@ -557,8 +566,8 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform'
-				} ]
+					blockType: 'core/freeform',
+				} ],
 			} );
 
 			expect( state ).to.equal( original );
@@ -575,7 +584,7 @@ describe( 'state', () => {
 		it( 'should return switched mode', () => {
 			const state = mode( null, {
 				type: 'SWITCH_MODE',
-				mode: 'text'
+				mode: 'text',
 			} );
 
 			expect( state ).to.equal( 'text' );
@@ -591,7 +600,7 @@ describe( 'state', () => {
 
 		it( 'should toggle the sidebar open flag', () => {
 			const state = isSidebarOpened( false, {
-				type: 'TOGGLE_SIDEBAR'
+				type: 'TOGGLE_SIDEBAR',
 			} );
 
 			expect( state ).to.be.true();
@@ -632,7 +641,7 @@ describe( 'state', () => {
 				error: {
 					code: 'pretend_error',
 					message: 'update failed',
-				}
+				},
 			} );
 			expect( state ).to.eql( {
 				requesting: false,

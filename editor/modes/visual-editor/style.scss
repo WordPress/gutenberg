@@ -1,6 +1,5 @@
 .editor-visual-editor {
 	margin: 0 auto;
-	max-width: 700px;
 	padding: 50px 10px;	/* Floating up/down arrows invisible */
 
 	&,
@@ -11,27 +10,35 @@
 	}
 
 	@include break-small() {
-		padding: 50px 40px;	/* Floating up/down appear */
+		padding: 50px 0 50px #{ $block-padding + $block-mover-margin };		/* Floating up/down appear, also compensate for mover */
 	}
 
 	@include break-large() {
-		padding: 60px 30px;
+		padding: 60px 0 60px #{ $block-padding + $block-mover-margin };		/* Compensate for mover on the left side */
 	}
+}
+
+/* "Hassle-free full bleed" from CSS Tricks */
+.editor-visual-editor > *:not( [data-align="wide"] ) {
+	max-width: $visual-editor-max-width;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .editor-visual-editor__block {
 	position: relative;
-	left: -#{ $block-padding + $block-mover-margin };	// make room for the mover
-	padding: $block-padding $block-padding $block-padding #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover
+	left: -#{ $block-padding + $block-mover-margin };	/* Make room for the mover */
+	padding: $block-padding $block-padding  $block-padding #{ $block-padding * 2 + $block-mover-margin };	/* Compensate for mover */
+	margin-right: #{ $block-padding + $block-mover-margin };
 	transition: 0.2s border-color;
 
 	&:before {
-		z-index: -1;
+		z-index: z-index( '.editor-visual-editor__block:before' );
 		content: '';
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: #{ $block-padding + $block-mover-margin };	// compensate for mover
+		left: #{ $block-padding + $block-mover-margin };	/* Compensate for mover */
 		right: 0;
 		border: 2px solid transparent;
 		transition: 0.2s border-color;
@@ -66,17 +73,36 @@
 
 .editor-visual-editor__block-controls {
 	@include animate_fade;
-	position: absolute;
-	bottom: 100%;
-	margin-bottom: -4px;
-	left: #{ $block-padding * 2 + $block-mover-margin };	// compensate for mover, and indent same as padding
 	display: flex;
-	z-index: 1;
+	position: sticky;
+	z-index: z-index( '.editor-visual-editor__block-controls' );
+	margin-top: -$block-controls-height - $item-spacing;
+	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
+	height: $block-controls-height;
+	width: 0;
+	white-space: nowrap;
+
+	top: $header-height + $admin-bar-height-big + $item-spacing;
+
+	@include break-medium() {
+		top: $header-height + $admin-bar-height + $item-spacing;
+	}
+}
+
+.editor-visual-editor__block-controls + div {
+	margin-top: -20px;
+
+	// prevent collapsing margins between the block and the toolbar
+	&:before {
+		content: "";
+		display: table;
+		clear: both;
+	}
 }
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
-	margin-right: 10px;
+	margin-right: $item-spacing;
 }
 
 .editor-visual-editor__block-controls .editor-block-switcher {
@@ -84,5 +110,5 @@
 }
 
 .editor-visual-editor .editor-inserter {
-	margin: $item-spacing;
+	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
 }

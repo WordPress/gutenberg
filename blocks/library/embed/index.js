@@ -1,16 +1,31 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
 import Button from 'components/button';
+import Placeholder from 'components/placeholder';
 
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
 
 const { attr, children } = query;
+
+/**
+ * Returns an attribute setter with behavior that if the target value is
+ * already the assigned attribute value, it will be set to undefined.
+ *
+ * @param  {string}   align Alignment value
+ * @return {Function}       Attribute setter
+ */
+function toggleAlignment( align ) {
+	return ( attributes, setAttributes ) => {
+		const nextAlign = attributes.align === align ? undefined : align;
+		setAttributes( { align: nextAlign } );
+	};
+}
 
 registerBlock( 'core/embed', {
 	title: wp.i18n.__( 'Embed' ),
@@ -22,7 +37,41 @@ registerBlock( 'core/embed', {
 	attributes: {
 		url: attr( 'iframe', 'src' ),
 		title: attr( 'iframe', 'title' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
+	},
+
+	controls: [
+		{
+			icon: 'align-left',
+			title: wp.i18n.__( 'Align left' ),
+			isActive: ( { align } ) => 'left' === align,
+			onClick: toggleAlignment( 'left' ),
+		},
+		{
+			icon: 'align-center',
+			title: wp.i18n.__( 'Align center' ),
+			isActive: ( { align } ) => ! align || 'center' === align,
+			onClick: toggleAlignment( 'center' ),
+		},
+		{
+			icon: 'align-right',
+			title: wp.i18n.__( 'Align right' ),
+			isActive: ( { align } ) => 'right' === align,
+			onClick: toggleAlignment( 'right' ),
+		},
+		{
+			icon: 'align-full-width',
+			title: wp.i18n.__( 'Wide width' ),
+			isActive: ( { align } ) => 'wide' === align,
+			onClick: toggleAlignment( 'wide' ),
+		},
+	],
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align ) {
+			return { 'data-align': align };
+		}
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
@@ -30,23 +79,17 @@ registerBlock( 'core/embed', {
 
 		if ( ! url ) {
 			return (
-				<div className="blocks-embed is-placeholder">
-					<div className="placeholder__label">
-						<Dashicon icon="cloud" />
-						{ wp.i18n.__( 'Embed URL' ) }
-					</div>
-					<div className="placeholder__fieldset">
-						<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
-						<Button isLarge>
-							{ wp.i18n.__( 'Embed' ) }
-						</Button>
-					</div>
-				</div>
+				<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
+					<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
+					<Button isLarge>
+						{ wp.i18n.__( 'Embed' ) }
+					</Button>
+				</Placeholder>
 			);
 		}
 
 		return (
-			<figure>
+			<figure className="blocks-embed">
 				<div className="iframe-overlay">
 					<iframe src={ url } title={ title } />
 				</div>
@@ -59,6 +102,7 @@ registerBlock( 'core/embed', {
 						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						inline
+						inlineToolbar
 					/>
 				) : null }
 			</figure>
@@ -79,5 +123,5 @@ registerBlock( 'core/embed', {
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
-	}
+	},
 } );

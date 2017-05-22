@@ -22,7 +22,7 @@ export function createEditorInstance( id, post ) {
 	store.dispatch( {
 		type: 'RESET_BLOCKS',
 		post,
-		blocks: wp.blocks.parse( post.content.raw )
+		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
 	wp.element.render(

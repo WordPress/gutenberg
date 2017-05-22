@@ -29,14 +29,14 @@ function applyOrUnset( align ) {
 registerBlock( 'core/button', {
 	title: wp.i18n.__( 'Button' ),
 
-	icon: 'marker',
+	icon: 'button',
 
 	category: 'layout',
 
 	attributes: {
 		url: attr( 'a', 'href' ),
 		title: attr( 'a', 'title' ),
-		text: children( 'a' )
+		text: children( 'a' ),
 	},
 
 	controls: [
@@ -44,20 +44,20 @@ registerBlock( 'core/button', {
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' )
+			onClick: applyOrUnset( 'left' ),
 		},
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
 			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' )
+			onClick: applyOrUnset( 'center' ),
 		},
 		{
 			icon: 'align-right',
 			title: wp.i18n.__( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' )
-		}
+			onClick: applyOrUnset( 'right' ),
+		},
 	],
 
 	getEditWrapperProps( attributes ) {
@@ -74,11 +74,14 @@ registerBlock( 'core/button', {
 			<span className="blocks-button" title={ title }>
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write some text…' ) }
+					placeholder={ wp.i18n.__( 'Write label…' ) }
 					value={ text }
+					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					inline
+					inlineToolbar
+					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&
 					<form
@@ -109,5 +112,5 @@ registerBlock( 'core/button', {
 				</a>
 			</div>
 		);
-	}
+	},
 } );

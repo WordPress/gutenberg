@@ -26,7 +26,7 @@ registerBlock( 'core/pullquote', {
 					value={ value || wp.i18n.__( 'Write Quote…' ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue
+							value: nextValue,
 						} )
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
@@ -38,7 +38,7 @@ registerBlock( 'core/pullquote', {
 						value={ citation || wp.i18n.__( 'Write caption…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
-								citation: nextCitation
+								citation: nextCitation,
 							} )
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
@@ -64,5 +64,5 @@ registerBlock( 'core/pullquote', {
 				) }
 			</blockquote>
 		);
-	}
+	},
 } );

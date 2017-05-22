@@ -4,6 +4,7 @@
 import { createElement, Component, cloneElement, Children } from 'react';
 import { render } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { isString } from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -81,7 +82,7 @@ export function concatChildren( ...childrens ) {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
-					key: [ i, j ].join()
+					key: [ i, j ].join(),
 				} );
 			}
 
@@ -91,3 +92,21 @@ export function concatChildren( ...childrens ) {
 		return memo;
 	}, [] );
 }
+
+/**
+ * Switches the nodeName of all the elements in the children object
+ *
+ * @param  {?Object} children  Children object
+ * @param  {String}  nodeName  Node name
+ * @return {?Object}           The updated children object
+ */
+export function switchChildrenNodeName( children, nodeName ) {
+	return children && Children.map( children, ( elt, index ) => {
+		if ( isString( elt ) ) {
+			return createElement( nodeName, { key: index }, elt );
+		}
+		const { children: childrenProp, ...props } = elt.props;
+		return createElement( nodeName, { key: index, ...props }, childrenProp );
+	} );
+}
+

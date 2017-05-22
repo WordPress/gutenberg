@@ -1,8 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { switchChildrenNodeName } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlock, createBlock, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
@@ -14,7 +19,7 @@ registerBlock( 'core/quote', {
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),
-		citation: children( 'footer' )
+		citation: children( 'footer' ),
 	},
 
 	controls: [ 1, 2 ].map( ( variation ) => ( {
@@ -24,7 +29,7 @@ registerBlock( 'core/quote', {
 		onClick( attributes, setAttributes ) {
 			setAttributes( { style: variation } );
 		},
-		subscript: variation
+		subscript: variation,
 	} ) ),
 
 	transforms: {
@@ -33,76 +38,79 @@ registerBlock( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/quote',
-						attributes: {
-							value: content
-						}
-					};
-				}
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: switchChildrenNodeName( values, 'p' ),
+					} );
+				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
-					return {
-						blockType: 'core/quote',
-						attributes: {
-							value: content
-						}
-					};
-				}
-			}
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
 		],
 		to: [
 			{
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
-					return {
-						blockType: 'core/text',
-						attributes: {
-							content: wp.element.concatChildren( value, citation )
-						}
-					};
-				}
+					return createBlock( 'core/text', {
+						content: wp.element.concatChildren( value, citation ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/list' ],
+				transform: ( { value, citation } ) => {
+					const valueElements = switchChildrenNodeName( value, 'li' );
+					const values = citation
+						? wp.element.concatChildren( valueElements, <li>{ citation }</li> )
+						: valueElements;
+					return createBlock( 'core/list', {
+						nodeName: 'ul',
+						values,
+					} );
+				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
 					if ( Array.isArray( value ) || citation ) {
-						const heading = {
-							blockType: 'core/heading',
-							attributes: {
-								nodeName: 'H2',
-								content: Array.isArray( value ) ? value[ 0 ] : value
-							}
-						};
-						const quote = {
-							blockType: 'core/quote',
-							attributes: {
-								...attrs,
-								citation,
-								value: Array.isArray( value ) ? value.slice( 1 ) : ''
-							}
-						};
+						const heading = createBlock( 'core/heading', {
+							content: Array.isArray( value ) ? value[ 0 ] : value,
+						} );
+						const quote = createBlock( 'core/quote', {
+							...attrs,
+							citation,
+							value: Array.isArray( value ) ? value.slice( 1 ) : '',
+						} );
 
 						return [ heading, quote ];
 					}
-					return {
-						blockType: 'core/heading',
-						attributes: {
-							nodeName: 'H2',
-							content: value
-						}
-					};
-				}
-			}
-		]
+					return createBlock( 'core/heading', {
+						content: value,
+					} );
+				},
+			},
+		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeWithPrevious } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
 		const { value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -112,21 +120,22 @@ registerBlock( 'core/quote', {
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: nextValue
+							value: nextValue,
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ () => setFocus( { editable: 'value' } ) }
-					onMerge={ mergeWithPrevious }
+					onMerge={ mergeBlocks }
 					showAlignments
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
+						placeholder={ wp.i18n.__( '— Add citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
-								citation: nextCitation
+								citation: nextCitation,
 							} )
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
@@ -151,5 +160,5 @@ registerBlock( 'core/quote', {
 				) }
 			</blockquote>
 		);
-	}
+	},
 } );

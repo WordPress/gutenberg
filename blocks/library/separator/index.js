@@ -17,5 +17,5 @@ registerBlock( 'core/separator', {
 
 	save() {
 		return <hr />;
-	}
+	},
 } );

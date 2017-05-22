@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import tinymce from 'tinymce';
+
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
 		this.initialize();
@@ -11,6 +16,14 @@ export default class TinyMCE extends wp.element.Component {
 		return false;
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		const isEmpty = String( nextProps.isEmpty );
+
+		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
+			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
+		}
+	}
+
 	componentWillUnmount() {
 		if ( ! this.editor ) {
 			return;
@@ -21,25 +34,27 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	initialize() {
-		const { settings, focus } = this.props;
+		const { focus } = this.props;
 
-		tinymce.init( {
-			target: this.editorNode,
+		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
 			toolbar: false,
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
-			plugins: [ 'table' ],
+			formats: {
+				strikethrough: { inline: 'del' },
+			},
+		} );
+
+		tinymce.init( {
+			...settings,
+			target: this.editorNode,
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
 			},
-			formats: {
-				strikethrough: { inline: 'del' }
-			},
-			...settings
 		} );
 
 		if ( focus ) {
@@ -48,7 +63,7 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue } = this.props;
+		const { tagName = 'div', style, defaultValue, placeholder } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -63,7 +78,8 @@ export default class TinyMCE extends wp.element.Component {
 			contentEditable: true,
 			suppressContentEditableWarning: true,
 			className: 'blocks-editable__tinymce',
-			style
+			style,
+			'data-placeholder': placeholder,
 		}, children );
 	}
 }

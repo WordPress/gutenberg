@@ -17,13 +17,19 @@ import Toolbar from 'components/toolbar';
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
 import {
+	deselectBlock,
+	focusBlock,
+	mergeBlocks,
+} from '../../actions';
+import {
 	getPreviousBlock,
+	getNextBlock,
 	getBlock,
 	getBlockFocus,
 	getBlockOrder,
 	isBlockHovered,
 	isBlockSelected,
-	isTypingInBlock
+	isTypingInBlock,
 } from '../../selectors';
 
 class VisualEditorBlock extends wp.element.Component {
@@ -31,11 +37,11 @@ class VisualEditorBlock extends wp.element.Component {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
-		this.maybeDeselect = this.maybeDeselect.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.removeOnBackspace = this.removeOnBackspace.bind( this );
-		this.mergeWithPrevious = this.mergeWithPrevious.bind( this );
+		this.removeOrDeselect = this.removeOrDeselect.bind( this );
+		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -58,8 +64,8 @@ class VisualEditorBlock extends wp.element.Component {
 		onChange( block.uid, {
 			attributes: {
 				...block.attributes,
-				...attributes
-			}
+				...attributes,
+			},
 		} );
 	}
 
@@ -67,14 +73,6 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isTyping, isHovered, onHover } = this.props;
 		if ( isTyping && ! isHovered ) {
 			onHover();
-		}
-	}
-
-	maybeDeselect( event ) {
-		// Annoyingly React does not support focusOut and we're forced to check
-		// related target to ensure it's not a child when blur fires.
-		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
-			this.props.onDeselect();
 		}
 	}
 
@@ -90,60 +88,47 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	removeOnBackspace( event ) {
+	removeOrDeselect( event ) {
 		const { keyCode, target } = event;
+
+		// Remove block on backspace
 		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
 			this.props.onRemove( this.props.uid );
 			if ( this.props.previousBlock ) {
 				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
 			}
 		}
+
+		// Deselect on escape
+		if ( 27 /* Escape */ === event.keyCode ) {
+			this.props.onDeselect();
+		}
 	}
 
-	mergeWithPrevious() {
-		const { block, previousBlock, onFocus, replaceBlocks } = this.props;
+	mergeBlocks( forward = false ) {
+		const { block, previousBlock, nextBlock, onMerge } = this.props;
 
 		// Do nothing when it's the first block
-		if ( ! previousBlock ) {
+		if (
+			( ! forward && ! previousBlock ) ||
+			( forward && ! nextBlock )
+		) {
 			return;
 		}
 
-		const previousBlockSettings = wp.blocks.getBlockSettings( previousBlock.blockType );
-
-		// Do nothing if the previous block is not mergeable
-		if ( ! previousBlockSettings.merge ) {
-			onFocus( previousBlock.uid );
-			return;
+		if ( forward ) {
+			onMerge( block, nextBlock );
+		} else {
+			onMerge( previousBlock, block );
 		}
+	}
 
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blocksWithTheSameType = previousBlock.blockType === block.blockType
-			? [ block ]
-			: wp.blocks.switchToBlockType( block, previousBlock.blockType );
+	selectAndStopPropagation( event ) {
+		this.props.onSelect();
 
-		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			return;
-		}
-
-		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = previousBlockSettings.merge( previousBlock.attributes, blocksWithTheSameType[ 0 ].attributes );
-
-		onFocus( previousBlock.uid, { offset: -1 } );
-		replaceBlocks(
-			[ previousBlock.uid, block.uid ],
-			[
-				{
-					...previousBlock,
-					attributes: {
-						...previousBlock.attributes,
-						...updatedAttributes
-					}
-				},
-				...blocksWithTheSameType.slice( 1 )
-			]
-		);
+		// Visual editor infers click as intent to clear the selected block, so
+		// prevent bubbling when occurring on block where selection is intended
+		event.stopPropagation();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -157,6 +142,12 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Focus node when focus state is programmatically transferred
 		if ( this.props.focus && ! prevProps.focus ) {
+			this.node.focus();
+		}
+	}
+
+	componentDidMount() {
+		if ( this.props.focus ) {
 			this.node.focus();
 		}
 	}
@@ -177,7 +168,7 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isHovered, isSelected, isTyping, focus } = this.props;
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': isSelected && ! isTyping,
-			'is-hovered': isHovered
+			'is-hovered': isHovered,
 		} );
 
 		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
@@ -194,10 +185,9 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onClick={ onSelect }
+				onClick={ this.selectAndStopPropagation }
 				onFocus={ onSelect }
-				onBlur={ this.maybeDeselect }
-				onKeyDown={ this.removeOnBackspace }
+				onKeyDown={ this.removeOrDeselect }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
@@ -215,25 +205,25 @@ class VisualEditorBlock extends wp.element.Component {
 								controls={ settings.controls.map( ( control ) => ( {
 									...control,
 									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: control.isActive( block.attributes )
+									isActive: control.isActive ? control.isActive( block.attributes ) : false,
 								} ) ) } />
 						) }
 						<Slot name="Formatting.Toolbar" />
 					</div>
 				}
-				<div onKeyDown={ this.maybeStartTyping }>
+				<div onKeyPress={ this.maybeStartTyping }>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
 						setAttributes={ this.setAttributes }
 						insertBlockAfter={ onInsertAfter }
 						setFocus={ partial( onFocus, block.uid ) }
-						mergeWithPrevious={ this.mergeWithPrevious }
+						mergeBlocks={ this.mergeBlocks }
 					/>
 				</div>
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
@@ -241,12 +231,13 @@ export default connect(
 	( state, ownProps ) => {
 		return {
 			previousBlock: getPreviousBlock( state, ownProps.uid ),
+			nextBlock: getNextBlock( state, ownProps.uid ),
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
-			order: getBlockOrder( state, ownProps.uid )
+			order: getBlockOrder( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -254,41 +245,37 @@ export default connect(
 			dispatch( {
 				type: 'UPDATE_BLOCK',
 				uid,
-				updates
+				updates,
 			} );
 		},
 		onSelect() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_SELECTED',
 				selected: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onDeselect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: false,
-				uid: ownProps.uid
-			} );
+			dispatch( deselectBlock( ownProps.uid ) );
 		},
 		onStartTyping() {
 			dispatch( {
 				type: 'START_TYPING',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: true,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMouseLeave() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
 				hovered: false,
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 
@@ -296,31 +283,23 @@ export default connect(
 			dispatch( {
 				type: 'INSERT_BLOCK',
 				after: ownProps.uid,
-				block
+				block,
 			} );
 		},
 
-		onFocus( uid, config ) {
-			dispatch( {
-				type: 'UPDATE_FOCUS',
-				uid,
-				config
-			} );
+		onFocus( ...args ) {
+			dispatch( focusBlock( ...args ) );
 		},
 
 		onRemove( uid ) {
 			dispatch( {
 				type: 'REMOVE_BLOCK',
-				uid
+				uid,
 			} );
 		},
 
-		replaceBlocks( uids, blocks ) {
-			dispatch( {
-				type: 'REPLACE_BLOCKS',
-				uids,
-				blocks
-			} );
-		}
+		onMerge( ...args ) {
+			mergeBlocks( dispatch, ...args );
+		},
 	} )
 )( VisualEditorBlock );

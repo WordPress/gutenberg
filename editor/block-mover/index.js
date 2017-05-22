@@ -15,19 +15,24 @@ import './style.scss';
 import { isFirstBlock, isLastBlock } from '../selectors';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
+	// We emulate a disabled state because forcefully applying the `disabled`
+	// attribute on the button while it has focus causes the screen to change
+	// to an unfocused state (body as active element) without firing blur on,
+	// the rendering parent, leaving it unable to react to focus out.
+
 	return (
 		<div className="editor-block-mover">
 			<IconButton
 				className="editor-block-mover__control"
-				onClick={ onMoveUp }
+				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
-				disabled={ isFirst }
+				aria-disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
-				onClick={ onMoveDown }
+				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
-				disabled={ isLast }
+				aria-disabled={ isLast }
 			/>
 		</div>
 	);
@@ -36,20 +41,20 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 export default connect(
 	( state, ownProps ) => ( {
 		isFirst: isFirstBlock( state, ownProps.uid ),
-		isLast: isLastBlock( state, ownProps.uid )
+		isLast: isLastBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			dispatch( {
 				type: 'MOVE_BLOCK_DOWN',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
 		},
 		onMoveUp() {
 			dispatch( {
 				type: 'MOVE_BLOCK_UP',
-				uid: ownProps.uid
+				uid: ownProps.uid,
 			} );
-		}
+		},
 	} )
 )( BlockMover );

@@ -21,17 +21,17 @@ describe( 'block factory', () => {
 		it( 'should create a block given its blockType and attributes', () => {
 			registerBlock( 'core/test-block', {
 				defaultAttributes: {
-					includesDefault: true
-				}
+					includesDefault: true,
+				},
 			} );
 			const block = createBlock( 'core/test-block', {
-				align: 'left'
+				align: 'left',
 			} );
 
 			expect( block.blockType ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {
 				includesDefault: true,
-				align: 'left'
+				align: 'left',
 			} );
 			expect( block.uid ).to.be.a( 'string' );
 		} );
@@ -44,15 +44,12 @@ describe( 'block factory', () => {
 					from: [ {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/updated-text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
-						}
-					} ]
-				}
+							return createBlock( 'core/updated-text-block', {
+								value: 'chicken ' + value,
+							} );
+						},
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -60,8 +57,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -70,8 +67,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
-					value: 'chicken ribs'
-				}
+					value: 'chicken ribs',
+				},
 			} ] );
 		} );
 
@@ -82,23 +79,20 @@ describe( 'block factory', () => {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/updated-text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
-						}
-					} ]
-				}
+							return createBlock( 'core/updated-text-block', {
+								value: 'chicken ' + value,
+							} );
+						},
+					} ],
+				},
 			} );
 
 			const block = {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -107,8 +101,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
-					value: 'chicken ribs'
-				}
+					value: 'chicken ribs',
+				},
 			} ] );
 		} );
 
@@ -120,8 +114,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -134,9 +128,9 @@ describe( 'block factory', () => {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
-						transform: () => null
-					} ]
-				}
+						transform: () => null,
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -144,8 +138,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -158,9 +152,9 @@ describe( 'block factory', () => {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
-						transform: () => []
-					} ]
-				}
+						transform: () => [],
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -168,8 +162,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -185,12 +179,12 @@ describe( 'block factory', () => {
 						transform: ( { value } ) => {
 							return {
 								attributes: {
-									value: 'chicken ' + value
-								}
+									value: 'chicken ' + value,
+								},
 							};
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -198,8 +192,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -214,20 +208,18 @@ describe( 'block factory', () => {
 						blocks: [ 'core/text-block' ],
 						transform: ( { value } ) => {
 							return [
+								createBlock( 'core/updated-text-block', {
+									value: 'chicken ' + value,
+								} ),
 								{
-									blockType: 'core/updated-text-block',
 									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
-									attributes: {
-										value: 'smoked ' + value
-									}
-								}
+										value: 'smoked ' + value,
+									},
+								},
 							];
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 			registerBlock( 'core/text-block', {} );
 
@@ -235,8 +227,8 @@ describe( 'block factory', () => {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -251,23 +243,20 @@ describe( 'block factory', () => {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
-							return {
-								blockType: 'core/text-block',
-								attributes: {
-									value: 'chicken ' + value
-								}
-							};
-						}
-					} ]
-				}
+							return createBlock( 'core/text-block', {
+								value: 'chicken ' + value,
+							} );
+						},
+					} ],
+				},
 			} );
 
 			const block = {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -283,29 +272,24 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [
-								{
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'smoked ' + value
-									}
-								}
+								createBlock( 'core/text-block', {
+									value: 'chicken ' + value,
+								} ),
+								createBlock( 'core/text-block', {
+									value: 'smoked ' + value,
+								} ),
 							];
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 
 			const block = {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -321,29 +305,24 @@ describe( 'block factory', () => {
 						blocks: [ 'core/updated-text-block' ],
 						transform: ( { value } ) => {
 							return [
-								{
-									blockType: 'core/text-block',
-									attributes: {
-										value: 'chicken ' + value
-									}
-								}, {
-									blockType: 'core/updated-text-block',
-									attributes: {
-										value: 'smoked ' + value
-									}
-								}
+								createBlock( 'core/text-block', {
+									value: 'chicken ' + value,
+								} ),
+								createBlock( 'core/updated-text-block', {
+									value: 'smoked ' + value,
+								} ),
 							];
-						}
-					} ]
-				}
+						},
+					} ],
+				},
 			} );
 
 			const block = {
 				uid: 1,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'ribs'
-				}
+					value: 'ribs',
+				},
 			};
 
 			const updatedBlock = switchToBlockType( block, 'core/updated-text-block' );
@@ -360,14 +339,14 @@ describe( 'block factory', () => {
 				uid: 2,
 				blockType: 'core/text-block',
 				attributes: {
-					value: 'chicken ribs'
-				}
+					value: 'chicken ribs',
+				},
 			}, {
 				uid: 1,
 				blockType: 'core/updated-text-block',
 				attributes: {
-					value: 'smoked ribs'
-				}
+					value: 'smoked ribs',
+				},
 			} ] );
 		} );
 	} );

@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
-import Button from 'components/button';
+import Placeholder from 'components/placeholder';
 
 /**
  * Internal dependencies
@@ -10,6 +9,7 @@ import Button from 'components/button';
 import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
+import MediaUploadButton from '../../media-upload-button';
 
 const { attr, children } = query;
 
@@ -37,7 +37,7 @@ registerBlock( 'core/image', {
 	attributes: {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' )
+		caption: children( 'figcaption' ),
 	},
 
 	controls: [
@@ -45,26 +45,26 @@ registerBlock( 'core/image', {
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' )
+			onClick: toggleAlignment( 'left' ),
 		},
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: toggleAlignment( 'center' )
+			isActive: ( { align } ) => ! align || 'center' === align,
+			onClick: toggleAlignment( 'center' ),
 		},
 		{
 			icon: 'align-right',
 			title: wp.i18n.__( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' )
+			onClick: toggleAlignment( 'right' ),
 		},
 		{
 			icon: 'align-full-width',
 			title: wp.i18n.__( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' )
-		}
+			onClick: toggleAlignment( 'wide' ),
+		},
 	],
 
 	getEditWrapperProps( attributes ) {
@@ -78,27 +78,34 @@ registerBlock( 'core/image', {
 		const { url, alt, caption } = attributes;
 
 		if ( ! url ) {
+			const uploadButtonProps = { isLarge: true };
+			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
 			return (
-				<div className="blocks-image is-placeholder">
-					<div className="placeholder__label">
-						<Dashicon icon="format-image" />
-						{ wp.i18n.__( 'Image' ) }
-					</div>
-					<div className="placeholder__instructions">
-						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
-					</div>
-					<Button isLarge>
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					icon="format-image"
+					label={ wp.i18n.__( 'Image' ) }
+					className="blocks-image">
+					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
+						onSelect={ setMediaUrl }
+						type="image"
+						auto-open
+					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
-					</Button>
-				</div>
+					</MediaUploadButton>
+				</Placeholder>
 			);
 		}
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
+		// Disable reason: Each block can be selected by clicking on it
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<figure className="blocks-image">
-				<img src={ url } alt={ alt } />
+				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
@@ -113,6 +120,7 @@ registerBlock( 'core/image', {
 				) : null }
 			</figure>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 
 	save( { attributes } ) {
@@ -129,5 +137,5 @@ registerBlock( 'core/image', {
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
-	}
+	},
 } );

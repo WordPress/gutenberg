@@ -76,7 +76,7 @@ export default function serialize( blocks ) {
 		const saveContent = getSaveContent( settings.save, block.attributes );
 		const beautifyOptions = {
 			indent_inner_html: true,
-			wrap_line_length: 0
+			wrap_line_length: 0,
 		};
 
 		return memo + (

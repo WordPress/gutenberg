@@ -11,40 +11,41 @@ const config = {
 		i18n: './i18n/index.js',
 		blocks: './blocks/index.js',
 		editor: './editor/index.js',
-		element: './element/index.js'
+		element: './element/index.js',
 	},
 	output: {
 		filename: '[name]/build/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'this'
+		libraryTarget: 'this',
 	},
 	externals: {
 		react: 'React',
 		'react-dom': 'ReactDOM',
-		'react-dom/server': 'ReactDOMServer'
+		'react-dom/server': 'ReactDOMServer',
+		tinymce: 'tinymce',
 	},
 	resolve: {
 		modules: [
 			__dirname,
-			'node_modules'
+			'node_modules',
 		],
 		alias: {
 			// There are currently resolution errors on RSF's "mitt" dependency
 			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js'
-		}
+			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
+		},
 	},
 	module: {
 		rules: [
 			{
 				test: /\.pegjs/,
-				use: 'pegjs-loader'
+				use: 'pegjs-loader',
 			},
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				use: 'babel-loader'
+				use: 'babel-loader',
 			},
 			{
 				test: /\.s?css$/,
@@ -56,33 +57,36 @@ const config = {
 							loader: 'sass-loader',
 							query: {
 								includePaths: [ 'editor/assets/stylesheets' ],
-								data: '@import "variables"; @import "mixins"; @import "animations";',
+								data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 								outputStyle: 'production' === process.env.NODE_ENV ?
-									'compressed' : 'nested'
-							}
-						}
-					]
-				} )
-			}
-		]
+									'compressed' : 'nested',
+							},
+						},
+					],
+				} ),
+			},
+		],
 	},
 	plugins: [
+		new webpack.DefinePlugin( {
+			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
+		} ),
 		new ExtractTextPlugin( {
-			filename: './[name]/build/style.css'
+			filename: './[name]/build/style.css',
 		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
 			options: {
 				postcss: [
-					require( 'autoprefixer' )
-				]
-			}
-		} )
+					require( 'autoprefixer' ),
+				],
+			},
+		} ),
 	],
 	stats: {
-		children: false
-	}
+		children: false,
+	},
 };
 
 switch ( process.env.NODE_ENV ) {
@@ -95,21 +99,21 @@ switch ( process.env.NODE_ENV ) {
 		config.module.rules = [
 			...[ 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
-				use: 'expose-loader?wp.' + entry
+				use: 'expose-loader?wp.' + entry,
 			} ) ),
-			...config.module.rules
+			...config.module.rules,
 		];
 		config.entry = [
 			'./i18n/index.js',
 			'./element/index.js',
 			'./blocks/index.js',
 			'./editor/index.js',
-			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` )
+			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` ),
 		];
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
-			path: __dirname
+			path: __dirname,
 		};
 		config.plugins.push( new webpack.ProvidePlugin( {
 			tinymce: 'tinymce/tinymce',

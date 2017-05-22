@@ -4,16 +4,19 @@ require( 'chai' )
 	.use( require( 'sinon-chai' ) );
 
 // Fake DOM
-global.document = require( 'jsdom' ).jsdom( '', {
+const { JSDOM } = require( 'jsdom' );
+const dom = new JSDOM( '', {
 	features: {
 		FetchExternalResources: false,
 		ProcessExternalResources: false,
-		SkipExternalResources: true
-	}
+		SkipExternalResources: true,
+	},
 } );
-global.window = document.defaultView;
-global.requestAnimationFrame = setTimeout;
-global.navigator = window.navigator;
+
+global.window = dom.window;
+global.document = dom.window.document;
+global.navigator = dom.window.navigator;
+global.requestAnimationFrame = window.setTimeout;
 
 // These are necessary to load TinyMCE successfully
 global.URL = window.URL;

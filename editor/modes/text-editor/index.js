@@ -46,14 +46,14 @@ function TextEditor( { blocks, onChange } ) {
 
 export default connect(
 	( state ) => ( {
-		blocks: getBlocks( state )
+		blocks: getBlocks( state ),
 	} ),
 	( dispatch ) => ( {
 		onChange( value ) {
 			dispatch( {
 				type: 'RESET_BLOCKS',
-				blocks: wp.blocks.parse( value )
+				blocks: wp.blocks.parse( value ),
 			} );
-		}
+		},
 	} )
 )( TextEditor );
