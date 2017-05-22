@@ -172,6 +172,12 @@ function gutenberg_register_scripts() {
 		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
 		array( 'react' )
 	);
+	$moment_script = SCRIPT_DEBUG ? 'min/moment.min.js' : 'moment.js';
+	gutenberg_register_vendor_script(
+		'moment',
+		'https://unpkg.com/moment@2.18.1/' . $moment_script,
+		array( 'react' )
+	);
 
 	// Editor Scripts.
 	gutenberg_register_vendor_script(
@@ -183,6 +189,36 @@ function gutenberg_register_scripts() {
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
 	);
+	wp_register_script(
+		'wp-date',
+		plugins_url( 'date/build/index.js', __FILE__ ),
+		array( 'moment' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'date/build/index.js' )
+	);
+	global $wp_locale;
+	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
+		'l10n' => array(
+			'locale'        => get_locale(),
+			'months'        => array_values( $wp_locale->month ),
+			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+			'weekdays'      => array_values( $wp_locale->weekday ),
+			'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+			'meridiem'      => (object) $wp_locale->meridiem,
+			'relative' => array(
+				'future' => __( '%s from now' ),
+				'past'   => __( '%s ago' ),
+			),
+		),
+		'formats' => array(
+			'time'     => get_option( 'time_format', __( 'g:i a' ) ),
+			'date'     => get_option( 'date_format', __( 'F j, Y' ) ),
+			'datetime' => __( 'F j, Y g:i a' ),
+		),
+		'timezone' => array(
+			'offset' => get_option( 'gmt_offset', 0 ),
+			'string' => get_option( 'timezone_string', 'UTC' ),
+		),
+	) ), 'before' );
 	wp_register_script(
 		'wp-i18n',
 		plugins_url( 'i18n/build/index.js', __FILE__ ),
@@ -435,7 +471,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-api', 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);

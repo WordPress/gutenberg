@@ -12,6 +12,7 @@ import moment from 'moment';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+import { dateI18n, settings } from 'date';
 
 /**
  * Internal dependencies
@@ -41,12 +42,12 @@ class PostSchedule extends Component {
 
 	render() {
 		const { date, onUpdateDate } = this.props;
-		const momentDate = date ? moment( date + '+0000', 'YYYY-MM-DDTHH:mm:ssZ' ) : date;
+		const momentDate = date ? moment( date ) : date;
 		const label = momentDate
-			? momentDate.format( 'LL, LT' )
+			? dateI18n( settings.formats.datetime, date )
 			: __( 'Immediately' );
 		const handleChange = ( newDate ) => {
-			onUpdateDate( newDate.utc( 0 ).format() );
+			onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
 		};
 		return (
 			<div className="editor-post-schedule">
@@ -62,6 +63,7 @@ class PostSchedule extends Component {
 							inline
 							selected={ momentDate }
 							onChange={ handleChange }
+							locale={ settings.l10n.locale }
 						/>
 						<PostScheduleClock
 							selected={ momentDate }
@@ -77,13 +79,13 @@ class PostSchedule extends Component {
 export default connect(
 	( state ) => {
 		return {
-			date: getEditedPostAttribute( state, 'date_gmt' ),
+			date: getEditedPostAttribute( state, 'date' ),
 		};
 	},
 	( dispatch ) => {
 		return {
-			onUpdateDate( dateGmt ) {
-				dispatch( editPost( { date_gmt: dateGmt } ) );
+			onUpdateDate( date ) {
+				dispatch( editPost( { date } ) );
 			},
 		};
 	}
