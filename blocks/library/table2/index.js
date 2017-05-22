@@ -16,7 +16,7 @@ function execCommand( command ) {
 }
 
 registerBlock( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: wp.i18n.__( 'Table2' ),
 	icon: 'editor-table',
 	category: 'common',
 
