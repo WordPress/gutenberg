@@ -10,3 +10,4 @@ import './button';
 import './pullquote';
 import './table';
 import './preformatted';
+import './code';
