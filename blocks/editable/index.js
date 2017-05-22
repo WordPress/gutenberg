@@ -67,7 +67,7 @@ export default class Editable extends wp.element.Component {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
-		this.onConfig = this.onConfig.bind( this );
+		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
@@ -85,8 +85,8 @@ export default class Editable extends wp.element.Component {
 		};
 	}
 
-	onConfig( settings ) {
-		return ( this.props.onConfig || identity )( {
+	getSettings( settings ) {
+		return ( this.props.getSettings || identity )( {
 			...settings,
 			forced_root_block: this.props.inline ? false : 'p',
 		} );
@@ -449,7 +449,7 @@ export default class Editable extends wp.element.Component {
 
 				<TinyMCE
 					tagName={ tagName }
-					onConfig={ this.onConfig }
+					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }

@@ -112,7 +112,7 @@ registerBlock( 'core/list', {
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
-				onConfig={ ( settings ) => ( {
+				getSettings={ ( settings ) => ( {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'lists' ),
 					lists_indent_on_tab: false,

@@ -36,7 +36,7 @@ export default class TinyMCE extends wp.element.Component {
 	initialize() {
 		const { focus } = this.props;
 
-		const settings = this.props.onConfig( {
+		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
 			toolbar: false,
