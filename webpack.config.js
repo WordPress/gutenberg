@@ -8,6 +8,7 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 const config = {
 	entry: {
+		date: './date/index.js',
 		i18n: './i18n/index.js',
 		blocks: './blocks/index.js',
 		editor: './editor/index.js',
@@ -24,6 +25,7 @@ const config = {
 		'react-dom': 'ReactDOM',
 		'react-dom/server': 'ReactDOMServer',
 		tinymce: 'tinymce',
+		moment: 'moment',
 	},
 	resolve: {
 		modules: [
@@ -97,13 +99,14 @@ switch ( process.env.NODE_ENV ) {
 	case 'test':
 		config.target = 'node';
 		config.module.rules = [
-			...[ 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
+			...[ 'date', 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
 				use: 'expose-loader?wp.' + entry,
 			} ) ),
 			...config.module.rules,
 		];
 		config.entry = [
+			'./date/index.js',
 			'./i18n/index.js',
 			'./element/index.js',
 			'./blocks/index.js',
