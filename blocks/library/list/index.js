@@ -31,7 +31,7 @@ function listSetType( listType, editorCommand ) {
 	return ( { internalListType, editor }, setAttributes ) => {
 		if ( internalListType ) {
 			// only change list types, don't toggle off internal lists
-			if ( internalListType !== listType )	{
+			if ( internalListType !== listType ) {
 				if ( editor ) {
 					editor.execCommand( editorCommand );
 				}
@@ -123,7 +123,7 @@ registerBlock( 'core/list', {
 						setAttributes( { internalListType: findInternalListType( nodeInfo ) } );
 					} );
 					setAttributes( { editor } );
-				}	}
+				} }
 				onChange={ ( nextValues ) => {
 					setAttributes( { values: nextValues } );
 				} }
