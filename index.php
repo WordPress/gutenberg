@@ -205,7 +205,9 @@ function gutenberg_register_scripts() {
 			'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
 			'meridiem'      => (object) $wp_locale->meridiem,
 			'relative' => array(
+				/* translators: %s: duration */
 				'future' => __( '%s from now' ),
+				/* translators: %s: duration */
 				'past'   => __( '%s ago' ),
 			),
 		),
