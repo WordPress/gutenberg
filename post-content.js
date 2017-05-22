@@ -140,7 +140,7 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/code -->',
 			'<pre><code>export default function MyButton() {\n\
 	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
-}\n</code></pre>',
+}</code></pre>',
 			'<!-- /wp:core/code -->',
 
 		].join( '' ),
