@@ -285,10 +285,6 @@ export default class Editable extends wp.element.Component {
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
 		this.setState( { alignment, bookmark, formats, focusPosition } );
-
-		if ( this.props.onNodeChange ) {
-			this.props.onNodeChange( { element, parents } );
-		}
 	}
 
 	updateContent() {
