@@ -94,6 +94,13 @@ export function savePost( dispatch, postId, edits ) {
 	} );
 }
 
+export function trashPost( dispatch, postId ) {
+	new wp.api.models.Post( { id: postId } ).destroy().done( () => {
+		const [ baseUrl ] = window.location.href.split( '?' );
+		window.location = baseUrl + '?page=gutenberg';
+	} );
+}
+
 export function mergeBlocks( dispatch, blockA, blockB ) {
 	const blockASettings = wp.blocks.getBlockSettings( blockA.blockType );
 
