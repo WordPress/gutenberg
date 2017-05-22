@@ -213,6 +213,49 @@ function gutenberg_register_scripts() {
 add_action( 'init', 'gutenberg_register_scripts' );
 
 /**
+ * Retrieves a unique and reasonably short and human-friendly filename for a
+ * vendor script based on a URL.
+ *
+ * @param  string $src Full URL of the external script.
+ *
+ * @return string      Script filename suitable for local caching.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_vendor_script_filename( $src ) {
+	$filename = basename( $src );
+	$hash = substr( md5( $src ), 0, 8 );
+
+	$match = preg_match(
+		'/^'
+		. '(?P<prefix>.*?)'
+		. '(?P<suffix>\.min|\.development|\.production)?'
+		. '(?P<extension>\.js)'
+		. '(?P<extra>.*)'
+		. '$/',
+		$filename,
+		$filename_pieces
+	);
+
+	if ( ! $match ) {
+		return "$filename.$hash.js";
+	}
+
+	$match = preg_match(
+		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
+		$src,
+		$tinymce_plugin_pieces
+	);
+	if ( $match ) {
+		$filename_pieces['prefix'] = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
+	}
+
+	return $filename_pieces['prefix'] . $filename_pieces['suffix']
+		. '.' . $hash
+		. $filename_pieces['extension'];
+}
+
+/**
  * Registers a vendor script from a URL, preferring a locally cached version if
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
@@ -225,7 +268,7 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * @since 0.1.0
  */
 function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
-	$filename = sanitize_file_name( $src );
+	$filename = gutenberg_vendor_script_filename( $src );
 	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
 
 	$needs_fetch = (
