@@ -229,7 +229,7 @@ function gutenberg_vendor_script_filename( $src ) {
 	$match = preg_match(
 		'/^'
 		. '(?P<prefix>.*?)'
-		. '(?P<suffix>\.min|\.development|\.production)?'
+		. '(?P<suffix>\.min|\.development|\.production\.min)?'
 		. '(?P<extension>\.js)'
 		. '(?P<extra>.*)'
 		. '$/',
@@ -241,6 +241,18 @@ function gutenberg_vendor_script_filename( $src ) {
 		return "$filename.$hash.js";
 	}
 
+	switch ( $filename_pieces['suffix'] ) {
+		case '.development':
+			$suffix = '';
+			break;
+		case '.production.min':
+			$suffix = '.min';
+			break;
+		default:
+			$suffix = $filename_pieces['suffix'];
+			break;
+	}
+
 	$match = preg_match(
 		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
 		$src,
@@ -250,7 +262,7 @@ function gutenberg_vendor_script_filename( $src ) {
 		$filename_pieces['prefix'] = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
 	}
 
-	return $filename_pieces['prefix'] . $filename_pieces['suffix']
+	return $filename_pieces['prefix'] . $suffix
 		. '.' . $hash
 		. $filename_pieces['extension'];
 }
