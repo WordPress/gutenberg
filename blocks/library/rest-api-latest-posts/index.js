@@ -6,10 +6,7 @@ import Placeholder from 'components/placeholder';
 /**
  * Internal dependencies
  */
-import { registerBlock, query } from '../../api';
-import Editable from '../../editable';
-
-const { attr, children } = query;
+import { registerBlock } from '../../api';
 
 function getLatestPosts( postsToShow = 5 ) {
 	const postsCollection = new wp.api.collections.Posts();
@@ -23,16 +20,15 @@ function getLatestPosts( postsToShow = 5 ) {
 	return posts;
 }
 
-function renderList( posts ) {
-	console.log( posts );
+function renderList( latestPosts ) {
 	return (
 		<ul>
-			<li>post</li>
+			{ latestPosts.map( (post) =>
+				<li><a href={ post.link }>{ post.title.rendered }</a></li>
+			) }
 		</ul>
 	);
 }
-
-let latestPosts = null;
 
 registerBlock( 'core/rest-api-latest-posts', {
 	title: wp.i18n.__( 'Latest Posts' ),
@@ -41,11 +37,12 @@ registerBlock( 'core/rest-api-latest-posts', {
 
 	category: 'rest-api',
 
-
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		getLatestPosts().then( posts => latestPosts = posts );
+	edit( { attributes, setAttributes } ) {
+		const { latestPosts } = attributes;
 
 		if ( ! latestPosts ) {
+			getLatestPosts().then( latestPosts => setAttributes( { latestPosts } ) );
+
 			return (
 				<Placeholder
 					icon="update"
@@ -63,9 +60,11 @@ registerBlock( 'core/rest-api-latest-posts', {
 	},
 
 	save( { attributes } ) {
+		const { latestPosts } = attributes;
+
 		return (
 			<div>
-				hello
+				{ renderList( latestPosts ) }
 			</div>
 		);
 	},
