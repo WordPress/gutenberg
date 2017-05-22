@@ -580,4 +580,31 @@ class Tests_REST_Request extends WP_UnitTestCase {
 		$request = WP_REST_Request::from_url( $using_home );
 		$this->assertFalse( $request );
 	}
+
+	public function test_set_param() {
+		$request = new WP_REST_Request();
+		$request->set_param( 'param', 'value' );
+		$this->assertEquals( 'value', $request->get_param( 'param' ) );
+	}
+
+	public function test_set_param_follows_parameter_order() {
+		$request = new WP_REST_Request();
+		$request->add_header( 'content-type', 'application/json' );
+		$request->set_method( 'POST' );
+		$request->set_body( wp_json_encode( array(
+			'param' => 'value'
+		) ) );
+		$this->assertEquals( 'value', $request->get_param( 'param' ) );
+		$this->assertEquals(
+			array( 'param' => 'value' ),
+			$request->get_json_params()
+		);
+
+		$request->set_param( 'param', 'new_value' );
+		$this->assertEquals( 'new_value', $request->get_param( 'param' ) );
+		$this->assertEquals(
+			array( 'param' => 'new_value' ),
+			$request->get_json_params()
+		);
+	}
 }
