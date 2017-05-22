@@ -34,24 +34,27 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	initialize() {
-		const { settings, focus } = this.props;
+		const { focus } = this.props;
 
-		tinymce.init( {
-			target: this.editorNode,
+		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
 			toolbar: false,
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			formats: {
+				strikethrough: { inline: 'del' },
+			},
+		} );
+
+		tinymce.init( {
+			...settings,
+			target: this.editorNode,
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
 			},
-			formats: {
-				strikethrough: { inline: 'del' },
-			},
-			...settings,
 		} );
 
 		if ( focus ) {

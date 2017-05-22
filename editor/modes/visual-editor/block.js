@@ -205,7 +205,7 @@ class VisualEditorBlock extends wp.element.Component {
 								controls={ settings.controls.map( ( control ) => ( {
 									...control,
 									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: control.isActive( block.attributes ),
+									isActive: control.isActive ? control.isActive( block.attributes ) : false,
 								} ) ) } />
 						) }
 						<Slot name="Formatting.Toolbar" />
