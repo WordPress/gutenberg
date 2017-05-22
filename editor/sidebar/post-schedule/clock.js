@@ -4,17 +4,23 @@
 import { __ } from 'i18n';
 import Button from 'components/button';
 
-function PostScheduleClock( { selected, onChange } ) {
+function PostScheduleClock( { is12Hour, selected, onChange } ) {
 	const minutes = selected ? selected.format( 'mm' ) : '';
 	const am = selected ? selected.format( 'A' ) : 'AM';
-	const hours = selected ? selected.format( 'hh' ) : '';
+	const hours = selected ? selected.format( is12Hour ? 'hh' : 'HH' ) : '';
 
 	const updateHours = ( event ) => {
 		const value = parseInt( event.target.value, 10 );
-		if ( value < 1 || value > 12 ) {
+		if (
+			( is12Hour && ( value < 1 || value > 12 ) ) ||
+			( ! is12Hour && ( value < 0 || value > 23 ) )
+		) {
 			return;
 		}
-		const newDate = selected.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) );
+
+		const newDate = is12Hour
+			? selected.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) )
+			: selected.clone().hours( value );
 		onChange( newDate );
 	};
 
@@ -58,7 +64,7 @@ function PostScheduleClock( { selected, onChange } ) {
 				value={ minutes }
 				onChange={ updateMinutes }
 			/>
-			<div>
+			{ is12Hour && <div>
 				<Button
 					className="button-secondary editor-post-schedule__clock-am-button"
 					isToggled={ am === 'AM' }
@@ -73,7 +79,7 @@ function PostScheduleClock( { selected, onChange } ) {
 				>
 					{ __( 'PM' ) }
 				</Button>
-			</div>
+			</div> }
 		</div>
 	);
 }

@@ -49,6 +49,7 @@ class PostSchedule extends Component {
 		const handleChange = ( newDate ) => {
 			onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
 		};
+		const is12HourTime = settings.formats.time.indexOf( 'a' ) !== -1 || settings.formats.time.indexOf( 'A' ) !== -1;
 		return (
 			<div className="editor-post-schedule">
 				<span>{ __( 'Publish' ) }</span>
@@ -68,6 +69,7 @@ class PostSchedule extends Component {
 						<PostScheduleClock
 							selected={ momentDate }
 							onChange={ handleChange }
+							is12Hour={ is12HourTime }
 						/>
 					</div>
 				}
