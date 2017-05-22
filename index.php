@@ -268,6 +268,10 @@ function gutenberg_vendor_script_filename( $src ) {
  * @since 0.1.0
  */
 function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
+	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
+		return;
+	}
+
 	$filename = gutenberg_vendor_script_filename( $src );
 	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
 
