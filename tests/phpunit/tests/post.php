@@ -939,7 +939,7 @@ class Tests_Post extends WP_UnitTestCase {
 			'link' => 'edit'
 		) );
 
-		preg_match_all( "|href='([^']+)'|", $wp_tag_cloud, $matches );
+		preg_match_all( '|href="([^"]+)"|', $wp_tag_cloud, $matches );
 		$this->assertSame( 1, count( $matches[1] ) );
 
 		$terms = get_terms( $tax );

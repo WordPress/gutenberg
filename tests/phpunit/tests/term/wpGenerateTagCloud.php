@@ -119,7 +119,7 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'format'     => 'list',
 		) );
 
-		$this->assertRegExp( "|^<ul class='wp-tag-cloud'>|", $found );
+		$this->assertRegExp( "|^<ul class='wp-tag-cloud' role='list'>|", $found );
 		$this->assertRegExp( "|</ul>\n|", $found );
 		$this->assertContains( '>' . $tags[0]->name . '<', $found );
 	}
@@ -164,7 +164,7 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'format'     => 'list',
 		) );
 
-		$this->assertRegExp( "|^<ul class='wp-tag-cloud'>|", $found );
+		$this->assertRegExp( "|^<ul class='wp-tag-cloud' role='list'>|", $found );
 		$this->assertRegExp( "|</ul>\n|", $found );
 
 		foreach ( $tags as $tag ) {
@@ -198,8 +198,8 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			),
 		) );
 
-		$this->assertContains( "title='Term has 1 post'", $actual[0] );
-		$this->assertContains( "title='Term has 2 posts'", $actual[1] );
+		$this->assertContains( 'aria-label="' . $term_objects[0]->name . ' (Term has 1 post)"', $actual[0] );
+		$this->assertContains( 'aria-label="' . $term_objects[1]->name . ' (Term has 2 posts)"', $actual[1] );
 	}
 
 	public function test_topic_count_text_callback() {
@@ -223,8 +223,8 @@ class Tests_WP_Generate_Tag_Cloud extends WP_UnitTestCase {
 			'topic_count_text_callback' => array( $this, 'topic_count_text_callback' ),
 		) );
 
-		$this->assertContains( "title='1 foo'", $actual[0] );
-		$this->assertContains( "title='2 foo'", $actual[1] );
+		$this->assertContains( 'aria-label="' . $term_objects[0]->name . ' (1 foo)"', $actual[0] );
+		$this->assertContains( 'aria-label="' . $term_objects[1]->name . ' (2 foo)"', $actual[1] );
 	}
 
 	/**
