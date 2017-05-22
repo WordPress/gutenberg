@@ -178,6 +178,11 @@ function gutenberg_register_scripts() {
 		'tinymce-nightly',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
 	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly-lists',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-nightly' )
+	);
 	wp_register_script(
 		'wp-i18n',
 		plugins_url( 'i18n/build/index.js', __FILE__ ),
@@ -193,7 +198,7 @@ function gutenberg_register_scripts() {
 	wp_register_script(
 		'wp-blocks',
 		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-element', 'tinymce-nightly' ),
+		array( 'wp-element', 'tinymce-nightly', 'tinymce-nightly-lists' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
 	);
 
