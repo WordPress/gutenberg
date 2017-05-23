@@ -3,8 +3,9 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq, isObject, omit } from 'lodash';
+import { uniq, isObject, omit, startsWith } from 'lodash';
 import { expect } from 'chai';
+import { format } from 'util';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import {
 	parseWithTinyMCE,
 } from '../api/parser';
 import serialize from '../api/serializer';
+import { getBlocks } from '../api/registration';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
@@ -126,5 +128,53 @@ describe( 'full post content fixture', () => {
 
 			expect( serializedActual ).to.eql( serializedExpected );
 		} );
+	} );
+
+	it( 'should be present for each block', () => {
+		const errors = [];
+
+		getBlocks().map( block => block.slug ).forEach( slug => {
+			const slugToFilename = slug.replace( /\//g, '-' );
+			const foundFixtures = fileBasenames
+				.filter( basename => (
+					basename === slugToFilename ||
+					startsWith( basename, slugToFilename + '-' )
+				) )
+				.map( basename => {
+					const filename = basename + '.html';
+					return {
+						filename,
+						contents: readFixtureFile( filename ),
+					};
+				} )
+				.filter( fixture => fixture.contents !== null );
+
+			if ( ! foundFixtures.length ) {
+				errors.push( format(
+					"Expected a fixture file called '%s.html' or '%s-*.html'.",
+					slugToFilename,
+					slugToFilename
+				) );
+			}
+
+			foundFixtures.forEach( fixture => {
+				const delimiter = new RegExp(
+					'<!--\\s*wp:' + slug + '(\\s+|\\s*-->)'
+				);
+				if ( ! delimiter.test( fixture.contents ) ) {
+					errors.push( format(
+						"Expected fixture file '%s' to test the '%s' block.",
+						fixture.filename,
+						slug
+					) );
+				}
+			} );
+		} );
+
+		if ( errors.length ) {
+			throw new Error(
+				'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
+			);
+		}
 	} );
 } );
