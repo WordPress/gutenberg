@@ -133,6 +133,10 @@ window._wpGutenbergPost = {
 			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
 
+			'<!-- wp:core/pullquote -->',
+			'<blockquote class="blocks-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+			'<!-- /wp:core/pullquote -->',
+
 			'<!-- wp:core/separator -->',
 			'<hr/>',
 			'<!-- /wp:core/separator -->',
