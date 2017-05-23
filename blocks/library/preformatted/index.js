@@ -12,7 +12,7 @@ registerBlock( 'core/preformatted', {
 
 	icon: 'text',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: children( 'pre' ),

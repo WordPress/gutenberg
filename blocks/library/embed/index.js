@@ -32,7 +32,7 @@ registerBlock( 'core/embed', {
 
 	icon: 'video-alt3',
 
-	category: 'common',
+	category: 'embed',
 
 	attributes: {
 		url: attr( 'iframe', 'src' ),
