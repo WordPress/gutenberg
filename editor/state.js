@@ -282,6 +282,29 @@ export function hoveredBlock( state = null, action ) {
 }
 
 /**
+ * Reducer returning the block insertion point
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function insertionPoint( state = { show: false }, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTION_POINT':
+			return {
+				show: true,
+				uid: action.uid,
+			};
+		case 'CLEAR_INSERTION_POINT':
+			return {
+				show: false,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning current editor mode, either "visual" or "text".
  *
  * @param  {string} state  Current state
@@ -355,6 +378,7 @@ export function createReduxStore() {
 		currentPost,
 		selectedBlock,
 		hoveredBlock,
+		insertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,

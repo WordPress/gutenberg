@@ -112,3 +112,17 @@
 .editor-visual-editor .editor-inserter {
 	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
 }
+
+.editor-visual-editor > .editor-visual-editor__insertion-point {
+	position: relative;
+
+	&:before {
+		position: absolute;
+		top: 6px;
+		right: #{ $block-padding + $block-mover-margin };
+		left: 0;
+		height: 3px;
+		background: $blue-medium;
+		content: '';
+	}
+}

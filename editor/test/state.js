@@ -16,6 +16,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
+	insertionPoint,
 	createReduxStore,
 } from '../state';
 
@@ -397,6 +398,30 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'insertionPoint', () => {
+		it( 'should set the insertion point', () => {
+			const state = insertionPoint( {}, {
+				type: 'SET_INSERTION_POINT',
+				uid: 'kumquat',
+			} );
+
+			expect( state ).to.eql( {
+				show: true,
+				uid: 'kumquat',
+			} );
+		} );
+
+		it( 'should clear the insertion point', () => {
+			const state = insertionPoint( {}, {
+				type: 'CLEAR_INSERTION_POINT',
+			} );
+
+			expect( state ).to.eql( {
+				show: false,
+			} );
+		} );
+	} );
+
 	describe( 'selectedBlock()', () => {
 		it( 'should return with block uid as selected', () => {
 			const state = selectedBlock( undefined, {
@@ -675,6 +700,7 @@ describe( 'state', () => {
 				'mode',
 				'isSidebarOpened',
 				'saving',
+				'insertionPoint',
 			] );
 		} );
 	} );

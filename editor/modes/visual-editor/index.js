@@ -15,9 +15,19 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlock from './block';
 import PostTitle from '../../post-title';
-import { getBlockUids } from '../../selectors';
+import { getBlockUids, getBlockInsertionPoint } from '../../selectors';
 
-function VisualEditor( { blocks, clearSelectedBlock } ) {
+const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
+
+function VisualEditor( { blocks, insertionPoint, clearSelectedBlock } ) {
+	const insertionPointIndex = blocks.indexOf( insertionPoint );
+	const blocksWithInsertionPoint = insertionPoint
+		? [
+			...blocks.slice( 0, insertionPointIndex + 1 ),
+			INSERTION_POINT_PLACEHOLDER,
+			...blocks.slice( insertionPointIndex + 1 ),
+		]
+		: blocks;
 	// Disable reason: Focus transfer between blocks and key events are handled
 	// by focused block element. Consider unhandled click bubbling as unselect.
 
@@ -29,9 +39,12 @@ function VisualEditor( { blocks, clearSelectedBlock } ) {
 			onClick={ clearSelectedBlock }
 			className="editor-visual-editor">
 			<PostTitle />
-			{ blocks.map( ( uid ) => (
-				<VisualEditorBlock key={ uid } uid={ uid } />
-			) ) }
+			{ blocksWithInsertionPoint.map( ( uid ) => {
+				if ( uid === INSERTION_POINT_PLACEHOLDER ) {
+					return <div key={ INSERTION_POINT_PLACEHOLDER } className="editor-visual-editor__insertion-point" />;
+				}
+				return <VisualEditorBlock key={ uid } uid={ uid } />;
+			} ) }
 			<Inserter position="top right" />
 		</div>
 	);
@@ -41,8 +54,8 @@ function VisualEditor( { blocks, clearSelectedBlock } ) {
 export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
+		insertionPoint: getBlockInsertionPoint( state ),
 	} ),
 	( dispatch ) => ( {
 		clearSelectedBlock: () => dispatch( { type: 'CLEAR_SELECTED_BLOCK' } ),
-	} )
-)( VisualEditor );
+	} ) )( VisualEditor );
