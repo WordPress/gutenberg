@@ -25,41 +25,35 @@ registerBlock( 'core/table2', {
 		rows: children( 'tr' ),
 	},
 
-	controls: [
+	advControls: [
 		{
 			icon: 'table-row-before',
 			title: wp.i18n.__( 'Insert Row Before' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableInsertRowBefore' ),
 		},
 		{
 			icon: 'table-row-after',
 			title: wp.i18n.__( 'Insert Row After' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableInsertRowAfter' ),
 		},
 		{
 			icon: 'table-row-delete',
 			title: wp.i18n.__( 'Delete Row' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableDeleteRow' ),
 		},
 		{
 			icon: 'table-col-before',
 			title: wp.i18n.__( 'Insert Column Before' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableInsertColBefore' ),
 		},
 		{
 			icon: 'table-col-after',
 			title: wp.i18n.__( 'Insert Column After' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableInsertColAfter' ),
 		},
 		{
 			icon: 'table-col-delete',
 			title: wp.i18n.__( 'Delete Column' ),
-			isActive: () => false,
 			onClick: execCommand( 'mceTableDeleteCol' ),
 		},
 	],

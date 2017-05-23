@@ -10,6 +10,7 @@ import { partial } from 'lodash';
  * WordPress dependencies
  */
 import Toolbar from 'components/toolbar';
+import ToolbarMenu from 'components/toolbar-menu';
 
 /**
  * Internal dependencies
@@ -209,6 +210,14 @@ class VisualEditorBlock extends wp.element.Component {
 								} ) ) } />
 						) }
 						<Slot name="Formatting.Toolbar" />
+						{ !! settings.advControls && (
+							<ToolbarMenu
+								icon={ settings.advIcon }
+								controls={ settings.advControls.map( ( control ) => ( {
+									...control,
+									onClick: () => control.onClick( block.attributes, this.setAttributes ),
+								} ) ) } />
+						) }
 					</div>
 				}
 				<div onKeyPress={ this.maybeStartTyping }>
