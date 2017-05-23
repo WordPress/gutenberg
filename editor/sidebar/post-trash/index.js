@@ -17,12 +17,12 @@ import './style.scss';
 import { getCurrentPost } from '../../selectors';
 import { trashPost } from '../../actions';
 
-function PostTrash( { postId, postType, trashPost } ) {
+function PostTrash( { postId, postType, ...props } ) {
 	if ( ! postId ) {
 		return null;
 	}
 
-	const onClick = () => trashPost( postId, postType );
+	const onClick = () => props.trashPost( postId, postType );
 
 	return (
 		<Button className="editor-post-trash" onClick={ onClick }>
