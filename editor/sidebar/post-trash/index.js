@@ -17,12 +17,12 @@ import './style.scss';
 import { getCurrentPost } from '../../selectors';
 import { trashPost } from '../../actions';
 
-function PostTrash( { postId, ...props } ) {
+function PostTrash( { postId, postType, trashPost } ) {
 	if ( ! postId ) {
 		return null;
 	}
 
-	const onClick = () => props.trashPost( postId );
+	const onClick = () => trashPost( postId, postType );
 
 	return (
 		<Button className="editor-post-trash" onClick={ onClick }>
@@ -34,14 +34,16 @@ function PostTrash( { postId, ...props } ) {
 
 export default connect(
 	( state ) => {
+		const post = getCurrentPost( state );
 		return {
-			postId: getCurrentPost( state ).id,
+			postId: post.id,
+			postType: post.type,
 		};
 	},
 	( dispatch ) => {
 		return {
-			trashPost( postId ) {
-				return trashPost( dispatch, postId );
+			trashPost( postId, postType ) {
+				return trashPost( dispatch, postId, postType );
 			},
 		};
 	}
