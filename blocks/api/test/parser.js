@@ -173,6 +173,12 @@ describe( 'block parser', () => {
 					expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 				} );
 
+				it( 'should parse empty post content', () => {
+					const parsed = parse( '' );
+
+					expect( parsed ).to.eql( [] );
+				} );
+
 				it( 'should parse the post content, ignoring unknown blocks', () => {
 					registerBlock( 'core/test-block', {
 						attributes: function( rawContent ) {
