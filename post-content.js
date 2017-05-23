@@ -117,6 +117,10 @@ window._wpGutenbergPost = {
 			'<figure><img src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
+			'<!-- wp:core/preformatted -->',
+			'<pre>An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
+			'<!-- /wp:core/preformatted -->',
+
 			'<!-- wp:core/text -->',
 			'<p>Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
 			'<!-- /wp:core/text -->',
@@ -136,10 +140,6 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/table -->',
 			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
 			'<!-- /wp:core/table -->',
-
-			'<!-- wp:core/preformatted -->',
-			'<pre>Some <em>preformatted</em> text...<br>And more!</pre>',
-			'<!-- /wp:core/preformatted -->',
 
 			'<!-- wp:core/code -->',
 			'<pre><code>export default function MyButton() {\n\
