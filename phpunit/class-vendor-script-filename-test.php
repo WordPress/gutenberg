@@ -59,6 +59,10 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 				'http://localhost/something.min.js?querystring',
 				'something.min.HASH.js',
 			),
+			array(
+				'http://localhost/idkwhatthisis',
+				'idkwhatthisis.HASH.js',
+			),
 		);
 	}
 
