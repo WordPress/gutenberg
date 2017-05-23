@@ -1,0 +1,49 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/list",
+        "attributes": {
+            "nodeName": "UL",
+            "values": [
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": "Text & Headings"
+                },
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": "Images & Videos"
+                },
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": "Galleries"
+                },
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": "Embeds, like YouTube, Tweets, or other WordPress posts."
+                },
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": "Layout blocks, like Buttons, Hero Images, Separators, etc."
+                },
+                {
+                    "type": "li",
+                    "attributes": {},
+                    "children": [
+                        "And ",
+                        {
+                            "type": "em",
+                            "attributes": {},
+                            "children": "Lists"
+                        },
+                        " like this one of course :)"
+                    ]
+                }
+            ]
+        }
+    }
+]

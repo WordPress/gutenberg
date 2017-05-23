@@ -95,7 +95,7 @@ describe( 'full post content fixture', () => {
 						blocksActualNormalized,
 						null,
 						4
-					);
+					) + '\n';
 					writeFixtureFile( f + '.json', blocksExpectedString );
 				} else {
 					throw new Error(
