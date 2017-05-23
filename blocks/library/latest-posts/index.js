@@ -7,18 +7,7 @@ import Placeholder from 'components/placeholder';
  * Internal dependencies
  */
 import { registerBlock } from '../../api';
-
-function getLatestPosts( postsToShow = 5 ) {
-	const postsCollection = new wp.api.collections.Posts();
-
-	const posts = postsCollection.fetch( {
-		data: {
-			per_page: postsToShow
-		}
-	} );
-
-	return posts;
-}
+import { getLatestPosts } from './data.js';
 
 function renderList( latestPosts ) {
 	return (
