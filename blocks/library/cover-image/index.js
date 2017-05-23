@@ -120,13 +120,12 @@ registerBlock( 'core/cover-image', {
 		}
 
 		const style = {
-			backgroundImage: url,
-			fontWeight: 'bold',
+			backgroundImage: `url(${ url })`,
 		};
 
 		return (
 			<section className="blocks-cover-image">
-				<section className="cover-image" data-url={ url } data-foo="bar" style={ style }>
+				<section className="cover-image" data-url={ url } style={ style }>
 					{ title || !! focus ? (
 						<Editable
 							tagName="h2"
