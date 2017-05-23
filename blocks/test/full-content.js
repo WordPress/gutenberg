@@ -151,7 +151,7 @@ describe( 'full post content fixture', () => {
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
-					"Expected a fixture file called '%s.html' or '%s-*.html'.",
+					'Expected a fixture file called \'%s.html\' or \'%s-*.html\'.',
 					slugToFilename,
 					slugToFilename
 				) );
@@ -163,7 +163,7 @@ describe( 'full post content fixture', () => {
 				);
 				if ( ! delimiter.test( fixture.contents ) ) {
 					errors.push( format(
-						"Expected fixture file '%s' to test the '%s' block.",
+						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,
 						slug
 					) );
