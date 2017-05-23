@@ -94,10 +94,10 @@ export function savePost( dispatch, postId, edits ) {
 	} );
 }
 
-export function trashPost( dispatch, postId ) {
+export function trashPost( dispatch, postId, postType ) {
 	new wp.api.models.Post( { id: postId } ).destroy().done( () => {
-		const [ baseUrl ] = window.location.href.split( '?' );
-		window.location = baseUrl + '?page=gutenberg';
+		window.location.href = 'edit.php?post_type=' + postType
+			+ '&trashed=1&ids=' + postId;
 	} );
 }
 
