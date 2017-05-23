@@ -124,6 +124,10 @@ class Tests_Theme_Custom_Header extends WP_UnitTestCase {
 		$this->assertFalse( has_custom_header() );
 		$this->assertEmpty( $html );
 
+		// ReflectionMethod::setAccessible is only available in PHP 5.3+
+		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			return;
+		}
 		// The container should always be returned in the Customizer preview.
 		$this->_set_customize_previewing( true );
 		$html = get_custom_header_markup();
@@ -205,6 +209,11 @@ class Tests_Theme_Custom_Header extends WP_UnitTestCase {
 	}
 
 	function test_header_script_is_enqueued_by_the_custom_header_markup_without_video_when_previewing_in_customizer() {
+		if ( version_compare( PHP_VERSION, '5.3', '<' ) ) {
+			$this->markTestSkipped( 'ReflectionMethod::setAccessible is only available in PHP 5.3+' );
+			return;
+		}
+
 		$this->_add_theme_support( array( 'video' => true, 'video-active-callback' => '__return_true' ) );
 		$this->_set_customize_previewing( true );
 
