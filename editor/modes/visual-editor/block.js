@@ -216,12 +216,11 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
-				tabIndex="0"
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ showUI &&
-					<div className="editor-visual-editor__block-controls">
+					<div className="editor-visual-editor__block-controls" tabIndex="-1">
 						<BlockSwitcher uid={ block.uid } />
 						{ !! settings.controls && (
 							<Toolbar
