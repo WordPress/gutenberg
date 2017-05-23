@@ -26,6 +26,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				onChange={ onChange }
 				value={ excerpt }
 				placeholder={ __( 'Write an excerpt (optional)' ) }
+				aria-label={ __( 'Excerpt' ) }
 			/>
 			<a href="https://codex.wordpress.org/Excerpt" target="_blank">
 				{ __( 'Learn more about manual excerpts' ) }

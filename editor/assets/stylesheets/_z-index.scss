@@ -7,6 +7,7 @@ $z-layers: (
 	'.editor-visual-editor__block {core/image aligned left or right}': 10,
 	'.editor-visual-editor__block-controls': 1,
 	'.editor-header': 20,
+	'.editor-post-visibility__dialog': 30,
 );
 
 @function z-index( $key ) {
