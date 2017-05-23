@@ -33,13 +33,14 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 			</a>
 		</PanelBody>
 	);
-	/* eslint-enable jsx-a11y/label-has-for */
 }
 
 export default connect(
-	( state ) => ( {
-		excerpt: getEditedPostExcerpt( state ),
-	} ),
+	( state ) => {
+		return {
+			excerpt: getEditedPostExcerpt( state ),
+		};
+	},
 	( dispatch ) => {
 		return {
 			onUpdateExcerpt( excerpt ) {
