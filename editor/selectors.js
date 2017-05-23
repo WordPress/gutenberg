@@ -64,6 +64,12 @@ export function getEditedPostTitle( state ) {
 		: state.editor.edits.title;
 }
 
+export function getEditedPostExcerpt( state ) {
+	return state.editor.edits.excerpt === undefined
+		? state.currentPost.excerpt.raw
+		: state.editor.edits.excerpt;
+}
+
 export function getEditedPostPreviewLink( state ) {
 	const link = state.currentPost.link;
 	if ( ! link ) {
