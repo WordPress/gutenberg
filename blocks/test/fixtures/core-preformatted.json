@@ -7,13 +7,11 @@
                 "Some ",
                 {
                     "type": "em",
-                    "attributes": {},
                     "children": "preformatted"
                 },
                 " text...",
                 {
-                    "type": "br",
-                    "attributes": {}
+                    "type": "br"
                 },
                 "And more!"
             ]

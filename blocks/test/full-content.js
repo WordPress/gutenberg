@@ -53,8 +53,11 @@ function normalizeReactTree( element ) {
 	if ( isObject( element ) ) {
 		const toReturn = {
 			type: element.type,
-			attributes: omit( element.props, 'children' ),
 		};
+		const attributes = omit( element.props, 'children' );
+		if ( Object.keys( attributes ).length ) {
+			toReturn.attributes = attributes;
+		}
 		if ( element.props.children ) {
 			toReturn.children = normalizeReactTree( element.props.children );
 		}
