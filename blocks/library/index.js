@@ -11,4 +11,4 @@ import './pullquote';
 import './table';
 import './preformatted';
 import './code';
-import './rest-api-latest-posts';
+import './latest-posts';

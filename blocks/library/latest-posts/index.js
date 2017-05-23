@@ -30,7 +30,7 @@ function renderList( latestPosts ) {
 	);
 }
 
-registerBlock( 'core/rest-api-latest-posts', {
+registerBlock( 'core/latest-posts', {
 	title: wp.i18n.__( 'Latest Posts' ),
 
 	icon: 'list-view',
@@ -53,7 +53,7 @@ registerBlock( 'core/rest-api-latest-posts', {
 		}
 
 		return (
-			<div className="blocks-rest-api-latest-posts">
+			<div className="blocks-latest-posts">
 				{ renderList( latestPosts ) }
 			</div>
 		);
