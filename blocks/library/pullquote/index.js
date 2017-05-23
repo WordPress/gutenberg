@@ -8,9 +8,12 @@ import Editable from '../../editable';
 const { children, query } = hpq;
 
 registerBlock( 'core/pullquote', {
+
 	title: wp.i18n.__( 'Pullquote' ),
+
 	icon: 'format-quote',
-	category: 'common',
+
+	category: 'formatting',
 
 	attributes: {
 		value: query( 'blockquote > p', children() ),

@@ -28,6 +28,27 @@ export function replaceBlocks( uids, blocks ) {
 	};
 }
 
+export function insertBlock( block, after ) {
+	return {
+		type: 'INSERT_BLOCK',
+		block,
+		after,
+	};
+}
+
+export function setInsertionPoint( uid ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		uid,
+	};
+}
+
+export function clearInsertionPoint() {
+	return {
+		type: 'CLEAR_INSERTION_POINT',
+	};
+}
+
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',

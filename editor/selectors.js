@@ -132,6 +132,15 @@ export function isTypingInBlock( state, uid ) {
 	return state.selectedBlock.uid === uid ? state.selectedBlock.typing : false;
 }
 
+export function getBlockInsertionPoint( state ) {
+	if ( ! state.insertionPoint.show ) {
+		return null;
+	}
+	const blockToInsertAfter = state.insertionPoint.uid;
+
+	return blockToInsertAfter || last( state.editor.blockOrder );
+}
+
 export function isSavingPost( state ) {
 	return state.saving.requesting;
 }

@@ -110,7 +110,7 @@
 }
 
 .editor-inserter__content {
-	max-height: 186px;
+	max-height: 20vw;
 	overflow: auto;
 
 	&:focus {
@@ -148,13 +148,13 @@ input[type=search].editor-inserter__search {
 	padding: 8px;
 	align-items: center;
 	cursor: pointer;
-	border: 1px solid transparent;
+	border: none;
 	background: none;
 	line-height: 20px;
 
 	&:hover,
 	&:focus {
-		border: 1px solid $dark-gray-500;
+		color: $blue-medium;
 		outline: none;
 		position: relative;
 	}

@@ -13,6 +13,8 @@ import IconButton from 'components/icon-button';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import { getSelectedBlock } from '../selectors';
+import { insertBlock, clearInsertionPoint } from '../actions';
 
 class Inserter extends wp.element.Component {
 	constructor() {
@@ -45,7 +47,11 @@ class Inserter extends wp.element.Component {
 
 	insertBlock( slug ) {
 		if ( slug ) {
-			this.props.onInsertBlock( slug );
+			const { selectedBlock, onInsertBlock } = this.props;
+			onInsertBlock(
+				slug,
+				selectedBlock ? selectedBlock.uid : null
+			);
 		} else if ( this.toggleNode ) {
 			// When menu is closed by pressing escape, restore focus to the
 			// original opening active element before menu closes
@@ -88,13 +94,18 @@ class Inserter extends wp.element.Component {
 }
 
 export default connect(
-	undefined,
+	( state ) => {
+		return {
+			selectedBlock: getSelectedBlock( state ),
+		};
+	},
 	( dispatch ) => ( {
-		onInsertBlock( slug ) {
-			dispatch( {
-				type: 'INSERT_BLOCK',
-				block: wp.blocks.createBlock( slug ),
-			} );
+		onInsertBlock( slug, after ) {
+			dispatch( clearInsertionPoint() );
+			dispatch( insertBlock(
+				wp.blocks.createBlock( slug ),
+				after
+			) );
 		},
 	} )
 )( clickOutside( Inserter ) );

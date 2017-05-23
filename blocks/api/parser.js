@@ -161,7 +161,7 @@ export function parseWithTinyMCE( content ) {
 	flushContentBetweenBlocks();
 
 	let currentNode = tree.firstChild;
-	do {
+	while ( currentNode ) {
 		if ( currentNode.name === 'wp-block' ) {
 			// Set node type to document fragment so that the TinyMCE
 			// serializer doesn't output its markup
@@ -208,7 +208,7 @@ export function parseWithTinyMCE( content ) {
 			currentNode = currentNode.next;
 			contentBetweenBlocks.append( toAppend );
 		}
-	} while ( currentNode );
+	}
 
 	flushContentBetweenBlocks();
 

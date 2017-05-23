@@ -16,7 +16,7 @@ registerBlock( 'core/code', {
 
 	icon: 'editor-code',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: prop( 'code', 'textContent' ),

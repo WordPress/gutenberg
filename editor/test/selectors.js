@@ -31,6 +31,7 @@ import {
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
+	getBlockInsertionPoint,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -577,6 +578,43 @@ describe( 'selectors', () => {
 			};
 
 			expect( isTypingInBlock( state, 23 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'getBlockInsertionPoint', () => {
+		it( 'should return the uid of the insertion point', () => {
+			const state = {
+				insertionPoint: {
+					show: true,
+					uid: 123,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 123 );
+		} );
+
+		it( 'should return return the last block uid if the insertion point is null', () => {
+			const state = {
+				insertionPoint: {
+					show: true,
+					uid: null,
+				},
+				editor: {
+					blockOrder: [ 34, 23 ],
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 23 );
+		} );
+
+		it( 'should return null if the insertion point is not shown', () => {
+			const state = {
+				insertionPoint: {
+					show: false,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state, 23 ) ).to.be.null();
 		} );
 	} );
 

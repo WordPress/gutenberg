@@ -131,10 +131,18 @@ export default class Editable extends wp.element.Component {
 		}
 
 		const content = this.getContent();
+		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
 			empty: ! content || ! content.length,
 		} );
+
+		if ( this.props.focus.collapsed !== collapsed ) {
+			this.props.onFocus( {
+				...this.props.focus,
+				collapsed,
+			} );
+		}
 	}
 
 	onChange() {

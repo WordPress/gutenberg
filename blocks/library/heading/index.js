@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isString } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -38,8 +43,11 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
+						const headingContent = isString( content[ 0 ] )
+							? content[ 0 ]
+							: content[ 0 ].props.children;
 						const heading = createBlock( 'core/heading', {
-							content: content[ 0 ].props.children,
+							content: headingContent,
 						} );
 						const blocks = [ heading ];
 
