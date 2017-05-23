@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last } from 'lodash';
+import { first, last, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -60,13 +60,13 @@ export function getEditedPostVisibility( state ) {
 
 export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
-		? state.currentPost.title.raw
+		? get( state.currentPost, 'title.raw' )
 		: state.editor.edits.title;
 }
 
 export function getEditedPostExcerpt( state ) {
 	return state.editor.edits.excerpt === undefined
-		? state.currentPost.excerpt.raw
+		? get( state.currentPost, 'excerpt.raw' )
 		: state.editor.edits.excerpt;
 }
 
