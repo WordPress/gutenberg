@@ -25,6 +25,8 @@ registerBlock( 'core/table2', {
 		rows: children( 'tr' ),
 	},
 
+	advIcon: 'editor-table',
+
 	advControls: [
 		{
 			icon: 'table-row-before',
