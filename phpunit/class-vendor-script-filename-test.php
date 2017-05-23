@@ -8,7 +8,7 @@
 class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 	function vendor_script_filename_cases() {
 		return array(
-			// Development mode scripts
+			// Development mode scripts.
 			array(
 				'https://unpkg.com/react@next/umd/react.development.js',
 				'react.HASH.js',
@@ -29,7 +29,7 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.js',
 				'tinymce-plugin-lists.HASH.js',
 			),
-			// Production mode scripts
+			// Production mode scripts.
 			array(
 				'https://unpkg.com/react@next/umd/react.production.min.js',
 				'react.min.HASH.js',
@@ -50,7 +50,7 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.min.js',
 				'tinymce-plugin-lists.min.HASH.js',
 			),
-			// Other cases
+			// Other cases.
 			array(
 				'http://localhost/something.js?querystring',
 				'something.HASH.js',
