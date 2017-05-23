@@ -16,6 +16,7 @@ import {
 	getPostEdits,
 	getEditedPostStatus,
 	getEditedPostTitle,
+	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	getEditedPostPreviewLink,
 	getBlock,
@@ -220,6 +221,34 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostExcerpt', () => {
+		it( 'should return the post saved excerpt if the excerpt is not edited', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { status: 'private' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'sassel' );
+		} );
+
+		it( 'should return the edited excerpt', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { excerpt: 'youcha' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'youcha' );
 		} );
 	} );
 
