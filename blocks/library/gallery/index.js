@@ -11,6 +11,32 @@ import GalleryImage from './gallery-image';
 
 const { query } = hpq;
 
+const openMediaLibrary = () => {
+	const frameConfig = {
+		title: wp.i18n.__( 'Select or Upload a media' ),
+		button: {
+			text: wp.i18n.__( 'Select' ),
+		},
+		multiple: true,
+	};
+
+	wp.media( frameConfig ).open();
+};
+
+/**
+ * Returns an attribute setter with behavior that if the target value is
+ * already the assigned attribute value, it will be set to undefined.
+ *
+ * @param  {string}   align Alignment value
+ * @return {Function}       Attribute setter
+ */
+function toggleAlignment( align ) {
+	return ( attributes, setAttributes ) => {
+		const nextAlign = attributes.align === align ? undefined : align;
+		setAttributes( { align: nextAlign } );
+	};
+}
+
 registerBlock( 'core/gallery', {
 	title: wp.i18n.__( 'Gallery' ),
 	icon: 'format-gallery',
@@ -20,8 +46,40 @@ registerBlock( 'core/gallery', {
 		images: query( 'div.blocks-gallery' ),
 	},
 
+	controls: [
+		{
+			icon: 'format-image',
+			title: wp.i18n.__( 'Edit Gallery' ),
+			onClick: () => openMediaLibrary(),
+		},
+		{
+			icon: 'align-left',
+			title: wp.i18n.__( 'Align left' ),
+			isActive: ( { align } ) => 'left' === align,
+			onClick: toggleAlignment( 'left' ),
+		},
+		{
+			icon: 'align-center',
+			title: wp.i18n.__( 'Align center' ),
+			isActive: ( { align } ) => ! align || 'center' === align,
+			onClick: toggleAlignment( 'center' ),
+		},
+		{
+			icon: 'align-right',
+			title: wp.i18n.__( 'Align right' ),
+			isActive: ( { align } ) => 'right' === align,
+			onClick: toggleAlignment( 'right' ),
+		},
+		{
+			icon: 'align-full-width',
+			title: wp.i18n.__( 'Wide width' ),
+			isActive: ( { align } ) => 'wide' === align,
+			onClick: toggleAlignment( 'wide' ),
+		},
+	],
+
 	edit( { attributes, setAttributes } ) {
-		const { images } = attributes;
+		const { images, align = 'none' } = attributes;
 		if ( ! images ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
@@ -43,7 +101,7 @@ registerBlock( 'core/gallery', {
 		}
 
 		return (
-			<div className="blocks-gallery-images">
+			<div className={ `blocks-gallery align${ align }` }>
 				{ images.map( ( img, i ) => (
 					<GalleryImage key={ i } img={ img } />
 				) ) }
@@ -52,10 +110,10 @@ registerBlock( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images } = attributes;
+		const { images, align = 'none' } = attributes;
 
 		return (
-			<div className="blocks-gallery">
+			<div className={ `blocks-gallery align${ align }` }>
 				{ images.map( ( img, i ) => (
 					<GalleryImage key={ i } img={ img } />
 				) ) }
