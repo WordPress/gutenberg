@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq } from 'lodash';
+import { uniq, isObject, omit } from 'lodash';
 import { expect } from 'chai';
 
 /**
@@ -45,13 +45,37 @@ function writeFixtureFile( filename, content ) {
 	);
 }
 
+function normalizeReactTree( element ) {
+	if ( Array.isArray( element ) ) {
+		return element.map( child => normalizeReactTree( child ) );
+	}
+
+	if ( isObject( element ) ) {
+		const toReturn = {
+			type: element.type,
+			attributes: omit( element.props, 'children' ),
+		};
+		if ( element.props.children ) {
+			toReturn.children = normalizeReactTree( element.props.children );
+		}
+		return toReturn;
+	}
+
+	return element;
+}
+
 function normalizeParsedBlocks( blocks ) {
 	return blocks.map( ( block, index ) => {
-		// Clone and remove React-instance-specific stuff; also attribute
+		// Clone and remove React-instance-specific stuff; also, attribute
 		// values that equal `undefined` will be removed
 		block = JSON.parse( JSON.stringify( block ) );
 		// Change unique UIDs to a predictable value
 		block.uid = '_uid_' + index;
+		// Walk each attribute and get a more concise representation of any
+		// React elements
+		for ( const k in block.attributes ) {
+			block.attributes[ k ] = normalizeReactTree( block.attributes[ k ] );
+		}
 		return block;
 	} );
 }
