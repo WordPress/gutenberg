@@ -166,8 +166,9 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 
 		const { isHovered, isSelected, isTyping, focus } = this.props;
+		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
-			'is-selected': isSelected && ! isTyping,
+			'is-selected': showUI,
 			'is-hovered': isHovered,
 		} );
 
@@ -196,8 +197,8 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( ( isSelected && ! isTyping ) || isHovered ) && <BlockMover uid={ block.uid } /> }
-				{ isSelected && ! isTyping &&
+				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ showUI &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
 						{ !! settings.controls && (
