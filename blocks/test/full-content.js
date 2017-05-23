@@ -26,6 +26,7 @@ const fixturesDir = path.join( __dirname, 'fixtures' );
 // Get the "base" name for each fixture first.
 const fileBasenames = uniq(
 	fs.readdirSync( fixturesDir )
+		.filter( f => /(\.html|\.json)$/.test( f ) )
 		.map( f => f.replace( /\..+$/, '' ) )
 );
 
