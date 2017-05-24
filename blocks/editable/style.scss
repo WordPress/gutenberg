@@ -19,7 +19,7 @@
 		color: $blue-medium;
 	}
 
-	a[data-mce-selected] {
+	&:focus a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
 		border-radius: 2px;
@@ -36,7 +36,7 @@
 		font-size: 14px;
 	}
 
-	code[data-mce-selected] {
+	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
 	}
 
