@@ -284,11 +284,12 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 	if ( $needs_fetch ) {
 		// Determine whether we can write to this file.  If not, don't waste
 		// time doing a network request.
-		$f = fopen( $full_path, 'a' );
+		// @codingStandardsIgnoreStart
+		$f = @fopen( $full_path, 'a' );
+		// @codingStandardsIgnoreEnd
 		if ( ! $f ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
-			// Note: the `fopen` call above will have generated a warning.
 			wp_register_script( $handle, $src, $deps );
 			return;
 		}
