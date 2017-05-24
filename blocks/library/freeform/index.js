@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlock, query, setUnknownTypeHandler } from '../../api';
 import Editable from '../../editable';
 
 const { children } = query;
@@ -22,31 +22,24 @@ function execCommand( command ) {
 
 function blockQuoteIsActive() {
 	return ( { inBlockQuote } ) => {
-		console.log( 'inQuote:', inBlockQuote );
 		return inBlockQuote;
 	};
 }
 
 function listIsActive( expectedListType ) {
 	return ( { listType } ) => {
-		const inList = expectedListType === listType;
-		console.log( 'inList:', inList );
-		return inList;
+		return expectedListType === listType;
 	};
 }
 
-function findParentList( { parents } ) {
+function findListType( { parents } ) {
 	const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
-	const listType = list ? list.nodeName : null;
-	console.log( 'listType:', listType );
-	return listType;
+	return list ? list.nodeName : null;
 }
 
-function findParentQuote( { parents } ) {
+function findInBlockQuote( { parents } ) {
 	const quote = find( parents, ( node ) => node.nodeName === 'BLOCKQUOTE' );
-	const inBlockQuote = ! ! quote;
-	console.log( 'inBlockQuote:', inBlockQuote );
-	return inBlockQuote;
+	return ! ! quote;
 }
 
 registerBlock( 'core/freeform', {
@@ -113,10 +106,9 @@ registerBlock( 'core/freeform', {
 				} ) }
 				onSetup={ ( editor ) => {
 					editor.on( 'nodeChange', ( nodeInfo ) => {
-						console.log( 'nodeChange ', nodeInfo );
 						setAttributes( {
-							listType: findParentList( nodeInfo ),
-							inBlockQuote: findParentQuote( nodeInfo ),
+							listType: findListType( nodeInfo ),
+							inBlockQuote: findInBlockQuote( nodeInfo ),
 						} );
 					} );
 					setAttributes( { editor } );
@@ -138,3 +130,5 @@ registerBlock( 'core/freeform', {
 		return content;
 	},
 } );
+
+setUnknownTypeHandler( 'core/freeform' );
