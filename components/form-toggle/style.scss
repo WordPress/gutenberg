@@ -25,6 +25,11 @@ $toggle-border-width: 2px;
 
 	&:hover:before {
 		background-color: $light-gray-500;
+
+		.components-form-toggle.is-checked & {
+			background-color: $blue-medium-500;
+			border: $toggle-border-width solid $blue-medium-500;
+		}
 	}
 
 	&:after {
