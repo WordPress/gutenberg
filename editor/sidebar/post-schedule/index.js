@@ -48,7 +48,16 @@ class PostSchedule extends Component {
 		const handleChange = ( newDate ) => {
 			onUpdateDate( newDate.format( 'YYYY-MM-DDTHH:mm:ss' ) );
 		};
-		const is12HourTime = settings.formats.time.indexOf( 'a' ) !== -1 || settings.formats.time.indexOf( 'A' ) !== -1;
+
+		// To know if the current timezone is a 12 hour time with look for "a" in the time format
+		// We also make sure this a is not escaped by a "/"
+		const is12HourTime = /a(?!\\)/i.test(
+			settings.formats.time
+				.toLowerCase() // Test only the lower case a
+				.replace( /\\\\/g, '' ) // Replace "//" with empty strings
+				.split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
+		);
+
 		return (
 			<div className="editor-post-schedule">
 				<span>{ __( 'Publish' ) }</span>
