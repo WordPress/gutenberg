@@ -1,0 +1,12 @@
+.blocks-freeform .blocks-editable__tinymce {
+  ul, ol {
+    padding-left: 2.5em;
+    margin-left: 0;
+  }
+  blockquote {
+    margin: 0;
+    box-shadow: inset 0px 0px 0px 0px $light-gray-500;
+    border-left: 4px solid $black;
+	  padding-left: 1em;
+  }
+}
