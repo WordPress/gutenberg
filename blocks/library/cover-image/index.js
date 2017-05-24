@@ -1,15 +1,11 @@
 /**
- * WordPress dependencies
- */
-import Button from 'components/button';
-
-/**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
 import Dashicon from 'components/dashicon';
+import MediaUploadButton from '../../media-upload-button';
 
 const { attr, text } = query;
 
@@ -92,9 +88,14 @@ registerBlock( 'core/cover-image', {
 					<div className="blocks-image__placeholder-instructions">
 						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
 					</div>
-					<Button isLarge>
+					<MediaUploadButton
+						buttonProps={ { isLarge: true } }
+						onSelect={ ( media ) => setAttributes( { url: media.url } ) }
+						type="image"
+						auto-open
+					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
-					</Button>
+					</MediaUploadButton>
 				</div>
 			);
 		}
