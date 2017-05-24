@@ -21,7 +21,7 @@
 		margin-left: 3px;
 	}
 
-	&:focus:before {
+	.has-accessible-focus &:focus:before {
 		top: -4px;
 		right: -4px;
 		bottom: -4px;

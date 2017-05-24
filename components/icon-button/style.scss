@@ -25,7 +25,7 @@
 		}
 	}
 
-	&:focus:before {
+	.has-accessible-focus &:focus:before {
 		content: '';
 		position: absolute;
 		top: 0;
