@@ -25,7 +25,18 @@ registerBlock( 'core/latest-posts', {
 				latestPosts: []
 			};
 
-			getLatestPosts().then( latestPosts => this.setState( { latestPosts } ) );
+			let { poststoshow } = this.props.attributes;
+
+			if ( ! poststoshow ) {
+				poststoshow = 5;
+
+				this.props.setAttributes( {
+					poststoshow
+				} );
+			}
+
+			getLatestPosts( poststoshow )
+				.then( latestPosts => this.setState( { latestPosts } ) );
 		}
 
 		renderPostsLoading() {
