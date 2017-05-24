@@ -56,7 +56,8 @@
 	display: flex;
 	justify-content: center;
 	position: absolute;
-	top: -50px;
+	top: -$block-controls-height - 4px;
+	line-height: 0;
 	left: 0;
 	right: 0;
 	z-index: 1;
