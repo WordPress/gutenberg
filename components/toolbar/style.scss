@@ -8,17 +8,19 @@
 .components-toolbar__control.components-button {
 	display: inline-flex;
 	align-items: flex-end;
-	margin: 3px;
-	margin-left: 0;
+	margin: 0;
+	padding: 3px;
 	background: none;
-	border: 1px solid transparent;
 	outline: none;
 	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
+	width: $icon-button-size;
 
-	&:first-child {
-		margin-left: 3px;
+	svg {
+		border: 1px solid transparent;
+		padding: 4px;
+		box-sizing: content-box;
 	}
 
 	&:focus:before {
@@ -28,16 +30,26 @@
 		left: -4px;
 	}
 
-	&.is-active,
-	&:hover,
-	&:not(:disabled):hover {
+	&.is-active svg,
+	&:hover svg,
+	&:not(:disabled):hover svg {
 		border: 1px solid $dark-gray-500;
 		color: $dark-gray-500;
 	}
 
+	&:hover,
+	&:not(:disabled):hover {
+		color: $dark-gray-500;
+	}
+
+	&.is-active svg,
+	&.is-active:hover svg {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
+
 	&.is-active,
 	&.is-active:hover {
-		background-color: $dark-gray-500;
 		color: $white;
 	}
 
@@ -47,8 +59,8 @@
 		font-size: 10px;
 		font-weight: bold;
 		position: relative;
-		top: -1px;
-		margin-left: -3px;
+		top: -5px;
+		left: -9px;
 	}
 }
 
