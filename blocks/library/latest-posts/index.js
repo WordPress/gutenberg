@@ -10,7 +10,7 @@ import { registerBlock } from '../../api';
 import { getLatestPosts } from './data.js';
 
 
-registerBlock( 'core/latest-posts', {
+registerBlock( 'core/latestposts', {
 	title: wp.i18n.__( 'Latest Posts' ),
 
 	icon: 'list-view',
