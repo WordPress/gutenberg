@@ -1,11 +1,30 @@
-.blocks-table {
-  border-collapse: collapse;
-  border: 1px solid $light-gray-500;
-  td {
-    border: 1px solid $light-gray-500;
-    padding: 15px 7px;
-  }
-  td[data-mce-selected="1"], th[data-mce-selected="1"] {
-    background-color: $light-gray-500;
-  }
+.editor-visual-editor__block[data-type="core/table2"] {
+	table {
+		border-collapse: collapse;
+	}
+
+	td, th {
+		padding: 0.5em;
+		border: 1px solid currentColor;
+	}
+
+	td[data-mce-selected="1"], th[data-mce-selected="1"] {
+		background-color: $light-gray-500;
+	}
+
+	&[data-align="left"],
+	&[data-align="right"] {
+    min-width: 33%;
+		max-width: 50%;
+	}
+
+	&[data-align="left"] {
+		float: left;
+		margin-right: $block-padding;
+	}
+
+	&[data-align="right"] {
+		float: right;
+		margin-left: $block-padding;
+	}
 }
