@@ -77,7 +77,7 @@ class BlockSwitcher extends wp.element.Component {
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
-					label={ wp.i18n.__( 'Change block type' ) }
+					title={ wp.i18n.__( 'Change block type' ) }
 				>
 					<Dashicon icon="arrow-down" />
 				</IconButton>

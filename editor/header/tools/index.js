@@ -25,13 +25,13 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
-				label={ wp.i18n.__( 'Undo' ) }
+				title={ wp.i18n.__( 'Undo' ) }
 				disabled={ ! hasUndo }
 				onClick={ undo } />
 			<IconButton
 				className="editor-tools__redo"
 				icon="redo"
-				label={ wp.i18n.__( 'Redo' ) }
+				title={ wp.i18n.__( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
 			<Inserter position="bottom" />

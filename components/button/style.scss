@@ -1,10 +1,105 @@
 .components-button {
+	display: inline-block;
+	position: relative;
 	background: none;
 	border: none;
 	outline: none;
 	text-decoration: none;
 
-	&:disabled {
+	&.is-toggled {
+		background: $dark-gray-500;
+		color: $white;
+	}
+
+	&.is-toggled:hover {
+		color: $white;
+		background: $dark-gray-400;
+	}
+
+	&.is-disabled {
 		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba( 30, 140, 190, .8 );
+	}
+
+	&[aria-label]:focus,
+	&[aria-label]:hover {
+		&:before,
+		&:after {
+			box-sizing: border-box;
+			z-index: z-index( '.components-button[aria-label]:after' );
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			transform: translateX( -50% );
+			pointer-events: none;
+			text-shadow: none;
+			font-family: $default-font;
+			font-size: $default-font-size;
+		}
+
+		&:before {
+			content: '';
+			width: 0;
+			height: 0;
+			margin-bottom: -6px;
+			border: 6px solid transparent;
+			border-bottom-width: 0;
+			border-top-color: $dark-gray-400;
+		}
+
+		&:after {
+			content: attr( aria-label );
+			padding: 4px 12px;
+			background: $dark-gray-400;
+			white-space: nowrap;
+			font-size: $default-font-size;
+			color: white;
+		}
+	}
+
+	&.is-tooltip-bounded-top {
+		&[aria-label]:focus,
+		&[aria-label]:hover {
+			&:before,
+			&:after {
+				top: 100%;
+				bottom: auto;
+			}
+
+			&:before {
+				margin-top: -6px;
+				margin-bottom: 0;
+				border-top-width: 0;
+				border-bottom-width: 6px;
+				border-top-color: transparent;
+				border-bottom-color: $dark-gray-400;
+			}
+		}
+	}
+
+	&.is-tooltip-bounded-right {
+		&[aria-label]:focus,
+		&[aria-label]:hover {
+			&:after {
+				left: auto;
+				right: 50%;
+				margin-right: -12px;
+				transform: none;
+			}
+		}
+	}
+
+	&.is-tooltip-bounded-left {
+		&[aria-label]:focus,
+		&[aria-label]:hover {
+			&:after {
+				margin-left: -12px;
+				transform: none;
+			}
+		}
 	}
 }
