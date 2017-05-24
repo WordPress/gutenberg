@@ -74,6 +74,7 @@ export default class Editable extends wp.element.Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 
@@ -100,6 +101,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
 
 		if ( this.props.onSetup ) {
@@ -228,6 +230,12 @@ export default class Editable extends wp.element.Component {
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
+		}
+	}
+
+	onKeyUp( { keyCode } ) {
+		if ( keyCode === KEYCODE_BACKSPACE ) {
+			this.onSelectionChange();
 		}
 	}
 
