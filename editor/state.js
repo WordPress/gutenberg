@@ -248,6 +248,12 @@ export function selectedBlock( state = {}, action ) {
 				typing: false,
 				focus: {},
 			};
+
+		case 'MULTI_SELECT':
+			return {
+				start: action.start,
+				end: action.end,
+			};
 	}
 
 	return state;
@@ -272,6 +278,7 @@ export function hoveredBlock( state = null, action ) {
 			break;
 
 		case 'START_TYPING':
+		case 'MULTI_SELECT':
 			return null;
 
 		case 'REPLACE_BLOCKS':

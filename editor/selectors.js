@@ -100,6 +100,28 @@ export function getSelectedBlock( state ) {
 	return state.editor.blocksByUid[ state.selectedBlock.uid ];
 }
 
+export function getSelectedBlocks( state ) {
+	const { blockOrder } = state.editor;
+	const { start, end } = state.selectedBlock;
+
+	if ( ! start || ! end ) {
+		return [];
+	}
+
+	const startIndex = blockOrder.indexOf( start );
+	const endIndex = blockOrder.indexOf( end );
+
+	if ( startIndex > endIndex ) {
+		return blockOrder.slice( endIndex, startIndex + 1 );
+	}
+
+	return blockOrder.slice( startIndex, endIndex + 1 );
+}
+
+export function getBlockSelectionEnd( state ) {
+	return state.selectedBlock.end;
+}
+
 export function getBlockUids( state ) {
 	return state.editor.blockOrder;
 }
@@ -128,6 +150,10 @@ export function getNextBlock( state, uid ) {
 
 export function isBlockSelected( state, uid ) {
 	return state.selectedBlock.uid === uid;
+}
+
+export function isBlockMultiSelected( state, uid ) {
+	return getSelectedBlocks( state ).indexOf( uid ) !== -1;
 }
 
 export function isBlockHovered( state, uid ) {
