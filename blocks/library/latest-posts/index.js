@@ -9,15 +9,6 @@ import Placeholder from 'components/placeholder';
 import { registerBlock } from '../../api';
 import { getLatestPosts } from './data.js';
 
-function renderList( latestPosts ) {
-	return (
-		<ul>
-			{ latestPosts.map( (post) =>
-				<li><a href={ post.link }>{ post.title.rendered }</a></li>
-			) }
-		</ul>
-	);
-}
 
 registerBlock( 'core/latest-posts', {
 	title: wp.i18n.__( 'Latest Posts' ),
@@ -26,12 +17,18 @@ registerBlock( 'core/latest-posts', {
 
 	category: 'rest-api',
 
-	edit( { attributes, setAttributes } ) {
-		const { latestPosts } = attributes;
+	edit: class extends wp.element.Component {
+		constructor() {
+			super( ...arguments );
 
-		if ( ! latestPosts ) {
-			getLatestPosts().then( latestPosts => setAttributes( { latestPosts } ) );
+			this.state = {
+				latestPosts: []
+			};
 
+			getLatestPosts().then( latestPosts => this.setState( { latestPosts } ) );
+		}
+
+		renderPostsLoading() {
 			return (
 				<Placeholder
 					icon="update"
@@ -41,20 +38,34 @@ registerBlock( 'core/latest-posts', {
 			);
 		}
 
-		return (
-			<div className="blocks-latest-posts">
-				{ renderList( latestPosts ) }
-			</div>
-		);
+		renderPostsList( latestPosts ) {
+			return (
+				<ul>
+					{ latestPosts.map( (post) =>
+						<li><a href={ post.link }>{ post.title.rendered }</a></li>
+					) }
+				</ul>
+			);
+		}
+
+		render() {
+			const { latestPosts } = this.state;
+
+			if ( ! latestPosts.length ) {
+				return this.renderPostsLoading();
+			}
+
+			return (
+				<div className="blocks-latest-posts">
+					{ this.renderPostsList( latestPosts ) }
+				</div>
+			);
+
+		}
+
 	},
 
-	save( { attributes } ) {
-		const { latestPosts } = attributes;
-
-		return (
-			<div>
-				{ renderList( latestPosts ) }
-			</div>
-		);
+	save() {
+		return null;
 	},
 } );
