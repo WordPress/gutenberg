@@ -11,6 +11,7 @@ import {
 	isEditorSidebarOpened,
 	hasEditorUndo,
 	hasEditorRedo,
+	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
@@ -121,6 +122,26 @@ describe( 'selectors', () => {
 			};
 
 			expect( hasEditorRedo( state ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isEditedPostNew', () => {
+		it( 'should return true when the post is new', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.true();
+		} );
+
+		it( 'should return false when the post has an ID', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+				},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.false();
 		} );
 	} );
 

@@ -24,6 +24,10 @@ export function hasEditorRedo( state ) {
 	return state.editor.history.future.length > 0;
 }
 
+export function isEditedPostNew( state ) {
+	return ! state.currentPost.id;
+}
+
 export function isEditedPostDirty( state ) {
 	return state.editor.dirty;
 }
