@@ -81,7 +81,7 @@ class Inserter extends wp.element.Component {
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
-					aria-expanded={ opened ? 'true' : 'false' }
+					aria-expanded={ opened }
 				>
 					{ children }
 				</IconButton>
