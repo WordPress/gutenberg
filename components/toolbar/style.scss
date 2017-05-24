@@ -64,6 +64,11 @@
 	}
 }
 
+// compensate for making the button hit area include the visual spacing
+.components-toolbar__control.components-button + .components-toolbar__control.components-button {
+	margin-left: -3px;
+}
+
 .components-toolbar__control .dashicon {
 	display: block;
 }
