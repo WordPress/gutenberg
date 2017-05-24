@@ -17,6 +17,7 @@ import IconButton from 'components/icon-button';
 import './style.scss';
 import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
+import FeaturedImage from '../featured-image';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
@@ -32,6 +33,7 @@ const PostSettings = ( { toggleSidebar } ) => {
 			</PanelHeader>
 			<PostStatus />
 			<PostExcerpt />
+			<FeaturedImage />
 		</Panel>
 	);
 };
