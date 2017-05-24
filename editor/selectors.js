@@ -56,7 +56,7 @@ export function getEditedPostVisibility( state ) {
 
 	if ( status === 'private' ) {
 		return 'private';
-	} else if ( password !== undefined && password !== null ) {
+	} else if ( password ) {
 		return 'password';
 	}
 	return 'public';
