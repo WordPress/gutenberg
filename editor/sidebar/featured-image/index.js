@@ -47,17 +47,12 @@ class FeaturedImage extends Component {
 	}
 
 	fetchMedia() {
+		this.setState( { media: null } );
 		if ( ! this.props.featuredImageId ) {
-			this.setState( {
-				media: null,
-				loading: false,
-			} );
+			this.setState( { loading: false } );
 			return;
 		}
-		this.setState( {
-			media: null,
-			loading: true,
-		} );
+		this.setState( { loading: true } );
 		const mediaIdToLoad = this.props.featuredImageId;
 		new wp.api.models.Media( { id: mediaIdToLoad } ).fetch()
 			.done( ( media ) => {
