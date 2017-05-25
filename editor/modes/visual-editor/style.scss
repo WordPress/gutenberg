@@ -87,7 +87,7 @@
 		top: $header-height + $admin-bar-height + $item-spacing;
 	}
 
-	&.controls-appear.controls-appear-active {
+	&.is-appearing {
 		@include animate_fade;
 	}
 }
