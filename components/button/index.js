@@ -12,14 +12,12 @@ function Button( { href, target, isPrimary, isLarge, isToggled, className, disab
 		'is-toggled': isToggled,
 	} );
 
-	const tag = href !== undefined ? 'a' : 'button';
+	const tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
-	const disabledLinkProps = tag === 'a' && !! disabled ? { 'aria-disabled': true, tabIndex: '-1' } : {};
 
 	return wp.element.createElement( tag, {
 		...tagProps,
 		...additionalProps,
-		...disabledLinkProps,
 		className: classes,
 	} );
 }

@@ -30,7 +30,7 @@
 
 	&.is-active,
 	&:hover,
-	&:not(:disabled):hover:not([aria-disabled="true"]) {
+	&:not(:disabled):hover {
 		border: 1px solid $dark-gray-500;
 		color: $dark-gray-500;
 	}
