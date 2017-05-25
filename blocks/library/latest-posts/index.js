@@ -9,7 +9,6 @@ import Placeholder from 'components/placeholder';
 import { registerBlock } from '../../api';
 import { getLatestPosts } from './data.js';
 
-
 registerBlock( 'core/latestposts', {
 	title: wp.i18n.__( 'Latest Posts' ),
 
@@ -18,7 +17,7 @@ registerBlock( 'core/latestposts', {
 	category: 'rest-api',
 
 	defaultAttributes: {
-		poststoshow: 5
+		poststoshow: 5,
 	},
 
 	edit: class extends wp.element.Component {
@@ -26,7 +25,7 @@ registerBlock( 'core/latestposts', {
 			super( ...arguments );
 
 			this.state = {
-				latestPosts: []
+				latestPosts: [],
 			};
 
 			const { poststoshow } = this.props.attributes;
@@ -48,8 +47,8 @@ registerBlock( 'core/latestposts', {
 		renderPostsList( latestPosts ) {
 			return (
 				<ul>
-					{ latestPosts.map( (post) =>
-						<li><a href={ post.link }>{ post.title.rendered }</a></li>
+					{ latestPosts.map( ( post, i ) =>
+						<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
 					) }
 				</ul>
 			);
@@ -69,7 +68,6 @@ registerBlock( 'core/latestposts', {
 			);
 
 		}
-
 	},
 
 	save() {
