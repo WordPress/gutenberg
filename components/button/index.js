@@ -4,7 +4,7 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { href, isPrimary, isLarge, isToggled, className, ...additionalProps } ) {
+function Button( { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } ) {
 	const classes = classnames( 'components-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
@@ -12,8 +12,8 @@ function Button( { href, isPrimary, isLarge, isToggled, className, ...additional
 		'is-toggled': isToggled,
 	} );
 
-	const tag = href !== undefined ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href } : { type: 'button' };
+	const tag = href !== undefined && ! disabled ? 'a' : 'button';
+	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
 
 	return wp.element.createElement( tag, {
 		...tagProps,
