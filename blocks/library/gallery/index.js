@@ -11,16 +11,30 @@ import GalleryImage from './gallery-image';
 
 const { query } = hpq;
 
-const openMediaLibrary = () => {
+const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
-		title: wp.i18n.__( 'Select or Upload a media' ),
+		frame: 'post',
+		title: wp.i18n.__( 'Update Gallery media' ),
 		button: {
 			text: wp.i18n.__( 'Select' ),
 		},
 		multiple: true,
+		state: 'gallery-edit',
+		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
 	};
 
-	wp.media( frameConfig ).open();
+	const editFrame = wp.media( frameConfig );
+	function updateFn() {
+		setAttributes( {
+			images: this.frame.state().attributes.library.models.map( ( a ) => {
+				return a.attributes;
+			} ),
+		} );
+	}
+
+	editFrame.on( 'insert', updateFn );
+	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
+	editFrame.open( 'gutenberg-gallery' );
 };
 
 /**
@@ -43,6 +57,7 @@ registerBlock( 'core/gallery', {
 	category: 'common',
 
 	attributes: {
+		// TODO: fix when loading view with existing gallery
 		images: query( 'div.blocks-gallery' ),
 	},
 
@@ -50,7 +65,7 @@ registerBlock( 'core/gallery', {
 		{
 			icon: 'format-image',
 			title: wp.i18n.__( 'Edit Gallery' ),
-			onClick: () => openMediaLibrary(),
+			onClick: editMediaLibrary,
 		},
 		{
 			icon: 'align-left',
