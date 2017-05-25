@@ -11,11 +11,13 @@ import {
 	isEditorSidebarOpened,
 	hasEditorUndo,
 	hasEditorRedo,
+	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
 	getEditedPostStatus,
 	getEditedPostTitle,
+	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	getEditedPostPreviewLink,
 	getBlock,
@@ -123,6 +125,26 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditedPostNew', () => {
+		it( 'should return true when the post is new', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.true();
+		} );
+
+		it( 'should return false when the post has an ID', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+				},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.false();
+		} );
+	} );
+
 	describe( 'isEditedPostDirty', () => {
 		it( 'should return true when the post is dirty', () => {
 			const state = {
@@ -220,6 +242,34 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostExcerpt', () => {
+		it( 'should return the post saved excerpt if the excerpt is not edited', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { status: 'private' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'sassel' );
+		} );
+
+		it( 'should return the edited excerpt', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { excerpt: 'youcha' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'youcha' );
 		} );
 	} );
 

@@ -304,6 +304,85 @@ describe( 'state', () => {
 					tags: [ 2 ],
 				} );
 			} );
+
+			it( 'should save initial post state', () => {
+				const state = editor( undefined, {
+					type: 'SETUP_NEW_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
+				} );
+
+				expect( state.edits ).to.eql( {
+					status: 'draft',
+					title: 'post title',
+				} );
+			} );
+		} );
+
+		describe( 'dirty()', () => {
+			it( 'should be true when the post is edited', () => {
+				const state = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				expect( state.dirty ).to.be.true();
+			} );
+
+			it( 'should change to false when the post is reset', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'RESET_BLOCKS',
+					post: {},
+					blocks: [],
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+
+			it( 'should not change from true when an unrelated action occurs', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'BRISKET_READY',
+				} );
+
+				expect( state.dirty ).to.be.true();
+			} );
+
+			it( 'should not change from false when an unrelated action occurs', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					post: {},
+					blocks: [],
+				} );
+
+				expect( original.dirty ).to.be.false();
+
+				const state = editor( original, {
+					type: 'BRISKET_READY',
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+
+			it( 'should be false when the post is initialized', () => {
+				const state = editor( undefined, {
+					type: 'SETUP_NEW_POST',
+					edits: {},
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
 		} );
 	} );
 

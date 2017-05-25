@@ -178,6 +178,11 @@ function gutenberg_register_scripts() {
 		'tinymce-nightly',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
 	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly-lists',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-nightly' )
+	);
 	wp_register_script(
 		'wp-i18n',
 		plugins_url( 'i18n/build/index.js', __FILE__ ),
@@ -193,7 +198,7 @@ function gutenberg_register_scripts() {
 	wp_register_script(
 		'wp-blocks',
 		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-element', 'tinymce-nightly' ),
+		array( 'wp-element', 'tinymce-nightly', 'tinymce-nightly-lists' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
 	);
 
@@ -208,6 +213,50 @@ function gutenberg_register_scripts() {
 add_action( 'init', 'gutenberg_register_scripts' );
 
 /**
+ * Retrieves a unique and reasonably short and human-friendly filename for a
+ * vendor script based on a URL.
+ *
+ * @param  string $src Full URL of the external script.
+ *
+ * @return string      Script filename suitable for local caching.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_vendor_script_filename( $src ) {
+	$filename = basename( $src );
+	$hash = substr( md5( $src ), 0, 8 );
+
+	$match = preg_match(
+		'/^'
+		. '(?P<prefix>.*?)'
+		. '(?P<ignore>\.development|\.production)?'
+		. '(?P<suffix>\.min)?'
+		. '(?P<extension>\.js)'
+		. '(?P<extra>.*)'
+		. '$/',
+		$filename,
+		$filename_pieces
+	);
+
+	if ( ! $match ) {
+		return "$filename.$hash.js";
+	}
+
+	$match = preg_match(
+		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
+		$src,
+		$tinymce_plugin_pieces
+	);
+	if ( $match ) {
+		$filename_pieces['prefix'] = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
+	}
+
+	return $filename_pieces['prefix'] . $filename_pieces['suffix']
+		. '.' . $hash
+		. $filename_pieces['extension'];
+}
+
+/**
  * Registers a vendor script from a URL, preferring a locally cached version if
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
@@ -220,7 +269,11 @@ add_action( 'init', 'gutenberg_register_scripts' );
  * @since 0.1.0
  */
 function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
-	$filename = basename( $src );
+	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
+		return;
+	}
+
+	$filename = gutenberg_vendor_script_filename( $src );
 	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
 
 	$needs_fetch = (
@@ -231,11 +284,12 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 	if ( $needs_fetch ) {
 		// Determine whether we can write to this file.  If not, don't waste
 		// time doing a network request.
-		$f = fopen( $full_path, 'a' );
+		// @codingStandardsIgnoreStart
+		$f = @fopen( $full_path, 'a' );
+		// @codingStandardsIgnoreEnd
 		if ( ! $f ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
-			// Note: the `fopen` call above will have generated a warning.
 			wp_register_script( $handle, $src, $deps );
 			return;
 		}

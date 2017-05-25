@@ -1,0 +1,16 @@
+.editor-post-trash {
+	cursor: pointer;
+	color: inherit;
+	flex-grow: 1;
+	text-align: right;
+
+	.dashicon {
+		vertical-align: middle;
+		margin-right: -10px;
+		margin-left: 10px;
+	}
+
+	&:hover {
+		color: $blue-medium;
+	}
+}

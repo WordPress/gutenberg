@@ -9,4 +9,16 @@
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.ClassComment.SpacingAfter">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment.MissingShort">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
 </ruleset>

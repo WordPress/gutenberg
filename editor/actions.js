@@ -94,6 +94,13 @@ export function savePost( dispatch, postId, edits ) {
 	} );
 }
 
+export function trashPost( dispatch, postId, postType ) {
+	new wp.api.models.Post( { id: postId } ).destroy().done( () => {
+		window.location.href = 'edit.php?post_type=' + postType
+			+ '&trashed=1&ids=' + postId;
+	} );
+}
+
 export function mergeBlocks( dispatch, blockA, blockB ) {
 	const blockASettings = wp.blocks.getBlockSettings( blockA.blockType );
 
