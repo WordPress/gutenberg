@@ -17,6 +17,10 @@ registerBlock( 'core/latestposts', {
 
 	category: 'rest-api',
 
+	defaultAttributes: {
+		poststoshow: 5
+	},
+
 	edit: class extends wp.element.Component {
 		constructor() {
 			super( ...arguments );
@@ -25,15 +29,7 @@ registerBlock( 'core/latestposts', {
 				latestPosts: []
 			};
 
-			let { poststoshow } = this.props.attributes;
-
-			if ( ! poststoshow ) {
-				poststoshow = 5;
-
-				this.props.setAttributes( {
-					poststoshow
-				} );
-			}
+			const { poststoshow } = this.props.attributes;
 
 			getLatestPosts( poststoshow )
 				.then( latestPosts => this.setState( { latestPosts } ) );
