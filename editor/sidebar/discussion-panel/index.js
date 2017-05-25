@@ -39,9 +39,6 @@ function DiscussionPanel( { pingStatus = 'open', commentStatus = 'open', ...prop
 					onChange={ onTogglePingback }
 				/>
 			</label>
-			<a href="https://make.wordpress.org/support/user-manual/building-your-wordpress-community/trackbacks-and-pingbacks/" target="_blank">
-				{ __( 'Send Trackbacks' ) }
-			</a>
 		</PanelBody>
 	);
 	/* eslint-enable jsx-a11y/label-has-for */
