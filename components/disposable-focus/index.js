@@ -1,23 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component, findDOMNode } from 'element';
 
 function disposableFocus( WrappedComponent ) {
 	return class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.bindWrapper = this.bindWrapper.bind( this );
-		}
-
 		componentDidMount() {
 			this.activeElement = document.activeElement;
 		}
 
 		componentWillUnmount() {
+			const wrapper = findDOMNode( this );
 			if (
 				this.activeElement && (
-					( document.activeElement && this.wrapper.contains( document.activeElement ) ) ||
+					( document.activeElement && wrapper && wrapper.contains( document.activeElement ) ) ||
 					! document.activeElement
 				)
 			) {
@@ -25,15 +21,9 @@ function disposableFocus( WrappedComponent ) {
 			}
 		}
 
-		bindWrapper( ref ) {
-			this.wrapper = ref;
-		}
-
 		render() {
 			return (
-				<div ref={ this.bindWrapper }>
-					<WrappedComponent { ...this.props } />
-				</div>
+				<WrappedComponent { ...this.props } />
 			);
 		}
 	};
