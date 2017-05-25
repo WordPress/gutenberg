@@ -18,6 +18,7 @@ import './style.scss';
 import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
 import FeaturedImage from '../featured-image';
+import DiscussionPanel from '../discussion-panel';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
@@ -32,8 +33,9 @@ const PostSettings = ( { toggleSidebar } ) => {
 				</div>
 			</PanelHeader>
 			<PostStatus />
-			<PostExcerpt />
 			<FeaturedImage />
+			<PostExcerpt />
+			<DiscussionPanel />
 		</Panel>
 	);
 };
