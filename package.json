@@ -74,6 +74,7 @@
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",
     "react-slot-fill": "^1.0.0-alpha.11",
+    "react-transition-group": "^1.1.3",
     "redux": "^3.6.0",
     "refx": "^2.0.0",
     "uuid": "^3.0.1"

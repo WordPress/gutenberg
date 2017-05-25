@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
+import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
  * WordPress dependencies
  */
+import { Children } from 'element';
 import Toolbar from 'components/toolbar';
 
 /**
@@ -32,6 +34,11 @@ import {
 	isBlockSelected,
 	isTypingInBlock,
 } from '../../selectors';
+
+function FirstChild( { children } ) {
+	const childrenArray = Children.toArray( children );
+	return childrenArray[ 0 ] || null;
+}
 
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
@@ -200,18 +207,27 @@ class VisualEditorBlock extends wp.element.Component {
 			>
 				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ showUI &&
-					<div className="editor-visual-editor__block-controls">
-						<BlockSwitcher uid={ block.uid } />
-						{ !! settings.controls && (
-							<Toolbar
-								controls={ settings.controls.map( ( control ) => ( {
-									...control,
-									onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									isActive: control.isActive ? control.isActive( block.attributes ) : false,
-								} ) ) } />
-						) }
-						<Slot name="Formatting.Toolbar" />
-					</div>
+					<CSSTransitionGroup
+						transitionName="controls"
+						transitionAppear={ true }
+						transitionAppearTimeout={ 100 }
+						transitionEnter={ false }
+						transitionLeave={ false }
+						component={ FirstChild }
+					>
+						<div className="editor-visual-editor__block-controls">
+							<BlockSwitcher uid={ block.uid } />
+							{ !! settings.controls && (
+								<Toolbar
+									controls={ settings.controls.map( ( control ) => ( {
+										...control,
+										onClick: () => control.onClick( block.attributes, this.setAttributes ),
+										isActive: control.isActive ? control.isActive( block.attributes ) : false,
+									} ) ) } />
+							) }
+							<Slot name="Formatting.Toolbar" />
+						</div>
+					</CSSTransitionGroup>
 				}
 				<div onKeyPress={ this.maybeStartTyping }>
 					<BlockEdit

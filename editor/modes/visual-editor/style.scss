@@ -72,7 +72,6 @@
 }
 
 .editor-visual-editor__block-controls {
-	@include animate_fade;
 	display: flex;
 	position: sticky;
 	z-index: z-index( '.editor-visual-editor__block-controls' );
@@ -86,6 +85,10 @@
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
+	}
+
+	&.controls-appear.controls-appear-active {
+		@include animate_fade;
 	}
 }
 
