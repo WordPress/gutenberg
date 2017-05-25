@@ -1,23 +1,25 @@
 <?php
 
 function gutenberg_block_core_latest_posts( $attributes ) {
-	$postsToShow = 5;
+	$posts_to_show = 5;
 
 	if ( array_key_exists( 'poststoshow', $attributes ) ) {
-		$postsToShow = $attributes['poststoshow'];
+		$posts_to_show = $attributes['poststoshow'];
 	}
 
 	$recent_posts = wp_get_recent_posts( array(
-		'numberposts' => $postsToShow,
+		'numberposts' => $posts_to_show,
 		'post_status' => 'publish'
 	) );
 
 	$posts_content = '';
 
 	foreach( $recent_posts as $post ) {
-		$post_permalink = get_permalink( $post['ID'] );
+		$post_id = $post['ID'];
+		$post_permalink = get_permalink( $post_id );
+		$post_title = get_the_title( $post_id );
 
-		$posts_content .= "<li><a href='{$post_permalink}'>{$post['post_title']}</a></li>\n";
+		$posts_content .= "<li><a href='{$post_permalink}'>{$post_title}</a></li>\n";
 	}
 
 	$block_content = <<<CONTENT
