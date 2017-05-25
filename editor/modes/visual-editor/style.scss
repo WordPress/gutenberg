@@ -54,6 +54,7 @@
 
 	&.is-multi-selected:before {
 		background: $blue-medium-100;
+		border: 2px solid $blue-medium-200;
 	}
 
 	.iframe-overlay {
