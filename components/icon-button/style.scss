@@ -17,7 +17,7 @@
 		width: auto;
 	}
 
-	&:not( :disabled ) {
+	&:not( :disabled ):not( [ aria-disabled="true" ] ) {
 		cursor: pointer;
 
 		&:hover {

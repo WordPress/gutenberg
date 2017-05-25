@@ -4,7 +4,7 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { href, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } ) {
+function Button( { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } ) {
 	const classes = classnames( 'components-button', className, {
 		button: ( isPrimary || isLarge ),
 		'button-primary': isPrimary,
@@ -13,14 +13,14 @@ function Button( { href, isPrimary, isLarge, isToggled, className, disabled, ...
 	} );
 
 	const tag = href !== undefined ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href } : { type: 'button' };
+	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	const disabledLinkProps = tag === 'a' && !! disabled ? { 'aria-disabled': true, tabIndex: '-1' } : {};
 
 	return wp.element.createElement( tag, {
-		className: classes,
-		'aria-disabled': disabled,
-		disabled,
 		...tagProps,
 		...additionalProps,
+		...disabledLinkProps,
+		className: classes,
 	} );
 }
 
