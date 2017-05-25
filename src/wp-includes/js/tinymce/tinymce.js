@@ -1,4 +1,4 @@
-// 4.6.1 (2017-05-10)
+// 4.6.2 (2017-05-23)
 (function () {
 
 var defs = {}; // id -> {dependencies, definition, instance (possibly undefined)}
@@ -82,7 +82,7 @@ var defineGlobal = function (id, ref) {
   define(id, [], function () { return ref; });
 };
 /*jsc
-["tinymce.core.api.Main","tinymce.core.api.Tinymce","tinymce.core.Register","tinymce.core.geom.Rect","tinymce.core.util.Promise","tinymce.core.util.Delay","tinymce.core.Env","tinymce.core.dom.EventUtils","tinymce.core.dom.Sizzle","tinymce.core.util.Tools","tinymce.core.dom.DomQuery","tinymce.core.html.Styles","tinymce.core.dom.TreeWalker","tinymce.core.html.Entities","tinymce.core.dom.DOMUtils","tinymce.core.dom.ScriptLoader","tinymce.core.AddOnManager","tinymce.core.dom.RangeUtils","tinymce.core.html.Node","tinymce.core.html.Schema","tinymce.core.html.SaxParser","tinymce.core.html.DomParser","tinymce.core.html.Writer","tinymce.core.html.Serializer","tinymce.core.dom.Serializer","tinymce.core.util.VK","tinymce.core.dom.ControlSelection","tinymce.core.dom.BookmarkManager","tinymce.core.dom.Selection","tinymce.core.Formatter","tinymce.core.UndoManager","tinymce.core.EditorCommands","tinymce.core.util.URI","tinymce.core.util.Class","tinymce.core.util.EventDispatcher","tinymce.core.util.Observable","tinymce.core.WindowManager","tinymce.core.NotificationManager","tinymce.core.EditorObservable","tinymce.core.Shortcuts","tinymce.core.Editor","tinymce.core.util.I18n","tinymce.core.FocusManager","tinymce.core.EditorManager","tinymce.core.util.XHR","tinymce.core.util.JSON","tinymce.core.util.JSONRequest","tinymce.core.util.JSONP","tinymce.core.util.LocalStorage","tinymce.core.api.Compat","tinymce.core.util.Color","tinymce.core.ui.Api","tinymce.core.util.Arr","tinymce.core.dom.Range","tinymce.core.dom.StyleSheetLoader","tinymce.core.dom.NodeType","tinymce.core.caret.CaretContainer","tinymce.core.text.Zwsp","tinymce.core.caret.CaretBookmark","tinymce.core.caret.CaretPosition","tinymce.core.dom.ScrollIntoView","tinymce.core.dom.TridentSelection","tinymce.core.dom.ElementUtils","tinymce.core.util.Fun","tinymce.core.fmt.Preview","tinymce.core.fmt.Hooks","tinymce.core.undo.Levels","tinymce.core.delete.DeleteCommands","tinymce.core.InsertContent","global!document","tinymce.core.ui.Window","tinymce.core.ui.MessageBox","tinymce.core.ui.Notification","tinymce.core.init.Render","tinymce.core.Mode","tinymce.core.ui.Sidebar","tinymce.core.util.Uuid","tinymce.core.ErrorReporter","tinymce.core.LegacyInput","tinymce.core.ui.Selector","tinymce.core.ui.Collection","tinymce.core.ui.ReflowQueue","tinymce.core.ui.Control","tinymce.core.ui.Factory","tinymce.core.ui.KeyboardNavigation","tinymce.core.ui.Container","tinymce.core.ui.DragHelper","tinymce.core.ui.Scrollable","tinymce.core.ui.Panel","tinymce.core.ui.Movable","tinymce.core.ui.Resizable","tinymce.core.ui.FloatPanel","tinymce.core.ui.Tooltip","tinymce.core.ui.Widget","tinymce.core.ui.Progress","tinymce.core.ui.Layout","tinymce.core.ui.AbsoluteLayout","tinymce.core.ui.Button","tinymce.core.ui.ButtonGroup","tinymce.core.ui.Checkbox","tinymce.core.ui.ComboBox","tinymce.core.ui.ColorBox","tinymce.core.ui.PanelButton","tinymce.core.ui.ColorButton","tinymce.core.ui.ColorPicker","tinymce.core.ui.Path","tinymce.core.ui.ElementPath","tinymce.core.ui.FormItem","tinymce.core.ui.Form","tinymce.core.ui.FieldSet","tinymce.core.ui.FilePicker","tinymce.core.ui.FitLayout","tinymce.core.ui.FlexLayout","tinymce.core.ui.FlowLayout","tinymce.core.ui.FormatControls","tinymce.core.ui.GridLayout","tinymce.core.ui.Iframe","tinymce.core.ui.InfoBox","tinymce.core.ui.Label","tinymce.core.ui.Toolbar","tinymce.core.ui.MenuBar","tinymce.core.ui.MenuButton","tinymce.core.ui.MenuItem","tinymce.core.ui.Throbber","tinymce.core.ui.Menu","tinymce.core.ui.ListBox","tinymce.core.ui.Radio","tinymce.core.ui.ResizeHandle","tinymce.core.ui.SelectBox","tinymce.core.ui.Slider","tinymce.core.ui.Spacer","tinymce.core.ui.SplitButton","tinymce.core.ui.StackLayout","tinymce.core.ui.TabPanel","tinymce.core.ui.TextBox","ephox.katamari.api.Arr","ephox.katamari.api.Fun","ephox.katamari.api.Future","ephox.katamari.api.Futures","ephox.katamari.api.Result","tinymce.core.caret.CaretCandidate","tinymce.core.geom.ClientRect","tinymce.core.text.ExtendingChar","tinymce.core.undo.Fragments","tinymce.core.delete.BlockBoundaryDelete","tinymce.core.delete.BlockRangeDelete","tinymce.core.delete.CefDelete","tinymce.core.delete.InlineBoundaryDelete","tinymce.core.caret.CaretWalker","tinymce.core.dom.RangeNormalizer","tinymce.core.InsertList","tinymce.core.data.ObservableObject","tinymce.core.ui.DomUtils","tinymce.core.ui.BoxUtils","tinymce.core.ui.ClassList","global!window","tinymce.core.init.Init","tinymce.core.PluginManager","tinymce.core.ThemeManager","tinymce.core.content.LinkTargets","tinymce.core.fmt.FontInfo","ephox.katamari.api.Option","global!Array","global!Error","global!String","ephox.katamari.api.LazyValue","ephox.katamari.async.Bounce","ephox.katamari.async.AsyncValues","tinymce.core.undo.Diff","tinymce.core.delete.BlockBoundary","tinymce.core.delete.MergeBlocks","ephox.katamari.api.Options","ephox.sugar.api.dom.Compare","ephox.sugar.api.node.Element","tinymce.core.delete.DeleteUtils","tinymce.core.caret.CaretUtils","tinymce.core.delete.CefDeleteAction","tinymce.core.delete.DeleteElement","tinymce.core.keyboard.BoundaryCaret","tinymce.core.keyboard.BoundaryLocation","tinymce.core.keyboard.BoundarySelection","tinymce.core.keyboard.InlineUtils","tinymce.core.caret.CaretFinder","tinymce.core.data.Binding","tinymce.core.init.InitContentBody","global!Object","global!setTimeout","ephox.katamari.api.Struct","ephox.sand.api.Node","ephox.sand.api.PlatformDetection","ephox.sugar.api.search.Selectors","global!console","ephox.sugar.api.node.Node","ephox.sugar.api.search.PredicateFind","ephox.sugar.api.search.Traverse","tinymce.core.dom.Empty","ephox.sugar.api.dom.Insert","ephox.sugar.api.dom.Remove","ephox.katamari.api.Adt","tinymce.core.text.Bidi","tinymce.core.caret.CaretContainerInline","tinymce.core.caret.CaretContainerRemove","tinymce.core.util.LazyEvaluator","ephox.katamari.api.Cell","tinymce.core.caret.CaretContainerInput","tinymce.core.EditorUpload","tinymce.core.ForceBlocks","tinymce.core.keyboard.KeyboardOverrides","tinymce.core.NodeChange","tinymce.core.SelectionOverrides","tinymce.core.util.Quirks","ephox.katamari.data.Immutable","ephox.katamari.data.MixedBag","ephox.sand.util.Global","ephox.katamari.api.Thunk","ephox.sand.core.PlatformDetection","global!navigator","ephox.sugar.api.node.NodeTypes","ephox.katamari.api.Type","ephox.sugar.api.node.Body","ephox.sugar.impl.ClosestOrAncestor","ephox.sugar.alien.Recurse","ephox.sugar.api.search.SelectorExists","ephox.sugar.api.dom.InsertAll","ephox.katamari.api.Obj","tinymce.core.file.Uploader","tinymce.core.file.ImageScanner","tinymce.core.file.BlobCache","tinymce.core.file.UploadStatus","tinymce.core.keyboard.ArrowKeys","tinymce.core.keyboard.DeleteBackspaceKeys","tinymce.core.keyboard.EnterKey","tinymce.core.keyboard.SpaceKey","tinymce.core.caret.FakeCaret","tinymce.core.caret.LineWalker","tinymce.core.caret.LineUtils","tinymce.core.DragDropOverrides","tinymce.core.dom.NodePath","ephox.katamari.util.BagUtils","ephox.katamari.api.Resolve","ephox.sand.core.Browser","ephox.sand.core.OperatingSystem","ephox.sand.detect.DeviceType","ephox.sand.detect.UaString","ephox.sand.info.PlatformInfo","ephox.sugar.api.search.SelectorFind","tinymce.core.file.Conversions","global!URL","tinymce.core.keyboard.MatchKeys","tinymce.core.keyboard.InsertSpace","tinymce.core.dom.Dimensions","tinymce.core.dom.MousePosition","ephox.katamari.api.Global","ephox.sand.detect.Version","ephox.katamari.api.Strings","ephox.katamari.api.Merger","global!Number","ephox.katamari.str.StrAppend","ephox.katamari.str.StringParts"]
+["tinymce.core.api.Main","tinymce.core.api.Tinymce","tinymce.core.Register","tinymce.core.geom.Rect","tinymce.core.util.Promise","tinymce.core.util.Delay","tinymce.core.Env","tinymce.core.dom.EventUtils","tinymce.core.dom.Sizzle","tinymce.core.util.Tools","tinymce.core.dom.DomQuery","tinymce.core.html.Styles","tinymce.core.dom.TreeWalker","tinymce.core.html.Entities","tinymce.core.dom.DOMUtils","tinymce.core.dom.ScriptLoader","tinymce.core.AddOnManager","tinymce.core.dom.RangeUtils","tinymce.core.html.Node","tinymce.core.html.Schema","tinymce.core.html.SaxParser","tinymce.core.html.DomParser","tinymce.core.html.Writer","tinymce.core.html.Serializer","tinymce.core.dom.Serializer","tinymce.core.util.VK","tinymce.core.dom.ControlSelection","tinymce.core.dom.BookmarkManager","tinymce.core.dom.Selection","tinymce.core.Formatter","tinymce.core.UndoManager","tinymce.core.EditorCommands","tinymce.core.util.URI","tinymce.core.util.Class","tinymce.core.util.EventDispatcher","tinymce.core.util.Observable","tinymce.core.WindowManager","tinymce.core.NotificationManager","tinymce.core.EditorObservable","tinymce.core.Shortcuts","tinymce.core.Editor","tinymce.core.util.I18n","tinymce.core.FocusManager","tinymce.core.EditorManager","tinymce.core.util.XHR","tinymce.core.util.JSON","tinymce.core.util.JSONRequest","tinymce.core.util.JSONP","tinymce.core.util.LocalStorage","tinymce.core.api.Compat","tinymce.core.util.Color","tinymce.core.ui.Api","tinymce.core.util.Arr","tinymce.core.dom.Range","tinymce.core.dom.StyleSheetLoader","tinymce.core.dom.NodeType","tinymce.core.caret.CaretContainer","tinymce.core.text.Zwsp","tinymce.core.caret.CaretBookmark","tinymce.core.caret.CaretPosition","tinymce.core.dom.ScrollIntoView","tinymce.core.dom.TridentSelection","tinymce.core.selection.FragmentReader","tinymce.core.dom.ElementUtils","tinymce.core.util.Fun","tinymce.core.fmt.Preview","tinymce.core.fmt.Hooks","tinymce.core.undo.Levels","tinymce.core.delete.DeleteCommands","tinymce.core.InsertContent","global!document","tinymce.core.ui.Window","tinymce.core.ui.MessageBox","tinymce.core.ui.Notification","tinymce.core.init.Render","tinymce.core.Mode","tinymce.core.ui.Sidebar","tinymce.core.util.Uuid","tinymce.core.ErrorReporter","tinymce.core.LegacyInput","tinymce.core.ui.Selector","tinymce.core.ui.Collection","tinymce.core.ui.ReflowQueue","tinymce.core.ui.Control","tinymce.core.ui.Factory","tinymce.core.ui.KeyboardNavigation","tinymce.core.ui.Container","tinymce.core.ui.DragHelper","tinymce.core.ui.Scrollable","tinymce.core.ui.Panel","tinymce.core.ui.Movable","tinymce.core.ui.Resizable","tinymce.core.ui.FloatPanel","tinymce.core.ui.Tooltip","tinymce.core.ui.Widget","tinymce.core.ui.Progress","tinymce.core.ui.Layout","tinymce.core.ui.AbsoluteLayout","tinymce.core.ui.Button","tinymce.core.ui.ButtonGroup","tinymce.core.ui.Checkbox","tinymce.core.ui.ComboBox","tinymce.core.ui.ColorBox","tinymce.core.ui.PanelButton","tinymce.core.ui.ColorButton","tinymce.core.ui.ColorPicker","tinymce.core.ui.Path","tinymce.core.ui.ElementPath","tinymce.core.ui.FormItem","tinymce.core.ui.Form","tinymce.core.ui.FieldSet","tinymce.core.ui.FilePicker","tinymce.core.ui.FitLayout","tinymce.core.ui.FlexLayout","tinymce.core.ui.FlowLayout","tinymce.core.ui.FormatControls","tinymce.core.ui.GridLayout","tinymce.core.ui.Iframe","tinymce.core.ui.InfoBox","tinymce.core.ui.Label","tinymce.core.ui.Toolbar","tinymce.core.ui.MenuBar","tinymce.core.ui.MenuButton","tinymce.core.ui.MenuItem","tinymce.core.ui.Throbber","tinymce.core.ui.Menu","tinymce.core.ui.ListBox","tinymce.core.ui.Radio","tinymce.core.ui.ResizeHandle","tinymce.core.ui.SelectBox","tinymce.core.ui.Slider","tinymce.core.ui.Spacer","tinymce.core.ui.SplitButton","tinymce.core.ui.StackLayout","tinymce.core.ui.TabPanel","tinymce.core.ui.TextBox","ephox.katamari.api.Arr","ephox.katamari.api.Fun","ephox.katamari.api.Future","ephox.katamari.api.Futures","ephox.katamari.api.Result","tinymce.core.caret.CaretCandidate","tinymce.core.geom.ClientRect","tinymce.core.text.ExtendingChar","ephox.sugar.api.dom.Insert","ephox.sugar.api.dom.Replication","ephox.sugar.api.node.Element","ephox.sugar.api.node.Fragment","ephox.sugar.api.node.Node","tinymce.core.dom.ElementType","tinymce.core.dom.Parents","tinymce.core.selection.SelectionUtils","tinymce.core.undo.Fragments","tinymce.core.delete.BlockBoundaryDelete","tinymce.core.delete.BlockRangeDelete","tinymce.core.delete.CefDelete","tinymce.core.delete.InlineBoundaryDelete","tinymce.core.caret.CaretWalker","tinymce.core.dom.RangeNormalizer","tinymce.core.InsertList","tinymce.core.data.ObservableObject","tinymce.core.ui.DomUtils","tinymce.core.ui.BoxUtils","tinymce.core.ui.ClassList","global!window","tinymce.core.init.Init","tinymce.core.PluginManager","tinymce.core.ThemeManager","tinymce.core.content.LinkTargets","tinymce.core.fmt.FontInfo","ephox.katamari.api.Option","global!Array","global!Error","global!String","ephox.katamari.api.LazyValue","ephox.katamari.async.Bounce","ephox.katamari.async.AsyncValues","ephox.sugar.api.search.Traverse","ephox.sugar.api.properties.Attr","global!console","ephox.sugar.api.dom.InsertAll","ephox.sugar.api.dom.Remove","ephox.sugar.api.node.NodeTypes","ephox.sugar.api.dom.Compare","ephox.katamari.api.Options","tinymce.core.undo.Diff","tinymce.core.delete.BlockBoundary","tinymce.core.delete.MergeBlocks","tinymce.core.delete.DeleteUtils","tinymce.core.caret.CaretUtils","tinymce.core.delete.CefDeleteAction","tinymce.core.delete.DeleteElement","tinymce.core.keyboard.BoundaryCaret","tinymce.core.keyboard.BoundaryLocation","tinymce.core.keyboard.BoundarySelection","tinymce.core.keyboard.InlineUtils","tinymce.core.caret.CaretFinder","tinymce.core.data.Binding","tinymce.core.init.InitContentBody","global!Object","global!setTimeout","ephox.katamari.api.Type","ephox.katamari.api.Struct","ephox.sugar.alien.Recurse","ephox.sand.api.Node","ephox.sand.api.PlatformDetection","ephox.sugar.api.search.Selectors","ephox.katamari.api.Obj","ephox.sugar.api.search.PredicateFind","tinymce.core.dom.Empty","ephox.katamari.api.Adt","tinymce.core.text.Bidi","tinymce.core.caret.CaretContainerInline","tinymce.core.caret.CaretContainerRemove","tinymce.core.util.LazyEvaluator","ephox.katamari.api.Cell","tinymce.core.caret.CaretContainerInput","tinymce.core.EditorUpload","tinymce.core.ForceBlocks","tinymce.core.keyboard.KeyboardOverrides","tinymce.core.NodeChange","tinymce.core.SelectionOverrides","tinymce.core.util.Quirks","ephox.katamari.data.Immutable","ephox.katamari.data.MixedBag","ephox.sand.util.Global","ephox.katamari.api.Thunk","ephox.sand.core.PlatformDetection","global!navigator","ephox.sugar.api.node.Body","ephox.sugar.impl.ClosestOrAncestor","ephox.sugar.api.search.SelectorExists","tinymce.core.file.Uploader","tinymce.core.file.ImageScanner","tinymce.core.file.BlobCache","tinymce.core.file.UploadStatus","tinymce.core.keyboard.ArrowKeys","tinymce.core.keyboard.DeleteBackspaceKeys","tinymce.core.keyboard.EnterKey","tinymce.core.keyboard.SpaceKey","tinymce.core.caret.FakeCaret","tinymce.core.caret.LineUtils","tinymce.core.DragDropOverrides","tinymce.core.keyboard.CefUtils","tinymce.core.dom.NodePath","ephox.katamari.util.BagUtils","ephox.katamari.api.Resolve","ephox.sand.core.Browser","ephox.sand.core.OperatingSystem","ephox.sand.detect.DeviceType","ephox.sand.detect.UaString","ephox.sand.info.PlatformInfo","ephox.sugar.api.search.SelectorFind","tinymce.core.file.Conversions","global!URL","tinymce.core.keyboard.CefNavigation","tinymce.core.keyboard.MatchKeys","tinymce.core.keyboard.InsertSpace","tinymce.core.dom.Dimensions","tinymce.core.dom.MousePosition","ephox.katamari.api.Global","ephox.sand.detect.Version","ephox.katamari.api.Strings","tinymce.core.caret.LineWalker","ephox.katamari.api.Merger","global!Number","ephox.katamari.str.StrAppend","ephox.katamari.str.StringParts"]
 jsc*/
 /**
  * Rect.js
@@ -13750,7 +13750,7 @@ define(
         var self = this, matches, index = 0, value, endRegExp, stack = [], attrList, i, text, name;
         var isInternalElement, removeInternalElements, shortEndedElements, fillAttrsMap, isShortEnded;
         var validate, elementRule, isValidElement, attr, attribsValue, validAttributesMap, validAttributePatterns;
-        var attributesRequired, attributesDefault, attributesForced;
+        var attributesRequired, attributesDefault, attributesForced, processHtml;
         var anyAttributesRequired, selfClosing, tokenRegExp, attrRegExp, specialElements, attrValue, idCount = 0;
         var decode = Entities.decode, fixSelfClosing, filteredUrlAttrs = Tools.makeMap('src,href,data,background,formaction,poster');
         var scriptUriRegExp = /((java|vb)script|mhtml):/i, dataUriRegExp = /^data:/i;
@@ -13868,8 +13868,9 @@ define(
         removeInternalElements = settings.remove_internals;
         fixSelfClosing = settings.fix_self_closing;
         specialElements = schema.getSpecialElements();
+        processHtml = html + '>';
 
-        while ((matches = tokenRegExp.exec(html + '>'))) { // Adds and extra '>' to keep regexps from doing catastrofic backtracking on malformed html
+        while ((matches = tokenRegExp.exec(processHtml))) { // Adds and extra '>' to keep regexps from doing catastrofic backtracking on malformed html
           // Text
           if (index < matches.index) {
             self.text(decode(html.substr(index, matches.index - index)));
@@ -18676,6 +18677,2201 @@ define(
   }
 );
 
+define(
+  'ephox.katamari.api.Type',
+
+  [
+    'global!Array',
+    'global!String'
+  ],
+
+  function (Array, String) {
+    var typeOf = function(x) {
+      if (x === null) return 'null';
+      var t = typeof x;
+      if (t === 'object' && Array.prototype.isPrototypeOf(x)) return 'array';
+      if (t === 'object' && String.prototype.isPrototypeOf(x)) return 'string';
+      return t;
+    };
+
+    var isType = function (type) {
+      return function (value) {
+        return typeOf(value) === type;
+      };
+    };
+
+    return {
+      isString: isType('string'),
+      isObject: isType('object'),
+      isArray: isType('array'),
+      isNull: isType('null'),
+      isBoolean: isType('boolean'),
+      isUndefined: isType('undefined'),
+      isFunction: isType('function'),
+      isNumber: isType('number')
+    };
+  }
+);
+
+
+define(
+  'ephox.katamari.data.Immutable',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'global!Array',
+    'global!Error'
+  ],
+
+  function (Arr, Fun, Array, Error) {
+    return function () {
+      var fields = arguments;
+      return function(/* values */) {
+        //  Don't use array slice(arguments), makes the whole function unoptimisable on Chrome
+        var values = new Array(arguments.length);
+        for (var i = 0; i < values.length; i++) values[i] = arguments[i];
+
+        if (fields.length !== values.length)
+          throw new Error('Wrong number of arguments to struct. Expected "[' + fields.length + ']", got ' + values.length + ' arguments');
+
+        var struct = {};
+        Arr.each(fields, function (name, i) {
+          struct[name] = Fun.constant(values[i]);
+        });
+        return struct;
+      };
+    };
+  }
+);
+
+define(
+  'ephox.katamari.api.Obj',
+
+  [
+    'ephox.katamari.api.Option',
+    'global!Object'
+  ],
+
+  function (Option, Object) {
+    // There are many variations of Object iteration that are faster than the 'for-in' style:
+    // http://jsperf.com/object-keys-iteration/107
+    //
+    // Use the native keys if it is available (IE9+), otherwise fall back to manually filtering
+    var keys = (function () {
+      var fastKeys = Object.keys;
+
+      // This technically means that 'each' and 'find' on IE8 iterate through the object twice.
+      // This code doesn't run on IE8 much, so it's an acceptable tradeoff.
+      // If it becomes a problem we can always duplicate the feature detection inside each and find as well.
+      var slowKeys = function (o) {
+        var r = [];
+        for (var i in o) {
+          if (o.hasOwnProperty(i)) {
+            r.push(i);
+          }
+        }
+        return r;
+      };
+
+      return fastKeys === undefined ? slowKeys : fastKeys;
+    })();
+
+
+    var each = function (obj, f) {
+      var props = keys(obj);
+      for (var k = 0, len = props.length; k < len; k++) {
+        var i = props[k];
+        var x = obj[i];
+        f(x, i, obj);
+      }
+    };
+
+    /** objectMap :: (JsObj(k, v), (v, k, JsObj(k, v) -> x)) -> JsObj(k, x) */
+    var objectMap = function (obj, f) {
+      return tupleMap(obj, function (x, i, obj) {
+        return {
+          k: i,
+          v: f(x, i, obj)
+        };
+      });
+    };
+
+    /** tupleMap :: (JsObj(k, v), (v, k, JsObj(k, v) -> { k: x, v: y })) -> JsObj(x, y) */
+    var tupleMap = function (obj, f) {
+      var r = {};
+      each(obj, function (x, i) {
+        var tuple = f(x, i, obj);
+        r[tuple.k] = tuple.v;
+      });
+      return r;
+    };
+
+    /** bifilter :: (JsObj(k, v), (v, k -> Bool)) -> { t: JsObj(k, v), f: JsObj(k, v) } */
+    var bifilter = function (obj, pred) {
+      var t = {};
+      var f = {};
+      each(obj, function(x, i) {
+        var branch = pred(x, i) ? t : f;
+        branch[i] = x;
+      });
+      return {
+        t: t,
+        f: f
+      };
+    };
+
+    /** mapToArray :: (JsObj(k, v), (v, k -> a)) -> [a] */
+    var mapToArray = function (obj, f) {
+      var r = [];
+      each(obj, function(value, name) {
+        r.push(f(value, name));
+      });
+      return r;
+    };
+
+    /** find :: (JsObj(k, v), (v, k, JsObj(k, v) -> Bool)) -> Option v */
+    var find = function (obj, pred) {
+      var props = keys(obj);
+      for (var k = 0, len = props.length; k < len; k++) {
+        var i = props[k];
+        var x = obj[i];
+        if (pred(x, i, obj)) {
+          return Option.some(x);
+        }
+      }
+      return Option.none();
+    };
+
+    /** values :: JsObj(k, v) -> [v] */
+    var values = function (obj) {
+      return mapToArray(obj, function (v) {
+        return v;
+      });
+    };
+
+    var size = function (obj) {
+      return values(obj).length;
+    };
+
+    return {
+      bifilter: bifilter,
+      each: each,
+      map: objectMap,
+      mapToArray: mapToArray,
+      tupleMap: tupleMap,
+      find: find,
+      keys: keys,
+      values: values,
+      size: size
+    };
+  }
+);
+define(
+  'ephox.katamari.util.BagUtils',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Type',
+    'global!Error'
+  ],
+
+  function (Arr, Type, Error) {
+    var sort = function (arr) {
+      return arr.slice(0).sort();
+    };
+
+    var reqMessage = function (required, keys) {
+      throw new Error('All required keys (' + sort(required).join(', ') + ') were not specified. Specified keys were: ' + sort(keys).join(', ') + '.');
+    };
+
+    var unsuppMessage = function (unsupported) {
+      throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
+    };
+
+    var validateStrArr = function (label, array) {
+      if (!Type.isArray(array)) throw new Error('The ' + label + ' fields must be an array. Was: ' + array + '.');
+      Arr.each(array, function (a) {
+        if (!Type.isString(a)) throw new Error('The value ' + a + ' in the ' + label + ' fields was not a string.');
+      });
+    };
+
+    var invalidTypeMessage = function (incorrect, type) {
+      throw new Error('All values need to be of type: ' + type + '. Keys (' + sort(incorrect).join(', ') + ') were not.');
+    };
+
+    var checkDupes = function (everything) {
+      var sorted = sort(everything);
+      var dupe = Arr.find(sorted, function (s, i) {
+        return i < sorted.length -1 && s === sorted[i + 1];
+      });
+
+      dupe.each(function (d) {
+        throw new Error('The field: ' + d + ' occurs more than once in the combined fields: [' + sorted.join(', ') + '].');
+      });
+    };
+
+    return {
+      sort: sort,
+      reqMessage: reqMessage,
+      unsuppMessage: unsuppMessage,
+      validateStrArr: validateStrArr,
+      invalidTypeMessage: invalidTypeMessage,
+      checkDupes: checkDupes
+    };
+  }
+);
+define(
+  'ephox.katamari.data.MixedBag',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.katamari.api.Obj',
+    'ephox.katamari.api.Option',
+    'ephox.katamari.util.BagUtils',
+    'global!Error',
+    'global!Object'
+  ],
+
+  function (Arr, Fun, Obj, Option, BagUtils, Error, Object) {
+    
+    return function (required, optional) {
+      var everything = required.concat(optional);
+      if (everything.length === 0) throw new Error('You must specify at least one required or optional field.');
+
+      BagUtils.validateStrArr('required', required);
+      BagUtils.validateStrArr('optional', optional);
+
+      BagUtils.checkDupes(everything);
+
+      return function (obj) {
+        var keys = Obj.keys(obj);
+
+        // Ensure all required keys are present.
+        var allReqd = Arr.forall(required, function (req) {
+          return Arr.contains(keys, req);
+        });
+
+        if (! allReqd) BagUtils.reqMessage(required, keys);
+
+        var unsupported = Arr.filter(keys, function (key) {
+          return !Arr.contains(everything, key);
+        });
+
+        if (unsupported.length > 0) BagUtils.unsuppMessage(unsupported);
+
+        var r = {};
+        Arr.each(required, function (req) {
+          r[req] = Fun.constant(obj[req]);
+        });
+
+        Arr.each(optional, function (opt) {
+          r[opt] = Fun.constant(Object.prototype.hasOwnProperty.call(obj, opt) ? Option.some(obj[opt]): Option.none());
+        });
+
+        return r;
+      };
+    };
+  }
+);
+define(
+  'ephox.katamari.api.Struct',
+
+  [
+    'ephox.katamari.data.Immutable',
+    'ephox.katamari.data.MixedBag'
+  ],
+
+  function (Immutable, MixedBag) {
+    return {
+      immutable: Immutable,
+      immutableBag: MixedBag
+    };
+  }
+);
+
+define(
+  'ephox.sugar.alien.Recurse',
+
+  [
+
+  ],
+
+  function () {
+    /**
+     * Applies f repeatedly until it completes (by returning Option.none()).
+     *
+     * Normally would just use recursion, but JavaScript lacks tail call optimisation.
+     *
+     * This is what recursion looks like when manually unravelled :)
+     */
+    var toArray = function (target, f) {
+      var r = [];
+
+      var recurse = function (e) {
+        r.push(e);
+        return f(e);
+      };
+
+      var cur = f(target);
+      do {
+        cur = cur.bind(recurse);
+      } while (cur.isSome());
+
+      return r;
+    };
+
+    return {
+      toArray: toArray
+    };
+  }
+);
+define(
+  'ephox.katamari.api.Global',
+
+  [
+  ],
+
+  function () {
+    // Use window object as the global if it's available since CSP will block script evals
+    if (typeof window !== 'undefined') {
+      return window;
+    } else {
+      return Function('return this;')();
+    }
+  }
+);
+
+
+define(
+  'ephox.katamari.api.Resolve',
+
+  [
+    'ephox.katamari.api.Global'
+  ],
+
+  function (Global) {
+    /** path :: ([String], JsObj?) -> JsObj */
+    var path = function (parts, scope) {
+      var o = scope !== undefined ? scope : Global;
+      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
+        o = o[parts[i]];
+      return o;
+    };
+
+    /** resolve :: (String, JsObj?) -> JsObj */
+    var resolve = function (p, scope) {
+      var parts = p.split('.');
+      return path(parts, scope);
+    };
+
+    /** step :: (JsObj, String) -> JsObj */
+    var step = function (o, part) {
+      if (o[part] === undefined || o[part] === null)
+        o[part] = {};
+      return o[part];
+    };
+
+    /** forge :: ([String], JsObj?) -> JsObj */
+    var forge = function (parts, target) {
+      var o = target !== undefined ? target : Global;      
+      for (var i = 0; i < parts.length; ++i)
+        o = step(o, parts[i]);
+      return o;
+    };
+
+    /** namespace :: (String, JsObj?) -> JsObj */
+    var namespace = function (name, target) {
+      var parts = name.split('.');
+      return forge(parts, target);
+    };
+
+    return {
+      path: path,
+      resolve: resolve,
+      forge: forge,
+      namespace: namespace
+    };
+  }
+);
+
+
+define(
+  'ephox.sand.util.Global',
+
+  [
+    'ephox.katamari.api.Resolve'
+  ],
+
+  function (Resolve) {
+    var unsafe = function (name, scope) {
+      return Resolve.resolve(name, scope);
+    };
+
+    var getOrDie = function (name, scope) {
+      var actual = unsafe(name, scope);
+
+      if (actual === undefined) throw name + ' not available on this browser';
+      return actual;
+    };
+
+    return {
+      getOrDie: getOrDie
+    };
+  }
+);
+define(
+  'ephox.sand.api.Node',
+
+  [
+    'ephox.sand.util.Global'
+  ],
+
+  function (Global) {
+    /*
+     * MDN says (yes) for IE, but it's undefined on IE8
+     */
+    var node = function () {
+      var f = Global.getOrDie('Node');
+      return f;
+    };
+
+    /*
+     * Most of numerosity doesn't alter the methods on the object.
+     * We're making an exception for Node, because bitwise and is so easy to get wrong.
+     *
+     * Might be nice to ADT this at some point instead of having individual methods.
+     */
+
+    var compareDocumentPosition = function (a, b, match) {
+      // Returns: 0 if e1 and e2 are the same node, or a bitmask comparing the positions
+      // of nodes e1 and e2 in their documents. See the URL below for bitmask interpretation
+      // https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+      return (a.compareDocumentPosition(b) & match) !== 0;
+    };
+
+    var documentPositionPreceding = function (a, b) {
+      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_PRECEDING);
+    };
+
+    var documentPositionContainedBy = function (a, b) {
+      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
+    };
+
+    return {
+      documentPositionPreceding: documentPositionPreceding,
+      documentPositionContainedBy: documentPositionContainedBy
+    };
+  }
+);
+define(
+  'ephox.katamari.api.Thunk',
+
+  [
+  ],
+
+  function () {
+
+    var cached = function (f) {
+      var called = false;
+      var r;
+      return function() {
+        if (!called) {
+          called = true;
+          r = f.apply(null, arguments);
+        }
+        return r;
+      };
+    };
+
+    return {
+      cached: cached
+    };
+  }
+);
+
+defineGlobal("global!Number", Number);
+define(
+  'ephox.sand.detect.Version',
+
+  [
+    'ephox.katamari.api.Arr',
+    'global!Number',
+    'global!String'
+  ],
+
+  function (Arr, Number, String) {
+    var firstMatch = function (regexes, s) {
+      for (var i = 0; i < regexes.length; i++) {
+        var x = regexes[i];
+        if (x.test(s)) return x;
+      }
+      return undefined;
+    };
+
+    var find = function (regexes, agent) {
+      var r = firstMatch(regexes, agent);
+      if (!r) return { major : 0, minor : 0 };
+      var group = function(i) {
+        return Number(agent.replace(r, '$' + i));
+      };
+      return nu(group(1), group(2));
+    };
+
+    var detect = function (versionRegexes, agent) {
+      var cleanedAgent = String(agent).toLowerCase();
+
+      if (versionRegexes.length === 0) return unknown();
+      return find(versionRegexes, cleanedAgent);
+    };
+
+    var unknown = function () {
+      return nu(0, 0);
+    };
+
+    var nu = function (major, minor) {
+      return { major: major, minor: minor };
+    };
+
+    return {
+      nu: nu,
+      detect: detect,
+      unknown: unknown
+    };
+  }
+);
+define(
+  'ephox.sand.core.Browser',
+
+  [
+    'ephox.katamari.api.Fun',
+    'ephox.sand.detect.Version'
+  ],
+
+  function (Fun, Version) {
+    var edge = 'Edge';
+    var chrome = 'Chrome';
+    var ie = 'IE';
+    var opera = 'Opera';
+    var firefox = 'Firefox';
+    var safari = 'Safari';
+
+    var isBrowser = function (name, current) {
+      return function () {
+        return current === name;
+      };
+    };
+
+    var unknown = function () {
+      return nu({
+        current: undefined,
+        version: Version.unknown()
+      });
+    };
+
+    var nu = function (info) {
+      var current = info.current;
+      var version = info.version;
+
+      return {
+        current: current,
+        version: version,
+
+        // INVESTIGATE: Rename to Edge ?
+        isEdge: isBrowser(edge, current),
+        isChrome: isBrowser(chrome, current),
+        // NOTE: isIe just looks too weird
+        isIE: isBrowser(ie, current),
+        isOpera: isBrowser(opera, current),
+        isFirefox: isBrowser(firefox, current),
+        isSafari: isBrowser(safari, current)
+      };
+    };
+
+    return {
+      unknown: unknown,
+      nu: nu,
+      edge: Fun.constant(edge),
+      chrome: Fun.constant(chrome),
+      ie: Fun.constant(ie),
+      opera: Fun.constant(opera),
+      firefox: Fun.constant(firefox),
+      safari: Fun.constant(safari)
+    };
+  }
+);
+define(
+  'ephox.sand.core.OperatingSystem',
+
+  [
+    'ephox.katamari.api.Fun',
+    'ephox.sand.detect.Version'
+  ],
+
+  function (Fun, Version) {
+    var windows = 'Windows';
+    var ios = 'iOS';
+    var android = 'Android';
+    var linux = 'Linux';
+    var osx = 'OSX';
+    var solaris = 'Solaris';
+    var freebsd = 'FreeBSD';
+
+    // Though there is a bit of dupe with this and Browser, trying to 
+    // reuse code makes it much harder to follow and change.
+    var isOS = function (name, current) {
+      return function () {
+        return current === name;
+      };
+    };
+
+    var unknown = function () {
+      return nu({
+        current: undefined,
+        version: Version.unknown()
+      });
+    };
+
+    var nu = function (info) {
+      var current = info.current;
+      var version = info.version;
+
+      return {
+        current: current,
+        version: version,
+
+        isWindows: isOS(windows, current),
+        // TODO: Fix capitalisation
+        isiOS: isOS(ios, current),
+        isAndroid: isOS(android, current),
+        isOSX: isOS(osx, current),
+        isLinux: isOS(linux, current),
+        isSolaris: isOS(solaris, current),
+        isFreeBSD: isOS(freebsd, current)
+      };
+    };
+
+    return {
+      unknown: unknown,
+      nu: nu,
+
+      windows: Fun.constant(windows),
+      ios: Fun.constant(ios),
+      android: Fun.constant(android),
+      linux: Fun.constant(linux),
+      osx: Fun.constant(osx),
+      solaris: Fun.constant(solaris),
+      freebsd: Fun.constant(freebsd)
+    };
+  }
+);
+define(
+  'ephox.sand.detect.DeviceType',
+
+  [
+    'ephox.katamari.api.Fun'
+  ],
+
+  function (Fun) {
+    return function (os, browser, userAgent) {
+      var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
+      var isiPhone = os.isiOS() && !isiPad;
+      var isAndroid3 = os.isAndroid() && os.version.major === 3;
+      var isAndroid4 = os.isAndroid() && os.version.major === 4;
+      var isTablet = isiPad || isAndroid3 || ( isAndroid4 && /mobile/i.test(userAgent) === true );
+      var isTouch = os.isiOS() || os.isAndroid();
+      var isPhone = isTouch && !isTablet;
+
+      var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
+
+      return {
+        isiPad : Fun.constant(isiPad),
+        isiPhone: Fun.constant(isiPhone),
+        isTablet: Fun.constant(isTablet),
+        isPhone: Fun.constant(isPhone),
+        isTouch: Fun.constant(isTouch),
+        isAndroid: os.isAndroid,
+        isiOS: os.isiOS,
+        isWebView: Fun.constant(iOSwebview)
+      };
+    };
+  }
+);
+define(
+  'ephox.sand.detect.UaString',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.sand.detect.Version',
+    'global!String'
+  ],
+
+  function (Arr, Version, String) {
+    var detect = function (candidates, userAgent) {
+      var agent = String(userAgent).toLowerCase();
+      return Arr.find(candidates, function (candidate) {
+        return candidate.search(agent);
+      });
+    };
+
+    // They (browser and os) are the same at the moment, but they might
+    // not stay that way.
+    var detectBrowser = function (browsers, userAgent) {
+      return detect(browsers, userAgent).map(function (browser) {
+        var version = Version.detect(browser.versionRegexes, userAgent);
+        return {
+          current: browser.name,
+          version: version
+        };
+      });
+    };
+
+    var detectOs = function (oses, userAgent) {
+      return detect(oses, userAgent).map(function (os) {
+        var version = Version.detect(os.versionRegexes, userAgent);
+        return {
+          current: os.name,
+          version: version
+        };
+      });
+    };
+
+    return {
+      detectBrowser: detectBrowser,
+      detectOs: detectOs
+    };
+  }
+);
+define(
+  'ephox.katamari.str.StrAppend',
+
+  [
+
+  ],
+
+  function () {
+    var addToStart = function (str, prefix) {
+      return prefix + str;
+    };
+
+    var addToEnd = function (str, suffix) {
+      return str + suffix;
+    };
+
+    var removeFromStart = function (str, numChars) {
+      return str.substring(numChars);
+    };
+
+    var removeFromEnd = function (str, numChars) {
+      return str.substring(0, str.length - numChars);
+    };
+ 
+    return {
+      addToStart: addToStart,
+      addToEnd: addToEnd,
+      removeFromStart: removeFromStart,
+      removeFromEnd: removeFromEnd
+    };
+  }
+);
+define(
+  'ephox.katamari.str.StringParts',
+
+  [
+    'ephox.katamari.api.Option',
+    'global!Error'
+  ],
+
+  function (Option, Error) {
+    /** Return the first 'count' letters from 'str'.
+-     *  e.g. first("abcde", 2) === "ab"
+-     */
+    var first = function(str, count) {
+     return str.substr(0, count);
+    };
+
+    /** Return the last 'count' letters from 'str'.
+    *  e.g. last("abcde", 2) === "de"
+    */
+    var last = function(str, count) {
+     return str.substr(str.length - count, str.length);
+    };
+
+    var head = function(str) {
+      return str === '' ? Option.none() : Option.some(str.substr(0, 1));
+    };
+
+    var tail = function(str) {
+      return str === '' ? Option.none() : Option.some(str.substring(1));
+    };
+
+    return {
+      first: first,
+      last: last,
+      head: head,
+      tail: tail
+    };
+  }
+);
+define(
+  'ephox.katamari.api.Strings',
+
+  [
+    'ephox.katamari.str.StrAppend',
+    'ephox.katamari.str.StringParts',
+    'global!Error'
+  ],
+
+  function (StrAppend, StringParts, Error) {
+    var checkRange = function(str, substr, start) {
+      if (substr === '') return true;
+      if (str.length < substr.length) return false;
+      var x = str.substr(start, start + substr.length);
+      return x === substr;
+    };
+
+    /** Given a string and object, perform template-replacements on the string, as specified by the object.
+     * Any template fields of the form ${name} are replaced by the string or number specified as obj["name"]
+     * Based on Douglas Crockford's 'supplant' method for template-replace of strings. Uses different template format.
+     */
+    var supplant = function(str, obj) {
+      var isStringOrNumber = function(a) {
+        var t = typeof a;
+        return t === 'string' || t === 'number';
+      };
+
+      return str.replace(/\${([^{}]*)}/g,
+        function (a, b) {
+          var value = obj[b];
+          return isStringOrNumber(value) ? value : a;
+        }
+      );
+    };
+
+    var removeLeading = function (str, prefix) {
+      return startsWith(str, prefix) ? StrAppend.removeFromStart(str, prefix.length) : str;
+    };
+
+    var removeTrailing = function (str, prefix) {
+      return endsWith(str, prefix) ? StrAppend.removeFromEnd(str, prefix.length) : str;
+    };
+
+    var ensureLeading = function (str, prefix) {
+      return startsWith(str, prefix) ? str : StrAppend.addToStart(str, prefix);
+    };
+
+    var ensureTrailing = function (str, prefix) {
+      return endsWith(str, prefix) ? str : StrAppend.addToEnd(str, prefix);
+    };
+ 
+    var contains = function(str, substr) {
+      return str.indexOf(substr) !== -1;
+    };
+
+    var capitalize = function(str) {
+      return StringParts.head(str).bind(function (head) {
+        return StringParts.tail(str).map(function (tail) {
+          return head.toUpperCase() + tail;
+        });
+      }).getOr(str);
+    };
+
+    /** Does 'str' start with 'prefix'?
+     *  Note: all strings start with the empty string.
+     *        More formally, for all strings x, startsWith(x, "").
+     *        This is so that for all strings x and y, startsWith(y + x, y)
+     */
+    var startsWith = function(str, prefix) {
+      return checkRange(str, prefix, 0);
+    };
+
+    /** Does 'str' end with 'suffix'?
+     *  Note: all strings end with the empty string.
+     *        More formally, for all strings x, endsWith(x, "").
+     *        This is so that for all strings x and y, endsWith(x + y, y)
+     */
+    var endsWith = function(str, suffix) {
+      return checkRange(str, suffix, str.length - suffix.length);
+    };
+
+   
+    /** removes all leading and trailing spaces */
+    var trim = function(str) {
+      return str.replace(/^\s+|\s+$/g, '');
+    };
+
+    var lTrim = function(str) {
+      return str.replace(/^\s+/g, '');
+    };
+
+    var rTrim = function(str) {
+      return str.replace(/\s+$/g, '');
+    };
+
+    return {
+      supplant: supplant,
+      startsWith: startsWith,
+      removeLeading: removeLeading,
+      removeTrailing: removeTrailing,
+      ensureLeading: ensureLeading,
+      ensureTrailing: ensureTrailing,
+      endsWith: endsWith,
+      contains: contains,
+      trim: trim,
+      lTrim: lTrim,
+      rTrim: rTrim,
+      capitalize: capitalize
+    };
+  }
+);
+
+define(
+  'ephox.sand.info.PlatformInfo',
+
+  [
+    'ephox.katamari.api.Fun',
+    'ephox.katamari.api.Strings'
+  ],
+
+  function (Fun, Strings) {
+    var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
+
+    var checkContains = function (target) {
+      return function (uastring) {
+        return Strings.contains(uastring, target);
+      };
+    };
+
+    var browsers = [
+      {
+        name : 'Edge',
+        versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
+        search: function (uastring) {
+          var monstrosity = Strings.contains(uastring, 'edge/') && Strings.contains(uastring, 'chrome') && Strings.contains(uastring, 'safari') && Strings.contains(uastring, 'applewebkit');
+          return monstrosity;
+        }
+      },
+      {
+        name : 'Chrome',
+        versionRegexes: [/.*?chrome\/([0-9]+)\.([0-9]+).*/, normalVersionRegex],
+        search : function (uastring) {
+          return Strings.contains(uastring, 'chrome') && !Strings.contains(uastring, 'chromeframe');
+        }
+      },
+      {
+        name : 'IE',
+        versionRegexes: [/.*?msie\ ?([0-9]+)\.([0-9]+).*/, /.*?rv:([0-9]+)\.([0-9]+).*/],
+        search: function (uastring) {
+          return Strings.contains(uastring, 'msie') || Strings.contains(uastring, 'trident');
+        }
+      },
+      // INVESTIGATE: Is this still the Opera user agent?
+      {
+        name : 'Opera',
+        versionRegexes: [normalVersionRegex, /.*?opera\/([0-9]+)\.([0-9]+).*/],
+        search : checkContains('opera')
+      },
+      {
+        name : 'Firefox',
+        versionRegexes: [/.*?firefox\/\ ?([0-9]+)\.([0-9]+).*/],
+        search : checkContains('firefox')
+      },
+      {
+        name : 'Safari',
+        versionRegexes: [normalVersionRegex, /.*?cpu os ([0-9]+)_([0-9]+).*/],
+        search : function (uastring) {
+          return (Strings.contains(uastring, 'safari') || Strings.contains(uastring, 'mobile/')) && Strings.contains(uastring, 'applewebkit');
+        }
+      }
+    ];
+
+    var oses = [
+      {
+        name : 'Windows',
+        search : checkContains('win'),
+        versionRegexes: [/.*?windows\ nt\ ?([0-9]+)\.([0-9]+).*/]
+      },
+      {
+        name : 'iOS',
+        search : function (uastring) {
+          return Strings.contains(uastring, 'iphone') || Strings.contains(uastring, 'ipad');
+        },
+        versionRegexes: [/.*?version\/\ ?([0-9]+)\.([0-9]+).*/, /.*cpu os ([0-9]+)_([0-9]+).*/, /.*cpu iphone os ([0-9]+)_([0-9]+).*/]
+      },
+      {
+        name : 'Android',
+        search : checkContains('android'),
+        versionRegexes: [/.*?android\ ?([0-9]+)\.([0-9]+).*/]
+      },
+      {
+        name : 'OSX',
+        search : checkContains('os x'),
+        versionRegexes: [/.*?os\ x\ ?([0-9]+)_([0-9]+).*/]
+      },
+      {
+        name : 'Linux',
+        search : checkContains('linux'),
+        versionRegexes: [ ]
+      },
+      { name : 'Solaris',
+        search : checkContains('sunos'),
+        versionRegexes: [ ]
+      },
+      {
+       name : 'FreeBSD',
+       search : checkContains('freebsd'),
+       versionRegexes: [ ]
+      }
+    ];
+
+    return {
+      browsers: Fun.constant(browsers),
+      oses: Fun.constant(oses)
+    };
+  }
+);
+define(
+  'ephox.sand.core.PlatformDetection',
+
+  [
+    'ephox.sand.core.Browser',
+    'ephox.sand.core.OperatingSystem',
+    'ephox.sand.detect.DeviceType',
+    'ephox.sand.detect.UaString',
+    'ephox.sand.info.PlatformInfo'
+  ],
+
+  function (Browser, OperatingSystem, DeviceType, UaString, PlatformInfo) {
+    var detect = function (userAgent) {
+      var browsers = PlatformInfo.browsers();
+      var oses = PlatformInfo.oses();
+
+      var browser = UaString.detectBrowser(browsers, userAgent).fold(
+        Browser.unknown,
+        Browser.nu
+      );
+      var os = UaString.detectOs(oses, userAgent).fold(
+        OperatingSystem.unknown,
+        OperatingSystem.nu
+      );
+      var deviceType = DeviceType(os, browser, userAgent);
+
+      return {
+        browser: browser,
+        os: os,
+        deviceType: deviceType
+      };
+    };
+
+    return {
+      detect: detect
+    };
+  }
+);
+defineGlobal("global!navigator", navigator);
+define(
+  'ephox.sand.api.PlatformDetection',
+
+  [
+    'ephox.katamari.api.Thunk',
+    'ephox.sand.core.PlatformDetection',
+    'global!navigator'
+  ],
+
+  function (Thunk, PlatformDetection, navigator) {
+    var detect = Thunk.cached(function () {
+      var userAgent = navigator.userAgent;
+      return PlatformDetection.detect(userAgent);
+    });
+
+    return {
+      detect: detect
+    };
+  }
+);
+define("global!console", [], function () { if (typeof console === "undefined") console = { log: function () {} }; return console; });
+defineGlobal("global!document", document);
+define(
+  'ephox.sugar.api.node.Element',
+
+  [
+    'ephox.katamari.api.Fun',
+    'global!Error',
+    'global!console',
+    'global!document'
+  ],
+
+  function (Fun, Error, console, document) {
+    var fromHtml = function (html, scope) {
+      var doc = scope || document;
+      var div = doc.createElement('div');
+      div.innerHTML = html;
+      if (!div.hasChildNodes() || div.childNodes.length > 1) {
+        console.error('HTML does not have a single root node', html);
+        throw 'HTML must have a single root node';
+      }
+      return fromDom(div.childNodes[0]);
+    };
+
+    var fromTag = function (tag, scope) {
+      var doc = scope || document;
+      var node = doc.createElement(tag);
+      return fromDom(node);
+    };
+
+    var fromText = function (text, scope) {
+      var doc = scope || document;
+      var node = doc.createTextNode(text);
+      return fromDom(node);
+    };
+
+    var fromDom = function (node) {
+      if (node === null || node === undefined) throw new Error('Node cannot be null or undefined');
+      return {
+        dom: Fun.constant(node)
+      };
+    };
+
+    return {
+      fromHtml: fromHtml,
+      fromTag: fromTag,
+      fromText: fromText,
+      fromDom: fromDom
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.node.NodeTypes',
+
+  [
+
+  ],
+
+  function () {
+    return {
+      ATTRIBUTE:              2,
+      CDATA_SECTION:          4,
+      COMMENT:                8,
+      DOCUMENT:               9,
+      DOCUMENT_TYPE:          10,
+      DOCUMENT_FRAGMENT:      11,
+      ELEMENT:                1,
+      TEXT:                   3,
+      PROCESSING_INSTRUCTION: 7,
+      ENTITY_REFERENCE:       5,
+      ENTITY:                 6,
+      NOTATION:               12
+    };
+  }
+);
+define(
+  'ephox.sugar.api.search.Selectors',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Option',
+    'ephox.sugar.api.node.Element',
+    'ephox.sugar.api.node.NodeTypes',
+    'global!Error',
+    'global!document'
+  ],
+
+  function (Arr, Option, Element, NodeTypes, Error, document) {
+    /*
+     * There's a lot of code here; the aim is to allow the browser to optimise constant comparisons,
+     * instead of doing object lookup feature detection on every call
+     */
+    var STANDARD = 0;
+    var MSSTANDARD = 1;
+    var WEBKITSTANDARD = 2;
+    var FIREFOXSTANDARD = 3;
+
+    var selectorType = (function () {
+      var test = document.createElement('span');
+      // As of Chrome 34 / Safari 7.1 / FireFox 34, everyone except IE has the unprefixed function.
+      // Still check for the others, but do it last.
+      return test.matches !== undefined ? STANDARD :
+             test.msMatchesSelector !== undefined ? MSSTANDARD :
+             test.webkitMatchesSelector !== undefined ? WEBKITSTANDARD :
+             test.mozMatchesSelector !== undefined ? FIREFOXSTANDARD :
+             -1;
+    })();
+
+
+    var ELEMENT = NodeTypes.ELEMENT;
+    var DOCUMENT = NodeTypes.DOCUMENT;
+
+    var is = function (element, selector) {
+      var elem = element.dom();
+      if (elem.nodeType !== ELEMENT) return false; // documents have querySelector but not matches
+
+      // As of Chrome 34 / Safari 7.1 / FireFox 34, everyone except IE has the unprefixed function.
+      // Still check for the others, but do it last.
+      else if (selectorType === STANDARD) return elem.matches(selector);
+      else if (selectorType === MSSTANDARD) return elem.msMatchesSelector(selector);
+      else if (selectorType === WEBKITSTANDARD) return elem.webkitMatchesSelector(selector);
+      else if (selectorType === FIREFOXSTANDARD) return elem.mozMatchesSelector(selector);
+      else throw new Error('Browser lacks native selectors'); // unfortunately we can't throw this on startup :(
+    };
+
+    var bypassSelector = function (dom) {
+      // Only elements and documents support querySelector
+      return dom.nodeType !== ELEMENT && dom.nodeType !== DOCUMENT ||
+              // IE fix for complex queries on empty nodes: http://jsfiddle.net/spyder/fv9ptr5L/
+              dom.childElementCount === 0;
+    };
+
+    var all = function (selector, scope) {
+      var base = scope === undefined ? document : scope.dom();
+      return bypassSelector(base) ? [] : Arr.map(base.querySelectorAll(selector), Element.fromDom);
+    };
+
+    var one = function (selector, scope) {
+      var base = scope === undefined ? document : scope.dom();
+      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element.fromDom);
+    };
+
+    return {
+      all: all,
+      is: is,
+      one: one
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.dom.Compare',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.sand.api.Node',
+    'ephox.sand.api.PlatformDetection',
+    'ephox.sugar.api.search.Selectors'
+  ],
+
+  function (Arr, Fun, Node, PlatformDetection, Selectors) {
+
+    var eq = function (e1, e2) {
+      return e1.dom() === e2.dom();
+    };
+
+    var isEqualNode = function (e1, e2) {
+      return e1.dom().isEqualNode(e2.dom());
+    };
+
+    var member = function (element, elements) {
+      return Arr.exists(elements, Fun.curry(eq, element));
+    };
+
+    // DOM contains() method returns true if e1===e2, we define our contains() to return false (a node does not contain itself).
+    var regularContains = function (e1, e2) {
+      var d1 = e1.dom(), d2 = e2.dom();
+      return d1 === d2 ? false : d1.contains(d2);
+    };
+
+    var ieContains = function (e1, e2) {
+      // IE only implements the contains() method for Element nodes.
+      // It fails for Text nodes, so implement it using compareDocumentPosition()
+      // https://connect.microsoft.com/IE/feedback/details/780874/node-contains-is-incorrect
+      // Note that compareDocumentPosition returns CONTAINED_BY if 'e2 *is_contained_by* e1':
+      // Also, compareDocumentPosition defines a node containing itself as false.
+      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
+    };
+
+    var browser = PlatformDetection.detect().browser;
+
+    // Returns: true if node e1 contains e2, otherwise false.
+    // (returns false if e1===e2: A node does not contain itself).
+    var contains = browser.isIE() ? ieContains : regularContains;
+
+    return {
+      eq: eq,
+      isEqualNode: isEqualNode,
+      member: member,
+      contains: contains,
+
+      // Only used by DomUniverse. Remove (or should Selectors.is move here?)
+      is: Selectors.is
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.search.Traverse',
+
+  [
+    'ephox.katamari.api.Type',
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.katamari.api.Option',
+    'ephox.katamari.api.Struct',
+    'ephox.sugar.alien.Recurse',
+    'ephox.sugar.api.dom.Compare',
+    'ephox.sugar.api.node.Element'
+  ],
+
+  function (Type, Arr, Fun, Option, Struct, Recurse, Compare, Element) {
+    // The document associated with the current element
+    var owner = function (element) {
+      return Element.fromDom(element.dom().ownerDocument);
+    };
+
+    var documentElement = function (element) {
+      // TODO: Avoid unnecessary wrap/unwrap here
+      var doc = owner(element);
+      return Element.fromDom(doc.dom().documentElement);
+    };
+
+    // The window element associated with the element
+    var defaultView = function (element) {
+      var el = element.dom();
+      var defaultView = el.ownerDocument.defaultView;
+      return Element.fromDom(defaultView);
+    };
+
+    var parent = function (element) {
+      var dom = element.dom();
+      return Option.from(dom.parentNode).map(Element.fromDom);
+    };
+
+    var findIndex = function (element) {
+      return parent(element).bind(function (p) {
+        // TODO: Refactor out children so we can avoid the constant unwrapping
+        var kin = children(p);
+        return Arr.findIndex(kin, function (elem) {
+          return Compare.eq(element, elem);
+        });
+      });
+    };
+
+    var parents = function (element, isRoot) {
+      var stop = Type.isFunction(isRoot) ? isRoot : Fun.constant(false);
+
+      // This is used a *lot* so it needs to be performant, not recursive
+      var dom = element.dom();
+      var ret = [];
+
+      while (dom.parentNode !== null && dom.parentNode !== undefined) {
+        var rawParent = dom.parentNode;
+        var parent = Element.fromDom(rawParent);
+        ret.push(parent);
+
+        if (stop(parent) === true) break;
+        else dom = rawParent;
+      }
+      return ret;
+    };
+
+    var siblings = function (element) {
+      // TODO: Refactor out children so we can just not add self instead of filtering afterwards
+      var filterSelf = function (elements) {
+        return Arr.filter(elements, function (x) {
+          return !Compare.eq(element, x);
+        });
+      };
+
+      return parent(element).map(children).map(filterSelf).getOr([]);
+    };
+
+    var offsetParent = function (element) {
+      var dom = element.dom();
+      return Option.from(dom.offsetParent).map(Element.fromDom);
+    };
+
+    var prevSibling = function (element) {
+      var dom = element.dom();
+      return Option.from(dom.previousSibling).map(Element.fromDom);
+    };
+
+    var nextSibling = function (element) {
+      var dom = element.dom();
+      return Option.from(dom.nextSibling).map(Element.fromDom);
+    };
+
+    var prevSiblings = function (element) {
+      // This one needs to be reversed, so they're still in DOM order
+      return Arr.reverse(Recurse.toArray(element, prevSibling));
+    };
+
+    var nextSiblings = function (element) {
+      return Recurse.toArray(element, nextSibling);
+    };
+
+    var children = function (element) {
+      var dom = element.dom();
+      return Arr.map(dom.childNodes, Element.fromDom);
+    };
+
+    var child = function (element, index) {
+      var children = element.dom().childNodes;
+      return Option.from(children[index]).map(Element.fromDom);
+    };
+
+    var firstChild = function (element) {
+      return child(element, 0);
+    };
+
+    var lastChild = function (element) {
+      return child(element, element.dom().childNodes.length - 1);
+    };
+
+    var spot = Struct.immutable('element', 'offset');
+    var leaf = function (element, offset) {
+      var cs = children(element);
+      return cs.length > 0 && offset < cs.length ? spot(cs[offset], 0) : spot(element, offset);
+    };
+
+    return {
+      owner: owner,
+      defaultView: defaultView,
+      documentElement: documentElement,
+      parent: parent,
+      findIndex: findIndex,
+      parents: parents,
+      siblings: siblings,
+      prevSibling: prevSibling,
+      offsetParent: offsetParent,
+      prevSiblings: prevSiblings,
+      nextSibling: nextSibling,
+      nextSiblings: nextSiblings,
+      children: children,
+      child: child,
+      firstChild: firstChild,
+      lastChild: lastChild,
+      leaf: leaf
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.dom.Insert',
+
+  [
+    'ephox.sugar.api.search.Traverse'
+  ],
+
+  function (Traverse) {
+    var before = function (marker, element) {
+      var parent = Traverse.parent(marker);
+      parent.each(function (v) {
+        v.dom().insertBefore(element.dom(), marker.dom());
+      });
+    };
+
+    var after = function (marker, element) {
+      var sibling = Traverse.nextSibling(marker);
+      sibling.fold(function () {
+        var parent = Traverse.parent(marker);
+        parent.each(function (v) {
+          append(v, element);
+        });
+      }, function (v) {
+        before(v, element);
+      });
+    };
+
+    var prepend = function (parent, element) {
+      var firstChild = Traverse.firstChild(parent);
+      firstChild.fold(function () {
+        append(parent, element);
+      }, function (v) {
+        parent.dom().insertBefore(element.dom(), v.dom());
+      });
+    };
+
+    var append = function (parent, element) {
+      parent.dom().appendChild(element.dom());
+    };
+
+    var appendAt = function (parent, element, index) {
+      Traverse.child(parent, index).fold(function () {
+        append(parent, element);
+      }, function (v) {
+        before(v, element);
+      });
+    };
+
+    var wrap = function (element, wrapper) {
+      before(element, wrapper);
+      append(wrapper, element);
+    };
+
+    return {
+      before: before,
+      after: after,
+      prepend: prepend,
+      append: append,
+      appendAt: appendAt,
+      wrap: wrap
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.node.Node',
+
+  [
+    'ephox.sugar.api.node.NodeTypes'
+  ],
+
+  function (NodeTypes) {
+    var name = function (element) {
+      var r = element.dom().nodeName;
+      return r.toLowerCase();
+    };
+
+    var type = function (element) {
+      return element.dom().nodeType;
+    };
+
+    var value = function (element) {
+      return element.dom().nodeValue;
+    };
+
+    var isType = function (t) {
+      return function (element) {
+        return type(element) === t;
+      };
+    };
+
+    var isComment = function (element) {
+      return type(element) === NodeTypes.COMMENT || name(element) === '#comment';
+    };
+
+    var isElement = isType(NodeTypes.ELEMENT);
+    var isText = isType(NodeTypes.TEXT);
+    var isDocument = isType(NodeTypes.DOCUMENT);
+
+    return {
+      name: name,
+      type: type,
+      value: value,
+      isElement: isElement,
+      isText: isText,
+      isDocument: isDocument,
+      isComment: isComment
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.properties.Attr',
+
+  [
+    'ephox.katamari.api.Type',
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Obj',
+    'ephox.sugar.api.node.Node',
+    'global!Error',
+    'global!console'
+  ],
+
+  /*
+   * Direct attribute manipulation has been around since IE8, but
+   * was apparently unstable until IE10.
+   */
+  function (Type, Arr, Obj, Node, Error, console) {
+    var rawSet = function (dom, key, value) {
+      /*
+       * JQuery coerced everything to a string, and silently did nothing on text node/null/undefined.
+       *
+       * We fail on those invalid cases, only allowing numbers and booleans.
+       */
+      if (Type.isString(value) || Type.isBoolean(value) || Type.isNumber(value)) {
+        dom.setAttribute(key, value + '');
+      } else {
+        console.error('Invalid call to Attr.set. Key ', key, ':: Value ', value, ':: Element ', dom);
+        throw new Error('Attribute value was not simple');
+      }
+    };
+
+    var set = function (element, key, value) {
+      rawSet(element.dom(), key, value);
+    };
+
+    var setAll = function (element, attrs) {
+      var dom = element.dom();
+      Obj.each(attrs, function (v, k) {
+        rawSet(dom, k, v);
+      });
+    };
+
+    var get = function (element, key) {
+      var v = element.dom().getAttribute(key);
+
+      // undefined is the more appropriate value for JS, and this matches JQuery
+      return v === null ? undefined : v;
+    };
+
+    var has = function (element, key) {
+      var dom = element.dom();
+
+      // return false for non-element nodes, no point in throwing an error
+      return dom && dom.hasAttribute ? dom.hasAttribute(key) : false;
+    };
+
+    var remove = function (element, key) {
+      element.dom().removeAttribute(key);
+    };
+
+    var hasNone = function (element) {
+      var attrs = element.dom().attributes;
+      return attrs === undefined || attrs === null || attrs.length === 0;
+    };
+
+    var clone = function (element) {
+      return Arr.foldl(element.dom().attributes, function (acc, attr) {
+        acc[attr.name] = attr.value;
+        return acc;
+      }, {});
+    };
+
+    var transferOne = function (source, destination, attr) {
+      // NOTE: We don't want to clobber any existing attributes
+      if (has(source, attr) && !has(destination, attr)) set(destination, attr, get(source, attr));        
+    };
+
+    // Transfer attributes(attrs) from source to destination, unless they are already present
+    var transfer = function (source, destination, attrs) {
+      if (!Node.isElement(source) || !Node.isElement(destination)) return;
+      Arr.each(attrs, function (attr) {
+        transferOne(source, destination, attr);
+      });
+    };
+
+    return {
+      clone: clone,
+      set: set,
+      setAll: setAll,
+      get: get,
+      has: has,
+      remove: remove,
+      hasNone: hasNone,
+      transfer: transfer
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.dom.InsertAll',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.sugar.api.dom.Insert'
+  ],
+
+  function (Arr, Insert) {
+    var before = function (marker, elements) {
+      Arr.each(elements, function (x) {
+        Insert.before(marker, x);
+      });
+    };
+
+    var after = function (marker, elements) {
+      Arr.each(elements, function (x, i) {
+        var e = i === 0 ? marker : elements[i - 1];
+        Insert.after(e, x);
+      });
+    };
+
+    var prepend = function (parent, elements) {
+      Arr.each(elements.slice().reverse(), function (x) {
+        Insert.prepend(parent, x);
+      });
+    };
+
+    var append = function (parent, elements) {
+      Arr.each(elements, function (x) {
+        Insert.append(parent, x);
+      });
+    };
+
+    return {
+      before: before,
+      after: after,
+      prepend: prepend,
+      append: append
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.dom.Remove',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.sugar.api.dom.InsertAll',
+    'ephox.sugar.api.search.Traverse'
+  ],
+
+  function (Arr, InsertAll, Traverse) {
+    var empty = function (element) {
+      // shortcut "empty node" trick. Requires IE 9.
+      element.dom().textContent = '';
+
+      // If the contents was a single empty text node, the above doesn't remove it. But, it's still faster in general
+      // than removing every child node manually.
+      // The following is (probably) safe for performance as 99.9% of the time the trick works and
+      // Traverse.children will return an empty array.
+      Arr.each(Traverse.children(element), function (rogue) {
+        remove(rogue);
+      });
+    };
+
+    var remove = function (element) {
+      var dom = element.dom();
+      if (dom.parentNode !== null)
+        dom.parentNode.removeChild(dom);
+    };
+
+    var unwrap = function (wrapper) {
+      var children = Traverse.children(wrapper);
+      if (children.length > 0)
+        InsertAll.before(wrapper, children);
+      remove(wrapper);
+    };
+
+    return {
+      empty: empty,
+      remove: remove,
+      unwrap: unwrap
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.dom.Replication',
+
+  [
+    'ephox.sugar.api.properties.Attr',
+    'ephox.sugar.api.node.Element',
+    'ephox.sugar.api.dom.Insert',
+    'ephox.sugar.api.dom.InsertAll',
+    'ephox.sugar.api.dom.Remove',
+    'ephox.sugar.api.search.Traverse'
+  ],
+
+  function (Attr, Element, Insert, InsertAll, Remove, Traverse) {
+    var clone = function (original, deep) {
+      return Element.fromDom(original.dom().cloneNode(deep));
+    };
+
+    /** Shallow clone - just the tag, no children */
+    var shallow = function (original) {
+      return clone(original, false);
+    };
+
+    /** Deep clone - everything copied including children */
+    var deep = function (original) {
+      return clone(original, true);
+    };
+
+    /** Shallow clone, with a new tag */
+    var shallowAs = function (original, tag) {
+      var nu = Element.fromTag(tag);
+
+      var attributes = Attr.clone(original);
+      Attr.setAll(nu, attributes);
+
+      return nu;
+    };
+
+    /** Deep clone, with a new tag */
+    var copy = function (original, tag) {
+      var nu = shallowAs(original, tag);
+
+      // NOTE
+      // previously this used serialisation:
+      // nu.dom().innerHTML = original.dom().innerHTML;
+      //
+      // Clone should be equivalent (and faster), but if TD <-> TH toggle breaks, put it back.
+
+      var cloneChildren = Traverse.children(deep(original));
+      InsertAll.append(nu, cloneChildren);
+
+      return nu;
+    };
+
+    /** Change the tag name, but keep all children */
+    var mutate = function (original, tag) {
+      var nu = shallowAs(original, tag);
+
+      Insert.before(original, nu);
+      var children = Traverse.children(original);
+      InsertAll.append(nu, children);
+      Remove.remove(original);
+      return nu;
+    };
+
+    return {
+      shallow: shallow,
+      shallowAs: shallowAs,
+      deep: deep,
+      copy: copy,
+      mutate: mutate
+    };
+  }
+);
+
+define(
+  'ephox.sugar.api.node.Fragment',
+
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.sugar.api.node.Element',
+    'global!document'
+  ],
+
+  function (Arr, Element, document) {
+    var fromElements = function (elements, scope) {
+      var doc = scope || document;
+      var fragment = doc.createDocumentFragment();
+      Arr.each(elements, function (element) {
+        fragment.appendChild(element.dom());
+      });
+      return Element.fromDom(fragment);
+    };
+
+    return {
+      fromElements: fromElements
+    };
+  }
+);
+
+/**
+ * ElementType.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.dom.ElementType',
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.sugar.api.node.Node'
+  ],
+  function (Arr, Fun, Node) {
+    var blocks = [
+      'article', 'aside', 'details', 'div', 'dt', 'figcaption', 'footer',
+      'form', 'fieldset', 'header', 'hgroup', 'html', 'main', 'nav',
+      'section', 'summary', 'body', 'p', 'dl', 'multicol', 'dd', 'figure',
+      'address', 'center', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'listing', 'xmp', 'pre', 'plaintext', 'menu', 'dir', 'ul', 'ol', 'li', 'hr',
+      'table', 'tbody', 'thead', 'tfoot', 'th', 'tr', 'td', 'caption'
+    ];
+
+    var voids = [
+      'area', 'base', 'basefont', 'br', 'col', 'frame', 'hr', 'img', 'input',
+      'isindex', 'link', 'meta', 'param', 'embed', 'source', 'wbr', 'track'
+    ];
+
+    var tableCells = ['td', 'th'];
+
+    var textBlocks = [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'address', 'pre', 'form',
+      'blockquote', 'center', 'dir', 'fieldset', 'header', 'footer', 'article',
+      'section', 'hgroup', 'aside', 'nav', 'figure'
+    ];
+
+    var headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    var lazyLookup = function (items) {
+      var lookup;
+      return function (node) {
+        lookup = lookup ? lookup : Arr.mapToObject(items, Fun.constant(true));
+        return lookup.hasOwnProperty(Node.name(node));
+      };
+    };
+
+    var isHeading = lazyLookup(headings);
+
+    var isBlock = lazyLookup(blocks);
+
+    var isInline = function (node) {
+      return Node.isElement(node) && !isBlock(node);
+    };
+
+    return {
+      isBlock: isBlock,
+      isInline: isInline,
+      isHeading: isHeading,
+      isTextBlock: lazyLookup(textBlocks),
+      isVoid: lazyLookup(voids),
+      isTableCell: lazyLookup(tableCells)
+    };
+  }
+);
+
+/**
+ * Parents.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.dom.Parents',
+  [
+    'ephox.katamari.api.Fun',
+    'ephox.sugar.api.dom.Compare',
+    'ephox.sugar.api.search.Traverse'
+  ],
+  function (Fun, Compare, Traverse) {
+    var dropLast = function (xs) {
+      return xs.slice(0, -1);
+    };
+
+    var parentsUntil = function (startNode, rootElm, predicate) {
+      if (Compare.contains(rootElm, startNode)) {
+        return dropLast(Traverse.parents(startNode, function (elm) {
+          return predicate(elm) || Compare.eq(elm, rootElm);
+        }));
+      } else {
+        return [];
+      }
+    };
+
+    var parents = function (startNode, rootElm) {
+      return parentsUntil(startNode, rootElm, Fun.constant(false));
+    };
+
+    var parentsAndSelf = function (startNode, rootElm) {
+      return [startNode].concat(parents(startNode, rootElm));
+    };
+
+    return {
+      parentsUntil: parentsUntil,
+      parents: parents,
+      parentsAndSelf: parentsAndSelf
+    };
+  }
+);
+
+define(
+  'ephox.katamari.api.Options',
+
+  [
+    'ephox.katamari.api.Option'
+  ],
+
+  function (Option) {
+    /** cat :: [Option a] -> [a] */
+    var cat = function (arr) {
+      var r = [];
+      var push = function (x) {
+        r.push(x);
+      };
+      for (var i = 0; i < arr.length; i++) {
+        arr[i].each(push);
+      }
+      return r;
+    };
+
+    /** findMap :: ([a], (a, Int -> Option b)) -> Option b */
+    var findMap = function (arr, f) {
+      for (var i = 0; i < arr.length; i++) {
+        var r = f(arr[i], i);
+        if (r.isSome()) {
+          return r;
+        }
+      }
+      return Option.none();
+    };
+
+    /**
+     * if all elements in arr are 'some', their inner values are passed as arguments to f
+     * f must have arity arr.length
+    */
+    var liftN = function(arr, f) {
+      var r = [];
+      for (var i = 0; i < arr.length; i++) {
+        var x = arr[i];
+        if (x.isSome()) {
+          r.push(x.getOrDie());
+        } else {
+          return Option.none();
+        }
+      }
+      return Option.some(f.apply(null, r));
+    };
+
+    return {
+      cat: cat,
+      findMap: findMap,
+      liftN: liftN
+    };
+  }
+);
+
+/**
+ * SelectionUtils.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.selection.SelectionUtils',
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.katamari.api.Option',
+    'ephox.katamari.api.Options',
+    'ephox.sugar.api.dom.Compare',
+    'ephox.sugar.api.node.Element',
+    'ephox.sugar.api.node.Node',
+    'ephox.sugar.api.search.Traverse',
+    'tinymce.core.dom.NodeType'
+  ],
+  function (Arr, Fun, Option, Options, Compare, Element, Node, Traverse, NodeType) {
+    var getStartNode = function (rng) {
+      var sc = rng.startContainer, so = rng.startOffset;
+      if (NodeType.isText(sc)) {
+        return so === 0 ? Option.some(Element.fromDom(sc)) : Option.none();
+      } else {
+        return Option.from(sc.childNodes[so]).map(Element.fromDom);
+      }
+    };
+
+    var getEndNode = function (rng) {
+      var ec = rng.endContainer, eo = rng.endOffset;
+      if (NodeType.isText(ec)) {
+        return eo === ec.data.length ? Option.some(Element.fromDom(ec)) : Option.none();
+      } else {
+        return Option.from(ec.childNodes[eo - 1]).map(Element.fromDom);
+      }
+    };
+
+    var getFirstChildren = function (node) {
+      return Traverse.firstChild(node).fold(
+        Fun.constant([node]),
+        function (child) {
+          return [node].concat(getFirstChildren(child));
+        }
+      );
+    };
+
+    var getLastChildren = function (node) {
+      return Traverse.lastChild(node).fold(
+        Fun.constant([node]),
+        function (child) {
+          if (Node.name(child) === 'br') {
+            return Traverse.prevSibling(child).map(function (sibling) {
+              return [node].concat(getLastChildren(sibling));
+            }).getOr([]);
+          } else {
+            return [node].concat(getLastChildren(child));
+          }
+        }
+      );
+    };
+
+    var hasAllContentsSelected = function (elm, rng) {
+      return Options.liftN([getStartNode(rng), getEndNode(rng)], function (startNode, endNode) {
+        var start = Arr.find(getFirstChildren(elm), Fun.curry(Compare.eq, startNode));
+        var end = Arr.find(getLastChildren(elm), Fun.curry(Compare.eq, endNode));
+        return start.isSome() && end.isSome();
+      }).getOr(false);
+    };
+
+    return {
+      hasAllContentsSelected: hasAllContentsSelected
+    };
+  }
+);
+
+/**
+ * FragmentReader.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.selection.FragmentReader',
+  [
+    'ephox.katamari.api.Arr',
+    'ephox.katamari.api.Fun',
+    'ephox.sugar.api.dom.Insert',
+    'ephox.sugar.api.dom.Replication',
+    'ephox.sugar.api.node.Element',
+    'ephox.sugar.api.node.Fragment',
+    'ephox.sugar.api.node.Node',
+    'tinymce.core.dom.ElementType',
+    'tinymce.core.dom.Parents',
+    'tinymce.core.selection.SelectionUtils'
+  ],
+  function (Arr, Fun, Insert, Replication, Element, Fragment, Node, ElementType, Parents, SelectionUtils) {
+    var findParentListContainer = function (parents) {
+      return Arr.find(parents, function (elm) {
+        return Node.name(elm) === 'ul' || Node.name(elm) === 'ol';
+      });
+    };
+
+    var getFullySelectedListWrappers = function (parents, rng) {
+      return Arr.find(parents, function (elm) {
+        return Node.name(elm) === 'li' && SelectionUtils.hasAllContentsSelected(elm, rng);
+      }).fold(
+        Fun.constant([]),
+        function (li) {
+          return findParentListContainer(parents).map(function (listCont) {
+            return [
+              Element.fromTag('li'),
+              Element.fromTag(Node.name(listCont))
+            ];
+          }).getOr([]);
+        }
+      );
+    };
+
+    var wrap = function (innerElm, elms) {
+      var wrapped = Arr.foldl(elms, function (acc, elm) {
+        Insert.append(elm, acc);
+        return elm;
+      }, innerElm);
+      return elms.length > 0 ? Fragment.fromElements([wrapped]) : wrapped;
+    };
+
+    var getWrapElements = function (rootNode, rng) {
+      var parents = Parents.parentsAndSelf(Element.fromDom(rng.commonAncestorContainer), Element.fromDom(rootNode));
+      var wrapElements = Arr.filter(parents, function (elm) {
+        return ElementType.isInline(elm) || ElementType.isHeading(elm);
+      });
+      var fullWrappers = getFullySelectedListWrappers(parents, rng);
+      return Arr.map(wrapElements.concat(fullWrappers), Replication.shallow);
+    };
+
+    var getFragmentFromRange = function (rootNode, rng) {
+      return wrap(Element.fromDom(rng.cloneContents()), getWrapElements(rootNode, rng));
+    };
+
+    var read = function (rootNode, rng) {
+      return rng.collapsed ? Fragment.fromElements([]) : getFragmentFromRange(rootNode, rng);
+    };
+
+    return {
+      read: read
+    };
+  }
+);
+
 /**
  * Selection.js
  *
@@ -18707,10 +20903,11 @@ define(
     'tinymce.core.dom.TreeWalker',
     'tinymce.core.dom.TridentSelection',
     'tinymce.core.Env',
+    'tinymce.core.selection.FragmentReader',
     'tinymce.core.text.Zwsp',
     'tinymce.core.util.Tools'
   ],
-  function (CaretPosition, BookmarkManager, ControlSelection, NodeType, RangeUtils, ScrollIntoView, TreeWalker, TridentSelection, Env, Zwsp, Tools) {
+  function (CaretPosition, BookmarkManager, ControlSelection, NodeType, RangeUtils, ScrollIntoView, TreeWalker, TridentSelection, Env, FragmentReader, Zwsp, Tools) {
     var each = Tools.each, trim = Tools.trim;
     var isIE = Env.ie;
 
@@ -18792,8 +20989,7 @@ define(
         }
 
         if (rng.cloneContents) {
-          fragment = rng.cloneContents();
-
+          fragment = args.contextual ? FragmentReader.read(self.editor.getBody(), rng).dom() : rng.cloneContents();
           if (fragment) {
             tmpElm.appendChild(fragment);
           }
@@ -19858,7 +22054,7 @@ define(
       function getRequiredParent(elm, candidate) {
         var name = typeof elm !== 'string' ? elm.nodeName.toLowerCase() : elm;
         var elmRule = schema.getElementRule(name);
-        var parentsRequired = elmRule.parentsRequired;
+        var parentsRequired = elmRule && elmRule.parentsRequired;
 
         if (parentsRequired && parentsRequired.length) {
           return candidate && Tools.inArray(parentsRequired, candidate) !== -1 ? candidate : parentsRequired[0];
@@ -19869,7 +22065,7 @@ define(
 
       function wrapInHtml(elm, ancestry, siblings) {
         var parent, parentCandidate, parentRequired;
-        var ancestor = ancestry.length && ancestry[0];
+        var ancestor = ancestry.length > 0 && ancestry[0];
         var ancestorName = ancestor && ancestor.name;
 
         parentRequired = getRequiredParent(elm, ancestorName);
@@ -20445,10 +22641,10 @@ define(
             { inline: 'strike', remove: 'all' }
           ],
 
-          forecolor: { inline: 'span', styles: { color: '%value' }, links: true, remove_similar: true },
-          hilitecolor: { inline: 'span', styles: { backgroundColor: '%value' }, links: true, remove_similar: true },
-          fontname: { inline: 'span', styles: { fontFamily: '%value' } },
-          fontsize: { inline: 'span', styles: { fontSize: '%value' } },
+          forecolor: { inline: 'span', styles: { color: '%value' }, links: true, remove_similar: true, clear_child_styles: true },
+          hilitecolor: { inline: 'span', styles: { backgroundColor: '%value' }, links: true, remove_similar: true, clear_child_styles: true },
+          fontname: { inline: 'span', styles: { fontFamily: '%value' }, clear_child_styles: true },
+          fontsize: { inline: 'span', styles: { fontSize: '%value' }, clear_child_styles: true },
           fontsize_class: { inline: 'span', attributes: { 'class': '%value' } },
           blockquote: { block: 'blockquote', wrapper: 1, remove: 'all' },
           subscript: { inline: 'sub' },
@@ -20490,6 +22686,16 @@ define(
         // Register user defined formats
         register(ed.settings.formats);
       }
+
+      var clearChildStyles = function (format, node) {
+        if (format.clear_child_styles) {
+          each(dom.select('*', node), function (node) {
+            each(format.styles, function (value, name) {
+              dom.setStyle(node, name, '');
+            });
+          });
+        }
+      };
 
       function addKeyboardShortcuts() {
         // Add some inline shortcuts
@@ -20933,6 +23139,8 @@ define(
 
                   removeFormat(format, vars, child, format.exact ? child : null);
                 });
+
+                clearChildStyles(format, node);
               });
 
               // Remove format if direct parent already has the same format
@@ -23029,7 +25237,9 @@ define(
     };
 
     var read = function (elm) {
-      return Arr.map(elm.childNodes, getOuterHtml);
+      return Arr.filter(Arr.map(elm.childNodes, getOuterHtml), function (item) {
+        return item.length > 0;
+      });
     };
 
     var write = function (fragments, elm) {
@@ -23525,1390 +25735,6 @@ define(
 );
 
 define(
-  'ephox.katamari.api.Options',
-
-  [
-    'ephox.katamari.api.Option'
-  ],
-
-  function (Option) {
-    /** cat :: [Option a] -> [a] */
-    var cat = function (arr) {
-      var r = [];
-      var push = function (x) {
-        r.push(x);
-      };
-      for (var i = 0; i < arr.length; i++) {
-        arr[i].each(push);
-      }
-      return r;
-    };
-
-    /** findMap :: ([a], (a, Int -> Option b)) -> Option b */
-    var findMap = function (arr, f) {
-      for (var i = 0; i < arr.length; i++) {
-        var r = f(arr[i], i);
-        if (r.isSome()) {
-          return r;
-        }
-      }
-      return Option.none();
-    };
-
-    /**
-     * if all elements in arr are 'some', their inner values are passed as arguments to f
-     * f must have arity arr.length
-    */
-    var liftN = function(arr, f) {
-      var r = [];
-      for (var i = 0; i < arr.length; i++) {
-        var x = arr[i];
-        if (x.isSome()) {
-          r.push(x.getOrDie());
-        } else {
-          return Option.none();
-        }
-      }
-      return Option.some(f.apply(null, r));
-    };
-
-    return {
-      cat: cat,
-      findMap: findMap,
-      liftN: liftN
-    };
-  }
-);
-
-define(
-  'ephox.katamari.data.Immutable',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Fun',
-    'global!Array',
-    'global!Error'
-  ],
-
-  function (Arr, Fun, Array, Error) {
-    return function () {
-      var fields = arguments;
-      return function(/* values */) {
-        //  Don't use array slice(arguments), makes the whole function unoptimisable on Chrome
-        var values = new Array(arguments.length);
-        for (var i = 0; i < values.length; i++) values[i] = arguments[i];
-
-        if (fields.length !== values.length)
-          throw new Error('Wrong number of arguments to struct. Expected "[' + fields.length + ']", got ' + values.length + ' arguments');
-
-        var struct = {};
-        Arr.each(fields, function (name, i) {
-          struct[name] = Fun.constant(values[i]);
-        });
-        return struct;
-      };
-    };
-  }
-);
-
-define(
-  'ephox.katamari.api.Obj',
-
-  [
-    'ephox.katamari.api.Option',
-    'global!Object'
-  ],
-
-  function (Option, Object) {
-    // There are many variations of Object iteration that are faster than the 'for-in' style:
-    // http://jsperf.com/object-keys-iteration/107
-    //
-    // Use the native keys if it is available (IE9+), otherwise fall back to manually filtering
-    var keys = (function () {
-      var fastKeys = Object.keys;
-
-      // This technically means that 'each' and 'find' on IE8 iterate through the object twice.
-      // This code doesn't run on IE8 much, so it's an acceptable tradeoff.
-      // If it becomes a problem we can always duplicate the feature detection inside each and find as well.
-      var slowKeys = function (o) {
-        var r = [];
-        for (var i in o) {
-          if (o.hasOwnProperty(i)) {
-            r.push(i);
-          }
-        }
-        return r;
-      };
-
-      return fastKeys === undefined ? slowKeys : fastKeys;
-    })();
-
-
-    var each = function (obj, f) {
-      var props = keys(obj);
-      for (var k = 0, len = props.length; k < len; k++) {
-        var i = props[k];
-        var x = obj[i];
-        f(x, i, obj);
-      }
-    };
-
-    /** objectMap :: (JsObj(k, v), (v, k, JsObj(k, v) -> x)) -> JsObj(k, x) */
-    var objectMap = function (obj, f) {
-      return tupleMap(obj, function (x, i, obj) {
-        return {
-          k: i,
-          v: f(x, i, obj)
-        };
-      });
-    };
-
-    /** tupleMap :: (JsObj(k, v), (v, k, JsObj(k, v) -> { k: x, v: y })) -> JsObj(x, y) */
-    var tupleMap = function (obj, f) {
-      var r = {};
-      each(obj, function (x, i) {
-        var tuple = f(x, i, obj);
-        r[tuple.k] = tuple.v;
-      });
-      return r;
-    };
-
-    /** bifilter :: (JsObj(k, v), (v, k -> Bool)) -> { t: JsObj(k, v), f: JsObj(k, v) } */
-    var bifilter = function (obj, pred) {
-      var t = {};
-      var f = {};
-      each(obj, function(x, i) {
-        var branch = pred(x, i) ? t : f;
-        branch[i] = x;
-      });
-      return {
-        t: t,
-        f: f
-      };
-    };
-
-    /** mapToArray :: (JsObj(k, v), (v, k -> a)) -> [a] */
-    var mapToArray = function (obj, f) {
-      var r = [];
-      each(obj, function(value, name) {
-        r.push(f(value, name));
-      });
-      return r;
-    };
-
-    /** find :: (JsObj(k, v), (v, k, JsObj(k, v) -> Bool)) -> Option v */
-    var find = function (obj, pred) {
-      var props = keys(obj);
-      for (var k = 0, len = props.length; k < len; k++) {
-        var i = props[k];
-        var x = obj[i];
-        if (pred(x, i, obj)) {
-          return Option.some(x);
-        }
-      }
-      return Option.none();
-    };
-
-    /** values :: JsObj(k, v) -> [v] */
-    var values = function (obj) {
-      return mapToArray(obj, function (v) {
-        return v;
-      });
-    };
-
-    var size = function (obj) {
-      return values(obj).length;
-    };
-
-    return {
-      bifilter: bifilter,
-      each: each,
-      map: objectMap,
-      mapToArray: mapToArray,
-      tupleMap: tupleMap,
-      find: find,
-      keys: keys,
-      values: values,
-      size: size
-    };
-  }
-);
-define(
-  'ephox.katamari.api.Type',
-
-  [
-    'global!Array',
-    'global!String'
-  ],
-
-  function (Array, String) {
-    var typeOf = function(x) {
-      if (x === null) return 'null';
-      var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x)) return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x)) return 'string';
-      return t;
-    };
-
-    var isType = function (type) {
-      return function (value) {
-        return typeOf(value) === type;
-      };
-    };
-
-    return {
-      isString: isType('string'),
-      isObject: isType('object'),
-      isArray: isType('array'),
-      isNull: isType('null'),
-      isBoolean: isType('boolean'),
-      isUndefined: isType('undefined'),
-      isFunction: isType('function'),
-      isNumber: isType('number')
-    };
-  }
-);
-
-
-define(
-  'ephox.katamari.util.BagUtils',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Type',
-    'global!Error'
-  ],
-
-  function (Arr, Type, Error) {
-    var sort = function (arr) {
-      return arr.slice(0).sort();
-    };
-
-    var reqMessage = function (required, keys) {
-      throw new Error('All required keys (' + sort(required).join(', ') + ') were not specified. Specified keys were: ' + sort(keys).join(', ') + '.');
-    };
-
-    var unsuppMessage = function (unsupported) {
-      throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
-    };
-
-    var validateStrArr = function (label, array) {
-      if (!Type.isArray(array)) throw new Error('The ' + label + ' fields must be an array. Was: ' + array + '.');
-      Arr.each(array, function (a) {
-        if (!Type.isString(a)) throw new Error('The value ' + a + ' in the ' + label + ' fields was not a string.');
-      });
-    };
-
-    var invalidTypeMessage = function (incorrect, type) {
-      throw new Error('All values need to be of type: ' + type + '. Keys (' + sort(incorrect).join(', ') + ') were not.');
-    };
-
-    var checkDupes = function (everything) {
-      var sorted = sort(everything);
-      var dupe = Arr.find(sorted, function (s, i) {
-        return i < sorted.length -1 && s === sorted[i + 1];
-      });
-
-      dupe.each(function (d) {
-        throw new Error('The field: ' + d + ' occurs more than once in the combined fields: [' + sorted.join(', ') + '].');
-      });
-    };
-
-    return {
-      sort: sort,
-      reqMessage: reqMessage,
-      unsuppMessage: unsuppMessage,
-      validateStrArr: validateStrArr,
-      invalidTypeMessage: invalidTypeMessage,
-      checkDupes: checkDupes
-    };
-  }
-);
-define(
-  'ephox.katamari.data.MixedBag',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Fun',
-    'ephox.katamari.api.Obj',
-    'ephox.katamari.api.Option',
-    'ephox.katamari.util.BagUtils',
-    'global!Error',
-    'global!Object'
-  ],
-
-  function (Arr, Fun, Obj, Option, BagUtils, Error, Object) {
-    
-    return function (required, optional) {
-      var everything = required.concat(optional);
-      if (everything.length === 0) throw new Error('You must specify at least one required or optional field.');
-
-      BagUtils.validateStrArr('required', required);
-      BagUtils.validateStrArr('optional', optional);
-
-      BagUtils.checkDupes(everything);
-
-      return function (obj) {
-        var keys = Obj.keys(obj);
-
-        // Ensure all required keys are present.
-        var allReqd = Arr.forall(required, function (req) {
-          return Arr.contains(keys, req);
-        });
-
-        if (! allReqd) BagUtils.reqMessage(required, keys);
-
-        var unsupported = Arr.filter(keys, function (key) {
-          return !Arr.contains(everything, key);
-        });
-
-        if (unsupported.length > 0) BagUtils.unsuppMessage(unsupported);
-
-        var r = {};
-        Arr.each(required, function (req) {
-          r[req] = Fun.constant(obj[req]);
-        });
-
-        Arr.each(optional, function (opt) {
-          r[opt] = Fun.constant(Object.prototype.hasOwnProperty.call(obj, opt) ? Option.some(obj[opt]): Option.none());
-        });
-
-        return r;
-      };
-    };
-  }
-);
-define(
-  'ephox.katamari.api.Struct',
-
-  [
-    'ephox.katamari.data.Immutable',
-    'ephox.katamari.data.MixedBag'
-  ],
-
-  function (Immutable, MixedBag) {
-    return {
-      immutable: Immutable,
-      immutableBag: MixedBag
-    };
-  }
-);
-
-define(
-  'ephox.katamari.api.Global',
-
-  [
-  ],
-
-  function () {
-    return Function('return this;')();
-  }
-);
-
-
-define(
-  'ephox.katamari.api.Resolve',
-
-  [
-    'ephox.katamari.api.Global'
-  ],
-
-  function (Global) {
-    /** path :: ([String], JsObj?) -> JsObj */
-    var path = function (parts, scope) {
-      var o = scope !== undefined ? scope : Global;
-      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
-        o = o[parts[i]];
-      return o;
-    };
-
-    /** resolve :: (String, JsObj?) -> JsObj */
-    var resolve = function (p, scope) {
-      var parts = p.split('.');
-      return path(parts, scope);
-    };
-
-    /** step :: (JsObj, String) -> JsObj */
-    var step = function (o, part) {
-      if (o[part] === undefined || o[part] === null)
-        o[part] = {};
-      return o[part];
-    };
-
-    /** forge :: ([String], JsObj?) -> JsObj */
-    var forge = function (parts, target) {
-      var o = target !== undefined ? target : Global;      
-      for (var i = 0; i < parts.length; ++i)
-        o = step(o, parts[i]);
-      return o;
-    };
-
-    /** namespace :: (String, JsObj?) -> JsObj */
-    var namespace = function (name, target) {
-      var parts = name.split('.');
-      return forge(parts, target);
-    };
-
-    return {
-      path: path,
-      resolve: resolve,
-      forge: forge,
-      namespace: namespace
-    };
-  }
-);
-
-
-define(
-  'ephox.sand.util.Global',
-
-  [
-    'ephox.katamari.api.Resolve'
-  ],
-
-  function (Resolve) {
-    var unsafe = function (name, scope) {
-      return Resolve.resolve(name, scope);
-    };
-
-    var getOrDie = function (name, scope) {
-      var actual = unsafe(name, scope);
-
-      if (actual === undefined) throw name + ' not available on this browser';
-      return actual;
-    };
-
-    return {
-      getOrDie: getOrDie
-    };
-  }
-);
-define(
-  'ephox.sand.api.Node',
-
-  [
-    'ephox.sand.util.Global'
-  ],
-
-  function (Global) {
-    /*
-     * MDN says (yes) for IE, but it's undefined on IE8
-     */
-    var node = function () {
-      var f = Global.getOrDie('Node');
-      return f;
-    };
-
-    /*
-     * Most of numerosity doesn't alter the methods on the object.
-     * We're making an exception for Node, because bitwise and is so easy to get wrong.
-     *
-     * Might be nice to ADT this at some point instead of having individual methods.
-     */
-
-    var compareDocumentPosition = function (a, b, match) {
-      // Returns: 0 if e1 and e2 are the same node, or a bitmask comparing the positions
-      // of nodes e1 and e2 in their documents. See the URL below for bitmask interpretation
-      // https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
-      return (a.compareDocumentPosition(b) & match) !== 0;
-    };
-
-    var documentPositionPreceding = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_PRECEDING);
-    };
-
-    var documentPositionContainedBy = function (a, b) {
-      return compareDocumentPosition(a, b, node().DOCUMENT_POSITION_CONTAINED_BY);
-    };
-
-    return {
-      documentPositionPreceding: documentPositionPreceding,
-      documentPositionContainedBy: documentPositionContainedBy
-    };
-  }
-);
-define(
-  'ephox.katamari.api.Thunk',
-
-  [
-  ],
-
-  function () {
-
-    var cached = function (f) {
-      var called = false;
-      var r;
-      return function() {
-        if (!called) {
-          called = true;
-          r = f.apply(null, arguments);
-        }
-        return r;
-      };
-    };
-
-    return {
-      cached: cached
-    };
-  }
-);
-
-defineGlobal("global!Number", Number);
-define(
-  'ephox.sand.detect.Version',
-
-  [
-    'ephox.katamari.api.Arr',
-    'global!Number',
-    'global!String'
-  ],
-
-  function (Arr, Number, String) {
-    var firstMatch = function (regexes, s) {
-      for (var i = 0; i < regexes.length; i++) {
-        var x = regexes[i];
-        if (x.test(s)) return x;
-      }
-      return undefined;
-    };
-
-    var find = function (regexes, agent) {
-      var r = firstMatch(regexes, agent);
-      if (!r) return { major : 0, minor : 0 };
-      var group = function(i) {
-        return Number(agent.replace(r, '$' + i));
-      };
-      return nu(group(1), group(2));
-    };
-
-    var detect = function (versionRegexes, agent) {
-      var cleanedAgent = String(agent).toLowerCase();
-
-      if (versionRegexes.length === 0) return unknown();
-      return find(versionRegexes, cleanedAgent);
-    };
-
-    var unknown = function () {
-      return nu(0, 0);
-    };
-
-    var nu = function (major, minor) {
-      return { major: major, minor: minor };
-    };
-
-    return {
-      nu: nu,
-      detect: detect,
-      unknown: unknown
-    };
-  }
-);
-define(
-  'ephox.sand.core.Browser',
-
-  [
-    'ephox.katamari.api.Fun',
-    'ephox.sand.detect.Version'
-  ],
-
-  function (Fun, Version) {
-    var edge = 'Edge';
-    var chrome = 'Chrome';
-    var ie = 'IE';
-    var opera = 'Opera';
-    var firefox = 'Firefox';
-    var safari = 'Safari';
-
-    var isBrowser = function (name, current) {
-      return function () {
-        return current === name;
-      };
-    };
-
-    var unknown = function () {
-      return nu({
-        current: undefined,
-        version: Version.unknown()
-      });
-    };
-
-    var nu = function (info) {
-      var current = info.current;
-      var version = info.version;
-
-      return {
-        current: current,
-        version: version,
-
-        // INVESTIGATE: Rename to Edge ?
-        isEdge: isBrowser(edge, current),
-        isChrome: isBrowser(chrome, current),
-        // NOTE: isIe just looks too weird
-        isIE: isBrowser(ie, current),
-        isOpera: isBrowser(opera, current),
-        isFirefox: isBrowser(firefox, current),
-        isSafari: isBrowser(safari, current)
-      };
-    };
-
-    return {
-      unknown: unknown,
-      nu: nu,
-      edge: Fun.constant(edge),
-      chrome: Fun.constant(chrome),
-      ie: Fun.constant(ie),
-      opera: Fun.constant(opera),
-      firefox: Fun.constant(firefox),
-      safari: Fun.constant(safari)
-    };
-  }
-);
-define(
-  'ephox.sand.core.OperatingSystem',
-
-  [
-    'ephox.katamari.api.Fun',
-    'ephox.sand.detect.Version'
-  ],
-
-  function (Fun, Version) {
-    var windows = 'Windows';
-    var ios = 'iOS';
-    var android = 'Android';
-    var linux = 'Linux';
-    var osx = 'OSX';
-    var solaris = 'Solaris';
-    var freebsd = 'FreeBSD';
-
-    // Though there is a bit of dupe with this and Browser, trying to 
-    // reuse code makes it much harder to follow and change.
-    var isOS = function (name, current) {
-      return function () {
-        return current === name;
-      };
-    };
-
-    var unknown = function () {
-      return nu({
-        current: undefined,
-        version: Version.unknown()
-      });
-    };
-
-    var nu = function (info) {
-      var current = info.current;
-      var version = info.version;
-
-      return {
-        current: current,
-        version: version,
-
-        isWindows: isOS(windows, current),
-        // TODO: Fix capitalisation
-        isiOS: isOS(ios, current),
-        isAndroid: isOS(android, current),
-        isOSX: isOS(osx, current),
-        isLinux: isOS(linux, current),
-        isSolaris: isOS(solaris, current),
-        isFreeBSD: isOS(freebsd, current)
-      };
-    };
-
-    return {
-      unknown: unknown,
-      nu: nu,
-
-      windows: Fun.constant(windows),
-      ios: Fun.constant(ios),
-      android: Fun.constant(android),
-      linux: Fun.constant(linux),
-      osx: Fun.constant(osx),
-      solaris: Fun.constant(solaris),
-      freebsd: Fun.constant(freebsd)
-    };
-  }
-);
-define(
-  'ephox.sand.detect.DeviceType',
-
-  [
-    'ephox.katamari.api.Fun'
-  ],
-
-  function (Fun) {
-    return function (os, browser, userAgent) {
-      var isiPad = os.isiOS() && /ipad/i.test(userAgent) === true;
-      var isiPhone = os.isiOS() && !isiPad;
-      var isAndroid3 = os.isAndroid() && os.version.major === 3;
-      var isAndroid4 = os.isAndroid() && os.version.major === 4;
-      var isTablet = isiPad || isAndroid3 || ( isAndroid4 && /mobile/i.test(userAgent) === true );
-      var isTouch = os.isiOS() || os.isAndroid();
-      var isPhone = isTouch && !isTablet;
-
-      var iOSwebview = browser.isSafari() && os.isiOS() && /safari/i.test(userAgent) === false;
-
-      return {
-        isiPad : Fun.constant(isiPad),
-        isiPhone: Fun.constant(isiPhone),
-        isTablet: Fun.constant(isTablet),
-        isPhone: Fun.constant(isPhone),
-        isTouch: Fun.constant(isTouch),
-        isAndroid: os.isAndroid,
-        isiOS: os.isiOS,
-        isWebView: Fun.constant(iOSwebview)
-      };
-    };
-  }
-);
-define(
-  'ephox.sand.detect.UaString',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.sand.detect.Version',
-    'global!String'
-  ],
-
-  function (Arr, Version, String) {
-    var detect = function (candidates, userAgent) {
-      var agent = String(userAgent).toLowerCase();
-      return Arr.find(candidates, function (candidate) {
-        return candidate.search(agent);
-      });
-    };
-
-    // They (browser and os) are the same at the moment, but they might
-    // not stay that way.
-    var detectBrowser = function (browsers, userAgent) {
-      return detect(browsers, userAgent).map(function (browser) {
-        var version = Version.detect(browser.versionRegexes, userAgent);
-        return {
-          current: browser.name,
-          version: version
-        };
-      });
-    };
-
-    var detectOs = function (oses, userAgent) {
-      return detect(oses, userAgent).map(function (os) {
-        var version = Version.detect(os.versionRegexes, userAgent);
-        return {
-          current: os.name,
-          version: version
-        };
-      });
-    };
-
-    return {
-      detectBrowser: detectBrowser,
-      detectOs: detectOs
-    };
-  }
-);
-define(
-  'ephox.katamari.str.StrAppend',
-
-  [
-
-  ],
-
-  function () {
-    var addToStart = function (str, prefix) {
-      return prefix + str;
-    };
-
-    var addToEnd = function (str, suffix) {
-      return str + suffix;
-    };
-
-    var removeFromStart = function (str, numChars) {
-      return str.substring(numChars);
-    };
-
-    var removeFromEnd = function (str, numChars) {
-      return str.substring(0, str.length - numChars);
-    };
- 
-    return {
-      addToStart: addToStart,
-      addToEnd: addToEnd,
-      removeFromStart: removeFromStart,
-      removeFromEnd: removeFromEnd
-    };
-  }
-);
-define(
-  'ephox.katamari.str.StringParts',
-
-  [
-    'ephox.katamari.api.Option',
-    'global!Error'
-  ],
-
-  function (Option, Error) {
-    /** Return the first 'count' letters from 'str'.
--     *  e.g. first("abcde", 2) === "ab"
--     */
-    var first = function(str, count) {
-     return str.substr(0, count);
-    };
-
-    /** Return the last 'count' letters from 'str'.
-    *  e.g. last("abcde", 2) === "de"
-    */
-    var last = function(str, count) {
-     return str.substr(str.length - count, str.length);
-    };
-
-    var head = function(str) {
-      return str === '' ? Option.none() : Option.some(str.substr(0, 1));
-    };
-
-    var tail = function(str) {
-      return str === '' ? Option.none() : Option.some(str.substring(1));
-    };
-
-    return {
-      first: first,
-      last: last,
-      head: head,
-      tail: tail
-    };
-  }
-);
-define(
-  'ephox.katamari.api.Strings',
-
-  [
-    'ephox.katamari.str.StrAppend',
-    'ephox.katamari.str.StringParts',
-    'global!Error'
-  ],
-
-  function (StrAppend, StringParts, Error) {
-    var checkRange = function(str, substr, start) {
-      if (substr === '') return true;
-      if (str.length < substr.length) return false;
-      var x = str.substr(start, start + substr.length);
-      return x === substr;
-    };
-
-    /** Given a string and object, perform template-replacements on the string, as specified by the object.
-     * Any template fields of the form ${name} are replaced by the string or number specified as obj["name"]
-     * Based on Douglas Crockford's 'supplant' method for template-replace of strings. Uses different template format.
-     */
-    var supplant = function(str, obj) {
-      var isStringOrNumber = function(a) {
-        var t = typeof a;
-        return t === 'string' || t === 'number';
-      };
-
-      return str.replace(/\${([^{}]*)}/g,
-        function (a, b) {
-          var value = obj[b];
-          return isStringOrNumber(value) ? value : a;
-        }
-      );
-    };
-
-    var removeLeading = function (str, prefix) {
-      return startsWith(str, prefix) ? StrAppend.removeFromStart(str, prefix.length) : str;
-    };
-
-    var removeTrailing = function (str, prefix) {
-      return endsWith(str, prefix) ? StrAppend.removeFromEnd(str, prefix.length) : str;
-    };
-
-    var ensureLeading = function (str, prefix) {
-      return startsWith(str, prefix) ? str : StrAppend.addToStart(str, prefix);
-    };
-
-    var ensureTrailing = function (str, prefix) {
-      return endsWith(str, prefix) ? str : StrAppend.addToEnd(str, prefix);
-    };
- 
-    var contains = function(str, substr) {
-      return str.indexOf(substr) !== -1;
-    };
-
-    var capitalize = function(str) {
-      return StringParts.head(str).bind(function (head) {
-        return StringParts.tail(str).map(function (tail) {
-          return head.toUpperCase() + tail;
-        });
-      }).getOr(str);
-    };
-
-    /** Does 'str' start with 'prefix'?
-     *  Note: all strings start with the empty string.
-     *        More formally, for all strings x, startsWith(x, "").
-     *        This is so that for all strings x and y, startsWith(y + x, y)
-     */
-    var startsWith = function(str, prefix) {
-      return checkRange(str, prefix, 0);
-    };
-
-    /** Does 'str' end with 'suffix'?
-     *  Note: all strings end with the empty string.
-     *        More formally, for all strings x, endsWith(x, "").
-     *        This is so that for all strings x and y, endsWith(x + y, y)
-     */
-    var endsWith = function(str, suffix) {
-      return checkRange(str, suffix, str.length - suffix.length);
-    };
-
-   
-    /** removes all leading and trailing spaces */
-    var trim = function(str) {
-      return str.replace(/^\s+|\s+$/g, '');
-    };
-
-    var lTrim = function(str) {
-      return str.replace(/^\s+/g, '');
-    };
-
-    var rTrim = function(str) {
-      return str.replace(/\s+$/g, '');
-    };
-
-    return {
-      supplant: supplant,
-      startsWith: startsWith,
-      removeLeading: removeLeading,
-      removeTrailing: removeTrailing,
-      ensureLeading: ensureLeading,
-      ensureTrailing: ensureTrailing,
-      endsWith: endsWith,
-      contains: contains,
-      trim: trim,
-      lTrim: lTrim,
-      rTrim: rTrim,
-      capitalize: capitalize
-    };
-  }
-);
-
-define(
-  'ephox.sand.info.PlatformInfo',
-
-  [
-    'ephox.katamari.api.Fun',
-    'ephox.katamari.api.Strings'
-  ],
-
-  function (Fun, Strings) {
-    var normalVersionRegex = /.*?version\/\ ?([0-9]+)\.([0-9]+).*/;
-
-    var checkContains = function (target) {
-      return function (uastring) {
-        return Strings.contains(uastring, target);
-      };
-    };
-
-    var browsers = [
-      {
-        name : 'Edge',
-        versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
-        search: function (uastring) {
-          var monstrosity = Strings.contains(uastring, 'edge/') && Strings.contains(uastring, 'chrome') && Strings.contains(uastring, 'safari') && Strings.contains(uastring, 'applewebkit');
-          return monstrosity;
-        }
-      },
-      {
-        name : 'Chrome',
-        versionRegexes: [/.*?chrome\/([0-9]+)\.([0-9]+).*/, normalVersionRegex],
-        search : function (uastring) {
-          return Strings.contains(uastring, 'chrome') && !Strings.contains(uastring, 'chromeframe');
-        }
-      },
-      {
-        name : 'IE',
-        versionRegexes: [/.*?msie\ ?([0-9]+)\.([0-9]+).*/, /.*?rv:([0-9]+)\.([0-9]+).*/],
-        search: function (uastring) {
-          return Strings.contains(uastring, 'msie') || Strings.contains(uastring, 'trident');
-        }
-      },
-      // INVESTIGATE: Is this still the Opera user agent?
-      {
-        name : 'Opera',
-        versionRegexes: [normalVersionRegex, /.*?opera\/([0-9]+)\.([0-9]+).*/],
-        search : checkContains('opera')
-      },
-      {
-        name : 'Firefox',
-        versionRegexes: [/.*?firefox\/\ ?([0-9]+)\.([0-9]+).*/],
-        search : checkContains('firefox')
-      },
-      {
-        name : 'Safari',
-        versionRegexes: [normalVersionRegex, /.*?cpu os ([0-9]+)_([0-9]+).*/],
-        search : function (uastring) {
-          return (Strings.contains(uastring, 'safari') || Strings.contains(uastring, 'mobile/')) && Strings.contains(uastring, 'applewebkit');
-        }
-      }
-    ];
-
-    var oses = [
-      {
-        name : 'Windows',
-        search : checkContains('win'),
-        versionRegexes: [/.*?windows\ nt\ ?([0-9]+)\.([0-9]+).*/]
-      },
-      {
-        name : 'iOS',
-        search : function (uastring) {
-          return Strings.contains(uastring, 'iphone') || Strings.contains(uastring, 'ipad');
-        },
-        versionRegexes: [/.*?version\/\ ?([0-9]+)\.([0-9]+).*/, /.*cpu os ([0-9]+)_([0-9]+).*/, /.*cpu iphone os ([0-9]+)_([0-9]+).*/]
-      },
-      {
-        name : 'Android',
-        search : checkContains('android'),
-        versionRegexes: [/.*?android\ ?([0-9]+)\.([0-9]+).*/]
-      },
-      {
-        name : 'OSX',
-        search : checkContains('os x'),
-        versionRegexes: [/.*?os\ x\ ?([0-9]+)_([0-9]+).*/]
-      },
-      {
-        name : 'Linux',
-        search : checkContains('linux'),
-        versionRegexes: [ ]
-      },
-      { name : 'Solaris',
-        search : checkContains('sunos'),
-        versionRegexes: [ ]
-      },
-      {
-       name : 'FreeBSD',
-       search : checkContains('freebsd'),
-       versionRegexes: [ ]
-      }
-    ];
-
-    return {
-      browsers: Fun.constant(browsers),
-      oses: Fun.constant(oses)
-    };
-  }
-);
-define(
-  'ephox.sand.core.PlatformDetection',
-
-  [
-    'ephox.sand.core.Browser',
-    'ephox.sand.core.OperatingSystem',
-    'ephox.sand.detect.DeviceType',
-    'ephox.sand.detect.UaString',
-    'ephox.sand.info.PlatformInfo'
-  ],
-
-  function (Browser, OperatingSystem, DeviceType, UaString, PlatformInfo) {
-    var detect = function (userAgent) {
-      var browsers = PlatformInfo.browsers();
-      var oses = PlatformInfo.oses();
-
-      var browser = UaString.detectBrowser(browsers, userAgent).fold(
-        Browser.unknown,
-        Browser.nu
-      );
-      var os = UaString.detectOs(oses, userAgent).fold(
-        OperatingSystem.unknown,
-        OperatingSystem.nu
-      );
-      var deviceType = DeviceType(os, browser, userAgent);
-
-      return {
-        browser: browser,
-        os: os,
-        deviceType: deviceType
-      };
-    };
-
-    return {
-      detect: detect
-    };
-  }
-);
-defineGlobal("global!navigator", navigator);
-define(
-  'ephox.sand.api.PlatformDetection',
-
-  [
-    'ephox.katamari.api.Thunk',
-    'ephox.sand.core.PlatformDetection',
-    'global!navigator'
-  ],
-
-  function (Thunk, PlatformDetection, navigator) {
-    var detect = Thunk.cached(function () {
-      var userAgent = navigator.userAgent;
-      return PlatformDetection.detect(userAgent);
-    });
-
-    return {
-      detect: detect
-    };
-  }
-);
-define("global!console", [], function () { if (typeof console === "undefined") console = { log: function () {} }; return console; });
-defineGlobal("global!document", document);
-define(
-  'ephox.sugar.api.node.Element',
-
-  [
-    'ephox.katamari.api.Fun',
-    'global!Error',
-    'global!console',
-    'global!document'
-  ],
-
-  function (Fun, Error, console, document) {
-    var fromHtml = function (html, scope) {
-      var doc = scope || document;
-      var div = doc.createElement('div');
-      div.innerHTML = html;
-      if (!div.hasChildNodes() || div.childNodes.length > 1) {
-        console.error('HTML does not have a single root node', html);
-        throw 'HTML must have a single root node';
-      }
-      return fromDom(div.childNodes[0]);
-    };
-
-    var fromTag = function (tag, scope) {
-      var doc = scope || document;
-      var node = doc.createElement(tag);
-      return fromDom(node);
-    };
-
-    var fromText = function (text, scope) {
-      var doc = scope || document;
-      var node = doc.createTextNode(text);
-      return fromDom(node);
-    };
-
-    var fromDom = function (node) {
-      if (node === null || node === undefined) throw new Error('Node cannot be null or undefined');
-      return {
-        dom: Fun.constant(node)
-      };
-    };
-
-    return {
-      fromHtml: fromHtml,
-      fromTag: fromTag,
-      fromText: fromText,
-      fromDom: fromDom
-    };
-  }
-);
-
-define(
-  'ephox.sugar.api.node.NodeTypes',
-
-  [
-
-  ],
-
-  function () {
-    return {
-      ATTRIBUTE:              2,
-      CDATA_SECTION:          4,
-      COMMENT:                8,
-      DOCUMENT:               9,
-      DOCUMENT_TYPE:          10,
-      DOCUMENT_FRAGMENT:      11,
-      ELEMENT:                1,
-      TEXT:                   3,
-      PROCESSING_INSTRUCTION: 7,
-      ENTITY_REFERENCE:       5,
-      ENTITY:                 6,
-      NOTATION:               12
-    };
-  }
-);
-define(
-  'ephox.sugar.api.search.Selectors',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Option',
-    'ephox.sugar.api.node.Element',
-    'ephox.sugar.api.node.NodeTypes',
-    'global!Error',
-    'global!document'
-  ],
-
-  function (Arr, Option, Element, NodeTypes, Error, document) {
-    /*
-     * There's a lot of code here; the aim is to allow the browser to optimise constant comparisons,
-     * instead of doing object lookup feature detection on every call
-     */
-    var STANDARD = 0;
-    var MSSTANDARD = 1;
-    var WEBKITSTANDARD = 2;
-    var FIREFOXSTANDARD = 3;
-
-    var selectorType = (function () {
-      var test = document.createElement('span');
-      // As of Chrome 34 / Safari 7.1 / FireFox 34, everyone except IE has the unprefixed function.
-      // Still check for the others, but do it last.
-      return test.matches !== undefined ? STANDARD :
-             test.msMatchesSelector !== undefined ? MSSTANDARD :
-             test.webkitMatchesSelector !== undefined ? WEBKITSTANDARD :
-             test.mozMatchesSelector !== undefined ? FIREFOXSTANDARD :
-             -1;
-    })();
-
-
-    var ELEMENT = NodeTypes.ELEMENT;
-    var DOCUMENT = NodeTypes.DOCUMENT;
-
-    var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT) return false; // documents have querySelector but not matches
-
-      // As of Chrome 34 / Safari 7.1 / FireFox 34, everyone except IE has the unprefixed function.
-      // Still check for the others, but do it last.
-      else if (selectorType === STANDARD) return elem.matches(selector);
-      else if (selectorType === MSSTANDARD) return elem.msMatchesSelector(selector);
-      else if (selectorType === WEBKITSTANDARD) return elem.webkitMatchesSelector(selector);
-      else if (selectorType === FIREFOXSTANDARD) return elem.mozMatchesSelector(selector);
-      else throw new Error('Browser lacks native selectors'); // unfortunately we can't throw this on startup :(
-    };
-
-    var bypassSelector = function (dom) {
-      // Only elements and documents support querySelector
-      return dom.nodeType !== ELEMENT && dom.nodeType !== DOCUMENT ||
-              // IE fix for complex queries on empty nodes: http://jsfiddle.net/spyder/fv9ptr5L/
-              dom.childElementCount === 0;
-    };
-
-    var all = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? [] : Arr.map(base.querySelectorAll(selector), Element.fromDom);
-    };
-
-    var one = function (selector, scope) {
-      var base = scope === undefined ? document : scope.dom();
-      return bypassSelector(base) ? Option.none() : Option.from(base.querySelector(selector)).map(Element.fromDom);
-    };
-
-    return {
-      all: all,
-      is: is,
-      one: one
-    };
-  }
-);
-
-define(
-  'ephox.sugar.api.dom.Compare',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Fun',
-    'ephox.sand.api.Node',
-    'ephox.sand.api.PlatformDetection',
-    'ephox.sugar.api.search.Selectors'
-  ],
-
-  function (Arr, Fun, Node, PlatformDetection, Selectors) {
-
-    var eq = function (e1, e2) {
-      return e1.dom() === e2.dom();
-    };
-
-    var isEqualNode = function (e1, e2) {
-      return e1.dom().isEqualNode(e2.dom());
-    };
-
-    var member = function (element, elements) {
-      return Arr.exists(elements, Fun.curry(eq, element));
-    };
-
-    // DOM contains() method returns true if e1===e2, we define our contains() to return false (a node does not contain itself).
-    var regularContains = function (e1, e2) {
-      var d1 = e1.dom(), d2 = e2.dom();
-      return d1 === d2 ? false : d1.contains(d2);
-    };
-
-    var ieContains = function (e1, e2) {
-      // IE only implements the contains() method for Element nodes.
-      // It fails for Text nodes, so implement it using compareDocumentPosition()
-      // https://connect.microsoft.com/IE/feedback/details/780874/node-contains-is-incorrect
-      // Note that compareDocumentPosition returns CONTAINED_BY if 'e2 *is_contained_by* e1':
-      // Also, compareDocumentPosition defines a node containing itself as false.
-      return Node.documentPositionContainedBy(e1.dom(), e2.dom());
-    };
-
-    var browser = PlatformDetection.detect().browser;
-
-    // Returns: true if node e1 contains e2, otherwise false.
-    // (returns false if e1===e2: A node does not contain itself).
-    var contains = browser.isIE() ? ieContains : regularContains;
-
-    return {
-      eq: eq,
-      isEqualNode: isEqualNode,
-      member: member,
-      contains: contains,
-
-      // Only used by DomUniverse. Remove (or should Selectors.is move here?)
-      is: Selectors.is
-    };
-  }
-);
-
-define(
-  'ephox.sugar.api.node.Node',
-
-  [
-    'ephox.sugar.api.node.NodeTypes'
-  ],
-
-  function (NodeTypes) {
-    var name = function (element) {
-      var r = element.dom().nodeName;
-      return r.toLowerCase();
-    };
-
-    var type = function (element) {
-      return element.dom().nodeType;
-    };
-
-    var value = function (element) {
-      return element.dom().nodeValue;
-    };
-
-    var isType = function (t) {
-      return function (element) {
-        return type(element) === t;
-      };
-    };
-
-    var isComment = function (element) {
-      return type(element) === NodeTypes.COMMENT || name(element) === '#comment';
-    };
-
-    var isElement = isType(NodeTypes.ELEMENT);
-    var isText = isType(NodeTypes.TEXT);
-    var isDocument = isType(NodeTypes.DOCUMENT);
-
-    return {
-      name: name,
-      type: type,
-      value: value,
-      isElement: isElement,
-      isText: isText,
-      isDocument: isDocument,
-      isComment: isComment
-    };
-  }
-);
-
-define(
   'ephox.sugar.api.node.Body',
 
   [
@@ -25048,189 +25874,6 @@ define(
       sibling: sibling,
       child: child,
       descendant: descendant
-    };
-  }
-);
-
-define(
-  'ephox.sugar.alien.Recurse',
-
-  [
-
-  ],
-
-  function () {
-    /**
-     * Applies f repeatedly until it completes (by returning Option.none()).
-     *
-     * Normally would just use recursion, but JavaScript lacks tail call optimisation.
-     *
-     * This is what recursion looks like when manually unravelled :)
-     */
-    var toArray = function (target, f) {
-      var r = [];
-
-      var recurse = function (e) {
-        r.push(e);
-        return f(e);
-      };
-
-      var cur = f(target);
-      do {
-        cur = cur.bind(recurse);
-      } while (cur.isSome());
-
-      return r;
-    };
-
-    return {
-      toArray: toArray
-    };
-  }
-);
-define(
-  'ephox.sugar.api.search.Traverse',
-
-  [
-    'ephox.katamari.api.Type',
-    'ephox.katamari.api.Arr',
-    'ephox.katamari.api.Fun',
-    'ephox.katamari.api.Option',
-    'ephox.katamari.api.Struct',
-    'ephox.sugar.alien.Recurse',
-    'ephox.sugar.api.dom.Compare',
-    'ephox.sugar.api.node.Element'
-  ],
-
-  function (Type, Arr, Fun, Option, Struct, Recurse, Compare, Element) {
-    // The document associated with the current element
-    var owner = function (element) {
-      return Element.fromDom(element.dom().ownerDocument);
-    };
-
-    var documentElement = function (element) {
-      // TODO: Avoid unnecessary wrap/unwrap here
-      var doc = owner(element);
-      return Element.fromDom(doc.dom().documentElement);
-    };
-
-    // The window element associated with the element
-    var defaultView = function (element) {
-      var el = element.dom();
-      var defaultView = el.ownerDocument.defaultView;
-      return Element.fromDom(defaultView);
-    };
-
-    var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
-    };
-
-    var findIndex = function (element) {
-      return parent(element).bind(function (p) {
-        // TODO: Refactor out children so we can avoid the constant unwrapping
-        var kin = children(p);
-        return Arr.findIndex(kin, function (elem) {
-          return Compare.eq(element, elem);
-        });
-      });
-    };
-
-    var parents = function (element, isRoot) {
-      var stop = Type.isFunction(isRoot) ? isRoot : Fun.constant(false);
-
-      // This is used a *lot* so it needs to be performant, not recursive
-      var dom = element.dom();
-      var ret = [];
-
-      while (dom.parentNode !== null && dom.parentNode !== undefined) {
-        var rawParent = dom.parentNode;
-        var parent = Element.fromDom(rawParent);
-        ret.push(parent);
-
-        if (stop(parent) === true) break;
-        else dom = rawParent;
-      }
-      return ret;
-    };
-
-    var siblings = function (element) {
-      // TODO: Refactor out children so we can just not add self instead of filtering afterwards
-      var filterSelf = function (elements) {
-        return Arr.filter(elements, function (x) {
-          return !Compare.eq(element, x);
-        });
-      };
-
-      return parent(element).map(children).map(filterSelf).getOr([]);
-    };
-
-    var offsetParent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.offsetParent).map(Element.fromDom);
-    };
-
-    var prevSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.previousSibling).map(Element.fromDom);
-    };
-
-    var nextSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element.fromDom);
-    };
-
-    var prevSiblings = function (element) {
-      // This one needs to be reversed, so they're still in DOM order
-      return Arr.reverse(Recurse.toArray(element, prevSibling));
-    };
-
-    var nextSiblings = function (element) {
-      return Recurse.toArray(element, nextSibling);
-    };
-
-    var children = function (element) {
-      var dom = element.dom();
-      return Arr.map(dom.childNodes, Element.fromDom);
-    };
-
-    var child = function (element, index) {
-      var children = element.dom().childNodes;
-      return Option.from(children[index]).map(Element.fromDom);
-    };
-
-    var firstChild = function (element) {
-      return child(element, 0);
-    };
-
-    var lastChild = function (element) {
-      return child(element, element.dom().childNodes.length - 1);
-    };
-
-    var spot = Struct.immutable('element', 'offset');
-    var leaf = function (element, offset) {
-      var cs = children(element);
-      return cs.length > 0 && offset < cs.length ? spot(cs[offset], 0) : spot(element, offset);
-    };
-
-    return {
-      owner: owner,
-      defaultView: defaultView,
-      documentElement: documentElement,
-      parent: parent,
-      findIndex: findIndex,
-      parents: parents,
-      siblings: siblings,
-      prevSibling: prevSibling,
-      offsetParent: offsetParent,
-      prevSiblings: prevSiblings,
-      nextSibling: nextSibling,
-      nextSiblings: nextSiblings,
-      children: children,
-      child: child,
-      firstChild: firstChild,
-      lastChild: lastChild,
-      leaf: leaf
     };
   }
 );
@@ -25822,19 +26465,40 @@ define(
   [
     'ephox.katamari.api.Fun',
     'ephox.katamari.api.Option',
+    'tinymce.core.caret.CaretCandidate',
     'tinymce.core.caret.CaretPosition',
-    'tinymce.core.caret.CaretWalker'
+    'tinymce.core.caret.CaretWalker',
+    'tinymce.core.dom.NodeType'
   ],
-  function (Fun, Option, CaretPosition, CaretWalker) {
+  function (Fun, Option, CaretCandidate, CaretPosition, CaretWalker, NodeType) {
     var fromPosition = function (forward, rootElement, position) {
       var walker = new CaretWalker(rootElement);
       return Option.from(forward ? walker.next(position) : walker.prev(position));
     };
 
-    var positionIn = function (forward, element) {
-      var caretWalker = new CaretWalker(element);
-      var startPos = forward ? CaretPosition.before(element) : CaretPosition.after(element);
+    var walkToPositionIn = function (forward, rootNode, startNode) {
+      var caretWalker = new CaretWalker(rootNode);
+      var startPos = forward ? CaretPosition.before(startNode) : CaretPosition.after(startNode);
       return Option.from(forward ? caretWalker.next(startPos) : caretWalker.prev(startPos));
+    };
+
+    var afterElement = function (node) {
+      return NodeType.isBr(node) ? CaretPosition.before(node) : CaretPosition.after(node);
+    };
+
+    var positionIn = function (forward, element) {
+      var startNode = forward ? element.firstChild : element.lastChild;
+      if (NodeType.isText(startNode)) {
+        return Option.some(new CaretPosition(startNode, forward ? 0 : startNode.data.length));
+      } else if (startNode) {
+        if (CaretCandidate.isCaretCandidate(startNode)) {
+          return Option.some(forward ? CaretPosition.before(startNode) : afterElement(startNode));
+        } else {
+          return walkToPositionIn(forward, element, startNode);
+        }
+      } else {
+        return Option.none();
+      }
     };
 
     return {
@@ -26185,157 +26849,6 @@ define(
   }
 );
 
-define(
-  'ephox.sugar.api.dom.Insert',
-
-  [
-    'ephox.sugar.api.search.Traverse'
-  ],
-
-  function (Traverse) {
-    var before = function (marker, element) {
-      var parent = Traverse.parent(marker);
-      parent.each(function (v) {
-        v.dom().insertBefore(element.dom(), marker.dom());
-      });
-    };
-
-    var after = function (marker, element) {
-      var sibling = Traverse.nextSibling(marker);
-      sibling.fold(function () {
-        var parent = Traverse.parent(marker);
-        parent.each(function (v) {
-          append(v, element);
-        });
-      }, function (v) {
-        before(v, element);
-      });
-    };
-
-    var prepend = function (parent, element) {
-      var firstChild = Traverse.firstChild(parent);
-      firstChild.fold(function () {
-        append(parent, element);
-      }, function (v) {
-        parent.dom().insertBefore(element.dom(), v.dom());
-      });
-    };
-
-    var append = function (parent, element) {
-      parent.dom().appendChild(element.dom());
-    };
-
-    var appendAt = function (parent, element, index) {
-      Traverse.child(parent, index).fold(function () {
-        append(parent, element);
-      }, function (v) {
-        before(v, element);
-      });
-    };
-
-    var wrap = function (element, wrapper) {
-      before(element, wrapper);
-      append(wrapper, element);
-    };
-
-    return {
-      before: before,
-      after: after,
-      prepend: prepend,
-      append: append,
-      appendAt: appendAt,
-      wrap: wrap
-    };
-  }
-);
-
-define(
-  'ephox.sugar.api.dom.InsertAll',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.sugar.api.dom.Insert'
-  ],
-
-  function (Arr, Insert) {
-    var before = function (marker, elements) {
-      Arr.each(elements, function (x) {
-        Insert.before(marker, x);
-      });
-    };
-
-    var after = function (marker, elements) {
-      Arr.each(elements, function (x, i) {
-        var e = i === 0 ? marker : elements[i - 1];
-        Insert.after(e, x);
-      });
-    };
-
-    var prepend = function (parent, elements) {
-      Arr.each(elements.slice().reverse(), function (x) {
-        Insert.prepend(parent, x);
-      });
-    };
-
-    var append = function (parent, elements) {
-      Arr.each(elements, function (x) {
-        Insert.append(parent, x);
-      });
-    };
-
-    return {
-      before: before,
-      after: after,
-      prepend: prepend,
-      append: append
-    };
-  }
-);
-
-define(
-  'ephox.sugar.api.dom.Remove',
-
-  [
-    'ephox.katamari.api.Arr',
-    'ephox.sugar.api.dom.InsertAll',
-    'ephox.sugar.api.search.Traverse'
-  ],
-
-  function (Arr, InsertAll, Traverse) {
-    var empty = function (element) {
-      // shortcut "empty node" trick. Requires IE 9.
-      element.dom().textContent = '';
-
-      // If the contents was a single empty text node, the above doesn't remove it. But, it's still faster in general
-      // than removing every child node manually.
-      // The following is (probably) safe for performance as 99.9% of the time the trick works and
-      // Traverse.children will return an empty array.
-      Arr.each(Traverse.children(element), function (rogue) {
-        remove(rogue);
-      });
-    };
-
-    var remove = function (element) {
-      var dom = element.dom();
-      if (dom.parentNode !== null)
-        dom.parentNode.removeChild(dom);
-    };
-
-    var unwrap = function (wrapper) {
-      var children = Traverse.children(wrapper);
-      if (children.length > 0)
-        InsertAll.before(wrapper, children);
-      remove(wrapper);
-    };
-
-    return {
-      empty: empty,
-      remove: remove,
-      unwrap: unwrap
-    };
-  }
-);
-
 /**
  * MergeBlocks.js
  *
@@ -26366,12 +26879,14 @@ define(
 
       if (NodeType.isBr(toPosition.getNode())) {
         Remove.remove(Element.fromDom(toPosition.getNode()));
-        toPosition = CaretFinder.positionIn(false, toBlock.dom()).getOr();
+        toPosition = CaretFinder.positionIn(false, toBlock.dom()).getOr(toPosition);
       }
 
-      Arr.each(children, function (node) {
-        Insert.append(toBlock, node);
-      });
+      if (Empty.isEmpty(fromBlock) === false) {
+        Arr.each(children, function (node) {
+          Insert.append(toBlock, node);
+        });
+      }
 
       if (Empty.isEmpty(fromBlock)) {
         Remove.remove(fromBlock);
@@ -26382,13 +26897,23 @@ define(
 
     var mergeBlocks = function (forward, block1, block2) {
       if (forward) {
-        return CaretFinder.positionIn(false, block1.dom()).bind(function (toPosition) {
-          return mergeBlocksAndReposition(forward, block2, block1, toPosition);
-        });
+        if (Empty.isEmpty(block1)) {
+          Remove.remove(block1);
+          return CaretFinder.positionIn(true, block2.dom());
+        } else {
+          return CaretFinder.positionIn(false, block1.dom()).bind(function (toPosition) {
+            return mergeBlocksAndReposition(forward, block2, block1, toPosition);
+          });
+        }
       } else {
-        return CaretFinder.positionIn(false, block2.dom()).bind(function (toPosition) {
-          return mergeBlocksAndReposition(forward, block1, block2, toPosition);
-        });
+        if (Empty.isEmpty(block2)) {
+          Remove.remove(block2);
+          return CaretFinder.positionIn(true, block1.dom());
+        } else {
+          return CaretFinder.positionIn(false, block2.dom()).bind(function (toPosition) {
+            return mergeBlocksAndReposition(forward, block1, block2, toPosition);
+          });
+        }
       }
     };
 
@@ -26847,18 +27372,20 @@ define(
   [
     'ephox.katamari.api.Fun',
     'ephox.katamari.api.Option',
+    'ephox.katamari.api.Options',
     'ephox.sugar.api.dom.Insert',
     'ephox.sugar.api.dom.Remove',
     'ephox.sugar.api.node.Element',
     'ephox.sugar.api.node.Node',
     'ephox.sugar.api.search.PredicateFind',
+    'ephox.sugar.api.search.Traverse',
     'tinymce.core.caret.CaretCandidate',
     'tinymce.core.caret.CaretPosition',
     'tinymce.core.dom.Empty',
     'tinymce.core.dom.NodeType',
     'tinymce.core.keyboard.InlineUtils'
   ],
-  function (Fun, Option, Insert, Remove, Element, Node, PredicateFind, CaretCandidate, CaretPosition, Empty, NodeType, InlineUtils) {
+  function (Fun, Option, Options, Insert, Remove, Element, Node, PredicateFind, Traverse, CaretCandidate, CaretPosition, Empty, NodeType, InlineUtils) {
     var needsReposition = function (pos, elm) {
       var container = pos.container();
       var offset = pos.offset();
@@ -26968,15 +27495,39 @@ define(
       }
     };
 
+    // When deleting an element between two text nodes IE 11 doesn't automatically merge the adjacent text nodes
+    var deleteNormalized = function (elm, afterDeletePosOpt) {
+      return Options.liftN([Traverse.prevSibling(elm), Traverse.nextSibling(elm), afterDeletePosOpt], function (prev, next, afterDeletePos) {
+        var offset, prevNode = prev.dom(), nextNode = next.dom();
+
+        if (NodeType.isText(prevNode) && NodeType.isText(nextNode)) {
+          offset = prevNode.data.length;
+          prevNode.appendData(nextNode.data);
+          Remove.remove(next);
+          Remove.remove(elm);
+          if (afterDeletePos.container() === nextNode) {
+            return new CaretPosition(prevNode, offset);
+          } else {
+            return afterDeletePos;
+          }
+        } else {
+          Remove.remove(elm);
+          return afterDeletePos;
+        }
+      }).orThunk(function () {
+        Remove.remove(elm);
+        return afterDeletePosOpt;
+      });
+    };
+
     var deleteElement = function (editor, forward, elm) {
       var afterDeletePos = findCaretPosOutsideElmAfterDelete(forward, editor.getBody(), elm.dom());
       var parentBlock = PredicateFind.ancestor(elm, Fun.curry(isBlock, editor), eqRawNode(editor.getBody()));
-
-      Remove.remove(elm);
+      var normalizedAfterDeletePos = deleteNormalized(elm, afterDeletePos);
 
       parentBlock.bind(paddEmptyBlock).fold(
         function () {
-          setSelection(editor, forward, afterDeletePos);
+          setSelection(editor, forward, normalizedAfterDeletePos);
         },
         function (paddPos) {
           setSelection(editor, forward, Option.some(paddPos));
@@ -28678,6 +29229,10 @@ define(
       function execCommand(command, ui, value, args) {
         var func, customCommand, state = 0;
 
+        if (editor.removed) {
+          return;
+        }
+
         if (!/^(mceAddUndoLevel|mceEndUndoLevel|mceBeginUndoLevel|mceRepaint)$/.test(command) && (!args || !args.skip_focus)) {
           editor.focus();
         }
@@ -28738,8 +29293,7 @@ define(
       function queryCommandState(command) {
         var func;
 
-        // Is hidden then return undefined
-        if (editor.quirks.isHidden()) {
+        if (editor.quirks.isHidden() || editor.removed) {
           return;
         }
 
@@ -28768,8 +29322,7 @@ define(
       function queryCommandValue(command) {
         var func;
 
-        // Is hidden then return undefined
-        if (editor.quirks.isHidden()) {
+        if (editor.quirks.isHidden() || editor.removed) {
           return;
         }
 
@@ -37125,7 +37678,7 @@ define(
      * @param {String} eventName Name of the event for example "click".
      */
     function bindEventDelegate(editor, eventName) {
-      var eventRootElm = getEventTarget(editor, eventName), delegate;
+      var eventRootElm, delegate;
 
       function isListening(editor) {
         return !editor.hidden && !editor.readonly;
@@ -37135,9 +37688,11 @@ define(
         editor.delegates = {};
       }
 
-      if (editor.delegates[eventName]) {
+      if (editor.delegates[eventName] || editor.removed) {
         return;
       }
+
+      eventRootElm = getEventTarget(editor, eventName);
 
       if (editor.settings.event_root) {
         if (!customEventRootDelegates) {
@@ -38009,55 +38564,21 @@ define(
       return (prefix || 'blobid') + (count++);
     };
 
-    return function (uploadStatus, blobCache) {
-      var cachedPromises = {};
+    var imageToBlobInfo = function (blobCache, img, resolve, reject) {
+      var base64, blobInfo;
 
-      function findAll(elm, predicate) {
-        var images, promises;
+      if (img.src.indexOf('blob:') === 0) {
+        blobInfo = blobCache.getByUri(img.src);
 
-        function imageToBlobInfo(img, resolve, reject) {
-          var base64, blobInfo;
-
-          if (img.src.indexOf('blob:') === 0) {
-            blobInfo = blobCache.getByUri(img.src);
-
-            if (blobInfo) {
-              resolve({
-                image: img,
-                blobInfo: blobInfo
-              });
-            } else {
-              Conversions.uriToBlob(img.src).then(function (blob) {
-                Conversions.blobToDataUri(blob).then(function (dataUri) {
-                  base64 = Conversions.parseDataUri(dataUri).data;
-                  blobInfo = blobCache.create(uniqueId(), blob, base64);
-                  blobCache.add(blobInfo);
-
-                  resolve({
-                    image: img,
-                    blobInfo: blobInfo
-                  });
-                });
-              }, function (err) {
-                reject(err);
-              });
-            }
-
-            return;
-          }
-
-          base64 = Conversions.parseDataUri(img.src).data;
-          blobInfo = blobCache.findFirst(function (cachedBlobInfo) {
-            return cachedBlobInfo.base64() === base64;
+        if (blobInfo) {
+          resolve({
+            image: img,
+            blobInfo: blobInfo
           });
-
-          if (blobInfo) {
-            resolve({
-              image: img,
-              blobInfo: blobInfo
-            });
-          } else {
-            Conversions.uriToBlob(img.src).then(function (blob) {
+        } else {
+          Conversions.uriToBlob(img.src).then(function (blob) {
+            Conversions.blobToDataUri(blob).then(function (dataUri) {
+              base64 = Conversions.parseDataUri(dataUri).data;
               blobInfo = blobCache.create(uniqueId(), blob, base64);
               blobCache.add(blobInfo);
 
@@ -38065,17 +38586,55 @@ define(
                 image: img,
                 blobInfo: blobInfo
               });
-            }, function (err) {
-              reject(err);
             });
-          }
+          }, function (err) {
+            reject(err);
+          });
         }
+
+        return;
+      }
+
+      base64 = Conversions.parseDataUri(img.src).data;
+      blobInfo = blobCache.findFirst(function (cachedBlobInfo) {
+        return cachedBlobInfo.base64() === base64;
+      });
+
+      if (blobInfo) {
+        resolve({
+          image: img,
+          blobInfo: blobInfo
+        });
+      } else {
+        Conversions.uriToBlob(img.src).then(function (blob) {
+          blobInfo = blobCache.create(uniqueId(), blob, base64);
+          blobCache.add(blobInfo);
+
+          resolve({
+            image: img,
+            blobInfo: blobInfo
+          });
+        }, function (err) {
+          reject(err);
+        });
+      }
+    };
+
+    var getAllImages = function (elm) {
+      return elm ? elm.getElementsByTagName('img') : [];
+    };
+
+    return function (uploadStatus, blobCache) {
+      var cachedPromises = {};
+
+      function findAll(elm, predicate) {
+        var images, promises;
 
         if (!predicate) {
           predicate = Fun.constant(true);
         }
 
-        images = Arr.filter(elm.getElementsByTagName('img'), function (img) {
+        images = Arr.filter(getAllImages(elm), function (img) {
           var src = img.src;
 
           if (!Env.fileApi) {
@@ -38125,7 +38684,7 @@ define(
           }
 
           newPromise = new Promise(function (resolve, reject) {
-            imageToBlobInfo(img, resolve, reject);
+            imageToBlobInfo(blobCache, img, resolve, reject);
           }).then(function (result) {
             delete cachedPromises[result.image.src];
             return result;
@@ -38792,6 +39351,752 @@ define(
     };
   }
 );
+/**
+ * Dimensions.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * This module measures nodes and returns client rects. The client rects has an
+ * extra node property.
+ *
+ * @private
+ * @class tinymce.dom.Dimensions
+ */
+define(
+  'tinymce.core.dom.Dimensions',
+  [
+    "tinymce.core.util.Arr",
+    "tinymce.core.dom.NodeType",
+    "tinymce.core.geom.ClientRect"
+  ],
+  function (Arr, NodeType, ClientRect) {
+
+    function getClientRects(node) {
+      function toArrayWithNode(clientRects) {
+        return Arr.map(clientRects, function (clientRect) {
+          clientRect = ClientRect.clone(clientRect);
+          clientRect.node = node;
+
+          return clientRect;
+        });
+      }
+
+      if (Arr.isArray(node)) {
+        return Arr.reduce(node, function (result, node) {
+          return result.concat(getClientRects(node));
+        }, []);
+      }
+
+      if (NodeType.isElement(node)) {
+        return toArrayWithNode(node.getClientRects());
+      }
+
+      if (NodeType.isText(node)) {
+        var rng = node.ownerDocument.createRange();
+
+        rng.setStart(node, 0);
+        rng.setEnd(node, node.data.length);
+
+        return toArrayWithNode(rng.getClientRects());
+      }
+    }
+
+    return {
+      /**
+       * Returns the client rects for a specific node.
+       *
+       * @method getClientRects
+       * @param {Array/DOMNode} node Node or array of nodes to get client rects on.
+       * @param {Array} Array of client rects with a extra node property.
+       */
+      getClientRects: getClientRects
+    };
+  }
+);
+/**
+ * LineUtils.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * Utility functions for working with lines.
+ *
+ * @private
+ * @class tinymce.caret.LineUtils
+ */
+define(
+  'tinymce.core.caret.LineUtils',
+  [
+    "tinymce.core.util.Fun",
+    "tinymce.core.util.Arr",
+    "tinymce.core.dom.NodeType",
+    "tinymce.core.dom.Dimensions",
+    "tinymce.core.geom.ClientRect",
+    "tinymce.core.caret.CaretUtils",
+    "tinymce.core.caret.CaretCandidate"
+  ],
+  function (Fun, Arr, NodeType, Dimensions, ClientRect, CaretUtils, CaretCandidate) {
+    var isContentEditableFalse = NodeType.isContentEditableFalse,
+      findNode = CaretUtils.findNode,
+      curry = Fun.curry;
+
+    function distanceToRectLeft(clientRect, clientX) {
+      return Math.abs(clientRect.left - clientX);
+    }
+
+    function distanceToRectRight(clientRect, clientX) {
+      return Math.abs(clientRect.right - clientX);
+    }
+
+    function findClosestClientRect(clientRects, clientX) {
+      function isInside(clientX, clientRect) {
+        return clientX >= clientRect.left && clientX <= clientRect.right;
+      }
+
+      return Arr.reduce(clientRects, function (oldClientRect, clientRect) {
+        var oldDistance, newDistance;
+
+        oldDistance = Math.min(distanceToRectLeft(oldClientRect, clientX), distanceToRectRight(oldClientRect, clientX));
+        newDistance = Math.min(distanceToRectLeft(clientRect, clientX), distanceToRectRight(clientRect, clientX));
+
+        if (isInside(clientX, clientRect)) {
+          return clientRect;
+        }
+
+        if (isInside(clientX, oldClientRect)) {
+          return oldClientRect;
+        }
+
+        // cE=false has higher priority
+        if (newDistance == oldDistance && isContentEditableFalse(clientRect.node)) {
+          return clientRect;
+        }
+
+        if (newDistance < oldDistance) {
+          return clientRect;
+        }
+
+        return oldClientRect;
+      });
+    }
+
+    function walkUntil(direction, rootNode, predicateFn, node) {
+      while ((node = findNode(node, direction, CaretCandidate.isEditableCaretCandidate, rootNode))) {
+        if (predicateFn(node)) {
+          return;
+        }
+      }
+    }
+
+    function findLineNodeRects(rootNode, targetNodeRect) {
+      var clientRects = [];
+
+      function collect(checkPosFn, node) {
+        var lineRects;
+
+        lineRects = Arr.filter(Dimensions.getClientRects(node), function (clientRect) {
+          return !checkPosFn(clientRect, targetNodeRect);
+        });
+
+        clientRects = clientRects.concat(lineRects);
+
+        return lineRects.length === 0;
+      }
+
+      clientRects.push(targetNodeRect);
+      walkUntil(-1, rootNode, curry(collect, ClientRect.isAbove), targetNodeRect.node);
+      walkUntil(1, rootNode, curry(collect, ClientRect.isBelow), targetNodeRect.node);
+
+      return clientRects;
+    }
+
+    function getContentEditableFalseChildren(rootNode) {
+      return Arr.filter(Arr.toArray(rootNode.getElementsByTagName('*')), isContentEditableFalse);
+    }
+
+    function caretInfo(clientRect, clientX) {
+      return {
+        node: clientRect.node,
+        before: distanceToRectLeft(clientRect, clientX) < distanceToRectRight(clientRect, clientX)
+      };
+    }
+
+    function closestCaret(rootNode, clientX, clientY) {
+      var contentEditableFalseNodeRects, closestNodeRect;
+
+      contentEditableFalseNodeRects = Dimensions.getClientRects(getContentEditableFalseChildren(rootNode));
+      contentEditableFalseNodeRects = Arr.filter(contentEditableFalseNodeRects, function (clientRect) {
+        return clientY >= clientRect.top && clientY <= clientRect.bottom;
+      });
+
+      closestNodeRect = findClosestClientRect(contentEditableFalseNodeRects, clientX);
+      if (closestNodeRect) {
+        closestNodeRect = findClosestClientRect(findLineNodeRects(rootNode, closestNodeRect), clientX);
+        if (closestNodeRect && isContentEditableFalse(closestNodeRect.node)) {
+          return caretInfo(closestNodeRect, clientX);
+        }
+      }
+
+      return null;
+    }
+
+    return {
+      findClosestClientRect: findClosestClientRect,
+      findLineNodeRects: findLineNodeRects,
+      closestCaret: closestCaret
+    };
+  }
+);
+/**
+ * LineWalker.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * This module lets you walk the document line by line
+ * returing nodes and client rects for each line.
+ *
+ * @private
+ * @class tinymce.caret.LineWalker
+ */
+define(
+  'tinymce.core.caret.LineWalker',
+  [
+    "tinymce.core.util.Fun",
+    "tinymce.core.util.Arr",
+    "tinymce.core.dom.Dimensions",
+    "tinymce.core.caret.CaretCandidate",
+    "tinymce.core.caret.CaretUtils",
+    "tinymce.core.caret.CaretWalker",
+    "tinymce.core.caret.CaretPosition",
+    "tinymce.core.geom.ClientRect"
+  ],
+  function (Fun, Arr, Dimensions, CaretCandidate, CaretUtils, CaretWalker, CaretPosition, ClientRect) {
+    var curry = Fun.curry;
+
+    function findUntil(direction, rootNode, predicateFn, node) {
+      while ((node = CaretUtils.findNode(node, direction, CaretCandidate.isEditableCaretCandidate, rootNode))) {
+        if (predicateFn(node)) {
+          return;
+        }
+      }
+    }
+
+    function walkUntil(direction, isAboveFn, isBeflowFn, rootNode, predicateFn, caretPosition) {
+      var line = 0, node, result = [], targetClientRect;
+
+      function add(node) {
+        var i, clientRect, clientRects;
+
+        clientRects = Dimensions.getClientRects(node);
+        if (direction == -1) {
+          clientRects = clientRects.reverse();
+        }
+
+        for (i = 0; i < clientRects.length; i++) {
+          clientRect = clientRects[i];
+          if (isBeflowFn(clientRect, targetClientRect)) {
+            continue;
+          }
+
+          if (result.length > 0 && isAboveFn(clientRect, Arr.last(result))) {
+            line++;
+          }
+
+          clientRect.line = line;
+
+          if (predicateFn(clientRect)) {
+            return true;
+          }
+
+          result.push(clientRect);
+        }
+      }
+
+      targetClientRect = Arr.last(caretPosition.getClientRects());
+      if (!targetClientRect) {
+        return result;
+      }
+
+      node = caretPosition.getNode();
+      add(node);
+      findUntil(direction, rootNode, add, node);
+
+      return result;
+    }
+
+    function aboveLineNumber(lineNumber, clientRect) {
+      return clientRect.line > lineNumber;
+    }
+
+    function isLine(lineNumber, clientRect) {
+      return clientRect.line === lineNumber;
+    }
+
+    var upUntil = curry(walkUntil, -1, ClientRect.isAbove, ClientRect.isBelow);
+    var downUntil = curry(walkUntil, 1, ClientRect.isBelow, ClientRect.isAbove);
+
+    function positionsUntil(direction, rootNode, predicateFn, node) {
+      var caretWalker = new CaretWalker(rootNode), walkFn, isBelowFn, isAboveFn,
+        caretPosition, result = [], line = 0, clientRect, targetClientRect;
+
+      function getClientRect(caretPosition) {
+        if (direction == 1) {
+          return Arr.last(caretPosition.getClientRects());
+        }
+
+        return Arr.last(caretPosition.getClientRects());
+      }
+
+      if (direction == 1) {
+        walkFn = caretWalker.next;
+        isBelowFn = ClientRect.isBelow;
+        isAboveFn = ClientRect.isAbove;
+        caretPosition = CaretPosition.after(node);
+      } else {
+        walkFn = caretWalker.prev;
+        isBelowFn = ClientRect.isAbove;
+        isAboveFn = ClientRect.isBelow;
+        caretPosition = CaretPosition.before(node);
+      }
+
+      targetClientRect = getClientRect(caretPosition);
+
+      do {
+        if (!caretPosition.isVisible()) {
+          continue;
+        }
+
+        clientRect = getClientRect(caretPosition);
+
+        if (isAboveFn(clientRect, targetClientRect)) {
+          continue;
+        }
+
+        if (result.length > 0 && isBelowFn(clientRect, Arr.last(result))) {
+          line++;
+        }
+
+        clientRect = ClientRect.clone(clientRect);
+        clientRect.position = caretPosition;
+        clientRect.line = line;
+
+        if (predicateFn(clientRect)) {
+          return result;
+        }
+
+        result.push(clientRect);
+      } while ((caretPosition = walkFn(caretPosition)));
+
+      return result;
+    }
+
+    return {
+      upUntil: upUntil,
+      downUntil: downUntil,
+
+      /**
+       * Find client rects with line and caret position until the predicate returns true.
+       *
+       * @method positionsUntil
+       * @param {Number} direction Direction forward/backward 1/-1.
+       * @param {DOMNode} rootNode Root node to walk within.
+       * @param {function} predicateFn Gets the client rect as it's input.
+       * @param {DOMNode} node Node to start walking from.
+       * @return {Array} Array of client rects with line and position properties.
+       */
+      positionsUntil: positionsUntil,
+
+      isAboveLine: curry(aboveLineNumber),
+      isLine: curry(isLine)
+    };
+  }
+);
+/**
+ * CefUtils.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.keyboard.CefUtils',
+  [
+    'tinymce.core.caret.CaretPosition',
+    'tinymce.core.caret.CaretUtils',
+    'tinymce.core.dom.NodeType',
+    'tinymce.core.util.Fun'
+  ],
+  function (CaretPosition, CaretUtils, NodeType, Fun) {
+    var isContentEditableTrue = NodeType.isContentEditableTrue;
+    var isContentEditableFalse = NodeType.isContentEditableFalse;
+
+    var showCaret = function (direction, editor, node, before) {
+      // TODO: Figure out a better way to handle this dependency
+      return editor._selectionOverrides.showCaret(direction, node, before);
+    };
+
+    var getNodeRange = function (node) {
+      var rng = node.ownerDocument.createRange();
+      rng.selectNode(node);
+      return rng;
+    };
+
+    var selectNode = function (editor, node) {
+      var e;
+
+      e = editor.fire('BeforeObjectSelected', { target: node });
+      if (e.isDefaultPrevented()) {
+        return null;
+      }
+
+      return getNodeRange(node);
+    };
+
+    var renderCaretAtRange = function (editor, range) {
+      var caretPosition, ceRoot;
+
+      range = CaretUtils.normalizeRange(1, editor.getBody(), range);
+      caretPosition = CaretPosition.fromRangeStart(range);
+
+      if (isContentEditableFalse(caretPosition.getNode())) {
+        return showCaret(1, editor, caretPosition.getNode(), !caretPosition.isAtEnd());
+      }
+
+      if (isContentEditableFalse(caretPosition.getNode(true))) {
+        return showCaret(1, editor, caretPosition.getNode(true), false);
+      }
+
+      // TODO: Should render caret before/after depending on where you click on the page forces after now
+      ceRoot = editor.dom.getParent(caretPosition.getNode(), Fun.or(isContentEditableFalse, isContentEditableTrue));
+      if (isContentEditableFalse(ceRoot)) {
+        return showCaret(1, editor, ceRoot, false);
+      }
+
+      return null;
+    };
+
+    var renderRangeCaret = function (editor, range) {
+      var caretRange;
+
+      if (!range || !range.collapsed) {
+        return range;
+      }
+
+      caretRange = renderCaretAtRange(editor, range);
+      if (caretRange) {
+        return caretRange;
+      }
+
+      return range;
+    };
+
+    return {
+      showCaret: showCaret,
+      selectNode: selectNode,
+      renderCaretAtRange: renderCaretAtRange,
+      renderRangeCaret: renderRangeCaret
+    };
+  }
+);
+
+/**
+ * CefNavigation.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+define(
+  'tinymce.core.keyboard.CefNavigation',
+  [
+    'tinymce.core.caret.CaretContainer',
+    'tinymce.core.caret.CaretPosition',
+    'tinymce.core.caret.CaretUtils',
+    'tinymce.core.caret.CaretWalker',
+    'tinymce.core.caret.LineUtils',
+    'tinymce.core.caret.LineWalker',
+    'tinymce.core.dom.NodeType',
+    'tinymce.core.dom.RangeUtils',
+    'tinymce.core.Env',
+    'tinymce.core.keyboard.CefUtils',
+    'tinymce.core.util.Arr',
+    'tinymce.core.util.Fun'
+  ],
+  function (CaretContainer, CaretPosition, CaretUtils, CaretWalker, LineUtils, LineWalker, NodeType, RangeUtils, Env, CefUtils, Arr, Fun) {
+    var isContentEditableFalse = NodeType.isContentEditableFalse;
+    var getSelectedNode = RangeUtils.getSelectedNode;
+    var isAfterContentEditableFalse = CaretUtils.isAfterContentEditableFalse;
+    var isBeforeContentEditableFalse = CaretUtils.isBeforeContentEditableFalse;
+
+    var getVisualCaretPosition = function (walkFn, caretPosition) {
+      while ((caretPosition = walkFn(caretPosition))) {
+        if (caretPosition.isVisible()) {
+          return caretPosition;
+        }
+      }
+
+      return caretPosition;
+    };
+
+    var isMoveInsideSameBlock = function (fromCaretPosition, toCaretPosition) {
+      var inSameBlock = CaretUtils.isInSameBlock(fromCaretPosition, toCaretPosition);
+
+      // Handle bogus BR <p>abc|<br></p>
+      if (!inSameBlock && NodeType.isBr(fromCaretPosition.getNode())) {
+        return true;
+      }
+
+      return inSameBlock;
+    };
+
+    var isRangeInCaretContainerBlock = function (range) {
+      return CaretContainer.isCaretContainerBlock(range.startContainer);
+    };
+
+    var getNormalizedRangeEndPoint = function (direction, rootNode, range) {
+      range = CaretUtils.normalizeRange(direction, rootNode, range);
+
+      if (direction === -1) {
+        return CaretPosition.fromRangeStart(range);
+      }
+
+      return CaretPosition.fromRangeEnd(range);
+    };
+
+    var moveToCeFalseHorizontally = function (direction, editor, getNextPosFn, isBeforeContentEditableFalseFn, range) {
+      var node, caretPosition, peekCaretPosition, rangeIsInContainerBlock;
+
+      if (!range.collapsed) {
+        node = getSelectedNode(range);
+        if (isContentEditableFalse(node)) {
+          return CefUtils.showCaret(direction, editor, node, direction === -1);
+        }
+      }
+
+      rangeIsInContainerBlock = isRangeInCaretContainerBlock(range);
+      caretPosition = getNormalizedRangeEndPoint(direction, editor.getBody(), range);
+
+      if (isBeforeContentEditableFalseFn(caretPosition)) {
+        return CefUtils.selectNode(editor, caretPosition.getNode(direction === -1));
+      }
+
+      caretPosition = getNextPosFn(caretPosition);
+      if (!caretPosition) {
+        if (rangeIsInContainerBlock) {
+          return range;
+        }
+
+        return null;
+      }
+
+      if (isBeforeContentEditableFalseFn(caretPosition)) {
+        return CefUtils.showCaret(direction, editor, caretPosition.getNode(direction === -1), direction === 1);
+      }
+
+      // Peek ahead for handling of ab|c<span cE=false> -> abc|<span cE=false>
+      peekCaretPosition = getNextPosFn(caretPosition);
+      if (isBeforeContentEditableFalseFn(peekCaretPosition)) {
+        if (isMoveInsideSameBlock(caretPosition, peekCaretPosition)) {
+          return CefUtils.showCaret(direction, editor, peekCaretPosition.getNode(direction === -1), direction === 1);
+        }
+      }
+
+      if (rangeIsInContainerBlock) {
+        return CefUtils.renderRangeCaret(editor, caretPosition.toRange());
+      }
+
+      return null;
+    };
+
+    var moveToCeFalseVertically = function (direction, editor, walkerFn, range) {
+      var caretPosition, linePositions, nextLinePositions,
+        closestNextLineRect, caretClientRect, clientX,
+        dist1, dist2, contentEditableFalseNode;
+
+      contentEditableFalseNode = getSelectedNode(range);
+      caretPosition = getNormalizedRangeEndPoint(direction, editor.getBody(), range);
+      linePositions = walkerFn(editor.getBody(), LineWalker.isAboveLine(1), caretPosition);
+      nextLinePositions = Arr.filter(linePositions, LineWalker.isLine(1));
+      caretClientRect = Arr.last(caretPosition.getClientRects());
+
+      if (isBeforeContentEditableFalse(caretPosition)) {
+        contentEditableFalseNode = caretPosition.getNode();
+      }
+
+      if (isAfterContentEditableFalse(caretPosition)) {
+        contentEditableFalseNode = caretPosition.getNode(true);
+      }
+
+      if (!caretClientRect) {
+        return null;
+      }
+
+      clientX = caretClientRect.left;
+
+      closestNextLineRect = LineUtils.findClosestClientRect(nextLinePositions, clientX);
+      if (closestNextLineRect) {
+        if (isContentEditableFalse(closestNextLineRect.node)) {
+          dist1 = Math.abs(clientX - closestNextLineRect.left);
+          dist2 = Math.abs(clientX - closestNextLineRect.right);
+
+          return CefUtils.showCaret(direction, editor, closestNextLineRect.node, dist1 < dist2);
+        }
+      }
+
+      if (contentEditableFalseNode) {
+        var caretPositions = LineWalker.positionsUntil(direction, editor.getBody(), LineWalker.isAboveLine(1), contentEditableFalseNode);
+
+        closestNextLineRect = LineUtils.findClosestClientRect(Arr.filter(caretPositions, LineWalker.isLine(1)), clientX);
+        if (closestNextLineRect) {
+          return CefUtils.renderRangeCaret(editor, closestNextLineRect.position.toRange());
+        }
+
+        closestNextLineRect = Arr.last(Arr.filter(caretPositions, LineWalker.isLine(0)));
+        if (closestNextLineRect) {
+          return CefUtils.renderRangeCaret(editor, closestNextLineRect.position.toRange());
+        }
+      }
+    };
+
+    var createTextBlock = function (editor) {
+      var textBlock = editor.dom.create(editor.settings.forced_root_block);
+
+      if (!Env.ie || Env.ie >= 11) {
+        textBlock.innerHTML = '<br data-mce-bogus="1">';
+      }
+
+      return textBlock;
+    };
+
+    var exitPreBlock = function (editor, direction, range) {
+      var pre, caretPos, newBlock;
+      var caretWalker = new CaretWalker(editor.getBody());
+      var getNextVisualCaretPosition = Fun.curry(getVisualCaretPosition, caretWalker.next);
+      var getPrevVisualCaretPosition = Fun.curry(getVisualCaretPosition, caretWalker.prev);
+
+      if (range.collapsed && editor.settings.forced_root_block) {
+        pre = editor.dom.getParent(range.startContainer, 'PRE');
+        if (!pre) {
+          return;
+        }
+
+        if (direction === 1) {
+          caretPos = getNextVisualCaretPosition(CaretPosition.fromRangeStart(range));
+        } else {
+          caretPos = getPrevVisualCaretPosition(CaretPosition.fromRangeStart(range));
+        }
+
+        if (!caretPos) {
+          newBlock = createTextBlock(editor);
+
+          if (direction === 1) {
+            editor.$(pre).after(newBlock);
+          } else {
+            editor.$(pre).before(newBlock);
+          }
+
+          editor.selection.select(newBlock, true);
+          editor.selection.collapse();
+        }
+      }
+    };
+
+    var getHorizontalRange = function (editor, forward) {
+      var caretWalker = new CaretWalker(editor.getBody());
+      var getNextVisualCaretPosition = Fun.curry(getVisualCaretPosition, caretWalker.next);
+      var getPrevVisualCaretPosition = Fun.curry(getVisualCaretPosition, caretWalker.prev);
+      var newRange, direction = forward ? 1 : -1;
+      var getNextPosFn = forward ? getNextVisualCaretPosition : getPrevVisualCaretPosition;
+      var isBeforeContentEditableFalseFn = forward ? isBeforeContentEditableFalse : isAfterContentEditableFalse;
+      var range = editor.selection.getRng();
+
+      newRange = moveToCeFalseHorizontally(direction, editor, getNextPosFn, isBeforeContentEditableFalseFn, range);
+      if (newRange) {
+        return newRange;
+      }
+
+      newRange = exitPreBlock(editor, direction, range);
+      if (newRange) {
+        return newRange;
+      }
+
+      return null;
+    };
+
+    var getVerticalRange = function (editor, down) {
+      var newRange, direction = down ? 1 : -1;
+      var walkerFn = down ? LineWalker.downUntil : LineWalker.upUntil;
+      var range = editor.selection.getRng();
+
+      newRange = moveToCeFalseVertically(direction, editor, walkerFn, range);
+      if (newRange) {
+        return newRange;
+      }
+
+      newRange = exitPreBlock(editor, direction, range);
+      if (newRange) {
+        return newRange;
+      }
+
+      return null;
+    };
+
+    var moveH = function (editor, forward) {
+      return function () {
+        var newRng = getHorizontalRange(editor, forward);
+
+        if (newRng) {
+          editor.selection.setRng(newRng);
+          return true;
+        } else {
+          return false;
+        }
+      };
+    };
+
+    var moveV = function (editor, down) {
+      return function () {
+        var newRng = getVerticalRange(editor, down);
+
+        if (newRng) {
+          editor.selection.setRng(newRng);
+          return true;
+        } else {
+          return false;
+        }
+      };
+    };
+
+    return {
+      moveH: moveH,
+      moveV: moveV
+    };
+  }
+);
+
 define(
   'ephox.katamari.api.Merger',
 
@@ -38916,13 +40221,18 @@ define(
     'ephox.katamari.api.Arr',
     'ephox.katamari.api.Cell',
     'tinymce.core.keyboard.BoundarySelection',
+    'tinymce.core.keyboard.CefNavigation',
     'tinymce.core.keyboard.MatchKeys',
     'tinymce.core.util.VK'
   ],
-  function (Arr, Cell, BoundarySelection, MatchKeys, VK) {
+  function (Arr, Cell, BoundarySelection, CefNavigation, MatchKeys, VK) {
     var setup = function (editor, caret) {
       editor.on('keydown', function (evt) {
         var matches = MatchKeys.match([
+          { keyCode: VK.RIGHT, action: CefNavigation.moveH(editor, true) },
+          { keyCode: VK.LEFT, action: CefNavigation.moveH(editor, false) },
+          { keyCode: VK.UP, action: CefNavigation.moveV(editor, false) },
+          { keyCode: VK.DOWN, action: CefNavigation.moveV(editor, true) },
           { keyCode: VK.RIGHT, action: BoundarySelection.move(editor, caret, true) },
           { keyCode: VK.LEFT, action: BoundarySelection.move(editor, caret, false) }
         ], evt);
@@ -40069,6 +41379,10 @@ define(
   function (CaretContainer, CaretContainerRemove, CaretPosition, DomQuery, NodeType, RangeUtils, ClientRect, Delay) {
     var isContentEditableFalse = NodeType.isContentEditableFalse;
 
+    var isTableCell = function (node) {
+      return node && /^(TD|TH)$/i.test(node.nodeName);
+    };
+
     return function (rootNode, isBlock) {
       var cursorInterval, $lastVisualCaret, caretContainerNode;
 
@@ -40143,6 +41457,10 @@ define(
         var clientRect, rng;
 
         hide();
+
+        if (isTableCell(node)) {
+          return null;
+        }
 
         if (isBlock(node)) {
           caretContainerNode = CaretContainer.insertBlock('p', node, before);
@@ -40231,383 +41549,6 @@ define(
         getCss: getCss,
         destroy: destroy
       };
-    };
-  }
-);
-/**
- * Dimensions.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This module measures nodes and returns client rects. The client rects has an
- * extra node property.
- *
- * @private
- * @class tinymce.dom.Dimensions
- */
-define(
-  'tinymce.core.dom.Dimensions',
-  [
-    "tinymce.core.util.Arr",
-    "tinymce.core.dom.NodeType",
-    "tinymce.core.geom.ClientRect"
-  ],
-  function (Arr, NodeType, ClientRect) {
-
-    function getClientRects(node) {
-      function toArrayWithNode(clientRects) {
-        return Arr.map(clientRects, function (clientRect) {
-          clientRect = ClientRect.clone(clientRect);
-          clientRect.node = node;
-
-          return clientRect;
-        });
-      }
-
-      if (Arr.isArray(node)) {
-        return Arr.reduce(node, function (result, node) {
-          return result.concat(getClientRects(node));
-        }, []);
-      }
-
-      if (NodeType.isElement(node)) {
-        return toArrayWithNode(node.getClientRects());
-      }
-
-      if (NodeType.isText(node)) {
-        var rng = node.ownerDocument.createRange();
-
-        rng.setStart(node, 0);
-        rng.setEnd(node, node.data.length);
-
-        return toArrayWithNode(rng.getClientRects());
-      }
-    }
-
-    return {
-      /**
-       * Returns the client rects for a specific node.
-       *
-       * @method getClientRects
-       * @param {Array/DOMNode} node Node or array of nodes to get client rects on.
-       * @param {Array} Array of client rects with a extra node property.
-       */
-      getClientRects: getClientRects
-    };
-  }
-);
-/**
- * LineWalker.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This module lets you walk the document line by line
- * returing nodes and client rects for each line.
- *
- * @private
- * @class tinymce.caret.LineWalker
- */
-define(
-  'tinymce.core.caret.LineWalker',
-  [
-    "tinymce.core.util.Fun",
-    "tinymce.core.util.Arr",
-    "tinymce.core.dom.Dimensions",
-    "tinymce.core.caret.CaretCandidate",
-    "tinymce.core.caret.CaretUtils",
-    "tinymce.core.caret.CaretWalker",
-    "tinymce.core.caret.CaretPosition",
-    "tinymce.core.geom.ClientRect"
-  ],
-  function (Fun, Arr, Dimensions, CaretCandidate, CaretUtils, CaretWalker, CaretPosition, ClientRect) {
-    var curry = Fun.curry;
-
-    function findUntil(direction, rootNode, predicateFn, node) {
-      while ((node = CaretUtils.findNode(node, direction, CaretCandidate.isEditableCaretCandidate, rootNode))) {
-        if (predicateFn(node)) {
-          return;
-        }
-      }
-    }
-
-    function walkUntil(direction, isAboveFn, isBeflowFn, rootNode, predicateFn, caretPosition) {
-      var line = 0, node, result = [], targetClientRect;
-
-      function add(node) {
-        var i, clientRect, clientRects;
-
-        clientRects = Dimensions.getClientRects(node);
-        if (direction == -1) {
-          clientRects = clientRects.reverse();
-        }
-
-        for (i = 0; i < clientRects.length; i++) {
-          clientRect = clientRects[i];
-          if (isBeflowFn(clientRect, targetClientRect)) {
-            continue;
-          }
-
-          if (result.length > 0 && isAboveFn(clientRect, Arr.last(result))) {
-            line++;
-          }
-
-          clientRect.line = line;
-
-          if (predicateFn(clientRect)) {
-            return true;
-          }
-
-          result.push(clientRect);
-        }
-      }
-
-      targetClientRect = Arr.last(caretPosition.getClientRects());
-      if (!targetClientRect) {
-        return result;
-      }
-
-      node = caretPosition.getNode();
-      add(node);
-      findUntil(direction, rootNode, add, node);
-
-      return result;
-    }
-
-    function aboveLineNumber(lineNumber, clientRect) {
-      return clientRect.line > lineNumber;
-    }
-
-    function isLine(lineNumber, clientRect) {
-      return clientRect.line === lineNumber;
-    }
-
-    var upUntil = curry(walkUntil, -1, ClientRect.isAbove, ClientRect.isBelow);
-    var downUntil = curry(walkUntil, 1, ClientRect.isBelow, ClientRect.isAbove);
-
-    function positionsUntil(direction, rootNode, predicateFn, node) {
-      var caretWalker = new CaretWalker(rootNode), walkFn, isBelowFn, isAboveFn,
-        caretPosition, result = [], line = 0, clientRect, targetClientRect;
-
-      function getClientRect(caretPosition) {
-        if (direction == 1) {
-          return Arr.last(caretPosition.getClientRects());
-        }
-
-        return Arr.last(caretPosition.getClientRects());
-      }
-
-      if (direction == 1) {
-        walkFn = caretWalker.next;
-        isBelowFn = ClientRect.isBelow;
-        isAboveFn = ClientRect.isAbove;
-        caretPosition = CaretPosition.after(node);
-      } else {
-        walkFn = caretWalker.prev;
-        isBelowFn = ClientRect.isAbove;
-        isAboveFn = ClientRect.isBelow;
-        caretPosition = CaretPosition.before(node);
-      }
-
-      targetClientRect = getClientRect(caretPosition);
-
-      do {
-        if (!caretPosition.isVisible()) {
-          continue;
-        }
-
-        clientRect = getClientRect(caretPosition);
-
-        if (isAboveFn(clientRect, targetClientRect)) {
-          continue;
-        }
-
-        if (result.length > 0 && isBelowFn(clientRect, Arr.last(result))) {
-          line++;
-        }
-
-        clientRect = ClientRect.clone(clientRect);
-        clientRect.position = caretPosition;
-        clientRect.line = line;
-
-        if (predicateFn(clientRect)) {
-          return result;
-        }
-
-        result.push(clientRect);
-      } while ((caretPosition = walkFn(caretPosition)));
-
-      return result;
-    }
-
-    return {
-      upUntil: upUntil,
-      downUntil: downUntil,
-
-      /**
-       * Find client rects with line and caret position until the predicate returns true.
-       *
-       * @method positionsUntil
-       * @param {Number} direction Direction forward/backward 1/-1.
-       * @param {DOMNode} rootNode Root node to walk within.
-       * @param {function} predicateFn Gets the client rect as it's input.
-       * @param {DOMNode} node Node to start walking from.
-       * @return {Array} Array of client rects with line and position properties.
-       */
-      positionsUntil: positionsUntil,
-
-      isAboveLine: curry(aboveLineNumber),
-      isLine: curry(isLine)
-    };
-  }
-);
-/**
- * LineUtils.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Utility functions for working with lines.
- *
- * @private
- * @class tinymce.caret.LineUtils
- */
-define(
-  'tinymce.core.caret.LineUtils',
-  [
-    "tinymce.core.util.Fun",
-    "tinymce.core.util.Arr",
-    "tinymce.core.dom.NodeType",
-    "tinymce.core.dom.Dimensions",
-    "tinymce.core.geom.ClientRect",
-    "tinymce.core.caret.CaretUtils",
-    "tinymce.core.caret.CaretCandidate"
-  ],
-  function (Fun, Arr, NodeType, Dimensions, ClientRect, CaretUtils, CaretCandidate) {
-    var isContentEditableFalse = NodeType.isContentEditableFalse,
-      findNode = CaretUtils.findNode,
-      curry = Fun.curry;
-
-    function distanceToRectLeft(clientRect, clientX) {
-      return Math.abs(clientRect.left - clientX);
-    }
-
-    function distanceToRectRight(clientRect, clientX) {
-      return Math.abs(clientRect.right - clientX);
-    }
-
-    function findClosestClientRect(clientRects, clientX) {
-      function isInside(clientX, clientRect) {
-        return clientX >= clientRect.left && clientX <= clientRect.right;
-      }
-
-      return Arr.reduce(clientRects, function (oldClientRect, clientRect) {
-        var oldDistance, newDistance;
-
-        oldDistance = Math.min(distanceToRectLeft(oldClientRect, clientX), distanceToRectRight(oldClientRect, clientX));
-        newDistance = Math.min(distanceToRectLeft(clientRect, clientX), distanceToRectRight(clientRect, clientX));
-
-        if (isInside(clientX, clientRect)) {
-          return clientRect;
-        }
-
-        if (isInside(clientX, oldClientRect)) {
-          return oldClientRect;
-        }
-
-        // cE=false has higher priority
-        if (newDistance == oldDistance && isContentEditableFalse(clientRect.node)) {
-          return clientRect;
-        }
-
-        if (newDistance < oldDistance) {
-          return clientRect;
-        }
-
-        return oldClientRect;
-      });
-    }
-
-    function walkUntil(direction, rootNode, predicateFn, node) {
-      while ((node = findNode(node, direction, CaretCandidate.isEditableCaretCandidate, rootNode))) {
-        if (predicateFn(node)) {
-          return;
-        }
-      }
-    }
-
-    function findLineNodeRects(rootNode, targetNodeRect) {
-      var clientRects = [];
-
-      function collect(checkPosFn, node) {
-        var lineRects;
-
-        lineRects = Arr.filter(Dimensions.getClientRects(node), function (clientRect) {
-          return !checkPosFn(clientRect, targetNodeRect);
-        });
-
-        clientRects = clientRects.concat(lineRects);
-
-        return lineRects.length === 0;
-      }
-
-      clientRects.push(targetNodeRect);
-      walkUntil(-1, rootNode, curry(collect, ClientRect.isAbove), targetNodeRect.node);
-      walkUntil(1, rootNode, curry(collect, ClientRect.isBelow), targetNodeRect.node);
-
-      return clientRects;
-    }
-
-    function getContentEditableFalseChildren(rootNode) {
-      return Arr.filter(Arr.toArray(rootNode.getElementsByTagName('*')), isContentEditableFalse);
-    }
-
-    function caretInfo(clientRect, clientX) {
-      return {
-        node: clientRect.node,
-        before: distanceToRectLeft(clientRect, clientX) < distanceToRectRight(clientRect, clientX)
-      };
-    }
-
-    function closestCaret(rootNode, clientX, clientY) {
-      var contentEditableFalseNodeRects, closestNodeRect;
-
-      contentEditableFalseNodeRects = Dimensions.getClientRects(getContentEditableFalseChildren(rootNode));
-      contentEditableFalseNodeRects = Arr.filter(contentEditableFalseNodeRects, function (clientRect) {
-        return clientY >= clientRect.top && clientY <= clientRect.bottom;
-      });
-
-      closestNodeRect = findClosestClientRect(contentEditableFalseNodeRects, clientX);
-      if (closestNodeRect) {
-        closestNodeRect = findClosestClientRect(findLineNodeRects(rootNode, closestNodeRect), clientX);
-        if (closestNodeRect && isContentEditableFalse(closestNodeRect.node)) {
-          return caretInfo(closestNodeRect, clientX);
-        }
-      }
-
-      return null;
-    }
-
-    return {
-      findClosestClientRect: findClosestClientRect,
-      findLineNodeRects: findLineNodeRects,
-      closestCaret: closestCaret
     };
   }
 );
@@ -41007,50 +41948,31 @@ define(
 define(
   'tinymce.core.SelectionOverrides',
   [
-    "tinymce.core.Env",
-    "tinymce.core.caret.CaretWalker",
-    "tinymce.core.caret.CaretPosition",
-    "tinymce.core.caret.CaretContainer",
-    "tinymce.core.caret.CaretContainerRemove",
-    "tinymce.core.caret.CaretUtils",
-    "tinymce.core.caret.FakeCaret",
-    "tinymce.core.caret.LineWalker",
-    "tinymce.core.caret.LineUtils",
-    "tinymce.core.dom.NodeType",
-    "tinymce.core.dom.RangeUtils",
-    "tinymce.core.geom.ClientRect",
-    "tinymce.core.util.VK",
-    "tinymce.core.util.Fun",
-    "tinymce.core.util.Arr",
-    "tinymce.core.util.Delay",
-    "tinymce.core.DragDropOverrides"
+    'tinymce.core.caret.CaretContainer',
+    'tinymce.core.caret.CaretPosition',
+    'tinymce.core.caret.CaretUtils',
+    'tinymce.core.caret.CaretWalker',
+    'tinymce.core.caret.FakeCaret',
+    'tinymce.core.caret.LineUtils',
+    'tinymce.core.dom.NodeType',
+    'tinymce.core.DragDropOverrides',
+    'tinymce.core.Env',
+    'tinymce.core.geom.ClientRect',
+    'tinymce.core.keyboard.CefUtils',
+    'tinymce.core.util.Arr',
+    'tinymce.core.util.Delay',
+    'tinymce.core.util.Fun',
+    'tinymce.core.util.VK'
   ],
-  function (
-    Env, CaretWalker, CaretPosition, CaretContainer, CaretContainerRemove, CaretUtils, FakeCaret, LineWalker,
-    LineUtils, NodeType, RangeUtils, ClientRect, VK, Fun, Arr, Delay, DragDropOverrides
-) {
-    var curry = Fun.curry,
-      isContentEditableTrue = NodeType.isContentEditableTrue,
+  function (CaretContainer, CaretPosition, CaretUtils, CaretWalker, FakeCaret, LineUtils, NodeType, DragDropOverrides, Env, ClientRect, CefUtils, Arr, Delay, Fun, VK) {
+    var isContentEditableTrue = NodeType.isContentEditableTrue,
       isContentEditableFalse = NodeType.isContentEditableFalse,
       isAfterContentEditableFalse = CaretUtils.isAfterContentEditableFalse,
-      isBeforeContentEditableFalse = CaretUtils.isBeforeContentEditableFalse,
-      getSelectedNode = RangeUtils.getSelectedNode;
-
-    function getVisualCaretPosition(walkFn, caretPosition) {
-      while ((caretPosition = walkFn(caretPosition))) {
-        if (caretPosition.isVisible()) {
-          return caretPosition;
-        }
-      }
-
-      return caretPosition;
-    }
+      isBeforeContentEditableFalse = CaretUtils.isBeforeContentEditableFalse;
 
     function SelectionOverrides(editor) {
-      var rootNode = editor.getBody(), caretWalker = new CaretWalker(rootNode);
-      var getNextVisualCaretPosition = curry(getVisualCaretPosition, caretWalker.next);
-      var getPrevVisualCaretPosition = curry(getVisualCaretPosition, caretWalker.prev),
-        fakeCaret = new FakeCaret(editor.getBody(), isBlock),
+      var rootNode = editor.getBody();
+      var fakeCaret = new FakeCaret(editor.getBody(), isBlock),
         realSelectionId = 'sel-' + editor.dom.uniqueId(),
         selectedContentEditableNode;
 
@@ -41100,36 +42022,6 @@ define(
         return fakeCaret.show(before, node);
       }
 
-      function selectNode(node) {
-        var e;
-
-        e = editor.fire('BeforeObjectSelected', { target: node });
-        if (e.isDefaultPrevented()) {
-          return null;
-        }
-
-        return getNodeRange(node);
-      }
-
-      function getNodeRange(node) {
-        var rng = node.ownerDocument.createRange();
-
-        rng.selectNode(node);
-
-        return rng;
-      }
-
-      function isMoveInsideSameBlock(fromCaretPosition, toCaretPosition) {
-        var inSameBlock = CaretUtils.isInSameBlock(fromCaretPosition, toCaretPosition);
-
-        // Handle bogus BR <p>abc|<br></p>
-        if (!inSameBlock && NodeType.isBr(fromCaretPosition.getNode())) {
-          return true;
-        }
-
-        return inSameBlock;
-      }
-
       function getNormalizedRangeEndPoint(direction, range) {
         range = CaretUtils.normalizeRange(direction, rootNode, range);
 
@@ -41140,177 +42032,6 @@ define(
         return CaretPosition.fromRangeEnd(range);
       }
 
-      function isRangeInCaretContainerBlock(range) {
-        return CaretContainer.isCaretContainerBlock(range.startContainer);
-      }
-
-      function moveToCeFalseHorizontally(direction, getNextPosFn, isBeforeContentEditableFalseFn, range) {
-        var node, caretPosition, peekCaretPosition, rangeIsInContainerBlock;
-
-        if (!range.collapsed) {
-          node = getSelectedNode(range);
-          if (isContentEditableFalse(node)) {
-            return showCaret(direction, node, direction == -1);
-          }
-        }
-
-        rangeIsInContainerBlock = isRangeInCaretContainerBlock(range);
-        caretPosition = getNormalizedRangeEndPoint(direction, range);
-
-        if (isBeforeContentEditableFalseFn(caretPosition)) {
-          return selectNode(caretPosition.getNode(direction == -1));
-        }
-
-        caretPosition = getNextPosFn(caretPosition);
-        if (!caretPosition) {
-          if (rangeIsInContainerBlock) {
-            return range;
-          }
-
-          return null;
-        }
-
-        if (isBeforeContentEditableFalseFn(caretPosition)) {
-          return showCaret(direction, caretPosition.getNode(direction == -1), direction == 1);
-        }
-
-        // Peek ahead for handling of ab|c<span cE=false> -> abc|<span cE=false>
-        peekCaretPosition = getNextPosFn(caretPosition);
-        if (isBeforeContentEditableFalseFn(peekCaretPosition)) {
-          if (isMoveInsideSameBlock(caretPosition, peekCaretPosition)) {
-            return showCaret(direction, peekCaretPosition.getNode(direction == -1), direction == 1);
-          }
-        }
-
-        if (rangeIsInContainerBlock) {
-          return renderRangeCaret(caretPosition.toRange());
-        }
-
-        return null;
-      }
-
-      function moveToCeFalseVertically(direction, walkerFn, range) {
-        var caretPosition, linePositions, nextLinePositions,
-          closestNextLineRect, caretClientRect, clientX,
-          dist1, dist2, contentEditableFalseNode;
-
-        contentEditableFalseNode = getSelectedNode(range);
-        caretPosition = getNormalizedRangeEndPoint(direction, range);
-        linePositions = walkerFn(rootNode, LineWalker.isAboveLine(1), caretPosition);
-        nextLinePositions = Arr.filter(linePositions, LineWalker.isLine(1));
-        caretClientRect = Arr.last(caretPosition.getClientRects());
-
-        if (isBeforeContentEditableFalse(caretPosition)) {
-          contentEditableFalseNode = caretPosition.getNode();
-        }
-
-        if (isAfterContentEditableFalse(caretPosition)) {
-          contentEditableFalseNode = caretPosition.getNode(true);
-        }
-
-        if (!caretClientRect) {
-          return null;
-        }
-
-        clientX = caretClientRect.left;
-
-        closestNextLineRect = LineUtils.findClosestClientRect(nextLinePositions, clientX);
-        if (closestNextLineRect) {
-          if (isContentEditableFalse(closestNextLineRect.node)) {
-            dist1 = Math.abs(clientX - closestNextLineRect.left);
-            dist2 = Math.abs(clientX - closestNextLineRect.right);
-
-            return showCaret(direction, closestNextLineRect.node, dist1 < dist2);
-          }
-        }
-
-        if (contentEditableFalseNode) {
-          var caretPositions = LineWalker.positionsUntil(direction, rootNode, LineWalker.isAboveLine(1), contentEditableFalseNode);
-
-          closestNextLineRect = LineUtils.findClosestClientRect(Arr.filter(caretPositions, LineWalker.isLine(1)), clientX);
-          if (closestNextLineRect) {
-            return renderRangeCaret(closestNextLineRect.position.toRange());
-          }
-
-          closestNextLineRect = Arr.last(Arr.filter(caretPositions, LineWalker.isLine(0)));
-          if (closestNextLineRect) {
-            return renderRangeCaret(closestNextLineRect.position.toRange());
-          }
-        }
-      }
-
-      function exitPreBlock(direction, range) {
-        var pre, caretPos, newBlock;
-
-        function createTextBlock() {
-          var textBlock = editor.dom.create(editor.settings.forced_root_block);
-
-          if (!Env.ie || Env.ie >= 11) {
-            textBlock.innerHTML = '<br data-mce-bogus="1">';
-          }
-
-          return textBlock;
-        }
-
-        if (range.collapsed && editor.settings.forced_root_block) {
-          pre = editor.dom.getParent(range.startContainer, 'PRE');
-          if (!pre) {
-            return;
-          }
-
-          if (direction == 1) {
-            caretPos = getNextVisualCaretPosition(CaretPosition.fromRangeStart(range));
-          } else {
-            caretPos = getPrevVisualCaretPosition(CaretPosition.fromRangeStart(range));
-          }
-
-          if (!caretPos) {
-            newBlock = createTextBlock();
-
-            if (direction == 1) {
-              editor.$(pre).after(newBlock);
-            } else {
-              editor.$(pre).before(newBlock);
-            }
-
-            editor.selection.select(newBlock, true);
-            editor.selection.collapse();
-          }
-        }
-      }
-
-      function moveH(direction, getNextPosFn, isBeforeContentEditableFalseFn, range) {
-        var newRange;
-
-        newRange = moveToCeFalseHorizontally(direction, getNextPosFn, isBeforeContentEditableFalseFn, range);
-        if (newRange) {
-          return newRange;
-        }
-
-        newRange = exitPreBlock(direction, range);
-        if (newRange) {
-          return newRange;
-        }
-
-        return null;
-      }
-
-      function moveV(direction, walkerFn, range) {
-        var newRange;
-
-        newRange = moveToCeFalseVertically(direction, walkerFn, range);
-        if (newRange) {
-          return newRange;
-        }
-
-        newRange = exitPreBlock(direction, range);
-        if (newRange) {
-          return newRange;
-        }
-
-        return null;
-      }
-
       function showBlockCaretContainer(blockCaretContainer) {
         if (blockCaretContainer.hasAttribute('data-mce-caret')) {
           CaretContainer.showCaretContainerBlock(blockCaretContainer);
@@ -41319,61 +42040,7 @@ define(
         }
       }
 
-      function renderCaretAtRange(range) {
-        var caretPosition, ceRoot;
-
-        range = CaretUtils.normalizeRange(1, rootNode, range);
-        caretPosition = CaretPosition.fromRangeStart(range);
-
-        if (isContentEditableFalse(caretPosition.getNode())) {
-          return showCaret(1, caretPosition.getNode(), !caretPosition.isAtEnd());
-        }
-
-        if (isContentEditableFalse(caretPosition.getNode(true))) {
-          return showCaret(1, caretPosition.getNode(true), false);
-        }
-
-        // TODO: Should render caret before/after depending on where you click on the page forces after now
-        ceRoot = editor.dom.getParent(caretPosition.getNode(), Fun.or(isContentEditableFalse, isContentEditableTrue));
-        if (isContentEditableFalse(ceRoot)) {
-          return showCaret(1, ceRoot, false);
-        }
-
-        return null;
-      }
-
-      function renderRangeCaret(range) {
-        var caretRange;
-
-        if (!range || !range.collapsed) {
-          return range;
-        }
-
-        caretRange = renderCaretAtRange(range);
-        if (caretRange) {
-          return caretRange;
-        }
-
-        return range;
-      }
-
       function registerEvents() {
-        var right = curry(moveH, 1, getNextVisualCaretPosition, isBeforeContentEditableFalse);
-        var left = curry(moveH, -1, getPrevVisualCaretPosition, isAfterContentEditableFalse);
-        var up = curry(moveV, -1, LineWalker.upUntil);
-        var down = curry(moveV, 1, LineWalker.downUntil);
-
-        function override(evt, moveFn) {
-          if (evt.isDefaultPrevented() === false) {
-            var range = moveFn(getRange());
-
-            if (range) {
-              evt.preventDefault();
-              setRange(range);
-            }
-          }
-        }
-
         function getContentEditableRoot(node) {
           var root = editor.getBody();
 
@@ -41404,7 +42071,7 @@ define(
           var range = getRange();
 
           if (range.collapsed) {
-            setRange(renderCaretAtRange(range));
+            setRange(CefUtils.renderCaretAtRange(editor, range));
           }
         });
 
@@ -41450,7 +42117,7 @@ define(
             if (isContentEditableFalse(contentEditableRoot)) {
               if (!moved) {
                 e.preventDefault();
-                setContentEditableSelection(selectNode(contentEditableRoot));
+                setContentEditableSelection(CefUtils.selectNode(editor, contentEditableRoot));
               }
             }
           });
@@ -41502,8 +42169,10 @@ define(
           if (contentEditableRoot) {
             if (isContentEditableFalse(contentEditableRoot)) {
               e.preventDefault();
-              setContentEditableSelection(selectNode(contentEditableRoot));
+              setContentEditableSelection(CefUtils.selectNode(editor, contentEditableRoot));
             } else {
+              removeContentEditableSelection();
+
               // Check that we're not attempting a shift + click select within a contenteditable='true' element
               if (!(isContentEditableTrue(contentEditableRoot) && e.shiftKey) && !isXYWithinRange(e.clientX, e.clientY, editor.selection.getRng())) {
                 editor.selection.placeCaretAt(e.clientX, e.clientY);
@@ -41532,22 +42201,6 @@ define(
           }
 
           switch (e.keyCode) {
-            case VK.RIGHT:
-              override(e, right);
-              break;
-
-            case VK.DOWN:
-              override(e, down);
-              break;
-
-            case VK.LEFT:
-              override(e, left);
-              break;
-
-            case VK.UP:
-              override(e, up);
-              break;
-
             default:
               if (isContentEditableFalse(editor.selection.getNode()) && isContentKey(e)) {
                 e.preventDefault();
@@ -41595,7 +42248,7 @@ define(
         editor.on('focus', function () {
           // Make sure we have a proper fake caret on focus
           Delay.setEditorTimeout(editor, function () {
-            editor.selection.setRng(renderRangeCaret(editor.selection.getRng()));
+            editor.selection.setRng(CefUtils.renderRangeCaret(editor, editor.selection.getRng()));
           }, 0);
         });
 
@@ -41779,6 +42432,7 @@ define(
       }
 
       return {
+        showCaret: showCaret,
         showBlockCaretContainer: showBlockCaretContainer,
         hideFakeCaret: hideFakeCaret,
         destroy: destroy
@@ -42884,7 +43538,7 @@ define(
       function isHidden() {
         var sel;
 
-        if (!isGecko) {
+        if (!isGecko || editor.removed) {
           return 0;
         }
 
@@ -43489,8 +44143,31 @@ define(
       return o;
     };
 
+    var relaxDomain = function (editor, ifr) {
+      // Domain relaxing is required since the user has messed around with document.domain
+      // This only applies to IE 11 other browsers including Edge seems to handle document.domain
+      if (document.domain !== window.location.hostname && Env.ie && Env.ie < 12) {
+        var bodyUuid = Uuid.uuid('mce');
+
+        editor[bodyUuid] = function () {
+          InitContentBody.initContentBody(editor);
+        };
+
+        /*eslint no-script-url:0 */
+        var domainRelaxUrl = 'javascript:(function(){' +
+          'document.open();document.domain="' + document.domain + '";' +
+          'var ed = window.parent.tinymce.get("' + editor.id + '");document.write(ed.iframeHTML);' +
+          'document.close();ed.' + bodyUuid + '(true);})()';
+
+        DOM.setAttrib(ifr, 'src', domainRelaxUrl);
+        return true;
+      }
+
+      return false;
+    };
+
     var createIframe = function (editor, o) {
-      var settings = editor.settings, bodyId, bodyClass, url;
+      var settings = editor.settings, bodyId, bodyClass;
 
       editor.iframeHTML = settings.doctype + '<html><head>';
 
@@ -43527,31 +44204,10 @@ define(
         '" class="mce-content-body ' + bodyClass +
         '" data-id="' + editor.id + '"><br></body></html>';
 
-      var bodyUuid = Uuid.uuid('mce');
-
-      editor[bodyUuid] = function () {
-        InitContentBody.initContentBody(editor);
-      };
-
-      /*eslint no-script-url:0 */
-      var domainRelaxUrl = 'javascript:(function(){' +
-        'document.open();document.domain="' + document.domain + '";' +
-        'var ed = window.parent.tinymce.get("' + editor.id + '");document.write(ed.iframeHTML);' +
-        'document.close();ed.' + bodyUuid + '(true);})()';
-
-      // Domain relaxing is required since the user has messed around with document.domain
-      if (document.domain != window.location.hostname) {
-        // Edge seems to be able to handle domain relaxing
-        if (Env.ie && Env.ie < 12) {
-          url = domainRelaxUrl;
-        }
-      }
-
       // Create iframe
       // TODO: ACC add the appropriate description on this.
       var ifr = DOM.create('iframe', {
         id: editor.id + "_ifr",
-        //src: url || 'javascript:""', // Workaround for HTTPS warning in IE6/7
         frameBorder: '0',
         allowTransparency: "true",
         title: editor.editorManager.translate(
@@ -43570,29 +44226,18 @@ define(
         editor.fire("load");
       };
 
-      DOM.setAttrib(ifr, "src", url || 'javascript:""');
+      var isDomainRelaxed = relaxDomain(editor, ifr);
 
       editor.contentAreaContainer = o.iframeContainer;
       editor.iframeElement = ifr;
 
       DOM.add(o.iframeContainer, ifr);
 
-      // Try accessing the document this will fail on IE when document.domain is set to the same as location.hostname
-      // Then we have to force domain relaxing using the domainRelaxUrl approach very ugly!!
-      if (Env.ie) {
-        try {
-          editor.getDoc();
-        } catch (e) {
-          ifr.src = url = domainRelaxUrl;
-        }
-      }
-
-      return url;
+      return isDomainRelaxed;
     };
 
     var init = function (editor) {
-      var settings = editor.settings, elm = editor.getElement();
-      var boxInfo, url;
+      var settings = editor.settings, elm = editor.getElement(), boxInfo;
 
       editor.rtl = settings.rtl_ui || editor.editorManager.i18n.rtl;
       editor.editorManager.i18n.setCode(settings.language);
@@ -43621,7 +44266,7 @@ define(
         return InitContentBody.initContentBody(editor);
       }
 
-      url = createIframe(editor, boxInfo);
+      var isDomainRelaxed = createIframe(editor, boxInfo);
 
       if (boxInfo.editorContainer) {
         DOM.get(boxInfo.editorContainer).style.display = editor.orgDisplay;
@@ -43631,7 +44276,7 @@ define(
       editor.getElement().style.display = 'none';
       DOM.setAttrib(editor.id, 'aria-hidden', true);
 
-      if (!url) {
+      if (!isDomainRelaxed) {
         InitContentBody.initContentBody(editor);
       }
     };
@@ -44265,6 +44910,10 @@ define(
           });
         }
 
+        if (self.removed) {
+          return;
+        }
+
         if (!skipFocus) {
           // Get selected control element
           rng = selection.getRng();
@@ -44813,6 +45462,10 @@ define(
       load: function (args) {
         var self = this, elm = self.getElement(), html;
 
+        if (self.removed) {
+          return '';
+        }
+
         if (elm) {
           args = args || {};
           args.load = true;
@@ -44842,7 +45495,7 @@ define(
       save: function (args) {
         var self = this, elm = self.getElement(), html, form;
 
-        if (!elm || !self.initialized) {
+        if (!elm || !self.initialized || self.removed) {
           return;
         }
 
@@ -45004,6 +45657,10 @@ define(
        */
       getContent: function (args) {
         var self = this, content, body = self.getBody();
+
+        if (self.removed) {
+          return '';
+        }
 
         // Setup args object
         args = args || {};
@@ -46058,7 +46715,7 @@ define(
        * @property minorVersion
        * @type String
        */
-      minorVersion: '6.1',
+      minorVersion: '6.2',
 
       /**
        * Release date of TinyMCE build.
@@ -46066,7 +46723,7 @@ define(
        * @property releaseDate
        * @type String
        */
-      releaseDate: '2017-05-10',
+      releaseDate: '2017-05-23',
 
       /**
        * Collection of editor instances.
@@ -50577,19 +51234,22 @@ define(
 define(
   'tinymce.core.fmt.FontInfo',
   [
-    "tinymce.core.dom.DOMUtils"
+    'ephox.katamari.api.Fun',
+    'ephox.katamari.api.Option',
+    'ephox.sugar.api.node.Element',
+    'ephox.sugar.api.node.Node',
+    'tinymce.core.dom.DOMUtils'
   ],
-  function (DOMUtils) {
+  function (Fun, Option, Element, Node, DOMUtils) {
     var getSpecifiedFontProp = function (propName, rootElm, elm) {
       while (elm !== rootElm) {
         if (elm.style[propName]) {
-          return elm.style[propName];
+          var foundStyle = elm.style[propName];
+          return foundStyle !== '' ? Option.some(foundStyle) : Option.none();
         }
-
         elm = elm.parentNode;
       }
-
-      return '';
+      return Option.none();
     };
 
     var toPt = function (fontSize) {
@@ -50606,24 +51266,25 @@ define(
     };
 
     var getComputedFontProp = function (propName, elm) {
-      return DOMUtils.DOM.getStyle(elm, propName, true);
+      return Option.from(DOMUtils.DOM.getStyle(elm, propName, true));
     };
 
-    var getFontSize = function (rootElm, elm) {
-      var specifiedFontSize = getSpecifiedFontProp('fontSize', rootElm, elm);
-      return specifiedFontSize !== '' ? specifiedFontSize : getComputedFontProp('fontSize', elm);
-    };
-
-    var getFontFamily = function (rootElm, elm) {
-      var specifiedFontSize = getSpecifiedFontProp('fontFamily', rootElm, elm);
-      var fontValue = specifiedFontSize !== '' ? specifiedFontSize : getComputedFontProp('fontFamily', elm);
-
-      return fontValue !== undefined ? normalizeFontFamily(fontValue) : '';
+    var getFontProp = function (propName) {
+      return function (rootElm, elm) {
+        return Option.from(elm)
+          .map(Element.fromDom)
+          .filter(Node.isElement)
+          .bind(function (element) {
+            return getSpecifiedFontProp(propName, rootElm, element.dom())
+              .or(getComputedFontProp(propName, element.dom()));
+          })
+          .getOr('');
+      };
     };
 
     return {
-      getFontSize: getFontSize,
-      getFontFamily: getFontFamily,
+      getFontSize: getFontProp('fontSize'),
+      getFontFamily: Fun.compose(normalizeFontFamily, getFontProp('fontFamily')),
       toPt: toPt
     };
   }
