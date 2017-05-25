@@ -27,13 +27,7 @@ class Inserter extends wp.element.Component {
 		};
 	}
 
-	toggle( event ) {
-		// When opening the menu, track reference to the current active element
-		// so we know where to restore focus after the menu is closed by escape
-		if ( ! this.state.opened ) {
-			this.toggleNode = event.currentTarget;
-		}
-
+	toggle() {
 		this.setState( {
 			opened: ! this.state.opened,
 		} );
@@ -52,10 +46,6 @@ class Inserter extends wp.element.Component {
 				slug,
 				selectedBlock ? selectedBlock.uid : null
 			);
-		} else if ( this.toggleNode ) {
-			// When menu is closed by pressing escape, restore focus to the
-			// original opening active element before menu closes
-			this.toggleNode.focus();
 		}
 
 		this.close();
