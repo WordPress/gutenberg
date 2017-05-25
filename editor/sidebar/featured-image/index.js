@@ -27,9 +27,6 @@ class FeaturedImage extends Component {
 			media: null,
 			loading: false,
 		};
-
-		// This boolean should be removed when we provide QueryComponents
-		this.mounted = true;
 	}
 
 	componentDidMount() {
@@ -43,7 +40,9 @@ class FeaturedImage extends Component {
 	}
 
 	componentWillUnmount() {
-		this.mounted = false;
+		if ( this.fetchMediaRequest ) {
+			this.fetchMediaRequest.abort();
+		}
 	}
 
 	fetchMedia() {
@@ -54,9 +53,9 @@ class FeaturedImage extends Component {
 		}
 		this.setState( { loading: true } );
 		const mediaIdToLoad = this.props.featuredImageId;
-		new wp.api.models.Media( { id: mediaIdToLoad } ).fetch()
+		this.fetchMediaRequest = new wp.api.models.Media( { id: mediaIdToLoad } ).fetch()
 			.done( ( media ) => {
-				if ( ! this.mounted || this.props.featuredImageId !== mediaIdToLoad ) {
+				if ( this.props.featuredImageId !== mediaIdToLoad ) {
 					return;
 				}
 				this.setState( {
@@ -65,7 +64,7 @@ class FeaturedImage extends Component {
 				} );
 			} )
 			.fail( () => {
-				if ( ! this.mounted || this.props.featuredImageId !== mediaIdToLoad ) {
+				if ( this.props.featuredImageId !== mediaIdToLoad ) {
 					return;
 				}
 				this.setState( {
