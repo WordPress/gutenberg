@@ -1,0 +1,17 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/heading",
+        "attributes": {
+            "content": [
+                "The ",
+                {
+                    "type": "em",
+                    "children": "Inserter"
+                },
+                " Tool"
+            ],
+            "nodeName": "H2"
+        }
+    }
+]

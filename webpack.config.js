@@ -98,6 +98,9 @@ switch ( process.env.NODE_ENV ) {
 
 	case 'test':
 		config.target = 'node';
+		config.node = {
+			__dirname: true,
+		};
 		config.module.rules = [
 			...[ 'date', 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
@@ -105,13 +108,17 @@ switch ( process.env.NODE_ENV ) {
 			} ) ),
 			...config.module.rules,
 		];
+		const testFiles = glob.sync(
+			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
+		);
 		config.entry = [
 			'./date/index.js',
 			'./i18n/index.js',
 			'./element/index.js',
 			'./blocks/index.js',
 			'./editor/index.js',
-			...glob.sync( `./{${ Object.keys( config.entry ).join() }}/**/test/*.js` ),
+			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
+			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
 		];
 		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {

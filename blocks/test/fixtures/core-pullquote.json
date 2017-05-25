@@ -1,0 +1,16 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/pullquote",
+        "attributes": {
+            "value": [
+                [
+                    "Testing pullquote block..."
+                ]
+            ],
+            "citation": [
+                "...with a caption"
+            ]
+        }
+    }
+]
