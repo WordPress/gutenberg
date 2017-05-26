@@ -297,7 +297,7 @@ export default connect(
 		},
 
 		onMerge( ...args ) {
-			mergeBlocks( dispatch, ...args );
+			dispatch( mergeBlocks( ...args ) );
 		},
 	} )
 )( VisualEditorBlock );

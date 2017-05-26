@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { combineReducers, createStore } from 'redux';
-import { keyBy, last, omit, without } from 'lodash';
+import { combineReducers, applyMiddleware, createStore } from 'redux';
+import refx from 'refx';
+import { keyBy, last, omit, without, flowRight } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
+import effects from './effects';
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -354,7 +356,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: action.isNew,
+				isNew: false,
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -386,10 +388,12 @@ export function createReduxStore() {
 		saving,
 	} );
 
-	return createStore(
-		reducer,
-		window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-	);
+	const enhancers = [ applyMiddleware( refx( effects ) ) ];
+	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
+	}
+
+	return createStore( reducer, flowRight( enhancers ) );
 }
 
 export default createReduxStore;
