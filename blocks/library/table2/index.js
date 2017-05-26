@@ -29,6 +29,12 @@ function execCommand( command ) {
 	};
 }
 
+function internalValue( defaultValue ) {
+	const thunk = () => defaultValue;
+	thunk._wpBlocksKnownMatcher = true;
+	return thunk;
+}
+
 registerBlock( 'core/table2', {
 	title: wp.i18n.__( 'Table2' ),
 	icon: 'editor-table',
@@ -36,7 +42,18 @@ registerBlock( 'core/table2', {
 
 	attributes: {
 		nodeName: prop( 'table', 'nodeName' ),
-		rows: children( 'tr' ),
+		content: children( 'table' ),
+		editor: internalValue( null ),
+	},
+
+	defaultAttributes: {
+		nodeName: 'TABLE',
+		content: [
+			<tbody key="1">
+				<tr><td><br /></td><td><br /></td></tr>
+				<tr><td><br /></td><td><br /></td></tr>
+			</tbody>,
+		],
 	},
 
 	controls: [
@@ -109,7 +126,7 @@ registerBlock( 'core/table2', {
 	],
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { nodeName = 'TABLE', rows = [ <tr key="1"><td><br /></td><td><br /></td></tr>, <tr key="2"><td><br /></td><td><br /></td></tr> ] } = attributes;
+		const { nodeName, content } = attributes;
 		return (
 			<Editable
 				tagName={ nodeName.toLowerCase() }
@@ -119,10 +136,10 @@ registerBlock( 'core/table2', {
 				} ) }
 				style={ { width: '100%' } }
 				onSetup={ ( editor ) => setAttributes( { editor } ) }
-				onChange={ ( nextRows ) => {
-					setAttributes( { rows: nextRows } );
+				onChange={ ( nextContent ) => {
+					setAttributes( { content: nextContent } );
 				} }
-				value={ rows }
+				value={ content }
 				focus={ focus }
 				onFocus={ setFocus }
 				showAlignments
@@ -131,11 +148,10 @@ registerBlock( 'core/table2', {
 	},
 
 	save( { attributes } ) {
-		const { rows = [ <tr key="1"><td><br /></td><td><br /></td></tr>, <tr key="2"><td><br /></td><td><br /></td></tr> ] } = attributes;
-
+		const { content } = attributes;
 		return (
 			<table className="blocks-table" style={ { width: '100%' } }>
-				{ rows }
+				{ content }
 			</table>
 		);
 	},
