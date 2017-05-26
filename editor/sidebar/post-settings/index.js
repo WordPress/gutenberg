@@ -17,6 +17,7 @@ import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
 import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
+import LastRevision from '../last-revision';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
@@ -31,6 +32,7 @@ const PostSettings = ( { toggleSidebar } ) => {
 				</div>
 			</PanelHeader>
 			<PostStatus />
+			<LastRevision />
 			<FeaturedImage />
 			<PostExcerpt />
 			<DiscussionPanel />

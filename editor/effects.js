@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { get } from 'lodash';
-import { parse, stringify } from 'querystring';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
 import { getBlockSettings, switchToBlockType } from 'blocks';
+import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { __ } from 'i18n';
 
 /**
@@ -26,6 +26,7 @@ export default {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
+				isNew,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -40,15 +41,11 @@ export default {
 		} );
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action ) {
-		const { post } = action;
-		const [ baseUrl, query ] = window.location.href.split( '?' );
-		const qs = parse( query || '' );
-		if ( qs.post_id === post.id ) {
+		const { post, isNew } = action;
+		if ( ! isNew ) {
 			return;
 		}
-
-		const newUrl = baseUrl + '?' + stringify( {
-			...qs,
+		const newUrl = getGutenbergURL( {
 			post_id: post.id,
 		} );
 		window.history.replaceState( {}, 'Post ' + post.id, newUrl );
@@ -65,7 +62,7 @@ export default {
 	},
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
-		window.location.href = 'edit.php?' + stringify( {
+		window.location.href = getWPAdminURL( 'edit.php', {
 			trashed: 1,
 			post_type: postType,
 			ids: postId,
