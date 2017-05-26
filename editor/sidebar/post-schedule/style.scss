@@ -31,6 +31,7 @@
 	background: $white;
 	padding: 10px;
 	min-width: 265px;
+	z-index: z-index( '.editor-post-schedule__dialog' );
 }
 
 .editor-post-schedule__dialog-arrow {

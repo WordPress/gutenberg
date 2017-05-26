@@ -8,6 +8,7 @@ $z-layers: (
 	'.editor-visual-editor__block-controls': 1,
 	'.editor-header': 20,
 	'.editor-post-visibility__dialog': 30,
+	'.editor-post-schedule__dialog': 30,
 );
 
 @function z-index( $key ) {
