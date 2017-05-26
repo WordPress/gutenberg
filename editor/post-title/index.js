@@ -11,15 +11,15 @@ import './style.scss';
 import { getEditedPostTitle } from '../selectors';
 import { editPost } from '../actions';
 
-/**
- * Constants
- */
-const REGEXP_NEWLINES = /[\r\n]+/g;
-
 function PostTitle( { title, onUpdate } ) {
 	const onChange = ( event ) => {
-		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
-		onUpdate( newTitle );
+		onUpdate( event.target.value );
+	};
+
+	const onKeyDown = ( event ) => {
+		if ( event.keyCode === 13 ) {
+			event.preventDefault();
+		}
 	};
 
 	return (
@@ -29,6 +29,7 @@ function PostTitle( { title, onUpdate } ) {
 				value={ title }
 				onChange={ onChange }
 				placeholder={ wp.i18n.__( 'Enter title here' ) }
+				onKeyDown={ onKeyDown }
 			/>
 		</h1>
 	);
