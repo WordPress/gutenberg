@@ -210,7 +210,7 @@ class VisualEditorBlock extends wp.element.Component {
 					<CSSTransitionGroup
 						transitionName={ { appear: 'appear-animation', appearActive: 'is-appearing' } }
 						transitionAppear={ true }
-						transitionAppearTimeout={ 10000 }
+						transitionAppearTimeout={ 100 }
 						transitionEnter={ false }
 						transitionLeave={ false }
 						component={ FirstChild }
