@@ -69,18 +69,37 @@ export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} blockType  Block type slug
- * @param  {String}  rawContent Raw block content
- * @param  {?Object} attributes Attributes obtained from block delimiters
- * @return {?Object}            An initialized block object (if possible)
+ * @param  {?String} blockType     Block type slug
+ * @param  {String}  rawContent    Raw block content
+ * @param  {?Object} attributes    Attributes obtained from block delimiters
+ * @param  {?Object} contentObject Cbject for validating against a schema.
+ * @return {?Object}               An initialized block object (if possible)
  */
-export function createBlockWithFallback( blockType, rawContent, attributes ) {
+export function createBlockWithFallback(
+	blockType,
+	rawContent,
+	attributes,
+	contentObject
+) {
 	// Use type from block content, otherwise find unknown handler
 	blockType = blockType || getUnknownTypeHandler();
 
 	// Try finding settings for known block type, else again fall back
 	let blockSettings = getBlockSettings( blockType );
 	const fallbackBlockType = getUnknownTypeHandler();
+
+	// If the block has a schema and we were passed a content tree object,
+	// validate the content against the block schema.  Then, if validation
+	// fails, ensure that we fall back to the unknown type handler.
+	if (
+		blockSettings &&
+		blockSettings.schema &&
+		contentObject &&
+		blockSettings.schema.validateFragment( contentObject ) !== true
+	) {
+		blockSettings = null;
+	}
+
 	if ( ! blockSettings ) {
 		blockType = fallbackBlockType;
 		blockSettings = getBlockSettings( blockType );
@@ -219,10 +238,12 @@ export function parseWithTinyMCE( content ) {
 			} while ( !! match );
 
 			// Try to create the block
+			const contentObject = mceNodeToObjectTree( currentNode );
 			const block = createBlockWithFallback(
 				nodeAttributes.slug,
 				rawContent,
-				blockAttributes
+				blockAttributes,
+				contentObject
 			);
 			if ( block ) {
 				flushContentBetweenBlocks();
