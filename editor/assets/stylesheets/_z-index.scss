@@ -9,6 +9,7 @@ $z-layers: (
 	'.editor-header': 20,
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
+	'.components-form-toggle__input': 40,
 );
 
 @function z-index( $key ) {

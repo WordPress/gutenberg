@@ -60,9 +60,9 @@ $toggle-border-width: 2px;
 	width: 100%;
 	height: 100%;
 	opacity: 0;
-	pointer-events: none;
 	margin: 0;
 	padding: 0;
+	z-index: z-index( '.components-form-toggle__input' );
 }
 
 .components-form-toggle__hint {
