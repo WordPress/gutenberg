@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import Dashicon from 'components/dashicon';
-import disposableFocus from 'components/disposable-focus';
+import disposableFocus from 'components/higher-order/disposable-focus';
 
 /**
  * Internal dependencies

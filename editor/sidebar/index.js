@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import disposableFocus from 'components/disposable-focus';
+import disposableFocus from 'components/higher-order/disposable-focus';
 
 /**
  * Internal Dependencies
