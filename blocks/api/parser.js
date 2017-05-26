@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * External dependencies
  */
@@ -9,7 +11,11 @@ import { escape, unescape, pickBy } from 'lodash';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings, getUnknownTypeHandler } from './registration';
+import {
+	getBlocks,
+	getBlockSettings,
+	getUnknownTypeHandler,
+} from './registration';
 import { createBlock } from './factory';
 
 /**
@@ -95,12 +101,37 @@ export function createBlockWithFallback( blockType, rawContent, attributes ) {
 }
 
 /**
+ * Converts an object tree from the format returned by the TinyMCE parser (with
+ * `firstChild` and `lastChild`) into the format expected by `phs` (with
+ * `childNodes`).
+ *
+ * @param  {Object} node A TinyMCE DOM-like node (result of a parse operation).
+ * @return {Object}      An object to validate against a `phs` schema.
+ */
+export function mceNodeToObjectTree( node ) {
+	const childNodes = [];
+	let child = node.firstChild;
+	while ( child ) {
+		childNodes.push( mceNodeToObjectTree( child ) );
+		child = child.next;
+	}
+	return {
+		// TODO nodeName = '#text', tagName = undefined
+		nodeName: node.name,
+		tagName: node.name,
+		childNodes,
+	};
+}
+
+/**
  * Parses the post content with TinyMCE and returns a list of blocks.
  *
  * @param  {String} content The post content
  * @return {Array}          Block list
  */
 export function parseWithTinyMCE( content ) {
+	const blocksWithSchemas = getBlocks().filter( block => !! block.schema );
+
 	// First, convert comment delimiters into temporary <wp-block> "tags" so
 	// that TinyMCE can parse them.  Examples:
 	//   In  : <!-- wp:core/text -->
@@ -123,14 +154,14 @@ export function parseWithTinyMCE( content ) {
 		}
 	);
 
-	// Create a custom HTML schema
-	const schema = new tinymce.html.Schema();
-	// Add <wp-block> "tags" to our schema
-	schema.addCustomElements( 'wp-block' );
+	// Create a custom TinyMCE parser schema
+	const parserSchema = new tinymce.html.Schema();
+	// Add <wp-block> "tags" to our parser schema
+	parserSchema.addCustomElements( 'wp-block' );
 	// Add valid <wp-block> "attributes" also
-	schema.addValidElements( 'wp-block[slug|attributes]' );
+	parserSchema.addValidElements( 'wp-block[slug|attributes]' );
 	// Initialize the parser with our custom schema
-	const parser = new tinymce.html.DomParser( { validate: true }, schema );
+	const parser = new tinymce.html.DomParser( { validate: true }, parserSchema );
 
 	// Parse the content into an object tree
 	const tree = parser.parse( content );
@@ -138,7 +169,7 @@ export function parseWithTinyMCE( content ) {
 	// Create a serializer that we will use to pass strings to blocks.
 	// TODO: pass parse trees instead, and verify them against the markup
 	// shapes that each block can accept.
-	const serializer = new tinymce.html.Serializer( { validate: true }, schema );
+	const serializer = new tinymce.html.Serializer( { validate: true }, parserSchema );
 
 	// Walk the tree and initialize blocks
 	const blocks = [];
@@ -200,6 +231,48 @@ export function parseWithTinyMCE( content ) {
 
 			currentNode = currentNode.next;
 		} else {
+			// We have some HTML content outside of block delimiters.  First
+			// see if the current node validates against any block schemas.
+			// TODO: We will need a way to match multiple tags against multiple
+			// schemas, and this should happen in `flushContentBetweenBlocks`
+			// instead.  We'll have to be careful to manage the algorithmic
+			// complexity well here, as the number of possible matches will
+			// quickly grow very large.
+			const currentNodeObject = mceNodeToObjectTree( currentNode );
+			const matchingBlocks = blocksWithSchemas.filter( block => {
+				const result = block.schema.validateNode( currentNodeObject );
+				// TODO: Eventually, `result` will contain any parameters
+				// deserialized from the HTML, as well as information about
+				// which branch of the schema was used, extra attributes
+				// present in the markup, etc.
+				return ( result === true );
+			} );
+
+			if ( matchingBlocks.length > 1 ) {
+				console.error(
+					'More than 1 block found matching HTML string \'%s\': %s',
+					serializer.serialize( currentNode ),
+					matchingBlocks.map( block => block.slug ).join( ', ' )
+				);
+			} else if ( matchingBlocks.length === 1 ) {
+				const contentString = serializer.serialize( currentNode );
+				const block = createBlockWithFallback(
+					matchingBlocks[ 0 ].slug,
+					contentString,
+					null // no known attributes
+				);
+				if ( block ) {
+					flushContentBetweenBlocks();
+					blocks.push( block );
+					currentNode = currentNode.next;
+					continue;
+				}
+			}
+
+			// If we get here, then we were unable to match the current node
+			// against a block schema for one reason or another, and we need to
+			// store it in `contentBetweenBlocks` instead.
+
 			// We have some HTML content outside of block delimiters.  Save it
 			// so that we can initialize it using `getUnknownTypeHandler`.
 			const toAppend = currentNode;
