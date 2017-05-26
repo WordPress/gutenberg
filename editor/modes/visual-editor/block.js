@@ -208,7 +208,7 @@ class VisualEditorBlock extends wp.element.Component {
 				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ showUI &&
 					<CSSTransitionGroup
-						transitionName={ { appear: 'appear-animation', appearActive: 'is-appearing' } }
+						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
 						transitionAppear={ true }
 						transitionAppearTimeout={ 100 }
 						transitionEnter={ false }

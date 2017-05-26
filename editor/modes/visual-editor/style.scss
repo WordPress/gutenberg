@@ -87,7 +87,7 @@
 		top: $header-height + $admin-bar-height + $item-spacing;
 	}
 
-	&.is-appearing {
+	&.is-appearing-active {
 		@include animate_fade;
 	}
 }
