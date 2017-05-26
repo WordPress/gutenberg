@@ -724,6 +724,43 @@ VIDEO;
 	}
 
 	/**
+	 * @ticket 40866
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_youtube_remove_feature() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'https://www.youtube.com/watch?v=i_cVJgIz_Cs&feature=youtu.be',
+		) );
+
+		$this->assertNotContains( 'feature=youtu.be', $actual );
+	}
+
+	/**
+	 * @ticket 40866
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_youtube_force_ssl() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'http://www.youtube.com/watch?v=i_cVJgIz_Cs',
+		) );
+
+		$this->assertContains( 'src="https://www.youtube.com/watch?v=i_cVJgIz_Cs', $actual );
+	}
+
+	/**
+	 * @ticket 40866
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_vimeo_force_ssl_remove_query_args() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'http://vimeo.com/190372437?blah=meh',
+		) );
+
+		$this->assertContains( 'src="https://vimeo.com/190372437', $actual );
+		$this->assertNotContains( 'blah=meh', $actual );
+	}
+
+	/**
 	 * Test [video] shortcode processing
 	 *
 	 */
