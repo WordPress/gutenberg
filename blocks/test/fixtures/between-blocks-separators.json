@@ -1,0 +1,77 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/separator",
+        "attributes": {}
+    },
+    {
+        "uid": "_uid_1",
+        "blockType": "core/separator",
+        "attributes": {}
+    },
+    {
+        "uid": "_uid_2",
+        "blockType": "core/text",
+        "attributes": {
+            "content": [
+                {
+                    "type": "p",
+                    "children": "some simple text"
+                }
+            ]
+        }
+    },
+    {
+        "uid": "_uid_3",
+        "blockType": "core/freeform",
+        "attributes": {
+            "html": "<div>this is not a separator</div><div>this is not a separator either</div>"
+        }
+    },
+    {
+        "uid": "_uid_4",
+        "blockType": "core/text",
+        "attributes": {
+            "content": [
+                {
+                    "type": "p",
+                    "children": "some more simple text"
+                }
+            ]
+        }
+    },
+    {
+        "uid": "_uid_5",
+        "blockType": "core/separator",
+        "attributes": {}
+    },
+    {
+        "uid": "_uid_6",
+        "blockType": "core/separator",
+        "attributes": {}
+    },
+    {
+        "uid": "_uid_7",
+        "blockType": "core/text",
+        "attributes": {
+            "content": [
+                {
+                    "type": "p",
+                    "children": "even more simple text"
+                }
+            ]
+        }
+    },
+    {
+        "uid": "_uid_8",
+        "blockType": "core/separator",
+        "attributes": {}
+    },
+    {
+        "uid": "_uid_9",
+        "blockType": "core/freeform",
+        "attributes": {
+            "html": "<div>still not a separator</div>"
+        }
+    }
+]
