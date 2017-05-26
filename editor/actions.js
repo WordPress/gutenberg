@@ -1,9 +1,3 @@
-/**
- * External dependencies
- */
-import { get } from 'lodash';
-import { parse, stringify } from 'querystring';
-
 export function focusBlock( uid, config ) {
 	return {
 		type: 'UPDATE_FOCUS',
@@ -56,86 +50,25 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost( dispatch, postId, edits ) {
-	const toSend = postId ? { id: postId, ...edits } : edits;
-	const isNew = ! postId;
-
-	dispatch( {
+export function savePost( postId, edits ) {
+	return {
 		type: 'REQUEST_POST_UPDATE',
 		edits,
-		isNew,
-	} );
-
-	new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
-		dispatch( {
-			type: 'REQUEST_POST_UPDATE_SUCCESS',
-			post: newPost,
-			isNew,
-		} );
-		if ( isNew && window.history.replaceState ) {
-			const [ baseUrl, query ] = window.location.href.split( '?' );
-			const qs = parse( query || '' );
-			const newUrl = baseUrl + '?' + stringify( {
-				...qs,
-				post_id: newPost.id,
-			} );
-			window.history.replaceState( {}, 'Post ' + newPost.id, newUrl );
-		}
-	} ).fail( ( err ) => {
-		dispatch( {
-			type: 'REQUEST_POST_UPDATE_FAILURE',
-			error: get( err, 'responseJSON', {
-				code: 'unknown_error',
-				message: wp.i18n.__( 'An unknown error occurred.' ),
-			} ),
-			edits,
-			isNew,
-		} );
-	} );
+		postId,
+	};
 }
 
-export function trashPost( dispatch, postId, postType ) {
-	new wp.api.models.Post( { id: postId } ).destroy().done( () => {
-		window.location.href = 'edit.php?post_type=' + postType
-			+ '&trashed=1&ids=' + postId;
-	} );
+export function trashPost( postId, postType ) {
+	return {
+		type: 'TRASH_POST',
+		postId,
+		postType,
+	};
 }
 
-export function mergeBlocks( dispatch, blockA, blockB ) {
-	const blockASettings = wp.blocks.getBlockSettings( blockA.blockType );
-
-	// Only focus the previous block if it's not mergeable
-	if ( ! blockASettings.merge ) {
-		dispatch( focusBlock( blockA.uid ) );
-		return;
-	}
-
-	// We can only merge blocks with similar types
-	// thus, we transform the block to merge first
-	const blocksWithTheSameType = blockA.blockType === blockB.blockType
-		? [ blockB ]
-		: wp.blocks.switchToBlockType( blockB, blockA.blockType );
-
-	// If the block types can not match, do nothing
-	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-		return;
-	}
-
-	// Calling the merge to update the attributes and remove the block to be merged
-	const updatedAttributes = blockASettings.merge( blockA.attributes, blocksWithTheSameType[ 0 ].attributes );
-
-	dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
-	dispatch( replaceBlocks(
-		[ blockA.uid, blockB.uid ],
-		[
-			{
-				...blockA,
-				attributes: {
-					...blockA.attributes,
-					...updatedAttributes,
-				},
-			},
-			...blocksWithTheSameType.slice( 1 ),
-		]
-	) );
+export function mergeBlocks( blockA, blockB ) {
+	return {
+		type: 'MERGE_BLOCKS',
+		blocks: [ blockA, blockB ],
+	};
 }

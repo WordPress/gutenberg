@@ -75,6 +75,7 @@
     "react-redux": "^5.0.4",
     "react-slot-fill": "^1.0.0-alpha.11",
     "redux": "^3.6.0",
+    "refx": "^2.0.0",
     "uuid": "^3.0.1"
   }
 }
