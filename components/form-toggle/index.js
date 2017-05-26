@@ -46,7 +46,7 @@ class FormToggle extends Component {
 					onChange={ onChange }
 				/>
 				{ showHint &&
-					<span className="components-form-toggle__hint">
+					<span className="components-form-toggle__hint" aria-hidden>
 						{ checked ? __( 'On' ) : __( 'Off' ) }
 					</span>
 				}
