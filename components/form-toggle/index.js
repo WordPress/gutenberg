@@ -7,6 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Component } from 'element';
 
 /**
@@ -21,8 +22,14 @@ class FormToggle extends Component {
 	}
 
 	render() {
-		const { className, checked, children, onChange = noop } = this.props;
-		const id = 'toggle-' + this.id;
+		const {
+			className,
+			checked,
+			onChange = noop,
+			showHint = true,
+			id = 'toggle-' + this.id,
+		} = this.props;
+
 		const wrapperClasses = classNames(
 			'components-form-toggle',
 			className,
@@ -30,7 +37,7 @@ class FormToggle extends Component {
 		);
 
 		return (
-			<div className={ wrapperClasses }>
+			<span className={ wrapperClasses }>
 				<input
 					className="components-form-toggle__input"
 					id={ id }
@@ -38,10 +45,12 @@ class FormToggle extends Component {
 					value={ checked }
 					onChange={ onChange }
 				/>
-				<label className="components-form-toggle__label" htmlFor={ id }>
-					{ children }
-				</label>
-			</div>
+				{ showHint &&
+					<span className="components-form-toggle__hint">
+						{ checked ? __( 'On' ) : __( 'Off' ) }
+					</span>
+				}
+			</span>
 		);
 	}
 }
