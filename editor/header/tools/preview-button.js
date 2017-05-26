@@ -16,7 +16,7 @@ import { getEditedPostPreviewLink } from '../../selectors';
 function PreviewButton( { link } ) {
 	return (
 		<IconButton
-			href={ !! link ? link : undefined }
+			href={ link }
 			target="_blank"
 			icon="visibility"
 			disabled={ ! link }

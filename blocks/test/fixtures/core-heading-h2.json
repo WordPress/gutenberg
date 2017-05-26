@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/heading",
+        "attributes": {
+            "content": [
+                "A picture is worth a thousand words, or so the saying goes"
+            ],
+            "nodeName": "H2"
+        }
+    }
+]
