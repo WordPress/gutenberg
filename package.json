@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "dom-react": "^2.0.0",
+    "dom-react": "^2.2.0",
     "element-closest": "^2.0.2",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
