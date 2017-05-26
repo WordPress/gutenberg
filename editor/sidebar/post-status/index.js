@@ -15,6 +15,8 @@ import FormToggle from 'components/form-toggle';
  */
 import './style.scss';
 import PostVisibility from '../post-visibility';
+import PostTrash from '../post-trash';
+import PostSchedule from '../post-schedule';
 import { getEditedPostStatus, getSuggestedPostFormat } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -43,8 +45,14 @@ function PostStatus( { status, onUpdateStatus, suggestedFormat } ) {
 				<PostVisibility />
 			</div>
 			<div className="editor-post-status__row">
+				<PostSchedule />
+			</div>
+			<div className="editor-post-status__row">
 				<span>{ __( 'Post Format' ) }</span>
 				<span>{ format }</span>
+			</div>
+			<div className="editor-post-status__row">
+				<PostTrash />
 			</div>
 		</PanelBody>
 	);

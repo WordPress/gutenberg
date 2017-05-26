@@ -9,9 +9,7 @@ Gutenberg is the project name. Conversations and discussions take place in #core
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
 
-WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor give them many rich layout options. By embracing the blocky nature, we can hopefully surface blocks that already exist, as well as attach more advanced layout options to each of them, allowing you to easily write richer posts.
-
-In the end you should be able to start up a new post, _type type type_ then _click click click_ and effortlessly end up with a rich post like this: <a href="http://moc.co/sandbox/example-post/">Example Post</a>.
+WordPress already supports a large amount of "blocks", but doesn't surface them very well, nor does it give them much in the way of layout options. By embracing the blocky nature, we can hopefully surface the blocks that already exist, as well as attach more advanced layout options to each of them, allowing you to easily write richer posts, like <a href="http://moc.co/sandbox/example-post/">this example post</a>.
 
 ## Overview
 

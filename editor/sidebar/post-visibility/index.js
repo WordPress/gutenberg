@@ -23,10 +23,11 @@ import {
 import { editPost } from '../../actions';
 
 class PostVisibility extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 		this.state = {
 			opened: false,
+			hasPassword: !! props.password,
 		};
 		this.toggleDialog = this.toggleDialog.bind( this );
 	}
@@ -43,9 +44,18 @@ class PostVisibility extends Component {
 	render() {
 		const { status, visibility, password, onUpdateVisibility } = this.props;
 
-		const setPublic = () => onUpdateVisibility( visibility === 'private' ? 'draft' : status );
-		const setPrivate = () => onUpdateVisibility( 'private' );
-		const setPasswordProtected = () => onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+		const setPublic = () => {
+			onUpdateVisibility( visibility === 'private' ? 'draft' : status );
+			this.setState( { hasPassword: false } );
+		};
+		const setPrivate = () => {
+			onUpdateVisibility( 'private' );
+			this.setState( { hasPassword: false } );
+		};
+		const setPasswordProtected = () => {
+			onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+			this.setState( { hasPassword: true } );
+		};
 		const updatePassword = ( event ) => onUpdateVisibility( status, event.target.value );
 
 		const visibilityOptions = [
@@ -54,18 +64,21 @@ class PostVisibility extends Component {
 				label: __( 'Public' ),
 				info: __( 'Visible to everyone.' ),
 				changeHandler: setPublic,
+				checked: visibility === 'public' && ! this.state.hasPassword,
 			},
 			{
 				value: 'private',
 				label: __( 'Private' ),
 				info: __( 'Only visible to site admins and editors.' ),
 				changeHandler: setPrivate,
+				checked: visibility === 'private',
 			},
 			{
 				value: 'password',
 				label: __( 'Password Protected' ),
 				info: __( 'Protected with a password you choose. Only those with the password can view this post.' ),
 				changeHandler: setPasswordProtected,
+				checked: this.state.hasPassword,
 			},
 		];
 		const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
@@ -85,14 +98,14 @@ class PostVisibility extends Component {
 						<div className="editor-post-visibility__dialog-legend">
 							{ __( 'Post Visibility' ) }
 						</div>
-						{ visibilityOptions.map( ( { value, label, info, changeHandler } ) => (
+						{ visibilityOptions.map( ( { value, label, info, changeHandler, checked } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
-								<input type="radio" value={ value } onChange={ changeHandler } checked={ value === visibility } />
+								<input type="radio" value={ value } onChange={ changeHandler } checked={ checked } />
 								{ label }
 								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
 							</label>
 						) ) }
-						{ visibility === 'password' &&
+						{ this.state.hasPassword &&
 							<input
 								className="editor-post-visibility__dialog-password-input"
 								type="text"

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last } from 'lodash';
+import { first, last, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -22,6 +22,10 @@ export function hasEditorUndo( state ) {
 
 export function hasEditorRedo( state ) {
 	return state.editor.history.future.length > 0;
+}
+
+export function isEditedPostNew( state ) {
+	return ! state.currentPost.id;
 }
 
 export function isEditedPostDirty( state ) {
@@ -52,7 +56,7 @@ export function getEditedPostVisibility( state ) {
 
 	if ( status === 'private' ) {
 		return 'private';
-	} else if ( password !== undefined && password !== null ) {
+	} else if ( password ) {
 		return 'password';
 	}
 	return 'public';
@@ -60,8 +64,14 @@ export function getEditedPostVisibility( state ) {
 
 export function getEditedPostTitle( state ) {
 	return state.editor.edits.title === undefined
-		? state.currentPost.title.raw
+		? get( state.currentPost, 'title.raw' )
 		: state.editor.edits.title;
+}
+
+export function getEditedPostExcerpt( state ) {
+	return state.editor.edits.excerpt === undefined
+		? get( state.currentPost, 'excerpt.raw' )
+		: state.editor.edits.excerpt;
 }
 
 export function getEditedPostPreviewLink( state ) {

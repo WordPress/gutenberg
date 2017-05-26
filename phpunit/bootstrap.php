@@ -23,6 +23,10 @@ if ( ! $_tests_dir ) {
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
+// Do not try to load JavaScript files from an external URL - this takes a
+// while.
+define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
+
 /**
  * Manually load the plugin being tested.
  */

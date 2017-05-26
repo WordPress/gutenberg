@@ -6,9 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
+import { __ } from 'i18n';
 import IconButton from 'components/icon-button';
-import Button from 'components/button';
 
 /**
  * Internal dependencies
@@ -34,13 +33,14 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 				label={ wp.i18n.__( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
-			<Inserter position="bottom" />
+			<Inserter position="bottom">
+				{ __( 'Insert' ) }
+			</Inserter>
+			<PreviewButton />
 			<div className="editor-tools__tabs">
-				<PreviewButton />
-				<Button onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
-					<Dashicon icon="admin-generic" />
+				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
 					{ wp.i18n.__( 'Post Settings' ) }
-				</Button>
+				</IconButton>
 			</div>
 			<PublishButton />
 		</div>
