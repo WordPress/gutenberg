@@ -42,6 +42,12 @@ function findInBlockQuote( { parents } ) {
 	return ! ! quote;
 }
 
+function internalValue( defaultValue ) {
+	const thunk = () => defaultValue;
+	thunk._wpBlocksKnownMatcher = true;
+	return thunk;
+}
+
 registerBlock( 'core/freeform', {
 	title: wp.i18n.__( 'Freeform' ),
 
@@ -51,12 +57,16 @@ registerBlock( 'core/freeform', {
 
 	attributes: {
 		content: children(),
+		listType: internalValue( null ),
+		inBlockQuote: internalValue( false ),
+		editor: internalValue( null ),
 	},
 
 	defaultAttributes: {
 		content: <p />,
 		listType: null,
 		inBlockQuote: false,
+		editor: null,
 	},
 
 	controls: [
