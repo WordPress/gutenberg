@@ -33,6 +33,10 @@ import {
 	isTypingInBlock,
 } from '../../selectors';
 
+function metaKeyPressed( event ) {
+	return event.metaKey || ( event.ctrlKey && ! event.altKey );
+}
+
 class VisualEditorBlock extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
@@ -40,10 +44,12 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.removeOrDeselect = this.removeOrDeselect.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
+		this.handleKeyUp = this.handleKeyUp.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
 		this.previousOffset = null;
+		this.metaCount = 0;
 	}
 
 	bindBlockNode( node ) {
@@ -89,7 +95,7 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	removeOrDeselect( event ) {
+	handleKeyDown( event ) {
 		const { keyCode, target } = event;
 
 		// Remove block on backspace
@@ -104,6 +110,20 @@ class VisualEditorBlock extends wp.element.Component {
 		if ( 27 /* Escape */ === event.keyCode ) {
 			this.props.onDeselect();
 		}
+
+		if ( metaKeyPressed( event ) ) {
+			this.metaCount++;
+		} else {
+			this.metaCount = 0;
+		}
+	}
+
+	handleKeyUp() {
+		if ( this.metaCount === 1 ) {
+			this.props.onStopTyping();
+		}
+
+		this.metaCount = 0;
 	}
 
 	mergeBlocks( forward = false ) {
@@ -189,18 +209,18 @@ class VisualEditorBlock extends wp.element.Component {
 				ref={ this.bindBlockNode }
 				onClick={ this.selectAndStopPropagation }
 				onFocus={ onSelect }
-				onKeyDown={ this.removeOrDeselect }
+				onKeyDown={ this.handleKeyDown }
+				onKeyUp={ this.handleKeyUp }
 				onMouseEnter={ onHover }
 				onMouseMove={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
-				tabIndex="0"
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
 				{ showUI &&
-					<div className="editor-visual-editor__block-controls">
+					<div className="editor-visual-editor__block-controls" tabIndex="-1">
 						<BlockSwitcher uid={ block.uid } />
 						{ !! settings.controls && (
 							<Toolbar
@@ -264,6 +284,11 @@ export default connect(
 			dispatch( {
 				type: 'START_TYPING',
 				uid: ownProps.uid,
+			} );
+		},
+		onStopTyping() {
+			dispatch( {
+				type: 'STOP_TYPING',
 			} );
 		},
 		onHover() {

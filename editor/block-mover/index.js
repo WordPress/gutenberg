@@ -21,7 +21,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 	// the rendering parent, leaving it unable to react to focus out.
 
 	return (
-		<div className="editor-block-mover">
+		<div className="editor-block-mover" tabIndex="-1">
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
