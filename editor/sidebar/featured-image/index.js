@@ -60,7 +60,10 @@ class FeaturedImage extends Component {
 					media,
 				} );
 			} )
-			.fail( () => {
+			.fail( ( error ) => {
+				if ( error && error.statusText === 'abort' ) {
+					return;
+				}
 				this.setState( {
 					loading: false,
 				} );
