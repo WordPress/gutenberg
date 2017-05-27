@@ -11,9 +11,15 @@ import './style.scss';
 import { getEditedPostTitle } from '../selectors';
 import { editPost } from '../actions';
 
+/**
+ * Constants
+ */
+const REGEXP_NEWLINES = /[\r\n]+/g;
+
 function PostTitle( { title, onUpdate } ) {
 	const onChange = ( event ) => {
-		onUpdate( event.target.value );
+		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
+		onUpdate( newTitle );
 	};
 
 	const onKeyDown = ( event ) => {
