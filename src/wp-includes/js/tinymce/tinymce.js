@@ -1,4 +1,4 @@
-// 4.6.2 (2017-05-23)
+// 4.6.2 (2017-05-26)
 (function () {
 
 var defs = {}; // id -> {dependencies, definition, instance (possibly undefined)}
@@ -20911,6 +20911,17 @@ define(
     var each = Tools.each, trim = Tools.trim;
     var isIE = Env.ie;
 
+    var isValidRange = function (rng) {
+      if (!rng) {
+        return false;
+      } else if (rng.select) { // Native IE range still produced by placeCaretAt
+        return true;
+      } else {
+        var sc = rng.startContainer, ec = rng.endContainer;
+        return !!(sc && sc.parentNode && ec && ec.parentNode);
+      }
+    };
+
     /**
      * Constructs a new selection instance.
      *
@@ -21477,7 +21488,7 @@ define(
       setRng: function (rng, forward) {
         var self = this, sel, node, evt;
 
-        if (!rng) {
+        if (!isValidRange(rng)) {
           return;
         }
 
@@ -25907,7 +25918,7 @@ define(
   function (Fun, TreeWalker, NodeType, CaretPosition, CaretContainer, CaretCandidate) {
     var isContentEditableTrue = NodeType.isContentEditableTrue,
       isContentEditableFalse = NodeType.isContentEditableFalse,
-      isBlockLike = NodeType.matchStyleValues('display', 'block table table-cell table-caption'),
+      isBlockLike = NodeType.matchStyleValues('display', 'block table table-cell table-caption list-item'),
       isCaretContainer = CaretContainer.isCaretContainer,
       isCaretContainerBlock = CaretContainer.isCaretContainerBlock,
       curry = Fun.curry,
@@ -27276,6 +27287,7 @@ define(
 define(
   'tinymce.core.keyboard.InlineUtils',
   [
+    'ephox.katamari.api.Arr',
     'ephox.katamari.api.Fun',
     'ephox.katamari.api.Option',
     'ephox.katamari.api.Options',
@@ -27287,7 +27299,7 @@ define(
     'tinymce.core.dom.DOMUtils',
     'tinymce.core.text.Bidi'
   ],
-  function (Fun, Option, Options, CaretContainer, CaretFinder, CaretPosition, CaretUtils, CaretWalker, DOMUtils, Bidi) {
+  function (Arr, Fun, Option, Options, CaretContainer, CaretFinder, CaretPosition, CaretUtils, CaretWalker, DOMUtils, Bidi) {
     var isInlineTarget = function (elm) {
       return DOMUtils.DOM.is(elm, 'a[href],code');
     };
@@ -27296,8 +27308,18 @@ define(
       return DOMUtils.DOM.getStyle(element, 'direction', true) === 'rtl' || Bidi.hasStrongRtl(element.textContent);
     };
 
+    var findInlineParents = function (rootNode, pos) {
+      return Arr.filter(DOMUtils.DOM.getParents(pos.container(), '*', rootNode), isInlineTarget);
+    };
+
     var findInline = function (rootNode, pos) {
-      return Option.from(DOMUtils.DOM.getParent(pos.container(), isInlineTarget, rootNode));
+      var parents = findInlineParents(rootNode, pos);
+      return Option.from(parents[0]);
+    };
+
+    var findRootInline = function (rootNode, pos) {
+      var parents = findInlineParents(rootNode, pos);
+      return Option.from(parents[parents.length - 1]);
     };
 
     var hasSameParentBlock = function (rootNode, node1, node2) {
@@ -27307,11 +27329,11 @@ define(
     };
 
     var isInInline = function (rootNode, pos) {
-      return pos ? findInline(rootNode, pos).isSome() : false;
+      return pos ? findRootInline(rootNode, pos).isSome() : false;
     };
 
     var isAtInlineEndPoint = function (rootNode, pos) {
-      return findInline(rootNode, pos).map(function (inline) {
+      return findRootInline(rootNode, pos).map(function (inline) {
         return findCaretPosition(inline, false, pos).isNone() || findCaretPosition(inline, true, pos).isNone();
       }).getOr(false);
     };
@@ -27332,9 +27354,17 @@ define(
       var container = pos.container(), offset = pos.offset();
 
       if (forward) {
-        return CaretContainer.isBeforeInline(pos) ? new CaretPosition(container, offset + 1) : pos;
+        if (CaretContainer.isCaretContainerInline(container)) {
+          return CaretPosition.after(container);
+        } else {
+          return CaretContainer.isBeforeInline(pos) ? new CaretPosition(container, offset + 1) : pos;
+        }
       } else {
-        return CaretContainer.isAfterInline(pos) ? new CaretPosition(container, offset - 1) : pos;
+        if (CaretContainer.isCaretContainerInline(container)) {
+          return CaretPosition.before(container);
+        } else {
+          return CaretContainer.isAfterInline(pos) ? new CaretPosition(container, offset - 1) : pos;
+        }
       }
     };
 
@@ -27344,6 +27374,7 @@ define(
     return {
       isInlineTarget: isInlineTarget,
       findInline: findInline,
+      findRootInline: findRootInline,
       isInInline: isInInline,
       isRtl: isRtl,
       isAtInlineEndPoint: isAtInlineEndPoint,
@@ -27881,6 +27912,11 @@ define(
       }
     };
 
+    var isPosCaretContainer = function (pos, caret) {
+      var caretNode = caret.get();
+      return caretNode && pos.container() === caretNode && CaretContainer.isCaretContainerInline(caretNode);
+    };
+
     var renderCaret = function (caret, location) {
       return location.fold(
         function (element) { // Before
@@ -27891,18 +27927,26 @@ define(
         },
         function (element) { // Start
           return InlineUtils.findCaretPositionIn(element, true).map(function (pos) {
-            CaretContainerRemove.remove(caret.get());
-            var text = insertInlinePos(pos, true);
-            caret.set(text);
-            return new CaretPosition(text, 1);
+            if (!isPosCaretContainer(pos, caret)) {
+              CaretContainerRemove.remove(caret.get());
+              var text = insertInlinePos(pos, true);
+              caret.set(text);
+              return new CaretPosition(text, 1);
+            } else {
+              return new CaretPosition(caret.get(), 1);
+            }
           });
         },
         function (element) { // End
           return InlineUtils.findCaretPositionIn(element, false).map(function (pos) {
-            CaretContainerRemove.remove(caret.get());
-            var text = insertInlinePos(pos, false);
-            caret.set(text);
-            return new CaretPosition(text, text.length - 1);
+            if (!isPosCaretContainer(pos, caret)) {
+              CaretContainerRemove.remove(caret.get());
+              var text = insertInlinePos(pos, false);
+              caret.set(text);
+              return new CaretPosition(text, text.length - 1);
+            } else {
+              return new CaretPosition(caret.get(), caret.get().length - 1);
+            }
           });
         },
         function (element) { // After
@@ -27991,10 +28035,10 @@ define(
     var before = function (rootNode, pos) {
       var nPos = InlineUtils.normalizeForwards(pos);
       var scope = rescope(rootNode, nPos.container());
-      return InlineUtils.findInline(scope, nPos).fold(
+      return InlineUtils.findRootInline(scope, nPos).fold(
         function () {
           return InlineUtils.findCaretPosition(scope, true, nPos)
-            .bind(Fun.curry(InlineUtils.findInline, scope))
+            .bind(Fun.curry(InlineUtils.findRootInline, scope))
             .map(function (inline) {
               return Location.before(inline);
             });
@@ -28005,7 +28049,7 @@ define(
 
     var start = function (rootNode, pos) {
       var nPos = InlineUtils.normalizeBackwards(pos);
-      return InlineUtils.findInline(rootNode, nPos).bind(function (inline) {
+      return InlineUtils.findRootInline(rootNode, nPos).bind(function (inline) {
         var prevPos = InlineUtils.findCaretPosition(inline, false, nPos);
         return prevPos.isNone() ? Option.some(Location.start(inline)) : Option.none();
       });
@@ -28013,7 +28057,7 @@ define(
 
     var end = function (rootNode, pos) {
       var nPos = InlineUtils.normalizeForwards(pos);
-      return InlineUtils.findInline(rootNode, nPos).bind(function (inline) {
+      return InlineUtils.findRootInline(rootNode, nPos).bind(function (inline) {
         var nextPos = InlineUtils.findCaretPosition(inline, true, nPos);
         return nextPos.isNone() ? Option.some(Location.end(inline)) : Option.none();
       });
@@ -28022,10 +28066,10 @@ define(
     var after = function (rootNode, pos) {
       var nPos = InlineUtils.normalizeBackwards(pos);
       var scope = rescope(rootNode, nPos.container());
-      return InlineUtils.findInline(scope, nPos).fold(
+      return InlineUtils.findRootInline(scope, nPos).fold(
         function () {
           return InlineUtils.findCaretPosition(scope, false, nPos)
-            .bind(Fun.curry(InlineUtils.findInline, scope))
+            .bind(Fun.curry(InlineUtils.findRootInline, scope))
             .map(function (inline) {
               return Location.after(inline);
             });
@@ -28091,8 +28135,8 @@ define(
 
     var betweenInlines = function (forward, rootNode, from, to, location) {
       return Options.liftN([
-        InlineUtils.findInline(rootNode, from),
-        InlineUtils.findInline(rootNode, to)
+        InlineUtils.findRootInline(rootNode, from),
+        InlineUtils.findRootInline(rootNode, to)
       ], function (fromInline, toInline) {
         if (fromInline !== toInline && InlineUtils.hasSameParentBlock(rootNode, fromInline, toInline)) {
           // Force after since some browsers normalize and lean left into the closest inline
@@ -28412,7 +28456,7 @@ define(
         });
 
         if (fromLocation.isSome() && toLocation.isSome()) {
-          return InlineUtils.findInline(rootNode, from).map(function (elm) {
+          return InlineUtils.findRootInline(rootNode, from).map(function (elm) {
             DeleteElement.deleteElement(editor, forward, Element.fromDom(elm));
             return true;
           }).getOr(false);
