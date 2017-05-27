@@ -395,6 +395,7 @@ describe( 'selectors', () => {
 					},
 				},
 				selectedBlock: { uid: null },
+				multiSelectedBlocks: {},
 			};
 
 			expect( getSelectedBlock( state ) ).to.equal( null );
@@ -409,6 +410,7 @@ describe( 'selectors', () => {
 					},
 				},
 				selectedBlock: { uid: 23 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
@@ -551,6 +553,7 @@ describe( 'selectors', () => {
 		it( 'should return true if the block is selected', () => {
 			const state = {
 				selectedBlock: { uid: 123 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( isBlockSelected( state, 123 ) ).to.be.true();
@@ -559,6 +562,7 @@ describe( 'selectors', () => {
 		it( 'should return false if the block is not selected', () => {
 			const state = {
 				selectedBlock: { uid: 123 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( isBlockSelected( state, 23 ) ).to.be.false();
@@ -590,6 +594,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					focus: { editable: 'cite' },
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 123 ) ).to.be.eql( { editable: 'cite' } );
@@ -601,6 +606,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					focus: { editable: 'cite' },
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 23 ) ).to.be.eql( null );
@@ -614,6 +620,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					typing: true,
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( isTypingInBlock( state, 123 ) ).to.be.true();
@@ -625,6 +632,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					typing: true,
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( isTypingInBlock( state, 23 ) ).to.be.false();

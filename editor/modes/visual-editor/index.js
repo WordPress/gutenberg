@@ -15,7 +15,12 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlock from './block';
 import PostTitle from '../../post-title';
-import { getBlockUids, getBlockInsertionPoint, getBlockSelectionEnd } from '../../selectors';
+import {
+	getBlockUids,
+	getBlockInsertionPoint,
+	getBlockSelectionStart,
+	getBlockSelectionEnd,
+} from '../../selectors';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
@@ -28,31 +33,34 @@ class VisualEditor extends wp.element.Component {
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 
 		this.state = {
-			selectionStart: null,
+			selectionAtStart: null,
 		};
 	}
 
 	onSelectionStart( uid ) {
-		this.setState( { selectionStart: uid } );
+		this.setState( { selectionAtStart: uid } );
 	}
 
 	onSelectionChange( uid ) {
-		const { onMultiSelect, selectionEnd } = this.props;
-		const { selectionStart } = this.state;
+		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
+		const { selectionAtStart } = this.state;
+		const isAtStart = selectionAtStart === uid;
 
-		if ( ! selectionStart || selectionStart === uid ) {
+		if ( ! selectionAtStart ) {
 			return;
 		}
 
-		if ( selectionEnd === uid ) {
-			return;
+		if ( isAtStart && selectionStart ) {
+			onMultiSelect( { start: null, end: null } );
 		}
 
-		onMultiSelect( { start: selectionStart, end: uid } );
+		if ( ! isAtStart && selectionEnd !== uid ) {
+			onMultiSelect( { start: selectionAtStart, end: uid } );
+		}
 	}
 
 	onSelectionEnd() {
-		this.setState( { selectionStart: null } );
+		this.setState( { selectionAtStart: null } );
 	}
 
 	render() {
@@ -107,6 +115,7 @@ export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
 		insertionPoint: getBlockInsertionPoint( state ),
+		selectionStart: getBlockSelectionStart( state ),
 		selectionEnd: getBlockSelectionEnd( state ),
 	} ),
 	( dispatch ) => ( {

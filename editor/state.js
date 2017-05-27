@@ -248,7 +248,25 @@ export function selectedBlock( state = {}, action ) {
 				typing: false,
 				focus: {},
 			};
+	}
 
+	return state;
+}
+
+/**
+ * Reducer returning multi selected block state.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function multiSelectedBlocks( state = { start: null, end: null }, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_SELECTED':
+			return {
+				start: null,
+				end: null,
+			};
 		case 'MULTI_SELECT':
 			return {
 				start: action.start,
@@ -388,6 +406,7 @@ export function createReduxStore() {
 		editor,
 		currentPost,
 		selectedBlock,
+		multiSelectedBlocks,
 		hoveredBlock,
 		insertionPoint,
 		mode,

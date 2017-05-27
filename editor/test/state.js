@@ -775,6 +775,7 @@ describe( 'state', () => {
 				'editor',
 				'currentPost',
 				'selectedBlock',
+				'multiSelectedBlocks',
 				'hoveredBlock',
 				'mode',
 				'isSidebarOpened',
