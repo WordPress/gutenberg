@@ -55,6 +55,7 @@ export function savePost( postId, edits ) {
 		type: 'REQUEST_POST_UPDATE',
 		edits,
 		postId,
+		isNew: ! postId,
 	};
 }
 
