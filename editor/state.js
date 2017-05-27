@@ -262,6 +262,7 @@ export function selectedBlock( state = {}, action ) {
  */
 export function multiSelectedBlocks( state = { start: null, end: null }, action ) {
 	switch ( action.type ) {
+		case 'CLEAR_SELECTED_BLOCK':
 		case 'TOGGLE_BLOCK_SELECTED':
 			return {
 				start: null,
