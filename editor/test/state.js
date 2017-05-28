@@ -131,8 +131,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
@@ -152,8 +152,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -173,8 +173,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
@@ -194,8 +194,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -215,8 +215,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'REMOVE_BLOCK',
-				uid: 'chicken',
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs' ] );
@@ -583,8 +583,8 @@ describe( 'state', () => {
 
 		it( 'should return with block moved up', () => {
 			const state = selectedBlock( undefined, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
@@ -592,8 +592,8 @@ describe( 'state', () => {
 
 		it( 'should return with block moved down', () => {
 			const state = selectedBlock( undefined, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
@@ -602,8 +602,8 @@ describe( 'state', () => {
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: true, focus: {} } );
 			const state = selectedBlock( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state ).to.equal( original );

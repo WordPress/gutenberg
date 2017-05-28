@@ -142,6 +142,10 @@ export function isFirstBlock( state, uid ) {
 	return first( state.editor.blockOrder ) === uid;
 }
 
+export function isFirstSelected( state, uid ) {
+	return first( getSelectedBlocks( state ) ) === uid;
+}
+
 export function isLastBlock( state, uid ) {
 	return last( state.editor.blockOrder ) === uid;
 }

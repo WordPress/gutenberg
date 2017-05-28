@@ -33,6 +33,7 @@ import {
 	isBlockHovered,
 	isBlockSelected,
 	isBlockMultiSelected,
+	isFirstSelected,
 	isTypingInBlock,
 } from '../../selectors';
 
@@ -105,7 +106,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Remove block on backspace
 		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
-			this.props.onRemove( this.props.uid );
+			this.props.onRemove( [ this.props.uid ] );
 			if ( this.props.previousBlock ) {
 				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
 			}
@@ -165,7 +166,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { block } = this.props;
+		const { block, selectedBlocks } = this.props;
 		const settings = wp.blocks.getBlockSettings( block.blockType );
 
 		let BlockEdit;
@@ -199,8 +200,6 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onClick={ this.selectAndStopPropagation }
-				onFocus={ onSelect }
 				onKeyDown={ this.removeOrDeselect }
 				onMouseDown={ this.props.onSelectionStart }
 				onTouchStart={ this.props.onSelectionStart }
@@ -218,7 +217,7 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ showUI &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
@@ -242,7 +241,26 @@ class VisualEditorBlock extends wp.element.Component {
 						</div>
 					</CSSTransitionGroup>
 				}
-				<div onKeyPress={ this.maybeStartTyping }>
+				{ this.props.isFirstSelected && (
+					<BlockMover uids={ selectedBlocks } />
+				) }
+				{ this.props.isFirstSelected && (
+					<div className="editor-visual-editor__block-controls">
+						<Toolbar
+							controls={ [ {
+								icon: 'trash',
+								title: '',
+								onClick: () => this.props.onRemove( selectedBlocks ),
+								isActive: false,
+							} ] }
+						/>
+					</div>
+				) }
+				<div
+					onKeyPress={ this.maybeStartTyping }
+					onFocus={ onSelect }
+					onClick={ this.selectAndStopPropagation }
+				>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
@@ -266,6 +284,7 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
+			isFirstSelected: isFirstSelected( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
@@ -319,10 +338,10 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uid ) {
+		onRemove( uids ) {
 			dispatch( {
-				type: 'REMOVE_BLOCK',
-				uid,
+				type: 'REMOVE_BLOCKS',
+				uids,
 			} );
 		},
 
