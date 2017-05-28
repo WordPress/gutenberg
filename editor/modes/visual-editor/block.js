@@ -198,7 +198,7 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } order={ this.props.order } /> }
 				{ showUI &&
 					<div className="editor-visual-editor__block-controls">
 						<BlockSwitcher uid={ block.uid } />
