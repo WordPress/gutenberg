@@ -19,7 +19,6 @@ import Toolbar from 'components/toolbar';
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
 import {
-	deselectBlock,
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
@@ -102,20 +101,34 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	removeOrDeselect( event ) {
-		const { keyCode, target } = event;
+	removeOrDeselect( { keyCode, target } ) {
+		const {
+			uid,
+			selectedBlocks,
+			previousBlock,
+			onRemove,
+			onFocus,
+			onDeselect,
+		} = this.props;
 
 		// Remove block on backspace
-		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
-			this.props.onRemove( [ this.props.uid ] );
-			if ( this.props.previousBlock ) {
-				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
+		if ( 8 /* Backspace */ === keyCode ) {
+			if ( target === this.node ) {
+				onRemove( [ uid ] );
+
+				if ( previousBlock ) {
+					onFocus( previousBlock.uid, { offset: -1 } );
+				}
+			}
+
+			if ( selectedBlocks.length ) {
+				onRemove( selectedBlocks );
 			}
 		}
 
 		// Deselect on escape
-		if ( 27 /* Escape */ === event.keyCode ) {
-			this.props.onDeselect();
+		if ( 27 /* Escape */ === keyCode ) {
+			onDeselect();
 		}
 	}
 
@@ -309,7 +322,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( deselectBlock( ownProps.uid ) );
+			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
 		},
 		onStartTyping() {
 			dispatch( {
