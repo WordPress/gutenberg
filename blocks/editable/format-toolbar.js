@@ -97,7 +97,12 @@ class FormatToolbar extends Component {
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.props.editor.selection.getBookmark( 2, true );
-		this.setState( { bookmark, formats, focusPosition } );
+		this.setState( {
+			bookmark,
+			formats,
+			focusPosition,
+			linkValue: '',
+		} );
 	}
 
 	isFormatActive( format ) {
@@ -163,6 +168,7 @@ class FormatToolbar extends Component {
 		event.preventDefault();
 		this.setState( {
 			isEditingLink: true,
+			linkValue: this.state.formats.link.value,
 		} );
 	}
 
@@ -230,7 +236,7 @@ class FormatToolbar extends Component {
 				{ !! formats.link && ! this.state.isEditingLink &&
 					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
 						<a className="editable-format-toolbar__link-value" href="" onClick={ this.editLink }>
-							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
+							{ !! formats.link && decodeURI( formats.link.value ) }
 						</a>
 						<IconButton icon="edit" onClick={ this.editLink } />
 						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
