@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import disposableFocus from 'components/higher-order/disposable-focus';
+import withFocusReturn from 'components/higher-order/with-focus-return';
 
 /**
  * Internal Dependencies
@@ -31,4 +31,4 @@ export default connect(
 			selectedBlock: getSelectedBlock( state ),
 		};
 	}
-)( disposableFocus( Sidebar ) );
+)( withFocusReturn( Sidebar ) );
