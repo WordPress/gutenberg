@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { uniq, get, reduce } from 'lodash';
+import { uniq, get, reduce, find } from 'lodash';
 import clickOutside from 'react-click-outside';
 
 /**
@@ -54,7 +54,7 @@ class BlockSwitcher extends wp.element.Component {
 		const blockSettings = wp.blocks.getBlockSettings( this.props.block.blockType );
 		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = transformFrom.find( t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
+			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
 			return transformation ? memo.concat( [ block.slug ] ) : memo;
 		}, [] );
 		const blocksToBeTransformedTo = get( blockSettings, 'transforms.to', [] )

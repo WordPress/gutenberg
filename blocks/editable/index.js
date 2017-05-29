@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity } from 'lodash';
+import { last, isEqual, capitalize, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -289,7 +289,7 @@ export default class Editable extends wp.element.Component {
 
 	onNodeChange( { element, parents } ) {
 		const formats = {};
-		const link = parents.find( ( node ) => node.nodeName.toLowerCase() === 'a' );
+		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
 			formats.link = { value: link.getAttribute( 'href' ), link };
 		}
