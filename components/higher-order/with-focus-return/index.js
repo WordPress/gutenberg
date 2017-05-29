@@ -12,7 +12,7 @@ import { Component, findDOMNode } from 'element';
  *
  * @return {Component}                   Component with the focus restauration behaviour
  */
-function disposableFocus( WrappedComponent ) {
+function withFocusReturn( WrappedComponent ) {
 	return class extends Component {
 		componentDidMount() {
 			this.activeElement = document.activeElement;
@@ -38,4 +38,4 @@ function disposableFocus( WrappedComponent ) {
 	};
 }
 
-export default disposableFocus;
+export default withFocusReturn;

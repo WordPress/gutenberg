@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import Dashicon from 'components/dashicon';
-import disposableFocus from 'components/higher-order/disposable-focus';
+import withFocusReturn from 'components/higher-order/with-focus-return';
 
 /**
  * Internal dependencies
@@ -309,4 +309,4 @@ export default connect(
 		};
 	},
 	{ setInsertionPoint, clearInsertionPoint }
-)( disposableFocus( InserterMenu ) );
+)( withFocusReturn( InserterMenu ) );
