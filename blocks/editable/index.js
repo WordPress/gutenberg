@@ -471,7 +471,9 @@ export default class Editable extends wp.element.Component {
 					defaultValue={ value }
 					isEmpty={ this.state.empty }
 					placeholder={ placeholder }
-					key={ key } />
+					key={ key }
+					insertBlocksAfter={ this.props.insertBlocksAfter }
+				/>
 			</div>
 		);
 	}

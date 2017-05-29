@@ -23,6 +23,7 @@ import {
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
+	insertBlocks,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -180,7 +181,7 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter, insertBlocksAfter } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper
 		let wrapperProps;
@@ -235,6 +236,7 @@ class VisualEditorBlock extends wp.element.Component {
 						attributes={ block.attributes }
 						setAttributes={ this.setAttributes }
 						insertBlockAfter={ onInsertAfter }
+						insertBlocksAfter={ insertBlocksAfter }
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
 					/>
@@ -299,6 +301,10 @@ export default connect(
 
 		onInsertAfter( block ) {
 			dispatch( insertBlock( block, ownProps.uid ) );
+		},
+
+		insertBlocksAfter( blocks ) {
+			dispatch( insertBlocks( blocks, ownProps.uid ) );
 		},
 
 		onFocus( ...args ) {

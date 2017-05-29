@@ -3,6 +3,11 @@
  */
 import tinymce from 'tinymce';
 
+/**
+ * Internal dependencies
+ */
+import paste from './paste';
+
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
 		this.initialize();
@@ -34,7 +39,7 @@ export default class TinyMCE extends wp.element.Component {
 	}
 
 	initialize() {
-		const { focus } = this.props;
+		const { focus, insertBlocksAfter } = this.props;
 
 		const settings = this.props.getSettings( {
 			theme: false,
@@ -46,14 +51,18 @@ export default class TinyMCE extends wp.element.Component {
 			formats: {
 				strikethrough: { inline: 'del' },
 			},
+			plugins: [],
 		} );
 
 		tinymce.init( {
 			...settings,
+			plugins: [ ...settings.plugins, 'paste' ],
 			target: this.editorNode,
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
+
+				paste( { editor, insertBlocksAfter } );
 			},
 		} );
 
