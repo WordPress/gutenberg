@@ -109,7 +109,7 @@ switch ( process.env.NODE_ENV ) {
 			...config.module.rules,
 		];
 		const testFiles = glob.sync(
-			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
+			'./{' + Object.keys( config.entry ).concat( 'components' ).sort() + '}/**/test/*.js'
 		);
 		config.entry = [
 			'./date/index.js',
