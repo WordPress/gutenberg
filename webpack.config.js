@@ -8,11 +8,12 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 const config = {
 	entry: {
-		date: './date/index.js',
-		i18n: './i18n/index.js',
 		blocks: './blocks/index.js',
+		components: './components/index.js',
+		date: './date/index.js',
 		editor: './editor/index.js',
 		element: './element/index.js',
+		i18n: './i18n/index.js',
 	},
 	output: {
 		filename: '[name]/build/index.js',
@@ -102,21 +103,29 @@ switch ( process.env.NODE_ENV ) {
 			__dirname: true,
 		};
 		config.module.rules = [
-			...[ 'date', 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
+			...[
+				'blocks',
+				'components',
+				'date',
+				'editor',
+				'element',
+				'i18n',
+			].map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
 				use: 'expose-loader?wp.' + entry,
 			} ) ),
 			...config.module.rules,
 		];
 		const testFiles = glob.sync(
-			'./{' + Object.keys( config.entry ).concat( 'components' ).sort() + '}/**/test/*.js'
+			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
 		);
 		config.entry = [
-			'./date/index.js',
-			'./i18n/index.js',
-			'./element/index.js',
 			'./blocks/index.js',
+			'./components/index.js',
+			'./date/index.js',
 			'./editor/index.js',
+			'./element/index.js',
+			'./i18n/index.js',
 			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
 			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
 		];
