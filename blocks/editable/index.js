@@ -131,12 +131,13 @@ export default class Editable extends wp.element.Component {
 
 		const content = this.getContent();
 		const collapsed = this.editor.selection.isCollapsed();
+		const previousCollpsedValue = this.props.focus.collapsed !== undefined ? this.props.focus.collapsed : true;
 
 		this.setState( {
 			empty: ! content || ! content.length,
 		} );
 
-		if ( this.props.focus.collapsed !== collapsed ) {
+		if ( collapsed !== previousCollpsedValue ) {
 			this.props.onFocus( {
 				...this.props.focus,
 				collapsed,
@@ -308,7 +309,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.focus !== prevProps.focus ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
