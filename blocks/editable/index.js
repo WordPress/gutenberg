@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity } from 'lodash';
+import { last, isEqual, capitalize, omitBy, identity } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -16,8 +16,8 @@ import Toolbar from 'components/toolbar';
  * Internal dependencies
  */
 import './style.scss';
-import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import FormatToolbar from './format-toolbar';
 
 const KEYCODE_BACKSPACE = 8;
 const KEYCODE_DELETE = 46;
@@ -75,13 +75,10 @@ export default class Editable extends wp.element.Component {
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 
 		this.state = {
-			formats: {},
 			alignment: null,
-			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 		};
 	}
@@ -155,31 +152,6 @@ export default class Editable extends wp.element.Component {
 		this.savedContent = this.getContent();
 		this.editor.save();
 		this.props.onChange( this.savedContent );
-	}
-
-	getRelativePosition( node ) {
-		const position = node.getBoundingClientRect();
-
-		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar
-			? this.editor.getBody().closest( '.blocks-editable' )
-			: this.editor.getBody().closest( '.editor-visual-editor__block' );
-		const containerPosition = container.getBoundingClientRect();
-		const blockPadding = 14;
-		const blockMoverMargin = 18;
-
-		// These offsets are necessary because the toolbar where the link modal lives
-		// is absolute positioned and it's not shown when we compute the position here
-		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar
-			? { top: 50, left: 0 }
-			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 250;
-
-		return {
-			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
-			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left,
-		};
 	}
 
 	isStartOfEditor() {
@@ -287,20 +259,10 @@ export default class Editable extends wp.element.Component {
 		);
 	}
 
-	onNodeChange( { element, parents } ) {
-		const formats = {};
-		const link = parents.find( ( node ) => node.nodeName.toLowerCase() === 'a' );
-		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ), link };
-		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
-		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
+	onNodeChange() {
 		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
 		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
-
-		const focusPosition = this.getRelativePosition( element );
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition } );
+		this.setState( { alignment } );
 	}
 
 	updateContent() {
@@ -362,43 +324,6 @@ export default class Editable extends wp.element.Component {
 		}
 	}
 
-	isFormatActive( format ) {
-		return !! this.state.formats[ format ];
-	}
-
-	changeFormats( formats ) {
-		if ( this.state.bookmark ) {
-			this.editor.selection.moveToBookmark( this.state.bookmark );
-		}
-
-		forEach( formats, ( formatValue, format ) => {
-			if ( format === 'link' ) {
-				if ( formatValue !== undefined ) {
-					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
-					if ( ! anchor ) {
-						this.editor.formatter.remove( 'link' );
-					}
-					this.editor.formatter.apply( 'link', { href: formatValue.value }, anchor );
-				} else {
-					this.editor.execCommand( 'Unlink' );
-				}
-			} else {
-				const isActive = this.isFormatActive( format );
-				if ( isActive && ! formatValue ) {
-					this.editor.formatter.remove( format );
-				} else if ( ! isActive && formatValue ) {
-					this.editor.formatter.apply( format );
-				}
-			}
-		} );
-
-		this.setState( {
-			formats: merge( {}, this.state.formats, formats ),
-		} );
-
-		this.editor.setDirty( true );
-	}
-
 	isAlignmentActive( align ) {
 		return this.state.alignment === align;
 	}
@@ -422,8 +347,9 @@ export default class Editable extends wp.element.Component {
 			className,
 			showAlignments = false,
 			inlineToolbar = false,
-			formattingControls,
+			showFormattingToolbar = true,
 			placeholder,
+			formattingControls,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -431,15 +357,6 @@ export default class Editable extends wp.element.Component {
 		// mount (+ initialize) a new child element in its place.
 		const key = [ 'editor', tagName ].join();
 		const classes = classnames( className, 'blocks-editable' );
-
-		const formatToolbar = (
-			<FormatToolbar
-				focusPosition={ this.state.focusPosition }
-				formats={ this.state.formats }
-				onChange={ this.changeFormats }
-				enabledControls={ formattingControls }
-			/>
-		);
 
 		return (
 			<div className={ classes }>
@@ -453,13 +370,16 @@ export default class Editable extends wp.element.Component {
 									isActive: this.isAlignmentActive( control.align ),
 								} ) ) } />
 						}
-						{ ! inlineToolbar && formatToolbar }
+
+						{ showFormattingToolbar &&
+							<FormatToolbar editor={ this.editor } enabledControls={ formattingControls } />
+						}
 					</Fill>
 				}
 
 				{ focus && inlineToolbar &&
 					<div className="block-editable__inline-toolbar">
-						{ formatToolbar }
+						<FormatToolbar editor={ this.editor } enabledControls={ formattingControls } inline />
 					</div>
 				}
 

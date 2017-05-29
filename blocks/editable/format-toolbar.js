@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import { forEach, merge } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { Component } from 'element';
 import IconButton from 'components/icon-button';
 import Toolbar from 'components/toolbar';
 
@@ -25,59 +31,132 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-class FormatToolbar extends wp.element.Component {
-	constructor( props ) {
+class FormatToolbar extends Component {
+	constructor() {
 		super( ...arguments );
 		this.state = {
-			linkValue: props.formats.link ? props.formats.link.value : '',
+			linkValue: '',
 			isEditingLink: false,
+			formats: {},
+			bookmark: null,
 		};
 		this.addLink = this.addLink.bind( this );
 		this.editLink = this.editLink.bind( this );
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.updateLinkValue = this.updateLinkValue.bind( this );
+		this.onNodeChange = this.onNodeChange.bind( this );
 	}
 
-	componentWillUnmout() {
-		if ( this.editTimeout ) {
-			clearTimeout( this.editTimeout );
-		}
+	componentWillMount() {
+		this.props.editor.on( 'nodechange', this.onNodeChange );
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const newState = {
-			linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
-		};
-		if (
-			! this.props.formats.link ||
-			! nextProps.formats.link ||
-			this.props.formats.link.node !== nextProps.formats.link.node
-		) {
-			newState.isEditingLink = false;
+		if ( nextProps.editor !== this.props.editor ) {
+			this.props.editor.off( 'nodechange', this.onNodeChange );
+			nextProps.editor.on( 'nodechange', this.onNodeChange );
 		}
-		this.setState( newState );
+	}
+
+	getRelativePosition( node ) {
+		// Todo: Find a better way to compute the position
+
+		const position = node.getBoundingClientRect();
+
+		// Find the parent "relative" positioned container
+		const container = this.props.inline
+			? this.props.editor.getBody().closest( '.blocks-editable' )
+			: this.props.editor.getBody().closest( '.editor-visual-editor__block' );
+		const containerPosition = container.getBoundingClientRect();
+		const blockPadding = 14;
+		const blockMoverMargin = 18;
+
+		// These offsets are necessary because the toolbar where the link modal lives
+		// is absolute positioned and it's not shown when we compute the position here
+		// so we compute the position about its parent relative position and adds the offset
+		const toolbarOffset = this.props.inline
+			? { top: 50, left: 0 }
+			: { top: 40, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
+		const linkModalWidth = 250;
+
+		return {
+			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
+			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left,
+		};
+	}
+
+	onNodeChange( { element, parents } ) {
+		const formats = {};
+		const link = parents.find( ( node ) => node.nodeName.toLowerCase() === 'a' );
+		if ( link ) {
+			formats.link = { value: link.getAttribute( 'href' ), link };
+		}
+		const activeFormats = this.props.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
+		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
+
+		const focusPosition = this.getRelativePosition( element );
+		const bookmark = this.props.editor.selection.getBookmark( 2, true );
+		this.setState( { bookmark, formats, focusPosition } );
+	}
+
+	isFormatActive( format ) {
+		return !! this.state.formats[ format ];
+	}
+
+	changeFormats( formats ) {
+		const editor = this.props.editor;
+
+		if ( this.state.bookmark ) {
+			editor.selection.moveToBookmark( this.state.bookmark );
+		}
+
+		forEach( formats, ( formatValue, format ) => {
+			if ( format === 'link' ) {
+				if ( formatValue !== undefined ) {
+					const anchor = editor.dom.getParent( editor.selection.getNode(), 'a' );
+					if ( ! anchor ) {
+						editor.formatter.remove( 'link' );
+					}
+					editor.formatter.apply( 'link', { href: formatValue.value }, anchor );
+				} else {
+					editor.execCommand( 'Unlink' );
+				}
+			} else {
+				const isActive = this.isFormatActive( format );
+				if ( isActive && ! formatValue ) {
+					editor.formatter.remove( format );
+				} else if ( ! isActive && formatValue ) {
+					editor.formatter.apply( format );
+				}
+			}
+		} );
+
+		this.setState( {
+			formats: merge( {}, this.state.formats, formats ),
+		} );
+
+		editor.setDirty( true );
 	}
 
 	toggleFormat( format ) {
 		return () => {
-			this.props.onChange( {
-				[ format ]: ! this.props.formats[ format ],
+			this.changeFormats( {
+				[ format ]: ! this.state.formats[ format ],
 			} );
 		};
 	}
 
 	addLink() {
-		if ( ! this.props.formats.link ) {
-			this.props.onChange( { link: { value: '' } } );
-
-			// Debounce the call to avoid the reset in willReceiveProps
-			this.editTimeout = setTimeout( () => this.setState( { isEditingLink: true } ) );
+		if ( ! this.state.formats.link ) {
+			this.changeFormats( { link: { value: '' } } );
+			this.setState( { isEditingLink: true } );
 		}
 	}
 
 	dropLink() {
-		this.props.onChange( { link: undefined } );
+		this.changeFormats( { link: undefined } );
+		this.setState( { isEditingLink: false } );
 	}
 
 	editLink( event ) {
@@ -89,7 +168,7 @@ class FormatToolbar extends wp.element.Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.linkValue } } );
+		this.changeFormats( { link: { value: this.state.linkValue } } );
 		this.setState( {
 			isEditingLink: false,
 		} );
@@ -102,7 +181,8 @@ class FormatToolbar extends wp.element.Component {
 	}
 
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { enabledControls = DEFAULT_CONTROLS } = this.props;
+		const { formats, focusPosition } = this.state;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
