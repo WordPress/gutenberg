@@ -14,25 +14,7 @@ import IconButton from 'components/icon-button';
 import './style.scss';
 import { isFirstBlock, isLastBlock, getBlock } from '../selectors';
 import { getBlockSettings } from '../../blocks/api/registration';
-
-function generateOrderTitle( { typeTitle, position, isFirst, isLast, dir } ) {
-	const prefix = 'Move "' + typeTitle + '" block from position ' + position;
-	let title = '';
-
-	if ( dir > 0 ) {
-		// moving down
-		title = ( ! isLast ) ?
-			prefix + ' down to position ' + ( position + 1 ) :
-			'Block "' + typeTitle + '" is at the end of the content and can’t be moved down';
-	} else {
-		// moving up
-		title = ( ! isFirst ) ?
-			prefix + ' up to position ' + ( position - 1 ) :
-			'Block "' + typeTitle + '" is at the beginning of the content and can’t be moved up';
-	}
-
-	return title;
-}
+import generateOrderTitle from './generate-order-title';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, block, order } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
