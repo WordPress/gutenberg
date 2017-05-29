@@ -23,6 +23,7 @@ import {
 	getBlock,
 	getBlocks,
 	getSelectedBlock,
+	getSelectedBlocks,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
@@ -30,6 +31,8 @@ import {
 	getPreviousBlock,
 	getNextBlock,
 	isBlockSelected,
+	isBlockMultiSelected,
+	isFirstSelected,
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
@@ -401,6 +404,21 @@ describe( 'selectors', () => {
 			expect( getSelectedBlock( state ) ).to.equal( null );
 		} );
 
+		it( 'should return null if there is multi selection', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: 23 },
+				multiSelectedBlocks: { start: 23, end: 123 },
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( null );
+		} );
+
 		it( 'should return the selected block', () => {
 			const state = {
 				editor: {
@@ -414,6 +432,30 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
+		} );
+	} );
+
+	describe( 'getSelectedBlocks', () => {
+		it( 'should return empty if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getSelectedBlocks( state ) ).to.eql( [] );
+		} );
+
+		it( 'should return empty if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getSelectedBlocks( state ) ).to.eql( [ 4, 3, 2 ] );
 		} );
 	} );
 
@@ -566,6 +608,40 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockSelected( state, 23 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isBlockMultiSelected', () => {
+		const state = {
+			editor: {
+				blockOrder: [ 5, 4, 3, 2, 1 ],
+			},
+			multiSelectedBlocks: { start: 2, end: 4 },
+		};
+
+		it( 'should return true if the block is multi selected', () => {
+			expect( isBlockMultiSelected( state, 3 ) ).to.be.true();
+		} );
+
+		it( 'should return false if the block is not multi selected', () => {
+			expect( isBlockMultiSelected( state, 5 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isFirstSelected', () => {
+		const state = {
+			editor: {
+				blockOrder: [ 5, 4, 3, 2, 1 ],
+			},
+			multiSelectedBlocks: { start: 2, end: 4 },
+		};
+
+		it( 'should return true if the block is first in multi selection', () => {
+			expect( isFirstSelected( state, 4 ) ).to.be.true();
+		} );
+
+		it( 'should return false if the block is not first in multi selection', () => {
+			expect( isFirstSelected( state, 3 ) ).to.be.false();
 		} );
 	} );
 
