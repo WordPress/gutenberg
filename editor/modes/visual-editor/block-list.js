@@ -11,7 +11,6 @@ import VisualEditorBlock from './block';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
-	getSelectedBlocks,
 	getBlockSelectionStart,
 	getBlockSelectionEnd,
 } from '../../selectors';
@@ -62,7 +61,7 @@ class VisualEditorBlockList extends wp.element.Component {
 	}
 
 	render() {
-		const { blocks, insertionPoint, selectedBlocks } = this.props;
+		const { blocks, insertionPoint } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = insertionPoint
 			? [
@@ -91,7 +90,6 @@ class VisualEditorBlockList extends wp.element.Component {
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
 							onSelectionChange={ () => this.onSelectionChange( uid ) }
 							onSelectionEnd={ this.onSelectionEnd }
-							selectedBlocks={ selectedBlocks }
 						/>
 					);
 				} ) }
@@ -104,7 +102,6 @@ export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
 		insertionPoint: getBlockInsertionPoint( state ),
-		selectedBlocks: getSelectedBlocks( state ),
 		selectionStart: getBlockSelectionStart( state ),
 		selectionEnd: getBlockSelectionEnd( state ),
 	} ),

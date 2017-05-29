@@ -33,7 +33,8 @@ import {
 	isBlockHovered,
 	isBlockSelected,
 	isBlockMultiSelected,
-	isFirstSelected,
+	isFirstSelectedBlock,
+	getSelectedBlocks,
 	isTypingInBlock,
 } from '../../selectors';
 
@@ -178,7 +179,7 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, isMultiSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
@@ -241,10 +242,10 @@ class VisualEditorBlock extends wp.element.Component {
 						</div>
 					</CSSTransitionGroup>
 				}
-				{ this.props.isFirstSelected && (
+				{ isFirstSelected && (
 					<BlockMover uids={ selectedBlocks } />
 				) }
-				{ this.props.isFirstSelected && (
+				{ isFirstSelected && (
 					<div className="editor-visual-editor__block-controls">
 						<Toolbar
 							controls={ [ {
@@ -284,7 +285,8 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
-			isFirstSelected: isFirstSelected( state, ownProps.uid ),
+			isFirstSelected: isFirstSelectedBlock( state, ownProps.uid ),
+			selectedBlocks: getSelectedBlocks( state ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),

@@ -32,7 +32,7 @@ import {
 	getNextBlock,
 	isBlockSelected,
 	isBlockMultiSelected,
-	isFirstSelected,
+	isFirstSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
@@ -628,7 +628,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isFirstSelected', () => {
+	describe( 'isFirstSelectedBlock', () => {
 		const state = {
 			editor: {
 				blockOrder: [ 5, 4, 3, 2, 1 ],
@@ -637,11 +637,11 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
-			expect( isFirstSelected( state, 4 ) ).to.be.true();
+			expect( isFirstSelectedBlock( state, 4 ) ).to.be.true();
 		} );
 
 		it( 'should return false if the block is not first in multi selection', () => {
-			expect( isFirstSelected( state, 3 ) ).to.be.false();
+			expect( isFirstSelectedBlock( state, 3 ) ).to.be.false();
 		} );
 	} );
 
