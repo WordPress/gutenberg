@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import { Button, PanelBody, Spinner, ResponsiveImage } from 'components';
+import { Button, PanelBody, Spinner, ResponsiveWrapper } from 'components';
 import { MediaUploadButton } from 'blocks';
 
 /**
@@ -60,8 +60,8 @@ class FeaturedImage extends Component {
 					media,
 				} );
 			} )
-			.fail( ( error ) => {
-				if ( error && error.statusText === 'abort' ) {
+			.fail( ( xhr ) => {
+				if ( xhr.statusText === 'abort' ) {
 					return;
 				}
 				this.setState( {
@@ -84,12 +84,12 @@ class FeaturedImage extends Component {
 							type="image"
 						>
 							{ media &&
-								<ResponsiveImage
-									src={ media.source_url }
-									alt={ __( 'Featured image' ) }
+								<ResponsiveWrapper
 									naturalWidth={ media.media_details.width }
 									naturalHeight={ media.media_details.height }
-								/>
+								>
+									<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+								</ResponsiveWrapper>
 							}
 							{ loading && <Spinner /> }
 						</MediaUploadButton>
