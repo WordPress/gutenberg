@@ -120,11 +120,11 @@ switch ( process.env.NODE_ENV ) {
 			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
 		);
 		config.entry = [
+			'./element/index.js',
 			'./blocks/index.js',
 			'./components/index.js',
 			'./date/index.js',
 			'./editor/index.js',
-			'./element/index.js',
 			'./i18n/index.js',
 			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
 			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
