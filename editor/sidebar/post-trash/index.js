@@ -40,11 +40,5 @@ export default connect(
 			postType: post.type,
 		};
 	},
-	( dispatch ) => {
-		return {
-			trashPost( postId, postType ) {
-				return trashPost( dispatch, postId, postType );
-			},
-		};
-	}
+	{ trashPost }
 )( PostTrash );

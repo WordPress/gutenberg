@@ -4,6 +4,11 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress Dependencies
+ */
+import withFocusReturn from 'components/higher-order/with-focus-return';
+
+/**
  * Internal Dependencies
  */
 import './style.scss';
@@ -26,4 +31,4 @@ export default connect(
 			selectedBlock: getSelectedBlock( state ),
 		};
 	}
-)( Sidebar );
+)( withFocusReturn( Sidebar ) );

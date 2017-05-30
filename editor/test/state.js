@@ -734,7 +734,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: true,
+				isNew: false,
 			} );
 		} );
 
