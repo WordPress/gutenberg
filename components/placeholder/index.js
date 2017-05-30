@@ -15,7 +15,7 @@ function Placeholder( { icon, children, label, instructions, className, ...addit
 	return (
 		<div { ...additionalProps } aria-label={ label } className={ classes }>
 			<div className="components-placeholder__label">
-				<Dashicon icon={ icon } />
+				{ !! icon && <Dashicon icon={ icon } /> }
 				{ label }
 			</div>
 			{ !! instructions && <div className="components-placeholder__instructions">{ instructions }</div> }
