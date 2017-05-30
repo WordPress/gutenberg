@@ -42,18 +42,18 @@ export function createBlock( blockName, attributes = {} ) {
  * Switch a block into one or more blocks of the new block type.
  *
  * @param  {Object} block      Block object
- * @param  {string} blockType  BlockType
+ * @param  {string} blockName  Block name
  * @return {Array}             Block object
  */
-export function switchToBlockType( block, blockType ) {
+export function switchToBlockType( block, blockName ) {
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationSettings = getBlockType( blockType );
+	const destinationSettings = getBlockType( blockName );
 	const sourceSettings = getBlockType( block.blockName );
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
 	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.blocks.indexOf( blockType ) !== -1 ) ||
+		find( transformationsTo, t => t.blocks.indexOf( blockName ) !== -1 ) ||
 		find( transformationsFrom, t => t.blocks.indexOf( block.blockName ) !== -1 );
 
 	// Stop if there is no valid transformation. (How did we get here?)
@@ -75,11 +75,11 @@ export function switchToBlockType( block, blockType ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockType( result.blockType ) ) ) {
+	if ( transformationResults.some( ( result ) => ! getBlockType( result.blockName ) ) ) {
 		return null;
 	}
 
-	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockType === blockType );
+	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockName === blockName );
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
@@ -92,7 +92,7 @@ export function switchToBlockType( block, blockType ) {
 			// The first transformed block whose type matches the "destination"
 			// type gets to keep the existing block's UID.
 			uid: index === firstSwitchedBlock ? block.uid : result.uid,
-			blockType: result.blockType,
+			blockName: result.blockName,
 			attributes: result.attributes,
 		};
 	} );

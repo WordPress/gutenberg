@@ -7,7 +7,7 @@ import sinon from 'sinon';
 /**
  * WordPress dependencies
  */
-import { getBlocks, unregisterBlock, registerBlock, createBlock } from 'blocks';
+import { getBlockTypes, unregisterBlock, registerBlock, createBlock } from 'blocks';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ describe( 'effects', () => {
 		const handler = effects.MERGE_BLOCKS;
 
 		afterEach( () => {
-			getBlocks().forEach( ( block ) => {
+			getBlockTypes().forEach( ( block ) => {
 				unregisterBlock( block.slug );
 			} );
 		} );
@@ -29,11 +29,11 @@ describe( 'effects', () => {
 			registerBlock( 'core/test-block', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 			};
 			const dispatch = sinon.spy();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
@@ -52,12 +52,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -67,7 +67,7 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );
@@ -83,12 +83,12 @@ describe( 'effects', () => {
 			registerBlock( 'core/test-block-2', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block2',
+				blockName: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -120,12 +120,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block-2',
+				blockName: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -135,7 +135,7 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				blockName: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );

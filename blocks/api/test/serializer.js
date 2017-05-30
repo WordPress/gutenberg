@@ -102,7 +102,7 @@ describe( 'block serializer', () => {
 			registerBlock( 'core/test-block', blockSettings );
 			const blockList = [
 				{
-					blockType: 'core/test-block',
+					blockName: 'core/test-block',
 					attributes: {
 						content: 'Ribs & Chicken',
 						align: 'left',
