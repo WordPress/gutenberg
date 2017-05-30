@@ -52,8 +52,8 @@ $toggle-border-width: 2px;
 		}
 
 		&:before {
-			background-color: $blue-medium;
-			border: $toggle-border-width solid $blue-medium;
+			background-color: $blue-medium-500;
+			border: $toggle-border-width solid $blue-medium-500;
 		}
 	}
 }
