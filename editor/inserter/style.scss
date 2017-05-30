@@ -22,7 +22,7 @@
 
 	&:hover,
 	&:focus {
-		color: $blue-medium;
+		color: $blue-medium-500;
 	}
 }
 
@@ -153,7 +153,7 @@ input[type=search].editor-inserter__search {
 
 	&:hover,
 	&:focus {
-		color: $blue-medium;
+		color: $blue-medium-500;
 		outline: none;
 		position: relative;
 	}
