@@ -23,23 +23,19 @@
 		box-sizing: content-box;
 	}
 
-	&:focus:before {
-		top: -4px;
-		right: -4px;
-		bottom: -4px;
-		left: -4px;
-	}
-
 	&.is-active svg,
 	&:hover svg,
-	&:not(:disabled):hover svg {
+	&:not(:disabled):hover svg,
+	&:focus svg {
 		border: 1px solid $dark-gray-500;
 		color: $dark-gray-500;
 	}
 
 	&:hover,
-	&:not(:disabled):hover {
+	&:not(:disabled):hover,
+	&:focus {
 		color: $dark-gray-500;
+		outline: none;
 	}
 
 	&.is-active svg,
