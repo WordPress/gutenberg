@@ -179,10 +179,6 @@ export function isBlockHovered( state, uid ) {
 }
 
 export function getBlockFocus( state, uid ) {
-	if ( isFirstSelectedBlock( state, uid ) ) {
-		return {};
-	}
-
 	if ( ! isBlockSelected( state, uid ) ) {
 		return null;
 	}

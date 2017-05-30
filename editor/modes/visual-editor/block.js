@@ -267,6 +267,7 @@ class VisualEditorBlock extends wp.element.Component {
 								onClick: () => this.props.onRemove( selectedBlocks ),
 								isActive: false,
 							} ] }
+							focus={ true }
 						/>
 					</div>
 				) }

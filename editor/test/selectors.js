@@ -670,9 +670,6 @@ describe( 'selectors', () => {
 					uid: 123,
 					focus: { editable: 'cite' },
 				},
-				editor: {
-					blockOrder: [ 123 ],
-				},
 				multiSelectedBlocks: {},
 			};
 
@@ -684,9 +681,6 @@ describe( 'selectors', () => {
 				selectedBlock: {
 					uid: 123,
 					focus: { editable: 'cite' },
-				},
-				editor: {
-					blockOrder: [ 123 ],
 				},
 				multiSelectedBlocks: {},
 			};
