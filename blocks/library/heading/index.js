@@ -2,6 +2,13 @@
  * External dependencies
  */
 import { isString } from 'lodash';
+import { Fill } from 'react-slot-fill';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from 'element';
+import Toolbar from 'components/toolbar';
 
 /**
  * Internal dependencies
@@ -9,7 +16,7 @@ import { isString } from 'lodash';
 import './style.scss';
 import { registerBlock, createBlock, query } from '../../api';
 import Editable from '../../editable';
-import BlockControls from '../../block-controls';
+import FormatToolbar from '../../editable/format-toolbar';
 
 const { children, prop } = query;
 
@@ -76,35 +83,51 @@ registerBlock( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
-		const { content, nodeName = 'H2' } = attributes;
+	edit: class extends Component {
+		constructor() {
+			super( ...arguments );
+			this.onSetup = this.onSetup.bind( this );
+		}
 
-		return [
-			focus && (
-				<BlockControls
-					key="controls"
-					controls={
-						'123456'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) )
-					}
-				/>
-			),
-			<Editable
-				key="editable"
-				tagName={ nodeName.toLowerCase() }
-				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				onMerge={ mergeBlocks }
-				inline
-			/>,
-		];
+		onSetup( editor ) {
+			this.editor = editor;
+		}
+
+		render() {
+			const { attributes, setAttributes, focus, setFocus, mergeBlocks } = this.props;
+			const { content, nodeName = 'H2' } = attributes;
+
+			return [
+				focus && (
+					<Fill name="Formatting.Toolbar">
+						<Toolbar
+							controls={
+								'123456'.split( '' ).map( ( level ) => ( {
+									icon: 'heading',
+									title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+									isActive: 'H' + level === nodeName,
+									onClick: () => setAttributes( { nodeName: 'H' + level } ),
+									subscript: level,
+								} ) )
+							}
+						/>
+						{ this.editor && <FormatToolbar editor={ this.editor } /> }
+					</Fill>
+				),
+				<Editable
+					key="editable"
+					tagName={ nodeName.toLowerCase() }
+					value={ content }
+					focus={ focus }
+					onFocus={ setFocus }
+					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onMerge={ mergeBlocks }
+					onSetup={ this.onSetup }
+					showFormattingToolbar={ false }
+					inline
+				/>,
+			];
+		}
 	},
 
 	save( { attributes } ) {
