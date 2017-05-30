@@ -44,7 +44,7 @@ class PostVisibility extends Component {
 		const { status, visibility, password, onUpdateVisibility } = this.props;
 
 		const setPublic = () => {
-			onUpdateVisibility( visibility === 'private' ? 'draft' : status );
+			onUpdateVisibility( visibility === 'private' ? 'publish' : status );
 			this.setState( { hasPassword: false } );
 		};
 		const setPrivate = () => {
@@ -52,7 +52,7 @@ class PostVisibility extends Component {
 			this.setState( { hasPassword: false } );
 		};
 		const setPasswordProtected = () => {
-			onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+			onUpdateVisibility( visibility === 'private' ? 'publish' : status, password || '' );
 			this.setState( { hasPassword: true } );
 		};
 		const updatePassword = ( event ) => onUpdateVisibility( status, event.target.value );

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import moment from 'moment';
 import { first, last, get } from 'lodash';
 
 /**
@@ -127,6 +128,31 @@ export function getEditedPostVisibility( state ) {
 		return 'password';
 	}
 	return 'public';
+}
+
+/**
+ * Return true if the post being edited has already been published.
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post has been bublished
+ */
+export function isEditedPostAlreadyPublished( state ) {
+	const post = getCurrentPost( state );
+
+	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
+		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Return true if the post being edited is being scheduled. Preferring the
+ * unsaved status values.
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post has been bublished
+ */
+export function isEditedPostBeingScheduled( state ) {
+	const date = getEditedPostAttribute( state, 'date' );
+	return moment( date ).isAfter( moment() );
 }
 
 /**
