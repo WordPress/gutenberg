@@ -11,7 +11,7 @@ import Button from '../';
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
-		it( 'without modifiers', () => {
+		it( 'should render a button element with only one class', () => {
 			const button = shallow( <Button /> );
 			expect( button.hasClass( 'components-button' ) ).to.be.true();
 			expect( button.hasClass( 'button' ) ).to.be.false();
@@ -24,71 +24,67 @@ describe( 'Button', () => {
 			expect( button.type() ).to.equal( 'button' );
 		} );
 
-		it( 'with isPrimary', () => {
+		it( 'should render a button element with button-primary class', () => {
 			const button = shallow( <Button isPrimary /> );
 			expect( button.hasClass( 'button' ) ).to.be.true();
 			expect( button.hasClass( 'button-large' ) ).to.be.false();
 			expect( button.hasClass( 'button-primary' ) ).to.be.true();
 		} );
 
-		it( 'with isLarge', () => {
+		it( 'should render a button element with button-large class', () => {
 			const button = shallow( <Button isLarge /> );
 			expect( button.hasClass( 'button' ) ).to.be.true();
 			expect( button.hasClass( 'button-large' ) ).to.be.true();
 			expect( button.hasClass( 'button-primary' ) ).to.be.false();
 		} );
 
-		it( 'with isToggled', () => {
+		it( 'should render a button element with is-toggled without button class', () => {
 			const button = shallow( <Button isToggled /> );
 			expect( button.hasClass( 'button' ) ).to.be.false();
 			expect( button.hasClass( 'is-toggled' ) ).to.be.true();
 		} );
 
-		it( 'with disabled', () => {
+		it( 'should add a disabled prop to the button', () => {
 			const button = shallow( <Button disabled /> );
 			expect( button.prop( 'disabled' ) ).to.be.true();
 		} );
 
-		it( 'does not render target without href present', () => {
+		it( 'should not poss the prop target into the element', () => {
 			const button = shallow( <Button target="_blank" /> );
 			expect( button.prop( 'target' ) ).to.be.undefined();
+		} );
+
+		it( 'should render with an additional className', () => {
+			const button = shallow( <Button className="gutenberg" /> );
+
+			expect( button.hasClass( 'gutenberg' ) ).to.be.true();
+		} );
+
+		it( 'should render and additional WordPress prop of value awesome', () => {
+			const button = <Button WordPress="awesome" />;
+
+			expect( button.props.WordPress ).to.equal( 'awesome' );
 		} );
 	} );
 
 	describe( 'with href property', () => {
-		it( 'renders as a link', () => {
+		it( 'should render a link instead of a button with href prop', () => {
 			const button = shallow( <Button href="https://wordpress.org/" /> );
 
 			expect( button.type() ).to.equal( 'a' );
 			expect( button.prop( 'href' ) ).to.equal( 'https://wordpress.org/' );
 		} );
 
-		it( 'including target renders', () => {
+		it( 'should allow for the passing of the target prop when a link is created', () => {
 			const button = shallow( <Button href="https://wordpress.org/" target="_blank" /> );
 
 			expect( button.prop( 'target' ) ).to.equal( '_blank' );
 		} );
 
-		it( 'will turn it into a button by using disabled property', () => {
+		it( 'should become a button again when disabled is supplied', () => {
 			const button = shallow( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( button.type() ).to.equal( 'button' );
-		} );
-	} );
-
-	describe( 'with className property', () => {
-		it( 'renders with an extra className', () => {
-			const button = shallow( <Button className="gutenberg" /> );
-
-			expect( button.hasClass( 'gutenberg' ) ).to.be.true();
-		} );
-	} );
-
-	describe( 'with additonal properties', () => {
-		it( 'renders WordPress property', () => {
-			const button = <Button WordPress="awesome" />;
-
-			expect( button.props.WordPress ).to.equal( 'awesome' );
 		} );
 	} );
 } );
