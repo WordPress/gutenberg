@@ -5,10 +5,6 @@ window._wpGutenbergPost = {
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},
-	// TODO `status` and any other initial attributes other than content and
-	// title need to move somewhere else when this file goes away.  See:
-	// https://github.com/WordPress/gutenberg/pull/848#issuecomment-302836177
-	status: 'draft',
 	content: {
 		raw: [
 			'<!-- wp:core/text -->',

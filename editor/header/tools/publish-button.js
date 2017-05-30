@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -18,9 +19,8 @@ import {
 	getPostEdits,
 	getBlocks,
 	isSavingPost,
-	didPostSaveRequestSucceed,
-	didPostSaveRequestFail,
-	isSavingNewPost,
+	isEditedPostAlreadyPublished,
+	isEditedPostBeingScheduled,
 } from '../../selectors';
 
 function PublishButton( {
@@ -28,32 +28,32 @@ function PublishButton( {
 	edits,
 	dirty,
 	blocks,
-	isSuccessful,
-	isRequesting,
-	isError,
-	requestIsNewPost,
+	isSaving,
+	isPublished,
 	onSave,
+	isBeingScheduled,
 } ) {
-	const buttonEnabled = ! isRequesting;
-
+	const buttonEnabled = ! isSaving &&
+		( dirty || ( ! isPublished && ! isBeingScheduled )
+	);
 	let buttonText;
-	if ( isRequesting ) {
-		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Saving…' )
-			: wp.i18n.__( 'Updating…' );
-	} else if ( ! dirty && isSuccessful ) {
-		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Saved!' )
-			: wp.i18n.__( 'Updated!' );
-	} else if ( ! dirty && isError ) {
-		buttonText = requestIsNewPost
-			? wp.i18n.__( 'Save failed' )
-			: wp.i18n.__( 'Update failed' );
-	} else if ( post && post.id ) {
+	if ( isPublished ) {
 		buttonText = wp.i18n.__( 'Update' );
+	} else if ( isBeingScheduled ) {
+		buttonText = wp.i18n.__( 'Schedule' );
 	} else {
-		buttonText = wp.i18n.__( 'Save draft' );
+		buttonText = wp.i18n.__( 'Publish' );
 	}
+	let publishStatus;
+	if ( isPublished ) {
+		publishStatus = post.status;
+	} else if ( isBeingScheduled ) {
+		publishStatus = 'future';
+	} else {
+		publishStatus = 'publish';
+	}
+	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
+	const onClick = () => onSave( post, { status: publishStatus, ...edits }, blocks );
 
 	const buttonDisabledHint = process.env.NODE_ENV === 'production'
 		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
@@ -63,9 +63,10 @@ function PublishButton( {
 		<Button
 			isPrimary
 			isLarge
-			onClick={ () => onSave( post, edits, blocks ) }
+			onClick={ onClick }
 			disabled={ ! buttonEnabled || process.env.NODE_ENV === 'production' }
 			title={ buttonDisabledHint }
+			className={ className }
 		>
 			{ buttonText }
 		</Button>
@@ -76,12 +77,11 @@ export default connect(
 	( state ) => ( {
 		post: getCurrentPost( state ),
 		edits: getPostEdits( state ),
-		dirty: isEditedPostDirty( state ),
 		blocks: getBlocks( state ),
-		isRequesting: isSavingPost( state ),
-		isSuccessful: didPostSaveRequestSucceed( state ),
-		isError: !! didPostSaveRequestFail( state ),
-		requestIsNewPost: isSavingNewPost( state ),
+		dirty: isEditedPostDirty( state ),
+		isSaving: isSavingPost( state ),
+		isPublished: isEditedPostAlreadyPublished( state ),
+		isBeingScheduled: isEditedPostBeingScheduled( state, 'date' ),
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {

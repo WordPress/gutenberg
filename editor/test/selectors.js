@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import moment from 'moment';
 
 /**
  * Internal dependencies
@@ -18,6 +19,8 @@ import {
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
+	isEditedPostAlreadyPublished,
+	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -306,6 +309,71 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+		} );
+	} );
+
+	describe( 'isEditedPostAlreadyPublished', () => {
+		it( 'should return true for public posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+			};
+
+			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+			};
+
+			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+			};
+
+			expect( isEditedPostAlreadyPublished( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for old scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2016-05-30T17:21:39',
+				},
+			};
+
+			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostBeingScheduled', () => {
+		it( 'should return true for posts with a future date', () => {
+			const state = {
+				editor: {
+					edits: { date: moment().add( 7, 'days' ).format( '' ) },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for posts with an old date', () => {
+			const state = {
+				editor: {
+					edits: { date: '2016-05-30T17:21:39' },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.false();
 		} );
 	} );
 
