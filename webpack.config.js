@@ -8,12 +8,12 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 const entryPointNames = [
 	'element',
-	'date',
 	'i18n',
 	'components',
-	'blocks',
-	'editor',
 	'utils',
+	'blocks',
+	'date',
+	'editor',
 ];
 
 const externals = {
