@@ -7,12 +7,12 @@ const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 const entryPointNames = [
-	'blocks',
-	'components',
-	'date',
-	'editor',
 	'element',
+	'date',
 	'i18n',
+	'components',
+	'blocks',
+	'editor',
 ];
 
 const externals = {
@@ -132,10 +132,7 @@ switch ( process.env.NODE_ENV ) {
 			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
 			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
 		];
-		config.externals = [
-			...config.externals,
-			require( 'webpack-node-externals' )(),
-		];
+		config.externals = [ require( 'webpack-node-externals' )() ];
 		config.output = {
 			filename: 'build/test.js',
 			path: __dirname,
