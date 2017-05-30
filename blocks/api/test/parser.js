@@ -17,14 +17,14 @@ import {
 import {
 	registerBlock,
 	unregisterBlock,
-	getRegisteredBlocks,
+	getBlockTypes,
 	setUnknownTypeHandler,
 } from '../registration';
 
 describe( 'block parser', () => {
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
-		getRegisteredBlocks().forEach( ( block ) => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlock( block.slug );
 		} );
 	} );

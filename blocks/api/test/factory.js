@@ -7,12 +7,12 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import { createBlock, switchToBlockType } from '../factory';
-import { getRegisteredBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
+import { getBlockTypes, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
 
 describe( 'block factory', () => {
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
-		getRegisteredBlocks().forEach( ( block ) => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlock( block.slug );
 		} );
 	} );

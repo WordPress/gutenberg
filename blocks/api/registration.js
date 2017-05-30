@@ -101,6 +101,6 @@ export function getBlockSettings( slug ) {
  *
  * @return {Array} Block settings
  */
-export function getRegisteredBlocks() {
+export function getBlockTypes() {
 	return Object.values( blocks );
 }
