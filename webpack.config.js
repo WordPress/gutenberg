@@ -13,6 +13,7 @@ const entryPointNames = [
 	'components',
 	'blocks',
 	'editor',
+	'utils',
 ];
 
 const externals = {
