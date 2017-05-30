@@ -1,4 +1,4 @@
-// 4.6.2 (2017-05-26)
+// 4.6.3 (2017-05-30)
 (function () {
 
 var defs = {}; // id -> {dependencies, definition, instance (possibly undefined)}
@@ -82,7 +82,7 @@ var defineGlobal = function (id, ref) {
   define(id, [], function () { return ref; });
 };
 /*jsc
-["tinymce.core.api.Main","tinymce.core.api.Tinymce","tinymce.core.Register","tinymce.core.geom.Rect","tinymce.core.util.Promise","tinymce.core.util.Delay","tinymce.core.Env","tinymce.core.dom.EventUtils","tinymce.core.dom.Sizzle","tinymce.core.util.Tools","tinymce.core.dom.DomQuery","tinymce.core.html.Styles","tinymce.core.dom.TreeWalker","tinymce.core.html.Entities","tinymce.core.dom.DOMUtils","tinymce.core.dom.ScriptLoader","tinymce.core.AddOnManager","tinymce.core.dom.RangeUtils","tinymce.core.html.Node","tinymce.core.html.Schema","tinymce.core.html.SaxParser","tinymce.core.html.DomParser","tinymce.core.html.Writer","tinymce.core.html.Serializer","tinymce.core.dom.Serializer","tinymce.core.util.VK","tinymce.core.dom.ControlSelection","tinymce.core.dom.BookmarkManager","tinymce.core.dom.Selection","tinymce.core.Formatter","tinymce.core.UndoManager","tinymce.core.EditorCommands","tinymce.core.util.URI","tinymce.core.util.Class","tinymce.core.util.EventDispatcher","tinymce.core.util.Observable","tinymce.core.WindowManager","tinymce.core.NotificationManager","tinymce.core.EditorObservable","tinymce.core.Shortcuts","tinymce.core.Editor","tinymce.core.util.I18n","tinymce.core.FocusManager","tinymce.core.EditorManager","tinymce.core.util.XHR","tinymce.core.util.JSON","tinymce.core.util.JSONRequest","tinymce.core.util.JSONP","tinymce.core.util.LocalStorage","tinymce.core.api.Compat","tinymce.core.util.Color","tinymce.core.ui.Api","tinymce.core.util.Arr","tinymce.core.dom.Range","tinymce.core.dom.StyleSheetLoader","tinymce.core.dom.NodeType","tinymce.core.caret.CaretContainer","tinymce.core.text.Zwsp","tinymce.core.caret.CaretBookmark","tinymce.core.caret.CaretPosition","tinymce.core.dom.ScrollIntoView","tinymce.core.dom.TridentSelection","tinymce.core.selection.FragmentReader","tinymce.core.dom.ElementUtils","tinymce.core.util.Fun","tinymce.core.fmt.Preview","tinymce.core.fmt.Hooks","tinymce.core.undo.Levels","tinymce.core.delete.DeleteCommands","tinymce.core.InsertContent","global!document","tinymce.core.ui.Window","tinymce.core.ui.MessageBox","tinymce.core.ui.Notification","tinymce.core.init.Render","tinymce.core.Mode","tinymce.core.ui.Sidebar","tinymce.core.util.Uuid","tinymce.core.ErrorReporter","tinymce.core.LegacyInput","tinymce.core.ui.Selector","tinymce.core.ui.Collection","tinymce.core.ui.ReflowQueue","tinymce.core.ui.Control","tinymce.core.ui.Factory","tinymce.core.ui.KeyboardNavigation","tinymce.core.ui.Container","tinymce.core.ui.DragHelper","tinymce.core.ui.Scrollable","tinymce.core.ui.Panel","tinymce.core.ui.Movable","tinymce.core.ui.Resizable","tinymce.core.ui.FloatPanel","tinymce.core.ui.Tooltip","tinymce.core.ui.Widget","tinymce.core.ui.Progress","tinymce.core.ui.Layout","tinymce.core.ui.AbsoluteLayout","tinymce.core.ui.Button","tinymce.core.ui.ButtonGroup","tinymce.core.ui.Checkbox","tinymce.core.ui.ComboBox","tinymce.core.ui.ColorBox","tinymce.core.ui.PanelButton","tinymce.core.ui.ColorButton","tinymce.core.ui.ColorPicker","tinymce.core.ui.Path","tinymce.core.ui.ElementPath","tinymce.core.ui.FormItem","tinymce.core.ui.Form","tinymce.core.ui.FieldSet","tinymce.core.ui.FilePicker","tinymce.core.ui.FitLayout","tinymce.core.ui.FlexLayout","tinymce.core.ui.FlowLayout","tinymce.core.ui.FormatControls","tinymce.core.ui.GridLayout","tinymce.core.ui.Iframe","tinymce.core.ui.InfoBox","tinymce.core.ui.Label","tinymce.core.ui.Toolbar","tinymce.core.ui.MenuBar","tinymce.core.ui.MenuButton","tinymce.core.ui.MenuItem","tinymce.core.ui.Throbber","tinymce.core.ui.Menu","tinymce.core.ui.ListBox","tinymce.core.ui.Radio","tinymce.core.ui.ResizeHandle","tinymce.core.ui.SelectBox","tinymce.core.ui.Slider","tinymce.core.ui.Spacer","tinymce.core.ui.SplitButton","tinymce.core.ui.StackLayout","tinymce.core.ui.TabPanel","tinymce.core.ui.TextBox","ephox.katamari.api.Arr","ephox.katamari.api.Fun","ephox.katamari.api.Future","ephox.katamari.api.Futures","ephox.katamari.api.Result","tinymce.core.caret.CaretCandidate","tinymce.core.geom.ClientRect","tinymce.core.text.ExtendingChar","ephox.sugar.api.dom.Insert","ephox.sugar.api.dom.Replication","ephox.sugar.api.node.Element","ephox.sugar.api.node.Fragment","ephox.sugar.api.node.Node","tinymce.core.dom.ElementType","tinymce.core.dom.Parents","tinymce.core.selection.SelectionUtils","tinymce.core.undo.Fragments","tinymce.core.delete.BlockBoundaryDelete","tinymce.core.delete.BlockRangeDelete","tinymce.core.delete.CefDelete","tinymce.core.delete.InlineBoundaryDelete","tinymce.core.caret.CaretWalker","tinymce.core.dom.RangeNormalizer","tinymce.core.InsertList","tinymce.core.data.ObservableObject","tinymce.core.ui.DomUtils","tinymce.core.ui.BoxUtils","tinymce.core.ui.ClassList","global!window","tinymce.core.init.Init","tinymce.core.PluginManager","tinymce.core.ThemeManager","tinymce.core.content.LinkTargets","tinymce.core.fmt.FontInfo","ephox.katamari.api.Option","global!Array","global!Error","global!String","ephox.katamari.api.LazyValue","ephox.katamari.async.Bounce","ephox.katamari.async.AsyncValues","ephox.sugar.api.search.Traverse","ephox.sugar.api.properties.Attr","global!console","ephox.sugar.api.dom.InsertAll","ephox.sugar.api.dom.Remove","ephox.sugar.api.node.NodeTypes","ephox.sugar.api.dom.Compare","ephox.katamari.api.Options","tinymce.core.undo.Diff","tinymce.core.delete.BlockBoundary","tinymce.core.delete.MergeBlocks","tinymce.core.delete.DeleteUtils","tinymce.core.caret.CaretUtils","tinymce.core.delete.CefDeleteAction","tinymce.core.delete.DeleteElement","tinymce.core.keyboard.BoundaryCaret","tinymce.core.keyboard.BoundaryLocation","tinymce.core.keyboard.BoundarySelection","tinymce.core.keyboard.InlineUtils","tinymce.core.caret.CaretFinder","tinymce.core.data.Binding","tinymce.core.init.InitContentBody","global!Object","global!setTimeout","ephox.katamari.api.Type","ephox.katamari.api.Struct","ephox.sugar.alien.Recurse","ephox.sand.api.Node","ephox.sand.api.PlatformDetection","ephox.sugar.api.search.Selectors","ephox.katamari.api.Obj","ephox.sugar.api.search.PredicateFind","tinymce.core.dom.Empty","ephox.katamari.api.Adt","tinymce.core.text.Bidi","tinymce.core.caret.CaretContainerInline","tinymce.core.caret.CaretContainerRemove","tinymce.core.util.LazyEvaluator","ephox.katamari.api.Cell","tinymce.core.caret.CaretContainerInput","tinymce.core.EditorUpload","tinymce.core.ForceBlocks","tinymce.core.keyboard.KeyboardOverrides","tinymce.core.NodeChange","tinymce.core.SelectionOverrides","tinymce.core.util.Quirks","ephox.katamari.data.Immutable","ephox.katamari.data.MixedBag","ephox.sand.util.Global","ephox.katamari.api.Thunk","ephox.sand.core.PlatformDetection","global!navigator","ephox.sugar.api.node.Body","ephox.sugar.impl.ClosestOrAncestor","ephox.sugar.api.search.SelectorExists","tinymce.core.file.Uploader","tinymce.core.file.ImageScanner","tinymce.core.file.BlobCache","tinymce.core.file.UploadStatus","tinymce.core.keyboard.ArrowKeys","tinymce.core.keyboard.DeleteBackspaceKeys","tinymce.core.keyboard.EnterKey","tinymce.core.keyboard.SpaceKey","tinymce.core.caret.FakeCaret","tinymce.core.caret.LineUtils","tinymce.core.DragDropOverrides","tinymce.core.keyboard.CefUtils","tinymce.core.dom.NodePath","ephox.katamari.util.BagUtils","ephox.katamari.api.Resolve","ephox.sand.core.Browser","ephox.sand.core.OperatingSystem","ephox.sand.detect.DeviceType","ephox.sand.detect.UaString","ephox.sand.info.PlatformInfo","ephox.sugar.api.search.SelectorFind","tinymce.core.file.Conversions","global!URL","tinymce.core.keyboard.CefNavigation","tinymce.core.keyboard.MatchKeys","tinymce.core.keyboard.InsertSpace","tinymce.core.dom.Dimensions","tinymce.core.dom.MousePosition","ephox.katamari.api.Global","ephox.sand.detect.Version","ephox.katamari.api.Strings","tinymce.core.caret.LineWalker","ephox.katamari.api.Merger","global!Number","ephox.katamari.str.StrAppend","ephox.katamari.str.StringParts"]
+["tinymce.core.api.Main","tinymce.core.api.Tinymce","tinymce.core.Register","tinymce.core.geom.Rect","tinymce.core.util.Promise","tinymce.core.util.Delay","tinymce.core.Env","tinymce.core.dom.EventUtils","tinymce.core.dom.Sizzle","tinymce.core.util.Tools","tinymce.core.dom.DomQuery","tinymce.core.html.Styles","tinymce.core.dom.TreeWalker","tinymce.core.html.Entities","tinymce.core.dom.DOMUtils","tinymce.core.dom.ScriptLoader","tinymce.core.AddOnManager","tinymce.core.dom.RangeUtils","tinymce.core.html.Node","tinymce.core.html.Schema","tinymce.core.html.SaxParser","tinymce.core.html.DomParser","tinymce.core.html.Writer","tinymce.core.html.Serializer","tinymce.core.dom.Serializer","tinymce.core.util.VK","tinymce.core.dom.ControlSelection","tinymce.core.dom.BookmarkManager","tinymce.core.dom.Selection","tinymce.core.Formatter","tinymce.core.UndoManager","tinymce.core.EditorCommands","tinymce.core.util.URI","tinymce.core.util.Class","tinymce.core.util.EventDispatcher","tinymce.core.util.Observable","tinymce.core.WindowManager","tinymce.core.NotificationManager","tinymce.core.EditorObservable","tinymce.core.Shortcuts","tinymce.core.Editor","tinymce.core.util.I18n","tinymce.core.FocusManager","tinymce.core.EditorManager","tinymce.core.util.XHR","tinymce.core.util.JSON","tinymce.core.util.JSONRequest","tinymce.core.util.JSONP","tinymce.core.util.LocalStorage","tinymce.core.api.Compat","tinymce.core.util.Color","tinymce.core.ui.Api","tinymce.core.util.Arr","tinymce.core.dom.Range","tinymce.core.dom.StyleSheetLoader","tinymce.core.dom.NodeType","tinymce.core.caret.CaretContainer","tinymce.core.text.Zwsp","tinymce.core.caret.CaretBookmark","tinymce.core.caret.CaretPosition","tinymce.core.dom.ScrollIntoView","tinymce.core.dom.TridentSelection","tinymce.core.selection.FragmentReader","tinymce.core.dom.ElementUtils","tinymce.core.util.Fun","tinymce.core.fmt.Preview","tinymce.core.fmt.Hooks","tinymce.core.undo.Levels","tinymce.core.delete.DeleteCommands","tinymce.core.InsertContent","global!document","tinymce.core.ui.Window","tinymce.core.ui.MessageBox","tinymce.core.ui.Notification","tinymce.core.init.Render","tinymce.core.Mode","tinymce.core.ui.Sidebar","tinymce.core.util.Uuid","tinymce.core.ErrorReporter","tinymce.core.LegacyInput","tinymce.core.ui.Selector","tinymce.core.ui.Collection","tinymce.core.ui.ReflowQueue","tinymce.core.ui.Control","tinymce.core.ui.Factory","tinymce.core.ui.KeyboardNavigation","tinymce.core.ui.Container","tinymce.core.ui.DragHelper","tinymce.core.ui.Scrollable","tinymce.core.ui.Panel","tinymce.core.ui.Movable","tinymce.core.ui.Resizable","tinymce.core.ui.FloatPanel","tinymce.core.ui.Tooltip","tinymce.core.ui.Widget","tinymce.core.ui.Progress","tinymce.core.ui.Layout","tinymce.core.ui.AbsoluteLayout","tinymce.core.ui.Button","tinymce.core.ui.ButtonGroup","tinymce.core.ui.Checkbox","tinymce.core.ui.ComboBox","tinymce.core.ui.ColorBox","tinymce.core.ui.PanelButton","tinymce.core.ui.ColorButton","tinymce.core.ui.ColorPicker","tinymce.core.ui.Path","tinymce.core.ui.ElementPath","tinymce.core.ui.FormItem","tinymce.core.ui.Form","tinymce.core.ui.FieldSet","tinymce.core.ui.FilePicker","tinymce.core.ui.FitLayout","tinymce.core.ui.FlexLayout","tinymce.core.ui.FlowLayout","tinymce.core.ui.FormatControls","tinymce.core.ui.GridLayout","tinymce.core.ui.Iframe","tinymce.core.ui.InfoBox","tinymce.core.ui.Label","tinymce.core.ui.Toolbar","tinymce.core.ui.MenuBar","tinymce.core.ui.MenuButton","tinymce.core.ui.MenuItem","tinymce.core.ui.Throbber","tinymce.core.ui.Menu","tinymce.core.ui.ListBox","tinymce.core.ui.Radio","tinymce.core.ui.ResizeHandle","tinymce.core.ui.SelectBox","tinymce.core.ui.Slider","tinymce.core.ui.Spacer","tinymce.core.ui.SplitButton","tinymce.core.ui.StackLayout","tinymce.core.ui.TabPanel","tinymce.core.ui.TextBox","ephox.katamari.api.Arr","ephox.katamari.api.Fun","ephox.katamari.api.Future","ephox.katamari.api.Futures","ephox.katamari.api.Result","tinymce.core.caret.CaretCandidate","tinymce.core.geom.ClientRect","tinymce.core.text.ExtendingChar","ephox.sugar.api.dom.Insert","ephox.sugar.api.dom.Replication","ephox.sugar.api.node.Element","ephox.sugar.api.node.Fragment","ephox.sugar.api.node.Node","tinymce.core.dom.ElementType","tinymce.core.dom.Parents","tinymce.core.selection.SelectionUtils","tinymce.core.undo.Fragments","tinymce.core.delete.BlockBoundaryDelete","tinymce.core.delete.BlockRangeDelete","tinymce.core.delete.CefDelete","tinymce.core.delete.InlineBoundaryDelete","tinymce.core.caret.CaretWalker","tinymce.core.dom.RangeNormalizer","tinymce.core.InsertList","tinymce.core.data.ObservableObject","tinymce.core.ui.DomUtils","tinymce.core.ui.BoxUtils","tinymce.core.ui.ClassList","global!window","tinymce.core.init.Init","tinymce.core.PluginManager","tinymce.core.ThemeManager","tinymce.core.content.LinkTargets","tinymce.core.fmt.FontInfo","ephox.katamari.api.Option","global!Array","global!Error","global!String","ephox.katamari.api.LazyValue","ephox.katamari.async.Bounce","ephox.katamari.async.AsyncValues","ephox.sugar.api.search.Traverse","ephox.sugar.api.properties.Attr","global!console","ephox.sugar.api.dom.InsertAll","ephox.sugar.api.dom.Remove","ephox.sugar.api.node.NodeTypes","ephox.sugar.api.dom.Compare","ephox.katamari.api.Options","tinymce.core.undo.Diff","tinymce.core.delete.BlockBoundary","tinymce.core.delete.MergeBlocks","tinymce.core.delete.DeleteUtils","tinymce.core.caret.CaretUtils","tinymce.core.delete.CefDeleteAction","tinymce.core.delete.DeleteElement","tinymce.core.caret.CaretFinder","tinymce.core.keyboard.BoundaryCaret","tinymce.core.keyboard.BoundaryLocation","tinymce.core.keyboard.BoundarySelection","tinymce.core.keyboard.InlineUtils","tinymce.core.data.Binding","tinymce.core.init.InitContentBody","global!Object","global!setTimeout","ephox.katamari.api.Type","ephox.katamari.api.Struct","ephox.sugar.alien.Recurse","ephox.sand.api.Node","ephox.sand.api.PlatformDetection","ephox.sugar.api.search.Selectors","ephox.katamari.api.Obj","ephox.sugar.api.search.PredicateFind","tinymce.core.dom.Empty","ephox.katamari.api.Adt","tinymce.core.text.Bidi","tinymce.core.caret.CaretContainerInline","tinymce.core.caret.CaretContainerRemove","tinymce.core.util.LazyEvaluator","ephox.katamari.api.Cell","tinymce.core.caret.CaretContainerInput","tinymce.core.EditorUpload","tinymce.core.ForceBlocks","tinymce.core.keyboard.KeyboardOverrides","tinymce.core.NodeChange","tinymce.core.SelectionOverrides","tinymce.core.util.Quirks","ephox.katamari.data.Immutable","ephox.katamari.data.MixedBag","ephox.sand.util.Global","ephox.katamari.api.Thunk","ephox.sand.core.PlatformDetection","global!navigator","ephox.sugar.api.node.Body","ephox.sugar.impl.ClosestOrAncestor","ephox.sugar.api.search.SelectorExists","tinymce.core.file.Uploader","tinymce.core.file.ImageScanner","tinymce.core.file.BlobCache","tinymce.core.file.UploadStatus","tinymce.core.keyboard.ArrowKeys","tinymce.core.keyboard.DeleteBackspaceKeys","tinymce.core.keyboard.EnterKey","tinymce.core.keyboard.SpaceKey","tinymce.core.caret.FakeCaret","tinymce.core.caret.LineUtils","tinymce.core.DragDropOverrides","tinymce.core.keyboard.CefUtils","tinymce.core.dom.NodePath","ephox.katamari.util.BagUtils","ephox.katamari.api.Resolve","ephox.sand.core.Browser","ephox.sand.core.OperatingSystem","ephox.sand.detect.DeviceType","ephox.sand.detect.UaString","ephox.sand.info.PlatformInfo","ephox.sugar.api.search.SelectorFind","tinymce.core.file.Conversions","global!URL","tinymce.core.keyboard.CefNavigation","tinymce.core.keyboard.MatchKeys","tinymce.core.keyboard.InsertSpace","tinymce.core.dom.Dimensions","tinymce.core.dom.MousePosition","ephox.katamari.api.Global","ephox.sand.detect.Version","ephox.katamari.api.Strings","tinymce.core.caret.LineWalker","ephox.katamari.api.Merger","global!Number","ephox.katamari.str.StrAppend","ephox.katamari.str.StringParts"]
 jsc*/
 /**
  * Rect.js
@@ -14873,31 +14873,28 @@ define(
 
       if (!settings.allow_unsafe_link_target) {
         self.addAttributeFilter('href', function (nodes) {
-          var i = nodes.length, node, rel;
-          var rules = 'noopener noreferrer';
+          var i = nodes.length, node;
 
-          function addTargetRules(rel) {
-            rel = removeTargetRules(rel);
-            return rel ? [rel, rules].join(' ') : rules;
-          }
+          var appendRel = function (rel) {
+            var parts = rel.split(' ').filter(function (p) {
+              return p.length > 0;
+            });
+            return parts.concat(['noopener']).join(' ');
+          };
 
-          function removeTargetRules(rel) {
-            var regExp = new RegExp('(' + rules.replace(' ', '|') + ')', 'g');
-            if (rel) {
-              rel = Tools.trim(rel.replace(regExp, ''));
+          var addNoOpener = function (rel) {
+            var newRel = rel ? Tools.trim(rel) : '';
+            if (!/\b(noopener)\b/g.test(newRel)) {
+              return appendRel(newRel);
+            } else {
+              return newRel;
             }
-            return rel ? rel : null;
-          }
-
-          function toggleTargetRules(rel, isUnsafe) {
-            return isUnsafe ? addTargetRules(rel) : removeTargetRules(rel);
-          }
+          };
 
           while (i--) {
             node = nodes[i];
-            rel = node.attr('rel');
-            if (node.name === 'a') {
-              node.attr('rel', toggleTargetRules(rel, node.attr('target') == '_blank'));
+            if (node.name === 'a' && node.attr('target') === '_blank') {
+              node.attr('rel', addNoOpener(node.attr('rel')));
             }
           }
         });
@@ -26478,23 +26475,67 @@ define(
     'ephox.katamari.api.Option',
     'tinymce.core.caret.CaretCandidate',
     'tinymce.core.caret.CaretPosition',
+    'tinymce.core.caret.CaretUtils',
     'tinymce.core.caret.CaretWalker',
     'tinymce.core.dom.NodeType'
   ],
-  function (Fun, Option, CaretCandidate, CaretPosition, CaretWalker, NodeType) {
-    var fromPosition = function (forward, rootElement, position) {
-      var walker = new CaretWalker(rootElement);
-      return Option.from(forward ? walker.next(position) : walker.prev(position));
-    };
-
+  function (Fun, Option, CaretCandidate, CaretPosition, CaretUtils, CaretWalker, NodeType) {
     var walkToPositionIn = function (forward, rootNode, startNode) {
-      var caretWalker = new CaretWalker(rootNode);
-      var startPos = forward ? CaretPosition.before(startNode) : CaretPosition.after(startNode);
-      return Option.from(forward ? caretWalker.next(startPos) : caretWalker.prev(startPos));
+      var position = forward ? CaretPosition.before(startNode) : CaretPosition.after(startNode);
+      return fromPosition(forward, rootNode, position);
     };
 
     var afterElement = function (node) {
       return NodeType.isBr(node) ? CaretPosition.before(node) : CaretPosition.after(node);
+    };
+
+    var isBeforeOrStart = function (position) {
+      if (CaretPosition.isTextPosition(position)) {
+        return position.offset() === 0;
+      } else {
+        return CaretCandidate.isCaretCandidate(position.getNode());
+      }
+    };
+
+    var isAfterOrEnd = function (position) {
+      if (CaretPosition.isTextPosition(position)) {
+        return position.offset() === position.container().data.length;
+      } else {
+        return CaretCandidate.isCaretCandidate(position.getNode(true));
+      }
+    };
+
+    var isBeforeAfterSameElement = function (from, to) {
+      return !CaretPosition.isTextPosition(from) && !CaretPosition.isTextPosition(to) && from.getNode() === to.getNode(true);
+    };
+
+    var isAtBr = function (position) {
+      return !CaretPosition.isTextPosition(position) && NodeType.isBr(position.getNode());
+    };
+
+    var shouldSkipPosition = function (forward, from, to) {
+      if (forward) {
+        return !isBeforeAfterSameElement(from, to) && !isAtBr(from) && isAfterOrEnd(from) && isBeforeOrStart(to);
+      } else {
+        return !isBeforeAfterSameElement(to, from) && isBeforeOrStart(from) && isAfterOrEnd(to);
+      }
+    };
+
+    // Finds: <p>a|<b>b</b></p> -> <p>a<b>|b</b></p>
+    var fromPosition = function (forward, rootNode, position) {
+      var walker = new CaretWalker(rootNode);
+      return Option.from(forward ? walker.next(position) : walker.prev(position));
+    };
+
+    // Finds: <p>a|<b>b</b></p> -> <p>a<b>b|</b></p>
+    var navigate = function (forward, rootNode, from) {
+      return fromPosition(forward, rootNode, from).bind(function (to) {
+        if (CaretUtils.isInSameBlock(from, to, rootNode) && shouldSkipPosition(forward, from, to)) {
+          return fromPosition(forward, rootNode, to);
+        } else {
+          return Option.some(to);
+        }
+      });
     };
 
     var positionIn = function (forward, element) {
@@ -26514,6 +26555,7 @@ define(
 
     return {
       fromPosition: fromPosition,
+      navigate: navigate,
       positionIn: positionIn
     };
   }
@@ -27297,9 +27339,10 @@ define(
     'tinymce.core.caret.CaretUtils',
     'tinymce.core.caret.CaretWalker',
     'tinymce.core.dom.DOMUtils',
+    'tinymce.core.dom.NodeType',
     'tinymce.core.text.Bidi'
   ],
-  function (Arr, Fun, Option, Options, CaretContainer, CaretFinder, CaretPosition, CaretUtils, CaretWalker, DOMUtils, Bidi) {
+  function (Arr, Fun, Option, Options, CaretContainer, CaretFinder, CaretPosition, CaretUtils, CaretWalker, DOMUtils, NodeType, Bidi) {
     var isInlineTarget = function (elm) {
       return DOMUtils.DOM.is(elm, 'a[href],code');
     };
@@ -27355,13 +27398,21 @@ define(
 
       if (forward) {
         if (CaretContainer.isCaretContainerInline(container)) {
-          return CaretPosition.after(container);
+          if (NodeType.isText(container.nextSibling)) {
+            return new CaretPosition(container.nextSibling, 0);
+          } else {
+            return CaretPosition.after(container);
+          }
         } else {
           return CaretContainer.isBeforeInline(pos) ? new CaretPosition(container, offset + 1) : pos;
         }
       } else {
         if (CaretContainer.isCaretContainerInline(container)) {
-          return CaretPosition.before(container);
+          if (NodeType.isText(container.previousSibling)) {
+            return new CaretPosition(container.previousSibling, container.previousSibling.data.length);
+          } else {
+            return CaretPosition.before(container);
+          }
         } else {
           return CaretContainer.isAfterInline(pos) ? new CaretPosition(container, offset - 1) : pos;
         }
@@ -28376,6 +28427,7 @@ define(
     'ephox.katamari.api.Options',
     'ephox.sugar.api.node.Element',
     'tinymce.core.caret.CaretContainer',
+    'tinymce.core.caret.CaretFinder',
     'tinymce.core.caret.CaretPosition',
     'tinymce.core.caret.CaretUtils',
     'tinymce.core.delete.DeleteElement',
@@ -28384,7 +28436,10 @@ define(
     'tinymce.core.keyboard.BoundarySelection',
     'tinymce.core.keyboard.InlineUtils'
   ],
-  function (Fun, Option, Options, Element, CaretContainer, CaretPosition, CaretUtils, DeleteElement, BoundaryCaret, BoundaryLocation, BoundarySelection, InlineUtils) {
+  function (
+    Fun, Option, Options, Element, CaretContainer, CaretFinder, CaretPosition, CaretUtils, DeleteElement, BoundaryCaret, BoundaryLocation, BoundarySelection,
+    InlineUtils
+  ) {
     var isFeatureEnabled = function (editor) {
       return editor.settings.inline_boundaries !== false;
     };
@@ -28396,6 +28451,21 @@ define(
       range.setEnd(to.container(), to.offset());
 
       return range;
+    };
+
+    // Checks for delete at <code>|a</code> when there is only one item left except the zwsp caret container nodes
+    var hasOnlyTwoOrLessPositionsLeft = function (elm) {
+      return Options.liftN([
+        InlineUtils.findCaretPositionIn(elm, true),
+        InlineUtils.findCaretPositionIn(elm, false)
+      ], function (firstPos, lastPos) {
+        var normalizedFirstPos = InlineUtils.normalizePosition(true, firstPos);
+        var normalizedLastPos = InlineUtils.normalizePosition(false, lastPos);
+
+        return InlineUtils.findCaretPosition(elm, true, normalizedFirstPos).map(function (pos) {
+          return pos.isEqual(normalizedLastPos);
+        }).getOr(true);
+      }).getOr(true);
     };
 
     var setCaretLocation = function (editor, caret) {
@@ -28450,27 +28520,31 @@ define(
       })
       .map(setCaretLocation(editor, caret))
       .getOrThunk(function () {
-        var toPosition = InlineUtils.findCaretPosition(rootNode, forward, from);
+        var toPosition = CaretFinder.navigate(forward, rootNode, from);
         var toLocation = toPosition.bind(function (pos) {
           return BoundaryLocation.readLocation(rootNode, pos);
         });
 
         if (fromLocation.isSome() && toLocation.isSome()) {
           return InlineUtils.findRootInline(rootNode, from).map(function (elm) {
-            DeleteElement.deleteElement(editor, forward, Element.fromDom(elm));
-            return true;
+            if (hasOnlyTwoOrLessPositionsLeft(elm)) {
+              DeleteElement.deleteElement(editor, forward, Element.fromDom(elm));
+              return true;
+            } else {
+              return false;
+            }
           }).getOr(false);
         } else {
-          return toLocation.map(function (_) {
-            toPosition.map(function (to) {
+          return toLocation.bind(function (_) {
+            return toPosition.map(function (to) {
               if (forward) {
                 deleteFromTo(editor, caret, from, to);
               } else {
                 deleteFromTo(editor, caret, to, from);
               }
-            });
 
-            return true;
+              return true;
+            });
           }).getOr(false);
         }
       });
@@ -38308,7 +38382,7 @@ define(
         xhr.onload = function () {
           var json;
 
-          if (xhr.status != 200) {
+          if (xhr.status < 200 || xhr.status >= 300) {
             failure("HTTP Error: " + xhr.status);
             return;
           }
@@ -40270,22 +40344,28 @@ define(
     'tinymce.core.util.VK'
   ],
   function (Arr, Cell, BoundarySelection, CefNavigation, MatchKeys, VK) {
+    var executeKeydownOverride = function (editor, caret, evt) {
+      var matches = MatchKeys.match([
+        { keyCode: VK.RIGHT, action: CefNavigation.moveH(editor, true) },
+        { keyCode: VK.LEFT, action: CefNavigation.moveH(editor, false) },
+        { keyCode: VK.UP, action: CefNavigation.moveV(editor, false) },
+        { keyCode: VK.DOWN, action: CefNavigation.moveV(editor, true) },
+        { keyCode: VK.RIGHT, action: BoundarySelection.move(editor, caret, true) },
+        { keyCode: VK.LEFT, action: BoundarySelection.move(editor, caret, false) }
+      ], evt);
+
+      Arr.find(matches, function (pattern) {
+        return pattern.action();
+      }).each(function (_) {
+        evt.preventDefault();
+      });
+    };
+
     var setup = function (editor, caret) {
       editor.on('keydown', function (evt) {
-        var matches = MatchKeys.match([
-          { keyCode: VK.RIGHT, action: CefNavigation.moveH(editor, true) },
-          { keyCode: VK.LEFT, action: CefNavigation.moveH(editor, false) },
-          { keyCode: VK.UP, action: CefNavigation.moveV(editor, false) },
-          { keyCode: VK.DOWN, action: CefNavigation.moveV(editor, true) },
-          { keyCode: VK.RIGHT, action: BoundarySelection.move(editor, caret, true) },
-          { keyCode: VK.LEFT, action: BoundarySelection.move(editor, caret, false) }
-        ], evt);
-
-        Arr.find(matches, function (pattern) {
-          return pattern.action();
-        }).each(function (_) {
-          evt.preventDefault();
-        });
+        if (evt.isDefaultPrevented() === false) {
+          executeKeydownOverride(editor, caret, evt);
+        }
       });
     };
 
@@ -40317,43 +40397,48 @@ define(
     'tinymce.core.util.VK'
   ],
   function (Arr, BlockBoundaryDelete, BlockRangeDelete, CefDelete, InlineBoundaryDelete, MatchKeys, VK) {
-    var setupKeyDownHandler = function (editor, caret) {
-      editor.on('keydown', function (evt) {
-        var matches = MatchKeys.match([
-          { keyCode: VK.BACKSPACE, action: MatchKeys.action(InlineBoundaryDelete.backspaceDelete, editor, caret, false) },
-          { keyCode: VK.DELETE, action: MatchKeys.action(InlineBoundaryDelete.backspaceDelete, editor, caret, true) },
-          { keyCode: VK.BACKSPACE, action: MatchKeys.action(CefDelete.backspaceDelete, editor, false) },
-          { keyCode: VK.DELETE, action: MatchKeys.action(CefDelete.backspaceDelete, editor, true) },
-          { keyCode: VK.BACKSPACE, action: MatchKeys.action(BlockRangeDelete.backspaceDelete, editor, false) },
-          { keyCode: VK.DELETE, action: MatchKeys.action(BlockRangeDelete.backspaceDelete, editor, true) },
-          { keyCode: VK.BACKSPACE, action: MatchKeys.action(BlockBoundaryDelete.backspaceDelete, editor, false) },
-          { keyCode: VK.DELETE, action: MatchKeys.action(BlockBoundaryDelete.backspaceDelete, editor, true) }
-        ], evt);
+    var executeKeydownOverride = function (editor, caret, evt) {
+      var matches = MatchKeys.match([
+        { keyCode: VK.BACKSPACE, action: MatchKeys.action(CefDelete.backspaceDelete, editor, false) },
+        { keyCode: VK.DELETE, action: MatchKeys.action(CefDelete.backspaceDelete, editor, true) },
+        { keyCode: VK.BACKSPACE, action: MatchKeys.action(InlineBoundaryDelete.backspaceDelete, editor, caret, false) },
+        { keyCode: VK.DELETE, action: MatchKeys.action(InlineBoundaryDelete.backspaceDelete, editor, caret, true) },
+        { keyCode: VK.BACKSPACE, action: MatchKeys.action(BlockRangeDelete.backspaceDelete, editor, false) },
+        { keyCode: VK.DELETE, action: MatchKeys.action(BlockRangeDelete.backspaceDelete, editor, true) },
+        { keyCode: VK.BACKSPACE, action: MatchKeys.action(BlockBoundaryDelete.backspaceDelete, editor, false) },
+        { keyCode: VK.DELETE, action: MatchKeys.action(BlockBoundaryDelete.backspaceDelete, editor, true) }
+      ], evt);
 
-        Arr.find(matches, function (pattern) {
-          return pattern.action();
-        }).each(function (_) {
-          evt.preventDefault();
-        });
+      Arr.find(matches, function (pattern) {
+        return pattern.action();
+      }).each(function (_) {
+        evt.preventDefault();
       });
     };
 
-    var setupKeyUpHandler = function (editor) {
-      editor.on('keyup', function (evt) {
-        var matches = MatchKeys.match([
-          { keyCode: VK.BACKSPACE, action: MatchKeys.action(CefDelete.paddEmptyElement, editor) },
-          { keyCode: VK.DELETE, action: MatchKeys.action(CefDelete.paddEmptyElement, editor) }
-        ], evt);
+    var executeKeyupOverride = function (editor, evt) {
+      var matches = MatchKeys.match([
+        { keyCode: VK.BACKSPACE, action: MatchKeys.action(CefDelete.paddEmptyElement, editor) },
+        { keyCode: VK.DELETE, action: MatchKeys.action(CefDelete.paddEmptyElement, editor) }
+      ], evt);
 
-        Arr.find(matches, function (pattern) {
-          return pattern.action();
-        });
+      Arr.find(matches, function (pattern) {
+        return pattern.action();
       });
     };
 
     var setup = function (editor, caret) {
-      setupKeyDownHandler(editor, caret);
-      setupKeyUpHandler(editor);
+      editor.on('keydown', function (evt) {
+        if (evt.isDefaultPrevented() === false) {
+          executeKeydownOverride(editor, caret, evt);
+        }
+      });
+
+      editor.on('keyup', function (evt) {
+        if (evt.isDefaultPrevented() === false) {
+          executeKeyupOverride(editor, evt);
+        }
+      });
     };
 
     return {
@@ -41176,22 +41261,24 @@ define(
     'tinymce.core.util.VK'
   ],
   function (Arr, InsertSpace, MatchKeys, VK) {
-    var setupKeyDownHandler = function (editor, caret) {
-      editor.on('keydown', function (evt) {
-        var matches = MatchKeys.match([
-          { keyCode: VK.SPACEBAR, action: MatchKeys.action(InsertSpace.insertAtSelection, editor) }
-        ], evt);
+    var executeKeydownOverride = function (editor, evt) {
+      var matches = MatchKeys.match([
+        { keyCode: VK.SPACEBAR, action: MatchKeys.action(InsertSpace.insertAtSelection, editor) }
+      ], evt);
 
-        Arr.find(matches, function (pattern) {
-          return pattern.action();
-        }).each(function (_) {
-          evt.preventDefault();
-        });
+      Arr.find(matches, function (pattern) {
+        return pattern.action();
+      }).each(function (_) {
+        evt.preventDefault();
       });
     };
 
     var setup = function (editor) {
-      setupKeyDownHandler(editor);
+      editor.on('keydown', function (evt) {
+        if (evt.isDefaultPrevented() === false) {
+          executeKeydownOverride(editor, evt);
+        }
+      });
     };
 
     return {
@@ -42186,14 +42273,6 @@ define(
           return block1 === block2;
         };
 
-        var isContentKey = function (e) {
-          if (e.keyCode >= 112 && e.keyCode <= 123) {
-            return false;
-          }
-
-          return true;
-        };
-
         // Checks if the target node is in a block and if that block has a caret position better than the
         // suggested caretNode this is to prevent the caret from being sucked in towards a cE=false block if
         // they are adjacent on the vertical axis
@@ -42239,14 +42318,14 @@ define(
           }
         });
 
-        editor.on('keydown', function (e) {
+        editor.on('keypress', function (e) {
           if (VK.modifierPressed(e)) {
             return;
           }
 
           switch (e.keyCode) {
             default:
-              if (isContentEditableFalse(editor.selection.getNode()) && isContentKey(e)) {
+              if (isContentEditableFalse(editor.selection.getNode())) {
                 e.preventDefault();
               }
               break;
@@ -46759,7 +46838,7 @@ define(
        * @property minorVersion
        * @type String
        */
-      minorVersion: '6.2',
+      minorVersion: '6.3',
 
       /**
        * Release date of TinyMCE build.
@@ -46767,7 +46846,7 @@ define(
        * @property releaseDate
        * @type String
        */
-      releaseDate: '2017-05-23',
+      releaseDate: '2017-05-30',
 
       /**
        * Collection of editor instances.
