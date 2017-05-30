@@ -22,6 +22,12 @@ function PostTitle( { title, onUpdate } ) {
 		onUpdate( newTitle );
 	};
 
+	const onKeyDown = ( event ) => {
+		if ( event.keyCode === 13 ) {
+			event.preventDefault();
+		}
+	};
+
 	return (
 		<h1 className="editor-post-title">
 			<Textarea
@@ -29,6 +35,7 @@ function PostTitle( { title, onUpdate } ) {
 				value={ title }
 				onChange={ onChange }
 				placeholder={ wp.i18n.__( 'Enter title here' ) }
+				onKeyDown={ onKeyDown }
 			/>
 		</h1>
 	);
