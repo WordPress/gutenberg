@@ -62,8 +62,8 @@ class VisualEditorBlock extends wp.element.Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			this.props.isSelected &&
-			newProps.isSelected
+			( ( this.props.isSelected && newProps.isSelected ) ||
+			( this.props.isFirstSelected && newProps.isFirstSelected ) )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
