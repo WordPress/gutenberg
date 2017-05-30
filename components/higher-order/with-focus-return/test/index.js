@@ -19,7 +19,7 @@ class Test extends Component {
 }
 
 describe( 'withFocusReturn()', () => {
-	describe( 'expected behavior', () => {
+	describe( 'testing rendering and focus handling', () => {
 		const Composite = withFocusReturn( Test );
 		const activeElement = document.createElement( 'button' );
 		const switchFocusTo = document.createElement( 'input' );
@@ -32,7 +32,7 @@ describe( 'withFocusReturn()', () => {
 			activeElement.blur();
 		} );
 
-		it( 'rendering with a basic <div> element', () => {
+		it( 'should render a basic Test component inside the HOC', () => {
 			const renderedComposite = shallow( <Composite /> );
 			const wrappedElement = renderedComposite.find( 'Test' );
 			const wrappedElementShallow = wrappedElement.shallow();
@@ -41,14 +41,14 @@ describe( 'withFocusReturn()', () => {
 			expect( wrappedElementShallow.text() ).to.equal( 'Testing' );
 		} );
 
-		it( 'passing additonal props', () => {
+		it( 'should pass additional props through to the wrapped element', () => {
 			const renderedComposite = shallow( <Composite test="test" /> );
 			const wrappedElement = renderedComposite.find( 'Test' );
 			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.node.props.test ).to.equal( 'test' );
+			expect( wrappedElement.props().test ).to.equal( 'test' );
 		} );
 
-		it( 'when component mounts and unmounts', () => {
+		it( 'should not switch focus back to the bound focus element', () => {
 			const mountedComposite = mount( <Composite /> );
 			expect( mountedComposite.instance().activeElement ).to.equal( activeElement );
 
@@ -56,7 +56,7 @@ describe( 'withFocusReturn()', () => {
 			switchFocusTo.focus();
 			expect( document.activeElement ).to.equal( switchFocusTo );
 
-			// Should keep focus on switchFocusTo because it is not within HOC.
+			// Should keep focus on switchFocusTo, because it is not within HOC.
 			mountedComposite.unmount();
 			expect( document.activeElement ).to.equal( switchFocusTo );
 		} );
@@ -69,7 +69,7 @@ describe( 'withFocusReturn()', () => {
 			document.activeElement.blur();
 			expect( document.activeElement ).to.equal( document.body );
 
-			// Should not return to original activeElement because it is not contained in.
+			// Should return to the activeElement saved with this component.
 			mountedComposite.unmount();
 			expect( document.activeElement ).to.equal( activeElement );
 		} );
