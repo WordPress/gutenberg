@@ -17,7 +17,7 @@ import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../../selectors';
+import { getEditedPostAttribute, getSuggestedPostFormat, getCurrentPost } from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostStatus extends Component {
@@ -27,9 +27,14 @@ class PostStatus extends Component {
 	}
 
 	render() {
-		const { status, onUpdateStatus, suggestedFormat } = this.props;
+		const { status, onUpdateStatus, suggestedFormat, post } = this.props;
 		const onToggle = () => {
-			const updatedStatus = status === 'pending' ? 'draft' : 'pending';
+			let updatedStatus;
+			if ( status !== 'pending' ) {
+				updatedStatus = 'pending';
+			} else {
+				updatedStatus = post.status && post.status !== 'pending' ? post.status : 'publish';
+			}
 			onUpdateStatus( updatedStatus );
 		};
 
@@ -72,6 +77,7 @@ PostStatus.instances = 1;
 export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
+		post: getCurrentPost( state ),
 		suggestedFormat: getSuggestedPostFormat( state ),
 	} ),
 	( dispatch ) => {
