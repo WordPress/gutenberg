@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress Dependencies
  */
-import withFocusReturn from 'components/higher-order/with-focus-return';
+import { withFocusReturn } from 'components';
 
 /**
  * Internal Dependencies
