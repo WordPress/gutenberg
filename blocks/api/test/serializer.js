@@ -71,7 +71,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
+			expect( attributes ).to.equal( 'category="food" ripeness="ripe"' );
 		} );
 
 		it( 'should not append an undefined attribute value', () => {
@@ -83,7 +83,7 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ' );
+			expect( attributes ).to.equal( 'category="food"' );
 		} );
 	} );
 
