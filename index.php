@@ -190,6 +190,12 @@ function gutenberg_register_scripts() {
 
 	// Editor Scripts.
 	wp_register_script(
+		'wp-utils',
+		plugins_url( 'utils/build/index.js', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'utils/build/index.js' )
+	);
+	wp_register_script(
 		'wp-date',
 		plugins_url( 'date/build/index.js', __FILE__ ),
 		array( 'moment' ),
@@ -242,7 +248,7 @@ function gutenberg_register_scripts() {
 	wp_register_script(
 		'wp-blocks',
 		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-element', 'wp-components', 'tinymce-nightly', 'tinymce-nightly-lists' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
 	);
 
@@ -485,7 +491,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);

@@ -12,6 +12,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  */
 import { Children } from 'element';
 import { Toolbar } from 'components';
+import { BACKSPACE, ESCAPE } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -112,7 +113,7 @@ class VisualEditorBlock extends wp.element.Component {
 		} = this.props;
 
 		// Remove block on backspace
-		if ( 8 /* Backspace */ === keyCode ) {
+		if ( BACKSPACE === keyCode ) {
 			if ( target === this.node ) {
 				onRemove( [ uid ] );
 
@@ -127,7 +128,7 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 
 		// Deselect on escape
-		if ( 27 /* Escape */ === keyCode ) {
+		if ( ESCAPE === keyCode ) {
 			onDeselect();
 		}
 	}

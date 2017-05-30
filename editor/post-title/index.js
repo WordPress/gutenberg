@@ -5,6 +5,11 @@ import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { ENTER } from 'utils/keycodes';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -23,7 +28,7 @@ function PostTitle( { title, onUpdate } ) {
 	};
 
 	const onKeyDown = ( event ) => {
-		if ( event.keyCode === 13 ) {
+		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
 		}
 	};
