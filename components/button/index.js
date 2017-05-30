@@ -4,22 +4,43 @@
 import './style.scss';
 import classnames from 'classnames';
 
-function Button( { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } ) {
-	const classes = classnames( 'components-button', className, {
-		button: ( isPrimary || isLarge ),
-		'button-primary': isPrimary,
-		'button-large': isLarge,
-		'is-toggled': isToggled,
-	} );
+class Button extends wp.element.Component {
+	constructor( props ) {
+		super( props );
+		this.setRef = this.setRef.bind( this );
+	}
 
-	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.ref.focus();
+		}
+	}
 
-	return wp.element.createElement( tag, {
-		...tagProps,
-		...additionalProps,
-		className: classes,
-	} );
+	setRef( ref ) {
+		this.ref = ref;
+	}
+
+	render() {
+		const { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } = this.props;
+		const classes = classnames( 'components-button', className, {
+			button: ( isPrimary || isLarge ),
+			'button-primary': isPrimary,
+			'button-large': isLarge,
+			'is-toggled': isToggled,
+		} );
+
+		const tag = href !== undefined && ! disabled ? 'a' : 'button';
+		const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+
+		delete additionalProps.focus;
+
+		return wp.element.createElement( tag, {
+			...tagProps,
+			...additionalProps,
+			className: classes,
+			ref: this.setRef,
+		} );
+	}
 }
 
 export default Button;

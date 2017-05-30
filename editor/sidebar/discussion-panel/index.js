@@ -8,8 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import PanelBody from 'components/panel/body';
-import FormToggle from 'components/form-toggle';
+import { PanelBody, FormToggle } from 'components';
 
 /**
  * Internal Dependencies

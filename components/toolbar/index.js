@@ -30,6 +30,7 @@ function Toolbar( { controls } ) {
 						'is-active': control.isActive,
 					} ) }
 					aria-pressed={ control.isActive }
+					focus={ focus && ! index }
 				/>
 			) ) }
 		</ul>

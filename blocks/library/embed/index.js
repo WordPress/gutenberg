@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
-import Placeholder from 'components/placeholder';
+import { Button, Placeholder } from 'components';
 
 /**
  * Internal dependencies

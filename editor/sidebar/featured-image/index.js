@@ -8,10 +8,8 @@ import { connect } from 'react-redux';
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import Button from 'components/button';
-import PanelBody from 'components/panel/body';
-import MediaUploadButton from 'blocks/media-upload-button';
-import Spinner from 'components/spinner';
+import { Button, PanelBody, Spinner } from 'components';
+import { MediaUploadButton } from 'blocks';
 
 /**
  * Internal dependencies

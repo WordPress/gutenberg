@@ -94,10 +94,40 @@ export function getBlocks( state ) {
 }
 
 export function getSelectedBlock( state ) {
-	if ( ! state.selectedBlock.uid ) {
+	const { uid } = state.selectedBlock;
+	const { start, end } = state.multiSelectedBlocks;
+
+	if ( start || end || ! uid ) {
 		return null;
 	}
-	return state.editor.blocksByUid[ state.selectedBlock.uid ];
+
+	return state.editor.blocksByUid[ uid ];
+}
+
+export function getSelectedBlocks( state ) {
+	const { blockOrder } = state.editor;
+	const { start, end } = state.multiSelectedBlocks;
+
+	if ( ! start || ! end ) {
+		return [];
+	}
+
+	const startIndex = blockOrder.indexOf( start );
+	const endIndex = blockOrder.indexOf( end );
+
+	if ( startIndex > endIndex ) {
+		return blockOrder.slice( endIndex, startIndex + 1 );
+	}
+
+	return blockOrder.slice( startIndex, endIndex + 1 );
+}
+
+export function getBlockSelectionStart( state ) {
+	return state.multiSelectedBlocks.start;
+}
+
+export function getBlockSelectionEnd( state ) {
+	return state.multiSelectedBlocks.end;
 }
 
 export function getBlockUids( state ) {
@@ -110,6 +140,10 @@ export function getBlockOrder( state, uid ) {
 
 export function isFirstBlock( state, uid ) {
 	return first( state.editor.blockOrder ) === uid;
+}
+
+export function isFirstSelectedBlock( state, uid ) {
+	return first( getSelectedBlocks( state ) ) === uid;
 }
 
 export function isLastBlock( state, uid ) {
@@ -127,7 +161,17 @@ export function getNextBlock( state, uid ) {
 }
 
 export function isBlockSelected( state, uid ) {
+	const { start, end } = state.multiSelectedBlocks;
+
+	if ( start || end ) {
+		return null;
+	}
+
 	return state.selectedBlock.uid === uid;
+}
+
+export function isBlockMultiSelected( state, uid ) {
+	return getSelectedBlocks( state ).indexOf( uid ) !== -1;
 }
 
 export function isBlockHovered( state, uid ) {
@@ -135,11 +179,19 @@ export function isBlockHovered( state, uid ) {
 }
 
 export function getBlockFocus( state, uid ) {
-	return state.selectedBlock.uid === uid ? state.selectedBlock.focus : null;
+	if ( ! isBlockSelected( state, uid ) ) {
+		return null;
+	}
+
+	return state.selectedBlock.focus;
 }
 
 export function isTypingInBlock( state, uid ) {
-	return state.selectedBlock.uid === uid ? state.selectedBlock.typing : false;
+	if ( ! isBlockSelected( state, uid ) ) {
+		return false;
+	}
+
+	return state.selectedBlock.typing;
 }
 
 export function getBlockInsertionPoint( state ) {

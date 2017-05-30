@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import IconButton from 'components/icon-button';
+import { IconButton } from 'components';
 
 /**
  * Internal dependencies
@@ -47,21 +48,21 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, block, order } ) {
 
 export default connect(
 	( state, ownProps ) => ( {
-		isFirst: isFirstBlock( state, ownProps.uid ),
-		isLast: isLastBlock( state, ownProps.uid ),
+		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
+		isLast: isLastBlock( state, last( ownProps.uids ) ),
 		block: getBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
 			dispatch( {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: ownProps.uid,
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: ownProps.uids,
 			} );
 		},
 		onMoveUp() {
 			dispatch( {
-				type: 'MOVE_BLOCK_UP',
-				uid: ownProps.uid,
+				type: 'MOVE_BLOCKS_UP',
+				uids: ownProps.uids,
 			} );
 		},
 	} )
