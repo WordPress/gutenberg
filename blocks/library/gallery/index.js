@@ -9,7 +9,7 @@ import MediaUploadButton from '../../media-upload-button';
 
 import GalleryImage from './gallery-image';
 
-const { query } = hpq;
+const { query, attr } = hpq;
 
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
@@ -57,8 +57,11 @@ registerBlock( 'core/gallery', {
 	category: 'common',
 
 	attributes: {
-		// TODO: fix when loading view with existing gallery
-		images: query( 'div.blocks-gallery' ),
+		images:
+			query( 'div.blocks-gallery div.blocks-gallery-image', {
+				url: attr( 'data-url' ),
+				alt: attr( 'data-alt' ),
+			} ),
 	},
 
 	controls: [
@@ -128,7 +131,7 @@ registerBlock( 'core/gallery', {
 		const { images, align = 'none' } = attributes;
 
 		return (
-			<div className={ `blocks-gallery align${ align }` }>
+			<div className={ `blocks-gallery align${ align }` } >
 				{ images.map( ( img, i ) => (
 					<GalleryImage key={ i } img={ img } />
 				) ) }
