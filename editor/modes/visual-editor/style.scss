@@ -52,6 +52,15 @@
 		border-color: $light-gray-500;
 	}
 
+	&.is-multi-selected *::selection {
+		background: transparent;
+	}
+
+	&.is-multi-selected:before {
+		background: $blue-medium-100;
+		border: 2px solid $blue-medium-200;
+	}
+
 	.iframe-overlay {
 		position: relative;
 	}
