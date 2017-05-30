@@ -242,11 +242,17 @@ function gutenberg_register_scripts() {
 	wp_register_script(
 		'wp-blocks',
 		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-element', 'tinymce-nightly', 'tinymce-nightly-lists' ),
+		array( 'wp-element', 'wp-components', 'tinymce-nightly', 'tinymce-nightly-lists' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
 	);
 
 	// Editor Styles.
+	wp_register_style(
+		'wp-components',
+		plugins_url( 'components/build/style.css', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/style.css' )
+	);
 	wp_register_style(
 		'wp-blocks',
 		plugins_url( 'blocks/build/style.css', __FILE__ ),
@@ -536,7 +542,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_style(
 		'wp-editor',
 		plugins_url( 'editor/build/style.css', __FILE__ ),
-		array( 'wp-blocks' ),
+		array( 'wp-components', 'wp-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/style.css' )
 	);
 }
