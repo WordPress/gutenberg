@@ -15,6 +15,20 @@ const entryPointNames = [
 	'i18n',
 ];
 
+const externals = {
+	react: 'React',
+	'react-dom': 'ReactDOM',
+	'react-dom/server': 'ReactDOMServer',
+	tinymce: 'tinymce',
+	moment: 'moment',
+};
+
+entryPointNames.forEach( entryPointName => {
+	externals[ entryPointName ] = {
+		'this': [ 'wp', entryPointName ],
+	};
+} );
+
 const config = {
 	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
 		memo[ entryPointName ] = './' + entryPointName + '/index.js';
@@ -26,13 +40,7 @@ const config = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
-	externals: {
-		react: 'React',
-		'react-dom': 'ReactDOM',
-		'react-dom/server': 'ReactDOMServer',
-		tinymce: 'tinymce',
-		moment: 'moment',
-	},
+	externals,
 	resolve: {
 		modules: [
 			__dirname,
@@ -126,7 +134,7 @@ switch ( process.env.NODE_ENV ) {
 		];
 		config.externals = [
 			...config.externals,
-			require( 'webpack-node-externals' )()
+			require( 'webpack-node-externals' )(),
 		];
 		config.output = {
 			filename: 'build/test.js',
