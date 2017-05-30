@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
-import { Toolbar } from 'components';
+import { IconButton, Toolbar } from 'components';
 
 const FORMATTING_CONTROLS = [
 	{

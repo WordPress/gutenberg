@@ -8,8 +8,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from 'components';
-import { withFocusReturn } from 'components';
+import { Dashicon, withFocusReturn } from 'components';
 
 /**
  * Internal dependencies

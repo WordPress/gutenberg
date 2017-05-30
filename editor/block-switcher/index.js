@@ -8,8 +8,7 @@ import clickOutside from 'react-click-outside';
 /**
  * WordPress dependencies
  */
-import { IconButton } from 'components';
-import { Dashicon } from 'components';
+import { Dashicon, IconButton } from 'components';
 
 /**
  * Internal dependencies
