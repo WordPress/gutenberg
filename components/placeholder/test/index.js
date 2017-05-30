@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import Placeholder from '../';
+import { Placeholder } from 'components';
 
 describe( 'Placeholder', () => {
 	describe( 'basic rendering', () => {
@@ -27,10 +27,11 @@ describe( 'Placeholder', () => {
 			expect( placeholderFieldset.exists() ).to.be.true();
 		} );
 
-		it( 'should render an Dashicon in the label section', () => {
+		it( 'should render a Dashicon in the label section', () => {
 			const placeholder = shallow( <Placeholder icon="wordpress" /> );
-			const placeholderLabel = placeholder.find( '.components-placeholder__label' ).shallow();
+			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
 
+			expect( placeholderLabel.exists() ).to.be.true();
 			expect( placeholderLabel.find( 'Dashicon' ).exists() ).to.be.true();
 		} );
 
@@ -71,7 +72,7 @@ describe( 'Placeholder', () => {
 
 		it( 'should add additional props to the top level container', () => {
 			const placeholder = shallow( <Placeholder test="test" /> );
-			expect( placeholder.props().test ).to.equal( 'test' );
+			expect( placeholder.prop( 'test' ) ).to.equal( 'test' );
 		} );
 	} );
 } );
