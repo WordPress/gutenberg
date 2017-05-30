@@ -178,8 +178,6 @@ function gutenberg_register_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
-
-	// Editor Scripts.
 	gutenberg_register_vendor_script(
 		'tinymce-nightly',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
@@ -189,6 +187,8 @@ function gutenberg_register_scripts() {
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
 	);
+
+	// Editor Scripts.
 	wp_register_script(
 		'wp-date',
 		plugins_url( 'date/build/index.js', __FILE__ ),
@@ -232,6 +232,12 @@ function gutenberg_register_scripts() {
 		plugins_url( 'element/build/index.js', __FILE__ ),
 		array( 'react', 'react-dom', 'react-dom-server' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' )
+	);
+	wp_register_script(
+		'wp-components',
+		plugins_url( 'components/build/index.js', __FILE__ ),
+		array( 'wp-element' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
@@ -473,7 +479,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
