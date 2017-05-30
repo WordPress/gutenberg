@@ -7,4 +7,4 @@ export { default as Placeholder } from './placeholder';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
 
-export { default as WithFocusReturn } from './higher-order/with-focus-return';
+export { default as withFocusReturn } from './higher-order/with-focus-return';
