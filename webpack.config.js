@@ -6,15 +6,20 @@ const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
+const entryPointNames = [
+	'blocks',
+	'components',
+	'date',
+	'editor',
+	'element',
+	'i18n',
+];
+
 const config = {
-	entry: {
-		blocks: './blocks/index.js',
-		components: './components/index.js',
-		date: './date/index.js',
-		editor: './editor/index.js',
-		element: './element/index.js',
-		i18n: './i18n/index.js',
-	},
+	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
+		memo[ entryPointName ] = './' + entryPointName + '/index.js';
+		return memo;
+	}, {} ),
 	output: {
 		filename: '[name]/build/index.js',
 		path: __dirname,
@@ -103,14 +108,7 @@ switch ( process.env.NODE_ENV ) {
 			__dirname: true,
 		};
 		config.module.rules = [
-			...[
-				'blocks',
-				'components',
-				'date',
-				'editor',
-				'element',
-				'i18n',
-			].map( ( entry ) => ( {
+			...entryPointNames.map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
 				use: 'expose-loader?wp.' + entry,
 			} ) ),
@@ -120,16 +118,16 @@ switch ( process.env.NODE_ENV ) {
 			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
 		);
 		config.entry = [
-			'./element/index.js',
-			'./blocks/index.js',
-			'./components/index.js',
-			'./date/index.js',
-			'./editor/index.js',
-			'./i18n/index.js',
+			...entryPointNames.map(
+				entryPointName => './' + entryPointName + '/index.js'
+			),
 			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
 			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
 		];
-		config.externals = [ require( 'webpack-node-externals' )() ];
+		config.externals = [
+			...config.externals,
+			require( 'webpack-node-externals' )()
+		];
 		config.output = {
 			filename: 'build/test.js',
 			path: __dirname,
