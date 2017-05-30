@@ -3,6 +3,12 @@ require( 'chai' )
 	.use( require( 'dirty-chai' ) )
 	.use( require( 'sinon-chai' ) );
 
+// Sinon plugins
+const sinon = require( 'sinon' );
+const sinonTest = require( 'sinon-test' );
+sinon.test = sinonTest.configureTest( sinon );
+sinon.testCase = sinonTest.configureTestCase( sinon );
+
 // Fake DOM
 const { JSDOM } = require( 'jsdom' );
 const dom = new JSDOM( '', {
