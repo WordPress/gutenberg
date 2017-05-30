@@ -1,10 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import Placeholder from 'components/placeholder';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlock, query } from '../../api';
 import Editable from '../../editable';
-import Dashicon from 'components/dashicon';
 import MediaUploadButton from '../../media-upload-button';
 
 const { attr, text } = query;
@@ -23,6 +27,29 @@ function toggleAlignment( align ) {
 	};
 }
 
+const editMediaLibrary = ( attributes, setAttributes ) => {
+	const frameConfig = {
+		frame: 'post',
+		title: wp.i18n.__( 'Change cover image' ),
+		button: {
+			text: wp.i18n.__( 'Select' ),
+		},
+		// TODO select
+		selection: new wp.media.model.Selection( attributes.image ),
+	};
+
+	const editFrame = wp.media( frameConfig );
+	function updateFn( model ) {
+		setAttributes( {
+			url: model.single().attributes.url,
+			image: model.single().attributes,
+		} );
+	}
+
+	editFrame.on( 'insert', updateFn );
+	editFrame.open( 'cover-image' );
+};
+
 registerBlock( 'core/cover-image', {
 	title: wp.i18n.__( 'Cover Image' ),
 
@@ -40,7 +67,7 @@ registerBlock( 'core/cover-image', {
 			icon: 'format-image',
 			title: wp.i18n.__( 'Change Image' ),
 			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
+			onClick: editMediaLibrary,
 		},
 		{
 			icon: 'align-left',
@@ -51,7 +78,7 @@ registerBlock( 'core/cover-image', {
 		{
 			icon: 'align-center',
 			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
+			isActive: ( { align } ) => ! align || 'center' === align,
 			onClick: toggleAlignment( 'center' ),
 		},
 		{
@@ -79,24 +106,23 @@ registerBlock( 'core/cover-image', {
 		const { url, title } = attributes;
 
 		if ( ! url ) {
+			const uploadButtonProps = { isLarge: true };
+			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
 			return (
-				<div className="blocks-image is-placeholder">
-					<div className="blocks-image__placeholder-label">
-						<Dashicon icon="format-image" />
-						{ wp.i18n.__( 'Cover Image' ) }
-					</div>
-					<div className="blocks-image__placeholder-instructions">
-						{ wp.i18n.__( 'Drag image here or insert from media library' ) }
-					</div>
+				<Placeholder
+					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					icon="format-image"
+					label={ wp.i18n.__( 'Image' ) }
+					className="blocks-image">
 					<MediaUploadButton
-						buttonProps={ { isLarge: true } }
-						onSelect={ ( media ) => setAttributes( { url: media.url } ) }
+						buttonProps={ uploadButtonProps }
+						onSelect={ setMediaUrl }
 						type="image"
 						auto-open
 					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</div>
+				</Placeholder>
 			);
 		}
 
@@ -128,8 +154,10 @@ registerBlock( 'core/cover-image', {
 		};
 
 		return (
-			<section className="cover-image" data-url={ url } style={ style }>
-				<h2>{ title }</h2>
+			<section className="blocks-cover-image">
+				<section className="cover-image" data-url={ url } style={ style }>
+					<h2>{ title }</h2>
+				</section>
 			</section>
 		);
 	},
