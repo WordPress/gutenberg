@@ -81,11 +81,11 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'INSERT_BLOCK',
-				block: {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
 					uid: 'ribs',
 					blockType: 'core/freeform',
-				},
+				} ],
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 2 );
@@ -244,12 +244,12 @@ describe( 'state', () => {
 			} );
 
 			const state = editor( original, {
-				type: 'INSERT_BLOCK',
+				type: 'INSERT_BLOCKS',
 				after: 'kumquat',
-				block: {
+				blocks: [ {
 					uid: 'persimmon',
 					blockType: 'core/freeform',
-				},
+				} ],
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 3 );
@@ -571,11 +571,11 @@ describe( 'state', () => {
 
 		it( 'should return with inserted block', () => {
 			const state = selectedBlock( undefined, {
-				type: 'INSERT_BLOCK',
-				block: {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
 					uid: 'ribs',
 					blockType: 'core/freeform',
-				},
+				} ],
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );

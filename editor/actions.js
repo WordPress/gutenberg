@@ -24,8 +24,16 @@ export function replaceBlocks( uids, blocks ) {
 
 export function insertBlock( block, after ) {
 	return {
-		type: 'INSERT_BLOCK',
-		block,
+		type: 'INSERT_BLOCKS',
+		blocks: [ block ],
+		after,
+	};
+}
+
+export function insertBlocks( blocks, after ) {
+	return {
+		type: 'INSERT_BLOCKS',
+		blocks,
 		after,
 	};
 }

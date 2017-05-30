@@ -27,7 +27,7 @@ registerBlock( 'core/text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, insertBlockAfter, insertBlocksAfter, focus, setFocus, mergeBlocks } ) {
 		const { content } = attributes;
 
 		return (
@@ -46,6 +46,7 @@ registerBlock( 'core/text', {
 						content: after,
 					} ) );
 				} }
+				insertBlocksAfter={ insertBlocksAfter }
 				onMerge={ mergeBlocks }
 				showAlignments
 			/>
