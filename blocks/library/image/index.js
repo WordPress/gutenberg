@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Placeholder from 'components/placeholder';
+import { Placeholder } from 'components';
 
 /**
  * Internal dependencies

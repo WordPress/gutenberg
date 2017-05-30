@@ -7,7 +7,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
+import { Dashicon } from 'components';
 
 /**
  * Internal dependencies

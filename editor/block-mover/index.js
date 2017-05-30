@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import IconButton from 'components/icon-button';
+import { IconButton } from 'components';
 
 /**
  * Internal dependencies

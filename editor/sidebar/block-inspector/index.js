@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Panel from 'components/panel';
-import PanelHeader from 'components/panel/header';
-import PanelBody from 'components/panel/body';
+import { Panel } from 'components';
+import { PanelHeader } from 'components';
+import { PanelBody } from 'components';
 
 /**
  * Internal Dependencies

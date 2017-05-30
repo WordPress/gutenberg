@@ -10,7 +10,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import Toolbar from 'components/toolbar';
+import { Toolbar } from 'components';
 
 /**
  * Internal dependencies
