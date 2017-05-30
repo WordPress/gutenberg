@@ -146,7 +146,7 @@ Registers a new block-level control. Controls appear in a block's toolbar when i
 
 Inline controls for [`Editable`](#editable) elements are identical for every block and cannot be modified.
 
-### `wp.blocks.getBlockSettings( slug: string )`
+### `wp.blocks.getBlockType( slug: string )`
 
 Returns settings associated with a registered block.
 

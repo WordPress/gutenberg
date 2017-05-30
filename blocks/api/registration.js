@@ -87,12 +87,12 @@ export function getUnknownTypeHandler() {
 }
 
 /**
- * Returns a registered block and its settings.
+ * Returns a registered block type.
  *
  * @param  {string}  slug Block slug
- * @return {?Object}      Block settings
+ * @return {?Object}      Block type
  */
-export function getBlockSettings( slug ) {
+export function getBlockType( slug ) {
 	return blocks[ slug ];
 }
 

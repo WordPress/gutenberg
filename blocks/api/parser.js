@@ -9,18 +9,18 @@ import { escape, unescape, pickBy } from 'lodash';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
 
 /**
  * Returns the block attributes parsed from raw content.
  *
  * @param  {String} rawContent    Raw block content
- * @param  {Object} blockSettings Block settings
+ * @param  {Object} blockType     Block type
  * @return {Object}               Block attributes
  */
-export function parseBlockAttributes( rawContent, blockSettings ) {
-	const { attributes } = blockSettings;
+export function parseBlockAttributes( rawContent, blockType ) {
+	const { attributes } = blockType;
 	if ( 'function' === typeof attributes ) {
 		return attributes( rawContent );
 	} else if ( attributes ) {
@@ -41,20 +41,20 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
 /**
  * Returns the block attributes of a registered block node given its settings.
  *
- * @param  {?Object} blockSettings Block settings
+ * @param  {?Object} blockType     Block type
  * @param  {string}  rawContent    Raw block content
  * @param  {?Object} attributes    Known block attributes (from delimiters)
  * @return {Object}                All block attributes
  */
-export function getBlockAttributes( blockSettings, rawContent, attributes ) {
+export function getBlockAttributes( blockType, rawContent, attributes ) {
 	// Merge any attributes present in comment delimiters with those
 	// that are specified in the block implementation.
 	attributes = attributes || {};
-	if ( blockSettings ) {
+	if ( blockType ) {
 		attributes = {
 			...attributes,
-			...blockSettings.defaultAttributes,
-			...parseBlockAttributes( rawContent, blockSettings ),
+			...blockType.defaultAttributes,
+			...parseBlockAttributes( rawContent, blockType ),
 		};
 	}
 
@@ -64,32 +64,32 @@ export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} blockType  Block type slug
+ * @param  {?String} name       Block type slug
  * @param  {String}  rawContent Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( blockType, rawContent, attributes ) {
+export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
-	blockType = blockType || getUnknownTypeHandler();
+	name = name || getUnknownTypeHandler();
 
-	// Try finding settings for known block type, else fall back again.
-	let blockSettings = getBlockSettings( blockType );
-	const fallbackBlockType = getUnknownTypeHandler();
-	if ( ! blockSettings ) {
-		blockType = fallbackBlockType;
-		blockSettings = getBlockSettings( blockType );
+	// Try finding settings for known block name, else fall back again.
+	let blockType = getBlockType( name );
+	const fallbackBlock = getUnknownTypeHandler();
+	if ( ! blockType ) {
+		name = fallbackBlock;
+		blockType = getBlockType( name );
 	}
 
 	// Include in set only if settings were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockSettings && ( rawContent.trim() || blockType !== fallbackBlockType ) ) {
+	if ( blockType && ( rawContent.trim() || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			blockType,
-			getBlockAttributes( blockSettings, rawContent.trim(), attributes )
+			name,
+			getBlockAttributes( blockType, rawContent.trim(), attributes )
 		);
 		return block;
 	}

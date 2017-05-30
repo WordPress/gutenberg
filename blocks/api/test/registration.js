@@ -14,7 +14,7 @@ import {
 	unregisterBlock,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
-	getBlockSettings,
+	getBlockType,
 	getBlockTypes,
 } from '../registration';
 
@@ -64,11 +64,11 @@ describe( 'blocks', () => {
 			expect( block ).to.be.undefined();
 		} );
 
-		it( 'should store a copy of block settings', () => {
-			const blockSettings = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockSettings );
-			blockSettings.mutated = true;
-			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
+		it( 'should store a copy of block type', () => {
+			const blockType = { settingName: 'settingValue' };
+			registerBlock( 'core/test-block-with-settings', blockType );
+			blockType.mutated = true;
+			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 			} );
@@ -108,18 +108,18 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'getBlockSettings()', () => {
+	describe( 'getBlockType()', () => {
 		it( 'should return { slug } for blocks with no settings', () => {
 			registerBlock( 'core/test-block' );
-			expect( getBlockSettings( 'core/test-block' ) ).to.eql( {
+			expect( getBlockType( 'core/test-block' ) ).to.eql( {
 				slug: 'core/test-block',
 			} );
 		} );
 
-		it( 'should return all block settings', () => {
-			const blockSettings = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockSettings );
-			expect( getBlockSettings( 'core/test-block-with-settings' ) ).to.eql( {
+		it( 'should return all block type elements', () => {
+			const blockType = { settingName: 'settingValue' };
+			registerBlock( 'core/test-block-with-settings', blockType );
+			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 			} );
@@ -133,8 +133,8 @@ describe( 'blocks', () => {
 
 		it( 'should return all registered blocks', () => {
 			registerBlock( 'core/test-block' );
-			const blockSettings = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockSettings );
+			const blockType = { settingName: 'settingValue' };
+			registerBlock( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).to.eql( [
 				{ slug: 'core/test-block' },
 				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },

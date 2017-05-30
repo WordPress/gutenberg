@@ -7,30 +7,30 @@ import { get, castArray, findIndex, isObjectLike, find } from 'lodash';
 /**
  * Internal dependencies
  */
-import { getBlockSettings } from './registration';
+import { getBlockType } from './registration';
 
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} blockType   BlockType
+ * @param  {String} blockName   Block name
  * @param  {Object} attributes  Block attributes
  * @return {Object}             Block object
  */
-export function createBlock( blockType, attributes = {} ) {
+export function createBlock( blockName, attributes = {} ) {
 	// Get the type definition associated with a registered block.
-	const blockSettings = getBlockSettings( blockType );
+	const blockType = getBlockType( blockName );
 
 	// Do we need this? What purpose does it have?
 	let defaultAttributes;
-	if ( blockSettings ) {
-		defaultAttributes = blockSettings.defaultAttributes;
+	if ( blockType ) {
+		defaultAttributes = blockType.defaultAttributes;
 	}
 
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
 	return {
 		uid: uuid(),
-		blockType,
+		blockName,
 		attributes: {
 			...defaultAttributes,
 			...attributes,
@@ -48,13 +48,13 @@ export function createBlock( blockType, attributes = {} ) {
 export function switchToBlockType( block, blockType ) {
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationSettings = getBlockSettings( blockType );
-	const sourceSettings = getBlockSettings( block.blockType );
+	const destinationSettings = getBlockType( blockType );
+	const sourceSettings = getBlockType( block.blockName );
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
 	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
 	const transformation =
 		find( transformationsTo, t => t.blocks.indexOf( blockType ) !== -1 ) ||
-		find( transformationsFrom, t => t.blocks.indexOf( block.blockType ) !== -1 );
+		find( transformationsFrom, t => t.blocks.indexOf( block.blockName ) !== -1 );
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
@@ -75,7 +75,7 @@ export function switchToBlockType( block, blockType ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockSettings( result.blockType ) ) ) {
+	if ( transformationResults.some( ( result ) => ! getBlockType( result.blockType ) ) ) {
 		return null;
 	}
 

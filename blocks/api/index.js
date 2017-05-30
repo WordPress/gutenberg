@@ -13,6 +13,6 @@ export {
 	unregisterBlock,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
-	getBlockSettings,
+	getBlockType,
 	getBlockTypes,
 } from './registration';

@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockSettings, switchToBlockType } from 'blocks';
+import { getBlockType, switchToBlockType } from 'blocks';
 import { __ } from 'i18n';
 
 /**
@@ -71,10 +71,10 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const [ blockA, blockB ] = action.blocks;
-		const blockASettings = getBlockSettings( blockA.blockType );
+		const blockType = getBlockType( blockA.blockType );
 
 		// Only focus the previous block if it's not mergeable
-		if ( ! blockASettings.merge ) {
+		if ( ! blockType.merge ) {
 			dispatch( focusBlock( blockA.uid ) );
 			return;
 		}
@@ -91,7 +91,7 @@ export default {
 		}
 
 		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockASettings.merge(
+		const updatedAttributes = blockType.merge(
 			blockA.attributes,
 			blocksWithTheSameType[ 0 ].attributes
 		);
