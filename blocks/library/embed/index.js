@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button, Placeholder } from 'components';
+import Button from 'components/button';
+import Placeholder from 'components/placeholder';
+import HtmlEmbed from 'components/html-embed';
 
 /**
  * Internal dependencies
@@ -34,7 +36,6 @@ registerBlock( 'core/embed', {
 	category: 'embed',
 
 	attributes: {
-		url: attr( 'iframe', 'src' ),
 		title: attr( 'iframe', 'title' ),
 		caption: children( 'figcaption' ),
 	},
@@ -73,52 +74,121 @@ registerBlock( 'core/embed', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, title, caption } = attributes;
+	edit: class extends wp.element.Component {
+		constructor() {
+			super( ...arguments );
+			this.doServerSideRender = this.doServerSideRender.bind( this );
+			this.state = {
+				html: '',
+				type: '',
+				error: false,
+				fetching: false,
+			};
+			this.noPreview = [
+				'facebook.com',
+			];
+		}
 
-		if ( ! url ) {
-			return (
-				<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
-					<input type="url" className="placeholder__input" placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) } />
-					<Button isLarge>
-						{ wp.i18n.__( 'Embed' ) }
-					</Button>
-				</Placeholder>
+		doServerSideRender( event ) {
+			event.preventDefault();
+			const { url } = this.props.attributes;
+			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce
+
+			this.setState( { error: false, fetching: true } );
+			fetch( api_url, {
+				credentials: 'include',
+			} ).then(
+				( response ) => {
+					response.json().then( ( obj ) => {
+						const { html, type } = obj;
+						if ( html ) {
+							this.setState( { html, type } );
+						} else {
+							this.setState( { error: true } );
+						}
+						this.setState( { fetching: false } );
+					} );
+				}
 			);
 		}
 
-		return (
-			<figure className="blocks-embed">
-				<div className="iframe-overlay">
-					<iframe src={ url } title={ title } />
-				</div>
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ wp.i18n.__( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus }
-						onFocus={ setFocus }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
-						inlineToolbar
-					/>
-				) : null }
-			</figure>
-		);
+		render() {
+			const { html, type, error, fetching } = this.state;
+			const { url, caption } = this.props.attributes;
+			const { setAttributes, focus, setFocus } = this.props;
+
+			if ( ! html ) {
+				return (
+					<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className={ placeholderClassName }>
+						<form onSubmit={ this.doServerSideRender }>
+							<input
+								type="url"
+								className="placeholder__input"
+								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
+								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
+							{ ! fetching ?
+								(
+									<Button
+										isLarge
+										type="submit">
+										{ wp.i18n.__( 'Embed' ) }
+									</Button>
+								) : (
+									<span className="spinner is-active" />
+								)
+							}
+							{ ( error ) ? (
+								<p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p>
+							) : null }
+						</form>
+					</Placeholder>
+				);
+			}
+
+			const domain = url.split( '/' )[ 2 ].replace( /^www\./, '' );
+			const cannotPreview = this.noPreview.includes( domain );
+			let placeholderClassName = 'blocks-embed';
+
+			if ( 'video' == type ) {
+				placeholderClassName = 'blocks-embed-video';
+			}
+
+			return (
+				<figure>
+					{ ( cannotPreview ) ? (
+						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
+							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
+							<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+						</Placeholder>
+					) : (
+						<HtmlEmbed html={ html } />
+					) }
+					{ ( caption && caption.length > 0 ) || !! focus ? (
+						<Editable
+							tagName="figcaption"
+							placeholder={ wp.i18n.__( 'Write caption…' ) }
+							value={ caption }
+							focus={ focus }
+							onFocus={ setFocus }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							inline
+							inlineToolbar
+						/>
+					) : null }
+				</figure>
+			);
+		}
 	},
 
 	save( { attributes } ) {
-		const { url, title, caption } = attributes;
-		const iframe = <iframe src={ url } title={ title } />;
-
+		const { url, caption } = attributes;
 		if ( ! caption || ! caption.length ) {
-			return iframe;
+			return url;
 		}
 
 		return (
 			<figure>
-				{ iframe }
+				{ url }
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
