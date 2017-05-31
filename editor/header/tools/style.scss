@@ -50,7 +50,7 @@
 		overflow: hidden;
 
 		&:hover {
-			color: $blue-medium;
+			color: $blue-medium-500;
 		}
 
 		@include break-medium() {

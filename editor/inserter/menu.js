@@ -8,8 +8,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
-import withFocusReturn from 'components/higher-order/with-focus-return';
+import { Dashicon, withFocusReturn } from 'components';
+import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -178,7 +178,7 @@ class InserterMenu extends wp.element.Component {
 
 	onKeyDown( keydown ) {
 		switch ( keydown.keyCode ) {
-			case 9 : /* Tab */
+			case TAB:
 				if ( keydown.shiftKey ) {
 					// Previous.
 					keydown.preventDefault();
@@ -189,31 +189,31 @@ class InserterMenu extends wp.element.Component {
 				keydown.preventDefault();
 				this.focusNext( this );
 				break;
-			case 27 : /* Escape */
+			case ESCAPE:
 				keydown.preventDefault();
 				this.props.onSelect( null );
 
 				break;
-			case 37 : /* ArrowLeft */
+			case LEFT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusPrevious( this );
 
 				break;
-			case 38 : /* ArrowUp */
+			case UP:
 				keydown.preventDefault();
 				this.focusPrevious( this );
 
 				break;
-			case 39 : /* ArrowRight */
+			case RIGHT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusNext( this );
 
 				break;
-			case 40 : /* ArrowDown */
+			case DOWN:
 				keydown.preventDefault();
 				this.focusNext( this );
 

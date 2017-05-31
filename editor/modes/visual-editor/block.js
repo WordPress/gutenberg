@@ -11,8 +11,8 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children } from 'element';
-import Toolbar from 'components/toolbar';
-import ToolbarMenu from 'components/toolbar-menu';
+import { Toolbar, ToolbarMenu } from 'components';
+import { BACKSPACE, ESCAPE } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -20,7 +20,6 @@ import ToolbarMenu from 'components/toolbar-menu';
 import BlockMover from '../../block-mover';
 import BlockSwitcher from '../../block-switcher';
 import {
-	deselectBlock,
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
@@ -33,6 +32,9 @@ import {
 	getBlockOrder,
 	isBlockHovered,
 	isBlockSelected,
+	isBlockMultiSelected,
+	isFirstSelectedBlock,
+	getSelectedBlocks,
 	isTypingInBlock,
 } from '../../selectors';
 
@@ -61,8 +63,8 @@ class VisualEditorBlock extends wp.element.Component {
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
-			this.props.isSelected &&
-			newProps.isSelected
+			( ( this.props.isSelected && newProps.isSelected ) ||
+			( this.props.isFirstSelected && newProps.isFirstSelected ) )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
@@ -79,10 +81,13 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	maybeHover() {
-		const { isTyping, isHovered, onHover } = this.props;
-		if ( isTyping && ! isHovered ) {
-			onHover();
+		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
+
+		if ( isHovered || isSelected || isMultiSelected ) {
+			return;
 		}
+
+		onHover();
 	}
 
 	maybeStartTyping() {
@@ -97,20 +102,34 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	removeOrDeselect( event ) {
-		const { keyCode, target } = event;
+	removeOrDeselect( { keyCode, target } ) {
+		const {
+			uid,
+			selectedBlocks,
+			previousBlock,
+			onRemove,
+			onFocus,
+			onDeselect,
+		} = this.props;
 
 		// Remove block on backspace
-		if ( 8 /* Backspace */ === keyCode && target === this.node ) {
-			this.props.onRemove( this.props.uid );
-			if ( this.props.previousBlock ) {
-				this.props.onFocus( this.props.previousBlock.uid, { offset: -1 } );
+		if ( BACKSPACE === keyCode ) {
+			if ( target === this.node ) {
+				onRemove( [ uid ] );
+
+				if ( previousBlock ) {
+					onFocus( previousBlock.uid, { offset: -1 } );
+				}
+			}
+
+			if ( selectedBlocks.length ) {
+				onRemove( selectedBlocks );
 			}
 		}
 
 		// Deselect on escape
-		if ( 27 /* Escape */ === event.keyCode ) {
-			this.props.onDeselect();
+		if ( ESCAPE === keyCode ) {
+			onDeselect();
 		}
 	}
 
@@ -162,7 +181,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { block } = this.props;
+		const { block, selectedBlocks } = this.props;
 		const settings = wp.blocks.getBlockSettings( block.blockType );
 
 		let BlockEdit;
@@ -174,14 +193,15 @@ class VisualEditorBlock extends wp.element.Component {
 			return null;
 		}
 
-		const { isHovered, isSelected, isTyping, focus } = this.props;
+		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
+			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onHover, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onSelect, onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper
 		let wrapperProps;
@@ -195,18 +215,24 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
-				onClick={ this.selectAndStopPropagation }
-				onFocus={ onSelect }
 				onKeyDown={ this.removeOrDeselect }
-				onMouseEnter={ onHover }
-				onMouseMove={ this.maybeHover }
+				onMouseDown={ this.props.onSelectionStart }
+				onTouchStart={ this.props.onSelectionStart }
+				onMouseMove={ () => {
+					this.props.onSelectionChange();
+					this.maybeHover();
+				} }
+				onTouchMove={ this.props.onSelectionChange }
+				onMouseUp={ this.props.onSelectionEnd }
+				onTouchEnd={ this.props.onSelectionEnd }
+				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
 				data-type={ block.blockType }
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } /> }
+				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ showUI &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
@@ -238,7 +264,27 @@ class VisualEditorBlock extends wp.element.Component {
 						</div>
 					</CSSTransitionGroup>
 				}
-				<div onKeyPress={ this.maybeStartTyping }>
+				{ isFirstSelected && (
+					<BlockMover uids={ selectedBlocks } />
+				) }
+				{ isFirstSelected && (
+					<div className="editor-visual-editor__block-controls">
+						<Toolbar
+							controls={ [ {
+								icon: 'trash',
+								title: '',
+								onClick: () => this.props.onRemove( selectedBlocks ),
+								isActive: false,
+							} ] }
+							focus={ true }
+						/>
+					</div>
+				) }
+				<div
+					onKeyPress={ this.maybeStartTyping }
+					onFocus={ onSelect }
+					onClick={ this.selectAndStopPropagation }
+				>
 					<BlockEdit
 						focus={ focus }
 						attributes={ block.attributes }
@@ -261,6 +307,9 @@ export default connect(
 			nextBlock: getNextBlock( state, ownProps.uid ),
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
+			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
+			isFirstSelected: isFirstSelectedBlock( state, ownProps.uid ),
+			selectedBlocks: getSelectedBlocks( state ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
@@ -283,7 +332,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( deselectBlock( ownProps.uid ) );
+			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
 		},
 		onStartTyping() {
 			dispatch( {
@@ -314,10 +363,10 @@ export default connect(
 			dispatch( focusBlock( ...args ) );
 		},
 
-		onRemove( uid ) {
+		onRemove( uids ) {
 			dispatch( {
-				type: 'REMOVE_BLOCK',
-				uid,
+				type: 'REMOVE_BLOCKS',
+				uids,
 			} );
 		},
 

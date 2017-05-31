@@ -178,8 +178,6 @@ function gutenberg_register_scripts() {
 		'https://unpkg.com/moment@2.18.1/' . $moment_script,
 		array( 'react' )
 	);
-
-	// Editor Scripts.
 	gutenberg_register_vendor_script(
 		'tinymce-nightly',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
@@ -188,6 +186,14 @@ function gutenberg_register_scripts() {
 		'tinymce-nightly-lists',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
+	);
+
+	// Editor Scripts.
+	wp_register_script(
+		'wp-utils',
+		plugins_url( 'utils/build/index.js', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'utils/build/index.js' )
 	);
 	wp_register_script(
 		'wp-date',
@@ -234,13 +240,25 @@ function gutenberg_register_scripts() {
 		filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' )
 	);
 	wp_register_script(
+		'wp-components',
+		plugins_url( 'components/build/index.js', __FILE__ ),
+		array( 'wp-element' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/index.js' )
+	);
+	wp_register_script(
 		'wp-blocks',
 		plugins_url( 'blocks/build/index.js', __FILE__ ),
-		array( 'wp-element', 'tinymce-nightly', 'tinymce-nightly-lists' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
 	);
 
 	// Editor Styles.
+	wp_register_style(
+		'wp-components',
+		plugins_url( 'components/build/style.css', __FILE__ ),
+		array(),
+		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/style.css' )
+	);
 	wp_register_style(
 		'wp-blocks',
 		plugins_url( 'blocks/build/style.css', __FILE__ ),
@@ -473,7 +491,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		plugins_url( 'editor/build/index.js', __FILE__ ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
@@ -530,7 +548,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_style(
 		'wp-editor',
 		plugins_url( 'editor/build/style.css', __FILE__ ),
-		array( 'wp-blocks' ),
+		array( 'wp-components', 'wp-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/style.css' )
 	);
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import IconButton from 'components/icon-button';
+import { IconButton } from 'components';
 
 class PanelBody extends Component {
 	constructor( props ) {
