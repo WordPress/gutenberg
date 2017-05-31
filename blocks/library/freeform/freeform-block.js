@@ -74,6 +74,8 @@ export default class FreeformBlock extends wp.element.Component {
 		super();
 		this.state = {
 			editor: null,
+			listType: null,
+			inBlockQuote: false,
 		};
 		this.setEditor = this.setEditor.bind( this );
 		this.controls = this.controls.bind( this );
