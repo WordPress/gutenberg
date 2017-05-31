@@ -41,7 +41,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure><iframe src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption>State of the Word 2016</figcaption></figure>',
+			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/heading -->',
