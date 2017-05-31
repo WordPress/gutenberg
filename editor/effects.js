@@ -19,7 +19,6 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch } = store;
 		const { postId, edits } = action;
-		const isNew = ! postId;
 		const toSend = postId ? { id: postId, ...edits } : edits;
 
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
@@ -36,7 +35,6 @@ export default {
 					message: __( 'An unknown error occurred.' ),
 				} ),
 				edits,
-				isNew,
 			} );
 		} );
 	},

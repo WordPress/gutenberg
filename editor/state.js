@@ -392,7 +392,6 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isNew: action.isNew,
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -400,7 +399,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -408,7 +406,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
-				isNew: action.isNew,
 			};
 	}
 

@@ -500,16 +500,6 @@ export function didPostSaveRequestFail( state ) {
 }
 
 /**
- * Returns true if the post being saved is a new draft, or false otherwise.
- *
- * @param  {Object}  state Global application state
- * @return {Boolean}       Whether post being saved is a new draft
- */
-export function isSavingNewPost( state ) {
-	return state.saving.isNew;
-}
-
-/**
  * Returns a suggested post format for the current post, inferred only if there
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.
