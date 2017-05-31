@@ -39,7 +39,7 @@ export function parseBlockAttributes( rawContent, blockType ) {
 }
 
 /**
- * Returns the block attributes of a registered block node given its settings.
+ * Returns the block attributes of a registered block node given its type.
  *
  * @param  {?Object} blockType     Block type
  * @param  {string}  rawContent    Raw block content
@@ -73,7 +73,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandler();
 
-	// Try finding settings for known block name, else fall back again.
+	// Try finding type for known block name, else fall back again.
 	let blockType = getBlockType( name );
 	const fallbackBlock = getUnknownTypeHandler();
 	if ( ! blockType ) {
@@ -81,7 +81,7 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
 		blockType = getBlockType( name );
 	}
 
-	// Include in set only if settings were determined.
+	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
 	if ( blockType && ( rawContent.trim() || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.

@@ -48,10 +48,10 @@ export function createBlock( blockName, attributes = {} ) {
 export function switchToBlockType( block, blockName ) {
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationSettings = getBlockType( blockName );
-	const sourceSettings = getBlockType( block.blockName );
-	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
-	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
+	const destinationType = getBlockType( blockName );
+	const sourceType = getBlockType( block.blockName );
+	const transformationsFrom = get( destinationType, 'transforms.from', [] );
+	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
 		find( transformationsTo, t => t.blocks.indexOf( blockName ) !== -1 ) ||
 		find( transformationsFrom, t => t.blocks.indexOf( block.blockName ) !== -1 );

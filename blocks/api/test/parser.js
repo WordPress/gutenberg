@@ -31,7 +31,7 @@ describe( 'block parser', () => {
 
 	describe( 'parseBlockAttributes()', () => {
 		it( 'should use the function implementation', () => {
-			const blockSettings = {
+			const blockType = {
 				attributes: function( rawContent ) {
 					return {
 						content: rawContent + ' & Chicken',
@@ -39,13 +39,13 @@ describe( 'block parser', () => {
 				},
 			};
 
-			expect( parseBlockAttributes( 'Ribs', blockSettings ) ).to.eql( {
+			expect( parseBlockAttributes( 'Ribs', blockType ) ).to.eql( {
 				content: 'Ribs & Chicken',
 			} );
 		} );
 
 		it( 'should use the query object implementation', () => {
-			const blockSettings = {
+			const blockType = {
 				attributes: {
 					emphasis: text( 'strong' ),
 					ignoredDomMatcher: ( node ) => node.innerHTML,
@@ -54,22 +54,22 @@ describe( 'block parser', () => {
 
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {
+			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {
 				emphasis: '& Chicken',
 			} );
 		} );
 
 		it( 'should return an empty object if no attributes defined', () => {
-			const blockSettings = {};
+			const blockType = {};
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, blockSettings ) ).to.eql( {} );
+			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {} );
 		} );
 	} );
 
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
-			const blockSettings = {
+			const blockType = {
 				attributes: function( rawContent ) {
 					return {
 						content: rawContent + ' & Chicken',
@@ -83,7 +83,7 @@ describe( 'block parser', () => {
 			const rawContent = 'Ribs';
 			const attrs = { align: 'left' };
 
-			expect( getBlockAttributes( blockSettings, rawContent, attrs ) ).to.eql( {
+			expect( getBlockAttributes( blockType, rawContent, attrs ) ).to.eql( {
 				align: 'left',
 				topic: 'none',
 				content: 'Ribs & Chicken',

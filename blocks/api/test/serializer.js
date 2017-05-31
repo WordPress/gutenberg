@@ -89,7 +89,7 @@ describe( 'block serializer', () => {
 
 	describe( 'serialize()', () => {
 		it( 'should serialize the post content properly', () => {
-			const blockSettings = {
+			const blockType = {
 				attributes: ( rawContent ) => {
 					return {
 						content: rawContent,
@@ -99,7 +99,7 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 			};
-			registerBlockType( 'core/test-block', blockSettings );
+			registerBlockType( 'core/test-block', blockType );
 			const blockList = [
 				{
 					blockName: 'core/test-block',
