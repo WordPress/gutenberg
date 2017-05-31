@@ -3,7 +3,6 @@
         "uid": "_uid_0",
         "blockType": "core/table2",
         "attributes": {
-            "nodeName": "TABLE",
             "content": [
                 {
                     "type": "thead",
@@ -194,8 +193,7 @@
                         }
                     ]
                 }
-            ],
-            "editor": null
+            ]
         }
     }
 ]

@@ -253,14 +253,7 @@ class VisualEditorBlock extends wp.element.Component {
 									} ) ) } />
 							) }
 							<Slot name="Formatting.Toolbar" />
-							{ !! settings.advControls && (
-								<ToolbarMenu
-									icon={ settings.advIcon }
-									controls={ settings.advControls.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( block.attributes, this.setAttributes ),
-									} ) ) } />
-							) }
+							<Slot name="Formatting.ToolbarMenu" />
 						</div>
 					</CSSTransitionGroup>
 				}

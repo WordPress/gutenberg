@@ -11,7 +11,7 @@
 
 .components-toolbar-menu__toggle {
 	width: auto;
-	margin: 3px;
+	margin: 0px;
 	padding: 8px;
 
 	&:focus:before {
@@ -24,7 +24,7 @@
 
 .components-toolbar-menu__menu {
 	position: absolute;
-	top: 43px;
+	top: $block-controls-height - 1px;
 	left: 0px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
