@@ -87,10 +87,16 @@ registerBlock( 'core/embed', {
 			this.noPreview = [
 				'facebook.com',
 			];
+			if ( this.props.attributes.url ) {
+				// if the url is already there, we're loading a saved block, so we need to render
+				this.doServerSideRender();
+			}
 		}
 
 		doServerSideRender( event ) {
-			event.preventDefault();
+			if ( event ) {
+				event.preventDefault();
+			}
 			const { url } = this.props.attributes;
 			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce; // eslint-disable-line no-undef
 
