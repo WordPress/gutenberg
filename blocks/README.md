@@ -58,7 +58,7 @@ function RandomImage( props ) {
 	} );
 }
 
-wp.blocks.registerBlock( 'myplugin/random-image', {
+wp.blocks.registerBlockType( 'myplugin/random-image', {
 	title: 'Random Image',
 
 	icon: 'format-image',
@@ -121,7 +121,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 ## API
 
-### `wp.blocks.registerBlock( slug: string, settings: Object )`
+### `wp.blocks.registerBlockType( slug: string, settings: Object )`
 
 Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 

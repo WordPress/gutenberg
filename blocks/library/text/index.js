@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
 const { children } = query;
 
-registerBlock( 'core/text', {
+registerBlockType( 'core/text', {
 	title: wp.i18n.__( 'Text' ),
 
 	icon: 'text',

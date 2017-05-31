@@ -7,12 +7,12 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
-import { getBlockTypes, registerBlock, unregisterBlock } from '../registration';
+import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( block => {
-			unregisterBlock( block.slug );
+			unregisterBlockType( block.slug );
 		} );
 	} );
 
@@ -99,7 +99,7 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 			};
-			registerBlock( 'core/test-block', blockSettings );
+			registerBlockType( 'core/test-block', blockSettings );
 			const blockList = [
 				{
 					blockName: 'core/test-block',

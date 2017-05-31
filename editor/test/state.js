@@ -24,11 +24,11 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		before( () => {
-			wp.blocks.registerBlock( 'core/test-block', {} );
+			wp.blocks.registerBlockType( 'core/test-block', {} );
 		} );
 
 		after( () => {
-			wp.blocks.unregisterBlock( 'core/test-block' );
+			wp.blocks.unregisterBlockType( 'core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {

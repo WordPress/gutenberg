@@ -7,7 +7,7 @@ import sinon from 'sinon';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlock, registerBlock, createBlock } from 'blocks';
+import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from 'blocks';
 
 /**
  * Internal dependencies
@@ -21,12 +21,12 @@ describe( 'effects', () => {
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
-				unregisterBlock( block.slug );
+				unregisterBlockType( block.slug );
 			} );
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 			const blockA = {
 				uid: 'chicken',
 				blockName: 'core/test-block',
@@ -43,7 +43,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -73,14 +73,14 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
 			} );
-			registerBlock( 'core/test-block-2', {} );
+			registerBlockType( 'core/test-block-2', {} );
 			const blockA = {
 				uid: 'chicken',
 				blockName: 'core/test-block',
@@ -98,14 +98,14 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should transform and merge the blocks', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
 			} );
-			registerBlock( 'core/test-block-2', {
+			registerBlockType( 'core/test-block-2', {
 				transforms: {
 					to: [ {
 						type: 'blocks',

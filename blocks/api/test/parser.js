@@ -15,8 +15,8 @@ import {
 	parseWithTinyMCE,
 } from '../parser';
 import {
-	registerBlock,
-	unregisterBlock,
+	registerBlockType,
+	unregisterBlockType,
 	getBlockTypes,
 	setUnknownTypeHandler,
 } from '../registration';
@@ -25,7 +25,7 @@ describe( 'block parser', () => {
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
 		getBlockTypes().forEach( ( block ) => {
-			unregisterBlock( block.slug );
+			unregisterBlockType( block.slug );
 		} );
 	} );
 
@@ -93,7 +93,7 @@ describe( 'block parser', () => {
 
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 
 			const block = createBlockWithFallback(
 				'core/test-block',
@@ -105,7 +105,7 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 
 			const block = createBlockWithFallback( 'core/test-block', 'content' );
 			expect( block.blockName ).to.eql( 'core/test-block' );
@@ -113,7 +113,7 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlock( 'core/unknown-block', {} );
+			registerBlockType( 'core/unknown-block', {} );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback(
@@ -126,7 +126,7 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlock( 'core/unknown-block', {} );
+			registerBlockType( 'core/unknown-block', {} );
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
@@ -146,7 +146,7 @@ describe( 'block parser', () => {
 			const parse = parsers[ parser ];
 			describe( parser, () => {
 				it( 'should parse the post content, including block attributes', () => {
-					registerBlock( 'core/test-block', {
+					registerBlockType( 'core/test-block', {
 						// Currently this is the only way to test block content parsing?
 						attributes: function( rawContent ) {
 							return {
@@ -180,7 +180,7 @@ describe( 'block parser', () => {
 				} );
 
 				it( 'should parse the post content, ignoring unknown blocks', () => {
-					registerBlock( 'core/test-block', {
+					registerBlockType( 'core/test-block', {
 						attributes: function( rawContent ) {
 							return {
 								content: rawContent + ' & Chicken',
@@ -203,8 +203,8 @@ describe( 'block parser', () => {
 				} );
 
 				it( 'should parse the post content, using unknown block handler', () => {
-					registerBlock( 'core/test-block', {} );
-					registerBlock( 'core/unknown-block', {} );
+					registerBlockType( 'core/test-block', {} );
+					registerBlockType( 'core/unknown-block', {} );
 
 					setUnknownTypeHandler( 'core/unknown-block' );
 
@@ -223,8 +223,8 @@ describe( 'block parser', () => {
 				} );
 
 				it( 'should parse the post content, including raw HTML at each end', () => {
-					registerBlock( 'core/test-block', {} );
-					registerBlock( 'core/unknown-block', {
+					registerBlockType( 'core/test-block', {} );
+					registerBlockType( 'core/unknown-block', {
 						// Currently this is the only way to test block content parsing?
 						attributes: function( rawContent ) {
 							return {

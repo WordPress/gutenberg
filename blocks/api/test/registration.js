@@ -10,8 +10,8 @@ import sinon from 'sinon';
  * Internal dependencies
  */
 import {
-	registerBlock,
-	unregisterBlock,
+	registerBlockType,
+	unregisterBlockType,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
 	getBlockType,
@@ -26,47 +26,47 @@ describe( 'blocks', () => {
 
 	afterEach( () => {
 		getBlockTypes().forEach( block => {
-			unregisterBlock( block.slug );
+			unregisterBlockType( block.slug );
 		} );
 		setUnknownTypeHandler( undefined );
 		console.error.restore();
 	} );
 
-	describe( 'registerBlock()', () => {
+	describe( 'registerBlockType()', () => {
 		it( 'should reject numbers', () => {
-			const block = registerBlock( 999 );
+			const block = registerBlockType( 999 );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must be strings.' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
-			const block = registerBlock( 'doing-it-wrong' );
+			const block = registerBlockType( 'doing-it-wrong' );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
-			const block = registerBlock( 'still/_doing_it_wrong' );
+			const block = registerBlockType( 'still/_doing_it_wrong' );
 			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should accept valid block names', () => {
-			const block = registerBlock( 'my-plugin/fancy-block-4' );
+			const block = registerBlockType( 'my-plugin/fancy-block-4' );
 			expect( console.error ).to.not.have.been.called();
 			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4' } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
-			registerBlock( 'core/test-block' );
-			const block = registerBlock( 'core/test-block' );
+			registerBlockType( 'core/test-block' );
+			const block = registerBlockType( 'core/test-block' );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is already registered.' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should store a copy of block type', () => {
 			const blockType = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockType );
+			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
@@ -75,19 +75,19 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'unregisterBlock()', () => {
+	describe( 'unregisterBlockType()', () => {
 		it( 'should fail if a block is not registered', () => {
-			const oldBlock = unregisterBlock( 'core/test-block' );
+			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is not registered.' );
 			expect( oldBlock ).to.be.undefined();
 		} );
 
 		it( 'should unregister existing blocks', () => {
-			registerBlock( 'core/test-block' );
+			registerBlockType( 'core/test-block' );
 			expect( getBlockTypes() ).to.eql( [
 				{ slug: 'core/test-block' },
 			] );
-			const oldBlock = unregisterBlock( 'core/test-block' );
+			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).to.not.have.been.called();
 			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
 			expect( getBlockTypes() ).to.eql( [] );
@@ -110,7 +110,7 @@ describe( 'blocks', () => {
 
 	describe( 'getBlockType()', () => {
 		it( 'should return { slug } for blocks with no settings', () => {
-			registerBlock( 'core/test-block' );
+			registerBlockType( 'core/test-block' );
 			expect( getBlockType( 'core/test-block' ) ).to.eql( {
 				slug: 'core/test-block',
 			} );
@@ -118,7 +118,7 @@ describe( 'blocks', () => {
 
 		it( 'should return all block type elements', () => {
 			const blockType = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockType );
+			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
 				slug: 'core/test-block-with-settings',
 				settingName: 'settingValue',
@@ -132,9 +132,9 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should return all registered blocks', () => {
-			registerBlock( 'core/test-block' );
+			registerBlockType( 'core/test-block' );
 			const blockType = { settingName: 'settingValue' };
-			registerBlock( 'core/test-block-with-settings', blockType );
+			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).to.eql( [
 				{ slug: 'core/test-block' },
 				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },

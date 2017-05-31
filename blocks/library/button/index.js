@@ -7,7 +7,7 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 
 const { attr, children } = query;
@@ -26,7 +26,7 @@ function applyOrUnset( align ) {
 	};
 }
 
-registerBlock( 'core/button', {
+registerBlockType( 'core/button', {
 	title: wp.i18n.__( 'Button' ),
 
 	icon: 'button',
