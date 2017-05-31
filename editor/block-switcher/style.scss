@@ -10,8 +10,8 @@
 
 .editor-block-switcher__toggle {
 	width: auto;
-	margin: 3px;
-	padding: 6px;
+	margin: 0;
+	padding: 8px;
 
 	&:focus:before {
 		top: -3px;
@@ -23,7 +23,7 @@
 
 .editor-block-switcher__menu {
 	position: absolute;
-	top: 43px;
+	top: $block-controls-height - 1px;
 	left: 0;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;

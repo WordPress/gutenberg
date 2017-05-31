@@ -6,27 +6,42 @@ const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
+const entryPointNames = [
+	'element',
+	'i18n',
+	'components',
+	'utils',
+	'blocks',
+	'date',
+	'editor',
+];
+
+const externals = {
+	react: 'React',
+	'react-dom': 'ReactDOM',
+	'react-dom/server': 'ReactDOMServer',
+	tinymce: 'tinymce',
+	moment: 'moment',
+};
+
+entryPointNames.forEach( entryPointName => {
+	externals[ entryPointName ] = {
+		'this': [ 'wp', entryPointName ],
+	};
+} );
+
 const config = {
-	entry: {
-		date: './date/index.js',
-		i18n: './i18n/index.js',
-		blocks: './blocks/index.js',
-		editor: './editor/index.js',
-		element: './element/index.js',
-	},
+	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
+		memo[ entryPointName ] = './' + entryPointName + '/index.js';
+		return memo;
+	}, {} ),
 	output: {
 		filename: '[name]/build/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
-	externals: {
-		react: 'React',
-		'react-dom': 'ReactDOM',
-		'react-dom/server': 'ReactDOMServer',
-		tinymce: 'tinymce',
-		moment: 'moment',
-	},
+	externals,
 	resolve: {
 		modules: [
 			__dirname,
@@ -102,7 +117,7 @@ switch ( process.env.NODE_ENV ) {
 			__dirname: true,
 		};
 		config.module.rules = [
-			...[ 'date', 'i18n', 'element', 'blocks', 'editor' ].map( ( entry ) => ( {
+			...entryPointNames.map( ( entry ) => ( {
 				test: require.resolve( './' + entry + '/index.js' ),
 				use: 'expose-loader?wp.' + entry,
 			} ) ),
@@ -112,11 +127,9 @@ switch ( process.env.NODE_ENV ) {
 			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
 		);
 		config.entry = [
-			'./date/index.js',
-			'./i18n/index.js',
-			'./element/index.js',
-			'./blocks/index.js',
-			'./editor/index.js',
+			...entryPointNames.map(
+				entryPointName => './' + entryPointName + '/index.js'
+			),
 			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
 			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
 		];

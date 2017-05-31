@@ -7,8 +7,8 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import PanelBody from 'components/panel/body';
-import FormToggle from 'components/form-toggle';
+import { Component } from 'element';
+import { PanelBody, FormToggle } from 'components';
 
 /**
  * Internal Dependencies
@@ -20,44 +20,54 @@ import PostSchedule from '../post-schedule';
 import { getEditedPostStatus, getSuggestedPostFormat } from '../../selectors';
 import { editPost } from '../../actions';
 
-function PostStatus( { status, onUpdateStatus, suggestedFormat } ) {
-	const onToggle = () => {
-		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
-		onUpdateStatus( updatedStatus );
-	};
+class PostStatus extends Component {
+	constructor() {
+		super( ...arguments );
+		this.id = this.constructor.instances++;
+	}
 
-	// Use the suggested post format based on the blocks content of the post
-	// or the default post format setting for the site.
-	const format = suggestedFormat || __( 'Standard' );
+	render() {
+		const { status, onUpdateStatus, suggestedFormat } = this.props;
+		const onToggle = () => {
+			const updatedStatus = status === 'pending' ? 'draft' : 'pending';
+			onUpdateStatus( updatedStatus );
+		};
 
-	// Disable Reason: The input is inside the label, we shouldn't need the htmlFor
-	/* eslint-disable jsx-a11y/label-has-for */
-	return (
-		<PanelBody title={ __( 'Status & Visibility' ) }>
-			<label className="editor-post-status__row">
-				<span>{ __( 'Pending review' ) }</span>
-				<FormToggle
-					checked={ status === 'pending' }
-					onChange={ onToggle }
-				/>
-			</label>
-			<div className="editor-post-status__row">
-				<PostVisibility />
-			</div>
-			<div className="editor-post-status__row">
-				<PostSchedule />
-			</div>
-			<div className="editor-post-status__row">
-				<span>{ __( 'Post Format' ) }</span>
-				<span>{ format }</span>
-			</div>
-			<div className="editor-post-status__row">
-				<PostTrash />
-			</div>
-		</PanelBody>
-	);
-	/* eslint-enable jsx-a11y/label-has-for */
+		// Use the suggested post format based on the blocks content of the post
+		// or the default post format setting for the site.
+		const format = suggestedFormat || __( 'Standard' );
+		const pendingId = 'pending-toggle-' + this.id;
+
+		return (
+			<PanelBody title={ __( 'Status & Visibility' ) }>
+				<div className="editor-post-status__row">
+					<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
+					<FormToggle
+						id={ pendingId }
+						checked={ status === 'pending' }
+						onChange={ onToggle }
+						showHint={ false }
+					/>
+				</div>
+				<div className="editor-post-status__row">
+					<PostVisibility />
+				</div>
+				<div className="editor-post-status__row">
+					<PostSchedule />
+				</div>
+				<div className="editor-post-status__row">
+					<span>{ __( 'Post Format' ) }</span>
+					<span>{ format }</span>
+				</div>
+				<div className="editor-post-status__row">
+					<PostTrash />
+				</div>
+			</PanelBody>
+		);
+	}
 }
+
+PostStatus.instances = 1;
 
 export default connect(
 	( state ) => ( {

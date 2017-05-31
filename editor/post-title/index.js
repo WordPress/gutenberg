@@ -5,6 +5,11 @@ import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { ENTER } from 'utils/keycodes';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -22,6 +27,12 @@ function PostTitle( { title, onUpdate } ) {
 		onUpdate( newTitle );
 	};
 
+	const onKeyDown = ( event ) => {
+		if ( event.keyCode === ENTER ) {
+			event.preventDefault();
+		}
+	};
+
 	return (
 		<h1 className="editor-post-title">
 			<Textarea
@@ -29,6 +40,7 @@ function PostTitle( { title, onUpdate } ) {
 				value={ title }
 				onChange={ onChange }
 				placeholder={ wp.i18n.__( 'Enter title here' ) }
+				onKeyDown={ onKeyDown }
 			/>
 		</h1>
 	);

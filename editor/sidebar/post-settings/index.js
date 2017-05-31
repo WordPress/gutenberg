@@ -7,9 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import Panel from 'components/panel';
-import PanelHeader from 'components/panel/header';
-import IconButton from 'components/icon-button';
+import { Panel, PanelHeader, IconButton } from 'components';
 
 /**
  * Internal Dependencies
@@ -17,6 +15,8 @@ import IconButton from 'components/icon-button';
 import './style.scss';
 import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
+import FeaturedImage from '../featured-image';
+import DiscussionPanel from '../discussion-panel';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
@@ -31,7 +31,9 @@ const PostSettings = ( { toggleSidebar } ) => {
 				</div>
 			</PanelHeader>
 			<PostStatus />
+			<FeaturedImage />
 			<PostExcerpt />
+			<DiscussionPanel />
 		</Panel>
 	);
 };

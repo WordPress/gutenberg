@@ -2,7 +2,7 @@
  * External dependencies
  */
 import uuid from 'uuid/v4';
-import { get, castArray, findIndex, isObjectLike } from 'lodash';
+import { get, castArray, findIndex, isObjectLike, find } from 'lodash';
 
 /**
  * Internal dependencies
@@ -49,8 +49,8 @@ export function switchToBlockType( block, blockType ) {
 	const transformationsFrom = get( destinationSettings, 'transforms.from', [] );
 	const transformationsTo = get( sourceSettings, 'transforms.to', [] );
 	const transformation =
-		transformationsTo.find( t => t.blocks.indexOf( blockType ) !== -1 ) ||
-		transformationsFrom.find( t => t.blocks.indexOf( block.blockType ) !== -1 );
+		find( transformationsTo, t => t.blocks.indexOf( blockType ) !== -1 ) ||
+		find( transformationsFrom, t => t.blocks.indexOf( block.blockType ) !== -1 );
 
 	// If no valid transformation, stop.  (How did we get here?)
 	if ( ! transformation ) {

@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
+import { Button } from 'components';
 
 /**
  * Internal dependencies
@@ -85,10 +85,10 @@ export default connect(
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {
-			savePost( dispatch, post.id, {
+			dispatch( savePost( post.id, {
 				content: wp.blocks.serialize( blocks ),
 				...edits,
-			} );
+			} ) );
 		},
 	} )
 )( PublishButton );

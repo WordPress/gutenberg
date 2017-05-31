@@ -7,45 +7,36 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
-class FormToggle extends Component {
-	constructor() {
-		super( ...arguments );
-		this.id = this.constructor.instances++;
-	}
+function FormToggle( { className, checked, id, onChange = noop, showHint = true } ) {
+	const wrapperClasses = classNames(
+		'components-form-toggle',
+		className,
+		{ 'is-checked': checked }
+	);
 
-	render() {
-		const { className, checked, children, onChange = noop } = this.props;
-		const id = 'toggle-' + this.id;
-		const wrapperClasses = classNames(
-			'components-form-toggle',
-			className,
-			{ 'is-checked': checked }
-		);
-
-		return (
-			<div className={ wrapperClasses }>
-				<input
-					className="components-form-toggle__input"
-					id={ id }
-					type="checkbox"
-					value={ checked }
-					onChange={ onChange }
-				/>
-				<label className="components-form-toggle__label" htmlFor={ id }>
-					{ children }
-				</label>
-			</div>
-		);
-	}
+	return (
+		<span className={ wrapperClasses }>
+			<input
+				className="components-form-toggle__input"
+				id={ id }
+				type="checkbox"
+				value={ checked }
+				onChange={ onChange }
+			/>
+			{ showHint &&
+				<span className="components-form-toggle__hint" aria-hidden>
+					{ checked ? __( 'On' ) : __( 'Off' ) }
+				</span>
+			}
+		</span>
+	);
 }
-
-FormToggle.instances = 1;
 
 export default FormToggle;

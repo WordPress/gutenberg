@@ -52,6 +52,15 @@
 		border-color: $light-gray-500;
 	}
 
+	&.is-multi-selected *::selection {
+		background: transparent;
+	}
+
+	&.is-multi-selected:before {
+		background: $blue-medium-100;
+		border: 2px solid $blue-medium-200;
+	}
+
 	.iframe-overlay {
 		position: relative;
 	}
@@ -72,7 +81,6 @@
 }
 
 .editor-visual-editor__block-controls {
-	@include animate_fade;
 	display: flex;
 	position: sticky;
 	z-index: z-index( '.editor-visual-editor__block-controls' );
@@ -86,6 +94,10 @@
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
+	}
+
+	&.is-appearing-active {
+		@include animate_fade;
 	}
 }
 
@@ -122,7 +134,7 @@
 		right: #{ $block-padding + $block-mover-margin };
 		left: 0;
 		height: 3px;
-		background: $blue-medium;
+		background: $blue-medium-500;
 		content: '';
 	}
 }
