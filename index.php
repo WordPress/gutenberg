@@ -38,7 +38,7 @@ $wp_registered_blocks = array();
 
  * @return array            The block, if it has been successfully registered.
  */
-function register_block( $slug, $settings ) {
+function register_block_type( $slug, $settings ) {
 	global $wp_registered_blocks;
 
 	if ( ! is_string( $slug ) ) {
@@ -74,7 +74,7 @@ function register_block( $slug, $settings ) {
  * @return array        The previous block value, if it has been
  *                        successfully unregistered; otherwise `null`.
  */
-function unregister_block( $slug ) {
+function unregister_block_type( $slug ) {
 	global $wp_registered_blocks;
 	if ( ! isset( $wp_registered_blocks[ $slug ] ) ) {
 		/* translators: 1: block slug */
