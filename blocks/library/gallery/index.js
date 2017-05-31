@@ -58,9 +58,9 @@ registerBlock( 'core/gallery', {
 
 	attributes: {
 		images:
-			query( 'div.blocks-gallery div.blocks-gallery-image', {
-				url: attr( 'data-url' ),
-				alt: attr( 'data-alt' ),
+			query( 'div.blocks-gallery div.blocks-gallery-image img', {
+				url: attr( 'src' ),
+				alt: attr( 'alt' ),
 			} ),
 	},
 

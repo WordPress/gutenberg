@@ -4,8 +4,8 @@
         "blockType": "core/gallery",
         "attributes": {
             "images": [
-                {},
-                {}
+                { "url": "https://cldup.com/uuUqE_dXzy.jpg", "alt": "title" },
+                { "url": "https://cldup.com/uuUqE_dXzy.jpg", "alt": "title" }
             ]
         }
     }
