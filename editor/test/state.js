@@ -388,6 +388,23 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should reset modified properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+						tags: [ 1 ],
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'REQUEST_POST_UPDATE',
+				} );
+
+				expect( state.edits ).to.eql( {} );
+			} );
+
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
 					type: 'SETUP_NEW_POST',

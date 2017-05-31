@@ -21,10 +21,10 @@ import {
 	getCurrentPost,
 	getPostEdits,
 	getBlocks,
-	isEditedPostAlreadyPublished,
+	getEditedPostStatus,
 } from '../../selectors';
 
-function SavedState( { isNew, isDirty, isSaving, isPublished, edits, blocks, post, onSave } ) {
+function SavedState( { isNew, isDirty, isSaving, edits, blocks, post, status, onSave } ) {
 	const className = 'editor-saved-state';
 
 	if ( isSaving ) {
@@ -43,8 +43,7 @@ function SavedState( { isNew, isDirty, isSaving, isPublished, edits, blocks, pos
 		);
 	}
 
-	const statusEdits = isPublished ? {} : { status: 'draft' };
-	const onClick = () => onSave( post, { ...edits, ...statusEdits }, blocks );
+	const onClick = () => onSave( post, { ...edits, status: status || 'draft' }, blocks );
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
@@ -61,7 +60,7 @@ export default connect(
 		isNew: isEditedPostNew( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
-		isPublished: isEditedPostAlreadyPublished( state ),
+		status: getEditedPostStatus( state ),
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {
