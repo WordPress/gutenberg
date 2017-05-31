@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { cloneElement } from 'element';
+import { cloneElement, Children } from 'element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { cloneElement } from 'element';
 import './style.scss';
 
 function ResponsiveWrapper( { naturalWidth, naturalHeight, children } ) {
-	if ( ! children || Array.isArray( children ) ) {
+	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
 	const imageStyle = {
