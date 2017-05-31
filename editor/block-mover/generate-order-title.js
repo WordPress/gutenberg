@@ -1,21 +1,29 @@
 export default function( { typeTitle, position, isFirst, isLast, dir } ) {
-	const prefix = 'Move "' + typeTitle + '" block from position ' + position;
-	const errorPrefix = 'Block "' + typeTitle + '"';
-	let title = '';
-
 	if ( isFirst && isLast ) {
-		title = errorPrefix + ' is the only block, and cannot be moved';
-	} else if ( dir > 0 ) {
-		// moving down
-		title = ( ! isLast ) ?
-			prefix + ' down to position ' + ( position + 1 ) :
-			errorPrefix + ' is at the end of the content and can’t be moved down';
-	} else {
-		// moving up
-		title = ( ! isFirst ) ?
-			prefix + ' up to position ' + ( position - 1 ) :
-			errorPrefix + ' is at the beginning of the content and can’t be moved up';
+		return `Block "${ typeTitle }" is the only block, and cannot be moved`;
 	}
 
-	return title;
+	if ( dir > 0 && ! isLast ) {
+		// moving down
+		return `Move "${ typeTitle }" block from position ${ position }` +
+			` down to position ${ position + 1 }`;
+	}
+
+	if ( dir > 0 && isLast ) {
+		// moving down, and is the last item
+		return `Block "${ typeTitle }" is at the end of the content and can’t be moved down`;
+	}
+
+	if ( dir < 0 && ! isFirst ) {
+		// moving up
+		return `Move "${ typeTitle }" block from position ${ position }` +
+			` up to position ${ position - 1 }`;
+	}
+
+	if ( dir < 0 && isFirst ) {
+		// moving up, and is the first item
+		return `Block "${ typeTitle }" is at the beginning of the content and can’t be moved up`;
+	}
+
+	return '';
 }
