@@ -18,8 +18,11 @@ import './style.scss';
 import {
 	getEditedPostAttribute,
 	getEditedPostVisibility,
+	getCurrentPost,
+	getPostEdits,
+	getBlocks,
 } from '../../selectors';
-import { editPost } from '../../actions';
+import { editPost, savePost } from '../../actions';
 
 class PostVisibility extends Component {
 	constructor( props ) {
@@ -41,15 +44,17 @@ class PostVisibility extends Component {
 	}
 
 	render() {
-		const { status, visibility, password, onUpdateVisibility } = this.props;
+		const { status, visibility, password, post, blocks, edits, onUpdateVisibility, onSave } = this.props;
 
 		const setPublic = () => {
 			onUpdateVisibility( visibility === 'private' ? 'publish' : status );
 			this.setState( { hasPassword: false } );
 		};
 		const setPrivate = () => {
-			onUpdateVisibility( 'private' );
-			this.setState( { hasPassword: false } );
+			if ( window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
+				onSave( post, { ...edits, status: 'private' }, blocks );
+				this.setState( { opened: false } );
+			}
 		};
 		const setPasswordProtected = () => {
 			onUpdateVisibility( visibility === 'private' ? 'publish' : status, password || '' );
@@ -126,11 +131,20 @@ export default connect(
 		status: getEditedPostAttribute( state, 'status' ),
 		visibility: getEditedPostVisibility( state ),
 		password: getEditedPostAttribute( state, 'password' ),
+		post: getCurrentPost( state ),
+		edits: getPostEdits( state ),
+		blocks: getBlocks( state ),
 	} ),
 	( dispatch ) => {
 		return {
 			onUpdateVisibility( status, password = null ) {
 				dispatch( editPost( { status, password } ) );
+			},
+			onSave( post, edits, blocks ) {
+				dispatch( savePost( post.id, {
+					content: wp.blocks.serialize( blocks ),
+					...edits,
+				} ) );
 			},
 		};
 	}
