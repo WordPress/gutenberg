@@ -121,7 +121,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 ## API
 
-### `wp.blocks.registerBlockType( slug: string, settings: Object )`
+### `wp.blocks.registerBlockType( name: string, typeDefinition: Object )`
 
 Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
@@ -148,7 +148,7 @@ Inline controls for [`Editable`](#editable) elements are identical for every blo
 
 ### `wp.blocks.getBlockType( slug: string )`
 
-Returns settings associated with a registered block.
+Returns type definitions associated with a registered block.
 
 ### `wp.blocks.getControlSettings( slug: string )`
 
