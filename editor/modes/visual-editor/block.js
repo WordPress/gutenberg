@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children } from 'element';
-import { Toolbar, ToolbarMenu } from 'components';
+import { Toolbar } from 'components';
 import { BACKSPACE, ESCAPE } from 'utils/keycodes';
 
 /**
