@@ -13,11 +13,11 @@ import { parse as parseQueryString, stringify } from 'querystring';
  * @return {String}       Updated URL
  */
 export function addQueryArgs( url, args ) {
-	const parsedUrl = parse( url, true );
-	const query = { ...parsedUrl.query, ...args };
-	delete parsedUrl.search;
+	const parsedURL = parse( url, true );
+	const query = { ...parsedURL.query, ...args };
+	delete parsedURL.search;
 
-	return format( { ...parsedUrl, query } );
+	return format( { ...parsedURL, query } );
 }
 
 /**
@@ -28,9 +28,9 @@ export function addQueryArgs( url, args ) {
  * @return {String}        URL
  */
 export function getGutenbergURL( query = {} ) {
-	const [ baseUrl, currentQuery ] = window.location.href.split( '?' );
-	const qs = parseQueryString( currentQuery || '' );
-	return baseUrl + '?' + stringify( {
+	const [ baseURL, currentQuery = '' ] = window.location.href.split( '?' );
+	const qs = parseQueryString( currentQuery );
+	return baseURL + '?' + stringify( {
 		...qs,
 		...query,
 	} );
