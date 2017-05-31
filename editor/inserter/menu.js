@@ -3,16 +3,20 @@
  */
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
+import { Dashicon, withFocusReturn } from 'components';
+import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { getSelectedBlock } from '../selectors';
+import { setInsertionPoint, clearInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -61,6 +65,18 @@ class InserterMenu extends wp.element.Component {
 				currentFocus: null,
 			} );
 		};
+	}
+
+	hoverBlock() {
+		return () => {
+			this.props.setInsertionPoint(
+				this.props.selectedBlock ? this.props.selectedBlock.uid : null
+			);
+		};
+	}
+
+	unhoverBlock() {
+		return () => this.props.clearInsertionPoint();
 	}
 
 	getVisibleBlocks( blockTypes ) {
@@ -162,7 +178,7 @@ class InserterMenu extends wp.element.Component {
 
 	onKeyDown( keydown ) {
 		switch ( keydown.keyCode ) {
-			case 9 : /* Tab */
+			case TAB:
 				if ( keydown.shiftKey ) {
 					// Previous.
 					keydown.preventDefault();
@@ -173,31 +189,31 @@ class InserterMenu extends wp.element.Component {
 				keydown.preventDefault();
 				this.focusNext( this );
 				break;
-			case 27 : /* Escape */
+			case ESCAPE:
 				keydown.preventDefault();
 				this.props.onSelect( null );
 
 				break;
-			case 37 : /* ArrowLeft */
+			case LEFT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusPrevious( this );
 
 				break;
-			case 38 : /* ArrowUp */
+			case UP:
 				keydown.preventDefault();
 				this.focusPrevious( this );
 
 				break;
-			case 39 : /* ArrowRight */
+			case RIGHT:
 				if ( this.state.currentFocus === 'search' ) {
 					return;
 				}
 				this.focusNext( this );
 
 				break;
-			case 40 : /* ArrowDown */
+			case DOWN:
 				keydown.preventDefault();
 				this.focusNext( this );
 
@@ -254,6 +270,8 @@ class InserterMenu extends wp.element.Component {
 											onClick={ this.selectBlock( slug ) }
 											ref={ this.bindReferenceNode( slug ) }
 											tabIndex="-1"
+											onMouseEnter={ this.hoverBlock() }
+											onMouseLeave={ this.unhoverBlock() }
 										>
 											<Dashicon icon={ icon } />
 											{ title }
@@ -284,4 +302,11 @@ class InserterMenu extends wp.element.Component {
 
 InserterMenu.instances = 0;
 
-export default InserterMenu;
+export default connect(
+	( state ) => {
+		return {
+			selectedBlock: getSelectedBlock( state ),
+		};
+	},
+	{ setInsertionPoint, clearInsertionPoint }
+)( withFocusReturn( InserterMenu ) );

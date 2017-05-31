@@ -1,0 +1,9 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/freeform",
+        "attributes": {
+            "html": "Testing freeform block with some<div class=\"wp-some-class\">HTML <span style=\"color: red;\">content</span></div>"
+        }
+    }
+]

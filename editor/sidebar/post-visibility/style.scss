@@ -16,7 +16,7 @@
 	}
 
 	&:hover {
-		color: $blue-medium;
+		color: $blue-medium-500;
 	}
 }
 
@@ -29,6 +29,7 @@
 	background: $white;
 	padding: 10px;
 	min-width: 240px;
+	z-index: z-index( '.editor-post-visibility__dialog' );
 }
 
 .editor-post-visibility__dialog-arrow {

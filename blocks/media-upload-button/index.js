@@ -3,7 +3,7 @@
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import Button from 'components/button';
+import { Button } from 'components';
 
 class MediaUploadButton extends Component {
 	constructor( { multiple = false, type } ) {

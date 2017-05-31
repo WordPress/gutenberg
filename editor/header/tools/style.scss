@@ -13,6 +13,14 @@
 	}
 }
 
+.editor-tools .components-icon-button .dashicon {
+	margin-right: 10px;
+
+	@include break-medium() {
+		margin-right: 4px;
+	}
+}
+
 .editor-tools__tabs {
 	margin: 0 $item-spacing;
 	padding: 0;
@@ -42,7 +50,7 @@
 		overflow: hidden;
 
 		&:hover {
-			color: $blue-medium;
+			color: $blue-medium-500;
 		}
 
 		@include break-medium() {
@@ -52,12 +60,7 @@
 	}
 
 	.components-button .dashicon {
-		margin-right: 10px;
 		flex-shrink: 0;
-
-		@include break-medium() {
-			margin-right: 4px;
-		}
 	}
 
 	.components-button {

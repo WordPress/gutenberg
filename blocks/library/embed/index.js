@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
-import Placeholder from 'components/placeholder';
+import { Button, Placeholder } from 'components';
 
 /**
  * Internal dependencies
@@ -32,7 +31,7 @@ registerBlock( 'core/embed', {
 
 	icon: 'video-alt3',
 
-	category: 'common',
+	category: 'embed',
 
 	attributes: {
 		url: attr( 'iframe', 'src' ),

@@ -13,6 +13,8 @@ import { __ } from 'i18n';
  */
 const categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
+	{ slug: 'formatting', title: __( 'Formatting' ) },
+	{ slug: 'embed', title: __( 'Embed' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 ];
 

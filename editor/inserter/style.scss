@@ -12,7 +12,6 @@
 
 .editor-inserter__toggle {
 	display: inline-flex;
-	justify-content: center;
 	align-items: center;
 	color: $dark-gray-500;
 	background: none;
@@ -23,7 +22,7 @@
 
 	&:hover,
 	&:focus {
-		color: $blue-medium;
+		color: $blue-medium-500;
 	}
 }
 
@@ -110,7 +109,7 @@
 }
 
 .editor-inserter__content {
-	max-height: 186px;
+	max-height: 20vw;
 	overflow: auto;
 
 	&:focus {
@@ -148,13 +147,13 @@ input[type=search].editor-inserter__search {
 	padding: 8px;
 	align-items: center;
 	cursor: pointer;
-	border: 1px solid transparent;
+	border: none;
 	background: none;
 	line-height: 20px;
 
 	&:hover,
 	&:focus {
-		border: 1px solid $dark-gray-500;
+		color: $blue-medium-500;
 		outline: none;
 		position: relative;
 	}

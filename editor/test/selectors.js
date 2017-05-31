@@ -11,16 +11,19 @@ import {
 	isEditorSidebarOpened,
 	hasEditorUndo,
 	hasEditorRedo,
+	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
 	getEditedPostStatus,
 	getEditedPostTitle,
+	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
 	getSelectedBlock,
+	getSelectedBlocks,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
@@ -28,9 +31,12 @@ import {
 	getPreviousBlock,
 	getNextBlock,
 	isBlockSelected,
+	isBlockMultiSelected,
+	isFirstSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
+	getBlockInsertionPoint,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -119,6 +125,26 @@ describe( 'selectors', () => {
 			};
 
 			expect( hasEditorRedo( state ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isEditedPostNew', () => {
+		it( 'should return true when the post is new', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.true();
+		} );
+
+		it( 'should return false when the post has an ID', () => {
+			const state = {
+				currentPost: {
+					id: 1,
+				},
+			};
+
+			expect( isEditedPostNew( state ) ).to.be.false();
 		} );
 	} );
 
@@ -219,6 +245,34 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostTitle( state ) ).to.equal( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostExcerpt', () => {
+		it( 'should return the post saved excerpt if the excerpt is not edited', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { status: 'private' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'sassel' );
+		} );
+
+		it( 'should return the edited excerpt', () => {
+			const state = {
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+				editor: {
+					edits: { excerpt: 'youcha' },
+				},
+			};
+
+			expect( getEditedPostExcerpt( state ) ).to.equal( 'youcha' );
 		} );
 	} );
 
@@ -344,6 +398,22 @@ describe( 'selectors', () => {
 					},
 				},
 				selectedBlock: { uid: null },
+				multiSelectedBlocks: {},
+			};
+
+			expect( getSelectedBlock( state ) ).to.equal( null );
+		} );
+
+		it( 'should return null if there is multi selection', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, blockType: 'core/heading' },
+						123: { uid: 123, blockType: 'core/text' },
+					},
+				},
+				selectedBlock: { uid: 23 },
+				multiSelectedBlocks: { start: 23, end: 123 },
 			};
 
 			expect( getSelectedBlock( state ) ).to.equal( null );
@@ -358,9 +428,34 @@ describe( 'selectors', () => {
 					},
 				},
 				selectedBlock: { uid: 23 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( getSelectedBlock( state ) ).to.equal( state.editor.blocksByUid[ 23 ] );
+		} );
+	} );
+
+	describe( 'getSelectedBlocks', () => {
+		it( 'should return empty if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getSelectedBlocks( state ) ).to.eql( [] );
+		} );
+
+		it( 'should return empty if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getSelectedBlocks( state ) ).to.eql( [ 4, 3, 2 ] );
 		} );
 	} );
 
@@ -500,6 +595,7 @@ describe( 'selectors', () => {
 		it( 'should return true if the block is selected', () => {
 			const state = {
 				selectedBlock: { uid: 123 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( isBlockSelected( state, 123 ) ).to.be.true();
@@ -508,9 +604,44 @@ describe( 'selectors', () => {
 		it( 'should return false if the block is not selected', () => {
 			const state = {
 				selectedBlock: { uid: 123 },
+				multiSelectedBlocks: {},
 			};
 
 			expect( isBlockSelected( state, 23 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isBlockMultiSelected', () => {
+		const state = {
+			editor: {
+				blockOrder: [ 5, 4, 3, 2, 1 ],
+			},
+			multiSelectedBlocks: { start: 2, end: 4 },
+		};
+
+		it( 'should return true if the block is multi selected', () => {
+			expect( isBlockMultiSelected( state, 3 ) ).to.be.true();
+		} );
+
+		it( 'should return false if the block is not multi selected', () => {
+			expect( isBlockMultiSelected( state, 5 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'isFirstSelectedBlock', () => {
+		const state = {
+			editor: {
+				blockOrder: [ 5, 4, 3, 2, 1 ],
+			},
+			multiSelectedBlocks: { start: 2, end: 4 },
+		};
+
+		it( 'should return true if the block is first in multi selection', () => {
+			expect( isFirstSelectedBlock( state, 4 ) ).to.be.true();
+		} );
+
+		it( 'should return false if the block is not first in multi selection', () => {
+			expect( isFirstSelectedBlock( state, 3 ) ).to.be.false();
 		} );
 	} );
 
@@ -539,6 +670,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					focus: { editable: 'cite' },
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 123 ) ).to.be.eql( { editable: 'cite' } );
@@ -550,6 +682,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					focus: { editable: 'cite' },
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( getBlockFocus( state, 23 ) ).to.be.eql( null );
@@ -563,6 +696,7 @@ describe( 'selectors', () => {
 					uid: 123,
 					typing: true,
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( isTypingInBlock( state, 123 ) ).to.be.true();
@@ -574,9 +708,47 @@ describe( 'selectors', () => {
 					uid: 123,
 					typing: true,
 				},
+				multiSelectedBlocks: {},
 			};
 
 			expect( isTypingInBlock( state, 23 ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'getBlockInsertionPoint', () => {
+		it( 'should return the uid of the insertion point', () => {
+			const state = {
+				insertionPoint: {
+					show: true,
+					uid: 123,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 123 );
+		} );
+
+		it( 'should return return the last block uid if the insertion point is null', () => {
+			const state = {
+				insertionPoint: {
+					show: true,
+					uid: null,
+				},
+				editor: {
+					blockOrder: [ 34, 23 ],
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 23 );
+		} );
+
+		it( 'should return null if the insertion point is not shown', () => {
+			const state = {
+				insertionPoint: {
+					show: false,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state, 23 ) ).to.be.null();
 		} );
 	} );
 

@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { isString } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlock, createBlock, query } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
 
 const { children, prop } = query;
 
@@ -19,18 +25,6 @@ registerBlock( 'core/heading', {
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
 	},
 
-	controls: [
-		...'123456'.split( '' ).map( ( level ) => ( {
-			icon: 'heading',
-			title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
-			isActive: ( { nodeName } ) => 'H' + level === nodeName,
-			onClick( attributes, setAttributes ) {
-				setAttributes( { nodeName: 'H' + level } );
-			},
-			subscript: level,
-		} ) ),
-	],
-
 	transforms: {
 		from: [
 			{
@@ -38,8 +32,11 @@ registerBlock( 'core/heading', {
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
 					if ( Array.isArray( content ) ) {
+						const headingContent = isString( content[ 0 ] )
+							? content[ 0 ]
+							: content[ 0 ].props.children;
 						const heading = createBlock( 'core/heading', {
-							content: content[ 0 ].props.children,
+							content: headingContent,
 						} );
 						const blocks = [ heading ];
 
@@ -82,8 +79,23 @@ registerBlock( 'core/heading', {
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
 		const { content, nodeName = 'H2' } = attributes;
 
-		return (
+		return [
+			focus && (
+				<BlockControls
+					key="controls"
+					controls={
+						'123456'.split( '' ).map( ( level ) => ( {
+							icon: 'heading',
+							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+							isActive: 'H' + level === nodeName,
+							onClick: () => setAttributes( { nodeName: 'H' + level } ),
+							subscript: level,
+						} ) )
+					}
+				/>
+			),
 			<Editable
+				key="editable"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
 				focus={ focus }
@@ -91,8 +103,8 @@ registerBlock( 'core/heading', {
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				inline
-			/>
-		);
+			/>,
+		];
 	},
 
 	save( { attributes } ) {

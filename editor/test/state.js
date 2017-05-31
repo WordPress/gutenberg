@@ -13,9 +13,11 @@ import {
 	currentPost,
 	hoveredBlock,
 	selectedBlock,
+	multiSelectedBlocks,
 	mode,
 	isSidebarOpened,
 	saving,
+	insertionPoint,
 	createReduxStore,
 } from '../state';
 
@@ -130,11 +132,36 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should move multiple blocks up', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					blockType: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs', 'veggies' ],
+			} );
+
+			expect( state.blockOrder ).to.eql( [ 'ribs', 'veggies', 'chicken' ] );
 		} );
 
 		it( 'should not move the first block up', () => {
@@ -151,8 +178,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -172,11 +199,36 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should move multiple blocks down', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					blockType: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'chicken', 'ribs' ],
+			} );
+
+			expect( state.blockOrder ).to.eql( [ 'veggies', 'chicken', 'ribs' ] );
 		} );
 
 		it( 'should not move the last block down', () => {
@@ -193,8 +245,8 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state.blockOrder ).to.equal( original.blockOrder );
@@ -214,8 +266,40 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'REMOVE_BLOCK',
-				uid: 'chicken',
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken' ],
+			} );
+
+			expect( state.blockOrder ).to.eql( [ 'ribs' ] );
+			expect( state.blocksByUid ).to.eql( {
+				ribs: {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {},
+				},
+			} );
+		} );
+
+		it( 'should remove multiple blocks', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'ribs',
+					blockType: 'core/test-block',
+					attributes: {},
+				}, {
+					uid: 'veggies',
+					blockType: 'core/test-block',
+					attributes: {},
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken', 'veggies' ],
 			} );
 
 			expect( state.blockOrder ).to.eql( [ 'ribs' ] );
@@ -302,6 +386,85 @@ describe( 'state', () => {
 					title: 'modified title',
 					tags: [ 2 ],
 				} );
+			} );
+
+			it( 'should save initial post state', () => {
+				const state = editor( undefined, {
+					type: 'SETUP_NEW_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
+				} );
+
+				expect( state.edits ).to.eql( {
+					status: 'draft',
+					title: 'post title',
+				} );
+			} );
+		} );
+
+		describe( 'dirty()', () => {
+			it( 'should be true when the post is edited', () => {
+				const state = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				expect( state.dirty ).to.be.true();
+			} );
+
+			it( 'should change to false when the post is reset', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'RESET_BLOCKS',
+					post: {},
+					blocks: [],
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+
+			it( 'should not change from true when an unrelated action occurs', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'BRISKET_READY',
+				} );
+
+				expect( state.dirty ).to.be.true();
+			} );
+
+			it( 'should not change from false when an unrelated action occurs', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					post: {},
+					blocks: [],
+				} );
+
+				expect( original.dirty ).to.be.false();
+
+				const state = editor( original, {
+					type: 'BRISKET_READY',
+				} );
+
+				expect( state.dirty ).to.be.false();
+			} );
+
+			it( 'should be false when the post is initialized', () => {
+				const state = editor( undefined, {
+					type: 'SETUP_NEW_POST',
+					edits: {},
+				} );
+
+				expect( state.dirty ).to.be.false();
 			} );
 		} );
 	} );
@@ -397,6 +560,30 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'insertionPoint', () => {
+		it( 'should set the insertion point', () => {
+			const state = insertionPoint( {}, {
+				type: 'SET_INSERTION_POINT',
+				uid: 'kumquat',
+			} );
+
+			expect( state ).to.eql( {
+				show: true,
+				uid: 'kumquat',
+			} );
+		} );
+
+		it( 'should clear the insertion point', () => {
+			const state = insertionPoint( {}, {
+				type: 'CLEAR_INSERTION_POINT',
+			} );
+
+			expect( state ).to.eql( {
+				show: false,
+			} );
+		} );
+	} );
+
 	describe( 'selectedBlock()', () => {
 		it( 'should return with block uid as selected', () => {
 			const state = selectedBlock( undefined, {
@@ -479,8 +666,8 @@ describe( 'state', () => {
 
 		it( 'should return with block moved up', () => {
 			const state = selectedBlock( undefined, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state ).to.eql( { uid: 'ribs', typing: false, focus: {} } );
@@ -488,8 +675,8 @@ describe( 'state', () => {
 
 		it( 'should return with block moved down', () => {
 			const state = selectedBlock( undefined, {
-				type: 'MOVE_BLOCK_DOWN',
-				uid: 'chicken',
+				type: 'MOVE_BLOCKS_DOWN',
+				uids: [ 'chicken' ],
 			} );
 
 			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
@@ -498,8 +685,8 @@ describe( 'state', () => {
 		it( 'should not update the state if the block moved is already selected', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: true, focus: {} } );
 			const state = selectedBlock( original, {
-				type: 'MOVE_BLOCK_UP',
-				uid: 'ribs',
+				type: 'MOVE_BLOCKS_UP',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state ).to.equal( original );
@@ -574,6 +761,34 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'multiSelectedBlocks()', () => {
+		it( 'should set multi selection', () => {
+			const state = multiSelectedBlocks( undefined, {
+				type: 'MULTI_SELECT',
+				start: 'ribs',
+				end: 'chicken',
+			} );
+
+			expect( state ).to.eql( { start: 'ribs', end: 'chicken' } );
+		} );
+
+		it( 'should unset multi selection', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
+
+			const state1 = multiSelectedBlocks( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state1 ).to.eql( { start: null, end: null } );
+
+			const state2 = multiSelectedBlocks( original, {
+				type: 'TOGGLE_BLOCK_SELECTED',
+			} );
+
+			expect( state2 ).to.eql( { start: null, end: null } );
+		} );
+	} );
+
 	describe( 'mode()', () => {
 		it( 'should return "visual" by default', () => {
 			const state = mode( undefined, {} );
@@ -630,7 +845,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: true,
+				isNew: false,
 			} );
 		} );
 
@@ -671,10 +886,12 @@ describe( 'state', () => {
 				'editor',
 				'currentPost',
 				'selectedBlock',
+				'multiSelectedBlocks',
 				'hoveredBlock',
 				'mode',
 				'isSidebarOpened',
 				'saving',
+				'insertionPoint',
 			] );
 		} );
 	} );

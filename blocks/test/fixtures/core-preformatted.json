@@ -1,0 +1,20 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/preformatted",
+        "attributes": {
+            "content": [
+                "Some ",
+                {
+                    "type": "em",
+                    "children": "preformatted"
+                },
+                " text...",
+                {
+                    "type": "br"
+                },
+                "And more!"
+            ]
+        }
+    }
+]

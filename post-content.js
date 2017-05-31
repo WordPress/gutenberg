@@ -5,6 +5,10 @@ window._wpGutenbergPost = {
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},
+	// TODO `status` and any other initial attributes other than content and
+	// title need to move somewhere else when this file goes away.  See:
+	// https://github.com/WordPress/gutenberg/pull/848#issuecomment-302836177
+	status: 'draft',
 	content: {
 		raw: [
 			'<!-- wp:core/text -->',
@@ -117,25 +121,33 @@ window._wpGutenbergPost = {
 			'<figure><img src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
+			'<!-- wp:core/preformatted -->',
+			'<pre>An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
+			'<!-- /wp:core/preformatted -->',
+
 			'<!-- wp:core/text -->',
 			'<p>Eu integre accusata prodesset est, <em>sed te impetus gubergren conceptam</em>, ex sed wisi nostrum ocurreret. Esse velit omittantur ius te, alii dissentias ei vis. At sed unum veritus fabellas. Te volutpat appellantur duo. Ad natum fuisset intellegebat eam, causae invidunt usu id, et vis impetus appetere.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/heading -->',
-			'<h6>Loem</h6>',
+			'<h6>Nominavi deseruisse</h6>',
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/list -->',
 			'<ul><li>Est quis reque cetero ad</li><li>Sea id autem nominavi deseruisse</li><li>Veniam qualisque definitionem pri id, ea autem feugiat delenit ius, mei at loem affert accumsan</li><li>Dicat eruditi cu est, te pro dicant pericula conclusionemque</li><li>Eius postea volumus mei ad</li></ul>',
 			'<!-- /wp:core/list -->',
 
-			'<!-- wp:core/table -->',
-			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr class="alt"><th><a href="https://wordpress.org/news/2003/05/wordpress-now-available/">.70</a></th><td>No musician chosen.</td><td>May 27, 2003</td></tr><tr><th><a href="https://wordpress.org/news/2004/01/wordpress-10/">1.0</a></th><td>Miles Davis</td><td>January 3, 2004</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2004/05/heres-the-beef/">1.2</a></th><td>Charles Mingus</td><td>May 22, 2004</td></tr><tr><th><a href="https://wordpress.org/news/2005/02/strayhorn/">1.5</a></th><td>Billy Strayhorn</td><td>February 17, 2005</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2005/12/wp2/">2.0</a></th><td>Duke Ellington</td><td>December 31, 2005</td></tr><tr><th><a href="https://wordpress.org/news/2007/01/ella-21/">2.1</a></th><td>Ella Fitzgerald</td><td>January 22, 2007</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2007/05/wordpress-22/">2.2</a></th><td>Stan Getz</td><td>May 16, 2007</td></tr><tr><th><a href="https://wordpress.org/news/2007/09/wordpress-23/">2.3</a></th><td>Dexter Gordon</td><td>September 24, 2007</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2008/03/wordpress-25-brecker/">2.5</a></th><td>Michael Brecker</td><td>March 29, 2008</td></tr><tr><th><a href="https://wordpress.org/news/2008/07/wordpress-26-tyner/">2.6</a></th><td>McCoy Tyner</td><td>July 15, 2008</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2008/12/coltrane/">2.7</a></th><td>John Coltrane</td><td>December 10, 2008</td></tr><tr><th><a href="https://wordpress.org/news/2009/06/wordpress-28/">2.8</a></th><td>Chet Baker</td><td>June 11, 2009</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2009/12/wordpress-2-9/">2.9</a></th><td>Carmen McRae</td><td>December 18, 2009</td></tr><tr><th><a href="https://wordpress.org/news/2010/06/thelonious/">3.0</a></th><td>Thelonious Monk</td><td>June 17, 2010</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2011/02/threeone/">3.1</a></th><td>Django Reinhardt</td><td>February 23, 2011</td></tr><tr><th><a href="https://wordpress.org/news/2011/07/gershwin/">3.2</a></th><td>George Gershwin</td><td>July 4, 2011</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2011/12/sonny/">3.3</a></th><td>Sonny Stitt</td><td>December 12, 2011</td></tr><tr><th><a href="https://wordpress.org/news/2012/06/green/">3.4</a></th><td>Grant Green</td><td>June 13, 2012</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2012/12/elvin/">3.5</a></th><td>Elvin Jones</td><td>December 11, 2012</td></tr><tr><th><a href="https://wordpress.org/news/2013/08/oscar/">3.6</a></th><td>Oscar Peterson</td><td>August 1, 2013</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2013/10/basie/">3.7</a></th><td>Count Basie</td><td>October 24, 2013</td></tr><tr><th><a href="https://wordpress.org/news/2013/12/parker/">3.8</a></th><td>Charlie Parker</td><td>December 12, 2013</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2014/04/smith/">3.9</a></th><td>Jimmy Smith</td><td>April 16, 2014</td></tr><tr><th><a href="https://wordpress.org/news/2014/09/benny/">4.0</a></th><td>Benny Goodman</td><td>September 4, 2014</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2014/12/dinah/">4.1</a></th><td>Dinah Washington</td><td>December 18, 2014</td></tr><tr><th><a href="https://wordpress.org/news/2015/04/powell/">4.2</a></th><td>Bud Powell</td><td>April 23, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2015/08/billie/">4.3</a></th><td>Billie Holiday</td><td>August 18, 2015</td></tr><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
-			'<!-- /wp:core/table -->',
+			'<!-- wp:core/pullquote -->',
+			'<blockquote class="blocks-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+			'<!-- /wp:core/pullquote -->',
 
-			'<!-- wp:core/preformatted -->',
-			'<pre>Some <em>preformatted</em> text...<br>And more!</pre>',
-			'<!-- /wp:core/preformatted -->',
+			'<!-- wp:core/separator -->',
+			'<hr/>',
+			'<!-- /wp:core/separator -->',
+
+			'<!-- wp:core/table -->',
+			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
+			'<!-- /wp:core/table -->',
 
 			'<!-- wp:core/code -->',
 			'<pre><code>export default function MyButton() {\n\

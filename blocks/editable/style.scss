@@ -16,10 +16,10 @@
 	}
 
 	a {
-		color: $blue-medium;
+		color: $blue-medium-500;
 	}
 
-	a[data-mce-selected] {
+	&:focus a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
 		border-radius: 2px;
@@ -36,7 +36,7 @@
 		font-size: 14px;
 	}
 
-	code[data-mce-selected] {
+	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
 	}
 
@@ -56,7 +56,8 @@
 	display: flex;
 	justify-content: center;
 	position: absolute;
-	top: -50px;
+	top: -$block-controls-height - 4px;
+	line-height: 0;
 	left: 0;
 	right: 0;
 	z-index: 1;

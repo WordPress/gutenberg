@@ -6,12 +6,22 @@
 	background: none;
 	color: $dark-gray-500;
 	position: relative;
+	width: $icon-button-size;	// show only icon on small breakpoints
+	overflow: hidden;
+
+	.dashicon {
+		flex: 0 0 auto;
+	}
+
+	@include break-medium() {
+		width: auto;
+	}
 
 	&:not( :disabled ) {
 		cursor: pointer;
 
 		&:hover {
-			color: $blue-medium;
+			color: $blue-medium-500;
 		}
 	}
 

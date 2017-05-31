@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { combineReducers, createStore } from 'redux';
-import { keyBy, last, omit, without } from 'lodash';
+import { combineReducers, applyMiddleware, createStore } from 'redux';
+import refx from 'refx';
+import { keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
+import effects from './effects';
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -27,6 +29,7 @@ export const editor = combineUndoableReducers( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
+			case 'SETUP_NEW_POST':
 				return {
 					...state,
 					...action.edits,
@@ -44,10 +47,11 @@ export const editor = combineUndoableReducers( {
 
 			case 'UPDATE_BLOCK':
 			case 'INSERT_BLOCK':
-			case 'MOVE_BLOCK_DOWN':
-			case 'MOVE_BLOCK_UP':
+			case 'MOVE_BLOCKS_DOWN':
+			case 'MOVE_BLOCKS_UP':
 			case 'REPLACE_BLOCKS':
-			case 'REMOVE_BLOCK':
+			case 'REMOVE_BLOCKS':
+			case 'EDIT_POST':
 				return true;
 		}
 
@@ -85,59 +89,72 @@ export const editor = combineUndoableReducers( {
 					};
 				}, omit( state, action.uids ) );
 
-			case 'REMOVE_BLOCK':
-				return omit( state, action.uid );
+			case 'REMOVE_BLOCKS':
+				return omit( state, action.uids );
 		}
 
 		return state;
 	},
 
 	blockOrder( state = [], action ) {
-		let index;
-		let swappedUid;
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 				return action.blocks.map( ( { uid } ) => uid );
 
-			case 'INSERT_BLOCK':
+			case 'INSERT_BLOCK': {
 				const position = action.after ? state.indexOf( action.after ) + 1 : state.length;
 				return [
 					...state.slice( 0, position ),
 					action.block.uid,
 					...state.slice( position ),
 				];
+			}
 
-			case 'MOVE_BLOCK_UP':
-				if ( action.uid === state[ 0 ] ) {
+			case 'MOVE_BLOCKS_UP': {
+				const firstUid = first( action.uids );
+				const lastUid = last( action.uids );
+
+				if ( ! state.length || firstUid === first( state ) ) {
 					return state;
 				}
-				index = state.indexOf( action.uid );
-				swappedUid = state[ index - 1 ];
-				return [
-					...state.slice( 0, index - 1 ),
-					action.uid,
-					swappedUid,
-					...state.slice( index + 1 ),
-				];
 
-			case 'MOVE_BLOCK_DOWN':
-				if ( action.uid === last( state ) ) {
+				const firstIndex = state.indexOf( firstUid );
+				const lastIndex = state.indexOf( lastUid );
+				const swappedUid = state[ firstIndex - 1 ];
+
+				return [
+					...state.slice( 0, firstIndex - 1 ),
+					...action.uids,
+					swappedUid,
+					...state.slice( lastIndex + 1 ),
+				];
+			}
+
+			case 'MOVE_BLOCKS_DOWN': {
+				const firstUid = first( action.uids );
+				const lastUid = last( action.uids );
+
+				if ( ! state.length || lastUid === last( state ) ) {
 					return state;
 				}
-				index = state.indexOf( action.uid );
-				swappedUid = state[ index + 1 ];
+
+				const firstIndex = state.indexOf( firstUid );
+				const lastIndex = state.indexOf( lastUid );
+				const swappedUid = state[ lastIndex + 1 ];
+
 				return [
-					...state.slice( 0, index ),
+					...state.slice( 0, firstIndex ),
 					swappedUid,
-					action.uid,
-					...state.slice( index + 2 ),
+					...action.uids,
+					...state.slice( lastIndex + 2 ),
 				];
+			}
 
 			case 'REPLACE_BLOCKS':
 				if ( ! action.blocks ) {
 					return state;
 				}
-				index = state.indexOf( action.uids[ 0 ] );
+
 				return state.reduce( ( memo, uid ) => {
 					if ( uid === action.uids[ 0 ] ) {
 						return memo.concat( action.blocks.map( ( block ) => block.uid ) );
@@ -148,8 +165,8 @@ export const editor = combineUndoableReducers( {
 					return memo;
 				}, [] );
 
-			case 'REMOVE_BLOCK':
-				return without( state, action.uid );
+			case 'REMOVE_BLOCKS':
+				return without( state, ...action.uids );
 		}
 
 		return state;
@@ -200,11 +217,13 @@ export function selectedBlock( state = {}, action ) {
 		case 'CLEAR_SELECTED_BLOCK':
 			return {};
 
-		case 'MOVE_BLOCK_UP':
-		case 'MOVE_BLOCK_DOWN':
-			return action.uid === state.uid
+		case 'MOVE_BLOCKS_UP':
+		case 'MOVE_BLOCKS_DOWN': {
+			const firstUid = first( action.uids );
+			return firstUid === state.uid
 				? state
-				: { uid: action.uid, typing: false, focus: {} };
+				: { uid: firstUid, typing: false, focus: {} };
+		}
 
 		case 'INSERT_BLOCK':
 			return {
@@ -250,6 +269,31 @@ export function selectedBlock( state = {}, action ) {
 }
 
 /**
+ * Reducer returning multi selected block state.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function multiSelectedBlocks( state = { start: null, end: null }, action ) {
+	switch ( action.type ) {
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'TOGGLE_BLOCK_SELECTED':
+			return {
+				start: null,
+				end: null,
+			};
+		case 'MULTI_SELECT':
+			return {
+				start: action.start,
+				end: action.end,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning hovered block state.
  *
  * @param  {Object} state  Current state
@@ -268,6 +312,7 @@ export function hoveredBlock( state = null, action ) {
 			break;
 
 		case 'START_TYPING':
+		case 'MULTI_SELECT':
 			return null;
 
 		case 'REPLACE_BLOCKS':
@@ -276,6 +321,29 @@ export function hoveredBlock( state = null, action ) {
 			}
 
 			return action.blocks[ 0 ].uid;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the block insertion point
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function insertionPoint( state = { show: false }, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTION_POINT':
+			return {
+				show: true,
+				uid: action.uid,
+			};
+		case 'CLEAR_INSERTION_POINT':
+			return {
+				show: false,
+			};
 	}
 
 	return state;
@@ -329,7 +397,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: action.isNew,
+				isNew: false,
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -354,16 +422,20 @@ export function createReduxStore() {
 		editor,
 		currentPost,
 		selectedBlock,
+		multiSelectedBlocks,
 		hoveredBlock,
+		insertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,
 	} );
 
-	return createStore(
-		reducer,
-		window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-	);
+	const enhancers = [ applyMiddleware( refx( effects ) ) ];
+	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
+	}
+
+	return createStore( reducer, flowRight( enhancers ) );
 }
 
 export default createReduxStore;

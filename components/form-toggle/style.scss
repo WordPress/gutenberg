@@ -1,19 +1,10 @@
-.components-form-toggle {
-	position: relative;
-}
-
-.components-form-toggle__input[type=checkbox] {
-	position: absolute;
-	opacity: 0;
-	pointer-events: none;
-	margin: 0;
-	padding: 0;
-}
-
 $toggle-width: 32px;
 $toggle-height: 18px;
 $toggle-border-width: 2px;
-.components-form-toggle__label {
+
+.components-form-toggle {
+	position: relative;
+
 	&:before {
 		content: '';
 		display: inline-block;
@@ -36,8 +27,8 @@ $toggle-border-width: 2px;
 		background-color: $light-gray-500;
 
 		.components-form-toggle.is-checked & {
-			background-color: $blue-medium;
-			border: $toggle-border-width solid $blue-medium;
+			background-color: $blue-medium-500;
+			border: $toggle-border-width solid $blue-medium-500;
 		}
 	}
 
@@ -52,11 +43,35 @@ $toggle-border-width: 2px;
 		border-radius: 50%;
 		background: $dark-gray-500;
 		transition: 0.1s transform ease;
+	}
 
-
-		.components-form-toggle.is-checked & {
+	&.is-checked {
+		&:after {
 			background-color: $white;
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
 		}
+
+		&:before {
+			background-color: $blue-medium-500;
+			border: $toggle-border-width solid $blue-medium-500;
+		}
 	}
+}
+
+.components-form-toggle__input[type=checkbox] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	margin: 0;
+	padding: 0;
+	z-index: z-index( '.components-form-toggle__input' );
+}
+
+.components-form-toggle__hint {
+	display: inline-block;
+	margin-left: 10px;
+	font-weight: 500;
 }

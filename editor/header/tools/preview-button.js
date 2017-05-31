@@ -6,8 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
-import Button from 'components/button';
+import { IconButton } from 'components';
 
 /**
  * Internal dependencies
@@ -16,10 +15,14 @@ import { getEditedPostPreviewLink } from '../../selectors';
 
 function PreviewButton( { link } ) {
 	return (
-		<Button href={ link } target="_blank">
-			<Dashicon icon="visibility" />
+		<IconButton
+			href={ link }
+			target="_blank"
+			icon="visibility"
+			disabled={ ! link }
+		>
 			{ wp.i18n._x( 'Preview', 'imperative verb' ) }
-		</Button>
+		</IconButton>
 	);
 }
 

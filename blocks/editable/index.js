@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity } from 'lodash';
+import { last, isEqual, capitalize, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -10,7 +10,8 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import Toolbar from 'components/toolbar';
+import { Toolbar } from 'components';
+import { BACKSPACE, DELETE } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -18,9 +19,6 @@ import Toolbar from 'components/toolbar';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-
-const KEYCODE_BACKSPACE = 8;
-const KEYCODE_DELETE = 46;
 
 const alignmentMap = {
 	alignleft: 'left',
@@ -74,6 +72,7 @@ export default class Editable extends wp.element.Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 
@@ -100,6 +99,7 @@ export default class Editable extends wp.element.Component {
 		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
+		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
 
 		if ( this.props.onSetup ) {
@@ -131,10 +131,18 @@ export default class Editable extends wp.element.Component {
 		}
 
 		const content = this.getContent();
+		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
 			empty: ! content || ! content.length,
 		} );
+
+		if ( this.props.focus.collapsed !== collapsed ) {
+			this.props.onFocus( {
+				...this.props.focus,
+				collapsed,
+			} );
+		}
 	}
 
 	onChange() {
@@ -211,15 +219,21 @@ export default class Editable extends wp.element.Component {
 	onKeyDown( event ) {
 		if (
 			this.props.onMerge && (
-				( event.keyCode === KEYCODE_BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === KEYCODE_DELETE && this.isEndOfEditor() )
+				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+				( event.keyCode === DELETE && this.isEndOfEditor() )
 			)
 		) {
-			const forward = event.keyCode === KEYCODE_DELETE;
+			const forward = event.keyCode === DELETE;
 			this.onChange();
 			this.props.onMerge( forward );
 			event.preventDefault();
 			event.stopImmediatePropagation();
+		}
+	}
+
+	onKeyUp( { keyCode } ) {
+		if ( keyCode === BACKSPACE ) {
+			this.onSelectionChange();
 		}
 	}
 
@@ -273,7 +287,7 @@ export default class Editable extends wp.element.Component {
 
 	onNodeChange( { element, parents } ) {
 		const formats = {};
-		const link = parents.find( ( node ) => node.nodeName.toLowerCase() === 'a' );
+		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
 			formats.link = { value: link.getAttribute( 'href' ), link };
 		}

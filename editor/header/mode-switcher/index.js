@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Dashicon from 'components/dashicon';
+import { Dashicon } from 'components';
 
 /**
  * Internal dependencies

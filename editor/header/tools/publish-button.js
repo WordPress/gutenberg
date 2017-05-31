@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
+import { Button } from 'components';
 
 /**
  * Internal dependencies
@@ -32,12 +32,11 @@ function PublishButton( {
 	isRequesting,
 	isError,
 	requestIsNewPost,
-	onUpdate,
-	onSaveDraft,
+	onSave,
 } ) {
 	const buttonEnabled = ! isRequesting;
-	let buttonText, saveCallback;
 
+	let buttonText;
 	if ( isRequesting ) {
 		buttonText = requestIsNewPost
 			? wp.i18n.__( 'Saving…' )
@@ -56,12 +55,6 @@ function PublishButton( {
 		buttonText = wp.i18n.__( 'Save draft' );
 	}
 
-	if ( post && post.id ) {
-		saveCallback = onUpdate;
-	} else {
-		saveCallback = onSaveDraft;
-	}
-
 	const buttonDisabledHint = process.env.NODE_ENV === 'production'
 		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
 		: null;
@@ -70,7 +63,7 @@ function PublishButton( {
 		<Button
 			isPrimary
 			isLarge
-			onClick={ () => saveCallback( post, edits, blocks ) }
+			onClick={ () => onSave( post, edits, blocks ) }
 			disabled={ ! buttonEnabled || process.env.NODE_ENV === 'production' }
 			title={ buttonDisabledHint }
 		>
@@ -91,19 +84,11 @@ export default connect(
 		requestIsNewPost: isSavingNewPost( state ),
 	} ),
 	( dispatch ) => ( {
-		onUpdate( post, edits, blocks ) {
-			savePost( dispatch, post.id, {
+		onSave( post, edits, blocks ) {
+			dispatch( savePost( post.id, {
 				content: wp.blocks.serialize( blocks ),
 				...edits,
-			} );
-		},
-
-		onSaveDraft( post, edits, blocks ) {
-			savePost( dispatch, null /* is a new post */, {
-				content: wp.blocks.serialize( blocks ),
-				status: 'draft', // TODO change this after status controls
-				...edits,
-			} );
+			} ) );
 		},
 	} )
 )( PublishButton );
