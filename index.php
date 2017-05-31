@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin Name: Gutenberg
- * Plugin URI: https://wordpress.github.io/gutenberg/
- * Description: Prototyping since 1440. Development plugin for the editor focus in core.
+ * Plugin URI: https://github.com/WordPress/gutenberg
+ * Description: Prototyping since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
  * Version: 0.1.0
+ * Author: Gutenberg Team
  *
  * @package gutenberg
  */
@@ -26,7 +27,6 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
-
 
 $wp_registered_blocks = array();
 
@@ -537,10 +537,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', _wpGutenbergPost );' );
 
-	/**
-	 * Styles
-	 */
-
+	// Adding styles.
 	wp_enqueue_style(
 		'wp-editor-font',
 		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
