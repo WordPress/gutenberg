@@ -92,7 +92,7 @@ registerBlock( 'core/embed', {
 		doServerSideRender( event ) {
 			event.preventDefault();
 			const { url } = this.props.attributes;
-			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce
+			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce; // eslint-disable-line no-undef
 
 			this.setState( { error: false, fetching: true } );
 			fetch( api_url, {
@@ -119,7 +119,7 @@ registerBlock( 'core/embed', {
 
 			if ( ! html ) {
 				return (
-					<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className={ placeholderClassName }>
+					<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
 						<form onSubmit={ this.doServerSideRender }>
 							<input
 								type="url"
@@ -149,14 +149,14 @@ registerBlock( 'core/embed', {
 			const cannotPreview = this.noPreview.includes( domain );
 			let placeholderClassName = 'blocks-embed';
 
-			if ( 'video' == type ) {
+			if ( 'video' === type ) {
 				placeholderClassName = 'blocks-embed-video';
 			}
 
 			return (
 				<figure>
 					{ ( cannotPreview ) ? (
-						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
+						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className={ placeholderClassName }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
