@@ -4,15 +4,15 @@
 import { get } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import { getBlockSettings, switchToBlockType } from 'blocks';
-import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { __ } from 'i18n';
 
 /**
  * Internal dependencies
  */
+import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { focusBlock, replaceBlocks } from './actions';
 
 export default {
@@ -45,10 +45,10 @@ export default {
 		if ( ! isNew ) {
 			return;
 		}
-		const newUrl = getGutenbergURL( {
+		const newURL = getGutenbergURL( {
 			post_id: post.id,
 		} );
-		window.history.replaceState( {}, 'Post ' + post.id, newUrl );
+		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch } = store;
