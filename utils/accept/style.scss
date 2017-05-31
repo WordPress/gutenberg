@@ -1,0 +1,36 @@
+.utils-accept__dialog {
+	top: 10px;
+	bottom: 10px;
+	width: 400px;
+	margin: auto;
+	background: $white;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+}
+
+.utils-accept__dialog-content {
+	padding: 20px;
+}
+
+.utils-accept__dialog-buttons {
+	text-align: right;
+	padding: 10px 20px;
+	border-top: 1px solid $light-gray-500;
+
+	.components-button {
+		margin-left: 10px;
+	}
+}
+
+.utils-accept__backdrop {
+	align-items: center;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	position: fixed;
+	z-index: z-index( '.utils-accept__backdrop' );
+	background-color: rgba( $light-gray-900, 0.8 );
+}

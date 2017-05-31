@@ -10,6 +10,7 @@ import { find } from 'lodash';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+import { accept } from 'utils';
 
 /**
  * Internal Dependencies
@@ -48,11 +49,14 @@ class PostVisibility extends Component {
 			this.setState( { hasPassword: false } );
 		};
 		const setPrivate = () => {
-			if ( window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
-				onUpdateVisibility( 'private' );
-				onSave();
-				this.setState( { opened: false } );
-			}
+			const message = __( 'Would you like to privately publish this post now?' );
+			accept( message, ( accepted ) => {
+				if ( accepted ) {
+					onUpdateVisibility( 'private' );
+					onSave();
+					this.setState( { opened: false } );
+				}
+			}, __( 'Yes' ), __( 'No' ) );
 		};
 		const setPasswordProtected = () => {
 			onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
