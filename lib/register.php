@@ -1,4 +1,9 @@
 <?php
+/**
+ * Initialization and wp-admin integration for the Gutenberg editor plugin.
+ *
+ * @package gutenberg
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );

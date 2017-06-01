@@ -1,4 +1,9 @@
 <?php
+/**
+ * Internationalization-related functions for the Gutenberg editor plugin.
+ *
+ * @package gutenberg
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Functions related to editor blocks for the Gutenberg editor plugin.
+ *
+ * @package gutenberg
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );

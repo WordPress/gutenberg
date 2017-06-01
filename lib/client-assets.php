@@ -1,4 +1,10 @@
 <?php
+/**
+ * Functions to register client-side assets (scripts and stylesheets) for the
+ * Gutenberg editor plugin.
+ *
+ * @package gutenberg
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
