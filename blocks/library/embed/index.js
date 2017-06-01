@@ -129,7 +129,7 @@ registerBlock( 'core/embed', {
 						<form onSubmit={ this.doServerSideRender }>
 							<input
 								type="url"
-								className="placeholder__input"
+								className="components-placeholder__input"
 								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 							{ ! fetching ?

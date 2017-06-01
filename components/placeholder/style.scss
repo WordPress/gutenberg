@@ -22,7 +22,8 @@
 	}
 }
 
-.components-placeholder__fieldset {
+.components-placeholder__fieldset,
+.components-placeholder__fieldset form {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
