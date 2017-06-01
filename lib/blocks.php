@@ -14,36 +14,36 @@ $wp_registered_blocks = array();
 /**
  * Registers a block.
  *
- * @param  string $slug Block slug including namespace.
+ * @param  string $name Block name including namespace.
  * @param  array  $settings Block settings.
 
  * @return array            The block, if it has been successfully registered.
  */
-function register_block_type( $slug, $settings ) {
+function register_block_type( $name, $settings ) {
 	global $wp_registered_blocks;
 
-	if ( ! is_string( $slug ) ) {
-		$message = __( 'Block slugs must be strings.' );
+	if ( ! is_string( $name ) ) {
+		$message = __( 'Block names must be strings.' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
-	$slug_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
-	if ( ! preg_match( $slug_matcher, $slug ) ) {
-		$message = __( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+	$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
+	if ( ! preg_match( $name_matcher, $name ) ) {
+		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
-	if ( isset( $wp_registered_blocks[ $slug ] ) ) {
-		/* translators: 1: block slug */
-		$message = sprintf( __( 'Block "%s" is already registered.' ), $slug );
+	if ( isset( $wp_registered_blocks[ $name ] ) ) {
+		/* translators: 1: block name */
+		$message = sprintf( __( 'Block "%s" is already registered.' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
-	$settings['slug'] = $slug;
-	$wp_registered_blocks[ $slug ] = $settings;
+	$settings['name'] = $name;
+	$wp_registered_blocks[ $name ] = $settings;
 
 	return $settings;
 }
@@ -51,20 +51,20 @@ function register_block_type( $slug, $settings ) {
 /**
  * Unregisters a block.
  *
- * @param  string $slug Block slug.
+ * @param  string $name Block name.
  * @return array        The previous block value, if it has been
- *                        successfully unregistered; otherwise `null`.
+ *                      successfully unregistered; otherwise `null`.
  */
-function unregister_block_type( $slug ) {
+function unregister_block_type( $name ) {
 	global $wp_registered_blocks;
-	if ( ! isset( $wp_registered_blocks[ $slug ] ) ) {
-		/* translators: 1: block slug */
-		$message = sprintf( __( 'Block "%s" is not registered.' ), $slug );
+	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
+		/* translators: 1: block name */
+		$message = sprintf( __( 'Block "%s" is not registered.' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
-	$unregistered_block = $wp_registered_blocks[ $slug ];
-	unset( $wp_registered_blocks[ $slug ] );
+	$unregistered_block = $wp_registered_blocks[ $name ];
+	unset( $wp_registered_blocks[ $name ] );
 
 	return $unregistered_block;
 }

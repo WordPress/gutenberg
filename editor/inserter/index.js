@@ -39,11 +39,11 @@ class Inserter extends wp.element.Component {
 		} );
 	}
 
-	insertBlock( slug ) {
-		if ( slug ) {
+	insertBlock( name ) {
+		if ( name ) {
 			const { insertionPoint, onInsertBlock } = this.props;
 			onInsertBlock(
-				slug,
+				name,
 				insertionPoint
 			);
 		}
@@ -94,10 +94,10 @@ export default connect(
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( slug, after ) {
+		onInsertBlock( name, after ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				wp.blocks.createBlock( slug ),
+				wp.blocks.createBlock( name ),
 				after
 			) );
 		},
