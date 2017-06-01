@@ -24,6 +24,8 @@ import {
 	getBlocks,
 	getSelectedBlock,
 	getSelectedBlocks,
+	getBlockSelectionStart,
+	getBlockSelectionEnd,
 	getBlockUids,
 	getBlockOrder,
 	isFirstBlock,
@@ -41,6 +43,7 @@ import {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	isSavingNewPost,
+	getSuggestedPostFormat,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -459,6 +462,54 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getBlockSelectionStart', () => {
+		it( 'returns null if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getBlockSelectionStart( state ) ).to.be.null();
+		} );
+
+		it( 'returns multi selection start', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getBlockSelectionStart( state ) ).to.equal( 2 );
+		} );
+	} );
+
+	describe( 'getBlockSelectionEnd', () => {
+		it( 'returns null if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getBlockSelectionEnd( state ) ).to.be.null();
+		} );
+
+		it( 'returns multi selection end', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getBlockSelectionEnd( state ) ).to.equal( 4 );
+		} );
+	} );
+
 	describe( 'getBlockUids', () => {
 		it( 'should return the ordered block UIDs', () => {
 			const state = {
@@ -837,6 +888,59 @@ describe( 'selectors', () => {
 			};
 
 			expect( isSavingNewPost( state ) ).to.be.false();
+		} );
+	} );
+
+	describe( 'getSuggestedPostFormat', () => {
+		it( 'returns null if cannot be determined', () => {
+			const state = {
+				editor: {
+					blockOrder: [],
+					blocksByUid: {},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.be.null();
+		} );
+
+		it( 'returns null if there is more than one block in the post', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 456 ],
+					blocksByUid: {
+						123: { uid: 123, blockType: 'core/image' },
+						456: { uid: 456, blockType: 'core/quote' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.be.null();
+		} );
+
+		it( 'returns Image if the first block is of type `core/image`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123 ],
+					blocksByUid: {
+						123: { uid: 123, blockType: 'core/image' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.equal( 'Image' );
+		} );
+
+		it( 'returns Quote if the first block is of type `core/quote`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 456 ],
+					blocksByUid: {
+						456: { uid: 456, blockType: 'core/quote' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.equal( 'Quote' );
 		} );
 	} );
 } );
