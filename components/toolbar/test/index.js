@@ -3,6 +3,7 @@
  */
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
+import { spy } from 'sinon';
 
 /**
  * Internal dependencies
@@ -11,12 +12,12 @@ import Toolbar from '../';
 
 describe( 'Toolbar', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render an empty node controls are not passed', () => {
+		it( 'should render an empty node, when controls are not passed', () => {
 			const toolbar = shallow( <Toolbar /> );
 			expect( toolbar.type() ).to.be.null();
 		} );
 
-		it( 'should render an empty node controls are empty', () => {
+		it( 'should render an empty node, when controls are empty', () => {
 			const toolbar = shallow( <Toolbar controls={ [] } /> );
 			expect( toolbar.type() ).to.be.null();
 		} );
@@ -35,11 +36,14 @@ describe( 'Toolbar', () => {
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
 			expect( toolbar.type() ).to.equal( 'ul' );
-			expect( listItem.props().icon ).to.equal( 'wordpress' );
-			expect( listItem.props().label ).to.equal( 'WordPress' );
-			expect( listItem.props()[ 'data-subscript' ] ).to.equal( 'wp' );
-			expect( listItem.props()[ 'aria-pressed' ] ).to.equal( false );
-			expect( listItem.props().className ).to.equal( 'components-toolbar__control' );
+			expect( listItem.props() ).to.include( {
+				icon: 'wordpress',
+				label: 'WordPress',
+				'data-subscript': 'wp',
+				'aria-pressed': false,
+				className: 'components-toolbar__control',
+				focus: undefined,
+			} );
 		} );
 
 		it( 'should render a list of controls with IconButtons and active control', () => {
@@ -55,16 +59,15 @@ describe( 'Toolbar', () => {
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
-			expect( listItem.props()[ 'aria-pressed' ] ).to.equal( true );
-			expect( listItem.props().className ).to.equal( 'components-toolbar__control is-active' );
+			expect( listItem.props() ).to.include( {
+				'aria-pressed': true,
+				className: 'components-toolbar__control is-active',
+			} );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
-			let clicked = false;
-			const clickHandler = ( event ) => {
-				clicked = true;
-				return event;
-			};
+			const clickHandler = spy();
+			const event = { stopPropagation: () => undefined };
 			const controls = [
 				{
 					icon: 'wordpress',
@@ -76,8 +79,23 @@ describe( 'Toolbar', () => {
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			const listItem = toolbar.find( 'IconButton' );
-			listItem.simulate( 'click', { stopPropagation: () => undefined } );
-			expect( clicked ).to.be.true();
+			listItem.simulate( 'click', event );
+			expect( clickHandler ).to.have.been.calledOnce();
+			expect( clickHandler ).to.have.been.calledWith();
+		} );
+
+		it( 'should have a focus property of true.', () => {
+			const controls = [
+				{
+					icon: 'wordpress',
+					title: 'WordPress',
+					subscript: 'wp',
+					isActive: true,
+				},
+			];
+			const toolbar = shallow( <Toolbar controls={ controls } focus={ true } /> );
+			const listItem = toolbar.find( 'IconButton' );
+			expect( listItem.prop( 'focus' ) ).to.be.true();
 		} );
 	} );
 } );

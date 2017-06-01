@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls } ) {
+function Toolbar( { controls, focus } ) {
 	if ( ! controls || ! controls.length ) {
 		return null;
 	}
