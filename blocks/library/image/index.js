@@ -7,11 +7,10 @@ import { Placeholder } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlock } from '../../api';
+import { findNodeAttribute, getEditableContent } from '../../api/source';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
-
-const { attr, children } = query;
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -34,10 +33,20 @@ registerBlock( 'core/image', {
 
 	category: 'common',
 
-	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
+	getInitialAttributes( node, encodedAttributes ) {
+		return {
+			align: 'none',
+			...encodedAttributes,
+			url: findNodeAttribute( node, 'img', 'src' ),
+			alt: findNodeAttribute( node, 'img', 'alt' ),
+			content: getEditableContent( node, [ 'figure', 'figcaption' ] ),
+		};
+	},
+
+	encodeAttributes( attributes ) {
+		const { align } = attributes;
+
+		return { align };
 	},
 
 	controls: [
@@ -124,7 +133,7 @@ registerBlock( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
+		const { url, alt, caption, align } = attributes;
 		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
 		if ( ! caption || ! caption.length ) {
