@@ -1,6 +1,7 @@
 export { default as Button } from './button';
 export { default as Dashicon } from './dashicon';
 export { default as FormToggle } from './form-toggle';
+export { default as FormTokenField } from './form-token-field';
 export { default as HtmlEmbed } from './html-embed';
 export { default as IconButton } from './icon-button';
 export { default as Panel } from './panel';

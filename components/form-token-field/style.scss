@@ -127,7 +127,7 @@ input[type="text"].components-form-token-field__input {
 }
 
 .components-form-token-field__token-text,
-.components-form-token-field__remove-token {
+.components-form-token-field__remove-token.components-icon-button {
 	display: inline-block;
 	line-height: 24px;
 	background: $dark-gray-500;
@@ -142,7 +142,7 @@ input[type="text"].components-form-token-field__input {
 	text-overflow: ellipsis;
 }
 
-.components-form-token-field__remove-token {
+.components-form-token-field__remove-token.components-icon-button {
 	cursor: pointer;
 	border-radius: 0 4px 4px 0;
 	padding: 0 2px;
