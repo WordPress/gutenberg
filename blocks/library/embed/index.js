@@ -153,16 +153,16 @@ registerBlock( 'core/embed', {
 
 			const domain = url.split( '/' )[ 2 ].replace( /^www\./, '' );
 			const cannotPreview = this.noPreview.includes( domain );
-			let placeholderClassName = 'blocks-embed';
+			let typeClassName = 'blocks-embed';
 
 			if ( 'video' === type ) {
-				placeholderClassName = 'blocks-embed-video';
+				typeClassName = 'blocks-embed-video';
 			}
 
 			return (
-				<figure>
+				<figure className={ typeClassName }>
 					{ ( cannotPreview ) ? (
-						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className={ placeholderClassName }>
+						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) }>
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 							<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 						</Placeholder>
