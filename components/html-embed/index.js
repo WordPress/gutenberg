@@ -6,15 +6,9 @@
  */
 export default class HtmlEmbed extends wp.element.Component {
 
-	static get defaultProps() {
-		return {
-			html: '',
-		};
-	}
-
 	componentDidMount() {
 		const body = this.node;
-		const { html } = this.props;
+		const { html = '' } = this.props;
 
 		body.innerHTML = html;
 
