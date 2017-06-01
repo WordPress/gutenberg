@@ -1,0 +1,16 @@
+[
+    {
+        "uid": "_uid_0",
+        "blockType": "core/freeform",
+        "attributes": {
+            "html": "<div>this is not a separator</div>"
+        }
+    },
+    {
+        "uid": "_uid_1",
+        "blockType": "core/freeform",
+        "attributes": {
+            "html": "<hr><div>what even happened here</div>"
+        }
+    }
+]
