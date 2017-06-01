@@ -10,6 +10,7 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
+import PostExternalLink from '../../post-external-link';
 
 export default function VisualEditor() {
 	return (
@@ -18,6 +19,7 @@ export default function VisualEditor() {
 			aria-label={ __( 'Visual Editor' ) }
 			className="editor-visual-editor"
 		>
+			<PostExternalLink />
 			<PostTitle />
 			<VisualEditorBlockList />
 			<Inserter position="top right" />
