@@ -5,6 +5,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Retrieves the root plugin path.
+ *
+ * @return string Root path to the gutenberg plugin.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_dir_path() {
+	return plugin_dir_path( dirname( __FILE__ ) );
+}
+
+/**
+ * Retrieves a URL to a file in the gutenberg plugin.
+ *
+ * @param  string $path Relative path of the desired file.
+ *
+ * @return string       Fully qualified URL pointing to the desired file.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_url( $path ) {
+	return plugins_url( $path, dirname( __FILE__ ) );
+}
+
+/**
  * Registers common scripts to be used as dependencies of the editor and plugins.
  *
  * @since 0.1.0
@@ -47,15 +71,15 @@ function gutenberg_register_scripts() {
 	// Editor Scripts.
 	wp_register_script(
 		'wp-utils',
-		plugins_url( 'utils/build/index.js', __FILE__ ),
+		gutenberg_url( 'utils/build/index.js' ),
 		array(),
-		filemtime( plugin_dir_path( __FILE__ ) . 'utils/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(
 		'wp-date',
-		plugins_url( 'date/build/index.js', __FILE__ ),
+		gutenberg_url( 'date/build/index.js' ),
 		array( 'moment' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'date/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'date/build/index.js' )
 	);
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
@@ -85,41 +109,41 @@ function gutenberg_register_scripts() {
 	) ), 'before' );
 	wp_register_script(
 		'wp-i18n',
-		plugins_url( 'i18n/build/index.js', __FILE__ ),
+		gutenberg_url( 'i18n/build/index.js' ),
 		array(),
-		filemtime( plugin_dir_path( __FILE__ ) . 'i18n/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'i18n/build/index.js' )
 	);
 	wp_register_script(
 		'wp-element',
-		plugins_url( 'element/build/index.js', __FILE__ ),
+		gutenberg_url( 'element/build/index.js' ),
 		array( 'react', 'react-dom', 'react-dom-server' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'element/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
 	);
 	wp_register_script(
 		'wp-components',
-		plugins_url( 'components/build/index.js', __FILE__ ),
+		gutenberg_url( 'components/build/index.js' ),
 		array( 'wp-element' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
-		plugins_url( 'blocks/build/index.js', __FILE__ ),
+		gutenberg_url( 'blocks/build/index.js' ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 
 	// Editor Styles.
 	wp_register_style(
 		'wp-components',
-		plugins_url( 'components/build/style.css', __FILE__ ),
+		gutenberg_url( 'components/build/style.css' ),
 		array(),
-		filemtime( plugin_dir_path( __FILE__ ) . 'components/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
 	);
 	wp_register_style(
 		'wp-blocks',
-		plugins_url( 'blocks/build/style.css', __FILE__ ),
+		gutenberg_url( 'blocks/build/style.css' ),
 		array(),
-		filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
 	);
 }
 add_action( 'init', 'gutenberg_register_scripts' );
@@ -186,7 +210,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 	}
 
 	$filename = gutenberg_vendor_script_filename( $src );
-	$full_path = plugin_dir_path( __FILE__ ) . 'vendor/' . $filename;
+	$full_path = gutenberg_dir_path() . 'vendor/' . $filename;
 
 	$needs_fetch = (
 		! file_exists( $full_path ) ||
@@ -227,7 +251,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 
 	wp_register_script(
 		$handle,
-		plugins_url( 'vendor/' . $filename, __FILE__ ),
+		gutenberg_url( 'vendor/' . $filename ),
 		$deps
 	);
 }
@@ -255,9 +279,9 @@ function gutenberg_scripts_and_styles( $hook ) {
 	// The editor code itself.
 	wp_enqueue_script(
 		'wp-editor',
-		plugins_url( 'editor/build/index.js', __FILE__ ),
+		gutenberg_url( 'editor/build/index.js' ),
 		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/index.js' ),
+		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
 
@@ -287,7 +311,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		// TODO: replace this with error handling
 		wp_add_inline_script(
 			'wp-editor',
-			file_get_contents( plugin_dir_path( __FILE__ ) . 'post-content.js' )
+			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
 	}
 
@@ -312,9 +336,9 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 	wp_enqueue_style(
 		'wp-editor',
-		plugins_url( 'editor/build/style.css', __FILE__ ),
+		gutenberg_url( 'editor/build/style.css' ),
 		array( 'wp-components', 'wp-blocks' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'editor/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
