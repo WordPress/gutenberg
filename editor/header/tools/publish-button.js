@@ -81,7 +81,7 @@ export default connect(
 		dirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
 		isPublished: isEditedPostAlreadyPublished( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state, 'date' ),
+		isBeingScheduled: isEditedPostBeingScheduled( state ),
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {
