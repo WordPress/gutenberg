@@ -39,7 +39,7 @@ WP_Block_End
   } }
 
 WP_Block_Type
-  = $(ASCII_Letter WP_Block_Type_Char*)
+  = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
 
 HTML_Attribute_List
   = as:(_+ a:HTML_Attribute_Item { return a })*
@@ -73,10 +73,6 @@ HTML_Attribute_Quoted
 
 HTML_Attribute_Name
   = $([a-zA-Z0-9:.]+)
-
-WP_Block_Type_Char
- = ASCII_AlphaNumeric
- / [\/]
 
 ASCII_AlphaNumeric
   = ASCII_Letter

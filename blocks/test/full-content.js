@@ -15,7 +15,7 @@ import {
 	parseWithTinyMCE,
 } from '../api/parser';
 import serialize from '../api/serializer';
-import { getBlocks } from '../api/registration';
+import { getBlockTypes } from '../api/registration';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
 
@@ -134,7 +134,7 @@ describe( 'full post content fixture', () => {
 	it( 'should be present for each block', () => {
 		const errors = [];
 
-		getBlocks().map( block => block.slug ).forEach( slug => {
+		getBlockTypes().map( block => block.slug ).forEach( slug => {
 			const slugToFilename = slug.replace( /\//g, '-' );
 			const foundFixtures = fileBasenames
 				.filter( basename => (

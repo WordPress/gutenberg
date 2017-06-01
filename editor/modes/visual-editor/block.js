@@ -182,11 +182,11 @@ class VisualEditorBlock extends wp.element.Component {
 
 	render() {
 		const { block, selectedBlocks } = this.props;
-		const settings = wp.blocks.getBlockSettings( block.blockType );
+		const blockType = wp.blocks.getBlockType( block.name );
 
 		let BlockEdit;
-		if ( settings ) {
-			BlockEdit = settings.edit || settings.save;
+		if ( blockType ) {
+			BlockEdit = blockType.edit || blockType.save;
 		}
 
 		if ( ! BlockEdit ) {
@@ -205,8 +205,8 @@ class VisualEditorBlock extends wp.element.Component {
 
 		// Determine whether the block has props to apply to the wrapper
 		let wrapperProps;
-		if ( settings.getEditWrapperProps ) {
-			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		if ( blockType.getEditWrapperProps ) {
+			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -228,7 +228,7 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
-				data-type={ block.blockType }
+				data-type={ block.name }
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
@@ -244,9 +244,9 @@ class VisualEditorBlock extends wp.element.Component {
 					>
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
-							{ !! settings.controls && (
+							{ !! blockType.controls && (
 								<Toolbar
-									controls={ settings.controls.map( ( control ) => ( {
+									controls={ blockType.controls.map( ( control ) => ( {
 										...control,
 										onClick: () => control.onClick( block.attributes, this.setAttributes ),
 										isActive: control.isActive ? control.isActive( block.attributes ) : false,

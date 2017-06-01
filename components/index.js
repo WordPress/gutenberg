@@ -6,6 +6,7 @@ export { default as Panel } from './panel';
 export { default as PanelHeader } from './panel/header';
 export { default as PanelBody } from './panel/body';
 export { default as Placeholder } from './placeholder';
+export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as Spinner } from './spinner';
 export { default as Toolbar } from './toolbar';
 

@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/heading",
+        "name": "core/heading",
         "attributes": {
             "content": [
                 "The ",

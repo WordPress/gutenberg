@@ -35,7 +35,7 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 		<Panel>
 			<PanelHeader label={ header } />
 			<PanelBody>
-				<div>{ selectedBlock.blockType } settings...</div>
+				<div>{ selectedBlock.name } settings...</div>
 				<ul>
 					{ Object.keys( selectedBlock.attributes ).map( ( attribute, index ) => (
 						<li key={ index }>{ attribute }: { selectedBlock.attributes[ attribute ] }</li>

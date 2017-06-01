@@ -24,7 +24,7 @@ let unknownTypeHandler;
  * @return {?WPBlock}          The block, if it has been successfully
  *                             registered; otherwise `undefined`.
  */
-export function registerBlock( slug, settings ) {
+export function registerBlockType( slug, settings ) {
 	if ( typeof slug !== 'string' ) {
 		console.error(
 			'Block slugs must be strings.'
@@ -55,7 +55,7 @@ export function registerBlock( slug, settings ) {
  * @return {?WPBlock}      The previous block value, if it has been
  *                         successfully unregistered; otherwise `undefined`.
  */
-export function unregisterBlock( slug ) {
+export function unregisterBlockType( slug ) {
 	if ( ! blocks[ slug ] ) {
 		console.error(
 			'Block "' + slug + '" is not registered.'
@@ -87,12 +87,12 @@ export function getUnknownTypeHandler() {
 }
 
 /**
- * Returns settings associated with a registered block.
+ * Returns a registered block type.
  *
  * @param  {string}  slug Block slug
- * @return {?Object}      Block settings
+ * @return {?Object}      Block type
  */
-export function getBlockSettings( slug ) {
+export function getBlockType( slug ) {
 	return blocks[ slug ];
 }
 
@@ -101,6 +101,6 @@ export function getBlockSettings( slug ) {
  *
  * @return {Array} Block settings
  */
-export function getBlocks() {
+export function getBlockTypes() {
 	return Object.values( blocks );
 }

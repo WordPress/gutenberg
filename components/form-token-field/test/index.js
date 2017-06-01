@@ -32,6 +32,10 @@ const charCodes = {
 };
 
 describe( 'FormTokenField', function() {
+	if ( ! process.env.RUN_SLOW_TESTS ) {
+		return;
+	}
+
 	let wrapper, tokenFieldNode, textInputNode;
 
 	function setText( text ) {

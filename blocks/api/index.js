@@ -9,10 +9,10 @@ export { default as parse } from './parser';
 export { default as serialize } from './serializer';
 export { getCategories } from './categories';
 export {
-	registerBlock,
-	unregisterBlock,
+	registerBlockType,
+	unregisterBlockType,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
-	getBlockSettings,
-	getBlocks,
+	getBlockType,
+	getBlockTypes,
 } from './registration';

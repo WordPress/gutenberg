@@ -40,27 +40,27 @@ class BlockSwitcher extends wp.element.Component {
 		} );
 	}
 
-	switchBlockType( blockType ) {
+	switchBlockType( name ) {
 		return () => {
 			this.setState( {
 				open: false,
 			} );
-			this.props.onTransform( this.props.block, blockType );
+			this.props.onTransform( this.props.block, name );
 		};
 	}
 
 	render() {
-		const blockSettings = wp.blocks.getBlockSettings( this.props.block.blockType );
-		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlocks(), ( memo, block ) => {
+		const blockType = wp.blocks.getBlockType( this.props.block.name );
+		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlockTypes(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.blockType ) !== -1 );
+			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.name ) !== -1 );
 			return transformation ? memo.concat( [ block.slug ] ) : memo;
 		}, [] );
-		const blocksToBeTransformedTo = get( blockSettings, 'transforms.to', [] )
+		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
 		const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
-			.reduce( ( memo, blockType ) => {
-				const block = wp.blocks.getBlockSettings( blockType );
+			.reduce( ( memo, name ) => {
+				const block = wp.blocks.getBlockType( name );
 				return !! block ? memo.concat( block ) : memo;
 			}, [] );
 
@@ -72,7 +72,7 @@ class BlockSwitcher extends wp.element.Component {
 			<div className="editor-block-switcher">
 				<IconButton
 					className="editor-block-switcher__toggle"
-					icon={ blockSettings.icon }
+					icon={ blockType.icon }
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
@@ -110,10 +110,10 @@ export default connect(
 		block: getBlock( state, ownProps.uid ),
 	} ),
 	( dispatch, ownProps ) => ( {
-		onTransform( block, blockType ) {
+		onTransform( block, name ) {
 			dispatch( replaceBlocks(
 				[ ownProps.uid ],
-				wp.blocks.switchToBlockType( block, blockType )
+				wp.blocks.switchToBlockType( block, name )
 			) );
 		},
 	} )

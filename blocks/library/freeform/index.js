@@ -3,12 +3,12 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query, setUnknownTypeHandler } from '../../api';
+import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
 import FreeformBlock from './freeform-block';
 
 const { children } = query;
 
-registerBlock( 'core/freeform', {
+registerBlockType( 'core/freeform', {
 	title: wp.i18n.__( 'Freeform' ),
 
 	icon: 'text',

@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import { Button, PanelBody, Spinner } from 'components';
+import { Button, PanelBody, Spinner, ResponsiveWrapper } from 'components';
 import { MediaUploadButton } from 'blocks';
 
 /**
@@ -50,19 +50,18 @@ class FeaturedImage extends Component {
 			return;
 		}
 		this.setState( { loading: true } );
-		const mediaIdToLoad = this.props.featuredImageId;
-		this.fetchMediaRequest = new wp.api.models.Media( { id: mediaIdToLoad } ).fetch()
+		if ( this.fetchMediaRequest ) {
+			this.fetchMediaRequest.abort();
+		}
+		this.fetchMediaRequest = new wp.api.models.Media( { id: this.props.featuredImageId } ).fetch()
 			.done( ( media ) => {
-				if ( this.props.featuredImageId !== mediaIdToLoad ) {
-					return;
-				}
 				this.setState( {
 					loading: false,
 					media,
 				} );
 			} )
-			.fail( () => {
-				if ( this.props.featuredImageId !== mediaIdToLoad ) {
+			.fail( ( xhr ) => {
+				if ( xhr.statusText === 'abort' ) {
 					return;
 				}
 				this.setState( {
@@ -80,16 +79,17 @@ class FeaturedImage extends Component {
 				<div className="editor-featured-image__content">
 					{ !! featuredImageId &&
 						<MediaUploadButton
-							buttonProps={ { className: 'button-link' } }
+							buttonProps={ { className: 'button-link editor-featured-image__preview' } }
 							onSelect={ onUpdateImage }
 							type="image"
 						>
 							{ media &&
-								<img
-									className="editor-featured-image__preview"
-									src={ media.source_url }
-									alt={ __( 'Featured image' ) }
-								/>
+								<ResponsiveWrapper
+									naturalWidth={ media.media_details.width }
+									naturalHeight={ media.media_details.height }
+								>
+									<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+								</ResponsiveWrapper>
 							}
 							{ loading && <Spinner /> }
 						</MediaUploadButton>
