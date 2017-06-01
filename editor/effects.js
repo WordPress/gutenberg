@@ -21,6 +21,7 @@ export default {
 		const { postId, edits } = action;
 		const toSend = postId ? { id: postId, ...edits } : edits;
 
+		dispatch( { type: 'CLEAR_POST_EDITS' } );
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',

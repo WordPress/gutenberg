@@ -101,7 +101,7 @@
 		right: 0;
 		bottom: 0;
 		content: '';
-    background-image: repeating-linear-gradient( -45deg, $blue-wordpress-700, $blue-wordpress-700 11px, $blue-wordpress 10px, $blue-wordpress 20px );
+		background-image: repeating-linear-gradient( -45deg, $blue-wordpress-700, $blue-wordpress-700 11px, $blue-wordpress 10px, $blue-wordpress 20px );
 		z-index: -1;
 		@include move_background;
 	}

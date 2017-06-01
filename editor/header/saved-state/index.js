@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Dashicon, Button } from 'components';
 
 /**
@@ -29,17 +30,17 @@ function SavedState( { isNew, isDirty, isSaving, edits, blocks, post, status, on
 
 	if ( isSaving ) {
 		return (
-			<div className={ className }>
-				Saving
-			</div>
+			<span className={ className }>
+				{ __( 'Saving' ) }
+			</span>
 		);
 	}
 	if ( ! isNew && ! isDirty ) {
 		return (
-			<div className={ className }>
-				<Dashicon icon={ 'saved' } />
-				{ wp.i18n.__( 'Saved' ) }
-			</div>
+			<span className={ className }>
+				<Dashicon icon="saved" />
+				{ __( 'Saved' ) }
+			</span>
 		);
 	}
 
@@ -47,7 +48,7 @@ function SavedState( { isNew, isDirty, isSaving, edits, blocks, post, status, on
 
 	return (
 		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			{ wp.i18n.__( 'Save' ) }
+			{ __( 'Save' ) }
 		</Button>
 	);
 }

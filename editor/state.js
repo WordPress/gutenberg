@@ -34,7 +34,7 @@ export const editor = combineUndoableReducers( {
 					...state,
 					...action.edits,
 				};
-			case 'REQUEST_POST_UPDATE':
+			case 'CLEAR_POST_EDITS':
 				return {};
 		}
 

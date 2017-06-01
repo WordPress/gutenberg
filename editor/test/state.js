@@ -399,7 +399,7 @@ describe( 'state', () => {
 				} );
 
 				const state = editor( original, {
-					type: 'REQUEST_POST_UPDATE',
+					type: 'CLEAR_POST_EDITS',
 				} );
 
 				expect( state.edits ).to.eql( {} );
