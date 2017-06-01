@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/code",
+        "name": "core/code",
         "attributes": {
             "content": "export default function MyButton() {\n\treturn <Button>Click Me!</Button>;\n}"
         }

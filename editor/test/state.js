@@ -24,11 +24,11 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		before( () => {
-			wp.blocks.registerBlock( 'core/test-block', {} );
+			wp.blocks.registerBlockType( 'core/test-block', {} );
 		} );
 
 		after( () => {
-			wp.blocks.unregisterBlock( 'core/test-block' );
+			wp.blocks.unregisterBlockType( 'core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
@@ -77,7 +77,7 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -85,7 +85,7 @@ describe( 'state', () => {
 				type: 'INSERT_BLOCK',
 				block: {
 					uid: 'ribs',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				},
 			} );
 
@@ -99,7 +99,7 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -108,12 +108,12 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				} ],
 			} );
 
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
-			expect( values( state.blocksByUid )[ 0 ].blockType ).to.equal( 'core/freeform' );
+			expect( values( state.blocksByUid )[ 0 ].name ).to.equal( 'core/freeform' );
 			expect( values( state.blocksByUid )[ 0 ].uid ).to.equal( 'wings' );
 			expect( state.blockOrder ).to.eql( [ 'wings' ] );
 		} );
@@ -123,11 +123,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -144,15 +144,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -169,11 +169,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -190,11 +190,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -211,15 +211,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -236,11 +236,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -257,11 +257,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -274,7 +274,7 @@ describe( 'state', () => {
 			expect( state.blocksByUid ).to.eql( {
 				ribs: {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				},
 			} );
@@ -285,15 +285,15 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'chicken',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'veggies',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -306,7 +306,7 @@ describe( 'state', () => {
 			expect( state.blocksByUid ).to.eql( {
 				ribs: {
 					uid: 'ribs',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				},
 			} );
@@ -317,11 +317,11 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
 					uid: 'kumquat',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				}, {
 					uid: 'loquat',
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {},
 				} ],
 			} );
@@ -331,7 +331,7 @@ describe( 'state', () => {
 				after: 'kumquat',
 				block: {
 					uid: 'persimmon',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				},
 			} );
 
@@ -539,7 +539,7 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				} ],
 			} );
 
@@ -552,7 +552,7 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				} ],
 			} );
 
@@ -657,7 +657,7 @@ describe( 'state', () => {
 				type: 'INSERT_BLOCK',
 				block: {
 					uid: 'ribs',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				},
 			} );
 
@@ -739,7 +739,7 @@ describe( 'state', () => {
 				uids: [ 'chicken' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				} ],
 			} );
 
@@ -753,7 +753,7 @@ describe( 'state', () => {
 				uids: [ 'ribs' ],
 				blocks: [ {
 					uid: 'wings',
-					blockType: 'core/freeform',
+					name: 'core/freeform',
 				} ],
 			} );
 

@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/embed",
+        "name": "core/embed",
         "attributes": {
             "url": "//www.youtube.com/embed/Nl6U7UotA-M",
             "caption": [

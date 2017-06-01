@@ -7,11 +7,11 @@ import TextareaAutosize from 'react-autosize-textarea';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 
 const { prop } = query;
 
-registerBlock( 'core/code', {
+registerBlockType( 'core/code', {
 	title: wp.i18n.__( 'Code' ),
 
 	icon: 'editor-code',

@@ -8,7 +8,7 @@ import { find } from 'lodash';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq, createBlock } from '../../api';
+import { registerBlockType, query as hpq, createBlock } from '../../api';
 import Editable from '../../editable';
 
 const { children, prop } = hpq;
@@ -47,7 +47,7 @@ function findInternalListType( { parents } ) {
 	return list ? list.nodeName : null;
 }
 
-registerBlock( 'core/list', {
+registerBlockType( 'core/list', {
 	title: wp.i18n.__( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',

@@ -7,7 +7,7 @@ import { html as beautifyHtml } from 'js-beautify';
 /**
  * Internal dependencies
  */
-import { getBlockSettings } from './registration';
+import { getBlockType } from './registration';
 import { parseBlockAttributes } from './parser';
 
 /**
@@ -52,7 +52,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 		Object.keys( expectedAttributes )
 	);
 
-	// Serialize the comment attributes
+	// Serialize the comment attributes as `key="value"`.
 	return keys.reduce( ( memo, key ) => {
 		const value = realAttributes[ key ];
 		if ( undefined === value ) {
@@ -64,16 +64,16 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 }
 
 /**
- * Takes a block list and returns the serialized post content
+ * Takes a block list and returns the serialized post content.
  *
  * @param  {Array}  blocks Block list
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
 	return blocks.reduce( ( memo, block ) => {
-		const blockType = block.blockType;
-		const settings = getBlockSettings( blockType );
-		const saveContent = getSaveContent( settings.save, block.attributes );
+		const blockName = block.name;
+		const blockType = getBlockType( blockName );
+		const saveContent = getSaveContent( blockType.save, block.attributes );
 		const beautifyOptions = {
 			indent_inner_html: true,
 			wrap_line_length: 0,
@@ -81,16 +81,16 @@ export default function serialize( blocks ) {
 
 		return memo + (
 			'<!-- wp:' +
-			blockType +
+			blockName +
 			' ' +
 			getCommentAttributes(
 				block.attributes,
-				parseBlockAttributes( saveContent, settings )
+				parseBlockAttributes( saveContent, blockType )
 			) +
 			'-->' +
 			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
 			'<!-- /wp:' +
-			blockType +
+			blockName +
 			' -->'
 		) + '\n\n';
 	}, '' );

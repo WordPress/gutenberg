@@ -7,12 +7,12 @@ import { switchChildrenNodeName } from 'element';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, createBlock, query as hpq } from '../../api';
+import { registerBlockType, createBlock, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
 
-registerBlock( 'core/quote', {
+registerBlockType( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',

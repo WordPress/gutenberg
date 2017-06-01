@@ -360,12 +360,12 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						123: { uid: 123, blockType: 'core/text' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).to.eql( { uid: 123, blockType: 'core/text' } );
+			expect( getBlock( state, 123 ) ).to.eql( { uid: 123, name: 'core/text' } );
 		} );
 	} );
 
@@ -374,16 +374,16 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getBlocks( state ) ).to.eql( [
-				{ uid: 123, blockType: 'core/text' },
-				{ uid: 23, blockType: 'core/heading' },
+				{ uid: 123, name: 'core/text' },
+				{ uid: 23, name: 'core/heading' },
 			] );
 		} );
 	} );
@@ -393,8 +393,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: null },
@@ -408,8 +408,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -423,8 +423,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -532,15 +532,15 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getPreviousBlock( state, 23 ) ).to.eql(
-				{ uid: 123, blockType: 'core/text' },
+				{ uid: 123, name: 'core/text' },
 			);
 		} );
 
@@ -548,8 +548,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -564,15 +564,15 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getNextBlock( state, 123 ) ).to.eql(
-				{ uid: 23, blockType: 'core/heading' },
+				{ uid: 23, name: 'core/heading' },
 			);
 		} );
 
@@ -580,8 +580,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},

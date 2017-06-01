@@ -7,19 +7,19 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import { createBlock, switchToBlockType } from '../factory';
-import { getBlocks, unregisterBlock, setUnknownTypeHandler, registerBlock } from '../registration';
+import { getBlockTypes, unregisterBlockType, setUnknownTypeHandler, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
-		getBlocks().forEach( ( block ) => {
-			unregisterBlock( block.slug );
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.slug );
 		} );
 	} );
 
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType and attributes', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				defaultAttributes: {
 					includesDefault: true,
 				},
@@ -28,7 +28,7 @@ describe( 'block factory', () => {
 				align: 'left',
 			} );
 
-			expect( block.blockType ).to.eql( 'core/test-block' );
+			expect( block.name ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {
 				includesDefault: true,
 				align: 'left',
@@ -39,7 +39,7 @@ describe( 'block factory', () => {
 
 	describe( 'switchToBlockType()', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
-			registerBlock( 'core/updated-text-block', {
+			registerBlockType( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -51,11 +51,11 @@ describe( 'block factory', () => {
 					} ],
 				},
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -65,7 +65,7 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
-				blockType: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
@@ -73,8 +73,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should switch the blockType of a block using the "transform to"', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {
+			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -89,7 +89,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -99,7 +99,7 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
-				blockType: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
@@ -107,12 +107,12 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should return null if no transformation is found', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -124,7 +124,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject transformations that return null', () => {
-			registerBlock( 'core/updated-text-block', {
+			registerBlockType( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -132,11 +132,11 @@ describe( 'block factory', () => {
 					} ],
 				},
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -148,7 +148,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject transformations that return an empty array', () => {
-			registerBlock( 'core/updated-text-block', {
+			registerBlockType( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -156,11 +156,11 @@ describe( 'block factory', () => {
 					} ],
 				},
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -172,7 +172,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject single transformations that do not include block types', () => {
-			registerBlock( 'core/updated-text-block', {
+			registerBlockType( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -186,11 +186,11 @@ describe( 'block factory', () => {
 					} ],
 				},
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -202,7 +202,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject array transformations that do not include block types', () => {
-			registerBlock( 'core/updated-text-block', {
+			registerBlockType( 'core/updated-text-block', {
 				transforms: {
 					from: [ {
 						blocks: [ 'core/text-block' ],
@@ -221,11 +221,11 @@ describe( 'block factory', () => {
 					} ],
 				},
 			} );
-			registerBlock( 'core/text-block', {} );
+			registerBlockType( 'core/text-block', {} );
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -237,8 +237,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject single transformations with unexpected block types', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {
+			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -253,7 +253,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -265,8 +265,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should reject array transformations with unexpected block types', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {
+			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -286,7 +286,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -298,8 +298,8 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should accept valid array transformations', () => {
-			registerBlock( 'core/updated-text-block', {} );
-			registerBlock( 'core/text-block', {
+			registerBlockType( 'core/updated-text-block', {} );
+			registerBlockType( 'core/text-block', {
 				transforms: {
 					to: [ {
 						blocks: [ 'core/updated-text-block' ],
@@ -319,7 +319,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -337,13 +337,13 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 2,
-				blockType: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
 			}, {
 				uid: 1,
-				blockType: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'smoked ribs',
 				},

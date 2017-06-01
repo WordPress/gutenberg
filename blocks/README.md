@@ -58,7 +58,7 @@ function RandomImage( props ) {
 	} );
 }
 
-wp.blocks.registerBlock( 'myplugin/random-image', {
+wp.blocks.registerBlockType( 'myplugin/random-image', {
 	title: 'Random Image',
 
 	icon: 'format-image',
@@ -121,7 +121,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 ## API
 
-### `wp.blocks.registerBlock( slug: string, settings: Object )`
+### `wp.blocks.registerBlockType( name: string, typeDefinition: Object )`
 
 Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
@@ -146,9 +146,9 @@ Registers a new block-level control. Controls appear in a block's toolbar when i
 
 Inline controls for [`Editable`](#editable) elements are identical for every block and cannot be modified.
 
-### `wp.blocks.getBlockSettings( slug: string )`
+### `wp.blocks.getBlockType( slug: string )`
 
-Returns settings associated with a registered block.
+Returns type definitions associated with a registered block.
 
 ### `wp.blocks.getControlSettings( slug: string )`
 

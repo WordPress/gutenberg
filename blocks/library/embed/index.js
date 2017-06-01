@@ -7,7 +7,7 @@ import { Button, Placeholder } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 
 const { attr, children } = query;
@@ -26,7 +26,7 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/embed', {
+registerBlockType( 'core/embed', {
 	title: wp.i18n.__( 'Embed' ),
 
 	icon: 'video-alt3',

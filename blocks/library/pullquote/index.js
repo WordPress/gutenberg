@@ -2,12 +2,12 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
 
-registerBlock( 'core/pullquote', {
+registerBlockType( 'core/pullquote', {
 
 	title: wp.i18n.__( 'Pullquote' ),
 
