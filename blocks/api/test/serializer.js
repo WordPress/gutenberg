@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import { pick, identity } from 'lodash';
 
 /**
  * Internal dependencies
@@ -56,34 +57,34 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'getCommentAttributes()', () => {
-		it( 'should return empty string if no difference', () => {
-			const attributes = getCommentAttributes( {}, {} );
-
-			expect( attributes ).to.equal( '' );
-		} );
-
-		it( 'should return joined string of key:value pairs by difference subset', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
-				category: 'food',
-				ripeness: 'ripe',
-			}, {
+		it( 'should return empty string if no encodeAttributes implementation', () => {
+			const commentAttributes = getCommentAttributes( undefined, {
 				fruit: 'bananas',
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
+			expect( commentAttributes ).to.equal( '' );
+		} );
+
+		it( 'should return joined string of `key="value"` pairs by difference subset', () => {
+			const commentAttributes = getCommentAttributes(
+				( attributes ) => pick( attributes, 'category', 'ripeness' ),
+				{
+					fruit: 'bananas',
+					category: 'food',
+					ripeness: 'ripe',
+				}
+			);
+
+			expect( commentAttributes ).to.equal( 'category="food" ripeness="ripe"' );
 		} );
 
 		it( 'should not append an undefined attribute value', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
+			const commentAttributes = getCommentAttributes( identity, {
 				category: 'food',
 				ripeness: undefined,
-			}, {
-				fruit: 'bananas',
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ' );
+			expect( commentAttributes ).to.equal( 'category="food"' );
 		} );
 	} );
 
@@ -94,6 +95,10 @@ describe( 'block serializer', () => {
 					return {
 						content: rawContent,
 					};
+				},
+				encodeAttributes( attributes ) {
+					const { align } = attributes;
+					return { align };
 				},
 				save( { attributes } ) {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;

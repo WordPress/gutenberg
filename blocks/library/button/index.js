@@ -39,6 +39,11 @@ registerBlockType( 'core/button', {
 		text: children( 'a' ),
 	},
 
+	encodeAttributes( attributes ) {
+		const { align } = attributes;
+		return { align };
+	},
+
 	controls: [
 		{
 			icon: 'align-left',
