@@ -4,6 +4,7 @@
 import Button from 'components/button';
 import Placeholder from 'components/placeholder';
 import HtmlEmbed from 'components/html-embed';
+import { Spinner } from 'components';
 
 /**
  * Internal dependencies
@@ -132,20 +133,15 @@ registerBlock( 'core/embed', {
 								className="components-placeholder__input"
 								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-							{ ! fetching ?
-								(
-									<Button
-										isLarge
-										type="submit">
-										{ wp.i18n.__( 'Embed' ) }
-									</Button>
-								) : (
-									<span className="spinner is-active" />
-								)
+							{ ! fetching
+								? <Button
+									isLarge
+									type="submit">
+									{ wp.i18n.__( 'Embed' ) }
+								</Button>
+								: <Spinner />
 							}
-							{ ( error ) ? (
-								<p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p>
-							) : null }
+							{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
 				);
