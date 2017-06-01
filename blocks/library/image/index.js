@@ -7,7 +7,7 @@ import { Placeholder } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 
@@ -27,7 +27,7 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/image', {
+registerBlockType( 'core/image', {
 	title: wp.i18n.__( 'Image' ),
 
 	icon: 'format-image',

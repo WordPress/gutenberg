@@ -9,18 +9,18 @@ import { escape, unescape, pickBy } from 'lodash';
  * Internal dependencies
  */
 import { parse as grammarParse } from './post.pegjs';
-import { getBlockSettings, getUnknownTypeHandler } from './registration';
+import { getBlockType, getUnknownTypeHandler } from './registration';
 import { createBlock } from './factory';
 
 /**
  * Returns the block attributes parsed from raw content.
  *
  * @param  {String} rawContent    Raw block content
- * @param  {Object} blockSettings Block settings
+ * @param  {Object} blockType     Block type
  * @return {Object}               Block attributes
  */
-export function parseBlockAttributes( rawContent, blockSettings ) {
-	const { attributes } = blockSettings;
+export function parseBlockAttributes( rawContent, blockType ) {
+	const { attributes } = blockType;
 	if ( 'function' === typeof attributes ) {
 		return attributes( rawContent );
 	} else if ( attributes ) {
@@ -39,21 +39,22 @@ export function parseBlockAttributes( rawContent, blockSettings ) {
 }
 
 /**
- * Returns the block attributes of a registered block node given its settings.
+ * Returns the block attributes of a registered block node given its type.
  *
- * @param  {?Object} blockSettings Block settings
+ * @param  {?Object} blockType     Block type
  * @param  {string}  rawContent    Raw block content
  * @param  {?Object} attributes    Known block attributes (from delimiters)
  * @return {Object}                All block attributes
  */
-export function getBlockAttributes( blockSettings, rawContent, attributes ) {
-	// Merge any attributes from comment delimiters with block implementation
+export function getBlockAttributes( blockType, rawContent, attributes ) {
+	// Merge any attributes present in comment delimiters with those
+	// that are specified in the block implementation.
 	attributes = attributes || {};
-	if ( blockSettings ) {
+	if ( blockType ) {
 		attributes = {
 			...attributes,
-			...blockSettings.defaultAttributes,
-			...parseBlockAttributes( rawContent, blockSettings ),
+			...blockType.defaultAttributes,
+			...parseBlockAttributes( rawContent, blockType ),
 		};
 	}
 
@@ -63,32 +64,32 @@ export function getBlockAttributes( blockSettings, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} blockType  Block type slug
+ * @param  {?String} name       Block type slug
  * @param  {String}  rawContent Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
  */
-export function createBlockWithFallback( blockType, rawContent, attributes ) {
-	// Use type from block content, otherwise find unknown handler
-	blockType = blockType || getUnknownTypeHandler();
+export function createBlockWithFallback( name, rawContent, attributes ) {
+	// Use type from block content, otherwise find unknown handler.
+	name = name || getUnknownTypeHandler();
 
-	// Try finding settings for known block type, else again fall back
-	let blockSettings = getBlockSettings( blockType );
-	const fallbackBlockType = getUnknownTypeHandler();
-	if ( ! blockSettings ) {
-		blockType = fallbackBlockType;
-		blockSettings = getBlockSettings( blockType );
+	// Try finding type for known block name, else fall back again.
+	let blockType = getBlockType( name );
+	const fallbackBlock = getUnknownTypeHandler();
+	if ( ! blockType ) {
+		name = fallbackBlock;
+		blockType = getBlockType( name );
 	}
 
-	// Include in set only if settings were determined
+	// Include in set only if type were determined.
 	// TODO do we ever expect there to not be an unknown type handler?
-	if ( blockSettings && ( rawContent.trim() || blockType !== fallbackBlockType ) ) {
+	if ( blockType && ( rawContent.trim() || name !== fallbackBlock ) ) {
 		// TODO allow blocks to opt-in to receiving a tree instead of a string.
 		// Gradually convert all blocks to this new format, then remove the
 		// string serialization.
 		const block = createBlock(
-			blockType,
-			getBlockAttributes( blockSettings, rawContent.trim(), attributes )
+			name,
+			getBlockAttributes( blockType, rawContent.trim(), attributes )
 		);
 		return block;
 	}
@@ -123,16 +124,19 @@ export function parseWithTinyMCE( content ) {
 		}
 	);
 
-	// Create a custom HTML schema
+	// Create a custom HTML schema.
 	const schema = new tinymce.html.Schema();
-	// Add <wp-block> "tags" to our schema
+
+	// Add <wp-block> "tags" to our schema.
 	schema.addCustomElements( 'wp-block' );
-	// Add valid <wp-block> "attributes" also
+
+	// Add valid <wp-block> "attributes" also.
 	schema.addValidElements( 'wp-block[slug|attributes]' );
-	// Initialize the parser with our custom schema
+
+	// Initialize the parser with our custom schema.
 	const parser = new tinymce.html.DomParser( { validate: true }, schema );
 
-	// Parse the content into an object tree
+	// Parse the content into an object tree.
 	const tree = parser.parse( content );
 
 	// Create a serializer that we will use to pass strings to blocks.
@@ -140,10 +144,10 @@ export function parseWithTinyMCE( content ) {
 	// shapes that each block can accept.
 	const serializer = new tinymce.html.Serializer( { validate: true }, schema );
 
-	// Walk the tree and initialize blocks
+	// Walk the tree and initialize blocks.
 	const blocks = [];
 
-	// Store markup we found in between blocks
+	// Store markup we found in between blocks.
 	let contentBetweenBlocks = null;
 	function flushContentBetweenBlocks() {
 		if ( contentBetweenBlocks && contentBetweenBlocks.firstChild ) {
@@ -164,19 +168,19 @@ export function parseWithTinyMCE( content ) {
 	while ( currentNode ) {
 		if ( currentNode.name === 'wp-block' ) {
 			// Set node type to document fragment so that the TinyMCE
-			// serializer doesn't output its markup
+			// serializer doesn't output its markup.
 			currentNode.type = 11;
 
 			// Serialize the content
 			const rawContent = serializer.serialize( currentNode );
 
-			// Retrieve the attributes from the <wp-block> tag
+			// Retrieve the attributes from the <wp-block> tag.
 			const nodeAttributes = currentNode.attributes.reduce( ( memo, attr ) => {
 				memo[ attr.name ] = attr.value;
 				return memo;
 			}, {} );
 
-			// Retrieve the block attributes from the original delimiters
+			// Retrieve the block attributes from the original delimiters.
 			const attributesMatcher = /([a-z0-9_-]+)(="([^"]*)")?/g;
 			const blockAttributes = {};
 			let match;
@@ -187,7 +191,7 @@ export function parseWithTinyMCE( content ) {
 				}
 			} while ( !! match );
 
-			// Try to create the block
+			// Try to create the block.
 			const block = createBlockWithFallback(
 				nodeAttributes.slug,
 				rawContent,

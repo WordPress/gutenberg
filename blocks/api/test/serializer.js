@@ -7,12 +7,12 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
-import { getBlocks, registerBlock, unregisterBlock } from '../registration';
+import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
-		getBlocks().forEach( block => {
-			unregisterBlock( block.slug );
+		getBlockTypes().forEach( block => {
+			unregisterBlockType( block.name );
 		} );
 	} );
 
@@ -89,7 +89,7 @@ describe( 'block serializer', () => {
 
 	describe( 'serialize()', () => {
 		it( 'should serialize the post content properly', () => {
-			const blockSettings = {
+			const blockType = {
 				attributes: ( rawContent ) => {
 					return {
 						content: rawContent,
@@ -99,10 +99,10 @@ describe( 'block serializer', () => {
 					return <p dangerouslySetInnerHTML={ { __html: attributes.content } } />;
 				},
 			};
-			registerBlock( 'core/test-block', blockSettings );
+			registerBlockType( 'core/test-block', blockType );
 			const blockList = [
 				{
-					blockType: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {
 						content: 'Ribs & Chicken',
 						align: 'left',

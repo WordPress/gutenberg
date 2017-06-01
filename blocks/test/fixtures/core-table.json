@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/table",
+        "name": "core/table",
         "attributes": {
             "body": [
                 [

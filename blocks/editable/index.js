@@ -306,9 +306,9 @@ export default class Editable extends wp.element.Component {
 		this.savedContent = this.props.value;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
+
 		// Saving the editor on updates avoid unecessary onChanges calls
 		// These calls can make the focus jump
-
 		this.editor.save();
 	}
 
@@ -348,7 +348,7 @@ export default class Editable extends wp.element.Component {
 			this.updateFocus();
 		}
 
-		// The savedContent var allows us to avoid updating the content right after an onChange call
+		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
@@ -425,8 +425,8 @@ export default class Editable extends wp.element.Component {
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we unmount (+ destroy) the previous TinyMCE element, then
-		// mount (+ initialize) a new child element in its place.
+		// changes, we unmount and destroy the previous TinyMCE element, then
+		// mount and initialize a new child element in its place.
 		const key = [ 'editor', tagName ].join();
 		const classes = classnames( className, 'blocks-editable' );
 
@@ -449,18 +449,17 @@ export default class Editable extends wp.element.Component {
 									...control,
 									onClick: () => this.toggleAlignment( control.align ),
 									isActive: this.isAlignmentActive( control.align ),
-								} ) ) } />
+								} ) ) }
+							/>
 						}
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-
 				{ focus && inlineToolbar &&
 					<div className="block-editable__inline-toolbar">
 						{ formatToolbar }
 					</div>
 				}
-
 				<TinyMCE
 					tagName={ tagName }
 					getSettings={ this.getSettings }
@@ -469,7 +468,8 @@ export default class Editable extends wp.element.Component {
 					defaultValue={ value }
 					isEmpty={ this.state.empty }
 					placeholder={ placeholder }
-					key={ key } />
+					key={ key }
+				/>
 			</div>
 		);
 	}

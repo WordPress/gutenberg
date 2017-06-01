@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { registerBlock, query, setUnknownTypeHandler } from '../../api';
+import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
 
 const { html } = query;
 
-registerBlock( 'core/freeform', {
+registerBlockType( 'core/freeform', {
 	title: wp.i18n.__( 'Freeform' ),
 
 	icon: 'text',
