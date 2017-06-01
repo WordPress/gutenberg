@@ -91,6 +91,11 @@ registerBlock( 'core/embed', {
 			}
 		}
 
+		componentWillUnmount() {
+			// can't about the fetch promise, so let it know we will unmount
+			this.unmounting = true;
+		}
+
 		doServerSideRender( event ) {
 			if ( event ) {
 				event.preventDefault();
@@ -103,6 +108,9 @@ registerBlock( 'core/embed', {
 				credentials: 'include',
 			} ).then(
 				( response ) => {
+					if ( this.unmounting ) {
+						return;
+					}
 					response.json().then( ( obj ) => {
 						const { html, type } = obj;
 						if ( html ) {
