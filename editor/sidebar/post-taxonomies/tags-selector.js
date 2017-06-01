@@ -13,8 +13,8 @@ import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 const DEFAULT_TAGS_QUERY = {
-	number: 1000,
-	order_by: 'count',
+	number: -1,
+	orderby: 'count',
 	order: 'DESC',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
