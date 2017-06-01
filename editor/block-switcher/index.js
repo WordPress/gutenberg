@@ -50,10 +50,10 @@ class BlockSwitcher extends wp.element.Component {
 	}
 
 	render() {
-		const blockType = wp.blocks.getBlockType( this.props.block.blockName );
+		const blockType = wp.blocks.getBlockType( this.props.block.name );
 		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlockTypes(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
-			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.blockName ) !== -1 );
+			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.name ) !== -1 );
 			return transformation ? memo.concat( [ block.slug ] ) : memo;
 		}, [] );
 		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )

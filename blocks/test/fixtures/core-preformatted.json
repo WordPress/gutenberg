@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockName": "core/preformatted",
+        "name": "core/preformatted",
         "attributes": {
             "content": [
                 "Some ",

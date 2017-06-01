@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockName": "core/separator",
+        "name": "core/separator",
         "attributes": {}
     }
 ]

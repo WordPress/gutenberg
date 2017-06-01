@@ -182,7 +182,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 	render() {
 		const { block, selectedBlocks } = this.props;
-		const blockType = wp.blocks.getBlockType( block.blockName );
+		const blockType = wp.blocks.getBlockType( block.name );
 
 		let BlockEdit;
 		if ( blockType ) {
@@ -228,7 +228,7 @@ class VisualEditorBlock extends wp.element.Component {
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
-				data-type={ block.blockName }
+				data-type={ block.name }
 				tabIndex="0"
 				{ ...wrapperProps }
 			>

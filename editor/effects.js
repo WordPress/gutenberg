@@ -71,7 +71,7 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const [ blockA, blockB ] = action.blocks;
-		const blockType = getBlockType( blockA.blockName );
+		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
@@ -81,9 +81,9 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.blockName === blockB.blockName
+		const blocksWithTheSameType = blockA.name === blockB.name
 			? [ blockB ]
-			: switchToBlockType( blockB, blockA.blockName );
+			: switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {

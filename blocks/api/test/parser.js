@@ -100,7 +100,7 @@ describe( 'block parser', () => {
 				'content',
 				{ attr: 'value' }
 			);
-			expect( block.blockName ).to.eql( 'core/test-block' );
+			expect( block.name ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( { attr: 'value' } );
 		} );
 
@@ -108,7 +108,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', {} );
 
 			const block = createBlockWithFallback( 'core/test-block', 'content' );
-			expect( block.blockName ).to.eql( 'core/test-block' );
+			expect( block.name ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {} );
 		} );
 
@@ -121,7 +121,7 @@ describe( 'block parser', () => {
 				'content',
 				{ attr: 'value' }
 			);
-			expect( block.blockName ).to.eql( 'core/unknown-block' );
+			expect( block.name ).to.eql( 'core/unknown-block' );
 			expect( block.attributes ).to.eql( { attr: 'value' } );
 		} );
 
@@ -130,7 +130,7 @@ describe( 'block parser', () => {
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const block = createBlockWithFallback( null, 'content' );
-			expect( block.blockName ).to.eql( 'core/unknown-block' );
+			expect( block.name ).to.eql( 'core/unknown-block' );
 			expect( block.attributes ).to.eql( {} );
 		} );
 
@@ -162,7 +162,7 @@ describe( 'block parser', () => {
 					);
 
 					expect( parsed ).to.have.lengthOf( 1 );
-					expect( parsed[ 0 ].blockName ).to.equal( 'core/test-block' );
+					expect( parsed[ 0 ].name ).to.equal( 'core/test-block' );
 					expect( parsed[ 0 ].attributes ).to.eql( {
 						content: 'Brisket',
 						smoked: 'yes',
@@ -195,7 +195,7 @@ describe( 'block parser', () => {
 					);
 
 					expect( parsed ).to.have.lengthOf( 1 );
-					expect( parsed[ 0 ].blockName ).to.equal( 'core/test-block' );
+					expect( parsed[ 0 ].name ).to.equal( 'core/test-block' );
 					expect( parsed[ 0 ].attributes ).to.eql( {
 						content: 'Ribs & Chicken',
 					} );
@@ -215,7 +215,7 @@ describe( 'block parser', () => {
 					);
 
 					expect( parsed ).to.have.lengthOf( 3 );
-					expect( parsed.map( ( { blockName } ) => blockName ) ).to.eql( [
+					expect( parsed.map( ( { name } ) => name ) ).to.eql( [
 						'core/test-block',
 						'core/unknown-block',
 						'core/unknown-block',
@@ -244,7 +244,7 @@ describe( 'block parser', () => {
 					);
 
 					expect( parsed ).to.have.lengthOf( 5 );
-					expect( parsed.map( ( { blockName } ) => blockName ) ).to.eql( [
+					expect( parsed.map( ( { name } ) => name ) ).to.eql( [
 						'core/unknown-block',
 						'core/test-block',
 						'core/unknown-block',

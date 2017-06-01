@@ -12,7 +12,7 @@ import { getBlockTypes, registerBlockType, unregisterBlockType } from '../regist
 describe( 'block serializer', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( block => {
-			unregisterBlockType( block.slug );
+			unregisterBlockType( block.name );
 		} );
 	} );
 
@@ -102,7 +102,7 @@ describe( 'block serializer', () => {
 			registerBlockType( 'core/test-block', blockType );
 			const blockList = [
 				{
-					blockName: 'core/test-block',
+					name: 'core/test-block',
 					attributes: {
 						content: 'Ribs & Chicken',
 						align: 'left',

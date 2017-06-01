@@ -28,7 +28,7 @@ describe( 'block factory', () => {
 				align: 'left',
 			} );
 
-			expect( block.blockName ).to.eql( 'core/test-block' );
+			expect( block.name ).to.eql( 'core/test-block' );
 			expect( block.attributes ).to.eql( {
 				includesDefault: true,
 				align: 'left',
@@ -55,7 +55,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -65,7 +65,7 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
-				blockName: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
@@ -89,7 +89,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -99,7 +99,7 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 1,
-				blockName: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
@@ -112,7 +112,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -136,7 +136,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -160,7 +160,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -190,7 +190,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -225,7 +225,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -253,7 +253,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -286,7 +286,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -319,7 +319,7 @@ describe( 'block factory', () => {
 
 			const block = {
 				uid: 1,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'ribs',
 				},
@@ -337,13 +337,13 @@ describe( 'block factory', () => {
 
 			expect( updatedBlock ).to.eql( [ {
 				uid: 2,
-				blockName: 'core/text-block',
+				name: 'core/text-block',
 				attributes: {
 					value: 'chicken ribs',
 				},
 			}, {
 				uid: 1,
-				blockName: 'core/updated-text-block',
+				name: 'core/updated-text-block',
 				attributes: {
 					value: 'smoked ribs',
 				},

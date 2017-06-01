@@ -12,13 +12,13 @@ import { getBlockType } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param  {String} blockName   Block name
+ * @param  {String} name        Block name
  * @param  {Object} attributes  Block attributes
  * @return {Object}             Block object
  */
-export function createBlock( blockName, attributes = {} ) {
+export function createBlock( name, attributes = {} ) {
 	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( blockName );
+	const blockType = getBlockType( name );
 
 	// Do we need this? What purpose does it have?
 	let defaultAttributes;
@@ -30,7 +30,7 @@ export function createBlock( blockName, attributes = {} ) {
 	// and the block attributes.
 	return {
 		uid: uuid(),
-		blockName,
+		name,
 		attributes: {
 			...defaultAttributes,
 			...attributes,
@@ -42,19 +42,19 @@ export function createBlock( blockName, attributes = {} ) {
  * Switch a block into one or more blocks of the new block type.
  *
  * @param  {Object} block      Block object
- * @param  {string} blockName  Block name
+ * @param  {string} name       Block name
  * @return {Array}             Block object
  */
-export function switchToBlockType( block, blockName ) {
+export function switchToBlockType( block, name ) {
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationType = getBlockType( blockName );
-	const sourceType = getBlockType( block.blockName );
+	const destinationType = getBlockType( name );
+	const sourceType = getBlockType( block.name );
 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
 	const transformationsTo = get( sourceType, 'transforms.to', [] );
 	const transformation =
-		find( transformationsTo, t => t.blocks.indexOf( blockName ) !== -1 ) ||
-		find( transformationsFrom, t => t.blocks.indexOf( block.blockName ) !== -1 );
+		find( transformationsTo, t => t.blocks.indexOf( name ) !== -1 ) ||
+		find( transformationsFrom, t => t.blocks.indexOf( block.name ) !== -1 );
 
 	// Stop if there is no valid transformation. (How did we get here?)
 	if ( ! transformation ) {
@@ -75,11 +75,11 @@ export function switchToBlockType( block, blockName ) {
 
 	// Ensure that every block object returned by the transformation has a
 	// valid block type.
-	if ( transformationResults.some( ( result ) => ! getBlockType( result.blockName ) ) ) {
+	if ( transformationResults.some( ( result ) => ! getBlockType( result.name ) ) ) {
 		return null;
 	}
 
-	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.blockName === blockName );
+	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.name === name );
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
@@ -92,7 +92,7 @@ export function switchToBlockType( block, blockName ) {
 			// The first transformed block whose type matches the "destination"
 			// type gets to keep the existing block's UID.
 			uid: index === firstSwitchedBlock ? block.uid : result.uid,
-			blockName: result.blockName,
+			name: result.name,
 			attributes: result.attributes,
 		};
 	} );

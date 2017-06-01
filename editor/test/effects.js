@@ -29,11 +29,11 @@ describe( 'effects', () => {
 			registerBlockType( 'core/test-block', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 			};
 			const dispatch = sinon.spy();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
@@ -52,12 +52,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -67,7 +67,7 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );
@@ -83,12 +83,12 @@ describe( 'effects', () => {
 			registerBlockType( 'core/test-block-2', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockName: 'core/test-block2',
+				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -120,12 +120,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockName: 'core/test-block-2',
+				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -135,7 +135,7 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockName: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );

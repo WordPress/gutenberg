@@ -71,7 +71,7 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
  */
 export default function serialize( blocks ) {
 	return blocks.reduce( ( memo, block ) => {
-		const blockName = block.blockName;
+		const blockName = block.name;
 		const blockType = getBlockType( blockName );
 		const saveContent = getSaveContent( blockType.save, block.attributes );
 		const beautifyOptions = {
