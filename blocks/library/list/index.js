@@ -130,7 +130,6 @@ registerBlockType( 'core/list', {
 				value={ values }
 				focus={ focus }
 				onFocus={ setFocus }
-				showAlignments
 				className="blocks-list" />
 		);
 	},
