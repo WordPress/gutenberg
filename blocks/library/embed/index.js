@@ -96,7 +96,7 @@ registerBlock( 'core/embed', {
 				event.preventDefault();
 			}
 			const { url } = this.props.attributes;
-			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce; // eslint-disable-line no-undef
+			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
 
 			this.setState( { error: false, fetching: true } );
 			fetch( api_url, {
