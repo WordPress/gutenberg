@@ -1,7 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { Children, cloneElement } from 'element';
+
+/**
  * Internal dependencies
  */
 import { registerBlockType, createBlock, query } from '../../api';
+import AlignmentToolbar from '../../alignment-toolbar';
+import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
 const { children } = query;
@@ -17,10 +24,6 @@ registerBlockType( 'core/text', {
 		content: children(),
 	},
 
-	defaultAttributes: {
-		content: <p />,
-	},
-
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
@@ -28,10 +31,21 @@ registerBlockType( 'core/text', {
 	},
 
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
-		const { content } = attributes;
+		const { align, content } = attributes;
 
-		return (
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			),
 			<Editable
+				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -47,13 +61,20 @@ registerBlockType( 'core/text', {
 					} ) );
 				} }
 				onMerge={ mergeBlocks }
-				showAlignments
-			/>
-		);
+				style={ { textAlign: align } }
+			/>,
+		];
 	},
 
 	save( { attributes } ) {
-		const { content } = attributes;
-		return content;
+		const { align, content } = attributes;
+
+		if ( ! align ) {
+			return content;
+		}
+
+		return Children.map( content, ( paragraph ) => (
+			cloneElement( paragraph, { style: { textAlign: align } } )
+		) );
 	},
 } );

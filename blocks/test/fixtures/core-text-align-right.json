@@ -3,6 +3,7 @@
         "uid": "_uid_0",
         "name": "core/text",
         "attributes": {
+            "align": "right",
             "content": [
                 {
                     "type": "p",
