@@ -13,13 +13,20 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { isFirstBlock, isLastBlock } from '../selectors';
+import { isFirstBlock, isLastBlock, getBlockOrder, getBlock } from '../selectors';
+import { blockMoverLabel } from './mover-label';
+import { getBlockType } from 'blocks';
 
-function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
+function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block, firstPosition } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
 	// the rendering parent, leaving it unable to react to focus out.
+	let blockType;
+
+	if ( uids.length === 1 && block ) {
+		blockType = getBlockType( block.name );
+	}
 
 	return (
 		<div className="editor-block-mover">
@@ -27,12 +34,26 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast } ) {
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
+				label={ blockMoverLabel( uids.length, {
+					type: blockType && blockType.title,
+					isFirst,
+					isLast,
+					firstPosition,
+					dir: -1,
+				} ) }
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
+				label={ blockMoverLabel( uids.length, {
+					type: blockType && blockType.title,
+					isFirst,
+					isLast,
+					firstPosition,
+					dir: 1,
+				} ) }
 				aria-disabled={ isLast }
 			/>
 		</div>
@@ -43,6 +64,8 @@ export default connect(
 	( state, ownProps ) => ( {
 		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
 		isLast: isLastBlock( state, last( ownProps.uids ) ),
+		firstPosition: getBlockOrder( state, first( ownProps.uids ) ),
+		block: getBlock( state, first( ownProps.uids ) ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
