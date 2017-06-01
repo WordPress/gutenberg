@@ -21,7 +21,7 @@ export default class HtmlEmbed extends wp.element.Component {
 				newScript.innerHTML = script.innerHTML;
 			}
 			return newScript;
-		});
+		} );
 
 		newScripts.forEach( ( script ) => body.appendChild( script ) );
 	}
