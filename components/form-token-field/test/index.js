@@ -197,6 +197,36 @@ describe( 'FormTokenField', function() {
 			setText( '  at  ' );
 			expect( getSuggestionsText() ).to.deep.equal( fixtures.matchingSuggestions.at );
 		} );
+
+		it( 'should manage the selected suggestion based on both keyboard and mouse events', test( function() {
+			// We need a high timeout here to accomodate Travis CI
+			this.timeout( 10000 );
+
+			setText( 't' );
+			expect( getSuggestionsText() ).to.deep.equal( fixtures.matchingSuggestions.t );
+			expect( getSelectedSuggestion() ).to.equal( null );
+			sendKeyDown( keyCodes.downArrow ); // 'the'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'he' ] );
+			sendKeyDown( keyCodes.downArrow ); // 'to'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'o' ] );
+
+			const hoverSuggestion = tokenFieldNode.find( '.components-form-token-field__suggestion' ).at( 5 ); // 'it'
+			expect( getSuggestionNodeText( hoverSuggestion ) ).to.deep.equal( [ 'i', 't' ] );
+
+			// before sending a hover event, we need to wait for
+			// SuggestionList#_scrollingIntoView to become false
+			this.clock.tick( 100 );
+
+			hoverSuggestion.simulate( 'mouseEnter' );
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 'i', 't' ] );
+			sendKeyDown( keyCodes.upArrow );
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 'wi', 't', 'h' ] );
+			sendKeyDown( keyCodes.upArrow );
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'his' ] );
+			hoverSuggestion.simulate( 'click' );
+			expect( getSelectedSuggestion() ).to.equal( null );
+			expect( getTokensHTML() ).to.deep.equal( [ 'foo', 'bar', 'it' ] );
+		} ) );
 	} );
 
 	describe( 'adding tokens', function() {
@@ -293,6 +323,25 @@ describe( 'FormTokenField', function() {
 			);
 		} ) );
 
+		it( 'should add the suggested token when the (non-blank) input field loses focus', test( function() {
+			testOnBlur(
+				't',                    // initialText
+				true,                   // selectSuggestion
+				[ 't', 'o' ],       // expectedSuggestion
+				[ 'foo', 'bar', 'to' ] // expectedTokens
+			);
+		} ) );
+
+		it( 'should not add the suggested token when the (blank) input field loses focus', test( function() {
+			testOnBlur(
+				'',               // initialText
+				true,             // selectSuggestion
+				'of',             // expectedSuggestion
+				[ 'foo', 'bar' ], // expectedTokens
+				this.clock
+			);
+		} ) );
+
 		it( 'should not lose focus when a suggestion is clicked', test( function() {
 			// prevents regression of https://github.com/Automattic/wp-calypso/issues/1884
 
@@ -312,6 +361,52 @@ describe( 'FormTokenField', function() {
 			setText( 'quux' );
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'baz', 'quux', 'bar' ] );
+		} );
+
+		it( 'should add tokens from the selected matching suggestion using Tab', function() {
+			setText( 't' );
+			expect( getSelectedSuggestion() ).to.equal( null );
+			sendKeyDown( keyCodes.downArrow ); // 'the'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'he' ] );
+			sendKeyDown( keyCodes.downArrow ); // 'to'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'o' ] );
+			sendKeyDown( keyCodes.tab );
+			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'to' ] );
+			expect( getSelectedSuggestion() ).to.equal( null );
+		} );
+
+		it( 'should add tokens from the selected matching suggestion using Enter', function() {
+			setText( 't' );
+			expect( getSelectedSuggestion() ).to.equal( null );
+			sendKeyDown( keyCodes.downArrow ); // 'the'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'he' ] );
+			sendKeyDown( keyCodes.downArrow ); // 'to'
+			expect( getSelectedSuggestion() ).to.deep.equal( [ 't', 'o' ] );
+			sendKeyDown( keyCodes.enter );
+			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'to' ] );
+			expect( getSelectedSuggestion() ).to.equal( null );
+		} );
+
+		it( 'should add tokens from the selected suggestion using Tab', function() {
+			expect( getSelectedSuggestion() ).to.equal( null );
+			sendKeyDown( keyCodes.downArrow ); // 'the'
+			expect( getSelectedSuggestion() ).to.equal( 'the' );
+			sendKeyDown( keyCodes.downArrow ); // 'of'
+			expect( getSelectedSuggestion() ).to.equal( 'of' );
+			sendKeyDown( keyCodes.tab );
+			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'of' ] );
+			expect( getSelectedSuggestion() ).to.equal( null );
+		} );
+
+		it( 'should add tokens from the selected suggestion using Enter', function() {
+			expect( getSelectedSuggestion() ).to.equal( null );
+			sendKeyDown( keyCodes.downArrow ); // 'the'
+			expect( getSelectedSuggestion() ).to.equal( 'the' );
+			sendKeyDown( keyCodes.downArrow ); // 'of'
+			expect( getSelectedSuggestion() ).to.equal( 'of' );
+			sendKeyDown( keyCodes.enter );
+			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'of' ] );
+			expect( getSelectedSuggestion() ).to.equal( null );
 		} );
 	} );
 
