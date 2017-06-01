@@ -26,6 +26,7 @@ class TagsSelector extends Component {
 		this.state = {
 			loading: true,
 			availableTags: [],
+			selectedTags: [],
 		};
 	}
 
@@ -36,6 +37,7 @@ class TagsSelector extends Component {
 					loading: false,
 					availableTags: tags,
 				} );
+				this.updateSelectedTags( this.props.tags );
 			} )
 			.fail( ( xhr ) => {
 				if ( xhr.statusText === 'abort' ) {
@@ -53,7 +55,24 @@ class TagsSelector extends Component {
 		}
 	}
 
+	componentWillReceiveProps( newProps ) {
+		if ( newProps.tags !== this.props.tags ) {
+			this.updateSelectedTags( newProps.tags );
+		}
+	}
+
+	updateSelectedTags( tags = [] ) {
+		const selectedTags = tags.map( ( tagId ) => {
+			const tagObject = find( this.state.availableTags, ( tag ) => tag.id === tagId );
+			return tagObject ? tagObject.name : '';
+		} );
+		this.setState( {
+			selectedTags,
+		} );
+	}
+
 	onTagsChange( tagNames ) {
+		this.setState( { selectedTags: tagNames } );
 		const newTagNames = tagNames.filter( ( tagName ) =>
 			! find( this.state.availableTags, ( tag ) => tag.name === tagName )
 		);
@@ -78,12 +97,7 @@ class TagsSelector extends Component {
 	}
 
 	render() {
-		const { tags = [] } = this.props;
-		const { loading, availableTags } = this.state;
-		const selectedTags = tags.map( ( tagId ) => {
-			const tagObject = find( this.state.availableTags, ( tag ) => tag.id === tagId );
-			return tagObject ? tagObject.name : '';
-		} );
+		const { loading, availableTags, selectedTags } = this.state;
 		const tagNames = availableTags.map( ( tag ) => tag.name );
 
 		return (
