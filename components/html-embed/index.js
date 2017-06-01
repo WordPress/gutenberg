@@ -1,3 +1,9 @@
+/***
+ * When embedding HTML from the WP oEmbed proxy, we need to insert it
+ * into a div and make sure any scripts get run. This component takes
+ * HTML and puts it into a div element, and creates and adds new script
+ * elements so all scripts get run as expected.
+ */
 export default class HtmlEmbed extends wp.element.Component {
 
 	static get defaultProps() {
