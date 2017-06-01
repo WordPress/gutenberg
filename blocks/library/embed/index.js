@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Button from 'components/button';
-import Placeholder from 'components/placeholder';
-import HtmlEmbed from 'components/html-embed';
-import { Spinner } from 'components';
+import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
 
 /**
  * Internal dependencies
