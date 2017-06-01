@@ -23,7 +23,7 @@ function withFocusReturn( WrappedComponent ) {
 			if (
 				this.activeElement && (
 					( document.activeElement && wrapper && wrapper.contains( document.activeElement ) ) ||
-					! document.activeElement
+					( ! document.activeElement || document.body === document.activeElement )
 				)
 			) {
 				this.activeElement.focus();

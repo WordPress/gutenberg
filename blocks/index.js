@@ -14,3 +14,4 @@ import './library';
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
 export { default as Editable } from './editable';
+export { default as MediaUploadButton } from './media-upload-button';

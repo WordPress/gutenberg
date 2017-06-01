@@ -79,7 +79,7 @@ registerBlock( 'core/image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
+			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
 			return (
 				<Placeholder
 					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
@@ -88,7 +88,7 @@ registerBlock( 'core/image', {
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
+						onSelect={ setMediaURL }
 						type="image"
 						auto-open
 					>

@@ -55,6 +55,7 @@
     "sass-loader": "^6.0.3",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
+    "sinon-test": "^1.0.2",
     "style-loader": "^0.14.1",
     "tinymce": "^4.5.6",
     "webpack": "^2.2.1",
@@ -63,6 +64,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "dom-react": "^2.2.0",
+    "dom-scroll-into-view": "^1.2.1",
     "element-closest": "^2.0.2",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
