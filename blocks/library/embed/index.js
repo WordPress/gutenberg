@@ -92,7 +92,7 @@ registerBlock( 'core/embed', {
 		}
 
 		componentWillUnmount() {
-			// can't about the fetch promise, so let it know we will unmount
+			// can't abort the fetch promise, so let it know we will unmount
 			this.unmounting = true;
 		}
 
