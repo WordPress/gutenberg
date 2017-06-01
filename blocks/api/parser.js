@@ -236,4 +236,4 @@ export function parseWithGrammar( content ) {
 	}, [] );
 }
 
-export default parseWithTinyMCE;
+export default parseWithGrammar;
