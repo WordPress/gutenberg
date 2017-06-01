@@ -13,20 +13,17 @@ export default class HtmlEmbed extends wp.element.Component {
 		body.innerHTML = html;
 
 		const scripts = body.getElementsByTagName( 'script' );
-		const newscripts = [];
-
-		for ( let i = 0; i < scripts.length; i++ ) {
-			const newscript = document.createElement( 'script' );
-			if ( scripts[ i ].src ) {
-				newscript.src = scripts[ i ].src;
+		const newScripts = Array.from( scripts ).map( ( script ) => {
+			const newScript = document.createElement( 'script' );
+			if ( script.src ) {
+				newScript.src = script.src;
 			} else {
-				newscript.innerHTML = scripts[ i ].innerHTML;
+				newScript.innerHTML = script.innerHTML;
 			}
-			newscripts.push( newscript );
-		}
-		for ( let i = 0; i < newscripts.length; i++ ) {
-			body.appendChild( newscripts[ i ] );
-		}
+			return newScript;
+		});
+
+		newScripts.forEach( ( script ) => body.appendChild( script ) );
 	}
 
 	render() {
