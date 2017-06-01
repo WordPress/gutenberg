@@ -8,7 +8,7 @@ import { unescape, find } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Spinner, FormTokenField } from 'components';
+import { FormTokenField } from 'components';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -102,16 +102,14 @@ class TagsSelector extends Component {
 
 		return (
 			<div className="editor-post-taxonomies__tags-selector">
-				{ loading && <Spinner /> }
-				{ ! loading &&
-					<FormTokenField
-						value={ selectedTags }
-						displayTransform={ unescape }
-						suggestions={ tagNames }
-						onChange={ this.onTagsChange }
-						maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-					/>
-				}
+				<FormTokenField
+					value={ selectedTags }
+					displayTransform={ unescape }
+					suggestions={ tagNames }
+					onChange={ this.onTagsChange }
+					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+					disabled={ loading }
+				/>
 			</div>
 		);
 	}
