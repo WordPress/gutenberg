@@ -24,7 +24,7 @@ function toggleAlignment( align ) {
 registerBlock( 'core/table2', {
 	title: wp.i18n.__( 'Table2' ),
 	icon: 'editor-table',
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: children( 'table' ),
