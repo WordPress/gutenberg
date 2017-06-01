@@ -29,7 +29,7 @@ describe( 'FormToggle', () => {
 			expect( formToggle.find( '.components-form-toggle__hint' ).text() ).to.equal( 'On' );
 		} );
 
-		it( 'shouuld render with an additional className', () => {
+		it( 'should render with an additional className', () => {
 			const formToggle = shallow( <FormToggle className="testing" /> );
 			expect( formToggle.hasClass( 'testing' ) ).to.be.true();
 		} );
@@ -39,14 +39,16 @@ describe( 'FormToggle', () => {
 			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'id' ) ).to.equal( 'test' );
 		} );
 
-		it( 'should render a checkbox with a noop on change and if an onChange function is provided override the noop', () => {
-			let formToggle = shallow( <FormToggle /> );
-			let checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
+		it( 'should render a checkbox with a noop onChange', () => {
+			const formToggle = shallow( <FormToggle /> );
+			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).to.equal( noop );
+		} );
 
+		it( 'should render a checkbox with a user-provided onChange', () => {
 			const testFunction = ( event ) => event;
-			formToggle = shallow( <FormToggle onChange={ testFunction } /> );
-			checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
+			const formToggle = shallow( <FormToggle onChange={ testFunction } /> );
+			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).to.equal( testFunction );
 		} );
 

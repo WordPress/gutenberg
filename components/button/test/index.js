@@ -61,9 +61,9 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render and additional WordPress prop of value awesome', () => {
-			const button = <Button WordPress="awesome" />;
+			const button = shallow( <Button WordPress="awesome" /> );
 
-			expect( button.props.WordPress ).to.equal( 'awesome' );
+			expect( button.prop( 'WordPress' ) ).to.equal( 'awesome' );
 		} );
 	} );
 
