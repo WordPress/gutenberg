@@ -90,7 +90,7 @@ registerBlock( 'core/table2', {
 	save( { attributes } ) {
 		const { content } = attributes;
 		return (
-			<table className="blocks-table" style={ { width: '100%' } }>
+			<table>
 				{ content }
 			</table>
 		);

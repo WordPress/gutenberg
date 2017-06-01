@@ -72,14 +72,12 @@ export default class TableBlock extends wp.element.Component {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
 				} ) }
-				style={ { width: '100%' } }
 				onSetup={ ( editor ) => this.setState( { editor } ) }
 				onChange={ onChange }
 				value={ content }
 				focus={ focus }
 				onFocus={ onFocus }
-				showAlignments
-				className="blocks-table" />,
+				showAlignments />,
 		];
 	}
 }
