@@ -53,14 +53,10 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 	);
 
 	// Serialize the comment attributes
-	return keys.reduce( ( memo, key ) => {
-		const value = realAttributes[ key ];
-		if ( undefined === value ) {
-			return memo;
-		}
-
-		return memo + `${ key }="${ value }" `;
-	}, '' );
+	return keys
+		.filter( key => undefined !== realAttributes[ key ] )
+		.map( key => `${ key }="${ realAttributes[ key ] }"` )
+		.join( ' ' );
 }
 
 /**
@@ -70,28 +66,26 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return blocks.reduce( ( memo, block ) => {
-		const blockType = block.blockType;
-		const settings = getBlockSettings( blockType );
-		const saveContent = getSaveContent( settings.save, block.attributes );
-		const beautifyOptions = {
-			indent_inner_html: true,
-			wrap_line_length: 0,
-		};
-
-		return memo + (
-			'<!-- wp:' +
-			blockType +
-			' ' +
-			getCommentAttributes(
+	return blocks
+		.map( block => {
+			const blockType = block.blockType;
+			const settings = getBlockSettings( blockType );
+			const saveContent = getSaveContent( settings.save, block.attributes );
+			const beautifyOptions = {
+				indent_inner_html: true,
+				wrap_line_length: 0,
+			};
+			const attributes = getCommentAttributes(
 				block.attributes,
 				parseBlockAttributes( saveContent, settings )
-			) +
-			'-->' +
-			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
-			'<!-- /wp:' +
-			blockType +
-			' -->'
-		) + '\n\n';
-	}, '' );
+			);
+
+			return [
+				`<!-- wp:${ blockType }${ attributes ? ` ${ attributes } ` : ' ' }-->`,
+				saveContent ? beautifyHtml( saveContent, beautifyOptions ) : undefined,
+				`<!-- /wp:${ blockType } -->`,
+			].join( '\n' );
+		} )
+		.join( '\n\n' )
+		.concat( '\n\n' ); // since we no longer have off-by-one-errors with spacing, we may not need this
 }
