@@ -108,12 +108,30 @@
 	z-index: z-index( '.editor-inserter__arrow' );
 }
 
+$scrollbar-width: 12px;
 .editor-inserter__content {
-	max-height: 50vh;
+	max-height: 10vh;	// fix me should be 50
 	overflow: auto;
+	box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
 
 	&:focus {
 		outline: none;
+	}
+
+	&::-webkit-scrollbar {
+		width: $scrollbar-width;
+		height: $scrollbar-width;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+		background-color: $dark-gray-300;
+		border: 3px solid transparent;
+		background-clip: padding-box;
+
+		&:hover {
+			background-color: $dark-gray-900;
+		}
 	}
 }
 
