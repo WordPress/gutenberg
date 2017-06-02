@@ -16,7 +16,7 @@ rm -f gutenberg.zip
 
 # Generate the plugin zip file
 zip -r gutenberg.zip \
-	index.php \
+	gutenberg.php \
 	lib/*.php \
 	post-content.js \
 	blocks/build \
