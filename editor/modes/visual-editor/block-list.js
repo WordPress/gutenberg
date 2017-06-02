@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import clickOutside from 'react-click-outside';
 
 /**
  * Internal dependencies
@@ -56,10 +55,6 @@ class VisualEditorBlockList extends wp.element.Component {
 		this.setState( { selectionAtStart: null } );
 	}
 
-	handleClickOutside() {
-		this.props.clearSelectedBlock();
-	}
-
 	render() {
 		const { blocks, insertionPoint } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
@@ -106,9 +101,8 @@ export default connect(
 		selectionEnd: getBlockSelectionEnd( state ),
 	} ),
 	( dispatch ) => ( {
-		clearSelectedBlock: () => dispatch( { type: 'CLEAR_SELECTED_BLOCK' } ),
 		onMultiSelect( { start, end } ) {
 			dispatch( { type: 'MULTI_SELECT', start, end } );
 		},
 	} )
-)( clickOutside( VisualEditorBlockList ) );
+)( VisualEditorBlockList );
