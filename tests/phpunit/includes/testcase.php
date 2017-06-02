@@ -451,7 +451,7 @@ class WP_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 * @param int|string $code
 	 */
 	public function setExpectedException( $exception, $message = '', $code = null ) {
-		if ( method_exists( 'PHPUnit_Framework_TestCase::setExpectedException' ) ) {
+		if ( method_exists( 'PHPUnit_Framework_TestCase', 'setExpectedException' ) ) {
 			parent::setExpectedException( $exception, $message, $code );
 		} else {
 			$this->expectException( $exception );
