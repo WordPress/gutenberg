@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 import TableBlock from './table-block';
 
 const { children } = hpq;
@@ -21,7 +21,7 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/table2', {
+registerBlockType( 'core/table2', {
 	title: wp.i18n.__( 'Table2' ),
 	icon: 'editor-table',
 	category: 'formatting',
