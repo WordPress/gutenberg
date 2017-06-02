@@ -17,6 +17,11 @@
 	}
 
 	&[data-align="wide"] {
+		margin-left: -24%;
+		margin-right: -24%;
+	}
+
+	&[data-align="full"] {
 		padding-left: 0;
 		padding-right: 0;
 		box-sizing: border-box;
