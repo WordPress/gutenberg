@@ -58,7 +58,7 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      ./bin/run-phpcs.sh
+      phpcs -s
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
