@@ -7,6 +7,8 @@
 
 	<file>gutenberg.php</file>
 	<file>./phpunit</file>
+	<arg value="s"/>
+	<arg name="extensions" value="php"/>
 
 	<!-- The plugin entry point already has a file comment, I promise -->
 	<rule ref="Squiz.Commenting.FileComment.Missing">
