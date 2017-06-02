@@ -6,14 +6,14 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import { blockMoverLabel, multiBlockMoverLabel } from '../mover-label';
+import { getBlockMoverLabel, getMultiBlockMoverLabel } from '../mover-label';
 
 describe( 'block mover', () => {
-	describe( 'blockMoverLabel', () => {
+	describe( 'getBlockMoverLabel', () => {
 		const type = 'TestType';
 
 		it( 'Should generate a title for the first item moving up', () => {
-			expect( blockMoverLabel( 1, {
+			expect( getBlockMoverLabel( 1, {
 				type,
 				firstPosition: 0,
 				isFirst: true,
@@ -25,7 +25,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the last item moving down', () => {
-			expect( blockMoverLabel( 1, {
+			expect( getBlockMoverLabel( 1, {
 				type,
 				firstPosition: 3,
 				isFirst: false,
@@ -37,7 +37,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the second item moving up', () => {
-			expect( blockMoverLabel( 1, {
+			expect( getBlockMoverLabel( 1, {
 				type,
 				firstPosition: 1,
 				isFirst: false,
@@ -49,7 +49,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the second item moving down', () => {
-			expect( blockMoverLabel( 1, {
+			expect( getBlockMoverLabel( 1, {
 				type,
 				firstPosition: 1,
 				isFirst: false,
@@ -61,7 +61,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the only item in the list', () => {
-			expect( blockMoverLabel( 1, {
+			expect( getBlockMoverLabel( 1, {
 				type,
 				firstPosition: 0,
 				isFirst: true,
@@ -73,9 +73,9 @@ describe( 'block mover', () => {
 		} );
 	} );
 
-	describe( 'multiBlockMoverLabel', () => {
+	describe( 'getMultiBlockMoverLabel', () => {
 		it( 'Should generate a title moving multiple blocks up', () => {
-			expect( multiBlockMoverLabel( 4, {
+			expect( getMultiBlockMoverLabel( 4, {
 				firstPosition: 1,
 				isFirst: false,
 				isLast: true,
@@ -86,7 +86,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title moving multiple blocks down', () => {
-			expect( multiBlockMoverLabel( 4, {
+			expect( getMultiBlockMoverLabel( 4, {
 				firstPosition: 0,
 				isFirst: true,
 				isLast: false,
@@ -97,7 +97,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the top', () => {
-			expect( multiBlockMoverLabel( 4, {
+			expect( getMultiBlockMoverLabel( 4, {
 				firstPosition: 1,
 				isFirst: true,
 				isLast: true,
@@ -108,7 +108,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the bottom', () => {
-			expect( multiBlockMoverLabel( 4, {
+			expect( getMultiBlockMoverLabel( 4, {
 				firstPosition: 2,
 				isFirst: false,
 				isLast: true,

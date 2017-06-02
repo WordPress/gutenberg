@@ -30,11 +30,11 @@ import { __, sprintf } from 'i18n';
  * @param  {blockMoverLabelOptions} options       Object options.
  * @return {string}                               Label for the block movement controls.
  */
-export function blockMoverLabel( selectedCount, { type, firstIndex, isFirst, isLast, dir } ) {
+export function getBlockMoverLabel( selectedCount, { type, firstIndex, isFirst, isLast, dir } ) {
 	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } );
+		return getMultiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } );
 	}
 
 	if ( isFirst && isLast ) {
@@ -81,7 +81,7 @@ export function blockMoverLabel( selectedCount, { type, firstIndex, isFirst, isL
  * @param  {multiBlockMoverLabelOptions} options       Object options.
  * @return {string}                                    Label for the block movement controls.
  */
-export function multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } ) {
+export function getMultiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } ) {
 	const position = ( firstIndex + 1 );
 
 	if ( dir < 0 && isFirst ) {

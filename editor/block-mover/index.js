@@ -15,7 +15,7 @@ import { getBlockType } from 'blocks';
  */
 import './style.scss';
 import { isFirstBlock, isLastBlock, getBlockOrder, getBlock } from '../selectors';
-import { blockMoverLabel } from './mover-label';
+import { getBlockMoverLabel } from './mover-label';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
@@ -28,7 +28,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
-				label={ blockMoverLabel( uids.length, {
+				label={ getBlockMoverLabel( uids.length, {
 					type: blockType && blockType.title,
 					isFirst,
 					isLast,
@@ -41,7 +41,7 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
-				label={ blockMoverLabel( uids.length, {
+				label={ getBlockMoverLabel( uids.length, {
 					type: blockType && blockType.title,
 					isFirst,
 					isLast,
