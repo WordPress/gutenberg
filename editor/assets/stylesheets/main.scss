@@ -50,6 +50,10 @@ body.toplevel_page_gutenberg {
 		max-width: 100%;
 	}
 
+	iframe {
+		width: 100%;
+	}
+
 	@include break-small() {
 		padding-top: $header-height;
 	}
