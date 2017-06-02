@@ -10,6 +10,11 @@ import './style.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 
+/**
+ * External dependencies
+ */
+import { parse } from 'url';
+
 const { attr, children } = query;
 
 /**
@@ -76,17 +81,25 @@ registerBlockType( 'core/embed', {
 		constructor() {
 			super( ...arguments );
 			this.doServerSideRender = this.doServerSideRender.bind( this );
+			this.isPreviewBlacklisted = this.isPreviewBlacklisted.bind( this );
 			this.state = {
 				html: '',
 				type: '',
 				error: false,
 				fetching: false,
+				loadingFromSavedBlock: false,
 			};
 			this.noPreview = [
 				'facebook.com',
 			];
+		}
+
+		componentWillMount() {
 			if ( this.props.attributes.url ) {
 				// if the url is already there, we're loading a saved block, so we need to render
+				// a different thing, which is why this doesn't use 'fetching', as that
+				// is for when the user is putting in a new url on the placeholder form
+				this.setState( { loadingFromSavedBlock: true } );
 				this.doServerSideRender();
 			}
 		}
@@ -94,6 +107,19 @@ registerBlockType( 'core/embed', {
 		componentWillUnmount() {
 			// can't abort the fetch promise, so let it know we will unmount
 			this.unmounting = true;
+		}
+
+		isPreviewBlacklisted( host ) {
+			if ( ! host ) {
+				return false;
+			}
+			host = host.replace( 'www.', '' );
+			for ( let i = 0; i < this.noPreview.length; i++ ) {
+				if ( host === this.noPreview[ i ] ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		doServerSideRender( event ) {
@@ -118,16 +144,23 @@ registerBlockType( 'core/embed', {
 						} else {
 							this.setState( { error: true } );
 						}
-						this.setState( { fetching: false } );
+						this.setState( { fetching: false, loadingFromSavedBlock: false } );
 					} );
 				}
 			);
 		}
 
 		render() {
-			const { html, type, error, fetching } = this.state;
+			const { html, type, error, fetching, loadingFromSavedBlock } = this.state;
 			const { url, caption } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
+
+			if ( loadingFromSavedBlock ) {
+				// we're loading from a saved block, but haven't fetched the HTML yet...
+				return (
+					<p>{ url }</p>
+				);
+			}
 
 			if ( ! html ) {
 				return (
@@ -152,8 +185,8 @@ registerBlockType( 'core/embed', {
 				);
 			}
 
-			const domain = url.split( '/' )[ 2 ].replace( /^www\./, '' );
-			const cannotPreview = this.noPreview.includes( domain );
+			const urlBits = parse( url );
+			const cannotPreview = this.isPreviewBlacklisted( urlBits.host );
 			let typeClassName = 'blocks-embed';
 
 			if ( 'video' === type ) {
