@@ -12,6 +12,7 @@
 	width: auto;
 	margin: 0;
 	padding: 8px;
+	border-radius: 0;
 
 	&:focus:before {
 		top: -3px;
@@ -42,12 +43,14 @@
 	background: none;
 	border: 1px solid transparent;
 	outline: none;
+	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
+		box-shadow: none;
 		color: $dark-gray-500;
 		border-color: $dark-gray-500;
 	}
