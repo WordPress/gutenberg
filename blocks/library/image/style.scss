@@ -35,7 +35,10 @@
 		.editor-block-mover {
 			display: none;
 		}
+	}
 
+	&[data-align="full"],
+	&[data-align="wide"] {
 		.editor-visual-editor__block-controls {
 			max-width: $visual-editor-max-width - ( ( $block-padding + $block-padding + $block-mover-margin ) * 2 );;
 			// a block is 600px wide inside a 700px container
