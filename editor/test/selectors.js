@@ -27,7 +27,7 @@ import {
 	getBlockSelectionStart,
 	getBlockSelectionEnd,
 	getBlockUids,
-	getBlockOrder,
+	getBlockIndex,
 	isFirstBlock,
 	isLastBlock,
 	getPreviousBlock,
@@ -522,7 +522,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockOrder', () => {
+	describe( 'getBlockIndex', () => {
 		it( 'should return the block order', () => {
 			const state = {
 				editor: {
@@ -530,7 +530,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockOrder( state, 23 ) ).to.equal( 1 );
+			expect( getBlockIndex( state, 23 ) ).to.equal( 1 );
 		} );
 	} );
 

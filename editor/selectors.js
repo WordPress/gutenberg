@@ -291,7 +291,7 @@ export function getBlockUids( state ) {
  * @param  {String} uid   Block unique ID
  * @return {Number}       Index at which block exists in order
  */
-export function getBlockOrder( state, uid ) {
+export function getBlockIndex( state, uid ) {
 	return state.editor.blockOrder.indexOf( uid );
 }
 
@@ -341,7 +341,7 @@ export function isLastBlock( state, uid ) {
  * @return {Object}       Block occurring before specified unique ID
  */
 export function getPreviousBlock( state, uid ) {
-	const order = getBlockOrder( state, uid );
+	const order = getBlockIndex( state, uid );
 	return state.editor.blocksByUid[ state.editor.blockOrder[ order - 1 ] ] || null;
 }
 
@@ -354,7 +354,7 @@ export function getPreviousBlock( state, uid ) {
  * @return {Object}       Block occurring after specified unique ID
  */
 export function getNextBlock( state, uid ) {
-	const order = getBlockOrder( state, uid );
+	const order = getBlockIndex( state, uid );
 	return state.editor.blocksByUid[ state.editor.blockOrder[ order + 1 ] ] || null;
 }
 

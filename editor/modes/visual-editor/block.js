@@ -29,7 +29,7 @@ import {
 	getNextBlock,
 	getBlock,
 	getBlockFocus,
-	getBlockOrder,
+	getBlockIndex,
 	isBlockHovered,
 	isBlockSelected,
 	isBlockMultiSelected,
@@ -302,7 +302,7 @@ export default connect(
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
-			order: getBlockOrder( state, ownProps.uid ),
+			order: getBlockIndex( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
