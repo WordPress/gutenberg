@@ -40,10 +40,6 @@ window._wpGutenbergPost = {
 			'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
-			'<!-- /wp:core/embed -->',
-
 			'<!-- wp:core/heading -->',
 			'<h2>The <em>Inserter</em> Tool</h2>',
 			'<!-- /wp:core/heading -->',
@@ -92,10 +88,6 @@ window._wpGutenbergPost = {
 			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
-			'<!-- wp:core/embed url="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" -->',
-			'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
-			'<!-- /wp:core/embed -->',
-
 			'<!-- wp:core/separator -->',
 			'<hr/>',
 			'<!-- /wp:core/separator -->',
@@ -116,6 +108,12 @@ window._wpGutenbergPost = {
 			'<p>Est quis reque cetero ad. Sea id autem nominavi deseruisse. <strong>Veniam qualisque definitionem pri id</strong>, ea autem feugiat delenit ius, mei at loem affert accumsan. Dicat eruditi cu est, te pro dicant pericula conclusionemque, ei vim detracto euripidis intellegam. Eius postea volumus mei ad.</p>',
 			'<p>Prima ridens denique his te, ferri illum volumus an his. Eu vel dicat homero qualisqu, vitae regione deserunt vis ei. Graeci incorrupte liberavisse no mea, saepe voluptaria usu ex, vis dicant euismod id. At dolor reprimique eos, quo altera detraxit moderatius id. Quo iudico utinam eu, ad alia munere mel.</p>',
 			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/code -->',
+			'<pre><code>export default function MyButton() {\n\
+	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
+}</code></pre>',
+			'<!-- /wp:core/code -->',
 
 			'<!-- wp:core/image -->',
 			'<figure><img src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
@@ -153,11 +151,21 @@ window._wpGutenbergPost = {
 			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
 			'<!-- /wp:core/table -->',
 
-			'<!-- wp:core/code -->',
-			'<pre><code>export default function MyButton() {\n\
-	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
-}</code></pre>',
-			'<!-- /wp:core/code -->',
+			'<!-- wp:core/heading -->',
+			'<h2>All that you can embed!</h2>',
+			'<!-- /wp:core/heading -->',
+
+			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
+			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
+			'<!-- /wp:core/embed -->',
+
+			'<!-- wp:core/embed url="https://twitter.com/photomatt/status/868657763970404352" -->',
+			'https://twitter.com/photomatt/status/868657763970404352',
+			'<!-- /wp:core/embed -->',
+
+			'<!-- wp:core/embed url="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" -->',
+			'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
+			'<!-- /wp:core/embed -->',
 
 		].join( '' ),
 	},
