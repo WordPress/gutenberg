@@ -104,7 +104,7 @@ registerBlockType( 'core/embed', {
 			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
 
 			this.setState( { error: false, fetching: true } );
-			fetch( api_url, {
+			window.fetch( api_url, {
 				credentials: 'include',
 			} ).then(
 				( response ) => {
