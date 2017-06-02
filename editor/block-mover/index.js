@@ -8,6 +8,7 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { IconButton } from 'components';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import { IconButton } from 'components';
 import './style.scss';
 import { isFirstBlock, isLastBlock, getBlockOrder, getBlock } from '../selectors';
 import { blockMoverLabel } from './mover-label';
-import { getBlockType } from 'blocks';
 
 function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
