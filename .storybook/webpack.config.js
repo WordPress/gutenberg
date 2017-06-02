@@ -5,7 +5,7 @@ config.module.rules = [
 		test: /\.md/,
 		use: 'raw-loader',
 	},
-]
-config.externals = [],
+];
+config.externals = [];
 
 module.exports = config;

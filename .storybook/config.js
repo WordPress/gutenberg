@@ -1,11 +1,11 @@
 import { configure } from '@storybook/react';
 import * as element from 'element';
+import './style.scss';
 
 function loadStories() {
-	console.log( 'aloooooo' );
 	window.wp = { ...window.wp, element };
-  require( '../components/story' );
-  require( '../components/button/story' );
+	require( '../components/story' );
+	require( '../components/button/story' );
 }
 
 configure( loadStories, module );
