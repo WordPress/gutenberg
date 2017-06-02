@@ -229,7 +229,7 @@ class VisualEditorBlock extends wp.element.Component {
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockMover uid={ block.uid } order={ this.props.order } /> }
 				{ showUI &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
