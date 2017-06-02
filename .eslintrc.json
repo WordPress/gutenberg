@@ -18,7 +18,8 @@
 		}
 	},
 	"globals": {
-		"wp": true
+		"wp": true,
+		"wpApiSettings": true
 	},
 	"plugins": [
 		"react",
