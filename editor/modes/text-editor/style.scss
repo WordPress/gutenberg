@@ -106,6 +106,7 @@
 
 /* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
 .editor-text-editor {
+	position: relative;
 	padding-left: 20px;
 	padding-right: 20px;
 

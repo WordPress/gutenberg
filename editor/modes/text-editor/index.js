@@ -9,6 +9,7 @@ import Textarea from 'react-autosize-textarea';
  */
 import './style.scss';
 import PostTitle from '../../post-title';
+import PostExternalLink from '../../post-external-link';
 import { getBlocks } from '../../selectors';
 
 function TextEditor( { blocks, onChange } ) {
@@ -32,6 +33,7 @@ function TextEditor( { blocks, onChange } ) {
 				</div>
 			</header>
 			<div className="editor-text-editor__body">
+				<PostExternalLink />
 				<PostTitle />
 				<Textarea
 					autoComplete="off"
