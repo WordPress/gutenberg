@@ -4,8 +4,8 @@
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 import { omit } from 'lodash';
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
+import 'moment-timezone/moment-timezone-utils';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,19 @@ import { createReduxStore } from './state';
 
 // Configure moment globally
 moment.locale( settings.l10n.locale );
-moment.tz.setDefault( settings.timezone.string );
+if ( settings.timezone.string ) {
+	moment.tz.setDefault( settings.timezone.string );
+} else {
+	const momentTimezone = {
+		name: 'WP',
+		abbrs: [ 'WP' ],
+		untils: [ null ],
+		offsets: [ -settings.timezone.offset * 60 ],
+	};
+	const unpackedTimezone = moment.tz.pack( momentTimezone );
+	moment.tz.add( unpackedTimezone );
+	moment.tz.setDefault( 'WP' );
+}
 
 /**
  * Initializes and returns an instance of Editor.
