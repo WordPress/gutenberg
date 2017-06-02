@@ -7,7 +7,7 @@
 		"plugin:jsx-a11y/recommended"
 	],
 	"env": {
-		"browser": true,
+		"browser": false,
 		"node": true,
 		"mocha": true
 	},
@@ -19,7 +19,9 @@
 	},
 	"globals": {
 		"wp": true,
-		"wpApiSettings": true
+		"wpApiSettings": true,
+		"window": true,
+		"document": true
 	},
 	"plugins": [
 		"react",
