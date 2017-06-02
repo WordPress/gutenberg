@@ -17,17 +17,11 @@ import { isFirstBlock, isLastBlock, getBlockOrder, getBlock } from '../selectors
 import { blockMoverLabel } from './mover-label';
 import { getBlockType } from 'blocks';
 
-function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block, firstIndex } ) {
+function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex } ) {
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
 	// the rendering parent, leaving it unable to react to focus out.
-	let blockType;
-
-	if ( uids.length === 1 && block ) {
-		blockType = getBlockType( block.name );
-	}
-
 	return (
 		<div className="editor-block-mover">
 			<IconButton
@@ -64,8 +58,8 @@ export default connect(
 	( state, ownProps ) => ( {
 		isFirst: isFirstBlock( state, first( ownProps.uids ) ),
 		isLast: isLastBlock( state, last( ownProps.uids ) ),
-		block: getBlock( state, first( ownProps.uids ) ),
 		firstIndex: getBlockOrder( state, first( ownProps.uids ) ),
+		blockType: getBlockType( getBlock( state, first( ownProps.uids ) ).name ),
 	} ),
 	( dispatch, ownProps ) => ( {
 		onMoveDown() {
