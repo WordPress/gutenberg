@@ -15,7 +15,6 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
-	getEditedPostStatus,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
@@ -192,34 +191,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).to.eql( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getEditedPostStatus', () => {
-		it( 'should return the post saved status if the status is not edited', () => {
-			const state = {
-				currentPost: {
-					status: 'draft',
-				},
-				editor: {
-					edits: { title: 'chicken' },
-				},
-			};
-
-			expect( getEditedPostStatus( state ) ).to.equal( 'draft' );
-		} );
-
-		it( 'should return the edited status', () => {
-			const state = {
-				currentPost: {
-					status: 'draft',
-				},
-				editor: {
-					edits: { status: 'pending' },
-				},
-			};
-
-			expect( getEditedPostStatus( state ) ).to.equal( 'pending' );
 		} );
 	} );
 

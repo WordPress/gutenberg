@@ -110,17 +110,6 @@ export function getEditedPostAttribute( state, attributeName ) {
 }
 
 /**
- * Returns the current status of the post being edited, preferring the unsaved
- * value if different than the saved post.
- *
- * @param  {Object} state Global application state
- * @return {String}       Post status
- */
-export function getEditedPostStatus( state ) {
-	return getEditedPostAttribute( state, 'status' );
-}
-
-/**
  * Returns the current visibility of the post being edited, preferring the
  * unsaved value if different than the saved post. The return value is one of
  * "private", "password", or "public".
@@ -129,7 +118,7 @@ export function getEditedPostStatus( state ) {
  * @return {String}       Post visiblity
  */
 export function getEditedPostVisibility( state ) {
-	const status = getEditedPostStatus( state );
+	const status = getEditedPostAttribute( state, 'status' );
 	const password = getEditedPostAttribute( state, 'password' );
 
 	if ( status === 'private' ) {

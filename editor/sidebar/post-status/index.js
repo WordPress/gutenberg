@@ -17,7 +17,7 @@ import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
-import { getEditedPostStatus, getSuggestedPostFormat } from '../../selectors';
+import { getEditedPostAttribute, getSuggestedPostFormat } from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostStatus extends Component {
@@ -71,7 +71,7 @@ PostStatus.instances = 1;
 
 export default connect(
 	( state ) => ( {
-		status: getEditedPostStatus( state ),
+		status: getEditedPostAttribute( state, 'status' ),
 		suggestedFormat: getSuggestedPostFormat( state ),
 	} ),
 	( dispatch ) => {
