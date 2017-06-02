@@ -15,7 +15,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import { getSelectedBlock } from '../selectors';
+import { getBlockSelectionEnd, getSelectedBlock } from '../selectors';
 import { setInsertionPoint, clearInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
@@ -68,10 +68,15 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	hoverBlock() {
+		const { lastMultiSelectedBlock, selectedBlock } = this.props;
+		let insertionPoint = null;
+		if ( lastMultiSelectedBlock ) {
+			insertionPoint = lastMultiSelectedBlock;
+		} else if ( selectedBlock ) {
+			insertionPoint = selectedBlock.uid;
+		}
 		return () => {
-			this.props.setInsertionPoint(
-				this.props.selectedBlock ? this.props.selectedBlock.uid : null
-			);
+			this.props.setInsertionPoint( insertionPoint );
 		};
 	}
 
@@ -306,6 +311,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
+			lastMultiSelectedBlock: getBlockSelectionEnd( state ),
 		};
 	},
 	{ setInsertionPoint, clearInsertionPoint }
