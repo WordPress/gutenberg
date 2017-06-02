@@ -52,7 +52,6 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
-		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -149,13 +148,6 @@ class VisualEditorBlock extends wp.element.Component {
 		} else {
 			onMerge( previousBlock, block );
 		}
-	}
-
-	selectAndStopPropagation( event ) {
-		this.props.onSelect();
-		// Visual editor infers click as intent to clear the selected block, so
-		// prevent bubbling when occurring on block where selection is intended
-		event.stopPropagation();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -280,7 +272,7 @@ class VisualEditorBlock extends wp.element.Component {
 				<div
 					onKeyPress={ this.maybeStartTyping }
 					onFocus={ onSelect }
-					onClick={ this.selectAndStopPropagation }
+					onClick={ onSelect }
 				>
 					<BlockEdit
 						focus={ focus }
