@@ -92,6 +92,10 @@ window._wpGutenbergPost = {
 			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
+			'<!-- wp:core/embed url="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" -->',
+			'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
+			'<!-- /wp:core/embed -->',
+
 			'<!-- wp:core/separator -->',
 			'<hr/>',
 			'<!-- /wp:core/separator -->',
