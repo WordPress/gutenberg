@@ -20,6 +20,10 @@
 	outline: none;
 	transition: color .2s ease;
 
+	.editor-layout__content & {
+		border-radius: $icon-button-size / 2;
+	}
+
 	&:hover,
 	&:focus {
 		color: $blue-medium-500;
