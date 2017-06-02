@@ -17,7 +17,6 @@ import { Component } from 'element';
 import './style.scss';
 import {
 	getEditedPostAttribute,
-	getEditedPostStatus,
 	getEditedPostVisibility,
 } from '../../selectors';
 import { editPost } from '../../actions';
@@ -124,7 +123,7 @@ class PostVisibility extends Component {
 
 export default connect(
 	( state ) => ( {
-		status: getEditedPostStatus( state ),
+		status: getEditedPostAttribute( state, 'status' ),
 		visibility: getEditedPostVisibility( state ),
 		password: getEditedPostAttribute( state, 'password' ),
 	} ),
