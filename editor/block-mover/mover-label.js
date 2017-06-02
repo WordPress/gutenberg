@@ -1,10 +1,10 @@
 import { __, sprintf } from 'i18n';
 
-export function blockMoverLabel( selectedCount, { type, firstPosition, isFirst, isLast, dir } ) {
-	const position = ( firstPosition + 1 );
+export function blockMoverLabel( selectedCount, { type, firstIndex, isFirst, isLast, dir } ) {
+	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstPosition, dir } );
+		return multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } );
 	}
 
 	if ( isFirst && isLast ) {
@@ -44,8 +44,8 @@ export function blockMoverLabel( selectedCount, { type, firstPosition, isFirst, 
 	return '';
 }
 
-export function multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstPosition, dir } ) {
-	const position = ( firstPosition + 1 );
+export function multiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } ) {
+	const position = ( firstIndex + 1 );
 
 	if ( dir < 0 && isFirst ) {
 		return __( 'Blocks cannot be moved up as they are already at the top' );
