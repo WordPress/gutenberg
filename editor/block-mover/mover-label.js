@@ -70,8 +70,6 @@ export function getBlockMoverLabel( selectedCount, { type, firstIndex, isFirst, 
 		// moving up, and is the first item
 		return sprintf( __( 'Block "%s" is at the beginning of the content and can’t be moved up' ), type );
 	}
-
-	return '';
 }
 
 /**
