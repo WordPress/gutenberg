@@ -36,6 +36,7 @@
 	&:focus {
 		color: $dark-gray-500;
 		outline: none;
+		box-shadow: none;
 	}
 
 	&.is-active svg,
