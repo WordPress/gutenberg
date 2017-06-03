@@ -10,15 +10,11 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-100;
+	color: $dark-gray-300;
 	cursor: pointer;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-
-	&:hover {
-		color: $dark-gray-900;
-	}
 
 	&[aria-disabled="true"] {
 		cursor: default;
