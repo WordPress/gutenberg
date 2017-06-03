@@ -273,6 +273,7 @@ class VisualEditorBlock extends wp.element.Component {
 					onKeyPress={ this.maybeStartTyping }
 					onFocus={ onSelect }
 					onClick={ onSelect }
+					onDragStart={ ( event ) => event.preventDefault() }
 				>
 					<BlockEdit
 						focus={ focus }
