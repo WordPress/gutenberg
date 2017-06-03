@@ -15,7 +15,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockSelectionEnd, getSelectedBlock } from '../selectors';
+import { getLastMultiSelectedBlockUid, getSelectedBlock } from '../selectors';
 import { setInsertionPoint, clearInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
@@ -311,7 +311,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getBlockSelectionEnd( state ),
+			lastMultiSelectedBlock: getLastMultiSelectedBlockUid( state ),
 		};
 	},
 	{ setInsertionPoint, clearInsertionPoint }

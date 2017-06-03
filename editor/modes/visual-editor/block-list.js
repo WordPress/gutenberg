@@ -4,14 +4,20 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import { serialize } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
-	getBlockSelectionStart,
-	getBlockSelectionEnd,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
+	getMultiSelectedBlocks,
 } from '../../selectors';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
@@ -23,10 +29,31 @@ class VisualEditorBlockList extends wp.element.Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
+		this.onCopy = this.onCopy.bind( this );
 
 		this.state = {
 			selectionAtStart: null,
 		};
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'copy', this.onCopy );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'copy', this.onCopy );
+	}
+
+	onCopy( event ) {
+		const { multiSelectedBlocks } = this.props;
+
+		if ( multiSelectedBlocks.length ) {
+			const serialized = serialize( multiSelectedBlocks );
+
+			event.clipboardData.setData( 'text/plain', serialized );
+			event.clipboardData.setData( 'text/html', serialized );
+			event.preventDefault();
+		}
 	}
 
 	onSelectionStart( uid ) {
@@ -97,8 +124,9 @@ export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
 		insertionPoint: getBlockInsertionPoint( state ),
-		selectionStart: getBlockSelectionStart( state ),
-		selectionEnd: getBlockSelectionEnd( state ),
+		selectionStart: getMultiSelectedBlocksStartUid( state ),
+		selectionEnd: getMultiSelectedBlocksEndUid( state ),
+		multiSelectedBlocks: getMultiSelectedBlocks( state ),
 	} ),
 	( dispatch ) => ( {
 		onMultiSelect( { start, end } ) {

@@ -16,11 +16,11 @@ import './style.scss';
 import ModeSwitcher from './mode-switcher';
 import SavedState from './saved-state';
 import Tools from './tools';
-import { getSelectedBlocks } from '../selectors';
+import { getMultiSelectedBlockUids } from '../selectors';
 import { clearSelectedBlock } from '../actions';
 
-function Header( { selectedBlocks, onRemove, onDeselect } ) {
-	const count = selectedBlocks.length;
+function Header( { multiSelectedBlockUids, onRemove, onDeselect } ) {
+	const count = multiSelectedBlockUids.length;
 
 	if ( count ) {
 		return (
@@ -32,7 +32,7 @@ function Header( { selectedBlocks, onRemove, onDeselect } ) {
 					<IconButton
 						icon="trash"
 						label={ __( 'Delete selected blocks' ) }
-						onClick={ () => onRemove( selectedBlocks ) }
+						onClick={ () => onRemove( multiSelectedBlockUids ) }
 						focus={ true }
 					>
 						{ __( 'Delete' ) }
@@ -60,7 +60,7 @@ function Header( { selectedBlocks, onRemove, onDeselect } ) {
 
 export default connect(
 	( state ) => ( {
-		selectedBlocks: getSelectedBlocks( state ),
+		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 	} ),
 	( dispatch ) => ( {
 		onDeselect: () => dispatch( clearSelectedBlock() ),

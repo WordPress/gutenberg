@@ -240,9 +240,7 @@ export function getBlock( state, uid ) {
  * @return {Object[]}       Post blocks
  */
 export function getBlocks( state ) {
-	return state.editor.blockOrder.map( ( uid ) => (
-		state.editor.blocksByUid[ uid ]
-	) );
+	return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
 }
 
 /**
@@ -259,17 +257,17 @@ export function getSelectedBlock( state ) {
 		return null;
 	}
 
-	return state.editor.blocksByUid[ uid ];
+	return getBlock( state, uid );
 }
 
 /**
- * Returns the current multi-selection set of blocks, or an empty array if
- * there is no multi-selection.
+ * Returns the current multi-selection set of blocks unique IDs, or an empty
+ * array if there is no multi-selection.
  *
  * @param  {Object} state Global application state
- * @return {Array}        Multi-selected block objects
+ * @return {Array}        Multi-selected block unique UDs
  */
-export function getSelectedBlocks( state ) {
+export function getMultiSelectedBlockUids( state ) {
 	const { blockOrder } = state.editor;
 	const { start, end } = state.multiSelectedBlocks;
 
@@ -288,24 +286,88 @@ export function getSelectedBlocks( state ) {
 }
 
 /**
+ * Returns the current multi-selection set of blocks, or an empty array if
+ * there is no multi-selection.
+ *
+ * @param  {Object} state Global application state
+ * @return {Array}        Multi-selected block objects
+ */
+export function getMultiSelectedBlocks( state ) {
+	return getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) );
+}
+
+/**
+ * Returns the unique ID of the first block in the multi-selection set, or null
+ * if there is no multi-selection.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?String}       First unique block ID in the multi-selection set
+ */
+export function getFirstMultiSelectedBlockUid( state ) {
+	return first( getMultiSelectedBlockUids( state ) ) || null;
+}
+
+/**
+ * Returns the unique ID of the last block in the multi-selection set, or null
+ * if there is no multi-selection.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?String}       Last unique block ID in the multi-selection set
+ */
+export function getLastMultiSelectedBlockUid( state ) {
+	return last( getMultiSelectedBlockUids( state ) ) || null;
+}
+
+/**
+ * Returns true if a multi-selection exists, and the block corresponding to the
+ * specified unique ID is the first block of the multi-selection set, or false
+ * otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @param  {Object}  uid   Block unique ID
+ * @return {Boolean}       Whether block is first in mult-selection
+ */
+export function isFirstMultiSelectedBlock( state, uid ) {
+	return getFirstMultiSelectedBlockUid( state ) === uid;
+}
+
+/**
+ * Returns true if the unique ID occurs within the block multi-selection, or
+ * false otherwise.
+ *
+ * @param  {Object} state Global application state
+ * @param  {Object} uid   Block unique ID
+ * @return {Boolean}      Whether block is in multi-selection set
+ */
+export function isBlockMultiSelected( state, uid ) {
+	return getMultiSelectedBlockUids( state ).indexOf( uid ) !== -1;
+}
+
+/**
  * Returns the unique ID of the block which begins the multi-selection set, or
- * null if there is no multi-selectino.
+ * null if there is no multi-selection.
+ *
+ * N.b.: This is not necessarily the first uid in the selection. See
+ * getFirstMultiSelectedBlockUid().
  *
  * @param  {Object}  state Global application state
  * @return {?String}       Unique ID of block beginning multi-selection
  */
-export function getBlockSelectionStart( state ) {
+export function getMultiSelectedBlocksStartUid( state ) {
 	return state.multiSelectedBlocks.start || null;
 }
 
 /**
  * Returns the unique ID of the block which ends the multi-selection set, or
- * null if there is no multi-selectino.
+ * null if there is no multi-selection.
+ *
+ * N.b.: This is not necessarily the last uid in the selection. See
+ * getLastMultiSelectedBlockUid().
  *
  * @param  {Object}  state Global application state
  * @return {?String}       Unique ID of block ending multi-selection
  */
-export function getBlockSelectionEnd( state ) {
+export function getMultiSelectedBlocksEndUid( state ) {
 	return state.multiSelectedBlocks.end || null;
 }
 
@@ -342,19 +404,6 @@ export function getBlockIndex( state, uid ) {
  */
 export function isFirstBlock( state, uid ) {
 	return first( state.editor.blockOrder ) === uid;
-}
-
-/**
- * Returns true if a multi-selection exists, and the block corresponding to the
- * specified unique ID is the first block of the multi-selection set, or false
- * otherwise.
- *
- * @param  {Object}  state Global application state
- * @param  {Object}  uid   Block unique ID
- * @return {Boolean}       Whether block is first in mult-selection
- */
-export function isFirstSelectedBlock( state, uid ) {
-	return first( getSelectedBlocks( state ) ) === uid;
 }
 
 /**
@@ -413,18 +462,6 @@ export function isBlockSelected( state, uid ) {
 	}
 
 	return state.selectedBlock.uid === uid;
-}
-
-/**
- * Returns true if the unique ID occurs within the block multi-selection, or
- * false otherwise.
- *
- * @param  {Object} state Global application state
- * @param  {Object} uid   Block unique ID
- * @return {Boolean}      Whether block is in multi-selection set
- */
-export function isBlockMultiSelected( state, uid ) {
-	return getSelectedBlocks( state ).indexOf( uid ) !== -1;
 }
 
 /**
