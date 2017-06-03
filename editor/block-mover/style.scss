@@ -15,10 +15,6 @@
 	width: 20px;
 	height: 20px;
 
-	&:hover {
-		color: $dark-gray-500;
-	}
-
 	&[aria-disabled="true"] {
 		cursor: default;
 		color: $light-gray-300;
