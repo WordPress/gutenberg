@@ -19,7 +19,10 @@ zip -r gutenberg.zip \
     index.php \
     post-content.js \
     blocks/build \
+    components/build \
+    date/build \
     editor/build \
     element/build \
     i18n/build \
+    utils/build \
     README.md

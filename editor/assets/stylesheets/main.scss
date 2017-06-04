@@ -12,7 +12,6 @@ body.toplevel_page_gutenberg {
 	#wpfooter {
 		display: none;
 	}
-
 }
 
 .gutenberg {
@@ -49,6 +48,10 @@ body.toplevel_page_gutenberg {
 
 	img {
 		max-width: 100%;
+	}
+
+	iframe {
+		width: 100%;
 	}
 
 	@include break-small() {

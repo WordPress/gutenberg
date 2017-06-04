@@ -20,6 +20,10 @@
 	outline: none;
 	transition: color .2s ease;
 
+	.editor-layout__content & {
+		border-radius: $icon-button-size / 2;
+	}
+
 	&:hover,
 	&:focus {
 		color: $blue-medium-500;
@@ -111,6 +115,7 @@
 .editor-inserter__content {
 	max-height: 50vh;
 	overflow: auto;
+	box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
 
 	&:focus {
 		outline: none;

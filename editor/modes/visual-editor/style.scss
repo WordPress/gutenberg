@@ -125,15 +125,16 @@
 	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
 }
 
-.editor-visual-editor > .editor-visual-editor__insertion-point {
+.editor-visual-editor .editor-visual-editor__insertion-point {
 	position: relative;
+	margin-right: #{ ( $block-padding + $block-mover-margin) * 2 };
 
 	&:before {
 		position: absolute;
 		top: 6px;
-		right: #{ $block-padding + $block-mover-margin };
-		left: 0;
 		height: 3px;
+		left: 0;
+		right: 0;
 		background: $blue-medium-500;
 		content: '';
 	}

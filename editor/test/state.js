@@ -786,6 +786,16 @@ describe( 'state', () => {
 			} );
 
 			expect( state2 ).to.eql( { start: null, end: null } );
+
+			const state3 = multiSelectedBlocks( original, {
+				type: 'INSERT_BLOCK',
+				block: {
+					uid: 'ribs',
+					name: 'core/freeform',
+				},
+			} );
+
+			expect( state3 ).to.eql( { start: null, end: null } );
 		} );
 	} );
 

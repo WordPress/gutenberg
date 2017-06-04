@@ -99,7 +99,7 @@ export default class Dashicon extends wp.element.Component {
 				break;
 			case 'align-full-width':
 				title = 'Align Full Width';
-				path = 'M5 5h10V3H5v2zm12 8V7H3v6h14zM5 17h10v-2H5v2z';
+				path = 'M17 13V3H3v10h14zM5 17h10v-2H5v2z';
 				break;
 			case 'align-left':
 				title = 'Align Left';
@@ -112,6 +112,10 @@ export default class Dashicon extends wp.element.Component {
 			case 'align-right':
 				title = 'Align Right';
 				path = 'M3 5h14V3H3v2zm0 4h3V7H3v2zm14 4V7H8v6h9zM3 13h3v-2H3v2zm0 4h14v-2H3v2z';
+				break;
+			case 'align-wide':
+				title = 'Align Wide';
+				path = 'M5 5h10V3H5v2zm12 8V7H3v6h14zM5 17h10v-2H5v2z';
 				break;
 			case 'analytics':
 				title = 'Analytics';

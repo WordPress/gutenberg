@@ -279,6 +279,7 @@ export function multiSelectedBlocks( state = { start: null, end: null }, action 
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'TOGGLE_BLOCK_SELECTED':
+		case 'INSERT_BLOCK':
 			return {
 				start: null,
 				end: null,
