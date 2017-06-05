@@ -3,12 +3,14 @@
  */
 import { nodeListToReact } from 'dom-react';
 import { concat, isEqual, omitBy } from 'lodash';
+import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
  */
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
+import FormatList from './format-list';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -218,7 +220,22 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
+		const formats = [
+			'Paragraph',
+			'Heading 1',
+			'Heading 2',
+			'Heading 3',
+			'Heading 4',
+			'Heading 5',
+			'Heading 6',
+			'Preformatted',
+		];
 		return [
+			focus && (
+				<Fill name="Formatting.Toolbar">
+					<FormatList formats={ formats } />
+				</Fill>
+			),
 			focus && (
 				<BlockControls
 					key="aligns"
