@@ -18,6 +18,7 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
+	getMultiSelectedBlockUids,
 } from '../../selectors';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
@@ -30,6 +31,7 @@ class VisualEditorBlockList extends wp.element.Component {
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onCopy = this.onCopy.bind( this );
+		this.onCut = this.onCut.bind( this );
 
 		this.state = {
 			selectionAtStart: null,
@@ -38,10 +40,12 @@ class VisualEditorBlockList extends wp.element.Component {
 
 	componentDidMount() {
 		document.addEventListener( 'copy', this.onCopy );
+		document.addEventListener( 'cut', this.onCut );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
+		document.removeEventListener( 'cut', this.onCut );
 	}
 
 	onCopy( event ) {
@@ -53,6 +57,16 @@ class VisualEditorBlockList extends wp.element.Component {
 			event.clipboardData.setData( 'text/plain', serialized );
 			event.clipboardData.setData( 'text/html', serialized );
 			event.preventDefault();
+		}
+	}
+
+	onCut( event ) {
+		const { multiSelectedBlockUids } = this.props;
+
+		this.onCopy( event );
+
+		if ( multiSelectedBlockUids.length ) {
+			this.props.onRemove( multiSelectedBlockUids );
 		}
 	}
 
@@ -83,7 +97,7 @@ class VisualEditorBlockList extends wp.element.Component {
 	}
 
 	render() {
-		const { blocks, insertionPoint } = this.props;
+		const { blocks, insertionPoint, multiSelectedBlockUids } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = insertionPoint
 			? [
@@ -112,6 +126,7 @@ class VisualEditorBlockList extends wp.element.Component {
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
 							onSelectionChange={ () => this.onSelectionChange( uid ) }
 							onSelectionEnd={ this.onSelectionEnd }
+							multiSelectedBlockUids={ multiSelectedBlockUids }
 						/>
 					);
 				} ) }
@@ -127,10 +142,14 @@ export default connect(
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),
+		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 	} ),
 	( dispatch ) => ( {
 		onMultiSelect( { start, end } ) {
 			dispatch( { type: 'MULTI_SELECT', start, end } );
+		},
+		onRemove( uids ) {
+			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
 )( VisualEditorBlockList );
