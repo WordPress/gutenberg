@@ -107,11 +107,12 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	setButtonActive( id, active ) {
-		const activeButtons = {
-			...this.state.activeButtons,
-			[ id ]: active,
-		};
-		this.setState( { activeButtons } );
+		this.setState( ( prevState ) => ( {
+			activeButtons: {
+				...prevState.activeButtons,
+				[ id ]: active,
+			},
+		} ) );
 	}
 
 	onSetup( editor ) {
@@ -217,7 +218,6 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
-
 		return [
 			focus && (
 				<BlockControls
