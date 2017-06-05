@@ -3,6 +3,7 @@
  */
 import ReactMarkdown from 'react-markdown';
 import { storiesOf } from '@storybook/react';
+import { text, boolean, withKnobs } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -10,9 +11,19 @@ import { storiesOf } from '@storybook/react';
 import Button from '../';
 import readme from '../README.md';
 
-storiesOf( 'Components', module ).add( 'Button', () => <div>
-	<ReactMarkdown source={ readme } />
-	<h2>Examples</h2>
-	<Button>Default Button</Button>
-	<Button isPrimary>Primary Button</Button>
-</div> );
+storiesOf( 'Components', module )
+	.addDecorator( withKnobs )
+	.add( 'Button', () => (
+		<div>
+			<ReactMarkdown source={ readme } />
+			<h2>Test It</h2>
+			<Button
+				isPrimary={ boolean( 'isPrimary', false ) }
+				isLarge={ boolean( 'isLarge', false ) }
+				isToggled={ boolean( 'isToggled', false ) }
+				disabled={ boolean( 'disabled', false ) }
+			>
+				{ text( 'Label', 'Default Label' ) }
+			</Button>
+		</div>
+	) );

@@ -9,4 +9,5 @@ import { storiesOf } from '@storybook/react';
  */
 import readme from '../README.md';
 
-storiesOf( 'Components', module ).add( 'Welcome', () => <ReactMarkdown source={ readme } /> );
+storiesOf( 'Components', module )
+	.add( 'Welcome', () => <ReactMarkdown source={ readme } /> );
