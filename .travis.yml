@@ -53,7 +53,7 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      phpcs
+      ./vendor/bin/phpcs
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
