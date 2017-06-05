@@ -158,7 +158,10 @@ registerBlockType( 'core/embed', {
 			if ( loadingFromSavedBlock ) {
 				// we're loading from a saved block, but haven't fetched the HTML yet...
 				return (
-					<p>{ url }</p>
+					<div className="blocks-embed__loading">
+						<Spinner />
+						<p className="blocks-embed__loading-text">{ wp.i18n.__( 'Embedding...' ) }</p>
+					</div>
 				);
 			}
 
