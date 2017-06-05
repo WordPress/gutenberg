@@ -58,11 +58,7 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      find . \
-        -not \( -path './node_modules' \) \
-        -not \( -path './vendor' \) \
-        -name '*.php' \
-      | xargs -d'\n' phpcs --standard=phpcs.ruleset.xml -s
+      phpcs
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then

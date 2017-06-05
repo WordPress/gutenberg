@@ -9,7 +9,7 @@ WP_Block
   / WP_Block_Html
 
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })+ e:WP_Block_End & { return s.blockType === e.blockType }
+  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })* e:WP_Block_End & { return s.blockType === e.blockType }
   { return {
     blockType: s.blockType,
     attrs: s.attrs,
