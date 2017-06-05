@@ -116,7 +116,4 @@ Then you must install the `WordPress-Coding-Standards` repository and tell
 
 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#standalone
 
-You should now be able to run `phpcs -s` from the root directory of this
-project.  (The `-s` option means "show sniff codes in all reports", or "show
-the name of each rule that fails".  This additional output makes it much easier
-to determine the specific issue with your code.)
+You should now be able to run `phpcs` from the root directory of this project.

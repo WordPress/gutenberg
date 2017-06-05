@@ -5,10 +5,11 @@
 	<rule ref="WordPress-Core" />
 	<rule ref="WordPress-Docs" />
 
-	<file>gutenberg.php</file>
-	<file>./phpunit</file>
 	<arg value="s"/>
 	<arg name="extensions" value="php"/>
+
+	<file>gutenberg.php</file>
+	<file>./phpunit</file>
 
 	<!-- The plugin entry point already has a file comment, I promise -->
 	<rule ref="Squiz.Commenting.FileComment.Missing">
