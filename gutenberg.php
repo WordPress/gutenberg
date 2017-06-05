@@ -9,6 +9,10 @@
  * @package gutenberg
  */
 
+### BEGIN AUTO-GENERATED DEFINES
+define( 'GUTENBERG_DEVELOPMENT_MODE', true );
+### END AUTO-GENERATED DEFINES
+
 // Load API functions.
 require_once dirname( __FILE__ ) . '/lib/blocks.php';
 require_once dirname( __FILE__ ) . '/lib/client-assets.php';
