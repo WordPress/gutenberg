@@ -3,6 +3,12 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { flow } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { applyComponentDecorators } from 'extensions';
 
 /**
  * Internal dependencies
@@ -30,7 +36,10 @@ function Layout( { mode, isSidebarOpened } ) {
 	);
 }
 
-export default connect( ( state ) => ( {
-	mode: getEditorMode( state ),
-	isSidebarOpened: isEditorSidebarOpened( state ),
-} ) )( Layout );
+export default flow(
+	applyComponentDecorators,
+	connect( ( state ) => ( {
+		mode: getEditorMode( state ),
+		isSidebarOpened: isEditorSidebarOpened( state ),
+	} ) )
+)( Layout );

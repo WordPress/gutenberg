@@ -6,6 +6,11 @@ import refx from 'refx';
 import { keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { extensionsReducer } from 'extensions';
+
+/**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
@@ -429,6 +434,7 @@ export function createReduxStore() {
 		mode,
 		isSidebarOpened,
 		saving,
+		extensions: extensionsReducer,
 	} );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
