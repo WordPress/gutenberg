@@ -42,11 +42,6 @@ before_script:
         composer global require "phpunit/phpunit=5.7.*"
       fi
     fi
-  - |
-    if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      composer global require wp-coding-standards/wpcs
-      phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
-    fi
 
 script:
   - |
