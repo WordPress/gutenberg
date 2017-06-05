@@ -10,6 +10,24 @@ import { concat, isEqual, omitBy } from 'lodash';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 
+const ALIGNMENT_CONTROLS = [
+	{
+		id: 'alignleft',
+		icon: 'editor-alignleft',
+		title: wp.i18n.__( 'Align left' ),
+	},
+	{
+		id: 'aligncenter',
+		icon: 'editor-aligncenter',
+		title: wp.i18n.__( 'Align center' ),
+	},
+	{
+		id: 'alignright',
+		icon: 'editor-alignright',
+		title: wp.i18n.__( 'Align right' ),
+	},
+];
+
 const FREEFORM_CONTROLS = [
 	{
 		id: 'blockquote',
@@ -40,24 +58,6 @@ const FREEFORM_CONTROLS = [
 		id: 'strikethrough',
 		icon: 'editor-strikethrough',
 		title: wp.i18n.__( 'Strikethrough' ),
-	},
-];
-
-const ALIGNMENT_CONTROLS = [
-	{
-		id: 'alignleft',
-		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
-	},
-	{
-		id: 'aligncenter',
-		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
-	},
-	{
-		id: 'alignright',
-		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
 	},
 ];
 
