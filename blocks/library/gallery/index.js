@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 
 import Placeholder from 'components/placeholder';
 import MediaUploadButton from '../../media-upload-button';
@@ -51,7 +51,7 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/gallery', {
+registerBlockType( 'core/gallery', {
 	title: wp.i18n.__( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
