@@ -61,22 +61,12 @@
 		border: 2px solid $blue-medium-200;
 	}
 
-	.iframe-overlay {
-		position: relative;
+	iframe {
+		pointer-events: none;
 	}
 
-	.iframe-overlay:before {
-		content: '';
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-	}
-
-	&.is-selected .iframe-overlay:before {
-		display: none;
+	&.is-selected iframe {
+		pointer-events: auto;
 	}
 }
 
