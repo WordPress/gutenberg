@@ -95,14 +95,4 @@ build as well, but it is better to catch errors locally.
 The easiest way to do this is using `composer`.
 [Install `composer`](https://getcomposer.org/download/)
 on your computer, then run `composer install`.  This will install `phpcs` and
-`WordPress-Coding-Standards`.
-
-You need to tell `phpcs` where to find the WordPress coding standards rulesets.
-You can do that using the following command:
-
-```sh
-vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs/
-```
-
-You should now be able to run `vendor/bin/phpcs` from the root directory of
-this project.
+`WordPress-Coding-Standards` which you can the run via `vendor/bin/phpcs`.
