@@ -9,6 +9,11 @@
  * @package gutenberg
  */
 
+require_once dirname( __FILE__ ) . '/lib/check-duplicate-plugins.php';
+if ( defined( 'GUTENBERG_MULTIPLE_COPIES' ) && GUTENBERG_MULTIPLE_COPIES ) {
+	return;
+}
+
 require_once dirname( __FILE__ ) . '/lib/blocks.php';
 require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 require_once dirname( __FILE__ ) . '/lib/i18n.php';
