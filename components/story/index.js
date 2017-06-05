@@ -1,5 +1,5 @@
 /**
- * External components
+ * External dependencies
  */
 import ReactMarkdown from 'react-markdown';
 import { storiesOf } from '@storybook/react';

@@ -65,7 +65,6 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
-				id: 'sass',
 				test: /\.s?css$/,
 				use: ExtractTextPlugin.extract( {
 					use: [
