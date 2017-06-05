@@ -255,6 +255,18 @@ describe( 'block parser', () => {
 					expect( parsed[ 2 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
 					expect( parsed[ 4 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
 				} );
+
+				it( 'should parse blocks with empty content', () => {
+					registerBlockType( 'core/test-block', {} );
+					const parsed = parse(
+						'<!-- wp:core/test-block --><!-- /wp:core/test-block -->'
+					);
+
+					expect( parsed ).to.have.lengthOf( 1 );
+					expect( parsed.map( ( { name } ) => name ) ).to.eql( [
+						'core/test-block',
+					] );
+				} );
 			} );
 		} );
 	} );
