@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { isEqual, omitBy } from 'lodash';
+import { concat, isEqual, omitBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -122,7 +122,7 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	onInit() {
-		FREEFORM_CONTROLS.forEach( ( control ) => {
+		concat( ALIGNMENT_CONTROLS, FREEFORM_CONTROLS ).forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
 				button.onPostRender.call( {
