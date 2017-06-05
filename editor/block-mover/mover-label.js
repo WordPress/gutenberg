@@ -24,36 +24,43 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 	}
 
 	if ( isFirst && isLast ) {
+		// translators: %s: Type of block (i.e. Text, Image etc)
 		return sprintf( __( 'Block "%s" is the only block, and cannot be moved' ), type );
 	}
 
 	if ( dir > 0 && ! isLast ) {
 		// moving down
 		return sprintf(
-			__( 'Move "%s" block from position %s down to position %s' ),
-			type,
-			position,
-			( position + 1 )
+			__( 'Move "%(type)s" block from position %(position)d down to position %(newPosition)d' ),
+			{
+				type,
+				position,
+				newPosition: ( position + 1 ),
+			}
 		);
 	}
 
 	if ( dir > 0 && isLast ) {
 		// moving down, and is the last item
+		// translators: %s: Type of block (i.e. Text, Image etc)
 		return sprintf( __( 'Block "%s" is at the end of the content and can’t be moved down' ), type );
 	}
 
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
 		return sprintf(
-			__( 'Move "%s" block from position %s up to position %s' ),
-			type,
-			position,
-			( position - 1 )
+			__( 'Move "%(type)s" block from position %(position)d up to position %(newPosition)d' ),
+			{
+				type,
+				position,
+				newPosition: ( position - 1 ),
+			}
 		);
 	}
 
 	if ( dir < 0 && isFirst ) {
 		// moving up, and is the first item
+		// translators: %s: Type of block (i.e. Text, Image etc)
 		return sprintf( __( 'Block "%s" is at the beginning of the content and can’t be moved up' ), type );
 	}
 }
@@ -82,17 +89,21 @@ export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isL
 
 	if ( dir < 0 && ! isFirst ) {
 		return sprintf(
-			__( 'Move %s blocks from position %s up by one place' ),
-			selectedCount,
-			position
+			__( 'Move %(selectedCount)d blocks from position %(position)d up by one place' ),
+			{
+				selectedCount,
+				position,
+			}
 		);
 	}
 
 	if ( dir > 0 && ! isLast ) {
 		return sprintf(
-			__( 'Move %s blocks from position %s down by one place' ),
-			selectedCount,
-			position
+			__( 'Move %(selectedCount)d blocks from position %(position)s down by one place' ),
+			{
+				selectedCount,
+				position,
+			}
 		);
 	}
 }
