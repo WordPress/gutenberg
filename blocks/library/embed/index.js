@@ -87,7 +87,6 @@ registerBlockType( 'core/embed', {
 				type: '',
 				error: false,
 				fetching: false,
-				loadingFromSavedBlock: false,
 			};
 			this.noPreview = [
 				'facebook.com',
@@ -99,7 +98,7 @@ registerBlockType( 'core/embed', {
 				// if the url is already there, we're loading a saved block, so we need to render
 				// a different thing, which is why this doesn't use 'fetching', as that
 				// is for when the user is putting in a new url on the placeholder form
-				this.setState( { loadingFromSavedBlock: true } );
+				this.setState( { fetching: true } );
 				this.doServerSideRender();
 			}
 		}
@@ -144,19 +143,18 @@ registerBlockType( 'core/embed', {
 						} else {
 							this.setState( { error: true } );
 						}
-						this.setState( { fetching: false, loadingFromSavedBlock: false } );
+						this.setState( { fetching: false } );
 					} );
 				}
 			);
 		}
 
 		render() {
-			const { html, type, error, fetching, loadingFromSavedBlock } = this.state;
+			const { html, type, error, fetching } = this.state;
 			const { url, caption } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
 
-			if ( loadingFromSavedBlock ) {
-				// we're loading from a saved block, but haven't fetched the HTML yet...
+			if ( fetching ) {
 				return (
 					<div className="blocks-embed__loading">
 						<Spinner />
@@ -174,14 +172,11 @@ registerBlockType( 'core/embed', {
 								className="components-placeholder__input"
 								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-							{ ! fetching
-								? <Button
-									isLarge
-									type="submit">
-									{ wp.i18n.__( 'Embed' ) }
-								</Button>
-								: <Spinner />
-							}
+							<Button
+								isLarge
+								type="submit">
+								{ wp.i18n.__( 'Embed' ) }
+							</Button>
 							{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
