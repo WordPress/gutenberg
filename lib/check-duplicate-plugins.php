@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Silence is golden.' );
+}
+
 if ( function_exists( 'the_gutenberg_project' ) ) {
 	if ( ! defined( 'GUTENBERG_MULTIPLE_COPIES' ) ) {
 		/**
