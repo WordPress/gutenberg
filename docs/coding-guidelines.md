@@ -92,28 +92,17 @@ When making any changes to the PHP code in this project, it's recommended to
 install and run `phpcs` on your computer.  This is a step in our Travis CI
 build as well, but it is better to catch errors locally.
 
-You will need to install `phpcs` version 2.9.x, because the 3.x versions are
-not yet compatible with the WordPress coding standards.  For more information see
-[this issue](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/718).
+The easiest way to do this is using `composer`.
+[Install `composer`](https://getcomposer.org/download/)
+on your computer, then run `composer install`.  This will install `phpcs` and
+`WordPress-Coding-Standards`.
 
-The easiest way to get `phpcs` is to download the .phar archive from the latest
-2.9.x release on GitHub:
-[PHP\_CodeSniffer releases](https://github.com/squizlabs/PHP_CodeSniffer/releases).
-
-For example:
+You need to tell `phpcs` where to find the WordPress coding standards rulesets.
+You can do that using the following command:
 
 ```sh
-wget \
-    https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.9.1/phpcs.phar \
-    -O ~/bin/phpcs
-chmod +x ~/bin/phpcs
+vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs/
 ```
 
-(If `~/bin` is not in your `$PATH`, pick another directory that is.)
-
-Then you must install the `WordPress-Coding-Standards` repository and tell
-`phpcs` where it lives.  See instructions here:
-
-https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#standalone
-
-You should now be able to run `phpcs` from the root directory of this project.
+You should now be able to run `vendor/bin/phpcs` from the root directory of
+this project.
