@@ -4,6 +4,8 @@
 import 'prismjs';
 import { configure, setAddon } from '@storybook/react';
 import infoAddon from '@storybook/addon-info';
+import { setOptions } from '@storybook/addon-options';
+
 
 /**
  * Internal dependencies
@@ -17,6 +19,16 @@ function loadStories() {
 	require( '../components/button/story' );
 }
 
-setAddon(infoAddon);
+setOptions( {
+  name: 'Gutenberg',
+  url: 'https://github.com/WordPress/gutenberg',
+  goFullScreen: false,
+  showLeftPanel: true,
+  showDownPanel: true,
+  showSearchBox: false,
+  downPanelInRight: true,
+  sortStoriesByKind: false,
+} );
+setAddon( infoAddon );
 
 configure( loadStories, module );
