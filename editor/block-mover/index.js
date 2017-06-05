@@ -28,26 +28,28 @@ function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, f
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon="arrow-up-alt2"
-				label={ getBlockMoverLabel( uids.length, {
-					type: blockType && blockType.title,
+				label={ getBlockMoverLabel(
+					uids.length,
+					blockType && blockType.title,
+					firstIndex,
 					isFirst,
 					isLast,
-					firstIndex,
-					dir: -1,
-				} ) }
+					-1,
+				) }
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon="arrow-down-alt2"
-				label={ getBlockMoverLabel( uids.length, {
-					type: blockType && blockType.title,
+				label={ getBlockMoverLabel(
+					uids.length,
+					blockType && blockType.title,
+					firstIndex,
 					isFirst,
 					isLast,
-					firstIndex,
-					dir: 1,
-				} ) }
+					1,
+				) }
 				aria-disabled={ isLast }
 			/>
 		</div>

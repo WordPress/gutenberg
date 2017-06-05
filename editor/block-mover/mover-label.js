@@ -1,24 +1,4 @@
 /**
- * @typedef blockMoverLabelOptions
- * @property {string}  type       Block type - in the case of a single block, should
- *                                define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
- * @property {number}  firstIndex The index (position - 1) of the first block selected.
- * @property {boolean} isFirst    This is the first block.
- * @property {boolean} isLast     This is the last block.
- * @property {number}  dir        Direction of movement (> 0 is considered to be going
- *                                down, < 0 is up).
- */
-
-/**
- * @typedef multiBlockMoverLabelOptions
- * @property {number}  firstIndex The index (position - 1) of the first block selected.
- * @property {boolean} isFirst    This is the first block.
- * @property {boolean} isLast     This is the last block.
- * @property {number}  dir        Direction of movement (> 0 is considered to be going
- *                                down, < 0 is up).
- */
-
-/**
  * Wordpress dependencies
  */
 import { __, sprintf } from 'i18n';
@@ -26,15 +6,21 @@ import { __, sprintf } from 'i18n';
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param  {number}                 selectedCount Number of blocks selected.
- * @param  {blockMoverLabelOptions} options       Object options.
- * @return {string}                               Label for the block movement controls.
+ * @param  {number}  selectedCount Number of blocks selected.
+ * @param  {string}  type          Block type - in the case of a single block, should
+ *                                 define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
+ * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
+ * @param  {boolean} isFirst       This is the first block.
+ * @param  {boolean} isLast        This is the last block.
+ * @param  {number}  dir           Direction of movement (> 0 is considered to be going
+ *                                 down, < 0 is up).
+ * @return {string}                Label for the block movement controls.
  */
-export function getBlockMoverLabel( selectedCount, { type, firstIndex, isFirst, isLast, dir } ) {
+export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return getMultiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } );
+		return getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir );
 	}
 
 	if ( isFirst && isLast ) {
@@ -75,11 +61,15 @@ export function getBlockMoverLabel( selectedCount, { type, firstIndex, isFirst, 
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param  {number}                      selectedCount Number of blocks selected.
- * @param  {multiBlockMoverLabelOptions} options       Object options.
- * @return {string}                                    Label for the block movement controls.
+ * @param  {number}  selectedCount Number of blocks selected.
+ * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
+ * @param  {boolean} isFirst       This is the first block.
+ * @param  {boolean} isLast        This is the last block.
+ * @param  {number}  dir           Direction of movement (> 0 is considered to be going
+ *                                 down, < 0 is up).
+ * @return {string}                Label for the block movement controls.
  */
-export function getMultiBlockMoverLabel( selectedCount, { isFirst, isLast, firstIndex, dir } ) {
+export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( dir < 0 && isFirst ) {
