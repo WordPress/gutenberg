@@ -4,22 +4,10 @@
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { children, query } = hpq;
-
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
 
 registerBlockType( 'core/table', {
 	title: wp.i18n.__( 'Table' ),
@@ -36,33 +24,6 @@ registerBlockType( 'core/table', {
 		body: [ [ [], [] ], [ [], [] ] ],
 	},
 
-	controls: [
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: toggleAlignment( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' ),
-		},
-		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
-			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' ),
-		},
-	],
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align ) {
@@ -72,9 +33,19 @@ registerBlockType( 'core/table', {
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-		return (
-			<table>
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ attributes.align }
+						onChange={ updateAlignment }
+						controls={ [ 'left', 'center', 'right', 'wide' ] }
+					/>
+				</BlockControls>
+			),
+			<table key="table">
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
 					attributes[ part ] && attributes[ part ].length
 						? wp.element.createElement( 't' + part, { key: part },
@@ -107,8 +78,8 @@ registerBlockType( 'core/table', {
 						)
 						: null
 				) }
-			</table>
-		);
+			</table>,
+		];
 	},
 
 	save( { attributes } ) {
