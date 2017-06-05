@@ -26,7 +26,7 @@ registerBlockType( 'core/code', {
 		return (
 			<TextareaAutosize
 				value={ attributes.content }
-				onFocus={ setFocus }
+				onFocus={ () => setFocus( {} ) }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 			/>
 		);
