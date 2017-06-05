@@ -11,6 +11,8 @@ import Button from '../';
 import readme from '../README.md';
 
 storiesOf( 'Components', module ).add( 'Button', () => <div>
-	<Button>Test</Button>
 	<ReactMarkdown source={ readme } />
+	<h2>Examples</h2>
+	<Button>Default Button</Button>
+	<Button isPrimary>Primary Button</Button>
 </div> );
