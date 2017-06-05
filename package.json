@@ -34,6 +34,7 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "@storybook/addon-knobs": "^3.0.1",
     "@storybook/react": "^3.0.0",
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.0",
