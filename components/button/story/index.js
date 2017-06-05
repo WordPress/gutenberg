@@ -13,10 +13,10 @@ import readme from '../README.md';
 
 storiesOf( 'Components', module )
 	.addDecorator( withKnobs )
-	.add( 'Button', () => (
-		<div>
-			<ReactMarkdown source={ readme } />
-			<h2>Test It</h2>
+	.addWithInfo(
+		'Button',
+		<ReactMarkdown source={ readme } />,
+		() => (
 			<Button
 				isPrimary={ boolean( 'isPrimary', false ) }
 				isLarge={ boolean( 'isLarge', false ) }
@@ -25,5 +25,6 @@ storiesOf( 'Components', module )
 			>
 				{ text( 'Label', 'Default Label' ) }
 			</Button>
-		</div>
-	) );
+		),
+		{ header: true, inline: true, propTables: false }
+	);

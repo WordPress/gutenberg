@@ -1,21 +1,4 @@
-Button
-======
-
 This component is used to implement dang sweet buttons.
-
-#### How to use:
-
-```jsx
-import Button from 'components/button';
-
-export default function RockOnButton() {
-	return (
-		<Button isPrimary>
-			You rock!
-		</Button>
-	);
-}
-```
 
 #### Props
 
