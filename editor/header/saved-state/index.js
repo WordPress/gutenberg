@@ -22,7 +22,7 @@ import {
 	getCurrentPost,
 	getPostEdits,
 	getBlocks,
-	getEditedPostStatus,
+	getEditedPostAttribute,
 } from '../../selectors';
 
 function SavedState( { isNew, isDirty, isSaving, edits, blocks, post, status, onSave } ) {
@@ -61,7 +61,7 @@ export default connect(
 		isNew: isEditedPostNew( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
-		status: getEditedPostStatus( state ),
+		status: getEditedPostAttribute( state, 'status' ),
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {
