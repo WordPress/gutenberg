@@ -39,13 +39,3 @@ By showing critical UI in the body of the content, many can get their basic blog
 When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default you'll see all your metaboxes right there.
 
 Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
-
-**The Newline as your Commandline**
-
-When your cursor is on a new line, you can either start typing, or you can use one of these commands to do cool things:
-
-- Type `/` to invoke the inserter.
-- Type `-` to start a list, other Markdown tricks work too.
-- Type `#` for headlines. Note the space.
-
-Some of these work already, but the idea can be extended in the future. For example `#tagname` (no space) might let you add tags in the body of the content.
