@@ -6,10 +6,10 @@ import Placeholder from 'components/placeholder';
 /**
  * Internal dependencies
  */
-import { registerBlock } from '../../api';
+import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 
-registerBlock( 'core/latestposts', {
+registerBlockType( 'core/latestposts', {
 	title: wp.i18n.__( 'Latest Posts' ),
 
 	icon: 'list-view',
@@ -66,7 +66,6 @@ registerBlock( 'core/latestposts', {
 					{ this.renderPostsList( latestPosts ) }
 				</div>
 			);
-
 		}
 	},
 

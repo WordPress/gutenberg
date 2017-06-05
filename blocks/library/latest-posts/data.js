@@ -11,7 +11,7 @@ export function getLatestPosts( postsToShow = 5 ) {
 	const posts = postsCollection.fetch( {
 		data: {
 			per_page: postsToShow,
-		}
+		},
 	} );
 
 	return posts;

@@ -8,9 +8,9 @@
 /**
  * Renders the `core/latest-posts` block on server.
  *
- * @param $attributes
+ * @param array $attributes The block attributes.
  *
- * @return string
+ * @return string Returns the post content with latest posts added.
  */
 function gutenberg_block_core_latest_posts( $attributes ) {
 	$posts_to_show = 5;
@@ -46,6 +46,6 @@ CONTENT;
 	return $block_content;
 }
 
-register_block( 'core/latestposts', array(
+register_block_type( 'core/latestposts', array(
 	'render' => 'gutenberg_block_core_latest_posts',
 ) );
