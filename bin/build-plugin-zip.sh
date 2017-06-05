@@ -16,13 +16,14 @@ rm -f gutenberg.zip
 
 # Generate the plugin zip file
 zip -r gutenberg.zip \
-    index.php \
-    post-content.js \
-    blocks/build \
-    components/build \
-    date/build \
-    editor/build \
-    element/build \
-    i18n/build \
-    utils/build \
-    README.md
+	gutenberg.php \
+	lib/*.php \
+	post-content.js \
+	blocks/build \
+	components/build \
+	date/build \
+	editor/build \
+	element/build \
+	i18n/build \
+	utils/build \
+	README.md
