@@ -217,6 +217,34 @@ export default class Editable extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
+		const { BACKSPACE, DELETE, UP, DOWN, LEFT, RIGHT } = window.tinymce.util.VK;
+		const before = event.keyCode === UP || event.keyCode === LEFT;
+		const after = event.keyCode === DOWN || event.keyCode === RIGHT;
+		const selectors = [
+			'*[contenteditable="true"]', '*[tabindex]',
+		];
+
+		if ( ( before && this.isStartOfEditor() ) || ( after && this.isEndOfEditor() ) ) {
+			const rootNode = this.editor.getBody();
+			const focusableNodes = Array.from( document.querySelectorAll( selectors.join( ',' ) ) );
+
+			if ( before ) {
+				focusableNodes.reverse();
+			}
+
+			const targetNode = focusableNodes
+				.slice( focusableNodes.indexOf( rootNode ) )
+				.reduce( ( result, node ) => {
+					return result || ( node.contains( rootNode ) ? null : node );
+				}, null );
+
+			if ( targetNode ) {
+				targetNode.focus();
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+
 		if (
 			this.props.onMerge && (
 				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
