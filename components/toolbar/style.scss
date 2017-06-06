@@ -65,13 +65,13 @@
 .components-toolbar__control.components-button + .components-toolbar__control.components-button {
 	margin-left: -3px;
 
-	&.show-divider {
+	&.left-divider {
 		margin-left: 6px;
 		position: relative;
 		overflow: visible;
 	}
 
-	&.show-divider:before {
+	&.left-divider:before {
 		display: inline-block;
 		content: '';
 		box-sizing: content-box;
