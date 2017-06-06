@@ -107,19 +107,6 @@ registerBlockType( 'core/embed', {
 			this.unmounting = true;
 		}
 
-		isPreviewBlacklisted( host ) {
-			if ( ! host ) {
-				return false;
-			}
-			host = host.replace( 'www.', '' );
-			for ( let i = 0; i < this.noPreview.length; i++ ) {
-				if ( host === this.noPreview[ i ] ) {
-					return true;
-				}
-			}
-			return false;
-		}
-
 		doServerSideRender( event ) {
 			if ( event ) {
 				event.preventDefault();
