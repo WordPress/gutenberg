@@ -66,8 +66,9 @@
 	margin-left: -3px;
 
 	&.show-divider {
-		margin-left: 0px;
+		margin-left: 6px;
 		position: relative;
+		overflow: visible;
 	}
 
 	&.show-divider:before {
@@ -76,10 +77,10 @@
 		box-sizing: content-box;
 		background-color: $light-gray-500;
 		position: absolute;
-		top: 6px;
-		left: 0px;
+		top: 8px;
+		left: -3px;
 		width: 1px;
-		height: $icon-button-size - 12px;
+		height: $icon-button-size - 16px;
 	}
 }
 
