@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import { Dashicon, ClipboardButton } from 'components';
+import { Dashicon, ClipboardButton, Button } from 'components';
 
 /**
  * Internal Dependencies
@@ -52,7 +52,9 @@ class PostPermalink extends Component {
 			<div className="editor-post-permalink">
 				<Dashicon icon="admin-links" />
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				<span className="editor-post-permalink__link">{ link }</span>
+				<Button className="editor-post-permalink__link" href={ link } target="_blank">
+					{ link }
+				</Button>
 				<ClipboardButton className="button" text={ link } onCopy={ this.onCopy }>
 					{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 				</ClipboardButton>
