@@ -137,7 +137,10 @@ export default class Editable extends wp.element.Component {
 			empty: ! content || ! content.length,
 		} );
 
-		if ( this.props.focus.collapsed !== collapsed ) {
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
 			this.props.onFocus( {
 				...this.props.focus,
 				collapsed,
@@ -344,7 +347,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.focus !== prevProps.focus ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
