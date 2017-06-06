@@ -1,5 +1,9 @@
 .editor-post-title {
-	font-size: $editor-font-size;
+	position: relative;
+
+	h1 {
+		font-size: $editor-font-size;
+	}
 
 	.editor-text-editor & {
 		padding-left: 20px;
