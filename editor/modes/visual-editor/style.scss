@@ -90,7 +90,11 @@
 	width: 0;
 	white-space: nowrap;
 
-	top: $header-height + $admin-bar-height-big + $item-spacing;
+	top: $header-height + $item-spacing;
+
+	@include break-small() {
+		top: $header-height + $admin-bar-height-big + $item-spacing;
+	}
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
