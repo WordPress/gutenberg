@@ -4,6 +4,7 @@
 import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 import clickOutside from 'react-click-outside';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -30,7 +31,7 @@ class PostTitle extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.state = {
-			isFocused: false,
+			isSelected: false,
 		};
 	}
 
@@ -40,11 +41,11 @@ class PostTitle extends Component {
 	}
 
 	onFocus() {
-		this.setState( { isFocused: true } );
+		this.setState( { isSelected: true } );
 	}
 
 	handleClickOutside() {
-		this.setState( { isFocused: false } );
+		this.setState( { isSelected: false } );
 	}
 
 	onKeyDown( event ) {
@@ -55,14 +56,15 @@ class PostTitle extends Component {
 
 	render() {
 		const { title } = this.props;
-		const { isFocused } = this.state;
+		const { isSelected } = this.state;
+		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
 		return (
 			<div
-				className="editor-post-title"
+				className={ className }
 				onFocus={ this.onFocus }
 			>
-				{ isFocused && <PostPermalink /> }
+				{ isSelected && <PostPermalink /> }
 				<h1>
 					<Textarea
 						className="editor-post-title__input"
