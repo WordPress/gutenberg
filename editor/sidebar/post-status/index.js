@@ -17,26 +17,28 @@ import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
-import { getEditedPostAttribute, getSuggestedPostFormat, getCurrentPost } from '../../selectors';
+import {
+	getEditedPostAttribute,
+	getSuggestedPostFormat,
+	isEditedPostAlreadyPublished,
+} from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostStatus extends Component {
 	constructor() {
 		super( ...arguments );
+		this.togglePendingStatus = this.togglePendingStatus.bind( this );
 		this.id = this.constructor.instances++;
 	}
 
+	togglePendingStatus() {
+		const { status, onUpdateStatus } = this.props;
+		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
+		onUpdateStatus( updatedStatus );
+	}
+
 	render() {
-		const { status, onUpdateStatus, suggestedFormat, post } = this.props;
-		const onToggle = () => {
-			let updatedStatus;
-			if ( status !== 'pending' ) {
-				updatedStatus = 'pending';
-			} else {
-				updatedStatus = post.status && post.status !== 'pending' ? post.status : 'publish';
-			}
-			onUpdateStatus( updatedStatus );
-		};
+		const { status, suggestedFormat, isPublished } = this.props;
 
 		// Use the suggested post format based on the blocks content of the post
 		// or the default post format setting for the site.
@@ -45,15 +47,17 @@ class PostStatus extends Component {
 
 		return (
 			<PanelBody title={ __( 'Status & Visibility' ) }>
-				<div className="editor-post-status__row">
-					<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
-					<FormToggle
-						id={ pendingId }
-						checked={ status === 'pending' }
-						onChange={ onToggle }
-						showHint={ false }
-					/>
-				</div>
+				{ ! isPublished &&
+					<div className="editor-post-status__row">
+						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
+						<FormToggle
+							id={ pendingId }
+							checked={ status === 'pending' }
+							onChange={ this.togglePendingStatus }
+							showHint={ false }
+						/>
+					</div>
+				}
 				<div className="editor-post-status__row">
 					<PostVisibility />
 				</div>
@@ -77,8 +81,8 @@ PostStatus.instances = 1;
 export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
-		post: getCurrentPost( state ),
 		suggestedFormat: getSuggestedPostFormat( state ),
+		isPublished: isEditedPostAlreadyPublished( state ),
 	} ),
 	( dispatch ) => {
 		return {
