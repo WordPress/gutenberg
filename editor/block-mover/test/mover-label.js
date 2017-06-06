@@ -9,8 +9,8 @@ import { expect } from 'chai';
 import { getBlockMoverLabel, getMultiBlockMoverLabel } from '../mover-label';
 
 describe( 'block mover', () => {
-	const dir_up = -1,
-		dir_down = 1;
+	const dirUp = -1,
+		dirDown = 1;
 
 	describe( 'getBlockMoverLabel', () => {
 		const type = 'TestType';
@@ -22,7 +22,7 @@ describe( 'block mover', () => {
 				0,
 				true,
 				false,
-				dir_up,
+				dirUp,
 			) ).to.equal(
 				`Block "${ type }" is at the beginning of the content and can’t be moved up`
 			);
@@ -35,7 +35,7 @@ describe( 'block mover', () => {
 				3,
 				false,
 				true,
-				dir_down,
+				dirDown,
 			) ).to.equal(
 				`Block "${ type }" is at the end of the content and can’t be moved down`
 			);
@@ -48,7 +48,7 @@ describe( 'block mover', () => {
 				1,
 				false,
 				false,
-				dir_up,
+				dirUp,
 			) ).to.equal(
 				`Move "${ type }" block from position 2 up to position 1`
 			);
@@ -61,7 +61,7 @@ describe( 'block mover', () => {
 				1,
 				false,
 				false,
-				dir_down,
+				dirDown,
 			) ).to.equal(
 				`Move "${ type }" block from position 2 down to position 3`
 			);
@@ -74,7 +74,7 @@ describe( 'block mover', () => {
 				0,
 				true,
 				true,
-				dir_down,
+				dirDown,
 			) ).to.equal(
 				`Block "${ type }" is the only block, and cannot be moved`
 			);
@@ -88,7 +88,7 @@ describe( 'block mover', () => {
 				1,
 				false,
 				true,
-				dir_up,
+				dirUp,
 			) ).to.equal(
 				'Move 4 blocks from position 2 up by one place'
 			);
@@ -100,7 +100,7 @@ describe( 'block mover', () => {
 				0,
 				true,
 				false,
-				dir_down,
+				dirDown,
 			) ).to.equal(
 				'Move 4 blocks from position 1 down by one place'
 			);
@@ -112,7 +112,7 @@ describe( 'block mover', () => {
 				1,
 				true,
 				true,
-				dir_up,
+				dirUp,
 			) ).to.equal(
 				'Blocks cannot be moved up as they are already at the top'
 			);
@@ -124,7 +124,7 @@ describe( 'block mover', () => {
 				2,
 				false,
 				true,
-				dir_down,
+				dirDown,
 			) ).to.equal(
 				'Blocks cannot be moved down as they are already at the bottom'
 			);
