@@ -52,6 +52,10 @@ class VisualEditorBlock extends wp.element.Component {
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onPointerDown = this.onPointerDown.bind( this );
+		this.onPointerMove = this.onPointerMove.bind( this );
+		this.onPointerUp = this.onPointerUp.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -171,6 +175,26 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	onFocus( event ) {
+		if ( event.target === this.node ) {
+			this.props.onSelect();
+		}
+	}
+
+	onPointerDown() {
+		this.props.onSelect();
+		this.props.onSelectionStart();
+	}
+
+	onPointerMove() {
+		this.props.onSelectionChange();
+		this.maybeHover();
+	}
+
+	onPointerUp() {
+		this.props.onSelectionEnd();
+	}
+
 	render() {
 		const { block, selectedBlocks } = this.props;
 		const blockType = wp.blocks.getBlockType( block.name );
@@ -199,7 +223,7 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onMouseLeave, onFocus, onInsertAfter } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -213,15 +237,13 @@ class VisualEditorBlock extends wp.element.Component {
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.removeOrDeselect }
-				onMouseDown={ this.props.onSelectionStart }
-				onTouchStart={ this.props.onSelectionStart }
-				onMouseMove={ () => {
-					this.props.onSelectionChange();
-					this.maybeHover();
-				} }
-				onTouchMove={ this.props.onSelectionChange }
-				onMouseUp={ this.props.onSelectionEnd }
-				onTouchEnd={ this.props.onSelectionEnd }
+				onFocus={ this.onFocus }
+				onMouseDown={ this.onPointerDown }
+				onTouchStart={ this.onPointerDown }
+				onMouseMove={ this.onPointerMove }
+				onTouchMove={ this.onPointerMove }
+				onMouseUp={ this.onPointerUp }
+				onTouchEnd={ this.onPointerUp }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
@@ -258,8 +280,6 @@ class VisualEditorBlock extends wp.element.Component {
 				) }
 				<div
 					onKeyPress={ this.maybeStartTyping }
-					onFocus={ onSelect }
-					onClick={ onSelect }
 					onDragStart={ ( event ) => event.preventDefault() }
 				>
 					<BlockEdit
