@@ -114,7 +114,11 @@
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
-	margin-right: $item-spacing;
+	margin-right: -1px;
+
+	@include break-small() {
+		margin-right: $item-spacing;
+	}
 }
 
 .editor-visual-editor__block-controls .editor-block-switcher {

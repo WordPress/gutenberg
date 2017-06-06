@@ -2,10 +2,14 @@
 	border: 1px solid $light-gray-500;
 	box-shadow: $shadow-popover;
 	background-color: $white;
-	margin-right: 10px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	margin-right: -1px;
+
+	@include break-small() {
+		margin-right: $item-spacing;
+	}
 }
 
 .editor-block-switcher__toggle {
