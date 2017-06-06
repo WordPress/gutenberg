@@ -1,6 +1,6 @@
 const config = require( '../webpack.config' );
 config.module.rules = [
-	...config.module.rules.filter( ( rule ) => ! rule.test.test( 'file.scss') ),
+	...config.module.rules.filter( ( rule ) => ! rule.test.test( 'file.scss' ) ),
 	{
 		test: /\.md/,
 		use: 'raw-loader',
