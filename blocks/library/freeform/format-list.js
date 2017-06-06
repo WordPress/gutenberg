@@ -1,27 +1,98 @@
 /**
+ * External dependencies
+ */
+import clickOutside from 'react-click-outside';
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { Dashicon } from 'components';
+import { Button, Dashicon } from 'components';
 
 /**
  * Internal dependencies
  */
 import './format-list.scss';
 
-function FormatList( props ) {
-	const { formats = [ '' ], selected = 0 } = props;
-	return (
-		<div className="editor-format-list">
-			<div className="formats">
-				{ formats.map( ( format, i ) => (
-					<span key={ format } className={ selected === i ? 'active' : null }>
-						{ format }<br />
-					</span>
-				) ) }
+class FormatList extends wp.element.Component {
+	constructor() {
+		super( ...arguments );
+		this.switchFormat = this.switchFormat.bind( this );
+		this.toggleMenu = this.toggleMenu.bind( this );
+		this.state = {
+			open: false,
+		};
+	}
+
+	handleClickOutside() {
+		if ( ! this.state.open ) {
+			return;
+		}
+		this.setState( { open: false } );
+	}
+
+	toggleMenu() {
+		this.setState( {
+			open: ! this.state.open,
+		} );
+	}
+
+	switchFormat( newValue ) {
+		if ( this.props.value !== newValue && this.props.onFormatChange ) {
+			this.props.onFormatChange( newValue );
+		}
+		this.setState( { open: false } );
+	}
+
+	render() {
+		const { formats = [ { text: '', value: '', textStyle: () => '' } ] } = this.props;
+		const selectedValue = this.props.value;
+		return (
+			<div className="editor-format-list">
+				<Button
+					className="editor-format-list__toggle"
+					onClick={ this.toggleMenu }
+					aria-haspopup="true"
+					aria-expanded={ this.state.open }
+					aria-label={ wp.i18n.__( 'Change format' ) }
+				>
+					<div className="formats">
+						{ formats.map( ( { text, value } ) => (
+							<span
+								key={ value }
+								className={ value === selectedValue ? 'active' : null }
+								aria-hidden={ value !== selectedValue }
+							>
+								{ text }<br />
+							</span>
+						) ) }
+					</div>
+					<Dashicon icon="arrow-down" />
+				</Button>
+				{ this.state.open &&
+					<div
+						className="editor-format-list__menu"
+						role="menu"
+						tabIndex="0"
+						aria-label={ wp.i18n.__( 'Formats' ) }
+					>
+						{ formats.map( ( { text, value } ) => (
+							<Button
+								key={ value }
+								onClick={ () => this.switchFormat( value ) }
+								className={ classnames( 'editor-format-list__menu-item', {
+									'is-active': value === selectedValue,
+								} ) }
+								role="menuitem"
+							>
+								{ text }
+							</Button>
+						) ) }
+					</div>
+				}
 			</div>
-			<Dashicon icon="arrow-down" />
-		</div>
-	);
+		);
+	}
 }
 
-export default FormatList;
+export default clickOutside( FormatList );

@@ -84,6 +84,7 @@ export default class FreeformBlock extends wp.element.Component {
 		super( ...arguments );
 		this.getSettings = this.getSettings.bind( this );
 		this.setButtonActive = this.setButtonActive.bind( this );
+		this.setFormatActive = this.setFormatActive.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -98,6 +99,18 @@ export default class FreeformBlock extends wp.element.Component {
 		this.state = {
 			empty: ! props.value || ! props.value.length,
 			activeButtons: { },
+			activeFormat: null,
+			formats: [
+				{ text: 'Paragraph', value: 'p', textStyle: () => '' },
+				{ text: 'Heading 1', value: 'h1', textStyle: () => '' },
+				{ text: 'Heading 2', value: 'h2', textStyle: () => '' },
+				{ text: 'Heading 3', value: 'h3', textStyle: () => '' },
+				{ text: 'Heading 4', value: 'h4', textStyle: () => '' },
+				{ text: 'Heading 5', value: 'h5', textStyle: () => '' },
+				{ text: 'Heading 6', value: 'h6', textStyle: () => '' },
+				{ text: 'Preformatted', value: 'pre', textStyle: () => '' },
+			],
+			handleFormatChange: null,
 		};
 	}
 
@@ -117,6 +130,10 @@ export default class FreeformBlock extends wp.element.Component {
 		} ) );
 	}
 
+	setFormatActive( newActiveFormat ) {
+		this.setState( { activeFormat: newActiveFormat } );
+	}
+
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
@@ -125,6 +142,15 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	onInit() {
+		const formatselect = this.editor.buttons.formatselect();
+		formatselect.onPostRender.call( {
+			value: this.setFormatActive,
+		} );
+		this.setState( {
+			formats: formatselect.values,
+			handleFormatChange: formatselect.onselect,
+		} );
+
 		concat( ALIGNMENT_CONTROLS, FREEFORM_CONTROLS ).forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
@@ -220,20 +246,11 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
-		const formats = [
-			'Paragraph',
-			'Heading 1',
-			'Heading 2',
-			'Heading 3',
-			'Heading 4',
-			'Heading 5',
-			'Heading 6',
-			'Preformatted',
-		];
+		const { formats, activeFormat, handleFormatChange } = this.state;
 		return [
 			focus && (
 				<Fill name="Formatting.Toolbar">
-					<FormatList formats={ formats } />
+					<FormatList formats={ formats } value={ activeFormat } onFormatChange={ handleFormatChange } />
 				</Fill>
 			),
 			focus && (
