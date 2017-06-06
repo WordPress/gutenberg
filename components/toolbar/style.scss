@@ -64,6 +64,23 @@
 // compensate for making the button hit area include the visual spacing
 .components-toolbar__control.components-button + .components-toolbar__control.components-button {
 	margin-left: -3px;
+
+	&.show-divider {
+		margin-left: 0px;
+		position: relative;
+	}
+
+	&.show-divider:before {
+		display: inline-block;
+		content: '';
+		box-sizing: content-box;
+		background-color: $light-gray-500;
+		position: absolute;
+		top: 6px;
+		left: 0px;
+		width: 1px;
+		height: $icon-button-size - 12px;
+	}
 }
 
 .components-toolbar__control .dashicon {

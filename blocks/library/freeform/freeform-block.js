@@ -45,6 +45,7 @@ const FREEFORM_CONTROLS = [
 		title: wp.i18n.__( 'Convert to ordered' ),
 	},
 	{
+		showDivider: true,
 		id: 'bold',
 		icon: 'editor-bold',
 		title: wp.i18n.__( 'Bold' ),

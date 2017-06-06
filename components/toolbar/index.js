@@ -28,6 +28,7 @@ function Toolbar( { controls, focus } ) {
 					} }
 					className={ classNames( 'components-toolbar__control', {
 						'is-active': control.isActive,
+						'show-divider': control.showDivider,
 					} ) }
 					aria-pressed={ control.isActive }
 					focus={ focus && ! index }
