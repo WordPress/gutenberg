@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { parse } from 'url';
+import { includes } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
@@ -10,12 +16,9 @@ import './style.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 
-/**
- * External dependencies
- */
-import { parse } from 'url';
-
 const { attr, children } = query;
+
+const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -81,16 +84,12 @@ registerBlockType( 'core/embed', {
 		constructor() {
 			super( ...arguments );
 			this.doServerSideRender = this.doServerSideRender.bind( this );
-			this.isPreviewBlacklisted = this.isPreviewBlacklisted.bind( this );
 			this.state = {
 				html: '',
 				type: '',
 				error: false,
 				fetching: false,
 			};
-			this.noPreview = [
-				'facebook.com',
-			];
 		}
 
 		componentWillMount() {
@@ -158,7 +157,7 @@ registerBlockType( 'core/embed', {
 				return (
 					<div className="blocks-embed__loading">
 						<Spinner />
-						<p className="blocks-embed__loading-text">{ wp.i18n.__( 'Embedding...' ) }</p>
+						<p className="blocks-embed__loading-text">{ wp.i18n.__( 'Embedding…' ) }</p>
 					</div>
 				);
 			}
@@ -171,7 +170,7 @@ registerBlockType( 'core/embed', {
 								type="url"
 								value={ url || '' }
 								className="components-placeholder__input"
-								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
+								placeholder={ wp.i18n.__( 'Enter URL to embed here…' ) }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 							<Button
 								isLarge
@@ -184,8 +183,8 @@ registerBlockType( 'core/embed', {
 				);
 			}
 
-			const urlBits = parse( url );
-			const cannotPreview = this.isPreviewBlacklisted( urlBits.host );
+			const parsedUrl = parse( url );
+			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			let typeClassName = 'blocks-embed';
 
 			if ( 'video' === type ) {
