@@ -7,7 +7,7 @@ import Placeholder from 'components/placeholder';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 
@@ -50,7 +50,7 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 	editFrame.open( 'cover-image' );
 };
 
-registerBlock( 'core/cover-image', {
+registerBlockType( 'core/cover-image', {
 	title: wp.i18n.__( 'Cover Image' ),
 
 	icon: 'format-image',
