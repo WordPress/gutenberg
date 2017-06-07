@@ -182,7 +182,6 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	onPointerDown() {
-		this.props.onSelect();
 		this.props.onSelectionStart();
 	}
 
@@ -281,6 +280,7 @@ class VisualEditorBlock extends wp.element.Component {
 				<div
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
+					onMouseDown={ this.props.onSelect }
 				>
 					<BlockEdit
 						focus={ focus }
