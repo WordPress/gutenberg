@@ -1,6 +1,7 @@
 const config = require( '../webpack.config' );
 config.module.rules = [
-	...config.module.rules.filter( ( rule ) => ! rule.test.test( 'file.scss' ) ),
+	// Exclude the sass loader to override it
+	...config.module.rules.filter( ( rule ) => ! rule.test.test( '.scss' ) ),
 	{
 		test: /\.md/,
 		use: 'raw-loader',
