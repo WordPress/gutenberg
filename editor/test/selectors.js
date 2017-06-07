@@ -19,7 +19,8 @@ import {
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
-	isEditedPostAlreadyPublished,
+	isEditedPostPublished,
+	isEditedPostPublishable,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
@@ -311,7 +312,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditedPostAlreadyPublished', () => {
+	describe( 'isEditedPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
 				currentPost: {
@@ -319,7 +320,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+			expect( isEditedPostPublished( state ) ).to.be.true();
 		} );
 
 		it( 'should return true for private posts', () => {
@@ -329,7 +330,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+			expect( isEditedPostPublished( state ) ).to.be.true();
 		} );
 
 		it( 'should return false for draft posts', () => {
@@ -339,7 +340,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostAlreadyPublished( state ) ).to.be.false();
+			expect( isEditedPostPublished( state ) ).to.be.false();
 		} );
 
 		it( 'should return true for old scheduled posts', () => {
@@ -350,7 +351,87 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostAlreadyPublished( state ) ).to.be.true();
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostPublishable', () => {
+		it( 'should return true for pending posts', () => {
+			const state = {
+				currentPost: {
+					status: 'pending',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for published posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for dirty posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: true,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
 		} );
 	} );
 

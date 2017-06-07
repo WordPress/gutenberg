@@ -20,7 +20,7 @@ import PostSchedule from '../post-schedule';
 import {
 	getEditedPostAttribute,
 	getSuggestedPostFormat,
-	isEditedPostAlreadyPublished,
+	isEditedPostPublished,
 } from '../../selectors';
 import { editPost } from '../../actions';
 
@@ -82,7 +82,7 @@ export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
 		suggestedFormat: getSuggestedPostFormat( state ),
-		isPublished: isEditedPostAlreadyPublished( state ),
+		isPublished: isEditedPostPublished( state ),
 	} ),
 	( dispatch ) => {
 		return {

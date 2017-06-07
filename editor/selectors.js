@@ -136,11 +136,22 @@ export function getEditedPostVisibility( state ) {
  * @param  {Object}   state Global application state
  * @return {Boolearn}       Whether the post has been bublished
  */
-export function isEditedPostAlreadyPublished( state ) {
+export function isEditedPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Return true if the post being edited can be published
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post can been bublished
+ */
+export function isEditedPostPublishable( state ) {
+	const post = getCurrentPost( state );
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
