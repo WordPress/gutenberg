@@ -254,5 +254,6 @@ registerBlockType( 'core/embedtwitter', getEmbedBlockSettings( { title: 'Twitter
 registerBlockType( 'core/embedvideopress', getEmbedBlockSettings( { title: 'VideoPress', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedvimeo', getEmbedBlockSettings( { title: 'Vimeo', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedvine', getEmbedBlockSettings( { title: 'Vine', icon: 'video-alt3' } ) );
+registerBlockType( 'core/embedwordpress', getEmbedBlockSettings( { title: 'WordPress', icon: 'wordpress' } ) );
 registerBlockType( 'core/embedwordpresstv', getEmbedBlockSettings( { title: 'WordPress.tv', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedyoutube', getEmbedBlockSettings( { title: 'YouTube', icon: 'video-alt3' } ) );
