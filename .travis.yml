@@ -44,8 +44,7 @@ before_script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      composer global require wp-coding-standards/wpcs
-      phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+      composer install
     fi
 
 script:
@@ -58,7 +57,7 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      phpcs
+      ./vendor/bin/phpcs
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
