@@ -108,7 +108,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				this.unmounting = true;
 			}
 
-      doServerSideRender( event ) {
+			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
 				}
