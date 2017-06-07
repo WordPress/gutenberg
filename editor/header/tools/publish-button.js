@@ -12,11 +12,8 @@ import { Button } from 'components';
 /**
  * Internal dependencies
  */
-import { savePost } from '../../actions';
+import { editPost, savePost } from '../../actions';
 import {
-	getCurrentPost,
-	getPostEdits,
-	getBlocks,
 	isSavingPost,
 	isEditedPostPublished,
 	isEditedPostBeingScheduled,
@@ -25,11 +22,9 @@ import {
 } from '../../selectors';
 
 function PublishButton( {
-	post,
-	edits,
-	blocks,
 	isSaving,
 	isPublished,
+	onStatusChange,
 	onSave,
 	isBeingScheduled,
 	visibility,
@@ -51,7 +46,10 @@ function PublishButton( {
 		publishStatus = 'private';
 	}
 	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
-	const onClick = () => onSave( post, { ...edits, status: publishStatus }, blocks );
+	const onClick = () => {
+		onStatusChange( publishStatus );
+		onSave();
+	};
 
 	const buttonDisabledHint = process.env.NODE_ENV === 'production'
 		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
@@ -73,21 +71,14 @@ function PublishButton( {
 
 export default connect(
 	( state ) => ( {
-		post: getCurrentPost( state ),
-		edits: getPostEdits( state ),
-		blocks: getBlocks( state ),
 		isSaving: isSavingPost( state ),
 		isPublished: isEditedPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
 		isPublishable: isEditedPostPublishable( state ),
 	} ),
-	( dispatch ) => ( {
-		onSave( post, edits, blocks ) {
-			dispatch( savePost( post.id, {
-				content: wp.blocks.serialize( blocks ),
-				...edits,
-			} ) );
-		},
-	} )
+	{
+		onStatusChange: ( status ) => editPost( { status } ),
+		onSave: savePost,
+	}
 )( PublishButton );

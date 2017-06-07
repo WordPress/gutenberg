@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockType, switchToBlockType } from 'blocks';
+import { serialize, getBlockType, switchToBlockType } from 'blocks';
 import { __ } from 'i18n';
 
 /**
@@ -14,13 +14,23 @@ import { __ } from 'i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { focusBlock, replaceBlocks } from './actions';
+import { getCurrentPostId, getBlocks, getPostEdits } from './selectors';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
-		const { dispatch } = store;
-		const { postId, edits } = action;
-		const toSend = postId ? { id: postId, ...edits } : edits;
+		const { dispatch, getState } = store;
+		const state = getState();
+		const postId = getCurrentPostId( state );
 		const isNew = ! postId;
+		const edits = getPostEdits( state );
+		const toSend = {
+			...edits,
+			content: serialize( getBlocks( state ) ),
+		};
+
+		if ( ! isNew ) {
+			toSend.id = postId;
+		}
 
 		dispatch( { type: 'CLEAR_POST_EDITS' } );
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {

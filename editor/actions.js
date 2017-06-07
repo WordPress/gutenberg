@@ -56,11 +56,9 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost( postId, edits ) {
+export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',
-		edits,
-		postId,
 	};
 }
 

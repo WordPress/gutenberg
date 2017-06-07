@@ -85,6 +85,17 @@ export function getCurrentPost( state ) {
 }
 
 /**
+ * Returns the ID of the post currently being edited, or null if the post has
+ * not yet been saved.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of current post
+ */
+export function getCurrentPostId( state ) {
+	return getCurrentPost( state ).id || null;
+}
+
+/**
  * Returns any post values which have been changed in the editor but not yet
  * been saved.
  *
