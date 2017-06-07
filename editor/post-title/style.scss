@@ -9,10 +9,12 @@
 		margin: 0;
 		padding: 0;
 		font-size: $editor-font-size;
+		transition: 0.2s border-color;
 	}
 
 	&.is-selected h1 {
 		border: 2px solid $light-gray-500;
+		transition: 0.2s border-color;
 	}
 
 	.editor-text-editor & {
