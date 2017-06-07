@@ -24,13 +24,14 @@ registerBlockType( 'core/latestposts', {
 		constructor() {
 			super( ...arguments );
 
-			this.state = {
-				latestPosts: [],
-			};
-
 			const { poststoshow } = this.props.attributes;
 
-			getLatestPosts( poststoshow )
+			this.state = {
+				latestPosts: [],
+				latestPostsRequest: getLatestPosts( poststoshow ),
+			};
+
+			this.state.latestPostsRequest
 				.then( latestPosts => this.setState( { latestPosts } ) );
 		}
 
@@ -56,6 +57,14 @@ registerBlockType( 'core/latestposts', {
 					</ul>
 				</div>
 			);
+		}
+	},
+
+	componentWillUnmount() {
+		const { latestPostsRequest } = this.state;
+
+		if ( latestPostsRequest.state() === 'pending' ) {
+			latestPostsRequest.abort();
 		}
 	},
 
