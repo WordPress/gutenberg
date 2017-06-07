@@ -1,4 +1,5 @@
 const config = require( '../webpack.config' );
+const webpack = require( 'webpack' );
 config.module.rules = [
 	// Exclude the sass loader to override it
 	...config.module.rules.filter( ( rule ) => ! rule.test.test( '.scss' ) ),
@@ -25,5 +26,10 @@ config.module.rules = [
 	},
 ];
 config.externals = [];
+
+// Exclude Uglify Plugin to avoid breaking the React Components Display Name
+config.plugins = config.plugins.filter( plugin => {
+	return plugin.constructor !== webpack.optimize.UglifyJsPlugin;
+} );
 
 module.exports = config;
