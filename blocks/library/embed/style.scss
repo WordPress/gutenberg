@@ -1,6 +1,20 @@
 .blocks-embed,
 .blocks-embed-video {
 	margin: 0;
+	&.is-loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 1em;
+		min-height: 200px;
+		text-align: center;
+		background: $light-gray-100;
+		p {
+			font-family: $default-font;
+			font-size: $default-font-size;
+		}
+	}
 }
 
 .blocks-embed-video > div:first-child {
@@ -16,22 +30,6 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-}
-
-.blocks-embed__loading {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 1em;
-	min-height: 200px;
-	text-align: center;
-	background: $light-gray-100;
-
-	.blocks-embed__loading-text {
-		font-family: $default-font;
-		font-size: $default-font-size;
-	}
 }
 
 div[data-type="core/embed"] {

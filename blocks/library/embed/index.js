@@ -142,9 +142,9 @@ registerBlockType( 'core/embed', {
 
 			if ( fetching ) {
 				return (
-					<div className="blocks-embed__loading">
+					<div className="blocks-embed is-loading">
 						<Spinner />
-						<p className="blocks-embed__loading-text">{ wp.i18n.__( 'Embedding…' ) }</p>
+						<p>{ wp.i18n.__( 'Embedding…' ) }</p>
 					</div>
 				);
 			}
