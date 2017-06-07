@@ -152,7 +152,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				if ( ! html ) {
 					return (
-						<Placeholder icon={ icon } label={ wp.i18n.__( title + ' URL' ) } className="blocks-embed">
+						<Placeholder icon={ icon } label={ wp.i18n.sprintf( wp.i18n.__( '%s URL' ), title ) } className="blocks-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -225,7 +225,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 registerBlockType( 'core/embed', getEmbedBlockSettings( { title: 'Embed', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedanimoto', getEmbedBlockSettings( { title: 'Animoto', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedcloudup', getEmbedBlockSettings( { title: 'Cloudup', icon: 'cloud' } ) );
-registerBlockType( 'core/embedcollegeHumor', getEmbedBlockSettings( { title: 'CollegeHumor', icon: 'video-alt3' } ) );
+registerBlockType( 'core/embedcollegehumor', getEmbedBlockSettings( { title: 'CollegeHumor', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embeddailymotion', getEmbedBlockSettings( { title: 'Dailymotion', icon: 'video-alt3' } ) );
 registerBlockType( 'core/embedfacebook', getEmbedBlockSettings( { title: 'Facebook', icon: 'facebook' } ) );
 registerBlockType( 'core/embedflickr', getEmbedBlockSettings( { title: 'Flickr', icon: 'format-image' } ) );
