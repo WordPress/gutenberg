@@ -41,6 +41,24 @@ function gutenberg_menu() {
 		'the_gutenberg_project',
 		'dashicons-edit'
 	);
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'New Post', 'gutenberg' ),
+		__( 'New Post', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg',
+		'the_gutenberg_project'
+	);
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Demo', 'gutenberg' ),
+		__( 'Demo', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg-demo',
+		'the_gutenberg_project'
+	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
