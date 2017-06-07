@@ -14,6 +14,12 @@ export function deselectBlock( uid ) {
 	};
 }
 
+export function clearSelectedBlock() {
+	return {
+		type: 'CLEAR_SELECTED_BLOCK',
+	};
+}
+
 export function replaceBlocks( uids, blocks ) {
 	return {
 		type: 'REPLACE_BLOCKS',

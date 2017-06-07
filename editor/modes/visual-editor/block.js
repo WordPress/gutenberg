@@ -23,6 +23,7 @@ import {
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
+	clearSelectedBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -329,7 +330,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
+			dispatch( clearSelectedBlock() );
 		},
 		onStartTyping() {
 			dispatch( {
