@@ -58,7 +58,7 @@ export function hasEditorRedo( state ) {
  * @return {Boolean}       Whether the post is new
  */
 export function isEditedPostNew( state ) {
-	return ! state.currentPost.id;
+	return ! getCurrentPostId( state );
 }
 
 /**
@@ -82,6 +82,17 @@ export function isEditedPostDirty( state ) {
  */
 export function getCurrentPost( state ) {
 	return state.currentPost;
+}
+
+/**
+ * Returns the ID of the post currently being edited, or null if the post has
+ * not yet been saved.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of current post
+ */
+export function getCurrentPostId( state ) {
+	return getCurrentPost( state ).id || null;
 }
 
 /**

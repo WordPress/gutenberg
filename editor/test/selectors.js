@@ -15,6 +15,7 @@ import {
 	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
+	getCurrentPostId,
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
@@ -178,10 +179,28 @@ describe( 'selectors', () => {
 	describe( 'getCurrentPost', () => {
 		it( 'should return the current post', () => {
 			const state = {
-				currentPost: { ID: 1 },
+				currentPost: { id: 1 },
 			};
 
-			expect( getCurrentPost( state ) ).to.eql( { ID: 1 } );
+			expect( getCurrentPost( state ) ).to.eql( { id: 1 } );
+		} );
+	} );
+
+	describe( 'getCurrentPostId', () => {
+		it( 'should return null if the post has not yet been saved', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostId( state ) ).to.be.null();
+		} );
+
+		it( 'should return the current post ID', () => {
+			const state = {
+				currentPost: { id: 1 },
+			};
+
+			expect( getCurrentPostId( state ) ).to.equal( 1 );
 		} );
 	} );
 
