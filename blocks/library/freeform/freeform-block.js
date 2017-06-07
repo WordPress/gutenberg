@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { concat, isEqual, omitBy } from 'lodash';
+import { isEqual, omitBy } from 'lodash';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -97,21 +97,12 @@ export default class FreeformBlock extends wp.element.Component {
 		this.controls = this.mapControls.bind( this );
 		this.editor = null;
 		this.savedContent = null;
+		this.formats = null;
+		this.handleFormatChange = null;
 		this.state = {
 			empty: ! props.value || ! props.value.length,
 			activeButtons: { },
 			activeFormat: null,
-			formats: [
-				{ text: 'Paragraph', value: 'p', textStyle: () => '' },
-				{ text: 'Heading 1', value: 'h1', textStyle: () => '' },
-				{ text: 'Heading 2', value: 'h2', textStyle: () => '' },
-				{ text: 'Heading 3', value: 'h3', textStyle: () => '' },
-				{ text: 'Heading 4', value: 'h4', textStyle: () => '' },
-				{ text: 'Heading 5', value: 'h5', textStyle: () => '' },
-				{ text: 'Heading 6', value: 'h6', textStyle: () => '' },
-				{ text: 'Preformatted', value: 'pre', textStyle: () => '' },
-			],
-			handleFormatChange: null,
 		};
 	}
 
@@ -147,12 +138,11 @@ export default class FreeformBlock extends wp.element.Component {
 		formatselect.onPostRender.call( {
 			value: this.setFormatActive,
 		} );
-		this.setState( {
-			formats: formatselect.values,
-			handleFormatChange: formatselect.onselect,
-		} );
+		this.formats = formatselect.values;
+		this.handleFormatChange = formatselect.onselect;
+		this.forceUpdate();
 
-		concat( ALIGNMENT_CONTROLS, FREEFORM_CONTROLS ).forEach( ( control ) => {
+		[ ...ALIGNMENT_CONTROLS, ...FREEFORM_CONTROLS ].forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
 				button.onPostRender.call( {
@@ -247,11 +237,14 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
-		const { formats, activeFormat, handleFormatChange } = this.state;
 		return [
 			focus && (
 				<Fill name="Formatting.Toolbar">
-					<FormatList formats={ formats } value={ activeFormat } onFormatChange={ handleFormatChange } />
+					<FormatList
+						onFormatChange={ this.handleFormatChange }
+						formats={ this.formats }
+						value={ this.state.activeFormat }
+					/>
 				</Fill>
 			),
 			focus && (
