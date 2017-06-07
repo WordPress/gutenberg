@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import moment from 'moment';
 
 /**
  * Internal dependencies
@@ -14,10 +15,14 @@ import {
 	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
+	getCurrentPostId,
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
+	isEditedPostPublished,
+	isEditedPostPublishable,
+	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -41,7 +46,6 @@ import {
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
-	isSavingNewPost,
 	getSuggestedPostFormat,
 } from '../selectors';
 
@@ -175,10 +179,28 @@ describe( 'selectors', () => {
 	describe( 'getCurrentPost', () => {
 		it( 'should return the current post', () => {
 			const state = {
-				currentPost: { ID: 1 },
+				currentPost: { id: 1 },
 			};
 
-			expect( getCurrentPost( state ) ).to.eql( { ID: 1 } );
+			expect( getCurrentPost( state ) ).to.eql( { id: 1 } );
+		} );
+	} );
+
+	describe( 'getCurrentPostId', () => {
+		it( 'should return null if the post has not yet been saved', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostId( state ) ).to.be.null();
+		} );
+
+		it( 'should return the current post ID', () => {
+			const state = {
+				currentPost: { id: 1 },
+			};
+
+			expect( getCurrentPostId( state ) ).to.equal( 1 );
 		} );
 	} );
 
@@ -306,6 +328,151 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostVisibility( state ) ).to.equal( 'private' );
+		} );
+	} );
+
+	describe( 'isEditedPostPublished', () => {
+		it( 'should return true for public posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for old scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2016-05-30T17:21:39',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostPublishable', () => {
+		it( 'should return true for pending posts', () => {
+			const state = {
+				currentPost: {
+					status: 'pending',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for published posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for dirty posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: true,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostBeingScheduled', () => {
+		it( 'should return true for posts with a future date', () => {
+			const state = {
+				editor: {
+					edits: { date: moment().add( 7, 'days' ).format( '' ) },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for posts with an old date', () => {
+			const state = {
+				editor: {
+					edits: { date: '2016-05-30T17:21:39' },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.false();
 		} );
 	} );
 
@@ -837,28 +1004,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( didPostSaveRequestFail( state ) ).to.be.false();
-		} );
-	} );
-
-	describe( 'isSavingNewPost', () => {
-		it( 'should return true if the post being saved is new', () => {
-			const state = {
-				saving: {
-					isNew: true,
-				},
-			};
-
-			expect( isSavingNewPost( state ) ).to.be.true();
-		} );
-
-		it( 'should return false if the post being saved is not new', () => {
-			const state = {
-				saving: {
-					isNew: false,
-				},
-			};
-
-			expect( isSavingNewPost( state ) ).to.be.false();
 		} );
 	} );
 

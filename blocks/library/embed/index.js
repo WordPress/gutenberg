@@ -108,15 +108,15 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				this.unmounting = true;
 			}
 
-			doServerSideRender( event ) {
+      doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
+				const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
 
 				this.setState( { error: false, fetching: true } );
-				window.fetch( api_url, {
+				window.fetch( apiURL, {
 					credentials: 'include',
 				} ).then(
 					( response ) => {

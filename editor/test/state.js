@@ -388,6 +388,23 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should reset modified properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+						tags: [ 1 ],
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'CLEAR_POST_EDITS',
+				} );
+
+				expect( state.edits ).to.eql( {} );
+			} );
+
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
 					type: 'SETUP_NEW_POST',
@@ -836,33 +853,28 @@ describe( 'state', () => {
 		it( 'should update when a request is started', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE',
-				isNew: true,
 			} );
 			expect( state ).to.eql( {
 				requesting: true,
 				successful: false,
 				error: null,
-				isNew: true,
 			} );
 		} );
 
 		it( 'should update when a request succeeds', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				isNew: true,
 			} );
 			expect( state ).to.eql( {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
 			} );
 		} );
 
 		it( 'should update when a request fails', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
-				isNew: true,
 				error: {
 					code: 'pretend_error',
 					message: 'update failed',
@@ -875,7 +887,6 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
-				isNew: true,
 			} );
 		} );
 	} );
