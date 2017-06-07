@@ -64,3 +64,12 @@ script:
       npm install || exit 1
       npm run ci || exit 1
     fi
+
+before_deploy:
+  - npm install && npm run build-storybook
+
+deploy:
+  provider: surge
+  project: ./storybook-static/
+  domain: gutenberg-devdoc.surge.sh
+  skip_cleanup: true

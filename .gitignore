@@ -5,3 +5,4 @@ gutenberg.pot
 *.log
 yarn.lock
 gutenberg.zip
+storybook-static
