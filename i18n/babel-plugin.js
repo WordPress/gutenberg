@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
+const { find, pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -76,27 +76,54 @@ const DEFAULT_OUTPUT = 'gettext.pot';
 const VALID_TRANSLATION_KEYS = [ 'msgid', 'msgid_plural', 'msgctxt' ];
 
 /**
- * Returns translator comment for a given AST node if one exists.
+ * Regular expression matching translator comment value.
  *
- * @param  {Object}  node AST node
- * @return {?string}      Translator comment
+ * @type {RegExp}
  */
-function getTranslatorComment( node ) {
-	if ( ! node.leadingComments ) {
+const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
+
+/**
+ * Returns translator comment for a given AST traversal path if one exists.
+ *
+ * @param  {Object}  path              Traversal path
+ * @param  {Number}  _originalNodeLine Private: In recursion, line number of
+ *                                     the original node passed
+ * @return {?string}                   Translator comment
+ */
+function getTranslatorComment( path, _originalNodeLine ) {
+	const { node, parent, parentPath } = path;
+
+	// Assign original node line so we can keep track in recursion whether a
+	// matched comment or parent occurs on the same or previous line
+	if ( ! _originalNodeLine ) {
+		_originalNodeLine = node.loc.start.line;
+	}
+
+	const comment = find( node.leadingComments, ( commentNode ) => {
+		const { line } = commentNode.loc.end;
+		return (
+			line >= _originalNodeLine - 1 &&
+			line <= _originalNodeLine &&
+			REGEXP_TRANSLATOR_COMMENT.test( commentNode.value )
+		);
+	} );
+
+	if ( comment ) {
+		// Match and extract text from translator prefix
+		return comment.value.match( REGEXP_TRANSLATOR_COMMENT )[ 1 ]
+			.split( '\n' )
+			.map( ( text ) => text.trim() )
+			.join( ' ' );
+	}
+
+	if ( ! parent || ! parent.loc || ! parentPath ) {
 		return;
 	}
 
-	const comments = node.leadingComments.reduce( ( memo, comment ) => {
-		const match = comment.value.match( /^\s*translators:\s*(.*?)\s*$/im );
-		if ( match ) {
-			memo.push( match[ 1 ] );
-		}
-
-		return memo;
-	}, [] );
-
-	if ( comments.length > 0 ) {
-		return comments.join( '\n' );
+	// Only recurse as long as parent node is on the same or previous line
+	const { line } = parent.loc.start;
+	if ( line >= _originalNodeLine - 1 && line <= _originalNodeLine ) {
+		return getTranslatorComment( parentPath, _originalNodeLine );
 	}
 }
 
@@ -208,7 +235,7 @@ module.exports = function() {
 				};
 
 				// If exists, also assign translator comment
-				const translator = getTranslatorComment( path.parent );
+				const translator = getTranslatorComment( path );
 				if ( translator ) {
 					translation.comments.translator = translator;
 				}
@@ -283,3 +310,4 @@ module.exports = function() {
 
 module.exports.isValidTranslationKey = isValidTranslationKey;
 module.exports.isSameTranslation = isSameTranslation;
+module.exports.getTranslatorComment = getTranslatorComment;
