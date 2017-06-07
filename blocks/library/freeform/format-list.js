@@ -38,17 +38,18 @@ class FormatList extends wp.element.Component {
 	}
 
 	switchFormat( newValue ) {
-		if ( this.props.value !== newValue && this.props.onFormatChange ) {
+		if ( this.props.onFormatChange ) {
 			this.props.onFormatChange( newValue );
 		}
 		this.setState( { open: false } );
 	}
 
 	render() {
-		const { formats = [ { text: '', value: '', textStyle: () => '' } ] } = this.props;
+		const { formats } = this.props;
 		const selectedValue = this.props.value;
+		const noFormat = { text: wp.i18n.__( 'No format' ), value: null };
 		return (
-			<div className="editor-format-list">
+			formats && <div className="editor-format-list">
 				<Button
 					className="editor-format-list__toggle"
 					onClick={ this.toggleMenu }
@@ -57,9 +58,9 @@ class FormatList extends wp.element.Component {
 					aria-label={ wp.i18n.__( 'Change format' ) }
 				>
 					<div className="formats">
-						{ formats.map( ( { text, value } ) => (
+						{ [ noFormat, ...formats ].map( ( { text, value }, i ) => (
 							<span
-								key={ value }
+								key={ i }
 								className={ value === selectedValue ? 'active' : null }
 								aria-hidden={ value !== selectedValue }
 							>
