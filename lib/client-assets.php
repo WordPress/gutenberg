@@ -126,6 +126,12 @@ function gutenberg_register_scripts() {
 		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
 	);
 	wp_register_script(
+		'wp-extensions',
+		gutenberg_url( 'extensions/build/index.js' ),
+		array( 'wp-element' ),
+		filemtime( gutenberg_dir_path() . 'extensions/build/index.js' )
+	);
+	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
 		array( 'wp-element' ),
@@ -286,7 +292,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_script(
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
-		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils' ),
+		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-extensions', 'wp-components', 'wp-utils' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);

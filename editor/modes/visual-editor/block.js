@@ -4,7 +4,7 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { partial, flow } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
@@ -12,6 +12,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  */
 import { Children } from 'element';
 import { Toolbar } from 'components';
+import { applyComponentDecorators } from 'extensions';
 import { BACKSPACE, ESCAPE } from 'utils/keycodes';
 
 /**
@@ -224,12 +225,6 @@ class VisualEditorBlock extends wp.element.Component {
 
 		const { onMouseLeave, onFocus, onInsertAfter } = this.props;
 
-		// Determine whether the block has props to apply to the wrapper.
-		let wrapperProps;
-		if ( blockType.getEditWrapperProps ) {
-			wrapperProps = blockType.getEditWrapperProps( block.attributes );
-		}
-
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -248,7 +243,7 @@ class VisualEditorBlock extends wp.element.Component {
 				className={ className }
 				data-type={ block.name }
 				tabIndex="0"
-				{ ...wrapperProps }
+				style={ this.props.style }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ showUI &&
@@ -297,78 +292,81 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 }
 
-export default connect(
-	( state, ownProps ) => {
-		return {
-			previousBlock: getPreviousBlock( state, ownProps.uid ),
-			nextBlock: getNextBlock( state, ownProps.uid ),
-			block: getBlock( state, ownProps.uid ),
-			isSelected: isBlockSelected( state, ownProps.uid ),
-			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
-			isFirstSelected: isFirstSelectedBlock( state, ownProps.uid ),
-			selectedBlocks: getSelectedBlocks( state ),
-			isHovered: isBlockHovered( state, ownProps.uid ),
-			focus: getBlockFocus( state, ownProps.uid ),
-			isTyping: isTypingInBlock( state, ownProps.uid ),
-			order: getBlockIndex( state, ownProps.uid ),
-		};
-	},
-	( dispatch, ownProps ) => ( {
-		onChange( uid, updates ) {
-			dispatch( {
-				type: 'UPDATE_BLOCK',
-				uid,
-				updates,
-			} );
+export default flow(
+	applyComponentDecorators,
+	connect(
+		( state, ownProps ) => {
+			return {
+				previousBlock: getPreviousBlock( state, ownProps.uid ),
+				nextBlock: getNextBlock( state, ownProps.uid ),
+				block: getBlock( state, ownProps.uid ),
+				isSelected: isBlockSelected( state, ownProps.uid ),
+				isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
+				isFirstSelected: isFirstSelectedBlock( state, ownProps.uid ),
+				selectedBlocks: getSelectedBlocks( state ),
+				isHovered: isBlockHovered( state, ownProps.uid ),
+				focus: getBlockFocus( state, ownProps.uid ),
+				isTyping: isTypingInBlock( state, ownProps.uid ),
+				order: getBlockIndex( state, ownProps.uid ),
+			};
 		},
-		onSelect() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_SELECTED',
-				selected: true,
-				uid: ownProps.uid,
-			} );
-		},
-		onDeselect() {
-			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
-		},
-		onStartTyping() {
-			dispatch( {
-				type: 'START_TYPING',
-				uid: ownProps.uid,
-			} );
-		},
-		onHover() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: true,
-				uid: ownProps.uid,
-			} );
-		},
-		onMouseLeave() {
-			dispatch( {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				hovered: false,
-				uid: ownProps.uid,
-			} );
-		},
+		( dispatch, ownProps ) => ( {
+			onChange( uid, updates ) {
+				dispatch( {
+					type: 'UPDATE_BLOCK',
+					uid,
+					updates,
+				} );
+			},
+			onSelect() {
+				dispatch( {
+					type: 'TOGGLE_BLOCK_SELECTED',
+					selected: true,
+					uid: ownProps.uid,
+				} );
+			},
+			onDeselect() {
+				dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
+			},
+			onStartTyping() {
+				dispatch( {
+					type: 'START_TYPING',
+					uid: ownProps.uid,
+				} );
+			},
+			onHover() {
+				dispatch( {
+					type: 'TOGGLE_BLOCK_HOVERED',
+					hovered: true,
+					uid: ownProps.uid,
+				} );
+			},
+			onMouseLeave() {
+				dispatch( {
+					type: 'TOGGLE_BLOCK_HOVERED',
+					hovered: false,
+					uid: ownProps.uid,
+				} );
+			},
 
-		onInsertAfter( block ) {
-			dispatch( insertBlock( block, ownProps.uid ) );
-		},
+			onInsertAfter( block ) {
+				dispatch( insertBlock( block, ownProps.uid ) );
+			},
 
-		onFocus( ...args ) {
-			dispatch( focusBlock( ...args ) );
-		},
+			onFocus( ...args ) {
+				dispatch( focusBlock( ...args ) );
+			},
 
-		onRemove( uids ) {
-			dispatch( {
-				type: 'REMOVE_BLOCKS',
-				uids,
-			} );
-		},
+			onRemove( uids ) {
+				dispatch( {
+					type: 'REMOVE_BLOCKS',
+					uids,
+				} );
+			},
 
-		onMerge( ...args ) {
-			dispatch( mergeBlocks( ...args ) );
-		},
-	} )
+			onMerge( ...args ) {
+				dispatch( mergeBlocks( ...args ) );
+			},
+		} )
+	)
 )( VisualEditorBlock );

@@ -73,13 +73,6 @@ registerBlockType( 'core/embed', {
 		},
 	],
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit: class extends wp.element.Component {
 		constructor() {
 			super( ...arguments );

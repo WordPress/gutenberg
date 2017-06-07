@@ -63,13 +63,6 @@ registerBlockType( 'core/table', {
 		},
 	],
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
 

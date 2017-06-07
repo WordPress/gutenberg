@@ -8,6 +8,7 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 const entryPointNames = [
 	'element',
+	'extensions',
 	'i18n',
 	'components',
 	'utils',

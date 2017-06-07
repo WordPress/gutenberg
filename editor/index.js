@@ -9,6 +9,7 @@ import { omit } from 'lodash';
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
+import './extensions/wide-align';
 import Layout from './layout';
 import { createReduxStore } from './state';
 

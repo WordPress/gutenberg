@@ -67,13 +67,6 @@ registerBlockType( 'core/image', {
 		},
 	],
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
 

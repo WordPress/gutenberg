@@ -902,6 +902,7 @@ describe( 'state', () => {
 				'isSidebarOpened',
 				'saving',
 				'insertionPoint',
+				'extensions',
 			] );
 		} );
 	} );

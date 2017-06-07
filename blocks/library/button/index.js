@@ -60,13 +60,6 @@ registerBlockType( 'core/button', {
 		},
 	],
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { text, url, title } = attributes;
 
