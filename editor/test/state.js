@@ -855,7 +855,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
+				isNew: true,
 			} );
 		} );
 
