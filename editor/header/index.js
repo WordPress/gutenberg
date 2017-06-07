@@ -17,6 +17,7 @@ import ModeSwitcher from './mode-switcher';
 import SavedState from './saved-state';
 import Tools from './tools';
 import { getSelectedBlocks } from '../selectors';
+import { clearSelectedBlock } from '../actions';
 
 function Header( { selectedBlocks, onRemove, onDeselect } ) {
 	const count = selectedBlocks.length;
@@ -62,9 +63,7 @@ export default connect(
 		selectedBlocks: getSelectedBlocks( state ),
 	} ),
 	( dispatch ) => ( {
-		onDeselect: () => dispatch( {
-			type: 'CLEAR_SELECTED_BLOCK',
-		} ),
+		onDeselect: () => dispatch( clearSelectedBlock() ),
 		onRemove: ( uids ) => dispatch( {
 			type: 'REMOVE_BLOCKS',
 			uids,

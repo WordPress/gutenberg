@@ -17,7 +17,7 @@ import { ENTER } from 'utils/keycodes';
  */
 import './style.scss';
 import { getEditedPostTitle } from '../selectors';
-import { editPost } from '../actions';
+import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
 
 /**
@@ -30,8 +30,8 @@ class PostTitle extends Component {
 		super( ...arguments );
 		this.bindTextarea = this.bindTextarea.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.select = this.select.bind( this );
-		this.unselect = this.unselect.bind( this );
+		this.onSelect = this.onSelect.bind( this );
+		this.onUnselect = this.onUnselect.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.state = {
 			isSelected: false,
@@ -56,7 +56,7 @@ class PostTitle extends Component {
 			document.activeElement === textarea &&
 			textarea.selectionStart !== textarea.selectionEnd
 		) {
-			this.select();
+			this.onSelect();
 		}
 	}
 
@@ -65,11 +65,12 @@ class PostTitle extends Component {
 		this.props.onUpdate( newTitle );
 	}
 
-	select() {
+	onSelect() {
 		this.setState( { isSelected: true } );
+		this.props.clearSelectedBlock();
 	}
 
-	unselect() {
+	onUnselect() {
 		this.setState( { isSelected: false } );
 	}
 
@@ -98,10 +99,10 @@ class PostTitle extends Component {
 						value={ title }
 						onChange={ this.onChange }
 						placeholder={ wp.i18n.__( 'Enter title here' ) }
-						onFocus={ this.select }
-						onClick={ this.select }
+						onFocus={ this.onSelect }
+						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
-						onKeyPress={ this.unselect }
+						onKeyPress={ this.onUnselect }
 					/>
 				</h1>
 			</div>
@@ -117,6 +118,9 @@ export default connect(
 		return {
 			onUpdate( title ) {
 				dispatch( editPost( { title } ) );
+			},
+			clearSelectedBlock() {
+				dispatch( clearSelectedBlock() );
 			},
 		};
 	}

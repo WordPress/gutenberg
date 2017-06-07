@@ -16,6 +16,7 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
+import { clearSelectedBlock } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -56,9 +57,5 @@ class VisualEditor extends Component {
 
 export default connect(
 	undefined,
-	( dispatch ) => ( {
-		clearSelectedBlock() {
-			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
-		},
-	} )
+	{ clearSelectedBlock }
 )( VisualEditor );
