@@ -7,11 +7,14 @@
 	flex-direction: row;
 	align-items: center;
 	z-index: z-index( '.editor-header' );
-	top: $admin-bar-height-big;
 	left: 0;
 	right: 0;
 
+	top: 0;
+	position: sticky;
+
 	@include break-small() {
+		top: $admin-bar-height-big;
 		position: fixed;
 	}
 
