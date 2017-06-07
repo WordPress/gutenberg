@@ -64,7 +64,6 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width / 2 } );
 		max-width: 100%;
 		padding-left: 0;
 		padding-right: 0;
-		box-sizing: border-box;
 
 		&:before {
 			left: 0;
@@ -80,33 +79,9 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width / 2 } );
 	&[data-align="full"],
 	&[data-align="wide"] {
 		.editor-visual-editor__block-controls {
-			max-width: $visual-editor-max-width - ( ( $block-padding + $block-padding + $block-mover-margin ) * 2 );;
-			// a block is 600px wide inside a 700px container
-			// with block mover margin, border widths and paddings, toolbars are indented 46px
-			// that's 2px border plus 10px padding plus 18px mover margin
-			// these 46px are accounted for on both sides, to make sure the block is centered
-
-			width: auto;
-			margin-left: $block-mover-padding-hidden + $block-padding;
-			margin-right: $block-mover-padding-hidden + $block-padding;
-
-			@include break-small() {
-				width: 100%;
-				margin-left: auto;
-				margin-right: auto;
-
-				.is-sidebar-opened & {
-					padding-left: $block-mover-padding-visible + $block-padding;
-					padding-right: $block-mover-padding-visible + $block-padding;
-				}
-			}
-
-			@include break-large() {
-				.is-sidebar-opened & {
-					padding-left: 0;
-					padding-right: 0;
-				}
-			}
+			width: $visual-editor-max-width - $block-padding - $block-padding;
+			margin-left: auto;
+			margin-right: auto;
 		}
 	}
 }
