@@ -152,7 +152,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				if ( ! html ) {
 					return (
-						<Placeholder icon="twitter" label={ wp.i18n.__( title + ' URL' ) } className="blocks-embed">
+						<Placeholder icon={ icon } label={ wp.i18n.__( title + ' URL' ) } className="blocks-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -182,7 +182,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				return (
 					<figure className={ typeClassName }>
 						{ ( cannotPreview ) ? (
-							<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) }>
+							<Placeholder icon={ icon } label={ wp.i18n.__( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 								<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
