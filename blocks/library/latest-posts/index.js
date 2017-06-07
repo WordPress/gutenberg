@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import Placeholder from 'components/placeholder';
+import { Placeholder } from 'components';
 
 /**
  * Internal dependencies
@@ -34,36 +34,26 @@ registerBlockType( 'core/latestposts', {
 				.then( latestPosts => this.setState( { latestPosts } ) );
 		}
 
-		renderPostsLoading() {
-			return (
-				<Placeholder
-					icon="update"
-					label={ wp.i18n.__( 'Loading latest posts, please wait' ) }
-				>
-				</Placeholder>
-			);
-		}
-
-		renderPostsList( latestPosts ) {
-			return (
-				<ul>
-					{ latestPosts.map( ( post, i ) =>
-						<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
-					) }
-				</ul>
-			);
-		}
-
 		render() {
 			const { latestPosts } = this.state;
 
 			if ( ! latestPosts.length ) {
-				return this.renderPostsLoading();
+				return (
+					<Placeholder
+						icon="update"
+						label={ wp.i18n.__( 'Loading latest posts, please wait' ) }
+					>
+					</Placeholder>
+				);
 			}
 
 			return (
 				<div className="blocks-latest-posts">
-					{ this.renderPostsList( latestPosts ) }
+					<ul>
+						{ latestPosts.map( ( post, i ) =>
+							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
+						) }
+					</ul>
 				</div>
 			);
 		}
