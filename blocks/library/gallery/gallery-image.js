@@ -1,10 +1,8 @@
 
-export default class GalleryImage extends wp.element.Component {
-	render() {
-		return (
-			<div key={ this.props.i } className="blocks-gallery-image">
-				<img src={ this.props.img.url } alt={ this.props.img.alt } />
-			</div>
-		);
-	}
+export default function GalleryImage( props ) {
+	return (
+		<figure key={ props.i } className="blocks-gallery-image">
+			<img src={ props.img.url } alt={ props.img.alt } />
+		</figure>
+	);
 }
