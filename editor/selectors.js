@@ -58,7 +58,7 @@ export function hasEditorRedo( state ) {
  * @return {Boolean}       Whether the post is new
  */
 export function isEditedPostNew( state ) {
-	return ! state.currentPost.id;
+	return ! getCurrentPostId( state );
 }
 
 /**
