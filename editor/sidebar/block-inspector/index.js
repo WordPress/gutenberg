@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { Slot } from 'react-slot-fill';
 
 /**
  * WordPress dependencies
@@ -35,12 +36,7 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 		<Panel>
 			<PanelHeader label={ header } />
 			<PanelBody>
-				<div>{ selectedBlock.name } settings...</div>
-				<ul>
-					{ Object.keys( selectedBlock.attributes ).map( ( attribute, index ) => (
-						<li key={ index }>{ attribute }: { selectedBlock.attributes[ attribute ] }</li>
-					) ) }
-				</ul>
+				<Slot name="Inspector.Controls" />
 			</PanelBody>
 		</Panel>
 	);
