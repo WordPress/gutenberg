@@ -7,7 +7,9 @@ import { Slot } from 'react-slot-fill';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Panel, PanelHeader, PanelBody } from 'components';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal Dependencies
@@ -21,6 +23,8 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 		return null;
 	}
 
+	const blockType = getBlockType( selectedBlock.name );
+
 	const onDeselect = ( event ) => {
 		event.preventDefault();
 		props.deselectBlock( selectedBlock.uid );
@@ -28,7 +32,11 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 
 	const header = (
 		<strong>
-			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">Post</a> → Block
+			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">
+				{ __( 'Post' ) }
+			</a>
+			{ ' → ' }
+			{ blockType.title }
 		</strong>
 	);
 
