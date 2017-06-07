@@ -1,6 +1,6 @@
 .editor-visual-editor {
 	margin: 0 auto;
-	padding: 50px $block-mover-padding-hidden;	// Floating up/down arrows invisible
+	padding: 50px 0;
 
 	&,
 	& p {
@@ -10,21 +10,26 @@
 	}
 
 	@include break-small() {
-		padding: 50px $block-mover-padding-visible;	// Floating up/down appear
+		padding: 50px 0;
 	}
 
 	@include break-large() {
-		padding: 60px $block-mover-padding-visible;
+		padding: 60px 0;
 	}
 }
 
 .editor-visual-editor {
-	max-width: $visual-editor-max-width;
 	margin-left: auto;
 	margin-right: auto;
+	> div {
+		display: grid;
+		grid-gap: 20px;
+		grid-template-columns: [full-start] minmax(1em, 1fr) [content-start] minmax(0, 40em) [content-end] minmax(1em, 1fr) [full-end];
+	}
 }
 
 .editor-visual-editor__block {
+	grid-column: main;
 	position: relative;
 	padding: $block-padding;
 	transition: 0.2s border-color;

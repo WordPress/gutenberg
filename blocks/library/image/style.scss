@@ -22,14 +22,10 @@
 	}
 
 	&[data-align="full"] {
+		grid-column: full;
 		padding-left: 0;
 		padding-right: 0;
 		box-sizing: border-box;
-		left: -$block-mover-padding-hidden;	// compensate for block padding
-
-		@include break-small() {
-			left: -$block-mover-padding-visible;	// compensate for mover and block padding
-		}
 
 		&:before {
 			left: 0;

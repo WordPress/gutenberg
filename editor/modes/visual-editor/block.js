@@ -37,7 +37,6 @@ import {
 	isFirstSelectedBlock,
 	getSelectedBlocks,
 	isTypingInBlock,
-	getEditorWidth,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -171,10 +170,6 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	isFullWidth() {
-		return this.props.block.attributes.align === 'full';
-	}
-
 	componentDidMount() {
 		if ( this.props.focus ) {
 			this.node.focus();
@@ -220,7 +215,7 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus, editorWidth } = this.props;
+		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
@@ -234,15 +229,6 @@ class VisualEditorBlock extends wp.element.Component {
 		let wrapperProps;
 		if ( blockType.getEditWrapperProps ) {
 			wrapperProps = blockType.getEditWrapperProps( block.attributes );
-		}
-
-		let style;
-
-		if ( this.isFullWidth() && editorWidth ) {
-			style = {
-				width: editorWidth[ 0 ],
-				marginLeft: -( editorWidth[ 0 ] / 2 ) + ( editorWidth[ 1 ] / 2 ),
-			};
 		}
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -263,7 +249,6 @@ class VisualEditorBlock extends wp.element.Component {
 				className={ className }
 				data-type={ block.name }
 				tabIndex="0"
-				style={ style }
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
@@ -327,7 +312,6 @@ export default connect(
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
 			order: getBlockIndex( state, ownProps.uid ),
-			editorWidth: getEditorWidth( state ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -337,9 +321,6 @@ export default connect(
 				uid,
 				updates,
 			} );
-
-			// we don't want to do this blindly on every change
-			dispatch( { type: 'SET_EDITOR_WIDTH' } );
 		},
 		onSelect() {
 			dispatch( {
