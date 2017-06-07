@@ -11,7 +11,7 @@ import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 
-const { attr, text } = query;
+const { text } = query;
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -58,7 +58,6 @@ registerBlockType( 'core/cover-image', {
 	category: 'common',
 
 	attributes: {
-		url: attr( 'section', 'data-url' ),
 		title: text( 'h2' ),
 	},
 
@@ -155,7 +154,7 @@ registerBlockType( 'core/cover-image', {
 
 		return (
 			<section className="blocks-cover-image">
-				<section className="cover-image" data-url={ url } style={ style }>
+				<section className="cover-image" style={ style }>
 					<h2>{ title }</h2>
 				</section>
 			</section>
