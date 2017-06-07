@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Placeholder } from 'components';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -10,7 +11,7 @@ import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 
 registerBlockType( 'core/latestposts', {
-	title: wp.i18n.__( 'Latest Posts' ),
+	title: __( 'Latest Posts' ),
 
 	icon: 'list-view',
 
@@ -42,7 +43,7 @@ registerBlockType( 'core/latestposts', {
 				return (
 					<Placeholder
 						icon="update"
-						label={ wp.i18n.__( 'Loading latest posts, please wait' ) }
+						label={ __( 'Loading latest posts, please wait' ) }
 					>
 					</Placeholder>
 				);
