@@ -14,30 +14,28 @@ import { Button } from 'components';
  */
 import { savePost } from '../../actions';
 import {
-	isEditedPostDirty,
 	getCurrentPost,
 	getPostEdits,
 	getBlocks,
 	isSavingPost,
-	isEditedPostAlreadyPublished,
+	isEditedPostPublished,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
+	isEditedPostPublishable,
 } from '../../selectors';
 
 function PublishButton( {
 	post,
 	edits,
-	dirty,
 	blocks,
 	isSaving,
 	isPublished,
 	onSave,
 	isBeingScheduled,
 	visibility,
+	isPublishable,
 } ) {
-	const buttonEnabled = ! isSaving &&
-		( dirty || ( ! isPublished && ! isBeingScheduled )
-	);
+	const buttonEnabled = ! isSaving && isPublishable;
 	let buttonText;
 	if ( isPublished ) {
 		buttonText = wp.i18n.__( 'Update' );
@@ -78,11 +76,11 @@ export default connect(
 		post: getCurrentPost( state ),
 		edits: getPostEdits( state ),
 		blocks: getBlocks( state ),
-		dirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
-		isPublished: isEditedPostAlreadyPublished( state ),
+		isPublished: isEditedPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
+		isPublishable: isEditedPostPublishable( state ),
 	} ),
 	( dispatch ) => ( {
 		onSave( post, edits, blocks ) {
