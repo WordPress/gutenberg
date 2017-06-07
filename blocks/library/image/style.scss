@@ -9,20 +9,21 @@
 	&[data-align="left"] {
 		float: left;
 		margin-right: $block-padding;
+		margin-left: calc( 50vw - 500px);
 	}
 
 	&[data-align="right"] {
 		float: right;
 		margin-left: $block-padding;
+		margin-right: calc( 50vw - 500px);
 	}
 
 	&[data-align="wide"] {
-		margin-left: -24%;
-		margin-right: -24%;
+		max-width: 1100px;
 	}
 
 	&[data-align="full"] {
-		grid-column: full;
+		max-width: 100%;
 		padding-left: 0;
 		padding-right: 0;
 		box-sizing: border-box;

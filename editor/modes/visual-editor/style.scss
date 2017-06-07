@@ -1,6 +1,6 @@
 .editor-visual-editor {
 	margin: 0 auto;
-	padding: 50px 0;
+	padding: 50px 0;	// Floating up/down arrows invisible
 
 	&,
 	& p {
@@ -21,15 +21,12 @@
 .editor-visual-editor {
 	margin-left: auto;
 	margin-right: auto;
-	> div {
-		display: grid;
-		grid-gap: 20px;
-		grid-template-columns: [full-start] minmax(1em, 1fr) [content-start] minmax(0, 40em) [content-end] minmax(1em, 1fr) [full-end];
-	}
 }
 
 .editor-visual-editor__block {
-	grid-column: main;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width;
 	position: relative;
 	padding: $block-padding;
 	transition: 0.2s border-color;
