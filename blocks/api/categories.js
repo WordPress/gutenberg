@@ -16,6 +16,7 @@ const categories = [
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 	{ slug: 'rest-api', title: __( 'REST API Blocks' ) },
+	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embed' ) },
 ];
 
