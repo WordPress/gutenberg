@@ -88,6 +88,7 @@ export default class FreeformBlock extends wp.element.Component {
 		this.setFormatActive = this.setFormatActive.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.updateFocus = this.updateFocus.bind( this );
@@ -131,6 +132,7 @@ export default class FreeformBlock extends wp.element.Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'focusin', this.onFocus );
+		editor.on( 'selectionChange', this.onSelectionChange );
 	}
 
 	onInit() {
@@ -151,6 +153,34 @@ export default class FreeformBlock extends wp.element.Component {
 			}
 		} );
 		this.updateFocus();
+	}
+
+	isActive() {
+		return document.activeElement === this.editor.getBody();
+	}
+
+	onSelectionChange() {
+		// We must check this because selectionChange is a global event.
+		if ( ! this.isActive() ) {
+			return;
+		}
+
+		const content = this.getContent();
+		const collapsed = this.editor.selection.isCollapsed();
+
+		this.setState( {
+			empty: ! content || ! content.length,
+		} );
+
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
+			this.props.onFocus( {
+				...this.props.focus,
+				collapsed,
+			} );
+		}
 	}
 
 	onChange() {
