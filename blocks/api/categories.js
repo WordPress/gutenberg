@@ -15,6 +15,7 @@ const categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
+	{ slug: 'rest-api', title: __( 'REST API Blocks' ) },
 	{ slug: 'embed', title: __( 'Embed' ) },
 ];
 

@@ -1,5 +1,8 @@
 .editor-visual-editor > .editor-post-title:not( [ data-align="wide" ] ),
 .editor-post-title {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width;
 	position: relative;
 	padding-right: 2 * ( $block-mover-margin + $block-padding );
 	margin-bottom: 10px;
