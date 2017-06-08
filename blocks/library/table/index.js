@@ -90,7 +90,7 @@ registerBlockType( 'core/table', {
 													inline
 													value={ value }
 													focus={ focussedKey === key ? focus : null }
-													onFocus={ () => setFocus( { editable: key } ) }
+													onFocus={ ( props ) => setFocus( { ...props, editable: key } ) }
 													onChange={ ( nextValue ) => {
 														const nextPart = [ ...attributes[ part ] ];
 

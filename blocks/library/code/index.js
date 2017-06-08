@@ -22,11 +22,10 @@ registerBlockType( 'core/code', {
 		content: prop( 'code', 'textContent' ),
 	},
 
-	edit( { attributes, setAttributes, setFocus } ) {
+	edit( { attributes, setAttributes } ) {
 		return (
 			<TextareaAutosize
 				value={ attributes.content }
-				onFocus={ setFocus }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 			/>
 		);
