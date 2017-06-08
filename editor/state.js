@@ -71,6 +71,7 @@ export const editor = combineUndoableReducers( {
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCKS':
 			case 'EDIT_POST':
+			case 'MARK_DIRTY':
 				return true;
 		}
 

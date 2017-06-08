@@ -3,6 +3,7 @@
  */
 import moment from 'moment';
 import { first, last, get } from 'lodash';
+import { createSelector } from 'reselect';
 
 /**
  * Internal dependencies
@@ -235,13 +236,22 @@ export function getBlock( state, uid ) {
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post.
+ * Note: It's important to memoize this selector to avoid return a new instance on each call
  *
  * @param  {Object}   state Global application state
  * @return {Object[]}       Post blocks
  */
-export function getBlocks( state ) {
-	return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
-}
+export const getBlocks = createSelector(
+	[
+		state => state.editor.blockOrder,
+		state => state.editor.blocksByUid,
+	],
+	( blockOrder, blocksByUid ) => {
+		return blockOrder.map( ( uid ) => (
+			blocksByUid[ uid ]
+		) );
+	}
+);
 
 /**
  * Returns the currently selected block, or null if there is no selected block.
