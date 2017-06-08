@@ -1,7 +1,7 @@
 .editor-block-mover {
 	position: absolute;
 	top: 10px;
-	left: 0;
+	left: -$block-mover-padding-visible;
 }
 
 .editor-block-mover__control {

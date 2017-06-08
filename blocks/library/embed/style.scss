@@ -1,6 +1,8 @@
 .blocks-embed,
 .blocks-embed-video {
 	margin: 0;
+	clear: both; // necessary because we use responsive trickery to set width/height, and therefore the video doesn't intrinsically clear floats like an img does
+
 	&.is-loading {
 		display: flex;
 		flex-direction: column;
@@ -30,45 +32,4 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-}
-
-div[data-type="core/embed"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content
-		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
-		width: 370px;
-	}
-
-	&[data-align="left"] {
-		float: left;
-		margin-right: $block-padding;
-	}
-
-	&[data-align="right"] {
-		float: right;
-		margin-left: $block-padding;
-	}
-
-	&[data-align="wide"] {
-		padding-left: 0;
-		padding-right: 0;
-		margin-right: -#{ $block-padding + $block-mover-margin };	/* Compensate for .editor-visual-editor centering padding */
-
-		&:before {
-			left: 0;
-			border-left-width: 0;
-			border-right-width: 0;
-		}
-
-		.editor-block-mover {
-			display: none;
-		}
-
-		.editor-visual-editor__block-controls {
-			max-width: #{ $visual-editor-max-width - $block-padding - ( $block-padding * 2 + $block-mover-margin ) };
-			margin-left: auto;
-			margin-right: auto;
-		}
-	}
 }
