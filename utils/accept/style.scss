@@ -1,11 +1,12 @@
 .utils-accept__dialog {
 	top: 10px;
 	bottom: 10px;
-	width: 400px;
+	max-width: 400px;
+	width: 100%;
 	margin: auto;
-	background: $white;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
+	background: $white;
 }
 
 .utils-accept__dialog-content {
@@ -14,8 +15,7 @@
 
 .utils-accept__dialog-buttons {
 	text-align: right;
-	padding: 10px 20px;
-	border-top: 1px solid $light-gray-500;
+	padding: 10px 20px 20px 20px;
 
 	.components-button {
 		margin-left: 10px;
@@ -32,5 +32,5 @@
 	justify-content: center;
 	position: fixed;
 	z-index: z-index( '.utils-accept__backdrop' );
-	background-color: rgba( $light-gray-900, 0.8 );
+	background-color: rgba( $dark-gray-900, 0.4 );
 }
