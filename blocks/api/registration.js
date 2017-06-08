@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
  * Block settings keyed by block slug.
