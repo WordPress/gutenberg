@@ -77,6 +77,85 @@
 	&.is-selected .iframe-overlay:before {
 		display: none;
 	}
+
+	// Alignments
+	&[data-align="left"],
+	&[data-align="right"] {
+		// Without z-index, won't be clickable as "above" adjacent content
+		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
+		max-width: 370px;
+	}
+
+	&[data-align="left"] {
+		float: left;
+
+		// mobile, and no sidebars
+		margin-right: $block-padding;
+
+		// sidebar (folded)
+		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
+		// sidebar and post settings
+		.auto-fold .is-sidebar-opened & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+				margin-left: $float-margin;
+			}
+		}
+	}
+
+	&[data-align="right"] {
+		float: right;
+
+		// mobile, and no sidebars
+		margin-right: $block-padding;
+
+		// sidebar (folded)
+		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
+		// sidebar and post settings
+		.auto-fold .is-sidebar-opened & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+				margin-right: $float-margin;
+			}
+		}
+	}
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+	}
+
+	&[data-align="full"] {
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+
+		&:before {
+			left: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
+
+	&[data-align="full"],
+	&[data-align="wide"] {
+		.editor-visual-editor__block-controls {
+			width: $visual-editor-max-width - $block-padding - $block-padding;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
 }
 
 .editor-visual-editor__block-controls {
