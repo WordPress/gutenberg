@@ -15,7 +15,7 @@ registerBlockType( 'core/latestposts', {
 
 	icon: 'list-view',
 
-	category: 'rest-api',
+	category: 'widgets',
 
 	defaultAttributes: {
 		poststoshow: 5,
