@@ -10,6 +10,7 @@ $z-layers: (
 	'.editor-header': 20,
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
+	'.utils-accept__backdrop': 100000
 );
 
 @function z-index( $key ) {
