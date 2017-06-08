@@ -4,13 +4,12 @@
 	margin-right: auto;
 	max-width: $visual-editor-max-width;
 	position: relative;
-	padding-right: 2 * ( $block-mover-margin + $block-padding );
 	margin-bottom: 10px;
 
 	h1 {
 		border: 2px solid transparent;
 		margin: 0;
-		padding: 0;
+		padding: #{ $block-padding / 2 } #{ $block-padding - 2px };
 		font-size: $editor-font-size;
 		transition: 0.2s border-color;
 	}
@@ -46,7 +45,7 @@ textarea.editor-post-title__input {
 	border: none;
 	box-shadow: none;
 	width: 100%;
-	padding: 5px;
+	padding: 5px 0;
 	margin: 0;
 
 	&:focus {

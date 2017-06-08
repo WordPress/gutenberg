@@ -110,9 +110,16 @@
 			}
 		}
 
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
 				margin-left: $float-margin;
 			}
 		}
@@ -138,9 +145,16 @@
 			}
 		}
 
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
 				margin-right: $float-margin;
 			}
 		}
@@ -227,7 +241,9 @@ $sticky-bottom-offset: 20px;
 
 .editor-visual-editor .editor-visual-editor__insertion-point {
 	position: relative;
-	margin-right: #{ ( $block-padding + $block-mover-margin) * 2 };
+	width: $visual-editor-max-width - $block-padding - $block-padding;
+	margin-left: auto;
+	margin-right: auto;
 
 	&:before {
 		position: absolute;
