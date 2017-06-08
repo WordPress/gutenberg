@@ -63,7 +63,7 @@ registerBlockType( 'core/image', {
 			onClick: toggleAlignment( 'right' ),
 		},
 		{
-			icon: 'align-width',
+			icon: 'align-wide',
 			title: __( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' ),
@@ -87,17 +87,10 @@ registerBlockType( 'core/image', {
 		const { url, alt, caption } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 
-		const inspector = focus && (
-			<InspectorControls key="inspector">
-				<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
-			</InspectorControls>
-		);
-
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
 			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
 			return [
-				inspector,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -122,7 +115,11 @@ registerBlockType( 'core/image', {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
-			inspector,
+			focus && (
+				<InspectorControls key="inspector">
+					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
+				</InspectorControls>
+			),
 			<figure key="image" className="blocks-image">
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
