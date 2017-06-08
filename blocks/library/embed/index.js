@@ -212,12 +212,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				return url;
 			}
 
-			return (
-				<figure>
-					{ url }
-					<figcaption>{ caption }</figcaption>
-				</figure>
-			);
+			// JSX does not preserve the newlines needed for WP to trigger embedding the url, so, we have this.
+			return '<figure>\n    ' + url + '\n    <figcaption>' + caption + '</figcaption>\n</figure>';
 		},
 	};
 }
