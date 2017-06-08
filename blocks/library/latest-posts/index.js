@@ -29,10 +29,11 @@ registerBlockType( 'core/latestposts', {
 
 			this.state = {
 				latestPosts: [],
-				latestPostsRequest: getLatestPosts( poststoshow ),
 			};
 
-			this.state.latestPostsRequest
+			this.latestPostsRequest = getLatestPosts( poststoshow );
+
+			this.latestPostsRequest
 				.then( latestPosts => this.setState( { latestPosts } ) );
 		}
 
@@ -62,10 +63,8 @@ registerBlockType( 'core/latestposts', {
 	},
 
 	componentWillUnmount() {
-		const { latestPostsRequest } = this.state;
-
-		if ( latestPostsRequest.state() === 'pending' ) {
-			latestPostsRequest.abort();
+		if ( this.latestPostsRequest.state() === 'pending' ) {
+			this.latestPostsRequest.abort();
 		}
 	},
 
