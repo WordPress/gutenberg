@@ -96,7 +96,7 @@ export function combineUndoableReducers( reducers, options ) {
 
 	return ( state = initialState, action ) => {
 		const nextState = reducer( state.history, action );
-		if ( nextState === state.history.present ) {
+		if ( nextState === state.history ) {
 			return state;
 		}
 

@@ -84,10 +84,11 @@ describe( 'undoableReducer', () => {
 	} );
 
 	describe( 'combineUndoableReducers()', () => {
+		const reducer = combineUndoableReducers( {
+			count: ( state = 0 ) => state,
+		} );
+
 		it( 'should return a combined reducer with getters', () => {
-			const reducer = combineUndoableReducers( {
-				count: ( state = 0 ) => state,
-			} );
 			const state = reducer( undefined, {} );
 
 			expect( typeof reducer ).toBe( 'function' );
@@ -99,6 +100,13 @@ describe( 'undoableReducer', () => {
 				},
 				future: [],
 			} );
+		} );
+
+		it( 'should return same reference if state has not changed', () => {
+			const original = reducer( undefined, {} );
+			const state = reducer( original, {} );
+
+			expect( state ).toBe( original );
 		} );
 	} );
 } );
