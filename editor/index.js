@@ -36,13 +36,16 @@ if ( settings.timezone.string ) {
 }
 
 /**
- * Initializes and returns an instance of Editor.
+ * Initializes Redux state with bootstrapped post, if provided.
  *
- * @param {String} id   Unique identifier for editor instance
- * @param {Object} post API entity for post to edit
+ * @param {Redux.Store} store Redux store instance
+ * @param {?Object}     post  Bootstrapped post object
  */
-export function createEditorInstance( id, post ) {
-	const store = createReduxStore();
+function preparePostState( store, post ) {
+	if ( ! post ) {
+		return;
+	}
+
 	store.dispatch( {
 		type: 'RESET_BLOCKS',
 		post,
@@ -62,6 +65,18 @@ export function createEditorInstance( id, post ) {
 			},
 		} );
 	}
+}
+
+/**
+ * Initializes and returns an instance of Editor.
+ *
+ * @param {String} id   Unique identifier for editor instance
+ * @param {Object} post API entity for post to edit
+ */
+export function createEditorInstance( id, post ) {
+	const store = createReduxStore();
+
+	preparePostState( store, post );
 
 	wp.element.render(
 		<ReduxProvider store={ store }>
