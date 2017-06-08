@@ -48,7 +48,8 @@ class VisualEditor extends Component {
 				role="region"
 				aria-label={ __( 'Visual Editor' ) }
 				className="editor-visual-editor"
-				onClick={ this.onClick }
+				onMouseDown={ this.onClick }
+				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
 			>
 				<PostTitle />
