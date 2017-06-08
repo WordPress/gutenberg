@@ -7,7 +7,7 @@ import { shallow, mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import PanelBody from '../body.js';
+import PanelBody from '../body';
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {

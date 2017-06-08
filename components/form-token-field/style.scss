@@ -4,8 +4,9 @@
 	margin: 0;
 	padding: 0;
 	background-color: $white;
+	border-radius: 4px;
 	border: 1px solid $light-gray-500;
-	color: $dark-gray-800;
+	color: $dark-gray-700;
 	cursor: text;
 	transition: all .15s ease-in-out;
 
@@ -28,7 +29,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
-	padding: 5px 14px 5px 0;
+	padding: 4px;
 }
 
 // Token input
@@ -37,13 +38,13 @@ input[type="text"].components-form-token-field__input {
 	width: auto;
 	max-width: 100%;
 	margin: 2px 0 2px 8px;
-	padding: 0 0 0 6px;
+	padding: 0;
 	line-height: 24px;
 	background: inherit;
 	border: 0;
 	outline: none;
 	font-family: inherit;
-	font-size: 14px;
+	font-size: $default-font-size;
 	color: $dark-gray-800;
 	box-shadow: none;
 
@@ -54,10 +55,10 @@ input[type="text"].components-form-token-field__input {
 
 // Tokens
 .components-form-token-field__token {
-	font-size: 14px;
+	font-size: $default-font-size;
 	display: flex;
-	margin: 2px 0 2px 8px;
-	color: $white;
+	margin: 2px 4px 2px 0;
+	color: $dark-gray-700;
 	overflow: hidden;
 
 	&.is-success {
@@ -127,32 +128,31 @@ input[type="text"].components-form-token-field__input {
 }
 
 .components-form-token-field__token-text,
-.components-form-token-field__remove-token {
+.components-form-token-field__remove-token.components-icon-button {
 	display: inline-block;
 	line-height: 24px;
-	background: $dark-gray-500;
+	background: $light-gray-500;
 	transition: all .2s cubic-bezier( .4, 1, .4, 1 );
 }
 
 .components-form-token-field__token-text {
-	border-radius: 4px 0 0 4px;
-	padding: 0 4px 0 6px;
+	border-radius: 12px 0 0 12px;
+	padding: 0 4px 0 8px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-.components-form-token-field__remove-token {
+.components-form-token-field__remove-token.components-icon-button {
 	cursor: pointer;
-	border-radius: 0 4px 4px 0;
+	border-radius: 0 12px 12px 0;
 	padding: 0 2px;
 	font-size: 10px;
-	color: $light-gray-500;
+	color: $dark-gray-500;
 	line-height: 10px;
 
 	&:hover {
-		color: white;
-		background: $dark-gray-600;
+		color: $dark-gray-700;
 	}
 }
 

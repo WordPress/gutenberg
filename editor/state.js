@@ -3,7 +3,7 @@
  */
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
-import { keyBy, first, last, omit, without, flowRight } from 'lodash';
+import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
  * Internal dependencies
@@ -30,10 +30,28 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'EDIT_POST':
 			case 'SETUP_NEW_POST':
-				return {
-					...state,
-					...action.edits,
-				};
+				return reduce( action.edits, ( result, value, key ) => {
+					// Only assign into result if not already same value
+					if ( value !== state[ key ] ) {
+						// Avoid mutating original state by creating shallow
+						// clone. Should only occur once per reduce.
+						if ( result === state ) {
+							result = { ...state };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state );
+
+			case 'CLEAR_POST_EDITS':
+				// Don't return a new object if there's not any edits
+				if ( ! Object.keys( state ).length ) {
+					return state;
+				}
+
+				return {};
 		}
 
 		return state;
@@ -64,6 +82,32 @@ export const editor = combineUndoableReducers( {
 				return keyBy( action.blocks, 'uid' );
 
 			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				// Consider as updates only changed values
+				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+					if ( value !== result[ key ] ) {
+						// Avoid mutating original block by creating shallow clone
+						if ( result === state[ action.uid ] ) {
+							result = { ...state[ action.uid ] };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state[ action.uid ] );
+
+				// Skip update if nothing has been changed. The reference will
+				// match the original block if `reduce` had no changed values.
+				if ( nextBlock === state[ action.uid ] ) {
+					return state;
+				}
+
+				// Otherwise merge updates into state
 				return {
 					...state,
 					[ action.uid ]: {
@@ -390,7 +434,6 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isNew: action.isNew,
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -398,7 +441,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -406,7 +448,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
-				isNew: action.isNew,
 			};
 	}
 

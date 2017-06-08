@@ -273,9 +273,11 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  * @param string $hook Screen name.
  */
 function gutenberg_scripts_and_styles( $hook ) {
-	if ( 'toplevel_page_gutenberg' !== $hook ) {
+	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
 		return;
 	}
+
+	$is_demo = isset( $page_match[ 2 ] );
 
 	/**
 	 * Scripts
@@ -312,13 +314,14 @@ function gutenberg_scripts_and_styles( $hook ) {
 			'wp-editor',
 			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
 		);
-	} else {
+	} else if ( $is_demo ) {
 		// ...with some test content
-		// TODO: replace this with error handling
 		wp_add_inline_script(
 			'wp-editor',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
+	} else {
+		// TODO: Error handling
 	}
 
 	// Prepare Jed locale data.
@@ -330,7 +333,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', _wpGutenbergPost );' );
+	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost );' );
 
 	/**
 	 * Styles

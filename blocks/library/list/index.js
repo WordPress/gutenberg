@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { switchChildrenNodeName } from 'element';
+import { Component, createElement, switchChildrenNodeName } from 'element';
 import { find } from 'lodash';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -10,45 +11,12 @@ import { find } from 'lodash';
 import './style.scss';
 import { registerBlockType, query as hpq, createBlock } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
 
 const { children, prop } = hpq;
 
-function execCommand( command ) {
-	return ( { editor } ) => {
-		if ( editor ) {
-			editor.execCommand( command );
-		}
-	};
-}
-
-function listIsActive( listType ) {
-	return ( { nodeName = 'OL', internalListType } ) => {
-		return listType === ( internalListType ? internalListType : nodeName );
-	};
-}
-
-function listSetType( listType, editorCommand ) {
-	return ( { internalListType, editor }, setAttributes ) => {
-		if ( internalListType ) {
-			// only change list types, don't toggle off internal lists
-			if ( internalListType !== listType ) {
-				if ( editor ) {
-					editor.execCommand( editorCommand );
-				}
-			}
-		} else {
-			setAttributes( { nodeName: listType } );
-		}
-	};
-}
-
-function findInternalListType( { parents } ) {
-	const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
-	return list ? list.nodeName : null;
-}
-
 registerBlockType( 'core/list', {
-	title: wp.i18n.__( 'List' ),
+	title: __( 'List' ),
 	icon: 'editor-ul',
 	category: 'common',
 
@@ -56,31 +24,6 @@ registerBlockType( 'core/list', {
 		nodeName: prop( 'ol,ul', 'nodeName' ),
 		values: children( 'ol,ul' ),
 	},
-
-	controls: [
-		{
-			icon: 'editor-ul',
-			title: wp.i18n.__( 'Convert to unordered' ),
-			isActive: listIsActive( 'UL' ),
-			onClick: listSetType( 'UL', 'InsertUnorderedList' ),
-		},
-		{
-			icon: 'editor-ol',
-			title: wp.i18n.__( 'Convert to ordered' ),
-			isActive: listIsActive( 'OL' ),
-			onClick: listSetType( 'OL', 'InsertOrderedList' ),
-		},
-		{
-			icon: 'editor-outdent',
-			title: wp.i18n.__( 'Outdent list item' ),
-			onClick: execCommand( 'Outdent' ),
-		},
-		{
-			icon: 'editor-indent',
-			title: wp.i18n.__( 'Indent list item' ),
-			onClick: execCommand( 'Indent' ),
-		},
-	],
 
 	transforms: {
 		from: [
@@ -108,37 +51,129 @@ registerBlockType( 'core/list', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { nodeName = 'OL', values = [] } = attributes;
-		return (
-			<Editable
-				tagName={ nodeName.toLowerCase() }
-				getSettings={ ( settings ) => ( {
-					...settings,
-					plugins: ( settings.plugins || [] ).concat( 'lists' ),
-					lists_indent_on_tab: false,
-				} ) }
-				onSetup={ ( editor ) => {
-					editor.on( 'nodeChange', ( nodeInfo ) => {
-						setAttributes( { internalListType: findInternalListType( nodeInfo ) } );
-					} );
-					setAttributes( { editor } );
-				} }
-				onChange={ ( nextValues ) => {
-					setAttributes( { values: nextValues } );
-				} }
-				value={ values }
-				focus={ focus }
-				onFocus={ setFocus }
-				showAlignments
-				className="blocks-list" />
-		);
+	edit: class extends Component {
+		constructor() {
+			super( ...arguments );
+
+			this.setupEditor = this.setupEditor.bind( this );
+			this.getEditorSettings = this.getEditorSettings.bind( this );
+			this.setNextValues = this.setNextValues.bind( this );
+
+			this.state = {
+				internalListType: null,
+			};
+		}
+
+		isListActive( listType ) {
+			const { internalListType } = this.state;
+			const { nodeName = 'OL' } = this.props.attributes;
+
+			return listType === ( internalListType ? internalListType : nodeName );
+		}
+
+		findInternalListType( { parents } ) {
+			const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
+			return list ? list.nodeName : null;
+		}
+
+		setupEditor( editor ) {
+			editor.on( 'nodeChange', ( nodeInfo ) => {
+				this.setState( {
+					internalListType: this.findInternalListType( nodeInfo ),
+				} );
+			} );
+
+			this.editor = editor;
+		}
+
+		createSetListType( type, command ) {
+			return () => {
+				const { setAttributes } = this.props;
+				const { internalListType } = this.state;
+				if ( internalListType ) {
+					// only change list types, don't toggle off internal lists
+					if ( internalListType !== type && this.editor ) {
+						this.editor.execCommand( command );
+					}
+				} else {
+					setAttributes( { nodeName: type } );
+				}
+			};
+		}
+
+		createExecCommand( command ) {
+			return () => {
+				if ( this.editor ) {
+					this.editor.execCommand( command );
+				}
+			};
+		}
+
+		getEditorSettings( settings ) {
+			return {
+				...settings,
+				plugins: ( settings.plugins || [] ).concat( 'lists' ),
+				lists_indent_on_tab: false,
+			};
+		}
+
+		setNextValues( nextValues ) {
+			this.props.setAttributes( { values: nextValues } );
+		}
+
+		render() {
+			const { attributes, focus, setFocus } = this.props;
+			const { nodeName = 'OL', values = [] } = attributes;
+
+			return [
+				focus && (
+					<BlockControls
+						key="controls"
+						controls={ [
+							{
+								icon: 'editor-ul',
+								title: __( 'Convert to unordered' ),
+								isActive: this.isListActive( 'UL' ),
+								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
+							},
+							{
+								icon: 'editor-ol',
+								title: __( 'Convert to ordered' ),
+								isActive: this.isListActive( 'OL' ),
+								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
+							},
+							{
+								icon: 'editor-outdent',
+								title: __( 'Outdent list item' ),
+								onClick: this.createExecCommand( 'Outdent' ),
+							},
+							{
+								icon: 'editor-indent',
+								title: __( 'Indent list item' ),
+								onClick: this.createExecCommand( 'Indent' ),
+							},
+						] }
+					/>
+				),
+				<Editable
+					key="editable"
+					tagName={ nodeName.toLowerCase() }
+					getSettings={ this.getEditorSettings }
+					onSetup={ this.setupEditor }
+					onChange={ this.setNextValues }
+					value={ values }
+					focus={ focus }
+					onFocus={ setFocus }
+					className="blocks-list"
+				/>,
+			];
+		}
 	},
 
 	save( { attributes } ) {
 		const { nodeName = 'OL', values = [] } = attributes;
 
-		return wp.element.createElement(
+		return createElement(
 			nodeName.toLowerCase(),
 			null,
 			values

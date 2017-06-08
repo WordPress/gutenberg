@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity, find } from 'lodash';
+import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -10,7 +10,6 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Toolbar } from 'components';
 import { BACKSPACE, DELETE } from 'utils/keycodes';
 
 /**
@@ -19,30 +18,6 @@ import { BACKSPACE, DELETE } from 'utils/keycodes';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-
-const alignmentMap = {
-	alignleft: 'left',
-	alignright: 'right',
-	aligncenter: 'center',
-};
-
-const ALIGNMENT_CONTROLS = [
-	{
-		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
-		align: 'left',
-	},
-	{
-		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
-		align: 'center',
-	},
-	{
-		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
-		align: 'right',
-	},
-];
 
 function createElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -78,7 +53,6 @@ export default class Editable extends wp.element.Component {
 
 		this.state = {
 			formats: {},
-			alignment: null,
 			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 		};
@@ -137,7 +111,10 @@ export default class Editable extends wp.element.Component {
 			empty: ! content || ! content.length,
 		} );
 
-		if ( this.props.focus.collapsed !== collapsed ) {
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
 			this.props.onFocus( {
 				...this.props.focus,
 				collapsed,
@@ -293,12 +270,10 @@ export default class Editable extends wp.element.Component {
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
-		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition } );
+		this.setState( { bookmark, formats, focusPosition } );
 	}
 
 	updateContent() {
@@ -344,7 +319,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.focus !== prevProps.focus ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
@@ -397,20 +372,6 @@ export default class Editable extends wp.element.Component {
 		this.editor.setDirty( true );
 	}
 
-	isAlignmentActive( align ) {
-		return this.state.alignment === align;
-	}
-
-	toggleAlignment( align ) {
-		this.editor.focus();
-
-		if ( this.isAlignmentActive( align ) ) {
-			this.editor.execCommand( 'JustifyNone' );
-		} else {
-			this.editor.execCommand( 'Justify' + capitalize( align ) );
-		}
-	}
-
 	render() {
 		const {
 			tagName,
@@ -418,7 +379,6 @@ export default class Editable extends wp.element.Component {
 			value,
 			focus,
 			className,
-			showAlignments = false,
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
@@ -443,15 +403,6 @@ export default class Editable extends wp.element.Component {
 			<div className={ classes }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
-						{ showAlignments &&
-							<Toolbar
-								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
-									...control,
-									onClick: () => this.toggleAlignment( control.align ),
-									isActive: this.isAlignmentActive( control.align ),
-								} ) ) }
-							/>
-						}
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}

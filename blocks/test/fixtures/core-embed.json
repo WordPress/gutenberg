@@ -3,9 +3,9 @@
         "uid": "_uid_0",
         "name": "core/embed",
         "attributes": {
-            "url": "https://www.youtube.com/watch?v=Nl6U7UotA-M",
+            "url": "https://example.com/",
             "caption": [
-                "State of the Word 2016"
+                "Embedded content from an example URL"
             ]
         }
     }

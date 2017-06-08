@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import moment from 'moment';
 import { first, last, get } from 'lodash';
 
 /**
@@ -57,7 +58,7 @@ export function hasEditorRedo( state ) {
  * @return {Boolean}       Whether the post is new
  */
 export function isEditedPostNew( state ) {
-	return ! state.currentPost.id;
+	return ! getCurrentPostId( state );
 }
 
 /**
@@ -81,6 +82,17 @@ export function isEditedPostDirty( state ) {
  */
 export function getCurrentPost( state ) {
 	return state.currentPost;
+}
+
+/**
+ * Returns the ID of the post currently being edited, or null if the post has
+ * not yet been saved.
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Number}       ID of current post
+ */
+export function getCurrentPostId( state ) {
+	return getCurrentPost( state ).id || null;
 }
 
 /**
@@ -127,6 +139,42 @@ export function getEditedPostVisibility( state ) {
 		return 'password';
 	}
 	return 'public';
+}
+
+/**
+ * Return true if the post being edited has already been published.
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post has been bublished
+ */
+export function isEditedPostPublished( state ) {
+	const post = getCurrentPost( state );
+
+	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
+		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Return true if the post being edited can be published
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post can been bublished
+ */
+export function isEditedPostPublishable( state ) {
+	const post = getCurrentPost( state );
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+}
+
+/**
+ * Return true if the post being edited is being scheduled. Preferring the
+ * unsaved status values.
+ *
+ * @param  {Object}   state Global application state
+ * @return {Boolearn}       Whether the post has been bublished
+ */
+export function isEditedPostBeingScheduled( state ) {
+	const date = getEditedPostAttribute( state, 'date' );
+	return moment( date ).isAfter( moment() );
 }
 
 /**
@@ -471,16 +519,6 @@ export function didPostSaveRequestSucceed( state ) {
  */
 export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
-}
-
-/**
- * Returns true if the post being saved is a new draft, or false otherwise.
- *
- * @param  {Object}  state Global application state
- * @return {Boolean}       Whether post being saved is a new draft
- */
-export function isSavingNewPost( state ) {
-	return state.saving.isNew;
 }
 
 /**

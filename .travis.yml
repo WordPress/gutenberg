@@ -44,8 +44,7 @@ before_script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      composer global require wp-coding-standards/wpcs
-      phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+      composer install
     fi
 
 script:
@@ -58,10 +57,19 @@ script:
     fi
   - |
     if [[ "$TRAVISCI" == "phpcs" ]] ; then
-      phpcs
+      ./vendor/bin/phpcs
     fi
   - |
     if [[ "$TRAVISCI" == "js" ]] ; then
       npm install || exit 1
       npm run ci || exit 1
     fi
+
+before_deploy:
+  - npm install && npm run build-storybook
+
+deploy:
+  provider: surge
+  project: ./storybook-static/
+  domain: gutenberg-devdoc.surge.sh
+  skip_cleanup: true
