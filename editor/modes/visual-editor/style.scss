@@ -110,9 +110,16 @@
 			}
 		}
 
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
 				margin-left: $float-margin;
 			}
 		}
@@ -138,9 +145,16 @@
 			}
 		}
 
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width  ) {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
 				margin-right: $float-margin;
 			}
 		}
