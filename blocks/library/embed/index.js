@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { parse } from 'url';
+import { includes } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
@@ -11,6 +17,8 @@ import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 
 const { attr, children } = query;
+
+const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -82,11 +90,14 @@ registerBlockType( 'core/embed', {
 				error: false,
 				fetching: false,
 			};
-			this.noPreview = [
-				'facebook.com',
-			];
+		}
+
+		componentWillMount() {
 			if ( this.props.attributes.url ) {
 				// if the url is already there, we're loading a saved block, so we need to render
+				// a different thing, which is why this doesn't use 'fetching', as that
+				// is for when the user is putting in a new url on the placeholder form
+				this.setState( { fetching: true } );
 				this.doServerSideRender();
 			}
 		}
@@ -101,10 +112,10 @@ registerBlockType( 'core/embed', {
 				event.preventDefault();
 			}
 			const { url } = this.props.attributes;
-			const api_url = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
+			const apiURL = wpApiSettings.root + 'oembed/1.0/proxy?url=' + encodeURIComponent( url ) + '&_wpnonce=' + wpApiSettings.nonce;
 
 			this.setState( { error: false, fetching: true } );
-			window.fetch( api_url, {
+			window.fetch( apiURL, {
 				credentials: 'include',
 			} ).then(
 				( response ) => {
@@ -129,31 +140,38 @@ registerBlockType( 'core/embed', {
 			const { url, caption } = this.props.attributes;
 			const { setAttributes, focus, setFocus } = this.props;
 
+			if ( fetching ) {
+				return (
+					<div className="blocks-embed is-loading">
+						<Spinner />
+						<p>{ wp.i18n.__( 'Embedding…' ) }</p>
+					</div>
+				);
+			}
+
 			if ( ! html ) {
 				return (
 					<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
 						<form onSubmit={ this.doServerSideRender }>
 							<input
 								type="url"
+								value={ url || '' }
 								className="components-placeholder__input"
-								placeholder={ wp.i18n.__( 'Enter URL to embed here...' ) }
+								placeholder={ wp.i18n.__( 'Enter URL to embed here…' ) }
 								onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-							{ ! fetching
-								? <Button
-									isLarge
-									type="submit">
-									{ wp.i18n.__( 'Embed' ) }
-								</Button>
-								: <Spinner />
-							}
+							<Button
+								isLarge
+								type="submit">
+								{ wp.i18n.__( 'Embed' ) }
+							</Button>
 							{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>
 					</Placeholder>
 				);
 			}
 
-			const domain = url.split( '/' )[ 2 ].replace( /^www\./, '' );
-			const cannotPreview = this.noPreview.includes( domain );
+			const parsedUrl = parse( url );
+			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 			let typeClassName = 'blocks-embed';
 
 			if ( 'video' === type ) {

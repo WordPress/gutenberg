@@ -1,9 +1,30 @@
+.editor-visual-editor > .editor-post-title:not( [ data-align="wide" ] ),
 .editor-post-title {
-	font-size: $editor-font-size;
+	position: relative;
+	padding-right: 2 * ( $block-mover-margin + $block-padding );
+	margin-bottom: 10px;
+
+	h1 {
+		border: 2px solid transparent;
+		margin: 0;
+		padding: 0;
+		font-size: $editor-font-size;
+		transition: 0.2s border-color;
+	}
+
+	&.is-selected h1 {
+		border: 2px solid $light-gray-500;
+		transition: 0.2s border-color;
+	}
 
 	.editor-text-editor & {
 		padding-left: 20px;
 		padding-right: 20px;
+
+		h1 {
+			margin: 0 -10px;
+			padding: 0 10px;
+		}
 
 		@include break-large() {
 			max-width: $text-editor-max-width;
@@ -14,6 +35,7 @@
 }
 
 textarea.editor-post-title__input {
+	display: block;
 	font-size: 2em;
 	font-family: $editor-font;
 	line-height: $editor-line-height;
@@ -21,7 +43,8 @@ textarea.editor-post-title__input {
 	border: none;
 	box-shadow: none;
 	width: 100%;
-	padding: 10px;
+	padding: 5px;
+	margin: 0;
 
 	&:focus {
 		outline: none;

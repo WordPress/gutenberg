@@ -14,6 +14,12 @@ export function deselectBlock( uid ) {
 	};
 }
 
+export function clearSelectedBlock() {
+	return {
+		type: 'CLEAR_SELECTED_BLOCK',
+	};
+}
+
 export function replaceBlocks( uids, blocks ) {
 	return {
 		type: 'REPLACE_BLOCKS',
@@ -50,11 +56,9 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost( postId, edits ) {
+export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',
-		edits,
-		postId,
 	};
 }
 

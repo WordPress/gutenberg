@@ -2,6 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
+import { isEqual } from 'lodash';
 
 export default class TinyMCE extends wp.element.Component {
 	componentDidMount() {
@@ -21,6 +22,10 @@ export default class TinyMCE extends wp.element.Component {
 
 		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
 			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
+		}
+
+		if ( ! isEqual( this.props.style, nextProps.style ) ) {
+			Object.assign( this.editorNode.style, nextProps.style );
 		}
 	}
 

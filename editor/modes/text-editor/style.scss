@@ -3,6 +3,11 @@
 	border-bottom: 1px solid $light-gray-500;
 	min-height: $admin-sidebar-width-collapsed;
 	top: $admin-bar-height-big + $header-height;
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+
 	left: 0;
 	right: 0;
 	display: flex;
@@ -59,7 +64,6 @@
 .auto-fold .editor-text-editor__formatting {
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
-		top: $admin-bar-height + $header-height;
 	}
 
 	@include break-large() {

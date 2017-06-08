@@ -23,6 +23,7 @@ import {
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
+	clearSelectedBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -182,7 +183,6 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	onPointerDown() {
-		this.props.onSelect();
 		this.props.onSelectionStart();
 	}
 
@@ -281,6 +281,7 @@ class VisualEditorBlock extends wp.element.Component {
 				<div
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
+					onMouseDown={ this.props.onSelect }
 				>
 					<BlockEdit
 						focus={ focus }
@@ -329,7 +330,7 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
+			dispatch( clearSelectedBlock() );
 		},
 		onStartTyping() {
 			dispatch( {
