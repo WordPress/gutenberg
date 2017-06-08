@@ -84,6 +84,10 @@
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
 		max-width: 370px;
+
+		.editor-block-mover {
+			display: none;
+		}
 	}
 
 	&[data-align="left"] {
@@ -95,6 +99,13 @@
 		// sidebar (folded)
 		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
+		// sidebar (sticky)
+		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
 				margin-left: $float-margin;
 			}
 		}
@@ -116,6 +127,13 @@
 		// sidebar (folded)
 		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
+		// sidebar (sticky)
+		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
 				margin-right: $float-margin;
 			}
 		}
