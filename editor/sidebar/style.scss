@@ -1,5 +1,6 @@
 .editor-sidebar {
 	position: fixed;
+	z-index: z-index( '.editor-sidebar' );
 	right: 0;
 	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
