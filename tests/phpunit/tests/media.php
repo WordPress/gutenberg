@@ -761,6 +761,31 @@ VIDEO;
 	}
 
 	/**
+	 * @ticket 40977
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_vimeo_adds_loop() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'http://vimeo.com/190372437',
+		) );
+
+		$this->assertContains( 'src="https://vimeo.com/190372437?loop=0', $actual );
+	}
+
+	/**
+	 * @ticket 40977
+	 * @depends test_video_shortcode_body
+	 */
+	function test_wp_video_shortcode_vimeo_force_adds_loop_true() {
+		$actual = wp_video_shortcode( array(
+			'src' => 'http://vimeo.com/190372437',
+			'loop' => true,
+		) );
+
+		$this->assertContains( 'src="https://vimeo.com/190372437?loop=1', $actual );
+	}
+
+	/**
 	 * Test [video] shortcode processing
 	 *
 	 */
