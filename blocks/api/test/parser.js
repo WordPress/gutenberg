@@ -76,6 +76,7 @@ describe( 'block parser', () => {
 					};
 				},
 				defaultAttributes: {
+					content: '',
 					topic: 'none',
 				},
 			};
