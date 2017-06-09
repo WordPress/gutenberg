@@ -20,9 +20,11 @@ import { getBlocks } from '../../selectors';
 class TextEditor extends Component {
 	constructor( { blocks } ) {
 		super( ...arguments );
+		const value = serialize( blocks );
 		this.state = {
 			blocks,
-			value: serialize( blocks ),
+			persistedValue: value,
+			value,
 		};
 		this.onChange = this.onChange.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -36,6 +38,9 @@ class TextEditor extends Component {
 	}
 
 	onBlur() {
+		if ( this.state.value === this.state.persistedValue ) {
+			return;
+		}
 		const blocks = parse( this.state.value );
 		this.setState( {
 			blocks,
@@ -46,9 +51,11 @@ class TextEditor extends Component {
 
 	componentWillReceiveProps( newProps ) {
 		if ( newProps.blocks !== this.state.blocks ) {
+			const value = serialize( newProps.blocks );
 			this.setState( {
 				blocks: newProps.blocks,
-				value: serialize( newProps.blocks ),
+				persistedValue: value,
+				value,
 			} );
 		}
 	}
