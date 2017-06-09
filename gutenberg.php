@@ -9,6 +9,8 @@
  * @package gutenberg
  */
 
+define( 'GUTENBERG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 require_once dirname( __FILE__ ) . '/lib/blocks.php';
 require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 require_once dirname( __FILE__ ) . '/lib/i18n.php';

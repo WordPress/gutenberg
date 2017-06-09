@@ -33,7 +33,7 @@ registerBlockType( 'core/pullquote', {
 						} )
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
@@ -45,7 +45,7 @@ registerBlockType( 'core/pullquote', {
 							} )
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
-						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 						inline
 					/>
 				) }

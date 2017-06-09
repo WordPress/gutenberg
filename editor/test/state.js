@@ -51,27 +51,6 @@ describe( 'state', () => {
 			expect( state.blockOrder ).to.eql( [ 'bananas' ] );
 		} );
 
-		it( 'should return with block updates', () => {
-			const original = editor( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [ {
-					uid: 'kumquat',
-					attributes: {},
-				} ],
-			} );
-			const state = editor( original, {
-				type: 'UPDATE_BLOCK',
-				uid: 'kumquat',
-				updates: {
-					attributes: {
-						updated: true,
-					},
-				},
-			} );
-
-			expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
-		} );
-
 		it( 'should insert block', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
@@ -363,6 +342,25 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should return same reference if no changed properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+					},
+				} );
+
+				expect( state.edits ).to.equal( original.edits );
+			} );
+
 			it( 'should save modified properties', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
@@ -403,6 +401,19 @@ describe( 'state', () => {
 				} );
 
 				expect( state.edits ).to.eql( {} );
+			} );
+
+			it( 'should return same reference if clearing non-edited', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'CLEAR_POST_EDITS',
+				} );
+
+				expect( state.edits ).to.equal( original.edits );
 			} );
 
 			it( 'should save initial post state', () => {
@@ -482,6 +493,70 @@ describe( 'state', () => {
 				} );
 
 				expect( state.dirty ).to.be.false();
+			} );
+		} );
+
+		describe( 'blocksByUid', () => {
+			it( 'should return with block updates', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+					} ],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
+			} );
+
+			it( 'should ignore updates to non-existant block', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid ).to.equal( original.blocksByUid );
+			} );
+
+			it( 'should return with same reference if no changes in updates', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} ],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid ).to.equal( state.blocksByUid );
 			} );
 		} );
 	} );
