@@ -67,6 +67,12 @@ describe( 'babel-plugin', () => {
 			expect( comment ).to.equal( 'Greeting' );
 		} );
 
+		it( 'should be case insensitive to translator prefix', () => {
+			const comment = getCommentFromString( '// TrANslAtORs: Greeting\n__( \'Hello world\' );' );
+
+			expect( comment ).to.equal( 'Greeting' );
+		} );
+
 		it( 'should traverse up parents until it encounters comment', () => {
 			const comment = getCommentFromString( '// translators: Greeting\nconst string = __( \'Hello world\' );' );
 
