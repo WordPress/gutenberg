@@ -33,6 +33,12 @@
 		z-index: z-index( '.editor-mode-switcher .dashicon' );
 		margin-left: -24px;
 		margin-top: -1px;
+
+		display: none;
+
+		@include break-small {
+			display: block;
+		}
 	}
 
 	&:hover,

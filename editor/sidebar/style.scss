@@ -1,11 +1,16 @@
 .editor-sidebar {
-	position: fixed;
+	position: sticky;
+	z-index: z-index( '.editor-sidebar' );
 	right: 0;
 	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
 	width: $sidebar-width;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
+
+	@include break-small() {
+		position: fixed;
+	}
 
 	@include break-medium() {
 		top: $admin-bar-height + $header-height;
@@ -27,7 +32,27 @@
 
 /* Visual and Text editor both */
 .editor-layout.is-sidebar-opened .editor-layout__content {
-	margin-right: $sidebar-width;
+	margin-left: -200%;
+	float: left;
+	height: 0;
+
+	@include break-small() {
+		margin-left: auto;
+		float: none;
+		height: auto;
+	}
+
+	@include break-medium() {
+		margin-right: $sidebar-width;
+	}
+}
+
+.editor-layout.is-sidebar-opened {
+	overflow: hidden;
+
+	@include break-small() {
+		overflow: auto;
+	}
 }
 
 .editor-layout.is-sidebar-opened .editor-sidebar {
