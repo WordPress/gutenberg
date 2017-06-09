@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { find, pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
+const { pick, reduce, uniq, forEach, sortBy, isEqual, merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -99,21 +99,25 @@ function getTranslatorComment( path, _originalNodeLine ) {
 		_originalNodeLine = node.loc.start.line;
 	}
 
-	const comment = find( node.leadingComments, ( commentNode ) => {
+	let comment;
+	forEach( node.leadingComments, ( commentNode ) => {
 		const { line } = commentNode.loc.end;
-		return (
-			line >= _originalNodeLine - 1 &&
-			line <= _originalNodeLine &&
-			REGEXP_TRANSLATOR_COMMENT.test( commentNode.value )
-		);
+		if ( line < _originalNodeLine - 1 || line > _originalNodeLine ) {
+			return;
+		}
+
+		const match = commentNode.value.match( REGEXP_TRANSLATOR_COMMENT );
+		if ( match ) {
+			// Extract text from matched translator prefix
+			comment = match[ 1 ].split( '\n' ).map( ( text ) => text.trim() ).join( ' ' );
+
+			// False return indicates to Lodash to break iteration
+			return false;
+		}
 	} );
 
 	if ( comment ) {
-		// Match and extract text from translator prefix
-		return comment.value.match( REGEXP_TRANSLATOR_COMMENT )[ 1 ]
-			.split( '\n' )
-			.map( ( text ) => text.trim() )
-			.join( ' ' );
+		return comment;
 	}
 
 	if ( ! parent || ! parent.loc || ! parentPath ) {
