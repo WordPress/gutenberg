@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+import { get, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,17 +28,30 @@ export default {
 			...edits,
 			content: serialize( getBlocks( state ) ),
 		};
+		const transactionId = uniqueId();
 
 		if ( ! isNew ) {
 			toSend.id = postId;
 		}
 
-		dispatch( { type: 'CLEAR_POST_EDITS' } );
+		dispatch( {
+			type: 'CLEAR_POST_EDITS',
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+		dispatch( {
+			type: 'UPDATE_POST',
+			edits: toSend,
+			optimist: { id: transactionId },
+		} );
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: newPost,
 				isNew,
+				optimist: { type: COMMIT, id: transactionId },
+			} );
+			dispatch( {
+				type: 'UPDATE_POST',
+				edits: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -47,6 +61,7 @@ export default {
 					message: __( 'An unknown error occurred.' ),
 				} ),
 				edits,
+				optimist: { type: REVERT, id: transactionId },
 			} );
 		} );
 	},
