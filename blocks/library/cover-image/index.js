@@ -137,6 +137,7 @@ registerBlockType( 'core/cover-image', {
 							tagName="h2"
 							placeholder={ wp.i18n.__( 'Write title' ) }
 							value={ title }
+							formattingControls={ [] }
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) } />

@@ -41,6 +41,10 @@
 			background-size: cover;
 		}
 	}
+
+	.blocks-editable__tinymce[data-is-empty="true"]:before {
+		position: inherit;
+	}
 }
 
 .blocks-cover-image {
