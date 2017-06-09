@@ -9,6 +9,8 @@
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>
+	<file>index.php</file>
+	<file>./lib</file>
 	<file>./phpunit</file>
 
 	<!-- The plugin entry point already has a file comment, I promise -->

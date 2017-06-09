@@ -277,7 +277,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		return;
 	}
 
-	$is_demo = isset( $page_match[ 2 ] );
+	$is_demo = isset( $page_match[2] );
 
 	/**
 	 * Scripts
@@ -314,14 +314,14 @@ function gutenberg_scripts_and_styles( $hook ) {
 			'wp-editor',
 			'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
 		);
-	} else if ( $is_demo ) {
+	} elseif ( $is_demo ) {
 		// ...with some test content
 		wp_add_inline_script(
 			'wp-editor',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
 	} else {
-		// TODO: Error handling
+		// TODO: Error handling.
 	}
 
 	// Prepare Jed locale data.
