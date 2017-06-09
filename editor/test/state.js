@@ -398,15 +398,21 @@ describe( 'state', () => {
 
 				const state = editor( original, {
 					type: 'CLEAR_POST_EDITS',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
 				} );
 
-				expect( state.edits ).to.eql( {} );
+				expect( state.edits ).to.eql( { tags: [ 1 ] } );
 			} );
 
 			it( 'should return same reference if clearing non-edited', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
-					edits: {},
+					edits: {
+						status: 'draft',
+					},
 				} );
 
 				const state = editor( original, {
