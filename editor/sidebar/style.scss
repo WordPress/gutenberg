@@ -33,7 +33,7 @@
 /* Visual and Text editor both */
 .editor-layout.is-sidebar-opened .editor-layout__content {
 	margin-left: -200%;
-    float: left;
+	float: left;
 	height: 0;
 
 	@include break-small() {
