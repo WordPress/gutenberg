@@ -39,8 +39,8 @@
 
 .editor-format-list .editor-format-list__menu {
 	position: absolute;
-	top: $block-controls-height - 1px;
-	left: 0;
+	top: $block-controls-height - 2px;
+	left: -1px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
@@ -48,6 +48,7 @@
 	display: flex;
 	flex-direction: column;
 	align-content: flex-start;
+	z-index: z-index( '.editor-format-list__menu' );
 
 	input {
 		font-size: 13px;
@@ -59,7 +60,7 @@
 	margin-bottom: 3px;
 	padding: 6px;
 	padding-left: 4px;
-	padding-right: 23px;
+	padding-right: 24px;
 	background: none;
 	border: 1px solid transparent;
 	outline: none;

@@ -7,7 +7,6 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	z-index: z-index( '.editor-inserter' );
 }
 
 .editor-inserter__toggle {
@@ -37,6 +36,7 @@
 	position: absolute;
 	left: -122px;
 	background: $white;
+	z-index: z-index( '.editor-inserter__menu' );
 
 	&.is-top {
 		bottom: 42px;
