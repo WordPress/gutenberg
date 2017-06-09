@@ -3,6 +3,7 @@
  */
 import clickOutside from 'react-click-outside';
 import classnames from 'classnames';
+import { fromPairs, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +14,22 @@ import { Button, Dashicon } from 'components';
  * Internal dependencies
  */
 import './format-list.scss';
+
+function naiveCss2Jsx( styleText ) {
+	return fromPairs(
+		styleText.split( ';' ).map(
+			( stylePart ) => {
+				const [ cssKey, cssValue ] = stylePart.split( ':', 2 );
+				const reactKey = cssKey.split( '-' ).map(
+					( part, index ) => (
+						index === 0 ?	part : part.substr( 0, 1 ).toUpperCase() + part.substr( 1 )
+					)
+				).join( '' );
+				return [ reactKey, cssValue ];
+			}
+		)
+	);
+}
 
 class FormatList extends wp.element.Component {
 	constructor() {
@@ -48,6 +65,7 @@ class FormatList extends wp.element.Component {
 		const { formats } = this.props;
 		const selectedValue = this.props.value;
 		const noFormat = { text: wp.i18n.__( 'No format' ), value: null };
+		const styleExclude = [ 'color', 'backgroundColor' ];
 		return (
 			formats && <div className="editor-format-list">
 				<Button
@@ -77,7 +95,7 @@ class FormatList extends wp.element.Component {
 						tabIndex="0"
 						aria-label={ wp.i18n.__( 'Formats' ) }
 					>
-						{ formats.map( ( { text, value } ) => (
+						{ formats.map( ( { text, value, textStyle } ) => (
 							<Button
 								key={ value }
 								onClick={ () => this.switchFormat( value ) }
@@ -86,7 +104,7 @@ class FormatList extends wp.element.Component {
 								} ) }
 								role="menuitem"
 							>
-								{ text }
+								<span style={ omit( naiveCss2Jsx( textStyle() ), styleExclude ) }>{ text }</span>
 							</Button>
 						) ) }
 					</div>
