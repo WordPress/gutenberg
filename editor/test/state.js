@@ -588,18 +588,19 @@ describe( 'state', () => {
 			expect( state ).to.equal( original );
 		} );
 
-		it( 'should remember a post object sent with REQUEST_POST_UPDATE_SUCCESS', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
+		it( 'should update the post object with UPDATE_POST', () => {
+			const original = deepFreeze( { title: 'unmodified', status: 'publish' } );
 
 			const state = currentPost( original, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
+				type: 'UPDATE_POST',
+				edits: {
 					title: 'updated post object from server',
 				},
 			} );
 
 			expect( state ).to.eql( {
 				title: 'updated post object from server',
+				status: 'publish',
 			} );
 		} );
 	} );
@@ -979,6 +980,7 @@ describe( 'state', () => {
 			const state = store.getState();
 
 			expect( Object.keys( state ) ).to.have.members( [
+				'optimist',
 				'editor',
 				'currentPost',
 				'selectedBlock',

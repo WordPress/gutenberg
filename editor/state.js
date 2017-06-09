@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
 import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
@@ -230,8 +231,8 @@ export function currentPost( state = {}, action ) {
 		case 'RESET_BLOCKS':
 			return action.post || state;
 
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return action.post;
+		case 'UPDATE_POST':
+			return { ...state, ...action.edits };
 	}
 
 	return state;
@@ -460,7 +461,7 @@ export function saving( state = {}, action ) {
  * @return {Redux.Store} Redux store
  */
 export function createReduxStore() {
-	const reducer = combineReducers( {
+	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
 		selectedBlock,
@@ -470,7 +471,7 @@ export function createReduxStore() {
 		mode,
 		isSidebarOpened,
 		saving,
-	} );
+	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
