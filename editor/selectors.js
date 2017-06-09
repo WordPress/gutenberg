@@ -3,7 +3,7 @@
  */
 import moment from 'moment';
 import { first, last, get } from 'lodash';
-import { createSelector } from 'reselect';
+import createSelector from 'rememo';
 
 /**
  * Internal dependencies
@@ -242,15 +242,15 @@ export function getBlock( state, uid ) {
  * @return {Object[]}       Post blocks
  */
 export const getBlocks = createSelector(
-	[
-		state => state.editor.blockOrder,
-		state => state.editor.blocksByUid,
-	],
-	( blockOrder, blocksByUid ) => {
-		return blockOrder.map( ( uid ) => (
-			blocksByUid[ uid ]
+	( state ) => {
+		return state.editor.blockOrder.map( ( uid ) => (
+			state.editor.blocksByUid[ uid ]
 		) );
-	}
+	},
+	( state ) => [
+		state.editor.blockOrder,
+		state.editor.blocksByUid,
+	]
 );
 
 /**
