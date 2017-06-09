@@ -9,8 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-define( 'GUTENBERG__BLOCKS_LIBRARY_DIR', GUTENBERG__PLUGIN_DIR . 'blocks/library' );
-
 $wp_registered_blocks = array();
 
 /**
@@ -130,12 +128,3 @@ function do_blocks( $content ) {
 	return $new_content;
 }
 add_filter( 'the_content', 'do_blocks', 10 ); // BEFORE do_shortcode().
-
-/**
- * Loads the server-side rendering of blocks. If your block supports
- * server-side rendering, add it here.
- */
-function gutenberg_load_blocks_server_side_rendering() {
-	require_once GUTENBERG__BLOCKS_LIBRARY_DIR . '/latest-posts/index.php';
-}
-add_action( 'init', 'gutenberg_load_blocks_server_side_rendering' );
