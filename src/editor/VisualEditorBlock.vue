@@ -5,6 +5,7 @@
     @mousedown="select"
     @focus="focus"
   >
+    <block-mover v-if="isSelected" :uid="uid" />
     <component :is="type.edit" :attributes="block.attributes" />
   </div>
 </template>
@@ -12,30 +13,37 @@
 <script>
 import { mapState } from 'vuex';
 import { getBlockType } from '../blocks';
-import { isBlockSelected } from '../selectors';
+import { isBlockSelected, getBlock } from '../selectors';
+import BlockMover from './BlockMover';
 
 export default {
   name: 'visual-editor-block',
-  props: ['block'],
+  props: ['uid'],
   computed: {
+    ...mapState({
+      isSelected(state) {
+        return isBlockSelected(state, this.uid);
+      },
+      block(state) {
+        return getBlock(state, this.uid);
+      },
+    }),
     type() {
       return getBlockType(this.block.name);
     },
-    ...mapState({
-      isSelected(state) {
-        return isBlockSelected(state, this.block.uid);
-      },
-    }),
   },
   methods: {
     select() {
-      this.$store.commit('selectBlock', this.block.uid);
+      this.$store.commit('selectBlock', this.uid);
     },
     focus(event) {
       if (event.target === this.$el) {
         this.select();
       }
     },
+  },
+  components: {
+    BlockMover,
   },
 };
 </script>

@@ -1,22 +1,24 @@
 <template>
   <div class="editor-visual-editor">
-    Visual Editor {{ blocks.length }}
-
-    <div v-for="block in blocks">
-      <visual-editor-block :block="block" />
-    </div>
+    <visual-editor-block v-for="block in blocks" :key="block.uid" :uid="block.uid" />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import VisualEditorBlock from './VisualEditorBlock';
+import { getBlocks } from '../selectors';
 
 export default {
   name: 'visual-editor',
-  props: ['blocks'],
   components: {
     VisualEditorBlock,
   },
+  computed: mapState({
+    blocks(state) {
+      return getBlocks(state);
+    },
+  }),
 };
 </script>
 

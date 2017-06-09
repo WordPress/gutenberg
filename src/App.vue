@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <visual-editor :blocks="blocks"></visual-editor>
+  <div class="gutenberg gutenberg__editor">
+    <visual-editor />
   </div>
 </template>
 
@@ -17,8 +17,10 @@ export default {
 </script>
 
 <style lang="scss">
-  body.toplevel_page_gutenberg,
-  body.gutenberg_page_gutenberg-demo {
+  @import url( 'https://wordpress.org/wp-admin/load-styles.php?c=0&dir=ltr&load%5B%5D=common,buttons,dashicons,forms' );
+
+  body,
+  body {
     background: $white;
 
     #update-nag, .update-nag {

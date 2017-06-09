@@ -6,7 +6,7 @@ import post from './post-content';
 import { parse } from './blocks';
 import store from './store';
 
-const blocks = parse(post.content.raw);
+store.commit('resetBlocks', parse(post.content.raw));
 
 Vue.config.productionTip = false;
 
@@ -14,11 +14,6 @@ Vue.config.productionTip = false;
 new Vue({
   el: '#app',
   store,
-  template: '<App v-bind:blocks="blocks"/>',
+  template: '<App />',
   components: { App },
-  data() {
-    return {
-      blocks,
-    };
-  },
 });
