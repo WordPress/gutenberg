@@ -109,7 +109,7 @@ registerBlockType( 'core/gallery', {
 					<MediaUploadButton
 						onSelect={ setMediaUrl }
 						type="image"
-						auto-open
+						autoOpen
 						multiple="true"
 					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
