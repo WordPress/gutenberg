@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 // When embedding HTML from the WP oEmbed proxy, we need to insert it
 // into a div and make sure any scripts get run. This component takes
 // HTML and puts it into a div element, and creates and adds new script
@@ -27,7 +32,11 @@ export default class HtmlEmbed extends wp.element.Component {
 
 	render() {
 		return (
-			<div ref={ ( node ) => this.node = node } />
+			<div
+				className="html-embed"
+				tabIndex="-1"
+				ref={ ( node ) => this.node = node }
+			/>
 		);
 	}
 }
