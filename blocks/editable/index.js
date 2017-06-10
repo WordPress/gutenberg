@@ -302,14 +302,19 @@ export default class Editable extends wp.element.Component {
 
 	updateFocus() {
 		const { focus } = this.props;
+		const isActive = this.isActive();
+
 		if ( focus ) {
-			this.editor.focus();
+			if ( ! isActive ) {
+				this.editor.focus();
+			}
+
 			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 ) {
+			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
-		} else {
+		} else if ( isActive ) {
 			this.editor.getBody().blur();
 		}
 	}
