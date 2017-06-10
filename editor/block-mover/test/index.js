@@ -11,8 +11,14 @@ import { BlockMover } from '../';
 
 describe( 'BlockMover', () => {
 	describe( 'basic rendering', () => {
+		const selectedUids = [ 'IisUID', 'IisOtherUID' ];
+
+		const blockType = {
+			title: 'yolo-block',
+		};
+
 		it( 'should render two IconButton components with the following props', () => {
-			const blockMover = shallow( <BlockMover /> );
+			const blockMover = shallow( <BlockMover uids={ selectedUids } blockType={ blockType } firstIndex={ 0 } /> );
 			expect( blockMover.hasClass( 'editor-block-mover' ) );
 
 			const moveUp = blockMover.childAt( 0 );
@@ -23,33 +29,51 @@ describe( 'BlockMover', () => {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				icon: 'arrow-up-alt2',
+				label: 'Move 2 blocks from position 1 up by one place',
 				'aria-disabled': undefined,
 			} );
 			expect( moveDown.props() ).to.include( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				icon: 'arrow-down-alt2',
+				label: 'Move 2 blocks from position 1 down by one place',
 				'aria-disabled': undefined,
 			} );
 		} );
 
 		it( 'should render the up arrow with a onMoveUp callback', () => {
 			const onMoveUp = ( event ) => event;
-			const blockMover = shallow( <BlockMover onMoveUp={ onMoveUp } /> );
+			const blockMover = shallow(
+				<BlockMover uids={ selectedUids }
+					blockType={ blockType }
+					onMoveUp={ onMoveUp }
+					firstIndex={ 0 } />
+				);
 			const moveUp = blockMover.childAt( 0 );
 			expect( moveUp.prop( 'onClick' ) ).to.equal( onMoveUp );
 		} );
 
 		it( 'should render the down arrow with a onMoveDown callback', () => {
 			const onMoveDown = ( event ) => event;
-			const blockMover = shallow( <BlockMover onMoveDown={ onMoveDown } /> );
+			const blockMover = shallow(
+				<BlockMover uids={ selectedUids }
+					blockType={ blockType }
+					onMoveDown={ onMoveDown }
+					firstIndex={ 0 } />
+				);
 			const moveDown = blockMover.childAt( 1 );
 			expect( moveDown.prop( 'onClick' ) ).to.equal( onMoveDown );
 		} );
 
 		it( 'should render with a disabled up arrown when the block isFirst', () => {
 			const onMoveUp = ( event ) => event;
-			const blockMover = shallow( <BlockMover onMoveUp={ onMoveUp } isFirst /> );
+			const blockMover = shallow(
+				<BlockMover uids={ selectedUids }
+					blockType={ blockType }
+					onMoveUp={ onMoveUp }
+					isFirst
+					firstIndex={ 0 } />
+				);
 			const moveUp = blockMover.childAt( 0 );
 			expect( moveUp.props() ).to.include( {
 				onClick: null,
@@ -59,7 +83,13 @@ describe( 'BlockMover', () => {
 
 		it( 'should render with a disabled down arrow when the block isLast', () => {
 			const onMoveDown = ( event ) => event;
-			const blockMover = shallow( <BlockMover onMoveDown={ onMoveDown } isLast /> );
+			const blockMover = shallow(
+				<BlockMover uids={ selectedUids }
+					blockType={ blockType }
+					onMoveDown={ onMoveDown }
+					isLast
+					firstIndex={ 0 } />
+				);
 			const moveDown = blockMover.childAt( 1 );
 			expect( moveDown.props() ).to.include( {
 				onClick: null,
