@@ -34,6 +34,12 @@
 	border: 1px solid $light-gray-500;
 	margin-left: -1px;
 	margin-right: -1px;
+
+	h2 {
+		margin: 0;
+		font-size: inherit;
+		color: inherit;
+	}
 }
 
 .components-panel__body + .components-panel__body,
