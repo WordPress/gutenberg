@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
 
@@ -67,11 +68,6 @@ registerBlockType( 'core/gallery', {
 
 	controls: [
 		{
-			icon: 'format-image',
-			title: wp.i18n.__( 'Edit Gallery' ),
-			onClick: editMediaLibrary,
-		},
-		{
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
@@ -90,12 +86,30 @@ registerBlockType( 'core/gallery', {
 			onClick: toggleAlignment( 'right' ),
 		},
 		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
+			icon: 'align-wide',
+			title: __( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' ),
 		},
+		{
+			icon: 'align-full-width',
+			title: __( 'Full width' ),
+			isActive: ( { align } ) => 'full' === align,
+			onClick: toggleAlignment( 'full' ),
+		},
+		{
+			icon: 'format-image',
+			title: wp.i18n.__( 'Edit Gallery' ),
+			onClick: editMediaLibrary,
+		},
 	],
+
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
 
 	edit( { attributes, setAttributes, focus } ) {
 		let { images, columns, align = 'none' } = attributes;
