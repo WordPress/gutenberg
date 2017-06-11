@@ -144,7 +144,7 @@ registerBlockType( 'core/gallery', {
 				) ) }
 				{ focus && images.length > 1 &&
 					<InspectorControls>
-						<label>Columns:</label>
+						<label className="blocks-text-control__label">{ __( 'Columns' ) }</label>
 						<input type="range" min="1" max={ images.length } value={ columns } onChange={ setColumnsNumber } />
 						<span>{columns}</span>
 					</InspectorControls> }
