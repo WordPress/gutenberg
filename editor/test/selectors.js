@@ -1024,8 +1024,8 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 123, 456 ],
 					blocksByUid: {
-						123: { uid: 123, blockType: 'core/image' },
-						456: { uid: 456, blockType: 'core/quote' },
+						123: { uid: 123, name: 'core/image' },
+						456: { uid: 456, name: 'core/quote' },
 					},
 				},
 			};
@@ -1038,7 +1038,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 123 ],
 					blocksByUid: {
-						123: { uid: 123, blockType: 'core/image' },
+						123: { uid: 123, name: 'core/image' },
 					},
 				},
 			};
@@ -1051,7 +1051,7 @@ describe( 'selectors', () => {
 				editor: {
 					blockOrder: [ 456 ],
 					blocksByUid: {
-						456: { uid: 456, blockType: 'core/quote' },
+						456: { uid: 456, name: 'core/quote' },
 					},
 				},
 			};
