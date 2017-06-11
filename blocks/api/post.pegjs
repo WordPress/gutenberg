@@ -53,7 +53,7 @@ WP_Block_Type
 
 HTML_Attribute_List
   = as:(_+ a:HTML_Attribute_Item { return a })*
-  { return as.reduce( function( attrs, attr ) { return Object.assign( attrs, attr ); }, {} ) }
+  { return as.reduce( function( attrs, attr ) { return Object.assign( attrs, attr ) }, {} ) }
 
 HTML_Attribute_Item
   = HTML_Attribute_Quoted
@@ -70,8 +70,6 @@ HTML_Attribute_Unquoted
 
 HTML_Attribute_Quoted
   = name:HTML_Attribute_Name _* "=" _* '"' value:$(('\\"' . / !'"' .)*) '"'
-  { return keyValue( name, value ) }
-  / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\'" . / !"'" .)*) "'"
   { return keyValue( name, value ) }
 
 HTML_Attribute_Name
