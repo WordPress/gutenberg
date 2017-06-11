@@ -53,6 +53,10 @@ function toggleAlignment( align ) {
 	};
 }
 
+function defaultColumnsNumber( attributes ) {
+	return Math.min( 3, attributes.images.length );
+}
+
 registerBlockType( 'core/gallery', {
 	title: wp.i18n.__( 'Gallery' ),
 	icon: 'format-gallery',
@@ -63,7 +67,7 @@ registerBlockType( 'core/gallery', {
 			query( 'div.blocks-gallery figure.blocks-gallery-image img', {
 				url: attr( 'src' ),
 				alt: attr( 'alt' ),
-			} ),
+			} ) || [],
 	},
 
 	controls: [
@@ -112,9 +116,9 @@ registerBlockType( 'core/gallery', {
 	},
 
 	edit( { attributes, setAttributes, focus } ) {
-		let { images, columns, align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => { setAttributes( { columns: event.target.value } ); };
-		if ( ! images ) {
+		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
 				<Placeholder
@@ -132,9 +136,6 @@ registerBlockType( 'core/gallery', {
 					</MediaUploadButton>
 				</Placeholder>
 			);
-		}
-		if ( !columns ) {
-			columns = Math.min( 3, images.length );
 		}
 
 		return (
