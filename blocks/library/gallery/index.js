@@ -118,9 +118,10 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
+	edit( { attributes, setAttributes, focus, id } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
+		const rangeId = `blocks-gallery-range-${ id }`;
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
@@ -148,8 +149,8 @@ registerBlockType( 'core/gallery', {
 				) ) }
 				{ focus && images.length > 1 &&
 					<InspectorControls>
-						<label className="blocks-text-control__label">{ __( 'Columns' ) }</label>
-						<input type="range" min="1" max={ Math.min( MAX_COLUMNS, images.length ) } value={ columns } onChange={ setColumnsNumber } />
+						<label className="blocks-text-control__label" htmlFor={ rangeId }>{ __( 'Columns' ) }</label>
+						<input id={ rangeId } type="range" min="1" max={ Math.min( MAX_COLUMNS, images.length ) } value={ columns } onChange={ setColumnsNumber } />
 						<span>{columns}</span>
 					</InspectorControls> }
 			</div>
