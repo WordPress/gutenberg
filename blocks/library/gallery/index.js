@@ -120,7 +120,7 @@ registerBlockType( 'core/gallery', {
 
 	edit( { attributes, setAttributes, focus } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
-		const setColumnsNumber = ( event ) => { setAttributes( { columns: event.target.value } ); };
+		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
