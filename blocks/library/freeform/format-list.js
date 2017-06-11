@@ -13,6 +13,7 @@ import { Button, Dashicon } from 'components';
 /**
  * Internal dependencies
  */
+import { __ } from 'i18n';
 import './format-list.scss';
 
 function naiveCss2Jsx( styleText ) {
@@ -59,7 +60,7 @@ class FormatList extends wp.element.Component {
 	render() {
 		const { formats } = this.props;
 		const selectedValue = this.props.value;
-		const noFormat = { text: wp.i18n.__( 'No format' ), value: null };
+		const noFormat = { text: __( 'No format' ), value: null };
 		const styleExclude = [ 'color', 'backgroundColor' ];
 		return (
 			formats && <div className="editor-format-list">
@@ -68,7 +69,7 @@ class FormatList extends wp.element.Component {
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
 					aria-expanded={ this.state.open }
-					aria-label={ wp.i18n.__( 'Change format' ) }
+					aria-label={ __( 'Change format' ) }
 				>
 					<div className="formats">
 						{ [ noFormat, ...formats ].map( ( { text, value }, i ) => (
@@ -88,7 +89,7 @@ class FormatList extends wp.element.Component {
 						className="editor-format-list__menu"
 						role="menu"
 						tabIndex="0"
-						aria-label={ wp.i18n.__( 'Formats' ) }
+						aria-label={ __( 'Formats' ) }
 					>
 						{ formats.map( ( { text, value, textStyle } ) => (
 							<Button

@@ -8,6 +8,7 @@ import { Fill } from 'react-slot-fill';
 /**
  * Internal dependencies
  */
+import { __ } from 'i18n';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 import FormatList from './format-list';
@@ -16,17 +17,17 @@ const ALIGNMENT_CONTROLS = [
 	{
 		id: 'alignleft',
 		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
+		title: __( 'Align left' ),
 	},
 	{
 		id: 'aligncenter',
 		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
+		title: __( 'Align center' ),
 	},
 	{
 		id: 'alignright',
 		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
+		title: __( 'Align right' ),
 	},
 ];
 
@@ -34,33 +35,33 @@ const FREEFORM_CONTROLS = [
 	{
 		id: 'blockquote',
 		icon: 'editor-quote',
-		title: wp.i18n.__( 'Quote' ),
+		title: __( 'Quote' ),
 	},
 	{
 		id: 'bullist',
 		icon: 'editor-ul',
-		title: wp.i18n.__( 'Convert to unordered' ),
+		title: __( 'Convert to unordered' ),
 	},
 	{
 		id: 'numlist',
 		icon: 'editor-ol',
-		title: wp.i18n.__( 'Convert to ordered' ),
+		title: __( 'Convert to ordered' ),
 	},
 	{
 		leftDivider: true,
 		id: 'bold',
 		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
+		title: __( 'Bold' ),
 	},
 	{
 		id: 'italic',
 		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
+		title: __( 'Italic' ),
 	},
 	{
 		id: 'strikethrough',
 		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
+		title: __( 'Strikethrough' ),
 	},
 ];
 
