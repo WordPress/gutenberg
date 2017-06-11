@@ -1,3 +1,13 @@
+{
+
+function keyValue( key, value ) {
+  const o = {};
+  o[ key ] = value;
+  return o;
+}
+
+}
+
 Document
   = WP_Block_List
 
@@ -52,17 +62,17 @@ HTML_Attribute_Item
 
 HTML_Attribute_Empty
   = name:HTML_Attribute_Name
-  { return { [ name ]: true } }
+  { return keyValue( name, true ) }
 
 HTML_Attribute_Unquoted
   = name:HTML_Attribute_Name _* "=" _* value:$([a-zA-Z0-9]+)
-  { return { [ name ]: value } }
+  { return keyValue( name, value ) }
 
 HTML_Attribute_Quoted
   = name:HTML_Attribute_Name _* "=" _* '"' value:$(('\\"' . / !'"' .)*) '"'
-  { return { [ name ]: value } }
+  { return keyValue( name, value ) }
   / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\'" . / !"'" .)*) "'"
-  { return { [ name ]: value } }
+  { return keyValue( name, value ) }
 
 HTML_Attribute_Name
   = $([a-zA-Z0-9:.]+)
