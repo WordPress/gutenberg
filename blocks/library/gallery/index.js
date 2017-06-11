@@ -1,15 +1,19 @@
 /**
  * Internal dependencies
  */
+import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
 
 import Placeholder from 'components/placeholder';
 import MediaUploadButton from '../../media-upload-button';
+import InspectorControls from '../../inspector-controls';
 
 import GalleryImage from './gallery-image';
 
 const { query, attr } = hpq;
+
+const MAX_COLUMNS = 8;
 
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
@@ -51,6 +55,11 @@ function toggleAlignment( align ) {
 	};
 }
 
+function defaultColumnsNumber( attributes ) {
+	attributes.images = attributes.images || [];
+	return Math.min( 3, attributes.images.length );
+}
+
 registerBlockType( 'core/gallery', {
 	title: wp.i18n.__( 'Gallery' ),
 	icon: 'format-gallery',
@@ -61,15 +70,10 @@ registerBlockType( 'core/gallery', {
 			query( 'div.blocks-gallery figure.blocks-gallery-image img', {
 				url: attr( 'src' ),
 				alt: attr( 'alt' ),
-			} ),
+			} ) || [],
 	},
 
 	controls: [
-		{
-			icon: 'format-image',
-			title: wp.i18n.__( 'Edit Gallery' ),
-			onClick: editMediaLibrary,
-		},
 		{
 			icon: 'align-left',
 			title: wp.i18n.__( 'Align left' ),
@@ -89,16 +93,36 @@ registerBlockType( 'core/gallery', {
 			onClick: toggleAlignment( 'right' ),
 		},
 		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
+			icon: 'align-wide',
+			title: __( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' ),
 		},
+		{
+			icon: 'align-full-width',
+			title: __( 'Full width' ),
+			isActive: ( { align } ) => 'full' === align,
+			onClick: toggleAlignment( 'full' ),
+		},
+		{
+			icon: 'format-image',
+			title: wp.i18n.__( 'Edit Gallery' ),
+			onClick: editMediaLibrary,
+		},
 	],
 
-	edit( { attributes, setAttributes } ) {
-		const { images, align = 'none' } = attributes;
-		if ( ! images ) {
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
+
+	edit( { attributes, setAttributes, focus, id } ) {
+		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
+		const rangeId = `blocks-gallery-range-${ id }`;
+		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
 				<Placeholder
@@ -119,21 +143,26 @@ registerBlockType( 'core/gallery', {
 		}
 
 		return (
-			<div className={ `blocks-gallery align${ align }` }>
-				{ images.map( ( img, i ) => (
-					<GalleryImage key={ i } img={ img } />
+			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
+				{ images.map( ( img ) => (
+					<GalleryImage key={ img.url } img={ img } />
 				) ) }
+				{ focus && images.length > 1 &&
+					<InspectorControls>
+						<label className="blocks-text-control__label" htmlFor={ rangeId }>{ __( 'Columns' ) }</label>
+						<input id={ rangeId } type="range" min="1" max={ Math.min( MAX_COLUMNS, images.length ) } value={ columns } onChange={ setColumnsNumber } />
+						<span>{columns}</span>
+					</InspectorControls> }
 			</div>
 		);
 	},
 
 	save( { attributes } ) {
-		const { images, align = 'none' } = attributes;
-
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		return (
-			<div className={ `blocks-gallery align${ align }` } >
-				{ images.map( ( img, i ) => (
-					<GalleryImage key={ i } img={ img } />
+			<div className={ `blocks-gallery align${ align } columns-${ columns }` } >
+				{ images.map( ( img ) => (
+					<GalleryImage key={ img.url } img={ img } />
 				) ) }
 			</div>
 		);

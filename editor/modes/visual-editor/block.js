@@ -289,6 +289,7 @@ class VisualEditorBlock extends wp.element.Component {
 						insertBlockAfter={ onInsertAfter }
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
+						id={ block.uid }
 					/>
 				</div>
 			</div>
