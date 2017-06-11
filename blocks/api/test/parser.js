@@ -156,7 +156,7 @@ describe( 'block parser', () => {
 					} );
 
 					const parsed = parse(
-						'<!-- wp:core/test-block smoked="yes" url="http://google.com" chicken="ribs & \'wings\'" checked -->' +
+						'<!-- wp:core/test-block smoked="yes" url="http://google.com" chicken="ribs & \'wings\'" -->' +
 						'Brisket' +
 						'<!-- /wp:core/test-block -->'
 					);
@@ -168,7 +168,6 @@ describe( 'block parser', () => {
 						smoked: 'yes',
 						url: 'http://google.com',
 						chicken: 'ribs & \'wings\'',
-						checked: true,
 					} );
 					expect( parsed[ 0 ].uid ).to.be.a( 'string' );
 				} );
