@@ -6,6 +6,7 @@ import { registerBlockType, query as hpq } from '../../api';
 
 import Placeholder from 'components/placeholder';
 import MediaUploadButton from '../../media-upload-button';
+import InspectorControls from '../../inspector-controls';
 
 import GalleryImage from './gallery-image';
 
@@ -96,8 +97,9 @@ registerBlockType( 'core/gallery', {
 		},
 	],
 
-	edit( { attributes, setAttributes } ) {
-		const { images, align = 'none' } = attributes;
+	edit( { attributes, setAttributes, focus } ) {
+		let { images, columns, align = 'none' } = attributes;
+		const setColumnsNumber = ( event ) => { setAttributes( { columns: event.target.value } ); };
 		if ( ! images ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
@@ -117,12 +119,21 @@ registerBlockType( 'core/gallery', {
 				</Placeholder>
 			);
 		}
+		if ( !columns ) {
+			columns = Math.min( 3, images.length );
+		}
 
 		return (
-			<div className={ `blocks-gallery align${ align }` }>
+			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
 				{ images.map( ( img, i ) => (
 					<GalleryImage key={ i } img={ img } />
 				) ) }
+				{ focus && images.length > 1 &&
+					<InspectorControls>
+						<label>Columns:</label>
+						<input type="range" min="1" max={ images.length } value={ columns } onChange={ setColumnsNumber } />
+						<span>{columns}</span>
+					</InspectorControls> }
 			</div>
 		);
 	},
