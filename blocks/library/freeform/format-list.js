@@ -3,7 +3,7 @@
  */
 import clickOutside from 'react-click-outside';
 import classnames from 'classnames';
-import { fromPairs, omit } from 'lodash';
+import { camelCase, fromPairs, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,12 +20,7 @@ function naiveCss2Jsx( styleText ) {
 		styleText.split( ';' ).map(
 			( stylePart ) => {
 				const [ cssKey, cssValue ] = stylePart.split( ':', 2 );
-				const reactKey = cssKey.split( '-' ).map(
-					( part, index ) => (
-						index === 0 ?	part : part.substr( 0, 1 ).toUpperCase() + part.substr( 1 )
-					)
-				).join( '' );
-				return [ reactKey, cssValue ];
+				return [ camelCase( cssKey ), cssValue ];
 			}
 		)
 	);
