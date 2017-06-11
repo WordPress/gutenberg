@@ -139,8 +139,8 @@ registerBlockType( 'core/gallery', {
 
 		return (
 			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
-				{ images.map( ( img, i ) => (
-					<GalleryImage key={ i } img={ img } />
+				{ images.map( ( img ) => (
+					<GalleryImage key={ img.url } img={ img } />
 				) ) }
 				{ focus && images.length > 1 &&
 					<InspectorControls>
@@ -157,8 +157,8 @@ registerBlockType( 'core/gallery', {
 
 		return (
 			<div className={ `blocks-gallery align${ align }` } >
-				{ images.map( ( img, i ) => (
-					<GalleryImage key={ i } img={ img } />
+				{ images.map( ( img ) => (
+					<GalleryImage key={ img.url } img={ img } />
 				) ) }
 			</div>
 		);
