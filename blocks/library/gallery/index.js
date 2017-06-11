@@ -13,6 +13,8 @@ import GalleryImage from './gallery-image';
 
 const { query, attr } = hpq;
 
+const MAX_COLUMNS = 8;
+
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
 		frame: 'post',
@@ -146,7 +148,7 @@ registerBlockType( 'core/gallery', {
 				{ focus && images.length > 1 &&
 					<InspectorControls>
 						<label className="blocks-text-control__label">{ __( 'Columns' ) }</label>
-						<input type="range" min="1" max={ images.length } value={ columns } onChange={ setColumnsNumber } />
+						<input type="range" min="1" max={ Math.min( MAX_COLUMNS, images.length ) } value={ columns } onChange={ setColumnsNumber } />
 						<span>{columns}</span>
 					</InspectorControls> }
 			</div>
