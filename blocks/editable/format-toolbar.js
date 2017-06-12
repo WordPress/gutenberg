@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { IconButton, Toolbar } from 'components';
+import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -36,11 +37,29 @@ class FormatToolbar extends wp.element.Component {
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.updateLinkValue = this.updateLinkValue.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'keydown', this.onKeyDown );
 	}
 
 	componentWillUnmout() {
 		if ( this.editTimeout ) {
 			clearTimeout( this.editTimeout );
+		}
+	}
+
+	onKeyDown( keydown ) {
+		switch ( keydown.keyCode ) {
+			case ESCAPE:
+				if ( this.state.isEditingLink ) {
+					keydown.preventDefault();
+					this.dropLink();
+				}
+				break;
+			default :
+				break;
 		}
 	}
 
