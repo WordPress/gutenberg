@@ -146,7 +146,7 @@ registerBlockType( 'core/gallery', {
 			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
 				<Fill name="Formatting.Toolbar">
 					<Toolbar controls={ [ {
-						icon: 'format-image',
+						icon: 'edit',
 						title: __( 'Edit Gallery' ),
 						onClick: () => editMediaLibrary( attributes, setAttributes ),
 					} ] } />
