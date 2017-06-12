@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Component } from 'element';
 
 /**
@@ -16,6 +17,7 @@ import './style.scss';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
+import withInstanceId from '../higher-order/with-instance-id';
 
 const initialState = {
 	incompleteTokenValue: '',
@@ -314,6 +316,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
+		this.speak( this.props.messages.added );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -331,6 +334,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
+		this.speak( this.props.messages.removed );
 	}
 
 	getTokenValue( token ) {
@@ -367,6 +371,10 @@ class FormTokenField extends Component {
 		}
 
 		return take( suggestions, props.maxSuggestions );
+	}
+
+	speak( message ) {
+		wp.a11y.speak( message, 'assertive' );
 	}
 
 	getSelectedSuggestion() {
@@ -416,14 +424,16 @@ class FormTokenField extends Component {
 				onMouseEnter={ token.onMouseEnter }
 				onMouseLeave={ token.onMouseLeave }
 				disabled={ 'error' !== status && this.props.disabled }
+				messages={ this.props.messages }
 			/>
 		);
 	}
 
 	renderInput() {
-		const { autoCapitalize, autoComplete, maxLength, value, placeholder } = this.props;
+		const { autoCapitalize, autoComplete, maxLength, value, placeholder, instanceId } = this.props;
 
 		let props = {
+			instanceId,
 			autoCapitalize,
 			autoComplete,
 			ref: this.bindInput,
@@ -431,6 +441,8 @@ class FormTokenField extends Component {
 			disabled: this.props.disabled,
 			value: this.state.incompleteTokenValue,
 			onBlur: this.onBlur,
+			isExpanded: this.state.isActive,
+			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
 
 		if ( value.length === 0 && placeholder ) {
@@ -447,7 +459,7 @@ class FormTokenField extends Component {
 	}
 
 	render() {
-		const { disabled } = this.props;
+		const { disabled, placeholder, instanceId } = this.props;
 		const classes = classnames( 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
@@ -469,6 +481,9 @@ class FormTokenField extends Component {
 
 		return (
 			<div { ...tokenFieldProps } >
+				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="components-form-token__howto">
+					{ placeholder }
+				</label>
 				<div ref={ this.bindTokensAndInput }
 					className="components-form-token-field__input-container"
 					tabIndex="-1"
@@ -478,6 +493,7 @@ class FormTokenField extends Component {
 					{ this.renderTokensAndInput() }
 				</div>
 				<SuggestionsList
+					instanceId={ instanceId }
 					match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
 					displayTransform={ this.props.displayTransform }
 					suggestions={ this.getMatchingSuggestions() }
@@ -487,6 +503,9 @@ class FormTokenField extends Component {
 					onHover={ this.onSuggestionHovered }
 					onSelect={ this.onSuggestionSelected }
 				/>
+				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token__howto">
+					{ __( 'Separate with commas' ) }
+				</div>
 			</div>
 		);
 	}
@@ -503,6 +522,13 @@ FormTokenField.defaultProps = {
 	isBorderless: false,
 	disabled: false,
 	tokenizeOnSpace: false,
+	messages: {
+		added: __( 'Item added.' ),
+		removed: __( 'Item removed.' ),
+		remove: __( 'Remove item: %s.' ),
+	},
 };
 
-export default FormTokenField;
+FormTokenField.instances = 0;
+
+export default withInstanceId( FormTokenField );
