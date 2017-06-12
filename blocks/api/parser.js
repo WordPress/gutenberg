@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { escape, unescape, pickBy } from 'lodash';
+import { pickBy } from 'lodash';
 
 /**
  * Internal dependencies
