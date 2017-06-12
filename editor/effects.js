@@ -46,6 +46,7 @@ export default {
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: newPost,
 				isNew,
 				optimist: { type: COMMIT, id: transactionId },
 			} );
