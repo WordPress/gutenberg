@@ -46,12 +46,20 @@ export const editor = combineUndoableReducers( {
 				}, state );
 
 			case 'CLEAR_POST_EDITS':
-				// Don't return a new object if there's not any edits
-				if ( ! Object.keys( state ).length ) {
+				// if we made other edits while saving, these new edits are kept in the store.
+				const keysToClear = reduce( action.edits, ( memo, value, key ) => {
+					if ( value === state[ key ] ) {
+						memo.push( key );
+					}
+					return memo;
+				}, [] );
+
+				// Don't return a new object if there are no keys to clear
+				if ( ! keysToClear.length ) {
 					return state;
 				}
 
-				return {};
+				return omit( state, keysToClear );
 		}
 
 		return state;

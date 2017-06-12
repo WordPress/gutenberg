@@ -32,13 +32,13 @@ export default {
 			toSend.id = postId;
 		}
 
-		dispatch( { type: 'CLEAR_POST_EDITS' } );
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
 				isNew,
 			} );
+			dispatch( { type: 'CLEAR_POST_EDITS', edits } );
 		} ).fail( ( err ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
