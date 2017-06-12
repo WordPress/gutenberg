@@ -562,11 +562,11 @@ describe( 'state', () => {
 	} );
 
 	describe( 'currentPost()', () => {
-		it( 'should remember a post object sent with RESET_BLOCKS', () => {
+		it( 'should reset a post object', () => {
 			const original = deepFreeze( { title: 'unmodified' } );
 
 			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
+				type: 'RESET_POST',
 				post: {
 					title: 'new post',
 				},
@@ -575,17 +575,6 @@ describe( 'state', () => {
 			expect( state ).to.eql( {
 				title: 'new post',
 			} );
-		} );
-
-		it( 'should ignore RESET_BLOCKS without a post object', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
-
-			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
-				post: null,
-			} );
-
-			expect( state ).to.equal( original );
 		} );
 
 		it( 'should update the post object with UPDATE_POST', () => {

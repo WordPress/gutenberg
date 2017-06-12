@@ -228,8 +228,8 @@ export const editor = combineUndoableReducers( {
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RESET_BLOCKS':
-			return action.post || state;
+		case 'RESET_POST':
+			return action.post;
 
 		case 'UPDATE_POST':
 			return { ...state, ...action.edits };

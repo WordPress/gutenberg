@@ -50,8 +50,8 @@ export default {
 				optimist: { type: COMMIT, id: transactionId },
 			} );
 			dispatch( {
-				type: 'UPDATE_POST',
-				edits: newPost,
+				type: 'RESET_POST',
+				post: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
