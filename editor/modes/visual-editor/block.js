@@ -25,6 +25,7 @@ import {
 	insertBlock,
 	clearSelectedBlock,
 	startTypingInBlock,
+	stopTypingInBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -84,13 +85,17 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	maybeHover() {
-		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
+		const { isHovered, isSelected, isTyping, isMultiSelected, onStopTyping, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected ) {
+		if ( isMultiSelected ) {
 			return;
 		}
 
-		onHover();
+		if ( isSelected && isTyping ) {
+			onStopTyping();
+		} else if ( ! isSelected && ! isHovered ) {
+			onHover();
+		}
 	}
 
 	maybeStartTyping() {
@@ -319,9 +324,15 @@ export default connect(
 		onDeselect() {
 			dispatch( clearSelectedBlock() );
 		},
+
 		onStartTyping() {
 			dispatch( startTypingInBlock( ownProps.uid ) );
 		},
+
+		onStopTyping() {
+			dispatch( stopTypingInBlock( ownProps.uid ) );
+		},
+
 		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',

@@ -89,3 +89,17 @@ export function startTypingInBlock( uid ) {
 		uid,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the user has stopped typing
+ * within a block's editable field.
+ *
+ * @param  {String} uid Block UID
+ * @return {Object}     Action object
+ */
+export function stopTypingInBlock( uid ) {
+	return {
+		type: 'STOP_TYPING',
+		uid,
+	};
+}

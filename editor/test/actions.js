@@ -10,6 +10,7 @@ import {
 	focusBlock,
 	replaceBlocks,
 	startTypingInBlock,
+	stopTypingInBlock,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -45,6 +46,15 @@ describe( 'actions', () => {
 		it( 'should return the START_TYPING action', () => {
 			expect( startTypingInBlock( 'chicken' ) ).to.eql( {
 				type: 'START_TYPING',
+				uid: 'chicken',
+			} );
+		} );
+	} );
+
+	describe( 'stopTypingInBlock', () => {
+		it( 'should return the STOP_TYPING action', () => {
+			expect( stopTypingInBlock( 'chicken' ) ).to.eql( {
+				type: 'STOP_TYPING',
 				uid: 'chicken',
 			} );
 		} );
