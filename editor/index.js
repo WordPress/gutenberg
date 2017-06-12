@@ -47,8 +47,11 @@ function preparePostState( store, post ) {
 	}
 
 	store.dispatch( {
-		type: 'RESET_BLOCKS',
+		type: 'RESET_POST',
 		post,
+	} );
+	store.dispatch( {
+		type: 'RESET_BLOCKS',
 		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
