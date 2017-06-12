@@ -143,6 +143,7 @@ class FormatToolbar extends wp.element.Component {
 							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
+						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
 					</form>
 				}
 
