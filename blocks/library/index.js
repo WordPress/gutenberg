@@ -11,4 +11,5 @@ import './pullquote';
 import './table';
 import './preformatted';
 import './code';
+import './gallery';
 import './latest-posts';

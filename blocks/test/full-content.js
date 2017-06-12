@@ -53,7 +53,10 @@ function normalizeReactTree( element ) {
 		return element.map( child => normalizeReactTree( child ) );
 	}
 
-	if ( isObject( element ) ) {
+	// Check if we got an object first, then if it actually has a `type` like a
+	// React component.  Sometimes we get other stuff here, which probably
+	// indicates a bug.
+	if ( isObject( element ) && element.type ) {
 		const toReturn = {
 			type: element.type,
 		};

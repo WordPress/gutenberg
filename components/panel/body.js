@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
+import { __, sprintf } from 'i18n';
 
 /**
  * Internal dependencies
@@ -33,6 +34,8 @@ class PanelBody extends Component {
 						className="components-panel__body-toggle"
 						onClick={ this.toggle }
 						icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
+						aria-expanded={ this.state.opened }
+						label={ sprintf( __( 'Open section: %s' ), title ) }
 					>
 						{ title }
 					</IconButton>

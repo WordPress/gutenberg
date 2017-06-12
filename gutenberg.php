@@ -9,9 +9,11 @@
  * @package gutenberg
  */
 
-define( 'GUTENBERG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-
+// Load API functions.
 require_once dirname( __FILE__ ) . '/lib/blocks.php';
 require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 require_once dirname( __FILE__ ) . '/lib/i18n.php';
 require_once dirname( __FILE__ ) . '/lib/register.php';
+
+// Register server-side code for individual blocks.
+require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';

@@ -18,6 +18,7 @@ rm -f gutenberg.zip
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
+	lib/blocks/*.php \
 	post-content.js \
 	blocks/build \
 	components/build \

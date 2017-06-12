@@ -12,7 +12,7 @@
  *
  * @return string Returns the post content with latest posts added.
  */
-function gutenberg_block_core_latest_posts( $attributes ) {
+function gutenberg_render_block_core_latest_posts( $attributes ) {
 	$posts_to_show = 5;
 
 	if ( array_key_exists( 'poststoshow', $attributes ) ) {
@@ -56,5 +56,5 @@ CONTENT;
 }
 
 register_block_type( 'core/latestposts', array(
-	'render' => 'gutenberg_block_core_latest_posts',
+	'render' => 'gutenberg_render_block_core_latest_posts',
 ) );

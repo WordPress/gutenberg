@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Component } from 'element';
+import { Component, findDOMNode } from 'element';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ class VisualEditor extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
 		this.onClick = this.onClick.bind( this );
 	}
 
@@ -29,8 +30,12 @@ class VisualEditor extends Component {
 		this.container = ref;
 	}
 
+	bindBlocksContainer( ref ) {
+		this.blocksContainer = findDOMNode( ref );
+	}
+
 	onClick( event ) {
-		if ( event.target === this.container ) {
+		if ( event.target === this.container || event.target === this.blocksContainer ) {
 			this.props.clearSelectedBlock();
 		}
 	}
@@ -43,11 +48,12 @@ class VisualEditor extends Component {
 				role="region"
 				aria-label={ __( 'Visual Editor' ) }
 				className="editor-visual-editor"
-				onClick={ this.onClick }
+				onMouseDown={ this.onClick }
+				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
 			>
 				<PostTitle />
-				<VisualEditorBlockList />
+				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
 				<Inserter position="top right" />
 			</div>
 		);

@@ -72,11 +72,17 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				isActive: ( { align } ) => 'wide' === align,
 				onClick: toggleAlignment( 'wide' ),
 			},
+			{
+				icon: 'align-full-width',
+				title: wp.i18n.__( 'Full width' ),
+				isActive: ( { align } ) => 'full' === align,
+				onClick: toggleAlignment( 'full' ),
+			},
 		],
 
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
-			if ( 'left' === align || 'right' === align || 'wide' === align ) {
+			if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
 				return { 'data-align': align };
 			}
 		},

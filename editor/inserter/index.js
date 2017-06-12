@@ -13,7 +13,7 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockSelectionEnd, getSelectedBlock } from '../selectors';
+import { getLastMultiSelectedBlockUid, getSelectedBlock } from '../selectors';
 import { insertBlock, clearInsertionPoint } from '../actions';
 
 class Inserter extends wp.element.Component {
@@ -97,7 +97,7 @@ export default connect(
 	( state ) => {
 		return {
 			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getBlockSelectionEnd( state ),
+			lastMultiSelectedBlock: getLastMultiSelectedBlockUid( state ),
 		};
 	},
 	( dispatch ) => ( {
