@@ -13,8 +13,8 @@ import { IconButton } from 'components';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getLastMultiSelectedBlockUid, getSelectedBlock } from '../selectors';
-import { insertBlock, clearInsertionPoint } from '../actions';
+import { getBlockInsertionPoint, getEditorMode } from '../selectors';
+import { insertBlock, hideInsertionPoint } from '../actions';
 
 class Inserter extends wp.element.Component {
 	constructor() {
@@ -41,14 +41,7 @@ class Inserter extends wp.element.Component {
 
 	insertBlock( slug ) {
 		if ( slug ) {
-			const { selectedBlock, lastMultiSelectedBlock, onInsertBlock } = this.props;
-			let insertionPoint = null;
-			if ( lastMultiSelectedBlock ) {
-				insertionPoint = lastMultiSelectedBlock;
-			} else if ( selectedBlock ) {
-				insertionPoint = selectedBlock.uid;
-			}
-
+			const { insertionPoint, onInsertBlock } = this.props;
 			onInsertBlock(
 				slug,
 				insertionPoint
@@ -96,13 +89,13 @@ class Inserter extends wp.element.Component {
 export default connect(
 	( state ) => {
 		return {
-			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getLastMultiSelectedBlockUid( state ),
+			insertionPoint: getBlockInsertionPoint( state ),
+			mode: getEditorMode( state ),
 		};
 	},
 	( dispatch ) => ( {
 		onInsertBlock( slug, after ) {
-			dispatch( clearInsertionPoint() );
+			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
 				wp.blocks.createBlock( slug ),
 				after

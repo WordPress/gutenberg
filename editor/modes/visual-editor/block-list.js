@@ -15,6 +15,7 @@ import VisualEditorBlock from './block';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
+	isBlockInsertionPointVisible,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
@@ -97,9 +98,9 @@ class VisualEditorBlockList extends wp.element.Component {
 	}
 
 	render() {
-		const { blocks, insertionPoint, multiSelectedBlockUids } = this.props;
+		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
-		const blocksWithInsertionPoint = insertionPoint
+		const blocksWithInsertionPoint = showInsertionPoint
 			? [
 				...blocks.slice( 0, insertionPointIndex + 1 ),
 				INSERTION_POINT_PLACEHOLDER,
@@ -139,6 +140,7 @@ export default connect(
 	( state ) => ( {
 		blocks: getBlockUids( state ),
 		insertionPoint: getBlockInsertionPoint( state ),
+		showInsertionPoint: isBlockInsertionPointVisible( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		multiSelectedBlocks: getMultiSelectedBlocks( state ),

@@ -15,8 +15,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import { getLastMultiSelectedBlockUid, getSelectedBlock } from '../selectors';
-import { setInsertionPoint, clearInsertionPoint } from '../actions';
+import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -65,23 +64,6 @@ class InserterMenu extends wp.element.Component {
 				currentFocus: null,
 			} );
 		};
-	}
-
-	hoverBlock() {
-		const { lastMultiSelectedBlock, selectedBlock } = this.props;
-		let insertionPoint = null;
-		if ( lastMultiSelectedBlock ) {
-			insertionPoint = lastMultiSelectedBlock;
-		} else if ( selectedBlock ) {
-			insertionPoint = selectedBlock.uid;
-		}
-		return () => {
-			this.props.setInsertionPoint( insertionPoint );
-		};
-	}
-
-	unhoverBlock() {
-		return () => this.props.clearInsertionPoint();
 	}
 
 	getVisibleBlocks( blockTypes ) {
@@ -275,8 +257,8 @@ class InserterMenu extends wp.element.Component {
 											onClick={ this.selectBlock( slug ) }
 											ref={ this.bindReferenceNode( slug ) }
 											tabIndex="-1"
-											onMouseEnter={ this.hoverBlock() }
-											onMouseLeave={ this.unhoverBlock() }
+											onMouseEnter={ this.props.showInsertionPoint }
+											onMouseLeave={ this.props.hideInsertionPoint }
 										>
 											<Dashicon icon={ icon } />
 											{ title }
@@ -308,11 +290,6 @@ class InserterMenu extends wp.element.Component {
 InserterMenu.instances = 0;
 
 export default connect(
-	( state ) => {
-		return {
-			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getLastMultiSelectedBlockUid( state ),
-		};
-	},
-	{ setInsertionPoint, clearInsertionPoint }
+	undefined,
+	{ showInsertionPoint, hideInsertionPoint }
 )( withFocusReturn( InserterMenu ) );

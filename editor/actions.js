@@ -36,16 +36,15 @@ export function insertBlock( block, after ) {
 	};
 }
 
-export function setInsertionPoint( uid ) {
+export function showInsertionPoint() {
 	return {
-		type: 'SET_INSERTION_POINT',
-		uid,
+		type: 'SHOW_INSERTION_POINT',
 	};
 }
 
-export function clearInsertionPoint() {
+export function hideInsertionPoint() {
 	return {
-		type: 'CLEAR_INSERTION_POINT',
+		type: 'HIDE_INSERTION_POINT',
 	};
 }
 
