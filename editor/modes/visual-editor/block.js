@@ -24,6 +24,7 @@ import {
 	mergeBlocks,
 	insertBlock,
 	clearSelectedBlock,
+	startTypingInBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -319,10 +320,7 @@ export default connect(
 			dispatch( clearSelectedBlock() );
 		},
 		onStartTyping() {
-			dispatch( {
-				type: 'START_TYPING',
-				uid: ownProps.uid,
-			} );
+			dispatch( startTypingInBlock( ownProps.uid ) );
 		},
 		onHover() {
 			dispatch( {
