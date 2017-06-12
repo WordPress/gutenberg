@@ -7,6 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { sprintf } from 'i18n';
 import IconButton from 'components/icon-button';
 
 function Token( {
@@ -19,6 +20,7 @@ function Token( {
 	onClickRemove = noop,
 	onMouseEnter,
 	onMouseLeave,
+	messages,
 } ) {
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
@@ -41,10 +43,12 @@ function Token( {
 			<span className="components-form-token-field__token-text">
 				{ displayTransform( value ) }
 			</span>
+
 			<IconButton
 				className="components-form-token-field__remove-token"
 				icon="dismiss"
 				onClick={ ! disabled && onClick }
+				label={ sprintf( messages.remove, displayTransform( value ) ) }
 			/>
 		</span>
 	);
