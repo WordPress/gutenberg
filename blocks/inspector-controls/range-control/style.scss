@@ -1,0 +1,10 @@
+.blocks-range-control {
+    display: flex;
+    
+    input[type="range"] {
+        width: 100%;
+    }
+    > span {
+        margin-left: 10px;
+    }
+}
