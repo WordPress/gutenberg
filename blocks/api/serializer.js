@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { difference } from 'lodash';
+import { isEmpty, map, reduce, some } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
@@ -37,34 +37,45 @@ export function getSaveContent( save, attributes ) {
 }
 
 /**
- * Returns comment attributes as serialized string, determined by subset of
- * difference between actual attributes of a block and those expected based
- * on its settings.
+ * Returns attributes which ought to be saved and serialized
  *
- * @param  {Object} realAttributes     Actual block attributes
- * @param  {Object} expectedAttributes Expected block attributes
- * @return {string}                    Comment attributes
+ * When a block exists in memory it contains as its attributes
+ * both those which come from the block comment opening _and_
+ * those which come from parsing the contents of the block.
+ * Additionally they may live in a form fine for memory but
+ * which isn't valid for serialization.
+ *
+ * This function returns a filtered set of attributes which are
+ * the ones which need to be saved in order to ensure a full
+ * serialization and they are in a form which is safe to store.
+ *
+ * @param {Object<String,*>}   allAttributes Attributes from in-memory block data
+ * @param {Object<String,*>}   fromContent   Attributes which are inferred from block content
+ * @returns {Object<String,*>} filtered set of attributes for minimum safe save/serialization
  */
-export function getCommentAttributes( realAttributes, expectedAttributes ) {
-	// Find difference and build into object subset of attributes.
-	const keys = difference(
-		Object.keys( realAttributes ),
-		Object.keys( expectedAttributes )
+export function attributesToSave( allAttributes, fromContent ) {
+	// Reasons an attribute need not be saved
+	const canBeInferred = key => fromContent.hasOwnProperty( key );
+	const isUndefined = key => undefined === allAttributes[ key ];
+
+	const isValid = key => ! some( [
+		isUndefined,
+		canBeInferred,
+	], f => f( key ) );
+
+	// Specific ways we need to transform the values of saved attributes
+	const escapeDoubleQuotes = value => 'string' === typeof value
+		? value.replace( '"', '\"' )
+		: value;
+
+	const transform = key => escapeDoubleQuotes( allAttributes[ key ] );
+
+	// Iterate over attributes and produce the set to save
+	return reduce(
+		Object.keys( allAttributes ),
+		( toSave, key ) => Object.assign( toSave, isValid( key ) && { [ key ]: transform( key ) } ),
+		{},
 	);
-
-	// Serialize the comment attributes as `key="value"`.
-	return keys.reduce( ( memo, key ) => {
-		const value = realAttributes[ key ];
-		if ( undefined === value ) {
-			return memo;
-		}
-
-		if ( 'string' === typeof value ) {
-			return memo + `${ key }="${ value.replace( '"', '\"' ) }" `;
-		}
-
-		return memo + `${ key }="${ value }" `;
-	}, '' );
 }
 
 /**
@@ -74,30 +85,31 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return blocks.reduce( ( memo, block ) => {
+	return blocks
+		.map( block => {
 		const blockName = block.name;
 		const blockType = getBlockType( blockName );
 		const saveContent = getSaveContent( blockType.save, block.attributes );
+			const saveAttributes = attributesToSave( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+
 		const beautifyOptions = {
 			indent_inner_html: true,
 			wrap_line_length: 0,
 		};
-		const blockAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+
+			const serializedAttributes = ! isEmpty( saveAttributes )
+				? map( saveAttributes, ( value, key ) => `${ key }="${ value }"` ).join( ' ' ) + ' '
+				: '';
 
 		if ( ! saveContent ) {
-			return memo + '<!-- wp:' + blockName + ' ' + blockAttributes + '/-->\n\n';
+				return `<!-- wp:${ blockName } ${ serializedAttributes }--><!-- /wp:${ blockName } -->`;
 		}
 
-		return memo + (
-			'<!-- wp:' +
-			blockName +
-			' ' +
-			blockAttributes +
-			'-->' +
-			'\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' +
-			'<!-- /wp:' +
-			blockName +
-			' -->'
-		) + '\n\n';
-	}, '' );
+			return [
+				`<!-- wp:${ blockName } ${ serializedAttributes } -->`,
+				beautifyHtml( saveContent, beautifyOptions ),
+				`<!-- /wp:${ blockName } -->`,
+			].join( '\n' );
+		} )
+		.join( '\n\n' );
 }
