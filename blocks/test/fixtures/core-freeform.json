@@ -4,13 +4,13 @@
         "name": "core/freeform",
         "attributes": {
             "content": [
-                "Testing freeform block with some",
+                "Testing freeform block with some\n",
                 {
                     "attributes": {
                         "className": "wp-some-class"
                     },
                     "children": [
-                        "HTML ",
+                        "\n\tHTML ",
                         {
                             "attributes": {
                                 "style": {
@@ -19,7 +19,8 @@
                             },
                             "children": "content",
                             "type": "span"
-                        }
+                        },
+                        "\n"
                     ],
                     "type": "div"
                 }

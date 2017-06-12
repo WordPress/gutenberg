@@ -15,8 +15,17 @@ WP_Block_List
   = WP_Block*
 
 WP_Block
-  = WP_Block_Balanced
+  = WP_Block_Void
+  / WP_Block_Balanced
   / WP_Block_Html
+
+WP_Block_Void
+  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:HTML_Attribute_List _? "/-->"
+  { return {
+    blockType: blockType,
+    attrs: attrs,
+    rawContent: ''
+  } }
 
 WP_Block_Balanced
   = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })* e:WP_Block_End & { return s.blockType === e.blockType }
