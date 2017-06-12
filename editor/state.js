@@ -380,17 +380,12 @@ export function hoveredBlock( state = null, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function insertionPoint( state = { show: false }, action ) {
+export function showInsertionPoint( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-			return {
-				show: true,
-				uid: action.uid,
-			};
-		case 'CLEAR_INSERTION_POINT':
-			return {
-				show: false,
-			};
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
 	}
 
 	return state;
@@ -468,7 +463,7 @@ export function createReduxStore() {
 		selectedBlock,
 		multiSelectedBlocks,
 		hoveredBlock,
-		insertionPoint,
+		showInsertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,

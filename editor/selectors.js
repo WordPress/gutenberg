@@ -243,9 +243,7 @@ export function getBlock( state, uid ) {
  */
 export const getBlocks = createSelector(
 	( state ) => {
-		return state.editor.blockOrder.map( ( uid ) => (
-			state.editor.blocksByUid[ uid ]
-		) );
+		return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
 		state.editor.blockOrder,
@@ -528,12 +526,31 @@ export function isTypingInBlock( state, uid ) {
  * @return {?String}       Unique ID after which insertion will occur
  */
 export function getBlockInsertionPoint( state ) {
-	if ( ! state.insertionPoint.show ) {
-		return null;
+	if ( getEditorMode( state ) !== 'visual' ) {
+		return last( state.editor.blockOrder );
 	}
-	const blockToInsertAfter = state.insertionPoint.uid;
 
-	return blockToInsertAfter || last( state.editor.blockOrder );
+	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
+	if ( lastMultiSelectedBlock ) {
+		return lastMultiSelectedBlock;
+	}
+
+	const selectedBlock = getSelectedBlock( state );
+	if ( selectedBlock ) {
+		return selectedBlock.uid;
+	}
+
+	return last( state.editor.blockOrder );
+}
+
+/**
+ * Returns true if we should show the block insertion point
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Boolean}      Whether the insertion point is visible or not
+ */
+export function isBlockInsertionPointVisible( state ) {
+	return state.showInsertionPoint;
 }
 
 /**

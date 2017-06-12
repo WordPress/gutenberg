@@ -17,7 +17,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
-	insertionPoint,
+	showInsertionPoint,
 	createReduxStore,
 } from '../state';
 
@@ -642,27 +642,21 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'insertionPoint', () => {
-		it( 'should set the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'SET_INSERTION_POINT',
-				uid: 'kumquat',
+	describe( 'showInsertionPoint', () => {
+		it( 'should show the insertion point', () => {
+			const state = showInsertionPoint( undefined, {
+				type: 'SHOW_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: true,
-				uid: 'kumquat',
-			} );
+			expect( state ).to.be.true();
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'CLEAR_INSERTION_POINT',
+			const state = showInsertionPoint( {}, {
+				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: false,
-			} );
+			expect( state ).to.be.false();
 		} );
 	} );
 
@@ -978,7 +972,7 @@ describe( 'state', () => {
 				'mode',
 				'isSidebarOpened',
 				'saving',
-				'insertionPoint',
+				'showInsertionPoint',
 			] );
 		} );
 	} );

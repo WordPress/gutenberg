@@ -43,6 +43,7 @@ import {
 	getBlockFocus,
 	isTypingInBlock,
 	getBlockInsertionPoint,
+	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -905,39 +906,78 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockInsertionPoint', () => {
-		it( 'should return the uid of the insertion point', () => {
+		it( 'should return the uid of the selected block', () => {
 			const state = {
-				insertionPoint: {
-					show: true,
-					uid: 123,
+				mode: 'visual',
+				selectedBlock: {
+					uid: 2,
+					typing: true,
+				},
+				multiSelectedBlocks: {},
+				editor: {
+					blocksByUid: {
+						2: { uid: 2 },
+					},
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 123 );
+			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
 		} );
 
-		it( 'should return return the last block uid if the insertion point is null', () => {
+		it( 'should return the last multi selected uid', () => {
 			const state = {
-				insertionPoint: {
-					show: true,
-					uid: null,
+				mode: 'visual',
+				selectedBlock: {},
+				multiSelectedBlocks: {
+					start: 1,
+					end: 2,
 				},
 				editor: {
-					blockOrder: [ 34, 23 ],
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 23 );
+			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
 		} );
 
-		it( 'should return null if the insertion point is not shown', () => {
+		it( 'should return the last block if no selection', () => {
 			const state = {
-				insertionPoint: {
-					show: false,
+				mode: 'visual',
+				selectedBlock: {},
+				multiSelectedBlocks: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state, 23 ) ).to.be.null();
+			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+		} );
+
+		it( 'should return the last block for the text mode', () => {
+			const state = {
+				mode: 'text',
+				selectedBlock: {
+					uid: 2,
+					typing: true,
+				},
+				multiSelectedBlocks: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+		} );
+	} );
+
+	describe( 'isBlockInsertionPointVisible', () => {
+		it( 'should return the value in state', () => {
+			const state = {
+				showInsertionPoint: true,
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).to.be.true();
 		} );
 	} );
 
