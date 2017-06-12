@@ -230,11 +230,11 @@ describe( 'block parser', () => {
 			setUnknownTypeHandler( 'core/unknown-block' );
 
 			const parsed = parse(
-				'<p>Cauliflower</p>' +
+				'<span>Cauliflower</span>' +
 				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
 				'\n<p>Broccoli</p>\n' +
 				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
-				'<p>Romanesco</p>'
+				'<div>Romanesco</div>'
 			);
 
 			expect( parsed ).to.have.lengthOf( 5 );
@@ -245,9 +245,9 @@ describe( 'block parser', () => {
 				'core/test-block',
 				'core/unknown-block',
 			] );
-			expect( parsed[ 0 ].attributes.content ).to.eql( '<p>Cauliflower</p>' );
-			expect( parsed[ 2 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
-			expect( parsed[ 4 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
+			expect( parsed[ 0 ].attributes.content ).to.eql( '<span>Cauliflower</span>' );
+			expect( parsed[ 2 ].attributes.content ).to.eql( 'Broccoli' );
+			expect( parsed[ 4 ].attributes.content ).to.eql( '<div>Romanesco</div>' );
 		} );
 
 		it( 'should parse blocks with empty content', () => {

@@ -18,6 +18,15 @@ window._wpGutenbergPost = {
 
 			'<!-- wp:core/more /-->',
 
+			'<p class="fancy important">This is just a plain <em>old</em> block in a <pre><code>&lt;p&gt;</code></pre> tag.</p>',
+
+			'\nBlarg!\n',
+
+			'<ul>',
+			'	<li>One</li>',
+			'	<li>Two</li>',
+			'</ul>',
+
 			'<!-- wp:core/text -->',
 			'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',
 			'<!-- /wp:core/text -->',
