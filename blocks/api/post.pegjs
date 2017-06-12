@@ -71,6 +71,8 @@ HTML_Attribute_Unquoted
 HTML_Attribute_Quoted
   = name:HTML_Attribute_Name _* "=" _* '"' value:$(('\\"' . / !'"' .)*) '"'
   { return keyValue( name, value ) }
+  / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\'" . / !"'" .)*) "'"
+  { return keyValue( name, value ) }
 
 HTML_Attribute_Name
   = $([a-zA-Z0-9:.]+)
