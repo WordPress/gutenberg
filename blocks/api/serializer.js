@@ -59,6 +59,10 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 			return memo;
 		}
 
+		if ( 'string' === typeof value ) {
+			return memo + `${ key }="${ value.replace( '"', '\"' ) }" `;
+		}
+
 		return memo + `${ key }="${ value }" `;
 	}, '' );
 }

@@ -85,6 +85,12 @@ describe( 'block serializer', () => {
 
 			expect( attributes ).to.equal( 'category="food" ' );
 		} );
+
+		it( 'should properly escape attributes with quotes in them', () => {
+			expect( getCommentAttributes( {
+				name: 'Kevin "The Yellow Dart" Smith',
+			}, {} ) ).to.equal( 'name="Kevin \"The Yellow Dart\" Smith" ' );
+		} );
 	} );
 
 	describe( 'serialize()', () => {
