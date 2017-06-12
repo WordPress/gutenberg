@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Placeholder } from 'components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { registerBlockType, query } from '../../api';
-import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
+import ImageBlockForm from './form';
 
 const { attr, children } = query;
 
@@ -83,61 +79,7 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption } = attributes;
-		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-
-		if ( ! url ) {
-			const uploadButtonProps = { isLarge: true };
-			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
-			return [
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Image' ) }
-					className="blocks-image">
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaURL }
-						type="image"
-						autoOpen
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
-		}
-
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-
-		// Disable reason: Each block can be selected by clicking on it
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
-				</InspectorControls>
-			),
-			<figure key="image" className="blocks-image">
-				<img src={ url } alt={ alt } onClick={ setFocus } />
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
-						inlineToolbar
-					/>
-				) : null }
-			</figure>,
-		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	edit: ImageBlockForm,
 
 	save( { attributes } ) {
 		const { url, alt, caption, align = 'none' } = attributes;
