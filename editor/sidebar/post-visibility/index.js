@@ -102,7 +102,7 @@ class PostVisibility extends Component {
 						</div>
 						{ visibilityOptions.map( ( { value, label, info, changeHandler, checked } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
-								<input type="radio" value={ value } onClick={ changeHandler } checked={ checked } />
+								<input type="radio" value={ value } onChange={ changeHandler } checked={ checked } />
 								{ label }
 								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
 							</label>
