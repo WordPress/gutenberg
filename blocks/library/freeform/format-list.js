@@ -16,9 +16,9 @@ import { Button, Dashicon } from 'components';
 import { __ } from 'i18n';
 import './format-list.scss';
 
-function naiveCss2Jsx( styleText ) {
+export function naiveCss2Jsx( styleText ) {
 	return fromPairs(
-		styleText.split( ';' ).map(
+		styleText.split( ';' ).filter( ( text ) => /\S/.test( text ) ).map(
 			( stylePart ) => {
 				const [ cssKey, cssValue ] = stylePart.split( ':', 2 );
 				return [ camelCase( cssKey ), cssValue ];
