@@ -92,11 +92,18 @@ registerBlockType( 'core/cover-image', {
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' ),
 		},
+		{
+			icon: 'admin-post',
+			title: wp.i18n.__( 'Fixed' ),
+			isActive: ( { align } ) => 'fixed' === align,
+			onClick: toggleAlignment( 'fixed' ),
+		},
 	],
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
+		const validAlignments = [ 'left', 'right', 'wide', 'fixed' ];
+		if ( -1 !== validAlignments.indexOf( align ) ) {
 			return { 'data-align': align };
 		}
 	},

@@ -16,7 +16,8 @@
 		margin-left: $block-padding;
 	}
 
-	&[data-align="wide"] {
+	&[data-align="wide"],
+	&[data-align="fixed"] {
 		padding-left: 0;
 		padding-right: 0;
 		margin-right: -#{ $block-padding + $block-mover-margin };	/* Compensate for .editor-visual-editor centering padding */
@@ -44,6 +45,12 @@
 
 	.blocks-editable__tinymce[data-is-empty="true"]:before {
 		position: inherit;
+	}
+
+	&[data-align="fixed"] {
+		.cover-image {
+			background-attachment: fixed;
+		}
 	}
 }
 
