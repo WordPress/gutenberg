@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { difference } from 'lodash';
+import { reduce } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
  * Internal dependencies
  */
 import { getBlockType } from './registration';
-import { parseBlockAttributes } from './parser';
 
 /**
  * Given a block's save render implementation and attributes, returns the
@@ -37,30 +36,28 @@ export function getSaveContent( save, attributes ) {
 }
 
 /**
- * Returns comment attributes as serialized string, determined by subset of
- * difference between actual attributes of a block and those expected based
- * on its settings.
+ * Returns comment attributes as serialized string, determined by the return
+ * value object of the block's `encodeAttributes` implementation. If a block
+ * does not provide an implementation, an empty string is returned.
  *
- * @param  {Object} realAttributes     Actual block attributes
- * @param  {Object} expectedAttributes Expected block attributes
- * @return {string}                    Comment attributes
+ * @param  {?Function} encodeAttributes Attribute encoding implementation
+ * @param  {Object}    attributes       Block attributes
+ * @return {String}                     Comment attributes
  */
-export function getCommentAttributes( realAttributes, expectedAttributes ) {
-	// Find difference and build into object subset of attributes.
-	const keys = difference(
-		Object.keys( realAttributes ),
-		Object.keys( expectedAttributes )
-	);
+export function getCommentAttributes( encodeAttributes, attributes ) {
+	let encodedAttributes;
+	if ( encodeAttributes ) {
+		encodedAttributes = encodeAttributes( attributes );
+	}
 
 	// Serialize the comment attributes as `key="value"`.
-	return keys.reduce( ( memo, key ) => {
-		const value = realAttributes[ key ];
-		if ( undefined === value ) {
-			return memo;
+	return reduce( encodedAttributes, ( result, value, key ) => {
+		if ( undefined !== value ) {
+			result.push( `${ key }="${ value }"` );
 		}
 
-		return memo + `${ key }="${ value }" `;
-	}, '' );
+		return result;
+	}, [] ).join( ' ' );
 }
 
 /**
@@ -74,6 +71,7 @@ export default function serialize( blocks ) {
 		const blockName = block.name;
 		const blockType = getBlockType( blockName );
 		const saveContent = getSaveContent( blockType.save, block.attributes );
+		const commentAttributes = getCommentAttributes( blockType.encodeAttributes, block.attributes );
 		const beautifyOptions = {
 			indent_inner_html: true,
 			wrap_line_length: 0,
@@ -83,10 +81,7 @@ export default function serialize( blocks ) {
 			'<!-- wp:' +
 			blockName +
 			' ' +
-			getCommentAttributes(
-				block.attributes,
-				parseBlockAttributes( saveContent, blockType )
-			) +
+			( commentAttributes ? commentAttributes + ' ' : '' ) +
 			'-->' +
 			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
 			'<!-- /wp:' +

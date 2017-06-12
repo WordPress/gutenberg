@@ -24,6 +24,11 @@ registerBlockType( 'core/quote', {
 		citation: children( 'footer' ),
 	},
 
+	encodeAttributes( attributes ) {
+		const { style } = attributes;
+		return { style };
+	},
+
 	controls: [ 1, 2 ].map( ( variation ) => ( {
 		icon: 'format-quote',
 		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
