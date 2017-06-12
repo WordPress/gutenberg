@@ -12,9 +12,15 @@
 	<file>index.php</file>
 	<file>./lib</file>
 	<file>./phpunit</file>
+	<file>./bin</file>
 
 	<!-- The plugin entry point already has a file comment, I promise -->
 	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>gutenberg.php</exclude-pattern>
+	</rule>
+
+	<!-- These special comments are markers for the build process -->
+	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>
 	</rule>
 
