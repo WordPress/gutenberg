@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { PanelBody, FormToggle } from 'components';
+import { PanelBody, FormToggle, withInstanceId } from 'components';
 
 /**
  * Internal Dependencies
@@ -28,7 +28,6 @@ class PostStatus extends Component {
 	constructor() {
 		super( ...arguments );
 		this.togglePendingStatus = this.togglePendingStatus.bind( this );
-		this.id = this.constructor.instances++;
 	}
 
 	togglePendingStatus() {
@@ -38,12 +37,12 @@ class PostStatus extends Component {
 	}
 
 	render() {
-		const { status, suggestedFormat, isPublished } = this.props;
+		const { status, suggestedFormat, isPublished, instanceId } = this.props;
 
 		// Use the suggested post format based on the blocks content of the post
 		// or the default post format setting for the site.
 		const format = suggestedFormat || __( 'Standard' );
-		const pendingId = 'pending-toggle-' + this.id;
+		const pendingId = 'pending-toggle-' + instanceId;
 
 		return (
 			<PanelBody title={ __( 'Status & Visibility' ) }>
@@ -76,8 +75,6 @@ class PostStatus extends Component {
 	}
 }
 
-PostStatus.instances = 1;
-
 export default connect(
 	( state ) => ( {
 		status: getEditedPostAttribute( state, 'status' ),
@@ -91,5 +88,5 @@ export default connect(
 			},
 		};
 	}
-)( PostStatus );
+)( withInstanceId( PostStatus ) );
 
