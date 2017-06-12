@@ -10,6 +10,6 @@ import { withKnobs } from '@storybook/addon-knobs';
  */
 import readme from '../README.md';
 
-storiesOf( 'Components', module )
+storiesOf( 'Higher Order Components', module )
 	.addDecorator( withKnobs )
 	.add( 'Intro', () => <ReactMarkdown source={ readme } /> );

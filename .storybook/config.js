@@ -16,6 +16,8 @@ function loadStories() {
 	window.wp = { ...window.wp, element };
 	require( '../components/story' );
 	require( '../components/button/story' );
+	require( '../components/higher-order/story' );
+	require( '../components/higher-order/with-instance-id/story' );
 }
 
 setOptions( {
