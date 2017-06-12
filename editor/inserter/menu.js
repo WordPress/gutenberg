@@ -8,15 +8,14 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Dashicon, withFocusReturn } from 'components';
+import { Dashicon, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getLastMultiSelectedBlockUid, getSelectedBlock } from '../selectors';
-import { setInsertionPoint, clearInsertionPoint } from '../actions';
+import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
 class InserterMenu extends wp.element.Component {
 	constructor() {
@@ -27,7 +26,6 @@ class InserterMenu extends wp.element.Component {
 			currentFocus: null,
 		};
 		this.filter = this.filter.bind( this );
-		this.instanceId = this.constructor.instances++;
 		this.isShownBlock = this.isShownBlock.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -65,23 +63,6 @@ class InserterMenu extends wp.element.Component {
 				currentFocus: null,
 			} );
 		};
-	}
-
-	hoverBlock() {
-		const { lastMultiSelectedBlock, selectedBlock } = this.props;
-		let insertionPoint = null;
-		if ( lastMultiSelectedBlock ) {
-			insertionPoint = lastMultiSelectedBlock;
-		} else if ( selectedBlock ) {
-			insertionPoint = selectedBlock.uid;
-		}
-		return () => {
-			this.props.setInsertionPoint( insertionPoint );
-		};
-	}
-
-	unhoverBlock() {
-		return () => this.props.clearInsertionPoint();
 	}
 
 	getVisibleBlocks( blockTypes ) {
@@ -242,7 +223,7 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	render() {
-		const { position = 'top' } = this.props;
+		const { position = 'top', instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlockTypes() );
 		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
 		const className = classnames( 'editor-inserter__menu', positionClasses );
@@ -256,7 +237,7 @@ class InserterMenu extends wp.element.Component {
 							<div key={ category.slug }>
 								<div
 									className="editor-inserter__separator"
-									id={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
+									id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
 									aria-hidden="true"
 								>
 									{ category.title }
@@ -265,7 +246,7 @@ class InserterMenu extends wp.element.Component {
 									className="editor-inserter__category-blocks"
 									role="menu"
 									tabIndex="0"
-									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
+									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
 								>
 									{ visibleBlocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
 										<button
@@ -275,8 +256,8 @@ class InserterMenu extends wp.element.Component {
 											onClick={ this.selectBlock( slug ) }
 											ref={ this.bindReferenceNode( slug ) }
 											tabIndex="-1"
-											onMouseEnter={ this.hoverBlock() }
-											onMouseLeave={ this.unhoverBlock() }
+											onMouseEnter={ this.props.showInsertionPoint }
+											onMouseLeave={ this.props.hideInsertionPoint }
 										>
 											<Dashicon icon={ icon } />
 											{ title }
@@ -287,11 +268,11 @@ class InserterMenu extends wp.element.Component {
 						) )
 					}
 				</div>
-				<label htmlFor={ `editor-inserter__search-${ this.instanceId }` } className="screen-reader-text">
+				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ wp.i18n.__( 'Search blocks' ) }
 				</label>
 				<input
-					id={ `editor-inserter__search-${ this.instanceId }` }
+					id={ `editor-inserter__search-${ instanceId }` }
 					type="search"
 					placeholder={ wp.i18n.__( 'Search…' ) }
 					className="editor-inserter__search"
@@ -305,14 +286,13 @@ class InserterMenu extends wp.element.Component {
 	}
 }
 
-InserterMenu.instances = 0;
+const connectComponent = connect(
+	undefined,
+	{ showInsertionPoint, hideInsertionPoint }
+);
 
-export default connect(
-	( state ) => {
-		return {
-			selectedBlock: getSelectedBlock( state ),
-			lastMultiSelectedBlock: getLastMultiSelectedBlockUid( state ),
-		};
-	},
-	{ setInsertionPoint, clearInsertionPoint }
-)( withFocusReturn( InserterMenu ) );
+export default flow(
+	withInstanceId,
+	withFocusReturn,
+	connectComponent
+)( InserterMenu );

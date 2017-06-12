@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
 import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
@@ -70,6 +71,7 @@ export const editor = combineUndoableReducers( {
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCKS':
 			case 'EDIT_POST':
+			case 'MARK_DIRTY':
 				return true;
 		}
 
@@ -227,11 +229,11 @@ export const editor = combineUndoableReducers( {
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RESET_BLOCKS':
-			return action.post || state;
-
-		case 'REQUEST_POST_UPDATE_SUCCESS':
+		case 'RESET_POST':
 			return action.post;
+
+		case 'UPDATE_POST':
+			return { ...state, ...action.edits };
 	}
 
 	return state;
@@ -378,17 +380,12 @@ export function hoveredBlock( state = null, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function insertionPoint( state = { show: false }, action ) {
+export function showInsertionPoint( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-			return {
-				show: true,
-				uid: action.uid,
-			};
-		case 'CLEAR_INSERTION_POINT':
-			return {
-				show: false,
-			};
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
 	}
 
 	return state;
@@ -460,17 +457,17 @@ export function saving( state = {}, action ) {
  * @return {Redux.Store} Redux store
  */
 export function createReduxStore() {
-	const reducer = combineReducers( {
+	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
 		selectedBlock,
 		multiSelectedBlocks,
 		hoveredBlock,
-		insertionPoint,
+		showInsertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,
-	} );
+	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {

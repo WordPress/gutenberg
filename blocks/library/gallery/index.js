@@ -4,8 +4,13 @@
 import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
+import { Fill } from 'react-slot-fill';
 
-import Placeholder from 'components/placeholder';
+/**
+ * WordPress dependencies
+ */
+import { Toolbar, Placeholder } from 'components';
+
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 
@@ -104,11 +109,6 @@ registerBlockType( 'core/gallery', {
 			isActive: ( { align } ) => 'full' === align,
 			onClick: toggleAlignment( 'full' ),
 		},
-		{
-			icon: 'format-image',
-			title: wp.i18n.__( 'Edit Gallery' ),
-			onClick: editMediaLibrary,
-		},
 	],
 
 	getEditWrapperProps( attributes ) {
@@ -133,7 +133,7 @@ registerBlockType( 'core/gallery', {
 					<MediaUploadButton
 						onSelect={ setMediaUrl }
 						type="image"
-						auto-open
+						autoOpen
 						multiple="true"
 					>
 						{ wp.i18n.__( 'Insert from Media Library' ) }
@@ -144,6 +144,13 @@ registerBlockType( 'core/gallery', {
 
 		return (
 			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
+				<Fill name="Formatting.Toolbar">
+					<Toolbar controls={ [ {
+						icon: 'edit',
+						title: __( 'Edit Gallery' ),
+						onClick: () => editMediaLibrary( attributes, setAttributes ),
+					} ] } />
+				</Fill>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }

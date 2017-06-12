@@ -7,7 +7,7 @@ window._wpGutenbergPost = {
 	},
 	content: {
 		raw: [
-			'<!-- wp:core/text -->',
+			'<!-- wp:core/text data="{\\"projectName\\":\\"gutenberg\\",\\"isAwesome\\":true}"-->',
 			'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
@@ -15,6 +15,8 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/text -->',
 			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
 			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/more /-->',
 
 			'<!-- wp:core/text -->',
 			'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',

@@ -3,6 +3,7 @@
  */
 import moment from 'moment';
 import { first, last, get } from 'lodash';
+import createSelector from 'rememo';
 
 /**
  * Internal dependencies
@@ -235,13 +236,20 @@ export function getBlock( state, uid ) {
 /**
  * Returns all block objects for the current post being edited as an array in
  * the order they appear in the post.
+ * Note: It's important to memoize this selector to avoid return a new instance on each call
  *
  * @param  {Object}   state Global application state
  * @return {Object[]}       Post blocks
  */
-export function getBlocks( state ) {
-	return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
-}
+export const getBlocks = createSelector(
+	( state ) => {
+		return state.editor.blockOrder.map( ( uid ) => getBlock( state, uid ) );
+	},
+	( state ) => [
+		state.editor.blockOrder,
+		state.editor.blocksByUid,
+	]
+);
 
 /**
  * Returns the currently selected block, or null if there is no selected block.
@@ -518,12 +526,31 @@ export function isTypingInBlock( state, uid ) {
  * @return {?String}       Unique ID after which insertion will occur
  */
 export function getBlockInsertionPoint( state ) {
-	if ( ! state.insertionPoint.show ) {
-		return null;
+	if ( getEditorMode( state ) !== 'visual' ) {
+		return last( state.editor.blockOrder );
 	}
-	const blockToInsertAfter = state.insertionPoint.uid;
 
-	return blockToInsertAfter || last( state.editor.blockOrder );
+	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
+	if ( lastMultiSelectedBlock ) {
+		return lastMultiSelectedBlock;
+	}
+
+	const selectedBlock = getSelectedBlock( state );
+	if ( selectedBlock ) {
+		return selectedBlock.uid;
+	}
+
+	return last( state.editor.blockOrder );
+}
+
+/**
+ * Returns true if we should show the block insertion point
+ *
+ * @param  {Object}  state Global application state
+ * @return {?Boolean}      Whether the insertion point is visible or not
+ */
+export function isBlockInsertionPointVisible( state ) {
+	return state.showInsertionPoint;
 }
 
 /**

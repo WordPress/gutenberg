@@ -59,6 +59,10 @@ export function getCommentAttributes( realAttributes, expectedAttributes ) {
 			return memo;
 		}
 
+		if ( 'string' === typeof value ) {
+			return memo + `${ key }="${ value.replace( '"', '\"' ) }" `;
+		}
+
 		return memo + `${ key }="${ value }" `;
 	}, '' );
 }
@@ -78,17 +82,19 @@ export default function serialize( blocks ) {
 			indent_inner_html: true,
 			wrap_line_length: 0,
 		};
+		const blockAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+
+		if ( ! saveContent ) {
+			return memo + '<!-- wp:' + blockName + ' ' + blockAttributes + '/-->\n\n';
+		}
 
 		return memo + (
 			'<!-- wp:' +
 			blockName +
 			' ' +
-			getCommentAttributes(
-				block.attributes,
-				parseBlockAttributes( saveContent, blockType )
-			) +
+			blockAttributes +
 			'-->' +
-			( saveContent ? '\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' : '' ) +
+			'\n' + beautifyHtml( saveContent, beautifyOptions ) + '\n' +
 			'<!-- /wp:' +
 			blockName +
 			' -->'
