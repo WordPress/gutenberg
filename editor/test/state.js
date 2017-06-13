@@ -798,6 +798,29 @@ describe( 'state', () => {
 			expect( state ).to.eql( { uid: 'chicken', typing: true, focus: {} } );
 		} );
 
+		it( 'should do nothing if typing stopped not within selected block', () => {
+			const original = selectedBlock( undefined, {} );
+			const state = selectedBlock( original, {
+				type: 'STOP_TYPING',
+				uid: 'chicken',
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should reset typing flag if typing stopped within selected block', () => {
+			const original = selectedBlock( undefined, {
+				type: 'START_TYPING',
+				uid: 'chicken',
+			} );
+			const state = selectedBlock( original, {
+				type: 'STOP_TYPING',
+				uid: 'chicken',
+			} );
+
+			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
+		} );
+
 		it( 'should set the typing flag and merge the existing state', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: false, focus: { editable: 'citation' } } );
 			const state = selectedBlock( original, {
