@@ -35,9 +35,9 @@ class BlockSwitcher extends wp.element.Component {
 	}
 
 	toggleMenu() {
-		this.setState( {
-			open: ! this.state.open,
-		} );
+		this.setState( ( state ) => ( {
+			open: ! state.open,
+		} ) );
 	}
 
 	switchBlockType( name ) {

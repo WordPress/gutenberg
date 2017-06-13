@@ -215,22 +215,22 @@ class FormTokenField extends Component {
 	}
 
 	handleUpArrowKey() {
-		this.setState( {
-			selectedSuggestionIndex: Math.max( ( this.state.selectedSuggestionIndex || 0 ) - 1, 0 ),
+		this.setState( ( state ) => ( {
+			selectedSuggestionIndex: Math.max( ( state.selectedSuggestionIndex || 0 ) - 1, 0 ),
 			selectedSuggestionScroll: true,
-		} );
+		} ) );
 
 		return true; // preventDefault
 	}
 
 	handleDownArrowKey() {
-		this.setState( {
+		this.setState( ( state, props ) => ( {
 			selectedSuggestionIndex: Math.min(
-				( this.state.selectedSuggestionIndex + 1 ) || 0,
-				this.getMatchingSuggestions().length - 1
+				( state.selectedSuggestionIndex + 1 ) || 0,
+				this.getMatchingSuggestions( state, props ).length - 1
 			),
 			selectedSuggestionScroll: true,
-		} );
+		} ) );
 
 		return true; // preventDefault
 	}
@@ -244,21 +244,21 @@ class FormTokenField extends Component {
 	}
 
 	moveInputToIndex( index ) {
-		this.setState( {
-			inputOffsetFromEnd: this.props.value.length - Math.max( index, -1 ) - 1,
-		} );
+		this.setState( ( state, props ) => ( {
+			inputOffsetFromEnd: props.value.length - Math.max( index, -1 ) - 1,
+		} ) );
 	}
 
 	moveInputBeforePreviousToken() {
-		this.setState( {
-			inputOffsetFromEnd: Math.min( this.state.inputOffsetFromEnd + 1, this.props.value.length ),
-		} );
+		this.setState( ( state, props ) => ( {
+			inputOffsetFromEnd: Math.min( state.inputOffsetFromEnd + 1, props.value.length ),
+		} ) );
 	}
 
 	moveInputAfterNextToken() {
-		this.setState( {
-			inputOffsetFromEnd: Math.max( this.state.inputOffsetFromEnd - 1, 0 ),
-		} );
+		this.setState( ( state ) => ( {
+			inputOffsetFromEnd: Math.max( state.inputOffsetFromEnd - 1, 0 ),
+		} ) );
 	}
 
 	deleteTokenBeforeInput() {
@@ -341,20 +341,20 @@ class FormTokenField extends Component {
 		return token;
 	}
 
-	getMatchingSuggestions() {
-		let suggestions = this.props.suggestions;
-		let match = this.props.saveTransform( this.state.incompleteTokenValue );
+	getMatchingSuggestions( state = this.state, props = this.props ) {
+		let suggestions = props.suggestions;
+		let match = props.saveTransform( state.incompleteTokenValue );
 		const startsWithMatch = [];
 		const containsMatch = [];
 
 		if ( match.length === 0 ) {
-			suggestions = difference( suggestions, this.props.value );
+			suggestions = difference( suggestions, props.value );
 		} else {
 			match = match.toLocaleLowerCase();
 
 			each( suggestions, ( suggestion ) => {
 				const index = suggestion.toLocaleLowerCase().indexOf( match );
-				if ( this.props.value.indexOf( suggestion ) === -1 ) {
+				if ( props.value.indexOf( suggestion ) === -1 ) {
 					if ( index === 0 ) {
 						startsWithMatch.push( suggestion );
 					} else if ( index > 0 ) {
@@ -366,7 +366,7 @@ class FormTokenField extends Component {
 			suggestions = startsWithMatch.concat( containsMatch );
 		}
 
-		return take( suggestions, this.props.maxSuggestions );
+		return take( suggestions, props.maxSuggestions );
 	}
 
 	getSelectedSuggestion() {
