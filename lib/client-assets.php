@@ -35,44 +35,13 @@ function gutenberg_url( $path ) {
 }
 
 /**
- * Registers common scripts to be used as dependencies of the editor and plugins.
+ * Registers common scripts and styles to be used as dependencies of the editor
+ * and plugins.
  *
  * @since 0.1.0
  */
-function gutenberg_register_scripts() {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-	gutenberg_register_vendor_script(
-		'react',
-		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
-	);
-	gutenberg_register_vendor_script(
-		'react-dom',
-		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
-	gutenberg_register_vendor_script(
-		'react-dom-server',
-		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
-		array( 'react' )
-	);
-	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
-	gutenberg_register_vendor_script(
-		'moment',
-		'https://unpkg.com/moment@2.18.1/' . $moment_script,
-		array( 'react' )
-	);
-	gutenberg_register_vendor_script(
-		'tinymce-nightly',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
-	);
-	gutenberg_register_vendor_script(
-		'tinymce-nightly-lists',
-		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
-		array( 'tinymce-nightly' )
-	);
+function gutenberg_register_scripts_and_styles() {
+	gutenberg_register_vendor_scripts();
 
 	// Editor Scripts.
 	wp_register_script(
@@ -152,7 +121,52 @@ function gutenberg_register_scripts() {
 		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
 	);
 }
-add_action( 'init', 'gutenberg_register_scripts' );
+add_action( 'init', 'gutenberg_register_scripts_and_styles' );
+
+/**
+ * Registers vendor JavaScript files to be used as dependencies of the editor
+ * and plugins.
+ *
+ * This function is called from a script during the plugin build process, so it
+ * should not call any WordPress PHP functions.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_register_vendor_scripts() {
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+	// Vendor Scripts.
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	gutenberg_register_vendor_script(
+		'react',
+		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
+	);
+	gutenberg_register_vendor_script(
+		'react-dom',
+		'https://unpkg.com/react-dom@next/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
+	);
+	gutenberg_register_vendor_script(
+		'react-dom-server',
+		'https://unpkg.com/react-dom@next/umd/react-dom-server' . $react_suffix . '.js',
+		array( 'react' )
+	);
+	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
+	gutenberg_register_vendor_script(
+		'moment',
+		'https://unpkg.com/moment@2.18.1/' . $moment_script,
+		array( 'react' )
+	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce' . $suffix . '.js'
+	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly-lists',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-nightly' )
+	);
+}
 
 /**
  * Retrieves a unique and reasonably short and human-friendly filename for a
@@ -216,11 +230,19 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 	}
 
 	$filename = gutenberg_vendor_script_filename( $src );
+
+	if ( defined( 'GUTENBERG_LIST_VENDOR_ASSETS' ) && GUTENBERG_LIST_VENDOR_ASSETS ) {
+		echo "$src|$filename\n";
+		return;
+	}
+
 	$full_path = gutenberg_dir_path() . 'vendor/' . $filename;
 
 	$needs_fetch = (
-		! file_exists( $full_path ) ||
-		time() - filemtime( $full_path ) >= DAY_IN_SECONDS
+		defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && (
+			! file_exists( $full_path ) ||
+			time() - filemtime( $full_path ) >= DAY_IN_SECONDS
+		)
 	);
 
 	if ( $needs_fetch ) {

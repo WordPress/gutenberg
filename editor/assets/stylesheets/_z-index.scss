@@ -1,4 +1,5 @@
 $z-layers: (
+<<<<<<< HEAD
 	".editor-mode-switcher .dashicon": -1,
 	".editor-block-switcher__arrow": 1,
 	".editor-inserter__arrow": 1,
@@ -11,6 +12,21 @@ $z-layers: (
 	".editor-header": 20,
 	".editor-post-visibility__dialog": 30,
 	".editor-post-schedule__dialog": 30,
+=======
+	'.editor-mode-switcher .dashicon': -1,
+	'.editor-block-switcher__arrow': 1,
+	'.editor-inserter__arrow': 1,
+	'.editor-inserter__menu': 1,
+	'.editor-visual-editor__block:before': -1,
+	'.editor-visual-editor__block {core/image aligned left or right}': 10,
+	'.editor-visual-editor__block-controls': 1,
+	'.components-form-toggle__input': 1,
+	'.editor-sidebar': 19,
+	'.editor-header': 20,
+	'.editor-post-visibility__dialog': 30,
+	'.editor-post-schedule__dialog': 30,
+	'.editor-format-list__menu': 1,
+>>>>>>> WordPress/master
 );
 
 @function z-index($key) {

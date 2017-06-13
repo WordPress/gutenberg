@@ -17,7 +17,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
-	insertionPoint,
+	showInsertionPoint,
 	createReduxStore,
 } from '../state';
 
@@ -562,11 +562,11 @@ describe( 'state', () => {
 	} );
 
 	describe( 'currentPost()', () => {
-		it( 'should remember a post object sent with RESET_BLOCKS', () => {
+		it( 'should reset a post object', () => {
 			const original = deepFreeze( { title: 'unmodified' } );
 
 			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
+				type: 'RESET_POST',
 				post: {
 					title: 'new post',
 				},
@@ -577,29 +577,19 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should ignore RESET_BLOCKS without a post object', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
+		it( 'should update the post object with UPDATE_POST', () => {
+			const original = deepFreeze( { title: 'unmodified', status: 'publish' } );
 
 			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
-				post: null,
-			} );
-
-			expect( state ).to.equal( original );
-		} );
-
-		it( 'should remember a post object sent with REQUEST_POST_UPDATE_SUCCESS', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
-
-			const state = currentPost( original, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
+				type: 'UPDATE_POST',
+				edits: {
 					title: 'updated post object from server',
 				},
 			} );
 
 			expect( state ).to.eql( {
 				title: 'updated post object from server',
+				status: 'publish',
 			} );
 		} );
 	} );
@@ -652,27 +642,21 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'insertionPoint', () => {
-		it( 'should set the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'SET_INSERTION_POINT',
-				uid: 'kumquat',
+	describe( 'showInsertionPoint', () => {
+		it( 'should show the insertion point', () => {
+			const state = showInsertionPoint( undefined, {
+				type: 'SHOW_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: true,
-				uid: 'kumquat',
-			} );
+			expect( state ).to.be.true();
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'CLEAR_INSERTION_POINT',
+			const state = showInsertionPoint( {}, {
+				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: false,
-			} );
+			expect( state ).to.be.false();
 		} );
 	} );
 
@@ -979,6 +963,7 @@ describe( 'state', () => {
 			const state = store.getState();
 
 			expect( Object.keys( state ) ).to.have.members( [
+				'optimist',
 				'editor',
 				'currentPost',
 				'selectedBlock',
@@ -987,7 +972,7 @@ describe( 'state', () => {
 				'mode',
 				'isSidebarOpened',
 				'saving',
-				'insertionPoint',
+				'showInsertionPoint',
 			] );
 		} );
 	} );

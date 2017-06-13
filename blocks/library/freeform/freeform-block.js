@@ -2,29 +2,32 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { concat, isEqual, omitBy } from 'lodash';
+import { isEqual, omitBy } from 'lodash';
+import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
  */
+import { __ } from 'i18n';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
+import FormatList from './format-list';
 
 const ALIGNMENT_CONTROLS = [
 	{
 		id: 'alignleft',
 		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
+		title: __( 'Align left' ),
 	},
 	{
 		id: 'aligncenter',
 		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
+		title: __( 'Align center' ),
 	},
 	{
 		id: 'alignright',
 		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
+		title: __( 'Align right' ),
 	},
 ];
 
@@ -32,33 +35,33 @@ const FREEFORM_CONTROLS = [
 	{
 		id: 'blockquote',
 		icon: 'editor-quote',
-		title: wp.i18n.__( 'Quote' ),
+		title: __( 'Quote' ),
 	},
 	{
 		id: 'bullist',
 		icon: 'editor-ul',
-		title: wp.i18n.__( 'Convert to unordered' ),
+		title: __( 'Convert to unordered' ),
 	},
 	{
 		id: 'numlist',
 		icon: 'editor-ol',
-		title: wp.i18n.__( 'Convert to ordered' ),
+		title: __( 'Convert to ordered' ),
 	},
 	{
 		leftDivider: true,
 		id: 'bold',
 		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
+		title: __( 'Bold' ),
 	},
 	{
 		id: 'italic',
 		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
+		title: __( 'Italic' ),
 	},
 	{
 		id: 'strikethrough',
 		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
+		title: __( 'Strikethrough' ),
 	},
 ];
 
@@ -83,8 +86,10 @@ export default class FreeformBlock extends wp.element.Component {
 		super( ...arguments );
 		this.getSettings = this.getSettings.bind( this );
 		this.setButtonActive = this.setButtonActive.bind( this );
+		this.setFormatActive = this.setFormatActive.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.updateFocus = this.updateFocus.bind( this );
@@ -94,9 +99,12 @@ export default class FreeformBlock extends wp.element.Component {
 		this.controls = this.mapControls.bind( this );
 		this.editor = null;
 		this.savedContent = null;
+		this.formats = null;
+		this.handleFormatChange = null;
 		this.state = {
 			empty: ! props.value || ! props.value.length,
 			activeButtons: { },
+			activeFormat: null,
 		};
 	}
 
@@ -116,15 +124,28 @@ export default class FreeformBlock extends wp.element.Component {
 		} ) );
 	}
 
+	setFormatActive( newActiveFormat ) {
+		this.setState( { activeFormat: newActiveFormat } );
+	}
+
 	onSetup( editor ) {
 		this.editor = editor;
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'focusin', this.onFocus );
+		editor.on( 'selectionChange', this.onSelectionChange );
 	}
 
 	onInit() {
-		concat( ALIGNMENT_CONTROLS, FREEFORM_CONTROLS ).forEach( ( control ) => {
+		const formatselect = this.editor.buttons.formatselect();
+		formatselect.onPostRender.call( {
+			value: this.setFormatActive,
+		} );
+		this.formats = formatselect.values;
+		this.handleFormatChange = formatselect.onselect;
+		this.forceUpdate();
+
+		[ ...ALIGNMENT_CONTROLS, ...FREEFORM_CONTROLS ].forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
 				button.onPostRender.call( {
@@ -133,6 +154,34 @@ export default class FreeformBlock extends wp.element.Component {
 			}
 		} );
 		this.updateFocus();
+	}
+
+	isActive() {
+		return document.activeElement === this.editor.getBody();
+	}
+
+	onSelectionChange() {
+		// We must check this because selectionChange is a global event.
+		if ( ! this.isActive() ) {
+			return;
+		}
+
+		const content = this.getContent();
+		const collapsed = this.editor.selection.isCollapsed();
+
+		this.setState( {
+			empty: ! content || ! content.length,
+		} );
+
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
+			this.props.onFocus( {
+				...this.props.focus,
+				collapsed,
+			} );
+		}
 	}
 
 	onChange() {
@@ -220,6 +269,15 @@ export default class FreeformBlock extends wp.element.Component {
 	render() {
 		const { content, focus } = this.props;
 		return [
+			focus && (
+				<Fill name="Formatting.Toolbar">
+					<FormatList
+						onFormatChange={ this.handleFormatChange }
+						formats={ this.formats }
+						value={ this.state.activeFormat }
+					/>
+				</Fill>
+			),
 			focus && (
 				<BlockControls
 					key="aligns"
