@@ -14,6 +14,13 @@ import './style.scss';
 
 function loadStories() {
 	window.wp = { ...window.wp, element };
+	require( './stories/intro' );
+	require( './stories/contributing' );
+	require( './stories/coding-guidelines' );
+	require( '../i18n/story' );
+	require( '../element/story' );
+	require( '../blocks/story' );
+	require( '../editor/story' );
 	require( '../components/story' );
 	require( '../components/button/story' );
 	require( '../components/higher-order/story' );
