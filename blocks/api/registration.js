@@ -15,6 +15,13 @@ const blocks = {};
 let unknownTypeHandler;
 
 /**
+ * Name of the default block.
+ *
+ * @type {?string}
+ */
+let defaultBlockName;
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -84,6 +91,24 @@ export function setUnknownTypeHandler( name ) {
  */
 export function getUnknownTypeHandler() {
 	return unknownTypeHandler;
+}
+
+/**
+ * Assigns the default block name
+ *
+ * @param {string} name Block name
+ */
+export function setDefaultBlock( name ) {
+	defaultBlockName = name;
+}
+
+/**
+ * Retrieves the default block name
+ *
+ * @return {?string} Blog name
+ */
+export function getDefaultBlock() {
+	return defaultBlockName;
 }
 
 /**
