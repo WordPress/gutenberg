@@ -121,7 +121,7 @@ registerBlockType( 'core/gallery', {
 
 	edit( { attributes, setAttributes, focus } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
-        const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
+		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
 			return (
@@ -156,7 +156,7 @@ registerBlockType( 'core/gallery', {
 				) ) }
 				{ focus && images.length > 1 &&
 					<InspectorControls>
-                        <RangeControl label={ __( 'Columns' ) } value={ columns } onChange={ setColumnsNumber } min="1" max={ Math.min( MAX_COLUMNS, images.length ) } />
+						<RangeControl label={ __( 'Columns' ) } value={ columns } onChange={ setColumnsNumber } min="1" max={ Math.min( MAX_COLUMNS, images.length ) } />
 					</InspectorControls> }
 			</div>
 		);
