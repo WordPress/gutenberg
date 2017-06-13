@@ -1,10 +1,9 @@
 .blocks-range-control {
-    display: flex;
-    
-    input[type="range"] {
-        width: 100%;
-    }
-    > span {
-        margin-left: 10px;
-    }
+	margin-bottom: 10px;
+}
+
+.blocks-range-control__label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 5px;
 }
