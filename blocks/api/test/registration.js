@@ -14,6 +14,8 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
+	setDefaultBlock,
+	getDefaultBlock,
 	getBlockType,
 	getBlockTypes,
 } from '../registration';
@@ -29,6 +31,7 @@ describe( 'blocks', () => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandler( undefined );
+		setDefaultBlock( undefined );
 		console.error.restore();
 	} );
 
@@ -105,6 +108,20 @@ describe( 'blocks', () => {
 	describe( 'getUnknownTypeHandler()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getUnknownTypeHandler() ).to.be.undefined();
+		} );
+	} );
+
+	describe( 'setDefaultBlock()', () => {
+		it( 'assigns default block name', () => {
+			setDefaultBlock( 'core/test-block' );
+
+			expect( getDefaultBlock() ).to.equal( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getDefaultBlock()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getDefaultBlock() ).to.be.undefined();
 		} );
 	} );
 

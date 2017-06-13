@@ -6,7 +6,7 @@ import { Children, cloneElement } from 'element';
 /**
  * Internal dependencies
  */
-import { registerBlockType, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, query, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -78,3 +78,5 @@ registerBlockType( 'core/text', {
 		) );
 	},
 } );
+
+setDefaultBlock( 'core/text' );
