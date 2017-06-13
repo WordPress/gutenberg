@@ -3,15 +3,20 @@
  */
 import { withInstanceId } from 'components';
 
-function TextControl( { label, value, instanceId, onChange, ...attributes } ) {
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
+function TextControl( { label, value, instanceId, onChange, ...props } ) {
 	const id = 'inspector-text-control-' + instanceId;
-    const type = attributes.type || 'text';
+    const type = props.type || 'text';
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<div className="blocks-inspector-control">
-			<label className="blocks-inspector-control__label" htmlFor={ id }>{ label }</label>
-			<input className="blocks-inspector-control__input" type={ type } id={ id } value={ value } onChange={ onChangeValue } { ...attributes } />
+		<div className="blocks-text-control">
+			<label className="blocks-text-control__label" htmlFor={ id }>{ label }</label>
+			<input className="blocks-text-control__input" type={ type } id={ id } value={ value } onChange={ onChangeValue } { ...props } />
 		</div>
 	);
 }
