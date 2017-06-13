@@ -36,11 +36,28 @@ export function getSaveContent( save, attributes ) {
 	return wp.element.renderToString( rawContent );
 }
 
+// Reasons an attribute shouldn't be stored in the block header
+const canBeInferred = ( allValue, contentValue ) => undefined !== contentValue;
+const isUndefined = allValue => undefined === allValue;
+
+const isValidForHeader = ( allValue, contentValue ) => ! some( [
+	isUndefined,
+	canBeInferred,
+], f => f( allValue, contentValue ) );
+
+// Specific ways we need to transform attributes for storage in the block header
+const escapeDoubleQuotes = value => 'string' === typeof value
+	? value.replace( /"/g, '\"' )
+	: value;
+
+const transformAttributeValue = escapeDoubleQuotes;
+
 /**
- * Returns attributes which ought to be saved and serialized
+ * Returns attributes which ought to be saved
+ * and serialized into the block comment header
  *
  * When a block exists in memory it contains as its attributes
- * both those which come from the block comment opening _and_
+ * both those which come from the block comment header _and_
  * those which come from parsing the contents of the block.
  * Additionally they may live in a form fine for memory but
  * which isn't valid for serialization.
@@ -49,31 +66,19 @@ export function getSaveContent( save, attributes ) {
  * the ones which need to be saved in order to ensure a full
  * serialization and they are in a form which is safe to store.
  *
- * @param {Object<String,*>}   allAttributes Attributes from in-memory block data
- * @param {Object<String,*>}   fromContent   Attributes which are inferred from block content
+ * @param {Object<String,*>}   allAttributes         Attributes from in-memory block data
+ * @param {Object<String,*>}   attributesFromContent Attributes which are inferred from block content
  * @returns {Object<String,*>} filtered set of attributes for minimum safe save/serialization
  */
-export function attributesToSave( allAttributes, fromContent ) {
-	// Reasons an attribute need not be saved
-	const canBeInferred = key => fromContent.hasOwnProperty( key );
-	const isUndefined = key => undefined === allAttributes[ key ];
-
-	const isValid = key => ! some( [
-		isUndefined,
-		canBeInferred,
-	], f => f( key ) );
-
-	// Specific ways we need to transform the values of saved attributes
-	const escapeDoubleQuotes = value => 'string' === typeof value
-		? value.replace( '"', '\"' )
-		: value;
-
-	const transform = key => escapeDoubleQuotes( allAttributes[ key ] );
-
+export function getCommentAttributes( allAttributes, attributesFromContent ) {
 	// Iterate over attributes and produce the set to save
 	return reduce(
 		Object.keys( allAttributes ),
-		( toSave, key ) => Object.assign( toSave, isValid( key ) && { [ key ]: transform( key ) } ),
+		( toSave, key ) => {
+			return isValidForHeader( allAttributes[ key ], attributesFromContent[ key ] )
+				? Object.assign( toSave, { [ key ]: transformAttributeValue( allAttributes[ key ] ) } )
+				: toSave;
+		},
 		{},
 	);
 }
@@ -90,7 +95,7 @@ export default function serialize( blocks ) {
 		const blockName = block.name;
 		const blockType = getBlockType( blockName );
 		const saveContent = getSaveContent( blockType.save, block.attributes );
-			const saveAttributes = attributesToSave( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+			const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
 
 		const beautifyOptions = {
 			indent_inner_html: true,
@@ -106,7 +111,7 @@ export default function serialize( blocks ) {
 		}
 
 			return [
-				`<!-- wp:${ blockName } ${ serializedAttributes } -->`,
+				`<!-- wp:${ blockName } ${ serializedAttributes }-->`,
 				beautifyHtml( saveContent, beautifyOptions ),
 				`<!-- /wp:${ blockName } -->`,
 			].join( '\n' );
