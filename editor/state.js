@@ -299,6 +299,16 @@ export function selectedBlock( state = {}, action ) {
 				typing: true,
 			};
 
+		case 'STOP_TYPING':
+			if ( action.uid !== state.uid ) {
+				return state;
+			}
+
+			return {
+				...state,
+				typing: false,
+			};
+
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.uid ) === -1 ) {
 				return state;

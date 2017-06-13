@@ -24,6 +24,8 @@ import {
 	mergeBlocks,
 	insertBlock,
 	clearSelectedBlock,
+	startTypingInBlock,
+	stopTypingInBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -50,6 +52,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
+		this.stopTyping = this.stopTyping.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
@@ -57,9 +60,10 @@ class VisualEditorBlock extends wp.element.Component {
 		this.previousOffset = null;
 	}
 
-	bindBlockNode( node ) {
-		this.node = node;
-		this.props.blockRef( node );
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.node.focus();
+		}
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -70,6 +74,45 @@ class VisualEditorBlock extends wp.element.Component {
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		// Preserve scroll prosition when block rearranged
+		if ( this.previousOffset ) {
+			window.scrollTo(
+				window.scrollX,
+				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
+			);
+			this.previousOffset = null;
+		}
+
+		// Focus node when focus state is programmatically transferred.
+		if ( this.props.focus && ! prevProps.focus ) {
+			this.node.focus();
+		}
+
+		// Bind or unbind mousemove from page when user starts or stops typing
+		const { isTyping } = this.props;
+		if ( isTyping !== prevProps.isTyping ) {
+			if ( isTyping ) {
+				document.addEventListener( 'mousemove', this.stopTyping );
+			} else {
+				this.removeStopTypingListener();
+			}
+		}
+	}
+
+	componentWillUnmount() {
+		this.removeStopTypingListener();
+	}
+
+	removeStopTypingListener() {
+		document.removeEventListener( 'mousemove', this.stopTyping );
+	}
+
+	bindBlockNode( node ) {
+		this.node = node;
+		this.props.blockRef( node );
 	}
 
 	setAttributes( attributes ) {
@@ -102,6 +145,10 @@ class VisualEditorBlock extends wp.element.Component {
 		if ( ! isTyping && isSelected ) {
 			onStartTyping();
 		}
+	}
+
+	stopTyping() {
+		this.props.onStopTyping();
 	}
 
 	removeOrDeselect( { keyCode, target } ) {
@@ -150,27 +197,6 @@ class VisualEditorBlock extends wp.element.Component {
 			onMerge( block, nextBlock );
 		} else {
 			onMerge( previousBlock, block );
-		}
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.previousOffset ) {
-			window.scrollTo(
-				window.scrollX,
-				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
-			);
-			this.previousOffset = null;
-		}
-
-		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus ) {
-			this.node.focus();
-		}
-	}
-
-	componentDidMount() {
-		if ( this.props.focus ) {
-			this.node.focus();
 		}
 	}
 
@@ -318,12 +344,15 @@ export default connect(
 		onDeselect() {
 			dispatch( clearSelectedBlock() );
 		},
+
 		onStartTyping() {
-			dispatch( {
-				type: 'START_TYPING',
-				uid: ownProps.uid,
-			} );
+			dispatch( startTypingInBlock( ownProps.uid ) );
 		},
+
+		onStopTyping() {
+			dispatch( stopTypingInBlock( ownProps.uid ) );
+		},
+
 		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',
