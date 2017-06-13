@@ -4,12 +4,14 @@
 }
 
 @keyframes animate_fade {
+
 	from {
 		opacity: 0;
-		transform: translateY( 4px );
+		transform: translateY(4px);
 	}
+
 	to {
 		opacity: 1;
-		transform: translateY( 0px );
+		transform: translateY(0);
 	}
 }

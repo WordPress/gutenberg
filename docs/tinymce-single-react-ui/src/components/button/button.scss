@@ -1,49 +1,54 @@
 @import "../../assets/stylesheets/_variables.scss";
 
 .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid $inactive-border;
-  padding: 5px;
-  background: $inactive-bg;
-  color: $inactive-color;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid $inactive-border;
+	padding: 5px;
+	background: $inactive-bg;
+	color: $inactive-color;
 
-  &:hover {
-    background: $hover-bg;
-    border-color: $hover-border;
-    color: $hover-color;
-    cursor: pointer;
-    :global {
-      .dashicon {
-        fill: $hover-color;
-      }
-    }
-  }
+	&:hover {
+		background: $hover-bg;
+		border-color: $hover-border;
+		color: $hover-color;
+		cursor: pointer;
 
-  &.active,
-  &:active {
-    background: $active-bg;
-    border-color: $active-border;
-    color: $active-color;
-    :global {
-      .dashicon {
-        fill: $active-color;
-      }
-    }
-  }
+		:global { /* stylelint-disable-line selector-pseudo-class-no-unknown */
 
-  &.inactive {
-    // opacity: .8;
-  }
+			.dashicon {
+				fill: $hover-color;
+			}
+		}
+	}
 
-  :global {
-    .dashicon {
-      width: 24px;
-      height: 24px;
-      fill: $inactive-color;
-    }
-  }
+	&.active,
+	&:active {
+		background: $active-bg;
+		border-color: $active-border;
+		color: $active-color;
+
+		:global { /* stylelint-disable-line selector-pseudo-class-no-unknown */
+
+			.dashicon {
+				fill: $active-color;
+			}
+		}
+	}
+
+	&.inactive {
+		// opacity: 0.8;
+	}
+
+	:global { /* stylelint-disable-line selector-pseudo-class-no-unknown */
+
+		.dashicon {
+			width: 24px;
+			height: 24px;
+			fill: $inactive-color;
+		}
+	}
 }
 
 

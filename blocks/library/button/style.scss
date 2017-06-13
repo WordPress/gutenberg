@@ -25,11 +25,12 @@ $blocks-button__height: 46px;
 		z-index: 2;
 		top: $blocks-button__height + 2px;
 		left: 50%;
-		transform: translateX( -50% );
+		transform: translateX(-50%);
 	}
 }
 
 .editor-visual-editor__block[data-type="core/button"] {
+
 	&[data-align="center"] {
 		text-align: center;
 	}

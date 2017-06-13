@@ -15,7 +15,8 @@
 }
 
 .editor-visual-editor .blocks-pullquote {
-	& > .blocks-editable p {
+
+	&.blocks-editable p {
 		font-family: $default-font;
 		font-size: 48px;
 		font-weight: 900;

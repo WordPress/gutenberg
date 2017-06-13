@@ -51,10 +51,10 @@
 	}
 
 	&[data-subscript]:after {
-		content: attr( data-subscript );
+		content: attr(data-subscript);
 		font-family: $default-font;
 		font-size: 10px;
-		font-weight: bold;
+		font-weight: 700;
 		position: relative;
 		top: -6px;
 		left: -9px;
@@ -73,7 +73,7 @@
 
 	&.left-divider:before {
 		display: inline-block;
-		content: '';
+		content: "";
 		box-sizing: content-box;
 		background-color: $light-gray-500;
 		position: absolute;

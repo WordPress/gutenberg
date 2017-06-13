@@ -8,7 +8,7 @@
 	border: 1px solid $light-gray-500;
 	color: $dark-gray-700;
 	cursor: text;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 
 	&:hover {
 		border-color: $light-gray-700;
@@ -62,6 +62,7 @@ input[type="text"].components-form-token-field__input {
 	overflow: hidden;
 
 	&.is-success {
+
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			background: $alert-green;
@@ -69,6 +70,7 @@ input[type="text"].components-form-token-field__input {
 	}
 
 	&.is-error {
+
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			background: $alert-red;
@@ -76,6 +78,7 @@ input[type="text"].components-form-token-field__input {
 	}
 
 	&.is-validating {
+
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			color: $dark-gray-500;
@@ -100,12 +103,14 @@ input[type="text"].components-form-token-field__input {
 		}
 
 		&.is-success {
+
 			.components-form-token-field__token-text {
 				color: $alert-green;
 			}
 		}
 
 		&.is-error {
+
 			.components-form-token-field__token-text {
 				color: $alert-red;
 				border-radius: 4px 0 0 4px;
@@ -114,6 +119,7 @@ input[type="text"].components-form-token-field__input {
 		}
 
 		&.is-validating {
+
 			.components-form-token-field__token-text {
 				color: $dark-gray-800;
 			}
@@ -121,6 +127,7 @@ input[type="text"].components-form-token-field__input {
 	}
 
 	&.is-disabled {
+
 		.components-form-token-field__remove-token {
 			cursor: default;
 		}
@@ -132,7 +139,7 @@ input[type="text"].components-form-token-field__input {
 	display: inline-block;
 	line-height: 24px;
 	background: $light-gray-500;
-	transition: all .2s cubic-bezier( .4, 1, .4, 1 );
+	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 }
 
 .components-form-token-field__token-text {
@@ -161,7 +168,7 @@ input[type="text"].components-form-token-field__input {
 	background: $white;
 	max-height: 0;
 	overflow-y: scroll;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 	list-style: none;
 	margin: 0;
 

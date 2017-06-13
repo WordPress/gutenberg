@@ -33,12 +33,12 @@
 		left: 0;
 		top: 0;
 		color: $gray-dark-300;
-		content: '— ';
+		content: "— ";
 	}
 }
 
 .quote-block__form.quote-style1 {
-	border-left: 4px solid black;
+	border-left: 4px solid #000;
 	padding-left: 20px;
 
 	.quote-block__content {
