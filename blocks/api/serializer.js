@@ -66,6 +66,7 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 			const allValue = allAttributes[ key ];
 			const contentValue = attributesFromContent[ key ];
 
+			// save only if attribute if not inferred from the content and if valued
 			return ! ( contentValue !== undefined || allValue === undefined )
 				? Object.assign( toSave, { [ key ]: escapeDoubleQuotes( allValue ) } )
 				: toSave;
