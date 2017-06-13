@@ -13,7 +13,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from 'element';
 import { parse, pasteHandler } from '../api';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { BACKSPACE, DELETE, ENTER, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -230,10 +230,41 @@ export default class Editable extends Component {
 	}
 
 	onKeyDown( event ) {
+		const { keyCode } = event;
+		const moveUp = ( keyCode === UP || keyCode === LEFT ) && this.isStartOfEditor();
+		const moveDown = ( keyCode === DOWN || keyCode === RIGHT ) && this.isEndOfEditor();
+		const selectors = [
+			'*[contenteditable="true"]',
+			'*[tabindex]',
+			'textarea',
+			'input',
+		].join( ',' );
+
+		if ( moveUp || moveDown ) {
+			const rootNode = this.editor.getBody();
+			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
+
+			if ( moveUp ) {
+				focusableNodes.reverse();
+			}
+
+			const targetNode = focusableNodes
+				.slice( focusableNodes.indexOf( rootNode ) )
+				.reduce( ( result, node ) => {
+					return result || ( node.contains( rootNode ) ? null : node );
+				}, null );
+
+			if ( targetNode ) {
+				targetNode.focus();
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+
 		if (
 			this.props.onMerge && (
-				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === DELETE && this.isEndOfEditor() )
+				( keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+				( keyCode === DELETE && this.isEndOfEditor() )
 			)
 		) {
 			const forward = event.keyCode === DELETE;
