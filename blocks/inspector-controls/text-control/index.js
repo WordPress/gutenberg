@@ -8,9 +8,8 @@ import { withInstanceId } from 'components';
  */
 import './style.scss';
 
-function TextControl( { label, value, instanceId, onChange, ...props } ) {
+function TextControl( { label, value, instanceId, onChange, type = 'text', ...props } ) {
 	const id = 'inspector-text-control-' + instanceId;
-    const type = props.type || 'text';
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
