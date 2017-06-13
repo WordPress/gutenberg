@@ -1,0 +1,18 @@
+
+.editor-visual-editor__block[data-type="core/freeform"] .editor-visual-editor__block-controls {
+	// Slot creates a div which has no class on it, I need it to be flex
+	&> div {
+		display: flex;
+
+		.more-draw {
+			position: absolute;
+			display: inline-flex;
+			top: -5px - $icon-button-size;
+			right: 0;
+
+			&> .components-toolbar:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+}
