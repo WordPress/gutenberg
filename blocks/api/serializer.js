@@ -47,16 +47,14 @@ const escapeDoubleQuotes = value => 'string' === typeof value
  * When a block exists in memory it contains as its attributes
  * both those which come from the block comment header _and_
  * those which come from parsing the contents of the block.
- * Additionally they may live in a form fine for memory but
- * which isn't valid for serialization.
  *
- * This function returns a filtered set of attributes which are
- * the ones which need to be saved in order to ensure a full
- * serialization and they are in a form which is safe to store.
+ * This function returns only those attributes which are
+ * needed to persist and which cannot already be inferred
+ * from the block content.
  *
  * @param {Object<String,*>}   allAttributes         Attributes from in-memory block data
  * @param {Object<String,*>}   attributesFromContent Attributes which are inferred from block content
- * @returns {Object<String,*>} filtered set of attributes for minimum safe save/serialization
+ * @returns {Object<String,*>} filtered set of attributes for minimum save/serialization
  */
 export function getCommentAttributes( allAttributes, attributesFromContent ) {
 	// Iterate over attributes and produce the set to save
@@ -68,7 +66,7 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 
 			// save only if attribute if not inferred from the content and if valued
 			return ! ( contentValue !== undefined || allValue === undefined )
-				? Object.assign( toSave, { [ key ]: escapeDoubleQuotes( allValue ) } )
+				? Object.assign( toSave, { [ key ]: allValue } )
 				: toSave;
 		},
 		{},
@@ -84,7 +82,7 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
  * @returns {string}       stringified equality pair
  */
 function asNameValuePair( value, key ) {
-	return `${ key }="${ value }`;
+	return `${ key }="${ escapeDoubleQuotes( value ) }"`;
 }
 
 export function serializeBlock( block ) {
