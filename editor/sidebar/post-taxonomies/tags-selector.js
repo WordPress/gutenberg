@@ -7,6 +7,7 @@ import { unescape, find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Component } from 'element';
 import { FormTokenField } from 'components';
 import { getEditedPostAttribute } from '../../selectors';
@@ -102,6 +103,7 @@ class TagsSelector extends Component {
 
 		return (
 			<div className="editor-post-taxonomies__tags-selector">
+				<strong className="editor-post-taxonomies__tags-selector-title">{ __( 'Tags' ) }</strong>
 				<FormTokenField
 					value={ selectedTags }
 					displayTransform={ unescape }
