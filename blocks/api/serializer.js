@@ -76,38 +76,50 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 }
 
 /**
+ * Lodash iterator which transforms a key: value
+ * pair into a string of `key="value"`
+ *
+ * @param {*}        value value to be stringified
+ * @param {String}   key   name of value
+ * @returns {string}       stringified equality pair
+ */
+function asNameValuePair( value, key ) {
+	return `${ key }="${ value }`;
+}
+
+export function serializeBlock( block ) {
+	const blockName = block.name;
+	const blockType = getBlockType( blockName );
+	const saveContent = getSaveContent( blockType.save, block.attributes );
+	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+
+	const serializedAttributes = ! isEmpty( saveAttributes )
+		? map( saveAttributes, asNameValuePair ).join( ' ' ) + ' '
+		: '';
+
+	if ( ! saveContent ) {
+		return `<!-- wp:${ blockName } ${ serializedAttributes }--><!-- /wp:${ blockName } -->`;
+	}
+
+	return (
+		`<!-- wp:${ blockName } ${ serializedAttributes }-->\n` +
+
+		/** make more readable - @see https://github.com/WordPress/gutenberg/pull/663 */
+		beautifyHtml( saveContent, {
+			indent_inner_html: true,
+			wrap_line_length: 0,
+		} ) +
+
+		`\n<!-- /wp:${ blockName } -->`
+	);
+}
+
+/**
  * Takes a block list and returns the serialized post content.
  *
  * @param  {Array}  blocks Block list
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	return blocks
-		.map( block => {
-			const blockName = block.name;
-			const blockType = getBlockType( blockName );
-			const saveContent = getSaveContent( blockType.save, block.attributes );
-			const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
-
-			const serializedAttributes = ! isEmpty( saveAttributes )
-				? map( saveAttributes, ( value, key ) => `${ key }="${ value }"` ).join( ' ' ) + ' '
-				: '';
-
-			if ( ! saveContent ) {
-				return `<!-- wp:${ blockName } ${ serializedAttributes }--><!-- /wp:${ blockName } -->`;
-			}
-
-			return [
-				`<!-- wp:${ blockName } ${ serializedAttributes }-->`,
-
-				/** make more readable - @see https://github.com/WordPress/gutenberg/pull/663 */
-				beautifyHtml( saveContent, {
-					indent_inner_html: true,
-					wrap_line_length: 0,
-				} ),
-
-				`<!-- /wp:${ blockName } -->`,
-			].join( '\n' );
-		} )
-		.join( '\n\n' );
+	return blocks.map( serializeBlock ).join( '\n\n' );
 }

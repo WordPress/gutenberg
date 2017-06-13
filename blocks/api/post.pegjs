@@ -45,7 +45,7 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List _? "-->"
+  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List __ "-->"
   { return {
     blockName: blockName,
     attrs: attrs
@@ -78,9 +78,9 @@ HTML_Attribute_Unquoted
   { return keyValue( name, value ) }
 
 HTML_Attribute_Quoted
-  = name:HTML_Attribute_Name _* "=" _* '"' value:$(("\\" '"' . / !'"' .)*) '"'
+  = name:HTML_Attribute_Name _* "=" _* '"' value:$(('\\"' . / !'"' .)*) '"'
   { return keyValue( name, value ) }
-  / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\" "'" . / !"'" .)*) "'"
+  / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\'" . / !"'" .)*) "'"
   { return keyValue( name, value ) }
 
 HTML_Attribute_Name
