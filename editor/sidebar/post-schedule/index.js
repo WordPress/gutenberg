@@ -32,7 +32,7 @@ class PostSchedule extends Component {
 
 	toggleDialog( event ) {
 		event.preventDefault();
-		this.setState( { opened: ! this.state.opened } );
+		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
 	handleClickOutside() {

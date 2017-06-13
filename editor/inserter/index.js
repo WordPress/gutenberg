@@ -28,9 +28,9 @@ class Inserter extends wp.element.Component {
 	}
 
 	toggle() {
-		this.setState( {
-			opened: ! this.state.opened,
-		} );
+		this.setState( ( state ) => ( {
+			opened: ! state.opened,
+		} ) );
 	}
 
 	close() {

@@ -20,9 +20,9 @@ class PanelBody extends Component {
 
 	toggle( event ) {
 		event.preventDefault();
-		this.setState( {
-			opened: ! this.state.opened,
-		} );
+		this.setState( ( state ) => ( {
+			opened: ! state.opened,
+		} ) );
 	}
 
 	render() {

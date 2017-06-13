@@ -45,9 +45,9 @@ class FormatList extends wp.element.Component {
 	}
 
 	toggleMenu() {
-		this.setState( {
-			open: ! this.state.open,
-		} );
+		this.setState( ( state ) => ( {
+			open: ! state.open,
+		} ) );
 	}
 
 	switchFormat( newValue ) {
