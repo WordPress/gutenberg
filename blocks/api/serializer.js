@@ -36,21 +36,9 @@ export function getSaveContent( save, attributes ) {
 	return wp.element.renderToString( rawContent );
 }
 
-// Reasons an attribute shouldn't be stored in the block header
-const canBeInferred = ( allValue, contentValue ) => undefined !== contentValue;
-const isUndefined = allValue => undefined === allValue;
-
-const isValidForHeader = ( allValue, contentValue ) => ! some( [
-	isUndefined,
-	canBeInferred,
-], f => f( allValue, contentValue ) );
-
-// Specific ways we need to transform attributes for storage in the block header
 const escapeDoubleQuotes = value => 'string' === typeof value
 	? value.replace( /"/g, '\"' )
 	: value;
-
-const transformAttributeValue = escapeDoubleQuotes;
 
 /**
  * Returns attributes which ought to be saved
@@ -75,8 +63,11 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 	return reduce(
 		Object.keys( allAttributes ),
 		( toSave, key ) => {
-			return isValidForHeader( allAttributes[ key ], attributesFromContent[ key ] )
-				? Object.assign( toSave, { [ key ]: transformAttributeValue( allAttributes[ key ] ) } )
+			const allValue = allAttributes[ key ];
+			const contentValue = attributesFromContent[ key ];
+
+			return ! ( contentValue !== undefined || allValue === undefined )
+				? Object.assign( toSave, { [ key ]: escapeDoubleQuotes( allValue ) } )
 				: toSave;
 		},
 		{},
