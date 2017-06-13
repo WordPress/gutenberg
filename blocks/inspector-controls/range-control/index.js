@@ -1,18 +1,23 @@
 /**
+ * WordPress dependencies
+ */
+import { withInstanceId } from 'components';
+
+/**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import './style.scss';
 
-class RangeControl extends BaseControl {
-	renderControl( { value, onChange, ...props } ) {
-		return (
-			<div className="blocks-range-control">
-				<input className="blocks-range-control__input" id={ this.id } type="range" value={ value } onChange={ onChange } { ...props } />
-				<span>{ value }</span>
-			</div>
-		);
-	}
+function RangeControl( { label, value, instanceId, onChange, ...props } ) {
+	const id = 'inspector-range-control-' + instanceId;
+
+	return (
+		<div className="blocks-range-control">
+			<label className="blocks-range-control__label" htmlFor={ id }>{ label }</label>
+			<input className="blocks-range-control__input" id={ id } type="range" value={ value } onChange={ onChange } { ...props } />
+			<span>{ value }</span>
+		</div>
+	);
 }
 
-export default RangeControl;
+export default withInstanceId( RangeControl );
