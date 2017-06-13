@@ -10,6 +10,7 @@
 
 	<file>gutenberg.php</file>
 	<file>./lib</file>
+	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>
 	<file>./bin</file>
 

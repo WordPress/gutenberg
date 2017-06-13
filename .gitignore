@@ -1,5 +1,6 @@
 node_modules
 build
+lib/parser.php
 gutenberg.pot
 .vscode
 *.log

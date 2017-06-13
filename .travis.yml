@@ -50,8 +50,14 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
+      # Run the build because otherwise there will be a bunch of warnings about
+      # failed `stat` calls from `filemtime()`.
       npm install || exit 1
       npm run build || exit 1
+      # Syntax check for php-pegjs parser
+      node bin/create-php-parser.js || exit 1
+      php lib/parser.php || exit 1
+      # Run PHPUnit tests
       phpunit || exit 1
       WP_MULTISITE=1 phpunit || exit 1
     fi
