@@ -1,9 +1,11 @@
 .blocks-range-control {
-	margin-bottom: 10px;
+	display: flex;
 }
 
-.blocks-range-control__label {
-	display: block;
-	font-weight: 500;
-	margin-bottom: 5px;
+.blocks-range-control__input {
+	width: 100%;
+	
+	+ span {
+		margin-left: 10px;
+	}
 }
