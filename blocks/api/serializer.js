@@ -84,27 +84,28 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 export default function serialize( blocks ) {
 	return blocks
 		.map( block => {
-		const blockName = block.name;
-		const blockType = getBlockType( blockName );
-		const saveContent = getSaveContent( blockType.save, block.attributes );
+			const blockName = block.name;
+			const blockType = getBlockType( blockName );
+			const saveContent = getSaveContent( blockType.save, block.attributes );
 			const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
-
-		const beautifyOptions = {
-			indent_inner_html: true,
-			wrap_line_length: 0,
-		};
 
 			const serializedAttributes = ! isEmpty( saveAttributes )
 				? map( saveAttributes, ( value, key ) => `${ key }="${ value }"` ).join( ' ' ) + ' '
 				: '';
 
-		if ( ! saveContent ) {
+			if ( ! saveContent ) {
 				return `<!-- wp:${ blockName } ${ serializedAttributes }--><!-- /wp:${ blockName } -->`;
-		}
+			}
 
 			return [
 				`<!-- wp:${ blockName } ${ serializedAttributes }-->`,
-				beautifyHtml( saveContent, beautifyOptions ),
+
+				/** make more readable - @see https://github.com/WordPress/gutenberg/pull/663 */
+				beautifyHtml( saveContent, {
+					indent_inner_html: true,
+					wrap_line_length: 0,
+				} ),
+
 				`<!-- /wp:${ blockName } -->`,
 			].join( '\n' );
 		} )
