@@ -916,10 +916,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'isSidebarOpened()', () => {
-		it( 'should be closed by default', () => {
+		it( 'should be opened by default', () => {
 			const state = isSidebarOpened( undefined, {} );
 
-			expect( state ).to.be.false();
+			expect( state ).to.be.true();
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
