@@ -31,6 +31,7 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
+
 global.window._wpDateSettings = {
 	formats: {
 		date: 'j F Y',
