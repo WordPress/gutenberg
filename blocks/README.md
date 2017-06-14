@@ -131,20 +131,7 @@ Registers a new block provided a unique name and an object defining its behavior
 - `category: string` - Slug of the block's category. The category is used to organize the blocks in the block inserter.
 - `edit( { attributes: Object, setAttributes: Function } ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( { attributes: Object } ): WPElement | String` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
-- `controls: string[]` - Slugs for controls to be made available to block. See also: [`wp.blocks.registerControl`](#wpblocksregistercontrol-slug-string-settings-object-)
 - `encodeAttributes( attributes: Object ): Object` - Called when save markup is generated, this function allows you to control which attributes are to be encoded in the block comment metadata. By default, all attribute values not defined in the block's `attributes` property are serialized to the comment metadata. If defined, this function should return the subset of attributes to encode, or `null` to bypass default behavior.
-
-### `wp.blocks.registerControl( slug: string, settings: Object )`
-
-Registers a new block-level control. Controls appear in a block's toolbar when it receives focus if it is included in the block's `controls` option.
-
-- `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the control. Shown in help tooltips.
-- `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
-- `onClick( attributes: Object, setAttributes: Function )` - Click behavior for control. Use this to change or toggle an attribute of the block.
-- `isVisible( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `false` to prevent the control's button from being shown. If this option is not defined for a control, the button will always be shown.
-- `isActive( attributes: Object ): boolean` - Called when a block receives focus or changes. Return `true` to apply an active effect to the control's button, in the case that the control's behavior is a toggle.
-
-Inline controls for [`Editable`](#editable) elements are identical for every block and cannot be modified.
 
 ### `wp.blocks.getBlockType( name: string )`
 
@@ -157,6 +144,51 @@ Returns settings associated with a registered control.
 ## Components
 
 Because many blocks share the same complex behaviors, the following components are made available to simplify implementations of your block's `edit` function.
+
+### `BlockControls`
+
+When returned by your block's `edit` implementation, renders a toolbar of icon buttons. This is useful for block-level modifications to be made available when a block is selected. For example, if your block supports alignment, you may want to display alignment options in the selected block's toolbar.
+
+Because the toolbar should only be shown when the block is selected, it is important that a `BlockControls` element is only returned when the block's `focus` prop is [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy), meaning that focus is currently within the block.
+
+Example:
+
+```js
+var el = wp.element.createElement,
+	BlockControls = wp.blocks.BlockControls,
+	AlignmentToolbar = wp.blocks.AlignmentToolbar;
+
+function edit( props ) {
+	return [
+		// Controls: (only visible when focused)
+		props.focus && (
+			el( BlockControls, { key: 'controls' },
+				el( AlignmentToolbar, {
+					value: props.align,
+					onChange: function( nextAlign ) {
+						props.setAttributes( { align: nextAlign } )
+					}
+				} )
+			)
+		),
+
+		// Block content: (with alignment as attribute)
+		el( 'p', { key: 'text', style: { textAlign: props.align } },
+			'Hello World!'
+		),
+	];
+}
+```
+
+Note in this example that we render `AlignmentToolbar` as a child of the `BlockControls` element. This is another pre-configured component you can use to simplify block text alignment.
+
+Alternatively, you can create your own toolbar controls by passing an array of `controls` as a prop to the `BlockControls` component. Each control should be an object with the following properties:
+
+- `icon: string` - Slug of the Dashicon to be shown in the control's toolbar button
+- `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
+- `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
+- `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
+- `leftDivider: ?boolean` - Whether a divider should be shown to the left of the control button. Defaults to `false`.
 
 ### `Editable`
 
