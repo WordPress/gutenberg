@@ -2,18 +2,22 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape, without, groupBy } from 'lodash';
+import { unescape as unescapeString, without, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+
+/**
+ * Internal dependencies
+ */
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 const DEFAULT_CATEGORIES_QUERY = {
-	number: -1,
+	per_page: -1,
 	orderby: 'count',
 	order: 'DESC',
 };
@@ -95,7 +99,7 @@ class CategoriesSelector extends Component {
 						value={ category.id }
 						onChange={ this.onCategoriesChange }
 					/>
-					<label htmlFor={ id }>{ unescape( category.name ) }</label>
+					<label htmlFor={ id }>{ unescapeString( category.name ) }</label>
 					{ !! category.children.length && (
 						<div className="editor-post-taxonomies__categories-subchoices">
 							{ this.renderCategories( category.children ) }
@@ -111,7 +115,7 @@ class CategoriesSelector extends Component {
 
 		return (
 			<div className="editor-post-taxonomies__categories-selector">
-				<strong className="editor-post-taxonomies__categories-selector-title">{ __( 'Categories' ) }</strong>
+				<h4 className="editor-post-taxonomies__categories-selector-title">{ __( 'Categories' ) }</h4>
 				{ this.renderCategories( availableCategories ) }
 			</div>
 		);
