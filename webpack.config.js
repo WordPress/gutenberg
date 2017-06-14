@@ -138,9 +138,6 @@ switch ( process.env.NODE_ENV ) {
 			filename: 'build/test.js',
 			path: __dirname,
 		};
-		config.plugins.push( new webpack.ProvidePlugin( {
-			tinymce: 'tinymce/tinymce',
-		} ) );
 		break;
 
 	default:
