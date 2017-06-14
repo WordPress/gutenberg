@@ -102,7 +102,7 @@ export default class FreeformBlock extends wp.element.Component {
 		this.setButtonActive = this.setButtonActive.bind( this );
 		this.setButtonDisabled = this.setButtonDisabled.bind( this );
 		this.setFormatActive = this.setFormatActive.bind( this );
-		this.toggleMoreDraw = this.toggleMoreDraw.bind( this );
+		this.toggleMoreDrawer = this.toggleMoreDrawer.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -155,7 +155,7 @@ export default class FreeformBlock extends wp.element.Component {
 		this.setState( { activeFormat: newActiveFormat } );
 	}
 
-	toggleMoreDraw() {
+	toggleMoreDrawer() {
 		this.setState( { showMore: ! this.state.showMore } );
 	}
 
@@ -332,7 +332,7 @@ export default class FreeformBlock extends wp.element.Component {
 						icon: 'ellipsis',
 						title: __( 'More' ),
 						isActive: showMore,
-						onClick: this.toggleMoreDraw,
+						onClick: this.toggleMoreDrawer,
 						children: (
 							showMore && <div className="more-drawer">
 								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
