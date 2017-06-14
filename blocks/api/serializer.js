@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map, reduce, some } from 'lodash';
+import { isEmpty, map, reduce } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
