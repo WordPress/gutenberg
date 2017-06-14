@@ -51,17 +51,12 @@ function PublishButton( {
 		onSave();
 	};
 
-	const buttonDisabledHint = process.env.NODE_ENV === 'production'
-		? wp.i18n.__( 'The Save button is disabled during early alpha releases.' )
-		: null;
-
 	return (
 		<Button
 			isPrimary
 			isLarge
 			onClick={ onClick }
-			disabled={ ! buttonEnabled || process.env.NODE_ENV === 'production' }
-			title={ buttonDisabledHint }
+			disabled={ ! buttonEnabled }
 			className={ className }
 		>
 			{ buttonText }
