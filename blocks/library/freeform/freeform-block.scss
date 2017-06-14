@@ -14,5 +14,32 @@
 				margin-right: 0;
 			}
 		}
+		.more-draw__arrow {
+			border: 10px dashed $light-gray-500;
+			width: 0;
+			height: 0;
+			line-height: 0;
+			position: absolute;
+			bottom: -10px;
+			right: $icon-button-size / 2;
+			margin-right: -10px;
+			border-top-style: solid;
+			border-bottom: none;
+			border-left-color: transparent;
+			border-right-color: transparent;
+
+			&:before {
+				bottom: 2px;
+				border: 10px solid $white;
+				content: " ";
+				position: absolute;
+				left: 50%;
+				margin-left: -10px;
+				border-top-style: solid;
+				border-bottom: none;
+				border-left-color: transparent;
+				border-right-color: transparent;
+			}
+		}
 	}
 }
