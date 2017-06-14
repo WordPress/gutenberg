@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { nodeListToReact } from 'dom-react';
-import { concat, find, isEqual, omitBy } from 'lodash';
+import { findDOMNode } from 'element';
+import { concat, find, isEqual, omitBy, throttle } from 'lodash';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -79,6 +81,8 @@ const MORE_CONTROLS = [
 	},
 ];
 
+const MORE_DRAWER_HEIGHT = 40;
+
 function createElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
@@ -103,17 +107,20 @@ export default class FreeformBlock extends wp.element.Component {
 		this.setButtonDisabled = this.setButtonDisabled.bind( this );
 		this.setFormatActive = this.setFormatActive.bind( this );
 		this.toggleMoreDrawer = this.toggleMoreDrawer.bind( this );
+		this.setToolbarRef = this.setToolbarRef.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onScroll = throttle( this.onScroll.bind( this ), 250 );
 		this.updateFocus = this.updateFocus.bind( this );
 		this.updateContent = this.updateContent.bind( this );
 		this.setContent = this.setContent.bind( this );
 		this.getContent = this.getContent.bind( this );
 		this.mapControls = this.mapControls.bind( this );
 		this.editor = null;
+		this.toolbarElem = null;
 		this.savedContent = null;
 		this.formats = null;
 		this.handleFormatChange = null;
@@ -123,6 +130,7 @@ export default class FreeformBlock extends wp.element.Component {
 			disabledButtons: { },
 			activeFormat: null,
 			showMore: false,
+			expandDown: false,
 		};
 	}
 
@@ -157,6 +165,10 @@ export default class FreeformBlock extends wp.element.Component {
 
 	toggleMoreDrawer() {
 		this.setState( { showMore: ! this.state.showMore } );
+	}
+
+	setToolbarRef( elem ) {
+		this.toolbarElem = elem;
 	}
 
 	onSetup( editor ) {
@@ -238,6 +250,25 @@ export default class FreeformBlock extends wp.element.Component {
 		}
 	}
 
+	onScroll() {
+		if ( this.toolbarElem ) {
+			let blockControls = findDOMNode( this.toolbarElem );
+			while ( blockControls ) {
+				if ( blockControls.classList.contains( 'editor-visual-editor__block-controls' ) ) {
+					break;
+				}
+				blockControls = blockControls.parentElement;
+			}
+			if ( blockControls ) {
+				const currentTop = blockControls.getBoundingClientRect().top;
+				const stickyTop = parseInt(
+					window.getComputedStyle( blockControls ).top,	10 );
+				const expandDown = currentTop - stickyTop <= MORE_DRAWER_HEIGHT;
+				this.setState( { expandDown } );
+			}
+		}
+	}
+
 	updateFocus() {
 		const { focus } = this.props;
 		if ( focus ) {
@@ -285,8 +316,13 @@ export default class FreeformBlock extends wp.element.Component {
 		} ) );
 	}
 
+	componentDidMount() {
+		window.addEventListener( 'scroll', this.onScroll );
+	}
+
 	componentWillUnmount() {
 		this.onChange();
+		window.removeEventListener( 'scroll', this.onScroll );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -307,7 +343,8 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
-		const { showMore } = this.state;
+		const { expandDown, showMore } = this.state;
+		const moreDrawerClasses = classnames( 'more-drawer', expandDown ? 'down' : 'up' );
 		return [
 			focus && (
 				<Fill name="Formatting.Toolbar">
@@ -315,6 +352,7 @@ export default class FreeformBlock extends wp.element.Component {
 						onFormatChange={ this.handleFormatChange }
 						formats={ this.formats }
 						value={ this.state.activeFormat }
+						ref={ this.setToolbarRef }
 					/>
 				</Fill>
 			),
@@ -334,7 +372,7 @@ export default class FreeformBlock extends wp.element.Component {
 						isActive: showMore,
 						onClick: this.toggleMoreDrawer,
 						children: (
-							showMore && <div className="more-drawer">
+							showMore && <div className={ moreDrawerClasses }>
 								<div className="more-draw__arrow" />
 								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
 							</div>
