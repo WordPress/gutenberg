@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { isEqual, omitBy } from 'lodash';
+import { isEqual, flatten, omitBy } from 'lodash';
 import { Fill } from 'react-slot-fill';
 
 /**
@@ -32,37 +32,40 @@ const ALIGNMENT_CONTROLS = [
 ];
 
 const FREEFORM_CONTROLS = [
-	{
-		id: 'blockquote',
-		icon: 'editor-quote',
-		title: __( 'Quote' ),
-	},
-	{
-		id: 'bullist',
-		icon: 'editor-ul',
-		title: __( 'Convert to unordered' ),
-	},
-	{
-		id: 'numlist',
-		icon: 'editor-ol',
-		title: __( 'Convert to ordered' ),
-	},
-	{
-		leftDivider: true,
-		id: 'bold',
-		icon: 'editor-bold',
-		title: __( 'Bold' ),
-	},
-	{
-		id: 'italic',
-		icon: 'editor-italic',
-		title: __( 'Italic' ),
-	},
-	{
-		id: 'strikethrough',
-		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
-	},
+	[
+		{
+			id: 'blockquote',
+			icon: 'editor-quote',
+			title: __( 'Quote' ),
+		},
+		{
+			id: 'bullist',
+			icon: 'editor-ul',
+			title: __( 'Convert to unordered' ),
+		},
+		{
+			id: 'numlist',
+			icon: 'editor-ol',
+			title: __( 'Convert to ordered' ),
+		},
+	],
+	[
+		{
+			id: 'bold',
+			icon: 'editor-bold',
+			title: __( 'Bold' ),
+		},
+		{
+			id: 'italic',
+			icon: 'editor-italic',
+			title: __( 'Italic' ),
+		},
+		{
+			id: 'strikethrough',
+			icon: 'editor-strikethrough',
+			title: __( 'Strikethrough' ),
+		},
+	],
 ];
 
 function createElement( type, props, ...children ) {
@@ -146,7 +149,7 @@ export default class FreeformBlock extends wp.element.Component {
 		this.handleFormatChange = formatselect.onselect;
 		this.forceUpdate();
 
-		[ ...ALIGNMENT_CONTROLS, ...FREEFORM_CONTROLS ].forEach( ( control ) => {
+		[ ...ALIGNMENT_CONTROLS, ...flatten( FREEFORM_CONTROLS ) ].forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
 				button.onPostRender.call( {
@@ -263,11 +266,17 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	mapControls( controls ) {
-		return controls.map( ( control ) => ( {
-			...control,
-			onClick: () => this.editor && this.editor.buttons[ control.id ].onclick(),
-			isActive: this.state.activeButtons[ control.id ],
-		} ) );
+		return controls.map( ( control ) => {
+			if ( Array.isArray( control ) ) {
+				return this.mapControls( control );
+			}
+
+			return {
+				...control,
+				onClick: () => this.editor && this.editor.buttons[ control.id ].onclick(),
+				isActive: this.state.activeButtons[ control.id ],
+			};
+		} );
 	}
 
 	componentWillUnmount() {
