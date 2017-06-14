@@ -33,7 +33,7 @@
     "redux": "^3.6.0",
     "redux-optimist": "0.0.2",
     "refx": "^2.0.0",
-    "rememo": "^1.1.0",
+    "rememo": "^1.1.1",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
