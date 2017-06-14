@@ -334,7 +334,7 @@ export default class FreeformBlock extends wp.element.Component {
 						isActive: showMore,
 						onClick: this.toggleMoreDraw,
 						children: (
-							showMore && <div className="more-draw">
+							showMore && <div className="more-drawer">
 								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
 							</div>
 						),
