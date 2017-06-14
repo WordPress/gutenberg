@@ -50,36 +50,44 @@
 	width: $icon-button-size;
 	height: $icon-button-size;
 
-	&> svg {
-		border: 1px solid transparent;
-		padding: 4px;
-		box-sizing: content-box;
-	}
-
-	&.is-active > svg,
-	&:hover > svg,
-	&:not(:disabled):hover > svg,
-	&:focus > svg {
-		border: 1px solid $dark-gray-500;
-		color: $dark-gray-500;
-	}
-
 	&:hover,
-	&:not(:disabled):hover,
 	&:focus {
 		color: $dark-gray-500;
 		outline: none;
 		box-shadow: none;
 	}
 
-	&.is-active > svg,
-	&.is-active:hover > svg {
-		background-color: $dark-gray-500;
+	&.is-active,
+	&.is-active:hover {
 		color: $white;
 	}
 
-	&.is-active,
-	&.is-active:hover {
+	&:disabled {
+		cursor: default;
+	}
+
+	&> svg {
+		border: 1px solid transparent;
+		padding: 4px;
+		box-sizing: content-box;
+	}
+
+	&:hover > svg,
+	&:focus > svg {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-active > svg,
+		&:hover > svg,
+		&:focus > svg {
+			border: 1px solid $dark-gray-500;
+		}
+	}
+
+	&.is-active > svg,
+	&.is-active:hover > svg {
+		background-color: $dark-gray-500;
 		color: $white;
 	}
 
