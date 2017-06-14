@@ -14,8 +14,8 @@ import CategoriesSelector from './categories-selector';
 function PostTaxonomies() {
 	return (
 		<PanelBody title={ __( 'Categories & Tags' ) } initialOpen={ false }>
-			<TagsSelector />
 			<CategoriesSelector />
+			<TagsSelector />
 		</PanelBody>
 	);
 }
