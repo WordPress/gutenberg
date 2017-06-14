@@ -1,6 +1,6 @@
 .blocks-quote {
 	margin: 0;
-	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
+	box-shadow: inset 0 0 0 0 $light-gray-500;
 
 	footer {
 		color: $dark-gray-100;
@@ -11,7 +11,7 @@
 		font-style: normal;
 
 		&:before {
-			content: '— ';
+			content: "— ";
 			position: absolute;
 			left: -1.3em;
 			top: 0;
@@ -26,7 +26,8 @@
 
 .editor-visual-editor .blocks-quote-style-2 {
 	padding: 0 1em;
-	& > .blocks-editable p {
+
+	&.blocks-editable p {
 		font-size: 24px;
 		font-style: italic;
 	}

@@ -1,35 +1,47 @@
 @mixin break-huge() {
+
 	@media ( min-width: #{ ( $break-huge ) } ) {
+
 		@content;
 	}
 }
 
 @mixin break-wide() {
+
 	@media ( min-width: #{ ( $break-wide ) } ) {
+
 		@content;
 	}
 }
 
 @mixin break-large() {
+
 	@media ( min-width: #{ ( $break-large ) } ) {
+
 		@content;
 	}
 }
 
 @mixin break-medium() {
+
 	@media ( min-width: #{ ( $break-medium ) } ) {
+
 		@content;
 	}
 }
 
 @mixin break-small() {
+
 	@media ( min-width: #{ ( $break-small ) } ) {
+
 		@content;
 	}
 }
 
 @mixin break-mobile() {
+
 	@media ( min-width: #{ ( $break-mobile ) } ) {
+
 		@content;
 	}
 }
@@ -41,8 +53,8 @@
  * than the space allows.
  */
 
-@mixin long-content-fade( $direction: right, $size: 20%, $color: #fff, $edge: 0px, $z-index: false) {
-	content: '';
+@mixin long-content-fade( $direction: right, $size: 20%, $color: #fff, $edge: 0, $z-index: false) {
+	content: "";
 	display: block;
 	position: absolute;
 	-webkit-touch-callout: none;
@@ -57,8 +69,8 @@
 		z-index: $z-index;
 	}
 
-	@if $direction == 'bottom' {
-		background: linear-gradient( to top, rgba( $color, 0 ), $color 90% );
+	@if $direction == "bottom" {
+		background: linear-gradient(to top, rgba($color, 0), $color 90%);
 		left: $edge;
 		right: $edge;
 		top: $edge;
@@ -66,8 +78,8 @@
 		width: auto;
 	}
 
-	@if $direction == 'top' {
-		background: linear-gradient( to bottom, rgba( $color, 0 ), $color 90% );
+	@if $direction == "top" {
+		background: linear-gradient(to bottom, rgba($color, 0), $color 90%);
 		top: calc(100% - $size);
 		left: $edge;
 		right: $edge;
@@ -75,8 +87,8 @@
 		width: auto;
 	}
 
-	@if $direction == 'left' {
-		background: linear-gradient( to left, rgba( $color, 0 ), $color 90% );
+	@if $direction == "left" {
+		background: linear-gradient(to left, rgba($color, 0), $color 90%);
 		top: $edge;
 		left: $edge;
 		bottom: $edge;
@@ -85,8 +97,8 @@
 		height: auto;
 	}
 
-	@if $direction == 'right' {
-		background: linear-gradient( to right, rgba( $color, 0 ), $color 90% );
+	@if $direction == "right" {
+		background: linear-gradient(to right, rgba($color, 0), $color 90%);
 		top: $edge;
 		bottom: $edge;
 		right: $edge;
@@ -99,12 +111,15 @@
 /**
  * Editor Width mixin
  *
- * This mixin seeks to take the vinegar out of the responsive alignments in the editor.
+ * This mixin seeks to take the vinegar out of the responsive
+ * alignments in the editor.
  */
 
-@mixin editor-width( $width ) {
+@mixin editor-width($width) {
+
 	@media ( min-width: #{ ( $width ) } ) {
+
 		@content;
 	}
 }
-$float-margin: calc( 50% - #{ $visual-editor-max-width / 2 } );
+$float-margin: calc(50% - #{ $visual-editor-max-width / 2 });

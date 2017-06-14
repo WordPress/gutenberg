@@ -44,11 +44,11 @@
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
-	padding: 3px 3px 0 3px;
+	padding: 3px 3px 0;
 	display: flex;
 	flex-direction: column;
 	align-content: flex-start;
-	z-index: z-index( '.editor-format-list__menu' );
+	z-index: z-index(".editor-format-list__menu");
 
 	input {
 		font-size: 13px;

@@ -32,8 +32,8 @@
 	transition: 0.2s border-color;
 
 	&:before {
-		z-index: z-index( '.editor-visual-editor__block:before' );
-		content: '';
+		z-index: z-index(".editor-visual-editor__block:before");
+		content: "";
 		position: absolute;
 		top: 0;
 		bottom: 0;
@@ -65,7 +65,7 @@
 	}
 
 	.iframe-overlay:before {
-		content: '';
+		content: "";
 		display: block;
 		position: absolute;
 		top: 0;
@@ -82,7 +82,7 @@
 	&[data-align="left"],
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content
-		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
+		z-index: z-index(".editor-visual-editor__block {core/image aligned left or right}");
 		max-width: 370px;
 
 		.editor-block-mover {
@@ -97,29 +97,33 @@
 		margin-right: $block-padding;
 
 		// sidebar (folded)
-		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+		.auto-fold .editor-layout:not(.is-sidebar-opened) & {
+
+			@include editor-width($admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding) {
 				margin-left: $float-margin;
 			}
 		}
 
 		// sidebar (sticky)
-		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
+		.sticky-menu .editor-layout:not(.is-sidebar-opened) & {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width - $block-padding) {
 				margin-left: $float-margin;
 			}
 		}
 
 		// sidebar (sticky) and post settings
 		.sticky-menu .editor-layout & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding) {
 				margin-left: $float-margin;
 			}
 		}
 
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width + $sidebar-width) {
 				margin-left: $float-margin;
 			}
 		}
@@ -132,29 +136,33 @@
 		margin-right: $block-padding;
 
 		// sidebar (folded)
-		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+		.auto-fold .editor-layout:not(.is-sidebar-opened) & {
+
+			@include editor-width($admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding) {
 				margin-right: $float-margin;
 			}
 		}
 
 		// sidebar (sticky)
-		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
+		.sticky-menu .editor-layout:not(.is-sidebar-opened) & {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width - $block-padding) {
 				margin-right: $float-margin;
 			}
 		}
 
 		// sidebar (sticky) and post settings
 		.sticky-menu .editor-layout & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding) {
 				margin-right: $float-margin;
 			}
 		}
 
 		// sidebar and post settings
 		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
+
+			@include editor-width($admin-sidebar-width + $visual-editor-max-width + $sidebar-width) {
 				margin-right: $float-margin;
 			}
 		}
@@ -182,6 +190,7 @@
 
 	&[data-align="full"],
 	&[data-align="wide"] {
+
 		.editor-visual-editor__block-controls {
 			width: $visual-editor-max-width - $block-padding - $block-padding;
 			margin-left: auto;
@@ -193,7 +202,7 @@
 .editor-visual-editor__block-controls {
 	display: flex;
 	position: sticky;
-	z-index: z-index( '.editor-visual-editor__block-controls' );
+	z-index: z-index(".editor-visual-editor__block-controls");
 	margin-top: -$block-controls-height - $item-spacing;
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
 	height: $block-controls-height;
@@ -211,16 +220,19 @@
 	}
 
 	&.is-appearing-active {
+
 		@include animate_fade;
 	}
 }
 
 $sticky-bottom-offset: 20px;
+
 .editor-visual-editor__block-controls + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
- 	margin-top: -$sticky-bottom-offset - 1px;
+	// prevent collapsing margins between block and toolbar,
+	// matches the 20px bottom offset
+	margin-top: -$sticky-bottom-offset - 1px;
 	padding-top: 1px;
- }
+}
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
@@ -236,7 +248,7 @@ $sticky-bottom-offset: 20px;
 }
 
 .editor-visual-editor .editor-inserter {
-	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
+	margin: $item-spacing $item-spacing $item-spacing calc(50% - #{ $visual-editor-max-width / 2 }); // account for full-width trick
 }
 
 .editor-visual-editor .editor-visual-editor__insertion-point {
@@ -252,6 +264,6 @@ $sticky-bottom-offset: 20px;
 		left: 0;
 		right: 0;
 		background: $blue-medium-500;
-		content: '';
+		content: "";
 	}
 }

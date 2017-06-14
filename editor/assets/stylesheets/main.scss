@@ -2,7 +2,8 @@ body.toplevel_page_gutenberg,
 body.gutenberg_page_gutenberg-demo {
 	background: $white;
 
-	#update-nag, .update-nag {
+	#update-nag,
+	.update-nag {
 		display: none;
 	}
 
@@ -16,6 +17,7 @@ body.gutenberg_page_gutenberg-demo {
 }
 
 .gutenberg {
+
 	* {
 		box-sizing: border-box;
 	}
@@ -62,6 +64,7 @@ body.gutenberg_page_gutenberg-demo {
 
 .editor-post-title,
 .editor-visual-editor__block {
+
 	input,
 	textarea {
 		border-radius: 4px;
@@ -73,12 +76,15 @@ body.gutenberg_page_gutenberg-demo {
 		&::-webkit-input-placeholder {
 			color: $dark-gray-100;
 		}
+
 		&::-moz-placeholder {
 			color: $dark-gray-100;
 		}
+
 		&:-ms-input-placeholder {
 			color: $dark-gray-100;
 		}
+
 		&:-moz-placeholder {
 			color: $dark-gray-100;
 		}

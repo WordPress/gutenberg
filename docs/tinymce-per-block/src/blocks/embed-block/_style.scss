@@ -1,7 +1,9 @@
 .embed-block__form {
 	margin: 50px auto;
 	width: 50%;
-	textarea, .textarea-mirror {
+
+	textarea,
+	.textarea-mirror {
 		width: 100%;
 		border: 1px solid $gray-light;
 		border-radius: 4px;
@@ -21,7 +23,7 @@
 		color: #87919d;
 		text-align: center;
 		vertical-align: middle;
-		font-weight: bold;
+		font-weight: 700;
 		margin-bottom: 10px;
 
 		.dashicon {
@@ -52,6 +54,7 @@
 }
 
 .embed-block {
+
 	&.align-full-width {
 		margin-left: calc(50% - 50vw);
 		width: 100vw;

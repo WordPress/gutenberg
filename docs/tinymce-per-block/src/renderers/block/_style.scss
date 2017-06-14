@@ -17,7 +17,7 @@
 
 		&:before {
 			z-index: -1;
-			content: '';
+			content: "";
 			position: absolute;
 			top: 0;
 			bottom: 0;
@@ -38,6 +38,7 @@
 }
 
 .block-list__block-controls {
+
 	@include animate_fade;
 	position: absolute;
 	left: 35px;
@@ -48,7 +49,7 @@
 .block-list__block-controls-group {
 	background: #fff;
 	border: 1px solid #d8dbdf;
-	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
+	box-shadow: 0 3px 20px rgba(18, 24, 30, 0.1), 0 1px 3px rgba(18, 24, 30, 0.1);
 	color: #12181e;
 	display: inline-block;
 	margin-left: 14px;

@@ -1,24 +1,26 @@
 @import "../../assets/stylesheets/_variables.scss";
 
 .toolbar {
-  display: inline-block;
+	display: inline-block;
 }
 
 .toolbarStyle {
-  border: 1px solid $toolbar-border;
+	border: 1px solid $toolbar-border;
 }
+
 .horizontal {
-  display: inline-flex;
+	display: inline-flex;
 }
+
 .verticalStyle {
-  background: $active-bg;
-  border-color: $active-bg;
+	background: $active-bg;
+	border-color: $active-bg;
 }
 
 .visible {
-  display: block;
+	display: block;
 }
 
 .hidden {
-  display: none;
+	display: none;
 }

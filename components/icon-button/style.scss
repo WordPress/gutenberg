@@ -18,7 +18,7 @@
 		width: auto;
 	}
 
-	&:not( :disabled ) {
+	&:not(:disabled) {
 		cursor: pointer;
 
 		&:hover {

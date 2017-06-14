@@ -6,7 +6,7 @@
 
 	blockquote {
 		width: 100%;
-		border-left: 4px solid black;
+		border-left: 4px solid #000;
 		padding-left: 20px;
 		margin-left: 0;
 		font-style: italic;
@@ -29,7 +29,7 @@
 				left: 0;
 				top: 0;
 				color: $gray-dark-300;
-				content: '— ';
+				content: "— ";
 			}
 		}
 
