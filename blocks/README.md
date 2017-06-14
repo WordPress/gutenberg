@@ -69,13 +69,13 @@ wp.blocks.registerBlockType( 'myplugin/random-image', {
 		category: query.attr( 'img', 'alt' )
 	},
 
-	edit: function( block ) {
-		var category = block.attributes.category,
+	edit: function( props ) {
+		var category = props.attributes.category,
 			children;
 
 		function setCategory( event ) {
 			var selected = event.target.querySelector( 'option:checked' );
-			block.setAttributes( { category: selected.value } );
+			props.setAttributes( { category: selected.value } );
 			event.preventDefault();
 		}
 
@@ -96,8 +96,8 @@ wp.blocks.registerBlockType( 'myplugin/random-image', {
 		return el( 'form', { onSubmit: setCategory }, children );
 	},
 
-	save: function( block ) {
-		return RandomImage( { category: block.attributes.category } );
+	save: function( props ) {
+		return RandomImage( { category: props.attributes.category } );
 	}
 } );
 ```
@@ -175,13 +175,13 @@ Example:
 var el = wp.element.createElement,
 	Editable = wp.blocks.Editable;
 
-function edit( attributes, setAttributes ) {
+function edit( props ) {
 	function onChange( value ) {
-		setAttributes( { text: value } );
+		props.setAttributes( { text: value } );
 	}
 
 	return el( Editable, {
-		value: attributes.text,
+		value: props.attributes.text,
 		onChange: onChange
 	} );
 }
