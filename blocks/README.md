@@ -188,7 +188,8 @@ Alternatively, you can create your own toolbar controls by passing an array of `
 - `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
 - `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
 - `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
-- `leftDivider: ?boolean` - Whether a divider should be shown to the left of the control button. Defaults to `false`.
+
+To create divisions between sets of controls within the same `BlockControls` element, passing `controls` instead as a nested array (array of arrays of objects). A divider will be shown between each set of controls.
 
 ### `Editable`
 
