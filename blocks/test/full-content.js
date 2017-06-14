@@ -134,12 +134,12 @@ describe( 'full post content fixture', () => {
 	it( 'should be present for each block', () => {
 		const errors = [];
 
-		getBlockTypes().map( block => block.slug ).forEach( slug => {
-			const slugToFilename = slug.replace( /\//g, '-' );
+		getBlockTypes().map( block => block.name ).forEach( name => {
+			const nameToFilename = name.replace( /\//g, '-' );
 			const foundFixtures = fileBasenames
 				.filter( basename => (
-					basename === slugToFilename ||
-					startsWith( basename, slugToFilename + '-' )
+					basename === nameToFilename ||
+					startsWith( basename, nameToFilename + '-' )
 				) )
 				.map( basename => {
 					const filename = basename + '.html';
@@ -153,20 +153,20 @@ describe( 'full post content fixture', () => {
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
 					'Expected a fixture file called \'%s.html\' or \'%s-*.html\'.',
-					slugToFilename,
-					slugToFilename
+					nameToFilename,
+					nameToFilename
 				) );
 			}
 
 			foundFixtures.forEach( fixture => {
 				const delimiter = new RegExp(
-					'<!--\\s*wp:' + slug + '(\\s+|\\s*-->)'
+					'<!--\\s*wp:' + name + '(\\s+|\\s*-->)'
 				);
 				if ( ! delimiter.test( fixture.contents ) ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',
 						fixture.filename,
-						slug
+						name
 					) );
 				}
 			} );

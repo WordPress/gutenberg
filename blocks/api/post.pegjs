@@ -20,17 +20,17 @@ WP_Block
   / WP_Block_Html
 
 WP_Block_Void
-  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:HTML_Attribute_List _? "/-->"
+  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List _? "/-->"
   { return {
-    blockType: blockType,
+    blockName: blockName,
     attrs: attrs,
     rawContent: ''
   } }
 
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })* e:WP_Block_End & { return s.blockType === e.blockType }
+  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })* e:WP_Block_End & { return s.blockName === e.blockName }
   { return {
-    blockType: s.blockType,
+    blockName: s.blockName,
     attrs: s.attrs,
     rawContent: ts.join( '' ),
   } }
@@ -45,19 +45,19 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockType:WP_Block_Type attrs:HTML_Attribute_List _? "-->"
+  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List _? "-->"
   { return {
-    blockType: blockType,
+    blockName: blockName,
     attrs: attrs
   } }
 
 WP_Block_End
-  = "<!--" __ "/wp:" blockType:WP_Block_Type __ "-->"
+  = "<!--" __ "/wp:" blockName:WP_Block_Name __ "-->"
   { return {
-    blockType: blockType
+    blockName: blockName
   } }
 
-WP_Block_Type
+WP_Block_Name
   = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
 
 HTML_Attribute_List

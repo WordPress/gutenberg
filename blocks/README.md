@@ -106,7 +106,7 @@ _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b963
 
 Let's briefly review a few items you might observe in the implementation:
 
-- When registering a new block, you must prefix its slug with a namespace for your plugin. This helps prevent conflicts when more than one plugin registers a block with the same slug.
+- When registering a new block, you must prefix its name with a namespace for your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
 - You will use `createElement` to describe the structure of your block's markup. See the [Element documentation](../element/README.md) for more information.
 - Extracting `RandomImage` to a separate function allows us to reuse it in both the editor-specific interface and the published content.
 - The `edit` function should handle any case where an attribute is unset, as in the case of the block being newly inserted.
@@ -123,7 +123,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 ### `wp.blocks.registerBlockType( name: string, typeDefinition: Object )`
 
-Registers a new block provided a unique slug and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
+Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
 - `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
@@ -146,11 +146,11 @@ Registers a new block-level control. Controls appear in a block's toolbar when i
 
 Inline controls for [`Editable`](#editable) elements are identical for every block and cannot be modified.
 
-### `wp.blocks.getBlockType( slug: string )`
+### `wp.blocks.getBlockType( name: string )`
 
 Returns type definitions associated with a registered block.
 
-### `wp.blocks.getControlSettings( slug: string )`
+### `wp.blocks.getControlSettings( name: string )`
 
 Returns settings associated with a registered control.
 
