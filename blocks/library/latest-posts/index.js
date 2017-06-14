@@ -60,11 +60,11 @@ registerBlockType( 'core/latestposts', {
 				</div>
 			);
 		}
-	},
 
-	componentWillUnmount() {
-		if ( this.latestPostsRequest.state() === 'pending' ) {
-			this.latestPostsRequest.abort();
+		componentWillUnmount() {
+			if ( this.latestPostsRequest.state() === 'pending' ) {
+				this.latestPostsRequest.abort();
+			}
 		}
 	},
 
