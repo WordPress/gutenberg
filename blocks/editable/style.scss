@@ -3,6 +3,10 @@
 }
 
 .blocks-editable__tinymce {
+	> p:empty {
+		min-height: $editor-font-size * $editor-line-height;
+	}
+
 	> p:first-child {
 		margin-top: 0;
 	}
