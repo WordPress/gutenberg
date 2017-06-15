@@ -255,3 +255,39 @@ $sticky-bottom-offset: 20px;
 		content: '';
 	}
 }
+
+.editor-visual-editor__placeholder {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width;
+	position: relative;
+	padding: $block-padding;
+	border: none;
+	background: none;
+	display: block;
+	transition: 0.2s border-color;
+	text-align: left;
+	width: 100%;
+	color: inherit;
+	opacity: 0.5;
+	line-height: $editor-line-height;
+	font-size: $editor-font-size;
+	cursor: text;
+
+	&:before {
+		z-index: z-index( '.editor-visual-editor__block:before' );
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border: 2px solid transparent;
+		transition: 0.2s border-color;
+	}
+
+	&:hover:before {
+		border-left-color: $light-gray-500;
+		@include animate_fade;
+	}
+}
