@@ -56,6 +56,19 @@
 	}
 }
 
+.blocks-editable.drop-cap-true {
+	p:first-child:first-letter {
+		float: left;
+		font-size: 4.1em;
+		line-height: 0.7;
+		font-family: serif;
+		font-weight: bold;
+		margin: .07em .23em 0 0;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+}
+
 .block-editable__inline-toolbar {
 	display: flex;
 	justify-content: center;

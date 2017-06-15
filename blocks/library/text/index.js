@@ -10,6 +10,8 @@ import { registerBlockType, createBlock, query, setDefaultBlock } from '../../ap
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
+import InspectorControls from '../../inspector-controls';
+import Toggle from 'components/form-toggle';
 
 const { children } = query;
 
@@ -31,8 +33,8 @@ registerBlockType( 'core/text', {
 	},
 
 	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
-		const { align, content } = attributes;
-
+		const { align, content, dropCap } = attributes;
+		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
 			focus && (
 				<BlockControls key="controls">
@@ -43,6 +45,11 @@ registerBlockType( 'core/text', {
 						} }
 					/>
 				</BlockControls>
+			),
+			focus && (
+				<InspectorControls>
+					<Toggle checked={ !! dropCap } onChange={ toggleDropCap } />
+				</InspectorControls>
 			),
 			<Editable
 				key="editable"
@@ -62,6 +69,7 @@ registerBlockType( 'core/text', {
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
+				className={ `drop-cap-${ dropCap }` }
 			/>,
 		];
 	},
