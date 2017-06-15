@@ -104,7 +104,7 @@ registerBlockType( 'core/latestposts', {
 					{ /* focus && */
 						<InspectorControls>
 
-							<span>Alignment</span>
+							<h4>{ wp.i18n.__( 'Alignment' ) }</h4>
 							<div>
 								{ alignments.map( ( alignment, index ) => (
 									<IconButton
