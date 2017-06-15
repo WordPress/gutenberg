@@ -47,14 +47,6 @@
 	}
 }
 
-.editor-layout.is-sidebar-opened {
-	overflow: hidden;
-
-	@include break-small() {
-		overflow: auto;
-	}
-}
-
 .editor-layout.is-sidebar-opened .editor-sidebar {
 	/* Sidebar covers screen on mobile */
 	width: 100%;
