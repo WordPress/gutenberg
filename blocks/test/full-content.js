@@ -127,7 +127,7 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
-			expect( serializedActual ).to.eql( serializedExpected );
+			expect( serializedActual.trim() ).to.eql( serializedExpected.trim() );
 		} );
 	} );
 
