@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
-import classnames from 'classnames';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { Dashicon, withFocusReturn, withInstanceId } from 'components';
+import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
 
 /**
@@ -223,14 +222,11 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	render() {
-		const { position = 'top', instanceId } = this.props;
+		const { position, instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlockTypes() );
-		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
-		const className = classnames( 'editor-inserter__menu', positionClasses );
 
 		return (
-			<div className={ className } tabIndex="0">
-				<div className="editor-inserter__arrow" />
+			<Popover position={ position } className="editor-inserter__menu">
 				<div role="menu" className="editor-inserter__content">
 					{ wp.blocks.getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
@@ -281,7 +277,7 @@ class InserterMenu extends wp.element.Component {
 					ref={ this.bindReferenceNode( 'search' ) }
 					tabIndex="-1"
 				/>
-			</div>
+			</Popover>
 		);
 	}
 }
