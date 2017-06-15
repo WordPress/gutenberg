@@ -36,9 +36,23 @@ export function getSaveContent( save, attributes ) {
 	return wp.element.renderToString( rawContent );
 }
 
-const escapeDoubleQuotes = value => 'string' === typeof value
-	? value.replace( /"/g, '\"' )
-	: value;
+const escapeDoubleQuotes = value => value.replace( /"/g, '\"' );
+const replaceHyphens = value => value.replace( /-/g, '\\-' );
+
+/**
+ * Transform value for storage in block comment
+ *
+ * Some special characters and sequences should not
+ * appear in a block comment header. This transformer
+ * will guarantee that we store the data safely.
+ *
+ * @param {*}   value attribute value to serialize
+ * @returns {*}       transformed value
+ */
+const serializeValue = value =>
+	'string' === typeof value
+		? replaceHyphens( escapeDoubleQuotes( value ) )
+		: value;
 
 /**
  * Returns attributes which ought to be saved
@@ -82,7 +96,7 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
  * @returns {string}       stringified equality pair
  */
 function asNameValuePair( value, key ) {
-	return `${ key }="${ escapeDoubleQuotes( value ) }"`;
+	return `${ key }="${ serializeValue( value ) }"`;
 }
 
 export function serializeBlock( block ) {
