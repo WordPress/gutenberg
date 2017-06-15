@@ -9,6 +9,9 @@ import { __ } from 'i18n';
  */
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
+import InspectorControls from '../../inspector-controls';
+import IconButton from '../../../components/icon-button';
+import classNames from 'classnames';
 
 registerBlockType( 'core/latestposts', {
 	title: __( 'Latest Posts' ),
@@ -21,14 +24,22 @@ registerBlockType( 'core/latestposts', {
 		poststoshow: 5,
 	},
 
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
+
 	edit: class extends wp.element.Component {
-		constructor() {
+		constructor( { focus } ) {
 			super( ...arguments );
 
 			const { poststoshow } = this.props.attributes;
 
 			this.state = {
 				latestPosts: [],
+				focus,
 			};
 
 			this.latestPostsRequest = getLatestPosts( poststoshow );
@@ -38,25 +49,83 @@ registerBlockType( 'core/latestposts', {
 		}
 
 		render() {
-			const { latestPosts } = this.state;
+			const { latestPosts, focus } = this.state;
 
-			if ( ! latestPosts.length ) {
-				return (
-					<Placeholder
-						icon="update"
-						label={ __( 'Loading latest posts, please wait' ) }
-					>
-					</Placeholder>
-				);
-			}
+			const alignments = [
+				{
+					icon: 'align-left',
+					title: wp.i18n.__( 'Align left' ),
+					isActive: ( { align } ) => 'left' === align,
+					value: 'left',
+				},
+				{
+					icon: 'align-center',
+					title: wp.i18n.__( 'Align center' ),
+					isActive: ( { align } ) => ! align || 'center' === align,
+					value: 'center',
+				},
+				{
+					icon: 'align-right',
+					title: wp.i18n.__( 'Align right' ),
+					isActive: ( { align } ) => 'right' === align,
+					value: 'right',
+				},
+				{
+					icon: 'align-wide',
+					title: __( 'Wide width' ),
+					isActive: ( { align } ) => 'wide' === align,
+					value: 'wide',
+				},
+				{
+					icon: 'align-full-width',
+					title: __( 'Full width' ),
+					isActive: ( { align } ) => 'full' === align,
+					value: 'full',
+				},
+			];
 
 			return (
-				<div className="blocks-latest-posts">
-					<ul>
-						{ latestPosts.map( ( post, i ) =>
-							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
-						) }
-					</ul>
+				<div>
+					{ 0 === latestPosts.length ?
+						<Placeholder
+							icon="update"
+							label={ __( 'Loading latest posts, please wait' ) }
+						>
+						</Placeholder>
+						:
+						<div className="blocks-latest-posts">
+							<ul>
+								{ latestPosts.map( ( post, i ) =>
+									<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
+								) }
+							</ul>
+						</div>
+					}
+					{ /* focus && */
+						<InspectorControls>
+
+							<span>Alignment</span>
+							<div>
+								{ alignments.map( ( alignment, index ) => (
+									<IconButton
+										key={ index }
+										icon={ alignment.icon }
+										label={ alignment.title }
+										data-subscript={ alignment.subscript }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											this.props.setAttributes( { align: alignment.value } );
+										} }
+										className={ classNames( 'components-toolbar__control', {
+											'is-active': alignment.isActive( this.props.attributes ),
+										} ) }
+										aria-pressed={ alignment.isActive }
+										focus={ focus && ! index }
+									/>
+								) ) }
+							</div>
+						</InspectorControls>
+					}
 				</div>
 			);
 		}
