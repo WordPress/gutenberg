@@ -16,8 +16,10 @@
 .blocks-range-control__field {
 	display: flex;
 	justify-content: center;
-	
-	> span {
-		margin-left: 10px;
-	}
+}
+
+.blocks-range-control__hint {
+	display: inline-block;
+	margin-left: 10px;
+	font-weight: 500;
 }

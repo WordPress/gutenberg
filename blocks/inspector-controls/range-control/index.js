@@ -16,7 +16,7 @@ function RangeControl( { label, value, instanceId, onChange, ...props } ) {
 			<label className="blocks-range-control__label" htmlFor={ id }>{ label }</label>
 			<div className="blocks-range-control__field">
 				<input className="blocks-range-control__input" id={ id } type="range" value={ value } onChange={ onChange } { ...props } />
-				<span>{ value }</span>
+				<span className="blocks-range-control__hint">{ value }</span>
 			</div>
 		</div>
 	);
