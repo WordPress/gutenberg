@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from 'element';
 import { __ } from 'i18n';
+import { Children, cloneElement } from 'element';
+import Toggle from 'components/form-toggle';
 
 /**
  * Internal dependencies
@@ -12,7 +13,6 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
-import Toggle from 'components/form-toggle';
 
 const { children } = query;
 
