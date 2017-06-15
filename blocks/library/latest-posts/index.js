@@ -5,6 +5,7 @@ import { Component } from 'element';
 import { Placeholder, FormToggle } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
+import { withInstanceId } from 'components';
 
 /**
  * Internal dependencies
@@ -26,7 +27,7 @@ registerBlockType( 'core/latestposts', {
 		displayPostDate: false,
 	},
 
-	edit: class extends Component {
+	edit: withInstanceId( class extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -64,10 +65,10 @@ registerBlockType( 'core/latestposts', {
 				);
 			}
 
-			const { focus } = this.props;
+			const { focus, instanceId } = this.props;
 			const { displayPostDate } = this.props.attributes;
 
-			const displayPostDateId = 'post-date-toggle';
+			const displayPostDateId = `post-date-toggle-${ instanceId }`;
 
 			return [
 				focus && (
@@ -107,7 +108,7 @@ registerBlockType( 'core/latestposts', {
 				this.latestPostsRequest.abort();
 			}
 		}
-	},
+	} ),
 
 	save() {
 		return null;
