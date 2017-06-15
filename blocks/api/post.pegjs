@@ -1,8 +1,14 @@
 {
 
+function untransformValue( value ) {
+	return 'string' === typeof value
+		? value.replace( /\\-/g, '-' )
+		: value;
+}
+
 function keyValue( key, value ) {
   const o = {};
-  o[ key ] = value;
+  o[ key ] = untransformValue( value );
   return o;
 }
 
@@ -45,7 +51,7 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List _? "-->"
+  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List __ "-->"
   { return {
     blockName: blockName,
     attrs: attrs
