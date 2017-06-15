@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Button } from 'components';
 
 /**
@@ -33,11 +34,11 @@ function PublishButton( {
 	const buttonEnabled = ! isSaving && isPublishable;
 	let buttonText;
 	if ( isPublished ) {
-		buttonText = wp.i18n.__( 'Update' );
+		buttonText = __( 'Update' );
 	} else if ( isBeingScheduled ) {
-		buttonText = wp.i18n.__( 'Schedule' );
+		buttonText = __( 'Schedule' );
 	} else {
-		buttonText = wp.i18n.__( 'Publish' );
+		buttonText = __( 'Publish' );
 	}
 	let publishStatus = 'publish';
 	if ( isBeingScheduled ) {
@@ -47,8 +48,13 @@ function PublishButton( {
 	}
 	const className = classnames( 'editor-tools__publish-button', { 'is-saving': isSaving } );
 	const onClick = () => {
-		onStatusChange( publishStatus );
-		onSave();
+		const doSave = isPublished ||
+			! process.env.NODE_ENV === 'production' ||
+			window.confirm( __( 'Keep in mind this is in Beta and may not display correctly on your theme' ) ); // eslint-disable-line no-alert
+		if ( doSave ) {
+			onStatusChange( publishStatus );
+			onSave();
+		}
 	};
 
 	return (
