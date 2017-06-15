@@ -1,32 +1,58 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+import { get, uniqueId } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { getBlockSettings, switchToBlockType } from 'blocks';
-import { getGutenbergURL, getWPAdminURL } from './utils/url';
+import { serialize, getBlockType, switchToBlockType } from 'blocks';
 import { __ } from 'i18n';
 
 /**
  * Internal dependencies
  */
+import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { focusBlock, replaceBlocks } from './actions';
+import { getCurrentPostId, getBlocks, getPostEdits } from './selectors';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
-		const { dispatch } = store;
-		const { postId, edits } = action;
+		const { dispatch, getState } = store;
+		const state = getState();
+		const postId = getCurrentPostId( state );
 		const isNew = ! postId;
-		const toSend = postId ? { id: postId, ...edits } : edits;
+		const edits = getPostEdits( state );
+		const toSend = {
+			...edits,
+			content: serialize( getBlocks( state ) ),
+		};
+		const transactionId = uniqueId();
 
+		if ( ! isNew ) {
+			toSend.id = postId;
+		}
+
+		dispatch( {
+			type: 'CLEAR_POST_EDITS',
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+		dispatch( {
+			type: 'UPDATE_POST',
+			edits: toSend,
+			optimist: { id: transactionId },
+		} );
 		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
 				isNew,
+				optimist: { type: COMMIT, id: transactionId },
+			} );
+			dispatch( {
+				type: 'RESET_POST',
+				post: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -36,7 +62,7 @@ export default {
 					message: __( 'An unknown error occurred.' ),
 				} ),
 				edits,
-				isNew,
+				optimist: { type: REVERT, id: transactionId },
 			} );
 		} );
 	},
@@ -45,10 +71,10 @@ export default {
 		if ( ! isNew ) {
 			return;
 		}
-		const newUrl = getGutenbergURL( {
+		const newURL = getGutenbergURL( {
 			post_id: post.id,
 		} );
-		window.history.replaceState( {}, 'Post ' + post.id, newUrl );
+		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch } = store;
@@ -71,19 +97,19 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const [ blockA, blockB ] = action.blocks;
-		const blockASettings = getBlockSettings( blockA.blockType );
+		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
-		if ( ! blockASettings.merge ) {
+		if ( ! blockType.merge ) {
 			dispatch( focusBlock( blockA.uid ) );
 			return;
 		}
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.blockType === blockB.blockType
+		const blocksWithTheSameType = blockA.name === blockB.name
 			? [ blockB ]
-			: switchToBlockType( blockB, blockA.blockType );
+			: switchToBlockType( blockB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -91,7 +117,7 @@ export default {
 		}
 
 		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockASettings.merge(
+		const updatedAttributes = blockType.merge(
 			blockA.attributes,
 			blocksWithTheSameType[ 0 ].attributes
 		);

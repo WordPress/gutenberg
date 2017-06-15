@@ -13,3 +13,18 @@
 		transform: translateY( 0px );
 	}
 }
+
+
+@mixin move_background {
+	background-size: 28px 28px;
+	animation: move_background .5s linear infinite;
+}
+
+@keyframes move_background {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 28px 0;
+	}
+}

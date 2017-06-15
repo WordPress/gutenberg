@@ -12,7 +12,7 @@ import FormToggle from '../';
 
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
-		it( 'without modifiers', () => {
+		it( 'should render a span element with an unchecked checkbox', () => {
 			const formToggle = shallow( <FormToggle /> );
 			expect( formToggle.hasClass( 'components-form-toggle' ) ).to.be.true();
 			expect( formToggle.hasClass( 'is-checked' ) ).to.be.false();
@@ -22,39 +22,41 @@ describe( 'FormToggle', () => {
 			expect( formToggle.find( '.components-form-toggle__hint' ).prop( 'aria-hidden' ) ).to.be.true();
 		} );
 
-		it( 'with checked modifier', () => {
+		it( 'should render a checked checkbox and change the accessability text to On when providing checked prop', () => {
 			const formToggle = shallow( <FormToggle checked /> );
 			expect( formToggle.hasClass( 'is-checked' ) ).to.be.true();
 			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'value' ) ).to.be.true();
 			expect( formToggle.find( '.components-form-toggle__hint' ).text() ).to.equal( 'On' );
 		} );
 
-		it( 'with additonal className', () => {
+		it( 'should render with an additional className', () => {
 			const formToggle = shallow( <FormToggle className="testing" /> );
 			expect( formToggle.hasClass( 'testing' ) ).to.be.true();
 		} );
 
-		it( 'with id property', () => {
+		it( 'should render an id prop for the input checkbox', () => {
 			const formToggle = shallow( <FormToggle id="test" /> );
 			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'id' ) ).to.equal( 'test' );
 		} );
 
-		it( 'with onChange handler', () => {
-			let formToggle = shallow( <FormToggle /> );
-			let checkBox = formToggle.node.props.children.find( child => 'input' === child.type && 'checkbox' === child.props.type );
+		it( 'should render a checkbox with a noop onChange', () => {
+			const formToggle = shallow( <FormToggle /> );
+			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).to.equal( noop );
+		} );
 
+		it( 'should render a checkbox with a user-provided onChange', () => {
 			const testFunction = ( event ) => event;
-			formToggle = shallow( <FormToggle onChange={ testFunction } /> );
-			checkBox = formToggle.node.props.children.find( child => 'input' === child.type && 'checkbox' === child.props.type );
+			const formToggle = shallow( <FormToggle onChange={ testFunction } /> );
+			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).to.equal( testFunction );
 		} );
 
-		it( 'with showHint false', () => {
+		it( 'should not render the hint when showHint is set to false', () => {
 			const formToggle = shallow( <FormToggle showHint={ false } /> );
 
 			// When showHint is not provided this element is not rendered.
-			expect( formToggle.find( '.components-form-toggle__hint' ).length ).to.equal( 0 );
+			expect( formToggle.find( '.components-form-toggle__hint' ).exists() ).to.be.false();
 		} );
 	} );
 } );

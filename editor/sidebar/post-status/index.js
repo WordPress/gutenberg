@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { PanelBody, FormToggle } from 'components';
+import { PanelBody, FormToggle, withInstanceId } from 'components';
 
 /**
  * Internal Dependencies
@@ -17,38 +17,46 @@ import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
-import { getEditedPostStatus, getSuggestedPostFormat } from '../../selectors';
+import {
+	getEditedPostAttribute,
+	getSuggestedPostFormat,
+	isEditedPostPublished,
+} from '../../selectors';
 import { editPost } from '../../actions';
 
 class PostStatus extends Component {
 	constructor() {
 		super( ...arguments );
-		this.id = this.constructor.instances++;
+		this.togglePendingStatus = this.togglePendingStatus.bind( this );
+	}
+
+	togglePendingStatus() {
+		const { status, onUpdateStatus } = this.props;
+		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
+		onUpdateStatus( updatedStatus );
 	}
 
 	render() {
-		const { status, onUpdateStatus, suggestedFormat } = this.props;
-		const onToggle = () => {
-			const updatedStatus = status === 'pending' ? 'draft' : 'pending';
-			onUpdateStatus( updatedStatus );
-		};
+		const { status, suggestedFormat, isPublished, instanceId } = this.props;
 
 		// Use the suggested post format based on the blocks content of the post
 		// or the default post format setting for the site.
 		const format = suggestedFormat || __( 'Standard' );
-		const pendingId = 'pending-toggle-' + this.id;
+		const pendingId = 'pending-toggle-' + instanceId;
 
 		return (
 			<PanelBody title={ __( 'Status & Visibility' ) }>
-				<div className="editor-post-status__row">
-					<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
-					<FormToggle
-						id={ pendingId }
-						checked={ status === 'pending' }
-						onChange={ onToggle }
-						showHint={ false }
-					/>
-				</div>
+				{ ! isPublished &&
+					<div className="editor-post-status__row">
+						<label htmlFor={ pendingId }>{ __( 'Pending review' ) }</label>
+						<FormToggle
+							id={ pendingId }
+							checked={ status === 'pending' }
+							onChange={ this.togglePendingStatus }
+							showHint={ false }
+						/>
+					</div>
+				}
 				<div className="editor-post-status__row">
 					<PostVisibility />
 				</div>
@@ -67,12 +75,11 @@ class PostStatus extends Component {
 	}
 }
 
-PostStatus.instances = 1;
-
 export default connect(
 	( state ) => ( {
-		status: getEditedPostStatus( state ),
+		status: getEditedPostAttribute( state, 'status' ),
 		suggestedFormat: getSuggestedPostFormat( state ),
+		isPublished: isEditedPostPublished( state ),
 	} ),
 	( dispatch ) => {
 		return {
@@ -81,5 +88,5 @@ export default connect(
 			},
 		};
 	}
-)( PostStatus );
+)( withInstanceId( PostStatus ) );
 

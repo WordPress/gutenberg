@@ -4,6 +4,13 @@
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as SlotFillProvider } from 'react-slot-fill';
 import { omit } from 'lodash';
+import moment from 'moment-timezone';
+import 'moment-timezone/moment-timezone-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { settings } from 'date';
 
 /**
  * Internal dependencies
@@ -12,17 +19,39 @@ import './assets/stylesheets/main.scss';
 import Layout from './layout';
 import { createReduxStore } from './state';
 
+// Configure moment globally
+moment.locale( settings.l10n.locale );
+if ( settings.timezone.string ) {
+	moment.tz.setDefault( settings.timezone.string );
+} else {
+	const momentTimezone = {
+		name: 'WP',
+		abbrs: [ 'WP' ],
+		untils: [ null ],
+		offsets: [ -settings.timezone.offset * 60 ],
+	};
+	const unpackedTimezone = moment.tz.pack( momentTimezone );
+	moment.tz.add( unpackedTimezone );
+	moment.tz.setDefault( 'WP' );
+}
+
 /**
- * Initializes and returns an instance of Editor.
+ * Initializes Redux state with bootstrapped post, if provided.
  *
- * @param {String} id   Unique identifier for editor instance
- * @param {Object} post API entity for post to edit
+ * @param {Redux.Store} store Redux store instance
+ * @param {?Object}     post  Bootstrapped post object
  */
-export function createEditorInstance( id, post ) {
-	const store = createReduxStore();
+function preparePostState( store, post ) {
+	if ( ! post ) {
+		return;
+	}
+
+	store.dispatch( {
+		type: 'RESET_POST',
+		post,
+	} );
 	store.dispatch( {
 		type: 'RESET_BLOCKS',
-		post,
 		blocks: wp.blocks.parse( post.content.raw ),
 	} );
 
@@ -39,6 +68,18 @@ export function createEditorInstance( id, post ) {
 			},
 		} );
 	}
+}
+
+/**
+ * Initializes and returns an instance of Editor.
+ *
+ * @param {String} id   Unique identifier for editor instance
+ * @param {Object} post API entity for post to edit
+ */
+export function createEditorInstance( id, post ) {
+	const store = createReduxStore();
+
+	preparePostState( store, post );
 
 	wp.element.render(
 		<ReduxProvider store={ store }>

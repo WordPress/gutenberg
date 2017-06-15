@@ -7,13 +7,13 @@ import { isString } from 'lodash';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, query } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
 const { children, prop } = query;
 
-registerBlock( 'core/heading', {
+registerBlockType( 'core/heading', {
 	title: wp.i18n.__( 'Heading' ),
 
 	icon: 'heading',

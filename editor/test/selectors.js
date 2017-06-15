@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { expect } from 'chai';
+import moment from 'moment';
 
 /**
  * Internal dependencies
@@ -14,33 +15,39 @@ import {
 	isEditedPostNew,
 	isEditedPostDirty,
 	getCurrentPost,
+	getCurrentPostId,
 	getPostEdits,
-	getEditedPostStatus,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
+	isEditedPostPublished,
+	isEditedPostPublishable,
+	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
 	getSelectedBlock,
-	getSelectedBlocks,
+	getMultiSelectedBlockUids,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
 	getBlockUids,
-	getBlockOrder,
+	getBlockIndex,
 	isFirstBlock,
 	isLastBlock,
 	getPreviousBlock,
 	getNextBlock,
 	isBlockSelected,
 	isBlockMultiSelected,
-	isFirstSelectedBlock,
+	isFirstMultiSelectedBlock,
 	isBlockHovered,
 	getBlockFocus,
 	isTypingInBlock,
 	getBlockInsertionPoint,
+	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
-	isSavingNewPost,
+	getSuggestedPostFormat,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -173,10 +180,28 @@ describe( 'selectors', () => {
 	describe( 'getCurrentPost', () => {
 		it( 'should return the current post', () => {
 			const state = {
-				currentPost: { ID: 1 },
+				currentPost: { id: 1 },
 			};
 
-			expect( getCurrentPost( state ) ).to.eql( { ID: 1 } );
+			expect( getCurrentPost( state ) ).to.eql( { id: 1 } );
+		} );
+	} );
+
+	describe( 'getCurrentPostId', () => {
+		it( 'should return null if the post has not yet been saved', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( getCurrentPostId( state ) ).to.be.null();
+		} );
+
+		it( 'should return the current post ID', () => {
+			const state = {
+				currentPost: { id: 1 },
+			};
+
+			expect( getCurrentPostId( state ) ).to.equal( 1 );
 		} );
 	} );
 
@@ -189,34 +214,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).to.eql( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getEditedPostStatus', () => {
-		it( 'should return the post saved status if the status is not edited', () => {
-			const state = {
-				currentPost: {
-					status: 'draft',
-				},
-				editor: {
-					edits: { title: 'chicken' },
-				},
-			};
-
-			expect( getEditedPostStatus( state ) ).to.equal( 'draft' );
-		} );
-
-		it( 'should return the edited status', () => {
-			const state = {
-				currentPost: {
-					status: 'draft',
-				},
-				editor: {
-					edits: { status: 'pending' },
-				},
-			};
-
-			expect( getEditedPostStatus( state ) ).to.equal( 'pending' );
 		} );
 	} );
 
@@ -335,6 +332,151 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditedPostPublished', () => {
+		it( 'should return true for public posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for old scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2016-05-30T17:21:39',
+				},
+			};
+
+			expect( isEditedPostPublished( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostPublishable', () => {
+		it( 'should return true for pending posts', () => {
+			const state = {
+				currentPost: {
+					status: 'pending',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return true for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for published posts', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for private posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return false for scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: false,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.false();
+		} );
+
+		it( 'should return true for dirty posts', () => {
+			const state = {
+				currentPost: {
+					status: 'private',
+				},
+				editor: {
+					dirty: true,
+				},
+			};
+
+			expect( isEditedPostPublishable( state ) ).to.be.true();
+		} );
+	} );
+
+	describe( 'isEditedPostBeingScheduled', () => {
+		it( 'should return true for posts with a future date', () => {
+			const state = {
+				editor: {
+					edits: { date: moment().add( 7, 'days' ).format( '' ) },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.true();
+		} );
+
+		it( 'should return false for posts with an old date', () => {
+			const state = {
+				editor: {
+					edits: { date: '2016-05-30T17:21:39' },
+				},
+			};
+
+			expect( isEditedPostBeingScheduled( state ) ).to.be.false();
+		} );
+	} );
+
 	describe( 'getEditedPostPreviewLink', () => {
 		it( 'should return null if the post has not link yet', () => {
 			const state = {
@@ -360,12 +502,12 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						123: { uid: 123, blockType: 'core/text' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 			};
 
-			expect( getBlock( state, 123 ) ).to.eql( { uid: 123, blockType: 'core/text' } );
+			expect( getBlock( state, 123 ) ).to.eql( { uid: 123, name: 'core/text' } );
 		} );
 	} );
 
@@ -374,16 +516,16 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getBlocks( state ) ).to.eql( [
-				{ uid: 123, blockType: 'core/text' },
-				{ uid: 23, blockType: 'core/heading' },
+				{ uid: 123, name: 'core/text' },
+				{ uid: 23, name: 'core/heading' },
 			] );
 		} );
 	} );
@@ -393,8 +535,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: null },
@@ -408,8 +550,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -423,8 +565,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 				},
 				selectedBlock: { uid: 23 },
@@ -435,7 +577,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getSelectedBlocks', () => {
+	describe( 'getMultiSelectedBlockUids', () => {
 		it( 'should return empty if there is no multi selection', () => {
 			const state = {
 				editor: {
@@ -444,7 +586,7 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: null, end: null },
 			};
 
-			expect( getSelectedBlocks( state ) ).to.eql( [] );
+			expect( getMultiSelectedBlockUids( state ) ).to.eql( [] );
 		} );
 
 		it( 'should return empty if there is no multi selection', () => {
@@ -455,7 +597,55 @@ describe( 'selectors', () => {
 				multiSelectedBlocks: { start: 2, end: 4 },
 			};
 
-			expect( getSelectedBlocks( state ) ).to.eql( [ 4, 3, 2 ] );
+			expect( getMultiSelectedBlockUids( state ) ).to.eql( [ 4, 3, 2 ] );
+		} );
+	} );
+
+	describe( 'getMultiSelectedBlocksStartUid', () => {
+		it( 'returns null if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getMultiSelectedBlocksStartUid( state ) ).to.be.null();
+		} );
+
+		it( 'returns multi selection start', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getMultiSelectedBlocksStartUid( state ) ).to.equal( 2 );
+		} );
+	} );
+
+	describe( 'getMultiSelectedBlocksEndUid', () => {
+		it( 'returns null if there is no multi selection', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123, 23 ],
+				},
+				multiSelectedBlocks: { start: null, end: null },
+			};
+
+			expect( getMultiSelectedBlocksEndUid( state ) ).to.be.null();
+		} );
+
+		it( 'returns multi selection end', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 5, 4, 3, 2, 1 ],
+				},
+				multiSelectedBlocks: { start: 2, end: 4 },
+			};
+
+			expect( getMultiSelectedBlocksEndUid( state ) ).to.equal( 4 );
 		} );
 	} );
 
@@ -471,7 +661,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockOrder', () => {
+	describe( 'getBlockIndex', () => {
 		it( 'should return the block order', () => {
 			const state = {
 				editor: {
@@ -479,7 +669,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockOrder( state, 23 ) ).to.equal( 1 );
+			expect( getBlockIndex( state, 23 ) ).to.equal( 1 );
 		} );
 	} );
 
@@ -532,15 +722,15 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getPreviousBlock( state, 23 ) ).to.eql(
-				{ uid: 123, blockType: 'core/text' },
+				{ uid: 123, name: 'core/text' },
 			);
 		} );
 
@@ -548,8 +738,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -564,15 +754,15 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
 			};
 
 			expect( getNextBlock( state, 123 ) ).to.eql(
-				{ uid: 23, blockType: 'core/heading' },
+				{ uid: 23, name: 'core/heading' },
 			);
 		} );
 
@@ -580,8 +770,8 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					blocksByUid: {
-						23: { uid: 23, blockType: 'core/heading' },
-						123: { uid: 123, blockType: 'core/text' },
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
 					},
 					blockOrder: [ 123, 23 ],
 				},
@@ -628,7 +818,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isFirstSelectedBlock', () => {
+	describe( 'isFirstMultiSelectedBlock', () => {
 		const state = {
 			editor: {
 				blockOrder: [ 5, 4, 3, 2, 1 ],
@@ -637,11 +827,11 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
-			expect( isFirstSelectedBlock( state, 4 ) ).to.be.true();
+			expect( isFirstMultiSelectedBlock( state, 4 ) ).to.be.true();
 		} );
 
 		it( 'should return false if the block is not first in multi selection', () => {
-			expect( isFirstSelectedBlock( state, 3 ) ).to.be.false();
+			expect( isFirstMultiSelectedBlock( state, 3 ) ).to.be.false();
 		} );
 	} );
 
@@ -716,39 +906,78 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockInsertionPoint', () => {
-		it( 'should return the uid of the insertion point', () => {
+		it( 'should return the uid of the selected block', () => {
 			const state = {
-				insertionPoint: {
-					show: true,
-					uid: 123,
+				mode: 'visual',
+				selectedBlock: {
+					uid: 2,
+					typing: true,
+				},
+				multiSelectedBlocks: {},
+				editor: {
+					blocksByUid: {
+						2: { uid: 2 },
+					},
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 123 );
+			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
 		} );
 
-		it( 'should return return the last block uid if the insertion point is null', () => {
+		it( 'should return the last multi selected uid', () => {
 			const state = {
-				insertionPoint: {
-					show: true,
-					uid: null,
+				mode: 'visual',
+				selectedBlock: {},
+				multiSelectedBlocks: {
+					start: 1,
+					end: 2,
 				},
 				editor: {
-					blockOrder: [ 34, 23 ],
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).to.equal( 23 );
+			expect( getBlockInsertionPoint( state ) ).to.equal( 2 );
 		} );
 
-		it( 'should return null if the insertion point is not shown', () => {
+		it( 'should return the last block if no selection', () => {
 			const state = {
-				insertionPoint: {
-					show: false,
+				mode: 'visual',
+				selectedBlock: {},
+				multiSelectedBlocks: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
 				},
 			};
 
-			expect( getBlockInsertionPoint( state, 23 ) ).to.be.null();
+			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+		} );
+
+		it( 'should return the last block for the text mode', () => {
+			const state = {
+				mode: 'text',
+				selectedBlock: {
+					uid: 2,
+					typing: true,
+				},
+				multiSelectedBlocks: {},
+				editor: {
+					blockOrder: [ 1, 2, 3 ],
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).to.equal( 3 );
+		} );
+	} );
+
+	describe( 'isBlockInsertionPointVisible', () => {
+		it( 'should return the value in state', () => {
+			const state = {
+				showInsertionPoint: true,
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).to.be.true();
 		} );
 	} );
 
@@ -818,25 +1047,56 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isSavingNewPost', () => {
-		it( 'should return true if the post being saved is new', () => {
+	describe( 'getSuggestedPostFormat', () => {
+		it( 'returns null if cannot be determined', () => {
 			const state = {
-				saving: {
-					isNew: true,
+				editor: {
+					blockOrder: [],
+					blocksByUid: {},
 				},
 			};
 
-			expect( isSavingNewPost( state ) ).to.be.true();
+			expect( getSuggestedPostFormat( state ) ).to.be.null();
 		} );
 
-		it( 'should return false if the post being saved is not new', () => {
+		it( 'returns null if there is more than one block in the post', () => {
 			const state = {
-				saving: {
-					isNew: false,
+				editor: {
+					blockOrder: [ 123, 456 ],
+					blocksByUid: {
+						123: { uid: 123, name: 'core/image' },
+						456: { uid: 456, name: 'core/quote' },
+					},
 				},
 			};
 
-			expect( isSavingNewPost( state ) ).to.be.false();
+			expect( getSuggestedPostFormat( state ) ).to.be.null();
+		} );
+
+		it( 'returns Image if the first block is of type `core/image`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 123 ],
+					blocksByUid: {
+						123: { uid: 123, name: 'core/image' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.equal( 'Image' );
+		} );
+
+		it( 'returns Quote if the first block is of type `core/quote`', () => {
+			const state = {
+				editor: {
+					blockOrder: [ 456 ],
+					blocksByUid: {
+						456: { uid: 456, name: 'core/quote' },
+					},
+				},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).to.equal( 'Quote' );
 		} );
 	} );
 } );

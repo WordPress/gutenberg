@@ -2,12 +2,12 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, createBlock, query } from '../../api';
+import { registerBlockType, createBlock, query } from '../../api';
 import Editable from '../../editable';
 
 const { children } = query;
 
-registerBlock( 'core/preformatted', {
+registerBlockType( 'core/preformatted', {
 	title: wp.i18n.__( 'Preformatted' ),
 
 	icon: 'text',

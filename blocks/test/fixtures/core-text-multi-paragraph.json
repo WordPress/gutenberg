@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/text",
+        "name": "core/text",
         "attributes": {
             "content": [
                 {
@@ -15,6 +15,7 @@
                         "—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you'll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting."
                     ]
                 },
+                "\n",
                 {
                     "type": "p",
                     "children": [

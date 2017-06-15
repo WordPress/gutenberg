@@ -1,7 +1,8 @@
 .editor-block-mover {
 	position: absolute;
 	top: 10px;
-	left: 0;
+	left: -$block-mover-padding-visible;
+	padding: 0 14px 20px 0; // handles hover area
 }
 
 .editor-block-mover__control {
@@ -10,14 +11,11 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-100;
+	color: $dark-gray-300;
 	cursor: pointer;
 	width: 20px;
 	height: 20px;
-
-	&:hover {
-		color: $dark-gray-900;
-	}
+	border-radius: 50%;
 
 	&[aria-disabled="true"] {
 		cursor: default;

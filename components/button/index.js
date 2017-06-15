@@ -4,7 +4,12 @@
 import './style.scss';
 import classnames from 'classnames';
 
-class Button extends wp.element.Component {
+/**
+ * WordPress dependencies
+ */
+import { Component } from 'element';
+
+class Button extends Component {
 	constructor( props ) {
 		super( props );
 		this.setRef = this.setRef.bind( this );

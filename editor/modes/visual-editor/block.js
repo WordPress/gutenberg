@@ -23,18 +23,20 @@ import {
 	focusBlock,
 	mergeBlocks,
 	insertBlock,
+	clearSelectedBlock,
+	startTypingInBlock,
+	stopTypingInBlock,
 } from '../../actions';
 import {
 	getPreviousBlock,
 	getNextBlock,
 	getBlock,
 	getBlockFocus,
-	getBlockOrder,
+	getBlockIndex,
 	isBlockHovered,
 	isBlockSelected,
 	isBlockMultiSelected,
-	isFirstSelectedBlock,
-	getSelectedBlocks,
+	isFirstMultiSelectedBlock,
 	isTypingInBlock,
 } from '../../selectors';
 
@@ -50,24 +52,67 @@ class VisualEditorBlock extends wp.element.Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
+		this.stopTyping = this.stopTyping.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
-		this.selectAndStopPropagation = this.selectAndStopPropagation.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onPointerDown = this.onPointerDown.bind( this );
 		this.previousOffset = null;
 	}
 
-	bindBlockNode( node ) {
-		this.node = node;
+	componentDidMount() {
+		if ( this.props.focus ) {
+			this.node.focus();
+		}
 	}
 
 	componentWillReceiveProps( newProps ) {
 		if (
 			this.props.order !== newProps.order &&
 			( ( this.props.isSelected && newProps.isSelected ) ||
-			( this.props.isFirstSelected && newProps.isFirstSelected ) )
+			( this.props.isFirstMultiSelected && newProps.isFirstMultiSelected ) )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		// Preserve scroll prosition when block rearranged
+		if ( this.previousOffset ) {
+			window.scrollTo(
+				window.scrollX,
+				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
+			);
+			this.previousOffset = null;
+		}
+
+		// Focus node when focus state is programmatically transferred.
+		if ( this.props.focus && ! prevProps.focus ) {
+			this.node.focus();
+		}
+
+		// Bind or unbind mousemove from page when user starts or stops typing
+		const { isTyping } = this.props;
+		if ( isTyping !== prevProps.isTyping ) {
+			if ( isTyping ) {
+				document.addEventListener( 'mousemove', this.stopTyping );
+			} else {
+				this.removeStopTypingListener();
+			}
+		}
+	}
+
+	componentWillUnmount() {
+		this.removeStopTypingListener();
+	}
+
+	removeStopTypingListener() {
+		document.removeEventListener( 'mousemove', this.stopTyping );
+	}
+
+	bindBlockNode( node ) {
+		this.node = node;
+		this.props.blockRef( node );
 	}
 
 	setAttributes( attributes ) {
@@ -102,17 +147,21 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
+	stopTyping() {
+		this.props.onStopTyping();
+	}
+
 	removeOrDeselect( { keyCode, target } ) {
 		const {
 			uid,
-			selectedBlocks,
+			multiSelectedBlockUids,
 			previousBlock,
 			onRemove,
 			onFocus,
 			onDeselect,
 		} = this.props;
 
-		// Remove block on backspace
+		// Remove block on backspace.
 		if ( BACKSPACE === keyCode ) {
 			if ( target === this.node ) {
 				onRemove( [ uid ] );
@@ -122,12 +171,12 @@ class VisualEditorBlock extends wp.element.Component {
 				}
 			}
 
-			if ( selectedBlocks.length ) {
-				onRemove( selectedBlocks );
+			if ( multiSelectedBlockUids.length ) {
+				onRemove( multiSelectedBlockUids );
 			}
 		}
 
-		// Deselect on escape
+		// Deselect on escape.
 		if ( ESCAPE === keyCode ) {
 			onDeselect();
 		}
@@ -136,7 +185,7 @@ class VisualEditorBlock extends wp.element.Component {
 	mergeBlocks( forward = false ) {
 		const { block, previousBlock, nextBlock, onMerge } = this.props;
 
-		// Do nothing when it's the first block
+		// Do nothing when it's the first block.
 		if (
 			( ! forward && ! previousBlock ) ||
 			( forward && ! nextBlock )
@@ -151,49 +200,37 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	selectAndStopPropagation( event ) {
-		this.props.onSelect();
-
-		// Visual editor infers click as intent to clear the selected block, so
-		// prevent bubbling when occurring on block where selection is intended
-		event.stopPropagation();
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.previousOffset ) {
-			window.scrollTo(
-				window.scrollX,
-				window.scrollY + this.node.getBoundingClientRect().top - this.previousOffset
-			);
-			this.previousOffset = null;
-		}
-
-		// Focus node when focus state is programmatically transferred
-		if ( this.props.focus && ! prevProps.focus ) {
-			this.node.focus();
+	onFocus( event ) {
+		if ( event.target === this.node ) {
+			this.props.onSelect();
 		}
 	}
 
-	componentDidMount() {
-		if ( this.props.focus ) {
-			this.node.focus();
-		}
+	onPointerDown() {
+		this.props.onSelectionStart();
 	}
 
 	render() {
-		const { block, selectedBlocks } = this.props;
-		const settings = wp.blocks.getBlockSettings( block.blockType );
-
+		const { block, multiSelectedBlockUids } = this.props;
+		const blockType = wp.blocks.getBlockType( block.name );
+		// The block as rendered in the editor is composed of general block UI
+		// (mover, toolbar, wrapper) and the display of the block content, which
+		// is referred to as <BlockEdit />.
 		let BlockEdit;
-		if ( settings ) {
-			BlockEdit = settings.edit || settings.save;
+		// `edit` and `save` are functions or components describing the markup
+		// with which a block is displayed. If `blockType` is valid, assign
+		// them preferencially as the render value for the block.
+		if ( blockType ) {
+			BlockEdit = blockType.edit || blockType.save;
 		}
 
+		// Should `BlockEdit` return as null, we have nothing to display for the block.
 		if ( ! BlockEdit ) {
 			return null;
 		}
 
-		const { isHovered, isSelected, isMultiSelected, isFirstSelected, isTyping, focus } = this.props;
+		// Generate the wrapper class names handling the different states of the block.
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, isTyping, focus } = this.props;
 		const showUI = isSelected && ( ! isTyping || ! focus.collapsed );
 		const className = classnames( 'editor-visual-editor__block', {
 			'is-selected': showUI,
@@ -201,34 +238,28 @@ class VisualEditorBlock extends wp.element.Component {
 			'is-hovered': isHovered,
 		} );
 
-		const { onSelect, onMouseLeave, onFocus, onInsertAfter } = this.props;
+		const { onMouseLeave, onFocus, onInsertAfter } = this.props;
 
-		// Determine whether the block has props to apply to the wrapper
+		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
-		if ( settings.getEditWrapperProps ) {
-			wrapperProps = settings.getEditWrapperProps( block.attributes );
+		if ( blockType.getEditWrapperProps ) {
+			wrapperProps = blockType.getEditWrapperProps( block.attributes );
 		}
 
 		// Disable reason: Each block can be selected by clicking on it
-
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.removeOrDeselect }
-				onMouseDown={ this.props.onSelectionStart }
-				onTouchStart={ this.props.onSelectionStart }
-				onMouseMove={ () => {
-					this.props.onSelectionChange();
-					this.maybeHover();
-				} }
-				onTouchMove={ this.props.onSelectionChange }
-				onMouseUp={ this.props.onSelectionEnd }
-				onTouchEnd={ this.props.onSelectionEnd }
+				onFocus={ this.onFocus }
+				onMouseDown={ this.onPointerDown }
+				onTouchStart={ this.onPointerDown }
+				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
 				onMouseLeave={ onMouseLeave }
 				className={ className }
-				data-type={ block.blockType }
+				data-type={ block.name }
 				tabIndex="0"
 				{ ...wrapperProps }
 			>
@@ -244,9 +275,9 @@ class VisualEditorBlock extends wp.element.Component {
 					>
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
-							{ !! settings.controls && (
+							{ !! blockType.controls && (
 								<Toolbar
-									controls={ settings.controls.map( ( control ) => ( {
+									controls={ blockType.controls.map( ( control ) => ( {
 										...control,
 										onClick: () => control.onClick( block.attributes, this.setAttributes ),
 										isActive: control.isActive ? control.isActive( block.attributes ) : false,
@@ -256,26 +287,13 @@ class VisualEditorBlock extends wp.element.Component {
 						</div>
 					</CSSTransitionGroup>
 				}
-				{ isFirstSelected && (
-					<BlockMover uids={ selectedBlocks } />
-				) }
-				{ isFirstSelected && (
-					<div className="editor-visual-editor__block-controls">
-						<Toolbar
-							controls={ [ {
-								icon: 'trash',
-								title: '',
-								onClick: () => this.props.onRemove( selectedBlocks ),
-								isActive: false,
-							} ] }
-							focus={ true }
-						/>
-					</div>
+				{ isFirstMultiSelected && (
+					<BlockMover uids={ multiSelectedBlockUids } />
 				) }
 				<div
 					onKeyPress={ this.maybeStartTyping }
-					onFocus={ onSelect }
-					onClick={ this.selectAndStopPropagation }
+					onDragStart={ ( event ) => event.preventDefault() }
+					onMouseDown={ this.props.onSelect }
 				>
 					<BlockEdit
 						focus={ focus }
@@ -284,6 +302,7 @@ class VisualEditorBlock extends wp.element.Component {
 						insertBlockAfter={ onInsertAfter }
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
+						id={ block.uid }
 					/>
 				</div>
 			</div>
@@ -300,12 +319,11 @@ export default connect(
 			block: getBlock( state, ownProps.uid ),
 			isSelected: isBlockSelected( state, ownProps.uid ),
 			isMultiSelected: isBlockMultiSelected( state, ownProps.uid ),
-			isFirstSelected: isFirstSelectedBlock( state, ownProps.uid ),
-			selectedBlocks: getSelectedBlocks( state ),
+			isFirstMultiSelected: isFirstMultiSelectedBlock( state, ownProps.uid ),
 			isHovered: isBlockHovered( state, ownProps.uid ),
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTypingInBlock( state, ownProps.uid ),
-			order: getBlockOrder( state, ownProps.uid ),
+			order: getBlockIndex( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -324,14 +342,17 @@ export default connect(
 			} );
 		},
 		onDeselect() {
-			dispatch( { type: 'CLEAR_SELECTED_BLOCK' } );
+			dispatch( clearSelectedBlock() );
 		},
+
 		onStartTyping() {
-			dispatch( {
-				type: 'START_TYPING',
-				uid: ownProps.uid,
-			} );
+			dispatch( startTypingInBlock( ownProps.uid ) );
 		},
+
+		onStopTyping() {
+			dispatch( stopTypingInBlock( ownProps.uid ) );
+		},
+
 		onHover() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',

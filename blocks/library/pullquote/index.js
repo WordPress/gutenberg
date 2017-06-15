@@ -2,12 +2,12 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
 
-registerBlock( 'core/pullquote', {
+registerBlockType( 'core/pullquote', {
 
 	title: wp.i18n.__( 'Pullquote' ),
 
@@ -33,7 +33,7 @@ registerBlock( 'core/pullquote', {
 						} )
 					}
 					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
@@ -45,7 +45,7 @@ registerBlock( 'core/pullquote', {
 							} )
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
-						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 						inline
 					/>
 				) }

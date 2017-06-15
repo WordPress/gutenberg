@@ -2,9 +2,9 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock } from '../../api';
+import { registerBlockType } from '../../api';
 
-registerBlock( 'core/separator', {
+registerBlockType( 'core/separator', {
 	title: wp.i18n.__( 'Separator' ),
 
 	icon: 'minus',

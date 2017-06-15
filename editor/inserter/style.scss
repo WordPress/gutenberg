@@ -1,13 +1,15 @@
 .editor-inserter {
 	display: inline-block;
-	position: relative;
 	background: none;
 	border: none;
 	padding: 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	z-index: z-index( '.editor-inserter' );
+
+	@include break-medium {
+		position: relative;
+	}
 }
 
 .editor-inserter__toggle {
@@ -20,6 +22,10 @@
 	outline: none;
 	transition: color .2s ease;
 
+	.editor-layout__content & {
+		border-radius: $icon-button-size / 2;
+	}
+
 	&:hover,
 	&:focus {
 		color: $blue-medium-500;
@@ -27,12 +33,22 @@
 }
 
 .editor-inserter__menu {
-	width: 280px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	position: absolute;
-	left: -122px;
 	background: $white;
+	z-index: z-index( '.editor-inserter__menu' );
+
+	left: 0;
+	right: 0;
+
+	// inserter becomes popup
+	@include break-medium {
+		width: 280px;
+		left: -122px;
+		right: auto;
+		height: auto;
+	}
 
 	&.is-top {
 		bottom: 42px;
@@ -62,7 +78,11 @@
 	}
 
 	&.is-bottom {
-		top: 42px;
+		top: $admin-bar-height-big + $item-spacing -1px;
+
+		@include break-medium {
+			top: $admin-bar-height + $item-spacing;
+		}
 
 		.editor-inserter__arrow {
 			top: -10px;
@@ -106,11 +126,24 @@
 	position: absolute;
 	width: 0;
 	z-index: z-index( '.editor-inserter__arrow' );
+
+	display: none;
+
+	@include break-medium {
+		display: block;
+	}
 }
 
 .editor-inserter__content {
-	max-height: 20vw;
+	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size } );
+
+	@include break-medium {
+		height: auto;
+		max-height: 50vh;
+	}
+
 	overflow: auto;
+	box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
 
 	&:focus {
 		outline: none;

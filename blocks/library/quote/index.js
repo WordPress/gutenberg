@@ -7,12 +7,14 @@ import { switchChildrenNodeName } from 'element';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, createBlock, query as hpq } from '../../api';
+import { registerBlockType, createBlock, query as hpq } from '../../api';
+import AlignmentToolbar from '../../alignment-toolbar';
+import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
 
-registerBlock( 'core/quote', {
+registerBlockType( 'core/quote', {
 	title: wp.i18n.__( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',
@@ -111,11 +113,24 @@ registerBlock( 'core/quote', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
-		const { value, citation, style = 1 } = attributes;
+		const { align, value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
-		return (
-			<blockquote className={ `blocks-quote blocks-quote-style-${ style }` }>
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			),
+			<blockquote
+				key="quote"
+				className={ `blocks-quote blocks-quote-style-${ style }` }
+			>
 				<Editable
 					value={ value }
 					onChange={
@@ -124,9 +139,9 @@ registerBlock( 'core/quote', {
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
-					onFocus={ () => setFocus( { editable: 'value' } ) }
+					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
-					showAlignments
+					style={ { textAlign: align } }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
@@ -139,21 +154,26 @@ registerBlock( 'core/quote', {
 							} )
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
-						onFocus={ () => setFocus( { editable: 'citation' } ) }
+						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 						inline
 					/>
 				) }
-			</blockquote>
-		);
+			</blockquote>,
+		];
 	},
 
 	save( { attributes } ) {
-		const { value, citation, style = 1 } = attributes;
+		const { align, value, citation, style = 1 } = attributes;
 
 		return (
 			<blockquote className={ `blocks-quote-style-${ style }` }>
 				{ value && value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph }</p>
+					<p
+						key={ i }
+						style={ { textAlign: align ? align : null } }
+					>
+						{ paragraph }
+					</p>
 				) ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>

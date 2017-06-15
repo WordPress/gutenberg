@@ -8,6 +8,7 @@
 	position: relative;
 	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
+	border-radius: 4px;
 
 	.dashicon {
 		flex: 0 0 auto;
@@ -25,13 +26,12 @@
 		}
 	}
 
-	&:focus:before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, .8);
+	&:focus {
+		box-shadow: 0 0 0 1px $blue-medium-400, 0 0 2px 1px $blue-medium-400;
+		outline: none;
+	}
+
+	&:active:focus {
+		box-shadow: none;
 	}
 }

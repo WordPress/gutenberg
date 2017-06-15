@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Placeholder } from 'components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query } from '../../api';
+import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
+import InspectorControls from '../../inspector-controls';
+import TextControl from '../../inspector-controls/text-control';
 
 const { attr, children } = query;
 
@@ -27,8 +30,8 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/image', {
-	title: wp.i18n.__( 'Image' ),
+registerBlockType( 'core/image', {
+	title: __( 'Image' ),
 
 	icon: 'format-image',
 
@@ -43,59 +46,67 @@ registerBlock( 'core/image', {
 	controls: [
 		{
 			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
+			title: __( 'Align left' ),
 			isActive: ( { align } ) => 'left' === align,
 			onClick: toggleAlignment( 'left' ),
 		},
 		{
 			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
+			title: __( 'Align center' ),
 			isActive: ( { align } ) => ! align || 'center' === align,
 			onClick: toggleAlignment( 'center' ),
 		},
 		{
 			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
+			title: __( 'Align right' ),
 			isActive: ( { align } ) => 'right' === align,
 			onClick: toggleAlignment( 'right' ),
 		},
 		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
+			icon: 'align-wide',
+			title: __( 'Wide width' ),
 			isActive: ( { align } ) => 'wide' === align,
 			onClick: toggleAlignment( 'wide' ),
+		},
+		{
+			icon: 'align-full-width',
+			title: __( 'Full width' ),
+			isActive: ( { align } ) => 'full' === align,
+			onClick: toggleAlignment( 'full' ),
 		},
 	],
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
 			return { 'data-align': align };
 		}
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
 		const { url, alt, caption } = attributes;
+		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
-			return (
+			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
+			return [
 				<Placeholder
-					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					key="placeholder"
+					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
-					label={ wp.i18n.__( 'Image' ) }
+					label={ __( 'Image' ) }
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
+						onSelect={ setMediaURL }
 						type="image"
-						auto-open
+						autoOpen
 					>
-						{ wp.i18n.__( 'Insert from Media Library' ) }
+						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</Placeholder>
-			);
+				</Placeholder>,
+			];
 		}
 
 		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
@@ -103,13 +114,18 @@ registerBlock( 'core/image', {
 		// Disable reason: Each block can be selected by clicking on it
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return (
-			<figure className="blocks-image">
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
+				</InspectorControls>
+			),
+			<figure key="image" className="blocks-image">
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
 						tagName="figcaption"
-						placeholder={ wp.i18n.__( 'Write caption…' ) }
+						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
@@ -118,8 +134,8 @@ registerBlock( 'core/image', {
 						inlineToolbar
 					/>
 				) : null }
-			</figure>
-		);
+			</figure>,
+		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	},
 

@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/list",
+        "name": "core/list",
         "attributes": {
             "nodeName": "UL",
             "values": [

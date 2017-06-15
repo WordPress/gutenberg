@@ -8,10 +8,11 @@ import { Fill } from 'react-slot-fill';
  */
 import { Toolbar } from 'components';
 
-export default function BlockControls( { controls } ) {
+export default function BlockControls( { controls, children } ) {
 	return (
 		<Fill name="Formatting.Toolbar">
 			<Toolbar controls={ controls } />
+			{ children }
 		</Fill>
 	);
 }

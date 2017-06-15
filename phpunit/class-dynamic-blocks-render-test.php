@@ -31,7 +31,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 				'render_dummy_block',
 			),
 		);
-		register_block( 'core/dummy', $settings );
+		register_block_type( 'core/dummy', $settings );
 		$post_content =
 			'before' .
 			'<!-- wp:core/dummy value="b1" --><!-- /wp:core/dummy -->' .
@@ -56,7 +56,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 				'render_dummy_block',
 			),
 		);
-		register_block( 'core/dummy', $settings );
+		register_block_type( 'core/dummy', $settings );
 		$post_content =
 			'before' .
 			'<!-- wp:core/dummy value="b1" -->this should be ignored<!-- /wp:core/dummy -->' .

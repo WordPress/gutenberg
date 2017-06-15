@@ -30,6 +30,11 @@ $blue-medium-300: #66C6E4;
 $blue-medium-200: #BFE7F3;
 $blue-medium-100: #E5F5FA;
 
+// Alerts
+$alert-yellow: #f0b849;
+$alert-red: #d94f4f;
+$alert-green: #4ab866;
+
 /* Other */
 $default-font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 $default-font-size: 13px;
@@ -53,13 +58,15 @@ $text-editor-max-width: 760px;
 
 /* Editor */
 $text-editor-max-width: 760px;
-$visual-editor-max-width: 700px;
+$visual-editor-max-width: 636px;	// previously 700
 $block-controls-height: 38px;
 $icon-button-size: 36px;
 
 /* Blocks */
 $block-padding: 14px;
 $block-mover-margin: 18px;
+$block-mover-padding-hidden: 10px;
+$block-mover-padding-visible: 32px;
 
 /* Media Queries */
 

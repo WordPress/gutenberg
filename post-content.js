@@ -5,13 +5,9 @@ window._wpGutenbergPost = {
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},
-	// TODO `status` and any other initial attributes other than content and
-	// title need to move somewhere else when this file goes away.  See:
-	// https://github.com/WordPress/gutenberg/pull/848#issuecomment-302836177
-	status: 'draft',
 	content: {
 		raw: [
-			'<!-- wp:core/text -->',
+			'<!-- wp:core/text data="{\\"projectName\\":\\"gutenberg\\",\\"isAwesome\\":true}"-->',
 			'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
@@ -19,6 +15,8 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/text -->',
 			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
 			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/more /-->',
 
 			'<!-- wp:core/text -->',
 			'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',
@@ -39,10 +37,6 @@ window._wpGutenbergPost = {
 			'<!-- wp:core/text -->',
 			'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 			'<!-- /wp:core/text -->',
-
-			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure><iframe src="//www.youtube.com/embed/Nl6U7UotA-M" frameborder="0" allowfullscreen></iframe><figcaption>State of the Word 2016</figcaption></figure>',
-			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/heading -->',
 			'<h2>The <em>Inserter</em> Tool</h2>',
@@ -113,6 +107,12 @@ window._wpGutenbergPost = {
 			'<p>Prima ridens denique his te, ferri illum volumus an his. Eu vel dicat homero qualisqu, vitae regione deserunt vis ei. Graeci incorrupte liberavisse no mea, saepe voluptaria usu ex, vis dicant euismod id. At dolor reprimique eos, quo altera detraxit moderatius id. Quo iudico utinam eu, ad alia munere mel.</p>',
 			'<!-- /wp:core/text -->',
 
+			'<!-- wp:core/code -->',
+			'<pre><code>export default function MyButton() {\n\
+	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
+}</code></pre>',
+			'<!-- /wp:core/code -->',
+
 			'<!-- wp:core/image -->',
 			'<figure><img src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
@@ -149,11 +149,21 @@ window._wpGutenbergPost = {
 			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
 			'<!-- /wp:core/table -->',
 
-			'<!-- wp:core/code -->',
-			'<pre><code>export default function MyButton() {\n\
-	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
-}</code></pre>',
-			'<!-- /wp:core/code -->',
+			'<!-- wp:core/heading -->',
+			'<h2>All that you can embed!</h2>',
+			'<!-- /wp:core/heading -->',
+
+			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
+			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
+			'<!-- /wp:core/embed -->',
+
+			'<!-- wp:core/embed url="https://twitter.com/photomatt/status/868657763970404352" -->',
+			'https://twitter.com/photomatt/status/868657763970404352',
+			'<!-- /wp:core/embed -->',
+
+			'<!-- wp:core/embed url="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" -->',
+			'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
+			'<!-- /wp:core/embed -->',
 
 		].join( '' ),
 	},

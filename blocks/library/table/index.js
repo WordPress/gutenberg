@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlock, query as hpq } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
 
 const { children, query } = hpq;
@@ -21,7 +21,7 @@ function toggleAlignment( align ) {
 	};
 }
 
-registerBlock( 'core/table', {
+registerBlockType( 'core/table', {
 	title: wp.i18n.__( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
@@ -90,7 +90,7 @@ registerBlock( 'core/table', {
 													inline
 													value={ value }
 													focus={ focussedKey === key ? focus : null }
-													onFocus={ () => setFocus( { editable: key } ) }
+													onFocus={ ( props ) => setFocus( { ...props, editable: key } ) }
 													onChange={ ( nextValue ) => {
 														const nextPart = [ ...attributes[ part ] ];
 

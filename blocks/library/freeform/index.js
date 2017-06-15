@@ -1,11 +1,14 @@
+
 /**
  * Internal dependencies
  */
-import { registerBlock, query, setUnknownTypeHandler } from '../../api';
+import './style.scss';
+import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
+import FreeformBlock from './freeform-block';
 
-const { html } = query;
+const { children } = query;
 
-registerBlock( 'core/freeform', {
+registerBlockType( 'core/freeform', {
 	title: wp.i18n.__( 'Freeform' ),
 
 	icon: 'text',
@@ -13,22 +16,33 @@ registerBlock( 'core/freeform', {
 	category: 'common',
 
 	attributes: {
-		html: html(),
+		content: children(),
 	},
 
-	edit( { attributes } ) {
+	defaultAttributes: {
+		content: <p />,
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { content } = attributes;
+
 		return (
-			<div
-				contentEditable
-				suppressContentEditableWarning
-			>
-				{ attributes.html }
-			</div>
+			<FreeformBlock
+				content={ content }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				focus={ focus }
+				onFocus={ setFocus }
+			/>
 		);
 	},
 
 	save( { attributes } ) {
-		return attributes.html;
+		const { content } = attributes;
+		return content;
 	},
 } );
 

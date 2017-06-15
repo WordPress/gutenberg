@@ -17,10 +17,9 @@ import { Component } from 'element';
 import './style.scss';
 import {
 	getEditedPostAttribute,
-	getEditedPostStatus,
 	getEditedPostVisibility,
 } from '../../selectors';
-import { editPost } from '../../actions';
+import { editPost, savePost } from '../../actions';
 
 class PostVisibility extends Component {
 	constructor( props ) {
@@ -42,15 +41,18 @@ class PostVisibility extends Component {
 	}
 
 	render() {
-		const { status, visibility, password, onUpdateVisibility } = this.props;
+		const { status, visibility, password, onUpdateVisibility, onSave } = this.props;
 
 		const setPublic = () => {
 			onUpdateVisibility( visibility === 'private' ? 'draft' : status );
 			this.setState( { hasPassword: false } );
 		};
 		const setPrivate = () => {
-			onUpdateVisibility( 'private' );
-			this.setState( { hasPassword: false } );
+			if ( window.confirm( __( 'Would you like to privately publish this post now?' ) ) ) { // eslint-disable-line no-alert
+				onUpdateVisibility( 'private' );
+				onSave();
+				this.setState( { opened: false } );
+			}
 		};
 		const setPasswordProtected = () => {
 			onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
@@ -100,7 +102,7 @@ class PostVisibility extends Component {
 						</div>
 						{ visibilityOptions.map( ( { value, label, info, changeHandler, checked } ) => (
 							<label key={ value } className="editor-post-visibility__dialog-label">
-								<input type="radio" value={ value } onChange={ changeHandler } checked={ checked } />
+								<input type="radio" value={ value } onClick={ changeHandler } checked={ checked } />
 								{ label }
 								{ <div className="editor-post-visibility__dialog-info">{ info }</div> }
 							</label>
@@ -124,16 +126,15 @@ class PostVisibility extends Component {
 
 export default connect(
 	( state ) => ( {
-		status: getEditedPostStatus( state ),
+		status: getEditedPostAttribute( state, 'status' ),
 		visibility: getEditedPostVisibility( state ),
 		password: getEditedPostAttribute( state, 'password' ),
 	} ),
-	( dispatch ) => {
-		return {
-			onUpdateVisibility( status, password = null ) {
-				dispatch( editPost( { status, password } ) );
-			},
-		};
+	{
+		onSave: savePost,
+		onUpdateVisibility( status, password = null ) {
+			return editPost( { status, password } );
+		},
 	}
 )( clickOutside( PostVisibility ) );
 

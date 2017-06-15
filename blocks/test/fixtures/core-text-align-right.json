@@ -1,8 +1,9 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/text",
+        "name": "core/text",
         "attributes": {
+            "align": "right",
             "content": [
                 {
                     "type": "p",

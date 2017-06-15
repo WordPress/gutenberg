@@ -2,51 +2,68 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Dashicon } from 'components';
+import { __ } from 'i18n';
+import { Dashicon, Button } from 'components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { isEditedPostNew, isEditedPostDirty } from '../../selectors';
+import { editPost, savePost } from '../../actions';
+import {
+	isEditedPostNew,
+	isEditedPostDirty,
+	isSavingPost,
+	getCurrentPost,
+	getEditedPostAttribute,
+} from '../../selectors';
 
-function SavedState( { isNew, isDirty } ) {
-	const classes = classNames( 'editor-saved-state', {
-		'is-new': isNew,
-		'is-dirty': isDirty,
-	} );
+function SavedState( { isNew, isDirty, isSaving, status, onStatusChange, onSave } ) {
+	const className = 'editor-saved-state';
 
-	let icon, text;
-	if ( isNew && isDirty ) {
-		icon = 'warning';
-		text = wp.i18n.__( 'New post with changes' );
-	} else if ( isNew ) {
-		icon = 'edit';
-		text = wp.i18n.__( 'New post' );
-	} else if ( isDirty ) {
-		icon = 'warning';
-		text = wp.i18n.__( 'Unsaved changes' );
-	} else {
-		icon = 'saved';
-		text = wp.i18n.__( 'Saved' );
+	if ( isSaving ) {
+		return (
+			<span className={ className }>
+				{ __( 'Saving' ) }
+			</span>
+		);
+	}
+	if ( ! isNew && ! isDirty ) {
+		return (
+			<span className={ className }>
+				<Dashicon icon="saved" />
+				{ __( 'Saved' ) }
+			</span>
+		);
 	}
 
+	const onClick = () => {
+		onStatusChange( status || 'draft' );
+		onSave();
+	};
+
 	return (
-		<div className={ classes }>
-			<Dashicon icon={ icon } />
-			{ text }
-		</div>
+		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
+			{ __( 'Save' ) }
+		</Button>
 	);
 }
 
 export default connect(
 	( state ) => ( {
+		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
 		isDirty: isEditedPostDirty( state ),
-	} )
+		isSaving: isSavingPost( state ),
+		status: getEditedPostAttribute( state, 'status' ),
+	} ),
+	{
+		onStatusChange: ( status ) => editPost( { status } ),
+		onSave: savePost,
+	}
 )( SavedState );

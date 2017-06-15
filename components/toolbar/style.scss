@@ -23,23 +23,20 @@
 		box-sizing: content-box;
 	}
 
-	&:focus:before {
-		top: -4px;
-		right: -4px;
-		bottom: -4px;
-		left: -4px;
-	}
-
 	&.is-active svg,
 	&:hover svg,
-	&:not(:disabled):hover svg {
+	&:not(:disabled):hover svg,
+	&:focus svg {
 		border: 1px solid $dark-gray-500;
 		color: $dark-gray-500;
 	}
 
 	&:hover,
-	&:not(:disabled):hover {
+	&:not(:disabled):hover,
+	&:focus {
 		color: $dark-gray-500;
+		outline: none;
+		box-shadow: none;
 	}
 
 	&.is-active svg,
@@ -67,6 +64,24 @@
 // compensate for making the button hit area include the visual spacing
 .components-toolbar__control.components-button + .components-toolbar__control.components-button {
 	margin-left: -3px;
+
+	&.left-divider {
+		margin-left: 6px;
+		position: relative;
+		overflow: visible;
+	}
+
+	&.left-divider:before {
+		display: inline-block;
+		content: '';
+		box-sizing: content-box;
+		background-color: $light-gray-500;
+		position: absolute;
+		top: 8px;
+		left: -3px;
+		width: 1px;
+		height: $icon-button-size - 16px;
+	}
 }
 
 .components-toolbar__control .dashicon {

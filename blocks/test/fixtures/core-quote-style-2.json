@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "blockType": "core/quote",
+        "name": "core/quote",
         "attributes": {
             "style": "2",
             "value": [

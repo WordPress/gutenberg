@@ -7,7 +7,7 @@ import sinon from 'sinon';
 /**
  * WordPress dependencies
  */
-import { getBlocks, unregisterBlock, registerBlock, createBlock } from 'blocks';
+import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from 'blocks';
 
 /**
  * Internal dependencies
@@ -20,20 +20,20 @@ describe( 'effects', () => {
 		const handler = effects.MERGE_BLOCKS;
 
 		afterEach( () => {
-			getBlocks().forEach( ( block ) => {
-				unregisterBlock( block.slug );
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
 			} );
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlock( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 			};
 			const dispatch = sinon.spy();
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
@@ -43,7 +43,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
@@ -52,12 +52,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -67,28 +67,28 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
 			} );
-			registerBlock( 'core/test-block-2', {} );
+			registerBlockType( 'core/test-block-2', {} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block2',
+				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -98,14 +98,14 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should transform and merge the blocks', () => {
-			registerBlock( 'core/test-block', {
+			registerBlockType( 'core/test-block', {
 				merge( attributes, attributesToMerge ) {
 					return {
 						content: attributes.content + ' ' + attributesToMerge.content,
 					};
 				},
 			} );
-			registerBlock( 'core/test-block-2', {
+			registerBlockType( 'core/test-block-2', {
 				transforms: {
 					to: [ {
 						type: 'blocks',
@@ -120,12 +120,12 @@ describe( 'effects', () => {
 			} );
 			const blockA = {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken' },
 			};
 			const blockB = {
 				uid: 'ribs',
-				blockType: 'core/test-block-2',
+				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
 			const dispatch = sinon.spy();
@@ -135,7 +135,7 @@ describe( 'effects', () => {
 			expect( dispatch ).to.have.been.calledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).to.have.been.calledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
-				blockType: 'core/test-block',
+				name: 'core/test-block',
 				attributes: { content: 'chicken ribs' },
 			} ] ) );
 		} );

@@ -2,16 +2,21 @@
 	border: 1px solid $light-gray-500;
 	box-shadow: $shadow-popover;
 	background-color: $white;
-	margin-right: 10px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
+	margin-right: -1px;
+
+	@include break-small() {
+		margin-right: $item-spacing;
+	}
 }
 
 .editor-block-switcher__toggle {
 	width: auto;
 	margin: 0;
 	padding: 8px;
+	border-radius: 0;
 
 	&:focus:before {
 		top: -3px;
@@ -42,12 +47,14 @@
 	background: none;
 	border: 1px solid transparent;
 	outline: none;
+	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
+		box-shadow: none;
 		color: $dark-gray-500;
 		border-color: $dark-gray-500;
 	}

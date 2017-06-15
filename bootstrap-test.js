@@ -3,6 +3,12 @@ require( 'chai' )
 	.use( require( 'dirty-chai' ) )
 	.use( require( 'sinon-chai' ) );
 
+// Sinon plugins
+const sinon = require( 'sinon' );
+const sinonTest = require( 'sinon-test' );
+sinon.test = sinonTest.configureTest( sinon );
+sinon.testCase = sinonTest.configureTestCase( sinon );
+
 // Fake DOM
 const { JSDOM } = require( 'jsdom' );
 const dom = new JSDOM( '', {
@@ -25,6 +31,7 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
+
 global.window._wpDateSettings = {
 	formats: {
 		date: 'j F Y',

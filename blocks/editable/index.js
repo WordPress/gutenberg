@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity, find } from 'lodash';
+import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -10,7 +10,6 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Toolbar } from 'components';
 import { BACKSPACE, DELETE } from 'utils/keycodes';
 
 /**
@@ -19,30 +18,6 @@ import { BACKSPACE, DELETE } from 'utils/keycodes';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-
-const alignmentMap = {
-	alignleft: 'left',
-	alignright: 'right',
-	aligncenter: 'center',
-};
-
-const ALIGNMENT_CONTROLS = [
-	{
-		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
-		align: 'left',
-	},
-	{
-		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
-		align: 'center',
-	},
-	{
-		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
-		align: 'right',
-	},
-];
 
 function createElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -78,7 +53,6 @@ export default class Editable extends wp.element.Component {
 
 		this.state = {
 			formats: {},
-			alignment: null,
 			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 		};
@@ -137,7 +111,10 @@ export default class Editable extends wp.element.Component {
 			empty: ! content || ! content.length,
 		} );
 
-		if ( this.props.focus.collapsed !== collapsed ) {
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
 			this.props.onFocus( {
 				...this.props.focus,
 				collapsed,
@@ -293,12 +270,10 @@ export default class Editable extends wp.element.Component {
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
-		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition } );
+		this.setState( { bookmark, formats, focusPosition } );
 	}
 
 	updateContent() {
@@ -306,9 +281,9 @@ export default class Editable extends wp.element.Component {
 		this.savedContent = this.props.value;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
+
 		// Saving the editor on updates avoid unecessary onChanges calls
 		// These calls can make the focus jump
-
 		this.editor.save();
 	}
 
@@ -327,14 +302,19 @@ export default class Editable extends wp.element.Component {
 
 	updateFocus() {
 		const { focus } = this.props;
+		const isActive = this.isActive();
+
 		if ( focus ) {
-			this.editor.focus();
+			if ( ! isActive ) {
+				this.editor.focus();
+			}
+
 			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 ) {
+			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
-		} else {
+		} else if ( isActive ) {
 			this.editor.getBody().blur();
 		}
 	}
@@ -344,11 +324,11 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.focus !== prevProps.focus ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
-		// The savedContent var allows us to avoid updating the content right after an onChange call
+		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
@@ -397,20 +377,6 @@ export default class Editable extends wp.element.Component {
 		this.editor.setDirty( true );
 	}
 
-	isAlignmentActive( align ) {
-		return this.state.alignment === align;
-	}
-
-	toggleAlignment( align ) {
-		this.editor.focus();
-
-		if ( this.isAlignmentActive( align ) ) {
-			this.editor.execCommand( 'JustifyNone' );
-		} else {
-			this.editor.execCommand( 'Justify' + capitalize( align ) );
-		}
-	}
-
 	render() {
 		const {
 			tagName,
@@ -418,15 +384,14 @@ export default class Editable extends wp.element.Component {
 			value,
 			focus,
 			className,
-			showAlignments = false,
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we unmount (+ destroy) the previous TinyMCE element, then
-		// mount (+ initialize) a new child element in its place.
+		// changes, we unmount and destroy the previous TinyMCE element, then
+		// mount and initialize a new child element in its place.
 		const key = [ 'editor', tagName ].join();
 		const classes = classnames( className, 'blocks-editable' );
 
@@ -443,24 +408,14 @@ export default class Editable extends wp.element.Component {
 			<div className={ classes }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
-						{ showAlignments &&
-							<Toolbar
-								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
-									...control,
-									onClick: () => this.toggleAlignment( control.align ),
-									isActive: this.isAlignmentActive( control.align ),
-								} ) ) } />
-						}
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-
 				{ focus && inlineToolbar &&
 					<div className="block-editable__inline-toolbar">
 						{ formatToolbar }
 					</div>
 				}
-
 				<TinyMCE
 					tagName={ tagName }
 					getSettings={ this.getSettings }
@@ -469,7 +424,8 @@ export default class Editable extends wp.element.Component {
 					defaultValue={ value }
 					isEmpty={ this.state.empty }
 					placeholder={ placeholder }
-					key={ key } />
+					key={ key }
+				/>
 			</div>
 		);
 	}
