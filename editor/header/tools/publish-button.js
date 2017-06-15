@@ -19,6 +19,7 @@ import {
 	isEditedPostPublished,
 	isEditedPostBeingScheduled,
 	getEditedPostVisibility,
+	isEditedPostSaveable,
 	isEditedPostPublishable,
 } from '../../selectors';
 
@@ -30,8 +31,9 @@ function PublishButton( {
 	isBeingScheduled,
 	visibility,
 	isPublishable,
+	isSaveable,
 } ) {
-	const buttonEnabled = ! isSaving && isPublishable;
+	const buttonEnabled = ! isSaving && isPublishable && isSaveable;
 	let buttonText;
 	if ( isPublished ) {
 		buttonText = __( 'Update' );
@@ -76,6 +78,7 @@ export default connect(
 		isPublished: isEditedPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
+		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
 	} ),
 	{

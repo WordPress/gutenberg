@@ -19,11 +19,16 @@ import {
 	isEditedPostNew,
 	isEditedPostDirty,
 	isSavingPost,
+	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
 } from '../../selectors';
 
-function SavedState( { isNew, isDirty, isSaving, status, onStatusChange, onSave } ) {
+function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+	if ( ! isSaveable ) {
+		return null;
+	}
+
 	const className = 'editor-saved-state';
 
 	if ( isSaving ) {
@@ -60,6 +65,7 @@ export default connect(
 		isNew: isEditedPostNew( state ),
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
+		isSaveable: isEditedPostSaveable( state ),
 		status: getEditedPostAttribute( state, 'status' ),
 	} ),
 	{
