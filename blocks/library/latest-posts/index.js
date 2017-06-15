@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Placeholder, FormToggle } from 'components';
+import { Placeholder, FormToggle, withInstanceId } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
-import { withInstanceId } from 'components';
 
 /**
  * Internal dependencies
@@ -30,7 +29,7 @@ registerBlockType( 'core/latestposts', {
 	edit: withInstanceId( class extends Component {
 		constructor() {
 			super( ...arguments );
-			this.changePostsToShow = this.changePostsToShow.bind(this);
+			this.changePostsToShow = this.changePostsToShow.bind( this );
 
 			const { poststoshow } = this.props.attributes;
 
@@ -53,18 +52,18 @@ registerBlockType( 'core/latestposts', {
 			setAttributes( { displayPostDate: ! displayPostDate } );
 		}
 
-		componentWillReceiveProps(nextProps) {
+		componentWillReceiveProps( nextProps ) {
 			const { poststoshow: postToShowCurrent } = this.props.attributes;
 			let { poststoshow: postToShowNext } = nextProps.attributes;
 			const { setAttributes } = this.props;
 
 			postToShowNext = parseInt( postToShowNext );
 
-			if( postToShowCurrent === postToShowNext ) {
+			if ( postToShowCurrent === postToShowNext ) {
 				return;
 			}
 
-			if( !isNaN(postToShowNext) && postToShowNext > 0 && postToShowNext <= 100 ) {
+			if ( ! isNaN( postToShowNext ) && postToShowNext > 0 && postToShowNext <= 100 ) {
 				this.latestPostsRequest = getLatestPosts( postToShowNext );
 
 				this.latestPostsRequest
@@ -77,7 +76,7 @@ registerBlockType( 'core/latestposts', {
 		changePostsToShow( postsToShow ) {
 			const { setAttributes } = this.props;
 
-			setAttributes( { poststoshow: postsToShow  } );
+			setAttributes( { poststoshow: postsToShow } );
 		}
 
 		render() {
@@ -97,6 +96,7 @@ registerBlockType( 'core/latestposts', {
 			const { displayPostDate } = this.props.attributes;
 
 			const displayPostDateId = `post-date-toggle-${ instanceId }`;
+			const postToShowId = `post-to-show-${ instanceId }`;
 
 			return [
 				focus && (
@@ -110,12 +110,13 @@ registerBlockType( 'core/latestposts', {
 								showHint={ false }
 							/>
 						</div>
-						<label>Number of posts to show:</label>
+						<label htmlFor={ postToShowId }>Number of posts to show:</label>
 						<input
 							type="text"
-							value={this.props.attributes.poststoshow}
-							ref="poststoshow"
-							onChange={ () => this.changePostsToShow( this.refs.poststoshow.value ) }
+							value={ this.props.attributes.poststoshow }
+							ref={ postToShowId }
+							id={ postToShowId }
+							onChange={ () => this.changePostsToShow( this.refs[ postToShowId ].value ) }
 						/>
 					</InspectorControls>
 				),
