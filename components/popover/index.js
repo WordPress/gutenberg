@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +20,8 @@ class Popover extends Component {
 		this.bindNode = this.bindNode.bind( this );
 
 		this.state = {
-			forcedPositions: {},
+			forcedYAxis: null,
+			forcedXAxis: null,
 		};
 	}
 
@@ -31,7 +31,10 @@ class Popover extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.position !== nextProps.position ) {
-			this.setState( { forcedPositions: {} } );
+			this.setState( {
+				forcedYAxis: null,
+				forcedXAxis: null,
+			} );
 		}
 	}
 
@@ -43,28 +46,19 @@ class Popover extends Component {
 
 	setForcedPositions() {
 		const rect = this.node.getBoundingClientRect();
-		const { forcedPositions } = this.state;
-
-		const nextForcedPositions = {};
 
 		// Check exceeding top or bottom of viewport
 		if ( rect.top < 0 ) {
-			nextForcedPositions.bottom = true;
+			this.setState( { forcedYAxis: 'bottom' } );
 		} else if ( rect.bottom > window.innerHeight ) {
-			nextForcedPositions.top = true;
+			this.setState( { forcedYAxis: 'top' } );
 		}
 
 		// Check exceeding left or right of viewport
 		if ( rect.left < 0 ) {
-			nextForcedPositions.right = true;
+			this.setState( { forcedXAxis: 'right' } );
 		} else if ( rect.right > window.innerWidth ) {
-			nextForcedPositions.left = true;
-		}
-
-		if ( ! isEqual( nextForcedPositions, forcedPositions ) ) {
-			this.setState( {
-				forcedPositions: nextForcedPositions,
-			} );
+			this.setState( { forcedXAxis: 'left' } );
 		}
 	}
 
@@ -74,26 +68,14 @@ class Popover extends Component {
 
 	render() {
 		const { position, children, className } = this.props;
-		const positions = position.split( ' ' );
-		const { forcedPositions } = this.state;
+		const { forcedYAxis, forcedXAxis } = this.state;
+		const [ yAxis = 'top', xAxis = 'center' ] = position.split( ' ' );
 
 		const classes = classnames(
 			'components-popover',
 			className,
-			...[ [ 'top', 'bottom' ], [ 'center', 'left', 'right' ] ].map( ( directions ) => {
-				// Consider first of directions set as the default
-				const defaultDirection = directions[ 0 ];
-
-				// Prefer the forced direction, but allow direction from props
-				// otherwise. Use default if neither forced nor prop value.
-				const direction = directions.reduce( ( result, dir ) => (
-					forcedPositions[ dir ] || ( ! result && includes( positions, dir ) )
-						? dir
-						: result
-				), null ) || defaultDirection;
-
-				return 'is-' + direction;
-			} )
+			'is-' + ( forcedYAxis || yAxis ),
+			'is-' + ( forcedXAxis || xAxis )
 		);
 
 		return (
