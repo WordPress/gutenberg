@@ -73,7 +73,7 @@ registerBlockType( 'core/latestposts', {
 				focus && (
 					<InspectorControls key="inspector">
 						<div className="editor-latest-posts__row">
-							<label htmlFor={ displayPostDateId }>{ __( 'Display post date?' ) }</label>
+							<label htmlFor={ displayPostDateId }>{ __( 'Display post date' ) }</label>
 							<FormToggle
 								id={ displayPostDateId }
 								checked={ displayPostDate }
