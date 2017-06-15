@@ -50,7 +50,7 @@ function PublishButton( {
 	const onClick = () => {
 		const doSave = isPublished ||
 			! process.env.NODE_ENV === 'production' ||
-			window.confirm( __( 'Keep in mind this is in Beta and may not display correctly on your theme' ) ); // eslint-disable-line no-alert
+			window.confirm( __( 'Keep in mind this plugin is a beta version and will not display correctly on your theme.' ) ); // eslint-disable-line no-alert
 		if ( doSave ) {
 			onStatusChange( publishStatus );
 			onSave();
