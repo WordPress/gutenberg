@@ -110,14 +110,17 @@ registerBlockType( 'core/latestposts', {
 								showHint={ false }
 							/>
 						</div>
-						<label htmlFor={ postToShowId }>Number of posts to show:</label>
-						<input
-							type="text"
-							value={ this.props.attributes.poststoshow }
-							ref={ postToShowId }
-							id={ postToShowId }
-							onChange={ () => this.changePostsToShow( this.refs[ postToShowId ].value ) }
-						/>
+						<div className="editor-latest-posts__row">
+							<label htmlFor={ postToShowId }>{ __( 'Number of posts to show' ) } </label>
+							<input
+								type="text"
+								value={ this.props.attributes.poststoshow }
+								ref={ postToShowId }
+								id={ postToShowId }
+								className="editor-latest-posts__input"
+								onChange={ () => this.changePostsToShow( this.refs[ postToShowId ].value ) }
+							/>
+						</div>
 					</InspectorControls>
 				),
 				<div className={ this.props.className } key="latest-posts">
