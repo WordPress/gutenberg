@@ -5,7 +5,8 @@
 	background-color: $white;
 }
 
-.editor-visual-editor__block-controls ul.components-toolbar {
+.editor-visual-editor__block-controls ul.components-toolbar,
+.block-editable__inline-toolbar ul.components-toolbar {
 	list-style-type: none;
 
 	&> li {
@@ -51,6 +52,8 @@
 	height: $icon-button-size;
 
 	&:hover,
+	/* the ":not(:disabled)" is needed to make it specific enough */
+	&:hover:not(:disabled),
 	&:focus {
 		color: $dark-gray-500;
 		outline: none;
