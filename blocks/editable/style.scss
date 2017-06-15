@@ -56,8 +56,8 @@
 	}
 }
 
-.editor-visual-editor__block:not( .is-selected ) .blocks-editable.drop-cap-true {
-	p:first-child:first-letter {
+.drop-cap-true .blocks-editable__tinymce:not( :focus )  {
+	&:first-letter {
 		float: left;
 		font-size: 4.1em;
 		line-height: 0.7;
