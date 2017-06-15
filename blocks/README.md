@@ -129,6 +129,7 @@ Registers a new block provided a unique name and an object defining its behavior
 - `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
 - `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
 - `category: string` - Slug of the block's category. The category is used to organize the blocks in the block inserter.
+- `compatibility: Object[]` - An array of compatibility initializers. See ["Backwards Compatibility" section](#backwards-compatibility) for more information.
 - `edit( { attributes: Object, setAttributes: Function } ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( { attributes: Object } ): WPElement | String` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
 - `controls: string[]` - Slugs for controls to be made available to block. See also: [`wp.blocks.registerControl`](#wpblocksregistercontrol-slug-string-settings-object-)
@@ -153,6 +154,44 @@ Returns type definitions associated with a registered block.
 ### `wp.blocks.getControlSettings( name: string )`
 
 Returns settings associated with a registered control.
+
+## Backwards Compatibility
+
+When defining a block, you can choose to associate its compatibility with content shapes that had existed prior to the introduction of blocks. A block's `compatibility` property can include one or more objects which describe how the block can be initialized in cases where the editor cannot find another applicable handler.
+
+For example, consider a paragraph of text. A post's content may contain paragraphs, either explicitly with a paragraph `<p>` tag or inferred by newlines courtesy of the default [`wpautop` behavior](https://developer.wordpress.org/reference/functions/wpautop/). Prior to block parsing, content is normalized to apply `wpautop`, so thankfully we need only deal with the paragraph elements.
+
+We want to define a text block to enable controls specific to text (alignment, etc.), but we also want to apply this treatment to paragraph tags which were not saved with block demarcations.
+
+To do so, we'll declare compatibility with the paragraph tag when registering the block:
+
+```js
+registerBlock( 'core/text', {
+	attributes: {
+		content: html( 'p' )
+	},
+
+	compatibility: [
+		{
+			tagName: 'p'
+		}
+	]	
+} );
+```
+
+For each compatibility object, we have a few ways to identify content:
+
+- `tagName`: Identify elements of a particular tag
+- `shortcode`: Identify shortcodes of a particular shortcode name
+- `blockType`: Enable conversion of an instance of another block type to this type
+
+Not shown in this example, but you can also define an `initialize` function which accepts the parsed content as an argument and is expected to return attributes of a block instance corresponding with the matched content. If omitted as is the case here, the block's default `attributes` property takes effect (in this case matching the HTML of the paragraph tag).
+
+```
+initialize( node: HTMLElement|WPShortcode|WPBlockNode ): ?Object
+```
+
+If the `initialize` function returns `null` or `undefined`, it's assumed that the block does not support the content. This is especially useful in cases where your block may be compatible with elements of a particular tag name, but only when specific conditions apply.
 
 ## Components
 
