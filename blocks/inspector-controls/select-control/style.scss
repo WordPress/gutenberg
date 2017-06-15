@@ -1,0 +1,13 @@
+.blocks-select-control:not(:last-child) {
+	margin-bottom: 15px;
+}
+
+.blocks-select-control__label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
+.blocks-select-control__input {
+	width: 100%;
+}
