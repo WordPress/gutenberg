@@ -65,6 +65,24 @@ describe( 'Toolbar', () => {
 			} );
 		} );
 
+		it( 'should render a nested list of controls with separator between', () => {
+			const controls = [
+				[ {
+					icon: 'wordpress',
+					title: 'WordPress',
+				} ],
+				[ {
+					icon: 'wordpress',
+					title: 'WordPress',
+				} ],
+			];
+
+			const toolbar = shallow( <Toolbar controls={ controls } /> );
+			expect( toolbar.children() ).to.have.lengthOf( 2 );
+			expect( toolbar.childAt( 0 ).hasClass( 'has-left-divider' ) ).to.be.false();
+			expect( toolbar.childAt( 1 ).hasClass( 'has-left-divider' ) ).to.be.true();
+		} );
+
 		it( 'should call the clickHandler on click.', () => {
 			const clickHandler = spy();
 			const event = { stopPropagation: () => undefined };
