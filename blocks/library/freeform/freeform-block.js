@@ -6,7 +6,6 @@ import { nodeListToReact } from 'dom-react';
 import { findDOMNode } from 'element';
 import 'element-closest';
 import { concat, find, isEqual, omitBy, throttle } from 'lodash';
-import { Fill } from 'react-slot-fill';
 
 /**
  * Internal dependencies
