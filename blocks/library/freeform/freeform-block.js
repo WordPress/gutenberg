@@ -4,6 +4,7 @@
 import classnames from 'classnames';
 import { nodeListToReact } from 'dom-react';
 import { findDOMNode } from 'element';
+import 'element-closest';
 import { concat, find, isEqual, omitBy, throttle } from 'lodash';
 import { Fill } from 'react-slot-fill';
 
@@ -16,6 +17,8 @@ import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 import FormatList from './format-list';
 import { Toolbar } from 'components';
+
+const BLOCK_CONTROLS_SELECTOR = '.editor-visual-editor__block-controls';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -252,17 +255,11 @@ export default class FreeformBlock extends wp.element.Component {
 
 	onScroll() {
 		if ( this.toolbarElem ) {
-			let blockControls = findDOMNode( this.toolbarElem );
-			while ( blockControls ) {
-				if ( blockControls.classList.contains( 'editor-visual-editor__block-controls' ) ) {
-					break;
-				}
-				blockControls = blockControls.parentElement;
-			}
+			const n = findDOMNode( this.toolbarElem );
+			const blockControls = n ? n.closest( BLOCK_CONTROLS_SELECTOR ) : null;
 			if ( blockControls ) {
 				const currentTop = blockControls.getBoundingClientRect().top;
-				const stickyTop = parseInt(
-					window.getComputedStyle( blockControls ).top,	10 );
+				const stickyTop = parseInt( window.getComputedStyle( blockControls ).top, 10 );
 				const expandDown = currentTop - stickyTop <= MORE_DRAWER_HEIGHT;
 				this.setState( { expandDown } );
 			}
