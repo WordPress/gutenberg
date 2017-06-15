@@ -368,38 +368,30 @@ export default class FreeformBlock extends wp.element.Component {
 		const moreDrawerClasses = classnames( 'more-drawer', expandDown ? 'down' : 'up' );
 		return [
 			focus && (
-				<Fill name="Formatting.Toolbar">
+				<BlockControls key="controls">
 					<FormatList
 						onFormatChange={ this.handleFormatChange }
 						formats={ this.formats }
 						value={ this.state.activeFormat }
 						ref={ this.setToolbarRef }
 					/>
-				</Fill>
-			),
-			focus && (
-				<BlockControls
-					key="aligns"
-					controls={ this.mapControls( ALIGNMENT_CONTROLS ) }
-				/>
-			),
-			focus && (
-				<BlockControls
-					key="controls"
-					controls={ concat( this.mapControls( FREEFORM_CONTROLS ), {
-						leftDivider: true,
-						icon: 'ellipsis',
-						title: __( 'More' ),
-						isActive: showMore,
-						onClick: this.toggleMoreDrawer,
-						children: (
-							showMore && <div className={ moreDrawerClasses }>
-								<div className="more-draw__arrow" />
-								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
-							</div>
-						),
-					} ) }
-				/>
+					<Toolbar controls={ this.mapControls( ALIGNMENT_CONTROLS ) } />
+					<Toolbar
+						controls={ concat( this.mapControls( FREEFORM_CONTROLS ), {
+							leftDivider: true,
+							icon: 'ellipsis',
+							title: __( 'More' ),
+							isActive: showMore,
+							onClick: this.toggleMoreDrawer,
+							children: (
+								showMore && <div className={ moreDrawerClasses }>
+									<div className="more-draw__arrow" />
+									<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
+								</div>
+							),
+						} ) }
+					/>
+				</BlockControls>
 			),
 			<TinyMCE
 				key="editor"
