@@ -8,7 +8,7 @@ import { withInstanceId } from 'components';
  */
 import './style.scss';
 
-function TextareaControl( { label, value, instanceId, onChange, rows = 3, ...props } ) {
+function TextareaControl( { label, value, instanceId, onChange, rows = 4, ...props } ) {
 	const id = 'inspector-textarea-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
