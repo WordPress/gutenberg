@@ -56,7 +56,7 @@
 	}
 }
 
-.blocks-editable.drop-cap-true {
+.editor-visual-editor__block:not( .is-selected ) .blocks-editable.drop-cap-true {
 	p:first-child:first-letter {
 		float: left;
 		font-size: 4.1em;
