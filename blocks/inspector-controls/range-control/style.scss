@@ -7,3 +7,17 @@
 	font-weight: 500;
 	margin-bottom: 5px;
 }
+
+.blocks-range-control__input {
+	width: 100%;
+	vertical-align: top;
+}
+
+.blocks-range-control__field {
+	display: flex;
+	justify-content: center;
+	
+	> span {
+		margin-left: 10px;
+	}
+}
