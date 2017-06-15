@@ -7,13 +7,18 @@ import { unescape, find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Component } from 'element';
 import { FormTokenField } from 'components';
+
+/**
+ * Internal dependencies
+ */
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 const DEFAULT_TAGS_QUERY = {
-	number: -1,
+	per_page: -1,
 	orderby: 'count',
 	order: 'DESC',
 };
@@ -102,6 +107,7 @@ class TagsSelector extends Component {
 
 		return (
 			<div className="editor-post-taxonomies__tags-selector">
+				<h4 className="editor-post-taxonomies__tags-selector-title">{ __( 'Tags' ) }</h4>
 				<FormTokenField
 					value={ selectedTags }
 					displayTransform={ unescape }

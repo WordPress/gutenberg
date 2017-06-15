@@ -29,17 +29,19 @@ class PanelBody extends Component {
 		const { title, children } = this.props;
 		return (
 			<div className="components-panel__body">
-				{ !! title &&
-					<IconButton
-						className="components-panel__body-toggle"
-						onClick={ this.toggle }
-						icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
-						aria-expanded={ this.state.opened }
-						label={ sprintf( __( 'Open section: %s' ), title ) }
-					>
-						{ title }
-					</IconButton>
-				}
+				{ !! title && (
+					<h3 className="components-panel__body-title">
+						<IconButton
+							className="components-panel__body-toggle"
+							onClick={ this.toggle }
+							icon={ this.state.opened ? 'arrow-down' : 'arrow-right' }
+							aria-expanded={ this.state.opened }
+							label={ sprintf( __( 'Open section: %s' ), title ) }
+						>
+							{ title }
+						</IconButton>
+					</h3>
+				) }
 				{ this.state.opened && children }
 			</div>
 		);

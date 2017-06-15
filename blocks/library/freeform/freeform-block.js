@@ -117,6 +117,7 @@ export default class FreeformBlock extends wp.element.Component {
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onScroll = throttle( this.onScroll.bind( this ), 250 );
+		this.isEndOfEditor = this.isEndOfEditor.bind( this );
 		this.updateFocus = this.updateFocus.bind( this );
 		this.updateContent = this.updateContent.bind( this );
 		this.setContent = this.setContent.bind( this );
@@ -266,16 +267,39 @@ export default class FreeformBlock extends wp.element.Component {
 		}
 	}
 
+	isEndOfEditor() {
+		const range = this.editor.selection.getRng();
+		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
+			return false;
+		}
+		const start = range.endContainer;
+		const body = this.editor.getBody();
+		let element = start;
+		while ( element !== body ) {
+			const child = element;
+			element = element.parentNode;
+			if ( element.lastChild !== child ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	updateFocus() {
 		const { focus } = this.props;
+		const isActive = this.isActive();
+
 		if ( focus ) {
-			this.editor.focus();
+			if ( ! isActive ) {
+				this.editor.focus();
+			}
+
 			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 ) {
+			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
-		} else {
+		} else if ( isActive ) {
 			this.editor.getBody().blur();
 		}
 	}

@@ -12,6 +12,8 @@ import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import effects from './effects';
 
+const isMobile = window.innerWidth < 782;
+
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
@@ -417,7 +419,7 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function isSidebarOpened( state = false, action ) {
+export function isSidebarOpened( state = ! isMobile, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return ! state;

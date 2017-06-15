@@ -54,7 +54,7 @@ class BlockSwitcher extends wp.element.Component {
 		const blocksToBeTransformedFrom = reduce( wp.blocks.getBlockTypes(), ( memo, block ) => {
 			const transformFrom = get( block, 'transforms.from', [] );
 			const transformation = find( transformFrom, t => t.blocks.indexOf( this.props.block.name ) !== -1 );
-			return transformation ? memo.concat( [ block.slug ] ) : memo;
+			return transformation ? memo.concat( [ block.name ] ) : memo;
 		}, [] );
 		const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
 			.reduce( ( memo, transformation ) => memo.concat( transformation.blocks ), [] );
@@ -87,10 +87,10 @@ class BlockSwitcher extends wp.element.Component {
 						tabIndex="0"
 						aria-label={ wp.i18n.__( 'Block types' ) }
 					>
-						{ allowedBlocks.map( ( { slug, title, icon } ) => (
+						{ allowedBlocks.map( ( { name, title, icon } ) => (
 							<IconButton
-								key={ slug }
-								onClick={ this.switchBlockType( slug ) }
+								key={ name }
+								onClick={ this.switchBlockType( name ) }
 								className="editor-block-switcher__menu-item"
 								icon={ icon }
 								role="menuitem"

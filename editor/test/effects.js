@@ -21,7 +21,7 @@ describe( 'effects', () => {
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.slug );
+				unregisterBlockType( block.name );
 			} );
 		} );
 

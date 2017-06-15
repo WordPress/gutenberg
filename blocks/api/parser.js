@@ -63,7 +63,7 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param  {?String} name       Block type slug
+ * @param  {?String} name       Block type name
  * @param  {String}  rawContent Raw block content
  * @param  {?Object} attributes Attributes obtained from block delimiters
  * @return {?Object}            An initialized block object (if possible)
@@ -102,8 +102,8 @@ export function createBlockWithFallback( name, rawContent, attributes ) {
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockType, rawContent, attrs } = blockNode;
-		const block = createBlockWithFallback( blockType, rawContent, attrs );
+		const { blockName, rawContent, attrs } = blockNode;
+		const block = createBlockWithFallback( blockName, rawContent, attrs );
 		if ( block ) {
 			memo.push( block );
 		}

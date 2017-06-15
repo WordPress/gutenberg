@@ -98,7 +98,7 @@ class PostTitle extends Component {
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
-						placeholder={ wp.i18n.__( 'Enter title here' ) }
+						placeholder={ wp.i18n.__( 'Add title…' ) }
 						onFocus={ this.onSelect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }

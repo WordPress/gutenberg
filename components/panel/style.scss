@@ -49,17 +49,26 @@
 	margin-top: -1px;
 }
 
-.components-panel__body-toggle.components-icon-button {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+.components-panel__body-title {
+	display: block;
 	padding: 0;
+	margin: 0;
+	font-size: inherit;
+}
+
+.components-panel__body-toggle.components-icon-button {
+	position: relative;
+	padding: 0;
+	padding-right: 20px;
 	outline: none;
 	width: 100%;
 	font-weight: 600;
 
 	.dashicon {
-		order: 2;
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY( -50% );
 	}
 }
 
