@@ -3,16 +3,10 @@
 }
 
 .blocks-editable__tinymce {
+	margin: 0;
+
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
-	}
-
-	> p:first-child {
-		margin-top: 0;
-	}
-
-	> p:last-child {
-		margin-bottom: 0;
 	}
 
 	&:focus {
