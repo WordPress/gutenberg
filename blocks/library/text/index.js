@@ -2,19 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Children, cloneElement } from 'element';
 import Toggle from 'components/form-toggle';
 
 /**
  * Internal dependencies
  */
-import { registerBlockType, createBlock, query, setDefaultBlock } from '../../api';
+import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 
-const { children } = query;
+const { children, query } = hpq;
 
 registerBlockType( 'core/text', {
 	title: __( 'Text' ),
@@ -24,7 +23,7 @@ registerBlockType( 'core/text', {
 	category: 'common',
 
 	attributes: {
-		content: children(),
+		content: query( 'p', children() ),
 	},
 
 	merge( attributes, attributesToMerge ) {
@@ -60,6 +59,8 @@ registerBlockType( 'core/text', {
 				</InspectorControls>
 			),
 			<Editable
+				inline
+				tagName="p"
 				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -86,12 +87,10 @@ registerBlockType( 'core/text', {
 		const { align, content } = attributes;
 
 		if ( ! align ) {
-			return content;
+			return <p>{ content }</p>;
 		}
 
-		return Children.map( content, ( paragraph ) => (
-			cloneElement( paragraph, { style: { textAlign: align } } )
-		) );
+		return <p style={ { textAlign: align } }>{ content }</p>;
 	},
 } );
 

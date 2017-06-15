@@ -9,10 +9,13 @@ window._wpGutenbergPost = {
 		raw: [
 			'<!-- wp:core/text data="{\\"projectName\\":\\"gutenberg\\",\\"isAwesome\\":true}" -->',
 			'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
-			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/text -->',
+			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/text align="right" -->',
 			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
 			'<!-- /wp:core/text -->',
 
@@ -43,7 +46,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
+			'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/text -->',
+			'<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/list -->',
@@ -104,6 +111,9 @@ window._wpGutenbergPost = {
 
 			'<!-- wp:core/text -->',
 			'<p>Est quis reque cetero ad. Sea id autem nominavi deseruisse. <strong>Veniam qualisque definitionem pri id</strong>, ea autem feugiat delenit ius, mei at loem affert accumsan. Dicat eruditi cu est, te pro dicant pericula conclusionemque, ei vim detracto euripidis intellegam. Eius postea volumus mei ad.</p>',
+			'<!-- /wp:core/text -->',
+
+			'<!-- wp:core/text -->',
 			'<p>Prima ridens denique his te, ferri illum volumus an his. Eu vel dicat homero qualisqu, vitae regione deserunt vis ei. Graeci incorrupte liberavisse no mea, saepe voluptaria usu ex, vis dicant euismod id. At dolor reprimique eos, quo altera detraxit moderatius id. Quo iudico utinam eu, ad alia munere mel.</p>',
 			'<!-- /wp:core/text -->',
 
