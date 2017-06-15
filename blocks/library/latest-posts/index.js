@@ -99,7 +99,7 @@ registerBlockType( 'core/latestposts', {
 							<div className="blocks-latest-posts">
 								<ul>
 									{ latestPosts.map( ( post, i ) =>
-										<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
+										<li key={ i } target="_blank"><a href={ post.link }>{ post.title.rendered }</a></li>
 									) }
 								</ul>
 							</div>
