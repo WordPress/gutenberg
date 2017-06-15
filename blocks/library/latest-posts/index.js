@@ -33,14 +33,13 @@ registerBlockType( 'core/latestposts', {
 	},
 
 	edit: class extends wp.element.Component {
-		constructor( { focus } ) {
+		constructor() {
 			super( ...arguments );
 
 			const { poststoshow } = this.props.attributes;
 
 			this.state = {
 				latestPosts: [],
-				focus,
 			};
 
 			this.latestPostsRequest = getLatestPosts( poststoshow );
@@ -50,7 +49,8 @@ registerBlockType( 'core/latestposts', {
 		}
 
 		render() {
-			const { latestPosts, focus } = this.state;
+			const { latestPosts } = this.state;
+			const { focus } = this.props;
 
 			const alignments = [
 				{
@@ -102,7 +102,7 @@ registerBlockType( 'core/latestposts', {
 							</ul>
 						</div>
 					}
-					{ /* focus && */
+					{ focus &&
 						<InspectorControls>
 
 							<h4>{ wp.i18n.__( 'Alignment' ) }</h4>
