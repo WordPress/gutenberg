@@ -81,6 +81,10 @@ class LastRevision extends Component {
 		const { revisions } = this.state;
 		const lastRevision = revisions.length ? revisions[ 0 ] : null;
 
+		if ( revisions.length <= 0 ) {
+			return false;
+		}
+
 		return (
 			<PanelBody>
 				<IconButton
