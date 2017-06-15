@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function SelectControl( { label, selected, instanceId, onChange, options = [], ...props } ) {
@@ -14,8 +15,7 @@ function SelectControl( { label, selected, instanceId, onChange, options = [], .
 	const onChangeValue = ( event ) => onChange( event.target.value );
 	
 	return ! isEmpty( options ) && (
-		<div className="blocks-select-control">
-			<label className="blocks-select-control__label" htmlFor={ id }>{ label }</label>
+		<BaseControl type="select" label={ label } id={ id }>
 			<select className="blocks-select-control__input" id={ id } onChange={ onChangeValue } { ...props }>
 				{ options.map( ( { value, label } ) =>
 					<option key={ value } value={ value } selected={ value == selected }>
@@ -23,7 +23,7 @@ function SelectControl( { label, selected, instanceId, onChange, options = [], .
 					</option>
 				) }
 			</select>
-		</div>
+		</BaseControl>
 	);
 }
 

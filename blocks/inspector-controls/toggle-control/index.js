@@ -7,16 +7,16 @@ import Toggle from 'components/form-toggle';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function ToggleControl( { label, checked, instanceId, onChange, ...props } ) {
 	const id = 'inspector-toggle-control-' + instanceId;
 
 	return (
-		<div className="blocks-toggle-control">
-			<label className="blocks-toggle-control__label" htmlFor={ id }>{ label }</label>
-			<Toggle id={ id } checked={ checked } onChange={ onChange } />
-		</div>
+		<BaseControl type="toggle" label={ label } id={ id }>
+  			<Toggle id={ id } checked={ checked } onChange={ onChange } />
+		</BaseControl>
 	);
 }
 

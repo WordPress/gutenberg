@@ -6,6 +6,7 @@ import { withInstanceId } from 'components';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function CheckboxControl( { label, heading, checked, instanceId, onChange, ...props } ) {
@@ -13,8 +14,7 @@ function CheckboxControl( { label, heading, checked, instanceId, onChange, ...pr
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<div className="blocks-checkbox-control">
-			{ heading && <span className="blocks-checkbox-control__heading">{ heading }</span> }
+		<BaseControl type="checkbox" label={ heading } id={ id }>
 			<label className="blocks-checkbox-control__label" htmlFor={ id }>
 				<input
 					id={ id }
@@ -26,7 +26,7 @@ function CheckboxControl( { label, heading, checked, instanceId, onChange, ...pr
 					{ ...props } />
 				{ label }
 			</label>
-		</div>
+		</BaseControl>
 	);
 }
 

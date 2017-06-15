@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function RadioControl( { label, selected, instanceId, options = [] } ) {
@@ -14,9 +15,8 @@ function RadioControl( { label, selected, instanceId, options = [] } ) {
 	const onChangeValue = ( event ) => onChange( event.target.value );
 	
 	return ! isEmpty( options ) && (
-		<div className="blocks-radio-control">
-			<label className="blocks-radio-control__label">{ label }</label>
-			<div className="blocks-radio-control__inputs">
+		<BaseControl type="radio" label={ label } id={ id }>
+			<div className="blocks-radio-control">
 				{ options.map( ( { value, label }, index ) =>
 					<label htmlFor={ ( id + '-' + index ) }>
 						<input
@@ -32,7 +32,7 @@ function RadioControl( { label, selected, instanceId, options = [] } ) {
 					</label>
 				) }
 			</div>
-		</div>
+		</BaseControl>
 	);
 }
 

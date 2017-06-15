@@ -1,21 +1,10 @@
-.blocks-range-control:not(:last-child) {
-	margin-bottom: 15px;
-}
-
-.blocks-range-control__label {
-	display: block;
-	font-weight: 500;
-	margin-bottom: 5px;
+.blocks-range-control {
+	display: flex;
+	justify-content: center;
 }
 
 .blocks-range-control__input {
 	width: 100%;
-	vertical-align: top;
-}
-
-.blocks-range-control__field {
-	display: flex;
-	justify-content: center;
 }
 
 .blocks-range-control__hint {

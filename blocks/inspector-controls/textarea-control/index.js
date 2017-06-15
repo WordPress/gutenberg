@@ -6,6 +6,7 @@ import { withInstanceId } from 'components';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function TextareaControl( { label, value, instanceId, onChange, rows = 4, ...props } ) {
@@ -13,12 +14,11 @@ function TextareaControl( { label, value, instanceId, onChange, rows = 4, ...pro
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<div className="blocks-textarea-control">
-			<label className="blocks-textarea-control__label" htmlFor={ id }>{ label }</label>
+		<BaseControl type="textarea" label={ label } id={ id }>
 			<textarea className="blocks-textarea-control__input" id={ id } rows={ rows } onChange={ onChangeValue } { ...props }>
 				{ value }
 			</textarea>
-		</div>
+		</BaseControl>
 	);
 }
 

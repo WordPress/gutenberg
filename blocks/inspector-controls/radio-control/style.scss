@@ -1,14 +1,4 @@
-.blocks-radio-control:not(:last-child) {
-	margin-bottom: 15px;
-}
-
-.blocks-radio-control__label {
-	display: block;
-	font-weight: 500;
-	margin-bottom: 5px;
-}
-
-.blocks-radio-control__inputs {
+.blocks-radio-control {
 	display: flex;
 	flex-direction: column;
 	
