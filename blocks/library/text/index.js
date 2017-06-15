@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Children, cloneElement } from 'element';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ import Toggle from 'components/form-toggle';
 const { children } = query;
 
 registerBlockType( 'core/text', {
-	title: wp.i18n.__( 'Text' ),
+	title: __( 'Text' ),
 
 	icon: 'text',
 
@@ -48,7 +49,14 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls>
-					<Toggle checked={ !! dropCap } onChange={ toggleDropCap } />
+					<div className="blocks-text__drop-cap" style={ { display: 'flex', justifyContent: 'space-between' } }>
+						<label htmlFor="blocks-text__drop-cap">{ __( 'Drop Cap' ) }</label>
+						<Toggle
+							checked={ !! dropCap }
+							onChange={ toggleDropCap }
+							id="blocks-text__drop-cap-toggle"
+						/>
+					</div>
 				</InspectorControls>
 			),
 			<Editable
