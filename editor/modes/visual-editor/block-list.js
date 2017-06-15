@@ -174,6 +174,8 @@ class VisualEditorBlockList extends wp.element.Component {
 			<div>
 				{ ! blocks.length && (
 					<input
+						type="text"
+						readOnly
 						className="editor-visual-editor__placeholder"
 						value={ __( 'Write your story' ) }
 						onFocus={ this.appendDefaultBlock }
