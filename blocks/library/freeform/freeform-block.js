@@ -172,6 +172,7 @@ export default class FreeformBlock extends wp.element.Component {
 
 	setToolbarRef( elem ) {
 		this.toolbarElem = elem;
+		this.onScroll();
 	}
 
 	onSetup( editor ) {
