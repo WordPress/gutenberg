@@ -32,108 +32,6 @@
 	}
 }
 
-.editor-inserter__menu {
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	position: absolute;
-	background: $white;
-	z-index: z-index( '.editor-inserter__menu' );
-
-	left: 0;
-	right: 0;
-
-	// inserter becomes popup
-	@include break-medium {
-		width: 280px;
-		left: -122px;
-		right: auto;
-		height: auto;
-	}
-
-	&.is-top {
-		bottom: 42px;
-
-		.editor-inserter__arrow {
-			bottom: -10px;
-			left: 50%;
-			margin-left: -10px;
-			border-top-style: solid;
-			border-bottom: none;
-			border-left-color: transparent;
-			border-right-color: transparent;
-
-			&:before {
-				bottom: 2px;
-				border: 10px solid $white;
-				content: " ";
-				position: absolute;
-				left: 50%;
-				margin-left: -10px;
-				border-top-style: solid;
-				border-bottom: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-			}
-		}
-	}
-
-	&.is-bottom {
-		top: $admin-bar-height-big + $item-spacing -1px;
-
-		@include break-medium {
-			top: $admin-bar-height + $item-spacing;
-		}
-
-		.editor-inserter__arrow {
-			top: -10px;
-			left: 50%;
-			margin-left: -10px;
-			border-bottom-style: solid;
-			border-top: none;
-			border-left-color: transparent;
-			border-right-color: transparent;
-
-			&:before {
-				top: 2px;
-				border: 10px solid $light-gray-100;
-				content: " ";
-				position: absolute;
-				left: 50%;
-				margin-left: -10px;
-				border-bottom-style: solid;
-				border-top: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-			}
-		}
-	}
-
-	&.is-right {
-		left: -32px;
-		.editor-inserter__arrow {
-			left: 49px;
-			&:before {
-				left: 0;
-			}
-		}
-	}
-}
-
-.editor-inserter__arrow {
-	border: 10px dashed $light-gray-500;
-	height: 0;
-	line-height: 0;
-	position: absolute;
-	width: 0;
-	z-index: z-index( '.editor-inserter__arrow' );
-
-	display: none;
-
-	@include break-medium {
-		display: block;
-	}
-}
-
 .editor-inserter__content {
 	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size } );
 
@@ -169,6 +67,10 @@ input[type=search].editor-inserter__search {
 	display: flex;
 	flex-flow: row wrap;
 	padding: 3px;
+}
+
+.editor-inserter__menu.is-bottom:after {
+	border-bottom-color: $light-gray-100;
 }
 
 .editor-inserter__block {
