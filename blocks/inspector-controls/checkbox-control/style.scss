@@ -1,0 +1,13 @@
+.blocks-checkbox-control:not(:last-child) {
+	margin-bottom: 15px;
+}
+
+.blocks-checkbox-control__heading {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
+input.blocks-checkbox-control__input {
+	margin-right: 7px;
+}
