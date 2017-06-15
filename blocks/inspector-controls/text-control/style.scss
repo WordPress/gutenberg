@@ -1,7 +1,5 @@
-.blocks-text-control {
-	&:not(:last-child) {
-		margin-bottom: 10px;
-	}
+.blocks-text-control:not(:last-child) {
+	margin-bottom: 15px;
 }
 
 .blocks-text-control__label {
