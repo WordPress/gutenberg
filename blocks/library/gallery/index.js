@@ -4,48 +4,11 @@
 import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
-import { Fill } from 'react-slot-fill';
-
-/**
- * WordPress dependencies
- */
-import { Toolbar, Placeholder } from 'components';
-
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import RangeControl from '../../inspector-controls/range-control';
 
 import GalleryImage from './gallery-image';
+import GalleryBlockForm from './form';
 
 const { query, attr } = hpq;
-
-const MAX_COLUMNS = 8;
-
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: wp.i18n.__( 'Update Gallery media' ),
-		button: {
-			text: wp.i18n.__( 'Select' ),
-		},
-		multiple: true,
-		state: 'gallery-edit',
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const editFrame = wp.media( frameConfig );
-	function updateFn() {
-		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
-				return a.attributes;
-			} ),
-		} );
-	}
-
-	editFrame.on( 'insert', updateFn );
-	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	editFrame.open( 'gutenberg-gallery' );
-};
 
 /**
  * Returns an attribute setter with behavior that if the target value is
@@ -59,11 +22,6 @@ function toggleAlignment( align ) {
 		const nextAlign = attributes.align === align ? undefined : align;
 		setAttributes( { align: nextAlign } );
 	};
-}
-
-function defaultColumnsNumber( attributes ) {
-	attributes.images = attributes.images || [];
-	return Math.min( 3, attributes.images.length );
 }
 
 registerBlockType( 'core/gallery', {
@@ -119,51 +77,11 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
-		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
-		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
-		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
-			return (
-				<Placeholder
-					instructions={ wp.i18n.__( 'Drag images here or insert from media library' ) }
-					icon="format-gallery"
-					label={ wp.i18n.__( 'Gallery' ) }
-					className="blocks-gallery">
-					<MediaUploadButton
-						onSelect={ setMediaUrl }
-						type="image"
-						autoOpen
-						multiple="true"
-					>
-						{ wp.i18n.__( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>
-			);
-		}
-
-		return (
-			<div className={ `blocks-gallery align${ align } columns-${ columns }` }>
-				<Fill name="Formatting.Toolbar">
-					<Toolbar controls={ [ {
-						icon: 'edit',
-						title: __( 'Edit Gallery' ),
-						onClick: () => editMediaLibrary( attributes, setAttributes ),
-					} ] } />
-				</Fill>
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
-				) ) }
-				{ focus && images.length > 1 &&
-					<InspectorControls>
-						<RangeControl label={ __( 'Columns' ) } value={ columns } onChange={ setColumnsNumber } min="1" max={ Math.min( MAX_COLUMNS, images.length ) } />
-					</InspectorControls> }
-			</div>
-		);
-	},
+	edit: GalleryBlockForm,
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images = [], align = 'none' } = attributes;
+		const { columns = Math.min( 3, images.length ) } = attributes;
 		return (
 			<div className={ `blocks-gallery align${ align } columns-${ columns }` } >
 				{ images.map( ( img ) => (

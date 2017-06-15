@@ -4,12 +4,14 @@
 import { Component } from 'element';
 import { __ } from 'i18n';
 import { Button } from 'components';
+import { noop } from 'lodash';
 
 class MediaUploadButton extends Component {
 	constructor( { multiple = false, type } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onSelect = this.onSelect.bind( this );
+		this.onClose = this.onClose.bind( this );
 		const frameConfig = {
 			title: __( 'Select or Upload a media' ),
 			button: {
@@ -24,6 +26,7 @@ class MediaUploadButton extends Component {
 
 		// When an image is selected in the media frame...
 		this.frame.on( 'select', this.onSelect );
+		this.frame.on( 'close', this.onClose );
 	}
 
 	componentDidMount() {
@@ -41,6 +44,11 @@ class MediaUploadButton extends Component {
 		// Get media attachment details from the frame state
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
+	}
+
+	onClose() {
+		const { onClose = noop } = this.props;
+		onClose();
 	}
 
 	openModal() {
