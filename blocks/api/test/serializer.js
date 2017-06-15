@@ -6,7 +6,7 @@ import { expect } from 'chai';
 /**
  * Internal dependencies
  */
-import serialize, { getCommentAttributes, getSaveContent } from '../serializer';
+import serialize, { getCommentAttributes, getSaveContent, serializeValue } from '../serializer';
 import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 
 describe( 'block serializer', () => {
@@ -56,13 +56,13 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'getCommentAttributes()', () => {
-		it( 'should return empty string if no difference', () => {
+		it( 'should return an empty set if no attributes provided', () => {
 			const attributes = getCommentAttributes( {}, {} );
 
-			expect( attributes ).to.equal( '' );
+			expect( attributes ).to.eql( {} );
 		} );
 
-		it( 'should return joined string of key:value pairs by difference subset', () => {
+		it( 'should only return attributes which cannot be inferred from the content', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
 				category: 'food',
@@ -71,25 +71,31 @@ describe( 'block serializer', () => {
 				fruit: 'bananas',
 			} );
 
-			expect( attributes ).to.equal( 'category="food" ripeness="ripe" ' );
+			expect( attributes ).to.eql( {
+				category: 'food',
+				ripeness: 'ripe',
+			} );
 		} );
 
-		it( 'should not append an undefined attribute value', () => {
+		it( 'should skip attributes whose values are undefined', () => {
 			const attributes = getCommentAttributes( {
 				fruit: 'bananas',
-				category: 'food',
 				ripeness: undefined,
-			}, {
-				fruit: 'bananas',
-			} );
+			}, {} );
 
-			expect( attributes ).to.equal( 'category="food" ' );
+			expect( attributes ).to.eql( { fruit: 'bananas' } );
+		} );
+	} );
+
+	describe( 'serializeValue()', () => {
+		it( 'should escape double-quotes', () => {
+			expect( serializeValue( 'a"b' ) ).to.equal( 'a\"b' );
 		} );
 
-		it( 'should properly escape attributes with quotes in them', () => {
-			expect( getCommentAttributes( {
-				name: 'Kevin "The Yellow Dart" Smith',
-			}, {} ) ).to.equal( 'name="Kevin \"The Yellow Dart\" Smith" ' );
+		it( 'should escape hyphens', () => {
+			expect( serializeValue( '-' ) ).to.equal( '\u{5c}-' );
+			expect( serializeValue( '--' ) ).to.equal( '\u{5c}-\u{5c}-' );
+			expect( serializeValue( '\\-' ) ).to.equal( '\u{5c}\u{5c}-' );
 		} );
 	} );
 
@@ -115,7 +121,7 @@ describe( 'block serializer', () => {
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->\n\n';
+			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );

@@ -49,7 +49,7 @@ const replaceHyphens = value => value.replace( /-/g, '\\-' );
  * @param {*}   value attribute value to serialize
  * @returns {*}       transformed value
  */
-const serializeValue = value =>
+export const serializeValue = value =>
 	'string' === typeof value
 		? replaceHyphens( escapeDoubleQuotes( value ) )
 		: value;
@@ -110,7 +110,7 @@ export function serializeBlock( block ) {
 		: '';
 
 	if ( ! saveContent ) {
-		return `<!-- wp:${ blockName } ${ serializedAttributes }--><!-- /wp:${ blockName } -->`;
+		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
 	}
 
 	return (
