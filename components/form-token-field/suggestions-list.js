@@ -110,7 +110,7 @@ class SuggestionsList extends Component {
 							>
 								{ match
 									? (
-										<span>
+										<span aria-label={ this.props.displayTransform( suggestion ) }>
 											{ match.suggestionBeforeMatch }
 											<strong className="components-form-token-field__suggestion-match">
 												{ match.suggestionMatch }
