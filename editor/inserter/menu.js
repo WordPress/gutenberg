@@ -226,7 +226,11 @@ class InserterMenu extends wp.element.Component {
 		const { position = 'top', instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlockTypes() );
 		const visualEditorHeight = document.querySelector( '.editor-visual-editor' ).clientHeight;
-		const minimumNeededHeight = window.innerHeight - 124;
+		const heightOccupied =
+			document.getElementById( 'wpadminbar' ).clientHeight +
+			document.querySelector( '.editor-header' ).clientHeight +
+			document.querySelector( '.editor-inserter__toggle' ).clientHeight;
+		const minimumNeededHeight = window.innerHeight - heightOccupied;
 		// 124 = $admin-bar-height-big + $header-height + $icon-button-size
 		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
 		if ( visualEditorHeight < minimumNeededHeight ) {
