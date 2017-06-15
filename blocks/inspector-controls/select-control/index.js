@@ -9,17 +9,16 @@ import { isEmpty } from 'lodash';
  */
 import './style.scss';
 
-function SelectControl( { label, value, instanceId, onChange, options = [], ...props } ) {
+function SelectControl( { label, selected, instanceId, onChange, options = [], ...props } ) {
 	const id = 'inspector-select-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
-	const selectedValue = value;
 	
 	return ! isEmpty( options ) && (
 		<div className="blocks-select-control">
 			<label className="blocks-select-control__label" htmlFor={ id }>{ label }</label>
 			<select className="blocks-select-control__input" id={ id } onChange={ onChangeValue } { ...props }>
 				{ options.map( ( { value, label } ) =>
-					<option key={ value } value={ value } selected={ value == selectedValue }>
+					<option key={ value } value={ value } selected={ value == selected }>
 						{ label }
 					</option>
 				) }
