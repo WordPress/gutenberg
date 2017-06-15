@@ -245,11 +245,11 @@ export default class Editable extends wp.element.Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeReact = nodeListToReact( beforeFragment.childNodes, createElement );
-			const afterReact = nodeListToReact( afterFragment.childNodes, createElement );
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, createElement );
+			const afterElement = nodeListToReact( afterFragment.childNodes, createElement );
 
-			this.setContent( beforeReact );
-			this.props.onSplit( beforeReact, afterReact );
+			this.setContent( beforeElement );
+			this.props.onSplit( beforeElement, afterElement );
 		}
 	}
 
