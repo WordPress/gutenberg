@@ -3,6 +3,7 @@
  */
 import { Placeholder } from 'components';
 import { __ } from 'i18n';
+import classNames from 'classnames';
 
 /**
  * Internal dependencies
@@ -12,7 +13,6 @@ import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import IconButton from '../../../components/icon-button';
-import classNames from 'classnames';
 
 registerBlockType( 'core/latestposts', {
 	title: __( 'Latest Posts' ),
