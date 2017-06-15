@@ -1,0 +1,13 @@
+.blocks-radio-control {
+	display: flex;
+	flex-direction: column;
+	
+	> label:not(:last-child) {
+		margin-bottom: 5px;
+	}
+}
+
+.blocks-radio-control__input[type=radio] {
+	margin-top: -3px;
+	margin-right: 6px;
+}
