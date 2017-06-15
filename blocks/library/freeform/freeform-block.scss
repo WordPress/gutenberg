@@ -3,71 +3,61 @@
 	// Slot creates a div which has no class on it, I need it to be flex
 	&> div {
 		display: flex;
+	}
 
-		.more-drawer {
+	.more-drawer {
+		position: absolute;
+		display: inline-flex;
+		top: -5px - $icon-button-size;
+		right: 0;
+
+		&.down {
+			top: 5px + $icon-button-size;
+		}
+
+		&> .components-toolbar:last-child {
+			margin-right: 0;
+		}
+
+		.more-draw__arrow {
+			width: 0;
+			height: 0;
+			line-height: 0;
 			position: absolute;
-			display: inline-flex;
-			top: -5px - $icon-button-size;
-			right: 0;
+			right: $icon-button-size / 2;
+			margin-right: -10px;
+			border: 10px solid $light-gray-500;
+			border-left-color: transparent;
+			border-right-color: transparent;
 
-			&.down {
-				top: 5px + $icon-button-size;
-			}
-
-			&> .components-toolbar:last-child {
-				margin-right: 0;
-			}
-
-			.more-draw__arrow {
-				border: 10px dashed $light-gray-500;
-				width: 0;
-				height: 0;
-				line-height: 0;
+			&:before {
+				content: " ";
 				position: absolute;
-				right: $icon-button-size / 2;
-				margin-right: -10px;
+				left: 50%;
+				margin-left: -10px;
+				border: 10px solid $light-gray-100;
+				border-left-color: transparent;
+				border-right-color: transparent;
 			}
+		}
 
-			&.up .more-draw__arrow {
-				bottom: -10px;
-				border-top-style: solid;
+		&.up .more-draw__arrow {
+			bottom: -10px;
+			border-bottom: none;
+
+			&:before {
+				bottom: 2px;
 				border-bottom: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-
-				&:before {
-					bottom: 2px;
-					border: 10px solid $white;
-					content: " ";
-					position: absolute;
-					left: 50%;
-					margin-left: -10px;
-					border-top-style: solid;
-					border-bottom: none;
-					border-left-color: transparent;
-					border-right-color: transparent;
-				}
 			}
+		}
 
-			&.down .more-draw__arrow {
-				top: -10px;
-				border-bottom-style: solid;
+		&.down .more-draw__arrow {
+			top: -10px;
+			border-top: none;
+
+			&:before {
+				top: 2px;
 				border-top: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-
-				&:before {
-					top: 2px;
-					border: 10px solid $light-gray-100;
-					content: " ";
-					position: absolute;
-					left: 50%;
-					margin-left: -10px;
-					border-bottom-style: solid;
-					border-top: none;
-					border-left-color: transparent;
-					border-right-color: transparent;
-				}
 			}
 		}
 	}
