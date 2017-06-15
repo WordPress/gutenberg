@@ -225,7 +225,15 @@ class InserterMenu extends wp.element.Component {
 	render() {
 		const { position = 'top', instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlockTypes() );
-		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
+		const visualEditorHeight = document.querySelector( '.editor-visual-editor' ).clientHeight;
+		const minimumNeededHeight = 600;
+		let positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
+		if ( visualEditorHeight < minimumNeededHeight ) {
+			const isTopIndex = positionClasses.indexOf( 'is-top' );
+			if ( -1 !== isTopIndex ) {
+				positionClasses[isTopIndex] = 'is-bottom';
+			};
+		}
 		const className = classnames( 'editor-inserter__menu', positionClasses );
 
 		return (
