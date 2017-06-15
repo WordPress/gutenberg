@@ -87,20 +87,23 @@ registerBlockType( 'core/latestposts', {
 
 			return (
 				<div>
-					{ 0 === latestPosts.length ?
-						<Placeholder
-							icon="update"
-							label={ __( 'Loading latest posts, please wait' ) }
-						>
-						</Placeholder>
-						:
-						<div className="blocks-latest-posts">
-							<ul>
-								{ latestPosts.map( ( post, i ) =>
-									<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
-								) }
-							</ul>
-						</div>
+					{ 0 === latestPosts.length
+						? (
+							<Placeholder
+								icon="update"
+								label={ __( 'Loading latest posts, please wait' ) }
+							>
+							</Placeholder>
+						)
+						: (
+							<div className="blocks-latest-posts">
+								<ul>
+									{ latestPosts.map( ( post, i ) =>
+										<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
+									) }
+								</ul>
+							</div>
+						)
 					}
 					{ focus &&
 						<InspectorControls>
