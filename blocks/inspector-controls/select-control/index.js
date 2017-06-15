@@ -10,15 +10,24 @@ import { isEmpty } from 'lodash';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function SelectControl( { label, selected, instanceId, onChange, options = [], ...props } ) {
+function SelectControl( { label, selected, instanceId, onBlur, options = [], ...props } ) {
 	const id = 'inspector-select-control-' + instanceId;
-	const onChangeValue = ( event ) => onChange( event.target.value );
-	
+	const onBlurValue = ( event ) => onBlur( event.target.value );
+
 	return ! isEmpty( options ) && (
 		<BaseControl label={ label } id={ id }>
-			<select className="blocks-select-control__input" id={ id } onChange={ onChangeValue } { ...props }>
-				{ options.map( ( { value, label } ) =>
-					<option key={ value } value={ value } selected={ value == selected }>
+			<select
+				id={ id }
+				className="blocks-select-control__input"
+				onBlur={ onBlurValue }
+				{ ...props }
+			>
+				{ options.map( ( option ) =>
+					<option
+						key={ option.value }
+						value={ option.value }
+						selected={ option.value === selected }
+					>
 						{ label }
 					</option>
 				) }

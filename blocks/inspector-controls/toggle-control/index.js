@@ -10,7 +10,7 @@ import Toggle from 'components/form-toggle';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function ToggleControl( { label, checked, instanceId, onChange, ...props } ) {
+function ToggleControl( { label, checked, instanceId, onChange } ) {
 	const id = 'inspector-toggle-control-' + instanceId;
 
 	return (

@@ -18,10 +18,10 @@ function CheckboxControl( { label, heading, checked, instanceId, onChange, ...pr
 			<label className="blocks-checkbox-control__label" htmlFor={ id }>
 				<input
 					id={ id }
-					className="blocks-checkbox-control__input" 
+					className="blocks-checkbox-control__input"
 					type="checkbox"
 					value="1"
-					onChange= { onChangeValue }
+					onChange={ onChangeValue }
 					checked={ checked }
 					{ ...props } />
 				{ label }
