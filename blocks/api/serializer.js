@@ -37,7 +37,7 @@ export function getSaveContent( save, attributes ) {
 }
 
 const escapeDoubleQuotes = value => value.replace( /"/g, '\"' );
-const replaceHyphens = value => value.replace( /-/g, '\\-' );
+const escapeHyphens = value => value.replace( /-/g, '\\-' );
 
 /**
  * Transform value for storage in block comment
@@ -51,7 +51,7 @@ const replaceHyphens = value => value.replace( /-/g, '\\-' );
  */
 export const serializeValue = value =>
 	'string' === typeof value
-		? replaceHyphens( escapeDoubleQuotes( value ) )
+		? escapeHyphens( escapeDoubleQuotes( value ) )
 		: value;
 
 /**
