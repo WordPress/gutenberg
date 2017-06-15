@@ -15,7 +15,7 @@ function SelectControl( { label, selected, instanceId, onChange, options = [], .
 	const onChangeValue = ( event ) => onChange( event.target.value );
 	
 	return ! isEmpty( options ) && (
-		<BaseControl type="select" label={ label } id={ id }>
+		<BaseControl label={ label } id={ id }>
 			<select className="blocks-select-control__input" id={ id } onChange={ onChangeValue } { ...props }>
 				{ options.map( ( { value, label } ) =>
 					<option key={ value } value={ value } selected={ value == selected }>

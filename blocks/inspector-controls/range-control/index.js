@@ -13,7 +13,7 @@ function RangeControl( { label, value, instanceId, onChange, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
 
 	return (
-		<BaseControl type="range" label={ label } id={ id }>
+		<BaseControl label={ label } id={ id }>
 			<div className="blocks-range-control">
 				<input className="blocks-range-control__input" id={ id } type="range" value={ value } onChange={ onChange } { ...props } />
 				<span className="blocks-range-control__hint">{ value }</span>

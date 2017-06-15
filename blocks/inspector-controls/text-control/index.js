@@ -14,7 +14,7 @@ function TextControl( { label, value, instanceId, onChange, type = 'text', ...pr
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl type="text" label={ label } id={ id }>
+		<BaseControl label={ label } id={ id }>
 			<input className="blocks-text-control__input" type={ type } id={ id } value={ value } onChange={ onChangeValue } { ...props } />
 		</BaseControl>
 	);

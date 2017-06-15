@@ -14,7 +14,7 @@ function TextareaControl( { label, value, instanceId, onChange, rows = 4, ...pro
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl type="textarea" label={ label } id={ id }>
+		<BaseControl label={ label } id={ id }>
 			<textarea className="blocks-textarea-control__input" id={ id } rows={ rows } onChange={ onChangeValue } { ...props }>
 				{ value }
 			</textarea>

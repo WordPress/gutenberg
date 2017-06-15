@@ -14,7 +14,7 @@ function CheckboxControl( { label, heading, checked, instanceId, onChange, ...pr
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl type="checkbox" label={ heading } id={ id }>
+		<BaseControl label={ heading } id={ id }>
 			<label className="blocks-checkbox-control__label" htmlFor={ id }>
 				<input
 					id={ id }
