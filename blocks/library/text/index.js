@@ -48,7 +48,7 @@ registerBlockType( 'core/text', {
 				</BlockControls>
 			),
 			focus && (
-				<InspectorControls>
+				<InspectorControls key="inspector">
 					<div className="blocks-text__drop-cap" style={ { display: 'flex', justifyContent: 'space-between' } }>
 						<label htmlFor="blocks-text__drop-cap">{ __( 'Drop Cap' ) }</label>
 						<Toggle
