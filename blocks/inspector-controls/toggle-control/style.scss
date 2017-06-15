@@ -1,0 +1,15 @@
+.blocks-toggle-control {
+	display: flex;
+	justify-content: space-between;
+	
+	&:not(:last-child) {
+		margin-bottom: 10px;
+	}
+}
+
+.blocks-toggle-control__label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
