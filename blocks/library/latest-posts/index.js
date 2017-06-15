@@ -111,7 +111,6 @@ registerBlockType( 'core/latestposts', {
 										key={ index }
 										icon={ alignment.icon }
 										label={ alignment.title }
-										data-subscript={ alignment.subscript }
 										onClick={ ( event ) => {
 											event.stopPropagation();
 											this.props.setAttributes( { align: alignment.value } );
@@ -119,7 +118,7 @@ registerBlockType( 'core/latestposts', {
 										className={ classNames( 'components-toolbar__control', {
 											'is-active': alignment.isActive( this.props.attributes ),
 										} ) }
-										aria-pressed={ alignment.isActive }
+										aria-pressed={ alignment.isActive( this.props.attributes ) }
 										focus={ focus && ! index }
 									/>
 								) ) }
