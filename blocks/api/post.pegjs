@@ -1,8 +1,14 @@
 {
 
+function untransformValue( value ) {
+	return 'string' === typeof value
+		? value.replace( /\\-/g, '-' )
+		: value;
+}
+
 function keyValue( key, value ) {
   const o = {};
-  o[ key ] = value;
+  o[ key ] = untransformValue( value );
   return o;
 }
 
