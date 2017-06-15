@@ -14,7 +14,7 @@ If you have a local WordPress environment, you can clone this repository into yo
 
 Some good options for a local WordPress development environment include <a href="https://varyingvagrantvagrants.org/">VVV</a> and <a href="https://www.mamp.info/">Mamp</a>.
 
-> Once the plugin is intalled, and you have built it through `npm` go to the post list and hover over a post row to click `Edit in Gutenberg` link. That should do it for initial testing.
+> Once the plugin is intalled, and you have built it through `npm` go to the post list to hover over a post row then click `Edit in Gutenberg` link.
 
 ## Workflow
 
