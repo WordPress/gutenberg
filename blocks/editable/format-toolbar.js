@@ -37,11 +37,11 @@ class FormatToolbar extends wp.element.Component {
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.updateLinkValue = this.updateLinkValue.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyPress = this.onKeyPress.bind( this );
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'keydown', this.onKeyDown );
+		document.addEventListener( 'keypress', this.onKeyPress );
 	}
 
 	componentWillUnmout() {
@@ -50,7 +50,7 @@ class FormatToolbar extends wp.element.Component {
 		}
 	}
 
-	onKeyDown( event ) {
+	onKeyPress( event ) {
 		switch ( event.keyCode ) {
 			case ESCAPE:
 				if ( this.state.isEditingLink ) {
