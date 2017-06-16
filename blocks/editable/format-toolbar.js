@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { IconButton, Toolbar } from 'components';
+import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -51,7 +52,7 @@ class FormatToolbar extends wp.element.Component {
 	}
 
 	onKeyDown( event ) {
-		if ( event.key === 'Escape' ) {
+		if ( event.keyCode === ESCAPE ) {
 			if ( this.state.isEditingLink ) {
 				event.stopPropagation();
 				this.dropLink();
