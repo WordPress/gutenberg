@@ -236,6 +236,19 @@ class InserterMenu extends Component {
 
 		return (
 			<Popover position={ position } className="editor-inserter__menu">
+				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+					{ __( 'Search blocks' ) }
+				</label>
+				<input
+					id={ `editor-inserter__search-${ instanceId }` }
+					type="search"
+					placeholder={ __( 'Search…' ) }
+					className="editor-inserter__search"
+					onChange={ this.filter }
+					onClick={ this.setSearchFocus }
+					ref={ this.bindReferenceNode( 'search' ) }
+					tabIndex="-1"
+				/>
 				<div role="menu" className="editor-inserter__content">
 					{ getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
@@ -273,19 +286,6 @@ class InserterMenu extends Component {
 						) )
 					}
 				</div>
-				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search blocks' ) }
-				</label>
-				<input
-					id={ `editor-inserter__search-${ instanceId }` }
-					type="search"
-					placeholder={ __( 'Search…' ) }
-					className="editor-inserter__search"
-					onChange={ this.filter }
-					onClick={ this.setSearchFocus }
-					ref={ this.bindReferenceNode( 'search' ) }
-					tabIndex="-1"
-				/>
 			</Popover>
 		);
 	}
