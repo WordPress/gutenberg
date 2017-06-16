@@ -128,3 +128,289 @@ function do_blocks( $content ) {
 	return $new_content;
 }
 add_filter( 'the_content', 'do_blocks', 10 ); // BEFORE do_shortcode().
+
+/**
+ * The low level API for registering assets to be loaded with a block.
+ *
+ * @param string $name   Name of already registered block you want to add assets to.
+ * @param array  $assets Array of asset data. It follows the following format:
+ *     array(
+ *       // Location to load.
+ *       'editor' => array(
+ *         'scripts' => array(
+ *           array(
+ *             'handle' => 'name of script to enqueue',
+ *             'src'    => 'url to resource',
+ *             'deps'   => array() of dependencies,
+ *             'ver'    => version of resource,
+ *             'in_footer'  => any specific media restrictions,
+ *           ),
+ *         ),
+ *         'styles' => array(
+ *           array(
+ *             'handle' => 'name of style to enqueue',
+ *             'src'    => 'url to resource',
+ *             'deps'   => array() of dependencies,
+ *             'ver'    => version of resource,
+ *             'media'  => any specific media restrictions,
+ *           ),
+ *         ),
+ *       ),
+ *       'theme'  => array(
+ *         // Same as above.
+ *       ),
+ *     );
+ *     Each individual asset is defined by an array matching the callback
+ *     parameters to the matching wp_enqueue_{ script|style } function.
+ * @return array Array of asset data for the block, after registering.
+ */
+function register_block_assets( $name, $assets ) {
+	global $wp_registered_blocks;
+	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
+		/* translators: 1: block name */
+		$message = sprintf( __( 'Block "%s" is not registered. It is possible you called this before it was registered.' ), $name );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return false;
+	}
+
+	// Check to see if assets have not been registered.
+	if ( ! isset( $wp_registered_blocks[ $name ]['assets'] ) ) {
+		$wp_registered_blocks[ $name ]['assets'] = array();
+	}
+
+	$wp_registered_blocks[ $name ]['assets'] = gutenberg_merge_assets( $wp_registered_blocks[ $name ]['assets'], $assets );
+	return $wp_registered_blocks[ $name ]['assets'];
+}
+
+/**
+ * Currently a wrapper for array_merge_recursive().
+ *
+ * Lifted into a function so validation can be more easily added.
+ *
+ * @param array $current_assets Array of current assets.
+ * @param array $new_assets     Array of new assets.
+ * @return array Array of merged assets.
+ */
+function gutenberg_merge_assets( $current_assets, $new_assets ) {
+	return array_merge_recursive( $current_assets, $new_assets );
+}
+
+/**
+ * Adds assets to be displayed in the theme.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $assets Array of new assets.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_theme_assets( $name, $assets ) {
+	$theme_assets = array(
+		'theme' => $assets,
+	);
+	return register_block_assets( $name, $theme_assets );
+}
+
+/**
+ * Add assets to be displayed in the editor.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $assets Array of new assets.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_editor_assets( $name, $assets ) {
+	$editor_assets = array(
+		'editor' => $assets,
+	);
+	return register_block_assets( $name, $editor_assets );
+}
+
+/**
+ * Add styles to be displayed in the editor.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $styles Array of new styles data.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_editor_styles( $name, $styles ) {
+	$editor_styles = array(
+		'styles' => $styles,
+	);
+	return gutenberg_register_block_editor_assets( $name, $editor_styles );
+}
+
+/**
+ * Add styles to be displayed in the theme.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $styles Array of new styles data.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_theme_styles( $name, $styles ) {
+	$editor_styles = array(
+		'styles' => $styles,
+	);
+	return gutenberg_register_block_theme_assets( $name, $editor_styles );
+}
+
+/**
+ * Add scripts to be displayed in the editor.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $scripts Array of new scripts data.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_editor_scripts( $name, $scripts ) {
+	$editor_scripts = array(
+		'scripts' => $scripts,
+	);
+	return gutenberg_register_block_editor_assets( $name, $editor_scripts );
+}
+
+/**
+ * Add scripts to be displayed in the theme.
+ *
+ * @param string $name   Name of the block to register to.
+ * @param array  $scripts Array of new scripts data.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_register_block_theme_scripts( $name, $scripts ) {
+	$theme_scripts = array(
+		'scripts' => $scripts,
+	);
+	return gutenberg_register_block_theme_assets( $name, $theme_scripts );
+}
+
+/**
+ * Adds a block style to the editor.
+ *
+ * Should use the same function signature as wp_register_script() after $name.
+ *
+ * @param string           $name      Block name to register to.
+ * @param string           $handle    (Required) Name of the script. Should be unique.
+ * @param string           $src       (Required) Full URL of the script,
+ *     or path of the script relative to the WordPress root directory.
+ * @param array            $deps      (Optional) An array of registered script
+ *     handles this script depends on. Default value: array().
+ * @param string|bool|null $version   (Optional) String specifying script
+ *    version number, if it has one, which is added to the URL as a query string
+ *    for cache busting purposes. If version is set to false, a version number is
+ *    automatically added equal to current installed WordPress version.
+ *    If set to null, no version is added. Default value: false.
+ * @param string           $media (Optional) Targeted medium. Default value: 'all'.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_editor_style( $name, $handle, $src, $deps = array(), $version = false, $media = 'all' ) {
+	$style = array(
+		'handle' => $handle,
+		'src'    => $src,
+		'deps'   => $deps,
+		'ver'    => $version,
+		'media'  => $media,
+	);
+
+	return gutenberg_register_block_editor_styles( $name, array( $style ) );
+}
+
+/**
+ * Adds a block style to the theme.
+ *
+ * Should use the same function signature as wp_register_script() after $name.
+ *
+ * @param string           $name      Block name to register to.
+ * @param string           $handle    (Required) Name of the script. Should be unique.
+ * @param string           $src       (Required) Full URL of the script,
+ *     or path of the script relative to the WordPress root directory.
+ * @param array            $deps      (Optional) An array of registered script
+ *     handles this script depends on. Default value: array().
+ * @param string|bool|null $version   (Optional) String specifying script
+ *    version number, if it has one, which is added to the URL as a query string
+ *    for cache busting purposes. If version is set to false, a version number is
+ *    automatically added equal to current installed WordPress version.
+ *    If set to null, no version is added. Default value: false.
+ * @param string           $media (Optional) Targeted medium. Default value: 'all'.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_theme_style( $name, $handle, $src, $deps = array(), $version = false, $media = 'all' ) {
+	$style = array(
+		'handle' => $handle,
+		'src'    => $src,
+		'deps'   => $deps,
+		'ver'    => $version,
+		'media'  => $media,
+	);
+
+	return gutenberg_register_block_theme_styles( $name, array( $style ) );
+}
+
+/**
+ * Adds a block script to the editor.
+ *
+ * Should use the same function signature as wp_register_script() after $name.
+ *
+ * @param string           $name      Block name to register to.
+ * @param string           $handle    (Required) Name of the script. Should be unique.
+ * @param string           $src       (Required) Full URL of the script,
+ *     or path of the script relative to the WordPress root directory.
+ * @param array            $deps      (Optional) An array of registered script
+ *     handles this script depends on. Default value: array().
+ * @param string|bool|null $version   (Optional) String specifying script
+ *    version number, if it has one, which is added to the URL as a query string
+ *    for cache busting purposes. If version is set to false, a version number is
+ *    automatically added equal to current installed WordPress version.
+ *    If set to null, no version is added. Default value: false.
+ * @param bool             $in_footer (Optional) Whether to enqueue the script
+ *     before </body> instead of in the <head>. Default 'false'. Default value: false.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_editor_script( $name, $handle, $src, $deps = array(), $version = false, $in_footer = false ) {
+	$script = array(
+		'handle'    => $handle,
+		'src'       => $src,
+		'deps'      => $deps,
+		'ver'       => $version,
+		'in_footer' => $in_footer,
+	);
+
+	return gutenberg_register_block_editor_scripts( $name, array( $script ) );
+}
+
+/**
+ * Adds a block script to the theme.
+ *
+ * Should use the same function signature as wp_register_script() after $name.
+ *
+ * @param string           $name      Block name to register to.
+ * @param string           $handle    (Required) Name of the script. Should be unique.
+ * @param string           $src       (Required) Full URL of the script,
+ *     or path of the script relative to the WordPress root directory.
+ * @param array            $deps      (Optional) An array of registered script
+ *     handles this script depends on. Default value: array().
+ * @param string|bool|null $version   (Optional) String specifying script
+ *    version number, if it has one, which is added to the URL as a query string
+ *    for cache busting purposes. If version is set to false, a version number is
+ *    automatically added equal to current installed WordPress version.
+ *    If set to null, no version is added. Default value: false.
+ * @param bool             $in_footer (Optional) Whether to enqueue the script
+ *     before </body> instead of in the <head>. Default 'false'. Default value: false.
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_theme_script( $name, $handle, $src, $deps = array(), $version = false, $in_footer = false ) {
+	$script = array(
+		'handle'    => $handle,
+		'src'       => $src,
+		'deps'      => $deps,
+		'ver'       => $version,
+		'in_footer' => $in_footer,
+	);
+
+	return gutenberg_register_block_theme_scripts( $name, array( $script ) );
+}
