@@ -51,15 +51,11 @@ class FormatToolbar extends wp.element.Component {
 	}
 
 	onKeyPress( event ) {
-		switch ( event.keyCode ) {
-			case ESCAPE:
-				if ( this.state.isEditingLink ) {
-					event.preventDefault();
-					this.dropLink();
-				}
-				break;
-			default :
-				break;
+		if ( event.keyCode === ESCAPE ) {
+			if ( this.state.isEditingLink ) {
+				event.preventDefault();
+				this.dropLink();
+			}
 		}
 	}
 
