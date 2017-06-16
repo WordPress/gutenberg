@@ -30,6 +30,16 @@ entryPointNames.forEach( entryPointName => {
 	};
 } );
 
+// Main CSS loader.
+const MainCSSExtractTextPlugin = new ExtractTextPlugin( {
+	filename: './[name]/build/style.css',
+} );
+
+// CSS loader for front end style building.
+const BlockCSSExtractTextPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/blocks.css',
+} );
+
 const config = {
 	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
 		memo[ entryPointName ] = './' + entryPointName + '/index.js';
@@ -65,8 +75,30 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
+				test: /blocks\.s?css$/,
+				include: [
+					/blocks/,
+				],
+				use: BlockCSSExtractTextPlugin.extract( {
+					use: [
+						{ loader: 'raw-loader' },
+						{ loader: 'postcss-loader' },
+						{
+							loader: 'sass-loader',
+							query: {
+								outputStyle: 'production' === process.env.NODE_ENV ?
+									'compressed' : 'nested',
+							},
+						},
+					],
+				} ),
+			},
+			{
 				test: /\.s?css$/,
-				use: ExtractTextPlugin.extract( {
+				exclude: [
+					/blocks\.s?css$/,
+				],
+				use: MainCSSExtractTextPlugin.extract( {
 					use: [
 						{ loader: 'raw-loader' },
 						{ loader: 'postcss-loader' },
@@ -88,9 +120,8 @@ const config = {
 		new webpack.DefinePlugin( {
 			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
 		} ),
-		new ExtractTextPlugin( {
-			filename: './[name]/build/style.css',
-		} ),
+		BlockCSSExtractTextPlugin,
+		MainCSSExtractTextPlugin,
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
