@@ -25,7 +25,9 @@ function PostTrash( { postId, postType, ...props } ) {
 
 	return (
 		<Button className="editor-post-trash" onClick={ onClick }>
-			{ __( 'Move to trash' ) }
+			<span className="editor-post-trash__label">
+				{ __( 'Move to trash' ) }
+			</span>
 			<Dashicon icon="trash" />
 		</Button>
 	);
