@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
 import { Component, findDOMNode } from 'element';
+import { LETTER_A, SMALL_LETTER_A } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -16,7 +18,8 @@ import './style.scss';
 import Inserter from '../../inserter';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
-import { clearSelectedBlock } from '../../actions';
+import { getBlockUids } from '../../selectors';
+import { clearSelectedBlock, multiSelect } from '../../actions';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -24,6 +27,15 @@ class VisualEditor extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'keydown', this.onKeyDown );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'keydown', this.onKeyDown );
 	}
 
 	bindContainer( ref ) {
@@ -40,6 +52,20 @@ class VisualEditor extends Component {
 		}
 	}
 
+	onKeyDown( event ) {
+		const { uids } = this.props;
+		const isEditable = [ 'textarea', 'input', 'select' ].indexOf( document.activeElement.tagName.toLowerCase() ) !== -1
+			|| document.activeElement.isContentEditable;
+		if (
+			! isEditable &&
+			( event.ctrlKey || event.metaKey ) &&
+			[ LETTER_A, SMALL_LETTER_A ].indexOf( event.keyCode ) !== -1
+		) {
+			event.preventDefault();
+			this.props.multiSelect( first( uids ), last( uids ) );
+		}
+	}
+
 	render() {
 		// Disable reason: Clicking the canvas should clear the selection
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -50,6 +76,7 @@ class VisualEditor extends Component {
 				className="editor-visual-editor"
 				onMouseDown={ this.onClick }
 				onTouchStart={ this.onClick }
+				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>
 				<PostTitle />
@@ -62,6 +89,13 @@ class VisualEditor extends Component {
 }
 
 export default connect(
-	undefined,
-	{ clearSelectedBlock }
+	( state ) => {
+		return {
+			uids: getBlockUids( state ),
+		};
+	},
+	{
+		clearSelectedBlock,
+		multiSelect,
+	}
 )( VisualEditor );

@@ -24,7 +24,7 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 } from '../../selectors';
-import { insertBlock } from '../../actions';
+import { insertBlock, multiSelect } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
@@ -137,11 +137,11 @@ class VisualEditorBlockList extends Component {
 		}
 
 		if ( isAtStart && selectionStart ) {
-			onMultiSelect( { start: null, end: null } );
+			onMultiSelect( null, null );
 		}
 
 		if ( ! isAtStart && selectionEnd !== uid ) {
-			onMultiSelect( { start: selectionAtStart, end: uid } );
+			onMultiSelect( selectionAtStart, uid );
 		}
 	}
 
@@ -220,8 +220,8 @@ export default connect(
 		onInsertBlock( block ) {
 			dispatch( insertBlock( block ) );
 		},
-		onMultiSelect( { start, end } ) {
-			dispatch( { type: 'MULTI_SELECT', start, end } );
+		onMultiSelect( start, end ) {
+			dispatch( multiSelect( start, end ) );
 		},
 		onRemove( uids ) {
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
