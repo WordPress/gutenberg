@@ -82,6 +82,7 @@ zip -r gutenberg.zip \
 	blocks/build/*.css \
 	components/build/*.css \
 	editor/build/*.css \
+	assets/*.jpg \
 	README.md
 
 # Reset `gutenberg.php`
