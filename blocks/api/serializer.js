@@ -119,16 +119,12 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 	);
 }
 
-/**
- * Lodash iterator which transforms a key: value
- * pair into a string of `key="value"`
- *
- * @param {*}        value value to be stringified
- * @param {String}   key   name of value
- * @returns {string}       stringified equality pair
- */
-function asNameValuePair( value, key ) {
-	return `${ key }="${ serializeValue( value ) }"`;
+export function serializeAttributes( attrs ) {
+	return JSON.stringify( attrs )
+		.replace( /--/g, '\\u002d\\u002d' ) // don't break HTML comments
+		.replace( /</g, '\\u003c' ) // don't break standard-non-compliant tools
+		.replace( />/g, '\\u003e' ) // ibid
+		.replace( /&/g, '\\u0026' ); // ibid
 }
 
 export function serializeBlock( block ) {
@@ -138,7 +134,7 @@ export function serializeBlock( block ) {
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
 
 	const serializedAttributes = ! isEmpty( saveAttributes )
-		? map( saveAttributes, asNameValuePair ).join( ' ' ) + ' '
+		? serializeAttributes( saveAttributes ) + ' '
 		: '';
 
 	if ( ! saveContent ) {
