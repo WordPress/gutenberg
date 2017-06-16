@@ -51,8 +51,8 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 	attributes = attributes || {};
 	if ( blockType ) {
 		attributes = {
-			...attributes,
 			...blockType.defaultAttributes,
+			...attributes,
 			...parseBlockAttributes( rawContent, blockType ),
 		};
 	}
