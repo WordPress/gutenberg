@@ -8,9 +8,9 @@ import classnames from 'classnames';
  */
 import './style.scss';
 
-function BaseControl( { id, label, className, children, ...props } ) {
+function BaseControl( { id, label, className, children } ) {
 	return (
-		<div className={ classnames( 'blocks-base-control', className ) } { ...props }>
+		<div className={ classnames( 'blocks-base-control', className ) }>
 			{ label && <label className="blocks-base-control__label" htmlFor={ id }>{ label }</label> }
 			{ children }
 		</div>
