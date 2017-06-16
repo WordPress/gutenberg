@@ -20,4 +20,5 @@ require_once dirname( __FILE__ ) . '/lib/i18n.php';
 require_once dirname( __FILE__ ) . '/lib/register.php';
 
 // Register server-side code for individual blocks.
+require_once dirname( __FILE__ ) . '/lib/blocks/quote.php';
 require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';

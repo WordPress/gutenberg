@@ -2,7 +2,9 @@
  * Internal dependencies
  */
 import { __ } from 'i18n';
+import './blocks.scss';
 import './style.scss';
+
 import { registerBlockType, query as hpq } from '../../api';
 import { Fill } from 'react-slot-fill';
 
