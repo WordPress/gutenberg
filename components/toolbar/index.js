@@ -25,22 +25,27 @@ function Toolbar( { controls, focus } ) {
 			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
 				...result,
 				...controlSet.map( ( control, controlIndex ) => (
-					<IconButton
+					<li
 						key={ [ setIndex, controlIndex ].join() }
-						icon={ control.icon }
-						label={ control.title }
-						data-subscript={ control.subscript }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							control.onClick();
-						} }
-						className={ classNames( 'components-toolbar__control', {
-							'is-active': control.isActive,
-							'has-left-divider': setIndex > 0 && controlIndex === 0,
-						} ) }
-						aria-pressed={ control.isActive }
-						focus={ focus && setIndex === 0 && controlIndex === 0 }
-					/>
+						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
+					>
+						<IconButton
+							icon={ control.icon }
+							label={ control.title }
+							data-subscript={ control.subscript }
+							onClick={ ( event ) => {
+								event.stopPropagation();
+								control.onClick();
+							} }
+							className={ classNames( 'components-toolbar__control', {
+								'is-active': control.isActive,
+							} ) }
+							aria-pressed={ control.isActive }
+							focus={ focus && setIndex === 0 && controlIndex === 0 }
+							disabled={ control.isDisabled }
+						/>
+						{ control.children }
+					</li>
 				) ),
 			], [] ) }
 		</ul>

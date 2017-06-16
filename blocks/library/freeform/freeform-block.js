@@ -1,17 +1,23 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { nodeListToReact } from 'dom-react';
-import { isEqual, flatten, omitBy } from 'lodash';
-import { Fill } from 'react-slot-fill';
+import { findDOMNode } from 'element';
+import 'element-closest';
+import { concat, find, flatten, isEqual, omitBy, throttle } from 'lodash';
 
 /**
  * Internal dependencies
  */
+import './freeform-block.scss';
 import { __ } from 'i18n';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 import FormatList from './format-list';
+import { Toolbar } from 'components';
+
+const BLOCK_CONTROLS_SELECTOR = '.editor-visual-editor__block-controls';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -67,6 +73,20 @@ const FREEFORM_CONTROLS = [
 		},
 	],
 ];
+const MORE_CONTROLS = [
+	{
+		id: 'indent',
+		icon: 'editor-indent',
+		title: __( 'Indent' ),
+	},
+	{
+		id: 'outdent',
+		icon: 'editor-outdent',
+		title: __( 'Outdent' ),
+	},
+];
+
+const MORE_DRAWER_HEIGHT = 40;
 
 function createElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -89,26 +109,34 @@ export default class FreeformBlock extends wp.element.Component {
 		super( ...arguments );
 		this.getSettings = this.getSettings.bind( this );
 		this.setButtonActive = this.setButtonActive.bind( this );
+		this.setButtonDisabled = this.setButtonDisabled.bind( this );
 		this.setFormatActive = this.setFormatActive.bind( this );
+		this.toggleMoreDrawer = this.toggleMoreDrawer.bind( this );
+		this.setToolbarRef = this.setToolbarRef.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onInit = this.onInit.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onScroll = throttle( this.onScroll.bind( this ), 250 );
 		this.isEndOfEditor = this.isEndOfEditor.bind( this );
 		this.updateFocus = this.updateFocus.bind( this );
 		this.updateContent = this.updateContent.bind( this );
 		this.setContent = this.setContent.bind( this );
 		this.getContent = this.getContent.bind( this );
-		this.controls = this.mapControls.bind( this );
+		this.mapControls = this.mapControls.bind( this );
 		this.editor = null;
+		this.toolbarElem = null;
 		this.savedContent = null;
 		this.formats = null;
 		this.handleFormatChange = null;
 		this.state = {
 			empty: ! props.value || ! props.value.length,
 			activeButtons: { },
+			disabledButtons: { },
 			activeFormat: null,
+			showMore: false,
+			expandDown: false,
 		};
 	}
 
@@ -128,8 +156,26 @@ export default class FreeformBlock extends wp.element.Component {
 		} ) );
 	}
 
+	setButtonDisabled( id, disabled ) {
+		this.setState( ( prevState ) => ( {
+			disabledButtons: {
+				...prevState.disabledButtons,
+				[ id ]: disabled,
+			},
+		} ) );
+	}
+
 	setFormatActive( newActiveFormat ) {
 		this.setState( { activeFormat: newActiveFormat } );
+	}
+
+	toggleMoreDrawer() {
+		this.setState( { showMore: ! this.state.showMore } );
+	}
+
+	setToolbarRef( elem ) {
+		this.toolbarElem = elem;
+		this.onScroll();
 	}
 
 	onSetup( editor ) {
@@ -149,12 +195,19 @@ export default class FreeformBlock extends wp.element.Component {
 		this.handleFormatChange = formatselect.onselect;
 		this.forceUpdate();
 
-		[ ...ALIGNMENT_CONTROLS, ...flatten( FREEFORM_CONTROLS ) ].forEach( ( control ) => {
+		[ ...ALIGNMENT_CONTROLS, ...flatten( FREEFORM_CONTROLS ), ...MORE_CONTROLS ].forEach( ( control ) => {
 			if ( control.id ) {
 				const button = this.editor.buttons[ control.id ];
-				button.onPostRender.call( {
-					active: ( isActive ) => this.setButtonActive( control.id, isActive ),
-				}, this.editor );
+				// TinyMCE uses the first 2 cases, I am not sure about the third.
+				const fnNames = [ 'onPostRender', 'onpostrender', 'OnPostRender' ];
+				const onPostRender = find( fnNames, ( fn ) => button.hasOwnProperty( fn ) );
+				if ( onPostRender ) {
+					button[ onPostRender ].call( {
+						active: ( isActive ) => this.setButtonActive( control.id, isActive ),
+					}, { control: {
+						disabled: ( isDisabled ) => this.setButtonDisabled( control.id, isDisabled ),
+					} } );
+				}
 			}
 		} );
 		this.updateFocus();
@@ -201,6 +254,19 @@ export default class FreeformBlock extends wp.element.Component {
 	onFocus() {
 		if ( this.props.onFocus ) {
 			this.props.onFocus();
+		}
+	}
+
+	onScroll() {
+		if ( this.toolbarElem ) {
+			const n = findDOMNode( this.toolbarElem );
+			const blockControls = n ? n.closest( BLOCK_CONTROLS_SELECTOR ) : null;
+			if ( blockControls ) {
+				const currentTop = blockControls.getBoundingClientRect().top;
+				const stickyTop = parseInt( window.getComputedStyle( blockControls ).top, 10 );
+				const expandDown = currentTop - stickyTop <= MORE_DRAWER_HEIGHT;
+				this.setState( { expandDown } );
+			}
 		}
 	}
 
@@ -275,12 +341,18 @@ export default class FreeformBlock extends wp.element.Component {
 				...control,
 				onClick: () => this.editor && this.editor.buttons[ control.id ].onclick(),
 				isActive: this.state.activeButtons[ control.id ],
+				isDisabled: this.state.disabledButtons[ control.id ],
 			};
 		} );
 	}
 
+	componentDidMount() {
+		window.addEventListener( 'scroll', this.onScroll );
+	}
+
 	componentWillUnmount() {
 		this.onChange();
+		window.removeEventListener( 'scroll', this.onScroll );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -301,35 +373,39 @@ export default class FreeformBlock extends wp.element.Component {
 
 	render() {
 		const { content, focus } = this.props;
+		const { expandDown, showMore } = this.state;
+		const moreDrawerClasses = classnames( 'more-drawer', expandDown ? 'down' : 'up' );
 		return [
-			focus && (
-				<Fill name="Formatting.Toolbar">
-					<FormatList
-						onFormatChange={ this.handleFormatChange }
-						formats={ this.formats }
-						value={ this.state.activeFormat }
-					/>
-				</Fill>
-			),
-			focus && (
-				<BlockControls
-					key="aligns"
-					controls={ this.mapControls( ALIGNMENT_CONTROLS ) }
+			focus && <BlockControls key="controls">
+				<FormatList
+					onFormatChange={ this.handleFormatChange }
+					formats={ this.formats }
+					value={ this.state.activeFormat }
+					ref={ this.setToolbarRef }
 				/>
-			),
-			focus && (
-				<BlockControls
-					key="controls"
-					controls={ this.mapControls( FREEFORM_CONTROLS ) }
+				<Toolbar controls={ this.mapControls( ALIGNMENT_CONTROLS ) } />
+				<Toolbar
+					controls={ concat( this.mapControls( FREEFORM_CONTROLS ), [ [ {
+						icon: 'ellipsis',
+						title: __( 'More' ),
+						isActive: showMore,
+						onClick: this.toggleMoreDrawer,
+						children: (
+							showMore && <div className={ moreDrawerClasses }>
+								<div className="more-draw__arrow" />
+								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
+							</div>
+						),
+					} ] ] ) }
 				/>
-			),
+			</BlockControls>,
 			<TinyMCE
 				key="editor"
 				getSettings={ this.getSettings }
 				onSetup={ this.onSetup }
 				defaultValue={ content }
 				isEmpty={ this.state.empty }
-				/>,
+			/>,
 		];
 	}
 }

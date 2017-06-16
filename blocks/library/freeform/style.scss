@@ -88,8 +88,3 @@
 		background: $light-gray-400;
 	}
 }
-
-// Slot creates a div which has no class on it, I need it to be flex
-.editor-visual-editor__block[data-type="core/freeform"] .editor-visual-editor__block-controls > div {
-	display: flex;
-}
