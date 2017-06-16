@@ -26,11 +26,11 @@
 .editor-visual-editor__block {
 	margin-left: auto;
 	margin-right: auto;
+	margin-bottom: 5px;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
 	 // The block mover needs to stay inside the block to allow clicks when hovering the block
 	padding: $block-padding $block-padding + $block-mover-padding-visible;
-	transition: 0.2s border-color;
 
 	&:before {
 		z-index: z-index( '.editor-visual-editor__block:before' );
@@ -40,16 +40,18 @@
 		bottom: 0;
 		left: $block-mover-padding-visible;
 		right: $block-mover-padding-visible;
-		border: 2px solid transparent;
-		transition: 0.2s border-color;
+		outline: 1px solid transparent;
+		transition: 0.2s outline;
 	}
 
 	&.is-hovered:before {
-		border-left-color: $light-gray-500;
+		outline: 1px dotted $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-selected:before {
-		border-color: $light-gray-500;
+		outline: 2px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-multi-selected *::selection {
@@ -58,7 +60,8 @@
 
 	&.is-multi-selected:before {
 		background: $blue-medium-100;
-		border: 2px solid $blue-medium-200;
+		outline: 2px solid $blue-medium-200;
+		transition: 0.2s outline;
 	}
 
 	.iframe-overlay {
@@ -258,25 +261,26 @@ $sticky-bottom-offset: 20px;
 }
 
 .editor-visual-editor__placeholder[type=text] {
-	margin-left: auto;
-	margin-right: auto;
+	margin: 2px auto;
 	max-width: $visual-editor-max-width;
 	position: relative;
 	padding: $block-padding;
-	border: 2px solid transparent;
+	outline: 1px solid transparent;
+	border: none;
 	background: none;
 	box-shadow: none;
 	display: block;
-	transition: 0.2s border-color;
+	transition: 0.2s outline;
 	text-align: left;
 	width: 100%;
 	color: inherit;
 	opacity: 0.5;
 	font-size: $editor-font-size;
+	line-height: $editor-line-height;
 	cursor: text;
-	left: -2px;
+	left: -1px;
 
 	&:hover {
-		border-left-color: $light-gray-500;
+		outline: 1px dotted $light-gray-500;
 	}
 }
