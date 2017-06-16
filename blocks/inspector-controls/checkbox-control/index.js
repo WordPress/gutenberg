@@ -23,7 +23,8 @@ function CheckboxControl( { label, heading, checked, instanceId, onChange, ...pr
 					value="1"
 					onChange={ onChangeValue }
 					checked={ checked }
-					{ ...props } />
+					{ ...props }
+				/>
 				{ label }
 			</label>
 		</BaseControl>

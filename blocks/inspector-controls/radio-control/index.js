@@ -15,23 +15,23 @@ function RadioControl( { label, selected, instanceId, onChange, options = [] } )
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id }>
-			<div className="blocks-radio-control">
-				{ options.map( ( option, i ) =>
-					<label key={ option.value } htmlFor={ ( id + '-' + i ) }>
-						<input
-							id={ ( id + '-' + i ) }
-							className="blocks-radio-control__input"
-							type="radio"
-							name={ id }
-							value={ option.value }
-							onChange={ onChangeValue }
-							selected={ option.value === selected }
-						/>
+		<BaseControl label={ label } id={ id } className={ [ 'blocks-radio-control' ] }>
+			{ options.map( ( option, index ) =>
+				<div className="blocks-radio-control__option">
+					<input
+						id={ ( id + '-' + index ) }
+						className="blocks-radio-control__input"
+						type="radio"
+						name={ id }
+						value={ option.value }
+						onChange={ onChangeValue }
+						selected={ option.value === selected }
+					/>
+					<label key={ option.value } htmlFor={ ( id + '-' + index ) }>
 						{ option.label }
 					</label>
-				) }
-			</div>
+				</div>
+			) }
 		</BaseControl>
 	);
 }

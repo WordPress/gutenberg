@@ -14,7 +14,7 @@ function ToggleControl( { label, checked, instanceId, onChange } ) {
 	const id = 'inspector-toggle-control-' + instanceId;
 
 	return (
-		<BaseControl label={ label } id={ id } classes={ [ 'blocks-toggle-control' ] }>
+		<BaseControl label={ label } id={ id } className={ [ 'blocks-toggle-control' ] }>
 			<Toggle id={ id } checked={ checked } onChange={ onChange } />
 		</BaseControl>
 	);
