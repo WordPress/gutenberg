@@ -9,7 +9,7 @@ import { first, last } from 'lodash';
  */
 import { __ } from 'i18n';
 import { Component, findDOMNode } from 'element';
-import { LETTER_A, SMALL_LETTER_A } from 'utils/keycodes';
+import { LETTER_A } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -59,7 +59,7 @@ class VisualEditor extends Component {
 		if (
 			! isEditable &&
 			( event.ctrlKey || event.metaKey ) &&
-			[ LETTER_A, SMALL_LETTER_A ].indexOf( event.keyCode ) !== -1
+			event.keyCode === LETTER_A
 		) {
 			event.preventDefault();
 			this.props.multiSelect( first( uids ), last( uids ) );
