@@ -1,0 +1,102 @@
+.components-popover {
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	position: absolute;
+	background: $white;
+	z-index: z-index( ".components-popover" );
+	left: 0;
+	right: 0;
+
+	@include break-medium {
+		width: 280px;
+		left: -122px;
+		right: auto;
+		height: auto;
+	}
+
+	&:before {
+		border: 10px dashed $light-gray-500;
+		display: none;
+
+		@include break-medium {
+			display: block;
+		}
+	}
+
+	&:after {
+		border: 10px solid $white;
+	}
+
+	&:before,
+	&:after {
+		content: "";
+		position: absolute;
+		left: 50%;
+		margin-left: -10px;
+		height: 0;
+		width: 0;
+		border-left-color: transparent;
+		border-right-color: transparent;
+		line-height: 0;
+	}
+
+	&.is-top {
+		bottom: 42px;
+
+		&:before {
+			bottom: -10px;
+		}
+
+		&:after {
+			bottom: -8px;
+		}
+
+		&:before,
+		&:after {
+			border-top-style: solid;
+			border-bottom: none;
+		}
+	}
+
+	&.is-bottom {
+		top: $admin-bar-height-big + $item-spacing -1px;
+
+		@include break-medium {
+			top: $admin-bar-height + $item-spacing;
+		}
+
+		&:before {
+			top: -10px;
+		}
+
+		&:after {
+			top: -8px;
+		}
+
+		&:before,
+		&:after {
+			border-bottom-style: solid;
+			border-top: none;
+		}
+	}
+
+	&.is-right {
+		left: -32px;
+
+		&:before,
+		&:after {
+			left: 49px;
+		}
+	}
+
+	&.is-left {
+		left: auto;
+		right: -42px;
+
+		&:before,
+		&:after {
+			left: auto;
+			right: 49px;
+		}
+	}
+}

@@ -28,7 +28,7 @@ class MediaUploadButton extends Component {
 
 	componentDidMount() {
 		if ( !! this.props.autoOpen ) {
-			this.frame.open();
+			setTimeout( () => this.frame.open() );
 		}
 	}
 

@@ -10,7 +10,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { BACKSPACE, DELETE } from 'utils/keycodes';
+import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -211,6 +211,45 @@ export default class Editable extends wp.element.Component {
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
+		}
+
+		if ( keyCode === ENTER && this.props.inline && this.props.onSplit ) {
+			const endNode = this.editor.selection.getEnd();
+
+			// Make sure the current selection is on a line break.
+			if ( endNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			const prevNode = endNode.previousSibling;
+
+			// Make sure the previous node is a line break. We only want to
+			// split on a double line break.
+			if ( ! prevNode || prevNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			const { dom } = this.editor;
+			const rootNode = this.editor.getBody();
+			const beforeRange = dom.createRng();
+			const afterRange = dom.createRng();
+
+			dom.remove( prevNode );
+
+			beforeRange.setStart( rootNode, 0 );
+			beforeRange.setEnd( endNode.parentNode, dom.nodeIndex( endNode ) );
+
+			afterRange.setStart( endNode.parentNode, dom.nodeIndex( endNode ) + 1 );
+			afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+
+			const beforeFragment = beforeRange.extractContents();
+			const afterFragment = afterRange.extractContents();
+
+			const beforeElement = nodeListToReact( beforeFragment.childNodes, createElement );
+			const afterElement = nodeListToReact( afterFragment.childNodes, createElement );
+
+			this.setContent( beforeElement );
+			this.props.onSplit( beforeElement, afterElement );
 		}
 	}
 

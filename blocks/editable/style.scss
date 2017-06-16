@@ -3,16 +3,10 @@
 }
 
 .blocks-editable__tinymce {
+	margin: 0;
+
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
-	}
-
-	> p:first-child {
-		margin-top: 0;
-	}
-
-	> p:last-child {
-		margin-bottom: 0;
 	}
 
 	&:focus {
@@ -56,6 +50,19 @@
 	}
 }
 
+.drop-cap-true .blocks-editable__tinymce:not( :focus )  {
+	&:first-letter {
+		float: left;
+		font-size: 4.1em;
+		line-height: 0.7;
+		font-family: serif;
+		font-weight: bold;
+		margin: .07em .23em 0 0;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+}
+
 .block-editable__inline-toolbar {
 	display: flex;
 	justify-content: center;
@@ -78,7 +85,6 @@ figcaption.blocks-editable__tinymce {
 		transform: translateX( -50% );
 	}
 }
-
 
 .editable-format-toolbar {
 	display: inline-flex;

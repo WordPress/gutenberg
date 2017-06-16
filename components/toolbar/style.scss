@@ -18,13 +18,13 @@
 	&> li + li {
 		margin-left: -3px;
 
-		&.left-divider {
+		&.has-left-divider {
 			margin-left: 6px;
 			position: relative;
 			overflow: visible;
 		}
 
-		&.left-divider:before {
+		&.has-left-divider:before {
 			display: inline-block;
 			content: '';
 			box-sizing: content-box;

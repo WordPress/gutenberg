@@ -7,7 +7,8 @@ import { throttle, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { serialize } from 'blocks';
+import { __ } from 'i18n';
+import { serialize, getDefaultBlock, createBlock } from 'blocks';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import {
 	getMultiSelectedBlocks,
 	getMultiSelectedBlockUids,
 } from '../../selectors';
+import { insertBlock } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
@@ -35,6 +37,7 @@ class VisualEditorBlockList extends wp.element.Component {
 		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
+		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
@@ -151,6 +154,11 @@ class VisualEditorBlockList extends wp.element.Component {
 		window.removeEventListener( 'touchend', this.onSelectionEnd );
 	}
 
+	appendDefaultBlock() {
+		const newBlock = createBlock( getDefaultBlock() );
+		this.props.onInsertBlock( newBlock );
+	}
+
 	render() {
 		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
@@ -164,7 +172,14 @@ class VisualEditorBlockList extends wp.element.Component {
 
 		return (
 			<div>
-				{ blocksWithInsertionPoint.map( ( uid ) => {
+				{ ! blocks.length && (
+					<input
+						className="editor-visual-editor__placeholder"
+						value={ __( 'Write your story' ) }
+						onFocus={ this.appendDefaultBlock }
+					/>
+				) }
+				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
 					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
 						return (
 							<div
@@ -200,6 +215,9 @@ export default connect(
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 	} ),
 	( dispatch ) => ( {
+		onInsertBlock( block ) {
+			dispatch( insertBlock( block ) );
+		},
 		onMultiSelect( { start, end } ) {
 			dispatch( { type: 'MULTI_SELECT', start, end } );
 		},
