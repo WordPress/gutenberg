@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { IconButton, Toolbar } from 'components';
+import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -36,11 +37,25 @@ class FormatToolbar extends wp.element.Component {
 		this.dropLink = this.dropLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.updateLinkValue = this.updateLinkValue.bind( this );
+		this.onKeyPress = this.onKeyPress.bind( this );
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'keypress', this.onKeyPress );
 	}
 
 	componentWillUnmout() {
 		if ( this.editTimeout ) {
 			clearTimeout( this.editTimeout );
+		}
+	}
+
+	onKeyPress( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			if ( this.state.isEditingLink ) {
+				event.preventDefault();
+				this.dropLink();
+			}
 		}
 	}
 
@@ -143,6 +158,7 @@ class FormatToolbar extends wp.element.Component {
 							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
+						<IconButton icon="editor-unlink" onClick={ this.dropLink } />
 					</form>
 				}
 
