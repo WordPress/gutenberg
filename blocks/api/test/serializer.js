@@ -171,7 +171,7 @@ describe( 'block serializer', () => {
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block {"align":"left"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );

@@ -152,7 +152,7 @@ describe( 'block parser', () => {
 			} );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block smoked="yes" url="http://google.com" chicken="ribs & \'wings\'" -->' +
+				'<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & \'wings\'"} -->' +
 				'Brisket' +
 				'<!-- /wp:core/test-block -->'
 			);
