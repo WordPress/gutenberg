@@ -105,7 +105,7 @@ function do_blocks( $content ) {
 	$matcher = '#' . join( '', array(
 		'(?P<opener><!--\s*',
 		'wp:(?P<block_name>[a-z](?:[a-z0-9/]+)*)\s+',
-		'(?P<attributes>(?:(?!-->).)*)',
+		'(?P<attributes>(?:(?!-->).)*?)',
 		'\s*/?-->\n?)',
 		'(?:',
 		'(?P<content>.*?)',
