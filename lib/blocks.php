@@ -114,7 +114,6 @@ function do_blocks( $content ) {
 		}
 
 		$block_markup = $block_match[0];
-		$block_position = $block_match[1];
 		$block_attributes_string = $matches[2][ $index ][0];
 		$block_attributes = parse_block_attributes( $block_attributes_string );
 
