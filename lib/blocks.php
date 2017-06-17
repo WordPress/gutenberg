@@ -73,6 +73,7 @@ function unregister_block_type( $name ) {
  * Extract the block attributes from the block's attributes string
  *
  * @since 0.1.0
+ * @deprecated No longer used since block attributes are stored as JSON.
  *
  * @param string $attr_string Attributes string.
 
@@ -121,8 +122,12 @@ function do_blocks( $content ) {
 
 		$output = '';
 		if ( isset( $wp_registered_blocks[ $block_name ] ) ) {
-			$block_attributes_string = $matches['attributes'][ $index ][0];
-			$block_attributes = parse_block_attributes( $block_attributes_string );
+			$block_attributes_string = trim( $matches['attributes'][ $index ][0] );
+			if ( '{' === substr( $block_attributes_string, 0, 1 ) ) {
+				$block_attributes = json_decode( $block_attributes_string, true );
+			} else {
+				$block_attributes = parse_block_attributes( $block_attributes_string ); // @todo Remove later once block attributes have been migrated to JSON.
+			}
 
 			// Call the block's render function to generate the dynamic output.
 			$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
