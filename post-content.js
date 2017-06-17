@@ -12,11 +12,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/text -->',
-			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
+			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. The text block has its own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/text align="right" -->',
-			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
+			'<p style="text-align:right;">... like this one, which is right aligned.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/more /-->',
