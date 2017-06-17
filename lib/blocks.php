@@ -102,7 +102,7 @@ function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
 	// Extract the blocks from the post content.
-	$matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)\s*\/?-->(?:.*?<!--\s*\/wp:\g1\s+-->)?/';
+	$matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)\s*\/?-->(?:.*?<!--\s*\/wp:\g1\s+-->)?/s';
 	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
 
 	$new_content = $content;
