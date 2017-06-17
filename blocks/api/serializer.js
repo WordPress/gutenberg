@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map, reduce, kebabCase, isObject } from 'lodash';
+import { isEmpty, reduce, kebabCase, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
