@@ -14,7 +14,7 @@ You can also type `npm run package-plugin` which will run the two commands above
 
 ### On a Local WordPress Environment
 
-If you have a local WordPress environment, you can clone this repository into your `wp-content/plugins` directory directly. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
+If you have a local WordPress environment, you can clone this repository right into your `wp-content/plugins` directory. `npm install` will get the dependencies set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
 
 Some good options for a local WordPress development environment include <a href="https://varyingvagrantvagrants.org/">VVV</a> and <a href="https://www.mamp.info/">Mamp</a>.
 
