@@ -145,4 +145,74 @@ class Tests_XMLRPC_wp_editTerm extends WP_XMLRPC_UnitTestCase {
 		$this->assertNotIXRError( $result );
 		$this->assertInternalType( 'boolean', $result );
 	}
+
+	/**
+	 * @ticket 35991
+	 */
+	public function test_update_term_meta() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$meta_id = add_term_meta( $t, 'foo', 'bar' );
+
+		$this->make_user_by_role( 'editor' );
+
+		$result = $this->myxmlrpcserver->wp_editTerm( array(
+			1,
+			'editor',
+			'editor',
+			$t,
+			array(
+				'taxonomy' => 'wptests_tax',
+				'custom_fields' => array(
+					array(
+						'id' => $meta_id,
+						'key' => 'foo',
+						'value' => 'baz',
+					),
+				),
+			),
+		) );
+
+		$this->assertNotIXRError( $result );
+
+		$found = get_term_meta( $t, 'foo', true );
+		$this->assertSame( 'baz', $found );
+	}
+
+	/**
+	 * @ticket 35991
+	 */
+	public function test_delete_term_meta() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$t = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+		$meta_id = add_term_meta( $t, 'foo', 'bar' );
+
+		$this->make_user_by_role( 'editor' );
+
+		$result = $this->myxmlrpcserver->wp_editTerm( array(
+			1,
+			'editor',
+			'editor',
+			$t,
+			array(
+				'taxonomy' => 'wptests_tax',
+				'custom_fields' => array(
+					array(
+						'id' => $meta_id,
+					),
+				),
+			),
+		) );
+
+		$this->assertNotIXRError( $result );
+
+		$found = get_term_meta( $t, 'foo' );
+		$this->assertSame( array(), $found );
+	}
 }

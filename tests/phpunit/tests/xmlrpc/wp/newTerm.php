@@ -106,4 +106,28 @@ class Tests_XMLRPC_wp_newTerm extends WP_XMLRPC_UnitTestCase {
 		$this->assertNotIXRError( $result );
 		$this->assertStringMatchesFormat( '%d', $result );
 	}
+
+	/**
+	 * @ticket 35991
+	 */
+	public function test_add_term_meta() {
+		$this->make_user_by_role( 'editor' );
+		$result = $this->myxmlrpcserver->wp_newTerm( array(
+			1,
+			'editor',
+			'editor',
+			array(
+				'taxonomy' => 'category',
+				'name' => 'Test meta',
+				'custom_fields' => array(
+					array(
+						'key' => 'key1',
+						'value' => 'value1',
+					),
+				),
+			),
+		) );
+		$this->assertNotIXRError( $result );
+		$this->assertStringMatchesFormat( '%d', $result );
+	}
 }

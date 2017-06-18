@@ -69,6 +69,7 @@ class Tests_XMLRPC_wp_getTerm extends WP_XMLRPC_UnitTestCase {
 		$this->make_user_by_role( 'editor' );
 
 		$term = get_term( self::$term_id, 'category', ARRAY_A );
+		$term['custom_fields'] = array();
 
 		$result = $this->myxmlrpcserver->wp_getTerm( array( 1, 'editor', 'editor', 'category', self::$term_id ) );
 
@@ -94,5 +95,30 @@ class Tests_XMLRPC_wp_getTerm extends WP_XMLRPC_UnitTestCase {
 		$this->assertEquals( $term['slug'], $result['slug'] );
 		$this->assertEquals( 'category', $result['taxonomy'] );
 		$this->assertEquals( $term['description'], $result['description'] );
+	}
+
+	/**
+	 * @ticket 35991
+	 */
+	public function test_get_term_meta() {
+		$this->make_user_by_role( 'editor' );
+
+		// Add term meta to test wp.getTerm.
+		add_term_meta( self::$term_id, 'foo', 'bar' );
+
+		$term = get_term( self::$term_id, 'category', ARRAY_A );
+
+		$result = $this->myxmlrpcserver->wp_getTerm( array(
+			1,
+			'editor',
+			'editor',
+			'category',
+			self::$term_id,
+		) );
+		$this->assertNotIXRError( $result );
+
+		$this->assertInternalType( 'array', $result['custom_fields'] );
+		$term_meta = get_term_meta( self::$term_id, '', true );
+		$this->assertEquals( $term_meta['foo'][0], $result['custom_fields'][0]['value'] );
 	}
 }
