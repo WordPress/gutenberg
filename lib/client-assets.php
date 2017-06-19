@@ -321,17 +321,47 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 
 	// Load an actual post if an ID is specified.
-	$post_to_edit = null;
+	$post = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
+		$post = get_post( (int) $_GET['post_id'] );
+	}
+
+	if ( $post ) {
+		$post_type = $post->post_type;
+	} elseif ( isset( $_GET['post_type'] ) ) {
+		$post_type = wp_unslash( $_GET['post_type'] );
+	} else {
+		$post_type = 'post';
+	}
+
+	if ( ! post_type_exists( $post_type ) ) {
+		wp_die( __( 'Unrecognized post type.', 'gutenberg' ) );
+	}
+	$post_type_object = get_post_type_object( $post_type );
+	if ( ! current_user_can( $post_type_object->cap->edit_posts ) ) {
+		wp_die( __( 'Unauthorized post type.', 'gutenberg' ) );
+	}
+
+	if ( $post && ! current_user_can( 'edit_post', $post->ID ) ) {
+		wp_die( __( 'Unauthorized to edit post.', 'gutenberg' ) );
+	}
+
+	// @todo Export to JS.
+	$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+
+	$post_to_edit = null;
+	if ( $post ) {
 		$request = new WP_REST_Request(
 			'GET',
-			sprintf( '/wp/v2/posts/%d', (int) $_GET['post_id'] )
+			sprintf( '/wp/v2/%s/%d', $rest_base, $post->ID )
 		);
 		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
-		if ( 200 === $response->get_status() ) {
-			$post_to_edit = $response->get_data();
+		if ( $response->is_error() ) {
+			$error = $response->as_error();
+			wp_die( $error->get_error_message() );
 		}
+		$post_to_edit = $response->get_data();
 	}
 
 	// Initialize the post data...
