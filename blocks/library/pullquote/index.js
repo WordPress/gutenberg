@@ -50,19 +50,22 @@ registerBlockType( 'core/pullquote', {
 			),
 			<blockquote key="quote" className="blocks-pullquote">
 				<Editable
-					value={ value || __( 'Write Quote…' ) }
+					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
 							value: nextValue,
 						} )
 					}
+					placeholder={ ( 'Write Quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
+					className="blocks-pullquote__content"
 				/>
 				{ ( citation || !! focus ) && (
 					<Editable
 						tagName="footer"
-						value={ citation || __( 'Write caption…' ) }
+						value={ citation }
+						placeholder={ __( 'Write caption…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
