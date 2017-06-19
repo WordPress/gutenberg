@@ -4,6 +4,7 @@
     "wp-coding-standards/wpcs": "^0.11.0"
   },
   "scripts": {
+    "lint": "phpcs",
     "post-install-cmd": [
       "phpcs --config-set installed_paths ../../wp-coding-standards/wpcs/"
     ]
