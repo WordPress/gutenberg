@@ -57,6 +57,7 @@ class VisualEditorBlock extends wp.element.Component {
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.stopClickPropagation = this.stopClickPropagation.bind( this );
 		this.previousOffset = null;
 	}
 
@@ -112,7 +113,6 @@ class VisualEditorBlock extends wp.element.Component {
 
 	bindBlockNode( node ) {
 		this.node = node;
-		this.props.blockRef( node );
 	}
 
 	setAttributes( attributes ) {
@@ -214,6 +214,12 @@ class VisualEditorBlock extends wp.element.Component {
 		this.props.onSelect();
 	}
 
+	stopClickPropagation( event ) {
+		// If parent visual editor receives a bubbled click event, it infers as
+		// click outside to clear selected block, so stop bubbling on click.
+		event.stopPropagation();
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const blockType = wp.blocks.getBlockType( block.name );
@@ -255,6 +261,7 @@ class VisualEditorBlock extends wp.element.Component {
 		return (
 			<div
 				ref={ this.bindBlockNode }
+				onClick={ this.stopClickPropagation }
 				onKeyDown={ this.removeOrDeselect }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
