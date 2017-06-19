@@ -53,7 +53,7 @@ class VisualEditor extends Component {
 				ref={ this.bindContainer }
 			>
 				<PostTitle />
-				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+				<VisualEditorBlockList ref={ this.bindBlocksContainer } settings={ this.props.settings } />
 				<Inserter position="top right" />
 			</div>
 		);

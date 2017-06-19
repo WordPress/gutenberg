@@ -23,11 +23,12 @@ registerBlockType( 'core/freeform', {
 		content: <p />,
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, settings } ) {
 		const { content } = attributes;
 
 		return (
 			<FreeformBlock
+				settings={ settings }
 				content={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {

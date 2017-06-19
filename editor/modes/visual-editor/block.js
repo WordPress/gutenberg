@@ -212,7 +212,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids } = this.props;
+		const { block, multiSelectedBlockUids, settings } = this.props;
 		const blockType = wp.blocks.getBlockType( block.name );
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
@@ -303,6 +303,7 @@ class VisualEditorBlock extends wp.element.Component {
 						setFocus={ partial( onFocus, block.uid ) }
 						mergeBlocks={ this.mergeBlocks }
 						id={ block.uid }
+						settings={ settings }
 					/>
 				</div>
 			</div>

@@ -109,9 +109,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	// Editor Styles.
 	wp_register_style(
+		'gutenberg-mce-skin',
+		includes_url( 'js/tinymce/skins/lightgray/skin.min.css' ),
+		array(),
+		'4.0'
+	);
+
+	wp_register_style(
 		'wp-components',
 		gutenberg_url( 'components/build/style.css' ),
-		array(),
+		array( 'gutenberg-mce-skin', 'editor-buttons' ),
 		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
 	);
 	wp_register_style(
@@ -133,10 +140,10 @@ add_action( 'init', 'gutenberg_register_scripts_and_styles' );
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	$suffix = true || SCRIPT_DEBUG ? '' : '.min';
 
 	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	$react_suffix = ( true || SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 	gutenberg_register_vendor_script(
 		'react',
 		'https://unpkg.com/react@next/umd/react' . $react_suffix . '.js'
@@ -354,8 +361,31 @@ function gutenberg_scripts_and_styles( $hook ) {
 		'before'
 	);
 
+	// Legacy Filters
+	$default_plugins = array( 'safari', 'inlinepopups', 'autosave', 'spellchecker', 'paste', 'wordpress', 'media', 'fullscreen', 'wpeditimage' );
+	$plugins = apply_filters( 'mce_external_plugins', array(), 'content' );
+	$editor_settings = array(
+		'buttons' => apply_filters( 'mce_buttons', array(), 'content' ),
+		'buttons2' => apply_filters( 'mce_buttons_2', array(), 'content' ),
+		'buttons3' => apply_filters( 'mce_buttons_3', array(), 'content' ),
+		'buttons4' => apply_filters( 'mce_buttons_4', array(), 'content' ),
+		'plugins' => array_merge( $default_plugins, array_keys( $plugins ) ),
+	);
+	foreach ( $plugins as $plugin => $file ) {
+		wp_enqueue_script(
+			'gutenberg_mce_plugin_' . $plugin,
+			$file
+		);
+	}
+	foreach( $default_plugins as $plugin ) {
+		wp_enqueue_script(
+			'gutenberg_mce_plugin_' . $plugin,
+			includes_url( 'js/tinymce/plugins/' . $plugin . '/plugin.js' )
+		);
+	}
+
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost );' );
+	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost, ' . json_encode( $editor_settings ) . ' );' );
 
 	/**
 	 * Styles

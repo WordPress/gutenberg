@@ -73,10 +73,11 @@ function preparePostState( store, post ) {
 /**
  * Initializes and returns an instance of Editor.
  *
- * @param {String} id   Unique identifier for editor instance
- * @param {Object} post API entity for post to edit
+ * @param {String} id              Unique identifier for editor instance
+ * @param {Object} post            API entity for post to edit
+ * @param {Object} editorSettings  Editor settings
  */
-export function createEditorInstance( id, post ) {
+export function createEditorInstance( id, post, editorSettings = {} ) {
 	const store = createReduxStore();
 
 	preparePostState( store, post );
@@ -84,7 +85,7 @@ export function createEditorInstance( id, post ) {
 	wp.element.render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
-				<Layout />
+				<Layout settings={ editorSettings } />
 			</SlotFillProvider>
 		</ReduxProvider>,
 		document.getElementById( id )

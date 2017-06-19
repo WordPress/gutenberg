@@ -8,14 +8,19 @@ import 'element-closest';
 import { concat, find, flatten, isEqual, omitBy, throttle } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+import { Toolbar } from 'components';
+
+/**
  * Internal dependencies
  */
 import './freeform-block.scss';
-import { __ } from 'i18n';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 import FormatList from './format-list';
-import { Toolbar } from 'components';
+import Buttons from './buttons';
 
 const BLOCK_CONTROLS_SELECTOR = '.editor-visual-editor__block-controls';
 
@@ -104,6 +109,12 @@ function createElement( type, props, ...children ) {
 	);
 }
 
+const builtInButtons = ALIGNMENT_CONTROLS
+	.concat( flatten( FREEFORM_CONTROLS ) )
+	.concat( MORE_CONTROLS )
+	.map( ( control ) => control.id )
+	.concat( 'formatselect' );
+
 export default class FreeformBlock extends wp.element.Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -141,9 +152,10 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	getSettings( baseSettings ) {
+		const { plugins = [] } = this.props.settings;
 		return {
 			...baseSettings,
-			plugins: ( baseSettings.plugins || [] ).concat( 'lists' ),
+			plugins: ( baseSettings.plugins || [] ).concat( 'lists' ).concat( plugins ),
 		};
 	}
 
@@ -195,21 +207,22 @@ export default class FreeformBlock extends wp.element.Component {
 		this.handleFormatChange = formatselect.onselect;
 		this.forceUpdate();
 
-		[ ...ALIGNMENT_CONTROLS, ...flatten( FREEFORM_CONTROLS ), ...MORE_CONTROLS ].forEach( ( control ) => {
-			if ( control.id ) {
-				const button = this.editor.buttons[ control.id ];
-				// TinyMCE uses the first 2 cases, I am not sure about the third.
-				const fnNames = [ 'onPostRender', 'onpostrender', 'OnPostRender' ];
-				const onPostRender = find( fnNames, ( fn ) => button.hasOwnProperty( fn ) );
-				if ( onPostRender ) {
-					button[ onPostRender ].call( {
-						active: ( isActive ) => this.setButtonActive( control.id, isActive ),
-					}, { control: {
-						disabled: ( isDisabled ) => this.setButtonDisabled( control.id, isDisabled ),
-					} } );
-				}
+		[ ...ALIGNMENT_CONTROLS, ...flatten( FREEFORM_CONTROLS ), ...MORE_CONTROLS ]
+		.map( ( control ) => control.id )
+		.forEach( ( control ) => {
+			const button = this.editor.buttons[ control ];
+			// TinyMCE uses the first 2 cases, I am not sure about the third.
+			const fnNames = [ 'onPostRender', 'onpostrender', 'OnPostRender' ];
+			const onPostRender = find( fnNames, ( fn ) => button.hasOwnProperty( fn ) );
+			if ( onPostRender ) {
+				button[ onPostRender ].call( {
+					active: ( isActive ) => this.setButtonActive( control, isActive ),
+				}, { control: {
+					disabled: ( isDisabled ) => this.setButtonDisabled( control, isDisabled ),
+				} } );
 			}
 		} );
+
 		this.updateFocus();
 	}
 
@@ -372,9 +385,11 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { content, focus } = this.props;
+		const { content, focus, settings } = this.props;
 		const { expandDown, showMore } = this.state;
+		const { buttons = [], buttons2 = [], buttons3 = [], buttons4 = [] } = settings;
 		const moreDrawerClasses = classnames( 'more-drawer', expandDown ? 'down' : 'up' );
+
 		return [
 			focus && <BlockControls key="controls">
 				<FormatList
@@ -384,6 +399,9 @@ export default class FreeformBlock extends wp.element.Component {
 					ref={ this.setToolbarRef }
 				/>
 				<Toolbar controls={ this.mapControls( ALIGNMENT_CONTROLS ) } />
+				{ !! buttons.length && (
+					<Buttons buttons={ buttons } exclude={ builtInButtons } editor={ this.editor } />
+				) }
 				<Toolbar
 					controls={ concat( this.mapControls( FREEFORM_CONTROLS ), [ [ {
 						icon: 'ellipsis',
@@ -394,6 +412,15 @@ export default class FreeformBlock extends wp.element.Component {
 							showMore && <div className={ moreDrawerClasses }>
 								<div className="more-draw__arrow" />
 								<Toolbar controls={ this.mapControls( MORE_CONTROLS ) } />
+								{ !! buttons2.length && (
+									<Buttons buttons={ buttons2 } exclude={ builtInButtons } editor={ this.editor } />
+								) }
+								{ !! buttons3.length && (
+									<Buttons buttons={ buttons3 } exclude={ builtInButtons } editor={ this.editor } />
+								) }
+								{ !! buttons4.length && (
+									<Buttons buttons={ buttons4 } exclude={ builtInButtons } editor={ this.editor } />
+								) }
 							</div>
 						),
 					} ] ] ) }
