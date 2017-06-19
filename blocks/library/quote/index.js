@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { switchChildrenNodeName } from 'element';
+import { Toolbar } from 'components';
 
 /**
  * Internal dependencies
@@ -23,16 +24,6 @@ registerBlockType( 'core/quote', {
 		value: query( 'blockquote > p', children() ),
 		citation: children( 'footer' ),
 	},
-
-	controls: [ 1, 2 ].map( ( variation ) => ( {
-		icon: 'format-quote',
-		title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
-		isActive: ( { style = 1 } ) => Number( style ) === variation,
-		onClick( attributes, setAttributes ) {
-			setAttributes( { style: variation } );
-		},
-		subscript: variation,
-	} ) ),
 
 	transforms: {
 		from: [
@@ -119,6 +110,15 @@ registerBlockType( 'core/quote', {
 		return [
 			focus && (
 				<BlockControls key="controls">
+					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
+						icon: 'format-quote',
+						title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
+						isActive: Number( style ) === variation,
+						onClick() {
+							setAttributes( { style: variation } );
+						},
+						subscript: variation,
+					} ) ) } />
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
