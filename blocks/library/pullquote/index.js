@@ -9,6 +9,8 @@ import { __ } from 'i18n';
 import './style.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { children, query } = hpq;
 
@@ -25,11 +27,28 @@ registerBlockType( 'core/pullquote', {
 		citation: children( 'footer' ),
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { value, citation } = attributes;
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
+		}
+	},
 
-		return (
-			<blockquote className="blocks-pullquote">
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { value, citation, align } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+					/>
+				</BlockControls>
+			),
+			<blockquote key="quote" className="blocks-pullquote">
 				<Editable
 					value={ value || __( 'Write Quote…' ) }
 					onChange={
@@ -54,15 +73,15 @@ registerBlockType( 'core/pullquote', {
 						inline
 					/>
 				) }
-			</blockquote>
-		);
+			</blockquote>,
+		];
 	},
 
 	save( { attributes } ) {
-		const { value, citation } = attributes;
+		const { value, citation, align = 'none' } = attributes;
 
 		return (
-			<blockquote className="blocks-pullquote">
+			<blockquote className={ `blocks-pullquote align${ align }` }>
 				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }
