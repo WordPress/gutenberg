@@ -81,7 +81,7 @@ class LastRevision extends Component {
 		const { revisions } = this.state;
 
 		if ( ! revisions.length ) {
-			return false;
+			return null;
 		}
 
 		const lastRevision = revisions[ 0 ];
