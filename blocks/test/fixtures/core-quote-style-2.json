@@ -5,9 +5,10 @@
         "attributes": {
             "style": "2",
             "value": [
-                [
-                    "There is no greater agony than bearing an untold story inside you."
-                ]
+                {
+                    "children": "There is no greater agony than bearing an untold story inside you.",
+                    "type": "p"
+                }
             ],
             "citation": [
                 "Maya Angelou"
