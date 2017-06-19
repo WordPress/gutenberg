@@ -27,6 +27,10 @@ $blocks-button__height: 46px;
 		left: 50%;
 		transform: translateX( -50% );
 	}
+
+	.blocks-editable__tinymce[data-is-empty="true"]:before {
+		position: inherit;
+	}
 }
 
 .editor-visual-editor__block[data-type="core/button"] {
