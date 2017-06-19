@@ -61,6 +61,7 @@
     "eslint-config-wordpress": "^1.1.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
+    "eslint-plugin-react-functional-set-state": "1.0.0",
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "gettext-parser": "^1.2.2",

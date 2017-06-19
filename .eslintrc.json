@@ -26,6 +26,7 @@
 	},
 	"plugins": [
 		"react",
+		"react-functional-set-state",
 		"jsx-a11y"
 	],
 	"settings": {
@@ -94,6 +95,7 @@
 		"react/jsx-key": "error",
 		"react/jsx-space-before-closing": "error",
 		"react/prop-types": "off",
+		"react-functional-set-state/no-this-state-props": "error",
 		"semi": "error",
 		"semi-spacing": "error",
 		"space-before-blocks": [ "error", "always" ],
