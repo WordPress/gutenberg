@@ -126,4 +126,4 @@ function do_blocks( $content ) {
 
 	return $new_content;
 }
-add_filter( 'the_content', 'do_blocks', 10 ); // BEFORE do_shortcode().
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
