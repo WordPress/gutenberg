@@ -88,7 +88,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		register_block_type( 'core/dummy', $settings );
 		$post_content =
 			'before' .
-			'<!-- wp:core/dummy value="b1" -->this should be ignored<!-- /wp:core/dummy -->' .
+			"<!-- wp:core/dummy value=\"b1\" -->this\nshould\n\nbe\nignored<!-- /wp:core/dummy -->" .
 			'between' .
 			'<!-- wp:core/dummy value="b2" -->this should also be ignored<!-- /wp:core/dummy -->' .
 			'after';
