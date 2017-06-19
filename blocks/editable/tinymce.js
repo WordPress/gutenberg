@@ -48,10 +48,13 @@ export default class TinyMCE extends wp.element.Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			plugins: [],
 			formats: {
 				strikethrough: { inline: 'del' },
 			},
 		} );
+
+		settings.plugins.push( 'paste' );
 
 		tinymce.init( {
 			...settings,
