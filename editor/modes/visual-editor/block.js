@@ -11,7 +11,6 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children } from 'element';
-import { Toolbar } from 'components';
 import { BACKSPACE, ESCAPE } from 'utils/keycodes';
 
 /**
@@ -277,14 +276,6 @@ class VisualEditorBlock extends wp.element.Component {
 					>
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
-							{ !! blockType.controls && (
-								<Toolbar
-									controls={ blockType.controls.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( block.attributes, this.setAttributes ),
-										isActive: control.isActive ? control.isActive( block.attributes ) : false,
-									} ) ) } />
-							) }
 							<Slot name="Formatting.Toolbar" />
 						</div>
 					</CSSTransitionGroup>
