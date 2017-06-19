@@ -38,15 +38,12 @@
 		background: $light-gray-400;
 	}
 
-	&[data-is-empty="true"] {
-		position: relative;
-	}
-
-	&[data-is-empty="true"]:before {
+	&[data-is-empty="true"]:after {
 		content: attr( data-placeholder );
+		display: block;
 		opacity: 0.5;
 		pointer-events: none;
-		position: absolute;
+		transform: translateY( -100% );
 	}
 }
 
