@@ -45,7 +45,7 @@
 	}
 
 	&.is-hovered:before {
-		outline: 1px dotted $light-gray-500;
+		outline: 1px solid $light-gray-500;
 		transition: 0.2s outline;
 	}
 
@@ -273,14 +273,13 @@ $sticky-bottom-offset: 20px;
 	transition: 0.2s outline;
 	text-align: left;
 	width: 100%;
-	color: inherit;
-	opacity: 0.5;
+	color: $light-gray-700;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	cursor: text;
 	left: -1px;
 
 	&:hover {
-		outline: 1px dotted $light-gray-500;
+		outline: 1px solid $light-gray-500;
 	}
 }
