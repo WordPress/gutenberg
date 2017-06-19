@@ -102,26 +102,37 @@ function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
 	// Extract the blocks from the post content.
-	$matcher = '/<!--\s*wp:([a-z](?:[a-z0-9\/]+)*)\s+((?:(?!-->).)*)\s*\/?-->(?:.*?<!--\s*\/wp:\g1\s+-->)?/s';
+	$matcher = '#' . join( '', array(
+		'(?P<opener><!--\s*',
+		'wp:(?P<block_name>[a-z](?:[a-z0-9/]+)*)\s+',
+		'(?P<attributes>(?:(?!-->).)*)',
+		'\s*/?-->\n?)',
+		'(?:',
+		'(?P<content>.*?)',
+		'(?P<closer><!--\s*/wp:\g{block_name}\s+-->\n?)',
+		')?',
+	) ) . '#s';
 	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
 
 	$new_content = $content;
 	foreach ( $matches[0] as $index => $block_match ) {
-		$block_name = $matches[1][ $index ][0];
-		// do nothing if the block is not registered.
+		$block_name = $matches['block_name'][ $index ][0];
+
+		$output = '';
 		if ( ! isset( $wp_registered_blocks[ $block_name ] ) ) {
-			continue;
+			if ( isset( $matches['content'][ $index ][0] ) ) {
+				$output = $matches['content'][ $index ][0];
+			}
+		} else {
+			$block_attributes_string = $matches['attributes'][ $index ][0];
+			$block_attributes = parse_block_attributes( $block_attributes_string );
+
+			// Call the block's render function to generate the dynamic output.
+			$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
 		}
 
-		$block_markup = $block_match[0];
-		$block_attributes_string = $matches[2][ $index ][0];
-		$block_attributes = parse_block_attributes( $block_attributes_string );
-
-		// Call the block's render function to generate the dynamic output.
-		$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
-
-		// Replace the matched block with the dynamic output.
-		$new_content = str_replace( $block_markup, $output, $new_content );
+		// Replace the matched block with the static or dynamic output.
+		$new_content = str_replace( $block_match[0], $output, $new_content );
 	}
 
 	return $new_content;
