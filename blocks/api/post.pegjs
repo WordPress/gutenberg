@@ -42,7 +42,7 @@ WP_Block_Balanced
   } }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced c:Any { return c })+
+  = ts:(!WP_Block_Balanced !WP_Block_Void c:Any { return c })+
   {
     return {
       attrs: {},
