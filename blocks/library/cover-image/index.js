@@ -34,8 +34,6 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 		button: {
 			text: wp.i18n.__( 'Select' ),
 		},
-		// TODO select
-		selection: new wp.media.model.Selection( attributes.image ),
 	};
 
 	const editFrame = wp.media( frameConfig );
