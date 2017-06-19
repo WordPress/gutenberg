@@ -115,6 +115,7 @@ function do_blocks( $content ) {
 	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
 
 	$new_content = $content;
+	$offset_differential = 0;
 	foreach ( $matches[0] as $index => $block_match ) {
 		$block_name = $matches['block_name'][ $index ][0];
 
@@ -132,7 +133,15 @@ function do_blocks( $content ) {
 		}
 
 		// Replace the matched block with the static or dynamic output.
-		$new_content = str_replace( $block_match[0], $output, $new_content );
+		$new_content = substr_replace(
+			$new_content,
+			$output,
+			$block_match[1] - $offset_differential,
+			strlen( $block_match[0] )
+		);
+
+		// Update offset for the next replacement.
+		$offset_differential += strlen( $block_match[0] ) - strlen( $output );
 	}
 
 	return $new_content;
