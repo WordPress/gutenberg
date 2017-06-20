@@ -104,7 +104,7 @@ function do_blocks( $content ) {
 			$block_attributes_string = trim( $matches['attributes'][ $index ][0] );
 			$block_attributes = json_decode( $block_attributes_string, true );
 			if ( ! is_array( $block_attributes ) ) {
-				$block_attributes = arraty();
+				$block_attributes = array();
 			}
 
 			// Call the block's render function to generate the dynamic output.
