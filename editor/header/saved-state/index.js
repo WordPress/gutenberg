@@ -24,7 +24,7 @@ import {
 	getEditedPostAttribute,
 } from '../../selectors';
 
-function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+export function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-saved-state';
 
 	if ( isSaving ) {
