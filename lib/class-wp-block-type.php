@@ -3,13 +3,13 @@
  * Blocks API: WP_Block_Type class
  *
  * @package gutenberg
- * @since 0.1.0
+ * @since 0.2.0
  */
 
 /**
  * Core class representing a block type.
  *
- * @since 0.1.0
+ * @since 0.2.0
  *
  * @see register_block_type()
  */
@@ -17,7 +17,7 @@ final class WP_Block_Type {
 	/**
 	 * Block type key.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 * @var string
 	 */
@@ -26,7 +26,7 @@ final class WP_Block_Type {
 	/**
 	 * Block type render callback.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 * @var callable
 	 */
@@ -37,7 +37,7 @@ final class WP_Block_Type {
 	 *
 	 * Will populate object properties from the provided arguments.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @see register_block_type()
@@ -55,7 +55,7 @@ final class WP_Block_Type {
 	/**
 	 * Sets block type properties.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @param array|string $args Array or string of arguments for registering a block type.
@@ -66,7 +66,7 @@ final class WP_Block_Type {
 		/**
 		 * Filters the arguments for registering a block type.
 		 *
-		 * @since 0.1.0
+		 * @since 0.2.0
 		 *
 		 * @param array  $args       Array of arguments for registering a block type.
 		 * @param string $block_type Block type key.

@@ -3,19 +3,19 @@
  * Blocks API: WP_Block_Type_Registry class
  *
  * @package gutenberg
- * @since 0.1.0
+ * @since 0.2.0
  */
 
 /**
  * Core class used for interacting with block types.
  *
- * @since 0.1.0
+ * @since 0.2.0
  */
 final class WP_Block_Type_Registry {
 	/**
 	 * Registered block types, as `$name => $instance` pairs.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access private
 	 * @var array
 	 */
@@ -24,7 +24,7 @@ final class WP_Block_Type_Registry {
 	/**
 	 * Container for the main instance of the class.
 	 *
-	 * @since 1.0.0
+	 * @since 0.2.0
 	 * @access private
 	 * @static
 	 * @var WP_Block_Type_Registry|null
@@ -34,7 +34,7 @@ final class WP_Block_Type_Registry {
 	/**
 	 * Registers a block type.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @param string $name Block type name including namespace.
@@ -77,7 +77,7 @@ final class WP_Block_Type_Registry {
 	/**
 	 * Unregisters a block type.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @param string $name Block type name including namespace.
@@ -100,7 +100,7 @@ final class WP_Block_Type_Registry {
 	/**
 	 * Retrieves a registered block type.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @param string $name Block type name including namespace.
@@ -117,7 +117,7 @@ final class WP_Block_Type_Registry {
 	/**
 	 * Checks if a block type is registered.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 *
 	 * @param tring $name Block type name including namespace.
@@ -132,7 +132,7 @@ final class WP_Block_Type_Registry {
 	 *
 	 * The instance will be created if it does not exist yet.
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
 	 * @static
 	 *
