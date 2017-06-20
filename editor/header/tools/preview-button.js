@@ -13,11 +13,11 @@ import { IconButton } from 'components';
  */
 import { getEditedPostPreviewLink } from '../../selectors';
 
-function PreviewButton( { link } ) {
+function PreviewButton( { link, postId } ) {
 	return (
 		<IconButton
 			href={ link }
-			target="_blank"
+			target={ `wp-preview-${ postId }` }
 			icon="visibility"
 			disabled={ ! link }
 		>
@@ -28,6 +28,7 @@ function PreviewButton( { link } ) {
 
 export default connect(
 	( state ) => ( {
+		postId: state.currentPost.id,
 		link: getEditedPostPreviewLink( state ),
 	} )
 )( PreviewButton );
