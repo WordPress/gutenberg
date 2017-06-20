@@ -207,8 +207,8 @@ export default class Editable extends wp.element.Component {
 			event.stopImmediatePropagation();
 		}
 
-		// If we click shift+Enter on inline Editables, we should avoid creating `p` tags
-		// We should also split the content if splitting is allowed.
+		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
+		// We also split the content and call the onSplit prop if provided.
 		if ( event.keyCode === ENTER && event.shiftKey && this.props.inline ) {
 			event.preventDefault();
 
