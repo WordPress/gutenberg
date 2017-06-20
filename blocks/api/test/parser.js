@@ -270,8 +270,8 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should parse void blocks', () => {
-			registerBlockType( 'core/test-block', {} );
-			registerBlockType( 'core/void-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockType );
+			registerBlockType( 'core/void-block', defaultBlockType );
 			const parsed = parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
 				'<!-- wp:core/void-block /-->'
