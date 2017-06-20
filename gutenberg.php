@@ -13,21 +13,9 @@
 define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
-// Add check to ensure WordPress Verion.
-if ( version_compare( $wp_version, '4.8', '<' ) ) {
-	add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
-	/**
-	 * Display a notice and deactivate Gutenberg
-	 */
-	function gutenberg_wordpress_version_notice() {
-		echo '<div class="error"><p>';
-		echo __( 'Gutenberg requires WordPress 4.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
-		echo '</p></div>';
-
-		deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
-	}
-} else {
-	// Load API functions.
+require_once dirname( __FILE__ ) . '/lib/init-checks.php';
+if ( gutenberg_can_init() ) {
+	// Load API functions, register scripts and actions, etc.
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';
 	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
 	require_once dirname( __FILE__ ) . '/lib/i18n.php';
