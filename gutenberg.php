@@ -21,7 +21,7 @@ if ( version_compare( $wp_version, '4.8', '<' ) ) {
 	 */
 	function gutenberg_wordpress_version_notice() {
 		echo '<div class="error"><p>';
-		echo __( 'Gutenberg requires WordPress 4.8 to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+		echo __( 'Gutenberg requires WordPress 4.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 		echo '</p></div>';
 
 		deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
