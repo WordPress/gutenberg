@@ -120,16 +120,14 @@ function do_blocks( $content ) {
 		$block_name = $matches['block_name'][ $index ][0];
 
 		$output = '';
-		if ( ! isset( $wp_registered_blocks[ $block_name ] ) ) {
-			if ( isset( $matches['content'][ $index ][0] ) ) {
-				$output = $matches['content'][ $index ][0];
-			}
-		} else {
+		if ( isset( $wp_registered_blocks[ $block_name ] ) ) {
 			$block_attributes_string = $matches['attributes'][ $index ][0];
 			$block_attributes = parse_block_attributes( $block_attributes_string );
 
 			// Call the block's render function to generate the dynamic output.
 			$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
+		} elseif ( isset( $matches['content'][ $index ][0] ) ) {
+			$output = $matches['content'][ $index ][0];
 		}
 
 		// Replace the matched block with the static or dynamic output.
