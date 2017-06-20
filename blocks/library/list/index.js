@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, createElement, switchChildrenNodeName } from 'element';
+import { Component, createElement } from 'element';
 import { find } from 'lodash';
 import { __ } from 'i18n';
 
@@ -14,6 +14,42 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 
 const { children, prop } = hpq;
+
+const fromBrDelimitedContent = function( content ) {
+	const listItems = [];
+	listItems.push( createElement( 'li', [], [] ) );
+	content.forEach( function( element, elementIndex, elements ) {
+		// "split" the incoming content on 'br' elements
+		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
+			// if is br and there are more elements to come, push a new list item
+			listItems.push( createElement( 'li', [], [] ) );
+		} else {
+			listItems[ listItems.length - 1 ].props.children.push( element );
+		}
+	} );
+	return listItems;
+};
+
+const toBrDelimitedContent = function( values ) {
+	const content = [];
+	values.forEach( function( li, liIndex, listItems ) {
+		if ( Array.isArray( li.props.children ) ) {
+			li.props.children.forEach( function( element, elementIndex, liChildren ) {
+				content.push( element );
+				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
+					// last element in this list item, but not last element overall
+					content.push( createElement( 'br' ) );
+				}
+			} );
+		} else {
+			content.push( li.props.children );
+			if ( liIndex !== listItems.length - 1 ) {
+				content.push( createElement( 'br' ) );
+			}
+		}
+	} );
+	return content;
+};
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
@@ -33,10 +69,25 @@ registerBlockType( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values: switchChildrenNodeName( content, 'li' ),
+						values: fromBrDelimitedContent( content ),
 					} );
 				},
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { value, citation } ) => {
+					const listItems = fromBrDelimitedContent( value );
+					const values = citation
+						? wp.element.concatChildren( listItems, <li>{ citation }</li> )
+						: listItems;
+					return createBlock( 'core/list', {
+						nodeName: 'ul',
+						values,
+					} );
+				},
+			},
+
 		],
 		to: [
 			{
@@ -44,7 +95,16 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/text' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/text', {
-						content: switchChildrenNodeName( values, 'p' ),
+						content: toBrDelimitedContent( values ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: toBrDelimitedContent( values ),
 					} );
 				},
 			},
