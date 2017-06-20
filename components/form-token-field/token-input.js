@@ -48,7 +48,7 @@ class TokenInput extends Component {
 				aria-autocomplete="list"
 				aria-owns={ `components-form-token-suggestions-${ instanceId }` }
 				aria-activedescendant={ selectedSuggestionIndex !== -1 ? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }` : undefined }
-				aria-describedby={ `components-form-token-suggestions-howto-${ this.instanceId }` }
+				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
 			/>
 		);
 	}
