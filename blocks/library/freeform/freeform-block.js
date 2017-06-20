@@ -170,7 +170,7 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	toggleMoreDrawer() {
-		this.setState( { showMore: ! this.state.showMore } );
+		this.setState( state => ( { showMore: ! state.showMore } ) );
 	}
 
 	setToolbarRef( elem ) {
