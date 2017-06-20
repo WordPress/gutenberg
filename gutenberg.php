@@ -13,11 +13,14 @@
 define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
-// Load API functions.
-require_once dirname( __FILE__ ) . '/lib/blocks.php';
-require_once dirname( __FILE__ ) . '/lib/client-assets.php';
-require_once dirname( __FILE__ ) . '/lib/i18n.php';
-require_once dirname( __FILE__ ) . '/lib/register.php';
+require_once dirname( __FILE__ ) . '/lib/init-checks.php';
+if ( gutenberg_can_init() ) {
+	// Load API functions, register scripts and actions, etc.
+	require_once dirname( __FILE__ ) . '/lib/blocks.php';
+	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
+	require_once dirname( __FILE__ ) . '/lib/i18n.php';
+	require_once dirname( __FILE__ ) . '/lib/register.php';
 
-// Register server-side code for individual blocks.
-require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
+	// Register server-side code for individual blocks.
+	require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
+}
