@@ -240,6 +240,7 @@ export default class Editable extends wp.element.Component {
 			}
 
 			this.editor.dom.remove( prevNode );
+			this.editor.dom.remove( endNode );
 			this.splitContent();
 		}
 	}
