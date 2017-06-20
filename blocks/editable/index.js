@@ -109,7 +109,11 @@ export default class Editable extends Component {
 		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
-			empty: ! content || ! content.length,
+			empty:
+				! content ||
+				! content.length ||
+				// On non-inline editables, TinyMCE appends an empty <p> tag
+				( ! this.props.inline && content.length === 1 && ! content[ 0 ].props.children ),
 		} );
 
 		if (
