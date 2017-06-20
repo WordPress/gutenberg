@@ -44,6 +44,19 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( ! settings ||
+			( settings && typeof settings.save !== 'function' ) ) {
+		console.error(
+			'A "save" function must be created within the block settings.'
+		);
+		return;
+	}
+	if ( settings && 'edit' in settings && typeof settings.edit !== 'function' ) {
+		console.error(
+			'The "edit" property must be a valid function.'
+		);
+		return;
+	}
 	if ( blocks[ name ] ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
