@@ -459,7 +459,11 @@ class FormTokenField extends Component {
 	}
 
 	render() {
-		const { disabled, placeholder, instanceId } = this.props;
+		const {
+			disabled,
+			placeholder = _( 'Add item.' ),
+			instanceId,
+		} = this.props;
 		const classes = classnames( 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
@@ -481,7 +485,7 @@ class FormTokenField extends Component {
 
 		return (
 			<div { ...tokenFieldProps } >
-				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="components-form-token__howto">
+				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="screen-reader-text">
 					{ placeholder }
 				</label>
 				<div ref={ this.bindTokensAndInput }
@@ -503,7 +507,7 @@ class FormTokenField extends Component {
 					onHover={ this.onSuggestionHovered }
 					onSelect={ this.onSuggestionSelected }
 				/>
-				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token__howto">
+				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Separate with commas' ) }
 				</div>
 			</div>
@@ -528,7 +532,5 @@ FormTokenField.defaultProps = {
 		remove: __( 'Remove item: %s.' ),
 	},
 };
-
-FormTokenField.instances = 0;
 
 export default withInstanceId( FormTokenField );
