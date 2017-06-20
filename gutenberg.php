@@ -13,11 +13,26 @@
 define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
-// Load API functions.
-require_once dirname( __FILE__ ) . '/lib/blocks.php';
-require_once dirname( __FILE__ ) . '/lib/client-assets.php';
-require_once dirname( __FILE__ ) . '/lib/i18n.php';
-require_once dirname( __FILE__ ) . '/lib/register.php';
+// Add check to ensure WordPress Verion.
+if ( version_compare( $wp_version, '4.8', '<' ) ) {
+	add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+	/**
+	 * Display a notice and deactivate Gutenberg
+	 */
+	function gutenberg_wordpress_version_notice() {
+		echo '<div class="error"><p>';
+		echo __( 'Gutenburg requires WordPress 4.8 to function properly. Please upgrade WordPress before activating Gutenburg.', 'gutenberg' );
+		echo '</p></div>';;
 
-// Register server-side code for individual blocks.
-require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
+		deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+	}
+} else {
+	// Load API functions.
+	require_once dirname( __FILE__ ) . '/lib/blocks.php';
+	require_once dirname( __FILE__ ) . '/lib/client-assets.php';
+	require_once dirname( __FILE__ ) . '/lib/i18n.php';
+	require_once dirname( __FILE__ ) . '/lib/register.php';
+
+	// Register server-side code for individual blocks.
+	require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
+}
