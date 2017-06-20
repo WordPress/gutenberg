@@ -207,9 +207,12 @@ export default class Editable extends wp.element.Component {
 			event.stopImmediatePropagation();
 		}
 
-		if ( event.keyCode === ENTER && this.props.inline && this.props.onSplit && event.shiftKey ) {
+		if ( event.keyCode === ENTER && event.shiftKey && this.props.inline ) {
 			event.preventDefault();
-			this.splitContent();
+
+			if ( this.props.onSplit ) {
+				this.splitContent();
+			}
 		}
 	}
 
