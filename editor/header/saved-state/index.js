@@ -25,10 +25,6 @@ import {
 } from '../../selectors';
 
 function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
-	if ( ! isSaveable ) {
-		return null;
-	}
-
 	const className = 'editor-saved-state';
 
 	if ( isSaving ) {
@@ -38,6 +34,11 @@ function SavedState( { isNew, isDirty, isSaving, isSaveable, status, onStatusCha
 			</span>
 		);
 	}
+
+	if ( ! isSaveable ) {
+		return null;
+	}
+
 	if ( ! isNew && ! isDirty ) {
 		return (
 			<span className={ className }>
