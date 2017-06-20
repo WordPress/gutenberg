@@ -311,6 +311,29 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 */
 	wp_enqueue_media();
 
+	// Export REST bases for all post types.
+	$post_type_rest_base_mapping = array();
+	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
+		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
+	}
+	$script = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
+	$script .= <<<JS
+		wp.api.getPostTypeModel = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
+			return _.first( _.filter( wp.api.models, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+		wp.api.getPostTypeRevisionsCollection = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
+			return _.first( _.filter( wp.api.collections, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+JS;
+	wp_add_inline_script( 'wp-api', $script );
+
 	// The editor code itself.
 	wp_enqueue_script(
 		'wp-editor',
@@ -346,14 +369,11 @@ function gutenberg_scripts_and_styles( $hook ) {
 		wp_die( __( 'Unauthorized to edit post.', 'gutenberg' ) );
 	}
 
-	// @todo Export to JS.
-	$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-
 	$post_to_edit = null;
 	if ( $post ) {
 		$request = new WP_REST_Request(
 			'GET',
-			sprintf( '/wp/v2/%s/%d', $rest_base, $post->ID )
+			sprintf( '/wp/v2/%s/%d', $post_type_rest_base_mapping[ $post->post_type ], $post->ID )
 		);
 		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );

@@ -43,7 +43,8 @@ export default {
 			edits: toSend,
 			optimist: { id: transactionId },
 		} );
-		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
+		const Model = wp.api.getPostTypeModel( state.currentPost.type );
+		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
@@ -79,7 +80,8 @@ export default {
 	TRASH_POST( action, store ) {
 		const { dispatch } = store;
 		const { postId } = action;
-		new wp.api.models.Post( { id: postId } ).destroy().done( () => {
+		const Model = wp.api.getPostTypeModel( store.getState().currentPost.type );
+		new Model( { id: postId } ).destroy().done( () => {
 			dispatch( {
 				...action,
 				type: 'TRASH_POST_SUCCESS',
