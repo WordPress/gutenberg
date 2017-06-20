@@ -61,23 +61,9 @@ final class WP_Block_Type {
 	 * @param array|string $args Array or string of arguments for registering a block type.
 	 */
 	public function set_props( $args ) {
-		$args = wp_parse_args( $args );
-
-		/**
-		 * Filters the arguments for registering a block type.
-		 *
-		 * @since 0.2.0
-		 *
-		 * @param array  $args       Array of arguments for registering a block type.
-		 * @param string $block_type Block type key.
-		 */
-		$args = apply_filters( 'register_block_type_args', $args, $this->name );
-
-		$defaults = array(
+		$args = wp_parse_args( $args, array(
 			'render' => null,
-		);
-
-		$args = array_merge( $defaults, $args );
+		) );
 
 		$args['name'] = $this->name;
 
