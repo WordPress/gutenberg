@@ -164,4 +164,4 @@ export default connect(
 			return editPost( { status, password } );
 		},
 	}
-)( clickOutside( withInstanceId( PostVisibility ) ) );
+)( withInstanceId( clickOutside( PostVisibility ) ) );
