@@ -20,6 +20,7 @@ import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
 import { clearSelectedBlock, multiSelect } from '../../actions';
+import { isEditableElement } from '../../utils/dom';
 
 class VisualEditor extends Component {
 	constructor() {
@@ -54,10 +55,8 @@ class VisualEditor extends Component {
 
 	onKeyDown( event ) {
 		const { uids } = this.props;
-		const isEditable = [ 'textarea', 'input', 'select' ].indexOf( document.activeElement.tagName.toLowerCase() ) !== -1
-			|| document.activeElement.isContentEditable;
 		if (
-			! isEditable &&
+			! isEditableElement( document.activeElement ) &&
 			( event.ctrlKey || event.metaKey ) &&
 			event.keyCode === CHAR_A
 		) {
