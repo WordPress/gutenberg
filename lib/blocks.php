@@ -70,27 +70,6 @@ function unregister_block_type( $name ) {
 }
 
 /**
- * Extract the block attributes from the block's attributes string
- *
- * @since 0.1.0
- * @deprecated No longer used since block attributes are stored as JSON.
- *
- * @param string $attr_string Attributes string.
-
- * @return array
- */
-function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
-	preg_match_all( $attributes_matcher, $attr_string, $matches );
-	$attributes = array();
-	foreach ( $matches[1] as $index => $attribute_match ) {
-		$attributes[ $attribute_match ] = $matches[2][ $index ];
-	}
-
-	return $attributes;
-}
-
-/**
  * Renders the dynamic blocks into the post content
  *
  * @since 0.1.0
@@ -123,10 +102,9 @@ function do_blocks( $content ) {
 		$output = '';
 		if ( isset( $wp_registered_blocks[ $block_name ] ) ) {
 			$block_attributes_string = trim( $matches['attributes'][ $index ][0] );
-			if ( '{' === substr( $block_attributes_string, 0, 1 ) ) {
-				$block_attributes = json_decode( $block_attributes_string, true );
-			} else {
-				$block_attributes = parse_block_attributes( $block_attributes_string ); // @todo Remove later once block attributes have been migrated to JSON.
+			$block_attributes = json_decode( $block_attributes_string, true );
+			if ( ! is_array( $block_attributes ) ) {
+				$block_attributes = arraty();
 			}
 
 			// Call the block's render function to generate the dynamic output.
