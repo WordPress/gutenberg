@@ -92,7 +92,7 @@ const MORE_CONTROLS = [
 
 const MORE_DRAWER_HEIGHT = 40;
 
-function createTinymceElement( type, props, ...children ) {
+function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -332,7 +332,7 @@ export default class FreeformBlock extends Component {
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinymceElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	mapControls( controls ) {

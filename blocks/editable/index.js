@@ -20,7 +20,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-function createTinymceElement( type, props, ...children ) {
+function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -262,8 +262,8 @@ export default class Editable extends Component {
 		const beforeFragment = beforeRange.extractContents();
 		const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinymceElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createTinymceElement );
+		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 		this.setContent( beforeElement );
 		this.props.onSplit( beforeElement, afterElement );
@@ -312,8 +312,8 @@ export default class Editable extends Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createTinymceElement ),
-			nodeListToReact( after, createTinymceElement )
+			nodeListToReact( before, createTinyMCEElement ),
+			nodeListToReact( after, createTinyMCEElement )
 		);
 	}
 
@@ -352,7 +352,7 @@ export default class Editable extends Component {
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinymceElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	updateFocus() {
