@@ -52,6 +52,7 @@ export default class Editable extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.onPastePostProcess = this.onPastePostProcess.bind( this );
 
 		this.state = {
 			formats: {},
@@ -77,6 +78,7 @@ export default class Editable extends Component {
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
+		editor.on( 'PastePostProcess', this.onPastePostProcess );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -120,6 +122,26 @@ export default class Editable extends Component {
 				...this.props.focus,
 				collapsed,
 			} );
+		}
+	}
+
+	onPastePostProcess( event ) {
+		const childNodes = Array.from( event.node.childNodes );
+		const isComment = ( node ) => node.nodeType === 8;
+		const mayBePartOfBlock = ( node ) => isComment( node ) || this.editor.dom.isBlock( node );
+
+		// If we detect comments or block level elements, insert as blocks.
+		// If there's no `onSplit` prop, content will later be converted to
+		// inline content.
+		if ( this.props.onSplit && childNodes.some( mayBePartOfBlock ) ) {
+			const HTML = event.node.innerHTML.replace( /<meta[^>]+>/, '' );
+			const blocks = wp.blocks.parse( HTML );
+
+			event.preventDefault();
+
+			// We must wait for TinyMCE to clean up paste containers after this
+			// event.
+			window.setTimeout( () => this.splitContent( blocks ), 0 );
 		}
 	}
 
@@ -246,7 +268,7 @@ export default class Editable extends Component {
 		}
 	}
 
-	splitContent() {
+	splitContent( blocks = [] ) {
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
@@ -266,7 +288,7 @@ export default class Editable extends Component {
 		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 		this.setContent( beforeElement );
-		this.props.onSplit( beforeElement, afterElement );
+		this.props.onSplit( beforeElement, afterElement, ...blocks );
 	}
 
 	onNewBlock() {
