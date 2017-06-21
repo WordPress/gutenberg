@@ -126,6 +126,7 @@ class PostVisibility extends Component {
 										checked={ checked }
 										id={ `editor-post-${ value }-${ instanceId }` }
 										aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+										className="editor-post-visibility__dialog-radio"
 									/>
 									<label
 										htmlFor={ `editor-post-${ value }-${ instanceId }` }

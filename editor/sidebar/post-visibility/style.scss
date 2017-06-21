@@ -62,12 +62,16 @@
 .editor-post-visibility__dialog-legend {
 	font-weight: 600;
 	font-size: 0.9em;
-
 }
 
 .editor-post-visibility__choice {
 	display: block;
 	margin: 10px 0;
+}
+
+.editor-post-visibility__dialog-radio,
+.editor-post-visibility__dialog-label {
+	vertical-align: top;
 }
 
 .editor-post-visibility__dialog-password-input {
