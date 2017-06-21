@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from 'element';
+import { Component, createElement, Children } from 'element';
 import { find } from 'lodash';
 import { __ } from 'i18n';
 
@@ -15,7 +15,11 @@ import BlockControls from '../../block-controls';
 
 const { children, prop } = hpq;
 
-const fromBrDelimitedContent = function( content ) {
+const fromBrDelimitedContent = ( content ) => {
+	if ( undefined === content ) {
+		// converting an empty block to a list block
+		return content;
+	}
 	const listItems = [];
 	listItems.push( createElement( 'li', [], [] ) );
 	content.forEach( function( element, elementIndex, elements ) {
@@ -30,23 +34,32 @@ const fromBrDelimitedContent = function( content ) {
 	return listItems;
 };
 
-const toBrDelimitedContent = function( values ) {
+const toBrDelimitedContent = ( values ) => {
+	if ( undefined === values ) {
+		// converting an empty list
+		return values;
+	}
 	const content = [];
 	values.forEach( function( li, liIndex, listItems ) {
-		if ( Array.isArray( li.props.children ) ) {
-			li.props.children.forEach( function( element, elementIndex, liChildren ) {
+		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
+			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
+				// we know we've just finished processing a list item, so break the text
+				content.push( createElement( 'br' ) );
+				// push each element from the child list's converted content
+				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
+				// add a break if there are more list items to come, because the recursive call won't
+				// have added it when it finished processing the child list because it thinks the content ended
+				if ( liIndex !== listItems.length - 1 ) {
+					content.push( createElement( 'br' ) );
+				}
+			} else {
 				content.push( element );
 				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
 					// last element in this list item, but not last element overall
 					content.push( createElement( 'br' ) );
 				}
-			} );
-		} else {
-			content.push( li.props.children );
-			if ( liIndex !== listItems.length - 1 ) {
-				content.push( createElement( 'br' ) );
 			}
-		}
+		} );
 	} );
 	return content;
 };
