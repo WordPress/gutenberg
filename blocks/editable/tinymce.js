@@ -4,7 +4,12 @@
 import tinymce from 'tinymce';
 import { isEqual } from 'lodash';
 
-export default class TinyMCE extends wp.element.Component {
+/**
+ * WordPress dependencies
+ */
+import { Component, Children, createElement } from 'element';
+
+export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
 	}
@@ -78,10 +83,10 @@ export default class TinyMCE extends wp.element.Component {
 		// us to show and focus the content before it's truly ready to edit.
 		let children;
 		if ( defaultValue ) {
-			children = wp.element.Children.toArray( defaultValue );
+			children = Children.toArray( defaultValue );
 		}
 
-		return wp.element.createElement( tagName, {
+		return createElement( tagName, {
 			ref: ( node ) => this.editorNode = node,
 			contentEditable: true,
 			suppressContentEditableWarning: true,

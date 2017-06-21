@@ -3,19 +3,23 @@
  */
 import classnames from 'classnames';
 import { nodeListToReact } from 'dom-react';
-import { findDOMNode } from 'element';
 import 'element-closest';
 import { concat, find, flatten, isEqual, omitBy, throttle } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { Component, createElement, renderToString, findDOMNode } from 'element';
+import { __ } from 'i18n';
+import { Toolbar } from 'components';
 
 /**
  * Internal dependencies
  */
 import './freeform-block.scss';
-import { __ } from 'i18n';
 import TinyMCE from '../../editable/tinymce';
 import BlockControls from '../../block-controls';
 import FormatList from './format-list';
-import { Toolbar } from 'components';
 
 const BLOCK_CONTROLS_SELECTOR = '.editor-visual-editor__block-controls';
 
@@ -88,7 +92,7 @@ const MORE_CONTROLS = [
 
 const MORE_DRAWER_HEIGHT = 40;
 
-function createElement( type, props, ...children ) {
+function createTinymceElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -97,14 +101,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class FreeformBlock extends wp.element.Component {
+export default class FreeformBlock extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.getSettings = this.getSettings.bind( this );
@@ -323,12 +327,12 @@ export default class FreeformBlock extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinymceElement );
 	}
 
 	mapControls( controls ) {

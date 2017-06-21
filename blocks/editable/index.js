@@ -10,6 +10,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
+import { createElement, Component, renderToString } from 'element';
 import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
@@ -19,7 +20,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-function createElement( type, props, ...children ) {
+function createTinymceElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -28,14 +29,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class Editable extends wp.element.Component {
+export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -261,8 +262,8 @@ export default class Editable extends wp.element.Component {
 		const beforeFragment = beforeRange.extractContents();
 		const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createElement );
+		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinymceElement );
+		const afterElement = nodeListToReact( afterFragment.childNodes, createTinymceElement );
 
 		this.setContent( beforeElement );
 		this.props.onSplit( beforeElement, afterElement );
@@ -311,8 +312,8 @@ export default class Editable extends wp.element.Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			nodeListToReact( before, createTinymceElement ),
+			nodeListToReact( after, createTinymceElement )
 		);
 	}
 
@@ -346,12 +347,12 @@ export default class Editable extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinymceElement );
 	}
 
 	updateFocus() {

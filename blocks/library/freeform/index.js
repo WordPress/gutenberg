@@ -1,3 +1,7 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -9,7 +13,7 @@ import FreeformBlock from './freeform-block';
 const { children } = query;
 
 registerBlockType( 'core/freeform', {
-	title: wp.i18n.__( 'Freeform' ),
+	title: __( 'Freeform' ),
 
 	icon: 'text',
 

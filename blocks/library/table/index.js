@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+import { createElement } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -10,7 +16,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 const { children, query } = hpq;
 
 registerBlockType( 'core/table', {
-	title: wp.i18n.__( 'Table' ),
+	title: __( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
@@ -48,7 +54,7 @@ registerBlockType( 'core/table', {
 			<table key="table">
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
 					attributes[ part ] && attributes[ part ].length
-						? wp.element.createElement( 't' + part, { key: part },
+						? createElement( 't' + part, { key: part },
 							attributes[ part ].map( ( rows = [], i ) =>
 								<tr key={ i }>
 									{ rows.map( ( value = '', ii ) => {
@@ -87,7 +93,7 @@ registerBlockType( 'core/table', {
 			<table>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
 					attributes[ part ] && attributes[ part ].length
-						? wp.element.createElement( 't' + part, { key: part },
+						? createElement( 't' + part, { key: part },
 							attributes[ part ].map( ( rows = [], i ) =>
 								<tr key={ i }>
 									{ rows.map( ( value = '', ii ) => {

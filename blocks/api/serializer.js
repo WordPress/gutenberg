@@ -5,6 +5,11 @@ import { isEmpty, map, reduce } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 
 /**
+ * WordPress dependencies
+ */
+import { Component, createElement, renderToString } from 'element';
+
+/**
  * Internal dependencies
  */
 import { getBlockType } from './registration';
@@ -21,8 +26,8 @@ import { parseBlockAttributes } from './parser';
 export function getSaveContent( save, attributes ) {
 	let rawContent;
 
-	if ( save.prototype instanceof wp.element.Component ) {
-		rawContent = wp.element.createElement( save, { attributes } );
+	if ( save.prototype instanceof Component ) {
+		rawContent = createElement( save, { attributes } );
 	} else {
 		rawContent = save( { attributes } );
 
@@ -33,7 +38,7 @@ export function getSaveContent( save, attributes ) {
 	}
 
 	// Otherwise, infer as element
-	return wp.element.renderToString( rawContent );
+	return renderToString( rawContent );
 }
 
 const escapeDoubleQuotes = value => value.replace( /"/g, '\"' );

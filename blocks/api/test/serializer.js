@@ -4,6 +4,11 @@
 import { expect } from 'chai';
 
 /**
+ * WordPress dependencies
+ */
+import { createElement, Component } from 'element';
+
+/**
  * Internal dependencies
  */
 import serialize, { getCommentAttributes, getSaveContent, serializeValue } from '../serializer';
@@ -28,7 +33,6 @@ describe( 'block serializer', () => {
 			} );
 
 			it( 'should return element as string if save returns element', () => {
-				const { createElement } = wp.element;
 				const saved = getSaveContent(
 					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 					{ fruit: 'Bananas' }
@@ -40,7 +44,6 @@ describe( 'block serializer', () => {
 
 		context( 'component save', () => {
 			it( 'should return element as string', () => {
-				const { Component, createElement } = wp.element;
 				const saved = getSaveContent(
 					class extends Component {
 						render() {

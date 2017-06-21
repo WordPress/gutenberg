@@ -7,6 +7,8 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from 'i18n';
+import { Component } from 'element';
 import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
 
 /**
@@ -24,7 +26,7 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 	return {
-		title: wp.i18n.__( title ),
+		title: __( title ),
 
 		icon,
 
@@ -42,7 +44,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 		},
 
-		edit: class extends wp.element.Component {
+		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
 				this.doServerSideRender = this.doServerSideRender.bind( this );
@@ -120,7 +122,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 						controls,
 						<div key="loading" className="blocks-embed is-loading">
 							<Spinner />
-							<p>{ wp.i18n.__( 'Embedding…' ) }</p>
+							<p>{ __( 'Embedding…' ) }</p>
 						</div>,
 					];
 				}
@@ -128,20 +130,20 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				if ( ! html ) {
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ wp.i18n.sprintf( wp.i18n.__( '%s URL' ), title ) } className="blocks-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="blocks-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
 									value={ url || '' }
 									className="components-placeholder__input"
-									placeholder={ wp.i18n.__( 'Enter URL to embed here…' ) }
+									placeholder={ __( 'Enter URL to embed here…' ) }
 									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 								<Button
 									isLarge
 									type="submit">
-									{ wp.i18n.__( 'Embed' ) }
+									{ __( 'Embed' ) }
 								</Button>
-								{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
+								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 							</form>
 						</Placeholder>,
 					];
@@ -159,9 +161,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					controls,
 					<figure key="embed" className={ typeClassName }>
 						{ ( cannotPreview ) ? (
-							<Placeholder icon={ icon } label={ wp.i18n.__( 'Embed URL' ) }>
+							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-								<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
 							<HtmlEmbed html={ html } />
@@ -169,7 +171,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable
 								tagName="figcaption"
-								placeholder={ wp.i18n.__( 'Write caption…' ) }
+								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								focus={ focus }
 								onFocus={ setFocus }

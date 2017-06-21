@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from 'i18n';
+import { concatChildren } from 'element';
 import { Toolbar } from 'components';
 
 /**
@@ -15,7 +17,7 @@ import Editable from '../../editable';
 const { children, query } = hpq;
 
 registerBlockType( 'core/quote', {
-	title: wp.i18n.__( 'Quote' ),
+	title: __( 'Quote' ),
 	icon: 'format-quote',
 	category: 'common',
 
@@ -51,7 +53,7 @@ registerBlockType( 'core/quote', {
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
 					return createBlock( 'core/text', {
-						content: wp.element.concatChildren( value, citation ),
+						content: concatChildren( value, citation ),
 					} );
 				},
 			},
@@ -88,7 +90,7 @@ registerBlockType( 'core/quote', {
 				<BlockControls key="controls">
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 'format-quote',
-						title: wp.i18n.sprintf( wp.i18n.__( 'Quote style %d' ), variation ),
+						title: sprintf( __( 'Quote style %d' ), variation ),
 						isActive: Number( style ) === variation,
 						onClick() {
 							setAttributes( { style: variation } );
@@ -123,7 +125,7 @@ registerBlockType( 'core/quote', {
 					<Editable
 						tagName="footer"
 						value={ citation }
-						placeholder={ wp.i18n.__( '— Add citation…' ) }
+						placeholder={ __( '— Add citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
