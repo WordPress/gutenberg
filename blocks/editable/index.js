@@ -127,13 +127,17 @@ export default class Editable extends Component {
 
 	onPastePostProcess( event ) {
 		const childNodes = Array.from( event.node.childNodes );
-		const isComment = ( node ) => node.nodeType === 8;
-		const mayBePartOfBlock = ( node ) => isComment( node ) || this.editor.dom.isBlock( node );
+		const isComment = ( node ) =>
+			node.nodeType === 8;
+		const isDoubleBR = ( node ) =>
+			node.nodeName === 'BR' && node.previousSibling && node.previousSibling.nodeName === 'BR';
+		const isBlockPart = ( node ) =>
+			isComment( node ) || isDoubleBR( node ) || this.editor.dom.isBlock( node );
 
 		// If we detect comments or block level elements, insert as blocks.
 		// If there's no `onSplit` prop, content will later be converted to
 		// inline content.
-		if ( this.props.onSplit && childNodes.some( mayBePartOfBlock ) ) {
+		if ( this.props.onSplit && childNodes.some( isBlockPart ) ) {
 			const HTML = event.node.innerHTML.replace( /<meta[^>]+>/, '' );
 			const blocks = wp.blocks.parse( HTML );
 
