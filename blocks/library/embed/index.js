@@ -69,6 +69,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				this.unmounting = true;
 			}
 
+			getPhotoHtml( photo ) {
+				return `<p><img src="${ photo.thumbnail_url }" alt="${ photo.title }" /></p>`;
+			}
+
 			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
@@ -88,6 +92,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							const { html, type } = obj;
 							if ( html ) {
 								this.setState( { html, type } );
+							} else if ( 'photo' === type ) {
+								this.setState( { html: this.getPhotoHtml( obj ), type } );
 							} else {
 								this.setState( { error: true } );
 							}
