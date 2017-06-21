@@ -1,4 +1,5 @@
 # Gutenberg
+[![Build Status](https://travis-ci.org/WordPress/gutenberg.svg?branch=master)](https://travis-ci.org/WordPress/gutenberg)
 
 Printing since 1440.
 
