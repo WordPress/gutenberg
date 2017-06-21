@@ -1,4 +1,9 @@
 /**
+ * WordPress
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -8,7 +13,7 @@ import Editable from '../../editable';
 const { children } = query;
 
 registerBlockType( 'core/preformatted', {
-	title: wp.i18n.__( 'Preformatted' ),
+	title: __( 'Preformatted' ),
 
 	icon: 'text',
 

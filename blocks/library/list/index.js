@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Children } from 'element';
+import { Component, createElement, Children, concatChildren } from 'element';
 import { find } from 'lodash';
 import { __ } from 'i18n';
 
@@ -92,7 +92,7 @@ registerBlockType( 'core/list', {
 				transform: ( { value, citation } ) => {
 					const listItems = fromBrDelimitedContent( value );
 					const values = citation
-						? wp.element.concatChildren( listItems, <li>{ citation }</li> )
+						? concatChildren( listItems, <li>{ citation }</li> )
 						: listItems;
 					return createBlock( 'core/list', {
 						nodeName: 'ul',

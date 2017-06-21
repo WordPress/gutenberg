@@ -4,6 +4,12 @@
 import { isString } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from 'i18n';
+import { concatChildren } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -14,7 +20,7 @@ import BlockControls from '../../block-controls';
 const { children, prop } = query;
 
 registerBlockType( 'core/heading', {
-	title: wp.i18n.__( 'Heading' ),
+	title: __( 'Heading' ),
 
 	icon: 'heading',
 
@@ -72,7 +78,7 @@ registerBlockType( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
@@ -86,7 +92,7 @@ registerBlockType( 'core/heading', {
 					controls={
 						'123456'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
-							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+							title: sprintf( __( 'Heading %s' ), level ),
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,

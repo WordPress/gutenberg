@@ -4,6 +4,11 @@
 import TextareaAutosize from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -12,7 +17,7 @@ import { registerBlockType, query } from '../../api';
 const { prop } = query;
 
 registerBlockType( 'core/code', {
-	title: wp.i18n.__( 'Code' ),
+	title: __( 'Code' ),
 
 	icon: 'editor-code',
 

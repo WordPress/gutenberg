@@ -8,6 +8,7 @@ import { throttle, reduce } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
+import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
 
 /**
@@ -27,7 +28,7 @@ import { insertBlock } from '../../actions';
 
 const INSERTION_POINT_PLACEHOLDER = '[[insertion-point]]';
 
-class VisualEditorBlockList extends wp.element.Component {
+class VisualEditorBlockList extends Component {
 	constructor( props ) {
 		super( props );
 

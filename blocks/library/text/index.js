@@ -3,6 +3,7 @@
  */
 import { __ } from 'i18n';
 import Toggle from 'components/form-toggle';
+import { concatChildren } from 'element';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ registerBlockType( 'core/text', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 

@@ -10,6 +10,8 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
+import { parse } from 'blocks';
+import { render } from 'element';
 import { settings } from 'date';
 
 /**
@@ -52,7 +54,7 @@ function preparePostState( store, post ) {
 	} );
 	store.dispatch( {
 		type: 'RESET_BLOCKS',
-		blocks: wp.blocks.parse( post.content.raw ),
+		blocks: parse( post.content.raw ),
 	} );
 
 	if ( ! post.id ) {
@@ -81,7 +83,7 @@ export function createEditorInstance( id, post ) {
 
 	preparePostState( store, post );
 
-	wp.element.render(
+	render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
 				<Layout />

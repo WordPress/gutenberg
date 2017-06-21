@@ -10,8 +10,9 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 /**
  * WordPress dependencies
  */
-import { Children } from 'element';
+import { Children, Component } from 'element';
 import { BACKSPACE, ESCAPE } from 'utils/keycodes';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal dependencies
@@ -44,7 +45,7 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
-class VisualEditorBlock extends wp.element.Component {
+class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
@@ -215,7 +216,7 @@ class VisualEditorBlock extends wp.element.Component {
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const blockType = wp.blocks.getBlockType( block.name );
+		const blockType = getBlockType( block.name );
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.

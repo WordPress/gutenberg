@@ -1,21 +1,19 @@
 /**
- * Internal dependencies
- */
-import { __ } from 'i18n';
-import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
-
-/**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Toolbar, Placeholder } from 'components';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import { registerBlockType, query as hpq } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-
 import GalleryImage from './gallery-image';
 
 const { query, attr } = hpq;
@@ -25,9 +23,9 @@ const MAX_COLUMNS = 8;
 const editMediaLibrary = ( attributes, setAttributes ) => {
 	const frameConfig = {
 		frame: 'post',
-		title: wp.i18n.__( 'Update Gallery media' ),
+		title: __( 'Update Gallery media' ),
 		button: {
-			text: wp.i18n.__( 'Select' ),
+			text: __( 'Select' ),
 		},
 		multiple: true,
 		state: 'gallery-edit',
@@ -54,7 +52,7 @@ function defaultColumnsNumber( attributes ) {
 }
 
 registerBlockType( 'core/gallery', {
-	title: wp.i18n.__( 'Gallery' ),
+	title: __( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
 
@@ -103,9 +101,9 @@ registerBlockType( 'core/gallery', {
 				controls,
 				<Placeholder
 					key="placeholder"
-					instructions={ wp.i18n.__( 'Drag images here or insert from media library' ) }
+					instructions={ __( 'Drag images here or insert from media library' ) }
 					icon="format-gallery"
-					label={ wp.i18n.__( 'Gallery' ) }
+					label={ __( 'Gallery' ) }
 					className="blocks-gallery">
 					<MediaUploadButton
 						onSelect={ setMediaUrl }
@@ -113,7 +111,7 @@ registerBlockType( 'core/gallery', {
 						autoOpen
 						multiple="true"
 					>
-						{ wp.i18n.__( 'Insert from Media Library' ) }
+						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
 				</Placeholder>,
 			];
