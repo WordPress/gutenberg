@@ -61,4 +61,32 @@
 			}
 		}
 	}
+
+	.components-toolbar__control {
+		width: auto;
+		font-family: $default-font;
+		min-width: 30px;
+	}
+}
+
+
+.blocks-buttons__listbox-choice,
+.blocks-buttons__menu-choice,
+.blocks-buttons__menu-items-item-toggle, {
+	display: block;
+	border: none;
+	padding: 5px;
+	background: none;
+	width: 100%;
+	text-align: left;
+}
+
+.blocks-buttons__menu-items-item {
+	position: relative;
+}
+
+.blocks-buttons__menu-items-item-submenu {
+	position: absolute;
+	left: 100%;
+	top: 0;
 }

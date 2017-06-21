@@ -8,6 +8,7 @@ import classNames from 'classnames';
  */
 import './style.scss';
 import IconButton from '../icon-button';
+import Button from '../button';
 
 function Toolbar( { controls, focus } ) {
 	if ( ! controls || ! controls.length ) {
@@ -29,21 +30,40 @@ function Toolbar( { controls, focus } ) {
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
 					>
-						<IconButton
-							icon={ control.icon }
-							label={ control.title }
-							data-subscript={ control.subscript }
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								control.onClick();
-							} }
-							className={ classNames( 'components-toolbar__control', {
-								'is-active': control.isActive,
-							} ) }
-							aria-pressed={ control.isActive }
-							focus={ focus && setIndex === 0 && controlIndex === 0 }
-							disabled={ control.isDisabled }
-						/>
+						{ control.icon && (
+							<IconButton
+								icon={ control.icon }
+								label={ control.title }
+								data-subscript={ control.subscript }
+								onClick={ ( event ) => {
+									event.stopPropagation();
+									control.onClick();
+								} }
+								className={ classNames( 'components-toolbar__control', {
+									'is-active': control.isActive,
+								} ) }
+								aria-pressed={ control.isActive }
+								focus={ focus && setIndex === 0 && controlIndex === 0 }
+								disabled={ control.isDisabled }
+							/>
+						) }
+						{ control.iconComponent && (
+							<Button
+								label={ control.title }
+								onClick={ ( event ) => {
+									event.stopPropagation();
+									control.onClick();
+								} }
+								className={ classNames( 'components-toolbar__control', {
+									'is-active': control.isActive,
+								} ) }
+								aria-pressed={ control.isActive }
+								focus={ focus && setIndex === 0 && controlIndex === 0 }
+								disabled={ control.isDisabled }
+							>
+								{ control.iconComponent }
+							</Button>
+						) }
 						{ control.children }
 					</li>
 				) ),

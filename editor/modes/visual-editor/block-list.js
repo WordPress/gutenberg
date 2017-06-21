@@ -160,7 +160,7 @@ class VisualEditorBlockList extends wp.element.Component {
 	}
 
 	render() {
-		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
+		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids, settings } = this.props;
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
 			? [
@@ -189,6 +189,7 @@ class VisualEditorBlockList extends wp.element.Component {
 							blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
 							onSelectionStart={ () => this.onSelectionStart( uid ) }
 							multiSelectedBlockUids={ multiSelectedBlockUids }
+							settings={ settings }
 						/>
 					);
 				} ) }

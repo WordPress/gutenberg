@@ -13,6 +13,7 @@
 		display: inline-flex;
 		position: relative;
 		margin: 0;
+		padding: 3px;
 	}
 
 	&> li + li {
@@ -42,14 +43,16 @@
 	display: inline-flex;
 	align-items: flex-end;
 	margin: 0;
-	padding: 3px;
 	background: none;
 	outline: none;
 	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
-	width: $icon-button-size;
-	height: $icon-button-size;
+	width: $icon-button-size - 6px;
+	height: $icon-button-size - 6px;
+	border: 1px solid transparent;
+	padding: 4px;
+	border-radius: 0;
 
 	&:hover,
 	/* the ":not(:disabled)" is needed to make it specific enough */
@@ -69,27 +72,21 @@
 		cursor: default;
 	}
 
-	&> svg {
-		border: 1px solid transparent;
-		padding: 4px;
-		box-sizing: content-box;
-	}
-
-	&:hover > svg,
-	&:focus > svg {
+	&:hover,
+	&:focus {
 		color: $dark-gray-500;
 	}
 
 	&:not(:disabled) {
-		&.is-active > svg,
-		&:hover > svg,
-		&:focus > svg {
+		&.is-active,
+		&:hover,
+		&:focus {
 			border: 1px solid $dark-gray-500;
 		}
 	}
 
-	&.is-active > svg,
-	&.is-active:hover > svg {
+	&.is-active,
+	&.is-active:hover {
 		background-color: $dark-gray-500;
 		color: $white;
 	}

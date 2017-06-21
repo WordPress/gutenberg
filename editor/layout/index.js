@@ -13,7 +13,7 @@ import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import { getEditorMode, isEditorSidebarOpened } from '../selectors';
 
-function Layout( { mode, isSidebarOpened } ) {
+function Layout( { mode, isSidebarOpened, settings } ) {
 	const className = classnames( 'editor-layout', {
 		'is-sidebar-opened': isSidebarOpened,
 	} );
@@ -23,7 +23,7 @@ function Layout( { mode, isSidebarOpened } ) {
 			<Header />
 			<div className="editor-layout__content">
 				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
+				{ mode === 'visual' && <VisualEditor settings={ settings } /> }
 			</div>
 			{ isSidebarOpened && <Sidebar /> }
 		</div>

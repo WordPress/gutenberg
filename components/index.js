@@ -10,10 +10,11 @@ export { default as Panel } from './panel';
 export { default as PanelHeader } from './panel/header';
 export { default as PanelBody } from './panel/body';
 export { default as Placeholder } from './placeholder';
+export { default as Popover } from './popover';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as Spinner } from './spinner';
+export { default as TinymceIcon } from './tinymce-icon';
 export { default as Toolbar } from './toolbar';
-export { default as Popover } from './popover';
 
 // Higher-Order Components
 export { default as withFocusReturn } from './higher-order/with-focus-return';
