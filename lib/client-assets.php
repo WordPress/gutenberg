@@ -321,6 +321,39 @@ JS;
 }
 
 /**
+ * Get post to edit.
+ *
+ * @param int $post_id Post ID to edit.
+ * @return array|WP_Error The post resource data or a WP_Error on failure.
+ */
+function gutenberg_get_post_to_edit( $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return new WP_Error( 'post_not_found', __( 'Post not found.', 'gutenberg' ) );
+	}
+
+	$post_type_object = get_post_type_object( $post->post_type );
+	if ( ! $post_type_object ) {
+		return new WP_Error( 'unrecognized_post_type', __( 'Unrecognized post type.', 'gutenberg' ) );
+	}
+
+	if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		return new WP_Error( 'unauthorized_post_type', __( 'Unauthorized post type.', 'gutenberg' ) );
+	}
+
+	$request = new WP_REST_Request(
+		'GET',
+		sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
+	);
+	$request->set_param( 'context', 'edit' );
+	$response = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return $response->as_error();
+	}
+	return $response->get_data();
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -353,45 +386,17 @@ function gutenberg_scripts_and_styles( $hook ) {
 		true // enqueue in the footer.
 	);
 
-	// Load an actual post if an ID is specified.
-	$post = null;
+	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
-		$post = get_post( (int) $_GET['post_id'] );
-	}
-
-	if ( $post ) {
-		$post_type = $post->post_type;
-	} elseif ( isset( $_GET['post_type'] ) ) {
-		$post_type = wp_unslash( $_GET['post_type'] );
-	} else {
-		$post_type = 'post';
-	}
-
-	if ( ! post_type_exists( $post_type ) ) {
-		wp_die( __( 'Unrecognized post type.', 'gutenberg' ) );
-	}
-	$post_type_object = get_post_type_object( $post_type );
-	if ( ! current_user_can( $post_type_object->cap->edit_posts ) ) {
-		wp_die( __( 'Unauthorized post type.', 'gutenberg' ) );
-	}
-
-	if ( $post && ! current_user_can( 'edit_post', $post->ID ) ) {
-		wp_die( __( 'Unauthorized to edit post.', 'gutenberg' ) );
+		$post_id = (int) $_GET['post_id'];
 	}
 
 	$post_to_edit = null;
-	if ( $post ) {
-		$request = new WP_REST_Request(
-			'GET',
-			sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
-		);
-		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
-		if ( $response->is_error() ) {
-			$error = $response->as_error();
-			wp_die( $error->get_error_message() );
+	if ( $post_id ) {
+		$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+		if ( is_wp_error( $post_to_edit ) ) {
+			wp_die( $post_to_edit->get_error_message() );
 		}
-		$post_to_edit = $response->get_data();
 	}
 
 	// Initialize the post data...
