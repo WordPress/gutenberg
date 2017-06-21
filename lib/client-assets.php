@@ -290,28 +290,13 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Scripts & Styles.
+ * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
  *
- * Enqueues the needed scripts and styles when visiting the top-level page of
- * the Gutenberg editor.
+ * This is temporary while waiting for #41111 in core.
  *
- * @since 0.1.0
- *
- * @param string $hook Screen name.
+ * @link https://core.trac.wordpress.org/ticket/41111
  */
-function gutenberg_scripts_and_styles( $hook ) {
-	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
-		return;
-	}
-
-	$is_demo = isset( $page_match[2] );
-
-	/**
-	 * Scripts
-	 */
-	wp_enqueue_media();
-
-	// Extend wp-api with methods to look up the REST API endpoints for all post types. This is temporary while waiting for <https://core.trac.wordpress.org/ticket/41111> in core.
+function gutenberg_extend_wp_api_backbone_client() {
 	$post_type_rest_base_mapping = array();
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
 		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
@@ -333,6 +318,31 @@ function gutenberg_scripts_and_styles( $hook ) {
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
+}
+
+/**
+ * Scripts & Styles.
+ *
+ * Enqueues the needed scripts and styles when visiting the top-level page of
+ * the Gutenberg editor.
+ *
+ * @since 0.1.0
+ *
+ * @param string $hook Screen name.
+ */
+function gutenberg_scripts_and_styles( $hook ) {
+	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
+		return;
+	}
+
+	$is_demo = isset( $page_match[2] );
+
+	/**
+	 * Scripts
+	 */
+	wp_enqueue_media();
+
+	gutenberg_extend_wp_api_backbone_client();
 
 	// The editor code itself.
 	wp_enqueue_script(
@@ -373,7 +383,7 @@ JS;
 	if ( $post ) {
 		$request = new WP_REST_Request(
 			'GET',
-			sprintf( '/wp/v2/%s/%d', $post_type_rest_base_mapping[ $post->post_type ], $post->ID )
+			sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
 		);
 		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
