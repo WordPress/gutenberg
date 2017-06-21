@@ -66,3 +66,5 @@ This list is manually curated to include valuable contributions by volunteers th
 - @diegoliv
 - @lukecav
 - @shaunandrews
+- @hugobaeta
+- @mizejewski
