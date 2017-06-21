@@ -9,9 +9,8 @@ export default {
 		textEscaped: [ '&lt;3', 'Stuff &amp; Things', 'Tags &amp; Stuff', 'Tags &amp; Stuff 2' ],
 		textUnescaped: [ '<3', 'Stuff & Things', 'Tags & Stuff', 'Tags & Stuff 2' ],
 		matchAmpersandUnescaped: [
-			[ 'Stuff ', '&', ' Things' ],
-			[ 'Tags ', '&', ' Stuff' ],
-			[ 'Tags ', '&', ' Stuff 2' ],
+			[ 'Tags ', '& S', 'tuff' ],
+			[ 'Tags ', '& S', 'tuff 2' ],
 		],
 		matchAmpersandSequence: [
 			[ 'Tag', 's &', ' Stuff' ],
