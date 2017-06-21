@@ -122,7 +122,7 @@ registerBlockType( 'core/gallery', {
 		return [
 			controls,
 			focus && images.length > 1 && (
-				<InspectorControls>
+				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
