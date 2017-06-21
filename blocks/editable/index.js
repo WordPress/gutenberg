@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import tinymce from 'tinymce';
 import classnames from 'classnames';
 import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
@@ -105,15 +106,10 @@ export default class Editable extends Component {
 			return;
 		}
 
-		const content = this.getContent();
 		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
-			empty:
-				! content ||
-				! content.length ||
-				// On non-inline editables, TinyMCE appends an empty <p> tag
-				( ! this.props.inline && content.length === 1 && ! content[ 0 ].props.children ),
+			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
 		} );
 
 		if (
