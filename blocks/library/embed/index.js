@@ -70,7 +70,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 
 			getPhotoHtml( photo ) {
-				return `<p><img src="${ photo.thumbnail_url }" alt="${ photo.title }" /></p>`;
+				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } /></p>;
+				return wp.element.renderToString( photoPreview );
 			}
 
 			doServerSideRender( event ) {
