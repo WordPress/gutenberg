@@ -34,7 +34,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image align="center" -->',
-			'<figure><img src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+			'<figure><img alt="Beautiful landscape" src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -106,7 +106,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
+			'<figure><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -124,11 +124,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/code -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
+			'<figure><img alt="Yet another image block" src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
+			'<figure><img alt="Yet another image block" src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/preformatted -->',
