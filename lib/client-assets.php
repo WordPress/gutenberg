@@ -360,7 +360,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost );' );
+	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
 
 	/**
 	 * Styles
