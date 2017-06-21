@@ -79,12 +79,17 @@ class LastRevision extends Component {
 
 	render() {
 		const { revisions } = this.state;
-		const lastRevision = revisions.length ? revisions[ 0 ] : null;
+
+		if ( ! revisions.length ) {
+			return null;
+		}
+
+		const lastRevision = revisions[ 0 ];
 
 		return (
 			<PanelBody>
 				<IconButton
-					href={ lastRevision ? getWPAdminURL( 'revision.php', { revision: lastRevision.id } ) : undefined }
+					href={ getWPAdminURL( 'revision.php', { revision: lastRevision.id } ) }
 					className="editor-last-revision__title"
 					icon="backup"
 				>
