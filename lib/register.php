@@ -69,8 +69,6 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  * @since 0.1.0
  */
 function gutenberg_add_edit_links_filters() {
-	// For hierarchical post types.
-	add_filter( 'page_row_actions', 'gutenberg_add_edit_links', 10, 2 );
 	// For non-hierarchical post types.
 	add_filter( 'post_row_actions', 'gutenberg_add_edit_links', 10, 2 );
 }
