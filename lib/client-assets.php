@@ -311,7 +311,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 */
 	wp_enqueue_media();
 
-	// Export REST bases for all post types.
+	// Extend wp-api with methods to look up the REST API endpoints for all post types. This is temporary while waiting for <https://core.trac.wordpress.org/ticket/41111> in core.
 	$post_type_rest_base_mapping = array();
 	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
 		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
