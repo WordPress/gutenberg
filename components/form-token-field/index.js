@@ -475,6 +475,7 @@ class FormTokenField extends Component {
 			tabIndex: '-1',
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
+		const showSuggestions = this.state.incompleteTokenValue.trim().length > 1;
 
 		if ( ! disabled ) {
 			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
@@ -498,25 +499,23 @@ class FormTokenField extends Component {
 					{ this.renderTokensAndInput() }
 				</div>
 
-				{ this.state.isActive && this.state.incompleteTokenValue.length > 1 && [
-					<div
-						key="label"
-						role="status"
-						aria-live="assertive"
-						aria-relevant="additions"
-						className="screen-reader-text"
-					>
-						{ ! matchingSuggestions.length && __( 'No results.' ) }
-						{ !! matchingSuggestions.length &&
-							sprintf( _n(
-								'%d result found, use up and down arrow keys to navigate.',
-								'%d results found, use up and down arrow keys to navigate.',
-								matchingSuggestions.length
-							), matchingSuggestions.length )
-						}
-					</div>,
+				<div
+					role="status"
+					aria-live="assertive"
+					aria-relevant="additions"
+					className="screen-reader-text"
+				>
+					{ showSuggestions && ! matchingSuggestions.length && __( 'No results.' ) }
+					{ showSuggestions && !! matchingSuggestions.length &&
+						sprintf( _n(
+							'%d result found, use up and down arrow keys to navigate.',
+							'%d results found, use up and down arrow keys to navigate.',
+							matchingSuggestions.length
+						), matchingSuggestions.length )
+					}
+				</div>
+				{ showSuggestions && (
 					<SuggestionsList
-						key="suggestions"
 						instanceId={ instanceId }
 						match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
 						displayTransform={ this.props.displayTransform }
@@ -526,8 +525,8 @@ class FormTokenField extends Component {
 						isExpanded={ this.state.isActive }
 						onHover={ this.onSuggestionHovered }
 						onSelect={ this.onSuggestionSelected }
-					/>,
-				] }
+					/>
+				) }
 				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Separate with commas' ) }
 				</div>

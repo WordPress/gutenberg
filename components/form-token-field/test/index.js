@@ -152,7 +152,7 @@ describe( 'FormTokenField', function() {
 		} );
 
 		it( 'should match against the unescaped values of suggestions with special characters', function() {
-			setText( '& ' );
+			setText( '& S' );
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
 			} );
