@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
 
 /**
@@ -474,6 +474,7 @@ class FormTokenField extends Component {
 			className: classes,
 			tabIndex: '-1',
 		};
+		const matchingSuggestions = this.getMatchingSuggestions();
 
 		if ( ! disabled ) {
 			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
@@ -496,17 +497,37 @@ class FormTokenField extends Component {
 				>
 					{ this.renderTokensAndInput() }
 				</div>
-				<SuggestionsList
-					instanceId={ instanceId }
-					match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
-					displayTransform={ this.props.displayTransform }
-					suggestions={ this.getMatchingSuggestions() }
-					selectedIndex={ this.state.selectedSuggestionIndex }
-					scrollIntoView={ this.state.selectedSuggestionScroll }
-					isExpanded={ this.state.isActive }
-					onHover={ this.onSuggestionHovered }
-					onSelect={ this.onSuggestionSelected }
-				/>
+
+				{ this.state.isActive && this.state.incompleteTokenValue.length > 1 && [
+					<div
+						key="label"
+						role="status"
+						aria-live="assertive"
+						aria-relevant="additions"
+						className="screen-reader-text"
+					>
+						{ ! matchingSuggestions.length && __( 'No results.' ) }
+						{ !! matchingSuggestions.length &&
+							sprintf( _n(
+								'%d result found, use up and down arrow keys to navigate.',
+								'%d results found, use up and down arrow keys to navigate.',
+								matchingSuggestions.length
+							), matchingSuggestions.length )
+						}
+					</div>,
+					<SuggestionsList
+						key="suggestions"
+						instanceId={ instanceId }
+						match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
+						displayTransform={ this.props.displayTransform }
+						suggestions={ matchingSuggestions }
+						selectedIndex={ this.state.selectedSuggestionIndex }
+						scrollIntoView={ this.state.selectedSuggestionScroll }
+						isExpanded={ this.state.isActive }
+						onHover={ this.onSuggestionHovered }
+						onSelect={ this.onSuggestionSelected }
+					/>,
+				] }
 				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Separate with commas' ) }
 				</div>
