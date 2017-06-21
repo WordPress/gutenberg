@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from 'components';
-import Toggle from 'components/form-toggle';
+import { withInstanceId, FormToggle } from 'components';
 
 /**
  * Internal dependencies
@@ -15,7 +14,7 @@ function ToggleControl( { label, checked, instanceId, onChange } ) {
 
 	return (
 		<BaseControl label={ label } id={ id } className="blocks-toggle-control">
-			<Toggle id={ id } checked={ checked } onChange={ onChange } />
+			<FormToggle id={ id } checked={ checked } onChange={ onChange } />
 		</BaseControl>
 	);
 }

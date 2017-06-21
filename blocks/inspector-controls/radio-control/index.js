@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { withInstanceId } from 'components';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
