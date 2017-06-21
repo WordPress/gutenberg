@@ -167,6 +167,21 @@ export function isEditedPostPublishable( state ) {
 }
 
 /**
+ * Returns true if the post can be saved, or false otherwise. A post must
+ * contain a title, an excerpt, or non-empty content to be valid for save.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether the post can be saved
+ */
+export function isEditedPostSaveable( state ) {
+	return (
+		getBlockCount( state ) > 0 ||
+		!! getEditedPostTitle( state ) ||
+		!! getEditedPostExcerpt( state )
+	);
+}
+
+/**
  * Return true if the post being edited is being scheduled. Preferring the
  * unsaved status values.
  *
@@ -250,6 +265,16 @@ export const getBlocks = createSelector(
 		state.editor.blocksByUid,
 	]
 );
+
+/**
+ * Returns the number of blocks currently present in the post.
+ *
+ * @param  {Object} state Global application state
+ * @return {Object}       Number of blocks in the post
+ */
+export function getBlockCount( state ) {
+	return getBlockUids( state ).length;
+}
 
 /**
  * Returns the currently selected block, or null if there is no selected block.

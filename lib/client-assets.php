@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists' ),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste' ),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 
@@ -164,6 +164,11 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'tinymce-nightly-lists',
 		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin' . $suffix . '.js',
+		array( 'tinymce-nightly' )
+	);
+	gutenberg_register_vendor_script(
+		'tinymce-nightly-paste',
+		'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/paste/plugin' . $suffix . '.js',
 		array( 'tinymce-nightly' )
 	);
 }
