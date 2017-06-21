@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Component, findDOMNode } from 'element';
+import { Component } from 'element';
 
 /**
  * Internal dependencies
@@ -21,23 +21,30 @@ import { clearSelectedBlock } from '../../actions';
 class VisualEditor extends Component {
 	constructor() {
 		super( ...arguments );
-		this.bindContainer = this.bindContainer.bind( this );
-		this.bindBlocksContainer = this.bindBlocksContainer.bind( this );
-		this.onClick = this.onClick.bind( this );
+
+		this.clearSelectedOnFocusOut = this.clearSelectedOnFocusOut.bind( this );
 	}
 
-	bindContainer( ref ) {
-		this.container = ref;
+	componentDidMount() {
+		// If a click occurs outside editor layout while in visual mode, treat
+		// as intent to clear selected block. This preserves selection when
+		// focus moves from block to post settings, but clears when moving from
+		// block to the admin bar, sidebar, or below page content.
+		this.content = document.getElementById( 'wpbody-content' );
+		this.content.addEventListener( 'focusout', this.clearSelectedOnFocusOut );
 	}
 
-	bindBlocksContainer( ref ) {
-		this.blocksContainer = findDOMNode( ref );
+	componentWillUnmount() {
+		this.content.removeEventListener( 'focusout', this.clearSelectedOnFocusOut );
+		delete this.content;
 	}
 
-	onClick( event ) {
-		if ( event.target === this.container || event.target === this.blocksContainer ) {
-			this.props.clearSelectedBlock();
+	clearSelectedOnFocusOut( event ) {
+		if ( this.content.contains( event.relatedTarget ) ) {
+			return;
 		}
+
+		this.props.clearSelectedBlock();
 	}
 
 	render() {
@@ -48,12 +55,10 @@ class VisualEditor extends Component {
 				role="region"
 				aria-label={ __( 'Visual Editor' ) }
 				className="editor-visual-editor"
-				onMouseDown={ this.onClick }
-				onTouchStart={ this.onClick }
-				ref={ this.bindContainer }
+				onClick={ this.props.clearSelectedBlock }
 			>
 				<PostTitle />
-				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
+				<VisualEditorBlockList />
 				<Inserter position="top right" />
 			</div>
 		);
