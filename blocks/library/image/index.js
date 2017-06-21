@@ -57,7 +57,9 @@ registerBlockType( 'core/image', {
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
+			const onSelectImage = ( media ) => {
+				setAttributes( { url: media.url, alt: media.alt, caption: media.caption } );
+			};
 			return [
 				controls,
 				<Placeholder
@@ -68,7 +70,7 @@ registerBlockType( 'core/image', {
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaURL }
+						onSelect={ onSelectImage }
 						type="image"
 						autoOpen
 					>
