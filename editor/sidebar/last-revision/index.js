@@ -57,7 +57,10 @@ class LastRevision extends Component {
 		}
 		this.setState( { loading: true } );
 		const postIdToLoad = this.props.postId;
-		const Collection = wp.api.getPostTypeRevisionsCollection( this.props.postType || 'post' );
+		const Collection = wp.api.getPostTypeRevisionsCollection( this.props.postType );
+		if ( ! Collection ) {
+			return;
+		}
 		this.fetchRevisionsRequest = new Collection( {}, { parent: postIdToLoad } ).fetch()
 			.done( ( revisions ) => {
 				if ( this.props.postId !== postIdToLoad ) {
