@@ -13,3 +13,4 @@ import './preformatted';
 import './code';
 import './freeform';
 import './latest-posts';
+import './cover-image';
