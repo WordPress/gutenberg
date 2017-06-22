@@ -18,7 +18,7 @@ import { getBlockType } from 'blocks';
  * Internal dependencies
  */
 import BlockMover from '../../block-mover';
-import BlockRightMenu from '../../block-right-menu';
+import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
 import {
 	focusBlock,

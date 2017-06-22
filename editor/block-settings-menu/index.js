@@ -14,11 +14,11 @@ import { IconButton } from 'components';
  */
 import './style.scss';
 
-function BlockRightMenu( { onDelete } ) {
+function BlockSettingsMenu( { onDelete } ) {
 	return (
-		<div className="editor-block-right-menu">
+		<div className="editor-block-settings-menu">
 			<IconButton
-				className="editor-block-right-menu__control"
+				className="editor-block-settings-menu__control"
 				onClick={ onDelete }
 				icon="trash"
 				label={ __( 'Delete the block' ) }
@@ -37,4 +37,4 @@ export default connect(
 			} );
 		},
 	} )
-)( BlockRightMenu );
+)( BlockSettingsMenu );
