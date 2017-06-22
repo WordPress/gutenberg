@@ -2,10 +2,17 @@
 	.blocks-editable__tinymce[data-is-empty="true"]:before {
 		position: inherit;
 	}
-}
 
-.blocks-cover-image {
-	margin: 0;
+	.blocks-cover-image {
+		margin: 0;
+
+		h2 {
+			color: white;
+			font-size: 24pt;
+			line-height: 1em;
+		}
+
+	}
 
 	.cover-image {
 		background-size: cover;
@@ -27,10 +34,8 @@
 		background: rgba( 0,0,0,.5 );
 	}
 
-	h2 {
-		color: white;
-		font-size: 24pt;
-		line-height: 1em;
+	&[data-align="full"] .cover-image::before {
+		right: 0;
+		left: 0;
 	}
-
 }
