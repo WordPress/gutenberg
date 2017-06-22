@@ -92,8 +92,8 @@ class InserterMenu extends Component {
 	}
 
 	findByIncrement( blockTypes, increment = 1 ) {
-		// Add on a fake search block to the list to cycle through.
-		const list = blockTypes.concat( { name: 'search' } );
+		// Prepend a fake search block to the list to cycle through.
+		const list = [ { name: 'search' }, ...blockTypes ];
 
 		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.name );
 		const nextIndex = currentIndex + increment;
