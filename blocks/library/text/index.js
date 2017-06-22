@@ -33,7 +33,10 @@ registerBlockType( 'core/text', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks } ) {
+	edit( {
+		attributes, setAttributes, insertBlockAfter, focus, setFocus, mergeBlocks,
+		onFocusPrevious, onFocusNext,
+	} ) {
 		const { align, content, dropCap } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -71,6 +74,8 @@ registerBlockType( 'core/text', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
+				onFocusPrevious={ onFocusPrevious }
+				onFocusNext={ onFocusNext }
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
 					insertBlockAfter( createBlock( 'core/text', {

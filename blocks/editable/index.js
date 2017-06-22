@@ -198,32 +198,15 @@ export default class Editable extends Component {
 		const { keyCode } = event;
 		const moveUp = ( keyCode === UP || keyCode === LEFT ) && this.isStartOfEditor();
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT ) && this.isEndOfEditor();
-		const selectors = [
-			'*[contenteditable="true"]',
-			'*[tabindex]',
-			'textarea',
-			'input',
-		].join( ',' );
 
-		if ( moveUp || moveDown ) {
-			const rootNode = this.editor.getBody();
-			const focusableNodes = Array.from( document.querySelectorAll( selectors ) );
+		if ( moveUp && this.props.onFocusPrevious ) {
+			event.preventDefault();
+			this.props.onFocusPrevious();
+		}
 
-			if ( moveUp ) {
-				focusableNodes.reverse();
-			}
-
-			const targetNode = focusableNodes
-				.slice( focusableNodes.indexOf( rootNode ) )
-				.reduce( ( result, node ) => {
-					return result || ( node.contains( rootNode ) ? null : node );
-				}, null );
-
-			if ( targetNode ) {
-				targetNode.focus();
-				event.preventDefault();
-				event.stopImmediatePropagation();
-			}
+		if ( moveDown && this.props.onFocusPrevious ) {
+			event.preventDefault();
+			this.props.onFocusNext();
 		}
 
 		if (

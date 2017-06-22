@@ -195,7 +195,7 @@ registerBlockType( 'core/list', {
 		}
 
 		render() {
-			const { attributes, focus, setFocus } = this.props;
+			const { attributes, focus, setFocus, onFocusPrevious, onFocusNext } = this.props;
 			const { nodeName = 'OL', values = [] } = attributes;
 
 			return [
@@ -237,6 +237,8 @@ registerBlockType( 'core/list', {
 					value={ values }
 					focus={ focus }
 					onFocus={ setFocus }
+					onFocusPrevious={ onFocusPrevious }
+					onFocusNext={ onFocusNext }
 					className="blocks-list"
 				/>,
 			];

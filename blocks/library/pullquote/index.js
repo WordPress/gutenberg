@@ -34,7 +34,7 @@ registerBlockType( 'core/pullquote', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, onFocusPrevious, onFocusNext } ) {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -59,6 +59,8 @@ registerBlockType( 'core/pullquote', {
 					placeholder={ __( 'Write Quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
+					onFocusPrevious={ onFocusPrevious }
+					onFocusNext={ () => setFocus( { editable: 'citation' } ) }
 					className="blocks-pullquote__content"
 				/>
 				{ ( citation || !! focus ) && (
@@ -73,6 +75,8 @@ registerBlockType( 'core/pullquote', {
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						onFocusPrevious={ () => setFocus( { editable: 'value' } ) }
+						onFocusNext={ onFocusNext }
 						inline
 					/>
 				) }

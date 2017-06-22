@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { BACKSPACE, ESCAPE } from 'utils/keycodes';
+import { BACKSPACE, ESCAPE, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 import { getBlockType } from 'blocks';
 
 /**
@@ -157,6 +157,7 @@ class VisualEditorBlock extends Component {
 			uid,
 			multiSelectedBlockUids,
 			previousBlock,
+			nextBlock,
 			onRemove,
 			onFocus,
 			onDeselect,
@@ -177,6 +178,22 @@ class VisualEditorBlock extends Component {
 				event.preventDefault();
 				onRemove( multiSelectedBlockUids );
 			}
+		}
+
+		if (
+			( keyCode === UP || keyCode === LEFT ) &&
+			previousBlock && target === this.node
+		) {
+			event.preventDefault();
+			onFocus( previousBlock.uid );
+		}
+
+		if (
+			( keyCode === DOWN || keyCode === RIGHT ) &&
+			nextBlock && target === this.node
+		) {
+			event.preventDefault();
+			onFocus( nextBlock.uid );
 		}
 
 		// Deselect on escape.
@@ -215,7 +232,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids } = this.props;
+		const { block, previousBlock, nextBlock, multiSelectedBlockUids } = this.props;
 		const blockType = getBlockType( block.name );
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
@@ -296,6 +313,8 @@ class VisualEditorBlock extends Component {
 						setAttributes={ this.setAttributes }
 						insertBlockAfter={ onInsertAfter }
 						setFocus={ partial( onFocus, block.uid ) }
+						onFocusPrevious={ () => previousBlock && onFocus( previousBlock.uid ) }
+						onFocusNext={ () => nextBlock && onFocus( nextBlock.uid ) }
 						mergeBlocks={ this.mergeBlocks }
 						id={ block.uid }
 					/>

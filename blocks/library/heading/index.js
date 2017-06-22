@@ -82,7 +82,10 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
+	edit( {
+		attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter,
+		onFocusPrevious, onFocusNext,
+	} ) {
 		const { content, nodeName = 'H2' } = attributes;
 
 		return [
@@ -106,6 +109,8 @@ registerBlockType( 'core/heading', {
 				value={ content }
 				focus={ focus }
 				onFocus={ setFocus }
+				onFocusPrevious={ onFocusPrevious }
+				onFocusNext={ onFocusNext }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				inline
