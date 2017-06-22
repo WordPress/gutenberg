@@ -290,6 +290,70 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
+ * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
+ *
+ * This is temporary while waiting for #41111 in core.
+ *
+ * @link https://core.trac.wordpress.org/ticket/41111
+ */
+function gutenberg_extend_wp_api_backbone_client() {
+	$post_type_rest_base_mapping = array();
+	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
+		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
+	}
+	$script = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
+	$script .= <<<JS
+		wp.api.getPostTypeModel = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
+			return _.first( _.filter( wp.api.models, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+		wp.api.getPostTypeRevisionsCollection = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
+			return _.first( _.filter( wp.api.collections, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+JS;
+	wp_add_inline_script( 'wp-api', $script );
+}
+
+/**
+ * Get post to edit.
+ *
+ * @param int $post_id Post ID to edit.
+ * @return array|WP_Error The post resource data or a WP_Error on failure.
+ */
+function gutenberg_get_post_to_edit( $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return new WP_Error( 'post_not_found', __( 'Post not found.', 'gutenberg' ) );
+	}
+
+	$post_type_object = get_post_type_object( $post->post_type );
+	if ( ! $post_type_object ) {
+		return new WP_Error( 'unrecognized_post_type', __( 'Unrecognized post type.', 'gutenberg' ) );
+	}
+
+	if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		return new WP_Error( 'unauthorized_post_type', __( 'Unauthorized post type.', 'gutenberg' ) );
+	}
+
+	$request = new WP_REST_Request(
+		'GET',
+		sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
+	);
+	$request->set_param( 'context', 'edit' );
+	$response = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return $response->as_error();
+	}
+	return $response->get_data();
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -311,6 +375,8 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 */
 	wp_enqueue_media();
 
+	gutenberg_extend_wp_api_backbone_client();
+
 	// The editor code itself.
 	wp_enqueue_script(
 		'wp-editor',
@@ -320,17 +386,16 @@ function gutenberg_scripts_and_styles( $hook ) {
 		true // enqueue in the footer.
 	);
 
-	// Load an actual post if an ID is specified.
-	$post_to_edit = null;
+	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
-		$request = new WP_REST_Request(
-			'GET',
-			sprintf( '/wp/v2/posts/%d', (int) $_GET['post_id'] )
-		);
-		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
-		if ( 200 === $response->get_status() ) {
-			$post_to_edit = $response->get_data();
+		$post_id = (int) $_GET['post_id'];
+	}
+
+	$post_to_edit = null;
+	if ( $post_id ) {
+		$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+		if ( is_wp_error( $post_to_edit ) ) {
+			wp_die( $post_to_edit->get_error_message() );
 		}
 	}
 
