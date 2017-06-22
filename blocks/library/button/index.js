@@ -80,7 +80,7 @@ registerBlockType( 'core/button', {
 		const { url, text, title, align = 'none' } = attributes;
 
 		return (
-			<div className={ `button align${ align }` }>
+			<div className={ `blocks-button align${ align }` }>
 				<a href={ url } title={ title }>
 					{ text }
 				</a>
