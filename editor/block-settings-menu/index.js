@@ -25,12 +25,6 @@ function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSide
 
 	return (
 		<div className="editor-block-settings-menu">
-			<IconButton
-				className="editor-block-settings-menu__control"
-				onClick={ onDelete }
-				icon="trash"
-				label={ __( 'Delete the block' ) }
-			/>
 			{ ! isSidebarOpened &&
 				<IconButton
 					className="editor-block-settings-menu__control"
@@ -39,6 +33,12 @@ function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSide
 					label={ __( 'Inspector' ) }
 				/>
 			}
+			<IconButton
+				className="editor-block-settings-menu__control"
+				onClick={ onDelete }
+				icon="trash"
+				label={ __( 'Delete the block' ) }
+			/>
 		</div>
 	);
 }
