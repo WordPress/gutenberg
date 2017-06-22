@@ -31,11 +31,9 @@ const charCodes = {
 	comma: 44,
 };
 
-describe( 'FormTokenField', function() {
-	if ( ! process.env.RUN_SLOW_TESTS ) {
-		return;
-	}
+const maybeDescribe = process.env.RUN_SLOW_TESTS ? describe : describe.skip;
 
+maybeDescribe( 'FormTokenField', function() {
 	let wrapper, tokenFieldNode, textInputNode;
 
 	function setText( text ) {
@@ -182,7 +180,7 @@ describe( 'FormTokenField', function() {
 
 		it( 'should manage the selected suggestion based on both keyboard and mouse events', test( function() {
 			// We need a high timeout here to accomodate Travis CI
-			this.timeout( 10000 );
+			//this.timeout( 10000 );
 
 			setText( 'th' );
 			expect( getSuggestionsText() ).to.deep.equal( fixtures.matchingSuggestions.th );

@@ -59,12 +59,15 @@
     "enzyme": "^2.8.2",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
+    "eslint-plugin-jest": "~20.0.3",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "gettext-parser": "^1.2.2",
     "glob": "^7.1.1",
+    "jest": "~20.0.4",
+    "jest-junit-reporter": "~1.1.0",
     "jsdom": "^10.1.0",
     "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
@@ -95,6 +98,39 @@
     "ci": "concurrently \"npm run build\" \"npm test\"",
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test-unit-jest": "jest"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/blocks/**/*.js",
+      "**/components/**/*.js",
+      "**/date/**/*.js",
+      "**/editor/**/*.js",
+      "**/element/**/*.js",
+      "**/i18n/**/*.js",
+      "**/utils/**/*.js"
+    ],
+    "moduleNameMapper": {
+      "\\.scss$": "<rootDir>/test/style-mock.js"
+    },
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
+    "testMatch": [
+      "**/blocks/**/test/*.js",
+      "**/components/**/test/*.js",
+      "**/date/**/test/*.js",
+      "**/editor/**/test/*.js",
+      "**/element/**/test/*.js",
+      "**/i18n/**/test/*.js",
+      "**/utils/**/test/*.js" ],
+    "timers": "fake",
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest",
+      "\\.pegjs$": "<rootDir>/test/pgejs-transform.js"
+    },
+    "verbose": true
   }
 }
