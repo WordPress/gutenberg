@@ -25,10 +25,6 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 		icon: 'align-full-width',
 		title: __( 'Full width' ),
 	},
-	fixed: {
-		icon: 'admin-post',
-		title: __( 'Full width' ),
-	},
 };
 
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];

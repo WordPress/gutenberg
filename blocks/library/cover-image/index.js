@@ -16,7 +16,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { text } = query;
 
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'fixed' ];
+const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 registerBlockType( 'core/cover-image', {
 	title: __( 'Cover Image' ),
