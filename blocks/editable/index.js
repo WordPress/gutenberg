@@ -12,7 +12,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from 'element';
-import { createBlock, parse } from '../api';
+import { parse, pasteHandler } from '../api';
 import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
@@ -138,56 +138,18 @@ export default class Editable extends Component {
 		// If there's no `onSplit` prop, content will later be converted to
 		// inline content.
 		if ( this.props.onSplit ) {
+			let blocks = [];
+
 			// Internal paste, so parse.
 			if ( childNodes.some( isBlockDelimiter ) ) {
-				const blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
-
-				// We must wait for TinyMCE to clean up paste containers after this
-				// event.
-				window.setTimeout( () => this.splitContent( blocks ), 0 );
-				event.preventDefault();
+				blocks = parse( event.node.innerHTML.replace( /<meta[^>]+>/, '' ) );
 			// External paste with block level content, so attempt to assign
 			// blocks.
 			} else if ( childNodes.some( isBlockPart ) ) {
-				// Handle BRs and text nodes.
-				const blockNodes = childNodes.reduce( ( acc, node, index ) => {
-					// Text nodes: wrap in a paragraph, or append to previous.
-					if ( node.nodeType === 3 ) {
-						if ( ! acc.length || acc[ acc.length - 1 ].nodeName !== 'P' ) {
-							acc.push( document.createElement( 'P' ) );
-						}
+				blocks = pasteHandler( childNodes );
+			}
 
-						acc[ acc.length - 1 ].appendChild( node );
-					// BR nodes: create a new paragraph on double, or append to
-					// previous.
-					} else if ( node.nodeName === 'BR' ) {
-						if ( childNodes[ index + 1 ] && childNodes[ index + 1 ].nodeName === 'BR' ) {
-							acc.push( document.createElement( 'P' ) );
-						}
-
-						// Don't append to an empty paragraph.
-						if ( acc[ acc.length - 1 ].hasChildNodes() ) {
-							acc[ acc.length - 1 ].appendChild( node );
-						}
-					} else {
-						acc.push( node );
-					}
-
-					return acc;
-				}, [] );
-
-				const blocks = blockNodes.map( ( node ) => {
-					if ( node.nodeName === 'P' ) {
-						return createBlock( 'core/text', {
-							content: nodeListToReact( node.childNodes, createElement ),
-						} );
-					}
-
-					return createBlock( 'core/freeform', {
-						content: nodeListToReact( [ node ], createElement ),
-					} );
-				} );
-
+			if ( blocks.length ) {
 				// We must wait for TinyMCE to clean up paste containers after this
 				// event.
 				window.setTimeout( () => this.splitContent( blocks ), 0 );
