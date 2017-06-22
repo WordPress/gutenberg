@@ -58,6 +58,6 @@ export const node = withKnownMatcherFlag( ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return nodeToReact( match, wp.element.createElement );
+		return nodeToReact( match, createElement );
 	};
 } );
