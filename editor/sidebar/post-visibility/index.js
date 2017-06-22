@@ -121,6 +121,7 @@ class PostVisibility extends Component {
 								<div key={ value } className="editor-post-visibility__choice">
 									<input
 										type="radio"
+										name="editor-post-visibility__setting"
 										value={ value }
 										onChange={ onSelect }
 										checked={ checked }
