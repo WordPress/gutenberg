@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import Placeholder from 'components/placeholder';
+import { Placeholder } from 'components';
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -10,46 +11,15 @@ import './style.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { text } = query;
 
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
-
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: wp.i18n.__( 'Change cover image' ),
-		button: {
-			text: wp.i18n.__( 'Select' ),
-		},
-	};
-
-	const editFrame = wp.media( frameConfig );
-	function updateFn( model ) {
-		setAttributes( {
-			url: model.single().attributes.url,
-			image: model.single().attributes,
-		} );
-	}
-
-	editFrame.on( 'insert', updateFn );
-	editFrame.open( 'cover-image' );
-};
+const validAlignments = [ 'left', 'center', 'right', 'wide', 'fixed' ];
 
 registerBlockType( 'core/cover-image', {
-	title: wp.i18n.__( 'Cover Image' ),
+	title: __( 'Cover Image' ),
 
 	icon: 'format-image',
 
@@ -59,88 +29,61 @@ registerBlockType( 'core/cover-image', {
 		title: text( 'h2' ),
 	},
 
-	controls: [
-		{
-			icon: 'format-image',
-			title: wp.i18n.__( 'Change Image' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: editMediaLibrary,
-		},
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => ! align || 'center' === align,
-			onClick: toggleAlignment( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' ),
-		},
-		{
-			icon: 'align-full-width',
-			title: wp.i18n.__( 'Wide width' ),
-			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' ),
-		},
-		{
-			icon: 'admin-post',
-			title: wp.i18n.__( 'Fixed' ),
-			isActive: ( { align } ) => 'fixed' === align,
-			onClick: toggleAlignment( 'fixed' ),
-		},
-	],
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		const validAlignments = [ 'left', 'right', 'wide', 'fixed' ];
 		if ( -1 !== validAlignments.indexOf( align ) ) {
 			return { 'data-align': align };
 		}
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, title } = attributes;
+		const { url, title, align } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const controls = (
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+						controls={ validAlignments }
+					/>
+				</BlockControls>
+			)
+		);
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
 			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
-			return (
+			return [
+				controls,
 				<Placeholder
-					instructions={ wp.i18n.__( 'Drag image here or insert from media library' ) }
+					key="placeholder"
+					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
-					label={ wp.i18n.__( 'Image' ) }
+					label={ __( 'Image' ) }
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
 						type="image"
-						auto-open
+						autoOpen
 					>
-						{ wp.i18n.__( 'Insert from Media Library' ) }
+						{ __( 'Insert from Media Library' ) }
 					</MediaUploadButton>
-				</Placeholder>
-			);
+				</Placeholder>,
+			];
 		}
 
-		const style = {
-			backgroundImage: `url(${ url })`,
-		};
+		const style = { backgroundImage: `url(${ url })` };
 
-		return (
-			<section className="blocks-cover-image">
+		return [
+			controls,
+			<section key="cover-image" className="blocks-cover-image">
 				<section className="cover-image" data-url={ url } style={ style }>
 					{ title || !! focus ? (
 						<Editable
 							tagName="h2"
-							placeholder={ wp.i18n.__( 'Write title' ) }
+							placeholder={ __( 'Write title' ) }
 							value={ title }
 							formattingControls={ [] }
 							focus={ focus }
@@ -148,8 +91,8 @@ registerBlockType( 'core/cover-image', {
 							onChange={ ( value ) => setAttributes( { title: value } ) } />
 					) : null }
 				</section>
-			</section>
-		);
+			</section>,
+		];
 	},
 
 	save( { attributes } ) {
