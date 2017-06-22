@@ -13,11 +13,11 @@ import FreeformBlock from './freeform-block';
 const { children } = query;
 
 registerBlockType( 'core/freeform', {
-	title: __( 'Freeform' ),
+	title: __( 'Classic Text' ),
 
-	icon: 'text',
+	icon: 'editor-kitchensink',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: children(),
