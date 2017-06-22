@@ -8,8 +8,3 @@ export const RIGHT = 39;
 export const DOWN = 40;
 export const DELETE = 46;
 export const CHAR_A = 'A'.charCodeAt( 0 );
-
-export function isAlphaKeyCode( keyCode ) {
-	return ( keyCode >= 65 && keyCode <= 90 );
-}
-
