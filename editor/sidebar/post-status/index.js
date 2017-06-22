@@ -68,9 +68,7 @@ class PostStatus extends Component {
 					<span>{ __( 'Post Format' ) }</span>
 					<span>{ format }</span>
 				</div>
-				
 				<PostSticky />
-			
 				<div className="editor-post-status__row">
 					<PostTrash />
 				</div>

@@ -18,9 +18,9 @@ import { editPost } from '../../actions';
 function PostSticky( { postSticky = false, instanceId, ...props } ) {
 	const stickyToggleId = 'post-sticky-toggle-' + instanceId;
 
-	const onTogglePostSticky = () => props.editPost( { sticky: !postSticky } );
+	const onTogglePostSticky = () => props.editPost( { sticky: ! postSticky } );
 
-	return ( 
+	return (
 		<div className="editor-post-status__row">
 			<label htmlFor={ stickyToggleId }>{ __( 'Stick to the front page' ) }</label>
 			<FormToggle
