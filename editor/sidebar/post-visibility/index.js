@@ -57,7 +57,6 @@ class PostVisibility extends Component {
 
 		onUpdateVisibility( 'private' );
 		onSave();
-		this.setState( { opened: false } );
 	}
 
 	setPasswordProtected() {
@@ -118,7 +117,7 @@ class PostVisibility extends Component {
 								{ __( 'Post Visibility' ) }
 							</legend>
 							{ visibilityOptions.map( ( { value, label, info, onSelect, checked } ) => (
-								<span key={ value } className="editor-post-visibility__choice">
+								<div key={ value } className="editor-post-visibility__choice">
 									<input
 										type="radio"
 										value={ value }
@@ -133,17 +132,26 @@ class PostVisibility extends Component {
 										className="editor-post-visibility__dialog-label"
 									>{ label }</label>
 									{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
-								</span>
+								</div>
 							) ) }
 						</fieldset>
 						{ this.state.hasPassword &&
-							<input
-								className="editor-post-visibility__dialog-password-input"
-								type="text"
-								onChange={ updatePassword }
-								value={ password }
-								placeholder={ __( 'Create password' ) }
-							/>
+							<div className="editor-post-visibility__dialog-password">
+								<label
+									htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+									className="screen-reader-text"
+								>
+									{ __( 'Create password' ) }
+								</label>
+								<input
+									className="editor-post-visibility__dialog-password-input"
+									id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
+									type="text"
+									onChange={ updatePassword }
+									value={ password }
+									placeholder={ __( 'Use a secure password' ) }
+								/>
+							</div>
 						}
 					</div>
 				}
