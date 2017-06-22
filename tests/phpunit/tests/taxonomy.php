@@ -292,6 +292,75 @@ class Tests_Taxonomy extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 37094
+	 */
+	public function test_term_assignment_should_invalidate_get_objects_in_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$posts = self::factory()->post->create_many( 2 );
+		$term_id = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		wp_set_object_terms( $posts[1], $term_id, 'wptests_tax' );
+
+		// Prime cache.
+		$before = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertEqualSets( array( $posts[1] ), $before );
+
+		wp_set_object_terms( $posts[1], array(), 'wptests_tax' );
+
+		$after = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertSame( array(), $after );
+	}
+
+	/**
+	 * @ticket 37094
+	 */
+	public function test_term_deletion_should_invalidate_get_objects_in_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$posts = self::factory()->post->create_many( 2 );
+		$term_id = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		wp_set_object_terms( $posts[1], $term_id, 'wptests_tax' );
+
+		// Prime cache.
+		$before = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertEqualSets( array( $posts[1] ), $before );
+
+		wp_delete_term( $term_id, 'wptests_tax' );
+
+		$after = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertSame( array(), $after );
+	}
+
+	/**
+	 * @ticket 37094
+	 */
+	public function test_post_deletion_should_invalidate_get_objects_in_term_cache() {
+		register_taxonomy( 'wptests_tax', 'post' );
+
+		$posts = self::factory()->post->create_many( 2 );
+		$term_id = self::factory()->term->create( array(
+			'taxonomy' => 'wptests_tax',
+		) );
+
+		wp_set_object_terms( $posts[1], $term_id, 'wptests_tax' );
+
+		// Prime cache.
+		$before = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertEqualSets( array( $posts[1] ), $before );
+
+		wp_delete_post( $posts[1], true );
+
+		$after = get_objects_in_term( $term_id, 'wptests_tax' );
+		$this->assertSame( array(), $after );
+	}
+
+	/**
 	 * @ticket 25706
 	 */
 	function test_in_category() {
