@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { isEmpty, map, reduce } from 'lodash';
+import { isEmpty, map, reduce, kebabCase, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement, renderToString } from 'element';
+import { Component, createElement, renderToString, cloneElement, Children } from 'element';
 
 /**
  * Internal dependencies
@@ -20,10 +21,11 @@ import { parseBlockAttributes } from './parser';
  * static markup to be saved.
  *
  * @param  {Function|WPComponent} save       Save render implementation
+ * @param  {String}               blockName  Block name
  * @param  {Object}               attributes Block attributes
  * @return {string}                          Save content
  */
-export function getSaveContent( save, attributes ) {
+export function getSaveContent( save, blockName, attributes ) {
 	let rawContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -37,8 +39,18 @@ export function getSaveContent( save, attributes ) {
 		}
 	}
 
+	// Adding a generic classname
+	const addClassnameToElement = ( element ) => {
+		if ( ! element || ! isObject( element ) ) {
+			return element;
+		}
+		const className = classnames( element.props.className, `wp-block-${ kebabCase( blockName ) }` );
+		return cloneElement( element, { className } );
+	};
+	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
+
 	// Otherwise, infer as element
-	return renderToString( rawContent );
+	return renderToString( contentWithClassname );
 }
 
 const escapeDoubleQuotes = value => value.replace( /"/g, '\"' );
@@ -107,7 +119,7 @@ function asNameValuePair( value, key ) {
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
-	const saveContent = getSaveContent( blockType.save, block.attributes );
+	const saveContent = getSaveContent( blockType.save, blockName, block.attributes );
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
 
 	const serializedAttributes = ! isEmpty( saveAttributes )

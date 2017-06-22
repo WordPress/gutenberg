@@ -26,6 +26,7 @@ describe( 'block serializer', () => {
 			it( 'should return string verbatim', () => {
 				const saved = getSaveContent(
 					( { attributes } ) => attributes.fruit,
+					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 
@@ -35,10 +36,11 @@ describe( 'block serializer', () => {
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 
-				expect( saved ).to.equal( '<div>Bananas</div>' );
+				expect( saved ).to.equal( '<div class="wp-block-core-fruit">Bananas</div>' );
 			} );
 		} );
 
@@ -50,6 +52,7 @@ describe( 'block serializer', () => {
 							return createElement( 'div', null, this.props.attributes.fruit );
 						}
 					},
+					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 
@@ -124,7 +127,7 @@ describe( 'block serializer', () => {
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p class="wp-block-core-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );
