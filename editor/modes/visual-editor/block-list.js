@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { throttle, reduce } from 'lodash';
+import { throttle, reduce, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { throttle, reduce } from 'lodash';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
+import { ENTER } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ class VisualEditorBlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.appendDefaultBlock = this.appendDefaultBlock.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 250 );
+		this.onPlaceholderKeyDown = this.onPlaceholderKeyDown.bind( this );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
 		this.onScroll = () => this.onPointerMove( { clientY: this.lastClientY } );
@@ -155,6 +157,12 @@ class VisualEditorBlockList extends Component {
 		window.removeEventListener( 'touchend', this.onSelectionEnd );
 	}
 
+	onPlaceholderKeyDown( event ) {
+		if ( event.keyCode === ENTER ) {
+			this.appendDefaultBlock();
+		}
+	}
+
 	appendDefaultBlock() {
 		const newBlock = createBlock( getDefaultBlock() );
 		this.props.onInsertBlock( newBlock );
@@ -199,7 +207,9 @@ class VisualEditorBlockList extends Component {
 					readOnly
 					className="editor-visual-editor__placeholder"
 					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Write' ) }
-					onFocus={ this.appendDefaultBlock }
+					onFocus={ ! blocks.length ? this.appendDefaultBlock : noop }
+					onClick={ !! blocks.length ? this.appendDefaultBlock : noop }
+					onKeyDown={ !! blocks.length ? this.onPlaceholderKeyDown : noop }
 				/>
 			</div>
 		);
