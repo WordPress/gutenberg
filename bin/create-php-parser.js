@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 const pegjs = require( 'pegjs' );
-const phppegjs = require( 'php-pegjs' );
+const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 
 const peg = fs.readFileSync( 'blocks/api/post.pegjs', 'utf8' );
-const parser = pegjs.buildParser(
+
+const parser = pegjs.generate(
 	peg,
-	{ plugins: [ phppegjs ] }
+	{ plugins: [ phpegjs ] }
 );
 
 fs.writeFileSync(
