@@ -113,15 +113,15 @@ registerBlockType( 'core/image', {
 
 	save( { attributes } ) {
 		const { url, alt, caption, align = 'none' } = attributes;
-		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
+		// If there's no caption set only save the image element.
 		if ( ! caption || ! caption.length ) {
-			return img;
+			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
 		}
 
 		return (
-			<figure>
-				{ img }
+			<figure className={ `align${ align }` }>
+				<img src={ url } alt={ alt } />
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);
