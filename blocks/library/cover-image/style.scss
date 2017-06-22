@@ -1,56 +1,6 @@
 .editor-visual-editor__block[data-type="core/cover-image"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content
-		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
-		max-width: 370px;
-	}
-
-	&[data-align="left"] {
-		float: left;
-		margin-right: $block-padding;
-	}
-
-	&[data-align="right"] {
-		float: right;
-		margin-left: $block-padding;
-	}
-
-	&[data-align="wide"],
-	&[data-align="fixed"] {
-		padding-left: 0;
-		padding-right: 0;
-		margin-right: -#{ $block-padding + $block-mover-margin };	/* Compensate for .editor-visual-editor centering padding */
-
-		&:before {
-			left: 0;
-			border-left-width: 0;
-			border-right-width: 0;
-		}
-
-		.editor-block-mover {
-			display: none;
-		}
-
-		.editor-visual-editor__block-controls {
-			max-width: #{ $visual-editor-max-width - $block-padding - ( $block-padding * 2 + $block-mover-margin ) };
-			margin-left: auto;
-			margin-right: auto;
-		}
-
-		.cover-image {
-			background-size: cover;
-		}
-	}
-
 	.blocks-editable__tinymce[data-is-empty="true"]:before {
 		position: inherit;
-	}
-
-	&[data-align="fixed"] {
-		.cover-image {
-			background-attachment: fixed;
-		}
 	}
 }
 
@@ -64,13 +14,23 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		background-attachment: fixed;
+	}
+
+	.cover-image::before {
+		content: '';
+		position: absolute;
+		top: $block-padding;
+		right: $block-padding * 2 + $block-mover-margin;
+		bottom: $block-padding;
+		left: $block-padding * 2 + $block-mover-margin;
+		background: rgba( 0,0,0,.5 );
 	}
 
 	h2 {
 		color: white;
-		font-size: 48pt;
+		font-size: 24pt;
 		line-height: 1em;
-		text-shadow:  1px 0 rgba(0,0,0, 0.5), 0 1px rgba(0,0,0, 0.5), 1px 0 rgba(0,0,0, 0.5), 0 -1px rgba(0,0,0, 0.5);
 	}
 
 }
