@@ -56,6 +56,7 @@ class PostVisibility extends Component {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
+		this.setState( { hasPassword: false } );
 		onSave();
 	}
 
