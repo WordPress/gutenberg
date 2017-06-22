@@ -30,6 +30,10 @@ registerBlockType( 'core/quote', {
 		citation: children( 'footer' ),
 	},
 
+	defaultAttributes: {
+		value: [],
+	},
+
 	transforms: {
 		from: [
 			{
