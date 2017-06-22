@@ -162,7 +162,7 @@ describe( 'block factory', () => {
 						transform: () => [],
 					} ],
 				},
-				save: noop
+				save: noop,
 			} );
 			registerBlockType( 'core/text-block', defaultBlockType );
 
@@ -259,7 +259,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
-				save: noop
+				save: noop,
 			} );
 
 			const block = {
@@ -327,7 +327,7 @@ describe( 'block factory', () => {
 						},
 					} ],
 				},
-				save: noop
+				save: noop,
 			} );
 
 			const block = {
