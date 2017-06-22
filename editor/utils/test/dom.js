@@ -8,7 +8,7 @@ import { expect } from 'chai';
  */
 import { isEditableElement } from '../dom';
 
-describe.only( 'isEditableElement', () => {
+describe( 'isEditableElement', () => {
 	it( 'should return false for non editable nodes', () => {
 		const div = document.createElement( 'div' );
 
