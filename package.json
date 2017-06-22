@@ -99,7 +99,9 @@
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "test-unit-jest": "jest"
+    "test-unit-jest": "jest",
+    "test-unit-jest:coverage": "jest --coverage",
+    "test-unit-jest:watch": "jest --watch"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -110,6 +112,11 @@
       "**/element/**/*.js",
       "**/i18n/**/*.js",
       "**/utils/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/components/clipboard-button/index.js",
+      "<rootDir>/components/form-toggle/index.js",
+      "<rootDir>/components/form-token-field/token.js"
     ],
     "moduleNameMapper": {
       "\\.scss$": "<rootDir>/test/style-mock.js"
