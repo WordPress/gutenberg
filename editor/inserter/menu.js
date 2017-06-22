@@ -228,6 +228,7 @@ class InserterMenu extends Component {
 		const { position, instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlockTypes() );
 
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<Popover position={ position } className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -283,6 +284,7 @@ class InserterMenu extends Component {
 				</div>
 			</Popover>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
