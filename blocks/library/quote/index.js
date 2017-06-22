@@ -56,7 +56,12 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = Array.isArray( value ) ? value[ 0 ] : value;
+					const textElement = value[ 0 ];
+					if ( ! textElement ) {
+						return createBlock( 'core/text', {
+							content: citation,
+						} );
+					}
 					const textContent = isString( textElement ) ? textElement : textElement.props.children;
 					if ( Array.isArray( value ) || citation ) {
 						const text = createBlock( 'core/text', {
