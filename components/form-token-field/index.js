@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some, throttle } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -46,6 +46,7 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
+		this.throlltedSpeak = throttle( this.speak.bind( this ), 1000 );
 	}
 
 	componentDidUpdate() {
@@ -190,13 +191,13 @@ class FormTokenField extends Component {
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
 			if ( !! matchingSuggestions.length ) {
-				this.speak( sprintf( _n(
+				this.throlltedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
 				), matchingSuggestions.length ) );
 			} else {
-				this.speak( __( 'No results.' ) );
+				this.throlltedSpeak( __( 'No results.' ) );
 			}
 		}
 	}
