@@ -49,21 +49,21 @@ final class WP_Block_Type_Registry {
 	public function register( $name, $args ) {
 		if ( ! is_string( $name ) ) {
 			$message = __( 'Block type names must be strings.' );
-			_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
 		}
 
 		$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
 		if ( ! preg_match( $name_matcher, $name ) ) {
 			$message = __( 'Block type names must contain a namespace prefix. Example: my-plugin/my-custom-block-type' );
-			_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
 		}
 
 		if ( $this->is_registered( $name ) ) {
 			/* translators: 1: block name */
 			$message = sprintf( __( 'Block type "%s" is already registered.' ), $name );
-			_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
 		}
 
@@ -87,7 +87,7 @@ final class WP_Block_Type_Registry {
 		if ( ! $this->is_registered( $name ) ) {
 			/* translators: 1: block name */
 			$message = sprintf( __( 'Block type "%s" is not registered.' ), $name );
-			_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
 		}
 
