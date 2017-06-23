@@ -40,7 +40,17 @@ describe( 'block serializer', () => {
 					{ fruit: 'Bananas' }
 				);
 
-				expect( saved ).to.equal( '<div class="wp-block-core-fruit">Bananas</div>' );
+				expect( saved ).to.equal( '<div class="wp-block-fruit">Bananas</div>' );
+			} );
+
+			it( 'should return use the namespace in the classname if it\' not a core block', () => {
+				const saved = getSaveContent(
+					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+					'myplugin/fruit',
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
 			} );
 		} );
 
@@ -127,7 +137,7 @@ describe( 'block serializer', () => {
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p class="wp-block-core-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );
