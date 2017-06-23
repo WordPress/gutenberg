@@ -94,14 +94,18 @@
 		color: $white;
 	}
 
+	&[data-subscript] svg {
+		padding: 4px 8px 4px 0px;
+	}
+
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
-		font-size: 10px;
+		font-size: $default-font-size;
 		font-weight: bold;
 		position: relative;
-		top: -6px;
-		left: -9px;
+		top: -5px;
+		left: -12px;
 	}
 }
 
