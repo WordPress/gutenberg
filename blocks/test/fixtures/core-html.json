@@ -5,12 +5,12 @@
         "attributes": {
             "content": [
                 {
-                    "children": "Some HTML code"
+                    "children": "Some HTML code",
                     "type": "h1"
-                }
-                "\n"
+                },
+                "\n",
                 {
-                    "children": "This text will scroll from right to left"
+                    "children": "This text will scroll from right to left",
                     "type": "marquee"
                 }
             ]
