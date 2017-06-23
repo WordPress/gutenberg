@@ -397,12 +397,6 @@ maybeDescribe( 'FormTokenField', function() {
 			expect( textInputNode.prop( 'value' ) ).to.equal( ' quux' );
 		} );
 
-		it( 'should skip empty tokens at the beginning of a paste', function() {
-			setText( ',  ,\t \t  ,,baz, quux' );
-			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).to.equal( ' quux' );
-		} );
-
 		it( 'should skip empty tokens in the middle of a paste', function() {
 			setText( 'baz,  ,\t \t  ,,quux' );
 			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'baz' ] );
