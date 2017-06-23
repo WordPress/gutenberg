@@ -74,6 +74,6 @@ registerBlockType( 'core/html', {
 	},
 
 	save( { attributes } ) {
-		return <div>{ attributes.content }</div>;
+		return attributes.content;
 	},
 } );
