@@ -25,6 +25,8 @@ registerBlockType( 'core/html', {
 
 	category: 'formatting',
 
+	className: false,
+
 	attributes: {
 		content: children(),
 	},
