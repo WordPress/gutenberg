@@ -44,7 +44,12 @@ export function getSaveContent( save, blockName, attributes ) {
 		if ( ! element || ! isObject( element ) ) {
 			return element;
 		}
-		const className = classnames( element.props.className, `wp-block-${ kebabCase( blockName ) }` );
+
+		// Drop the namespace "core/"" for core blocks only
+		const match = /^([a-z0-9-]+)\/([a-z0-9-]+)$/.exec( blockName );
+		const sanitizedBlockName = match[ 1 ] === 'core' ? match[ 2 ] : blockName;
+
+		const className = classnames( element.props.className, `wp-block-${ kebabCase( sanitizedBlockName ) }` );
 		return cloneElement( element, { className } );
 	};
 	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
