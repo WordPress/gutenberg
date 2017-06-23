@@ -40,6 +40,7 @@ function ModeSwitcher( { mode, onSwitch } ) {
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<div className="editor-mode-switcher">
+			<label className="screen-reader-text">{ __( 'Change editor mode' ) }</label>
 			<select
 				value={ mode }
 				onChange={ ( event ) => onSwitch( event.target.value ) }
