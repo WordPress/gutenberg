@@ -19,9 +19,8 @@
 
 .components-panel__body {
 	padding: 15px;
-	border: 1px solid $light-gray-500;
-	margin-left: -1px;
-	margin-right: -1px;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 }
 
 .components-panel__header {
@@ -31,9 +30,8 @@
 	background: $light-gray-300;
 	padding: 0 15px;
 	height: 50px;
-	border: 1px solid $light-gray-500;
-	margin-left: -1px;
-	margin-right: -1px;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 
 	h2 {
 		margin: 0;
