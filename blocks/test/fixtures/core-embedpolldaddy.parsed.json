@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://polldaddy.com/"
         },
-        "rawContent": "\n<figure>\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedpolldaddy\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

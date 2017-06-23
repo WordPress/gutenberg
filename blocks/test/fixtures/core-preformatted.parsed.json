@@ -1,8 +1,8 @@
 [
     {
         "blockName": "core/preformatted",
-        "attrs": {},
-        "rawContent": "\n<pre>Some <em>preformatted</em> text...<br>And more!</pre>\n"
+        "attrs": null,
+        "rawContent": "\n<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>\n"
     },
     {
         "attrs": {},

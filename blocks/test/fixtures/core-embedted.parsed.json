@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://ted.com/"
         },
-        "rawContent": "\n<figure>\n    https://ted.com/\n    <figcaption>Embedded content from ted</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedted\">\n    https://ted.com/\n    <figcaption>Embedded content from ted</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

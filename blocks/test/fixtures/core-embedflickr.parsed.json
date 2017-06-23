@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://flickr.com/"
         },
-        "rawContent": "\n<figure>\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedflickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

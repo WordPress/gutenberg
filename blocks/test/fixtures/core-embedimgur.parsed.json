@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://imgur.com/"
         },
-        "rawContent": "\n<figure>\n    https://imgur.com/\n    <figcaption>Embedded content from imgur</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedimgur\">\n    https://imgur.com/\n    <figcaption>Embedded content from imgur</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

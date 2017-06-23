@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://meetupcom.com/"
         },
-        "rawContent": "\n<figure>\n    https://meetupcom.com/\n    <figcaption>Embedded content from meetupcom</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedmeetupcom\">\n    https://meetupcom.com/\n    <figcaption>Embedded content from meetupcom</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

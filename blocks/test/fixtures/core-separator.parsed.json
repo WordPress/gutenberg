@@ -1,8 +1,8 @@
 [
     {
         "blockName": "core/separator",
-        "attrs": {},
-        "rawContent": "\n<hr/>\n"
+        "attrs": null,
+        "rawContent": "\n<hr class=\"wp-block-separator\" />\n"
     },
     {
         "attrs": {},

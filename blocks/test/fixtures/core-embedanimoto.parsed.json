@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://animoto.com/"
         },
-        "rawContent": "\n<figure>\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embedanimoto\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

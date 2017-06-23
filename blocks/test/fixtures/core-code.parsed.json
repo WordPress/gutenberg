@@ -1,8 +1,8 @@
 [
     {
         "blockName": "core/code",
-        "attrs": {},
-        "rawContent": "\n<pre><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n"
+        "attrs": null,
+        "rawContent": "\n<pre class=\"wp-block-code\"><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n"
     },
     {
         "attrs": {},
