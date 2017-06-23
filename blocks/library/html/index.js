@@ -55,8 +55,10 @@ registerBlockType( 'core/html', {
 				<div>
 					{ focus &&
 						<BlockControls key="controls">
-							<button onClick={ this.edit }>HTML</button>
-							<button onClick={ this.preview }>Visual</button>
+							<ul className="components-toolbar">
+								<li><button className="components-tab-button" onClick={ this.edit }><span>HTML</span></button></li>
+								<li><button className="components-tab-button" onClick={ this.preview }><span>Visual</span></button></li>
+							</ul>
 						</BlockControls>
 					}
 					{ preview
