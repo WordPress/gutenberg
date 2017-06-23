@@ -15,7 +15,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @EphoxJames | |
 | @mkaz | |
 | @notnownikki | |
-| @BE | |-Webdesign
+| @BE-Webdesign | |
 | @njpanderson | |
 | @mimo84 | |
 | @intronic | |
@@ -31,7 +31,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @circlecube | |
 | @adamsilverstein | |
 | @timmyc | |
-| @ephox | |-mogran
+| @ephox-mogran | |
 | @nb | |
 | @JDGrimes | |
 | @Soean | |
