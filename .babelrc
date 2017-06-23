@@ -29,9 +29,7 @@
 			]
 		},
 		"test": {
-			"presets": [
-				[ "env" ]
-			]
+			"presets": [ "env" ]
 		},
 		"gettext": {
 			"plugins": [

@@ -99,9 +99,9 @@
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "test-unit-jest": "jest",
-    "test-unit-jest:coverage": "jest --coverage",
-    "test-unit-jest:watch": "jest --watch"
+    "test-unit:jest": "jest",
+    "test-unit:coverage": "jest --coverage",
+    "test-unit:watch": "jest --watch"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -123,6 +123,9 @@
     },
     "modulePaths": [
       "<rootDir>"
+    ],
+    "setupFiles": [
+      "<rootDir>/test/setup-globals.js"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
     "testMatch": [
