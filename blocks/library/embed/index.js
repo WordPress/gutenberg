@@ -9,7 +9,7 @@ import { includes } from 'lodash';
  */
 import { __, sprintf } from 'i18n';
 import { Component } from 'element';
-import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
+import { Button, Placeholder, Spinner, SandBox } from 'components';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
 
+// These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
@@ -72,7 +73,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 
 			getPhotoHtml( photo ) {
-				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } /></p>;
+				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
+				// acually the full size photo.
+				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 				return wp.element.renderToString( photoPreview );
 			}
 
@@ -158,6 +161,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+				const iframeTitle = 'Embedded content from ' + parsedUrl.host;
 				let typeClassName = 'blocks-embed';
 
 				if ( 'video' === type ) {
@@ -173,7 +177,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
-							<HtmlEmbed html={ html } />
+							<SandBox html={ html } title={ iframeTitle } />
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable
