@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedvine",
+        "attrs": {
+            "url": "https://vine.com/"
+        },
+        "rawContent": "\n<figure>\n    https://vine.com/\n    <figcaption>Embedded content from vine</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

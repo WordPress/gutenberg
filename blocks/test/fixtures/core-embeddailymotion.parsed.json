@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embeddailymotion",
+        "attrs": {
+            "url": "https://dailymotion.com/"
+        },
+        "rawContent": "\n<figure>\n    https://dailymotion.com/\n    <figcaption>Embedded content from dailymotion</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

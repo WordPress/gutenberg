@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/latestposts",
+        "attrs": {
+            "poststoshow": "5"
+        },
+        "rawContent": ""
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedsmugmug",
+        "attrs": {
+            "url": "https://smugmug.com/"
+        },
+        "rawContent": "\n<figure>\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

@@ -6,11 +6,13 @@ and serialization logic.
 Each test is made up of three fixture files:
 
 1. `fixture-name.html`: The initial post content.
-2. `fixture-name.json`: The **expected** parsed representation of the block(s)
-   inside the post content, along with their attributes and any nested content.
-   The contents of this file are compared against the **actual** parsed block
-   object(s).
-3. `fixture-name.serialized.html`: The **expected** result of calling
+2. `fixture-name.parsed.json`: The **expected** output of the PEG parser for
+   this content (checked against the **actual** output of both the JS and PHP
+   versions of the parser).
+3. `fixture-name.json`: The **expected** representation of the block(s) inside
+   the post content, along with their attributes and any nested content.  The
+   contents of this file are compared against the **actual** block object(s).
+4. `fixture-name.serialized.html`: The **expected** result of calling
    `serialize` on the parsed block object(s).  The contents of this file are
    compared against the **actual** re-serialized post content.  This final step
    simulates opening and re-saving a post.
@@ -22,8 +24,9 @@ the parsing and serialization of that block.  These fixtures must be named like
 
 1. `core-image.html` (or `core-image-specific-test-name.html`).  Must contain a
    `<!-- wp:core/image -->` block.
-2. `core-image.json` (or `core-image-specific-test-name.html`).
-3. `core-image.serialized.html` (or
+2. `core-image.parsed.json` (or `core-image-specific-test-name.parsed.json`).
+3. `core-image.json` (or `core-image-specific-test-name.json`).
+4. `core-image.serialized.html` (or
    `core-image-specific-test-name.serialized.html`).
 
 Ideally all important attributes and features of the block should be tested
