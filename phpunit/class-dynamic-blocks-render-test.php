@@ -33,8 +33,13 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 * Tear down.
 	 */
 	function tearDown() {
+		parent::tearDown();
+
 		$this->dummy_block_instance_number = 0;
-		$GLOBALS['wp_registered_blocks'] = array();
+
+		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $block_type ) {
+			WP_Block_Type_Registry::get_instance()->unregister( $name );
+		}
 	}
 
 	/**
