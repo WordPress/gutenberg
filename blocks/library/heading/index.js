@@ -26,6 +26,8 @@ registerBlockType( 'core/heading', {
 
 	category: 'common',
 
+	className: false,
+
 	attributes: {
 		content: children( 'h1,h2,h3,h4,h5,h6' ),
 		nodeName: prop( 'h1,h2,h3,h4,h5,h6', 'nodeName' ),
