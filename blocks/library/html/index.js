@@ -19,7 +19,7 @@ import BlockControls from '../../block-controls';
 const { children } = query;
 
 registerBlockType( 'core/html', {
-	title: __( 'HTML' ),
+	title: __( 'Custom HTML' ),
 
 	icon: 'editor-code',
 
@@ -63,7 +63,7 @@ registerBlockType( 'core/html', {
 								</li>
 								<li>
 									<button className={ `components-tab-button ${ preview ? 'is-active' : '' }` } onClick={ this.preview }>
-										<span>Visual</span>
+										<span>{ __( 'Preview' ) }</span>
 									</button>
 								</li>
 							</ul>
