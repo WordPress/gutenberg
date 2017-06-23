@@ -175,12 +175,23 @@
 
 		&:before {
 			left: 0;
+			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
 		}
 
 		.editor-block-mover {
 			display: none;
+		}
+
+		.editor-block-settings-menu {
+			top: -24px;
+			right: 10px;
+		}
+
+		.editor-block-settings-menu__control {
+			float: left;
+			margin-right: 8px;
 		}
 	}
 
