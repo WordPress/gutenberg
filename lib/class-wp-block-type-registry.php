@@ -115,6 +115,18 @@ final class WP_Block_Type_Registry {
 	}
 
 	/**
+	 * Retrieves all registered block types.
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 *
+	 * @return array Associative array of `$block_type_name => $block_type` pairs.
+	 */
+	public function get_all_registered() {
+		return $this->registered_block_types;
+	}
+
+	/**
 	 * Checks if a block type is registered.
 	 *
 	 * @since 0.2.0
