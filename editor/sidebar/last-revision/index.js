@@ -15,7 +15,7 @@ import PanelBody from 'components/panel/body';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPost, isSavingPost } from '../../selectors';
+import { getCurrentPostId, getCurrentPostType, isSavingPost } from '../../selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 class LastRevision extends Component {
@@ -112,8 +112,8 @@ class LastRevision extends Component {
 export default connect(
 	( state ) => {
 		return {
-			postId: getCurrentPost( state ).id,
-			postType: getCurrentPost( state ).type,
+			postId: getCurrentPostId( state ),
+			postType: getCurrentPostType( state ),
 			isSaving: isSavingPost( state ),
 		};
 	}

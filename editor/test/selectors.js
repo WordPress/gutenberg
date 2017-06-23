@@ -16,6 +16,7 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getCurrentPostId,
+	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
@@ -204,6 +205,18 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).to.equal( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostType', () => {
+		it( 'should return the post type', () => {
+			const state = {
+				currentPost: {
+					type: 'post',
+				},
+			};
+
+			expect( getCurrentPostType( state ) ).to.equal( 'post' );
 		} );
 	} );
 
