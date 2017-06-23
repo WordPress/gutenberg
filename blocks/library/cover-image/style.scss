@@ -1,0 +1,41 @@
+.editor-visual-editor__block[data-type="core/cover-image"] {
+	.blocks-editable__tinymce[data-is-empty="true"]:before {
+		position: inherit;
+	}
+
+	.blocks-cover-image {
+		margin: 0;
+
+		h2 {
+			color: white;
+			font-size: 24pt;
+			line-height: 1em;
+		}
+
+	}
+
+	.cover-image {
+		background-size: cover;
+		height: 430px;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-attachment: fixed;
+	}
+
+	.cover-image::before {
+		content: '';
+		position: absolute;
+		top: $block-padding;
+		right: $block-padding * 2 + $block-mover-margin;
+		bottom: $block-padding;
+		left: $block-padding * 2 + $block-mover-margin;
+		background: rgba( 0,0,0,.5 );
+	}
+
+	&[data-align="full"] .cover-image::before {
+		right: 0;
+		left: 0;
+	}
+}

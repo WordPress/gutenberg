@@ -10,6 +10,7 @@
 
 	@include break-small() {
 		position: fixed;
+		overflow: auto;
 	}
 
 	@include break-medium() {
@@ -17,9 +18,8 @@
 	}
 
 	> .components-panel {
-		margin-left: -1px;
-		margin-right: -1px;
-
+		border-left: none;
+		border-right: none;
 		&:first-child {
 			margin-top: -1px;
 		}
