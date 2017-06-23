@@ -2,6 +2,7 @@
  * Temporary test post content
  */
 window._wpGutenbergPost = {
+	type: 'post',
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},

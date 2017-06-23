@@ -15,7 +15,12 @@ import { __ } from 'i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { focusBlock, replaceBlocks } from './actions';
-import { getCurrentPost, getCurrentPostId, getBlocks, getPostEdits } from './selectors';
+import {
+	getCurrentPostId,
+	getCurrentPostType,
+	getBlocks,
+	getPostEdits,
+} from './selectors';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -43,7 +48,7 @@ export default {
 			edits: toSend,
 			optimist: { id: transactionId },
 		} );
-		const Model = wp.api.getPostTypeModel( getCurrentPost( state ).type );
+		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
@@ -78,9 +83,9 @@ export default {
 		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	TRASH_POST( action, store ) {
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 		const { postId } = action;
-		const Model = wp.api.getPostTypeModel( getCurrentPost( store.getState() ).type );
+		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
 		new Model( { id: postId } ).destroy().done( () => {
 			dispatch( {
 				...action,

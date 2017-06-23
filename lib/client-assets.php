@@ -413,7 +413,14 @@ function gutenberg_scripts_and_styles( $hook ) {
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
 	} else {
-		// TODO: Error handling.
+		// ...with a new empty post
+		$empty_post = array(
+			'type' => 'post',
+		);
+		wp_add_inline_script(
+			'wp-editor',
+			'window._wpGutenbergPost = ' . wp_json_encode( $empty_post ) . ';'
+		);
 	}
 
 	// Prepare Jed locale data.

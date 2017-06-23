@@ -86,6 +86,16 @@ export function getCurrentPost( state ) {
 }
 
 /**
+ * Returns the post type of the post currently being edited
+ *
+ * @param  {Object} state Global application state
+ * @return {String}       Post type
+ */
+export function getCurrentPostType( state ) {
+	return state.currentPost.type;
+}
+
+/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
