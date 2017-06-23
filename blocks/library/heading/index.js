@@ -108,7 +108,7 @@ registerBlockType( 'core/heading', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<h4>{ __( 'Heading Size' ) }</h4>
+					<h3>{ __( 'Heading Size' ) }</h3>
 					<Toolbar
 						controls={
 							'123456'.split( '' ).map( ( level ) => ( {
@@ -120,7 +120,7 @@ registerBlockType( 'core/heading', {
 							} ) )
 						}
 					/>
-					<h4>{ __( 'Text Alignment' ) }</h4>
+					<h3>{ __( 'Text Alignment' ) }</h3>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
