@@ -40,4 +40,10 @@
 	<rule ref="Generic.Commenting.DocComment.MissingShort">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
+	<rule ref="Squiz.Commenting.VariableComment.Missing">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
 </ruleset>

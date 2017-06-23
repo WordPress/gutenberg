@@ -58,7 +58,7 @@ script:
       node bin/create-php-parser.js || exit 1
       php lib/parser.php || exit 1
       # Run PHPUnit tests
-      phpunit || exit 1
+      RUN_PARSER_TESTS=1 phpunit || exit 1
       WP_MULTISITE=1 phpunit || exit 1
     fi
   - |
