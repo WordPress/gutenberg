@@ -17,15 +17,29 @@ import { getBlockType } from './registration';
 import { parseBlockAttributes } from './parser';
 
 /**
- * Given a block's save render implementation and attributes, returns the
+ * Returns the block's default classname from its name
+ *
+ * @param {String}   blockName  The block name
+ * @return {string}             The block's default class
+ */
+export function getBlockDefaultClassname( blockName ) {
+	// Drop the namespace "core/"" for core blocks only
+	const match = /^([a-z0-9-]+)\/([a-z0-9-]+)$/.exec( blockName );
+	const sanitizedBlockName = match[ 1 ] === 'core' ? match[ 2 ] : blockName;
+
+	return `wp-block-${ kebabCase( sanitizedBlockName ) }`;
+}
+
+/**
+ * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Function|WPComponent} save       Save render implementation
- * @param  {String}               blockName  Block name
+ * @param  {Object}               blockType  Block type
  * @param  {Object}               attributes Block attributes
  * @return {string}                          Save content
  */
-export function getSaveContent( save, blockName, attributes ) {
+export function getSaveContent( blockType, attributes ) {
+	const { save, className = getBlockDefaultClassname( blockType.name ) } = blockType;
 	let rawContent;
 
 	if ( save.prototype instanceof Component ) {
@@ -41,16 +55,12 @@ export function getSaveContent( save, blockName, attributes ) {
 
 	// Adding a generic classname
 	const addClassnameToElement = ( element ) => {
-		if ( ! element || ! isObject( element ) ) {
+		if ( ! element || ! isObject( element ) || ! className ) {
 			return element;
 		}
 
-		// Drop the namespace "core/"" for core blocks only
-		const match = /^([a-z0-9-]+)\/([a-z0-9-]+)$/.exec( blockName );
-		const sanitizedBlockName = match[ 1 ] === 'core' ? match[ 2 ] : blockName;
-
-		const className = classnames( element.props.className, `wp-block-${ kebabCase( sanitizedBlockName ) }` );
-		return cloneElement( element, { className } );
+		const updatedClassName = classnames( element.props.className, className );
+		return cloneElement( element, { className: updatedClassName } );
 	};
 	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
 
@@ -124,7 +134,7 @@ function asNameValuePair( value, key ) {
 export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
-	const saveContent = getSaveContent( blockType.save, blockName, block.attributes );
+	const saveContent = getSaveContent( blockType, block.attributes );
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
 
 	const serializedAttributes = ! isEmpty( saveAttributes )

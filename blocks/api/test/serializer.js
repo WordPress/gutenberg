@@ -25,8 +25,10 @@ describe( 'block serializer', () => {
 		context( 'function save', () => {
 			it( 'should return string verbatim', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => attributes.fruit,
-					'core/fruit',
+					{
+						save: ( { attributes } ) => attributes.fruit,
+						name: 'core/fruit',
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -35,8 +37,10 @@ describe( 'block serializer', () => {
 
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-					'core/fruit',
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'core/fruit',
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -45,24 +49,54 @@ describe( 'block serializer', () => {
 
 			it( 'should return use the namespace in the classname if it\' not a core block', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
-					'myplugin/fruit',
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+					},
 					{ fruit: 'Bananas' }
 				);
 
 				expect( saved ).to.equal( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
+			} );
+
+			it( 'should overrides the className', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: 'apples',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="apples">Bananas</div>' );
+			} );
+
+			it( 'should not add a className if falsy', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: false,
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div>Bananas</div>' );
 			} );
 		} );
 
 		context( 'component save', () => {
 			it( 'should return element as string', () => {
 				const saved = getSaveContent(
-					class extends Component {
-						render() {
-							return createElement( 'div', null, this.props.attributes.fruit );
-						}
+					{
+						save: class extends Component {
+							render() {
+								return createElement( 'div', null, this.props.attributes.fruit );
+							}
+						},
+						name: 'core/fruit',
 					},
-					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 

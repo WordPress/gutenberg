@@ -23,6 +23,8 @@ registerBlockType( 'core/text', {
 
 	category: 'common',
 
+	className: false,
+
 	attributes: {
 		content: query( 'p', children() ),
 	},
