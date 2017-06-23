@@ -29,7 +29,7 @@
 	margin-bottom: 5px;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-	 // The block mover needs to stay inside the block to allow clicks when hovering the block
+	// The block mover needs to stay inside the block to allow clicks when hovering the block
 	padding: $block-padding $block-padding + $block-mover-padding-visible;
 
 	&:before {
