@@ -9,7 +9,7 @@ window._wpGutenbergPost = {
 	content: {
 		raw: [
 			'<!-- wp:core/cover-image url="https://cldup.com/GCwahb3aOb.jpg" -->',
-			'<section className="cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Gutenberg Editor</h2></section>',
+			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Gutenberg Editor</h2></section>',
 			'<!-- /wp:core/cover-image -->',
 
 			'<!-- wp:core/text data="{\\"projectName\\":\\"gutenberg\\",\\"isAwesome\\":true}" -->',
@@ -39,7 +39,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image align="center" -->',
-			'<figure><img alt="Beautiful landscape" src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+			'<figure class="wp-block-image"><img alt="Beautiful landscape" src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -67,11 +67,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/button align="center" -->',
-			'<div class="aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+			'<div class="aligncenter wp-block-button"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
 			'<!-- /wp:core/button -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/heading -->',
@@ -83,7 +83,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote style="1" -->',
-			'<blockquote class="blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
+			'<blockquote class="blocks-quote-style-1 wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/text -->',
@@ -95,11 +95,11 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote style="2" -->',
-			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
+			'<blockquote class="blocks-quote-style-2 wp-block-quote"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/heading -->',
@@ -111,7 +111,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -123,21 +123,21 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/code -->',
-			'<pre><code>export default function MyButton() {\n\
+			'<pre class="wp-block-code"><code>export default function MyButton() {\n\
 	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 }</code></pre>',
 			'<!-- /wp:core/code -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img alt="Yet another image block" src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img alt="Yet another image block" src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/preformatted -->',
-			'<pre>An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
+			'<pre class="wp-block-preformatted">An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
 			'<!-- /wp:core/preformatted -->',
 
 			'<!-- wp:core/text -->',
@@ -153,15 +153,15 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/list -->',
 
 			'<!-- wp:core/pullquote -->',
-			'<blockquote class="blocks-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+			'<blockquote class="blocks-pullquote wp-block-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
 			'<!-- /wp:core/pullquote -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/table -->',
-			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
+			'<table class="widefat wp-block-table"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
 			'<!-- /wp:core/table -->',
 
 			'<!-- wp:core/heading -->',
@@ -169,7 +169,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
+			'<figure class="wp-block-embed">https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
 			'<!-- wp:core/embed url="https://twitter.com/photomatt/status/868657763970404352" -->',
