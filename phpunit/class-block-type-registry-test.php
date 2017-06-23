@@ -10,6 +10,11 @@
  */
 class Block_Type_Registry_Test extends WP_UnitTestCase {
 
+	/**
+	 * Dummy block type registry.
+	 *
+	 * @var WP_Block_Type_Registry
+	 */
 	private $registry = null;
 
 	function setUp() {
