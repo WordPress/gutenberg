@@ -104,7 +104,7 @@ final class WP_Block_Type_Registry {
 	 * @access public
 	 *
 	 * @param string $name Block type name including namespace.
-	 * @return WP_Block_Type|null The unregistered block type, or null if it is not registered.
+	 * @return WP_Block_Type|null The registered block type, or null if it is not registered.
 	 */
 	public function get_registered( $name ) {
 		if ( ! $this->is_registered( $name ) ) {
