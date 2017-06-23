@@ -223,7 +223,12 @@ class VisualEditorBlock extends Component {
 		}
 	}
 
-	onPointerDown() {
+	onPointerDown( event ) {
+		// Not the main button (usually the left button on pointer device).
+		if ( event.buttons !== 1 ) {
+			return;
+		}
+
 		this.props.onSelectionStart();
 		this.props.onSelect();
 	}
