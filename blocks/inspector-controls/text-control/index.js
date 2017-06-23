@@ -6,6 +6,7 @@ import { withInstanceId } from 'components';
 /**
  * Internal dependencies
  */
+import BaseControl from './../base-control';
 import './style.scss';
 
 function TextControl( { label, value, instanceId, onChange, type = 'text', ...props } ) {
@@ -13,10 +14,9 @@ function TextControl( { label, value, instanceId, onChange, type = 'text', ...pr
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<div className="blocks-text-control">
-			<label className="blocks-text-control__label" htmlFor={ id }>{ label }</label>
+		<BaseControl label={ label } id={ id }>
 			<input className="blocks-text-control__input" type={ type } id={ id } value={ value } onChange={ onChangeValue } { ...props } />
-		</div>
+		</BaseControl>
 	);
 }
 
