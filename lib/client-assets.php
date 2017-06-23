@@ -414,6 +414,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 		);
 	} else {
 		// ...with a new empty post
+		// TODO: Error handling if we tried and failed to get a post above
 		$empty_post = array(
 			'type' => 'post',
 		);
