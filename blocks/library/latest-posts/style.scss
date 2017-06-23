@@ -12,7 +12,9 @@
 }
 
 .blocks-latest-posts__post-date {
-	padding-left: 1em;
+	display: block;
+	color: $dark-gray-100;
+	font-size: $default-font-size;
 }
 
 .editor-latest-posts__input {
