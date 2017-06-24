@@ -22,5 +22,6 @@ if ( gutenberg_can_init() ) {
 	require_once dirname( __FILE__ ) . '/lib/register.php';
 
 	// Register server-side code for individual blocks.
+	require_once dirname( __FILE__ ) . '/lib/blocks/quote.php';
 	require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
 }
