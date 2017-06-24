@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "eslint": "^3.19.0",
-    "eslint-config-stylelint": "^6.0.0",
+    "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "eslint-plugin-jest": "^20.0.0",
     "jest": "^20.0.0",
     "npm-run-all": "^4.0.0",
@@ -67,7 +67,7 @@
       "jest"
     ],
     "extends": [
-      "stylelint",
+      "plugin:wordpress/recommended",
       "plugin:jest/recommended"
     ],
     "env": {
