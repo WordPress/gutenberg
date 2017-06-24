@@ -8,6 +8,7 @@ import { Toolbar, Placeholder } from 'components';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';

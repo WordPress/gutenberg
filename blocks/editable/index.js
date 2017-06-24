@@ -18,6 +18,7 @@ import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
