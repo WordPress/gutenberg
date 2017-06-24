@@ -18,14 +18,14 @@ describe( 'flags no warnings with valid values css', () => {
 
 	it( 'did not error', () => {
 		return result.then( data => (
-      expect( data.errored ).toBeFalsy()
-    ) );
+			expect( data.errored ).toBeFalsy()
+		) );
 	});
 
 	it( 'flags no warnings', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings.length ).toBe( 0 )
-    ) );
+			expect( data.results[0].warnings.length ).toBe( 0 )
+		) );
 	});
 });
 
@@ -41,283 +41,283 @@ describe( 'flags warnings with invalid values css', () => {
 
 	it( 'did error', () => {
 		return result.then( data => (
-      expect( data.errored ).toBeTruthy()
-    ) );
+			expect( data.errored ).toBeTruthy()
+		) );
 	});
 
 	it( 'flags warnings', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings.length ).toBe( 9 )
-    ) );
+			expect( data.results[0].warnings.length ).toBe( 9 )
+		) );
 	});
 
 	it( 'correct first warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].text ).toBe( 'Expected a trailing semicolon (declaration-block-trailing-semicolon)' )
-    ) );
+			expect( data.results[0].warnings[0].text ).toBe( 'Expected a trailing semicolon (declaration-block-trailing-semicolon)' )
+		) );
 	});
 
 	it( 'correct first warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].rule ).toBe( 'declaration-block-trailing-semicolon' )
-    ) );
+			expect( data.results[0].warnings[0].rule ).toBe( 'declaration-block-trailing-semicolon' )
+		) );
 	});
 
 	it( 'correct first warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[0].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct first warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].line ).toBe( 2 )
-    ) );
+			expect( data.results[0].warnings[0].line ).toBe( 2 )
+		) );
 	});
 
 	it( 'correct first warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].column ).toBe( 16 )
-    ) );
+			expect( data.results[0].warnings[0].column ).toBe( 16 )
+		) );
 	});
 
 	it( 'correct second warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].text ).toBe( 'Expected single space after ":" with a single-line declaration (declaration-colon-space-after)' )
-    ) );
+			expect( data.results[0].warnings[1].text ).toBe( 'Expected single space after ":" with a single-line declaration (declaration-colon-space-after)' )
+		) );
 	});
 
 	it( 'correct second warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].rule ).toBe( 'declaration-colon-space-after' )
-    ) );
+			expect( data.results[0].warnings[1].rule ).toBe( 'declaration-colon-space-after' )
+		) );
 	});
 
 	it( 'correct second warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[1].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct second warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].line ).toBe( 2 )
-    ) );
+			expect( data.results[0].warnings[1].line ).toBe( 2 )
+		) );
 	});
 
 	it( 'correct second warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].column ).toBe( 13 )
-    ) );
+			expect( data.results[0].warnings[1].column ).toBe( 13 )
+		) );
 	});
 
 	it( 'correct third warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].text ).toBe( 'Unexpected unit "em" for property "line-height" (declaration-property-unit-whitelist)' )
-    ) );
+			expect( data.results[0].warnings[2].text ).toBe( 'Unexpected unit "em" for property "line-height" (declaration-property-unit-whitelist)' )
+		) );
 	});
 
 	it( 'correct third warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].rule ).toBe( 'declaration-property-unit-whitelist' )
-    ) );
+			expect( data.results[0].warnings[2].rule ).toBe( 'declaration-property-unit-whitelist' )
+		) );
 	});
 
 	it( 'correct third warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[2].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].line ).toBe( 12 )
-    ) );
+			expect( data.results[0].warnings[2].line ).toBe( 12 )
+		) );
 	});
 
 	it( 'correct third warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].column ).toBe( 15 )
-    ) );
+			expect( data.results[0].warnings[2].column ).toBe( 15 )
+		) );
 	});
 
 	it( 'correct forth warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[3].text ).toBe( 'Expected quotes around "Times New Roman" (font-family-name-quotes)' )
-    ) );
+			expect( data.results[0].warnings[3].text ).toBe( 'Expected quotes around "Times New Roman" (font-family-name-quotes)' )
+		) );
 	});
 
 	it( 'correct forth warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[3].rule ).toBe( 'font-family-name-quotes' )
-    ) );
+			expect( data.results[0].warnings[3].rule ).toBe( 'font-family-name-quotes' )
+		) );
 	});
 
 	it( 'correct forth warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[3].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[3].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct forth warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[3].line ).toBe( 10 )
-    ) );
+			expect( data.results[0].warnings[3].line ).toBe( 10 )
+		) );
 	});
 
 	it( 'correct forth warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[3].column ).toBe( 15 )
-    ) );
+			expect( data.results[0].warnings[3].column ).toBe( 15 )
+		) );
 	});
 
 	it( 'correct fifth warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[4].text ).toBe( 'Expected numeric font-weight notation (font-weight-notation)' )
-    ) );
+			expect( data.results[0].warnings[4].text ).toBe( 'Expected numeric font-weight notation (font-weight-notation)' )
+		) );
 	});
 
 	it( 'correct fifth warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[4].rule ).toBe( 'font-weight-notation' )
-    ) );
+			expect( data.results[0].warnings[4].rule ).toBe( 'font-weight-notation' )
+		) );
 	});
 
 	it( 'correct fifth warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[4].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[4].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct fifth warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[4].line ).toBe( 11 )
-    ) );
+			expect( data.results[0].warnings[4].line ).toBe( 11 )
+		) );
 	});
 
 	it( 'correct fifth warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[4].column ).toBe( 15 )
-    ) );
+			expect( data.results[0].warnings[4].column ).toBe( 15 )
+		) );
 	});
 
 	it( 'correct sixth warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[5].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
-    ) );
+			expect( data.results[0].warnings[5].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
+		) );
 	});
 
 	it( 'correct sixth warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[5].rule ).toBe( 'length-zero-no-unit' )
-    ) );
+			expect( data.results[0].warnings[5].rule ).toBe( 'length-zero-no-unit' )
+		) );
 	});
 
 	it( 'correct sixth warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[5].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[5].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct sixth warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[5].line ).toBe( 6 )
-    ) );
+			expect( data.results[0].warnings[5].line ).toBe( 6 )
+		) );
 	});
 
 	it( 'correct sixth warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[5].column ).toBe( 11 )
-    ) );
+			expect( data.results[0].warnings[5].column ).toBe( 11 )
+		) );
 	});
 
 	it( 'correct seventh warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[6].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
-    ) );
+			expect( data.results[0].warnings[6].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
+		) );
 	});
 
 	it( 'correct seventh warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[6].rule ).toBe( 'length-zero-no-unit' )
-    ) );
+			expect( data.results[0].warnings[6].rule ).toBe( 'length-zero-no-unit' )
+		) );
 	});
 
 	it( 'correct seventh warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[6].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[6].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct seventh warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[6].line ).toBe( 6 )
-    ) );
+			expect( data.results[0].warnings[6].line ).toBe( 6 )
+		) );
 	});
 
 	it( 'correct seventh warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[6].column ).toBe( 15 )
-    ) );
+			expect( data.results[0].warnings[6].column ).toBe( 15 )
+		) );
 	});
 
 	it( 'correct eighth warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[7].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
-    ) );
+			expect( data.results[0].warnings[7].text ).toBe( 'Unexpected unit (length-zero-no-unit)' )
+		) );
 	});
 
 	it( 'correct eighth warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[7].rule ).toBe( 'length-zero-no-unit' )
-    ) );
+			expect( data.results[0].warnings[7].rule ).toBe( 'length-zero-no-unit' )
+		) );
 	});
 
 	it( 'correct eighth warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[7].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[7].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct eighth warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[7].line ).toBe( 6 )
-    ) );
+			expect( data.results[0].warnings[7].line ).toBe( 6 )
+		) );
 	});
 
 	it( 'correct eighth warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[7].column ).toBe( 24 )
-    ) );
+			expect( data.results[0].warnings[7].column ).toBe( 24 )
+		) );
 	});
 
 	it( 'correct ninth warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[8].text ).toBe( "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)" )
-    ) );
+			expect( data.results[0].warnings[8].text ).toBe( "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)" )
+		) );
 	});
 
 	it( 'correct ninth warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[8].rule ).toBe( 'shorthand-property-no-redundant-values' )
-    ) );
+			expect( data.results[0].warnings[8].rule ).toBe( 'shorthand-property-no-redundant-values' )
+		) );
 	});
 
 	it( 'correct ninth warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[8].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[8].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct ninth warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[8].line ).toBe( 6 )
-    ) );
+			expect( data.results[0].warnings[8].line ).toBe( 6 )
+		) );
 	});
 
 	it( 'correct ninth warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[8].column ).toBe( 2 )
-    ) );
+			expect( data.results[0].warnings[8].column ).toBe( 2 )
+		) );
 	});
 });

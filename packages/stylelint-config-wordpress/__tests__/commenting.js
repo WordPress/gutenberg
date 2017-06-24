@@ -18,14 +18,14 @@ describe( 'flags no warnings with valid commenting css', () => {
 
 	it( 'did not error', () => {
 		return result.then( data => (
-      expect( data.errored ).toBeFalsy()
-    ) );
+			expect( data.errored ).toBeFalsy()
+		) );
 	});
 
 	it( 'flags no warnings', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings.length ).toBe( 0 )
-    ) );
+			expect( data.results[0].warnings.length ).toBe( 0 )
+		) );
 	});
 });
 
@@ -41,103 +41,103 @@ describe( 'flags warnings with invalid commenting css', () => {
 
 	it( 'did error', () => {
 		return result.then( data => (
-      expect( data.errored ).toBeTruthy()
-    ) );
+			expect( data.errored ).toBeTruthy()
+		) );
 	});
 
 	it( 'flags three warnings', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings.length ).toBe( 3 )
-    ) );
+			expect( data.results[0].warnings.length ).toBe( 3 )
+		) );
 	});
 
 	it( 'correct first warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].text ).toBe( 'Expected empty line before comment (comment-empty-line-before)' )
-    ) );
+			expect( data.results[0].warnings[0].text ).toBe( 'Expected empty line before comment (comment-empty-line-before)' )
+		) );
 	});
 
 	it( 'correct first warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].rule ).toBe( 'comment-empty-line-before' )
-    ) );
+			expect( data.results[0].warnings[0].rule ).toBe( 'comment-empty-line-before' )
+		) );
 	});
 
 	it( 'correct first warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[0].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct first warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].line ).toBe( 9 )
-    ) );
+			expect( data.results[0].warnings[0].line ).toBe( 9 )
+		) );
 	});
 
 	it( 'correct first warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[0].column ).toBe( 1 )
-    ) );
+			expect( data.results[0].warnings[0].column ).toBe( 1 )
+		) );
 	});
 
 	it( 'correct second warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].text ).toBe( 'Expected empty line before comment (comment-empty-line-before)' )
-    ) );
+			expect( data.results[0].warnings[1].text ).toBe( 'Expected empty line before comment (comment-empty-line-before)' )
+		) );
 	});
 
 	it( 'correct second warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].rule ).toBe( 'comment-empty-line-before' )
-    ) );
+			expect( data.results[0].warnings[1].rule ).toBe( 'comment-empty-line-before' )
+		) );
 	});
 
 	it( 'correct second warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[1].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct second warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].line ).toBe( 18 )
-    ) );
+			expect( data.results[0].warnings[1].line ).toBe( 18 )
+		) );
 	});
 
 	it( 'correct second warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[1].column ).toBe( 1 )
-    ) );
+			expect( data.results[0].warnings[1].column ).toBe( 1 )
+		) );
 	});
 
 	it( 'correct third warning text', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].text ).toBe( 'Expected line length to be no more than 80 characters (max-line-length)' )
-    ) );
+			expect( data.results[0].warnings[2].text ).toBe( 'Expected line length to be no more than 80 characters (max-line-length)' )
+		) );
 	});
 
 	it( 'correct third warning rule flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].rule ).toBe( 'max-line-length' )
-    ) );
+			expect( data.results[0].warnings[2].rule ).toBe( 'max-line-length' )
+		) );
 	});
 
 	it( 'correct third warning severity flagged', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].severity ).toBe( 'error' )
-    ) );
+			expect( data.results[0].warnings[2].severity ).toBe( 'error' )
+		) );
 	});
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].line ).toBe( 24 )
-    ) );
+			expect( data.results[0].warnings[2].line ).toBe( 24 )
+		) );
 	});
 
 	it( 'correct third warning column number', () => {
 		return result.then( data => (
-      expect( data.results[0].warnings[2].column ).toBe( 131 )
-    ) );
+			expect( data.results[0].warnings[2].column ).toBe( 131 )
+		) );
 	});
 });

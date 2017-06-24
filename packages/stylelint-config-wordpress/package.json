@@ -36,7 +36,7 @@
     "node": ">=6.9.1"
   },
   "devDependencies": {
-    "eslint": "^3.19.0",
+    "eslint": "^4.1.0",
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
     "eslint-plugin-jest": "^20.0.0",
     "jest": "^20.0.0",

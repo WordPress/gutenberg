@@ -11,7 +11,7 @@ module.exports = {
 
 	rules: {
 
-    // stylelint-config-wordpress css overrides
+		// stylelint-config-wordpress css overrides
 		'at-rule-no-unknown': [ true, {
 			ignoreAtRules: [ 'extend', 'at-root', 'warn', 'error', 'if', 'else', 'for', 'each', 'while', 'mixin', 'include', 'content', 'return', 'function' ],
 		} ],
