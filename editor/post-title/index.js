@@ -101,6 +101,7 @@ class PostTitle extends Component {
 						onChange={ this.onChange }
 						placeholder={ __( 'Add title…' ) }
 						onFocus={ this.onSelect }
+						onBlur={ this.onUnselect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
