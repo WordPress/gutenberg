@@ -17,6 +17,8 @@
 
 		imageWidgetModelInstance = new wp.mediaWidgets.modelConstructors.media_image();
 		imageWidgetControlInstance = new ImageWidgetControl({
+			el: jQuery( '<div></div>' ),
+			syncContainer: jQuery( '<div></div>' ),
 			model: imageWidgetModelInstance
 		});
 
@@ -84,6 +86,8 @@
 
 		imageWidgetModelInstance = new wp.mediaWidgets.modelConstructors.media_image();
 		imageWidgetControlInstance = new wp.mediaWidgets.controlConstructors.media_image({
+			el: jQuery( '<div></div>' ),
+			syncContainer: jQuery( '<div></div>' ),
 			model: imageWidgetModelInstance
 		});
 		equal( imageWidgetControlInstance.$el.find( 'img' ).length, 0, 'No images should be rendered' );
