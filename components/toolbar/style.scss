@@ -36,11 +36,6 @@ ul.components-toolbar {
 			height: $icon-button-size - 16px;
 		}
 	}
-
-	.editor-sidebar & {
-		box-shadow: none;
-		margin-bottom: $panel-padding;
-	}
 }
 
 .components-toolbar__control.components-button {
