@@ -28,7 +28,7 @@ WP_Block
   / WP_Block_Html
 
 WP_Tag_More
-  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { return text })? WS* "-->" noTeaser:(WS* WP_Tag_NoTeaser)?
+  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
   { return {
     blockName: 'wp:core/more',
     attrs: {
@@ -37,9 +37,6 @@ WP_Tag_More
     },
     rawContent: ''
   } }
-
-WP_Tag_NoTeaser
-  = "<!--" WS* "noteaser" WS* "-->"
 
 WP_Block_Void
   = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
