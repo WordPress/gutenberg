@@ -1,0 +1,7 @@
+.editor-layout .components-notice-list {
+	top: 100px;
+}
+
+.editor-layout.is-sidebar-opened .components-notice-list {
+	right: $sidebar-width;
+}

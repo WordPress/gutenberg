@@ -51,6 +51,7 @@ import {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getNotices,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -1188,6 +1189,22 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSuggestedPostFormat( state ) ).to.equal( 'Quote' );
+		} );
+	} );
+
+	describe( 'getNotices', () => {
+		it( 'should return the notices array', () => {
+			const state = {
+				notices: {
+					b: { id: 'b', content: 'Post saved' },
+					a: { id: 'a', content: 'Error saving' },
+				},
+			};
+
+			expect( getNotices( state ) ).to.eql( [
+				state.notices.b,
+				state.notices.a,
+			] );
 		} );
 	} );
 } );
