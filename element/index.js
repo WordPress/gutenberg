@@ -82,11 +82,11 @@ export function renderToString( element ) {
 /**
  * Concatenate two or more React children objects
  *
- * @param  {...?Object} childrens Set of children to concatenate
- * @return {Array}                The concatenated value
+ * @param  {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate
+ * @return {Array}                        The concatenated value
  */
-export function concatChildren( ...childrens ) {
-	return childrens.reduce( ( memo, children, i ) => {
+export function concatChildren( ...childrenArguments ) {
+	return childrenArguments.reduce( ( memo, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
@@ -117,4 +117,3 @@ export function switchChildrenNodeName( children, nodeName ) {
 		return createElement( nodeName, { key: index, ...props }, childrenProp );
 	} );
 }
-

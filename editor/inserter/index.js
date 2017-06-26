@@ -7,7 +7,10 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
+import { Component } from 'element';
 import { IconButton } from 'components';
+import { createBlock } from 'blocks';
 
 /**
  * Internal dependencies
@@ -16,7 +19,7 @@ import InserterMenu from './menu';
 import { getBlockInsertionPoint, getEditorMode } from '../selectors';
 import { insertBlock, hideInsertionPoint } from '../actions';
 
-class Inserter extends wp.element.Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
@@ -28,9 +31,9 @@ class Inserter extends wp.element.Component {
 	}
 
 	toggle() {
-		this.setState( {
-			opened: ! this.state.opened,
-		} );
+		this.setState( ( state ) => ( {
+			opened: ! state.opened,
+		} ) );
 	}
 
 	close() {
@@ -67,7 +70,7 @@ class Inserter extends wp.element.Component {
 			<div className="editor-inserter">
 				<IconButton
 					icon="insert"
-					label={ wp.i18n.__( 'Insert block' ) }
+					label={ __( 'Insert block' ) }
 					onClick={ this.toggle }
 					className="editor-inserter__toggle"
 					aria-haspopup="true"
@@ -97,7 +100,7 @@ export default connect(
 		onInsertBlock( name, after ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				wp.blocks.createBlock( name ),
+				createBlock( name ),
 				after
 			) );
 		},

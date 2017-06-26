@@ -9,6 +9,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { Component } from 'element';
 import { ENTER } from 'utils/keycodes';
 
@@ -98,7 +99,7 @@ class PostTitle extends Component {
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
-						placeholder={ wp.i18n.__( 'Add title…' ) }
+						placeholder={ __( 'Add title…' ) }
 						onFocus={ this.onSelect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }

@@ -8,6 +8,7 @@ import { camelCase, fromPairs, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Component } from 'element';
 import { Button, Dashicon } from 'components';
 
 /**
@@ -27,7 +28,7 @@ export function naiveCss2Jsx( styleText ) {
 	);
 }
 
-class FormatList extends wp.element.Component {
+class FormatList extends Component {
 	constructor() {
 		super( ...arguments );
 		this.switchFormat = this.switchFormat.bind( this );
@@ -45,9 +46,9 @@ class FormatList extends wp.element.Component {
 	}
 
 	toggleMenu() {
-		this.setState( {
-			open: ! this.state.open,
-		} );
+		this.setState( ( state ) => ( {
+			open: ! state.open,
+		} ) );
 	}
 
 	switchFormat( newValue ) {

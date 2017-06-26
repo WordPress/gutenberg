@@ -10,6 +10,8 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * WordPress dependencies
  */
+import { parse } from 'blocks';
+import { render } from 'element';
 import { settings } from 'date';
 
 /**
@@ -39,21 +41,20 @@ if ( settings.timezone.string ) {
  * Initializes Redux state with bootstrapped post, if provided.
  *
  * @param {Redux.Store} store Redux store instance
- * @param {?Object}     post  Bootstrapped post object
+ * @param {Object}     post  Bootstrapped post object
  */
 function preparePostState( store, post ) {
-	if ( ! post ) {
-		return;
-	}
-
 	store.dispatch( {
 		type: 'RESET_POST',
 		post,
 	} );
-	store.dispatch( {
-		type: 'RESET_BLOCKS',
-		blocks: wp.blocks.parse( post.content.raw ),
-	} );
+
+	if ( post.content ) {
+		store.dispatch( {
+			type: 'RESET_BLOCKS',
+			blocks: parse( post.content.raw ),
+		} );
+	}
 
 	if ( ! post.id ) {
 		// Each property that is set in `post-content.js` (other than `content`
@@ -63,8 +64,8 @@ function preparePostState( store, post ) {
 		store.dispatch( {
 			type: 'SETUP_NEW_POST',
 			edits: {
-				title: post.title.raw,
-				...omit( post, 'title', 'content' ),
+				title: post.title ? post.title.raw : undefined,
+				...omit( post, 'title', 'content', 'type' ),
 			},
 		} );
 	}
@@ -74,14 +75,14 @@ function preparePostState( store, post ) {
  * Initializes and returns an instance of Editor.
  *
  * @param {String} id   Unique identifier for editor instance
- * @param {Object} post API entity for post to edit
+ * @param {Object} post API entity for post to edit  (type required)
  */
 export function createEditorInstance( id, post ) {
 	const store = createReduxStore();
 
 	preparePostState( store, post );
 
-	wp.element.render(
+	render(
 		<ReduxProvider store={ store }>
 			<SlotFillProvider>
 				<Layout />

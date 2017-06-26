@@ -14,6 +14,14 @@ export function deselectBlock( uid ) {
 	};
 }
 
+export function multiSelect( start, end ) {
+	return {
+		type: 'MULTI_SELECT',
+		start,
+		end,
+	};
+}
+
 export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',

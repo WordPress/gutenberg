@@ -6,3 +6,4 @@ gutenberg.pot
 yarn.lock
 gutenberg.zip
 storybook-static
+.DS_Store

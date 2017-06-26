@@ -7,16 +7,21 @@
 	margin-bottom: 10px;
 
 	h1 {
-		border: 2px solid transparent;
+		outline: 1px solid transparent;
 		margin: 0;
 		padding: #{ $block-padding / 2 } #{ $block-padding - 2px };
 		font-size: $editor-font-size;
-		transition: 0.2s border-color;
+		transition: 0.2s outline;
+	}
+
+	&:hover h1 {
+		outline: 1px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-selected h1 {
-		border: 2px solid $light-gray-500;
-		transition: 0.2s border-color;
+		outline: 2px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	.editor-text-editor & {
@@ -40,7 +45,7 @@ textarea.editor-post-title__input {
 	display: block;
 	font-size: 2em;
 	font-family: $editor-font;
-	line-height: $editor-line-height;
+	line-height: $default-line-height;
 	outline: none;
 	border: none;
 	box-shadow: none;

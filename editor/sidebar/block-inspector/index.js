@@ -33,7 +33,7 @@ const BlockInspector = ( { selectedBlock, ...props } ) => {
 	const header = (
 		<strong>
 			<a href="" onClick={ onDeselect } className="editor-block-inspector__deselect-post">
-				{ __( 'Post' ) }
+				{ __( 'Post Settings' ) }
 			</a>
 			{ ' → ' }
 			{ blockType.title }

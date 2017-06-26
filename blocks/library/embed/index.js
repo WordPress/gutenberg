@@ -7,6 +7,8 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from 'i18n';
+import { Component } from 'element';
 import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
 
 /**
@@ -15,28 +17,16 @@ import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
 import './style.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
 
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
-
 function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 	return {
-		title: wp.i18n.__( title ),
+		title: __( title ),
 
 		icon,
 
@@ -47,39 +37,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			caption: children( 'figcaption' ),
 		},
 
-		controls: [
-			{
-				icon: 'align-left',
-				title: wp.i18n.__( 'Align left' ),
-				isActive: ( { align } ) => 'left' === align,
-				onClick: toggleAlignment( 'left' ),
-			},
-			{
-				icon: 'align-center',
-				title: wp.i18n.__( 'Align center' ),
-				isActive: ( { align } ) => ! align || 'center' === align,
-				onClick: toggleAlignment( 'center' ),
-			},
-			{
-				icon: 'align-right',
-				title: wp.i18n.__( 'Align right' ),
-				isActive: ( { align } ) => 'right' === align,
-				onClick: toggleAlignment( 'right' ),
-			},
-			{
-				icon: 'align-full-width',
-				title: wp.i18n.__( 'Wide width' ),
-				isActive: ( { align } ) => 'wide' === align,
-				onClick: toggleAlignment( 'wide' ),
-			},
-			{
-				icon: 'align-full-width',
-				title: wp.i18n.__( 'Full width' ),
-				isActive: ( { align } ) => 'full' === align,
-				onClick: toggleAlignment( 'full' ),
-			},
-		],
-
 		getEditWrapperProps( attributes ) {
 			const { align } = attributes;
 			if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -87,7 +44,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 		},
 
-		edit: class extends wp.element.Component {
+		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
 				this.doServerSideRender = this.doServerSideRender.bind( this );
@@ -114,6 +71,11 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				this.unmounting = true;
 			}
 
+			getPhotoHtml( photo ) {
+				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } /></p>;
+				return wp.element.renderToString( photoPreview );
+			}
+
 			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
@@ -133,6 +95,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 							const { html, type } = obj;
 							if ( html ) {
 								this.setState( { html, type } );
+							} else if ( 'photo' === type ) {
+								this.setState( { html: this.getPhotoHtml( obj ), type } );
 							} else {
 								this.setState( { error: true } );
 							}
@@ -144,37 +108,52 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 			render() {
 				const { html, type, error, fetching } = this.state;
-				const { url, caption } = this.props.attributes;
+				const { align, url, caption } = this.props.attributes;
 				const { setAttributes, focus, setFocus } = this.props;
+				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+
+				const controls = (
+					focus && (
+						<BlockControls key="controls">
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ updateAlignment }
+								controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+							/>
+						</BlockControls>
+					)
+				);
 
 				if ( fetching ) {
-					return (
-						<div className="blocks-embed is-loading">
+					return [
+						controls,
+						<div key="loading" className="blocks-embed is-loading">
 							<Spinner />
-							<p>{ wp.i18n.__( 'Embedding…' ) }</p>
-						</div>
-					);
+							<p>{ __( 'Embedding…' ) }</p>
+						</div>,
+					];
 				}
 
 				if ( ! html ) {
-					return (
-						<Placeholder icon={ icon } label={ wp.i18n.sprintf( wp.i18n.__( '%s URL' ), title ) } className="blocks-embed">
+					return [
+						controls,
+						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="blocks-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
 									value={ url || '' }
 									className="components-placeholder__input"
-									placeholder={ wp.i18n.__( 'Enter URL to embed here…' ) }
+									placeholder={ __( 'Enter URL to embed here…' ) }
 									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 								<Button
 									isLarge
 									type="submit">
-									{ wp.i18n.__( 'Embed' ) }
+									{ __( 'Embed' ) }
 								</Button>
-								{ error && <p className="components-placeholder__error">{ wp.i18n.__( 'Sorry, we could not embed that content.' ) }</p> }
+								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 							</form>
-						</Placeholder>
-					);
+						</Placeholder>,
+					];
 				}
 
 				const parsedUrl = parse( url );
@@ -185,12 +164,13 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 					typeClassName = 'blocks-embed-video';
 				}
 
-				return (
-					<figure className={ typeClassName }>
+				return [
+					controls,
+					<figure key="embed" className={ typeClassName }>
 						{ ( cannotPreview ) ? (
-							<Placeholder icon={ icon } label={ wp.i18n.__( 'Embed URL' ) }>
+							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-								<p className="components-placeholder__error">{ wp.i18n.__( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
 							<HtmlEmbed html={ html } />
@@ -198,7 +178,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable
 								tagName="figcaption"
-								placeholder={ wp.i18n.__( 'Write caption…' ) }
+								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								focus={ focus }
 								onFocus={ setFocus }
@@ -207,8 +187,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								inlineToolbar
 							/>
 						) : null }
-					</figure>
-				);
+					</figure>,
+				];
 			}
 		},
 

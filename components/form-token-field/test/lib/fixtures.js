@@ -7,13 +7,10 @@ export default {
 	},
 	specialSuggestions: {
 		textEscaped: [ '&lt;3', 'Stuff &amp; Things', 'Tags &amp; Stuff', 'Tags &amp; Stuff 2' ],
-		htmlEscaped: [ '&lt;3', 'Stuff&nbsp;&amp;&nbsp;Things', 'Tags&nbsp;&amp;&nbsp;Stuff', 'Tags&nbsp;&amp;&nbsp;Stuff&nbsp;2' ],
 		textUnescaped: [ '<3', 'Stuff & Things', 'Tags & Stuff', 'Tags & Stuff 2' ],
-		htmlUnescaped: [ '&lt;3', 'Stuff&nbsp;&amp;&nbsp;Things', 'Tags&nbsp;&amp;&nbsp;Stuff', 'Tags&nbsp;&amp;&nbsp;Stuff&nbsp;2' ],
 		matchAmpersandUnescaped: [
-			[ 'Stuff ', '&', ' Things' ],
-			[ 'Tags ', '&', ' Stuff' ],
-			[ 'Tags ', '&', ' Stuff 2' ],
+			[ 'Tags ', '& S', 'tuff' ],
+			[ 'Tags ', '& S', 'tuff 2' ],
 		],
 		matchAmpersandSequence: [
 			[ 'Tag', 's &', ' Stuff' ],
@@ -22,28 +19,20 @@ export default {
 		matchAmpersandEscaped: [],
 	},
 	matchingSuggestions: {
-		t: [
-			[ 't', 'he' ],
-			[ 't', 'o' ],
-			[ 't', 'hat' ],
-			[ 't', 'his' ],
-			[ 'wi', 't', 'h' ],
-			[ 'i', 't' ],
-			[ 'no', 't' ],
-			[ 'a', 't' ],
+		th: [
+			[ 'th', 'e' ],
+			[ 'th', 'at' ],
+			[ 'th', 'is' ],
+			[ 'wi', 'th' ],
 		],
-		s: [
-			[ 's', 'nake' ],
-			[ 's', 'ound' ],
-			[ 'i', 's' ],
-			[ 'thi', 's' ],
-			[ 'a', 's' ],
-			[ 'wa', 's' ],
-			[ 'pipe', 's' ],
+		so: [
+			[ 'so', 'und' ],
+			[ 'as', 'so', 'ciate' ],
 		],
 		at: [
 			[ 'at' ],
 			[ 'th', 'at' ],
+			[ 'associ', 'at', 'e' ],
 		],
 	},
 };

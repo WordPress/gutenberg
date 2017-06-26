@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { IconButton } from 'components';
 
 /**
@@ -9,25 +10,13 @@ import { IconButton } from 'components';
 import './style.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
 
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function applyOrUnset( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
-
 registerBlockType( 'core/button', {
-	title: wp.i18n.__( 'Button' ),
+	title: __( 'Button' ),
 
 	icon: 'button',
 
@@ -39,27 +28,6 @@ registerBlockType( 'core/button', {
 		text: children( 'a' ),
 	},
 
-	controls: [
-		{
-			icon: 'align-left',
-			title: wp.i18n.__( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: applyOrUnset( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: wp.i18n.__( 'Align center' ),
-			isActive: ( { align } ) => 'center' === align,
-			onClick: applyOrUnset( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: wp.i18n.__( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: applyOrUnset( 'right' ),
-		},
-	],
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
@@ -68,19 +36,24 @@ registerBlockType( 'core/button', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { text, url, title } = attributes;
+		const { text, url, title, align } = attributes;
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-		return (
-			<span className="blocks-button" title={ title }>
+		return [
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
+				</BlockControls>
+			),
+			<span key="button" className="blocks-button" title={ title }>
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write label…' ) }
+					placeholder={ __( 'Write label…' ) }
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					inline
-					inlineToolbar
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&
@@ -93,13 +66,13 @@ registerBlockType( 'core/button', {
 							required
 							value={ url }
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+							placeholder={ __( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
 					</form>
 				}
-			</span>
-		);
+			</span>,
+		];
 	},
 
 	save( { attributes } ) {

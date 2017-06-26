@@ -15,7 +15,7 @@ import PanelBody from 'components/panel/body';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPost, isSavingPost } from '../../selectors';
+import { getCurrentPostId, getCurrentPostType, isSavingPost } from '../../selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 class LastRevision extends Component {
@@ -57,7 +57,11 @@ class LastRevision extends Component {
 		}
 		this.setState( { loading: true } );
 		const postIdToLoad = this.props.postId;
-		this.fetchRevisionsRequest = new wp.api.collections.PostRevisions( {}, { parent: postIdToLoad } ).fetch()
+		const Collection = wp.api.getPostTypeRevisionsCollection( this.props.postType );
+		if ( ! Collection ) {
+			return;
+		}
+		this.fetchRevisionsRequest = new Collection( {}, { parent: postIdToLoad } ).fetch()
 			.done( ( revisions ) => {
 				if ( this.props.postId !== postIdToLoad ) {
 					return;
@@ -79,12 +83,17 @@ class LastRevision extends Component {
 
 	render() {
 		const { revisions } = this.state;
-		const lastRevision = revisions.length ? revisions[ 0 ] : null;
+
+		if ( ! revisions.length ) {
+			return null;
+		}
+
+		const lastRevision = revisions[ 0 ];
 
 		return (
 			<PanelBody>
 				<IconButton
-					href={ lastRevision ? getWPAdminURL( 'revision.php', { revision: lastRevision.id } ) : undefined }
+					href={ getWPAdminURL( 'revision.php', { revision: lastRevision.id } ) }
 					className="editor-last-revision__title"
 					icon="backup"
 				>
@@ -103,7 +112,8 @@ class LastRevision extends Component {
 export default connect(
 	( state ) => {
 		return {
-			postId: getCurrentPost( state ).id,
+			postId: getCurrentPostId( state ),
+			postType: getCurrentPostType( state ),
 			isSaving: isSavingPost( state ),
 		};
 	}

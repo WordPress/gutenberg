@@ -86,6 +86,16 @@ export function getCurrentPost( state ) {
 }
 
 /**
+ * Returns the post type of the post currently being edited
+ *
+ * @param  {Object} state Global application state
+ * @return {String}       Post type
+ */
+export function getCurrentPostType( state ) {
+	return state.currentPost.type;
+}
+
+/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
@@ -164,6 +174,21 @@ export function isEditedPostPublished( state ) {
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
 	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+}
+
+/**
+ * Returns true if the post can be saved, or false otherwise. A post must
+ * contain a title, an excerpt, or non-empty content to be valid for save.
+ *
+ * @param  {Object}  state Global application state
+ * @return {Boolean}       Whether the post can be saved
+ */
+export function isEditedPostSaveable( state ) {
+	return (
+		getBlockCount( state ) > 0 ||
+		!! getEditedPostTitle( state ) ||
+		!! getEditedPostExcerpt( state )
+	);
 }
 
 /**
@@ -250,6 +275,16 @@ export const getBlocks = createSelector(
 		state.editor.blocksByUid,
 	]
 );
+
+/**
+ * Returns the number of blocks currently present in the post.
+ *
+ * @param  {Object} state Global application state
+ * @return {Object}       Number of blocks in the post
+ */
+export function getBlockCount( state ) {
+	return getBlockUids( state ).length;
+}
 
 /**
  * Returns the currently selected block, or null if there is no selected block.

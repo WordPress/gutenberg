@@ -72,6 +72,7 @@ $toggle-border-width: 2px;
 
 .components-form-toggle__hint {
 	display: inline-block;
+	min-width: 24px;	// This prevents a position jog when the control is right aligned, and the width of the label changes
 	margin-left: 10px;
 	font-weight: 500;
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import Toggle from 'components/form-toggle';
+import { concatChildren } from 'element';
 
 /**
  * Internal dependencies
@@ -12,6 +12,7 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
 
 const { children, query } = hpq;
 
@@ -22,13 +23,15 @@ registerBlockType( 'core/text', {
 
 	category: 'common',
 
+	className: false,
+
 	attributes: {
 		content: query( 'p', children() ),
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
@@ -48,14 +51,11 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<div className="blocks-text__drop-cap" style={ { display: 'flex', justifyContent: 'space-between' } }>
-						<label htmlFor="blocks-text__drop-cap">{ __( 'Drop Cap' ) }</label>
-						<Toggle
-							checked={ !! dropCap }
-							onChange={ toggleDropCap }
-							id="blocks-text__drop-cap-toggle"
-						/>
-					</div>
+					<ToggleControl
+						label={ __( 'Drop Cap' ) }
+						checked={ !! dropCap }
+						onChange={ toggleDropCap }
+					/>
 				</InspectorControls>
 			),
 			<Editable
@@ -79,6 +79,7 @@ registerBlockType( 'core/text', {
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
 				className={ `drop-cap-${ dropCap }` }
+				placeholder={ __( 'Write…' ) }
 			/>,
 		];
 	},

@@ -13,7 +13,7 @@ import { Button, Dashicon } from 'components';
  * Internal dependencies
  */
 import './style.scss';
-import { getCurrentPost } from '../../selectors';
+import { getCurrentPostId, getCurrentPostType } from '../../selectors';
 import { trashPost } from '../../actions';
 
 function PostTrash( { postId, postType, ...props } ) {
@@ -33,10 +33,9 @@ function PostTrash( { postId, postType, ...props } ) {
 
 export default connect(
 	( state ) => {
-		const post = getCurrentPost( state );
 		return {
-			postId: post.id,
-			postType: post.type,
+			postId: getCurrentPostId( state ),
+			postType: getCurrentPostType( state ),
 		};
 	},
 	{ trashPost }

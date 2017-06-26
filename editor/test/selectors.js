@@ -16,16 +16,19 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getCurrentPostId,
+	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	isEditedPostPublished,
 	isEditedPostPublishable,
+	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
+	getBlockCount,
 	getSelectedBlock,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -202,6 +205,18 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).to.equal( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostType', () => {
+		it( 'should return the post type', () => {
+			const state = {
+				currentPost: {
+					type: 'post',
+				},
+			};
+
+			expect( getCurrentPostType( state ) ).to.equal( 'post' );
 		} );
 	} );
 
@@ -455,6 +470,66 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditedPostSaveable', () => {
+		it( 'should return false if the post has no title, excerpt, content', () => {
+			const state = {
+				editor: {
+					blocksByUid: {},
+					blockOrder: [],
+					edits: {},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).to.be.false();
+		} );
+
+		it( 'should return true if the post has a title', () => {
+			const state = {
+				editor: {
+					blocksByUid: {},
+					blockOrder: [],
+					edits: {},
+				},
+				currentPost: {
+					title: { raw: 'sassel' },
+				},
+			};
+
+			expect( isEditedPostSaveable( state ) ).to.be.true();
+		} );
+
+		it( 'should return true if the post has an excerpt', () => {
+			const state = {
+				editor: {
+					blocksByUid: {},
+					blockOrder: [],
+					edits: {},
+				},
+				currentPost: {
+					excerpt: { raw: 'sassel' },
+				},
+			};
+
+			expect( isEditedPostSaveable( state ) ).to.be.true();
+		} );
+
+		it( 'should return true if the post has content', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						123: { uid: 123, name: 'core/text' },
+					},
+					blockOrder: [ 123 ],
+					edits: {},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).to.be.true();
+		} );
+	} );
+
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
 			const state = {
@@ -527,6 +602,22 @@ describe( 'selectors', () => {
 				{ uid: 123, name: 'core/text' },
 				{ uid: 23, name: 'core/heading' },
 			] );
+		} );
+	} );
+
+	describe( 'getBlockCount', () => {
+		it( 'should return the number of blocks in the post', () => {
+			const state = {
+				editor: {
+					blocksByUid: {
+						23: { uid: 23, name: 'core/heading' },
+						123: { uid: 123, name: 'core/text' },
+					},
+					blockOrder: [ 123, 23 ],
+				},
+			};
+
+			expect( getBlockCount( state ) ).to.equal( 2 );
 		} );
 	} );
 

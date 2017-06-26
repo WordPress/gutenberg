@@ -13,22 +13,10 @@ import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
-
-/**
- * Returns an attribute setter with behavior that if the target value is
- * already the assigned attribute value, it will be set to undefined.
- *
- * @param  {string}   align Alignment value
- * @return {Function}       Attribute setter
- */
-function toggleAlignment( align ) {
-	return ( attributes, setAttributes ) => {
-		const nextAlign = attributes.align === align ? undefined : align;
-		setAttributes( { align: nextAlign } );
-	};
-}
 
 registerBlockType( 'core/image', {
 	title: __( 'Image' ),
@@ -43,39 +31,6 @@ registerBlockType( 'core/image', {
 		caption: children( 'figcaption' ),
 	},
 
-	controls: [
-		{
-			icon: 'align-left',
-			title: __( 'Align left' ),
-			isActive: ( { align } ) => 'left' === align,
-			onClick: toggleAlignment( 'left' ),
-		},
-		{
-			icon: 'align-center',
-			title: __( 'Align center' ),
-			isActive: ( { align } ) => ! align || 'center' === align,
-			onClick: toggleAlignment( 'center' ),
-		},
-		{
-			icon: 'align-right',
-			title: __( 'Align right' ),
-			isActive: ( { align } ) => 'right' === align,
-			onClick: toggleAlignment( 'right' ),
-		},
-		{
-			icon: 'align-wide',
-			title: __( 'Wide width' ),
-			isActive: ( { align } ) => 'wide' === align,
-			onClick: toggleAlignment( 'wide' ),
-		},
-		{
-			icon: 'align-full-width',
-			title: __( 'Full width' ),
-			isActive: ( { align } ) => 'full' === align,
-			onClick: toggleAlignment( 'full' ),
-		},
-	],
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -84,13 +39,29 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption } = attributes;
+		const { url, alt, caption, align } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
+		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+
+		const controls = (
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
+						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
+					/>
+				</BlockControls>
+			)
+		);
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
+			const onSelectImage = ( media ) => {
+				setAttributes( { url: media.url, alt: media.alt, caption: media.caption } );
+			};
 			return [
+				controls,
 				<Placeholder
 					key="placeholder"
 					instructions={ __( 'Drag image here or insert from media library' ) }
@@ -99,7 +70,7 @@ registerBlockType( 'core/image', {
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaURL }
+						onSelect={ onSelectImage }
 						type="image"
 						autoOpen
 					>
@@ -115,6 +86,7 @@ registerBlockType( 'core/image', {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
+			controls,
 			focus && (
 				<InspectorControls key="inspector">
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
@@ -141,15 +113,15 @@ registerBlockType( 'core/image', {
 
 	save( { attributes } ) {
 		const { url, alt, caption, align = 'none' } = attributes;
-		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
+		// If there's no caption set only save the image element.
 		if ( ! caption || ! caption.length ) {
-			return img;
+			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
 		}
 
 		return (
-			<figure>
-				{ img }
+			<figure className={ `align${ align }` }>
+				<img src={ url } alt={ alt } />
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);

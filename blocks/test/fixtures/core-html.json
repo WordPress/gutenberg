@@ -1,0 +1,19 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/html",
+        "attributes": {
+            "content": [
+                {
+                    "children": "Some HTML code",
+                    "type": "h1"
+                },
+                "\n",
+                {
+                    "children": "This text will scroll from right to left",
+                    "type": "marquee"
+                }
+            ]
+        }
+    }
+]

@@ -10,14 +10,15 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 /**
  * WordPress dependencies
  */
-import { Children } from 'element';
-import { Toolbar } from 'components';
-import { BACKSPACE, ESCAPE } from 'utils/keycodes';
+import { Children, Component } from 'element';
+import { BACKSPACE, ESCAPE, DELETE } from 'utils/keycodes';
+import { getBlockType } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import BlockMover from '../../block-mover';
+import BlockRightMenu from '../../block-settings-menu';
 import BlockSwitcher from '../../block-switcher';
 import {
 	focusBlock,
@@ -45,14 +46,14 @@ function FirstChild( { children } ) {
 	return childrenArray[ 0 ] || null;
 }
 
-class VisualEditorBlock extends wp.element.Component {
+class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.stopTyping = this.stopTyping.bind( this );
+		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.removeOrDeselect = this.removeOrDeselect.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
@@ -95,7 +96,7 @@ class VisualEditorBlock extends wp.element.Component {
 		const { isTyping } = this.props;
 		if ( isTyping !== prevProps.isTyping ) {
 			if ( isTyping ) {
-				document.addEventListener( 'mousemove', this.stopTyping );
+				document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 			} else {
 				this.removeStopTypingListener();
 			}
@@ -107,7 +108,7 @@ class VisualEditorBlock extends wp.element.Component {
 	}
 
 	removeStopTypingListener() {
-		document.removeEventListener( 'mousemove', this.stopTyping );
+		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
 	}
 
 	bindBlockNode( node ) {
@@ -147,11 +148,25 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	stopTyping() {
-		this.props.onStopTyping();
+	stopTypingOnMouseMove( { clientX, clientY } ) {
+		const { lastClientX, lastClientY } = this;
+
+		// We need to check that the mouse really moved
+		// Because Safari trigger mousemove event when we press shift, ctrl...
+		if (
+			lastClientX &&
+			lastClientY &&
+			( lastClientX !== clientX || lastClientY !== clientY )
+		) {
+			this.props.onStopTyping();
+		}
+
+		this.lastClientX = clientX;
+		this.lastClientY = clientY;
 	}
 
-	removeOrDeselect( { keyCode, target } ) {
+	removeOrDeselect( event ) {
+		const { keyCode, target } = event;
 		const {
 			uid,
 			multiSelectedBlockUids,
@@ -162,8 +177,9 @@ class VisualEditorBlock extends wp.element.Component {
 		} = this.props;
 
 		// Remove block on backspace.
-		if ( BACKSPACE === keyCode ) {
+		if ( BACKSPACE === keyCode || DELETE === keyCode ) {
 			if ( target === this.node ) {
+				event.preventDefault();
 				onRemove( [ uid ] );
 
 				if ( previousBlock ) {
@@ -172,6 +188,7 @@ class VisualEditorBlock extends wp.element.Component {
 			}
 
 			if ( multiSelectedBlockUids.length ) {
+				event.preventDefault();
 				onRemove( multiSelectedBlockUids );
 			}
 		}
@@ -206,14 +223,19 @@ class VisualEditorBlock extends wp.element.Component {
 		}
 	}
 
-	onPointerDown() {
+	onPointerDown( event ) {
+		// Not the main button (usually the left button on pointer device).
+		if ( event.buttons !== 1 ) {
+			return;
+		}
+
 		this.props.onSelectionStart();
 		this.props.onSelect();
 	}
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
-		const blockType = wp.blocks.getBlockType( block.name );
+		const blockType = getBlockType( block.name );
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
 		// is referred to as <BlockEdit />.
@@ -263,6 +285,7 @@ class VisualEditorBlock extends wp.element.Component {
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
@@ -274,14 +297,6 @@ class VisualEditorBlock extends wp.element.Component {
 					>
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
-							{ !! blockType.controls && (
-								<Toolbar
-									controls={ blockType.controls.map( ( control ) => ( {
-										...control,
-										onClick: () => control.onClick( block.attributes, this.setAttributes ),
-										isActive: control.isActive ? control.isActive( block.attributes ) : false,
-									} ) ) } />
-							) }
 							<Slot name="Formatting.Toolbar" />
 						</div>
 					</CSSTransitionGroup>

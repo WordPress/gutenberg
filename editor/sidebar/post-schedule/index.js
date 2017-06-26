@@ -30,9 +30,8 @@ class PostSchedule extends Component {
 		this.toggleDialog = this.toggleDialog.bind( this );
 	}
 
-	toggleDialog( event ) {
-		event.preventDefault();
-		this.setState( { opened: ! this.state.opened } );
+	toggleDialog() {
+		this.setState( ( state ) => ( { opened: ! state.opened } ) );
 	}
 
 	handleClickOutside() {
@@ -61,7 +60,12 @@ class PostSchedule extends Component {
 		return (
 			<div className="editor-post-schedule">
 				<span>{ __( 'Publish' ) }</span>
-				<button className="editor-post-schedule__toggle button-link" onClick={ this.toggleDialog }>
+				<button
+					type="button"
+					className="editor-post-schedule__toggle button-link"
+					onClick={ this.toggleDialog }
+					aria-expanded={ this.state.opened }
+				>
 					{ label }
 				</button>
 

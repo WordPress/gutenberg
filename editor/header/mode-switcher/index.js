@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { __, _x } from 'i18n';
 import { Dashicon } from 'components';
 
 /**
@@ -22,11 +23,11 @@ import { getEditorMode } from '../../selectors';
 const MODES = [
 	{
 		value: 'visual',
-		label: wp.i18n.__( 'Visual' ),
+		label: __( 'Visual' ),
 	},
 	{
 		value: 'text',
-		label: wp.i18n._x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
+		label: _x( 'Text', 'Name for the Text editor tab (formerly HTML)' ),
 	},
 ];
 

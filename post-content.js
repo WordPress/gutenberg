@@ -2,21 +2,26 @@
  * Temporary test post content
  */
 window._wpGutenbergPost = {
+	type: 'post',
 	title: {
 		raw: 'Welcome to the Gutenberg Editor',
 	},
 	content: {
 		raw: [
-			'<!-- wp:core/text data="{\\"projectName\\":\\"gutenberg\\",\\"isAwesome\\":true}" -->',
+			'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg" } -->',
+			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Gutenberg Editor</h2></section>',
+			'<!-- /wp:core/cover-image -->',
+
+			'<!-- wp:core/text { "project": { "name": "gutenberg", "for": "WordPress" }, "isAwesome": true } -->',
 			'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/text -->',
-			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. A text block can have multiple paragraphs, if that\'s how you prefer to write your posts. But you can also split it by hitting enter twice. Once blocks are split they get their own controls to be moved freely around the post...</p>',
+			'<p>What you are reading now is a <strong>text block</strong>, the most basic block of all. The text block has its own controls to be moved freely around the post...</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/text align="right" -->',
-			'<p style="text-align:right;">... like this one, which is separate from the above and right aligned.</p>',
+			'<!-- wp:core/text { "align": "right" } -->',
+			'<p style="text-align:right;">... like this one, which is right aligned.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/more /-->',
@@ -33,8 +38,8 @@ window._wpGutenbergPost = {
 			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully you\'ll find aspects like adding captions or going full-width with your pictures much easier and robust than before.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/image align="center" -->',
-			'<figure><img src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
+			'<!-- wp:core/image { "align": "center" } -->',
+			'<figure class="wp-block-image"><img alt="Beautiful landscape" src="https://cldup.com/YLYhpou2oq.jpg" class="aligncenter"/><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -61,12 +66,12 @@ window._wpGutenbergPost = {
 			'<p>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/button align="center" -->',
-			'<div class="aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+			'<!-- wp:core/button { "align": "center" } -->',
+			'<div class="aligncenter wp-block-button"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
 			'<!-- /wp:core/button -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/heading -->',
@@ -77,8 +82,8 @@ window._wpGutenbergPost = {
 			'<p>A huge benefit of blocks is that you can edit them in place and manipulate you content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/quote style="1" -->',
-			'<blockquote class="blocks-quote-style-1"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
+			'<!-- wp:core/quote { "style": 1 } -->',
+			'<blockquote class="blocks-quote-style-1 wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><footer>Matt Mullenweg, 2017</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/text -->',
@@ -89,12 +94,12 @@ window._wpGutenbergPost = {
 			'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/quote style="2" -->',
-			'<blockquote class="blocks-quote-style-2"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
+			'<!-- wp:core/quote { "style": 2 } -->',
+			'<blockquote class="blocks-quote-style-2 wp-block-quote"><p>There is no greater agony than bearing an untold story inside you.</p><footer>Maya Angelou</footer></blockquote>',
 			'<!-- /wp:core/quote -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/heading -->',
@@ -106,7 +111,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/text -->',
@@ -118,21 +123,21 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/code -->',
-			'<pre><code>export default function MyButton() {\n\
+			'<pre class="wp-block-code"><code>export default function MyButton() {\n\
 	return &lt;Button&gt;Click Me!&lt;/Button&gt;;\n\
 }</code></pre>',
 			'<!-- /wp:core/code -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/image -->',
-			'<figure><img src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
+			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
 			'<!-- wp:core/preformatted -->',
-			'<pre>An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
+			'<pre class="wp-block-preformatted">An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
 			'<!-- /wp:core/preformatted -->',
 
 			'<!-- wp:core/text -->',
@@ -148,30 +153,30 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/list -->',
 
 			'<!-- wp:core/pullquote -->',
-			'<blockquote class="blocks-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
+			'<blockquote class="blocks-pullquote wp-block-pullquote"><p>Code is Poetry</p><footer>The WordPress community</footer></blockquote>',
 			'<!-- /wp:core/pullquote -->',
 
 			'<!-- wp:core/separator -->',
-			'<hr/>',
+			'<hr class="wp-block-separator" />',
 			'<!-- /wp:core/separator -->',
 
 			'<!-- wp:core/table -->',
-			'<table class="widefat"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
+			'<table class="widefat wp-block-table"><thead><tr><th>Version</th><th>Musician</th><th>Date</th></tr></thead><tbody><tr><th><a href="https://wordpress.org/news/2015/12/clifford/">4.4</a></th><td>Clifford Brown</td><td>December 8, 2015</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/04/coleman/">4.5</a></th><td>Coleman Hawkins</td><td>April 12, 2016</td></tr><tr><th><a href="https://wordpress.org/news/2016/08/pepper/">4.6</a></th><td>Pepper Adams</td><td>August 16, 2016</td></tr><tr class="alt"><th><a href="https://wordpress.org/news/2016/12/vaughan/">4.7</a></th><td>Sarah Vaughan</td><td>December 6, 2016</td></tr></tbody></table>',
 			'<!-- /wp:core/table -->',
 
 			'<!-- wp:core/heading -->',
 			'<h2>All that you can embed!</h2>',
 			'<!-- /wp:core/heading -->',
 
-			'<!-- wp:core/embed url="https://www.youtube.com/watch?v=Nl6U7UotA-M" -->',
-			'<figure>https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
+			'<!-- wp:core/embed { "url": "https://www.youtube.com/watch?v=Nl6U7UotA-M" } -->',
+			'<figure class="wp-block-embed">https://www.youtube.com/watch?v=Nl6U7UotA-M<figcaption>State of the Word 2016</figcaption></figure>',
 			'<!-- /wp:core/embed -->',
 
-			'<!-- wp:core/embed url="https://twitter.com/photomatt/status/868657763970404352" -->',
+			'<!-- wp:core/embed { "url": "https://twitter.com/photomatt/status/868657763970404352" } -->',
 			'https://twitter.com/photomatt/status/868657763970404352',
 			'<!-- /wp:core/embed -->',
 
-			'<!-- wp:core/embed url="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" -->',
+			'<!-- wp:core/embed { "url": "https://make.wordpress.org/core/2017/01/17/editor-technical-overview/" } -->',
 			'https://make.wordpress.org/core/2017/01/17/editor-technical-overview/',
 			'<!-- /wp:core/embed -->',
 

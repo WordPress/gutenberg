@@ -6,6 +6,11 @@ import { values } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -24,11 +29,11 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		before( () => {
-			wp.blocks.registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 		} );
 
 		after( () => {
-			wp.blocks.unregisterBlockType( 'core/test-block' );
+			unregisterBlockType( 'core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {

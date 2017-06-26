@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, createElement, switchChildrenNodeName } from 'element';
+import { Component, createElement, Children, concatChildren } from 'element';
 import { find } from 'lodash';
 import { __ } from 'i18n';
 
@@ -15,6 +15,55 @@ import BlockControls from '../../block-controls';
 
 const { children, prop } = hpq;
 
+const fromBrDelimitedContent = ( content ) => {
+	if ( undefined === content ) {
+		// converting an empty block to a list block
+		return content;
+	}
+	const listItems = [];
+	listItems.push( createElement( 'li', [], [] ) );
+	content.forEach( function( element, elementIndex, elements ) {
+		// "split" the incoming content on 'br' elements
+		if ( 'br' === element.type && elementIndex < elements.length - 1 ) {
+			// if is br and there are more elements to come, push a new list item
+			listItems.push( createElement( 'li', [], [] ) );
+		} else {
+			listItems[ listItems.length - 1 ].props.children.push( element );
+		}
+	} );
+	return listItems;
+};
+
+const toBrDelimitedContent = ( values ) => {
+	if ( undefined === values ) {
+		// converting an empty list
+		return values;
+	}
+	const content = [];
+	values.forEach( function( li, liIndex, listItems ) {
+		Children.toArray( li.props.children ).forEach( function( element, elementIndex, liChildren ) {
+			if ( 'ul' === element.type || 'ol' === element.type ) { // lists within lists
+				// we know we've just finished processing a list item, so break the text
+				content.push( createElement( 'br' ) );
+				// push each element from the child list's converted content
+				content.push.apply( content, toBrDelimitedContent( Children.toArray( element.props.children ) ) );
+				// add a break if there are more list items to come, because the recursive call won't
+				// have added it when it finished processing the child list because it thinks the content ended
+				if ( liIndex !== listItems.length - 1 ) {
+					content.push( createElement( 'br' ) );
+				}
+			} else {
+				content.push( element );
+				if ( elementIndex === liChildren.length - 1 && liIndex !== listItems.length - 1 ) {
+					// last element in this list item, but not last element overall
+					content.push( createElement( 'br' ) );
+				}
+			}
+		} );
+	} );
+	return content;
+};
+
 registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	icon: 'editor-ul',
@@ -25,6 +74,8 @@ registerBlockType( 'core/list', {
 		values: children( 'ol,ul' ),
 	},
 
+	className: false,
+
 	transforms: {
 		from: [
 			{
@@ -33,10 +84,25 @@ registerBlockType( 'core/list', {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						nodeName: 'ul',
-						values: switchChildrenNodeName( content, 'li' ),
+						values: fromBrDelimitedContent( content ),
 					} );
 				},
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { value, citation } ) => {
+					const listItems = fromBrDelimitedContent( value );
+					const values = citation
+						? concatChildren( listItems, <li>{ citation }</li> )
+						: listItems;
+					return createBlock( 'core/list', {
+						nodeName: 'ul',
+						values,
+					} );
+				},
+			},
+
 		],
 		to: [
 			{
@@ -44,7 +110,16 @@ registerBlockType( 'core/list', {
 				blocks: [ 'core/text' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/text', {
-						content: switchChildrenNodeName( values, 'p' ),
+						content: toBrDelimitedContent( values ),
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: toBrDelimitedContent( values ),
 					} );
 				},
 			},
