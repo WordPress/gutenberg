@@ -28,6 +28,7 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				id={ id }
 				type="checkbox"
 				value={ checked }
+				checked={ checked }
 				onChange={ onChange }
 			/>
 			{ showHint &&
