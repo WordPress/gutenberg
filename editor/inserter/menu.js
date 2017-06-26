@@ -2,23 +2,24 @@
  * External dependencies
  */
 import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
-import classnames from 'classnames';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { Dashicon, withFocusReturn } from 'components';
+import { __ } from 'i18n';
+import { Component } from 'element';
+import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { getCategories, getBlockTypes } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getSelectedBlock } from '../selectors';
-import { setInsertionPoint, clearInsertionPoint } from '../actions';
+import { showInsertionPoint, hideInsertionPoint } from '../actions';
 
-class InserterMenu extends wp.element.Component {
+class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodes = {};
@@ -27,7 +28,6 @@ class InserterMenu extends wp.element.Component {
 			currentFocus: null,
 		};
 		this.filter = this.filter.bind( this );
-		this.instanceId = this.constructor.instances++;
 		this.isShownBlock = this.isShownBlock.bind( this );
 		this.setSearchFocus = this.setSearchFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -57,26 +57,14 @@ class InserterMenu extends wp.element.Component {
 		} );
 	}
 
-	selectBlock( slug ) {
+	selectBlock( name ) {
 		return () => {
-			this.props.onSelect( slug );
+			this.props.onSelect( name );
 			this.setState( {
 				filterValue: '',
 				currentFocus: null,
 			} );
 		};
-	}
-
-	hoverBlock() {
-		return () => {
-			this.props.setInsertionPoint(
-				this.props.selectedBlock ? this.props.selectedBlock.uid : null
-			);
-		};
-	}
-
-	unhoverBlock() {
-		return () => this.props.clearInsertionPoint();
 	}
 
 	getVisibleBlocks( blockTypes ) {
@@ -85,7 +73,7 @@ class InserterMenu extends wp.element.Component {
 
 	sortBlocksByCategory( blockTypes ) {
 		const getCategoryIndex = ( item ) => {
-			return findIndex( wp.blocks.getCategories(), ( category ) => category.slug === item.category );
+			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 
 		return sortBy( blockTypes, getCategoryIndex );
@@ -105,23 +93,23 @@ class InserterMenu extends wp.element.Component {
 
 	findByIncrement( blockTypes, increment = 1 ) {
 		// Add on a fake search block to the list to cycle through.
-		const list = blockTypes.concat( { slug: 'search' } );
+		const list = blockTypes.concat( { name: 'search' } );
 
-		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.slug );
+		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.name );
 		const nextIndex = currentIndex + increment;
 		const highestIndex = list.length - 1;
 		const lowestIndex = 0;
 
 		if ( nextIndex > highestIndex ) {
-			return list[ lowestIndex ].slug;
+			return list[ lowestIndex ].name;
 		}
 
 		if ( nextIndex < lowestIndex ) {
-			return list[ highestIndex ].slug;
+			return list[ highestIndex ].name;
 		}
 
-		// Return the slug of the next block type.
-		return list[ nextIndex ].slug;
+		// Return the name of the next block type.
+		return list[ nextIndex ].name;
 	}
 
 	findNext( blockTypes ) {
@@ -129,7 +117,7 @@ class InserterMenu extends wp.element.Component {
 		 * null is the initial state value and triggers start at beginning.
 		 */
 		if ( null === this.state.currentFocus ) {
-			return blockTypes[ 0 ].slug;
+			return blockTypes[ 0 ].name;
 		}
 
 		return this.findByIncrement( blockTypes, 1 );
@@ -140,7 +128,7 @@ class InserterMenu extends wp.element.Component {
 		 * null is the initial state value and triggers start at beginning.
 		 */
 		if ( null === this.state.currentFocus ) {
-			return blockTypes[ 0 ].slug;
+			return blockTypes[ 0 ].name;
 		}
 
 		return this.findByIncrement( blockTypes, -1 );
@@ -150,7 +138,7 @@ class InserterMenu extends wp.element.Component {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( wp.blocks.getBlockTypes() );
+		)( getBlockTypes() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -165,7 +153,7 @@ class InserterMenu extends wp.element.Component {
 		const sortedByCategory = flow(
 			this.getVisibleBlocks,
 			this.sortBlocksByCategory,
-		)( wp.blocks.getBlockTypes() );
+		)( getBlockTypes() );
 
 		// If the block list is empty return early.
 		if ( ! sortedByCategory.length ) {
@@ -237,21 +225,18 @@ class InserterMenu extends wp.element.Component {
 	}
 
 	render() {
-		const { position = 'top' } = this.props;
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( wp.blocks.getBlockTypes() );
-		const positionClasses = position.split( ' ' ).map( ( pos ) => `is-${ pos }` );
-		const className = classnames( 'editor-inserter__menu', positionClasses );
+		const { position, instanceId } = this.props;
+		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlockTypes() );
 
 		return (
-			<div className={ className } tabIndex="0">
-				<div className="editor-inserter__arrow" />
+			<Popover position={ position } className="editor-inserter__menu">
 				<div role="menu" className="editor-inserter__content">
-					{ wp.blocks.getCategories()
+					{ getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 							<div key={ category.slug }>
 								<div
 									className="editor-inserter__separator"
-									id={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
+									id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
 									aria-hidden="true"
 								>
 									{ category.title }
@@ -260,21 +245,21 @@ class InserterMenu extends wp.element.Component {
 									className="editor-inserter__category-blocks"
 									role="menu"
 									tabIndex="0"
-									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ this.instanceId }` }
+									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
 								>
-									{ visibleBlocksByCategory[ category.slug ].map( ( { slug, title, icon } ) => (
+									{ visibleBlocksByCategory[ category.slug ].map( ( block ) => (
 										<button
 											role="menuitem"
-											key={ slug }
+											key={ block.name }
 											className="editor-inserter__block"
-											onClick={ this.selectBlock( slug ) }
-											ref={ this.bindReferenceNode( slug ) }
+											onClick={ this.selectBlock( block.name ) }
+											ref={ this.bindReferenceNode( block.name ) }
 											tabIndex="-1"
-											onMouseEnter={ this.hoverBlock() }
-											onMouseLeave={ this.unhoverBlock() }
+											onMouseEnter={ this.props.showInsertionPoint }
+											onMouseLeave={ this.props.hideInsertionPoint }
 										>
-											<Dashicon icon={ icon } />
-											{ title }
+											<Dashicon icon={ block.icon } />
+											{ block.title }
 										</button>
 									) ) }
 								</div>
@@ -282,31 +267,31 @@ class InserterMenu extends wp.element.Component {
 						) )
 					}
 				</div>
-				<label htmlFor={ `editor-inserter__search-${ this.instanceId }` } className="screen-reader-text">
-					{ wp.i18n.__( 'Search blocks' ) }
+				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+					{ __( 'Search blocks' ) }
 				</label>
 				<input
-					id={ `editor-inserter__search-${ this.instanceId }` }
+					id={ `editor-inserter__search-${ instanceId }` }
 					type="search"
-					placeholder={ wp.i18n.__( 'Search…' ) }
+					placeholder={ __( 'Search…' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
 					onClick={ this.setSearchFocus }
 					ref={ this.bindReferenceNode( 'search' ) }
 					tabIndex="-1"
 				/>
-			</div>
+			</Popover>
 		);
 	}
 }
 
-InserterMenu.instances = 0;
+const connectComponent = connect(
+	undefined,
+	{ showInsertionPoint, hideInsertionPoint }
+);
 
-export default connect(
-	( state ) => {
-		return {
-			selectedBlock: getSelectedBlock( state ),
-		};
-	},
-	{ setInsertionPoint, clearInsertionPoint }
-)( withFocusReturn( InserterMenu ) );
+export default flow(
+	withInstanceId,
+	withFocusReturn,
+	connectComponent
+)( InserterMenu );

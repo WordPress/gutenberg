@@ -1,15 +1,18 @@
 /**
  * External dependencies
  */
+import optimist from 'redux-optimist';
 import { combineReducers, applyMiddleware, createStore } from 'redux';
 import refx from 'refx';
-import { keyBy, first, last, omit, without, flowRight } from 'lodash';
+import { reduce, keyBy, first, last, omit, without, flowRight } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { combineUndoableReducers } from './utils/undoable-reducer';
 import effects from './effects';
+
+const isMobile = window.innerWidth < 782;
 
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
@@ -30,10 +33,28 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'EDIT_POST':
 			case 'SETUP_NEW_POST':
-				return {
-					...state,
-					...action.edits,
-				};
+				return reduce( action.edits, ( result, value, key ) => {
+					// Only assign into result if not already same value
+					if ( value !== state[ key ] ) {
+						// Avoid mutating original state by creating shallow
+						// clone. Should only occur once per reduce.
+						if ( result === state ) {
+							result = { ...state };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state );
+
+			case 'CLEAR_POST_EDITS':
+				// Don't return a new object if there's not any edits
+				if ( ! Object.keys( state ).length ) {
+					return state;
+				}
+
+				return {};
 		}
 
 		return state;
@@ -52,6 +73,7 @@ export const editor = combineUndoableReducers( {
 			case 'REPLACE_BLOCKS':
 			case 'REMOVE_BLOCKS':
 			case 'EDIT_POST':
+			case 'MARK_DIRTY':
 				return true;
 		}
 
@@ -64,6 +86,32 @@ export const editor = combineUndoableReducers( {
 				return keyBy( action.blocks, 'uid' );
 
 			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.uid ] ) {
+					return state;
+				}
+
+				// Consider as updates only changed values
+				const nextBlock = reduce( action.updates, ( result, value, key ) => {
+					if ( value !== result[ key ] ) {
+						// Avoid mutating original block by creating shallow clone
+						if ( result === state[ action.uid ] ) {
+							result = { ...state[ action.uid ] };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				}, state[ action.uid ] );
+
+				// Skip update if nothing has been changed. The reference will
+				// match the original block if `reduce` had no changed values.
+				if ( nextBlock === state[ action.uid ] ) {
+					return state;
+				}
+
+				// Otherwise merge updates into state
 				return {
 					...state,
 					[ action.uid ]: {
@@ -183,11 +231,11 @@ export const editor = combineUndoableReducers( {
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RESET_BLOCKS':
-			return action.post || state;
-
-		case 'REQUEST_POST_UPDATE_SUCCESS':
+		case 'RESET_POST':
 			return action.post;
+
+		case 'UPDATE_POST':
+			return { ...state, ...action.edits };
 	}
 
 	return state;
@@ -253,6 +301,16 @@ export function selectedBlock( state = {}, action ) {
 				typing: true,
 			};
 
+		case 'STOP_TYPING':
+			if ( action.uid !== state.uid ) {
+				return state;
+			}
+
+			return {
+				...state,
+				typing: false,
+			};
+
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.uid ) === -1 ) {
 				return state;
@@ -279,6 +337,7 @@ export function multiSelectedBlocks( state = { start: null, end: null }, action 
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'TOGGLE_BLOCK_SELECTED':
+		case 'INSERT_BLOCK':
 			return {
 				start: null,
 				end: null,
@@ -333,17 +392,12 @@ export function hoveredBlock( state = null, action ) {
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export function insertionPoint( state = { show: false }, action ) {
+export function showInsertionPoint( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-			return {
-				show: true,
-				uid: action.uid,
-			};
-		case 'CLEAR_INSERTION_POINT':
-			return {
-				show: false,
-			};
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
 	}
 
 	return state;
@@ -365,7 +419,7 @@ export function mode( state = 'visual', action ) {
 	return state;
 }
 
-export function isSidebarOpened( state = false, action ) {
+export function isSidebarOpened( state = ! isMobile, action ) {
 	switch ( action.type ) {
 		case 'TOGGLE_SIDEBAR':
 			return ! state;
@@ -389,7 +443,6 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isNew: action.isNew,
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -397,7 +450,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -405,7 +457,6 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
-				isNew: action.isNew,
 			};
 	}
 
@@ -418,17 +469,17 @@ export function saving( state = {}, action ) {
  * @return {Redux.Store} Redux store
  */
 export function createReduxStore() {
-	const reducer = combineReducers( {
+	const reducer = optimist( combineReducers( {
 		editor,
 		currentPost,
 		selectedBlock,
 		multiSelectedBlocks,
 		hoveredBlock,
-		insertionPoint,
+		showInsertionPoint,
 		mode,
 		isSidebarOpened,
 		saving,
-	} );
+	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];
 	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {

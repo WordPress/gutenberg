@@ -105,12 +105,12 @@ class FeaturedImage extends Component {
 							onSelect={ onUpdateImage }
 							type="image"
 						>
-							{ wp.i18n.__( 'Set featured image' ) }
+							{ __( 'Set featured image' ) }
 						</MediaUploadButton>
 					}
 					{ !! featuredImageId &&
 						<Button className="editor-featured-image__toggle button-link" onClick={ onRemoveImage }>
-							{ wp.i18n.__( 'Remove featured image' ) }
+							{ __( 'Remove featured image' ) }
 						</Button>
 					}
 				</div>

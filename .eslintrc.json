@@ -7,7 +7,8 @@
 		"plugin:jsx-a11y/recommended"
 	],
 	"env": {
-		"browser": true,
+		"browser": false,
+		"es6": true,
 		"node": true,
 		"mocha": true
 	},
@@ -18,7 +19,10 @@
 		}
 	},
 	"globals": {
-		"wp": true
+		"wp": true,
+		"wpApiSettings": true,
+		"window": true,
+		"document": true
 	},
 	"plugins": [
 		"react",
@@ -32,6 +36,7 @@
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
 		"brace-style": [ "error", "1tbs" ],
+		"camelcase": [ "error", { "properties": "never" } ],
 		"comma-dangle": [ "error", "always-multiline" ],
 		"comma-spacing": "error",
 		"comma-style": "error",

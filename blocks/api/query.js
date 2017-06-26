@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createElement } from 'element';
+
+/**
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
@@ -39,7 +44,7 @@ export const children = withKnownMatcherFlag( ( selector ) => {
 		}
 
 		if ( match ) {
-			return nodeListToReact( match.childNodes || [], wp.element.createElement );
+			return nodeListToReact( match.childNodes || [], createElement );
 		}
 
 		return [];

@@ -1,13 +1,15 @@
 .editor-inserter {
 	display: inline-block;
-	position: relative;
 	background: none;
 	border: none;
 	padding: 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	z-index: z-index( '.editor-inserter' );
+
+	@include break-medium {
+		position: relative;
+	}
 }
 
 .editor-inserter__toggle {
@@ -20,97 +22,26 @@
 	outline: none;
 	transition: color .2s ease;
 
+	.editor-layout__content & {
+		border-radius: $icon-button-size / 2;
+	}
+
 	&:hover,
 	&:focus {
 		color: $blue-medium-500;
 	}
 }
 
-.editor-inserter__menu {
-	width: 280px;
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
-	position: absolute;
-	left: -122px;
-	background: $white;
-
-	&.is-top {
-		bottom: 42px;
-
-		.editor-inserter__arrow {
-			bottom: -10px;
-			left: 50%;
-			margin-left: -10px;
-			border-top-style: solid;
-			border-bottom: none;
-			border-left-color: transparent;
-			border-right-color: transparent;
-
-			&:before {
-				bottom: 2px;
-				border: 10px solid $white;
-				content: " ";
-				position: absolute;
-				left: 50%;
-				margin-left: -10px;
-				border-top-style: solid;
-				border-bottom: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-			}
-		}
-	}
-
-	&.is-bottom {
-		top: 42px;
-
-		.editor-inserter__arrow {
-			top: -10px;
-			left: 50%;
-			margin-left: -10px;
-			border-bottom-style: solid;
-			border-top: none;
-			border-left-color: transparent;
-			border-right-color: transparent;
-
-			&:before {
-				top: 2px;
-				border: 10px solid $light-gray-100;
-				content: " ";
-				position: absolute;
-				left: 50%;
-				margin-left: -10px;
-				border-bottom-style: solid;
-				border-top: none;
-				border-left-color: transparent;
-				border-right-color: transparent;
-			}
-		}
-	}
-
-	&.is-right {
-		left: -32px;
-		.editor-inserter__arrow {
-			left: 49px;
-			&:before {
-				left: 0;
-			}
-		}
-	}
-}
-
-.editor-inserter__arrow {
-	border: 10px dashed $light-gray-500;
-	height: 0;
-	line-height: 0;
-	position: absolute;
-	width: 0;
-	z-index: z-index( '.editor-inserter__arrow' );
-}
-
 .editor-inserter__content {
-	max-height: 50vh;
+	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size } );
+
+	@include break-medium {
+		height: auto;
+		max-height: 50vh;
+	}
+
 	overflow: auto;
+	box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
 
 	&:focus {
 		outline: none;
@@ -136,6 +67,10 @@ input[type=search].editor-inserter__search {
 	display: flex;
 	flex-flow: row wrap;
 	padding: 3px;
+}
+
+.editor-inserter__menu.is-bottom:after {
+	border-bottom-color: $light-gray-100;
 }
 
 .editor-inserter__block {

@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
+import tinymce from 'tinymce';
 import classnames from 'classnames';
-import { last, isEqual, capitalize, omitBy, forEach, merge, identity, find } from 'lodash';
+import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import { Fill } from 'react-slot-fill';
 import 'element-closest';
@@ -10,8 +11,8 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Toolbar } from 'components';
-import { BACKSPACE, DELETE } from 'utils/keycodes';
+import { createElement, Component, renderToString } from 'element';
+import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -20,31 +21,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-const alignmentMap = {
-	alignleft: 'left',
-	alignright: 'right',
-	aligncenter: 'center',
-};
-
-const ALIGNMENT_CONTROLS = [
-	{
-		icon: 'editor-alignleft',
-		title: wp.i18n.__( 'Align left' ),
-		align: 'left',
-	},
-	{
-		icon: 'editor-aligncenter',
-		title: wp.i18n.__( 'Align center' ),
-		align: 'center',
-	},
-	{
-		icon: 'editor-alignright',
-		title: wp.i18n.__( 'Align right' ),
-		align: 'right',
-	},
-];
-
-function createElement( type, props, ...children ) {
+function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -53,14 +30,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class Editable extends wp.element.Component {
+export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -78,7 +55,6 @@ export default class Editable extends wp.element.Component {
 
 		this.state = {
 			formats: {},
-			alignment: null,
 			bookmark: null,
 			empty: ! props.value || ! props.value.length,
 		};
@@ -130,14 +106,16 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		const content = this.getContent();
 		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
-			empty: ! content || ! content.length,
+			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
 		} );
 
-		if ( this.props.focus.collapsed !== collapsed ) {
+		if (
+			this.props.focus && this.props.onFocus &&
+			this.props.focus.collapsed !== collapsed
+		) {
 			this.props.onFocus( {
 				...this.props.focus,
 				collapsed,
@@ -229,12 +207,66 @@ export default class Editable extends wp.element.Component {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
+
+		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
+		// We also split the content and call the onSplit prop if provided.
+		if ( event.keyCode === ENTER && event.shiftKey && this.props.inline ) {
+			event.preventDefault();
+
+			if ( this.props.onSplit ) {
+				this.splitContent();
+			}
+		}
 	}
 
 	onKeyUp( { keyCode } ) {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
+
+		if ( keyCode === ENTER && this.props.inline && this.props.onSplit ) {
+			const endNode = this.editor.selection.getEnd();
+
+			// Make sure the current selection is on a line break.
+			if ( endNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			const prevNode = endNode.previousSibling;
+
+			// Make sure the previous node is a line break. We only want to
+			// split on a double line break.
+			if ( ! prevNode || prevNode.nodeName !== 'BR' ) {
+				return;
+			}
+
+			this.editor.dom.remove( prevNode );
+			this.editor.dom.remove( endNode );
+			this.splitContent();
+		}
+	}
+
+	splitContent() {
+		const { dom } = this.editor;
+		const rootNode = this.editor.getBody();
+		const beforeRange = dom.createRng();
+		const afterRange = dom.createRng();
+		const selectionRange = this.editor.selection.getRng();
+
+		beforeRange.setStart( rootNode, 0 );
+		beforeRange.setEnd( selectionRange.startContainer, selectionRange.startOffset );
+
+		afterRange.setStart( selectionRange.endContainer, selectionRange.endOffset );
+		afterRange.setEnd( rootNode, dom.nodeIndex( rootNode.lastChild ) + 1 );
+
+		const beforeFragment = beforeRange.extractContents();
+		const afterFragment = afterRange.extractContents();
+
+		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+
+		this.setContent( beforeElement );
+		this.props.onSplit( beforeElement, afterElement );
 	}
 
 	onNewBlock() {
@@ -280,8 +312,8 @@ export default class Editable extends wp.element.Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			nodeListToReact( before, createTinyMCEElement ),
+			nodeListToReact( after, createTinyMCEElement )
 		);
 	}
 
@@ -293,12 +325,10 @@ export default class Editable extends wp.element.Component {
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-		const alignments = this.editor.formatter.matchAll( [ 'alignleft', 'aligncenter', 'alignright' ] );
-		const alignment = alignments.length > 0 ? alignmentMap[ alignments[ 0 ] ] : null;
 
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.setState( { alignment, bookmark, formats, focusPosition } );
+		this.setState( { bookmark, formats, focusPosition } );
 	}
 
 	updateContent() {
@@ -317,24 +347,29 @@ export default class Editable extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	updateFocus() {
 		const { focus } = this.props;
+		const isActive = this.isActive();
+
 		if ( focus ) {
-			this.editor.focus();
+			if ( ! isActive ) {
+				this.editor.focus();
+			}
+
 			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 ) {
+			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
 				this.editor.selection.select( this.editor.getBody(), true );
 				this.editor.selection.collapse( false );
 			}
-		} else {
+		} else if ( isActive ) {
 			this.editor.getBody().blur();
 		}
 	}
@@ -344,7 +379,7 @@ export default class Editable extends wp.element.Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.focus !== prevProps.focus ) {
+		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
 			this.updateFocus();
 		}
 
@@ -390,25 +425,11 @@ export default class Editable extends wp.element.Component {
 			}
 		} );
 
-		this.setState( {
-			formats: merge( {}, this.state.formats, formats ),
-		} );
+		this.setState( ( state ) => ( {
+			formats: merge( {}, state.formats, formats ),
+		} ) );
 
 		this.editor.setDirty( true );
-	}
-
-	isAlignmentActive( align ) {
-		return this.state.alignment === align;
-	}
-
-	toggleAlignment( align ) {
-		this.editor.focus();
-
-		if ( this.isAlignmentActive( align ) ) {
-			this.editor.execCommand( 'JustifyNone' );
-		} else {
-			this.editor.execCommand( 'Justify' + capitalize( align ) );
-		}
 	}
 
 	render() {
@@ -418,7 +439,6 @@ export default class Editable extends wp.element.Component {
 			value,
 			focus,
 			className,
-			showAlignments = false,
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
@@ -443,15 +463,6 @@ export default class Editable extends wp.element.Component {
 			<div className={ classes }>
 				{ focus &&
 					<Fill name="Formatting.Toolbar">
-						{ showAlignments &&
-							<Toolbar
-								controls={ ALIGNMENT_CONTROLS.map( ( control ) => ( {
-									...control,
-									onClick: () => this.toggleAlignment( control.align ),
-									isActive: this.isAlignmentActive( control.align ),
-								} ) ) }
-							/>
-						}
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}

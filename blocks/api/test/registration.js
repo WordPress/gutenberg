@@ -14,6 +14,8 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandler,
 	getUnknownTypeHandler,
+	setDefaultBlock,
+	getDefaultBlock,
 	getBlockType,
 	getBlockTypes,
 } from '../registration';
@@ -26,35 +28,36 @@ describe( 'blocks', () => {
 
 	afterEach( () => {
 		getBlockTypes().forEach( block => {
-			unregisterBlockType( block.slug );
+			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandler( undefined );
+		setDefaultBlock( undefined );
 		console.error.restore();
 	} );
 
 	describe( 'registerBlockType()', () => {
 		it( 'should reject numbers', () => {
 			const block = registerBlockType( 999 );
-			expect( console.error ).to.have.been.calledWith( 'Block slugs must be strings.' );
+			expect( console.error ).to.have.been.calledWith( 'Block names must be strings.' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).to.have.been.calledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console.error ).to.have.been.calledWith( 'Block slugs must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( console.error ).to.have.been.calledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
 			expect( block ).to.be.undefined();
 		} );
 
 		it( 'should accept valid block names', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-4' );
 			expect( console.error ).to.not.have.been.called();
-			expect( block ).to.eql( { slug: 'my-plugin/fancy-block-4' } );
+			expect( block ).to.eql( { name: 'my-plugin/fancy-block-4' } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
@@ -69,7 +72,7 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
-				slug: 'core/test-block-with-settings',
+				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 			} );
 		} );
@@ -85,11 +88,11 @@ describe( 'blocks', () => {
 		it( 'should unregister existing blocks', () => {
 			registerBlockType( 'core/test-block' );
 			expect( getBlockTypes() ).to.eql( [
-				{ slug: 'core/test-block' },
+				{ name: 'core/test-block' },
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
 			expect( console.error ).to.not.have.been.called();
-			expect( oldBlock ).to.eql( { slug: 'core/test-block' } );
+			expect( oldBlock ).to.eql( { name: 'core/test-block' } );
 			expect( getBlockTypes() ).to.eql( [] );
 		} );
 	} );
@@ -108,11 +111,25 @@ describe( 'blocks', () => {
 		} );
 	} );
 
+	describe( 'setDefaultBlock()', () => {
+		it( 'assigns default block name', () => {
+			setDefaultBlock( 'core/test-block' );
+
+			expect( getDefaultBlock() ).to.equal( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getDefaultBlock()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getDefaultBlock() ).to.be.undefined();
+		} );
+	} );
+
 	describe( 'getBlockType()', () => {
-		it( 'should return { slug } for blocks with no settings', () => {
+		it( 'should return { name } for blocks with no settings', () => {
 			registerBlockType( 'core/test-block' );
 			expect( getBlockType( 'core/test-block' ) ).to.eql( {
-				slug: 'core/test-block',
+				name: 'core/test-block',
 			} );
 		} );
 
@@ -120,7 +137,7 @@ describe( 'blocks', () => {
 			const blockType = { settingName: 'settingValue' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).to.eql( {
-				slug: 'core/test-block-with-settings',
+				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 			} );
 		} );
@@ -136,8 +153,8 @@ describe( 'blocks', () => {
 			const blockType = { settingName: 'settingValue' };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).to.eql( [
-				{ slug: 'core/test-block' },
-				{ slug: 'core/test-block-with-settings', settingName: 'settingValue' },
+				{ name: 'core/test-block' },
+				{ name: 'core/test-block-with-settings', settingName: 'settingValue' },
 			] );
 		} );
 	} );

@@ -1,6 +1,6 @@
 .editor-visual-editor {
 	margin: 0 auto;
-	padding: 50px 10px;	/* Floating up/down arrows invisible */
+	padding: 50px 0;	// Floating up/down arrows invisible
 
 	&,
 	& p {
@@ -10,27 +10,27 @@
 	}
 
 	@include break-small() {
-		padding: 50px 0 50px #{ $block-padding + $block-mover-margin };		/* Floating up/down appear, also compensate for mover */
+		padding: 50px 0;
 	}
 
 	@include break-large() {
-		padding: 60px 0 60px #{ $block-padding + $block-mover-margin };		/* Compensate for mover on the left side */
+		padding: 60px 0;
 	}
 }
 
-/* "Hassle-free full bleed" from CSS Tricks */
-.editor-visual-editor > *:not( [data-align="wide"] ) {
-	max-width: $visual-editor-max-width;
+.editor-visual-editor {
 	margin-left: auto;
 	margin-right: auto;
 }
 
 .editor-visual-editor__block {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 5px;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-	left: -#{ $block-padding + $block-mover-margin };	/* Make room for the mover */
-	padding: $block-padding $block-padding  $block-padding #{ $block-padding * 2 + $block-mover-margin };	/* Compensate for mover */
-	margin-right: #{ $block-padding + $block-mover-margin };
-	transition: 0.2s border-color;
+	// The block mover needs to stay inside the block to allow clicks when hovering the block
+	padding: $block-padding $block-padding + $block-mover-padding-visible;
 
 	&:before {
 		z-index: z-index( '.editor-visual-editor__block:before' );
@@ -38,18 +38,20 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: #{ $block-padding + $block-mover-margin };	/* Compensate for mover */
-		right: 0;
-		border: 2px solid transparent;
-		transition: 0.2s border-color;
+		left: $block-mover-padding-visible;
+		right: $block-mover-padding-visible;
+		outline: 1px solid transparent;
+		transition: 0.2s outline;
 	}
 
 	&.is-hovered:before {
-		border-left-color: $light-gray-500;
+		outline: 1px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-selected:before {
-		border-color: $light-gray-500;
+		outline: 2px solid $light-gray-500;
+		transition: 0.2s outline;
 	}
 
 	&.is-multi-selected *::selection {
@@ -58,7 +60,8 @@
 
 	&.is-multi-selected:before {
 		background: $blue-medium-100;
-		border: 2px solid $blue-medium-200;
+		outline: 2px solid $blue-medium-200;
+		transition: 0.2s outline;
 	}
 
 	.iframe-overlay {
@@ -78,6 +81,128 @@
 	&.is-selected .iframe-overlay:before {
 		display: none;
 	}
+
+	// Alignments
+	&[data-align="left"],
+	&[data-align="right"] {
+		// Without z-index, won't be clickable as "above" adjacent content
+		z-index: z-index( '.editor-visual-editor__block {core/image aligned left or right}' );
+		max-width: 370px;
+
+		.editor-block-mover {
+			display: none;
+		}
+	}
+
+	&[data-align="left"] {
+		float: left;
+
+		// mobile, and no sidebars
+		margin-right: $block-padding;
+
+		// sidebar (folded)
+		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
+		// sidebar (sticky)
+		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-left: $float-margin;
+			}
+		}
+
+		// sidebar and post settings
+		.auto-fold .is-sidebar-opened & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
+				margin-left: $float-margin;
+			}
+		}
+	}
+
+	&[data-align="right"] {
+		float: right;
+
+		// mobile, and no sidebars
+		margin-right: $block-padding;
+
+		// sidebar (folded)
+		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
+		// sidebar (sticky)
+		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
+		// sidebar (sticky) and post settings
+		.sticky-menu .editor-layout & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
+				margin-right: $float-margin;
+			}
+		}
+
+		// sidebar and post settings
+		.auto-fold .is-sidebar-opened & {
+			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
+				margin-right: $float-margin;
+			}
+		}
+	}
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+	}
+
+	&[data-align="full"] {
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+
+		&:before {
+			left: 0;
+			right: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.editor-block-mover {
+			display: none;
+		}
+
+		.editor-block-settings-menu {
+			top: -24px;
+			right: 10px;
+		}
+
+		.editor-block-settings-menu__control {
+			float: left;
+			margin-right: 8px;
+		}
+	}
+
+	&[data-align="full"],
+	&[data-align="wide"] {
+		.editor-visual-editor__block-controls {
+			width: $visual-editor-max-width - $block-padding - $block-padding;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
 }
 
 .editor-visual-editor__block-controls {
@@ -90,7 +215,11 @@
 	width: 0;
 	white-space: nowrap;
 
-	top: $header-height + $admin-bar-height-big + $item-spacing;
+	top: $header-height + $item-spacing;
+
+	@include break-small() {
+		top: $header-height + $admin-bar-height-big + $item-spacing;
+	}
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
@@ -101,20 +230,20 @@
 	}
 }
 
+$sticky-bottom-offset: 20px;
 .editor-visual-editor__block-controls + div {
-	margin-top: -20px;
-
-	// prevent collapsing margins between the block and the toolbar
-	&:before {
-		content: "";
-		display: table;
-		clear: both;
-	}
-}
+	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset
+ 	margin-top: -$sticky-bottom-offset - 1px;
+	padding-top: 1px;
+ }
 
 .editor-visual-editor__block-controls .components-toolbar {
 	display: inline-flex;
-	margin-right: $item-spacing;
+	margin-right: -1px;
+
+	@include break-small() {
+		margin-right: $item-spacing;
+	}
 }
 
 .editor-visual-editor__block-controls .editor-block-switcher {
@@ -125,16 +254,43 @@
 	margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
 }
 
-.editor-visual-editor > .editor-visual-editor__insertion-point {
+.editor-visual-editor .editor-visual-editor__insertion-point {
 	position: relative;
+	width: $visual-editor-max-width - $block-padding - $block-padding;
+	margin-left: auto;
+	margin-right: auto;
 
 	&:before {
 		position: absolute;
 		top: 6px;
-		right: #{ $block-padding + $block-mover-margin };
-		left: 0;
 		height: 3px;
+		left: 0;
+		right: 0;
 		background: $blue-medium-500;
 		content: '';
+	}
+}
+
+.editor-visual-editor__placeholder[type=text] {
+	margin: 2px auto;
+	max-width: $visual-editor-max-width;
+	position: relative;
+	padding: $block-padding;
+	outline: 1px solid transparent;
+	border: none;
+	background: none;
+	box-shadow: none;
+	display: block;
+	transition: 0.2s outline;
+	text-align: left;
+	width: 100%;
+	color: $light-gray-700;
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	cursor: text;
+	left: -1px;
+
+	&:hover {
+		outline: 1px solid $light-gray-500;
 	}
 }

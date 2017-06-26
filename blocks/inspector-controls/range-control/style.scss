@@ -1,0 +1,14 @@
+.blocks-range-control {
+	display: flex;
+	justify-content: center;
+}
+
+.blocks-range-control__input {
+	width: 100%;
+}
+
+.blocks-range-control__hint {
+	display: inline-block;
+	margin-left: 10px;
+	font-weight: 500;
+}

@@ -43,7 +43,7 @@ function Token( {
 			</span>
 			<IconButton
 				className="components-form-token-field__remove-token"
-				icon="no-alt"
+				icon="dismiss"
 				onClick={ ! disabled && onClick }
 			/>
 		</span>

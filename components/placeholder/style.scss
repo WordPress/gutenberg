@@ -22,12 +22,19 @@
 	}
 }
 
-.components-placeholder__fieldset {
+.components-placeholder__fieldset,
+.components-placeholder__fieldset form {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	width: 100%;
 	max-width: 280px;
+	flex-wrap: wrap;
+
+	p {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
 }
 
 .components-placeholder__input {

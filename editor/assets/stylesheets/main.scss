@@ -1,4 +1,5 @@
-body.toplevel_page_gutenberg {
+body.toplevel_page_gutenberg,
+body.gutenberg_page_gutenberg-demo {
 	background: $white;
 
 	#update-nag, .update-nag {
@@ -12,7 +13,6 @@ body.toplevel_page_gutenberg {
 	#wpfooter {
 		display: none;
 	}
-
 }
 
 .gutenberg {
@@ -51,12 +51,15 @@ body.toplevel_page_gutenberg {
 		max-width: 100%;
 	}
 
+	iframe {
+		width: 100%;
+	}
+
 	@include break-small() {
 		padding-top: $header-height;
 	}
 }
 
-.editor-sidebar,
 .editor-post-title,
 .editor-visual-editor__block {
 	input,

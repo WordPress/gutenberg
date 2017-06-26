@@ -1,3 +1,23 @@
-.editor-post-taxonomies__tags-selector {
-	margin-top: 10px;
+.editor-post-taxonomies__tags-selector,
+.editor-post-taxonomies__categories-selector {
+	margin-top: 15px;
+}
+
+.editor-post-taxonomies__tags-selector-title,
+.editor-post-taxonomies__categories-selector-title {
+	display: block;
+	margin-bottom: 10px;
+}
+
+.editor-post-taxonomies__categories-choice {
+	margin-bottom: 5px;
+}
+
+.editor-post-taxonomies__categories-input[type=checkbox] {
+	margin-top: 0;
+}
+
+.editor-post-taxonomies__categories-subchoices {
+	margin-top: 5px;
+	margin-left: 15px;
 }

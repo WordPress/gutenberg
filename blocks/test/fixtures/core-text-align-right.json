@@ -3,16 +3,9 @@
         "uid": "_uid_0",
         "name": "core/text",
         "attributes": {
+            "align": "right",
             "content": [
-                {
-                    "type": "p",
-                    "attributes": {
-                        "style": {
-                            "textAlign": "right"
-                        }
-                    },
-                    "children": "... like this one, which is separate from the above and right aligned."
-                }
+                [ "... like this one, which is separate from the above and right aligned." ]
             ]
         }
     }

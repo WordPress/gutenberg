@@ -1,34 +1,52 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
+import './style.scss';
 import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
+import FreeformBlock from './freeform-block';
 
-const { html } = query;
+const { children } = query;
 
 registerBlockType( 'core/freeform', {
-	title: wp.i18n.__( 'Freeform' ),
+	title: __( 'Classic Text' ),
 
-	icon: 'text',
+	icon: 'editor-kitchensink',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
-		html: html(),
+		content: children(),
 	},
 
-	edit( { attributes } ) {
+	defaultAttributes: {
+		content: <p />,
+	},
+
+	edit( { attributes, setAttributes, focus, setFocus } ) {
+		const { content } = attributes;
+
 		return (
-			<div
-				contentEditable
-				suppressContentEditableWarning
-			>
-				{ attributes.html }
-			</div>
+			<FreeformBlock
+				content={ content }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				focus={ focus }
+				onFocus={ setFocus }
+			/>
 		);
 	},
 
 	save( { attributes } ) {
-		return attributes.html;
+		const { content } = attributes;
+		return content;
 	},
 } );
 

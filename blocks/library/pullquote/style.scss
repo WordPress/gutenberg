@@ -8,13 +8,21 @@
 		position: relative;
 	}
 
-	footer p {
+	footer p,
+	footer .blocks-editable__tinymce[data-is-empty="true"]:before {
 		font-size: 16px;
 		font-family: $default-font;
+	}
+
+	.blocks-editable__tinymce[data-is-empty="true"]:before {
+		width: 100%;
+		left: 50%;
+		transform: translateX( -50% );
 	}
 }
 
 .editor-visual-editor .blocks-pullquote {
+	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
 	& > .blocks-editable p {
 		font-family: $default-font;
 		font-size: 48px;

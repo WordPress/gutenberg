@@ -4,6 +4,12 @@
 import { isString } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __, sprintf } from 'i18n';
+import { concatChildren } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -14,11 +20,13 @@ import BlockControls from '../../block-controls';
 const { children, prop } = query;
 
 registerBlockType( 'core/heading', {
-	title: wp.i18n.__( 'Heading' ),
+	title: __( 'Heading' ),
 
 	icon: 'heading',
 
 	category: 'common',
+
+	className: false,
 
 	attributes: {
 		content: children( 'h1,h2,h3,h4,h5,h6' ),
@@ -72,11 +80,11 @@ registerBlockType( 'core/heading', {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlockAfter } ) {
 		const { content, nodeName = 'H2' } = attributes;
 
 		return [
@@ -86,7 +94,7 @@ registerBlockType( 'core/heading', {
 					controls={
 						'123456'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
-							title: wp.i18n.sprintf( wp.i18n.__( 'Heading %s' ), level ),
+							title: sprintf( __( 'Heading %s' ), level ),
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
@@ -103,6 +111,12 @@ registerBlockType( 'core/heading', {
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				inline
+				onSplit={ ( before, after ) => {
+					setAttributes( { content: before } );
+					insertBlockAfter( createBlock( 'core/text', {
+						content: after,
+					} ) );
+				} }
 			/>,
 		];
 	},

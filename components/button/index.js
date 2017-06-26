@@ -4,7 +4,12 @@
 import './style.scss';
 import classnames from 'classnames';
 
-class Button extends wp.element.Component {
+/**
+ * WordPress dependencies
+ */
+import { Component, createElement } from 'element';
+
+class Button extends Component {
 	constructor( props ) {
 		super( props );
 		this.setRef = this.setRef.bind( this );
@@ -34,7 +39,7 @@ class Button extends wp.element.Component {
 
 		delete additionalProps.focus;
 
-		return wp.element.createElement( tag, {
+		return createElement( tag, {
 			...tagProps,
 			...additionalProps,
 			className: classes,

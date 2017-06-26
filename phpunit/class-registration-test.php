@@ -18,7 +18,7 @@ class Registration_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage register_block_type
 	 */
-	function test_invalid_non_string_slugs() {
+	function test_invalid_non_string_names() {
 		$result = register_block_type( 1, array() );
 		$this->assertFalse( $result );
 	}
@@ -28,7 +28,7 @@ class Registration_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage register_block_type
 	 */
-	function test_invalid_slugs_without_namespace() {
+	function test_invalid_names_without_namespace() {
 		$result = register_block_type( 'text', array() );
 		$this->assertFalse( $result );
 	}
@@ -54,7 +54,7 @@ class Registration_Test extends WP_UnitTestCase {
 		$updated_settings = register_block_type( 'core/text', $settings );
 		$this->assertEquals( $updated_settings, array(
 			'icon' => 'text',
-			'slug' => 'core/text',
+			'name' => 'core/text',
 		) );
 		$this->assertEquals( $updated_settings, $wp_registered_blocks['core/text'] );
 	}
@@ -96,7 +96,7 @@ class Registration_Test extends WP_UnitTestCase {
 		$unregistered_block = unregister_block_type( 'core/text' );
 		$this->assertEquals( $unregistered_block, array(
 			'icon' => 'text',
-			'slug' => 'core/text',
+			'name' => 'core/text',
 		) );
 		$this->assertFalse( isset( $wp_registered_blocks['core/text'] ) );
 	}

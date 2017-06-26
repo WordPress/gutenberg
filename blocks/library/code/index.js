@@ -4,6 +4,11 @@
 import TextareaAutosize from 'react-autosize-textarea';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -12,7 +17,7 @@ import { registerBlockType, query } from '../../api';
 const { prop } = query;
 
 registerBlockType( 'core/code', {
-	title: wp.i18n.__( 'Code' ),
+	title: __( 'Code' ),
 
 	icon: 'editor-code',
 
@@ -22,11 +27,10 @@ registerBlockType( 'core/code', {
 		content: prop( 'code', 'textContent' ),
 	},
 
-	edit( { attributes, setAttributes, setFocus } ) {
+	edit( { attributes, setAttributes } ) {
 		return (
 			<TextareaAutosize
 				value={ attributes.content }
-				onFocus={ setFocus }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
 			/>
 		);

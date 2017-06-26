@@ -1,7 +1,7 @@
 function PanelHeader( { label, children } ) {
 	return (
 		<div className="components-panel__header">
-			{ label && <strong>{ label }</strong> }
+			{ label && <h2>{ label }</h2> }
 			{ children }
 		</div>
 	);

@@ -6,6 +6,11 @@ import { values } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -17,18 +22,18 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
-	insertionPoint,
+	showInsertionPoint,
 	createReduxStore,
 } from '../state';
 
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		before( () => {
-			wp.blocks.registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 		} );
 
 		after( () => {
-			wp.blocks.unregisterBlockType( 'core/test-block' );
+			unregisterBlockType( 'core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
@@ -49,27 +54,6 @@ describe( 'state', () => {
 			expect( Object.keys( state.blocksByUid ) ).to.have.lengthOf( 1 );
 			expect( values( state.blocksByUid )[ 0 ].uid ).to.equal( 'bananas' );
 			expect( state.blockOrder ).to.eql( [ 'bananas' ] );
-		} );
-
-		it( 'should return with block updates', () => {
-			const original = editor( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [ {
-					uid: 'kumquat',
-					attributes: {},
-				} ],
-			} );
-			const state = editor( original, {
-				type: 'UPDATE_BLOCK',
-				uid: 'kumquat',
-				updates: {
-					attributes: {
-						updated: true,
-					},
-				},
-			} );
-
-			expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
 		} );
 
 		it( 'should insert block', () => {
@@ -363,6 +347,25 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should return same reference if no changed properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+					},
+				} );
+
+				expect( state.edits ).to.equal( original.edits );
+			} );
+
 			it( 'should save modified properties', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
@@ -386,6 +389,36 @@ describe( 'state', () => {
 					title: 'modified title',
 					tags: [ 2 ],
 				} );
+			} );
+
+			it( 'should reset modified properties', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						status: 'draft',
+						title: 'post title',
+						tags: [ 1 ],
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'CLEAR_POST_EDITS',
+				} );
+
+				expect( state.edits ).to.eql( {} );
+			} );
+
+			it( 'should return same reference if clearing non-edited', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {},
+				} );
+
+				const state = editor( original, {
+					type: 'CLEAR_POST_EDITS',
+				} );
+
+				expect( state.edits ).to.equal( original.edits );
 			} );
 
 			it( 'should save initial post state', () => {
@@ -467,14 +500,78 @@ describe( 'state', () => {
 				expect( state.dirty ).to.be.false();
 			} );
 		} );
+
+		describe( 'blocksByUid', () => {
+			it( 'should return with block updates', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+					} ],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid.kumquat.attributes.updated ).to.be.true();
+			} );
+
+			it( 'should ignore updates to non-existant block', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid ).to.equal( original.blocksByUid );
+			} );
+
+			it( 'should return with same reference if no changes in updates', () => {
+				const original = editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} ],
+				} );
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK',
+					uid: 'kumquat',
+					updates: {
+						attributes: {
+							updated: true,
+						},
+					},
+				} );
+
+				expect( state.blocksByUid ).to.equal( state.blocksByUid );
+			} );
+		} );
 	} );
 
 	describe( 'currentPost()', () => {
-		it( 'should remember a post object sent with RESET_BLOCKS', () => {
+		it( 'should reset a post object', () => {
 			const original = deepFreeze( { title: 'unmodified' } );
 
 			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
+				type: 'RESET_POST',
 				post: {
 					title: 'new post',
 				},
@@ -485,29 +582,19 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should ignore RESET_BLOCKS without a post object', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
+		it( 'should update the post object with UPDATE_POST', () => {
+			const original = deepFreeze( { title: 'unmodified', status: 'publish' } );
 
 			const state = currentPost( original, {
-				type: 'RESET_BLOCKS',
-				post: null,
-			} );
-
-			expect( state ).to.equal( original );
-		} );
-
-		it( 'should remember a post object sent with REQUEST_POST_UPDATE_SUCCESS', () => {
-			const original = deepFreeze( { title: 'unmodified' } );
-
-			const state = currentPost( original, {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				post: {
+				type: 'UPDATE_POST',
+				edits: {
 					title: 'updated post object from server',
 				},
 			} );
 
 			expect( state ).to.eql( {
 				title: 'updated post object from server',
+				status: 'publish',
 			} );
 		} );
 	} );
@@ -560,27 +647,21 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'insertionPoint', () => {
-		it( 'should set the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'SET_INSERTION_POINT',
-				uid: 'kumquat',
+	describe( 'showInsertionPoint', () => {
+		it( 'should show the insertion point', () => {
+			const state = showInsertionPoint( undefined, {
+				type: 'SHOW_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: true,
-				uid: 'kumquat',
-			} );
+			expect( state ).to.be.true();
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = insertionPoint( {}, {
-				type: 'CLEAR_INSERTION_POINT',
+			const state = showInsertionPoint( {}, {
+				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).to.eql( {
-				show: false,
-			} );
+			expect( state ).to.be.false();
 		} );
 	} );
 
@@ -722,6 +803,29 @@ describe( 'state', () => {
 			expect( state ).to.eql( { uid: 'chicken', typing: true, focus: {} } );
 		} );
 
+		it( 'should do nothing if typing stopped not within selected block', () => {
+			const original = selectedBlock( undefined, {} );
+			const state = selectedBlock( original, {
+				type: 'STOP_TYPING',
+				uid: 'chicken',
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should reset typing flag if typing stopped within selected block', () => {
+			const original = selectedBlock( undefined, {
+				type: 'START_TYPING',
+				uid: 'chicken',
+			} );
+			const state = selectedBlock( original, {
+				type: 'STOP_TYPING',
+				uid: 'chicken',
+			} );
+
+			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
+		} );
+
 		it( 'should set the typing flag and merge the existing state', () => {
 			const original = deepFreeze( { uid: 'ribs', typing: false, focus: { editable: 'citation' } } );
 			const state = selectedBlock( original, {
@@ -786,6 +890,16 @@ describe( 'state', () => {
 			} );
 
 			expect( state2 ).to.eql( { start: null, end: null } );
+
+			const state3 = multiSelectedBlocks( original, {
+				type: 'INSERT_BLOCK',
+				block: {
+					uid: 'ribs',
+					name: 'core/freeform',
+				},
+			} );
+
+			expect( state3 ).to.eql( { start: null, end: null } );
 		} );
 	} );
 
@@ -807,10 +921,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'isSidebarOpened()', () => {
-		it( 'should be closed by default', () => {
+		it( 'should be opened by default', () => {
 			const state = isSidebarOpened( undefined, {} );
 
-			expect( state ).to.be.false();
+			expect( state ).to.be.true();
 		} );
 
 		it( 'should toggle the sidebar open flag', () => {
@@ -826,33 +940,28 @@ describe( 'state', () => {
 		it( 'should update when a request is started', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE',
-				isNew: true,
 			} );
 			expect( state ).to.eql( {
 				requesting: true,
 				successful: false,
 				error: null,
-				isNew: true,
 			} );
 		} );
 
 		it( 'should update when a request succeeds', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				isNew: true,
 			} );
 			expect( state ).to.eql( {
 				requesting: false,
 				successful: true,
 				error: null,
-				isNew: false,
 			} );
 		} );
 
 		it( 'should update when a request fails', () => {
 			const state = saving( null, {
 				type: 'REQUEST_POST_UPDATE_FAILURE',
-				isNew: true,
 				error: {
 					code: 'pretend_error',
 					message: 'update failed',
@@ -865,7 +974,6 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
-				isNew: true,
 			} );
 		} );
 	} );
@@ -883,6 +991,7 @@ describe( 'state', () => {
 			const state = store.getState();
 
 			expect( Object.keys( state ) ).to.have.members( [
+				'optimist',
 				'editor',
 				'currentPost',
 				'selectedBlock',
@@ -891,7 +1000,7 @@ describe( 'state', () => {
 				'mode',
 				'isSidebarOpened',
 				'saving',
-				'insertionPoint',
+				'showInsertionPoint',
 			] );
 		} );
 	} );

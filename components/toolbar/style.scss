@@ -5,6 +5,39 @@
 	background-color: $white;
 }
 
+.editor-visual-editor__block-controls ul.components-toolbar,
+.block-editable__inline-toolbar ul.components-toolbar {
+	list-style-type: none;
+
+	&> li {
+		display: inline-flex;
+		position: relative;
+		margin: 0;
+	}
+
+	&> li + li {
+		margin-left: -3px;
+
+		&.has-left-divider {
+			margin-left: 6px;
+			position: relative;
+			overflow: visible;
+		}
+
+		&.has-left-divider:before {
+			display: inline-block;
+			content: '';
+			box-sizing: content-box;
+			background-color: $light-gray-500;
+			position: absolute;
+			top: 8px;
+			left: -3px;
+			width: 1px;
+			height: $icon-button-size - 16px;
+		}
+	}
+}
+
 .components-toolbar__control.components-button {
 	display: inline-flex;
 	align-items: flex-end;
@@ -16,36 +49,15 @@
 	cursor: pointer;
 	position: relative;
 	width: $icon-button-size;
-
-	svg {
-		border: 1px solid transparent;
-		padding: 4px;
-		box-sizing: content-box;
-	}
-
-	&:focus:before {
-		top: -4px;
-		right: -4px;
-		bottom: -4px;
-		left: -4px;
-	}
-
-	&.is-active svg,
-	&:hover svg,
-	&:not(:disabled):hover svg {
-		border: 1px solid $dark-gray-500;
-		color: $dark-gray-500;
-	}
+	height: $icon-button-size;
 
 	&:hover,
-	&:not(:disabled):hover {
+	/* the ":not(:disabled)" is needed to make it specific enough */
+	&:hover:not(:disabled),
+	&:focus {
 		color: $dark-gray-500;
-	}
-
-	&.is-active svg,
-	&.is-active:hover svg {
-		background-color: $dark-gray-500;
-		color: $white;
+		outline: none;
+		box-shadow: none;
 	}
 
 	&.is-active,
@@ -53,20 +65,48 @@
 		color: $white;
 	}
 
+	&:disabled {
+		cursor: default;
+	}
+
+	&> svg {
+		border: 1px solid transparent;
+		padding: 4px;
+		box-sizing: content-box;
+	}
+
+	&:hover > svg,
+	&:focus > svg {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-active > svg,
+		&:hover > svg,
+		&:focus > svg {
+			border: 1px solid $dark-gray-500;
+		}
+	}
+
+	&.is-active > svg,
+	&.is-active:hover > svg {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
+
+	&[data-subscript] svg {
+		padding: 4px 8px 4px 0px;
+	}
+
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
-		font-size: 10px;
+		font-size: $default-font-size;
 		font-weight: bold;
 		position: relative;
-		top: -6px;
-		left: -9px;
+		top: -5px;
+		left: -12px;
 	}
-}
-
-// compensate for making the button hit area include the visual spacing
-.components-toolbar__control.components-button + .components-toolbar__control.components-button {
-	margin-left: -3px;
 }
 
 .components-toolbar__control .dashicon {

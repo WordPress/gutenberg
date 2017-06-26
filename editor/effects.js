@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+import { get, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockType, switchToBlockType } from 'blocks';
+import { serialize, getBlockType, switchToBlockType } from 'blocks';
 import { __ } from 'i18n';
 
 /**
@@ -14,19 +15,50 @@ import { __ } from 'i18n';
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
 import { focusBlock, replaceBlocks } from './actions';
+import {
+	getCurrentPostId,
+	getCurrentPostType,
+	getBlocks,
+	getPostEdits,
+} from './selectors';
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
-		const { dispatch } = store;
-		const { postId, edits } = action;
+		const { dispatch, getState } = store;
+		const state = getState();
+		const postId = getCurrentPostId( state );
 		const isNew = ! postId;
-		const toSend = postId ? { id: postId, ...edits } : edits;
+		const edits = getPostEdits( state );
+		const toSend = {
+			...edits,
+			content: serialize( getBlocks( state ) ),
+		};
+		const transactionId = uniqueId();
 
-		new wp.api.models.Post( toSend ).save().done( ( newPost ) => {
+		if ( ! isNew ) {
+			toSend.id = postId;
+		}
+
+		dispatch( {
+			type: 'CLEAR_POST_EDITS',
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+		dispatch( {
+			type: 'UPDATE_POST',
+			edits: toSend,
+			optimist: { id: transactionId },
+		} );
+		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
+		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
 				isNew,
+				optimist: { type: COMMIT, id: transactionId },
+			} );
+			dispatch( {
+				type: 'RESET_POST',
+				post: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -36,7 +68,7 @@ export default {
 					message: __( 'An unknown error occurred.' ),
 				} ),
 				edits,
-				isNew,
+				optimist: { type: REVERT, id: transactionId },
 			} );
 		} );
 	},
@@ -51,9 +83,10 @@ export default {
 		window.history.replaceState( {}, 'Post ' + post.id, newURL );
 	},
 	TRASH_POST( action, store ) {
-		const { dispatch } = store;
+		const { dispatch, getState } = store;
 		const { postId } = action;
-		new wp.api.models.Post( { id: postId } ).destroy().done( () => {
+		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		new Model( { id: postId } ).destroy().done( () => {
 			dispatch( {
 				...action,
 				type: 'TRASH_POST_SUCCESS',

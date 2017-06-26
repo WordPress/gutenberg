@@ -25,7 +25,6 @@ describe( 'Dashicon', () => {
 
 		it( 'should render a SVG icon element when a matching icon is provided', () => {
 			const dashicon = shallow( <Dashicon icon="wordpress" /> );
-			expect( dashicon.find( 'title' ).text() ).to.equal( 'WordPress' );
 			expect( dashicon.hasClass( 'dashicon' ) ).to.be.true();
 			expect( dashicon.hasClass( 'dashicons-wordpress' ) ).to.be.true();
 			expect( dashicon.type() ).to.equal( 'svg' );

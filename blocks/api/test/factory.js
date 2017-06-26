@@ -13,7 +13,7 @@ describe( 'block factory', () => {
 	afterEach( () => {
 		setUnknownTypeHandler( undefined );
 		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.slug );
+			unregisterBlockType( block.name );
 		} );
 	} );
 
