@@ -226,6 +226,7 @@
 	white-space: nowrap;
 
 	// Mobile viewport
+	top: $header-height - 1px;
 	margin-left: -$block-padding;
 	margin-right: -$block-padding;
 
