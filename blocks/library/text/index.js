@@ -78,7 +78,7 @@ registerBlockType( 'core/text', {
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
-				className={ `drop-cap-${ dropCap }` }
+				className={ dropCap && 'drop-cap' }
 				placeholder={ __( 'Write…' ) }
 			/>,
 		];

@@ -50,7 +50,7 @@
 	}
 }
 
-.drop-cap-true .blocks-editable__tinymce:not( :focus )  {
+.drop-cap .blocks-editable__tinymce:not( :focus )  {
 	&:first-letter {
 		float: left;
 		font-size: 4.1em;
@@ -63,7 +63,7 @@
 	}
 }
 
-.drop-cap-true:not( :focus )  {
+.drop-cap:not( :focus )  {
 	overflow: hidden;
 }
 
