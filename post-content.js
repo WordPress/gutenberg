@@ -8,7 +8,7 @@ window._wpGutenbergPost = {
 	},
 	content: {
 		raw: [
-			'<!-- wp:core/cover-image url="https://cldup.com/GCwahb3aOb.jpg" -->',
+			'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg" } -->',
 			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Gutenberg Editor</h2></section>',
 			'<!-- /wp:core/cover-image -->',
 
