@@ -1,0 +1,39 @@
+.editor-visual-editor__block[data-type="core/more"] {
+	max-width: 100%;
+
+	.blocks-editable {
+		display: block;
+		text-align: center;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+	.blocks-editable > span {
+		position: relative;
+		display: inline-block;
+		font-size: 12px;
+		text-transform: uppercase;
+		font-weight: 600;
+		font-family: $default-font;
+		color: $dark-gray-300;
+	}
+
+	.blocks-editable > span:before,
+	.blocks-editable > span:after {
+		content: '';
+		position: absolute;
+			top: 50%;
+		width: 100vw;
+		border-top: 3px dashed $light-gray-700;
+		margin-top: -2px;
+	}
+
+	.blocks-editable > span:before {
+		right: 100%;
+		margin-right: 20px;
+	}
+
+	.blocks-editable > span:after {
+		left: 100%;
+		margin-left: 20px;
+	}
+}
