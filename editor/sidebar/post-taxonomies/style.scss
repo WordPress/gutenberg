@@ -1,6 +1,6 @@
 .editor-post-taxonomies__tags-selector,
 .editor-post-taxonomies__categories-selector {
-	margin-top: 15px;
+	margin-top: $panel-padding;
 }
 
 .editor-post-taxonomies__tags-selector-title,
@@ -19,5 +19,5 @@
 
 .editor-post-taxonomies__categories-subchoices {
 	margin-top: 5px;
-	margin-left: 15px;
+	margin-left: $panel-padding;
 }

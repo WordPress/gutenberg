@@ -238,7 +238,6 @@ $sticky-bottom-offset: 20px;
  }
 
 .editor-visual-editor__block-controls .components-toolbar {
-	display: inline-flex;
 	margin-right: -1px;
 
 	@include break-small() {
