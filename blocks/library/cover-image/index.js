@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Placeholder } from 'components';
+import { Placeholder, Toolbar, Dashicon } from 'components';
 import { __ } from 'i18n';
 
 /**
@@ -37,8 +37,10 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, title, align } = attributes;
+		const { url, title, align, id } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
+
 		const controls = (
 			focus && (
 				<BlockControls key="controls">
@@ -47,13 +49,25 @@ registerBlockType( 'core/cover-image', {
 						onChange={ updateAlignment }
 						controls={ validAlignments }
 					/>
+
+					<Toolbar>
+						<li>
+							<MediaUploadButton
+								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								onSelect={ onSelectImage }
+								type="image"
+								value={ id }
+							>
+								<Dashicon icon="format-image" />
+							</MediaUploadButton>
+						</li>
+					</Toolbar>
 				</BlockControls>
 			)
 		);
 
 		if ( ! url ) {
 			const uploadButtonProps = { isLarge: true };
-			const setMediaUrl = ( media ) => setAttributes( { url: media.url } );
 			return [
 				controls,
 				<Placeholder
@@ -64,7 +78,7 @@ registerBlockType( 'core/cover-image', {
 					className="blocks-image">
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaUrl }
+						onSelect={ onSelectImage }
 						type="image"
 						autoOpen
 					>
