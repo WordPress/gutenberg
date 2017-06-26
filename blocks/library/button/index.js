@@ -35,7 +35,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, onFocusPrevious, onFocusNext } ) {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -52,6 +52,8 @@ registerBlockType( 'core/button', {
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
+					onFocusPrevious={ onFocusPrevious }
+					onFocusNext={ onFocusNext }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					inline
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }

@@ -42,7 +42,7 @@ registerBlockType( 'core/preformatted', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, onFocusPrevious, onFocusNext } ) {
 		const { content } = attributes;
 
 		return (
@@ -56,6 +56,8 @@ registerBlockType( 'core/preformatted', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
+				onFocusPrevious={ onFocusPrevious }
+				onFocusNext={ onFocusNext }
 			/>
 		);
 	},

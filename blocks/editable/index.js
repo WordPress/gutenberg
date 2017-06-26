@@ -12,7 +12,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from 'element';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { BACKSPACE, DELETE, ENTER, UP, DOWN, LEFT, RIGHT } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -195,10 +195,24 @@ export default class Editable extends Component {
 	}
 
 	onKeyDown( event ) {
+		const { keyCode } = event;
+		const moveUp = ( keyCode === UP || keyCode === LEFT ) && this.isStartOfEditor();
+		const moveDown = ( keyCode === DOWN || keyCode === RIGHT ) && this.isEndOfEditor();
+
+		if ( moveUp && this.props.onFocusPrevious ) {
+			event.preventDefault();
+			this.props.onFocusPrevious();
+		}
+
+		if ( moveDown && this.props.onFocusPrevious ) {
+			event.preventDefault();
+			this.props.onFocusNext();
+		}
+
 		if (
 			this.props.onMerge && (
-				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
-				( event.keyCode === DELETE && this.isEndOfEditor() )
+				( keyCode === BACKSPACE && this.isStartOfEditor() ) ||
+				( keyCode === DELETE && this.isEndOfEditor() )
 			)
 		) {
 			const forward = event.keyCode === DELETE;

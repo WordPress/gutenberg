@@ -83,7 +83,7 @@ registerBlockType( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onFocusPrevious, onFocusNext } ) {
 		const { align, value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -120,6 +120,8 @@ registerBlockType( 'core/quote', {
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
+					onFocusPrevious={ onFocusPrevious }
+					onFocusNext={ () => setFocus( { editable: 'citation' } ) }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
 				/>
@@ -135,6 +137,8 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						onFocusPrevious={ () => setFocus( { editable: 'value' } ) }
+						onFocusNext={ onFocusNext }
 						inline
 					/>
 				) }
