@@ -4,6 +4,7 @@
 import { __, sprintf } from 'i18n';
 import { concatChildren } from 'element';
 import { Toolbar } from 'components';
+import { isObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -61,7 +62,8 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					if ( Array.isArray( value ) || citation ) {
+					const isMultiParagraph = Array.isArray( value ) && isObject( value[ 0 ] ) && value[ 0 ].type === 'p';
+					if ( isMultiParagraph || citation ) {
 						const heading = createBlock( 'core/heading', {
 							content: Array.isArray( value ) ? value[ 0 ] : value,
 						} );

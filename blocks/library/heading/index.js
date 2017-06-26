@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString } from 'lodash';
+import { isString, isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,8 @@ registerBlockType( 'core/heading', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( { content, ...attrs } ) => {
-					if ( Array.isArray( content ) ) {
+					const isMultiParagraph = Array.isArray( content ) && isObject( content[ 0 ] ) && content[ 0 ].type === 'p';
+					if ( isMultiParagraph ) {
 						const headingContent = isString( content[ 0 ] )
 							? content[ 0 ]
 							: content[ 0 ].props.children;
