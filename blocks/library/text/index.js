@@ -3,6 +3,7 @@
  */
 import { __ } from 'i18n';
 import { concatChildren } from 'element';
+import { Toolbar } from 'components';
 
 /**
  * Internal dependencies
@@ -41,11 +42,15 @@ registerBlockType( 'core/text', {
 		return [
 			focus && (
 				<BlockControls key="controls">
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
+					<Toolbar
+						controls={ [ {
+							icon: 'editor-aligncenter',
+							title: __( 'Align center' ),
+							isActive: align === 'center',
+							onClick: () => setAttributes( {
+								align: align === 'center' ? null : 'center',
+							} ),
+						} ] }
 					/>
 				</BlockControls>
 			),
@@ -55,6 +60,13 @@ registerBlockType( 'core/text', {
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
 						onChange={ toggleDropCap }
+					/>
+					<h3>{ __( 'Text Alignment' ) }</h3>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
 					/>
 				</InspectorControls>
 			),
