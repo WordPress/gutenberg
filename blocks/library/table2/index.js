@@ -77,6 +77,8 @@ registerBlockType( 'core/table2', {
 		const { content } = attributes;
 		return (
 			<TableBlock
+				attributes={ attributes }
+				setAttributes={ setAttributes }
 				onChange={ ( nextContent ) => {
 					setAttributes( { content: nextContent } );
 				} }
