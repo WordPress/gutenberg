@@ -17,6 +17,7 @@ function loadStories() {
 	require( './stories/intro' );
 	require( './stories/contributing' );
 	require( './stories/coding-guidelines' );
+	require( './stories/design' );
 	require( '../i18n/story' );
 	require( '../element/story' );
 	require( '../blocks/story' );
