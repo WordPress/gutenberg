@@ -41,6 +41,10 @@
 	}
 }
 
+.editor-sidebar .editor-block-inspector + .editor-post-settings {
+	display: none;
+}
+
 /* Visual and Text editor both */
 .editor-layout.is-sidebar-opened .editor-layout__content {
 	margin-left: -200%;

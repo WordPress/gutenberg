@@ -22,7 +22,7 @@ import LastRevision from '../last-revision';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
-		<Panel>
+		<Panel className="editor-post-settings">
 			<PanelHeader label={ __( 'Post Settings' ) } >
 				<div className="editor-sidebar-post-settings__icons">
 					<IconButton
