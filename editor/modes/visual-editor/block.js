@@ -298,7 +298,6 @@ class VisualEditorBlock extends Component {
 						<div className="editor-visual-editor__block-controls">
 							<BlockSwitcher uid={ block.uid } />
 							<Slot name="Formatting.Toolbar" />
-							<Slot name="Formatting.ToolbarMenu" />
 						</div>
 					</CSSTransitionGroup>
 				}

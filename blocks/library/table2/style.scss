@@ -1,4 +1,9 @@
 .editor-visual-editor__block[data-type="core/table2"] {
+
+	.editor-visual-editor__block-controls > div {
+		display: flex;
+	}
+
 	table {
 		border-collapse: collapse;
 		width: 100%;
