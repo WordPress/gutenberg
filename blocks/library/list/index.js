@@ -74,6 +74,8 @@ registerBlockType( 'core/list', {
 		values: children( 'ol,ul' ),
 	},
 
+	className: false,
+
 	transforms: {
 		from: [
 			{

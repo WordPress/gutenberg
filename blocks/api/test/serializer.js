@@ -25,7 +25,10 @@ describe( 'block serializer', () => {
 		context( 'function save', () => {
 			it( 'should return string verbatim', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => attributes.fruit,
+					{
+						save: ( { attributes } ) => attributes.fruit,
+						name: 'core/fruit',
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -34,7 +37,48 @@ describe( 'block serializer', () => {
 
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'core/fruit',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="wp-block-fruit">Bananas</div>' );
+			} );
+
+			it( 'should return use the namespace in the classname if it\' not a core block', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
+			} );
+
+			it( 'should overrides the className', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: 'apples',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="apples">Bananas</div>' );
+			} );
+
+			it( 'should not add a className if falsy', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: false,
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -45,10 +89,13 @@ describe( 'block serializer', () => {
 		context( 'component save', () => {
 			it( 'should return element as string', () => {
 				const saved = getSaveContent(
-					class extends Component {
-						render() {
-							return createElement( 'div', null, this.props.attributes.fruit );
-						}
+					{
+						save: class extends Component {
+							render() {
+								return createElement( 'div', null, this.props.attributes.fruit );
+							}
+						},
+						name: 'core/fruit',
 					},
 					{ fruit: 'Bananas' }
 				);
@@ -124,7 +171,7 @@ describe( 'block serializer', () => {
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );

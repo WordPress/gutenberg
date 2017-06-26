@@ -60,3 +60,7 @@ global.window._wpDateSettings = {
 		string: 'America/New_York',
 	},
 };
+global.wp = global.wp || {};
+global.wp.a11y = {
+	speak: () => {},
+};

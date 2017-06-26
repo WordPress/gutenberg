@@ -115,6 +115,12 @@ class TagsSelector extends Component {
 					onChange={ this.onTagsChange }
 					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 					disabled={ loading }
+					placeholder={ __( 'Add New Tag' ) }
+					messages={ {
+						added: __( 'Tag added.' ),
+						removed: __( 'Tag removed.' ),
+						remove: __( 'Remove tag: %s.' ),
+					} }
 				/>
 			</div>
 		);

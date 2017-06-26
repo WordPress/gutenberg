@@ -29,17 +29,26 @@ class TokenInput extends Component {
 	}
 
 	render() {
-		const props = { ...this.props, onChange: this.onChange };
-		const { value, placeholder } = props;
+		const { value, placeholder, isExpanded, instanceId, selectedSuggestionIndex, ...props } = this.props;
 		const size = ( ( value.length === 0 && placeholder && placeholder.length ) || value.length ) + 1;
 
 		return (
 			<input
 				ref={ this.bindInput }
+				id={ `components-form-token-input-${ instanceId }` }
 				type="text"
 				{ ...props }
+				value={ value }
+				placeholder={ placeholder }
+				onChange={ this.onChange }
 				size={ size }
 				className="components-form-token-field__input"
+				role="combobox"
+				aria-expanded={ isExpanded }
+				aria-autocomplete="list"
+				aria-owns={ `components-form-token-suggestions-${ instanceId }` }
+				aria-activedescendant={ selectedSuggestionIndex !== -1 ? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }` : undefined }
+				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
 			/>
 		);
 	}
