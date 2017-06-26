@@ -27,7 +27,6 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				className="components-form-toggle__input"
 				id={ id }
 				type="checkbox"
-				value={ checked }
 				checked={ checked }
 				onChange={ onChange }
 			/>
