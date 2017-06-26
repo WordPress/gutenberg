@@ -1,6 +1,5 @@
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import { ToolbarMenu } from 'components';
 
 function execCommand( command ) {
@@ -53,19 +52,9 @@ export default class TableBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, content, focus, onFocus, onChange } = this.props;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { content, focus, onFocus, onChange } = this.props;
 
 		return [
-			focus && (
-				<BlockControls key="toolbar">
-					<BlockAlignmentToolbar
-						value={ attributes.align }
-						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide' ] }
-					/>
-				</BlockControls>
-			),
 			<Editable
 				key="editor"
 				tagName="table"
