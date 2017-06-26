@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -7,6 +12,7 @@ import { concatChildren } from 'element';
 /**
  * Internal dependencies
  */
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -85,13 +91,16 @@ registerBlockType( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
+		const { align, content, dropCap } = attributes;
+		const cssClassNames = classnames( {
+			'has-drop-cap': dropCap,
+		} );
 
 		if ( ! align ) {
-			return <p>{ content }</p>;
+			return <p className={ cssClassNames }>{ content }</p>;
 		}
 
-		return <p style={ { textAlign: align } }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ cssClassNames }>{ content }</p>;
 	},
 } );
 

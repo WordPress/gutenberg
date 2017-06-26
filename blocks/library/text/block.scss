@@ -1,4 +1,4 @@
-.drop-cap-true .blocks-editable__tinymce:not( :focus )  {
+.has-drop-cap {
 	&:first-letter {
 		float: left;
 		font-size: 4.1em;
@@ -11,6 +11,6 @@
 	}
 }
 
-.drop-cap-true:not( :focus )  {
+.has-drop-cap:not( :focus )  {
 	overflow: hidden;
 }
