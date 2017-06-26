@@ -229,7 +229,7 @@ class VisualEditorBlockList extends Component {
 					type="text"
 					readOnly
 					className="editor-visual-editor__placeholder"
-					value={ ! blocks.length ? __( 'Write your story.' ) : __( 'Continue writing…' ) }
+					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Continue writing…' ) }
 					onFocus={ ! blocks.length ? this.appendDefaultBlock : noop }
 					onClick={ !! blocks.length ? this.appendDefaultBlock : noop }
 					onKeyDown={ !! blocks.length ? this.onPlaceholderKeyDown : noop }
