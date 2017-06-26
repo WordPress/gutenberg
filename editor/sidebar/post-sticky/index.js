@@ -15,17 +15,19 @@ import { FormToggle, withInstanceId } from 'components';
 import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
-function PostSticky( { postSticky = false, instanceId, ...props } ) {
-	const stickyToggleId = 'post-sticky-toggle-' + instanceId;
+function PostSticky( { onTogglePostSticky, postType, postSticky = false, instanceId } ) {
+	if ( postType !== 'post' ) {
+		return false;
+	}
 
-	const onTogglePostSticky = () => props.editPost( { sticky: ! postSticky } );
+	const stickyToggleId = 'post-sticky-toggle-' + instanceId;
 
 	return (
 		<div className="editor-post-status__row">
 			<label htmlFor={ stickyToggleId }>{ __( 'Stick to the front page' ) }</label>
 			<FormToggle
 				checked={ postSticky }
-				onChange={ onTogglePostSticky }
+				onChange={ () => onTogglePostSticky( postSticky ) }
 				showHint={ false }
 				id={ stickyToggleId }
 			/>
@@ -36,8 +38,15 @@ function PostSticky( { postSticky = false, instanceId, ...props } ) {
 export default connect(
 	( state ) => {
 		return {
+			postType: getEditedPostAttribute( state, 'type' ),
 			postSticky: getEditedPostAttribute( state, 'sticky' ),
 		};
 	},
-	{ editPost }
+	( dispatch ) => {
+		return {
+			onTogglePostSticky( postSticky ) {
+				dispatch( editPost( { sticky: ! postSticky } ) );
+			},
+		};
+	},
 )( withInstanceId( PostSticky ) );
