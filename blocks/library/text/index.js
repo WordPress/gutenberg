@@ -96,6 +96,15 @@ registerBlockType( 'core/text', {
 			'has-drop-cap': dropCap,
 		} );
 
+		// If no classes are present don't add empty attribute.
+		if ( cssClassNames.length === 0 ) {
+			if ( ! align ) {
+				return <p>{ content }</p>;
+			}
+
+			return <p style={ { textAlign: align } }>{ content }</p>;
+		}
+
 		if ( ! align ) {
 			return <p className={ cssClassNames }>{ content }</p>;
 		}
