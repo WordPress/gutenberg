@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { BACKSPACE, ESCAPE } from 'utils/keycodes';
+import { BACKSPACE, ESCAPE, DELETE } from 'utils/keycodes';
 import { getBlockType } from 'blocks';
 
 /**
@@ -177,7 +177,7 @@ class VisualEditorBlock extends Component {
 		} = this.props;
 
 		// Remove block on backspace.
-		if ( BACKSPACE === keyCode ) {
+		if ( BACKSPACE === keyCode || DELETE === keyCode ) {
 			if ( target === this.node ) {
 				event.preventDefault();
 				onRemove( [ uid ] );
