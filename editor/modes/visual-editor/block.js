@@ -340,12 +340,11 @@ class VisualEditorBlock extends Component {
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI && isValid && <BlockToolbar uid={ block.uid } /> }
-
-				{ isFirstMultiSelected && (
-					<BlockMover uids={ multiSelectedBlockUids } />
-				) }
+				{ ( showUI || isHovered ) && <BlockRightMenu uids={ [ block.uid ] } /> }
+				{ showUI && isValid && <BlockToolbar uids={ [ block.uid ] } /> }
+				{ isFirstMultiSelected && <BlockMover uids={ multiSelectedBlockUids } /> }
+				{ isFirstMultiSelected && <BlockRightMenu uids={ multiSelectedBlockUids } /> }
+				{ isFirstMultiSelected && isValid && <BlockToolbar uids={ multiSelectedBlockUids } /> }
 				<div
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }

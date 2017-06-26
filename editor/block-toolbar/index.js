@@ -42,7 +42,7 @@ class BlockToolbar extends Component {
 
 	render() {
 		const { showMobileControls } = this.state;
-		const { uid } = this.props;
+		const { uids } = this.props;
 
 		const toolbarClassname = classnames( 'editor-block-toolbar', {
 			'is-showing-mobile-controls': showMobileControls,
@@ -60,7 +60,7 @@ class BlockToolbar extends Component {
 				<div className={ toolbarClassname }>
 					<div className="editor-block-toolbar__group">
 						{ ! showMobileControls && [
-							<BlockSwitcher key="switcher" uid={ uid } />,
+							<BlockSwitcher key="switcher" uids={ uids } />,
 							<Slot key="slot" name="Formatting.Toolbar" />,
 						] }
 						<Toolbar className="editor-block-toolbar__mobile-tools">
@@ -74,8 +74,8 @@ class BlockToolbar extends Component {
 
 							{ showMobileControls &&
 								<div className="editor-block-toolbar__mobile-tools-content">
-									<BlockMover uids={ [ uid ] } />
-									<BlockRightMenu uid={ uid } />
+									<BlockMover uids={ uids } />
+									<BlockRightMenu uids={ uids } />
 								</div>
 							}
 						</Toolbar>
