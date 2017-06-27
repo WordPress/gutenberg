@@ -357,7 +357,8 @@ JS;
 	 *
 	 * @param array  $settings The WP-API JS Client settings.
 	 */
-	$settings = apply_filters( 'rest_js_client_settings', $settings );
+	$settings = apply_filters( 'wp_api_js_client_settings', $settings );
+
 	wp_deregister_script( 'wp-api' );
 	wp_register_script( 'wp-api', "/wp-includes/js/wp-api$suffix.js", array( 'jquery', 'backbone', 'underscore' ), false, 1 );
 	wp_localize_script( 'wp-api', 'wpApiSettings', $settings );
