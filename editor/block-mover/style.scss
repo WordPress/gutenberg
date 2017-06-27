@@ -3,6 +3,13 @@
 	top: 10px;
 	left: 0;
 	padding: 0 14px 20px 0; // handles hover area
+
+	// Mobile, to be revisited
+	display: none;
+
+	@include break-small {
+		display: block;
+	}
 }
 
 .editor-block-mover__control {
