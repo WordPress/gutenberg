@@ -129,14 +129,18 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes } ) {
-		const { url, title } = attributes;
+		const { url, title, parallax } = attributes;
 		const style = {
 			backgroundImage: `url(${ url })`,
 		};
+		const sectionClasses = classnames( {
+			'cover-image': true,
+			parallax,
+		} );
 
 		return (
 			<section className="blocks-cover-image">
-				<section className="cover-image" style={ style }>
+				<section className={ sectionClasses } style={ style }>
 					<h2>{ title }</h2>
 				</section>
 			</section>
