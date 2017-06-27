@@ -10,7 +10,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 const { children } = hpq;
 
 registerBlockType( 'core/table2', {
-	title: wp.i18n.__( 'Table2' ),
+	title: wp.i18n.__( 'TinyMCE Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
