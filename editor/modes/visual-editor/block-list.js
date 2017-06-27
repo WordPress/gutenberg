@@ -21,6 +21,7 @@ import {
 	getBlock,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	hasTypedInSelectedBlock,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
@@ -196,6 +197,7 @@ class VisualEditorBlockList extends Component {
 		const {
 			blockUids,
 			lastBlock,
+			hasTypedInLastBlock,
 			showInsertionPoint,
 			insertionPoint,
 			multiSelectedBlockUids
@@ -212,7 +214,8 @@ class VisualEditorBlockList extends Component {
 		const showContinueWriting = (
 			! lastBlock ||
 			lastBlock.name !== getDefaultBlock() ||
-			!! lastBlock.attributes.content
+			!! lastBlock.attributes.content ||
+			hasTypedInLastBlock
 		);
 
 		return (
@@ -269,10 +272,16 @@ class VisualEditorBlockList extends Component {
 export default connect(
 	( state ) => {
 		const blockUids = getBlockUids( state );
+		const lastBlockUid = blockUids.length
+			? blockUids[ blockUids.length - 1 ]
+			: null;
 		return {
 			blockUids,
-			lastBlock: blockUids.length
-				? getBlock( state, blockUids[ blockUids.length - 1 ] )
+			lastBlock: lastBlockUid
+				? getBlock( state, lastBlockUid )
+				: null,
+			hasTypedInLastBlock: lastBlockUid
+				? hasTypedInSelectedBlock( state, lastBlockUid )
 				: null,
 			insertionPoint: getBlockInsertionPoint( state ),
 			showInsertionPoint: isBlockInsertionPointVisible( state ),
