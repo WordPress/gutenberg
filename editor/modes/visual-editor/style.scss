@@ -289,6 +289,10 @@
 		}
 	}
 
+	&[data-clear="true"] {
+		float: none;
+	}
+
 	& > .components-drop-zone {
 		border: none;
 		top: -4px;
