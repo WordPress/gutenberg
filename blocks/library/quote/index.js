@@ -151,7 +151,7 @@ registerBlockType( 'core/quote', {
 					focus={ focusedEditable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
-					style={ { textAlign: align } }
+					style={ { textAlign: align || null } }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable

@@ -8,7 +8,7 @@ const ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
 		title: __( 'Align left' ),
-		align: 'left',
+		align: undefined,
 	},
 	{
 		icon: 'editor-aligncenter',
@@ -32,7 +32,7 @@ export default function AlignmentToolbar( { value, onChange } ) {
 				return {
 					...control,
 					isActive,
-					onClick: () => onChange( isActive ? null : align ),
+					onClick: () => onChange( isActive ? undefined : align ),
 				};
 			} ) }
 		/>

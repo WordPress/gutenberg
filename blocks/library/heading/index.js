@@ -144,7 +144,7 @@ registerBlockType( 'core/heading', {
 						content: after,
 					} ) );
 				} }
-				style={ { textAlign: align } }
+				style={ { textAlign: align || null } }
 			/>,
 		];
 	},
