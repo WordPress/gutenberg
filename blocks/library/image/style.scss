@@ -6,3 +6,7 @@
 		width: 100%;
 	}
 }
+
+.editor-visual-editor__block[data-display-block="true"] {
+	float: none !important;
+}

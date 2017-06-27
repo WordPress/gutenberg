@@ -14,6 +14,7 @@ import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
@@ -32,16 +33,25 @@ registerBlockType( 'core/image', {
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
+		const { align, displayBlock } = attributes;
+		let props = {};
+
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+			props['data-align'] = align;
 		}
+
+		if ( displayBlock ) {
+			props['data-display-block'] = true;
+		}
+
+		return props;
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption, align } = attributes;
+		const { url, alt, caption, align, displayBlock } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const toggleDisplayBlock = () => setAttributes( { displayBlock: ! displayBlock } );
 
 		const controls = (
 			focus && (
@@ -90,6 +100,11 @@ registerBlockType( 'core/image', {
 			focus && (
 				<InspectorControls key="inspector">
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
+					<ToggleControl
+						label={ __( 'Display block' ) }
+						checked={ !! displayBlock }
+						onChange={ toggleDisplayBlock }
+					/>
 				</InspectorControls>
 			),
 			<figure key="image" className="blocks-image">
