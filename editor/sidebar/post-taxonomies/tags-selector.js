@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape, find } from 'lodash';
+import { unescape, find, throttle } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,9 +18,9 @@ import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 const DEFAULT_TAGS_QUERY = {
-	per_page: -1,
+	per_page: 100,
 	orderby: 'count',
-	order: 'DESC',
+	order: 'desc',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 
@@ -28,35 +28,41 @@ class TagsSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onTagsChange = this.onTagsChange.bind( this );
+		this.searchTags = throttle( this.searchTags.bind( this ), 500 );
 		this.state = {
-			loading: true,
+			loading: false,
 			availableTags: [],
 			selectedTags: [],
 		};
 	}
 
 	componentDidMount() {
-		this.fetchTagsRequest = new wp.api.collections.Tags().fetch( DEFAULT_TAGS_QUERY )
-			.done( ( tags ) => {
-				this.setState( {
-					loading: false,
-					availableTags: tags,
-				} );
-				this.updateSelectedTags( this.props.tags );
-			} )
-			.fail( ( xhr ) => {
-				if ( xhr.statusText === 'abort' ) {
-					return;
+		if ( this.props.tags ) {
+			this.setState( { loading: false } );
+			this.initRequest = this.fetchTags( { include: this.props.tags } );
+			this.initRequest.then(
+				() => {
+					this.setState( { loading: false } );
+				},
+				( xhr ) => {
+					if ( xhr.statusText === 'abort' ) {
+						return;
+					}
+					this.setState( {
+						loading: false,
+					} );
 				}
-				this.setState( {
-					loading: false,
-				} );
-			} );
+			);
+		}
+		this.searchTags();
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchTagsRequest ) {
-			this.fetchTagsRequest.abort();
+		if ( this.initRequest ) {
+			this.initRequest.abort();
+		}
+		if ( this.searchRequest ) {
+			this.searchRequest.abort();
 		}
 	}
 
@@ -64,6 +70,21 @@ class TagsSelector extends Component {
 		if ( newProps.tags !== this.props.tags ) {
 			this.updateSelectedTags( newProps.tags );
 		}
+	}
+
+	fetchTags( params = {} ) {
+		const query = { ...DEFAULT_TAGS_QUERY, ...params };
+		const request = new wp.api.collections.Tags().fetch( { data: query } );
+		request.then( ( tags ) => {
+			this.setState( ( state ) => ( {
+				availableTags: state.availableTags.concat(
+					tags.filter( ( tag ) => ! find( state.availableTags, ( availableTag ) => availableTag.id === tag.id ) )
+				),
+			} ) );
+			this.updateSelectedTags( this.props.tags );
+		} );
+
+		return request;
 	}
 
 	updateSelectedTags( tags = [] ) {
@@ -101,6 +122,13 @@ class TagsSelector extends Component {
 			} );
 	}
 
+	searchTags( search = '' ) {
+		if ( this.searchRequest ) {
+			this.searchRequest.abort();
+		}
+		this.searchRequest = this.fetchTags( { search } );
+	}
+
 	render() {
 		const { loading, availableTags, selectedTags } = this.state;
 		const tagNames = availableTags.map( ( tag ) => tag.name );
@@ -113,6 +141,7 @@ class TagsSelector extends Component {
 					displayTransform={ unescape }
 					suggestions={ tagNames }
 					onChange={ this.onTagsChange }
+					onInputChange={ this.searchTags }
 					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 					disabled={ loading }
 					placeholder={ __( 'Add New Tag' ) }
