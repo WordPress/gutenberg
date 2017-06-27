@@ -1,12 +1,15 @@
 .editor-visual-editor__block[data-type="core/more"] {
 	max-width: 100%;
+	text-align: center;
 
 	.blocks-editable {
-		display: block;
+		display: inline-block;
 		text-align: center;
 		overflow: hidden;
 		white-space: nowrap;
+		margin: 0 auto;
 	}
+
 	.blocks-editable > span {
 		position: relative;
 		display: inline-block;
@@ -15,25 +18,18 @@
 		font-weight: 600;
 		font-family: $default-font;
 		color: $dark-gray-300;
+		background: $white;
+		padding-left: 4px;
+		padding-right: 4px;
 	}
 
-	.blocks-editable > span:before,
-	.blocks-editable > span:after {
+	.blocks-more:before {
 		content: '';
 		position: absolute;
-			top: 50%;
-		width: 100vw;
+		top: 50%;
+		left: $block-mover-padding-visible + $block-padding;
+		right: $block-mover-padding-visible + $block-padding;
 		border-top: 3px dashed $light-gray-700;
-		margin-top: -2px;
-	}
-
-	.blocks-editable > span:before {
-		right: 100%;
-		margin-right: 20px;
-	}
-
-	.blocks-editable > span:after {
-		left: 100%;
-		margin-left: 20px;
+		margin-top: -4px;
 	}
 }

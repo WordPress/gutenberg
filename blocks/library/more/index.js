@@ -37,7 +37,7 @@ registerBlockType( 'core/more', {
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">
-						<p>The "more" block allows you to set a content break point on your post. Visitors of your blog are then presented with just the initial content and a link to read more.</p>
+						<p className="editor-block-inspector__description">"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.</p>
 					</InspectorControls>
 				}
 			</div>
