@@ -21,7 +21,7 @@ const { html } = query;
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
 
-	icon: 'editor-code',
+	icon: 'html',
 
 	category: 'formatting',
 
