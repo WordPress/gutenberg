@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from 'i18n';
@@ -92,24 +87,13 @@ registerBlockType( 'core/text', {
 
 	save( { attributes } ) {
 		const { align, content, dropCap } = attributes;
-		const cssClassNames = classnames( {
-			'has-drop-cap': dropCap,
-		} );
-
-		// If no classes are present don't add empty attribute.
-		if ( cssClassNames.length === 0 ) {
-			if ( ! align ) {
-				return <p>{ content }</p>;
-			}
-
-			return <p style={ { textAlign: align } }>{ content }</p>;
-		}
+		const className = dropCap ? 'has-drop-cap' : undefined;
 
 		if ( ! align ) {
-			return <p className={ cssClassNames }>{ content }</p>;
+			return <p className={ className }>{ content }</p>;
 		}
 
-		return <p style={ { textAlign: align } } className={ cssClassNames }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
 	},
 } );
 
