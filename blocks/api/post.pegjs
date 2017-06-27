@@ -129,7 +129,7 @@ WP_Block_Name
 WP_Block_Attributes
   = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
   {
-    /** <?php return json_decode( $attrs ); ?> **/
+    /** <?php return json_decode( $attrs, true ); ?> **/
     return maybeJSON( attrs );
   }
 
