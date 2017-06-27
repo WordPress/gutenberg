@@ -58,7 +58,7 @@ registerBlockType( 'core/cover-image', {
 								type="image"
 								value={ id }
 							>
-								<Dashicon icon="format-image" />
+								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
 					</Toolbar>
