@@ -40,7 +40,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, title, align, id, parallax } = attributes;
+		const { url, title, align, id, hasParallax } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 
@@ -94,9 +94,9 @@ registerBlockType( 'core/cover-image', {
 		const style = { backgroundImage: `url(${ url })` };
 		const sectionClasses = classnames( {
 			'cover-image': true,
-			parallax,
+			'has-parallax': hasParallax,
 		} );
-		const toggleParallax = () => setAttributes( { parallax: ! parallax } );
+		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 
 		return [
 			controls,
@@ -104,7 +104,7 @@ registerBlockType( 'core/cover-image', {
 				<InspectorControls key="inspector">
 					<ToggleControl
 						label={ __( 'Fixed Position' ) }
-						checked={ !! parallax }
+						checked={ !! hasParallax }
 						onChange={ toggleParallax }
 					/>
 				</InspectorControls>
@@ -129,13 +129,13 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes } ) {
-		const { url, title, parallax } = attributes;
+		const { url, title, hasParallax } = attributes;
 		const style = {
 			backgroundImage: `url(${ url })`,
 		};
 		const sectionClasses = classnames( {
 			'cover-image': true,
-			parallax,
+			'has-parallax': hasParallax,
 		} );
 
 		return (
