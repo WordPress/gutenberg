@@ -127,7 +127,7 @@ registerBlockType( 'core/quote', {
 					<Editable
 						tagName="footer"
 						value={ citation }
-						placeholder={ __( '— Add citation…' ) }
+						placeholder={ __( 'Add citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,

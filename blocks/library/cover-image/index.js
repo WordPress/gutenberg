@@ -88,7 +88,9 @@ registerBlockType( 'core/cover-image', {
 							formattingControls={ [] }
 							focus={ focus }
 							onFocus={ setFocus }
-							onChange={ ( value ) => setAttributes( { title: value } ) } />
+							onChange={ ( value ) => setAttributes( { title: value } ) }
+							inline
+						/>
 					) : null }
 				</section>
 			</section>,
