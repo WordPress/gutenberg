@@ -23,4 +23,5 @@ if ( gutenberg_can_init() ) {
 
 	// Register server-side code for individual blocks.
 	require_once dirname( __FILE__ ) . '/lib/blocks/latest-posts.php';
+	require_once dirname( __FILE__ ) . '/lib/blocks/archives.php';
 }
