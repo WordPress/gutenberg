@@ -99,7 +99,6 @@ registerBlockType( 'core/cover-image', {
 							tagName="h2"
 							placeholder={ __( 'Write title' ) }
 							value={ title }
-							formattingControls={ [ 'italic', 'strikethrough', 'link' ] }
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
