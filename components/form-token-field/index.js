@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some, throttle } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some, debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -46,7 +46,7 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
-		this.throlltedSpeak = throttle( this.speak.bind( this ), 1000 );
+		this.debouncedSpeak = debounce( this.speakAssertive.bind( this ), 500 );
 	}
 
 	componentDidUpdate() {
@@ -191,13 +191,13 @@ class FormTokenField extends Component {
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
 			if ( !! matchingSuggestions.length ) {
-				this.throlltedSpeak( sprintf( _n(
+				this.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
 				), matchingSuggestions.length ) );
 			} else {
-				this.throlltedSpeak( __( 'No results.' ) );
+				this.debouncedSpeak( __( 'No results.' ) );
 			}
 		}
 	}
@@ -400,7 +400,7 @@ class FormTokenField extends Component {
 		return take( suggestions, maxSuggestions );
 	}
 
-	speak( message ) {
+	speakAssertive( message ) {
 		wp.a11y.speak( message, 'assertive' );
 	}
 
