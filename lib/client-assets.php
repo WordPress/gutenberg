@@ -317,6 +317,51 @@ function gutenberg_extend_wp_api_backbone_client() {
 			} ) );
 		};
 JS;
+
+	/**
+	 * @var WP_REST_Server $wp_rest_server
+	 */
+	global $wp_rest_server;
+
+	// Ensure the rest server is initialized.
+	if ( empty( $wp_rest_server ) ) {
+		/** This filter is documented in wp-includes/rest-api.php */
+		$wp_rest_server_class = apply_filters( 'wp_rest_server_class', 'WP_REST_Server' );
+		$wp_rest_server       = new $wp_rest_server_class();
+
+		/** This filter is documented in wp-includes/rest-api.php */
+		do_action( 'rest_api_init', $wp_rest_server );
+	}
+
+	// Load the schema.
+	$schema_request  = new WP_REST_Request( 'GET', '/wp/v2' );
+	$schema_response = $wp_rest_server->dispatch( $schema_request );
+	$schema = null;
+	if ( ! $schema_response->is_error() ) {
+		$schema = $schema_response->get_data();
+	}
+
+	// Localize the wp-api settings and schema.
+	$settings = array(
+		'root'          => esc_url_raw( get_rest_url() ),
+		'nonce'         => wp_create_nonce( 'wp_rest' ),
+		'versionString' => 'wp/v2/',
+		'schema'        => $schema,
+		'cacheSchema'   => true,
+	);
+
+	/**
+	 * Filter the JavaScript Client settings before localizing.
+	 *
+	 * Enables modifying the settings values sent to the JS client.
+	 *
+	 * @param array  $settings The WP-API JS Client settings.
+	 */
+	$settings = apply_filters( 'rest_js_client_settings', $settings );
+	wp_deregister_script( 'wp-api' );
+	wp_register_script( 'wp-api', "/wp-includes/js/wp-api$suffix.js", array( 'jquery', 'backbone', 'underscore' ), false, 1 );
+	wp_localize_script( 'wp-api', 'wpApiSettings', $settings );
+
 	wp_add_inline_script( 'wp-api', $script );
 }
 
@@ -433,7 +478,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
+	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost );' );
 
 	/**
 	 * Styles
