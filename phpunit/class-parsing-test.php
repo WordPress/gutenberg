@@ -55,14 +55,12 @@ class Parsing_Test extends WP_UnitTestCase {
 			}
 		}
 
-		$html   = file_get_contents( $html_filename );
-		$parsed = json_decode( file_get_contents( $parsed_json_filename ), true );
+		$html            = file_get_contents( $html_filename );
+		$expected_parsed = json_decode( file_get_contents( $parsed_json_filename ), true );
 
 		$parser = new PhpPegJs\Parser;
 		$result = $parser->parse( $html );
 
-		error_log( json_encode( compact( 'html', 'result' ) ) );
-
-		$this->assertEquals( $parsed, $result );
+		$this->assertEquals( $expected_parsed, $result );
 	}
 }
