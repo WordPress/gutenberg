@@ -449,6 +449,7 @@ export default class Editable extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
+		const isPlaceholderVisible = placeholder && this.state.empty;
 		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (
@@ -478,11 +479,11 @@ export default class Editable extends Component {
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }
-					isEmpty={ this.state.empty }
+					isPlaceholderVisible={ isPlaceholderVisible }
 					label={ placeholder }
 					key={ key }
 				/>
-				{ this.state.empty &&
+				{ isPlaceholderVisible &&
 					<Tagname
 						className="blocks-editable__tinymce"
 						style={ style }

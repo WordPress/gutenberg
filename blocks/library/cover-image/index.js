@@ -97,7 +97,7 @@ registerBlockType( 'core/cover-image', {
 					{ title || !! focus ? (
 						<Editable
 							tagName="h2"
-							placeholder={ __( 'Write title' ) }
+							placeholder={ __( 'Write title…' ) }
 							value={ title }
 							formattingControls={ [] }
 							focus={ focus }
