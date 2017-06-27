@@ -77,7 +77,7 @@ registerBlockType( 'core/text', {
 					} ) );
 				} }
 				onMerge={ mergeBlocks }
-				style={ { textAlign: align } }
+				style={ { textAlign: align || null } }
 				className={ dropCap && 'has-drop-cap' }
 				placeholder={ __( 'Write…' ) }
 			/>,
