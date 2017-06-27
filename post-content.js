@@ -110,7 +110,7 @@ window._wpGutenbergPost = {
 			'<p>Ea veniam homero eam. Ex inimicus molestiae cum, debet scaevola at eos. Vis assum veritus ut, has ea nostrud accusata, offendit appareat comprehensam ea pro. Ad quo quem veritus appellantur, te est quas phaedrum, eum alia habeo ad. Ei est erroribus imperdiet, omnis dicam propriae sed no. His vitae oratio fierent ne, cu duo tota eligendi, electram rationibus in qui.</p>',
 			'<!-- /wp:core/text -->',
 
-			'<!-- wp:core/image -->',
+			'<!-- wp:core/image { "align": "wide" } -->',
 			'<figure class="wp-block-image"><img alt="Accessibility is important don\'t forget image alt attribute" src="https://cldup.com/uuUqE_dXzy.jpg" /></figure>',
 			'<!-- /wp:core/image -->',
 
@@ -128,13 +128,12 @@ window._wpGutenbergPost = {
 }</code></pre>',
 			'<!-- /wp:core/code -->',
 
-			'<!-- wp:core/image -->',
-			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/GCwahb3aOb.jpg" /></figure>',
-			'<!-- /wp:core/image -->',
-
-			'<!-- wp:core/image -->',
-			'<figure class="wp-block-image"><img alt="Yet another image block" src="https://cldup.com/lUUQPv6w9c.jpg" /></figure>',
-			'<!-- /wp:core/image -->',
+			'<!-- wp:core/gallery {"align":"wide"} -->',
+			'<div class="blocks-gallery alignwide columns-2 wp-block-gallery">',
+			'<figure class="blocks-gallery-image"><img src="https://cldup.com/GCwahb3aOb.jpg" alt="" /></figure>',
+			'<figure class="blocks-gallery-image"><img src="https://cldup.com/lUUQPv6w9c.jpg" alt="" /></figure>',
+			'</div>',
+			'<!-- /wp:core/gallery -->',
 
 			'<!-- wp:core/preformatted -->',
 			'<pre class="wp-block-preformatted">An old silent pond...<br>A frog jumps into the pond,<br>splash! Silence again.</pre>',
