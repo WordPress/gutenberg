@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map, reduce, kebabCase, isObject } from 'lodash';
+import { isEmpty, reduce, kebabCase, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -68,24 +68,6 @@ export function getSaveContent( blockType, attributes ) {
 	return renderToString( contentWithClassname );
 }
 
-const escapeDoubleQuotes = value => value.replace( /"/g, '\"' );
-const escapeHyphens = value => value.replace( /-/g, '\\-' );
-
-/**
- * Transform value for storage in block comment
- *
- * Some special characters and sequences should not
- * appear in a block comment header. This transformer
- * will guarantee that we store the data safely.
- *
- * @param {*}   value attribute value to serialize
- * @returns {*}       transformed value
- */
-export const serializeValue = value =>
-	'string' === typeof value
-		? escapeHyphens( escapeDoubleQuotes( value ) )
-		: value;
-
 /**
  * Returns attributes which ought to be saved
  * and serialized into the block comment header
@@ -119,16 +101,12 @@ export function getCommentAttributes( allAttributes, attributesFromContent ) {
 	);
 }
 
-/**
- * Lodash iterator which transforms a key: value
- * pair into a string of `key="value"`
- *
- * @param {*}        value value to be stringified
- * @param {String}   key   name of value
- * @returns {string}       stringified equality pair
- */
-function asNameValuePair( value, key ) {
-	return `${ key }="${ serializeValue( value ) }"`;
+export function serializeAttributes( attrs ) {
+	return JSON.stringify( attrs )
+		.replace( /--/g, '\\u002d\\u002d' ) // don't break HTML comments
+		.replace( /</g, '\\u003c' ) // don't break standard-non-compliant tools
+		.replace( />/g, '\\u003e' ) // ibid
+		.replace( /&/g, '\\u0026' ); // ibid
 }
 
 export function serializeBlock( block ) {
@@ -138,7 +116,7 @@ export function serializeBlock( block ) {
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
 
 	const serializedAttributes = ! isEmpty( saveAttributes )
-		? map( saveAttributes, asNameValuePair ).join( ' ' ) + ' '
+		? serializeAttributes( saveAttributes ) + ' '
 		: '';
 
 	if ( ! saveContent ) {
