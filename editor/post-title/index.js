@@ -86,9 +86,9 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, isBlockSelected } = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const className = classnames( 'editor-post-title', { 'is-selected': isSelected && ! isBlockSelected } );
 
 		return (
 			<div className={ className }>
@@ -114,6 +114,7 @@ class PostTitle extends Component {
 export default connect(
 	( state ) => ( {
 		title: getEditedPostTitle( state ),
+		isBlockSelected: !! state.selectedBlock.focus,
 	} ),
 	( dispatch ) => {
 		return {
