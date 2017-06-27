@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { flow, groupBy, sortBy, findIndex, filter } from 'lodash';
+import { flow, groupBy, sortBy, findIndex, filter, debounce } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __, _n, sprintf } from 'i18n';
 import { Component } from 'element';
 import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
 import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
@@ -36,6 +36,8 @@ class InserterMenu extends Component {
 		this.getBlocksForCurrentTab = this.getBlocksForCurrentTab.bind( this );
 		this.sortBlocks = this.sortBlocks.bind( this );
 		this.addRecentBlocks = this.addRecentBlocks.bind( this );
+		const speakAssertive = ( message ) => wp.a11y.speak( message, 'assertive' );
+		this.debouncedSpeakAssertive = debounce( speakAssertive, 500 );
 	}
 
 	componentDidMount() {
@@ -44,6 +46,21 @@ class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'keydown', this.onKeyDown );
+		this.debouncedSpeakAssertive.cancel();
+	}
+
+	componentDidUpdate() {
+		const visibleBlocks = this.getVisibleBlocks( getBlockTypes() );
+		// Announce the blocks search results to screen readers.
+		if ( !! visibleBlocks.length ) {
+			this.debouncedSpeakAssertive( sprintf( _n(
+				'%d result found',
+				'%d results found',
+				visibleBlocks.length
+			), visibleBlocks.length ) );
+		} else {
+			this.debouncedSpeakAssertive( __( 'No results.' ) );
+		}
 	}
 
 	bindReferenceNode( nodeName ) {
