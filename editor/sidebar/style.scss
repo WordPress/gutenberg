@@ -28,6 +28,17 @@
 			margin-bottom: -1px;
 		}
 	}
+
+	h3 {
+		font-size: $default-font-size;
+		margin-top: 0;
+		margin-bottom: .5em;
+	}
+
+	ul.components-toolbar {
+		box-shadow: none;
+		margin-bottom: $panel-padding;
+	}
 }
 
 /* Visual and Text editor both */

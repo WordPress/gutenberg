@@ -70,26 +70,6 @@ function unregister_block_type( $name ) {
 }
 
 /**
- * Extract the block attributes from the block's attributes string
- *
- * @since 0.1.0
- *
- * @param string $attr_string Attributes string.
-
- * @return array
- */
-function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
-	preg_match_all( $attributes_matcher, $attr_string, $matches );
-	$attributes = array();
-	foreach ( $matches[1] as $index => $attribute_match ) {
-		$attributes[ $attribute_match ] = $matches[2][ $index ];
-	}
-
-	return $attributes;
-}
-
-/**
  * Renders the dynamic blocks into the post content
  *
  * @since 0.1.0
@@ -105,7 +85,7 @@ function do_blocks( $content ) {
 	$matcher = '#' . join( '', array(
 		'(?P<opener><!--\s*',
 		'wp:(?P<block_name>[a-z](?:[a-z0-9/]+)*)\s+',
-		'(?P<attributes>(?:(?!-->).)*)',
+		'(?P<attributes>(?:(?!-->).)*?)',
 		'\s*/?-->\n?)',
 		'(?:',
 		'(?P<content>.*?)',
@@ -121,8 +101,11 @@ function do_blocks( $content ) {
 
 		$output = '';
 		if ( isset( $wp_registered_blocks[ $block_name ] ) ) {
-			$block_attributes_string = $matches['attributes'][ $index ][0];
-			$block_attributes = parse_block_attributes( $block_attributes_string );
+			$block_attributes_string = trim( $matches['attributes'][ $index ][0] );
+			$block_attributes = json_decode( $block_attributes_string, true );
+			if ( ! is_array( $block_attributes ) ) {
+				$block_attributes = array();
+			}
 
 			// Call the block's render function to generate the dynamic output.
 			$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
