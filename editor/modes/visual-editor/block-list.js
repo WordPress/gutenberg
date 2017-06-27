@@ -200,7 +200,7 @@ class VisualEditorBlockList extends Component {
 			hasTypedInLastBlock,
 			showInsertionPoint,
 			insertionPoint,
-			multiSelectedBlockUids
+			multiSelectedBlockUids,
 		} = this.props;
 		const insertionPointIndex = blockUids.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
