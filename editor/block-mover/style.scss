@@ -3,6 +3,7 @@
 	top: 10px;
 	left: 0;
 	padding: 0 14px 20px 0; // handles hover area
+	z-index: z-index( '.editor-block-mover' );
 
 	// Mobile, to be revisited
 	display: none;
