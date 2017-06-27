@@ -99,11 +99,11 @@ registerBlockType( 'core/cover-image', {
 							tagName="h2"
 							placeholder={ __( 'Write title' ) }
 							value={ title }
-							formattingControls={ [] }
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
 							inline
+							inlineToolbar
 						/>
 					) : null }
 				</section>
