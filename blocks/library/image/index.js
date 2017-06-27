@@ -54,7 +54,7 @@ registerBlockType( 'core/image', {
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
-    const toggleDisplayBlock = () => setAttributes( { displayBlock: ! displayBlock } );
+		const toggleDisplayBlock = () => setAttributes( { displayBlock: ! displayBlock } );
 		const uploadButtonProps = { isLarge: true };
 
 		const controls = (
