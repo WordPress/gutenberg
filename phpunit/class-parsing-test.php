@@ -5,9 +5,12 @@
  * @package Gutenberg
  */
 
+// To run these tests, set the RUN_PARSER_TESTS environment variable to a
+// truthy value.
 if ( getenv( 'RUN_PARSER_TESTS' ) ) {
-	// Use the RUN_PARSER_TESTS environment variable to run these tests.
-
+	/**
+	 * Tests for the PHP parser generated from our PEG grammar by `phpegjs`.
+	 */
 	class Parsing_Test extends WP_UnitTestCase {
 		protected static $fixtures_dir;
 
