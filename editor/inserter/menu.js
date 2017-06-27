@@ -25,7 +25,7 @@ class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			currentFocus: null,
+			currentFocus: 'search',
 		};
 		this.filter = this.filter.bind( this );
 		this.isShownBlock = this.isShownBlock.bind( this );
