@@ -21,6 +21,10 @@
 	padding: $panel-padding;
 	border-top: 1px solid $light-gray-500;
 	border-bottom: 1px solid $light-gray-500;
+
+	h3 {
+		margin: 0 0 .5em 0;
+	}
 }
 
 .components-panel__header {
@@ -47,7 +51,7 @@
 	margin-top: -1px;
 }
 
-.components-panel__body-title {
+.components-panel .components-panel__body-title {
 	display: block;
 	padding: 0;
 	margin: 0;
