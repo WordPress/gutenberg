@@ -1,3 +1,4 @@
 import * as keycodes from './keycodes';
+import WordCounter from './wordcount';
 
-export { keycodes };
+export { keycodes, WordCounter };

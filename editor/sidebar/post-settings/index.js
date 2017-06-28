@@ -19,6 +19,7 @@ import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
+import WordCount from '../word-count';
 
 const PostSettings = ( { toggleSidebar } ) => {
 	return (
@@ -42,6 +43,7 @@ const PostSettings = ( { toggleSidebar } ) => {
 			<FeaturedImage />
 			<PostExcerpt />
 			<DiscussionPanel />
+			<WordCount />
 		</Panel>
 	);
 };
