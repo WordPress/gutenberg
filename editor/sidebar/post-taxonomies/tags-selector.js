@@ -29,6 +29,7 @@ class TagsSelector extends Component {
 		super( ...arguments );
 		this.onTagsChange = this.onTagsChange.bind( this );
 		this.searchTags = throttle( this.searchTags.bind( this ), 500 );
+		this.findOrCreateTag = this.findOrCreateTag.bind( this );
 		this.state = {
 			loading: false,
 			availableTags: [],
@@ -97,6 +98,21 @@ class TagsSelector extends Component {
 		} );
 	}
 
+	findOrCreateTag( tagName ) {
+		return new Promise( ( resolve, reject ) => {
+			// Tries to create a tag or fetch it if it already exists
+			new wp.api.models.Tag( { name: tagName } ).save()
+				.then( resolve, ( xhr ) => {
+					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
+					if ( errorCode === 'term_exists' ) {
+						return new wp.api.models.Tag( { id: xhr.responseJSON.data } )
+							.fetch().then( resolve, reject );
+					}
+					reject( xhr );
+				} );
+		} );
+	}
+
 	onTagsChange( tagNames ) {
 		this.setState( { selectedTags: tagNames } );
 		const newTagNames = tagNames.filter( ( tagName ) =>
@@ -112,9 +128,8 @@ class TagsSelector extends Component {
 		if ( newTagNames.length === 0 ) {
 			return this.props.onUpdateTags( tagNamesToIds( tagNames, this.state.availableTags ) );
 		}
-		const createTag = ( tagName ) => new wp.api.models.Tag( { name: tagName } ).save();
 		Promise
-			.all( newTagNames.map( createTag ) )
+			.all( newTagNames.map( this.findOrCreateTag ) )
 			.then( ( newTags ) => {
 				const newAvailableTags = this.state.availableTags.concat( newTags );
 				this.setState( { availableTags: newAvailableTags } );
