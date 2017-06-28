@@ -10,6 +10,7 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
+import { Dashicon } from 'components';
 import { ENTER } from 'utils/keycodes';
 
 /**
@@ -192,8 +193,19 @@ class VisualEditorBlockList extends Component {
 		this.props.onInsertBlock( newBlock );
 	}
 
+	insertBlock( name ) {
+		const newBlock = createBlock( name );
+		this.props.onInsertBlock( newBlock );
+	}
+
 	render() {
-		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
+		const {
+			blocks,
+			showInsertionPoint,
+			insertionPoint,
+			multiSelectedBlockUids,
+		} = this.props;
+
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
 			? [
@@ -238,17 +250,27 @@ class VisualEditorBlockList extends Component {
 				}
 				<div className="editor-visual-editor__continue-writing">
 					<Inserter position="top right" />
-					{ !! blocks.length &&
-						<input
-							type="text"
-							readOnly
-							className="editor-visual-editor__placeholder"
-							value={ __( 'Continue writing…' ) }
-							onFocus={ noop }
-							onClick={ this.appendDefaultBlock }
-							onKeyDown={ this.onPlaceholderKeyDown }
-						/>
-					}
+					<button
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( 'core/text' ) }
+					>
+						<Dashicon icon="text" />
+						{ __( 'Text' ) }
+					</button>
+					<button
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( 'core/image' ) }
+					>
+						<Dashicon icon="format-image" />
+						{ __( 'Image' ) }
+					</button>
+					<button
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( 'core/heading' ) }
+					>
+						<Dashicon icon="heading" />
+						{ __( 'Heading' ) }
+					</button>
 				</div>
 			</div>
 		);
