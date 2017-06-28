@@ -58,7 +58,7 @@ registerBlockType( 'core/gallery', {
 
 	attributes: {
 		images:
-			query( 'div.blocks-gallery figure.blocks-gallery-image img', {
+			query( 'div.wp-block-gallery figure.blocks-gallery-image img', {
 				url: attr( 'src' ),
 				alt: attr( 'alt' ),
 			} ) || [],
@@ -71,7 +71,7 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
+	edit( { attributes, setAttributes, focus, className } ) {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -104,7 +104,7 @@ registerBlockType( 'core/gallery', {
 					instructions={ __( 'Drag images here or insert from media library' ) }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
-					className="blocks-gallery">
+					className={ className }>
 					<MediaUploadButton
 						onSelect={ setMediaUrl }
 						type="image"
@@ -130,7 +130,7 @@ registerBlockType( 'core/gallery', {
 					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `blocks-gallery align${ align } columns-${ columns }` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns }` }>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }
@@ -141,7 +141,7 @@ registerBlockType( 'core/gallery', {
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		return (
-			<div className={ `blocks-gallery align${ align } columns-${ columns }` } >
+			<div className={ `align${ align } columns-${ columns }` } >
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }

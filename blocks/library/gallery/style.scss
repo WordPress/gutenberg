@@ -1,11 +1,11 @@
 
-.blocks-gallery {
+.wp-block-gallery {
 	display: flex;
 	flex-wrap: wrap;
 
 	&:not( .components-placeholder ) {
 		margin-right: -16px;
-		margin-bottom: -16px;	
+		margin-bottom: -16px;
 	}
 
 	.blocks-gallery-image {
@@ -43,7 +43,7 @@
 	}
 }
 
-.blocks-gallery.is-placeholder {
+.wp-block-gallery.is-placeholder {
 	margin: -15px;
 	padding: 6em 0;
 	border: 2px solid $light-gray-500;

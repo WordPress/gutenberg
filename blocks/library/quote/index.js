@@ -113,7 +113,7 @@ registerBlockType( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks } ) {
+	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, className } ) {
 		const { align, value, citation, style = 1 } = attributes;
 		const focusedEditable = focus ? focus.editable || 'value' : null;
 
@@ -139,7 +139,7 @@ registerBlockType( 'core/quote', {
 			),
 			<blockquote
 				key="quote"
-				className={ `blocks-quote blocks-quote-style-${ style }` }
+				className={ `${ className } blocks-quote-style-${ style }` }
 			>
 				<Editable
 					value={ value }

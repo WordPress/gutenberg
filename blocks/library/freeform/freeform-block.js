@@ -376,7 +376,7 @@ export default class FreeformBlock extends Component {
 	}
 
 	render() {
-		const { content, focus } = this.props;
+		const { content, focus, className } = this.props;
 		const { expandDown, showMore } = this.state;
 		const moreDrawerClasses = classnames( 'more-drawer', expandDown ? 'down' : 'up' );
 		return [
@@ -405,6 +405,7 @@ export default class FreeformBlock extends Component {
 			</BlockControls>,
 			<TinyMCE
 				key="editor"
+				className={ className }
 				getSettings={ this.getSettings }
 				onSetup={ this.onSetup }
 				defaultValue={ content }

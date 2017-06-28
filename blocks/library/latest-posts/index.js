@@ -52,7 +52,7 @@ registerBlockType( 'core/latestposts', {
 			}
 
 			return (
-				<div className="blocks-latest-posts">
+				<div className={ this.props.className }>
 					<ul>
 						{ latestPosts.map( ( post, i ) =>
 							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>

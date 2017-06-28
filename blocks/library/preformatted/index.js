@@ -42,7 +42,7 @@ registerBlockType( 'core/preformatted', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -58,6 +58,7 @@ registerBlockType( 'core/preformatted', {
 				onFocus={ setFocus }
 				placeholder={ __( 'Write preformatted text…' ) }
 				inline
+				className={ className }
 			/>
 		);
 	},

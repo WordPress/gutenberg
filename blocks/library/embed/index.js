@@ -130,7 +130,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				if ( fetching ) {
 					return [
 						controls,
-						<div key="loading" className="blocks-embed is-loading">
+						<div key="loading" className="wp-block-embed is-loading">
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
 						</div>,
@@ -140,7 +140,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				if ( ! html ) {
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="blocks-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -162,10 +162,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 				const iframeTitle = 'Embedded content from ' + parsedUrl.host;
-				let typeClassName = 'blocks-embed';
-
+				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
-					typeClassName = 'blocks-embed-video';
+					typeClassName += ' is-video';
 				}
 
 				return [
