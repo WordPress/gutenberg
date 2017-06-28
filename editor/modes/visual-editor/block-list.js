@@ -16,6 +16,7 @@ import { ENTER } from 'utils/keycodes';
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import Inserter from '../../inserter';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
@@ -224,16 +225,31 @@ class VisualEditorBlockList extends Component {
 						/>
 					);
 				} ) }
-
-				<input
-					type="text"
-					readOnly
-					className="editor-visual-editor__placeholder"
-					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Continue writing…' ) }
-					onFocus={ ! blocks.length ? this.appendDefaultBlock : noop }
-					onClick={ !! blocks.length ? this.appendDefaultBlock : noop }
-					onKeyDown={ !! blocks.length ? this.onPlaceholderKeyDown : noop }
-				/>
+				{ ! blocks.length &&
+					<input
+						type="text"
+						readOnly
+						className="editor-visual-editor__placeholder"
+						value={ __( 'Write your story' ) }
+						onFocus={ this.appendDefaultBlock }
+						onClick={ noop }
+						onKeyDown={ noop }
+					/>
+				}
+				<div className="editor-visual-editor__continue-writing">
+					<Inserter position="top right" />
+					{ !! blocks.length &&
+						<input
+							type="text"
+							readOnly
+							className="editor-visual-editor__placeholder"
+							value={ __( 'Continue writing…' ) }
+							onFocus={ noop }
+							onClick={ this.appendDefaultBlock }
+							onKeyDown={ this.onPlaceholderKeyDown }
+						/>
+					}
+				</div>
 			</div>
 		);
 	}

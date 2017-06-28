@@ -322,3 +322,17 @@ $sticky-bottom-offset: 20px;
 		outline: 1px solid $light-gray-500;
 	}
 }
+
+.editor-visual-editor__continue-writing {
+	display: flex;
+	.editor-visual-editor__placeholder[type=text] {
+		opacity: 0;
+		transition: opacity 200;
+		margin: 2px 0;
+		outline: none;
+	}
+	&:hover .editor-visual-editor__placeholder[type=text],
+	&:focus .editor-visual-editor__placeholder[type=text] {
+		opacity: 1;
+	}
+}
