@@ -76,7 +76,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName, style, defaultValue, label } = this.props;
+		const { tagName = 'div', style, defaultValue, label } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
