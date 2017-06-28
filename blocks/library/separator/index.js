@@ -16,8 +16,8 @@ registerBlockType( 'core/separator', {
 
 	category: 'layout',
 
-	edit() {
-		return <hr className="blocks-separator" />;
+	edit( { className } ) {
+		return <hr className={ className } />;
 	},
 
 	save() {

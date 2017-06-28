@@ -39,7 +39,7 @@ registerBlockType( 'core/cover-image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, title, align, id, hasParallax } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
@@ -78,7 +78,7 @@ registerBlockType( 'core/cover-image', {
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className="blocks-image">
+					className={ className }>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
@@ -109,7 +109,7 @@ registerBlockType( 'core/cover-image', {
 					/>
 				</InspectorControls>
 			),
-			<section key="cover-image" className="blocks-cover-image">
+			<section key="cover-image" className={ className }>
 				<section className={ sectionClasses } data-url={ url } style={ style }>
 					{ title || !! focus ? (
 						<Editable
@@ -139,7 +139,7 @@ registerBlockType( 'core/cover-image', {
 		} );
 
 		return (
-			<section className="blocks-cover-image">
+			<section>
 				<section className={ sectionClasses } style={ style }>
 					<h2>{ title }</h2>
 				</section>

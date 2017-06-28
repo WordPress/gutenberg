@@ -35,7 +35,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -45,7 +45,7 @@ registerBlockType( 'core/button', {
 					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className="blocks-button" title={ title }>
+			<span key="button" className={ className } title={ title }>
 				<Editable
 					tagName="span"
 					placeholder={ __( 'Write label…' ) }
