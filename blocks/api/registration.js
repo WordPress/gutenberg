@@ -1,6 +1,11 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
@@ -45,13 +50,13 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( ! settings ||
-			( settings && typeof settings.save !== 'function' ) ) {
+			( settings && ! isFunction( settings.save ) ) ) {
 		console.error(
 			'A "save" function must be created within the block settings.'
 		);
 		return;
 	}
-	if ( settings && 'edit' in settings && typeof settings.edit !== 'function' ) {
+	if ( settings && 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
 		);
