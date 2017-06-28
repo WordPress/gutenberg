@@ -1,4 +1,4 @@
-.has-drop-cap {
+p.has-drop-cap {
 	&:first-letter {
 		float: left;
 		font-size: 4.1em;
@@ -11,6 +11,6 @@
 	}
 }
 
-.has-drop-cap:not( :focus )  {
+p.has-drop-cap:not( :focus )  {
 	overflow: hidden;
 }
