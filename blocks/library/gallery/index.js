@@ -76,7 +76,7 @@ registerBlockType( 'core/gallery', {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const { imageCrop } = attributes;
+		const { imageCrop = true } = attributes;
 		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
