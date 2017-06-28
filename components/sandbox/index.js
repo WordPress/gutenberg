@@ -1,13 +1,20 @@
-// When embedding HTML from the WP oEmbed proxy, we need to insert it
-// into a div and make sure any scripts get run. This component takes
-// HTML and puts it into a div element, and creates and adds new script
-// elements so all scripts get run as expected.
+/**
+ * Internal dependencies
+ */
+import ResizableIframe from 'components/resizable-iframe';
 
-export default class HtmlEmbed extends wp.element.Component {
+export default class Sandbox extends wp.element.Component {
+
+	static get defaultProps() {
+		return {
+			html: '',
+			title: '',
+		};
+	}
 
 	componentDidMount() {
-		const body = this.node;
-		const { html = '' } = this.props;
+		const body = this.node.getFrameBody();
+		const { html } = this.props;
 
 		body.innerHTML = html;
 
@@ -27,7 +34,10 @@ export default class HtmlEmbed extends wp.element.Component {
 
 	render() {
 		return (
-			<div ref={ ( node ) => this.node = node } />
+			<ResizableIframe
+				sandbox="allow-same-origin allow-scripts"
+				title={ this.props.title }
+				ref={ ( node ) => this.node = node } />
 		);
 	}
 }

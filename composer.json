@@ -1,7 +1,7 @@
 {
   "require-dev": {
     "squizlabs/php_codesniffer": "2.9.x",
-    "wp-coding-standards/wpcs": "^0.11.0"
+    "wp-coding-standards/wpcs": "dev-develop"
   },
   "scripts": {
     "lint": "phpcs",

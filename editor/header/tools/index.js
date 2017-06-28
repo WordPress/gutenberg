@@ -24,13 +24,13 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<IconButton
 				className="editor-tools__undo"
 				icon="undo"
-				label={ wp.i18n.__( 'Undo' ) }
+				label={ __( 'Undo' ) }
 				disabled={ ! hasUndo }
 				onClick={ undo } />
 			<IconButton
 				className="editor-tools__redo"
 				icon="redo"
-				label={ wp.i18n.__( 'Redo' ) }
+				label={ __( 'Redo' ) }
 				disabled={ ! hasRedo }
 				onClick={ redo } />
 			<Inserter position="bottom">
@@ -39,7 +39,7 @@ function Tools( { undo, redo, hasUndo, hasRedo, isSidebarOpened, toggleSidebar }
 			<PreviewButton />
 			<div className="editor-tools__tabs">
 				<IconButton icon="admin-generic" onClick={ toggleSidebar } isToggled={ isSidebarOpened }>
-					{ wp.i18n.__( 'Post Settings' ) }
+					{ __( 'Post Settings' ) }
 				</IconButton>
 			</div>
 			<PublishButton />

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
 import { IconButton } from 'components';
 
 /**
@@ -15,7 +16,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 const { attr, children } = query;
 
 registerBlockType( 'core/button', {
-	title: wp.i18n.__( 'Button' ),
+	title: __( 'Button' ),
 
 	icon: 'button',
 
@@ -34,7 +35,7 @@ registerBlockType( 'core/button', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { text, url, title, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -44,16 +45,15 @@ registerBlockType( 'core/button', {
 					<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className="blocks-button" title={ title }>
+			<span key="button" className={ className } title={ title }>
 				<Editable
 					tagName="span"
-					placeholder={ wp.i18n.__( 'Write label…' ) }
+					placeholder={ __( 'Write label…' ) }
 					value={ text }
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					inline
-					inlineToolbar
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&
@@ -66,7 +66,7 @@ registerBlockType( 'core/button', {
 							required
 							value={ url }
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
-							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+							placeholder={ __( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
 					</form>

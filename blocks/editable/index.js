@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import tinymce from 'tinymce';
 import classnames from 'classnames';
 import { last, isEqual, omitBy, forEach, merge, identity, find } from 'lodash';
 import { nodeListToReact } from 'dom-react';
@@ -10,6 +11,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
+import { createElement, Component, renderToString } from 'element';
 import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 
 /**
@@ -19,7 +21,7 @@ import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 
-function createElement( type, props, ...children ) {
+function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -28,14 +30,14 @@ function createElement( type, props, ...children ) {
 		return children;
 	}
 
-	return wp.element.createElement(
+	return createElement(
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
 }
 
-export default class Editable extends wp.element.Component {
+export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -104,11 +106,10 @@ export default class Editable extends wp.element.Component {
 			return;
 		}
 
-		const content = this.getContent();
 		const collapsed = this.editor.selection.isCollapsed();
 
 		this.setState( {
-			empty: ! content || ! content.length,
+			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
 		} );
 
 		if (
@@ -261,8 +262,8 @@ export default class Editable extends wp.element.Component {
 		const beforeFragment = beforeRange.extractContents();
 		const afterFragment = afterRange.extractContents();
 
-		const beforeElement = nodeListToReact( beforeFragment.childNodes, createElement );
-		const afterElement = nodeListToReact( afterFragment.childNodes, createElement );
+		const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
+		const afterElement = nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 
 		this.setContent( beforeElement );
 		this.props.onSplit( beforeElement, afterElement );
@@ -311,8 +312,8 @@ export default class Editable extends wp.element.Component {
 		this.setContent( this.props.value );
 
 		this.props.onSplit(
-			nodeListToReact( before, createElement ),
-			nodeListToReact( after, createElement )
+			nodeListToReact( before, createTinyMCEElement ),
+			nodeListToReact( after, createTinyMCEElement )
 		);
 	}
 
@@ -320,7 +321,7 @@ export default class Editable extends wp.element.Component {
 		const formats = {};
 		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ), link };
+			formats.link = { value: link.getAttribute( 'href' ) || '', link };
 		}
 		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
@@ -346,12 +347,12 @@ export default class Editable extends wp.element.Component {
 			content = '';
 		}
 
-		content = wp.element.renderToString( content );
+		content = renderToString( content );
 		this.editor.setContent( content, { format: 'raw' } );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createElement );
+		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	updateFocus() {
@@ -433,7 +434,7 @@ export default class Editable extends wp.element.Component {
 
 	render() {
 		const {
-			tagName,
+			tagName: Tagname = 'div',
 			style,
 			value,
 			focus,
@@ -441,12 +442,14 @@ export default class Editable extends wp.element.Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
+			inline,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
-		const key = [ 'editor', tagName ].join();
+		const key = [ 'editor', Tagname ].join();
+		const isPlaceholderVisible = placeholder && this.state.empty;
 		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (
@@ -471,15 +474,23 @@ export default class Editable extends wp.element.Component {
 					</div>
 				}
 				<TinyMCE
-					tagName={ tagName }
+					tagName={ Tagname }
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }
-					isEmpty={ this.state.empty }
-					placeholder={ placeholder }
+					isPlaceholderVisible={ isPlaceholderVisible }
+					label={ placeholder }
 					key={ key }
 				/>
+				{ isPlaceholderVisible &&
+					<Tagname
+						className="blocks-editable__tinymce"
+						style={ style }
+					>
+						{ inline ? placeholder : <p>{ placeholder }</p> }
+					</Tagname>
+				}
 			</div>
 		);
 	}

@@ -1,23 +1,25 @@
 /**
  * WordPress dependencies
  */
+import { __ } from 'i18n';
+import { Component } from 'element';
 import { IconButton, Toolbar } from 'components';
 import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
-		title: wp.i18n.__( 'Bold' ),
+		title: __( 'Bold' ),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
-		title: wp.i18n.__( 'Italic' ),
+		title: __( 'Italic' ),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
-		title: wp.i18n.__( 'Strikethrough' ),
+		title: __( 'Strikethrough' ),
 		format: 'strikethrough',
 	},
 ];
@@ -25,7 +27,7 @@ const FORMATTING_CONTROLS = [
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-class FormatToolbar extends wp.element.Component {
+class FormatToolbar extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -133,7 +135,7 @@ class FormatToolbar extends wp.element.Component {
 		if ( enabledControls.indexOf( 'link' ) !== -1 ) {
 			toolbarControls.push( {
 				icon: 'admin-links',
-				title: wp.i18n.__( 'Link' ),
+				title: __( 'Link' ),
 				onClick: this.addLink,
 				isActive: !! formats.link,
 			} );
@@ -156,7 +158,7 @@ class FormatToolbar extends wp.element.Component {
 							required
 							value={ this.state.linkValue }
 							onChange={ this.updateLinkValue }
-							placeholder={ wp.i18n.__( 'Paste URL or type' ) }
+							placeholder={ __( 'Paste URL or type' ) }
 						/>
 						<IconButton icon="editor-break" type="submit" />
 						<IconButton icon="editor-unlink" onClick={ this.dropLink } />

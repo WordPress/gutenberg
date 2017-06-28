@@ -81,7 +81,13 @@ class SuggestionsList extends Component {
 		// why, since usually a div isn't focusable by default
 		// TODO does this still apply now that it's a <ul> and not a <div>?
 		return (
-			<ul ref={ this.bindList } className={ classes } tabIndex="-1">
+			<ul
+				ref={ this.bindList }
+				className={ classes }
+				tabIndex="-1"
+				id={ `components-form-token-suggestions-${ this.props.instanceId }` }
+				role="listbox"
+			>
 				{
 					map( this.props.suggestions, ( suggestion, index ) => {
 						const match = this.computeSuggestionMatch( suggestion );
@@ -89,17 +95,22 @@ class SuggestionsList extends Component {
 							'is-selected': index === this.props.selectedIndex,
 						} );
 
-						/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+						/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 						return (
 							<li
+								id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
+								role="option"
+								tabIndex="-1"
 								className={ classeName }
 								key={ suggestion }
 								onMouseDown={ this.handleMouseDown }
 								onClick={ this.handleClick( suggestion ) }
-								onMouseEnter={ this.handleHover( suggestion ) }>
+								onMouseEnter={ this.handleHover( suggestion ) }
+								aria-selected={ index === this.props.selectedIndex }
+							>
 								{ match
 									? (
-										<span>
+										<span aria-label={ this.props.displayTransform( suggestion ) }>
 											{ match.suggestionBeforeMatch }
 											<strong className="components-form-token-field__suggestion-match">
 												{ match.suggestionMatch }
@@ -111,7 +122,7 @@ class SuggestionsList extends Component {
 								}
 							</li>
 						);
-						/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+						/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 					} )
 				}
 			</ul>

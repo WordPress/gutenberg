@@ -2,7 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, get } from 'lodash';
+import { first, last, get, values } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -83,6 +83,16 @@ export function isEditedPostDirty( state ) {
  */
 export function getCurrentPost( state ) {
 	return state.currentPost;
+}
+
+/**
+ * Returns the post type of the post currently being edited
+ *
+ * @param  {Object} state Global application state
+ * @return {String}       Post type
+ */
+export function getCurrentPostType( state ) {
+	return state.currentPost.type;
 }
 
 /**
@@ -637,4 +647,14 @@ export function getSuggestedPostFormat( state ) {
 	}
 
 	return null;
+}
+
+/**
+ * Returns the user notices array
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of notices
+ */
+export function getNotices( state ) {
+	return values( state.notices );
 }

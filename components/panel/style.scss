@@ -18,10 +18,13 @@
 }
 
 .components-panel__body {
-	padding: 15px;
-	border: 1px solid $light-gray-500;
-	margin-left: -1px;
-	margin-right: -1px;
+	padding: $panel-padding;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
+
+	h3 {
+		margin: 0 0 .5em 0;
+	}
 }
 
 .components-panel__header {
@@ -29,11 +32,10 @@
 	justify-content: space-between;
 	align-items: center;
 	background: $light-gray-300;
-	padding: 0 15px;
+	padding: 0 $panel-padding;
 	height: 50px;
-	border: 1px solid $light-gray-500;
-	margin-left: -1px;
-	margin-right: -1px;
+	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 
 	h2 {
 		margin: 0;
@@ -49,7 +51,7 @@
 	margin-top: -1px;
 }
 
-.components-panel__body-title {
+.components-panel .components-panel__body-title {
 	display: block;
 	padding: 0;
 	margin: 0;

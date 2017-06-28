@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component, createElement } from 'element';
 
 class Button extends Component {
 	constructor( props ) {
@@ -39,7 +39,7 @@ class Button extends Component {
 
 		delete additionalProps.focus;
 
-		return wp.element.createElement( tag, {
+		return createElement( tag, {
 			...tagProps,
 			...additionalProps,
 			className: classes,

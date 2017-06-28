@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Component } from 'element';
 import { Placeholder } from 'components';
 import { __ } from 'i18n';
 
@@ -21,7 +22,7 @@ registerBlockType( 'core/latestposts', {
 		poststoshow: 5,
 	},
 
-	edit: class extends wp.element.Component {
+	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -51,7 +52,7 @@ registerBlockType( 'core/latestposts', {
 			}
 
 			return (
-				<div className="blocks-latest-posts">
+				<div className={ this.props.className }>
 					<ul>
 						{ latestPosts.map( ( post, i ) =>
 							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>

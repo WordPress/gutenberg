@@ -16,6 +16,7 @@ import {
 	isEditedPostDirty,
 	getCurrentPost,
 	getCurrentPostId,
+	getCurrentPostType,
 	getPostEdits,
 	getEditedPostTitle,
 	getEditedPostExcerpt,
@@ -50,6 +51,7 @@ import {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getNotices,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -204,6 +206,18 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).to.equal( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostType', () => {
+		it( 'should return the post type', () => {
+			const state = {
+				currentPost: {
+					type: 'post',
+				},
+			};
+
+			expect( getCurrentPostType( state ) ).to.equal( 'post' );
 		} );
 	} );
 
@@ -1175,6 +1189,22 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSuggestedPostFormat( state ) ).to.equal( 'Quote' );
+		} );
+	} );
+
+	describe( 'getNotices', () => {
+		it( 'should return the notices array', () => {
+			const state = {
+				notices: {
+					b: { id: 'b', content: 'Post saved' },
+					a: { id: 'a', content: 'Error saving' },
+				},
+			};
+
+			expect( getNotices( state ) ).to.eql( [
+				state.notices.b,
+				state.notices.a,
+			] );
 		} );
 	} );
 } );
