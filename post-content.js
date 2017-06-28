@@ -59,7 +59,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/list -->',
-			'<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>',
+			'<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And Lists like this one of course :)</li></ul>',
 			'<!-- /wp:core/list -->',
 
 			'<!-- wp:core/text -->',
