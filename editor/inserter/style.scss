@@ -62,8 +62,7 @@ input[type="search"].editor-inserter__search {
 
 	&:focus {
 		outline: none;
-		border-color: $blue-focus;
-		box-shadow: $shadow-focus;
+		box-shadow: $button-focus-style;
 	}
 }
 
