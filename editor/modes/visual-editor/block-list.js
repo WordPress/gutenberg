@@ -264,13 +264,6 @@ class VisualEditorBlockList extends Component {
 						<Dashicon icon="format-image" />
 						{ __( 'Image' ) }
 					</button>
-					<button
-						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( 'core/heading' ) }
-					>
-						<Dashicon icon="heading" />
-						{ __( 'Heading' ) }
-					</button>
 				</div>
 			</div>
 		);
