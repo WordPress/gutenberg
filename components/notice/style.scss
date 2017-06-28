@@ -2,6 +2,7 @@
 	position: fixed;
 	top: 40px;
 	right: 0;
-	width: 300px;
+	min-width: 300px;
+	max-width: 400px;
 	z-index: z-index( ".components-notice-list" );
 }
