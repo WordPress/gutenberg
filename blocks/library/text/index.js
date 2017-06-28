@@ -31,6 +31,8 @@ registerBlockType( 'core/text', {
 		content: query( 'p', children() ),
 	},
 
+	pasteMatcher: ( node ) => node.nodeName === 'P',
+
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: concatChildren( attributes.content, attributesToMerge.content ),

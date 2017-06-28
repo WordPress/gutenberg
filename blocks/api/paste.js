@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,8 @@ import { createElement } from 'element';
  * Internal dependencies
  */
 import { createBlock } from './factory';
+import { getBlockTypes, getUnknownTypeHandler } from './registration';
+import { getBlockAttributes } from './parser';
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
@@ -62,15 +65,14 @@ export function normaliseToBlockLevelNodes( nodes ) {
 
 export default function( nodes ) {
 	return normaliseToBlockLevelNodes( nodes ).map( ( node ) => {
-		// To do: move to block registration.
-		if ( node.nodeName === 'P' ) {
-			return createBlock( 'core/text', {
-				content: nodeListToReact( node.childNodes, createElement ),
-			} );
-		}
-
-		return createBlock( 'core/freeform', {
-			content: nodeListToReact( [ node ], createElement ),
+		const type = find( getBlockTypes(), ( { pasteMatcher } ) => {
+			return pasteMatcher && pasteMatcher( node );
 		} );
+		const name = type ? type.name : getUnknownTypeHandler();
+		const attributes = type
+			? getBlockAttributes( type, node.outerHTML )
+			: { content: nodeListToReact( [ node ], createElement ) };
+
+		return createBlock( name, attributes );
 	} );
 }
