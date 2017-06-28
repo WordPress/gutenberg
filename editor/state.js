@@ -292,6 +292,7 @@ export function selectedBlock( state = {}, action ) {
 				return {
 					uid: action.uid,
 					typing: true,
+					hasTypedBefore: true,
 					focus: {},
 				};
 			}
@@ -299,6 +300,7 @@ export function selectedBlock( state = {}, action ) {
 			return {
 				...state,
 				typing: true,
+				hasTypedBefore: true,
 			};
 
 		case 'STOP_TYPING':

@@ -801,7 +801,12 @@ describe( 'state', () => {
 				uid: 'chicken',
 			} );
 
-			expect( state ).to.eql( { uid: 'chicken', typing: true, focus: {} } );
+			expect( state ).to.eql( {
+				uid: 'chicken',
+				typing: true,
+				hasTypedBefore: true,
+				focus: {},
+			} );
 		} );
 
 		it( 'should do nothing if typing stopped not within selected block', () => {
@@ -824,17 +829,31 @@ describe( 'state', () => {
 				uid: 'chicken',
 			} );
 
-			expect( state ).to.eql( { uid: 'chicken', typing: false, focus: {} } );
+			expect( state ).to.eql( {
+				uid: 'chicken',
+				typing: false,
+				hasTypedBefore: true,
+				focus: {},
+			} );
 		} );
 
 		it( 'should set the typing flag and merge the existing state', () => {
-			const original = deepFreeze( { uid: 'ribs', typing: false, focus: { editable: 'citation' } } );
+			const original = deepFreeze( {
+				uid: 'ribs',
+				typing: false,
+				focus: { editable: 'citation' },
+			} );
 			const state = selectedBlock( original, {
 				type: 'START_TYPING',
 				uid: 'ribs',
 			} );
 
-			expect( state ).to.eql( { uid: 'ribs', typing: true, focus: { editable: 'citation' } } );
+			expect( state ).to.eql( {
+				uid: 'ribs',
+				typing: true,
+				hasTypedBefore: true,
+				focus: { editable: 'citation' },
+			} );
 		} );
 
 		it( 'should replace the selected block', () => {

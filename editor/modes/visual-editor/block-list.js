@@ -18,8 +18,10 @@ import { ENTER } from 'utils/keycodes';
 import VisualEditorBlock from './block';
 import {
 	getBlockUids,
+	getBlock,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	hasTypedInSelectedBlock,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
@@ -192,19 +194,33 @@ class VisualEditorBlockList extends Component {
 	}
 
 	render() {
-		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
-		const insertionPointIndex = blocks.indexOf( insertionPoint );
+		const {
+			blockUids,
+			lastBlock,
+			hasTypedInLastBlock,
+			showInsertionPoint,
+			insertionPoint,
+			multiSelectedBlockUids,
+		} = this.props;
+		const insertionPointIndex = blockUids.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
 			? [
-				...blocks.slice( 0, insertionPointIndex + 1 ),
+				...blockUids.slice( 0, insertionPointIndex + 1 ),
 				INSERTION_POINT_PLACEHOLDER,
-				...blocks.slice( insertionPointIndex + 1 ),
+				...blockUids.slice( insertionPointIndex + 1 ),
 			]
-			: blocks;
+			: blockUids;
+
+		const showContinueWriting = (
+			! lastBlock ||
+			lastBlock.name !== getDefaultBlock() ||
+			!! lastBlock.attributes.content ||
+			hasTypedInLastBlock
+		);
 
 		return (
 			<div>
-				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
+				{ !! blockUids.length && blocksWithInsertionPoint.map( ( uid ) => {
 					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
 						return (
 							<div
@@ -225,30 +241,56 @@ class VisualEditorBlockList extends Component {
 					);
 				} ) }
 
-				<input
-					type="text"
-					readOnly
-					className="editor-visual-editor__placeholder"
-					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Continue writing…' ) }
-					onFocus={ ! blocks.length ? this.appendDefaultBlock : noop }
-					onClick={ !! blocks.length ? this.appendDefaultBlock : noop }
-					onKeyDown={ !! blocks.length ? this.onPlaceholderKeyDown : noop }
-				/>
+				{ showContinueWriting && (
+					<input
+						type="text"
+						readOnly
+						className="editor-visual-editor__placeholder"
+						value={ ! blockUids.length
+							? __( 'Write your story' )
+							: __( 'Continue writing…' )
+						}
+						onFocus={ ! blockUids.length
+							? this.appendDefaultBlock
+							: noop
+						}
+						onClick={ !! blockUids.length
+							? this.appendDefaultBlock
+							: noop
+						}
+						onKeyDown={ !! blockUids.length
+							? this.onPlaceholderKeyDown
+							: noop
+						}
+					/>
+				) }
 			</div>
 		);
 	}
 }
 
 export default connect(
-	( state ) => ( {
-		blocks: getBlockUids( state ),
-		insertionPoint: getBlockInsertionPoint( state ),
-		showInsertionPoint: isBlockInsertionPointVisible( state ),
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		multiSelectedBlocks: getMultiSelectedBlocks( state ),
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-	} ),
+	( state ) => {
+		const blockUids = getBlockUids( state );
+		const lastBlockUid = blockUids.length
+			? blockUids[ blockUids.length - 1 ]
+			: null;
+		return {
+			blockUids,
+			lastBlock: lastBlockUid
+				? getBlock( state, lastBlockUid )
+				: null,
+			hasTypedInLastBlock: lastBlockUid
+				? hasTypedInSelectedBlock( state, lastBlockUid )
+				: null,
+			insertionPoint: getBlockInsertionPoint( state ),
+			showInsertionPoint: isBlockInsertionPointVisible( state ),
+			selectionStart: getMultiSelectedBlocksStartUid( state ),
+			selectionEnd: getMultiSelectedBlocksEndUid( state ),
+			multiSelectedBlocks: getMultiSelectedBlocks( state ),
+			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		};
+	},
 	( dispatch ) => ( {
 		onInsertBlock( block ) {
 			dispatch( insertBlock( block ) );

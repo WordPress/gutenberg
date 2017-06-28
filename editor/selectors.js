@@ -553,6 +553,22 @@ export function isTypingInBlock( state, uid ) {
 }
 
 /**
+ * Returns true if the block corresponding to the specified unique ID is
+ * selected and the user has typed within it before, or false otherwise.
+ *
+ * @param  {Object}  state Global application state
+ * @param  {Object}  uid   Block unique ID
+ * @return {Boolean}       Whether user is typing within block
+ */
+export function hasTypedInSelectedBlock( state, uid ) {
+	if ( ! isBlockSelected( state, uid ) ) {
+		return false;
+	}
+
+	return state.selectedBlock.hasTypedBefore;
+}
+
+/**
  * Returns the unique ID of the block after which a new block insertion would
  * be placed, or null if the insertion point is not shown. Defaults to the
  * unique ID of the last block occurring in the post if not otherwise assigned.
