@@ -9,7 +9,7 @@ import { first, last } from 'lodash';
  */
 import { __ } from 'i18n';
 import { Component, findDOMNode } from 'element';
-import { CHAR_A } from 'utils-gb/keycodes';
+import { CHAR_A } from 'utils/keycodes';
 
 /**
  * Internal dependencies
