@@ -17,18 +17,13 @@
 		}
 	}
 
-	// Cropped
+	// Cropped shows background instead
 	&.is-cropped .blocks-gallery-image {
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
+		background-position: center center;
+		background-size: cover;
 
-		// IE10+ hack
-		_:-ms-lang(x), img {
-			height: auto;
-			width: auto;
+		img {
+			visibility: hidden;
 		}
 	}
 

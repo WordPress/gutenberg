@@ -143,7 +143,7 @@ registerBlockType( 'core/gallery', {
 			),
 			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
+					<GalleryImage key={ img.url } img={ img } crop={ imageCrop } />
 				) ) }
 			</div>,
 		];
