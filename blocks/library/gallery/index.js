@@ -12,6 +12,7 @@ import { registerBlockType, query as hpq } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
@@ -75,6 +76,8 @@ registerBlockType( 'core/gallery', {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { imageCrop } = attributes;
+		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
 			focus && (
@@ -131,9 +134,14 @@ registerBlockType( 'core/gallery', {
 						min="1"
 						max={ Math.min( MAX_COLUMNS, images.length ) }
 					/>
+					<ToggleControl
+						label={ __( 'Crop Images' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `${ className } align${ align } columns-${ columns }` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }

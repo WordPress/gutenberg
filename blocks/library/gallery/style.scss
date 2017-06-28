@@ -8,11 +8,17 @@
 		margin-bottom: -16px;
 	}
 
-	// Cropped by default
 	.blocks-gallery-image {
 		flex-grow: 1;
 		margin: 0 16px 16px 0;
 
+		img {
+			max-width: 100%;
+		}
+	}
+
+	// Cropped
+	&.crop-true .blocks-gallery-image {
 		img {
 			width: 100%;
 			height: 100%;
@@ -25,18 +31,6 @@
 			width: auto;
 		}
 	}
-
-	/*
-	// Uncropped
-	.blocks-gallery-image {
-		flex-grow: 1;
-		margin: 0 16px 16px 0;
-
-		img {
-			max-width: 100%;
-		}
-	}
-	*/
 
 	&.columns-1 figure {
 		width: calc(100% / 1 - 2 * 8px);
