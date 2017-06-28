@@ -79,7 +79,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>A huge benefit of blocks is that you can edit them in place and manipulate you content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
+			'<p>A huge benefit of blocks is that you can edit them in place and manipulate your content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote { "style": 1 } -->',
