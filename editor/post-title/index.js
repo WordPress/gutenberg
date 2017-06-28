@@ -99,7 +99,7 @@ class PostTitle extends Component {
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
-						placeholder={ __( 'Add title…' ) }
+						placeholder={ __( 'Add title' ) }
 						onFocus={ this.onSelect }
 						onClick={ this.onSelect }
 						onKeyDown={ this.onKeyDown }

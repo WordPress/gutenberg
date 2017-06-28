@@ -76,7 +76,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, placeholder } = this.props;
+		const { tagName, style, defaultValue, label } = this.props;
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -92,7 +92,7 @@ export default class TinyMCE extends Component {
 			suppressContentEditableWarning: true,
 			className: 'blocks-editable__tinymce',
 			style,
-			'data-placeholder': placeholder,
+			'aria-label': label,
 		}, children );
 	}
 }

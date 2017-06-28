@@ -9,8 +9,11 @@ import classNames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls, focus } ) {
-	if ( ! controls || ! controls.length ) {
+function Toolbar( { controls = [], children } ) {
+	if (
+		( ! controls || ! controls.length ) &&
+		! children
+	) {
 		return null;
 	}
 
@@ -41,13 +44,13 @@ function Toolbar( { controls, focus } ) {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
-							focus={ focus && setIndex === 0 && controlIndex === 0 }
 							disabled={ control.isDisabled }
 						/>
 						{ control.children }
 					</li>
 				) ),
 			], [] ) }
+			{ children }
 		</ul>
 	);
 }

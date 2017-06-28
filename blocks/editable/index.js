@@ -434,7 +434,7 @@ export default class Editable extends Component {
 
 	render() {
 		const {
-			tagName,
+			tagName: Tagname = 'div',
 			style,
 			value,
 			focus,
@@ -442,12 +442,13 @@ export default class Editable extends Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
+			inline,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
-		const key = [ 'editor', tagName ].join();
+		const key = [ 'editor', Tagname ].join();
 		const classes = classnames( className, 'blocks-editable' );
 
 		const formatToolbar = (
@@ -472,15 +473,23 @@ export default class Editable extends Component {
 					</div>
 				}
 				<TinyMCE
-					tagName={ tagName }
+					tagName={ Tagname }
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
 					defaultValue={ value }
 					isEmpty={ this.state.empty }
-					placeholder={ placeholder }
+					label={ placeholder }
 					key={ key }
 				/>
+				{ this.state.empty &&
+					<Tagname
+						className="blocks-editable__tinymce"
+						style={ style }
+					>
+						{ inline ? placeholder : <p>{ placeholder }</p> }
+					</Tagname>
+				}
 			</div>
 		);
 	}

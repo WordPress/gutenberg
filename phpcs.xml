@@ -9,7 +9,6 @@
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>
-	<file>index.php</file>
 	<file>./lib</file>
 	<file>./phpunit</file>
 	<file>./bin</file>

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Placeholder } from 'components';
+import { Placeholder, Dashicon, Toolbar } from 'components';
 
 /**
  * Internal dependencies
@@ -39,9 +39,13 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption, align } = attributes;
+		const { url, alt, caption, align, id } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSelectImage = ( media ) => {
+			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
+		};
+		const uploadButtonProps = { isLarge: true };
 
 		const controls = (
 			focus && (
@@ -51,15 +55,24 @@ registerBlockType( 'core/image', {
 						onChange={ updateAlignment }
 						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
+
+					<Toolbar>
+						<li>
+							<MediaUploadButton
+								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								onSelect={ onSelectImage }
+								type="image"
+								value={ id }
+							>
+								<Dashicon icon="edit" />
+							</MediaUploadButton>
+						</li>
+					</Toolbar>
 				</BlockControls>
 			)
 		);
 
 		if ( ! url ) {
-			const uploadButtonProps = { isLarge: true };
-			const onSelectImage = ( media ) => {
-				setAttributes( { url: media.url, alt: media.alt, caption: media.caption } );
-			};
 			return [
 				controls,
 				<Placeholder
@@ -71,7 +84,7 @@ registerBlockType( 'core/image', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
-						type="image"
+						type="format-image"
 						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }

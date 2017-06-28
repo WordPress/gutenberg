@@ -25,7 +25,7 @@ class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			currentFocus: null,
+			currentFocus: 'search',
 		};
 		this.filter = this.filter.bind( this );
 		this.isShownBlock = this.isShownBlock.bind( this );
@@ -92,8 +92,8 @@ class InserterMenu extends Component {
 	}
 
 	findByIncrement( blockTypes, increment = 1 ) {
-		// Add on a fake search block to the list to cycle through.
-		const list = blockTypes.concat( { name: 'search' } );
+		// Prepend a fake search block to the list to cycle through.
+		const list = [ { name: 'search' }, ...blockTypes ];
 
 		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.name );
 		const nextIndex = currentIndex + increment;
@@ -228,8 +228,23 @@ class InserterMenu extends Component {
 		const { position, instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlockTypes() );
 
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<Popover position={ position } className="editor-inserter__menu">
+				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+					{ __( 'Search blocks' ) }
+				</label>
+				<input
+					autoFocus
+					id={ `editor-inserter__search-${ instanceId }` }
+					type="search"
+					placeholder={ __( 'Search…' ) }
+					className="editor-inserter__search"
+					onChange={ this.filter }
+					onClick={ this.setSearchFocus }
+					ref={ this.bindReferenceNode( 'search' ) }
+					tabIndex="-1"
+				/>
 				<div role="menu" className="editor-inserter__content">
 					{ getCategories()
 						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
@@ -267,21 +282,9 @@ class InserterMenu extends Component {
 						) )
 					}
 				</div>
-				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search blocks' ) }
-				</label>
-				<input
-					id={ `editor-inserter__search-${ instanceId }` }
-					type="search"
-					placeholder={ __( 'Search…' ) }
-					className="editor-inserter__search"
-					onChange={ this.filter }
-					onClick={ this.setSearchFocus }
-					ref={ this.bindReferenceNode( 'search' ) }
-					tabIndex="-1"
-				/>
 			</Popover>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 

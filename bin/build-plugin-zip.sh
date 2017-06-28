@@ -67,7 +67,6 @@ mv gutenberg.tmp.php gutenberg.php
 # Generate the plugin zip file
 zip -r gutenberg.zip \
 	gutenberg.php \
-	index.php \
 	lib/*.php \
 	lib/blocks/*.php \
 	post-content.js \

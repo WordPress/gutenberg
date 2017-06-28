@@ -16,19 +16,19 @@ import './style.scss';
 import { registerBlockType, query } from '../../api';
 import BlockControls from '../../block-controls';
 
-const { children } = query;
+const { html } = query;
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
 
-	icon: 'editor-code',
+	icon: 'html',
 
 	category: 'formatting',
 
 	className: false,
 
 	attributes: {
-		content: children(),
+		content: html(),
 	},
 
 	edit: class extends Component {

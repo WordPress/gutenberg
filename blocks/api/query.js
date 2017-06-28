@@ -6,7 +6,7 @@ import { createElement } from 'element';
 /**
  * External dependencies
  */
-import { nodeListToReact } from 'dom-react';
+import { nodeListToReact, nodeToReact } from 'dom-react';
 import { flow } from 'lodash';
 import {
 	attr as originalAttr,
@@ -36,11 +36,11 @@ export const html = withKnownMatcherFlag( originalHtml );
 export const text = withKnownMatcherFlag( originalText );
 export const query = withKnownMatcherFlag( originalQuery );
 export const children = withKnownMatcherFlag( ( selector ) => {
-	return ( node ) => {
-		let match = node;
+	return ( domNode ) => {
+		let match = domNode;
 
 		if ( selector ) {
-			match = node.querySelector( selector );
+			match = domNode.querySelector( selector );
 		}
 
 		if ( match ) {
@@ -48,5 +48,16 @@ export const children = withKnownMatcherFlag( ( selector ) => {
 		}
 
 		return [];
+	};
+} );
+export const node = withKnownMatcherFlag( ( selector ) => {
+	return ( domNode ) => {
+		let match = domNode;
+
+		if ( selector ) {
+			match = domNode.querySelector( selector );
+		}
+
+		return nodeToReact( match, createElement );
 	};
 } );

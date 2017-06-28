@@ -4,6 +4,7 @@
 
 .blocks-editable__tinymce {
 	margin: 0;
+	position: relative;
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
@@ -39,18 +40,23 @@
 	}
 
 	&[data-is-empty="true"] {
-		position: relative;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		margin-top: 0;
+
+		& > p {
+			margin-top: 0;
+		}
 	}
 
-	&[data-is-empty="true"]:before {
-		content: attr( data-placeholder );
+	& + .blocks-editable__tinymce {
 		opacity: 0.5;
 		pointer-events: none;
-		position: absolute;
 	}
 }
 
-.drop-cap-true .blocks-editable__tinymce:not( :focus )  {
+.has-drop-cap .blocks-editable__tinymce:not( :focus )  {
 	&:first-letter {
 		float: left;
 		font-size: 4.1em;
@@ -63,7 +69,7 @@
 	}
 }
 
-.drop-cap-true:not( :focus )  {
+.has-drop-cap:not( :focus )  {
 	overflow: hidden;
 }
 
