@@ -11,7 +11,7 @@ import classnames from 'classnames';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { ENTER } from 'utils/keycodes';
+import { ENTER } from 'utils-gb/keycodes';
 
 /**
  * Internal dependencies

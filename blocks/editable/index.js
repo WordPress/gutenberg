@@ -12,7 +12,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from 'element';
-import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
+import { BACKSPACE, DELETE, ENTER } from 'utils-gb/keycodes';
 
 /**
  * Internal dependencies
