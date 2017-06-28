@@ -60,7 +60,7 @@ if ( getenv( 'RUN_PARSER_TESTS' ) ) {
 			$html            = file_get_contents( $html_filename );
 			$expected_parsed = json_decode( file_get_contents( $parsed_json_filename ), true );
 
-			$parser = new PhpPegJs\Parser;
+			$parser = new Gutenberg_PEG_Parser;
 			$result = $parser->parse( $html );
 
 			$this->assertEquals( $expected_parsed, $result );

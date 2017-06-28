@@ -9,7 +9,13 @@ const peg = fs.readFileSync( 'blocks/api/post.pegjs', 'utf8' );
 
 const parser = pegjs.generate(
 	peg,
-	{ plugins: [ phpegjs ] }
+	{
+		plugins: [ phpegjs ],
+		phpegjs: {
+			parserNamespace: null,
+			parserGlobalNamePrefix: 'Gutenberg_PEG_',
+		},
+	}
 );
 
 fs.writeFileSync(
