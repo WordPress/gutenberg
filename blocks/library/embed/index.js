@@ -199,7 +199,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 
 			return (
-				<figure className={ `align${ align }` }>{ '\n' }
+				<figure className={ align && `align${ align }` }>{ '\n' }
 					{ url }
 					<figcaption>{ caption }</figcaption>
 				</figure>
