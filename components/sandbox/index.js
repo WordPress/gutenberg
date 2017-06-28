@@ -58,7 +58,8 @@ export default class Sandbox extends wp.element.Component {
 					ref={ ( node ) => this.preRenderer = node }
 					style={ { display: 'none' } }
 					sandbox="allow-same-origin"
-					onLoad={ this.shiftContent.bind( this ) } />
+					onLoad={ this.shiftContent.bind( this ) }
+					title="hidden rendering content" />
 				<ResizableIframe
 					sandbox="allow-same-origin allow-scripts"
 					title={ this.props.title }
