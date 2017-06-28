@@ -332,6 +332,8 @@ $sticky-bottom-offset: 20px;
 		transition: opacity 150ms;
 		margin: 0 10px;
 		width: auto;
+		font-family: $default-font;
+		font-size: $default-font-size;
 	}
 	&:hover .editor-inserter__block,
 	&:focus .editor-inserter__block {
