@@ -3,6 +3,7 @@
  */
 import { __ } from 'i18n';
 import { Toolbar, Placeholder } from 'components';
+import { pick } from 'lodash';
 
 /**
  * Internal dependencies
@@ -53,7 +54,7 @@ const slimImageObjects = ( imgs ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
 	const newImgs = [];
 	imgs.forEach( ( img ) => {
-		newImgs.push( _.pick( img, attrSet ) );
+		newImgs.push( pick( img, attrSet ) );
 	} );
 	return newImgs;
 };
