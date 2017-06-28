@@ -222,9 +222,27 @@ function edit( props ) {
 
 ## Matchers
 
-Given the block's HTML content as a string, attribute matchers extract the block attributes values into an Object. The matchers are made available throught the `wp.blocks.query` variable.
+Given the block's HTML content as a string, attribute matchers extract the block attributes values into an Object. The matchers are made available throught the `wp.blocks.query` variable as superset of [HPQ](http://github.com/aduth/hpq)'s API.
 
-In addition to all [HPQ](http://github.com/aduth/hpq)'s matchers, we provide these extra matchers to ease working with HTML content:
+`attr( selector: ?string, name: string ): Function`
+
+Generates a matcher function, returning an attribute by name if the attribute exists. If no selector is passed, returns attribute of the root element.
+
+`prop( selector: ?string, name: string ): Function`
+
+Generates a matcher function, returning an attribute by property if the attribute exists. If no selector is passed, returns property of the root element.
+
+`html( selector: ?string ): Function`
+
+Convenience for `prop( selector, 'innerHTML' )` .
+
+`text( selector: ?string ): Function`
+
+Convenience for `prop( selector, 'textContent' )` .
+
+`query( selector: string, matchers: Object | Function )`
+
+Creates a new matching context by first finding elements matching selector using [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) before then running another `parse` on `matchers` scoped to the matched elements.
 
 `node( selector: ?string ): Function`
 
