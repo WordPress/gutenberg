@@ -152,12 +152,13 @@ registerBlockType( 'core/quote', {
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
 					style={ { textAlign: align } }
+					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
 					<Editable
 						tagName="footer"
 						value={ citation }
-						placeholder={ __( 'Add citation…' ) }
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,

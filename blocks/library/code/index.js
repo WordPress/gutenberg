@@ -32,6 +32,7 @@ registerBlockType( 'core/code', {
 			<TextareaAutosize
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				placeholder={ __( 'Write code…' ) }
 			/>
 		);
 	},

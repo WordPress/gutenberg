@@ -56,7 +56,7 @@ registerBlockType( 'core/pullquote', {
 							value: nextValue,
 						} )
 					}
-					placeholder={ __( 'Write Quote…' ) }
+					placeholder={ __( 'Write quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					className="blocks-pullquote__content"

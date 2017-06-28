@@ -23,10 +23,11 @@ export default class TinyMCE extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		const isEmpty = String( nextProps.isEmpty );
+		const name = 'data-is-placeholder-visible';
+		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
 
-		if ( this.editorNode.getAttribute( 'data-is-empty' ) !== isEmpty ) {
-			this.editorNode.setAttribute( 'data-is-empty', isEmpty );
+		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
+			this.editorNode.setAttribute( name, isPlaceholderVisible );
 		}
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
