@@ -135,7 +135,7 @@ export default class FreeformBlock extends Component {
 		this.formats = null;
 		this.handleFormatChange = null;
 		this.state = {
-			empty: ! props.value || ! props.value.length,
+			empty: ! props.content || ! props.content.length,
 			activeButtons: { },
 			disabledButtons: { },
 			activeFormat: null,
