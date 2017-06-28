@@ -197,13 +197,13 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 		},
 
 		save( { attributes } ) {
-			const { url, caption } = attributes;
+			const { url, caption, align } = attributes;
 			if ( ! caption || ! caption.length ) {
 				return url;
 			}
 
 			return (
-				<figure>{ '\n' }
+				<figure className={ align && `align${ align }` }>{ '\n' }
 					{ url }
 					<figcaption>{ caption }</figcaption>
 				</figure>
