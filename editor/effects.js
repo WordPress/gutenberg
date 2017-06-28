@@ -51,14 +51,14 @@ export default {
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
+				type: 'RESET_POST',
+				post: newPost,
+			} );
+			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: newPost,
 				isNew,
 				optimist: { type: COMMIT, id: transactionId },
-			} );
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {

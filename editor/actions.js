@@ -1,3 +1,9 @@
+/**
+ * External Dependencies
+ */
+import uuid from 'uuid/v4';
+import { partial } from 'lodash';
+
 export function focusBlock( uid, config ) {
 	return {
 		type: 'UPDATE_FOCUS',
@@ -111,3 +117,41 @@ export function stopTypingInBlock( uid ) {
 		uid,
 	};
 }
+
+/**
+ * Returns an action object used to create a notice
+ *
+ * @param {String}     status   The notice status
+ * @param {WPElement}  content  The notice content
+ * @param {String}     id       The notice id
+ *
+ * @return {Object}             Action object
+ */
+export function createNotice( status, content, id = uuid() ) {
+	return {
+		type: 'CREATE_NOTICE',
+		notice: {
+			id,
+			status,
+			content,
+		},
+	};
+}
+
+/**
+ * Returns an action object used to remove a notice
+ *
+ * @param {String}  id  The notice id
+ *
+ * @return {Object}     Action object
+ */
+export function removeNotice( id ) {
+	return {
+		type: 'REMOVE_NOTICE',
+		noticeId: id,
+	};
+}
+
+export const successNotice = partial( createNotice, 'success' );
+export const errorNotice = partial( createNotice, 'error' );
+export const warningNotice = partial( createNotice, 'warning' );
