@@ -35,7 +35,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully you\'ll find aspects like adding captions or going full-width with your pictures much easier and robust than before.</p>',
+			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you\'ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image { "align": "center" } -->',
