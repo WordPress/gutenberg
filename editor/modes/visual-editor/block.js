@@ -11,7 +11,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
  * WordPress dependencies
  */
 import { Children, Component } from 'element';
-import { BACKSPACE, ESCAPE, DELETE } from 'utils-gb/keycodes';
+import { BACKSPACE, ESCAPE, DELETE } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
 
 /**
