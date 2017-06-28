@@ -15,7 +15,7 @@ function IconButton( { icon, children, label, className, focus, ...additionalPro
 
 	return (
 		<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
-			<span aria-hidden="true"><Dashicon icon={ icon } /></span>
+			<Dashicon icon={ icon } />
 			{ children }
 		</Button>
 	);
