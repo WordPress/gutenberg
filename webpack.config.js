@@ -10,7 +10,7 @@ const entryPointNames = [
 	'element',
 	'i18n',
 	'components',
-	'utils',
+	'utils-gb',
 	'blocks',
 	'date',
 	'editor',

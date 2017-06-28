@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { Dashicon, Popover, withFocusReturn, withInstanceId } from 'components';
-import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
+import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils-gb/keycodes';
 import { getCategories, getBlockTypes } from 'blocks';
 
 /**

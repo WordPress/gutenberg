@@ -4,7 +4,7 @@
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { IconButton, Toolbar } from 'components';
-import { ESCAPE } from 'utils/keycodes';
+import { ESCAPE } from 'utils-gb/keycodes';
 
 const FORMATTING_CONTROLS = [
 	{

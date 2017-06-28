@@ -46,9 +46,9 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Scripts.
 	wp_register_script(
 		'wp-utils',
-		gutenberg_url( 'utils/build/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
+		gutenberg_url( 'utils-gb/build/index.js' ),
+		array( 'word-count' ),
+		filemtime( gutenberg_dir_path() . 'utils-gb/build/index.js' )
 	);
 	wp_register_script(
 		'wp-date',

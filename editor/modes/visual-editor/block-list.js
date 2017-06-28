@@ -11,7 +11,7 @@ import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
 import { Dashicon } from 'components';
-import { ENTER } from 'utils/keycodes';
+import { ENTER } from 'utils-gb/keycodes';
 
 /**
  * Internal dependencies
