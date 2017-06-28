@@ -121,6 +121,9 @@ registerBlockType( 'core/gallery', {
 			controls,
 			focus && images.length > 1 && (
 				<InspectorControls key="inspector">
+					<p className="editor-block-inspector__description">Image galleries are a great way to share groups of pictures on your site.</p>
+					<hr />
+					<h3>{ __( 'Gallery Settings' ) }</h3>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
