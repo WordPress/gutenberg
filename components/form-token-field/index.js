@@ -64,6 +64,10 @@ class FormTokenField extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.debouncedSpeak.cancel();
+	}
+
 	bindInput( ref ) {
 		this.input = ref;
 	}
@@ -338,7 +342,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.speak( this.props.messages.added );
+		this.speakAssertive( this.props.messages.added );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -356,7 +360,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.speak( this.props.messages.removed );
+		this.speakAssertive( this.props.messages.removed );
 	}
 
 	getTokenValue( token ) {
