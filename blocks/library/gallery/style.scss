@@ -17,6 +17,21 @@
 		}
 	}
 
+	// Cropped
+	&.is-cropped .blocks-gallery-image {
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		// Alas, IE11+ doesn't support object-fit
+		_:-ms-lang(x), img {
+			height: auto;
+			width: auto;
+		}
+	}
+
 	&.columns-1 figure {
 		width: calc(100% / 1 - 2 * 8px);
 	}
