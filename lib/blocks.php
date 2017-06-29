@@ -128,3 +128,246 @@ function do_blocks( $content ) {
 	return $new_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().
+
+/**
+ * The low level API for registering assets to be loaded with a block.
+ *
+ * @param string $name   Name of already registered block you want to add assets to.
+ * @param array  $assets Array of asset data. It follows the following format:
+ *     array(
+ *       // Location to load.
+ *       'editor' => array(
+ *         'scripts' => array(
+ *           array(
+ *             'handle' => 'name of script to enqueue',
+ *             'src'    => 'url to resource',
+ *             'deps'   => array() of dependencies,
+ *             'ver'    => version of resource,
+ *             'in_footer'  => any specific media restrictions,
+ *           ),
+ *         ),
+ *         'styles' => array(
+ *           array(
+ *             'handle' => 'name of style to enqueue',
+ *             'src'    => 'url to resource',
+ *             'deps'   => array() of dependencies,
+ *             'ver'    => version of resource,
+ *             'media'  => any specific media restrictions,
+ *           ),
+ *         ),
+ *       ),
+ *       'theme'  => array(
+ *         // Same as above.
+ *       ),
+ *     );
+ *     Each individual asset is defined by an array matching the callback
+ *     parameters to the matching wp_enqueue_{ script|style } function.
+ * @return array Array of asset data for the block, after registering.
+ */
+function gutenberg_register_block_assets( $name, $assets ) {
+	global $wp_registered_blocks;
+	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
+		/* translators: 1: block name */
+		$message = sprintf( __( 'Block "%s" is not registered. It is possible you called this before it was registered.' ), $name );
+		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
+		return false;
+	}
+
+	// Check to see if assets have not been registered.
+	if ( ! isset( $wp_registered_blocks[ $name ]['assets'] ) ) {
+		$wp_registered_blocks[ $name ]['assets'] = array();
+	}
+
+	$wp_registered_blocks[ $name ]['assets'] = gutenberg_merge_assets( $wp_registered_blocks[ $name ]['assets'], $assets );
+	return $wp_registered_blocks[ $name ]['assets'];
+}
+
+/**
+ * Currently a wrapper for array_merge_recursive().
+ *
+ * Lifted into a function so validation can be more easily added. Might not be
+ * needed at all though.
+ *
+ * @param array $current_assets Array of current assets.
+ * @param array $new_assets     Array of new assets.
+ * @return array Array of merged assets.
+ */
+function gutenberg_merge_assets( $current_assets, $new_assets ) {
+	return array_merge_recursive( $current_assets, $new_assets );
+}
+
+/**
+ * Adds a block style to the editor.
+ *
+ * @param string $name Block name to register to.
+ * @param array  $args Array of asset data related to wp_enqueue_style().
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_editor_style( $name, $args ) {
+	if ( ! isset( $args['handle'] ) ) {
+		/* translators: 1: block name */
+		$message = 'Registered styles must provide a handle in $args array.';
+		_doing_it_wrong( __FUNCTION__, $message, '0.2.0' );
+		return array();
+	}
+
+	$defaults = array(
+		'src'   => '',
+		'deps'  => array(),
+		'ver'   => false,
+		'media' => 'all',
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$style = array(
+		'handle' => $args['handle'],
+		'src'    => $args['src'],
+		'deps'   => $args['deps'],
+		'ver'    => $args['ver'],
+		'media'  => $args['media'],
+	);
+
+	$assets = array(
+		'editor' => array(
+			'styles' => array(
+				$style,
+			),
+		),
+	);
+
+	return gutenberg_register_block_assets( $name, $assets );
+}
+
+/**
+ * Adds a block style to the theme.
+ *
+ * @param string $name Block name to register to.
+ * @param array  $args Array of asset data related to wp_enqueue_style().
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_theme_style( $name, $args ) {
+	if ( ! isset( $args['handle'] ) ) {
+		/* translators: 1: block name */
+		$message = 'Registered styles must provide a handle in $args array.';
+		_doing_it_wrong( __FUNCTION__, $message, '0.2.0' );
+		return array();
+	}
+
+	$defaults = array(
+		'src'   => '',
+		'deps'  => array(),
+		'ver'   => false,
+		'media' => 'all',
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$style = array(
+		'handle' => $args['handle'],
+		'src'    => $args['src'],
+		'deps'   => $args['deps'],
+		'ver'    => $args['ver'],
+		'media'  => $args['media'],
+	);
+
+	$assets = array(
+		'theme' => array(
+			'styles' => array(
+				$style,
+			),
+		),
+	);
+
+	return gutenberg_register_block_assets( $name, $assets );
+}
+
+/**
+ * Adds a block script to the editor.
+ *
+ * @param string $name Block name to register to.
+ * @param array  $args Array of asset data related to wp_enqueue_script().
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_editor_script( $name, $args ) {
+	if ( ! isset( $args['handle'] ) ) {
+		/* translators: 1: block name */
+		$message = 'Registered scripts must provide a handle in $args array.';
+		_doing_it_wrong( __FUNCTION__, $message, '0.2.0' );
+		return array();
+	}
+
+	$defaults = array(
+		'src'   => '',
+		'deps'  => array(),
+		'ver'   => false,
+		'in_footer' => false,
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$script = array(
+		'handle' => $args['handle'],
+		'src'    => $args['src'],
+		'deps'   => $args['deps'],
+		'ver'    => $args['ver'],
+		'in_footer'  => $args['in_footer'],
+	);
+
+	$assets = array(
+		'editor' => array(
+			'scripts' => array(
+				$script,
+			),
+		),
+	);
+
+	return gutenberg_register_block_assets( $name, $assets );
+}
+
+/**
+ * Adds a block script to the theme.
+ *
+ * @param string $name Block name to register to.
+ * @param array  $args Array of asset data related to wp_enqueue_script().
+ *
+ * @return array Array of asset data for block.
+ */
+function gutenberg_add_block_theme_script( $name, $args ) {
+	if ( ! isset( $args['handle'] ) ) {
+		/* translators: 1: block name */
+		$message = 'Registered scripts must provide a handle in $args array.';
+		_doing_it_wrong( __FUNCTION__, $message, '0.2.0' );
+		return array();
+	}
+
+	$defaults = array(
+		'src'   => '',
+		'deps'  => array(),
+		'ver'   => false,
+		'in_footer' => false,
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$script = array(
+		'handle' => $args['handle'],
+		'src'    => $args['src'],
+		'deps'   => $args['deps'],
+		'ver'    => $args['ver'],
+		'in_footer'  => $args['in_footer'],
+	);
+
+	$assets = array(
+		'theme' => array(
+			'scripts' => array(
+				$script,
+			),
+		),
+	);
+
+	return gutenberg_register_block_assets( $name, $assets );
+}

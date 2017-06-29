@@ -456,5 +456,50 @@ function gutenberg_scripts_and_styles( $hook ) {
 		array( 'wp-components', 'wp-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
+
+	// Enqueue any special theme editor styles and scripts.
+	global $wp_registered_blocks;
+	gutenberg_load_custom_assets_by_location( $wp_registered_blocks, 'editor' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+
+/**
+ * Handles the enqueueing of front end scripts and styles from Gutenberg.
+ */
+function gutenberg_frontend_scripts_and_styles() {
+	// Enqueue any special theme front-end styles and scripts.
+	global $wp_registered_blocks;
+	gutenberg_load_custom_assets_by_location( $wp_registered_blocks, 'theme' );
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
+
+/**
+ * Loads custom assets based on the location provided.
+ *
+ * Use 'theme' for front end and 'editor' for the editor itself.
+ *
+ * @param array  $blocks   Should be the $wp_registered_blocks global.
+ * @param string $location A string to check for assets for a location.
+ */
+function gutenberg_load_custom_assets_by_location( $blocks, $location ) {
+	foreach ( $blocks as $name => $settings ) {
+		// If there are assets registered see if any theme assets are registered.
+		if ( isset( $settings['assets'] ) && isset( $settings['assets'][ $location ] ) ) {
+			$location_assets = $settings['assets'][ $location ];
+
+			// Handle scripts.
+			if ( isset( $location_assets['scripts'] ) && is_array( $location_assets['scripts'] ) ) {
+				foreach ( $location_assets['scripts'] as $script ) {
+					wp_enqueue_style( $script['handle'], $script['src'], $script['deps'], $script['ver'], $script['in_footer'] );
+				}
+			}
+
+			// Handle styles.
+			if ( isset( $location_assets['styles'] ) && is_array( $location_assets['styles'] ) ) {
+				foreach ( $location_assets['styles'] as $style ) {
+					wp_enqueue_style( $style['handle'], $style['src'], $style['deps'], $style['ver'], $style['media'] );
+				}
+			}
+		}
+	}
+}
