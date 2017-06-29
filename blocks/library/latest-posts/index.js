@@ -19,7 +19,7 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
 
-registerBlockType( 'core/latestposts', {
+registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
 
 	icon: 'list-view',

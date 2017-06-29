@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/latestposts",
+        "blockName": "core/latest-posts",
         "attrs": {
             "poststoshow": 5,
             "displayPostDate": false
