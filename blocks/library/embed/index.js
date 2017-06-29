@@ -219,238 +219,237 @@ registerBlockType(
 	} )
 );
 registerBlockType(
-	'core/embedanimoto',
+	'core-embed/animoto',
 	getEmbedBlockSettings( {
 		title: 'Animoto',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedcloudup',
+	'core-embed/cloudup',
 	getEmbedBlockSettings( {
 		title: 'Cloudup',
 		icon: 'cloud'
 	} )
 );
 registerBlockType(
-	'core/embedcollegehumor',
+	'core-embed/collegehumor',
 	getEmbedBlockSettings( {
 		title: 'CollegeHumor',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embeddailymotion',
+	'core-embed/dailymotion',
 	getEmbedBlockSettings( {
 		title: 'Dailymotion',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedfacebook',
+	'core-embed/facebook',
 	getEmbedBlockSettings( {
 		title: 'Facebook',
 		icon: 'facebook'
 	} )
 );
 registerBlockType(
-	'core/embedflickr',
+	'core-embed/flickr',
 	getEmbedBlockSettings( {
 		title: 'Flickr',
 		icon: 'format-image'
 	} )
 );
 registerBlockType(
-	'core/embedfunnyordie',
+	'core-embed/funnyordie',
 	getEmbedBlockSettings( {
-		title: 'Funny
-		or Die',
+		title: 'Funny or Die',
 		icon: 'video-alt3'
 	} ) );
 registerBlockType(
-	'core/embedhulu',
+	'core-embed/hulu',
 	getEmbedBlockSettings( {
 		title: 'Hulu',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedimgur',
+	'core-embed/imgur',
 	getEmbedBlockSettings( {
 		title: 'Imgur',
 		icon: 'format-image'
 	} )
 );
 registerBlockType(
-	'core/embedinstagram',
+	'core-embed/instagram',
 	getEmbedBlockSettings( {
 		title: 'Instagram',
 		icon: 'camera'
 	} )
 );
 registerBlockType(
-	'core/embedissuu',
+	'core-embed/issuu',
 	getEmbedBlockSettings( {
 		title: 'Issuu',
 		icon: 'media-default'
 	} )
 );
 registerBlockType(
-	'core/embedkickstarter',
+	'core-embed/kickstarter',
 	getEmbedBlockSettings( {
 		title: 'Kickstarter',
 		icon: 'lightbulb'
 	} )
 );
 registerBlockType(
-	'core/embedmeetupcom',
+	'core-embed/meetup-com',
 	getEmbedBlockSettings( {
 		title: 'Meetup.com',
 		icon: 'location-alt'
 	} )
 );
 registerBlockType(
-	'core/embedmixcloud',
+	'core-embed/mixcloud',
 	getEmbedBlockSettings( {
 		title: 'Mixcloud',
 		icon: 'format-audio'
 	} )
 );
 registerBlockType(
-	'core/embedphotobucket',
+	'core-embed/photobucket',
 	getEmbedBlockSettings( {
 		title: 'Photobucket',
 		icon: 'camera'
 	} )
 );
 registerBlockType(
-	'core/embedpolldaddy',
+	'core-embed/polldaddy',
 	getEmbedBlockSettings( {
 		title: 'Polldaddy',
 		icon: 'yes'
 	} )
 );
 registerBlockType(
-	'core/embedreddit',
+	'core-embed/reddit',
 	getEmbedBlockSettings( {
 		title: 'Reddit',
 		icon: 'share'
 	} )
 );
 registerBlockType(
-	'core/embedreverbnation',
+	'core-embed/reverbnation',
 	getEmbedBlockSettings( {
 		title: 'ReverbNation',
 		icon: 'format-audio'
 	} )
 );
 registerBlockType(
-	'core/embedscreencast',
+	'core-embed/screencast',
 	getEmbedBlockSettings( {
 		title: 'Screencast',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedscribd',
+	'core-embed/scribd',
 	getEmbedBlockSettings( {
 		title: 'Scribd',
 		icon: 'book-alt'
 	} )
 );
 registerBlockType(
-	'core/embedslideshare',
+	'core-embed/slideshare',
 	getEmbedBlockSettings( {
 		title: 'Slideshare',
 		icon: 'slides'
 	} )
 );
 registerBlockType(
-	'core/embedsmugmug',
+	'core-embed/smugmug',
 	getEmbedBlockSettings( {
 		title: 'SmugMug',
 		icon: 'camera'
 	} )
 );
 registerBlockType(
-	'core/embedsoundcloud',
+	'core-embed/soundcloud',
 	getEmbedBlockSettings( {
 		title: 'SoundCloud',
 		icon: 'format-audio'
 	} )
 );
 registerBlockType(
-	'core/embedspeaker',
+	'core-embed/speaker',
 	getEmbedBlockSettings( {
 		title: 'Speaker',
 		icon: 'format-audio'
 	} )
 );
 registerBlockType(
-	'core/embedspotify',
+	'core-embed/spotify',
 	getEmbedBlockSettings( {
 		title: 'Spotify',
 		icon: 'format-audio'
 	} )
 );
 registerBlockType(
-	'core/embedted',
+	'core-embed/ted',
 	getEmbedBlockSettings( {
 		title: 'TED',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedtumblr',
+	'core-embed/tumblr',
 	getEmbedBlockSettings( {
 		title: 'Tumblr',
 		icon: 'share'
 	} )
 );
 registerBlockType(
-	'core/embedtwitter',
+	'core-embed/twitter',
 	getEmbedBlockSettings( {
 		title: 'Twitter',
 		icon: 'twitter'
 	} )
 );
 registerBlockType(
-	'core/embedvideopress',
+	'core-embed/videopress',
 	getEmbedBlockSettings( {
 		title: 'VideoPress',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedvimeo',
+	'core-embed/vimeo',
 	getEmbedBlockSettings( {
 		title: 'Vimeo',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedvine',
+	'core-embed/vine',
 	getEmbedBlockSettings( {
 		title: 'Vine',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedwordpress',
+	'core-embed/wordpress',
 	getEmbedBlockSettings( {
 		title: 'WordPress',
 		icon: 'wordpress'
 	} )
 );
 registerBlockType(
-	'core/embedwordpresstv',
+	'core-embed/wordpress-tv',
 	getEmbedBlockSettings( {
 		title: 'WordPress.tv',
 		icon: 'video-alt3'
 	} )
 );
 registerBlockType(
-	'core/embedyoutube',
+	'core-embed/youtube',
 	getEmbedBlockSettings( {
 		title: 'YouTube',
 		icon: 'video-alt3'
