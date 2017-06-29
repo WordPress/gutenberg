@@ -18,6 +18,11 @@ const FORMATTING_CONTROLS = [
 		format: 'italic',
 	},
 	{
+		icon: 'editor-underline',
+		title: __( 'Underline' ),
+		format: 'underline',
+	},
+	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
 		format: 'strikethrough',
@@ -25,7 +30,7 @@ const FORMATTING_CONTROLS = [
 ];
 
 // Default controls shown if no `enabledControls` prop provided
-const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
+const DEFAULT_CONTROLS = [ 'bold', 'italic', 'underline', 'strikethrough', 'link' ];
 
 class FormatToolbar extends Component {
 	constructor( props ) {

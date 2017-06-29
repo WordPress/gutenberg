@@ -71,6 +71,11 @@ const FREEFORM_CONTROLS = [
 			title: __( 'Italic' ),
 		},
 		{
+			id: 'underline',
+			icon: 'editor-underline',
+			title: __( 'Underline' ),
+		},
+		{
 			id: 'strikethrough',
 			icon: 'editor-strikethrough',
 			title: __( 'Strikethrough' ),
