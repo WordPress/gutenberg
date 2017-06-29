@@ -49,14 +49,13 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( ! settings ||
-			( settings && ! isFunction( settings.save ) ) ) {
+	if ( ! settings || ( settings && ! isFunction( settings.save ) ) ) {
 		console.error(
 			'A "save" function must be created within the block settings.'
 		);
 		return;
 	}
-	if ( settings && 'edit' in settings && ! isFunction( settings.edit ) ) {
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
 		);
