@@ -158,11 +158,11 @@ describe( 'full post content fixture', () => {
 		const errors = [];
 
 		getBlockTypes().map( block => block.name ).forEach( name => {
-			const nameToFilename = name.replace( /\//g, '-' );
+			const nameToFilename = name.replace( /\//g, '__' );
 			const foundFixtures = fileBasenames
 				.filter( basename => (
 					basename === nameToFilename ||
-					startsWith( basename, nameToFilename + '-' )
+					startsWith( basename, nameToFilename + '__' )
 				) )
 				.map( basename => {
 					const filename = basename + '.html';
@@ -175,7 +175,7 @@ describe( 'full post content fixture', () => {
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
-					'Expected a fixture file called \'%s.html\' or \'%s-*.html\'.',
+					'Expected a fixture file called \'%s.html\' or \'%s__*.html\'.',
 					nameToFilename,
 					nameToFilename
 				) );

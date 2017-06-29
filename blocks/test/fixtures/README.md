@@ -19,15 +19,15 @@ Each test is made up of four fixture files:
 
 Every block is required to have at least one such set of fixture files to test
 the parsing and serialization of that block.  These fixtures must be named like
-`core-blockname{-*,}.{html,json,serialized.html}`.  For example, for the
+`core__blockname{__*,}.{html,json,serialized.html}`.  For example, for the
 `core/image` block, the following four fixture files must exist:
 
-1. `core-image.html` (or `core-image-specific-test-name.html`).  Must contain a
-   `<!-- wp:core/image -->` block.
-2. `core-image.parsed.json` (or `core-image-specific-test-name.parsed.json`).
-3. `core-image.json` (or `core-image-specific-test-name.json`).
-4. `core-image.serialized.html` (or
-   `core-image-specific-test-name.serialized.html`).
+1. `core__image.html` (or `core__image__specific-test-name.html`).  Must
+   contain a `<!-- wp:core/image -->` block.
+2. `core__image.parsed.json` (or `core__image__specific-test-name.parsed.json`).
+3. `core__image.json` (or `core__image__specific-test-name.json`).
+4. `core__image.serialized.html` (or
+   `core__image__specific-test-name.serialized.html`).
 
 Ideally all important attributes and features of the block should be tested
 this way.  New contributions in the form of additional test cases are always
