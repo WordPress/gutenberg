@@ -119,3 +119,24 @@ input[type="search"].editor-inserter__search {
 	background: $light-gray-100;
 	border-bottom: 1px solid $light-gray-500;
 }
+
+.editor-inserter__tabs {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.editor-inserter__tab {
+	background: #eee;
+	border: none;
+	border-bottom: 2px solid transparent;
+	border-top: 2px solid transparent;
+	box-shadow: 0 0 0 1px #ddd;
+	font-size: $default-font;
+	padding: 8px 8px;
+	width: 100%;
+
+	&.is-active {
+		border-bottom: 2px solid #f00;
+	}
+}
