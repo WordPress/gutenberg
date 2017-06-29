@@ -1,14 +1,4 @@
 .wp-block-pullquote {
-	color: $light-gray-900;
-	padding: 2em;
-	text-align: center;
-
-	footer {
-		color: $dark-gray-900;
-		position: relative;
-	}
-
-	footer p,
 	footer .blocks-editable__tinymce[data-is-empty="true"]:before {
 		font-size: 16px;
 		font-family: $default-font;
@@ -19,9 +9,7 @@
 		left: 50%;
 		transform: translateX( -50% );
 	}
-}
 
-.editor-visual-editor .wp-block-pullquote {
 	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
 	& > .blocks-editable p {
 		font-family: $default-font;

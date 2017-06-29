@@ -9,6 +9,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
