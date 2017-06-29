@@ -323,7 +323,7 @@ export default class Editable extends Component {
 		if ( link ) {
 			formats.link = { value: link.getAttribute( 'href' ) || '', link };
 		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
+		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'underline', 'strikethrough' ] );
 		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
 
 		const focusPosition = this.getRelativePosition( element );
