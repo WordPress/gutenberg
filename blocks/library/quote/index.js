@@ -12,7 +12,7 @@ import { Toolbar } from 'components';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
