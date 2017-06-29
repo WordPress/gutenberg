@@ -116,22 +116,18 @@ registerBlockType( 'core/latestposts', {
 						/>
 					</InspectorControls>
 				),
-				<div className={ this.props.className } key="latest-posts">
-					<ul className="blocks-latest-posts__list">
-						{ latestPosts.map( ( post, i ) =>
-							<li key={ i }>
-								<a href={ post.link }>{ post.title.rendered }</a>
-								{ displayPostDate && post.date_gmt &&
-									(
-										<span className="blocks-latest-posts__post-date">
-											{ moment( post.date_gmt ).local().format( 'MMM DD h:mm A' ) }
-										</span>
-									)
-								}
-							</li>
-						) }
-					</ul>
-				</div>,
+				<ul className={ this.props.className } key="latest-posts">
+					{ latestPosts.map( ( post, i ) =>
+						<li key={ i }>
+							<a href={ post.link }>{ post.title.rendered }</a>
+							{ displayPostDate && post.date_gmt &&
+								<span className={ `${ this.props.className }__post-date` }>
+									{ moment( post.date_gmt ).local().format( 'MMM DD h:mm A' ) }
+								</span>
+							}
+						</li>
+					) }
+				</ul>,
 			];
 		}
 
