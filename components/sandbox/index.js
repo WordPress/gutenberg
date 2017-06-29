@@ -1,37 +1,143 @@
-/**
- * Internal dependencies
- */
-import ResizableIframe from 'components/resizable-iframe';
-
 export default class Sandbox extends wp.element.Component {
 
-	// Two phase render for sandboxed content.
-    //
-	// 1) Render the document into a hidden iframe,
-	//    with scripts disabled.
-	//
-	//    This makes sure all initial assets are loaded and we
-	//    have all size information for the initial render
-	//    in the ResizableIframe. Scripts may add, delete,
-	//    or otherwise mess with the initial assets, and
-	//    we need everything fully loaded to make sure the
-	//    ResizableIframe has all size information as soon
-	//    as it renders.
-	//
-	//    This stop scenarios like this:
-	//
-	//      * ResizableIframe gets an img node added to the DOM
-	//      * MutationObserver says, "Hey, I have a new node! Please resize!",
-	//        but the img has not loaded, so the dimensions are 0,0
-	//      * ResizableIframe resizes, but to 0,0
-	//      * Image loads, and is hidden because the iframe is 0,0
-	//
-	//    Instead, we are certain that all initial assets are loaded
-	//    and the iframe resizes correctly when it gets the initial
-	//    state of the document.
-	//
-	// 2) When the document has been pre-rendered (all assets loaded)
-	//    the onLoad triggers and renders into the ResizableIframe.
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			width: 0,
+			height: 0,
+		};
+		this.trySandbox = this.trySandbox.bind( this );
+		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+	}
+
+	isFrameAccessible() {
+		try {
+			return !! this.iframe.contentDocument.body;
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	checkMessageForResize( event ) {
+		const iframe = this.iframe;
+
+		// Attempt to parse the message data as JSON if passed as string
+		let data = event.data || {};
+		if ( 'string' === typeof data ) {
+			try {
+				data = JSON.parse( data );
+			} catch ( e ) {} // eslint-disable-line no-empty
+		}
+
+		// Verify that the mounted element is the source of the message
+		if ( ! iframe || iframe.contentWindow !== event.source ) {
+			return;
+		}
+
+		// Update the state only if the message is formatted as we expect, i.e.
+		// as an object with a 'resize' action, width, and height
+		const { action, width, height } = data;
+		const { width: oldWidth, height: oldHeight } = this.state;
+
+		if ( 'resize' === action && ( oldWidth !== width || oldHeight !== height ) ) {
+			this.setState( { width, height } );
+		}
+	}
+
+	componentDidMount() {
+		window.addEventListener( 'message', this.checkMessageForResize, false );
+		this.trySandbox();
+	}
+
+	componentDidUpdate() {
+		this.trySandbox();
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'message', this.checkMessageForResize );
+	}
+
+	trySandbox() {
+		if ( ! this.isFrameAccessible() ) {
+			return;
+		}
+
+		const body = this.iframe.contentDocument.body;
+		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
+			return;
+		}
+
+		// put the html snippet into a html document, and then write it to the iframe's document
+		// we can use this in the future to inject custom styles or scripts
+		const html = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<title>` + this.props.title + `</title>
+			</head>
+			<body data-resizable-iframe-connected="data-resizable-iframe-connected">
+				` + this.props.html + `
+				<script type="text/javascript">
+					( function() {
+						var observer;
+
+						if ( ! window.MutationObserver || ! document.body || ! window.top ) {
+							return;
+						}
+
+						function sendResize() {
+							window.top.postMessage( {
+								action: 'resize',
+								width: document.body.offsetWidth,
+								height: document.body.offsetHeight
+							}, '*' );
+						}
+
+						observer = new MutationObserver( sendResize );
+						observer.observe( document.body, {
+							attributes: true,
+							attributeOldValue: false,
+							characterData: true,
+							characterDataOldValue: false,
+							childList: true,
+							subtree: true
+						} );
+
+						window.addEventListener( 'load', sendResize, true );
+
+						// Hack: Remove viewport unit styles, as these are relative
+						// the iframe root and interfere with our mechanism for
+						// determining the unconstrained page bounds.
+						function removeViewportStyles( ruleOrNode ) {
+							[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
+								if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+									ruleOrNode.style[ style ] = '';
+								}
+							} );
+						}
+
+						Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
+						Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
+							Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
+						} );
+
+						document.body.style.position = 'absolute';
+						document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+
+						sendResize();
+					} )();
+				</script>
+			</body>
+		</html>
+		`;
+
+		// writing the document like this makes it act in the same way as if it was
+		// loaded over the network, so DOM creation and mutation, script execution, etc.
+		// all work as expected
+		this.iframe.contentWindow.document.open();
+		this.iframe.contentWindow.document.write( html );
+		this.iframe.contentWindow.document.close();
+	}
 
 	static get defaultProps() {
 		return {
@@ -40,45 +146,16 @@ export default class Sandbox extends wp.element.Component {
 		};
 	}
 
-	shiftContent() {
-		const body = this.iframe.getFrameBody();
-		body.innerHTML = this.props.html;
-
-		// recreate script elements so they get executed
-		const scripts = body.getElementsByTagName( 'script' );
-		const newScripts = Array.from( scripts ).map( ( script ) => {
-			const newScript = document.createElement( 'script' );
-			if ( script.src ) {
-				newScript.src = script.src;
-			} else {
-				newScript.innerHTML = script.innerHTML;
-			}
-			return newScript;
-		} );
-		newScripts.forEach( ( script ) => body.appendChild( script ) );
-	}
-
-	componentDidMount() {
-		const { html } = this.props;
-		this.preRenderer.contentWindow.document.open();
-		this.preRenderer.contentWindow.document.write( html );
-		this.preRenderer.contentWindow.document.close();
-	}
-
 	render() {
 		return (
-			<div>
-				<iframe
-					ref={ ( node ) => this.preRenderer = node }
-					style={ { display: 'none' } }
-					sandbox="allow-same-origin"
-					onLoad={ this.shiftContent.bind( this ) }
-					title="hidden rendering content" />
-				<ResizableIframe
-					sandbox="allow-same-origin allow-scripts"
-					title={ this.props.title }
-					ref={ ( node ) => this.iframe = node } />
-			</div>
+			<iframe
+				ref={ ( node ) => this.iframe = node }
+				title={ this.props.title }
+				scrolling="no"
+				sandbox="allow-scripts allow-same-origin"
+				onLoad={ this.trySandbox }
+				width={ this.state.width }
+				height={ this.state.height } />
 		);
 	}
 }
