@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Placeholder, FormToggle, withInstanceId } from 'components';
+import { Placeholder } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
 
@@ -13,6 +13,8 @@ import './style.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
+import TextControl from '../../inspector-controls/text-control';
+import ToggleControl from '../../inspector-controls/toggle-control';
 
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
@@ -29,7 +31,7 @@ registerBlockType( 'core/latestposts', {
 		displayPostDate: false,
 	},
 
-	edit: withInstanceId( class extends Component {
+	edit: class extends Component {
 		constructor() {
 			super( ...arguments );
 			this.changePostsToShow = this.changePostsToShow.bind( this );
@@ -93,37 +95,25 @@ registerBlockType( 'core/latestposts', {
 				);
 			}
 
-			const { focus, instanceId } = this.props;
+			const { focus } = this.props;
 			const { displayPostDate } = this.props.attributes;
-
-			const displayPostDateId = `post-date-toggle-${ instanceId }`;
-			const postToShowId = `post-to-show-${ instanceId }`;
 
 			return [
 				focus && (
 					<InspectorControls key="inspector">
-						<div className="editor-latest-posts__row">
-							<label htmlFor={ displayPostDateId }>{ __( 'Display post date' ) }</label>
-							<FormToggle
-								id={ displayPostDateId }
-								checked={ displayPostDate }
-								onChange={ this.toggleDisplayPostDate }
-								showHint={ false }
-							/>
-						</div>
-						<div className="editor-latest-posts__row">
-							<label htmlFor={ postToShowId }>{ __( 'Number of posts to show' ) } </label>
-							<input
-								type="number"
-								min={ MIN_POSTS }
-								max={ MAX_POSTS }
-								value={ this.props.attributes.poststoshow }
-								ref={ postToShowId }
-								id={ postToShowId }
-								className="editor-latest-posts__input"
-								onChange={ () => this.changePostsToShow( this.refs[ postToShowId ].value ) }
-							/>
-						</div>
+						<ToggleControl
+							label={ __( 'Display post date' ) }
+							checked={ displayPostDate }
+							onChange={ this.toggleDisplayPostDate }
+						/>
+						<TextControl
+							label={ __( 'Number of posts to show' ) }
+							type="number"
+							min={ MIN_POSTS }
+							max={ MAX_POSTS }
+							value={ this.props.attributes.poststoshow }
+							onChange={ ( value ) => this.changePostsToShow( value ) }
+						/>
 					</InspectorControls>
 				),
 				<div className={ this.props.className } key="latest-posts">
@@ -150,7 +140,7 @@ registerBlockType( 'core/latestposts', {
 				this.latestPostsRequest.abort();
 			}
 		}
-	} ),
+	},
 
 	save() {
 		return null;
