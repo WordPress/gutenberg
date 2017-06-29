@@ -26,6 +26,7 @@ class InserterMenu extends Component {
 		this.state = {
 			filterValue: '',
 			currentFocus: 'search',
+			tab: 'recent',
 		};
 		this.filter = this.filter.bind( this );
 		this.isShownBlock = this.isShownBlock.bind( this );
@@ -224,6 +225,28 @@ class InserterMenu extends Component {
 		this.changeMenuSelection( 'search' );
 	}
 
+	getBlockItem( block ) {
+		return (
+			<button
+				role="menuitem"
+				key={ block.name }
+				className="editor-inserter__block"
+				onClick={ this.selectBlock( block.name ) }
+				ref={ this.bindReferenceNode( block.name ) }
+				tabIndex="-1"
+				onMouseEnter={ this.props.showInsertionPoint }
+				onMouseLeave={ this.props.hideInsertionPoint }
+			>
+				<Dashicon icon={ block.icon } />
+				{ block.title }
+			</button>
+		);
+	}
+
+	switchTab( tab ) {
+		this.setState( { tab: tab } );
+	}
+
 	render() {
 		const { position, instanceId } = this.props;
 		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( getBlockTypes() );
@@ -246,41 +269,77 @@ class InserterMenu extends Component {
 					tabIndex="-1"
 				/>
 				<div role="menu" className="editor-inserter__content">
-					{ getCategories()
-						.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
-							<div key={ category.slug }>
-								<div
-									className="editor-inserter__separator"
-									id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
-									aria-hidden="true"
-								>
-									{ category.title }
+					{ this.state.tab === 'recent' &&
+						<div className="editor-inserter__recent">
+							{ getCategories()
+								.map( ( category ) => category.slug === 'common' && !! visibleBlocksByCategory[ category.slug ] && (
+									<div
+										className="editor-inserter__category-blocks"
+										role="menu"
+										tabIndex="0"
+										aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+									>
+										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
+									</div>
+								) )
+							}
+						</div>
+					}
+					{ this.state.tab === 'blocks' &&
+						getCategories()
+							.map( ( category ) => category.slug !== 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
+								<div key={ category.slug }>
+									<div
+										className="editor-inserter__separator"
+										id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+										aria-hidden="true"
+									>
+										{ category.title }
+									</div>
+									<div
+										className="editor-inserter__category-blocks"
+										role="menu"
+										tabIndex="0"
+										aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+									>
+										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
+									</div>
 								</div>
+							) )
+					}
+					{ this.state.tab === 'embeds' &&
+						getCategories()
+							.map( ( category ) => category.slug === 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
 								<div
 									className="editor-inserter__category-blocks"
 									role="menu"
 									tabIndex="0"
 									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
 								>
-									{ visibleBlocksByCategory[ category.slug ].map( ( block ) => (
-										<button
-											role="menuitem"
-											key={ block.name }
-											className="editor-inserter__block"
-											onClick={ this.selectBlock( block.name ) }
-											ref={ this.bindReferenceNode( block.name ) }
-											tabIndex="-1"
-											onMouseEnter={ this.props.showInsertionPoint }
-											onMouseLeave={ this.props.hideInsertionPoint }
-										>
-											<Dashicon icon={ block.icon } />
-											{ block.title }
-										</button>
-									) ) }
+									{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
 								</div>
-							</div>
-						) )
+							) )
 					}
+				</div>
+				<div className="editor-inserter__tabs is-recent">
+					<button
+						className={ `editor-inserter__tab ${ this.state.tab === 'recent' ? 'is-active' : '' }` }
+						onClick={ () => this.switchTab( 'recent' ) }
+					>
+						{ __( 'Recent' ) }
+					</button>
+					<button
+						className={ `editor-inserter__tab ${ this.state.tab === 'blocks' ? 'is-active' : '' }` }
+						onClick={ () => this.switchTab( 'blocks' ) }
+					>
+						{ __( 'Blocks' ) }
+					</button>
+					<button
+						className={ `editor-inserter__tab ${ this.state.tab === 'embeds' ? 'is-active' : '' }` }
+						onClick={ () => this.switchTab( 'embeds' ) }
+					>
+						{ __( 'Embeds' ) }
+					</button>
 				</div>
 			</Popover>
 		);
