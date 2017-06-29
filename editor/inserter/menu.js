@@ -278,6 +278,7 @@ class InserterMenu extends Component {
 										role="menu"
 										tabIndex="0"
 										aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+										key={ category.slug }
 									>
 										{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
 									</div>
@@ -315,6 +316,7 @@ class InserterMenu extends Component {
 									role="menu"
 									tabIndex="0"
 									aria-labelledby={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
+									key={ category.slug }
 								>
 									{ visibleBlocksByCategory[ category.slug ].map( ( block ) => this.getBlockItem( block ) ) }
 								</div>
