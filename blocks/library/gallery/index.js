@@ -97,6 +97,8 @@ registerBlockType( 'core/gallery', {
 
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
+			const uploadButtonProps = { isLarge: true };
+
 			return [
 				controls,
 				<Placeholder
@@ -106,6 +108,7 @@ registerBlockType( 'core/gallery', {
 					label={ __( 'Gallery' ) }
 					className={ className }>
 					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
 						type="image"
 						autoOpen
