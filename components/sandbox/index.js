@@ -1,3 +1,5 @@
+import { renderToString } from 'element';
+
 export default class Sandbox extends wp.element.Component {
 
 	constructor() {
@@ -67,75 +69,75 @@ export default class Sandbox extends wp.element.Component {
 			return;
 		}
 
+		const observeAndResizeJS = `
+			( function() {
+				var observer;
+
+				if ( ! window.MutationObserver || ! document.body || ! window.top ) {
+					return;
+				}
+
+				function sendResize() {
+					window.top.postMessage( {
+						action: 'resize',
+						width: document.body.offsetWidth,
+						height: document.body.offsetHeight
+					}, '*' );
+				}
+
+				observer = new MutationObserver( sendResize );
+				observer.observe( document.body, {
+					attributes: true,
+					attributeOldValue: false,
+					characterData: true,
+					characterDataOldValue: false,
+					childList: true,
+					subtree: true
+				} );
+
+				window.addEventListener( 'load', sendResize, true );
+
+				// Hack: Remove viewport unit styles, as these are relative
+				// the iframe root and interfere with our mechanism for
+				// determining the unconstrained page bounds.
+				function removeViewportStyles( ruleOrNode ) {
+					[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
+						if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+							ruleOrNode.style[ style ] = '';
+						}
+					} );
+				}
+
+				Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
+				Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
+					Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
+				} );
+
+				document.body.style.position = 'absolute';
+				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+
+				sendResize();
+		} )();`;
+
 		// put the html snippet into a html document, and then write it to the iframe's document
 		// we can use this in the future to inject custom styles or scripts
-		const html = `
-		<!DOCTYPE html>
-		<html>
-			<head>
-				<title>` + this.props.title + `</title>
-			</head>
-			<body data-resizable-iframe-connected="data-resizable-iframe-connected">
-				` + this.props.html + `
-				<script type="text/javascript">
-					( function() {
-						var observer;
-
-						if ( ! window.MutationObserver || ! document.body || ! window.top ) {
-							return;
-						}
-
-						function sendResize() {
-							window.top.postMessage( {
-								action: 'resize',
-								width: document.body.offsetWidth,
-								height: document.body.offsetHeight
-							}, '*' );
-						}
-
-						observer = new MutationObserver( sendResize );
-						observer.observe( document.body, {
-							attributes: true,
-							attributeOldValue: false,
-							characterData: true,
-							characterDataOldValue: false,
-							childList: true,
-							subtree: true
-						} );
-
-						window.addEventListener( 'load', sendResize, true );
-
-						// Hack: Remove viewport unit styles, as these are relative
-						// the iframe root and interfere with our mechanism for
-						// determining the unconstrained page bounds.
-						function removeViewportStyles( ruleOrNode ) {
-							[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-								if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-									ruleOrNode.style[ style ] = '';
-								}
-							} );
-						}
-
-						Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-						Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-							Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-						} );
-
-						document.body.style.position = 'absolute';
-						document.body.setAttribute( 'data-resizable-iframe-connected', '' );
-
-						sendResize();
-					} )();
-				</script>
-			</body>
-		</html>
-		`;
+		const htmlDoc = (
+			<html lang={ document.documentElement.lang }>
+				<head>
+					<title>{ this.props.title }</title>
+				</head>
+				<body data-resizable-iframe-connected="data-resizable-iframe-connected">
+					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
+					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
+				</body>
+			</html>
+		);
 
 		// writing the document like this makes it act in the same way as if it was
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
 		// all work as expected
 		this.iframe.contentWindow.document.open();
-		this.iframe.contentWindow.document.write( html );
+		this.iframe.contentWindow.document.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
 		this.iframe.contentWindow.document.close();
 	}
 
