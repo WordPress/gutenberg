@@ -9,9 +9,8 @@
 }
 
 .blocks-base-control__description {
-	display: block;
+	min-width: 100%;
 	margin-top: 5px;
 	margin-bottom: 0;
-	font-style: italic;
 	color: $dark-gray-300;
 }
