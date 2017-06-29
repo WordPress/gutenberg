@@ -14,6 +14,9 @@ import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 
+const MIN_POSTS = 1;
+const MAX_POSTS = 100;
+
 registerBlockType( 'core/latestposts', {
 	title: __( 'Latest Posts' ),
 
@@ -54,16 +57,14 @@ registerBlockType( 'core/latestposts', {
 
 		componentWillReceiveProps( nextProps ) {
 			const { poststoshow: postToShowCurrent } = this.props.attributes;
-			let { poststoshow: postToShowNext } = nextProps.attributes;
+			const { poststoshow: postToShowNext } = nextProps.attributes;
 			const { setAttributes } = this.props;
-
-			postToShowNext = parseInt( postToShowNext );
 
 			if ( postToShowCurrent === postToShowNext ) {
 				return;
 			}
 
-			if ( ! isNaN( postToShowNext ) && postToShowNext > 0 && postToShowNext <= 100 ) {
+			if ( postToShowNext >= MIN_POSTS && postToShowNext <= MAX_POSTS ) {
 				this.latestPostsRequest = getLatestPosts( postToShowNext );
 
 				this.latestPostsRequest
@@ -76,7 +77,7 @@ registerBlockType( 'core/latestposts', {
 		changePostsToShow( postsToShow ) {
 			const { setAttributes } = this.props;
 
-			setAttributes( { poststoshow: postsToShow } );
+			setAttributes( { poststoshow: parseInt( postsToShow, 10 ) || 0 } );
 		}
 
 		render() {
@@ -113,7 +114,9 @@ registerBlockType( 'core/latestposts', {
 						<div className="editor-latest-posts__row">
 							<label htmlFor={ postToShowId }>{ __( 'Number of posts to show' ) } </label>
 							<input
-								type="text"
+								type="number"
+								min={ MIN_POSTS }
+								max={ MAX_POSTS }
 								value={ this.props.attributes.poststoshow }
 								ref={ postToShowId }
 								id={ postToShowId }
