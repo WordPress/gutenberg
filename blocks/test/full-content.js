@@ -157,7 +157,28 @@ describe( 'full post content fixture', () => {
 	it( 'should be present for each block', () => {
 		const errors = [];
 
-		getBlockTypes().map( block => block.name ).forEach( name => {
+		// Ensure that more specific block names are tested first.  For
+		// example, we have both `core-embed.html` which tests the `core/embed`
+		// block, and `core-embed-collegehumor.html` which tests the
+		// `core-embed/collegehumor` block.
+		const blockNames = getBlockTypes().map( block => block.name );
+		blockNames.sort( ( a, b ) => {
+			a = a.replace( /\//g, '-' );
+			b = b.replace( /\//g, '-' );
+			// Sort in reverse order
+			if ( a < b ) {
+				return 1;
+			} else if ( a > b ) {
+				return -1;
+			} else {
+				return 0;
+			}
+		} );
+		console.log( { blockNames } );
+
+		const verifiedFixtures = {};
+
+		blockNames.forEach( name => {
 			const nameToFilename = name.replace( /\//g, '-' );
 			const foundFixtures = fileBasenames
 				.filter( basename => (
@@ -171,7 +192,8 @@ describe( 'full post content fixture', () => {
 						contents: readFixtureFile( filename ),
 					};
 				} )
-				.filter( fixture => fixture.contents !== null );
+				.filter( fixture => fixture.contents !== null )
+				.filter( fixture => ! verifiedFixtures[ fixture.filename ] );
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
@@ -192,6 +214,7 @@ describe( 'full post content fixture', () => {
 						name
 					) );
 				}
+				verifiedFixtures[ fixture.filename ] = true;
 			} );
 		} );
 
