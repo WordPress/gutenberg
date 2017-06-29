@@ -2,7 +2,8 @@
     {
         "blockName": "core/latestposts",
         "attrs": {
-            "poststoshow": 5
+            "poststoshow": 5,
+            "displayPostDate": false
         },
         "rawContent": ""
     },
