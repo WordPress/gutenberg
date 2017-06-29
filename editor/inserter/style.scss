@@ -124,11 +124,11 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__tab {
-	background: #eee;
+	background: $light-gray-300;
 	border: none;
 	border-bottom: 2px solid transparent;
 	border-top: 2px solid transparent;
-	box-shadow: 0 0 0 1px #ddd;
+	box-shadow: 0 0 0 1px $light-gray-500;
 	font-size: $default-font;
 	padding: 8px 8px;
 	width: 100%;
