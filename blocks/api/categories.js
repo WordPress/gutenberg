@@ -12,6 +12,7 @@ import { __ } from 'i18n';
  * @var {Array} categories
  */
 const categories = [
+	{ slug: 'recent', title: __( 'Recently Used' ) },
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
