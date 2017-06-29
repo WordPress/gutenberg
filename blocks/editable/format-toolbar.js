@@ -151,9 +151,11 @@ class FormatToolbar extends Component {
 						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
+						<label className="screen-reader-text" htmlFor="editable-format-toolbar__link-input">URL</label>
 						<input
 							autoFocus
 							className="editable-format-toolbar__link-input"
+							id="editable-format-toolbar__link-input"
 							type="url"
 							required
 							value={ this.state.linkValue }

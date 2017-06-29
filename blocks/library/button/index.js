@@ -60,8 +60,10 @@ registerBlockType( 'core/button', {
 					<form
 						className="editable-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
+						<label className="screen-reader-text" htmlFor="editable-format-toolbar__link-input">URL</label>
 						<input
 							className="editable-format-toolbar__link-input"
+							id="editable-format-toolbar__link-input"
 							type="url"
 							required
 							value={ url }
