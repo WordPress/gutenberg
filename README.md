@@ -28,7 +28,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Why
 
-One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine -- but only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
+One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine -- but only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully, we can make people start to _love_ WordPress, as opposed to pick it because it's what everyone else uses to blog.
 
 ## Ingredients
 
@@ -40,6 +40,6 @@ By showing critical UI in the body of the content, many can get their basic blog
 
 **Advanced Formatting**
 
-When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default you'll see all your metaboxes right there.
+When the Post Settings sidebar is open — which it is by default — you are essentially in advanced layout mode. By default, you'll see all your metaboxes right there.
 
 Every block can be _inspected_ by clicking it. And every block has advanced layout options available in the inspector; text might have drop-cap, image might have fixed position scrolling. As such, block attributes fall in two camps — the most important ones available right on the block, advanced ones living in the sidebar inspector.
