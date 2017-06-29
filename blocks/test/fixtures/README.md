@@ -3,7 +3,7 @@
 This directory contains sets of fixture files that are used to test the parsing
 and serialization logic.
 
-Each test is made up of three fixture files:
+Each test is made up of four fixture files:
 
 1. `fixture-name.html`: The initial post content.
 2. `fixture-name.parsed.json`: The **expected** output of the PEG parser for
@@ -20,7 +20,7 @@ Each test is made up of three fixture files:
 Every block is required to have at least one such set of fixture files to test
 the parsing and serialization of that block.  These fixtures must be named like
 `core-blockname{-*,}.{html,json,serialized.html}`.  For example, for the
-`core/image` block, the following three fixture files must exist:
+`core/image` block, the following four fixture files must exist:
 
 1. `core-image.html` (or `core-image-specific-test-name.html`).  Must contain a
    `<!-- wp:core/image -->` block.
@@ -35,7 +35,7 @@ welcome - this is a great way for us to identify bugs and prevent them from
 recurring in the future.
 
 When adding a new test, it's only necessary to create file (1) above, then
-there is a command you can run to generate (2) and (3):
+there is a command you can run to generate (2) through (4):
 
 ```sh
 GENERATE_MISSING_FIXTURES=y npm run test-unit -- --grep 'full post content fixture'
