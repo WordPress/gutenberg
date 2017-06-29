@@ -17,15 +17,15 @@ describe( 'FormToggle', () => {
 			expect( formToggle.hasClass( 'components-form-toggle' ) ).to.be.true();
 			expect( formToggle.hasClass( 'is-checked' ) ).to.be.false();
 			expect( formToggle.type() ).to.equal( 'span' );
-			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'value' ) ).to.be.undefined();
+			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'checked' ) ).to.be.undefined();
 			expect( formToggle.find( '.components-form-toggle__hint' ).text() ).to.equal( 'Off' );
 			expect( formToggle.find( '.components-form-toggle__hint' ).prop( 'aria-hidden' ) ).to.be.true();
 		} );
 
-		it( 'should render a checked checkbox and change the accessability text to On when providing checked prop', () => {
+		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
 			const formToggle = shallow( <FormToggle checked /> );
 			expect( formToggle.hasClass( 'is-checked' ) ).to.be.true();
-			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'value' ) ).to.be.true();
+			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'checked' ) ).to.be.true();
 			expect( formToggle.find( '.components-form-toggle__hint' ).text() ).to.equal( 'On' );
 		} );
 
