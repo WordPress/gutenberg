@@ -70,7 +70,7 @@ registerBlockType( 'core/button', {
 							onChange={ ( event ) => setAttributes( { url: event.target.value } ) }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" label={ __( 'Submit' ) } type="submit" />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				}
 			</span>,

@@ -162,8 +162,8 @@ class FormatToolbar extends Component {
 							onChange={ this.updateLinkValue }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
-						<IconButton icon="editor-break" label={ __( 'Submit' ) } type="submit" />
-						<IconButton icon="editor-unlink" label={ __( 'Unlink' ) } onClick={ this.dropLink } />
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</form>
 				}
 
@@ -173,7 +173,7 @@ class FormatToolbar extends Component {
 							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
 						<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-						<IconButton icon="editor-unlink" label={ __( 'Unlink' ) } onClick={ this.dropLink } />
+						<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 					</div>
 				}
 			</div>
