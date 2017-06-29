@@ -27,7 +27,7 @@ registerBlockType( 'core/latest-posts', {
 	category: 'widgets',
 
 	defaultAttributes: {
-		poststoshow: 5,
+		postsToShow: 5,
 		displayPostDate: false,
 	},
 
@@ -36,13 +36,13 @@ registerBlockType( 'core/latest-posts', {
 			super( ...arguments );
 			this.changePostsToShow = this.changePostsToShow.bind( this );
 
-			const { poststoshow } = this.props.attributes;
+			const { postsToShow } = this.props.attributes;
 
 			this.state = {
 				latestPosts: [],
 			};
 
-			this.latestPostsRequest = getLatestPosts( poststoshow );
+			this.latestPostsRequest = getLatestPosts( postsToShow );
 
 			this.latestPostsRequest
 				.then( latestPosts => this.setState( { latestPosts } ) );
@@ -58,8 +58,8 @@ registerBlockType( 'core/latest-posts', {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			const { poststoshow: postToShowCurrent } = this.props.attributes;
-			const { poststoshow: postToShowNext } = nextProps.attributes;
+			const { postsToShow: postToShowCurrent } = this.props.attributes;
+			const { postsToShow: postToShowNext } = nextProps.attributes;
 			const { setAttributes } = this.props;
 
 			if ( postToShowCurrent === postToShowNext ) {
@@ -72,14 +72,14 @@ registerBlockType( 'core/latest-posts', {
 				this.latestPostsRequest
 					.then( latestPosts => this.setState( { latestPosts } ) );
 
-				setAttributes( { poststoshow: postToShowNext } );
+				setAttributes( { postsToShow: postToShowNext } );
 			}
 		}
 
 		changePostsToShow( postsToShow ) {
 			const { setAttributes } = this.props;
 
-			setAttributes( { poststoshow: parseInt( postsToShow, 10 ) || 0 } );
+			setAttributes( { postsToShow: parseInt( postsToShow, 10 ) || 0 } );
 		}
 
 		render() {
@@ -111,7 +111,7 @@ registerBlockType( 'core/latest-posts', {
 							type="number"
 							min={ MIN_POSTS }
 							max={ MAX_POSTS }
-							value={ this.props.attributes.poststoshow }
+							value={ this.props.attributes.postsToShow }
 							onChange={ ( value ) => this.changePostsToShow( value ) }
 						/>
 					</InspectorControls>

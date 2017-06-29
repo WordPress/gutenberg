@@ -3,7 +3,7 @@
         "uid": "_uid_0",
         "name": "core/latest-posts",
         "attributes": {
-            "poststoshow": 5,
+            "postsToShow": 5,
             "displayPostDate": false
         }
     }
