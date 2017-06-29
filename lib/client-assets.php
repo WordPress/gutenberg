@@ -386,6 +386,13 @@ function gutenberg_scripts_and_styles( $hook ) {
 		true // enqueue in the footer.
 	);
 
+	// Register `wp-utils` as a dependency of `word-count` to ensure that
+	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
+	$word_count_script = wp_scripts()->query( 'word-count' );
+	array_push( $word_count_script->deps, 'wp-utils' );
+	// Now load the `word-count` script from core.
+	wp_enqueue_script( 'word-count' );
+
 	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
 		$post_id = (int) $_GET['post_id'];
