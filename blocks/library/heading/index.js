@@ -19,6 +19,7 @@ import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
+import BlockDescription from '../../block-description';
 
 const { children, prop } = query;
 
@@ -108,7 +109,11 @@ registerBlockType( 'core/heading', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<h3>{ __( 'Heading Size' ) }</h3>
+					<BlockDescription>
+						<p>{ __( 'Search engines use the headings to index the structure and content of your web pages.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Heading Settings' ) }</h3>
+					<p>{ __( 'Size' ) }</p>
 					<Toolbar
 						controls={
 							'123456'.split( '' ).map( ( level ) => ( {
@@ -120,7 +125,7 @@ registerBlockType( 'core/heading', {
 							} ) )
 						}
 					/>
-					<h3>{ __( 'Text Alignment' ) }</h3>
+					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
