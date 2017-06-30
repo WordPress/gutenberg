@@ -9,11 +9,16 @@ import { withInstanceId, FormToggle } from 'components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function ToggleControl( { label, checked, instanceId, onChange } ) {
+function ToggleControl( { label, description, checked, instanceId, onChange } ) {
 	const id = 'inspector-toggle-control-' + instanceId;
 
 	return (
-		<BaseControl label={ label } id={ id } className="blocks-toggle-control">
+		<BaseControl
+			id={ id }
+			label={ label }
+			description={ description }
+			className="blocks-toggle-control"
+		>
 			<FormToggle id={ id } checked={ checked } onChange={ onChange } />
 		</BaseControl>
 	);

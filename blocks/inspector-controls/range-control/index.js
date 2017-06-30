@@ -9,13 +9,22 @@ import { withInstanceId } from 'components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RangeControl( { label, value, instanceId, onChange, ...props } ) {
+function RangeControl( { label, description, value, instanceId, onChange, ...props } ) {
 	const id = 'inspector-range-control-' + instanceId;
 
 	return (
-		<BaseControl label={ label } id={ id } className="blocks-range-control">
-			<input className="blocks-range-control__input" id={ id } type="range" value={ value } onChange={ onChange } { ...props } />
-			<span className="blocks-range-control__hint">{ value }</span>
+		<BaseControl label={ label } description={ description } id={ id }>
+			<div className="blocks-range-control">
+				<input
+					id={ id }
+					type="range"
+					value={ value }
+					className="blocks-range-control__input"
+					onChange={ onChange }
+					{ ...props }
+				/>
+				<span className="blocks-range-control__hint">{ value }</span>
+			</div>
 		</BaseControl>
 	);
 }

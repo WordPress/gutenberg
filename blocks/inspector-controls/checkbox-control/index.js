@@ -9,12 +9,12 @@ import { withInstanceId } from 'components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function CheckboxControl( { label, heading, checked, instanceId, onChange, ...props } ) {
+function CheckboxControl( { label, description, heading, checked, instanceId, onChange, ...props } ) {
 	const id = 'inspector-checkbox-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl label={ heading } id={ id }>
+		<BaseControl label={ heading } description={ description } id={ id }>
 			<input
 				id={ id }
 				className="blocks-checkbox-control__input"

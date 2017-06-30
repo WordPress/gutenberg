@@ -14,12 +14,17 @@ import { withInstanceId } from 'components';
 import BaseControl from './../base-control';
 import './style.scss';
 
-function RadioControl( { label, selected, instanceId, onChange, options = [] } ) {
+function RadioControl( { label, description, selected, instanceId, onChange, options = [] } ) {
 	const id = 'inspector-radio-control-' + instanceId;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id } className="blocks-radio-control">
+		<BaseControl
+			id={ id }
+			label={ label }
+			description={ description }
+			className="blocks-radio-control"
+		>
 			{ options.map( ( option, index ) =>
 				<div
 					key={ ( id + '-' + index ) }
