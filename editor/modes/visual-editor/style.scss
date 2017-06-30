@@ -224,6 +224,7 @@
 	margin-bottom: $item-spacing + 20px;	// 20px is the offset from the bottom of the selected block where it stops sticking
 	width: 0;
 	white-space: nowrap;
+	height: $block-controls-height;
 
 	// Mobile viewport
 	top: $header-height - 1px;
