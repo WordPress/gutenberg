@@ -72,7 +72,6 @@ export default class TableBlock extends wp.element.Component {
 				<BlockControls key="menu">
 					<ToolbarMenu
 						icon="editor-table"
-						onSelect={ () => this.state.editor.focus() }
 						controls={
 							TABLE_CONTROLS.map( ( control ) => ( {
 								...control,

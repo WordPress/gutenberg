@@ -2,23 +2,47 @@
 	border: 1px solid $light-gray-500;
 	box-shadow: $shadow-popover;
 	background-color: $white;
+	padding: 3px;
 	margin-right: 10px;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
 	position: relative;
-}
+	display: flex;
 
-.components-toolbar-menu__toggle {
-	width: auto;
-	margin: 0px;
-	padding: 8px;
+	.components-toolbar-menu__toggle {
+		width: auto;
+		margin: 0px;
+		padding: 4px;
+		border: 1px solid transparent;
+		border-radius: 0;
+		display: flex;
+		flex-direction: row;
 
-	&:focus:before {
-		top: -3px;
-		right: -3px;
-		bottom: -3px;
-		left: -3px;
+		&.is-active,
+		&.is-active:hover {
+			background-color: $dark-gray-500;
+			color: $white;
+		}
+
+		&:focus:before {
+			top: -3px;
+			right: -3px;
+			bottom: -3px;
+			left: -3px;
+		}
+
+		&:hover,
+		&:focus,
+		&:not(:disabled):hover {
+			box-shadow: none;
+			outline: none;
+			color: $dark-gray-500;
+			border-color: $dark-gray-500;
+		}
+
+		&.is-active > svg,
+		&.is-active:hover > svg {
+			background-color: $dark-gray-500;
+			color: $white;
+		}
 	}
 }
 
@@ -30,30 +54,32 @@
 	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 3px 3px 0 3px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
 
-	input {
-		font-size: 13px;
-	}
-}
-
-.components-toolbar-menu__menu-item {
-	width: 100%;
-	margin-bottom: 3px;
-	padding: 6px;
-	background: none;
-	border: 1px solid transparent;
-	outline: none;
-	color: $dark-gray-500;
-	cursor: pointer;
-
-	&:hover,
-	&:focus,
-	&:not(:disabled):hover {
+	.components-toolbar-menu__menu-item {
+		width: 100%;
+		margin-bottom: 3px;
+		padding: 6px;
+		background: none;
+		border: 1px solid transparent;
+		border-radius: 0;
+		outline: none;
 		color: $dark-gray-500;
-		border-color: $dark-gray-500;
-	}
+		cursor: pointer;
 
-	.dashicon {
-		margin-right: 5px;
+		&:hover,
+		&:focus,
+		&:not(:disabled):hover {
+			box-shadow: none;
+			color: $dark-gray-500;
+			border-color: $dark-gray-500;
+		}
+
+		.dashicon {
+			margin-right: 5px;
+		}
 	}
 }
+

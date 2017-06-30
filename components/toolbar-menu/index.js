@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classNames from 'classnames';
 import clickOutside from 'react-click-outside';
 import { findIndex } from 'lodash';
 
@@ -72,19 +73,24 @@ class ToolbarMenu extends wp.element.Component {
 	focusIndex( index ) {
 		if ( this.menuRef ) {
 			const menu = findDOMNode( this.menuRef );
-			menu.children[ index ].focus();
+			if ( index < 0 ) {
+				menu.previousElementSibling.focus();
+			} else {
+				menu.children[ index ].focus();
+			}
 		}
 	}
 
 	focusPrevious() {
 		const i = this.findActiveIndex();
-		const prevI = i === 0 || i === -1 ? this.props.controls.length - 1 : i - 1;
+		const prevI = i <= -1 ? -1 : i - 1;
 		this.focusIndex( prevI );
 	}
 
 	focusNext() {
 		const i = this.findActiveIndex();
-		const nextI = i === ( this.props.controls.length - 1 ) || i === -1 ? 0 : i + 1;
+		const maxI = this.props.controls.length - 1;
+		const nextI = i >= maxI ? maxI : i + 1;
 		this.focusIndex( nextI );
 	}
 
@@ -93,7 +99,11 @@ class ToolbarMenu extends wp.element.Component {
 			switch ( keydown.keyCode ) {
 				case ESCAPE:
 					keydown.preventDefault();
+					keydown.stopPropagation();
 					this.closeMenu();
+					const node = findDOMNode( this );
+					const toggle = node.querySelector( '.components-toolbar-menu__toggle' );
+					toggle.focus();
 					if ( this.props.onSelect ) {
 						this.props.onSelect( null );
 					}
@@ -123,15 +133,27 @@ class ToolbarMenu extends wp.element.Component {
 				default:
 					break;
 			}
+		} else {
+			switch ( keydown.keyCode ) {
+				case DOWN:
+					keydown.preventDefault();
+					this.toggleMenu();
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'keydown', this.handleKeyDown, false );
+		const node = findDOMNode( this );
+		node.addEventListener( 'keydown', this.handleKeyDown, false );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'keydown', this.handleKeyDown, false );
+		const node = findDOMNode( this );
+		node.removeEventListener( 'keydown', this.handleKeyDown, false );
 	}
 
 	render() {
@@ -150,7 +172,11 @@ class ToolbarMenu extends wp.element.Component {
 		return (
 			<div className="components-toolbar-menu">
 				<IconButton
-					className="components-toolbar-menu__toggle"
+					className={
+						classNames( 'components-toolbar-menu__toggle', {
+							'is-active': this.state.open,
+						} )
+					}
 					icon={ icon }
 					onClick={ this.toggleMenu }
 					aria-haspopup="true"
