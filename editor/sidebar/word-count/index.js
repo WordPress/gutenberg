@@ -14,7 +14,7 @@ import { serialize } from 'blocks';
 function WordCount( { content, stopRender } ) {
 	const wordcount = ( stopRender ) ? __( 'Calculating...' ) : wp.utils.WordCounter.prototype.count( content );
 	return (
-		<PanelBody><strong>{ __( 'Word Count' ) }:</strong>{ wordcount }</PanelBody>
+		<PanelBody><strong>{ __( 'Word Count' ) }: </strong>{ wordcount }</PanelBody>
 	);
 }
 
