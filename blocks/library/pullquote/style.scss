@@ -12,8 +12,7 @@
 
 	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
 	& > .blocks-editable p {
-		font-family: $default-font;
 		font-size: 48px;
-		font-weight: 900;
+		font-weight: bold;
 	}
 }
