@@ -138,14 +138,17 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				}
 
 				if ( ! html ) {
+					const label = sprintf( __( '%s URL' ), title );
+
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="wp-block-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
 									value={ url || '' }
 									className="components-placeholder__input"
+									aria-label={ label }
 									placeholder={ __( 'Enter URL to embed here…' ) }
 									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
 								<Button

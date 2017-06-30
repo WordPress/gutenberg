@@ -35,13 +35,12 @@ describe( 'Placeholder', () => {
 			expect( placeholderLabel.find( 'Dashicon' ).exists() ).to.be.true();
 		} );
 
-		it( 'should render a label section and add aria label', () => {
+		it( 'should render a label section', () => {
 			const label = 'WordPress';
 			const placeholder = shallow( <Placeholder label={ label } /> );
 			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
 			const child = placeholderLabel.childAt( 0 );
 
-			expect( placeholder.prop( 'aria-label' ) ).to.equal( label );
 			expect( child.text() ).to.equal( label );
 		} );
 
