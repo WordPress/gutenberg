@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Unit test factory for terms.
+ *
+ * Note: The below @method notations are defined solely for the benefit of IDEs,
+ * as a way to indicate expected return values from the given factory methods.
+ *
+ * @method int create( $args = array(), $generation_definitions = null )
+ * @method int[] create_many( $count, $args = array(), $generation_definitions = null )
+ */
 class WP_UnitTest_Factory_For_Term extends WP_UnitTest_Factory_For_Thing {
 
 	private $taxonomy;
@@ -35,6 +44,9 @@ class WP_UnitTest_Factory_For_Term extends WP_UnitTest_Factory_For_Thing {
 		return wp_set_post_terms( $post_id, $terms, $taxonomy, $append );
 	}
 
+	/**
+	 * @return array|null|WP_Error|WP_Term
+	 */
 	function create_and_get( $args = array(), $generation_definitions = null ) {
 		$term_id = $this->create( $args, $generation_definitions );
 		$taxonomy = isset( $args['taxonomy'] ) ? $args['taxonomy'] : $this->taxonomy;
