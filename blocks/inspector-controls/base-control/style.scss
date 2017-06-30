@@ -1,9 +1,8 @@
-.blocks-base-control:not(:last-child) {
-	margin-bottom: 15px;
+.blocks-base-control {
+	margin: 1em 0 1.5em 0;
 }
 
 .blocks-base-control__label {
 	display: block;
-	font-weight: 500;
 	margin-bottom: 5px;
 }

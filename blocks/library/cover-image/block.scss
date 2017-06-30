@@ -7,6 +7,9 @@
 		font-size: 24pt;
 		line-height: 1em;
 		z-index: 1;
+		max-width: $visual-editor-max-width;
+		padding: $block-padding;
+		text-align: center;
 	}
 
 	.cover-image {
@@ -22,7 +25,7 @@
 		background-attachment: fixed;
 	}
 
-	.cover-image:before {
+	.has-background-dim.cover-image:before {
 		content: '';
 		position: absolute;
 		top: 0;
