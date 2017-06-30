@@ -32,9 +32,9 @@
 	.cover-image.has-background-dim::before {
 		content: '';
 		position: absolute;
-		top: $block-padding;
+		top: 0;
 		right: $block-padding * 2 + $block-mover-margin;
-		bottom: $block-padding;
+		bottom: 0;
 		left: $block-padding * 2 + $block-mover-margin;
 		background: rgba( 0,0,0,.5 );
 	}
