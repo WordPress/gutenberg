@@ -34,7 +34,7 @@ You can pick among all the <a href="https://github.com/WordPress/gutenberg/issue
 
 ## Testing
 
-Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both.
+Gutenberg contains both PHP and JavaScript code and encourages testing and code style linting for both.
 
 ### JavaScript Testing
 
