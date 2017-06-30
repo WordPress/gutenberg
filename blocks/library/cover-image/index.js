@@ -41,7 +41,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, title, align, id, hasParallax } = attributes;
+		const { url, title, align, id, hasParallax, hasBackgroundDim = true } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 
@@ -96,17 +96,27 @@ registerBlockType( 'core/cover-image', {
 		const sectionClasses = classnames( {
 			'cover-image': true,
 			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
 		} );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
 
 		return [
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
+					<p className="editor-block-inspector__description">Image galleries are a great way to share groups of pictures on your site.</p>
+					<hr />
+					<h3>{ __( 'Cover Image Settings' ) }</h3>
 					<ToggleControl
-						label={ __( 'Fixed Position' ) }
+						label={ __( 'Fixed Background' ) }
 						checked={ !! hasParallax }
 						onChange={ toggleParallax }
+					/>
+					<ToggleControl
+						label={ __( 'Dim Background' ) }
+						checked={ !! hasBackgroundDim }
+						onChange={ toggleBackgroundDim }
 					/>
 				</InspectorControls>
 			),
