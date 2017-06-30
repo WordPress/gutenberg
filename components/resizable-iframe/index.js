@@ -1,5 +1,5 @@
 /**
- * Imported from Calypso, with some lint fixes and gutenburg specific changes.
+ * Imported from Calypso, with some lint fixes and Gutenberg-specific changes.
  */
 
 /**
