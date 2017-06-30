@@ -142,13 +142,14 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes } ) {
-		const { url, title, hasParallax } = attributes;
+		const { url, title, hasParallax, hasBackgroundDim } = attributes;
 		const style = {
 			backgroundImage: `url(${ url })`,
 		};
 		const sectionClasses = classnames( {
 			'cover-image': true,
 			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
 		} );
 
 		return (
