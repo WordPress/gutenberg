@@ -52,11 +52,7 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 // we only need this set to display the image in the library
 const slimImageObjects = ( imgs ) => {
 	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
-	const newImgs = [];
-	imgs.forEach( ( img ) => {
-		newImgs.push( pick( img, attrSet ) );
-	} );
-	return newImgs;
+	return imgs.map( ( img ) => pick( img, attrSet ) );
 };
 
 function defaultColumnsNumber( attributes ) {
