@@ -7,20 +7,17 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Component } from 'element';
 import { PanelHeader } from 'components';
-
+import { Component } from 'element';
+import { getBlocks, getBlockCount } from '../../selectors';
+import { serialize } from '../../../blocks/api';
 
 class WordCount extends Component {
-
-	componentDidMount() {
-		console.log( window.wp.utils.WordCounter );
-	}
-
 	render() {
+		console.log( wp.blocks.getBlockTypes() );
 		return (
 			<PanelHeader label={ __( 'Word Count' ) } >
-				<div>{ this.props.wordcount }</div>
+				<div>{ this.props.blocks.length }</div>
 			</PanelHeader>
 		);
 	}
@@ -29,14 +26,9 @@ class WordCount extends Component {
 export default connect(
 	( state ) => {
 		return {
-			wordcount: 200,
+			blocks: getBlocks( state ),
+			blockCount: getBlockCount( state ),
+			//content: serialize( getBlocks( state ) ),
 		};
 	},
-	( dispatch ) => {
-		return {
-			onUpdateExcerpt( excerpt ) {
-				dispatch( editPost( { excerpt } ) );
-			},
-		};
-	}
 )( WordCount );
