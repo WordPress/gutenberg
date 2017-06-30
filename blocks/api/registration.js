@@ -49,7 +49,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( ! settings || ( settings && ! isFunction( settings.save ) ) ) {
+	if ( ! settings || ! isFunction( settings.save ) ) {
 		console.error(
 			'A "save" function must be created within the block settings.'
 		);
