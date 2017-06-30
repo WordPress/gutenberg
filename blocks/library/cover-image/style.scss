@@ -10,6 +10,9 @@
 			color: white;
 			font-size: 24pt;
 			line-height: 1em;
+			max-width: $visual-editor-max-width;
+			padding: $block-padding;
+			text-align: center;
 		}
 	}
 
