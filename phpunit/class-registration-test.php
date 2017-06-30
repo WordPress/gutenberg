@@ -38,7 +38,7 @@ class Registration_Test extends WP_UnitTestCase {
 	 *
 	 * @expectedIncorrectUsage register_block_type
 	 */
-	function test_invlalid_characters() {
+	function test_invalid_characters() {
 		$result = register_block_type( 'still/_doing_it_wrong', array() );
 		$this->assertFalse( $result );
 	}
