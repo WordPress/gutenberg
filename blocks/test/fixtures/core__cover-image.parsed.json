@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/cover-image",
+        "attrs": {
+            "url": "https://cldup.com/uuUqE_dXzy.jpg"
+        },
+        "rawContent": "\n<section class=\"wp-block-cover-image\">\n\t<section class=\"cover-image\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg);\">\n\t\t<h2>Guten Berg!</h2>\n\t</section>\n</section>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

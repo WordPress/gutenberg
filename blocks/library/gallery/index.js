@@ -8,13 +8,16 @@ import { Toolbar, Placeholder } from 'components';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query as hpq } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
+import BlockDescription from '../../block-description';
 
 const { query, attr } = hpq;
 
@@ -75,6 +78,8 @@ registerBlockType( 'core/gallery', {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { imageCrop = true } = attributes;
+		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
 			focus && (
@@ -97,6 +102,8 @@ registerBlockType( 'core/gallery', {
 
 		if ( images.length === 0 ) {
 			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
+			const uploadButtonProps = { isLarge: true };
+
 			return [
 				controls,
 				<Placeholder
@@ -106,6 +113,7 @@ registerBlockType( 'core/gallery', {
 					label={ __( 'Gallery' ) }
 					className={ className }>
 					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
 						type="image"
 						autoOpen
@@ -121,6 +129,10 @@ registerBlockType( 'core/gallery', {
 			controls,
 			focus && images.length > 1 && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Gallery Settings' ) }</h3>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -128,9 +140,14 @@ registerBlockType( 'core/gallery', {
 						min="1"
 						max={ Math.min( MAX_COLUMNS, images.length ) }
 					/>
+					<ToggleControl
+						label={ __( 'Crop Images' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `${ className } align${ align } columns-${ columns }` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }
@@ -139,9 +156,9 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true } = attributes;
 		return (
-			<div className={ `align${ align } columns-${ columns }` } >
+			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }

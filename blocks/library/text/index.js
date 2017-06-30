@@ -7,12 +7,14 @@ import { concatChildren } from 'element';
 /**
  * Internal dependencies
  */
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
@@ -51,6 +53,10 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Text. Great things start here.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Text Settings' ) }</h3>
 					<ToggleControl
 						label={ __( 'Drop Cap' ) }
 						checked={ !! dropCap }
@@ -85,13 +91,14 @@ registerBlockType( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
+		const { align, content, dropCap } = attributes;
+		const className = dropCap && 'has-drop-cap';
 
 		if ( ! align ) {
-			return <p>{ content }</p>;
+			return <p className={ className }>{ content }</p>;
 		}
 
-		return <p style={ { textAlign: align } }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
 	},
 } );
 

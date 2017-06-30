@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/screencast",
+        "attributes": {
+            "url": "https://screencast.com/",
+            "caption": [
+                "Embedded content from screencast"
+            ]
+        }
+    }
+]
