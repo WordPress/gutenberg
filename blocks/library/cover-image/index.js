@@ -17,6 +17,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const { text } = query;
 
@@ -105,8 +106,9 @@ registerBlockType( 'core/cover-image', {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
-					<p className="editor-block-inspector__description">Image galleries are a great way to share groups of pictures on your site.</p>
-					<hr />
+					<BlockDescription>
+						<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
+					</BlockDescription>
 					<h3>{ __( 'Cover Image Settings' ) }</h3>
 					<ToggleControl
 						label={ __( 'Fixed Background' ) }
