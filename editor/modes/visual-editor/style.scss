@@ -268,13 +268,13 @@ $sticky-bottom-offset: 20px;
 .editor-visual-editor .editor-inserter {
 	margin: $item-spacing;
 
-	@include break-small {
+	/*@include break-small {
 		margin: $item-spacing $item-spacing $item-spacing calc( 50% - #{ $visual-editor-max-width / 2 } );	// account for full-width trick
-	}
+	}*/
 
 	.editor-inserter__toggle {
 		color: $dark-gray-300;
-		margin: 4px 0 0 4px;	// align better with text blocks
+		margin: 4px 0 0 -4px;	// align better with text blocks
 	}
 
 	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
@@ -327,6 +327,8 @@ $sticky-bottom-offset: 20px;
 .editor-visual-editor__continue-writing {
 	display: flex;
 	align-items: baseline;
+	max-width: $visual-editor-max-width;
+	margin: 0 auto;
 
 	> .editor-inserter__block {
 		opacity: 0;
