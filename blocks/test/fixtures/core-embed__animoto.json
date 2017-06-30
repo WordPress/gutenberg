@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/animoto",
+        "attributes": {
+            "url": "https://animoto.com/",
+            "caption": [
+                "Embedded content from animoto"
+            ]
+        }
+    }
+]

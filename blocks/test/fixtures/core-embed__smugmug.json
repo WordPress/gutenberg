@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/smugmug",
+        "attributes": {
+            "url": "https://smugmug.com/",
+            "caption": [
+                "Embedded content from smugmug"
+            ]
+        }
+    }
+]
