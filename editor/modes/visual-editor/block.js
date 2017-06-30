@@ -13,6 +13,7 @@ import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 import { Children, Component } from 'element';
 import { BACKSPACE, ESCAPE, DELETE } from 'utils/keycodes';
 import { getBlockType, getBlockDefaultClassname } from 'blocks';
+import { __, sprintf } from 'i18n';
 
 /**
  * Internal dependencies
@@ -236,6 +237,7 @@ class VisualEditorBlock extends Component {
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const blockType = getBlockType( block.name );
+		const blockLabel = sprintf( __( 'Editor block: %s' ), blockType.title );
 		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
@@ -283,6 +285,7 @@ class VisualEditorBlock extends Component {
 				className={ wrapperClassname }
 				data-type={ block.name }
 				tabIndex="0"
+				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
