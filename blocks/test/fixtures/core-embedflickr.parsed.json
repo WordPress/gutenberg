@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedflickr",
+        "attrs": {
+            "url": "https://flickr.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedflickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

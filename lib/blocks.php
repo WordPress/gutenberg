@@ -81,50 +81,24 @@ function unregister_block_type( $name ) {
 function do_blocks( $content ) {
 	global $wp_registered_blocks;
 
-	// Extract the blocks from the post content.
-	$matcher = '#' . join( '', array(
-		'(?P<opener><!--\s*',
-		'wp:(?P<block_name>[a-z](?:[a-z0-9/]+)*)\s+',
-		'(?P<attributes>(?:(?!-->).)*?)',
-		'\s*/?-->\n?)',
-		'(?:',
-		'(?P<content>.*?)',
-		'(?P<closer><!--\s*/wp:\g{block_name}\s+-->\n?)',
-		')?',
-	) ) . '#s';
-	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
+	$parser = new Gutenberg_PEG_Parser;
+	$blocks = $parser->parse( $content );
 
-	$new_content = $content;
-	$offset_differential = 0;
-	foreach ( $matches[0] as $index => $block_match ) {
-		$block_name = $matches['block_name'][ $index ][0];
+	$content_after_blocks = '';
 
-		$output = '';
-		if ( isset( $wp_registered_blocks[ $block_name ] ) ) {
-			$block_attributes_string = trim( $matches['attributes'][ $index ][0] );
-			$block_attributes = json_decode( $block_attributes_string, true );
-			if ( ! is_array( $block_attributes ) ) {
-				$block_attributes = array();
-			}
-
-			// Call the block's render function to generate the dynamic output.
-			$output = call_user_func( $wp_registered_blocks[ $block_name ]['render'], $block_attributes );
-		} elseif ( isset( $matches['content'][ $index ][0] ) ) {
-			$output = $matches['content'][ $index ][0];
+	foreach ( $blocks as $block ) {
+		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		if ( $block_name && isset( $wp_registered_blocks[ $block_name ] ) ) {
+			$content_after_blocks .= call_user_func(
+				$wp_registered_blocks[ $block_name ]['render'],
+				$attributes
+			);
+		} else {
+			$content_after_blocks .= $block['rawContent'];
 		}
-
-		// Replace the matched block with the static or dynamic output.
-		$new_content = substr_replace(
-			$new_content,
-			$output,
-			$block_match[1] - $offset_differential,
-			strlen( $block_match[0] )
-		);
-
-		// Update offset for the next replacement.
-		$offset_differential += strlen( $block_match[0] ) - strlen( $output );
 	}
 
-	return $new_content;
+	return $content_after_blocks;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().

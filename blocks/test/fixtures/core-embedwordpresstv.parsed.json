@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedwordpresstv",
+        "attrs": {
+            "url": "https://wordpresstv.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedwordpresstv\">\n    https://wordpresstv.com/\n    <figcaption>Embedded content from wordpresstv</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

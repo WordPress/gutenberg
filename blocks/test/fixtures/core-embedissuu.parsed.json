@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedissuu",
+        "attrs": {
+            "url": "https://issuu.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedissuu\">\n    https://issuu.com/\n    <figcaption>Embedded content from issuu</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

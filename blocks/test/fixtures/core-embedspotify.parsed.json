@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedspotify",
+        "attrs": {
+            "url": "https://spotify.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedspotify\">\n    https://spotify.com/\n    <figcaption>Embedded content from spotify</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedpolldaddy",
+        "attrs": {
+            "url": "https://polldaddy.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedpolldaddy\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

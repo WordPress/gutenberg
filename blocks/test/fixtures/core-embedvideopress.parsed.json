@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedvideopress",
+        "attrs": {
+            "url": "https://videopress.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedvideopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

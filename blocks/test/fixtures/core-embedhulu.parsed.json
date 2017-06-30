@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedhulu",
+        "attrs": {
+            "url": "https://hulu.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedhulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]

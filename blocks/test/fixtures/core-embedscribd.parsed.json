@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/embedscribd",
+        "attrs": {
+            "url": "https://scribd.com/"
+        },
+        "rawContent": "\n<figure class=\"wp-block-embedscribd\">\n    https://scribd.com/\n    <figcaption>Embedded content from scribd</figcaption>\n</figure>\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]
