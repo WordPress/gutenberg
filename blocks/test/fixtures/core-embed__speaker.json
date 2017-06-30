@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/speaker",
+        "attributes": {
+            "url": "https://speaker.com/",
+            "caption": [
+                "Embedded content from speaker"
+            ]
+        }
+    }
+]

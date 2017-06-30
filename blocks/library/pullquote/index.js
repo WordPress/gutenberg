@@ -34,7 +34,7 @@ registerBlockType( 'core/pullquote', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -48,7 +48,7 @@ registerBlockType( 'core/pullquote', {
 					/>
 				</BlockControls>
 			),
-			<blockquote key="quote" className="blocks-pullquote">
+			<blockquote key="quote" className={ className }>
 				<Editable
 					value={ value }
 					onChange={
@@ -56,7 +56,7 @@ registerBlockType( 'core/pullquote', {
 							value: nextValue,
 						} )
 					}
-					placeholder={ __( 'Write Quote…' ) }
+					placeholder={ __( 'Write quote…' ) }
 					focus={ focus && focus.editable === 'value' ? focus : null }
 					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					className="blocks-pullquote__content"
@@ -84,7 +84,7 @@ registerBlockType( 'core/pullquote', {
 		const { value, citation, align = 'none' } = attributes;
 
 		return (
-			<blockquote className={ `blocks-pullquote align${ align }` }>
+			<blockquote className={ `align${ align }` }>
 				{ value && value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph }</p>
 				) ) }

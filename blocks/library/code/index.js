@@ -27,11 +27,13 @@ registerBlockType( 'core/code', {
 		content: prop( 'code', 'textContent' ),
 	},
 
-	edit( { attributes, setAttributes } ) {
+	edit( { attributes, setAttributes, className } ) {
 		return (
 			<TextareaAutosize
+				className={ className }
 				value={ attributes.content }
 				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				placeholder={ __( 'Write code…' ) }
 			/>
 		);
 	},

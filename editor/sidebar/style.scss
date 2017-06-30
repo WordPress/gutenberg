@@ -33,6 +33,12 @@
 		font-size: $default-font-size;
 	}
 
+	hr {
+		border-top: none;
+		border-bottom: 1px solid $light-gray-500;
+		margin: 1.5em 0;
+	}
+
 	ul.components-toolbar {
 		box-shadow: none;
 		margin-bottom: $panel-padding;

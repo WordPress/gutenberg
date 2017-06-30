@@ -6,11 +6,14 @@ $z-layers: (
 	'.editor-visual-editor__block-controls': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-format-list__menu': 1,
+	'.editor-inserter__tabs': 1,
+	'.editor-inserter__tab.is-active': 1,
 	'.editor-sidebar': 19,
 	'.editor-header': 20,
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
 	'.editor-block-mover': 30,
+	'.components-notice-list': 100000,
 	'.components-popover': 100000,
 );
 

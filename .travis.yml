@@ -50,9 +50,23 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
+      # Run the build because otherwise there will be a bunch of warnings about
+      # failed `stat` calls from `filemtime()`.
       npm install || exit 1
       npm run build || exit 1
-      phpunit || exit 1
+      # Make sure phpegjs parser is up to date
+      node bin/create-php-parser.js || exit 1
+      if ! git diff --quiet --exit-code lib/parser.php; then
+        echo 'ERROR: The PEG parser has been updated, but the generated PHP version'
+        echo '       (lib/parser.php) has not.  Run `bin/create-php-parser.js` and'
+        echo '       commit the resulting changes to resolve this.'
+        sleep .2 # Otherwise Travis doesn't want to print the whole message
+        exit 1
+      fi
+      # Check parser syntax
+      php lib/parser.php || exit 1
+      # Run PHPUnit tests
+      RUN_PARSER_TESTS=1 phpunit || exit 1
       WP_MULTISITE=1 phpunit || exit 1
     fi
   - |

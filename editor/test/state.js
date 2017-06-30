@@ -22,6 +22,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
+	notices,
 	showInsertionPoint,
 	createReduxStore,
 } from '../state';
@@ -978,6 +979,56 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'notices()', () => {
+		it( 'should create a notice', () => {
+			const originalState = {
+				b: {
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			};
+			const state = notices( originalState, {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+			} );
+			expect( state ).to.eql( {
+				b: originalState.b,
+				a: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+			} );
+		} );
+
+		it( 'should remove a notice', () => {
+			const originalState = {
+				a: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+				b: {
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			};
+			const state = notices( originalState, {
+				type: 'REMOVE_NOTICE',
+				noticeId: 'a',
+			} );
+			expect( state ).to.eql( {
+				b: originalState.b,
+			} );
+		} );
+	} );
+
 	describe( 'createReduxStore()', () => {
 		it( 'should return a redux store', () => {
 			const store = createReduxStore();
@@ -1001,6 +1052,7 @@ describe( 'state', () => {
 				'isSidebarOpened',
 				'saving',
 				'showInsertionPoint',
+				'notices',
 			] );
 		} );
 	} );
