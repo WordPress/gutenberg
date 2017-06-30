@@ -186,7 +186,28 @@ class Tests_Cron extends WP_UnitTestCase {
 		// wp_clear_scheduled_hook() should take args as an array like the other functions and does from WP 3.0
 		wp_clear_scheduled_hook($multi_hook, $multi_args);
 		$this->assertFalse( wp_next_scheduled($multi_hook, $multi_args) );
+	}
 
+	/**
+	 * @ticket 18997
+	 */
+	function test_unschedule_hook() {
+		$hook = __FUNCTION__;
+		$args = array( rand_str() );
+
+		// schedule several events with and without arguments.
+		wp_schedule_single_event( strtotime( '+1 hour' ), $hook );
+		wp_schedule_single_event( strtotime( '+2 hour' ), $hook );
+		wp_schedule_single_event( strtotime( '+3 hour' ), $hook, $args );
+		wp_schedule_single_event( strtotime( '+4 hour' ), $hook, $args );
+
+		// make sure they're returned by wp_next_scheduled().
+		$this->assertTrue( wp_next_scheduled( $hook ) > 0 );
+		$this->assertTrue( wp_next_scheduled( $hook, $args ) > 0 );
+
+		// clear the schedule and make sure it's gone.
+		wp_unschedule_hook( $hook );
+		$this->assertFalse( wp_next_scheduled( $hook ) );
 	}
 
 	/**
