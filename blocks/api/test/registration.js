@@ -22,7 +22,7 @@ import {
 } from '../registration';
 
 describe( 'blocks', () => {
-	const defaultBlockType = { save: noop };
+	const defaultBlockSettings = { save: noop };
 
 	// Reset block state before each test.
 	beforeEach( () => {
@@ -58,14 +58,14 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should accept valid block names', () => {
-			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockType );
+			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
 			expect( console.error ).to.not.have.been.called();
 			expect( block ).to.eql( { name: 'my-plugin/fancy-block-4', save: noop } );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
-			registerBlockType( 'core/test-block', defaultBlockType );
-			const block = registerBlockType( 'core/test-block', defaultBlockType );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const block = registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( console.error ).to.have.been.calledWith( 'Block "core/test-block" is already registered.' );
 			expect( block ).to.be.undefined();
 		} );
@@ -103,7 +103,7 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should unregister existing blocks', () => {
-			registerBlockType( 'core/test-block', defaultBlockType );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockTypes() ).to.eql( [
 				{ name: 'core/test-block', save: noop },
 			] );
@@ -144,7 +144,7 @@ describe( 'blocks', () => {
 
 	describe( 'getBlockType()', () => {
 		it( 'should return { name, save } for blocks with minimum settings', () => {
-			registerBlockType( 'core/test-block', defaultBlockType );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( getBlockType( 'core/test-block' ) ).to.eql( {
 				name: 'core/test-block',
 				save: noop,
@@ -168,7 +168,7 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should return all registered blocks', () => {
-			registerBlockType( 'core/test-block', defaultBlockType );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const blockType = { settingName: 'settingValue', save: noop };
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).to.eql( [
