@@ -72,7 +72,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a save function', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-5' );
-			expect( console.error ).to.have.been.calledWith( 'A "save" function must be created within the block settings.' );
+			expect( console.error ).to.have.been.calledWith( 'The "save" property must be specified and must be a valid function.' );
 			expect( block ).to.be.undefined();
 		} );
 

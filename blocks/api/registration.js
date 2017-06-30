@@ -51,7 +51,7 @@ export function registerBlockType( name, settings ) {
 	}
 	if ( ! settings || ! isFunction( settings.save ) ) {
 		console.error(
-			'A "save" function must be created within the block settings.'
+			'The "save" property must be specified and must be a valid function.'
 		);
 		return;
 	}
