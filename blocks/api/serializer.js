@@ -143,6 +143,5 @@ export function serializeBlock( block ) {
  * @return {String}        The post content
  */
 export default function serialize( blocks ) {
-	console.log( 'Saving', blocks );
 	return blocks.map( serializeBlock ).join( '\n\n' );
 }

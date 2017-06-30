@@ -38,12 +38,12 @@ const PostSettings = ( { toggleSidebar } ) => {
 				</div>
 			</PanelHeader>
 			<PostStatus />
+			<WordCount />
 			<LastRevision />
 			<PostTaxonomies />
 			<FeaturedImage />
 			<PostExcerpt />
 			<DiscussionPanel />
-			<WordCount />
 		</Panel>
 	);
 };
