@@ -32,6 +32,16 @@ In all of the above cases, except in separating the top-level element from its d
 
 You may observe that these conventions adhere closely to the [BEM (Blocks, Elements, Modifiers)](http://getbem.com/introduction/) CSS methodology, with minor adjustments to the application of modifiers.
 
+#### SCSS File Naming Conventions for Blocks
+
+The build process will split SCSS from within the blocks library directory into two separate CSS files when Webpack runs.
+
+Styles placed in a block.scss file will be built into `blocks/build/style.css`, to load on the front end theme as well as in the editor.
+
+All other SCSS files will be built into `blocks/build/edit-blocks.css`, to load **only in the editor**.
+
+Examples of styles that appear in both the theme and the editor include gallery columns and drop caps.
+
 ## JavaScript
 
 ### Imports

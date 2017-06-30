@@ -1,0 +1,9 @@
+div[data-type="core/latestposts"] .wp-block-latestposts {
+	padding-left: 2.5em;
+}
+
+.wp-block-latestposts__post-date {
+	display: block;
+	color: $dark-gray-100;
+	font-size: $default-font-size;
+}

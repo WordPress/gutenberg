@@ -39,7 +39,7 @@
 		background: $light-gray-400;
 	}
 
-	&[data-is-empty="true"] {
+	&[data-is-placeholder-visible="true"] {
 		position: absolute;
 		top: 0;
 		width: 100%;

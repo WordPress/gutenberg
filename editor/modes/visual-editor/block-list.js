@@ -10,12 +10,14 @@ import { throttle, reduce, noop } from 'lodash';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { serialize, getDefaultBlock, createBlock } from 'blocks';
+import { Dashicon } from 'components';
 import { ENTER } from 'utils/keycodes';
 
 /**
  * Internal dependencies
  */
 import VisualEditorBlock from './block';
+import Inserter from '../../inserter';
 import {
 	getBlockUids,
 	getBlockInsertionPoint,
@@ -191,8 +193,19 @@ class VisualEditorBlockList extends Component {
 		this.props.onInsertBlock( newBlock );
 	}
 
+	insertBlock( name ) {
+		const newBlock = createBlock( name );
+		this.props.onInsertBlock( newBlock );
+	}
+
 	render() {
-		const { blocks, showInsertionPoint, insertionPoint, multiSelectedBlockUids } = this.props;
+		const {
+			blocks,
+			showInsertionPoint,
+			insertionPoint,
+			multiSelectedBlockUids,
+		} = this.props;
+
 		const insertionPointIndex = blocks.indexOf( insertionPoint );
 		const blocksWithInsertionPoint = showInsertionPoint
 			? [
@@ -224,16 +237,34 @@ class VisualEditorBlockList extends Component {
 						/>
 					);
 				} ) }
-
-				<input
-					type="text"
-					readOnly
-					className="editor-visual-editor__placeholder"
-					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Continue writing…' ) }
-					onFocus={ ! blocks.length ? this.appendDefaultBlock : noop }
-					onClick={ !! blocks.length ? this.appendDefaultBlock : noop }
-					onKeyDown={ !! blocks.length ? this.onPlaceholderKeyDown : noop }
-				/>
+				{ ! blocks.length &&
+					<input
+						type="text"
+						readOnly
+						className="editor-visual-editor__placeholder"
+						value={ __( 'Write your story' ) }
+						onFocus={ this.appendDefaultBlock }
+						onClick={ noop }
+						onKeyDown={ noop }
+					/>
+				}
+				<div className="editor-visual-editor__continue-writing">
+					<Inserter position="top right" />
+					<button
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( 'core/text' ) }
+					>
+						<Dashicon icon="text" />
+						{ __( 'Text' ) }
+					</button>
+					<button
+						className="editor-inserter__block"
+						onClick={ () => this.insertBlock( 'core/image' ) }
+					>
+						<Dashicon icon="format-image" />
+						{ __( 'Image' ) }
+					</button>
+				</div>
 			</div>
 		);
 	}

@@ -15,7 +15,6 @@ import { CHAR_A } from 'utils/keycodes';
  * Internal dependencies
  */
 import './style.scss';
-import Inserter from '../../inserter';
 import VisualEditorBlockList from './block-list';
 import PostTitle from '../../post-title';
 import { getBlockUids } from '../../selectors';
@@ -80,7 +79,6 @@ class VisualEditor extends Component {
 			>
 				<PostTitle />
 				<VisualEditorBlockList ref={ this.bindBlocksContainer } />
-				<Inserter position="top right" />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

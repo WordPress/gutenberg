@@ -9,7 +9,7 @@ import { includes } from 'lodash';
  */
 import { __, sprintf } from 'i18n';
 import { Component } from 'element';
-import { Button, Placeholder, HtmlEmbed, Spinner } from 'components';
+import { Button, Placeholder, Spinner, SandBox } from 'components';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { attr, children } = query;
 
+// These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
@@ -72,7 +73,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 			}
 
 			getPhotoHtml( photo ) {
-				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } /></p>;
+				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
+				// acually the full size photo.
+				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 				return wp.element.renderToString( photoPreview );
 			}
 
@@ -127,7 +130,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				if ( fetching ) {
 					return [
 						controls,
-						<div key="loading" className="blocks-embed is-loading">
+						<div key="loading" className="wp-block-embed is-loading">
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
 						</div>,
@@ -137,7 +140,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 				if ( ! html ) {
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="blocks-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ sprintf( __( '%s URL' ), title ) } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -158,10 +161,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-				let typeClassName = 'blocks-embed';
-
+				const iframeTitle = 'Embedded content from ' + parsedUrl.host;
+				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
-					typeClassName = 'blocks-embed-video';
+					typeClassName += ' is-video';
 				}
 
 				return [
@@ -173,7 +176,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
 						) : (
-							<HtmlEmbed html={ html } />
+							<SandBox html={ html } title={ iframeTitle } />
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
 							<Editable
@@ -193,13 +196,13 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 		},
 
 		save( { attributes } ) {
-			const { url, caption } = attributes;
+			const { url, caption, align } = attributes;
 			if ( ! caption || ! caption.length ) {
 				return url;
 			}
 
 			return (
-				<figure>{ '\n' }
+				<figure className={ align && `align${ align }` }>{ '\n' }
 					{ url }
 					<figcaption>{ caption }</figcaption>
 				</figure>

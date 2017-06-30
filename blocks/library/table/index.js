@@ -37,7 +37,7 @@ registerBlockType( 'core/table', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const focussedKey = focus ? focus.editable || 'body.0.0' : null;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
@@ -51,7 +51,7 @@ registerBlockType( 'core/table', {
 					/>
 				</BlockControls>
 			),
-			<table key="table">
+			<table key="table" className={ className }>
 				{ [ 'head', 'body', 'foot' ].map( ( part ) =>
 					attributes[ part ] && attributes[ part ].length
 						? createElement( 't' + part, { key: part },

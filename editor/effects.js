@@ -14,9 +14,9 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import { getGutenbergURL, getWPAdminURL } from './utils/url';
-import { focusBlock, replaceBlocks } from './actions';
+import { focusBlock, replaceBlocks, successNotice, errorNotice } from './actions';
 import {
-	getCurrentPostId,
+	getCurrentPost,
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
@@ -26,8 +26,8 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
-		const postId = getCurrentPostId( state );
-		const isNew = ! postId;
+		const post = getCurrentPost( state );
+		const isNew = ! post.id;
 		const edits = getPostEdits( state );
 		const toSend = {
 			...edits,
@@ -36,7 +36,7 @@ export default {
 		const transactionId = uniqueId();
 
 		if ( ! isNew ) {
-			toSend.id = postId;
+			toSend.id = post.id;
 		}
 
 		dispatch( {
@@ -51,14 +51,15 @@ export default {
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
 			dispatch( {
+				type: 'RESET_POST',
+				post: newPost,
+			} );
+			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				previousPost: post,
 				post: newPost,
 				isNew,
 				optimist: { type: COMMIT, id: transactionId },
-			} );
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
 			} );
 		} ).fail( ( err ) => {
 			dispatch( {
@@ -67,13 +68,40 @@ export default {
 					code: 'unknown_error',
 					message: __( 'An unknown error occurred.' ),
 				} ),
+				post,
 				edits,
 				optimist: { type: REVERT, id: transactionId },
 			} );
 		} );
 	},
-	REQUEST_POST_UPDATE_SUCCESS( action ) {
-		const { post, isNew } = action;
+	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
+		const { previousPost, post, isNew } = action;
+		const { dispatch } = store;
+
+		const publishStatus = [ 'publish', 'private', 'future' ];
+		const isPublished = publishStatus.indexOf( previousPost.status ) !== -1;
+		const messages = {
+			publish: __( 'Post published!' ),
+			'private': __( 'Post published privately!' ),
+			future: __( 'Post schduled!' ),
+		};
+
+		// If we save a non published post, we don't show any notice
+		// If we publish/schedule a post, we show the corresponding publish message
+		// Unless we show an update notice
+		if ( isPublished || publishStatus.indexOf( post.status ) !== -1 ) {
+			const noticeMessage = ! isPublished && publishStatus.indexOf( post.status ) !== -1
+				? messages[ post.status ]
+				: __( 'Post updated!' );
+			dispatch( successNotice(
+				<p>
+					<span>{ noticeMessage }</span>
+					{ ' ' }
+					<a href={ post.link } target="_blank">{ __( 'View post' ) }</a>
+				</p>
+			) );
+		}
+
 		if ( ! isNew ) {
 			return;
 		}
@@ -81,6 +109,24 @@ export default {
 			post_id: post.id,
 		} );
 		window.history.replaceState( {}, 'Post ' + post.id, newURL );
+	},
+	REQUEST_POST_UPDATE_FAILURE( action, store ) {
+		const { post, edits } = action;
+		const { dispatch } = store;
+
+		const publishStatus = [ 'publish', 'private', 'future' ];
+		const isPublished = publishStatus.indexOf( post.status ) !== -1;
+		// If the post was being published, we show the corresponding publish error message
+		// Unless we publish an "updating failed" message
+		const messages = {
+			publish: __( 'Publishing failed' ),
+			'private': __( 'Publishing failed' ),
+			future: __( 'Scheduling failed' ),
+		};
+		const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1
+			? messages[ edits.status ]
+			: __( 'Updating failed' );
+		dispatch( errorNotice( noticeMessage ) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;

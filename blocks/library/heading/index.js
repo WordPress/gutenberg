@@ -145,6 +145,7 @@ registerBlockType( 'core/heading', {
 					} ) );
 				} }
 				style={ { textAlign: align } }
+				placeholder={ __( 'Write heading…' ) }
 			/>,
 		];
 	},

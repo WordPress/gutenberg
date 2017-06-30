@@ -8,7 +8,7 @@ window._wpGutenbergPost = {
 	},
 	content: {
 		raw: [
-			'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg", "align": "full" } -->',
+			'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg", "align": "full", "hasParallax": true } -->',
 			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>A tale of mountains and the printing press</h2></section>',
 			'<!-- /wp:core/cover-image -->',
 
@@ -35,7 +35,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully you\'ll find aspects like adding captions or going full-width with your pictures much easier and robust than before.</p>',
+			'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you\'ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/image { "align": "center" } -->',
@@ -79,7 +79,7 @@ window._wpGutenbergPost = {
 			'<!-- /wp:core/heading -->',
 
 			'<!-- wp:core/text -->',
-			'<p>A huge benefit of blocks is that you can edit them in place and manipulate you content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
+			'<p>A huge benefit of blocks is that you can edit them in place and manipulate your content directly. Instead of having fields for editing things like the source of a quote, or the text of a button, you can directly change the content. Try editing the following quote:</p>',
 			'<!-- /wp:core/text -->',
 
 			'<!-- wp:core/quote { "style": 1 } -->',

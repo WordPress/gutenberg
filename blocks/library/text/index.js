@@ -7,6 +7,7 @@ import { concatChildren } from 'element';
 /**
  * Internal dependencies
  */
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -85,13 +86,14 @@ registerBlockType( 'core/text', {
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
+		const { align, content, dropCap } = attributes;
+		const className = dropCap && 'has-drop-cap';
 
 		if ( ! align ) {
-			return <p>{ content }</p>;
+			return <p className={ className }>{ content }</p>;
 		}
 
-		return <p style={ { textAlign: align } }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
 	},
 } );
 

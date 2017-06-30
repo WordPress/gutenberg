@@ -38,7 +38,7 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { url, alt, caption, align, id } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -80,7 +80,7 @@ registerBlockType( 'core/image', {
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className="blocks-image">
+					className={ className }>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
@@ -105,7 +105,7 @@ registerBlockType( 'core/image', {
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
 			),
-			<figure key="image" className="blocks-image">
+			<figure key="image" className={ className }>
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable

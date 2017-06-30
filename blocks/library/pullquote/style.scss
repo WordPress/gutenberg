@@ -1,4 +1,4 @@
-.blocks-pullquote {
+.wp-block-pullquote {
 	color: $light-gray-900;
 	padding: 2em;
 	text-align: center;
@@ -21,7 +21,7 @@
 	}
 }
 
-.editor-visual-editor .blocks-pullquote {
+.editor-visual-editor .wp-block-pullquote {
 	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
 	& > .blocks-editable p {
 		font-family: $default-font;
