@@ -38,25 +38,37 @@ export function normaliseToBlockLevelNodes( nodes ) {
 			}
 
 			accu.lastChild.appendChild( node );
-		// BR nodes: create a new paragraph on double, or append to previous.
-		} else if ( node.nodeName === 'BR' ) {
-			if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {
-				accu.appendChild( document.createElement( 'P' ) );
-				decu.removeChild( node.nextSibling );
-			}
-
-			// Don't append to an empty paragraph.
-			if (
-				accu.lastChild &&
-				accu.lastChild.nodeName === 'P' &&
-				accu.lastChild.hasChildNodes()
-			) {
-				accu.lastChild.appendChild( node );
-			} else {
-				decu.removeChild( node );
-			}
+		// Element nodes.
 		} else if ( node.nodeType === 1 ) {
-			accu.appendChild( node );
+			// BR nodes: create a new paragraph on double, or append to previous.
+			if ( node.nodeName === 'BR' ) {
+				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {
+					accu.appendChild( document.createElement( 'P' ) );
+					decu.removeChild( node.nextSibling );
+				}
+
+				// Don't append to an empty paragraph.
+				if (
+					accu.lastChild &&
+					accu.lastChild.nodeName === 'P' &&
+					accu.lastChild.hasChildNodes()
+				) {
+					accu.lastChild.appendChild( node );
+				} else {
+					decu.removeChild( node );
+				}
+			} else if ( node.nodeName === 'P' ) {
+				// Only append non-empty paragraph nodes.
+				if ( /^(\s|&nbsp;)*$/.test( node.innerHTML ) ) {
+					decu.removeChild( node );
+				} else {
+					accu.appendChild( node );
+				}
+			} else {
+				accu.appendChild( node );
+			}
+		} else {
+			decu.removeChild( node );
 		}
 	}
 

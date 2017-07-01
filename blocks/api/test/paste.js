@@ -38,5 +38,9 @@ describe( 'normaliseToBlockLevelNodes', () => {
 		const HTML = '<p>test</p><div>test<br>test</div>';
 		equal( transform( HTML ), HTML );
 	} );
+
+	it( 'should remove empty paragraphs', () => {
+		equal( transform( '<p>&nbsp;</p>' ), '' );
+	} );
 } );
 
