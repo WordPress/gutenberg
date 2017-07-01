@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { nodeListToReact } from 'dom-react';
-import { find } from 'lodash';
+import { find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { createElement } from 'element';
  */
 import { createBlock } from './factory';
 import { getBlockTypes, getUnknownTypeHandler } from './registration';
-import { getBlockAttributes } from './parser';
+import { parseBlockAttributes } from './parser';
 
 /**
  * Normalises array nodes of any node type to an array of block level nodes.
@@ -65,14 +65,30 @@ export function normaliseToBlockLevelNodes( nodes ) {
 
 export default function( nodes ) {
 	return normaliseToBlockLevelNodes( nodes ).map( ( node ) => {
-		const type = find( getBlockTypes(), ( { pasteMatcher } ) => {
-			return pasteMatcher && pasteMatcher( node );
-		} );
-		const name = type ? type.name : getUnknownTypeHandler();
-		const attributes = type
-			? getBlockAttributes( type, node.outerHTML )
-			: { content: nodeListToReact( [ node ], createElement ) };
+		const block = getBlockTypes().reduce( ( acc, blockType ) => {
+			if ( acc ) {
+				return acc;
+			}
 
-		return createBlock( name, attributes );
+			const transformsFrom = get( blockType, 'transforms.from', [] );
+			const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
+
+			if ( ! transform || ! transform.matcher( node ) ) {
+				return acc;
+			}
+
+			const { name, defaultAttributes = [] } = blockType;
+			const attributes = parseBlockAttributes( node.outerHTML, transform.attributes );
+
+			return createBlock( name, { ...defaultAttributes, ...attributes } );
+		}, null );
+
+		if ( block ) {
+			return block;
+		}
+
+		return createBlock( getUnknownTypeHandler(), {
+			content: nodeListToReact( [ node ], createElement ),
+		} );
 	} );
 }

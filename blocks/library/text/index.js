@@ -31,7 +31,17 @@ registerBlockType( 'core/text', {
 		content: query( 'p', children() ),
 	},
 
-	pasteMatcher: ( node ) => node.nodeName === 'P',
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => node.nodeName === 'P',
+				attributes: {
+					content: query( 'p', children() ),
+				},
+			},
+		],
+	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
