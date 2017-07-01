@@ -32,6 +32,23 @@ registerBlockType( 'core/image', {
 		caption: children( 'figcaption' ),
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'IMG' ||
+					( ! node.textContent && node.querySelector( 'img' ) )
+				),
+				attributes: {
+					url: attr( 'img', 'src' ),
+					alt: attr( 'img', 'alt' ),
+					caption: children( 'figcaption' ),
+				},
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
