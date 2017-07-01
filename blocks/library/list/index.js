@@ -102,7 +102,14 @@ registerBlockType( 'core/list', {
 					} );
 				},
 			},
-
+			{
+				type: 'raw',
+				matcher: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				attributes: {
+					nodeName: prop( 'ol,ul', 'nodeName' ),
+					values: children( 'ol,ul' ),
+				},
+			},
 		],
 		to: [
 			{

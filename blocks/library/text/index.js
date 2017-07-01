@@ -35,7 +35,11 @@ registerBlockType( 'core/text', {
 		from: [
 			{
 				type: 'raw',
-				matcher: ( node ) => node.nodeName === 'P',
+				matcher: ( node ) => (
+					node.nodeName === 'P' &&
+					// Do not allow embedded content.
+					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
+				),
 				attributes: {
 					content: query( 'p', children() ),
 				},
