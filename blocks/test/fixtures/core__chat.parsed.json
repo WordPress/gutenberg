@@ -1,0 +1,13 @@
+[
+    {
+        "blockName": "core/chat",
+        "attrs": {
+            "compact": false
+        },
+        "rawContent": "\nPascal: Alexa, open the window\nAlexa: I'm not quite sure how to help you with\nPascal: Siri, tell me a joke\nSiri: Pascal, get Siri-ous. Ha ha!\nPascal: OK, Google. Now it's your turn!\nGoogle Home: Alexa, tell Siri to tell Pascal a better joke.\nPascal: Ugh!\nOkay, that's enough. No internet for you anymore!\nAlexa: 💔\nGoogle Home: 😔\nSiri: 📴\n"
+    },
+    {
+        "attrs": {},
+        "rawContent": "\n"
+    }
+]
