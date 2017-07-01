@@ -3,7 +3,7 @@
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
-import { IconButton, Toolbar } from 'components';
+import { IconButton, Toolbar, withInstanceId } from 'components';
 import { ESCAPE } from 'utils/keycodes';
 
 const FORMATTING_CONTROLS = [
@@ -118,7 +118,7 @@ class FormatToolbar extends Component {
 		} );
 	}
 
-	render() {
+	render( { instanceId } ) {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
@@ -151,11 +151,11 @@ class FormatToolbar extends Component {
 						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<label className="screen-reader-text" htmlFor="editable-format-toolbar__link-input">{ __( 'URL' ) }</label>
+						<label className="screen-reader-text" htmlFor={ `editable-format-toolbar__link-input-${ instanceId }` }>{ __( 'URL' ) }</label>
 						<input
 							autoFocus
 							className="editable-format-toolbar__link-input"
-							id="editable-format-toolbar__link-input"
+							id={ `editable-format-toolbar__link-input-${ instanceId }` }
 							type="url"
 							required
 							value={ this.state.linkValue }
