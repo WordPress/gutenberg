@@ -134,16 +134,12 @@ input[type="search"].editor-inserter__search {
 	width: 100%;
 	margin: 0;
 	color: $dark-gray-500;
+	outline: none;
 
 	&.is-active {
 		background: $white;
 		border-bottom-color: $blue-medium-500;
 		position: relative;
 		z-index: z-index( '.editor-inserter__tab.is-active' );
-	}
-
-	&:focus {
-		box-shadow: $button-focus-style;
-		outline: none;
 	}
 }
