@@ -53,6 +53,21 @@ class Tests_Comment extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 36784
+	 */
+	function test_wp_update_comment_updates_comment_meta() {
+		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => self::$post_id ) );
+		wp_update_comment( array(
+			'comment_ID' => $comment_id,
+			'comment_meta' => array(
+				'food' => 'taco',
+				'sauce' => 'fire',
+			),
+		) );
+		$this->assertEquals( 'fire', get_comment_meta( $comment_id, 'sauce', true ) );
+	}
+
+	/**
 	 * @ticket 30307
 	 */
 	function test_wp_update_comment_updates_user_id() {
