@@ -132,7 +132,6 @@ registerBlockType( 'core/cover-image', {
 							focus={ focus }
 							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { title: value } ) }
-							inline
 							inlineToolbar
 						/>
 					) : null }

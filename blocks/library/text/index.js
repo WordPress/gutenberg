@@ -65,7 +65,6 @@ registerBlockType( 'core/text', {
 				</InspectorControls>
 			),
 			<Editable
-				inline
 				tagName="p"
 				key="editable"
 				value={ content }

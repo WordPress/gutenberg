@@ -142,6 +142,7 @@ registerBlockType( 'core/quote', {
 				className={ `${ className } blocks-quote-style-${ style }` }
 			>
 				<Editable
+					multiline="p"
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
@@ -166,7 +167,6 @@ registerBlockType( 'core/quote', {
 						}
 						focus={ focusedEditable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
 			</blockquote>,

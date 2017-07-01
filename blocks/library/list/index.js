@@ -231,6 +231,7 @@ registerBlockType( 'core/list', {
 					/>
 				),
 				<Editable
+					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
 					getSettings={ this.getEditorSettings }
@@ -240,6 +241,7 @@ registerBlockType( 'core/list', {
 					focus={ focus }
 					onFocus={ setFocus }
 					className="blocks-list"
+					placeholder={ __( 'Write list…' ) }
 				/>,
 			];
 		}

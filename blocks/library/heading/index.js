@@ -142,7 +142,6 @@ registerBlockType( 'core/heading', {
 				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				inline
 				onSplit={ ( before, after ) => {
 					setAttributes( { content: before } );
 					insertBlockAfter( createBlock( 'core/text', {
