@@ -1,0 +1,20 @@
+.editor-visual-editor__block[data-type="core/chat"] {
+	.components-placeholder__fieldset {
+		max-width: none;
+	}
+
+	textarea {
+		box-shadow: none;
+		background: $white;
+		font-family: $editor-html-font;
+		font-size: $text-editor-font-size;
+		color: $dark-gray-800;
+		border: 1px solid $light-gray-500;
+		border-radius: 4px;
+		margin: 0;
+		overflow-x: auto;
+		width: 100%;
+		min-height: 10em;
+		text-align: left;
+	}
+}
