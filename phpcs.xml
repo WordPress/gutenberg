@@ -10,6 +10,7 @@
 
 	<file>gutenberg.php</file>
 	<file>./lib</file>
+	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>
 	<file>./bin</file>
 
@@ -21,6 +22,11 @@
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>
+	</rule>
+
+	<!-- How about no -->
+	<rule ref="Squiz.Commenting.LongConditionClosingComment.Missing">
+		<exclude-pattern>*</exclude-pattern>
 	</rule>
 
 	<!-- Do not require docblocks for unit tests -->
@@ -37,6 +43,12 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 	<rule ref="Generic.Commenting.DocComment.MissingShort">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.VariableComment.Missing">
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 </ruleset>

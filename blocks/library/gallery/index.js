@@ -3,20 +3,22 @@
  */
 import { __ } from 'i18n';
 import { Toolbar, Placeholder } from 'components';
+import { pick } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
+import './block.scss';
+import { registerBlockType } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
+import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
-
-const { query, attr } = hpq;
+import BlockDescription from '../../block-description';
 
 const MAX_COLUMNS = 8;
 
@@ -46,6 +48,13 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 	editFrame.open( 'gutenberg-gallery' );
 };
 
+// the media library image object contains numerous attributes
+// we only need this set to display the image in the library
+const slimImageObjects = ( imgs ) => {
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt' ];
+	return imgs.map( ( img ) => pick( img, attrSet ) );
+};
+
 function defaultColumnsNumber( attributes ) {
 	attributes.images = attributes.images || [];
 	return Math.min( 3, attributes.images.length );
@@ -55,14 +64,6 @@ registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
-
-	attributes: {
-		images:
-			query( 'div.wp-block-gallery figure.blocks-gallery-image img', {
-				url: attr( 'src' ),
-				alt: attr( 'alt' ),
-			} ) || [],
-	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
@@ -75,6 +76,8 @@ registerBlockType( 'core/gallery', {
 		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
 		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { imageCrop = true } = attributes;
+		const toggleImageCrop = () => setAttributes( { imageCrop: ! imageCrop } );
 
 		const controls = (
 			focus && (
@@ -96,7 +99,9 @@ registerBlockType( 'core/gallery', {
 		);
 
 		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
+			const setMediaUrl = ( imgs ) => setAttributes( { images: slimImageObjects( imgs ) } );
+			const uploadButtonProps = { isLarge: true };
+
 			return [
 				controls,
 				<Placeholder
@@ -106,6 +111,7 @@ registerBlockType( 'core/gallery', {
 					label={ __( 'Gallery' ) }
 					className={ className }>
 					<MediaUploadButton
+						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
 						type="image"
 						autoOpen
@@ -121,6 +127,10 @@ registerBlockType( 'core/gallery', {
 			controls,
 			focus && images.length > 1 && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Image galleries are a great way to share groups of pictures on your site.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Gallery Settings' ) }</h3>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -128,9 +138,14 @@ registerBlockType( 'core/gallery', {
 						min="1"
 						max={ Math.min( MAX_COLUMNS, images.length ) }
 					/>
+					<ToggleControl
+						label={ __( 'Crop Images' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+					/>
 				</InspectorControls>
 			),
-			<div key="gallery" className={ `${ className } align${ align } columns-${ columns }` }>
+			<div key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }
@@ -139,9 +154,9 @@ registerBlockType( 'core/gallery', {
 	},
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align = 'none', imageCrop = true } = attributes;
 		return (
-			<div className={ `align${ align } columns-${ columns }` } >
+			<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( img ) => (
 					<GalleryImage key={ img.url } img={ img } />
 				) ) }

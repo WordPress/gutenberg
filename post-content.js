@@ -9,7 +9,7 @@ window._wpGutenbergPost = {
 	content: {
 		raw: [
 			'<!-- wp:core/cover-image { "url": "https://cldup.com/GCwahb3aOb.jpg", "align": "full", "hasParallax": true } -->',
-			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>A tale of mountains and the printing press</h2></section>',
+			'<section className="cover-image wp-block-cover-image" style={ { backgroundImage: \'url("https://cldup.com/GCwahb3aOb.jpg");\' } }><h2>Of mountains & printing presses</h2></section>',
 			'<!-- /wp:core/cover-image -->',
 
 			'<!-- wp:core/text { "project": { "name": "gutenberg", "for": "WordPress" }, "isAwesome": true } -->',

@@ -187,6 +187,8 @@ class FormTokenField extends Component {
 			selectedSuggestionScroll: false,
 		} );
 
+		this.props.onInputChange( tokenValue );
+
 		const showMessage = tokenValue.trim().length > 1;
 		if ( showMessage ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
@@ -555,6 +557,7 @@ FormTokenField.defaultProps = {
 	displayTransform: identity,
 	saveTransform: ( token ) => token.trim(),
 	onChange: () => {},
+	onInputChange: () => {},
 	isBorderless: false,
 	disabled: false,
 	tokenizeOnSpace: false,

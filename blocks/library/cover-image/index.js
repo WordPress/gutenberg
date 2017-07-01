@@ -9,6 +9,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
@@ -16,6 +17,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const { text } = query;
 
@@ -40,7 +42,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, title, align, id, hasParallax } = attributes;
+		const { url, title, align, id, hasParallax, hasBackgroundDim = true } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 
@@ -95,17 +97,28 @@ registerBlockType( 'core/cover-image', {
 		const sectionClasses = classnames( {
 			'cover-image': true,
 			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
 		} );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+		const toggleBackgroundDim = () => setAttributes( { hasBackgroundDim: ! hasBackgroundDim } );
 
 		return [
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Cover Image is a bold image block with an optional title.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Cover Image Settings' ) }</h3>
 					<ToggleControl
-						label={ __( 'Fixed Position' ) }
+						label={ __( 'Fixed Background' ) }
 						checked={ !! hasParallax }
 						onChange={ toggleParallax }
+					/>
+					<ToggleControl
+						label={ __( 'Dim Background' ) }
+						checked={ !! hasBackgroundDim }
+						onChange={ toggleBackgroundDim }
 					/>
 				</InspectorControls>
 			),
@@ -129,13 +142,14 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes } ) {
-		const { url, title, hasParallax } = attributes;
+		const { url, title, hasParallax, hasBackgroundDim } = attributes;
 		const style = {
 			backgroundImage: `url(${ url })`,
 		};
 		const sectionClasses = classnames( {
 			'cover-image': true,
 			'has-parallax': hasParallax,
+			'has-background-dim': hasBackgroundDim,
 		} );
 
 		return (

@@ -36,8 +36,7 @@
 	height: calc( 100vh - #{ $admin-bar-height-big + $header-height + $icon-button-size } );
 
 	@include break-medium {
-		height: auto;
-		max-height: 50vh;
+		height: 240px;
 	}
 
 	overflow: auto;
@@ -54,7 +53,7 @@ input[type="search"].editor-inserter__search {
 	margin: 0;
 	box-shadow: none;
 	border: 1px solid transparent;
-	border-top: 1px solid $light-gray-500;
+	border-bottom: 1px solid $light-gray-500;
 	padding: 8px 11px;
 	font-size: 13px;
 	position: relative;
@@ -69,11 +68,11 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__category-blocks {
 	display: flex;
 	flex-flow: row wrap;
-	padding: 4px;
+	padding: 8px;
 }
 
 .editor-inserter__menu.is-bottom:after {
-	border-bottom-color: $light-gray-100;
+	border-bottom-color: $white;
 }
 
 .editor-inserter__block {
@@ -82,7 +81,7 @@ input[type="search"].editor-inserter__search {
 	font-size: 12px;
 	color: $dark-gray-500;
 	margin: 0;
-	padding: 8px;
+	padding: 12px 6px;
 	align-items: center;
 	cursor: pointer;
 	border: none;
@@ -111,11 +110,40 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__separator {
 	display: block;
 	margin: 0;
-	padding: 4px 12px;
-	font-size: 11px;
+	padding: 12px 14px 0 14px;
+	font-size: $default-font-size;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	background: $light-gray-100;
-	border-bottom: 1px solid $light-gray-500;
+}
+
+.editor-inserter__tabs {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	z-index: z-index( '.editor-inserter__tabs' );
+}
+
+.editor-inserter__tab {
+	background: $light-gray-300;
+	border: none;
+	border-bottom: 2px solid transparent;
+	border-top: 2px solid transparent;
+	box-shadow: 0 0 0 1px $light-gray-500;
+	font-size: $default-font;
+	padding: 8px 8px;
+	width: 100%;
+	margin: 0;
+	color: $dark-gray-500;
+
+	&.is-active {
+		background: $white;
+		border-bottom-color: $blue-medium-500;
+		position: relative;
+		z-index: z-index( '.editor-inserter__tab.is-active' );
+	}
+
+	&:focus {
+		box-shadow: $button-focus-style;
+		outline: none;
+	}
 }
