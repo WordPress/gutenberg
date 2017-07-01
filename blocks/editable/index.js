@@ -63,7 +63,7 @@ export default class Editable extends Component {
 	getSettings( settings ) {
 		return ( this.props.getSettings || identity )( {
 			...settings,
-			forced_root_block: this.props.inline ? false : 'p',
+			forced_root_block: this.props.multiline || false,
 		} );
 	}
 
@@ -210,7 +210,7 @@ export default class Editable extends Component {
 
 		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER && event.shiftKey && this.props.inline ) {
+		if ( event.keyCode === ENTER && event.shiftKey && ! this.props.multiline ) {
 			event.preventDefault();
 
 			if ( this.props.onSplit ) {
@@ -224,7 +224,7 @@ export default class Editable extends Component {
 			this.onSelectionChange();
 		}
 
-		if ( keyCode === ENTER && this.props.inline && this.props.onSplit ) {
+		if ( keyCode === ENTER && ! this.props.multiline && this.props.onSplit ) {
 			const endNode = this.editor.selection.getEnd();
 
 			// Make sure the current selection is on a line break.
@@ -270,7 +270,7 @@ export default class Editable extends Component {
 	}
 
 	onNewBlock() {
-		if ( this.props.tagName || ! this.props.onSplit ) {
+		if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
 			return;
 		}
 
@@ -442,7 +442,7 @@ export default class Editable extends Component {
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
-			inline,
+			multiline: MultilineTag,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -488,7 +488,7 @@ export default class Editable extends Component {
 						className="blocks-editable__tinymce"
 						style={ style }
 					>
-						{ inline ? placeholder : <p>{ placeholder }</p> }
+						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
 			</div>

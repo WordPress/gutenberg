@@ -123,7 +123,6 @@ registerBlockType( 'core/image', {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
 						inlineToolbar
 					/>
 				) : null }

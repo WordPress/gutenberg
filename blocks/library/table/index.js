@@ -64,7 +64,6 @@ registerBlockType( 'core/table', {
 										return (
 											<Cell key={ key }>
 												<Editable
-													inline
 													value={ value }
 													focus={ focussedKey === key ? focus : null }
 													onFocus={ ( props ) => setFocus( { ...props, editable: key } ) }
