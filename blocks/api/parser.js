@@ -15,11 +15,10 @@ import { createBlock } from './factory';
  * Returns the block attributes parsed from raw content.
  *
  * @param  {String} rawContent    Raw block content
- * @param  {Object} blockType     Block type
+ * @param  {Object} attributes    Block attribute matchers
  * @return {Object}               Block attributes
  */
-export function parseBlockAttributes( rawContent, blockType ) {
-	const { attributes } = blockType;
+export function parseBlockAttributes( rawContent, attributes ) {
 	if ( 'function' === typeof attributes ) {
 		return attributes( rawContent );
 	} else if ( attributes ) {
@@ -53,7 +52,7 @@ export function getBlockAttributes( blockType, rawContent, attributes ) {
 		attributes = {
 			...blockType.defaultAttributes,
 			...attributes,
-			...parseBlockAttributes( rawContent, blockType ),
+			...parseBlockAttributes( rawContent, blockType.attributes ),
 		};
 	}
 
