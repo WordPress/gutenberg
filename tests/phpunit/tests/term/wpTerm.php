@@ -68,4 +68,19 @@ class Tests_Term_WpTerm extends WP_UnitTestCase {
 
 		$this->assertSame( 1, $found->term_id );
 	}
+
+	/**
+	 * @ticket 40671
+	 */
+	public function test_get_instance_should_respect_taxonomy_when_term_id_is_found_in_cache() {
+		global $wpdb;
+
+		register_taxonomy( 'wptests_tax2', 'post' );
+
+		// Ensure that cache is primed.
+		WP_Term::get_instance( self::$term_id, 'wptests_tax' );
+
+		$found = WP_Term::get_instance( self::$term_id, 'wptests_tax2' );
+		$this->assertFalse( $found );
+	}
 }
