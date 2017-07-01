@@ -1386,4 +1386,52 @@ class Tests_User_Query extends WP_UnitTestCase {
 		$this->assertSame( $r1, $r2 );
 		$this->assertSame( $r1, $r3 );
 	}
+
+	/**
+	 * @ticket 39643
+	 */
+	public function test_search_by_display_name_only() {
+
+		$new_user1 = $this->factory->user->create( array(
+			'user_login'   => 'name1',
+			'display_name' => 'Sophia Andresen',
+		) );
+		self::$author_ids[] = $new_user1;
+
+		$q = new WP_User_Query( array(
+			'search' => '*Sophia*',
+			'fields' => '',
+			'search_columns' => array( 'display_name' ),
+			'include' => self::$author_ids,
+		) );
+
+		$ids = $q->get_results();
+
+		/* must include user that has same string in display_name */
+		$this->assertEquals( array( $new_user1 ), $ids );
+	}
+
+	/**
+	 * @ticket 39643
+	 */
+	public function test_search_by_display_name_only_ignore_others() {
+
+		$new_user1 = $this->factory->user->create( array(
+			'user_login'   => 'Sophia Andresen',
+			'display_name' => 'name1',
+		) );
+		self::$author_ids[] = $new_user1;
+
+		$q = new WP_User_Query( array(
+			'search' => '*Sophia*',
+			'fields' => '',
+			'search_columns' => array( 'display_name' ),
+			'include' => self::$author_ids,
+		) );
+
+		$ids = $q->get_results();
+
+		/* must not include user that has same string in other fields */
+		$this->assertEquals( array(), $ids );
+	}
 }
