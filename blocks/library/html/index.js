@@ -15,6 +15,8 @@ import { Component } from 'element';
 import './style.scss';
 import { registerBlockType, query } from '../../api';
 import BlockControls from '../../block-controls';
+import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 const { html } = query;
 
@@ -70,6 +72,13 @@ registerBlockType( 'core/html', {
 								</li>
 							</ul>
 						</BlockControls>
+					}
+					{ focus &&
+						<InspectorControls key="inspector">
+							<BlockDescription>
+								<p>{ __( 'Arbitrary HTML code.' ) }</p>
+							</BlockDescription>
+						</InspectorControls>
 					}
 					{ preview
 						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
