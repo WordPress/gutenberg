@@ -41,6 +41,9 @@ registerBlockType( 'core/html', {
 			this.state = {
 				preview: false,
 			};
+			const allowedHtmlTags = new Set( Object.keys( wp.editor.allowedPostHtml ) );
+			const unsafeHtmlTags = [ 'script', 'iframe', 'form', 'input', 'style' ];
+			this.disallowedHtmlTags = unsafeHtmlTags.filter( tag => ! allowedHtmlTags.has( tag ) );
 		}
 
 		preview() {
@@ -77,6 +80,17 @@ registerBlockType( 'core/html', {
 						<InspectorControls key="inspector">
 							<BlockDescription>
 								<p>{ __( 'Arbitrary HTML code.' ) }</p>
+								{ ! wp.editor.canUnfilteredHtml && this.disallowedHtmlTags.length > 0 &&
+									<p>
+										<span>{ __( 'Some HTML tags are not permitted, including:' ) }</span>
+										{ ' ' }
+										{ this.disallowedHtmlTags.map( ( tag, i ) => <span key={ i }>
+											{ 0 !== i && ', ' }
+											<code>{ tag }</code>
+										</span> ) }
+										{ '.' }
+									</p>
+								}
 							</BlockDescription>
 						</InspectorControls>
 					}
