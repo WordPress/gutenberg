@@ -20,7 +20,7 @@ export default function ChatTranscript( props ) {
 
 	return (
 		<div className={ `wp-block-chat${ compact ? ' is-compact' : '' }` }>
-			{value && value.split( "\n" ).map( ( line, index ) => {
+			{value && value.split( '\n' ).map( ( line, index ) => {
 				line = line.trim();
 
 				let message = line;
