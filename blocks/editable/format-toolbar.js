@@ -118,11 +118,12 @@ class FormatToolbar extends Component {
 		} );
 	}
 
-	render( { instanceId } ) {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS } = this.props;
+	render() {
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, instanceId } = this.props;
 		const linkStyle = focusPosition
 			? { position: 'absolute', ...focusPosition }
 			: null;
+		const linkInputId = 'editable-format-toolbar__link-input-' + instanceId;
 
 		const toolbarControls = FORMATTING_CONTROLS
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
@@ -151,11 +152,11 @@ class FormatToolbar extends Component {
 						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
 						onSubmit={ this.submitLink }>
-						<label className="screen-reader-text" htmlFor={ `editable-format-toolbar__link-input-${ instanceId }` }>{ __( 'URL' ) }</label>
+						<label className="screen-reader-text" htmlFor={ linkInputId }>{ __( 'URL' ) }</label>
 						<input
 							autoFocus
 							className="editable-format-toolbar__link-input"
-							id={ `editable-format-toolbar__link-input-${ instanceId }` }
+							id={ linkInputId }
 							type="url"
 							required
 							value={ this.state.linkValue }
@@ -186,4 +187,5 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default FormatToolbar;
+export default withInstanceId( FormatToolbar );
+
