@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers a block type.
  *
  * @since 0.1.0
+ * @since 0.4.0 Now also accepts a WP_Block_Type instance as first parameter.
  *
  * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
  *                                   complete WP_Block_Type instance. In case a WP_Block_Type
