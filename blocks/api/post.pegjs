@@ -1,15 +1,16 @@
 {
 
-function untransformValue( value ) {
-	return 'string' === typeof value
-		? value.replace( /\\-/g, '-' )
-		: value;
-}
+/** <?php
+// The `maybeJSON` function is not needed in PHP because its return semantics
+// are the same as `json_decode`
+?> **/
 
-function keyValue( key, value ) {
-  const o = {};
-  o[ key ] = untransformValue( value );
-  return o;
+function maybeJSON( s ) {
+	try {
+		return JSON.parse( s );
+	} catch (e) {
+		return null;
+	}
 }
 
 }
@@ -26,24 +27,63 @@ WP_Block
   / WP_Block_Html
 
 WP_Block_Void
-  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List _? "/-->"
-  { return {
-    blockName: blockName,
-    attrs: attrs,
-    rawContent: ''
-  } }
+  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+    /** <?php return $a; ?> **/
+    return a;
+  })? "/-->"
+  {
+    /** <?php
+    return array(
+      'blockName'  => $blockName,
+      'attrs'      => $attrs,
+      'rawContent' => '',
+    );
+    ?> **/
+
+    return {
+      blockName: blockName,
+      attrs: attrs,
+      rawContent: ''
+    };
+  }
 
 WP_Block_Balanced
-  = s:WP_Block_Start ts:(!WP_Block_End c:Any { return c })* e:WP_Block_End & { return s.blockName === e.blockName }
-  { return {
-    blockName: s.blockName,
-    attrs: s.attrs,
-    rawContent: ts.join( '' ),
-  } }
+  = s:WP_Block_Start ts:(!WP_Block_End c:Any {
+    /** <?php return $c; ?> **/
+    return c;
+  })* e:WP_Block_End & {
+    /** <?php return $s['blockName'] === $e['blockName']; ?> **/
+    return s.blockName === e.blockName;
+  }
+  {
+    /** <?php
+    return array(
+      'blockName'  => $s['blockName'],
+      'attrs'      => $s['attrs'],
+      'rawContent' => implode( '', $ts ),
+    );
+    ?> **/
+
+    return {
+      blockName: s.blockName,
+      attrs: s.attrs,
+      rawContent: ts.join( '' )
+    };
+  }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced !WP_Block_Void c:Any { return c })+
+  = ts:(!WP_Block_Balanced !WP_Block_Void c:Any {
+    /** <?php return $c; ?> **/
+    return c;
+  })+
   {
+    /** <?php
+    return array(
+      'attrs'      => array(),
+      'rawContent' => implode( '', $ts ),
+    );
+    ?> **/
+
     return {
       attrs: {},
       rawContent: ts.join( '' )
@@ -51,46 +91,47 @@ WP_Block_Html
   }
 
 WP_Block_Start
-  = "<!--" __ "wp:" blockName:WP_Block_Name attrs:HTML_Attribute_List __ "-->"
-  { return {
-    blockName: blockName,
-    attrs: attrs
-  } }
+  = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
+    /** <?php return $a; ?> **/
+    return a;
+  })? "-->"
+  {
+    /** <?php
+    return array(
+      'blockName' => $blockName,
+      'attrs'     => $attrs,
+    );
+    ?> **/
+
+    return {
+      blockName: blockName,
+      attrs: attrs
+    };
+  }
 
 WP_Block_End
-  = "<!--" __ "/wp:" blockName:WP_Block_Name __ "-->"
-  { return {
-    blockName: blockName
-  } }
+  = "<!--" WS+ "/wp:" blockName:WP_Block_Name WS+ "-->"
+  {
+    /** <?php
+    return array(
+      'blockName' => $blockName,
+    );
+    ?> **/
+
+    return {
+      blockName: blockName
+    };
+  }
 
 WP_Block_Name
   = $(ASCII_Letter (ASCII_AlphaNumeric / "/" ASCII_AlphaNumeric)*)
 
-HTML_Attribute_List
-  = as:(_+ a:HTML_Attribute_Item { return a })*
-  { return as.reduce( function( attrs, attr ) { return Object.assign( attrs, attr ) }, {} ) }
-
-HTML_Attribute_Item
-  = HTML_Attribute_Quoted
-  / HTML_Attribute_Unquoted
-  / HTML_Attribute_Empty
-
-HTML_Attribute_Empty
-  = name:HTML_Attribute_Name
-  { return keyValue( name, true ) }
-
-HTML_Attribute_Unquoted
-  = name:HTML_Attribute_Name _* "=" _* value:$([a-zA-Z0-9]+)
-  { return keyValue( name, value ) }
-
-HTML_Attribute_Quoted
-  = name:HTML_Attribute_Name _* "=" _* '"' value:$(('\\"' . / !'"' .)*) '"'
-  { return keyValue( name, value ) }
-  / name:HTML_Attribute_Name _* "=" _* "'" value:$(("\\'" . / !"'" .)*) "'"
-  { return keyValue( name, value ) }
-
-HTML_Attribute_Name
-  = $([a-zA-Z0-9:.]+)
+WP_Block_Attributes
+  = attrs:$("{" (!("}" WS+ """/"? "-->") .)* "}")
+  {
+    /** <?php return json_decode( $attrs, true ); ?> **/
+    return maybeJSON( attrs );
+  }
 
 ASCII_AlphaNumeric
   = ASCII_Letter
@@ -105,6 +146,9 @@ ASCII_Digit
 
 Special_Chars
   = [\-\_]
+
+WS
+  = [ \t\r\n]
 
 Newline
   = [\r\n]

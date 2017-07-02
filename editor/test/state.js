@@ -6,6 +6,11 @@ import { values } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from 'blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -17,6 +22,7 @@ import {
 	mode,
 	isSidebarOpened,
 	saving,
+	notices,
 	showInsertionPoint,
 	createReduxStore,
 } from '../state';
@@ -24,11 +30,11 @@ import {
 describe( 'state', () => {
 	describe( 'editor()', () => {
 		before( () => {
-			wp.blocks.registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', {} );
 		} );
 
 		after( () => {
-			wp.blocks.unregisterBlockType( 'core/test-block' );
+			unregisterBlockType( 'core/test-block' );
 		} );
 
 		it( 'should return empty blocksByUid, blockOrder, history by default', () => {
@@ -973,6 +979,56 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'notices()', () => {
+		it( 'should create a notice', () => {
+			const originalState = {
+				b: {
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			};
+			const state = notices( originalState, {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+			} );
+			expect( state ).to.eql( {
+				b: originalState.b,
+				a: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+			} );
+		} );
+
+		it( 'should remove a notice', () => {
+			const originalState = {
+				a: {
+					id: 'a',
+					content: 'Post saved',
+					status: 'success',
+				},
+				b: {
+					id: 'b',
+					content: 'Error saving',
+					status: 'error',
+				},
+			};
+			const state = notices( originalState, {
+				type: 'REMOVE_NOTICE',
+				noticeId: 'a',
+			} );
+			expect( state ).to.eql( {
+				b: originalState.b,
+			} );
+		} );
+	} );
+
 	describe( 'createReduxStore()', () => {
 		it( 'should return a redux store', () => {
 			const store = createReduxStore();
@@ -996,6 +1052,7 @@ describe( 'state', () => {
 				'isSidebarOpened',
 				'saving',
 				'showInsertionPoint',
+				'notices',
 			] );
 		} );
 	} );

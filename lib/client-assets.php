@@ -97,7 +97,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element' ),
+		array( 'wp-element', 'wp-a11y' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
@@ -119,6 +119,12 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'blocks/build/style.css' ),
 		array(),
 		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
+	);
+	wp_register_style(
+		'wp-edit-blocks',
+		gutenberg_url( 'blocks/build/edit-blocks.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
 	);
 }
 add_action( 'init', 'gutenberg_register_scripts_and_styles' );
@@ -290,6 +296,70 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
+ * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
+ *
+ * This is temporary while waiting for #41111 in core.
+ *
+ * @link https://core.trac.wordpress.org/ticket/41111
+ */
+function gutenberg_extend_wp_api_backbone_client() {
+	$post_type_rest_base_mapping = array();
+	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
+		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
+	}
+	$script = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
+	$script .= <<<JS
+		wp.api.getPostTypeModel = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
+			return _.first( _.filter( wp.api.models, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+		wp.api.getPostTypeRevisionsCollection = function( postType ) {
+			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<parent>[\\\\d]+)/revisions';
+			return _.first( _.filter( wp.api.collections, function( model ) {
+				return model.prototype.route && route === model.prototype.route.index;
+			} ) );
+		};
+JS;
+	wp_add_inline_script( 'wp-api', $script );
+}
+
+/**
+ * Get post to edit.
+ *
+ * @param int $post_id Post ID to edit.
+ * @return array|WP_Error The post resource data or a WP_Error on failure.
+ */
+function gutenberg_get_post_to_edit( $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return new WP_Error( 'post_not_found', __( 'Post not found.', 'gutenberg' ) );
+	}
+
+	$post_type_object = get_post_type_object( $post->post_type );
+	if ( ! $post_type_object ) {
+		return new WP_Error( 'unrecognized_post_type', __( 'Unrecognized post type.', 'gutenberg' ) );
+	}
+
+	if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+		return new WP_Error( 'unauthorized_post_type', __( 'Unauthorized post type.', 'gutenberg' ) );
+	}
+
+	$request = new WP_REST_Request(
+		'GET',
+		sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
+	);
+	$request->set_param( 'context', 'edit' );
+	$response = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return $response->as_error();
+	}
+	return $response->get_data();
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -311,6 +381,8 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 */
 	wp_enqueue_media();
 
+	gutenberg_extend_wp_api_backbone_client();
+
 	// The editor code itself.
 	wp_enqueue_script(
 		'wp-editor',
@@ -320,17 +392,23 @@ function gutenberg_scripts_and_styles( $hook ) {
 		true // enqueue in the footer.
 	);
 
-	// Load an actual post if an ID is specified.
-	$post_to_edit = null;
+	// Register `wp-utils` as a dependency of `word-count` to ensure that
+	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
+	$word_count_script = wp_scripts()->query( 'word-count' );
+	array_push( $word_count_script->deps, 'wp-utils' );
+	// Now load the `word-count` script from core.
+	wp_enqueue_script( 'word-count' );
+
+	$post_id = null;
 	if ( isset( $_GET['post_id'] ) && (int) $_GET['post_id'] > 0 ) {
-		$request = new WP_REST_Request(
-			'GET',
-			sprintf( '/wp/v2/posts/%d', (int) $_GET['post_id'] )
-		);
-		$request->set_param( 'context', 'edit' );
-		$response = rest_do_request( $request );
-		if ( 200 === $response->get_status() ) {
-			$post_to_edit = $response->get_data();
+		$post_id = (int) $_GET['post_id'];
+	}
+
+	$post_to_edit = null;
+	if ( $post_id ) {
+		$post_to_edit = gutenberg_get_post_to_edit( $post_id );
+		if ( is_wp_error( $post_to_edit ) ) {
+			wp_die( $post_to_edit->get_error_message() );
 		}
 	}
 
@@ -348,7 +426,15 @@ function gutenberg_scripts_and_styles( $hook ) {
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
 	} else {
-		// TODO: Error handling.
+		// ...with a new empty post
+		// TODO: Error handling if we tried and failed to get a post above
+		$empty_post = array(
+			'type' => 'post',
+		);
+		wp_add_inline_script(
+			'wp-editor',
+			'window._wpGutenbergPost = ' . wp_json_encode( $empty_post ) . ';'
+		);
 	}
 
 	// Prepare Jed locale data.
@@ -360,7 +446,7 @@ function gutenberg_scripts_and_styles( $hook ) {
 	);
 
 	// Initialize the editor.
-	wp_add_inline_script( 'wp-editor', 'wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost );' );
+	wp_add_inline_script( 'wp-editor', 'wp.api.init().done( function() { wp.editor.createEditorInstance( \'editor\', window._wpGutenbergPost ); } );' );
 
 	/**
 	 * Styles
@@ -373,8 +459,17 @@ function gutenberg_scripts_and_styles( $hook ) {
 	wp_enqueue_style(
 		'wp-editor',
 		gutenberg_url( 'editor/build/style.css' ),
-		array( 'wp-components', 'wp-blocks' ),
+		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+
+/**
+ * Handles the enqueueing of front end scripts and styles from Gutenberg.
+ */
+function gutenberg_frontend_scripts_and_styles() {
+	// Enqueue basic styles built out of Gutenberg through npm build.
+	wp_enqueue_style( 'wp-blocks' );
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );

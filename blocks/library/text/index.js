@@ -2,16 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import Toggle from 'components/form-toggle';
+import { concatChildren } from 'element';
 
 /**
  * Internal dependencies
  */
+import './block.scss';
 import { registerBlockType, createBlock, query as hpq, setDefaultBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
+import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const { children, query } = hpq;
 
@@ -22,13 +25,15 @@ registerBlockType( 'core/text', {
 
 	category: 'common',
 
+	className: false,
+
 	attributes: {
 		content: query( 'p', children() ),
 	},
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: wp.element.concatChildren( attributes.content, attributesToMerge.content ),
+			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
 	},
 
@@ -48,14 +53,15 @@ registerBlockType( 'core/text', {
 			),
 			focus && (
 				<InspectorControls key="inspector">
-					<div className="blocks-text__drop-cap" style={ { display: 'flex', justifyContent: 'space-between' } }>
-						<label htmlFor="blocks-text__drop-cap">{ __( 'Drop Cap' ) }</label>
-						<Toggle
-							checked={ !! dropCap }
-							onChange={ toggleDropCap }
-							id="blocks-text__drop-cap-toggle"
-						/>
-					</div>
+					<BlockDescription>
+						<p>{ __( 'Text. Great things start here.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Text Settings' ) }</h3>
+					<ToggleControl
+						label={ __( 'Drop Cap' ) }
+						checked={ !! dropCap }
+						onChange={ toggleDropCap }
+					/>
 				</InspectorControls>
 			),
 			<Editable
@@ -78,19 +84,21 @@ registerBlockType( 'core/text', {
 				} }
 				onMerge={ mergeBlocks }
 				style={ { textAlign: align } }
-				className={ `drop-cap-${ dropCap }` }
+				className={ dropCap && 'has-drop-cap' }
+				placeholder={ __( 'Write…' ) }
 			/>,
 		];
 	},
 
 	save( { attributes } ) {
-		const { align, content } = attributes;
+		const { align, content, dropCap } = attributes;
+		const className = dropCap && 'has-drop-cap';
 
 		if ( ! align ) {
-			return <p>{ content }</p>;
+			return <p className={ className }>{ content }</p>;
 		}
 
-		return <p style={ { textAlign: align } }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
 	},
 } );
 

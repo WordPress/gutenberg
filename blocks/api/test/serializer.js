@@ -4,9 +4,14 @@
 import { expect } from 'chai';
 
 /**
+ * WordPress dependencies
+ */
+import { createElement, Component } from 'element';
+
+/**
  * Internal dependencies
  */
-import serialize, { getCommentAttributes, getSaveContent, serializeValue } from '../serializer';
+import serialize, { getCommentAttributes, getSaveContent, serializeAttributes } from '../serializer';
 import { getBlockTypes, registerBlockType, unregisterBlockType } from '../registration';
 
 describe( 'block serializer', () => {
@@ -20,7 +25,10 @@ describe( 'block serializer', () => {
 		context( 'function save', () => {
 			it( 'should return string verbatim', () => {
 				const saved = getSaveContent(
-					( { attributes } ) => attributes.fruit,
+					{
+						save: ( { attributes } ) => attributes.fruit,
+						name: 'core/fruit',
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -28,9 +36,49 @@ describe( 'block serializer', () => {
 			} );
 
 			it( 'should return element as string if save returns element', () => {
-				const { createElement } = wp.element;
 				const saved = getSaveContent(
-					( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'core/fruit',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="wp-block-fruit">Bananas</div>' );
+			} );
+
+			it( 'should return use the namespace in the classname if it\' not a core block', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
+			} );
+
+			it( 'should overrides the className', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: 'apples',
+					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).to.equal( '<div class="apples">Bananas</div>' );
+			} );
+
+			it( 'should not add a className if falsy', () => {
+				const saved = getSaveContent(
+					{
+						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
+						name: 'myplugin/fruit',
+						className: false,
+					},
 					{ fruit: 'Bananas' }
 				);
 
@@ -40,12 +88,14 @@ describe( 'block serializer', () => {
 
 		context( 'component save', () => {
 			it( 'should return element as string', () => {
-				const { Component, createElement } = wp.element;
 				const saved = getSaveContent(
-					class extends Component {
-						render() {
-							return createElement( 'div', null, this.props.attributes.fruit );
-						}
+					{
+						save: class extends Component {
+							render() {
+								return createElement( 'div', null, this.props.attributes.fruit );
+							}
+						},
+						name: 'core/fruit',
 					},
 					{ fruit: 'Bananas' }
 				);
@@ -87,15 +137,18 @@ describe( 'block serializer', () => {
 		} );
 	} );
 
-	describe( 'serializeValue()', () => {
-		it( 'should escape double-quotes', () => {
-			expect( serializeValue( 'a"b' ) ).to.equal( 'a\"b' );
+	describe( 'serializeAttributes()', () => {
+		it( 'should not break HTML comments', () => {
+			expect( serializeAttributes( { a: '-- and --' } ) ).to.equal( '{"a":"\\u002d\\u002d and \\u002d\\u002d"}' );
 		} );
-
-		it( 'should escape hyphens', () => {
-			expect( serializeValue( '-' ) ).to.equal( '\u{5c}-' );
-			expect( serializeValue( '--' ) ).to.equal( '\u{5c}-\u{5c}-' );
-			expect( serializeValue( '\\-' ) ).to.equal( '\u{5c}\u{5c}-' );
+		it( 'should not break standard-non-compliant tools for "<"', () => {
+			expect( serializeAttributes( { a: '< and <' } ) ).to.equal( '{"a":"\\u003c and \\u003c"}' );
+		} );
+		it( 'should not break standard-non-compliant tools for ">"', () => {
+			expect( serializeAttributes( { a: '> and >' } ) ).to.equal( '{"a":"\\u003e and \\u003e"}' );
+		} );
+		it( 'should not break standard-non-compliant tools for "&"', () => {
+			expect( serializeAttributes( { a: '& and &' } ) ).to.equal( '{"a":"\\u0026 and \\u0026"}' );
 		} );
 	} );
 
@@ -117,11 +170,11 @@ describe( 'block serializer', () => {
 					name: 'core/test-block',
 					attributes: {
 						content: 'Ribs & Chicken',
-						align: 'left',
+						stuff: 'left & right -- but <not>',
 					},
 				},
 			];
-			const expectedPostContent = '<!-- wp:core/test-block align="left" -->\n<p>Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
+			const expectedPostContent = '<!-- wp:core/test-block {"stuff":"left \\u0026 right \\u002d\\u002d but \\u003cnot\\u003e"} -->\n<p class="wp-block-test-block">Ribs & Chicken</p>\n<!-- /wp:core/test-block -->';
 
 			expect( serialize( blockList ) ).to.eql( expectedPostContent );
 		} );

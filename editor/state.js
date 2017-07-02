@@ -463,6 +463,24 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
+export function notices( state = {}, action ) {
+	switch ( action.type ) {
+		case 'CREATE_NOTICE':
+			return {
+				...state,
+				[ action.notice.id ]: action.notice,
+			};
+		case 'REMOVE_NOTICE':
+			if ( ! state.hasOwnProperty( action.noticeId ) ) {
+				return state;
+			}
+
+			return omit( state, action.noticeId );
+	}
+
+	return state;
+}
+
 /**
  * Creates a new instance of a Redux store.
  *
@@ -479,6 +497,7 @@ export function createReduxStore() {
 		mode,
 		isSidebarOpened,
 		saving,
+		notices,
 	} ) );
 
 	const enhancers = [ applyMiddleware( refx( effects ) ) ];

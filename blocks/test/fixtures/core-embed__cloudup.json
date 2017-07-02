@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/cloudup",
+        "attributes": {
+            "url": "https://cloudup.com/",
+            "caption": [
+                "Embedded content from cloudup"
+            ]
+        }
+    }
+]

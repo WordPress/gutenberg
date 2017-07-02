@@ -42,7 +42,6 @@ describe( 'Toolbar', () => {
 				'data-subscript': 'wp',
 				'aria-pressed': false,
 				className: 'components-toolbar__control',
-				focus: undefined,
 			} );
 		} );
 
@@ -100,20 +99,6 @@ describe( 'Toolbar', () => {
 			listItem.simulate( 'click', event );
 			expect( clickHandler ).to.have.been.calledOnce();
 			expect( clickHandler ).to.have.been.calledWith();
-		} );
-
-		it( 'should have a focus property of true.', () => {
-			const controls = [
-				{
-					icon: 'wordpress',
-					title: 'WordPress',
-					subscript: 'wp',
-					isActive: true,
-				},
-			];
-			const toolbar = shallow( <Toolbar controls={ controls } focus={ true } /> );
-			const listItem = toolbar.find( 'IconButton' );
-			expect( listItem.prop( 'focus' ) ).to.be.true();
 		} );
 	} );
 } );

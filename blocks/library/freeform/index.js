@@ -1,3 +1,7 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from 'i18n';
 
 /**
  * Internal dependencies
@@ -9,11 +13,11 @@ import FreeformBlock from './freeform-block';
 const { children } = query;
 
 registerBlockType( 'core/freeform', {
-	title: wp.i18n.__( 'Freeform' ),
+	title: __( 'Classic Text' ),
 
-	icon: 'text',
+	icon: 'editor-kitchensink',
 
-	category: 'common',
+	category: 'formatting',
 
 	attributes: {
 		content: children(),
@@ -23,11 +27,12 @@ registerBlockType( 'core/freeform', {
 		content: <p />,
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
 		const { content } = attributes;
 
 		return (
 			<FreeformBlock
+				className={ className }
 				content={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {

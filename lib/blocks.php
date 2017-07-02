@@ -40,26 +40,6 @@ function unregister_block_type( $name ) {
 }
 
 /**
- * Extract the block attributes from the block's attributes string
- *
- * @since 0.1.0
- *
- * @param string $attr_string Attributes string.
-
- * @return array
- */
-function parse_block_attributes( $attr_string ) {
-	$attributes_matcher = '/([^\s]+)="([^"]+)"\s*/';
-	preg_match_all( $attributes_matcher, $attr_string, $matches );
-	$attributes = array();
-	foreach ( $matches[1] as $index => $attribute_match ) {
-		$attributes[ $attribute_match ] = $matches[2][ $index ];
-	}
-
-	return $attributes;
-}
-
-/**
  * Renders the dynamic blocks into the post content
  *
  * @since 0.1.0
@@ -71,48 +51,29 @@ function parse_block_attributes( $attr_string ) {
 function do_blocks( $content ) {
 	$registry = WP_Block_Type_Registry::get_instance();
 
-	// Extract the blocks from the post content.
-	$matcher = '#' . join( '', array(
-		'(?P<opener><!--\s*',
-		'wp:(?P<block_type_name>[a-z](?:[a-z0-9/]+)*)\s+',
-		'(?P<attributes>(?:(?!-->).)*)',
-		'\s*/?-->\n?)',
-		'(?:',
-		'(?P<content>.*?)',
-		'(?P<closer><!--\s*/wp:\g{block_type_name}\s+-->\n?)',
-		')?',
-	) ) . '#s';
-	preg_match_all( $matcher, $content, $matches, PREG_OFFSET_CAPTURE );
+	$parser = new Gutenberg_PEG_Parser;
+	$blocks = $parser->parse( $content );
 
-	$new_content = $content;
-	$offset_differential = 0;
-	foreach ( $matches[0] as $index => $block_match ) {
-		$block_type_name = $matches['block_type_name'][ $index ][0];
-		$block_type = $registry->get_registered( $block_type_name );
+	$content_after_blocks = '';
 
-		$output = '';
-		if ( null !== $block_type ) {
-			$block_attributes_string = $matches['attributes'][ $index ][0];
-			$block_attributes = parse_block_attributes( $block_attributes_string );
+	foreach ( $blocks as $block ) {
+		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
+		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 
-			// Call the block's render function to generate the dynamic output.
-			$output = call_user_func( $block_type->render, $block_attributes );
-		} elseif ( isset( $matches['content'][ $index ][0] ) ) {
-			$output = $matches['content'][ $index ][0];
+		if ( $block_name ) {
+			$block_type = $registry->get_registered( $block_name );
+			if ( null !== $block_type ) {
+				$content_after_blocks .= call_user_func(
+					$block_type->render,
+					$attributes
+				);
+				continue;
+			}
 		}
 
-		// Replace the matched block with the static or dynamic output.
-		$new_content = substr_replace(
-			$new_content,
-			$output,
-			$block_match[1] - $offset_differential,
-			strlen( $block_match[0] )
-		);
-
-		// Update offset for the next replacement.
-		$offset_differential += strlen( $block_match[0] ) - strlen( $output );
+		$content_after_blocks .= $block['rawContent'];
 	}
 
-	return $new_content;
+	return $content_after_blocks;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpautop().

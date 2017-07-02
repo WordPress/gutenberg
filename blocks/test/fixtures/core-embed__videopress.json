@@ -1,0 +1,12 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core-embed/videopress",
+        "attributes": {
+            "url": "https://videopress.com/",
+            "caption": [
+                "Embedded content from videopress"
+            ]
+        }
+    }
+]

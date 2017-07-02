@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from 'i18n';
-import { Placeholder } from 'components';
+import { Placeholder, Dashicon, Toolbar } from 'components';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import BlockDescription from '../../block-description';
 
 const { attr, children } = query;
 
@@ -38,10 +39,14 @@ registerBlockType( 'core/image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption, align } = attributes;
+	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+		const { url, alt, caption, align, id } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSelectImage = ( media ) => {
+			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
+		};
+		const uploadButtonProps = { isLarge: true };
 
 		const controls = (
 			focus && (
@@ -51,13 +56,24 @@ registerBlockType( 'core/image', {
 						onChange={ updateAlignment }
 						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
+
+					<Toolbar>
+						<li>
+							<MediaUploadButton
+								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								onSelect={ onSelectImage }
+								type="image"
+								value={ id }
+							>
+								<Dashicon icon="edit" />
+							</MediaUploadButton>
+						</li>
+					</Toolbar>
 				</BlockControls>
 			)
 		);
 
 		if ( ! url ) {
-			const uploadButtonProps = { isLarge: true };
-			const setMediaURL = ( media ) => setAttributes( { url: media.url } );
 			return [
 				controls,
 				<Placeholder
@@ -65,11 +81,11 @@ registerBlockType( 'core/image', {
 					instructions={ __( 'Drag image here or insert from media library' ) }
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className="blocks-image">
+					className={ className }>
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
-						onSelect={ setMediaURL }
-						type="image"
+						onSelect={ onSelectImage }
+						type="format-image"
 						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }
@@ -87,10 +103,14 @@ registerBlockType( 'core/image', {
 			controls,
 			focus && (
 				<InspectorControls key="inspector">
+					<BlockDescription>
+						<p>{ __( 'Worth a thousand words.' ) }</p>
+					</BlockDescription>
+					<h3>{ __( 'Image Settings' ) }</h3>
 					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
 				</InspectorControls>
 			),
-			<figure key="image" className="blocks-image">
+			<figure key="image" className={ className }>
 				<img src={ url } alt={ alt } onClick={ setFocus } />
 				{ ( caption && caption.length > 0 ) || !! focus ? (
 					<Editable
@@ -111,15 +131,15 @@ registerBlockType( 'core/image', {
 
 	save( { attributes } ) {
 		const { url, alt, caption, align = 'none' } = attributes;
-		const img = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 
+		// If there's no caption set only save the image element.
 		if ( ! caption || ! caption.length ) {
-			return img;
+			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
 		}
 
 		return (
-			<figure>
-				{ img }
+			<figure className={ `align${ align }` }>
+				<img src={ url } alt={ alt } />
 				<figcaption>{ caption }</figcaption>
 			</figure>
 		);

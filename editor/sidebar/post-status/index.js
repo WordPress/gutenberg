@@ -17,6 +17,7 @@ import './style.scss';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
+import PostSticky from '../post-sticky';
 import {
 	getEditedPostAttribute,
 	getSuggestedPostFormat,
@@ -67,6 +68,7 @@ class PostStatus extends Component {
 					<span>{ __( 'Post Format' ) }</span>
 					<span>{ format }</span>
 				</div>
+				<PostSticky />
 				<div className="editor-post-status__row">
 					<PostTrash />
 				</div>

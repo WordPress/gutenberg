@@ -1,5 +1,4 @@
-.blocks-embed,
-.blocks-embed-video {
+.wp-block-embed {
 	margin: 0;
 	clear: both; // necessary because we use responsive trickery to set width/height, and therefore the video doesn't intrinsically clear floats like an img does
 
@@ -17,19 +16,19 @@
 			font-size: $default-font-size;
 		}
 	}
-}
 
-.blocks-embed-video > div:first-child {
-	position: relative;
-	width: 100%;
-	height: 0;
-	padding-bottom: 56.25%; /* 16:9 */
-}
+	&.is-video > div:first-child {
+		position: relative;
+		width: 100%;
+		height: 0;
+		padding-bottom: 56.25%; /* 16:9 */
+	}
 
-.blocks-embed-video > div > iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	&.is-video > div > iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
 }
