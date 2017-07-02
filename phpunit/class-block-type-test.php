@@ -29,7 +29,9 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'bar' => 'foo',
 		);
 
-		$block_type = new WP_Block_Type( 'core/dummy', array( 'render' => array( $this, 'render_dummy_block' ) ) );
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'render' => array( $this, 'render_dummy_block' ),
+		) );
 		$output = $block_type->render( $attributes );
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
@@ -41,7 +43,9 @@ class Block_Type_Test extends WP_UnitTestCase {
 		);
 		$content = '<p>Test content.</p>';
 
-		$block_type = new WP_Block_Type( 'core/dummy', array( 'render' => array( $this, 'render_dummy_block_with_content' ) ) );
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'render' => array( $this, 'render_dummy_block_with_content' ),
+		) );
 		$output = $block_type->render( $attributes, $content );
 		$attributes['_content'] = $content;
 		$this->assertSame( $attributes, json_decode( $output, true ) );
