@@ -313,7 +313,7 @@ export default class FreeformBlock extends Component {
 
 	updateContent() {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
+		this.savedContent = this.props.content;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
 
