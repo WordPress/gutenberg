@@ -188,7 +188,7 @@ registerBlockType( 'core/list', {
 			return {
 				...settings,
 				plugins: ( settings.plugins || [] ).concat( 'lists' ),
-				lists_indent_on_tab: false,
+				lists_indent_on_tab: true,
 			};
 		}
 
