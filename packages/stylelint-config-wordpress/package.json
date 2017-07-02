@@ -51,6 +51,7 @@
     "stylelint": "^7.10.1"
   },
   "scripts": {
+    "dry-release": "npmpub --dry --verbose",
     "lint:js": "eslint . --ignore-path .gitignore",
     "lint:md": "remark . --quiet --frail",
     "lint": "npm-run-all --parallel lint:*",
