@@ -13,7 +13,7 @@
  *
  * @see register_block_type()
  */
-final class WP_Block_Type {
+class WP_Block_Type {
 	/**
 	 * Block type key.
 	 *

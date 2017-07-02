@@ -92,6 +92,16 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should accept a WP_Block_Type instance
+	 */
+	function test_register_block_type_instance() {
+		$block_type = new WP_Dummy_Block_Type( 'core/dummy' );
+
+		$result = $this->registry->register( $block_type );
+		$this->assertSame( $block_type, $result );
+	}
+
+	/**
 	 * Unregistering should fail if a block is not registered
 	 *
 	 * @expectedIncorrectUsage WP_Block_Type_Registry::unregister

@@ -37,16 +37,24 @@ final class WP_Block_Type_Registry {
 	 * @since 0.2.0
 	 * @access public
 	 *
-	 * @param string $name Block type name including namespace.
-	 * @param array  $args {
-	 *     Array of block type arguments. Any arguments may be defined, however the following
-	 *     ones are supported by default.
+	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+	 *                                   complete WP_Block_Type instance. In case a WP_Block_Type
+	 *                                   is provided, the $args parameter will be ignored.
+	 * @param array                $args {
+	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
+	 *     ones described below are supported by default. Default empty array.
 	 *
 	 *     @type callable $render Callback used to render blocks of this block type.
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
-	public function register( $name, $args ) {
+	public function register( $name, $args = array() ) {
+		$block_type = null;
+		if ( is_a( $name, 'WP_Block_Type' ) ) {
+			$block_type = $name;
+			$name = $block_type->name;
+		}
+
 		if ( ! is_string( $name ) ) {
 			$message = __( 'Block type names must be strings.' );
 			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
@@ -67,7 +75,9 @@ final class WP_Block_Type_Registry {
 			return false;
 		}
 
-		$block_type = new WP_Block_Type( $name, $args );
+		if ( ! $block_type ) {
+			$block_type = new WP_Block_Type( $name, $args );
+		}
 
 		$this->registered_block_types[ $name ] = $block_type;
 
