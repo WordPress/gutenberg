@@ -53,6 +53,24 @@ final class WP_Block_Type {
 	}
 
 	/**
+	 * Renders the block type output for given attributes and content.
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 *
+	 * @param array  $attributes Optional. Block attributes. Default empty array.
+	 * @param string $content    Optional. Raw block content. Default empty string.
+	 * @return string Rendered block type output.
+	 */
+	public function render( $attributes = array(), $content = '' ) {
+		if ( ! is_callable( $this->render ) ) {
+			return $content;
+		}
+
+		return call_user_func( $this->render, $attributes, $content );
+	}
+
+	/**
 	 * Sets block type properties.
 	 *
 	 * @since 0.2.0

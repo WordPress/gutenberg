@@ -59,19 +59,17 @@ function do_blocks( $content ) {
 	foreach ( $blocks as $block ) {
 		$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
 		$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : '';
 
 		if ( $block_name ) {
 			$block_type = $registry->get_registered( $block_name );
 			if ( null !== $block_type ) {
-				$content_after_blocks .= call_user_func(
-					$block_type->render,
-					$attributes
-				);
+				$content_after_blocks .= $block_type->render( $attributes, $raw_content );
 				continue;
 			}
 		}
 
-		$content_after_blocks .= $block['rawContent'];
+		$content_after_blocks .= $raw_content;
 	}
 
 	return $content_after_blocks;
