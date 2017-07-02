@@ -237,7 +237,8 @@ class VisualEditorBlock extends Component {
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const blockType = getBlockType( block.name );
-		const blockLabel = sprintf( __( 'Editor block: %s' ), blockType.title );
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 		const { className = getBlockDefaultClassname( block.name ) } = blockType;
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content, which
