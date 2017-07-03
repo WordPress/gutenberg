@@ -17,8 +17,8 @@ import { getCategories, getBlockTypes } from 'blocks';
  * Internal dependencies
  */
 import './style.scss';
+import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
 import { showInsertionPoint, hideInsertionPoint } from '../actions';
-import { getRecentlyUsedBlocks } from '../selectors';
 
 class InserterMenu extends Component {
 	constructor() {
@@ -61,6 +61,10 @@ class InserterMenu extends Component {
 		} else {
 			this.debouncedSpeakAssertive( __( 'No results.' ) );
 		}
+	}
+
+	isDisabledBlock( block ) {
+		return block.useOnce && find( this.props.blocks, ( { name } ) => block.name === name );
 	}
 
 	bindReferenceNode( nodeName ) {
@@ -134,24 +138,26 @@ class InserterMenu extends Component {
 	}
 
 	findByIncrement( blockTypes, increment = 1 ) {
-		// Prepend a fake search block to the list to cycle through.
-		const list = [ { name: 'search' }, ...blockTypes ];
-
-		const currentIndex = findIndex( list, ( blockType ) => this.state.currentFocus === blockType.name );
+		const currentIndex = findIndex( blockTypes, ( blockType ) => this.state.currentFocus === blockType.name );
 		const nextIndex = currentIndex + increment;
-		const highestIndex = list.length - 1;
+		const highestIndex = blockTypes.length - 1;
 		const lowestIndex = 0;
 
 		if ( nextIndex > highestIndex ) {
-			return list[ lowestIndex ].name;
+			return 'search';
 		}
 
 		if ( nextIndex < lowestIndex ) {
-			return list[ highestIndex ].name;
+			return 'search';
 		}
 
 		// Return the name of the next block type.
-		return list[ nextIndex ].name;
+		const block = blockTypes[ nextIndex ];
+		if ( this.isDisabledBlock( block ) ) {
+			return this.findByIncrement( blockTypes, increment > 0 ? increment + 1 : increment - 1 );
+		}
+
+		return block.name;
 	}
 
 	findNext( blockTypes ) {
@@ -267,6 +273,7 @@ class InserterMenu extends Component {
 	}
 
 	getBlockItem( block ) {
+		const disabled = this.isDisabledBlock( block );
 		return (
 			<button
 				role="menuitem"
@@ -277,6 +284,7 @@ class InserterMenu extends Component {
 				tabIndex="-1"
 				onMouseEnter={ this.props.showInsertionPoint }
 				onMouseLeave={ this.props.hideInsertionPoint }
+				disabled={ disabled }
 			>
 				<Dashicon icon={ block.icon } />
 				{ block.title }
@@ -326,7 +334,7 @@ class InserterMenu extends Component {
 					}
 					{ this.state.tab === 'blocks' && ! isSearching &&
 						getCategories()
-							.map( ( category ) => category.slug !== 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
+							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div key={ category.slug }>
 									<div
 										className="editor-inserter__separator"
@@ -348,7 +356,7 @@ class InserterMenu extends Component {
 					}
 					{ this.state.tab === 'embeds' && ! isSearching &&
 						getCategories()
-							.map( ( category ) => category.slug === 'embed' && !! visibleBlocksByCategory[ category.slug ] && (
+							.map( ( category ) => !! visibleBlocksByCategory[ category.slug ] && (
 								<div
 									className="editor-inserter__category-blocks"
 									role="menu"
@@ -415,6 +423,7 @@ const connectComponent = connect(
 	( state ) => {
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
+			blocks: getBlocks( state ),
 		};
 	},
 	{ showInsertionPoint, hideInsertionPoint }
