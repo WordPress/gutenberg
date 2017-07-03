@@ -7,6 +7,7 @@
 	width: $sidebar-width;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
+	color: $dark-gray-500;
 
 	@include break-small() {
 		position: fixed;
@@ -29,8 +30,14 @@
 		}
 	}
 
+	p {
+		margin-top: 0;
+	}
+
 	h3 {
 		font-size: $default-font-size;
+		color: $dark-gray-500;
+		margin-bottom: 1.5em;
 	}
 
 	hr {
@@ -41,7 +48,11 @@
 
 	ul.components-toolbar {
 		box-shadow: none;
-		margin-bottom: $panel-padding;
+		margin-bottom: 1.5em;
+	}
+
+	p + ul.components-toolbar {
+		margin-top: -1em;
 	}
 }
 

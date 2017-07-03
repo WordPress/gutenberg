@@ -10,6 +10,9 @@
 			color: white;
 			font-size: 24pt;
 			line-height: 1em;
+			max-width: $visual-editor-max-width;
+			padding: $block-padding;
+			text-align: center;
 		}
 	}
 
@@ -26,12 +29,12 @@
 		background-attachment: fixed;
 	}
 
-	.cover-image::before {
+	.cover-image.has-background-dim::before {
 		content: '';
 		position: absolute;
-		top: $block-padding;
+		top: 0;
 		right: $block-padding * 2 + $block-mover-margin;
-		bottom: $block-padding;
+		bottom: 0;
 		left: $block-padding * 2 + $block-mover-margin;
 		background: rgba( 0,0,0,.5 );
 	}

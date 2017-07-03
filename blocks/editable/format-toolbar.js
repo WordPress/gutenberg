@@ -167,7 +167,11 @@ class FormatToolbar extends Component {
 
 				{ !! formats.link && ! this.state.isEditingLink &&
 					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
-						<a className="editable-format-toolbar__link-value" href="" onClick={ this.editLink }>
+						<a
+							className="editable-format-toolbar__link-value"
+							href={ this.state.linkValue }
+							target="_blank"
+						>
 							{ this.state.linkValue && decodeURI( this.state.linkValue ) }
 						</a>
 						<IconButton icon="edit" onClick={ this.editLink } />

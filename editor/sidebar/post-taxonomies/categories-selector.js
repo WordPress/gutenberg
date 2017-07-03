@@ -17,9 +17,9 @@ import { getEditedPostAttribute } from '../../selectors';
 import { editPost } from '../../actions';
 
 const DEFAULT_CATEGORIES_QUERY = {
-	per_page: -1,
+	per_page: 100,
 	orderby: 'count',
-	order: 'DESC',
+	order: 'desc',
 };
 
 class CategoriesSelector extends Component {
@@ -50,7 +50,8 @@ class CategoriesSelector extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchCategoriesRequest = new wp.api.collections.Categories().fetch( DEFAULT_CATEGORIES_QUERY )
+		this.fetchCategoriesRequest = new wp.api.collections.Categories()
+			.fetch( { data: DEFAULT_CATEGORIES_QUERY } )
 			.done( ( categories ) => {
 				const availableCategories = this.buildCategoriesTree( categories );
 
