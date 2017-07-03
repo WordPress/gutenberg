@@ -1,6 +1,6 @@
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import { ToolbarMenu } from 'components';
+import { Toolbar, ToolbarMenu } from 'components';
 
 function execCommand( command ) {
 	return ( editor ) => {
@@ -71,14 +71,18 @@ export default class TableBlock extends wp.element.Component {
 			/>,
 			focus && (
 				<BlockControls key="menu">
-					<ToolbarMenu
-						icon="editor-table"
-						controls={
-							TABLE_CONTROLS.map( ( control ) => ( {
-								...control,
-								onClick: () => control.onClick( this.state.editor ),
-							} ) ) }
-					/>
+					<Toolbar>
+						<li>
+							<ToolbarMenu
+								icon="editor-table"
+								controls={
+									TABLE_CONTROLS.map( ( control ) => ( {
+										...control,
+										onClick: () => control.onClick( this.state.editor ),
+									} ) ) }
+							/>
+						</li>
+					</Toolbar>
 				</BlockControls>
 			),
 		];

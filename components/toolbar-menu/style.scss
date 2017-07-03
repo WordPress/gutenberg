@@ -1,9 +1,5 @@
 .components-toolbar-menu {
-	border: 1px solid $light-gray-500;
-	box-shadow: $shadow-popover;
-	background-color: $white;
 	padding: 3px;
-	margin-right: 10px;
 	position: relative;
 	display: flex;
 
@@ -49,7 +45,7 @@
 .components-toolbar-menu__menu {
 	position: absolute;
 	top: $block-controls-height - 1px;
-	left: 0px;
+	left: -1px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
