@@ -223,15 +223,17 @@ class Gutenberg_PEG_Parser {
     private $peg_c32;
     private $peg_c33;
 
-    private function peg_f0($text) { return text }
-    private function peg_f1($customText, $noTeaser) { return {
-        blockName: 'wp:core/more',
-        attrs: {
-          customText: customText,
-          noTeaser: !! noTeaser
-        },
-        rawContent: ''
-      } }
+    private function peg_f0($text) { return $text; }
+    private function peg_f1($customText, $noTeaser) {
+        return array(
+           'blockName' => 'wp:core/more',
+           'attrs' => array(
+             'customText' => $customText,
+             'noTeaser' => (bool) $noTeaser
+           ),
+           'rawContent' => ''
+        );
+        }
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
