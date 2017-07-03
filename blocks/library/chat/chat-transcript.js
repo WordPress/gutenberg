@@ -3,9 +3,7 @@
  */
 import { uniq } from 'lodash';
 
-export default function ChatTranscript( props ) {
-	const { value, compact } = props;
-
+export default function ChatTranscript( { value, compact } ) {
 	let lastAuthor;
 	let authors = [];
 
