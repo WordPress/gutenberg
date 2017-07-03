@@ -131,16 +131,17 @@ registerBlockType( 'core/image', {
 
 	save( { attributes } ) {
 		const { url, alt, caption, align = 'none' } = attributes;
+		const needsWrapper = [ 'wide', 'full' ].indexOf( align ) !== -1;
 
 		// If there's no caption set only save the image element.
-		if ( ! caption || ! caption.length ) {
+		if ( ! needsWrapper && ( ! caption || ! caption.length ) ) {
 			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
 		}
 
 		return (
 			<figure className={ `align${ align }` }>
 				<img src={ url } alt={ alt } />
-				<figcaption>{ caption }</figcaption>
+				{ caption && !! caption.length && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},
