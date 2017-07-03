@@ -232,26 +232,15 @@ export default function( editor ) {
 				return;
 			}
 
-			editor.undoManager.add();
+			node.deleteData( 0, match[0].length );
 
-			editor.undoManager.transact( function() {
-				node.deleteData( 0, match[0].length );
+			if ( ! parent.innerHTML ) {
+				parent.appendChild( document.createElement( 'br' ) );
+			}
 
-				if ( ! parent.innerHTML ) {
-					parent.appendChild( document.createElement( 'br' ) );
-				}
+			const block = pattern.transform( { content: getContent() } );
 
-				editor.selection.setCursorLocation( parent );
-
-				const block = pattern.transform( { content: getContent() } );
-
-				onReplace( [ block ] );
-			} );
-
-			// We need to wait for native events to be triggered.
-			setTimeout( function() {
-				canUndo = 'space';
-			} );
+			onReplace( [ block ] );
 
 			return false;
 		} );
