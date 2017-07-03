@@ -148,7 +148,7 @@ export default class OldEditor extends Component {
 				key="toolbar"
 				id={ id + '-toolbar' }
 				ref={ ref => this.ref = ref }
-				className="editor-visual-editor__block-controls freeform-toolbar"
+				className="freeform-toolbar"
 			/>,
 			<div
 				key="editor"
