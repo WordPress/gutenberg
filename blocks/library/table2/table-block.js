@@ -1,6 +1,6 @@
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
-import { Toolbar, ToolbarMenu } from 'components';
+import { Toolbar, DropdownMenu } from 'components';
 
 function execCommand( command ) {
 	return ( editor ) => {
@@ -73,7 +73,7 @@ export default class TableBlock extends wp.element.Component {
 				<BlockControls key="menu">
 					<Toolbar>
 						<li>
-							<ToolbarMenu
+							<DropdownMenu
 								icon="editor-table"
 								controls={
 									TABLE_CONTROLS.map( ( control ) => ( {

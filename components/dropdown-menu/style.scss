@@ -1,9 +1,9 @@
-.components-toolbar-menu {
+.components-dropdown-menu {
 	padding: 3px;
 	position: relative;
 	display: flex;
 
-	.components-toolbar-menu__toggle {
+	.components-dropdown-menu__toggle {
 		width: auto;
 		margin: 0px;
 		padding: 4px;
@@ -42,7 +42,7 @@
 	}
 }
 
-.components-toolbar-menu__menu {
+.components-dropdown-menu__menu {
 	position: absolute;
 	top: $block-controls-height - 1px;
 	left: -1px;
@@ -54,7 +54,7 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	.components-toolbar-menu__menu-item {
+	.components-dropdown-menu__menu-item {
 		width: 100%;
 		margin-bottom: 3px;
 		padding: 6px;

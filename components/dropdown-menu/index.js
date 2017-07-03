@@ -18,7 +18,7 @@ import { TAB, ESCAPE, LEFT, UP, RIGHT, DOWN } from 'utils/keycodes';
  */
 import './style.scss';
 
-class ToolbarMenu extends wp.element.Component {
+class DropdownMenu extends wp.element.Component {
 	constructor() {
 		super( ...arguments );
 		this.bindMenuRef = this.bindMenuRef.bind( this );
@@ -102,7 +102,7 @@ class ToolbarMenu extends wp.element.Component {
 					keydown.stopPropagation();
 					this.closeMenu();
 					const node = findDOMNode( this );
-					const toggle = node.querySelector( '.components-toolbar-menu__toggle' );
+					const toggle = node.querySelector( '.components-dropdown-menu__toggle' );
 					toggle.focus();
 					if ( this.props.onSelect ) {
 						this.props.onSelect( null );
@@ -170,10 +170,10 @@ class ToolbarMenu extends wp.element.Component {
 		}
 
 		return (
-			<div className="components-toolbar-menu">
+			<div className="components-dropdown-menu">
 				<IconButton
 					className={
-						classNames( 'components-toolbar-menu__toggle', {
+						classNames( 'components-dropdown-menu__toggle', {
 							'is-active': this.state.open,
 						} )
 					}
@@ -187,7 +187,7 @@ class ToolbarMenu extends wp.element.Component {
 				</IconButton>
 				{ this.state.open &&
 					<div
-						className="components-toolbar-menu__menu"
+						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
 						ref={ this.bindMenuRef }
@@ -205,7 +205,7 @@ class ToolbarMenu extends wp.element.Component {
 										onSelect( index );
 									}
 								} }
-								className="components-toolbar-menu__menu-item"
+								className="components-dropdown-menu__menu-item"
 								icon={ control.icon }
 								role="menuitem"
 							>
@@ -219,4 +219,4 @@ class ToolbarMenu extends wp.element.Component {
 	}
 }
 
-export default clickOutside( ToolbarMenu );
+export default clickOutside( DropdownMenu );
