@@ -143,10 +143,6 @@ input[type="search"].editor-inserter__search {
 		z-index: z-index( '.editor-inserter__tab.is-active' );
 	}
 
-	&:hover {
-		color: $blue-medium-500;
-	}
-
 	&:focus {
 		box-shadow: $button-focus-style;
 		outline: none;
