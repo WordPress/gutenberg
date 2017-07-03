@@ -134,6 +134,7 @@ input[type="search"].editor-inserter__search {
 	width: 100%;
 	margin: 0;
 	color: $dark-gray-500;
+	cursor: pointer;
 
 	&.is-active {
 		background: $white;
