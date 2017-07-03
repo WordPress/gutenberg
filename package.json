@@ -14,6 +14,7 @@
   "scripts": {
     "build-clean": "rimraf ./packages/*/build ./packages/*/build-browser ./packages/*/build-module",
     "build": "node ./scripts/build.js",
-    "test": "jest"
+    "test": "jest",
+    "watch": "jest --watch"
   }
 }
