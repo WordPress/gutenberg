@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 import clickOutside from 'react-click-outside';
 import { findIndex } from 'lodash';
 
@@ -173,7 +173,7 @@ class DropdownMenu extends wp.element.Component {
 			<div className="components-dropdown-menu">
 				<IconButton
 					className={
-						classNames( 'components-dropdown-menu__toggle', {
+						classnames( 'components-dropdown-menu__toggle', {
 							'is-active': this.state.open,
 						} )
 					}
