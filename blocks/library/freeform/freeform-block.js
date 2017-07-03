@@ -135,7 +135,7 @@ export default class FreeformBlock extends Component {
 		this.formats = null;
 		this.handleFormatChange = null;
 		this.state = {
-			empty: ! props.value || ! props.value.length,
+			empty: ! props.content || ! props.content.length,
 			activeButtons: { },
 			disabledButtons: { },
 			activeFormat: null,
@@ -313,7 +313,7 @@ export default class FreeformBlock extends Component {
 
 	updateContent() {
 		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
+		this.savedContent = this.props.content;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
 
