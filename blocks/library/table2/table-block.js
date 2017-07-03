@@ -52,12 +52,13 @@ export default class TableBlock extends wp.element.Component {
 	}
 
 	render() {
-		const { content, focus, onFocus, onChange } = this.props;
+		const { content, focus, onFocus, onChange, className } = this.props;
 
 		return [
 			<Editable
 				key="editor"
 				tagName="table"
+				className={ className }
 				getSettings={ ( settings ) => ( {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
