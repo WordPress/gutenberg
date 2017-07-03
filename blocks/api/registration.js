@@ -1,6 +1,11 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * Block settings keyed by block name.
  *
  * @type {Object}
@@ -41,6 +46,18 @@ export function registerBlockType( name, settings ) {
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block'
+		);
+		return;
+	}
+	if ( ! settings || ! isFunction( settings.save ) ) {
+		console.error(
+			'The "save" property must be specified and must be a valid function.'
+		);
+		return;
+	}
+	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
+		console.error(
+			'The "edit" property must be a valid function.'
 		);
 		return;
 	}
