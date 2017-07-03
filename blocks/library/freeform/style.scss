@@ -56,6 +56,7 @@
 
 	&.mce-edit-focus {
 		outline: none;
+		margin-top: $item-spacing;
 	}
 
 	a {
@@ -84,13 +85,21 @@
 	}
 }
 
-.editor-visual-editor__block-controls.freeform-toolbar {
+.freeform-toolbar {
 	width: auto;
 }
 
 .freeform-toolbar .mce-tinymce-inline {
 	margin: 0;
 	background: transparent;
+	position: sticky;
+	top: $header-height - 1px;
+	z-index: z-index( '.editor-visual-editor__block-controls' );
+	margin-top: -$block-controls-height - $item-spacing;
+
+	@include break-medium() {
+		top: $header-height + $admin-bar-height + $item-spacing;
+	}
 }
 
 // Overwrite inline styles.
@@ -130,8 +139,7 @@ div.mce-toolbar-grp > div {
 
 .freeform-toolbar .mce-toolbar:not(:first-child) {
 	display: none;
-	position: absolute;
-	top: -44px;
+	margin-top: 6px;
 }
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar {
