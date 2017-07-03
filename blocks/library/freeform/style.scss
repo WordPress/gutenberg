@@ -1,4 +1,8 @@
 .editor-visual-editor__block[data-type="core/freeform"] .blocks-editable__tinymce {
+	p {
+		line-height: inherit;
+	}
+
 	ul, ol {
 		padding-left: 2.5em;
 		margin-left: 0;
@@ -16,15 +20,6 @@
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
 		color: $dark-gray-800;
-	}
-
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		margin: 0;
 	}
 
 	h1 {
@@ -51,15 +46,15 @@
 		font-size: 1em;
 	}
 
-	> p:first-child {
+	> *:first-child {
 		margin-top: 0;
 	}
 
-	> p:last-child {
+	> *:last-child {
 		margin-bottom: 0;
 	}
 
-	&:focus {
+	&.mce-edit-focus {
 		outline: none;
 	}
 
@@ -87,4 +82,144 @@
 	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
 	}
+}
+
+.editor-visual-editor__block-controls.freeform-toolbar {
+	width: auto;
+}
+
+.freeform-toolbar .mce-tinymce-inline {
+	margin: 0;
+	background: transparent;
+}
+
+// Overwrite inline styles.
+.freeform-toolbar .mce-tinymce-inline,
+.freeform-toolbar .mce-tinymce-inline > div,
+.freeform-toolbar div.mce-toolbar-grp,
+.freeform-toolbar div.mce-toolbar-grp > div {
+	height: auto !important;
+	width: 100% !important;
+	border: none !important;
+}
+
+.freeform-toolbar div.mce-toolbar-grp {
+	background-color: transparent;
+	border: none;
+	position: static;
+}
+
+div.mce-toolbar-grp > div {
+    padding: 0;
+}
+
+.freeform-toolbar div.mce-btn-group {
+	border: 1px solid $light-gray-500;
+	box-shadow: $shadow-popover;
+	background-color: $white;
+	padding: 0;
+
+	&:not(:first-child) {
+		margin-left: 6px;
+	}
+}
+
+.freeform-toolbar .mce-container-body.mce-abs-layout {
+	overflow: visible;
+}
+
+.freeform-toolbar .mce-toolbar:not(:first-child) {
+	display: none;
+	position: absolute;
+	top: -44px;
+}
+
+.freeform-toolbar.has-advanced-toolbar .mce-toolbar {
+	display: block;
+}
+
+.freeform-toolbar .mce-toolbar .mce-btn {
+	margin: 0;
+	padding: 3px;
+	background: none;
+	outline: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+	position: relative;
+	width: $icon-button-size;
+	height: $icon-button-size;
+
+	// Overwrite
+	border: none;
+	box-sizing: border-box;
+
+	&:hover,
+	/* the ":not(:disabled)" is needed to make it specific enough */
+	&:hover:not(:disabled),
+	&:focus,
+	&:focus:active {
+		color: $dark-gray-500;
+		outline: none;
+		box-shadow: none;
+		background: inherit;
+	}
+
+	&.mce-active,
+	&.mce-active:hover {
+		background: none;
+		color: $white;
+	}
+
+	&:disabled {
+		cursor: default;
+	}
+
+	&> button {
+		border: 1px solid transparent;
+		padding: 4px;
+		box-sizing: content-box;
+	}
+
+	&:hover button,
+	&:focus button {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.mce-active button,
+		&:hover button,
+		&:focus button {
+			border: 1px solid $dark-gray-500;
+		}
+	}
+
+	&.mce-active button,
+	&.mce-active:hover button {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
+
+	&.mce-active .mce-ico {
+		color: $white;
+	}
+
+	&.mce-listbox,
+	&.mce-colorbutton {
+		width: auto;
+		border: none;
+		box-shadow: none;
+	}
+
+	&.mce-colorbutton .mce-preview {
+		bottom: 8px;
+		left: 8px;
+	}
+}
+
+.mce-tooltip {
+	display: none;
+}
+
+.components-toolbar__control .dashicon {
+	display: block;
 }

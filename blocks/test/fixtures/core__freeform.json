@@ -3,28 +3,7 @@
         "uid": "_uid_0",
         "name": "core/freeform",
         "attributes": {
-            "content": [
-                "Testing freeform block with some\n",
-                {
-                    "attributes": {
-                        "className": "wp-some-class"
-                    },
-                    "children": [
-                        "\n\tHTML ",
-                        {
-                            "attributes": {
-                                "style": {
-                                    "color": "red"
-                                }
-                            },
-                            "children": "content",
-                            "type": "span"
-                        },
-                        "\n"
-                    ],
-                    "type": "div"
-                }
-            ]
+            "content": "Testing freeform block with some\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>"
         }
     }
 ]
