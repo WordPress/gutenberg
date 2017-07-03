@@ -21,6 +21,7 @@ import { BACKSPACE, DELETE, ENTER } from 'utils/keycodes';
 import './style.scss';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import patterns from './patterns';
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -80,6 +81,8 @@ export default class Editable extends Component {
 		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'selectionChange', this.onSelectionChange );
 		editor.on( 'PastePostProcess', this.onPastePostProcess );
+
+		patterns.apply( this, [ editor ] );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
