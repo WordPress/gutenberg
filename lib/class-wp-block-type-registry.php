@@ -44,7 +44,7 @@ final class WP_Block_Type_Registry {
 	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
 	 *     ones described below are supported by default. Default empty array.
 	 *
-	 *     @type callable $render Callback used to render blocks of this block type.
+	 *     @type callable $render_callback Callback used to render blocks of this block type.
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */

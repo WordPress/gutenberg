@@ -30,7 +30,7 @@ class WP_Block_Type {
 	 * @access public
 	 * @var callable
 	 */
-	public $render;
+	public $render_callback;
 
 	/**
 	 * Constructor.
@@ -63,11 +63,11 @@ class WP_Block_Type {
 	 * @return string Rendered block type output.
 	 */
 	public function render( $attributes = array(), $content = '' ) {
-		if ( ! is_callable( $this->render ) ) {
+		if ( ! is_callable( $this->render_callback ) ) {
 			return $content;
 		}
 
-		return call_user_func( $this->render, $attributes, $content );
+		return call_user_func( $this->render_callback, $attributes, $content );
 	}
 
 	/**
@@ -80,7 +80,7 @@ class WP_Block_Type {
 	 */
 	public function set_props( $args ) {
 		$args = wp_parse_args( $args, array(
-			'render' => null,
+			'render_callback' => null,
 		) );
 
 		$args['name'] = $this->name;

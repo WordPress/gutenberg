@@ -12,14 +12,14 @@ class Block_Type_Test extends WP_UnitTestCase {
 	function test_set_props() {
 		$name = 'core/dummy';
 		$args = array(
-			'render' => array( $this, 'render_dummy_block' ),
-			'foo'    => 'bar',
+			'render_callback' => array( $this, 'render_dummy_block' ),
+			'foo'             => 'bar',
 		);
 
 		$block_type = new WP_Block_Type( $name, $args );
 
 		$this->assertSame( $name, $block_type->name );
-		$this->assertSame( $args['render'], $block_type->render );
+		$this->assertSame( $args['render_callback'], $block_type->render_callback );
 		$this->assertSame( $args['foo'], $block_type->foo );
 	}
 
@@ -30,7 +30,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		);
 
 		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'render' => array( $this, 'render_dummy_block' ),
+			'render_callback' => array( $this, 'render_dummy_block' ),
 		) );
 		$output = $block_type->render( $attributes );
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
@@ -44,7 +44,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$content = '<p>Test content.</p>';
 
 		$block_type = new WP_Block_Type( 'core/dummy', array(
-			'render' => array( $this, 'render_dummy_block_with_content' ),
+			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
 		) );
 		$output = $block_type->render( $attributes, $content );
 		$attributes['_content'] = $content;
