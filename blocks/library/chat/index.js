@@ -66,7 +66,11 @@ registerBlockType( 'core/chat', {
 				</Placeholder>
 			),
 			! focus && (
-				<ChatTranscript value={ content } compact={ compact } />
+				<ChatTranscript
+					className={ className }
+					value={ content }
+					compact={ compact }
+				/>
 			),
 		];
 	},
