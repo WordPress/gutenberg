@@ -60,21 +60,6 @@
     "test": "jest",
     "watch": "jest --watch"
   },
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 8
-    },
-    "plugins": [
-      "jest"
-    ],
-    "extends": [
-      "plugin:wordpress/recommended",
-      "plugin:jest/recommended"
-    ],
-    "env": {
-      "jest": true
-    }
-  },
   "jest": {
     "testEnvironment": "node",
     "verbose": true
