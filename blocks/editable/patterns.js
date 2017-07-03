@@ -4,7 +4,12 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get } from 'lodash';
+import { find, get, escapeRegExp, trimStart } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { ESCAPE, ENTER, SPACE, BACKSPACE } from 'utils/keycodes';
 
 /**
  * Internal dependencies
@@ -15,17 +20,6 @@ import { getBlockTypes } from '../api/registration';
  * Browser dependencies
  */
 const { setTimeout } = window;
-
-/**
- * Escapes characters for use in a Regular Expression.
- *
- * @param  {String} string Characters to escape
- *
- * @return {String}        Escaped characters
- */
-function escapeRegExp( string ) {
-	return string.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' );
-}
 
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );
@@ -61,7 +55,9 @@ export default function( editor ) {
 	} );
 
 	editor.on( 'keydown', function( event ) {
-		if ( ( canUndo && event.keyCode === 27 /* ESCAPE */ ) || ( canUndo === 'space' && event.keyCode === VK.BACKSPACE ) ) {
+		const { keyCode } = event;
+
+		if ( ( canUndo && keyCode === ESCAPE ) || ( canUndo === 'space' && keyCode === BACKSPACE ) ) {
 			editor.undoManager.undo();
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -71,12 +67,12 @@ export default function( editor ) {
 			return;
 		}
 
-		if ( event.keyCode === VK.ENTER ) {
+		if ( keyCode === ENTER ) {
 			enter();
 		// Wait for the browser to insert the character.
-		} else if ( event.keyCode === VK.SPACEBAR ) {
+		} else if ( keyCode === SPACE ) {
 			setTimeout( space );
-		} else if ( event.keyCode > 47 && ! ( event.keyCode >= 91 && event.keyCode <= 93 ) ) {
+		} else if ( keyCode > 47 && ! ( keyCode >= 91 && keyCode <= 93 ) ) {
 			setTimeout( inline );
 		}
 	}, true );
@@ -287,7 +283,7 @@ export default function( editor ) {
 			editor.undoManager.transact( function() {
 				if ( pattern.format ) {
 					editor.formatter.apply( pattern.format, {}, node );
-					node.replaceData( 0, node.data.length, ltrim( node.data.slice( pattern.start.length ) ) );
+					node.replaceData( 0, node.data.length, trimStart( node.data.slice( pattern.start.length ) ) );
 				} else if ( pattern.element ) {
 					parent = node.parentNode && node.parentNode.parentNode;
 
@@ -302,9 +298,5 @@ export default function( editor ) {
 				canUndo = 'enter';
 			} );
 		} );
-	}
-
-	function ltrim( text ) {
-		return text ? text.replace( /^\s+/, '' ) : '';
 	}
 }
