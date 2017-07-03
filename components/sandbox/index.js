@@ -154,7 +154,7 @@ export default class Sandbox extends wp.element.Component {
 				ref={ ( node ) => this.iframe = node }
 				title={ this.props.title }
 				scrolling="no"
-				sandbox="allow-scripts allow-same-origin"
+				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
 				width={ this.state.width }
 				height={ this.state.height } />
