@@ -12,7 +12,7 @@ import { __ } from 'i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
+import { registerBlockType, query, createBlock } from '../../api';
 
 const { prop } = query;
 
@@ -25,6 +25,16 @@ registerBlockType( 'core/code', {
 
 	attributes: {
 		content: prop( 'code', 'textContent' ),
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'pattern',
+				regExp: /^```$/,
+				transform: () => createBlock( 'core/code' ),
+			},
+		],
 	},
 
 	edit( { attributes, setAttributes, className } ) {

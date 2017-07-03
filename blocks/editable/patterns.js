@@ -4,7 +4,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, trimStart } from 'lodash';
+import { find, get, escapeRegExp, trimStart, partition } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,21 +28,15 @@ export default function( editor ) {
 	var VK = tinymce.util.VK;
 	var settings = editor.settings.wptextpattern || {};
 
-	const spacePatterns = getBlockTypes().reduce( ( acc, blockType ) => {
+	const patterns = getBlockTypes().reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
 		const transforms = transformsFrom.filter( ( { type } ) => type === 'pattern' );
 		return [ ...acc, ...transforms ];
 	}, [] );
 
-	var enterPatterns = settings.enter || [
-		// { start: '##', format: 'h2' },
-		// { start: '###', format: 'h3' },
-		// { start: '####', format: 'h4' },
-		// { start: '#####', format: 'h5' },
-		// { start: '######', format: 'h6' },
-		// { start: '>', format: 'blockquote' },
-		// { regExp: /^(-){3,}$/, element: 'hr' }
-	];
+	const [ enterPatterns, spacePatterns ] = partition( patterns, ( { regExp } ) =>
+		regExp.source.endsWith( '$' )
+	);
 
 	var inlinePatterns = settings.inline || [
 		{ delimiter: '`', format: 'code' }
@@ -209,6 +203,10 @@ export default function( editor ) {
 	}
 
 	function space() {
+		if ( ! onReplace ) {
+			return;
+		}
+
 		var rng = editor.selection.getRng(),
 			node = rng.startContainer,
 			parent,
@@ -243,60 +241,27 @@ export default function( editor ) {
 	}
 
 	function enter() {
-		var rng = editor.selection.getRng(),
-			start = rng.startContainer,
-			node = firstTextNode( start ),
-			i = enterPatterns.length,
-			text, pattern, parent;
-
-		if ( ! node ) {
+		if ( ! onReplace || ! inline ) {
 			return;
 		}
 
-		text = node.data;
+		// Merge text nodes.
+		editor.getBody().normalize();
 
-		while ( i-- ) {
-			if ( enterPatterns[ i ].start ) {
-				if ( text.indexOf( enterPatterns[ i ].start ) === 0 ) {
-					pattern = enterPatterns[ i ];
-					break;
-				}
-			} else if ( enterPatterns[ i ].regExp ) {
-				if ( enterPatterns[ i ].regExp.test( text ) ) {
-					pattern = enterPatterns[ i ];
-					break;
-				}
-			}
+		const content = getContent();
+
+		if ( ! content.length ) {
+			return;
 		}
+
+		const pattern = find( enterPatterns, ( { regExp } ) => regExp.test( content[ 0 ] ) )
 
 		if ( ! pattern ) {
 			return;
 		}
 
-		if ( node === start && tinymce.trim( text ) === pattern.start ) {
-			return;
-		}
+		const block = pattern.transform( { content } );
 
-		editor.once( 'keyup', function() {
-			editor.undoManager.add();
-
-			editor.undoManager.transact( function() {
-				if ( pattern.format ) {
-					editor.formatter.apply( pattern.format, {}, node );
-					node.replaceData( 0, node.data.length, trimStart( node.data.slice( pattern.start.length ) ) );
-				} else if ( pattern.element ) {
-					parent = node.parentNode && node.parentNode.parentNode;
-
-					if ( parent ) {
-						parent.replaceChild( document.createElement( pattern.element ), node.parentNode );
-					}
-				}
-			} );
-
-			// We need to wait for native events to be triggered.
-			setTimeout( function() {
-				canUndo = 'enter';
-			} );
-		} );
+		editor.once( 'keyup', () => onReplace( [ block ] ) );
 	}
 }
