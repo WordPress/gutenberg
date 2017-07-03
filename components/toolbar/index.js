@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -40,7 +40,7 @@ function Toolbar( { controls = [], children } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classNames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
