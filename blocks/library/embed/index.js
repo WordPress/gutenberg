@@ -164,7 +164,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed' } ) {
 
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-				const iframeTitle = 'Embedded content from ' + parsedUrl.host;
+				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
 				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
 					typeClassName += ' is-video';
