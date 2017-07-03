@@ -1,13 +1,13 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
 import { Placeholder } from 'components';
 import { __ } from 'i18n';
-
-/**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * Internal dependencies
