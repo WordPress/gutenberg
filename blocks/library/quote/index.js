@@ -54,6 +54,15 @@ registerBlockType( 'core/quote', {
 					} );
 				},
 			},
+			{
+				type: 'pattern',
+				regExp: /^>\s/,
+				transform: ( { content } ) => {
+					return createBlock( 'core/quote', {
+						value: content,
+					} );
+				},
+			},
 		],
 		to: [
 			{
