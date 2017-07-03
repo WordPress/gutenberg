@@ -8,9 +8,9 @@ import { __ } from 'i18n';
  */
 import './style.scss';
 import { registerBlockType, query, setUnknownTypeHandler } from '../../api';
-import FreeformBlock from './freeform-block';
+import OldEditor from './old-editor';
 
-const { children } = query;
+const { prop } = query;
 
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic Text' ),
@@ -20,30 +20,10 @@ registerBlockType( 'core/freeform', {
 	category: 'formatting',
 
 	attributes: {
-		content: children(),
+		content: prop( 'innerHTML' ),
 	},
 
-	defaultAttributes: {
-		content: <p />,
-	},
-
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { content } = attributes;
-
-		return (
-			<FreeformBlock
-				className={ className }
-				content={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				focus={ focus }
-				onFocus={ setFocus }
-			/>
-		);
-	},
+	edit: OldEditor,
 
 	save( { attributes } ) {
 		const { content } = attributes;
