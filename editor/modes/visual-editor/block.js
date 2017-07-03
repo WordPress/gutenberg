@@ -32,6 +32,7 @@ import {
 	clearSelectedBlock,
 	startTyping,
 	stopTyping,
+	replaceBlocks,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -335,7 +336,7 @@ class VisualEditorBlock extends Component {
 			'is-showing-mobile-controls': showMobileControls,
 		} );
 
-		const { onMouseLeave, onFocus, onInsertBlocksAfter } = this.props;
+		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -408,6 +409,7 @@ class VisualEditorBlock extends Component {
 							attributes={ block.attributes }
 							setAttributes={ this.setAttributes }
 							insertBlocksAfter={ onInsertBlocksAfter }
+							onReplace={ onReplace }
 							setFocus={ partial( onFocus, block.uid ) }
 							mergeBlocks={ this.mergeBlocks }
 							className={ className }
@@ -496,6 +498,10 @@ export default connect(
 
 		onMerge( ...args ) {
 			dispatch( mergeBlocks( ...args ) );
+		},
+
+		onReplace( blocks ) {
+			dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
 		},
 	} )
 )( VisualEditorBlock );
