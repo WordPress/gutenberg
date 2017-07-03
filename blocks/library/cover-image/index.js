@@ -58,7 +58,10 @@ registerBlockType( 'core/cover-image', {
 					<Toolbar>
 						<li>
 							<MediaUploadButton
-								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
+								buttonProps={ {
+									className: 'components-icon-button components-toolbar__control',
+									'aria-label': __( 'Edit image' ),
+								} }
 								onSelect={ onSelectImage }
 								type="image"
 								value={ id }
