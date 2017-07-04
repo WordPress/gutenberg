@@ -13,6 +13,7 @@
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
+		z-index: auto;
 		height: auto;
 		overflow: auto;
 	}
