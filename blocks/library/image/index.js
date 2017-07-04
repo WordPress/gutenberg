@@ -88,7 +88,7 @@ registerBlockType( 'core/image', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
-						type="format-image"
+						type="image"
 						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }
