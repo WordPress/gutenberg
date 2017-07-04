@@ -8,6 +8,7 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { __ } from 'i18n';
 import { Component } from 'element';
+import { SandBox } from 'components';
 
 /**
  * Internal dependencies
@@ -95,7 +96,7 @@ registerBlockType( 'core/html', {
 						</InspectorControls>
 					}
 					{ preview
-						? <div dangerouslySetInnerHTML={ { __html: attributes.content } } />
+						? <SandBox html={ attributes.content } title={ __( 'Preview of custom HTML' ) } />
 						: <TextareaAutosize
 							value={ attributes.content }
 							onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
