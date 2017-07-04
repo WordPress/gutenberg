@@ -5,7 +5,7 @@ BEFORE POSTING YOUR ISSUE:
 - If you're requesting a new feature, explain why you'd like it to be added.
 - Search this repository for the issue and whether it has been fixed or reported already.
 - Ensure you are using the latest code before logging bugs.
-- Disabled all plugins to ensure it's not a plugin conflict issue.
+- Disable all plugins to ensure it's not a plugin conflict issue.
 -->
 
 ## Issue Overview
