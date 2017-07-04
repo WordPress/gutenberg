@@ -1354,6 +1354,27 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 40891
+	 */
+	public function test_taxonomy_meta_capabilities_with_non_existent_terms() {
+		$caps = array(
+			'add_term_meta',
+			'delete_term_meta',
+			'edit_term_meta',
+		);
+
+		$taxonomy = 'wptests_tax';
+		register_taxonomy( $taxonomy, 'post' );
+
+		$editor = self::$users['editor'];
+
+		foreach ( $caps as $cap ) {
+			// `null` represents a non-existent term ID.
+			$this->assertFalse( user_can( $editor->ID, $cap, null ) );
+		}
+	}
+
+	/**
 	 * @ticket 21786
 	 */
 	function test_negative_caps() {
