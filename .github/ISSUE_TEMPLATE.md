@@ -2,6 +2,7 @@
 BEFORE POSTING YOUR ISSUE:
 - These comments won't show up when you submit the issue.
 - Try to add as much detail as possible. Be specific!
+- Please add the version of Gutenberg you are using in the description
 - If you're requesting a new feature, explain why you'd like it to be added.
 - Search this repository for the issue and whether it has been fixed or reported already.
 - Ensure you are using the latest code before logging bugs.
@@ -18,6 +19,7 @@ BEFORE POSTING YOUR ISSUE:
 2.
 3.
 4.
+<!-- Provide what browser you are using and any other specfics to your setup -->
 
 ## Expected Behavior
 <!-- If you're describing a bug, tell us what should happen -->
