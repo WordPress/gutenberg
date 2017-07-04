@@ -23,21 +23,21 @@ function register_block_type( $name, $settings ) {
 	global $wp_registered_blocks;
 
 	if ( ! is_string( $name ) ) {
-		$message = __( 'Block names must be strings.' );
+		$message = __( 'Block names must be strings.', 'gutenberg' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
 	$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
 	if ( ! preg_match( $name_matcher, $name ) ) {
-		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+		$message = __( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block', 'gutenberg' );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
 
 	if ( isset( $wp_registered_blocks[ $name ] ) ) {
 		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is already registered.' ), $name );
+		$message = sprintf( __( 'Block "%s" is already registered.', 'gutenberg' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
@@ -59,7 +59,7 @@ function unregister_block_type( $name ) {
 	global $wp_registered_blocks;
 	if ( ! isset( $wp_registered_blocks[ $name ] ) ) {
 		/* translators: 1: block name */
-		$message = sprintf( __( 'Block "%s" is not registered.' ), $name );
+		$message = sprintf( __( 'Block "%s" is not registered.', 'gutenberg' ), $name );
 		_doing_it_wrong( __FUNCTION__, $message, '0.1.0' );
 		return false;
 	}
