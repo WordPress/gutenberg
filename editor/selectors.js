@@ -2,12 +2,13 @@
  * External dependencies
  */
 import moment from 'moment';
-import { first, last, get, values } from 'lodash';
+import { first, last, get, values, sortBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * Internal dependencies
  */
+import { getBlockType } from 'blocks';
 import { addQueryArgs } from './utils/url';
 
 /**
@@ -667,4 +668,19 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getNotices( state ) {
 	return values( state.notices );
+}
+
+/**
+ * Resolves the list of recently used block names into a list of block type settings.
+ *
+ * @param {Object} state Global application state
+ * @return {Array}       List of recently used blocks
+ */
+export function getRecentlyUsedBlocks( state ) {
+	// resolves the block names in the state to the block type settings,
+	// and orders by title so they don't jump around as much in the recent tab
+	return sortBy(
+		state.editor.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) ),
+		( blockType ) => blockType.title
+	);
 }
