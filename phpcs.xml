@@ -11,6 +11,9 @@
 	<!-- Use colors in output -->
 	<arg value="-colors"/>
 	
+	<!-- Show Progress -->
+	<arg value="p"/>
+	
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>
