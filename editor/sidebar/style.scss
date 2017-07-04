@@ -9,11 +9,12 @@
 	background: $light-gray-300;
 	color: $dark-gray-500;
 	height: 100vh;
-	overflow: auto;
+	overflow: hidden;
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
 		height: auto;
+		overflow: auto;
 	}
 
 	@include break-medium() {
@@ -23,12 +24,38 @@
 	> .components-panel {
 		border-left: none;
 		border-right: none;
+		overflow: auto;
+		height: 100%;
+		padding-top: $sidebar-panel-header-height;
+
+		@include break-small() {
+			overflow: inherit;
+			height: auto;
+			padding-top: 0;
+		}
+
 		&:first-child {
 			margin-top: -1px;
 		}
 
 		&:last-child {
 			margin-bottom: -1px;
+		}
+	}
+
+	> .components-panel .components-panel__header {
+		position: fixed;
+		z-index: z-index( '.components-panel__header' );
+		top: 0;
+		left: 0;
+		right: 0;
+		height: $sidebar-panel-header-height;
+
+		@include break-small() {
+			position: inherit;
+			top: auto;
+			left: auto;
+			right: auto;
 		}
 	}
 
