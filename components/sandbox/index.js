@@ -80,8 +80,8 @@ export default class Sandbox extends wp.element.Component {
 				function sendResize() {
 					window.top.postMessage( {
 						action: 'resize',
-						width: document.body.offsetWidth,
-						height: document.body.offsetHeight
+						width: document.body.scrollWidth,
+						height: document.body.scrollHeight
 					}, '*' );
 				}
 
