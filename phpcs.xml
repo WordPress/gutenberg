@@ -5,7 +5,12 @@
 	<rule ref="WordPress-Core" />
 	<rule ref="WordPress-Docs" />
 
+	<!-- Show sniff codes in all reports -->
 	<arg value="s"/>
+
+	<!-- Use colors in output -->
+	<arg value="-colors"/>
+	
 	<arg name="extensions" value="php"/>
 
 	<file>gutenberg.php</file>
