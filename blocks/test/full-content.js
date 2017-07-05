@@ -88,7 +88,7 @@ function normalizeParsedBlocks( blocks ) {
 	} );
 }
 
-describe.skip( 'full post content fixture', () => {
+describe( 'full post content fixture', () => {
 	fileBasenames.forEach( f => {
 		it( f, () => {
 			const content = readFixtureFile( f + '.html' );

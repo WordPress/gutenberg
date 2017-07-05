@@ -125,7 +125,8 @@
       "<rootDir>"
     ],
     "setupFiles": [
-      "<rootDir>/test/setup-globals.js"
+      "<rootDir>/test/setup-globals.js",
+      "<rootDir>/test/setup-wp-aliases.js"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
     "testMatch": [
