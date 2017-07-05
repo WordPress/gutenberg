@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://youtube.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

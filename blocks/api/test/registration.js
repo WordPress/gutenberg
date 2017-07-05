@@ -51,6 +51,12 @@ describe( 'blocks', () => {
 			expect( block ).to.be.undefined();
 		} );
 
+		it( 'should reject blocks with too many namespaces', () => {
+			const block = registerBlockType( 'doing/it/wrong' );
+			expect( console.error ).to.have.been.calledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );
+			expect( block ).to.be.undefined();
+		} );
+
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
 			expect( console.error ).to.have.been.calledWith( 'Block names must contain a namespace prefix. Example: my-plugin/my-custom-block' );

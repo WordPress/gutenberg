@@ -47,7 +47,7 @@ describe( 'block serializer', () => {
 				expect( saved ).to.equal( '<div class="wp-block-fruit">Bananas</div>' );
 			} );
 
-			it( 'should return use the namespace in the classname if it\' not a core block', () => {
+			it( 'should use the namespace in the classname for non-core blocks', () => {
 				const saved = getSaveContent(
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
@@ -59,7 +59,7 @@ describe( 'block serializer', () => {
 				expect( saved ).to.equal( '<div class="wp-block-myplugin-fruit">Bananas</div>' );
 			} );
 
-			it( 'should overrides the className', () => {
+			it( 'should allow overriding the className', () => {
 				const saved = getSaveContent(
 					{
 						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),

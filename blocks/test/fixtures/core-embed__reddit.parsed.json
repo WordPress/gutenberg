@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://reddit.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-reddit\">\n    https://reddit.com/\n    <figcaption>Embedded content from reddit</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-reddit\">\n    https://reddit.com/\n    <figcaption>Embedded content from reddit</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
