@@ -3510,7 +3510,7 @@ mockedApiResponse.oembeds = {
     "type": "rich",
     "width": 600,
     "height": 338,
-    "html": "<blockquote class=\"wp-embedded-content\">...</blockquote>"
+    "html": "<blockquote class=\"wp-embedded-content\">...</blockquote>..."
 };
 
 mockedApiResponse.oembedProxy = {
@@ -3901,7 +3901,7 @@ mockedApiResponse.MediaCollection = [
         "template": "",
         "meta": [],
         "description": {
-            "rendered": "<p class=\"attachment\"><a href='http://example.org/wp-content/uploads//tmp/canola.jpg'><img width=\"1\" height=\"1\" src=\"http://example.org/wp-content/uploads//tmp/canola.jpg\" class=\"attachment-medium size-medium\" alt=\"\" /></a></p>\n"
+            "rendered": "<p class=\"attachment\"><!-- <a...><img.../></a> --></p>"
         },
         "caption": {
             "rendered": "<p>A sample caption</p>\n"
@@ -3960,7 +3960,7 @@ mockedApiResponse.MediaModel = {
     "template": "",
     "meta": [],
     "description": {
-        "rendered": "<p class=\"attachment\"><a href='http://example.org/wp-content/uploads//tmp/canola.jpg'><img width=\"1\" height=\"1\" src=\"http://example.org/wp-content/uploads//tmp/canola.jpg\" class=\"attachment-medium size-medium\" alt=\"\" /></a></p>\n"
+        "rendered": "<p class=\"attachment\"><!-- <a...><img.../></a> --></p>"
     },
     "caption": {
         "rendered": "<p>A sample caption</p>\n"
