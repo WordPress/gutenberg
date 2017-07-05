@@ -17,6 +17,11 @@
 	@include break-large() {
 		padding: 60px 0;
 	}
+
+	.collaboration-enabled {
+		padding-top: 5px;
+		margin-top: 2px;
+	}
 }
 
 .editor-visual-editor {

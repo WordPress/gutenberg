@@ -14,6 +14,7 @@ define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 
 require_once dirname( __FILE__ ) . '/lib/init-checks.php';
+require_once dirname( __FILE__ ) . '/lib/collaboration.php';
 if ( gutenberg_can_init() ) {
 	// Load API functions, register scripts and actions, etc.
 	require_once dirname( __FILE__ ) . '/lib/blocks.php';

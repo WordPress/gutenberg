@@ -715,3 +715,42 @@ export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
 	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }
+
+/**
+ * Returns the peerData Object
+ *
+ * @param {Object} state Global application state
+ * @param {Object} uid current props uid
+ *
+ * @return {Object} Name, Css style for peerColor, peerID
+ */
+export function getPeerData( state, uid ) {
+	const { peerID, peerName, peerColor, blocksByUid } = state.collaborationMode;
+
+	if ( peerColor && peerID && peerName && peerID !== window.grtcProps.peerID && blocksByUid === uid ) {
+		const peerMetaData = {
+			peerID,
+			peerName,
+			peerColor: {
+				'border-top': '2px solid ' + peerColor,
+				'border-bottom': '2px solid ' + peerColor,
+			},
+		};
+		window.grtcProps.lastPeerData = {
+			...peerMetaData,
+			blockID: blocksByUid,
+		};
+		return peerMetaData;
+	}
+
+	// This is to avoid unsetting current another peer border, This is basically storing last block peer data.
+	if ( window.grtcProps.lastPeerData && peerID === window.grtcProps.peerID && window.grtcProps.lastPeerData.blockID === uid ) {
+		return window.grtcProps.lastPeerData;
+	}
+
+	return {
+		peerID: null,
+		peerName: null,
+		peerColor: {},
+	};
+}

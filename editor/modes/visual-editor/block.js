@@ -31,6 +31,7 @@ import {
 	clearSelectedBlock,
 	startTyping,
 	stopTyping,
+	collaborationState,
 } from '../../actions';
 import {
 	getPreviousBlock,
@@ -43,6 +44,7 @@ import {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	isTyping,
+	getPeerData,
 } from '../../selectors';
 
 function FirstChild( { children } ) {
@@ -302,6 +304,7 @@ class VisualEditorBlock extends Component {
 
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
+		const { peerName, peerID, peerColor } = this.props.peerData;
 		const blockType = getBlockType( block.name );
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
@@ -345,66 +348,74 @@ class VisualEditorBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<div
-				ref={ this.bindBlockNode }
-				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.onKeyUp }
-				onFocus={ this.onFocus }
-				onMouseMove={ this.maybeHover }
-				onMouseEnter={ this.maybeHover }
-				onMouseLeave={ onMouseLeave }
-				className={ wrapperClassname }
-				data-type={ block.name }
-				tabIndex="0"
-				aria-label={ blockLabel }
-				{ ...wrapperProps }
+				className="collaboration-enabled"
+				style={ peerColor }
+				data-id={ peerID }
+				data-name={ peerName }
+				data-block={ this.props.uid }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI &&
-					<CSSTransitionGroup
-						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
-						transitionAppear={ true }
-						transitionAppearTimeout={ 100 }
-						transitionEnter={ false }
-						transitionLeave={ false }
-						component={ FirstChild }
-					>
-						<div className="editor-visual-editor__block-controls">
-							<BlockSwitcher uid={ block.uid } />
-							<Slot name="Formatting.Toolbar" />
-							<Toolbar className="editor-visual-editor__mobile-tools">
-								{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-								{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-								<IconButton
-									className="editor-visual-editor__mobile-toggle"
-									onClick={ this.toggleMobileControls }
-									aria-expanded={ showMobileControls }
-									label={ __( 'Toggle extra controls' ) }
-									icon="ellipsis"
-								/>
-							</Toolbar>
-						</div>
-					</CSSTransitionGroup>
-				}
-				{ isFirstMultiSelected && (
-					<BlockMover uids={ multiSelectedBlockUids } />
-				) }
 				<div
-					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
-					onMouseDown={ this.onPointerDown }
-					onTouchStart={ this.onPointerDown }
+					ref={ this.bindBlockNode }
+					onKeyDown={ this.onKeyDown }
+					onKeyUp={ this.onKeyUp }
+					onFocus={ this.onFocus }
+					onMouseMove={ this.maybeHover }
+					onMouseEnter={ this.maybeHover }
+					onMouseLeave={ onMouseLeave }
+					className={ wrapperClassname }
+					data-type={ block.name }
+					tabIndex="0"
+					aria-label={ blockLabel }
+					{ ...wrapperProps }
 				>
-					<BlockEdit
-						focus={ focus }
-						attributes={ block.attributes }
-						setAttributes={ this.setAttributes }
-						insertBlocksAfter={ onInsertBlocksAfter }
-						setFocus={ partial( onFocus, block.uid ) }
-						mergeBlocks={ this.mergeBlocks }
-						className={ classnames( className, block.attributes.className ) }
-						id={ block.uid }
-					/>
+					{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+					{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+					{ showUI &&
+						<CSSTransitionGroup
+							transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
+							transitionAppear={ true }
+							transitionAppearTimeout={ 100 }
+							transitionEnter={ false }
+							transitionLeave={ false }
+							component={ FirstChild }
+						>
+							<div className="editor-visual-editor__block-controls">
+								<BlockSwitcher uid={ block.uid } />
+								<Slot name="Formatting.Toolbar" />
+								<Toolbar className="editor-visual-editor__mobile-tools">
+									{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+									{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+									<IconButton
+										className="editor-visual-editor__mobile-toggle"
+										onClick={ this.toggleMobileControls }
+										aria-expanded={ showMobileControls }
+										label={ __( 'Toggle extra controls' ) }
+										icon="ellipsis"
+									/>
+								</Toolbar>
+							</div>
+						</CSSTransitionGroup>
+					}
+					{ isFirstMultiSelected && (
+						<BlockMover uids={ multiSelectedBlockUids } />
+					) }
+					<div
+						onKeyPress={ this.maybeStartTyping }
+						onDragStart={ ( event ) => event.preventDefault() }
+						onMouseDown={ this.onPointerDown }
+						onTouchStart={ this.onPointerDown }
+					>
+						<BlockEdit
+							focus={ focus }
+							attributes={ block.attributes }
+							setAttributes={ this.setAttributes }
+							insertBlocksAfter={ onInsertBlocksAfter }
+							setFocus={ partial( onFocus, block.uid ) }
+							mergeBlocks={ this.mergeBlocks }
+							className={ classnames( className, block.attributes.className ) }
+							id={ block.uid }
+						/>
+					</div>
 				</div>
 			</div>
 		);
@@ -425,6 +436,7 @@ export default connect(
 			focus: getBlockFocus( state, ownProps.uid ),
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
+			peerData: getPeerData( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {
@@ -438,7 +450,9 @@ export default connect(
 				selected: true,
 				uid: ownProps.uid,
 			} );
+			dispatch( collaborationState( window.grtcProps, ownProps.uid ) );
 		},
+
 		onDeselect() {
 			dispatch( clearSelectedBlock() );
 		},
@@ -458,6 +472,7 @@ export default connect(
 				uid: ownProps.uid,
 			} );
 		},
+
 		onMouseLeave() {
 			dispatch( {
 				type: 'TOGGLE_BLOCK_HOVERED',

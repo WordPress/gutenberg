@@ -19,6 +19,7 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import TableOfContents from '../table-of-contents';
+import CollaborationPanel from '../collaboration';
 
 const PostSettings = () => {
 	return (
@@ -30,6 +31,7 @@ const PostSettings = () => {
 			<PostExcerpt />
 			<DiscussionPanel />
 			<TableOfContents />
+			<CollaborationPanel />
 		</Panel>
 	);
 };
