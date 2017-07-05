@@ -10,6 +10,7 @@ import './style.scss';
 import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
+import BlockDescription from '../../block-description';
 
 registerBlockType( 'core/more', {
 	title: __( 'More' ),
@@ -37,7 +38,9 @@ registerBlockType( 'core/more', {
 				/>
 				{ focus &&
 					<InspectorControls key="inspector">
-						<p className="editor-block-inspector__description">"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.</p>
+						<BlockDescription>
+							<p>{ __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.</p><p className="editor-block-inspector__description">"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ) }</p>
+						</BlockDescription>
 					</InspectorControls>
 				}
 			</div>
