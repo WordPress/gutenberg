@@ -1122,5 +1122,49 @@ export function isPublishingPost( state ) {
 
 	// Consider as publishing when current post prior to request was not
 	// considered published
-	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+	return ! ! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+}
+
+/**
+ * Returns the peerData Object
+ *
+ * @param {Object} state Global application state
+ * @param {Object} uid current props uid
+ *
+ * @return {Object} peerMataData {Name, Css style for peerColor, peerID}, grtcProps
+ */
+export function getPeerData( state, uid ) {
+	const { peerID, peerName, peerColor, blocksByUid } = state.collaborationMode;
+	const grtcProps = state.collaborationLocalData;
+	let peerMetaData = {
+		peerID: null,
+		peerName: null,
+		peerColor: null,
+		peerShowStyle: false,
+	};
+
+	// Show UI if peerID doesn't match and you get state from other peer.
+	if ( peerColor && peerID && peerName && peerID !== grtcProps.peerID && blocksByUid === uid ) {
+		peerMetaData = {
+			peerID,
+			peerName,
+			peerColor,
+			peerShowStyle: true,
+			blockID: blocksByUid,
+		};
+		grtcProps.lastPeerData = peerMetaData;
+	}
+
+	// This is to avoid unsetting current another peer border, This is basically storing last block peer data.
+	if ( grtcProps.lastPeerData && peerID === grtcProps.peerID && grtcProps.lastPeerData.blockID === uid ) {
+		return {
+			peerMetaData: grtcProps.lastPeerData,
+			grtcProps,
+		};
+	}
+
+	return {
+		peerMetaData,
+		grtcProps,
+	};
 }

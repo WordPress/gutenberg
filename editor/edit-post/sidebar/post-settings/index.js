@@ -16,6 +16,7 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import { MetaBoxes } from '../../../components';
+import CollaborationPanel from '../collaboration';
 
 const panel = (
 	<Panel>
@@ -27,6 +28,7 @@ const panel = (
 		<DiscussionPanel />
 		<PageAttributes />
 		<DocumentOutlinePanel />
+		<CollaborationPanel />
 		<MetaBoxes location="side" usePanel />
 	</Panel>
 );
