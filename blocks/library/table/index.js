@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { cloneElement } from 'element';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -62,9 +67,30 @@ registerBlockType( 'core/table', {
 
 	save( { attributes } ) {
 		const { content } = attributes;
+
+		// React prohibits whitespace nodes as children of `table`, `thead`,
+		// and `tbody`.
+		// TODO: Why is this only a problem when running the tests?
+
+		function excludeWhitespace( node ) {
+			if ( Array.isArray( node ) ) {
+				return node.map( childNode => excludeWhitespace( childNode ) );
+			}
+
+			if ( typeof node === 'string' ) {
+				return /\S/.test( node ) ? node : null;
+			}
+
+			if ( node.props && node.props.children ) {
+				return cloneElement( node, {}, excludeWhitespace( node.props.children ) );
+			}
+
+			return node;
+		}
+
 		return (
 			<table>
-				{ content }
+				{ excludeWhitespace( content ) }
 			</table>
 		);
 	},
