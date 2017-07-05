@@ -7,3 +7,4 @@ yarn.lock
 gutenberg.zip
 storybook-static
 .DS_Store
+phpcs.xml
