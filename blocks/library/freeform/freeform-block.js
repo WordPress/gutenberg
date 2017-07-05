@@ -174,7 +174,7 @@ export default class FreeformBlock extends Component {
 	}
 
 	toggleMoreDrawer() {
-		this.setState( { showMore: ! this.state.showMore } );
+		this.setState( state => ( { showMore: ! state.showMore } ) );
 	}
 
 	setToolbarRef( elem ) {
