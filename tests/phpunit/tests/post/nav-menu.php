@@ -553,4 +553,63 @@ class Test_Nav_Menus extends WP_UnitTestCase {
 		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[0] ) );
 		$this->assertNotInstanceOf( 'WP_Post', get_post( $nav_created_post_ids[1] ) );
 	}
+
+	/**
+	 * @ticket 39800
+	 */
+	function test_parent_ancestor_for_post_archive() {
+
+		register_post_type( 'books', array( 'label' => 'Books', 'public' => true, 'has_archive' => true ) );
+
+		$first_page_id  = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Top Level Page' ) );
+		$second_page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Second Level Page' ) );
+
+
+		$first_menu_id = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type'      => 'post_type',
+			'menu-item-object'    => 'page',
+			'menu-item-object-id' => $first_page_id,
+			'menu-item-status'    => 'publish',
+		));
+
+		$second_menu_id = wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type'      => 'post_type',
+			'menu-item-object'    => 'page',
+			'menu-item-object-id' => $second_page_id,
+			'menu-item-status'    => 'publish',
+			'menu-item-parent-id' => $first_menu_id
+		));
+
+		wp_update_nav_menu_item( $this->menu_id, 0, array(
+			'menu-item-type'      => 'post_type_archive',
+			'menu-item-object'    => 'books',
+			'menu-item-status'    => 'publish',
+			'menu-item-parent-id' => $second_menu_id
+		));
+
+		$this->go_to( get_post_type_archive_link( 'books' ) );
+
+		$menu_items = wp_get_nav_menu_items( $this->menu_id );
+		_wp_menu_item_classes_by_context( $menu_items );
+
+		$top_page_menu_item       = $menu_items[0];
+		$secondary_page_menu_item = $menu_items[1];
+		$post_archive_menu_item   = $menu_items[2];
+
+		$this->assertFalse( $top_page_menu_item->current_item_parent );
+		$this->assertTrue( $top_page_menu_item->current_item_ancestor );
+		$this->assertContains( 'current-menu-ancestor', $top_page_menu_item->classes );
+
+		$this->assertTrue( $secondary_page_menu_item->current_item_parent );
+		$this->assertTrue( $secondary_page_menu_item->current_item_ancestor  );
+		$this->assertContains( 'current-menu-parent', $secondary_page_menu_item->classes );
+		$this->assertContains( 'current-menu-ancestor', $secondary_page_menu_item->classes );
+
+		$this->assertFalse( $post_archive_menu_item->current_item_parent );
+		$this->assertFalse( $post_archive_menu_item->current_item_ancestor  );
+
+		$this->assertNotContains( 'current-menu-parent', $post_archive_menu_item->classes );
+		$this->assertNotContains( 'current-menu-ancestor', $post_archive_menu_item->classes );
+	}
+
 }
