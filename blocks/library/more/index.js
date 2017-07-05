@@ -55,7 +55,7 @@ registerBlockType( 'core/more', {
 						</BlockDescription>
 					</InspectorControls>
 				}
-			</div>
+			</div>,
 		];
 	},
 
