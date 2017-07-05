@@ -1,3 +1,5 @@
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+
 /**
  * WordPress dependencies
  */
@@ -30,40 +32,38 @@ export function getCategories() {
 }
 
 /**
- * Register a new block category (e.g {slug: 'custom', title: __('Custom Blocks')})
+ * Register a new block category
+ *
+ * @param {Array} cat e.g {slug: 'custom', title: __('Custom Blocks')}
  *
  * @return {Array} Block categories
+ *
  */
 export function registerCategory( cat ) {
-
 	if ( ! cat ) {
 		console.error(
 			'The Block category must be defined'
 		);
 		return;
 	}
-
 	if ( ! cat.slug ) {
 		console.error(
 			'The Block category slug must be defined'
 		);
 		return;
 	}
-
 	if ( ! /^[a-z0-9-]+$/.test( cat.slug ) ) {
 		console.error(
 			'Block category slug must not contain characters which are invalid for urls'
 		);
 		return;
 	}
-
 	if ( categories.find( x => x.slug === cat.slug ) ) {
 		console.error(
 			'Block category "' + cat.slug + '" is already registered.'
 		);
 		return;
 	}
-
 	if ( ! cat.title ) {
 		console.error(
 			'The Block category title must be defined'
@@ -71,6 +71,6 @@ export function registerCategory( cat ) {
 		return;
 	}
 
-	categories.push(cat);
+	categories.push( cat );
 	return categories;
 }
