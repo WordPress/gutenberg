@@ -9,7 +9,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { children } = hpq;
 
-registerBlockType( 'core/table2', {
+registerBlockType( 'core/table', {
 	title: wp.i18n.__( 'Table' ),
 	icon: 'editor-table',
 	category: 'formatting',
@@ -29,7 +29,7 @@ registerBlockType( 'core/table2', {
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align ) {
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
 			return { 'data-align': align };
 		}
 	},
@@ -43,7 +43,7 @@ registerBlockType( 'core/table2', {
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide' ] }
+						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
 					/>
 				</BlockControls>
 			),
