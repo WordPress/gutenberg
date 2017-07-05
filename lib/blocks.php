@@ -108,7 +108,7 @@ add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode() and wpauto
  *
  * @since 0.3.0
  */
-function gutenberg_frontend_scripts_and_styles() {
+function gutenberg_common_scripts_and_styles() {
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-blocks' );
 
@@ -130,5 +130,5 @@ function gutenberg_frontend_scripts_and_styles() {
 	 */
 	do_action( 'enqueue_block_assets' );
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
-add_action( 'admin_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
