@@ -378,11 +378,13 @@ function gutenberg_common_scripts_and_styles() {
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-blocks' );
 
-	// Enqueue block styles built through plugins.  This lives in a separate
-	// action for a couple of reasons: (1) we want to load these assets
-	// (usually stylesheets) in *both* frontend and editor contexts, and (2)
-	// one day we may need to be smarter about whether assets are included
-	// based on whether blocks are actually present on the page.
+	/*
+	 * Enqueue block styles built through plugins.  This lives in a separate
+	 * action for a couple of reasons: (1) we want to load these assets
+	 * (usually stylesheets) in *both* frontend and editor contexts, and (2)
+	 * one day we may need to be smarter about whether assets are included
+	 * based on whether blocks are actually present on the page.
+	 */
 
 	/**
 	 * Fires after enqueuing block assets for both editor and front-end.
