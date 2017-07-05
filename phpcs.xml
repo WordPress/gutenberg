@@ -25,7 +25,7 @@
 	</rule>
 
 	<!-- How about no -->
-	<rule ref="Squiz.Commenting.LongConditionClosingComment.Missing">
+	<rule ref="Squiz.Commenting.InlineComment.SpacingAfter">
 		<exclude-pattern>*</exclude-pattern>
 	</rule>
 
