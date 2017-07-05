@@ -481,4 +481,3 @@ function gutenberg_scripts_and_styles( $hook ) {
 	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
-

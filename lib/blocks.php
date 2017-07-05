@@ -113,11 +113,13 @@ function gutenberg_frontend_scripts_and_styles() {
 	wp_enqueue_style( 'wp-blocks' );
 
 	// Enqueue block styles built through plugins.  This lives in a separate
-	// action because one day we may need to be smarter about whether assets
-	// are included based on whether blocks are actually present on the page.
+	// action for a couple of reasons: (1) we want to load these assets
+	// (usually stylesheets) in *both* frontend and editor contexts, and (2)
+	// one day we may need to be smarter about whether assets are included
+	// based on whether blocks are actually present on the page.
 
 	/**
-	 * Fires after block assets have been enqueued for the front-end.
+	 * Fires after enqueuing block assets for both editor and front-end.
 	 *
 	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
 	 *
@@ -126,6 +128,7 @@ function gutenberg_frontend_scripts_and_styles() {
 	 *
 	 * @since 0.4.0
 	 */
-	do_action( 'enqueue_block_frontend_assets' );
+	do_action( 'enqueue_block_assets' );
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_frontend_scripts_and_styles' );
