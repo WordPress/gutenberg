@@ -11,6 +11,7 @@ import { registerBlockType } from '../../api';
 import Editable from '../../editable';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
+import ToggleControl from '../../inspector-controls/toggle-control';
 
 registerBlockType( 'core/more', {
 	title: __( 'More' ),
@@ -23,10 +24,21 @@ registerBlockType( 'core/more', {
 	},
 
 	edit( { attributes, setAttributes, className, focus, setFocus } ) {
-		const { text } = attributes;
+		const { text, noTeaser } = attributes;
 
-		return (
-			<div className={ className }>
+		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
+
+		return [
+			focus && (
+				<InspectorControls key="inspector">
+					<ToggleControl
+						label={ __( 'Hide the teaser before the "More" tag' ) }
+						checked={ !! noTeaser }
+						onChange={ toggleNoTeaser }
+					/>
+				</InspectorControls>
+			),
+			<div key="more-tag" className={ className }>
 				<Editable
 					tagName="span"
 					value={ text || __( 'Read more' ) }
@@ -44,7 +56,7 @@ registerBlockType( 'core/more', {
 					</InspectorControls>
 				}
 			</div>
-		);
+		];
 	},
 
 	save( { attributes } ) {
