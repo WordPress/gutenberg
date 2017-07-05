@@ -168,7 +168,7 @@ describe( 'full post content fixture', () => {
 			expect(
 				serializedActual
 			).to.eql(
-				serializedExpected,
+				serializedExpected.replace( /\n$/, '' ),
 				format( 'File \'%s.serialized.html\' does not match expected value', f )
 			);
 		} );
