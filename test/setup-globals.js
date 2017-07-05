@@ -1,3 +1,15 @@
+// Turn various warnings into errors
+/* eslint-disable no-console */
+console._errorOriginal = console.error;
+console.error = ( ...args ) => {
+	const util = require( 'util' );
+	throw new Error(
+		'Warning caught via console.error: ' +
+		util.format.apply( util, args )
+	);
+};
+/* eslint-enable no-console */
+
 // These are necessary to load TinyMCE successfully
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
