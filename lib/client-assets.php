@@ -372,7 +372,7 @@ function gutenberg_get_post_to_edit( $post_id ) {
  * `gutenberg_editor_scripts_and_styles` so that editor-specific stylesheets
  * are loaded last.
  *
- * @since 0.3.0
+ * @since 0.4.0
  */
 function gutenberg_common_scripts_and_styles() {
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
