@@ -22,11 +22,11 @@ registerBlockType( 'core/more', {
 	attributes: {
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, focus, setFocus } ) {
 		const { text } = attributes;
 
 		return (
-			<div className="blocks-more">
+			<div className={ className }>
 				<Editable
 					tagName="span"
 					value={ text || __( 'Read more' ) }

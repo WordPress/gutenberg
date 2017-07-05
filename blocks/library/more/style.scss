@@ -1,29 +1,31 @@
 .editor-visual-editor__block[data-type="core/more"] {
 	max-width: 100%;
 	text-align: center;
+}
 
+.wp-block-more {
 	.blocks-editable {
 		display: inline-block;
 		text-align: center;
 		overflow: hidden;
 		white-space: nowrap;
 		margin: 0 auto;
+
+		> span {
+			position: relative;
+			display: inline-block;
+			font-size: 12px;
+			text-transform: uppercase;
+			font-weight: 600;
+			font-family: $default-font;
+			color: $dark-gray-300;
+			background: $white;
+			padding-left: 4px;
+			padding-right: 4px;
+		}
 	}
 
-	.blocks-editable > span {
-		position: relative;
-		display: inline-block;
-		font-size: 12px;
-		text-transform: uppercase;
-		font-weight: 600;
-		font-family: $default-font;
-		color: $dark-gray-300;
-		background: $white;
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-
-	.blocks-more:before {
+	&:before {
 		content: '';
 		position: absolute;
 		top: 50%;
