@@ -2,7 +2,7 @@
   {
     "blockName": "core/more",
     "attrs": {
-      "customText": "Continue reading",
+      "text": "Continue reading",
       "noTeaser": true
     },
     "rawContent": ""
