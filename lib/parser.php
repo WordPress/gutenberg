@@ -266,7 +266,7 @@ class Gutenberg_PEG_Parser {
     private function peg_f0($text) { return $text; }
     private function peg_f1($customText, $noTeaser) {
         return array(
-           'blockName' => 'wp:core/more',
+           'blockName' => 'core/more',
            'attrs' => array(
              'customText' => $customText,
              'noTeaser' => (bool) $noTeaser
@@ -861,11 +861,26 @@ class Gutenberg_PEG_Parser {
           $s4 = $this->peg_FAILED;
         }
         if ($s4 !== $this->peg_FAILED) {
-          $s5 = $this->peg_parseAny();
+          $s5 = $this->peg_currPos;
+          $this->peg_silentFails++;
+          $s6 = $this->peg_parseWP_Tag_More();
+          $this->peg_silentFails--;
+          if ($s6 === $this->peg_FAILED) {
+            $s5 = null;
+          } else {
+            $this->peg_currPos = $s5;
+            $s5 = $this->peg_FAILED;
+          }
           if ($s5 !== $this->peg_FAILED) {
-            $this->peg_reportedPos = $s2;
-            $s3 = $this->peg_f7($s5);
-            $s2 = $s3;
+            $s6 = $this->peg_parseAny();
+            if ($s6 !== $this->peg_FAILED) {
+              $this->peg_reportedPos = $s2;
+              $s3 = $this->peg_f7($s6);
+              $s2 = $s3;
+            } else {
+              $this->peg_currPos = $s2;
+              $s2 = $this->peg_FAILED;
+            }
           } else {
             $this->peg_currPos = $s2;
             $s2 = $this->peg_FAILED;
@@ -904,11 +919,26 @@ class Gutenberg_PEG_Parser {
               $s4 = $this->peg_FAILED;
             }
             if ($s4 !== $this->peg_FAILED) {
-              $s5 = $this->peg_parseAny();
+              $s5 = $this->peg_currPos;
+              $this->peg_silentFails++;
+              $s6 = $this->peg_parseWP_Tag_More();
+              $this->peg_silentFails--;
+              if ($s6 === $this->peg_FAILED) {
+                $s5 = null;
+              } else {
+                $this->peg_currPos = $s5;
+                $s5 = $this->peg_FAILED;
+              }
               if ($s5 !== $this->peg_FAILED) {
-                $this->peg_reportedPos = $s2;
-                $s3 = $this->peg_f7($s5);
-                $s2 = $s3;
+                $s6 = $this->peg_parseAny();
+                if ($s6 !== $this->peg_FAILED) {
+                  $this->peg_reportedPos = $s2;
+                  $s3 = $this->peg_f7($s6);
+                  $s2 = $s3;
+                } else {
+                  $this->peg_currPos = $s2;
+                  $s2 = $this->peg_FAILED;
+                }
               } else {
                 $this->peg_currPos = $s2;
                 $s2 = $this->peg_FAILED;

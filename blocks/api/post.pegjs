@@ -95,7 +95,7 @@ WP_Block_Balanced
   }
 
 WP_Block_Html
-  = ts:(!WP_Block_Balanced !WP_Block_Void c:Any {
+  = ts:(!WP_Block_Balanced !WP_Block_Void !WP_Tag_More c:Any {
     /** <?php return $c; ?> **/
     return c;
   })+
