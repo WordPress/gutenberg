@@ -92,6 +92,11 @@ describe( 'full post content fixture', () => {
 	fileBasenames.forEach( f => {
 		it( f, () => {
 			const content = readFixtureFile( f + '.html' );
+			if ( content === null ) {
+				throw new Error(
+					'Missing fixture file: ' + f + '.html'
+				);
+			}
 
 			const parserOutputActual = grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
@@ -161,9 +166,9 @@ describe( 'full post content fixture', () => {
 			}
 
 			expect(
-				serializedActual.trim()
+				serializedActual
 			).to.eql(
-				serializedExpected.trim(),
+				serializedExpected.replace( /\n$/, '' ),
 				format( 'File \'%s.serialized.html\' does not match expected value', f )
 			);
 		} );
