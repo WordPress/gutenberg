@@ -112,7 +112,12 @@ describe( 'full post content fixture', () => {
 			}
 
 			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
-			expect( parserOutputActual ).to.eql( parserOutputExpected );
+			expect(
+				parserOutputActual
+			).to.eql(
+				parserOutputExpected,
+				format( 'File \'%s.parsed.json\' does not match expected value', f )
+			);
 
 			const blocksActual = parse( content );
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
@@ -134,7 +139,12 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
-			expect( blocksActualNormalized ).to.eql( blocksExpected );
+			expect(
+				blocksActualNormalized
+			).to.eql(
+				blocksExpected,
+				format( 'File \'%s.json\' does not match expected value', f )
+			);
 
 			const serializedActual = serialize( blocksActual );
 			let serializedExpected = readFixtureFile( f + '.serialized.html' );
@@ -150,7 +160,12 @@ describe( 'full post content fixture', () => {
 				}
 			}
 
-			expect( serializedActual.trim() ).to.eql( serializedExpected.trim() );
+			expect(
+				serializedActual.trim()
+			).to.eql(
+				serializedExpected.trim(),
+				format( 'File \'%s.serialized.html\' does not match expected value', f )
+			);
 		} );
 	} );
 
