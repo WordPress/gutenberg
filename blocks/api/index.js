@@ -9,6 +9,11 @@ export {
 } from './serializer';
 export { isValidBlock } from './validation';
 export { getCategories } from './categories';
+export { default as serialize, getBlockDefaultClassname } from './serializer';
+export {
+	getCategories,
+	registerCategory,
+} from './categories';
 export {
 	registerBlockType,
 	unregisterBlockType,
