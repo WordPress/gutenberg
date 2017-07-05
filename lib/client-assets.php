@@ -467,6 +467,13 @@ function gutenberg_scripts_and_styles( $hook ) {
 		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
+
+	global $hook_suffix;
+	/**
+	 * Hook to allow extending of gutenberg editor in plugin/themes.
+	 */
+	do_action( 'block_enqueue_script', $hook_suffix );
+
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
 
