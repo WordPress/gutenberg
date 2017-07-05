@@ -26,8 +26,6 @@ window._wpGutenbergPost.content = {
 		'<p style="text-align:right">... like this one, which is right aligned.</p>',
 		'<!-- /wp:core/text -->',
 
-		'<!-- wp:core/more /-->',
-
 		'<!-- wp:core/text -->',
 		'<p>Headings are separate blocks as well, which helps with the outline and organization of your content.</p>',
 		'<!-- /wp:core/text -->',

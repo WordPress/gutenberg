@@ -141,7 +141,7 @@ export function serializeBlock( block ) {
 	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType.attributes ) );
 
 	if ( 'core/more' === blockName ) {
-		return `<!--more ${ saveAttributes.customText ? `${ saveAttributes.customText } ` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
+		return `<!--more ${ saveAttributes.customText ? `${ saveAttributes.customText }` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
 	}
 
 	const serializedAttributes = ! isEmpty( saveAttributes )
