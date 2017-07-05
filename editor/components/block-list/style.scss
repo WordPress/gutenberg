@@ -94,6 +94,76 @@
 		background: $blue-medium-highlight;
 	}
 
+	&.is-collaboration {
+		.collaboration-legend {
+			float: right;
+			margin-top: -14px;
+			margin-right: -14px;
+			color: #fff;
+			font-size: 12px;
+		}
+
+		&[class*="collab-"] {
+			pointer-events: none;
+			opacity: 0.8;
+		}
+
+		&.collab-null {
+			pointer-events: all;
+			opacity: 1;
+		}
+
+		&.collab-red {
+			&:before {
+				outline: 2px solid $collab-red;
+				transition: 0.2s outline;
+			}
+			.collaboration-legend {
+				background: $collab-red;
+			}
+		}
+
+		&.collab-orange {
+			&:before {
+				outline: 2px solid $collab-orange;
+				transition: 0.2s outline;
+			}
+			.collaboration-legend {
+				background: $collab-orange;
+			}
+		}
+
+		&.collab-yellow {
+			&:before {
+				outline: 2px solid $collab-yellow;
+				transition: 0.2s outline;
+			}
+			.collaboration-legend {
+				background: $collab-yellow;
+			}
+		}
+
+		&.collab-green {
+			&:before {
+				outline: 2px solid $collab-green;
+				transition: 0.2s outline;
+			}
+			.collaboration-legend {
+				background: $collab-green;
+			}
+		}
+
+		&.collab-purple {
+			&:before {
+				outline: 2px solid $collab-purple;
+				transition: 0.2s outline;
+			}
+			.collaboration-legend {
+				background: $collab-purple;
+			}
+		}
+	}
+
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
 		background: transparent;

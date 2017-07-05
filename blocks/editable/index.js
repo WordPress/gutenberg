@@ -723,6 +723,7 @@ export default class Editable extends Component {
 	}
 
 	getContent() {
+		return this.editor.getContent();
 		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 

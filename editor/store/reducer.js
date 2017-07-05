@@ -39,6 +39,11 @@ import { PREFERENCES_DEFAULTS } from './defaults';
 const MAX_RECENT_BLOCKS = 8;
 
 /**
+* Collaboration Dependencies
+*/
+import GRTC from '../grtc/app';
+
+/**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
@@ -822,6 +827,153 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+export function collaborationLocalData( state = {}, action ) {
+	switch ( action.type ) {
+		case 'COLLABORATION_LOCAL_DATA':
+			return {
+				...state,
+				peerColor: action.peerColor,
+				peerID: action.peerID,
+				lastPeerData: action.lastPeerData,
+				peerName: action.peerName,
+			};
+	}
+	return state;
+}
+
+export function collaborationMode( state = {}, action ) {
+	switch ( action.type ) {
+		case 'COLLABORATION_MODE':
+			return {
+				...state,
+				active: action.active,
+			};
+
+		case 'COLLABORATION_STATE':
+			return {
+				...state,
+				blocksByUid: action.blocksByUid,
+				peerName: action.peerName,
+				peerColor: action.peerColor,
+				peerID: action.peerID,
+			};
+	}
+	return state;
+}
+
+export function grtcMiddleware( { dispatch } ) {
+	let grtc = {};
+	let grtcID = window.location.hash.slice( 1, window.location.hash.length );
+	let manualGRTC = true;
+
+	const grtcAPI = window.location.origin + '/wp-json/collaborate';
+	const peerID = GRTC.uuid();
+
+	const grtcProps = {
+		peerColor: GRTC.getColor(),
+		peerID,
+		lastPeerData: null,
+		peerName: null,
+	};
+
+	/**
+	 * @return {Promise} promise object for username fetch.
+	 * Resolves promise if username fetch failed.
+	 */
+	function getUsername() {
+		return new Promise( ( resolve, reject ) => {
+			jQuery.get( grtcAPI + '/username', resolve ).fail( reject );
+		} );
+	}
+
+	/**
+	 * @param {Boolean} active is collaboration mode
+	 * @param {Object} reduxStore for reference in current scope.
+	 * Initializes itself if collaboration mode is enabled.
+	 * else Destory the P2P Data channels.
+	 */
+	function checkMode( active ) {
+		if ( active ) {
+			if ( window.location.hash.length === 0 ) {
+				grtcID = GRTC.uuid();
+				window.history.pushState( '', '', '#' + grtcID );
+				startMode( grtcID, grtcAPI );
+			} else {
+				startMode( grtcID, grtcAPI );
+			}
+		} else if ( ! grtc.isConnected ) {
+			grtc.peer.destroy();
+		}
+	}
+
+	/**
+	 * Start the grtc module and enable its API.
+	 * @param {string} id the unique doc id
+	 * @param {string} url url to which module will interact.
+	 */
+	function startMode( id, url ) {
+		getUsername().then( ( username ) => {
+			grtcProps.peerName = username;
+			dispatch( {
+				type: 'COLLABORATION_LOCAL_DATA',
+				...grtcProps,
+			} );
+			grtc = new GRTC( id, url, username );
+			grtc.on( 'peerData', onReceivedAction );
+			// Temporary change for testing, Not using alert. Need UI.
+			grtc.on( 'peerConnected', function() {
+				alert( 'Peer connected' );
+			} );
+		} );
+	}
+
+	/**
+	 * @param {Object} action is redux action
+	 * send if grtc is connected & peerID is undefined
+	 * to stop infinite loop.
+	 */
+	function onAction( action ) {
+		if ( action.type === 'TOGGLE_BLOCK_SELECTED' || action.type === 'UPDATE_FOCUS' || action.type === 'COLLABORATION_LOCAL_DATA' ) {
+			return;
+		}
+
+		if ( grtc.isConnected && typeof action.peerID === 'undefined' ) {
+			action.peerID = peerID;
+			grtc.send( action );
+		} else if ( grtc.isConnected && action.type === 'COLLABORATION_STATE' ) {
+			grtc.send( action );
+		}
+	}
+
+	/**
+	 * @param {Object} action received from other peer.
+	 * Dispatch the action using dispatch.
+	 */
+	function onReceivedAction( action ) {
+		if ( typeof action.peerID !== 'undefined' && action.peerID !== peerID ) {
+			dispatch( action );
+		}
+	}
+
+	return next => action => {
+		if ( action.type === 'COLLABORATION_MODE' ) {
+			checkMode( action.active );
+			manualGRTC = false;
+		} else if ( window.location.hash.length !== 0 && manualGRTC ) {
+			// if url is shared enable the collaboration mode automatically.
+			manualGRTC = false;
+			dispatch( {
+				type: 'COLLABORATION_MODE',
+				active: true,
+				mode: 'manual',
+			} );
+		} else {
+			onAction( action );
+		}
+		return next( action );
+	};
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -837,4 +989,6 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	mobile,
 	reusableBlocks,
+	collaborationMode,
+	collaborationLocalData,
 } ) );
