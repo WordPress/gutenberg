@@ -365,6 +365,41 @@ function gutenberg_get_post_to_edit( $post_id ) {
 }
 
 /**
+ * Handles the enqueueing of block scripts and styles that are common to both
+ * the editor and the front-end.
+ *
+ * Note: This function must remain *before*
+ * `gutenberg_editor_scripts_and_styles` so that editor-specific stylesheets
+ * are loaded last.
+ *
+ * @since 0.3.0
+ */
+function gutenberg_common_scripts_and_styles() {
+	// Enqueue basic styles built out of Gutenberg through `npm build`.
+	wp_enqueue_style( 'wp-blocks' );
+
+	// Enqueue block styles built through plugins.  This lives in a separate
+	// action for a couple of reasons: (1) we want to load these assets
+	// (usually stylesheets) in *both* frontend and editor contexts, and (2)
+	// one day we may need to be smarter about whether assets are included
+	// based on whether blocks are actually present on the page.
+
+	/**
+	 * Fires after enqueuing block assets for both editor and front-end.
+	 *
+	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'enqueue_block_assets' );
+}
+add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -374,7 +409,7 @@ function gutenberg_get_post_to_edit( $post_id ) {
  *
  * @param string $hook Screen name.
  */
-function gutenberg_scripts_and_styles( $hook ) {
+function gutenberg_editor_scripts_and_styles( $hook ) {
 	if ( ! preg_match( '/(toplevel|gutenberg)_page_gutenberg(-demo)?/', $hook, $page_match ) ) {
 		return;
 	}
@@ -480,4 +515,4 @@ function gutenberg_scripts_and_styles( $hook ) {
 	 */
 	do_action( 'enqueue_block_editor_assets' );
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_scripts_and_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
