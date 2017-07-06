@@ -55,7 +55,7 @@ input[type="search"].editor-inserter__search {
 	border: 1px solid transparent;
 	border-bottom: 1px solid $light-gray-500;
 	padding: 8px 11px;
-	font-size: 13px;
+	font-size: $default-font-size;
 	position: relative;
 	z-index: 1;
 

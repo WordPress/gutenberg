@@ -1,6 +1,7 @@
 body.toplevel_page_gutenberg,
 body.gutenberg_page_gutenberg-demo {
 	background: $white;
+	font-size: $default-font-size;
 
 	#update-nag, .update-nag {
 		display: none;
@@ -39,7 +40,7 @@ body.gutenberg_page_gutenberg-demo {
 	}
 
 	select {
-		font-size: 13px;
+		font-size: $default-font-size;
 		color: $dark-gray-500;
 	}
 }
