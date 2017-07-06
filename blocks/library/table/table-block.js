@@ -46,9 +46,23 @@ const TABLE_CONTROLS = [
 export default class TableBlock extends wp.element.Component {
 	constructor() {
 		super();
+		this.handleSetup = this.handleSetup.bind( this );
 		this.state = {
 			editor: null,
 		};
+	}
+
+	handleSetup( editor ) {
+		// select the end of the first table cell
+		editor.on( 'init', () => {
+			const cell = editor.getBody().querySelector( 'td,th' );
+			if ( cell ) {
+				cell.focus();
+				editor.selection.select( cell, true );
+				editor.selection.collapse( false );
+			}
+		} );
+		this.setState( { editor } );
 	}
 
 	render() {
@@ -63,7 +77,7 @@ export default class TableBlock extends wp.element.Component {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
 				} ) }
-				onSetup={ ( editor ) => this.setState( { editor } ) }
+				onSetup={ this.handleSetup }
 				onChange={ onChange }
 				value={ content }
 				focus={ focus }
