@@ -179,11 +179,6 @@ maybeDescribe( 'FormTokenField', function() {
 		} );
 
 		it( 'should manage the selected suggestion based on both keyboard and mouse events', test( function() {
-			// We need a high timeout for Mocha here to accomodate Travis CI
-			if ( this.timeout ) {
-				this.timeout( 10000 );
-			}
-
 			setText( 'th' );
 			expect( getSuggestionsText() ).to.deep.equal( fixtures.matchingSuggestions.th );
 			expect( getSelectedSuggestion() ).to.equal( null );

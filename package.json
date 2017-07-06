@@ -65,11 +65,8 @@
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "gettext-parser": "^1.2.2",
-    "glob": "^7.1.1",
     "jest": "~20.0.4",
     "jest-junit-reporter": "~1.1.0",
-    "jsdom": "^10.1.0",
-    "mocha": "^3.2.0",
     "node-sass": "^4.5.0",
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.1",
@@ -85,11 +82,9 @@
     "sinon-test": "^1.0.2",
     "style-loader": "^0.14.1",
     "tinymce": "^4.5.6",
-    "webpack": "^2.2.1",
-    "webpack-node-externals": "^1.5.4"
+    "webpack": "^2.2.1"
   },
   "scripts": {
-    "test-unit": "cross-env NODE_ENV=test webpack && mocha build --require bootstrap-test.js",
     "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
     "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
     "lint": "eslint . .storybook",
@@ -99,7 +94,7 @@
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "test-unit:jest": "jest",
+    "test-unit": "jest",
     "test-unit:coverage": "jest --coverage",
     "test-unit:watch": "jest --watch"
   },
