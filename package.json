@@ -115,6 +115,8 @@
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/components/clipboard-button/index.js",
+      "<rootDir>/components/notice/index.js",
+      "<rootDir>/components/notice/list.js",
       "<rootDir>/components/form-toggle/index.js",
       "<rootDir>/components/form-token-field/token.js"
     ],
