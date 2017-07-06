@@ -33,39 +33,35 @@ describe( 'block parser', () => {
 
 	describe( 'parseBlockAttributes()', () => {
 		it( 'should use the function implementation', () => {
-			const blockType = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
-				},
+			const attributes = function( rawContent ) {
+				return {
+					content: rawContent + ' & Chicken',
+				};
 			};
 
-			expect( parseBlockAttributes( 'Ribs', blockType ) ).to.eql( {
+			expect( parseBlockAttributes( 'Ribs', attributes ) ).to.eql( {
 				content: 'Ribs & Chicken',
 			} );
 		} );
 
 		it( 'should use the query object implementation', () => {
-			const blockType = {
-				attributes: {
-					emphasis: text( 'strong' ),
-					ignoredDomMatcher: ( node ) => node.innerHTML,
-				},
+			const attributes = {
+				emphasis: text( 'strong' ),
+				ignoredDomMatcher: ( node ) => node.innerHTML,
 			};
 
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {
+			expect( parseBlockAttributes( rawContent, attributes ) ).to.eql( {
 				emphasis: '& Chicken',
 			} );
 		} );
 
 		it( 'should return an empty object if no attributes defined', () => {
-			const blockType = {};
+			const attributes = {};
 			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
 
-			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {} );
+			expect( parseBlockAttributes( rawContent, attributes ) ).to.eql( {} );
 		} );
 	} );
 

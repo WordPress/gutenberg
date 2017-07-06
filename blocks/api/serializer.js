@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, kebabCase, isObject } from 'lodash';
+import { isEmpty, reduce, isObject } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import classnames from 'classnames';
 
@@ -23,11 +23,8 @@ import { parseBlockAttributes } from './parser';
  * @return {string}             The block's default class
  */
 export function getBlockDefaultClassname( blockName ) {
-	// Drop the namespace "core/"" for core blocks only
-	const match = /^([a-z0-9-]+)\/([a-z0-9-]+)$/.exec( blockName );
-	const sanitizedBlockName = match[ 1 ] === 'core' ? match[ 2 ] : blockName;
-
-	return `wp-block-${ kebabCase( sanitizedBlockName ) }`;
+	// Drop common prefixes: 'core/' or 'core-' (in 'core-embed/')
+	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 }
 
 /**
@@ -59,7 +56,7 @@ export function getSaveContent( blockType, attributes ) {
 			return element;
 		}
 
-		const updatedClassName = classnames( element.props.className, className );
+		const updatedClassName = classnames( className, element.props.className );
 		return cloneElement( element, { className: updatedClassName } );
 	};
 	const contentWithClassname = Children.map( rawContent, addClassnameToElement );
@@ -113,7 +110,11 @@ export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
 	const saveContent = getSaveContent( blockType, block.attributes );
-	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType ) );
+	const saveAttributes = getCommentAttributes( block.attributes, parseBlockAttributes( saveContent, blockType.attributes ) );
+
+	if ( 'wp:core/more' === blockName ) {
+		return `<!-- more ${ saveAttributes.customText ? `${ saveAttributes.customText } ` : '' }-->${ saveAttributes.noTeaser ? '\n<!--noteaser-->' : '' }`;
+	}
 
 	const serializedAttributes = ! isEmpty( saveAttributes )
 		? serializeAttributes( saveAttributes ) + ' '

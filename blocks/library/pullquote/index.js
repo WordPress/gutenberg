@@ -51,6 +51,7 @@ registerBlockType( 'core/pullquote', {
 			),
 			<blockquote key="quote" className={ className }>
 				<Editable
+					multiline="p"
 					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
@@ -74,7 +75,6 @@ registerBlockType( 'core/pullquote', {
 						}
 						focus={ focus && focus.editable === 'citation' ? focus : null }
 						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						inline
 					/>
 				) }
 			</blockquote>,

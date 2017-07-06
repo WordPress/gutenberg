@@ -32,6 +32,23 @@ registerBlockType( 'core/image', {
 		caption: children( 'figcaption' ),
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				matcher: ( node ) => (
+					node.nodeName === 'IMG' ||
+					( ! node.textContent && node.querySelector( 'img' ) )
+				),
+				attributes: {
+					url: attr( 'img', 'src' ),
+					alt: attr( 'img', 'alt' ),
+					caption: children( 'figcaption' ),
+				},
+			},
+		],
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
@@ -88,7 +105,7 @@ registerBlockType( 'core/image', {
 					<MediaUploadButton
 						buttonProps={ uploadButtonProps }
 						onSelect={ onSelectImage }
-						type="format-image"
+						type="image"
 						autoOpen
 					>
 						{ __( 'Insert from Media Library' ) }
@@ -123,7 +140,6 @@ registerBlockType( 'core/image', {
 						focus={ focus && focus.editable === 'caption' ? focus : undefined }
 						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
 						inlineToolbar
 					/>
 				) : null }

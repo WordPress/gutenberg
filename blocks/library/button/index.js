@@ -54,7 +54,6 @@ registerBlockType( 'core/button', {
 					focus={ focus }
 					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					inline
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 				{ focus &&

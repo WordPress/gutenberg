@@ -24,11 +24,6 @@
 		<exclude-pattern>gutenberg.php</exclude-pattern>
 	</rule>
 
-	<!-- How about no -->
-	<rule ref="Squiz.Commenting.LongConditionClosingComment.Missing">
-		<exclude-pattern>*</exclude-pattern>
-	</rule>
-
 	<!-- Do not require docblocks for unit tests -->
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>

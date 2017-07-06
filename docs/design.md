@@ -43,11 +43,16 @@ The content area holds the document itself, and optionally a sidebar for context
 
 The block itself is the most basic unit of the editor. Everything is a block, and you build them together mimicking the vertical flow of the underlying HTML markup. By surfacing each section of the document as a block we can manipulate, we can attach features that are unique to each block, contextually. Inspired by desktop layout apps, it's a way to add a breadth of advanced features without weighing down the UI.
 
-As you scroll down a page on long blocks, the quick toolbar unsticks from the block, and sticks to the top of the screen.
-
 The block interface holds _basic actions_. Through ensuring good defaults, and only the most common actions, you should be able to get all your blogging done without ever having to use the Post Settings sidebar.
 
-If you need to do advanced configuration, though, you should keep the post settings sidebar open. The sidebar is contextual to what is selected:
+The block itself has multiple states:
+
+- An unselected block is the closest thing to a live preview of the contents itself.
+- A selected block shows quick controls attached to the block itself, notably the quick toolbar. But a selected image block surfaces a caption field, a quote surfaces a citation field, and dynamic blocks could potentially surface quick configuration form fields right then and there. 
+
+As you scroll down a page on long blocks, the quick toolbar unsticks from the block, and sticks to the top of the screen.
+
+If your block needs advanced configuration, though, you should keep the post settings sidebar open. The sidebar is contextual to what is selected:
 
 - if nothing is selected, you are at the _document scope_, and see document metadata
 - if a block is selected, you are at the _block scope_, and you see block metadata
