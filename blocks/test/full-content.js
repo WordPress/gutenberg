@@ -89,6 +89,11 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
+	before( () => {
+		// Registers all blocks
+		require( 'blocks' );
+	} );
+
 	fileBasenames.forEach( f => {
 		it( f, () => {
 			const content = readFixtureFile( f + '.html' );
