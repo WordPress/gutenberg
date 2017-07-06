@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://wordpress.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-wordpress\">\n    https://wordpress.com/\n    <figcaption>Embedded content from WordPress</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

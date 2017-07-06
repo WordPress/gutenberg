@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://dailymotion.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-dailymotion\">\n    https://dailymotion.com/\n    <figcaption>Embedded content from dailymotion</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-dailymotion\">\n    https://dailymotion.com/\n    <figcaption>Embedded content from dailymotion</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

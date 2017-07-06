@@ -35,6 +35,11 @@ const editMediaLibrary = ( attributes, setAttributes ) => {
 	};
 
 	const editFrame = wp.media( frameConfig );
+
+	// the frameConfig settings dont carry to other state modals
+	// so requires setting this attribute directory to not show settings
+	editFrame.state( 'gallery-edit' ).attributes.displaySettings = false;
+
 	function updateFn() {
 		setAttributes( {
 			images: this.frame.state().attributes.library.models.map( ( a ) => {

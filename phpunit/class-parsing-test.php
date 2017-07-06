@@ -42,21 +42,25 @@ class Parsing_Test extends WP_UnitTestCase {
 	 * @dataProvider parsing_test_filenames
 	 */
 	function test_parser_output( $html_filename, $parsed_json_filename ) {
-		$html_filename        = self::$fixtures_dir . '/' . $html_filename;
-		$parsed_json_filename = self::$fixtures_dir . '/' . $parsed_json_filename;
+		$html_path        = self::$fixtures_dir . '/' . $html_filename;
+		$parsed_json_path = self::$fixtures_dir . '/' . $parsed_json_filename;
 
-		foreach ( array( $html_filename, $parsed_json_filename ) as $filename ) {
+		foreach ( array( $html_path, $parsed_json_path ) as $filename ) {
 			if ( ! file_exists( $filename ) ) {
 				throw new Exception( "Missing fixture file: '$filename'" );
 			}
 		}
 
-		$html            = file_get_contents( $html_filename );
-		$expected_parsed = json_decode( file_get_contents( $parsed_json_filename ), true );
+		$html            = file_get_contents( $html_path );
+		$expected_parsed = json_decode( file_get_contents( $parsed_json_path ), true );
 
 		$parser = new Gutenberg_PEG_Parser;
 		$result = $parser->parse( $html );
 
-		$this->assertEquals( $expected_parsed, $result );
+		$this->assertEquals(
+			$expected_parsed,
+			$result,
+			"File '$parsed_json_filename' does not match expected value"
+		);
 	}
 }

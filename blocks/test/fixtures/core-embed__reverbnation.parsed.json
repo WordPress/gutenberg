@@ -4,7 +4,7 @@
         "attrs": {
             "url": "https://reverbnation.com/"
         },
-        "rawContent": "\n<figure class=\"wp-block-core-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>\n"
+        "rawContent": "\n<figure class=\"wp-block-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

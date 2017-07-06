@@ -22,9 +22,32 @@ WP_Block_List
   = WP_Block*
 
 WP_Block
-  = WP_Block_Void
+  = WP_Tag_More
+  / WP_Block_Void
   / WP_Block_Balanced
   / WP_Block_Html
+
+WP_Tag_More
+  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
+  { /** <?php
+    return array(
+       'blockName' => 'wp:core/more',
+       'attrs' => array(
+         'customText' => $customText,
+         'noTeaser' => (bool) $noTeaser
+       ),
+       'rawContent' => ''
+    );
+    ?> **/
+    return {
+      blockName: 'wp:core/more',
+      attrs: {
+        customText: customText,
+        noTeaser: !! noTeaser
+      },
+      rawContent: ''
+    }
+  }
 
 WP_Block_Void
   = "<!--" WS+ "wp:" blockName:WP_Block_Name WS+ attrs:(a:WP_Block_Attributes WS+ {
