@@ -1,10 +1,11 @@
-import { describe, it } from 'mocha';
+/**
+ * External dependencies
+ */
 import { equal } from 'assert';
-import { JSDOM } from 'jsdom';
 
-const { window } = new JSDOM();
-const { document } = window;
-
+/**
+ * Internal dependencies
+ */
 import { normaliseToBlockLevelNodes } from '../paste';
 
 describe( 'normaliseToBlockLevelNodes', () => {

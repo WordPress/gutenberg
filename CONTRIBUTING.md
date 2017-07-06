@@ -38,7 +38,7 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ### JavaScript Testing
 
-Tests for JavaScript use [Mocha](https://mochajs.org/) as the test runner and [Chai BDD](http://chaijs.com/api/bdd/) as an assertion library (with a [small variation](https://github.com/prodatakey/dirty-chai) on assertion properties). If needed, you can also use [Sinon](http://sinonjs.org/) for mocking and [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
+Tests for JavaScript use [Jest](http://facebook.github.io/jest//) as the test runner. If needed, you can also use [Sinon](http://sinonjs.org/) for mocking and [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
 Assuming you've followed the instructions above to install Node and project dependencies, tests can be run from the command-line with NPM:
 

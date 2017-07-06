@@ -59,14 +59,14 @@
     "enzyme": "^2.8.2",
     "eslint": "^3.17.1",
     "eslint-config-wordpress": "^1.1.0",
+    "eslint-plugin-jest": "~20.0.3",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
     "gettext-parser": "^1.2.2",
-    "glob": "^7.1.1",
-    "jsdom": "^10.1.0",
-    "mocha": "^3.2.0",
+    "jest": "~20.0.4",
+    "jest-junit-reporter": "~1.1.0",
     "node-sass": "^4.5.0",
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.1",
@@ -82,11 +82,9 @@
     "sinon-test": "^1.0.2",
     "style-loader": "^0.14.1",
     "tinymce": "^4.5.6",
-    "webpack": "^2.2.1",
-    "webpack-node-externals": "^1.5.4"
+    "webpack": "^2.2.1"
   },
   "scripts": {
-    "test-unit": "cross-env NODE_ENV=test webpack && mocha build --require bootstrap-test.js",
     "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
     "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
     "lint": "eslint . .storybook",
@@ -95,6 +93,52 @@
     "ci": "concurrently \"npm run build\" \"npm test\"",
     "package-plugin": "./bin/build-plugin-zip.sh",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test-unit": "jest",
+    "test-unit:coverage": "jest --coverage",
+    "test-unit:watch": "jest --watch"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/blocks/**/*.js",
+      "**/components/**/*.js",
+      "**/date/**/*.js",
+      "**/editor/**/*.js",
+      "**/element/**/*.js",
+      "**/i18n/**/*.js",
+      "**/utils/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/components/clipboard-button/index.js",
+      "<rootDir>/components/notice/index.js",
+      "<rootDir>/components/notice/list.js",
+      "<rootDir>/components/form-toggle/index.js",
+      "<rootDir>/components/form-token-field/token.js"
+    ],
+    "moduleNameMapper": {
+      "\\.scss$": "<rootDir>/test/style-mock.js"
+    },
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "setupFiles": [
+      "<rootDir>/test/setup-globals.js",
+      "<rootDir>/test/setup-wp-aliases.js"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/test/setup-test-framework.js",
+    "testMatch": [
+      "**/blocks/**/test/*.js",
+      "**/components/**/test/*.js",
+      "**/date/**/test/*.js",
+      "**/editor/**/test/*.js",
+      "**/element/**/test/*.js",
+      "**/i18n/**/test/*.js",
+      "**/utils/**/test/*.js" ],
+    "timers": "fake",
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest",
+      "\\.pegjs$": "<rootDir>/test/pgejs-transform.js"
+    },
+    "verbose": true
   }
 }

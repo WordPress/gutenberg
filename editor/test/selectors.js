@@ -681,7 +681,7 @@ describe( 'selectors', () => {
 			expect( getMultiSelectedBlockUids( state ) ).to.eql( [] );
 		} );
 
-		it( 'should return empty if there is no multi selection', () => {
+		it( 'should return selected block uids if there is multi selection', () => {
 			const state = {
 				editor: {
 					blockOrder: [ 5, 4, 3, 2, 1 ],

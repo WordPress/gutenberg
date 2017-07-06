@@ -31,11 +31,9 @@ const charCodes = {
 	comma: 44,
 };
 
-describe( 'FormTokenField', function() {
-	if ( ! process.env.RUN_SLOW_TESTS ) {
-		return;
-	}
+const maybeDescribe = process.env.RUN_SLOW_TESTS ? describe : describe.skip;
 
+maybeDescribe( 'FormTokenField', function() {
 	let wrapper, tokenFieldNode, textInputNode;
 
 	function setText( text ) {
@@ -181,9 +179,6 @@ describe( 'FormTokenField', function() {
 		} );
 
 		it( 'should manage the selected suggestion based on both keyboard and mouse events', test( function() {
-			// We need a high timeout here to accomodate Travis CI
-			this.timeout( 10000 );
-
 			setText( 'th' );
 			expect( getSuggestionsText() ).to.deep.equal( fixtures.matchingSuggestions.th );
 			expect( getSelectedSuggestion() ).to.equal( null );
@@ -389,12 +384,6 @@ describe( 'FormTokenField', function() {
 			setText( 'baz \tbaz,  quux \tquux,quux , wut  \twut, wut' );
 			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'baz', 'quux', 'wut' ] );
 			expect( textInputNode.prop( 'value' ) ).to.equal( ' wut' );
-		} );
-
-		it( 'should skip empty tokens at the beginning of a paste', function() {
-			setText( ',  ,\t \t  ,,baz, quux' );
-			expect( wrapper.state( 'tokens' ) ).to.deep.equal( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).to.equal( ' quux' );
 		} );
 
 		it( 'should skip empty tokens at the beginning of a paste', function() {
