@@ -1292,6 +1292,46 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensure that save_changeset_post method bails updating an underlying changeset which is invalid.
+	 *
+	 * @ticket 41252
+	 * @covers WP_Customize_Manager::save_changeset_post
+	 * @covers WP_Customize_Manager::get_changeset_post_data
+	 */
+	function test_save_changeset_post_for_bad_changeset() {
+		$uuid = wp_generate_uuid4();
+		$post_id = wp_insert_post( array(
+			'post_type' => 'customize_changeset',
+			'post_content' => 'INVALID_JSON',
+			'post_name' => $uuid,
+			'post_status' => 'auto-draft',
+			'post_date' => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+		) );
+		$manager = $this->create_test_manager( $uuid );
+		$args = array(
+			'data' => array(
+				'blogname' => array(
+					'value' => 'Test',
+				),
+			),
+		);
+
+		$r = $manager->save_changeset_post( $args );
+		$this->assertInstanceOf( 'WP_Error', $r );
+		if ( function_exists( 'json_last_error' ) ) {
+			$this->assertEquals( 'json_parse_error', $r->get_error_code() );
+		}
+
+		wp_update_post( array(
+			'ID' => $post_id,
+			'post_content' => 'null',
+		) );
+		$r = $manager->save_changeset_post( $args );
+		$this->assertInstanceOf( 'WP_Error', $r );
+		$this->assertEquals( 'expected_array', $r->get_error_code() );
+	}
+
+	/**
 	 * Register scratchpad setting.
 	 *
 	 * @param WP_Customize_Manager $wp_customize Manager.
