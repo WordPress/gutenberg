@@ -127,7 +127,7 @@ Registers a new block provided a unique name and an object defining its behavior
 
 - `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
 - `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
-- `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
+- `attributes: Object | Function` - An object of [matchers](#matchers) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
 - `category: string` - Slug of the block's category. The category is used to organize the blocks in the block inserter.
 - `edit( { attributes: Object, setAttributes: Function } ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
 - `save( { attributes: Object } ): WPElement | String` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
@@ -219,3 +219,35 @@ function edit( props ) {
 	} );
 }
 ```
+
+## Matchers
+
+Given the block's HTML content as a string, attribute matchers extract the block attributes values into an Object. The matchers are made available throught the `wp.blocks.query` variable as superset of [HPQ](http://github.com/aduth/hpq)'s API.
+
+`attr( selector: ?string, name: string ): Function`
+
+Generates a matcher function, returning an attribute by name if the attribute exists. If no selector is passed, returns attribute of the root element.
+
+`prop( selector: ?string, name: string ): Function`
+
+Generates a matcher function, returning an attribute by property if the attribute exists. If no selector is passed, returns property of the root element.
+
+`html( selector: ?string ): Function`
+
+Convenience for `prop( selector, 'innerHTML' )` .
+
+`text( selector: ?string ): Function`
+
+Convenience for `prop( selector, 'textContent' )` .
+
+`query( selector: string, matchers: Object | Function )`
+
+Creates a new matching context by first finding elements matching selector using [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) before then running another `parse` on `matchers` scoped to the matched elements.
+
+`node( selector: ?string ): Function`
+
+Generates a matcher function, converting the HTML markup to a WPElement (The [Editable](#Editable) component expects a WPElement for its `value` prop). If no selector is passed, returns WPElement of the root element.
+
+`children( selector: ?string ): Function`
+
+Similar to the `node` matcher but converts only the children of the matched node into a WPElement.
