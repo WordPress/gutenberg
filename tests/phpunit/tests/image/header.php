@@ -111,11 +111,11 @@ class Tests_Image_Header extends WP_UnitTestCase {
 			'guid' => 'http://localhost/foo.png'
 		) );
 
-		$cropped = 'http://localhost/foo-cropped.png';
+		$cropped = 'foo-cropped.png';
 
 		$object = $this->custom_image_header->create_attachment_object( $cropped, $id );
 		$this->assertEquals( 'foo-cropped.png', $object['post_title'] );
-		$this->assertEquals( $cropped, $object['guid'] );
+		$this->assertEquals( 'http://localhost/' . $cropped, $object['guid'] );
 		$this->assertEquals( 'custom-header', $object['context'] );
 		$this->assertEquals( 'image/jpeg', $object['post_mime_type'] );
 	}
@@ -128,7 +128,7 @@ class Tests_Image_Header extends WP_UnitTestCase {
 			'guid' => 'http://localhost/foo.png'
 		) );
 
-		$cropped = 'http://localhost/foo-cropped.png';
+		$cropped = 'foo-cropped.png';
 		$object = $this->custom_image_header->create_attachment_object( $cropped, $id );
 
 		$cropped_id = $this->custom_image_header->insert_attachment( $object, $cropped );
