@@ -14,14 +14,20 @@ import { IconButton } from 'components';
 class UrlInput extends Component {
 	constructor() {
 		super( ...arguments );
-		this.expand = this.expand.bind( this );
+		this.toggle = this.toggle.bind( this );
+		this.submitLink = this.submitLink.bind( this );
 		this.state = {
 			expanded: false,
 		};
 	}
 
-	expand() {
+	toggle() {
 		this.setState( { expanded: ! this.state.expanded } );
+	}
+
+	submitLink( event ) {
+		event.preventDefault();
+		this.toggle();
 	}
 
 	render() {
@@ -32,16 +38,16 @@ class UrlInput extends Component {
 			<li className="components-url-input">
 				<IconButton
 					icon="admin-links"
-					onClick={ this.expand }
+					onClick={ this.toggle }
 					className={ classnames( 'components-toolbar__control', {
-						'is-active': expanded,
+						'is-active': url,
 					} ) }
-					/>
-				{ ( expanded || url ) &&
+				/>
+				{ expanded &&
 					<form
 						className="editable-format-toolbar__link-modal"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<IconButton className="components-url-input__back" icon="arrow-left-alt" type="button" onClick={ this.expand } />
+						onSubmit={ ( event ) => this.submitLink( event ) }>
+						<IconButton className="components-url-input__back" icon="arrow-left-alt" onClick={ this.toggle } />
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
