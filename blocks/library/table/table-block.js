@@ -52,11 +52,11 @@ export default class TableBlock extends wp.element.Component {
 		};
 	}
 
-	handleSetup( editor ) {
+	handleSetup( editor, focus ) {
 		// select the end of the first table cell
 		editor.on( 'init', () => {
 			const cell = editor.getBody().querySelector( 'td,th' );
-			if ( cell ) {
+			if ( cell && focus ) {
 				cell.focus();
 				editor.selection.select( cell, true );
 				editor.selection.collapse( false );
@@ -77,7 +77,7 @@ export default class TableBlock extends wp.element.Component {
 					...settings,
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
 				} ) }
-				onSetup={ this.handleSetup }
+				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
 				onChange={ onChange }
 				value={ content }
 				focus={ focus }
