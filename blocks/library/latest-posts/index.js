@@ -92,7 +92,7 @@ registerBlockType( 'core/latest-posts', {
 						icon="admin-post"
 						label={ __( 'Latest Posts' ) }
 					>
-					<Spinner />
+						<Spinner />
 					</Placeholder>
 				);
 			}
