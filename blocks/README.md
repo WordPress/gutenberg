@@ -1,47 +1,105 @@
 # Blocks
 
-Block is the abstract term used to describe units of markup that, composed together, form the content or layout of a webpage. The idea combines concepts of what in WordPress today we achieve with shortcodes, custom HTML, and embed discovery into a single consistent API and user experience.
+"Block" is the abstract term used to describe units of markup that, composed
+together, form the content or layout of a webpage. The idea combines concepts
+of what in WordPress today we achieve with shortcodes, custom HTML, and embed
+discovery into a single consistent API and user experience.
 
-For more context, refer to [_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/) from the [Make WordPress Design](https://make.wordpress.org/design/) blog.
+For more context, refer to
+[_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/)
+from the
+[Make WordPress Design](https://make.wordpress.org/design/)
+blog.
 
-The following documentation outlines steps you as a developer will need to follow to add your own custom blocks to WordPress's editor interfaces.
+The following documentation outlines steps you as a developer will need to
+follow to add your own custom blocks to WordPress's editor interfaces.
 
 ## Getting Started
 
-If you're not already accustomed to working with JavaScript in your WordPress plugins, you may first want to reference the guide on [_Including CSS & JavaScript_](https://developer.wordpress.org/themes/basics/including-css-javascript/) in the Theme Handbook.
+If you're not already accustomed to working with JavaScript in your WordPress
+plugins, you may first want to reference the guide on
+[_Including CSS & JavaScript_](https://developer.wordpress.org/themes/basics/including-css-javascript/)
+in the Theme Handbook.
 
-At a minimum, you will need to enqueue scripts for your block as part of a `block_enqueue_scripts` action callback, with a dependency on the `wp-blocks` script handle:
+At a minimum, you will need to enqueue scripts for your block as part of a
+`enqueue_block_editor_assets` action callback, with a dependency on the
+`wp-blocks` script handle:
 
 ```php
 <?php
-// plugin.php
+// myplugin.php
 
-function myplugin_block_enqueue_scripts() {
-	wp_enqueue_script( 'myplugin-block', plugins_url( 'block.js', __FILE__ ), array( 'wp-blocks' ) );
+function myplugin_enqueue_block_editor_assets() {
+	wp_enqueue_script(
+		'myplugin-block',
+		plugins_url( 'block.js', __FILE__ ),
+		array( 'wp-blocks' )
+	);
 }
-add_action( 'block_enqueue_scripts', 'myplugin_block_enqueue_scripts' );
+add_action( 'enqueue_block_editor_assets', 'myplugin_enqueue_block_editor_assets' );
 ```
 
-The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
+The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor
+context when the editor is ready to receive additional scripts and stylesheets.
+There is also an `enqueue_block_assets` hook which is run under __both__ the
+editor and front-end contexts.  This should be used to enqueue stylesheets
+common to the front-end and the editor.  (The rules can be overridden in the
+editor-specific stylesheet if necessary.)
+
+The following sections will describe what you'll need to include in `block.js`
+to describe the behavior of your custom block.
 
 ## Example
 
-Let's imagine you wanted to define a block to show a randomly generated image in a post's content using [lorempixel.com](http://lorempixel.com/). The service provides a choice of category and you'd like to offer this as an option when editing the post.
+Let's imagine you wanted to define a block to show a randomly generated image
+in a post's content using
+[lorempixel.com](http://lorempixel.com/).
+The service provides a choice of category and you'd like to offer this as an
+option when editing the post.
 
-Take a step back and consider the ideal workflow for adding a new random image. After inserting the block, as a user I'd expect it to be shown in some empty state, with an option to choose a category in a select dropdown. Upon confirming my selection, a preview of the image should be shown next to the dropdown. At this point, you might realize that while you'd want some controls to be shown when editing content, the markup included in the published post might not appear the same (your visitors should not see a dropdown field when reading your content). This leads to the first requirement of describing a block: __you will need to provide implementations both for what's to be shown in an editor and what's to be saved with the published content__. You needn't worry about redundant effort here, as concepts of [Elements](../element/README.md) and componentization provide an avenue for sharing common behaviors.
+Take a step back and consider the ideal workflow for adding a new random image:
 
-Now that we've considered user interaction, you should think about the underlying values that determine the markup generated by your block. In our example, the output is affected only when the category changes. Put another way: __the output of a block is a function of its attributes__. The category, a simple string, is the only thing we require to be able to generate the image we want to include in the published content. We call these underlying values of a block instance its _attributes_.
+- Insert the block.  It should be shown in some empty state, with an option to choose a category in a select dropdown.
+- Upon confirming my selection, a preview of the image should be shown next to the dropdown.
 
-With these concepts in mind, let's explore an implementation of our random image block:
+At this point, you might realize that while you'd want some controls to be
+shown when editing content, the markup included in the published post might not
+appear the same (your visitors should not see a dropdown field when reading
+your content).
+
+This leads to the first requirement of describing a block:
+
+__You will need to provide implementations both for what's to be shown in an
+editor and what's to be saved with the published content__.
+
+To eliminate redundant effort here, share common behaviors by splitting your
+code up into
+[components](../element).
+
+Now that we've considered user interaction, you should think about the
+underlying values that determine the markup generated by your block. In our
+example, the output is affected only when the category changes. Put another
+way: __the output of a block is a function of its attributes__.
+
+The category, a simple string, is the only thing we require to be able to
+generate the image we want to include in the published content. We call these
+underlying values of a block instance its __attributes__.
+
+With these concepts in mind, let's explore an implementation of our random
+image block:
 
 ```php
 <?php
-// plugin.php
+// random-image.php
 
-function random_image_block_enqueue_scripts() {
-	wp_enqueue_script( 'random-image-block', plugins_url( 'block.js', __FILE__ ), array( 'wp-blocks', 'wp-element' ) );
+function random_image_enqueue_block_editor_assets() {
+	wp_enqueue_script(
+		'random-image-block',
+		plugins_url( 'block.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element' )
+	);
 }
-add_action( 'block_enqueue_scripts', 'random_image_block_enqueue_scripts' );
+add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_assets' );
 ```
 
 ```js
@@ -106,32 +164,78 @@ _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b963
 
 Let's briefly review a few items you might observe in the implementation:
 
-- When registering a new block, you must prefix its name with a namespace for your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
-- You will use `createElement` to describe the structure of your block's markup. See the [Element documentation](../element/README.md) for more information.
-- Extracting `RandomImage` to a separate function allows us to reuse it in both the editor-specific interface and the published content.
-- The `edit` function should handle any case where an attribute is unset, as in the case of the block being newly inserted.
-- We only change the attributes of a block by calling the `setAttributes` helper. Never assign a value on the attributes object directly.
-- React provides conveniences for working with `select` element with [`value` and `onChange` props](https://facebook.github.io/react/docs/forms.html#the-select-tag).
+- When registering a new block, you must prefix its name with a namespace for
+  your plugin. This helps prevent conflicts when more than one plugin registers
+  a block with the same name.
+- You will use `createElement` to describe the structure of your block's
+  markup. See the [Element documentation](../element/README.md) for more
+  information.
+- Extracting `RandomImage` to a separate function allows us to reuse it in both
+  the editor-specific interface and the published content.
+- The `edit` function should handle any case where an attribute is unset, as in
+  the case of the block being newly inserted.
+- We only change the attributes of a block by calling the `setAttributes`
+  helper. Never assign a value on the attributes object directly.
+- React provides conveniences for working with `select` element with
+  [`value` and `onChange` props](https://facebook.github.io/react/docs/forms.html#the-select-tag).
 
-By concerning yourself only with describing the markup of a block given its attributes, you need not worry about maintaining the state of the page, or how your block interacts in the context of the surrounding editor.
+By concerning yourself only with describing the markup of a block given its
+attributes, you need not worry about maintaining the state of the page, or how
+your block interacts in the context of the surrounding editor.
 
-But how does the markup become an object of attributes? We need a pattern for encoding the values into the published post's markup, and then retrieving them the next time the post is edited. This is the motivation for the block's `attributes` property. The shape of this object matches that of the attributes object we'd like to receive, where each value is a [__matcher__](http://github.com/aduth/hpq) which tries to find the desired value from the markup of the block.
+But how does the markup become an object of attributes? We need a pattern for
+encoding the values into the published post's markup, and then retrieving them
+the next time the post is edited. This is the motivation for the block's
+`attributes` property. The shape of this object matches that of the attributes
+object we'd like to receive, where each value is a
+[__matcher__](http://github.com/aduth/hpq)
+which tries to find the desired value from the markup of the block.
 
-In the random image block above, we've given the `alt` attribute of the image a secondary responsibility of tracking the selected category. There are a few other ways we could have achieved this, but the category value happens to work well as an `alt` descriptor. In the `attributes` property, we define an object with a key of `category` whose value tries to find this `alt` attribute of the markup. If it's successful, the category's value in our `edit` and `save` functions will be assigned. In the case of a new block or invalid markup, this value would be `undefined`, so we adjust our return value accordingly.
+In the random image block above, we've given the `alt` attribute of the image a
+secondary responsibility of tracking the selected category. There are a few
+other ways we could have achieved this, but the category value happens to work
+well as an `alt` descriptor. In the `attributes` property, we define an object
+with a key of `category` whose value tries to find this `alt` attribute of the
+markup. If it's successful, the category's value in our `edit` and `save`
+functions will be assigned. In the case of a new block or invalid markup, this
+value would be `undefined`, so we adjust our return value accordingly.
 
 ## API
 
 ### `wp.blocks.registerBlockType( name: string, typeDefinition: Object )`
 
-Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
+Registers a new block provided a unique name and an object defining its
+behavior. Once registered, the block is made available as an option to any
+editor interface where blocks are implemented.
 
-- `title: string` - A human-readable [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files) label for the block. Shown in the block picker.
-- `icon: string | WPElement | Function` - Slug of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards) to be shown in the control's button, or an element (or function returning an element) if you choose to render your own SVG.
-- `attributes: Object | Function` - An object of [matchers](http://github.com/aduth/hpq) or a function which, when passed the raw content of the block, returns block attributes as an object. When defined as an object of matchers, the attributes object is generated with values corresponding to the shape of the matcher object keys.
-- `category: string` - Slug of the block's category. The category is used to organize the blocks in the block inserter.
-- `edit( { attributes: Object, setAttributes: Function } ): WPElement` - Returns an element describing the markup of a block to be shown in the editor. A block can update its own state in response to events using the `setAttributes` function, passing an object of properties to be applied as a partial update.
-- `save( { attributes: Object } ): WPElement | String` - Returns an element describing the markup of a block to be saved in the published content. This function is called before save and when switching to an editor's HTML view.
-- `encodeAttributes( attributes: Object ): Object` - Called when save markup is generated, this function allows you to control which attributes are to be encoded in the block comment metadata. By default, all attribute values not defined in the block's `attributes` property are serialized to the comment metadata. If defined, this function should return the subset of attributes to encode, or `null` to bypass default behavior.
+- `title: string` - A human-readable
+  [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
+  label for the block. Shown in the block picker.
+- `icon: string | WPElement | Function` - Slug of the
+  [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
+  to be shown in the control's button, or an element (or function returning an
+  element) if you choose to render your own SVG.
+- `attributes: Object | Function` - An object of
+  [matchers](http://github.com/aduth/hpq) or a function which, when passed the
+  raw content of the block, returns block attributes as an object. When defined
+  as an object of matchers, the attributes object is generated with values
+  corresponding to the shape of the matcher object keys.
+- `category: string` - Slug of the block's category. The category is used to
+  organize the blocks in the block inserter.
+- `edit( { attributes: Object, setAttributes: Function } ): WPElement` -
+  Returns an element describing the markup of a block to be shown in the
+  editor. A block can update its own state in response to events using the
+  `setAttributes` function, passing an object of properties to be applied as a
+  partial update.
+- `save( { attributes: Object } ): WPElement | String` - Returns an element
+  describing the markup of a block to be saved in the published content. This
+  function is called before save and when switching to an editor's HTML view.
+- `encodeAttributes( attributes: Object ): Object` - Called when save markup is
+  generated, this function allows you to control which attributes are to be
+  encoded in the block comment metadata. By default, all attribute values not
+  defined in the block's `attributes` property are serialized to the comment
+  metadata. If defined, this function should return the subset of attributes to
+  encode, or `null` to bypass default behavior.
 
 ### `wp.blocks.getBlockType( name: string )`
 
@@ -143,13 +247,21 @@ Returns settings associated with a registered control.
 
 ## Components
 
-Because many blocks share the same complex behaviors, the following components are made available to simplify implementations of your block's `edit` function.
+Because many blocks share the same complex behaviors, the following components
+are made available to simplify implementations of your block's `edit` function.
 
 ### `BlockControls`
 
-When returned by your block's `edit` implementation, renders a toolbar of icon buttons. This is useful for block-level modifications to be made available when a block is selected. For example, if your block supports alignment, you may want to display alignment options in the selected block's toolbar.
+When returned by your block's `edit` implementation, renders a toolbar of icon
+buttons. This is useful for block-level modifications to be made available when
+a block is selected. For example, if your block supports alignment, you may
+want to display alignment options in the selected block's toolbar.
 
-Because the toolbar should only be shown when the block is selected, it is important that a `BlockControls` element is only returned when the block's `focus` prop is [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy), meaning that focus is currently within the block.
+Because the toolbar should only be shown when the block is selected, it is
+important that a `BlockControls` element is only returned when the block's
+`focus` prop is
+[truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy),
+meaning that focus is currently within the block.
 
 Example:
 
@@ -180,27 +292,45 @@ function edit( props ) {
 }
 ```
 
-Note in this example that we render `AlignmentToolbar` as a child of the `BlockControls` element. This is another pre-configured component you can use to simplify block text alignment.
+Note in this example that we render `AlignmentToolbar` as a child of the
+`BlockControls` element. This is another pre-configured component you can use
+to simplify block text alignment.
 
-Alternatively, you can create your own toolbar controls by passing an array of `controls` as a prop to the `BlockControls` component. Each control should be an object with the following properties:
+Alternatively, you can create your own toolbar controls by passing an array of
+`controls` as a prop to the `BlockControls` component. Each control should be
+an object with the following properties:
 
 - `icon: string` - Slug of the Dashicon to be shown in the control's toolbar button
 - `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
 - `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
 - `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
 
-To create divisions between sets of controls within the same `BlockControls` element, passing `controls` instead as a nested array (array of arrays of objects). A divider will be shown between each set of controls.
+To create divisions between sets of controls within the same `BlockControls`
+element, passing `controls` instead as a nested array (array of arrays of
+objects). A divider will be shown between each set of controls.
 
 ### `Editable`
 
-Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similar to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
+Render a rich
+[`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
+providing users the option to add emphasis to content or links to content. It
+behaves similarly to a
+[controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),
+except that `onChange` is triggered less frequently than would be expected from
+a traditional `input` field, usually when the user exits the field.
 
 The following props are made available:
 
-- `inline: boolean` - If true, only inline elements are allowed to be used in inserted into the text, effectively disabling the behavior of the "Enter" key.
-- `placeholder: string` - A text hint to be shown to the user when the field value is empty, similar to the [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute)
-- `value: string` - Markup value of the editable field. Only valid markup is allowed, as determined by `inline` value and available controls.
-- `onChange: Function` - Callback handler when the value of the field changes, passing the new value as its only argument.
+- `inline: boolean` - If true, only inline elements are allowed to be used in
+  inserted into the text, effectively disabling the behavior of the "Enter"
+  key.
+- `placeholder: string` - A text hint to be shown to the user when the field
+  value is empty, similar to the
+  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+- `value: string` - Markup value of the editable field. Only valid markup is
+  allowed, as determined by `inline` value and available controls.
+- `onChange: Function` - Callback handler when the value of the field changes,
+  passing the new value as its only argument.
 
 Example:
 
