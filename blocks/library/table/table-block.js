@@ -52,6 +52,12 @@ export default class TableBlock extends wp.element.Component {
 		};
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.focus && ! this.props.focus && this.editor ) {
+			this.editor.plugins.table.cellSelection.clear();
+		}
+	}
+
 	handleSetup( editor, focus ) {
 		// select the end of the first table cell
 		editor.on( 'init', () => {
