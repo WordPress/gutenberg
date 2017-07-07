@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
+import './style.scss';
 import { __ } from 'i18n';
 import { Component } from 'element';
 import { IconButton } from 'components';
@@ -23,8 +29,14 @@ class UrlInput extends Component {
 		const { expanded } = this.state;
 
 		return (
-			<div>
-				<IconButton icon="admin-links" onClick={ this.expand } />
+			<li className="components-url-input">
+				<IconButton
+					icon="admin-links"
+					onClick={ this.expand }
+					className={ classnames( 'components-toolbar__control', {
+						'is-active': expanded,
+					} ) }
+					/>
 				{ ( expanded || url ) &&
 					<form
 						className="editable-format-toolbar__link-modal"
@@ -40,7 +52,7 @@ class UrlInput extends Component {
 						<IconButton icon="editor-break" type="submit" />
 					</form>
 				}
-			</div>
+			</li>
 		);
 	}
 }
