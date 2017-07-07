@@ -41,26 +41,14 @@ export default class OldEditor extends Component {
 
 	initialize() {
 		const { id } = this.props;
-		const {
-			plugins,
-			external_plugins,
-			toolbar1,
-			toolbar2,
-			toolbar3,
-			toolbar4,
-		} = window.wpEditorL10n.tinymce.settings;
+		const { settings } = window.wpEditorL10n.tinymce;
 
 		wp.oldEditor.initialize( id, {
 			tinymce: {
+				...settings,
 				inline: true,
 				content_css: false,
 				fixed_toolbar_container: '#' + id + '-toolbar',
-				plugins,
-				external_plugins,
-				toolbar1: toolbar1.join( ',' ),
-				toolbar2: toolbar2.join( ',' ),
-				toolbar3: toolbar3.join( ',' ),
-				toolbar4: toolbar4.join( ',' ),
 				setup: this.onSetup,
 			},
 		} );
