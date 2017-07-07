@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { filter, map } from 'lodash';
-import { test } from 'sinon';
 import { mount } from 'enzyme';
 
 /**
@@ -177,7 +176,7 @@ maybeDescribe( 'FormTokenField', function() {
 			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.at );
 		} );
 
-		it( 'should manage the selected suggestion based on both keyboard and mouse events', test( function() {
+		it( 'should manage the selected suggestion based on both keyboard and mouse events', function() {
 			setText( 'th' );
 			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.th );
 			expect( getSelectedSuggestion() ).toBe( null );
@@ -191,7 +190,7 @@ maybeDescribe( 'FormTokenField', function() {
 
 			// before sending a hover event, we need to wait for
 			// SuggestionList#_scrollingIntoView to become false
-			this.clock.tick( 100 );
+			jest.runTimersToTime( 100 );
 
 			hoverSuggestion.simulate( 'mouseEnter' );
 			expect( getSelectedSuggestion() ).toEqual( [ 'wi', 'th' ] );
@@ -202,7 +201,7 @@ maybeDescribe( 'FormTokenField', function() {
 			hoverSuggestion.simulate( 'click' );
 			expect( getSelectedSuggestion() ).toBe( null );
 			expect( getTokensHTML() ).toEqual( [ 'foo', 'bar', 'with' ] );
-		} ) );
+		} );
 	} );
 
 	describe( 'adding tokens', function() {
@@ -290,44 +289,44 @@ maybeDescribe( 'FormTokenField', function() {
 			testSavedState( true );
 		}
 
-		it( 'should add the current text when the input field loses focus', test( function() {
+		it( 'should add the current text when the input field loses focus', function() {
 			testOnBlur(
 				't',                   // initialText
 				false,                 // selectSuggestion
 				null,                  // expectedSuggestion
 				[ 'foo', 'bar', 't' ]  // expectedTokens
 			);
-		} ) );
+		} );
 
-		it( 'shouldn\'t show any suggestion when the initial text is smaller than two characters', test( function() {
+		it( 'shouldn\'t show any suggestion when the initial text is smaller than two characters', function() {
 			testOnBlur(
 				't',                    // initialText
 				true,                   // selectSuggestion
 				null,                   // expectedSuggestion
 				[ 'foo', 'bar', 'to' ]  // expectedTokens
 			);
-		} ) );
+		} );
 
-		it( 'should add the suggested token when the (non-blank) input field loses focus', test( function() {
+		it( 'should add the suggested token when the (non-blank) input field loses focus', function() {
 			testOnBlur(
 				'to',                    // initialText
 				true,                    // selectSuggestion
 				[ 'to' ],            // expectedSuggestion
 				[ 'foo', 'bar', 'to' ]   // expectedTokens
 			);
-		} ) );
+		} );
 
-		it( 'should not lose focus when a suggestion is clicked', test( function() {
+		it( 'should not lose focus when a suggestion is clicked', function() {
 			// prevents regression of https://github.com/Automattic/wp-calypso/issues/1884
 			setText( 'th' );
 			const firstSuggestion = tokenFieldNode.find( '.components-form-token-field__suggestion' ).at( 0 );
 			firstSuggestion.simulate( 'click' );
 
 			// wait for setState call
-			this.clock.tick( 10 );
+			jest.runTimersToTime( 10 );
 
 			expect( tokenFieldNode.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( true );
-		} ) );
+		} );
 
 		it( 'should add tokens in the middle of the current tokens', function() {
 			sendKeyDown( keyCodes.leftArrow );

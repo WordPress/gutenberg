@@ -49,7 +49,6 @@
 		"eol-last": "error",
 		"func-call-spacing": "error",
 		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
-		"jest/valid-expect": "off",
 		"jsx-quotes": "error",
 		"key-spacing": "error",
 		"keyword-spacing": "error",
