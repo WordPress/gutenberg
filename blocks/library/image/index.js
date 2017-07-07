@@ -16,6 +16,7 @@ import TextControl from '../../inspector-controls/text-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockDescription from '../../block-description';
+import UrlInput from '../../url-input';
 
 const { attr, children } = query;
 
@@ -30,6 +31,7 @@ registerBlockType( 'core/image', {
 		url: attr( 'img', 'src' ),
 		alt: attr( 'img', 'alt' ),
 		caption: children( 'figcaption' ),
+		href: attr( 'a', 'href' ),
 	},
 
 	transforms: {
@@ -57,13 +59,14 @@ registerBlockType( 'core/image', {
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, alt, caption, align, id } = attributes;
+		const { url, alt, caption, align, id, href } = attributes;
 		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => {
 			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
 		};
 		const uploadButtonProps = { isLarge: true };
+		const onSetHref = ( event ) => setAttributes( { href: event.target.value } );
 
 		const controls = (
 			focus && (
@@ -88,6 +91,7 @@ registerBlockType( 'core/image', {
 								<Dashicon icon="edit" />
 							</MediaUploadButton>
 						</li>
+						<UrlInput onChange={ onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
 			)
@@ -149,17 +153,22 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
+		const { url, alt, caption, align = 'none', href } = attributes;
 		const needsWrapper = [ 'wide', 'full' ].indexOf( align ) !== -1;
 
 		// If there's no caption set only save the image element.
 		if ( ! needsWrapper && ( ! caption || ! caption.length ) ) {
-			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
+			const imageWithAlignment = <img src={ url } alt={ alt } className={ `align${ align }` } />;
+			return href
+				? <a href={ href }>{ imageWithAlignment }</a>
+				: imageWithAlignment;
 		}
+
+		const image = <img src={ url } alt={ alt } />;
 
 		return (
 			<figure className={ `align${ align }` }>
-				<img src={ url } alt={ alt } />
+				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && !! caption.length && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
