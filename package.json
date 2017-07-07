@@ -100,20 +100,22 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "**/blocks/**/*.js",
-      "**/components/**/*.js",
-      "**/date/**/*.js",
-      "**/editor/**/*.js",
-      "**/element/**/*.js",
-      "**/i18n/**/*.js",
-      "**/utils/**/*.js"
+      "blocks/**/*.js",
+      "components/**/*.js",
+      "date/**/*.js",
+      "editor/**/*.js",
+      "element/**/*.js",
+      "i18n/**/*.js",
+      "utils/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/components/clipboard-button/index.js",
       "<rootDir>/components/notice/index.js",
       "<rootDir>/components/notice/list.js",
       "<rootDir>/components/form-toggle/index.js",
-      "<rootDir>/components/form-token-field/token.js"
+      "<rootDir>/components/form-token-field/token.js",
+      "<rootDir>/[^/]+/build/index.js",
+      ".*/story/[^/]+.js"
     ],
     "moduleNameMapper": {
       "\\.scss$": "<rootDir>/test/style-mock.js"
@@ -133,7 +135,8 @@
       "**/editor/**/test/*.js",
       "**/element/**/test/*.js",
       "**/i18n/**/test/*.js",
-      "**/utils/**/test/*.js" ],
+      "**/utils/**/test/*.js"
+    ],
     "timers": "fake",
     "transform": {
       "^.+\\.jsx?$": "babel-jest",
