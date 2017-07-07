@@ -88,11 +88,14 @@ add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
  * @return array          Updated post actions.
  */
 function gutenberg_add_edit_links( $actions, $post ) {
-	$can_edit_post = current_user_can( 'edit_post', $post->ID );
+	if ( ! gutenberg_can_edit_post( $post->ID ) ) {
+		return $actions;
+	}
+
 	$title = _draft_or_post_title( $post->ID );
 	$post_type = get_post_type( $post );
 
-	if ( $can_edit_post && 'trash' !== $post->post_status && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
+	if ( 'trash' !== $post->post_status && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
 		// Build the Gutenberg edit action. See also: WP_Posts_List_Table::handle_row_actions().
 		$gutenberg_url = menu_page_url( 'gutenberg', false );
 		$gutenberg_action = sprintf(
@@ -117,4 +120,27 @@ function gutenberg_add_edit_links( $actions, $post ) {
 	}
 
 	return $actions;
+}
+
+/**
+ * Return whether the post can be edited in Gutenberg and by the current user.
+ *
+ * Gutenberg depends on the REST API, and if the post type is not shown in the
+ * REST API, then the post cannot be edited in Gutenberg.
+ *
+ * @since 0.5.0
+ *
+ * @param int $post_id Post.
+ * @return bool Whether the post can be edited with Gutenberg.
+ */
+function gutenberg_can_edit_post( $post_id ) {
+	$post = get_post( $post_id );
+	if ( ! $post || ! post_type_exists( $post->post_type ) ) {
+		return false;
+	}
+	$post_type_object = get_post_type_object( $post->post_type );
+	if ( ! $post_type_object->show_in_rest ) {
+		return false;
+	}
+	return current_user_can( 'edit_post', $post_id );
 }
