@@ -443,7 +443,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'tinymce' => array(
 			'baseURL' => includes_url( 'js/tinymce' ),
 			'suffix' => SCRIPT_DEBUG ? '' : '.min',
-			'settings' => array(
+			'settings' => apply_filters( 'tiny_mce_before_init', array(
 				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
 				'plugins' => array_unique( apply_filters( 'tiny_mce_plugins', array(
 					'charmap',
@@ -465,25 +465,24 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'wptextpattern',
 					'wpview',
 				) ) ),
-				'toolbar1' => array_merge( apply_filters( 'mce_buttons', array(
+				'toolbar1' => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
 					'formatselect',
-					'|',
-					'alignleft',
-					'aligncenter',
-					'alignright',
-					'|',
+					'bold',
+					'italic',
 					'bullist',
 					'numlist',
 					'blockquote',
-					'|',
-					'bold',
-					'italic',
-					'strikethrough',
+					'alignleft',
+					'aligncenter',
+					'alignright',
 					'link',
-				), 'editor' ), array( '|', 'kitchensink' ) ),
-				'toolbar2' => apply_filters( 'mce_buttons_2', array(
-					'hr',
+					'unlink',
 					'wp_more',
+					'spellchecker',
+				), 'editor' ), array( 'kitchensink' ) ) ),
+				'toolbar2' => implode( ',', apply_filters( 'mce_buttons_2', array(
+					'strikethrough',
+					'hr',
 					'forecolor',
 					'pastetext',
 					'removeformat',
@@ -493,10 +492,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'undo',
 					'redo',
 					'wp_help',
-				), 'editor' ),
-				'toolbar3' => apply_filters( 'mce_buttons_3', array(), 'editor' ),
-				'toolbar4' => apply_filters( 'mce_buttons_4', array(), 'editor' ),
-			),
+				), 'editor' ) ),
+				'toolbar3' => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
+				'toolbar4' => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+			), 'editor' ),
 		),
 	) );
 

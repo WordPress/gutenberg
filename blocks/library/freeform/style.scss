@@ -87,29 +87,44 @@
 
 .freeform-toolbar {
 	width: auto;
-}
-
-.freeform-toolbar .mce-tinymce-inline {
-	margin: 0;
-	background: transparent;
-	position: sticky;
 	top: $header-height - 1px;
 	z-index: z-index( '.editor-visual-editor__block-controls' );
-	margin-top: -$block-controls-height - $item-spacing;
+	position: sticky;
 
 	@include break-medium() {
 		top: $header-height + $admin-bar-height + $item-spacing;
 	}
 }
 
+.freeform-toolbar .mce-tinymce-inline {
+	margin: 0;
+	margin-top: -$block-controls-height - $item-spacing;
+	border: 1px solid $light-gray-500;
+	background-color: $white;
+	box-shadow: $shadow-popover;
+}
+
 // Overwrite inline styles.
 .freeform-toolbar .mce-tinymce-inline,
 .freeform-toolbar .mce-tinymce-inline > div,
 .freeform-toolbar div.mce-toolbar-grp,
-.freeform-toolbar div.mce-toolbar-grp > div {
+.freeform-toolbar div.mce-toolbar-grp > div,
+.freeform-toolbar .mce-menubar,
+.freeform-toolbar .mce-menubar > div {
 	height: auto !important;
 	width: 100% !important;
-	border: none !important;
+}
+
+.freeform-toolbar .mce-tinymce-inline .mce-flow-layout {
+    white-space: normal;
+}
+
+.freeform-toolbar .mce-container-body.mce-abs-layout {
+	overflow: visible;
+}
+
+.freeform-toolbar .mce-menubar {
+	position: static;
 }
 
 .freeform-toolbar div.mce-toolbar-grp {
@@ -118,35 +133,26 @@
 	position: static;
 }
 
-div.mce-toolbar-grp > div {
+.freeform-toolbar div.mce-toolbar-grp > div {
     padding: 0;
 }
 
-.freeform-toolbar div.mce-btn-group {
-	border: 1px solid $light-gray-500;
-	box-shadow: $shadow-popover;
-	background-color: $white;
-	padding: 0;
-
-	&:not(:first-child) {
-		margin-left: 6px;
-	}
-}
-
-.freeform-toolbar .mce-container-body.mce-abs-layout {
-	overflow: visible;
-}
-
-.freeform-toolbar .mce-toolbar:not(:first-child) {
+.freeform-toolbar .mce-toolbar-grp .mce-toolbar:not(:first-child) {
 	display: none;
-	margin-top: 6px;
+	border-top: 1px solid $light-gray-500;
 }
 
-.freeform-toolbar.has-advanced-toolbar .mce-toolbar {
+.freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
 }
 
-.freeform-toolbar .mce-toolbar .mce-btn {
+.freeform-toolbar div.mce-btn-group {
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+.freeform-toolbar .mce-toolbar-grp .mce-toolbar .mce-btn {
 	margin: 0;
 	padding: 3px;
 	background: none;
@@ -160,6 +166,8 @@ div.mce-toolbar-grp > div {
 	// Overwrite
 	border: none;
 	box-sizing: border-box;
+	box-shadow: none;
+	border-radius: 0;
 
 	&:hover,
 	/* the ":not(:disabled)" is needed to make it specific enough */
