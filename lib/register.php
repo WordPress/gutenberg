@@ -131,8 +131,6 @@ function gutenberg_add_edit_links_filters() {
 	add_filter( 'page_row_actions', 'gutenberg_add_edit_links', 10, 2 );
 	// For non-hierarchical post types.
 	add_filter( 'post_row_actions', 'gutenberg_add_edit_links', 10, 2 );
-
-	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
 }
 add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
 
@@ -231,6 +229,7 @@ function gutenberg_filter_edit_post_link( $url, $post_id, $context ) {
 	}
 	return $url;
 }
+add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
 
 /**
  * Return whether the post can be edited in Gutenberg and by the current user.
