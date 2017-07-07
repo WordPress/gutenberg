@@ -10,7 +10,7 @@ import { pick } from 'lodash';
  */
 import './style.scss';
 import './block.scss';
-import { registerBlockType } from '../../api';
+import { registerBlockType, query as hpq } from '../../api';
 import MediaUploadButton from '../../media-upload-button';
 import InspectorControls from '../../inspector-controls';
 import RangeControl from '../../inspector-controls/range-control';
@@ -19,6 +19,8 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 import BlockDescription from '../../block-description';
+
+const { query, attr } = hpq;
 
 const MAX_COLUMNS = 8;
 
@@ -69,6 +71,13 @@ registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	icon: 'format-gallery',
 	category: 'common',
+
+	attributes: {
+		images: query( '.blocks-gallery-image', {
+			url: attr( 'img', 'src' ),
+			alt: attr( 'img', 'alt' )
+		} )
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
