@@ -73,6 +73,8 @@ function gutenberg_add_edit_links_filters() {
 	add_filter( 'page_row_actions', 'gutenberg_add_edit_links', 10, 2 );
 	// For non-hierarchical post types.
 	add_filter( 'post_row_actions', 'gutenberg_add_edit_links', 10, 2 );
+
+	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
 }
 add_action( 'admin_init', 'gutenberg_add_edit_links_filters' );
 
@@ -95,18 +97,31 @@ function gutenberg_add_edit_links( $actions, $post ) {
 	$title = _draft_or_post_title( $post->ID );
 	$post_type = get_post_type( $post );
 
+	if ( gutenberg_post_has_blocks( $post->ID ) ) {
+		$text = __( 'Classic Editor', 'gutenberg' );
+		/* translators: %s: post title */
+		$label = __( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' );
+
+		remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
+		$edit_url = get_edit_post_link( $post->ID, 'raw' );
+		add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
+	} else {
+		$text = __( 'Gutenberg', 'gutenberg' );
+		/* translators: %s: post title */
+		$label = __( 'Edit &#8220;%s&#8221; in the Gutenberg editor', 'gutenberg' );
+		$edit_url = gutenberg_get_edit_post_url( $post->ID );
+	}
+
 	if ( 'trash' !== $post->post_status && apply_filters( 'gutenberg_add_edit_link_for_post_type', true, $post_type, $post ) ) {
 		// Build the Gutenberg edit action. See also: WP_Posts_List_Table::handle_row_actions().
-		$gutenberg_url = menu_page_url( 'gutenberg', false );
 		$gutenberg_action = sprintf(
 			'<a href="%s" aria-label="%s">%s</a>',
-			add_query_arg( 'post_id', $post->ID, $gutenberg_url ),
+			esc_url( $edit_url ),
 			esc_attr( sprintf(
-				/* translators: %s: post title */
-				__( 'Edit &#8220;%s&#8221; in the Gutenberg editor', 'gutenberg' ),
+				$label,
 				$title
 			) ),
-			__( 'Gutenberg', 'gutenberg' )
+			$text
 		);
 		// Insert the Gutenberg action immediately after the Edit action.
 		$edit_offset = array_search( 'edit', array_keys( $actions ), true );
@@ -120,6 +135,43 @@ function gutenberg_add_edit_links( $actions, $post ) {
 	}
 
 	return $actions;
+}
+
+/**
+ * Get the edit post URL for Gutenberg.
+ *
+ * @since 0.5.0
+ *
+ * @param int $post_id Post ID.
+ * @return string|false URL or false if not available.
+ */
+function gutenberg_get_edit_post_url( $post_id ) {
+	// Note that menu_page_url() cannot be used because it does not work on the frontend.
+	$gutenberg_url = admin_url( 'admin.php?page=gutenberg' );
+	$gutenberg_url = add_query_arg( 'post_id', $post_id, $gutenberg_url );
+	return $gutenberg_url;
+}
+
+/**
+ * Filters the post edit link to default to the Gutenberg editor when the post content contains a block.
+ *
+ * @since 0.5.0
+ *
+ * @param string $url     The edit link URL.
+ * @param int    $post_id Post ID.
+ * @param string $context The link context. If set to 'display' then ampersands are encoded.
+ * @return string Edit post link.
+ */
+function gutenberg_filter_edit_post_link( $url, $post_id, $context ) {
+	$post = get_post( $post_id );
+	if ( gutenberg_can_edit_post( $post_id ) && gutenberg_post_has_blocks( $post_id ) ) {
+		$gutenberg_url = gutenberg_get_edit_post_url( $post->ID );
+		if ( 'display' === $context ) {
+			$gutenberg_url = esc_url( $gutenberg_url );
+		}
+		$url = $gutenberg_url;
+	}
+	return $url;
 }
 
 /**
@@ -143,4 +195,17 @@ function gutenberg_can_edit_post( $post_id ) {
 		return false;
 	}
 	return current_user_can( 'edit_post', $post_id );
+}
+
+/**
+ * Determine whether a post has blocks.
+ *
+ * @since 0.5.0
+ *
+ * @param int $post_id Post ID.
+ * @return bool Whether the post has blocks.
+ */
+function gutenberg_post_has_blocks( $post_id ) {
+	$post = get_post( $post_id );
+	return $post && preg_match( '#<!-- wp:\w+#', $post->post_content );
 }
