@@ -84,20 +84,6 @@
     "tinymce": "^4.5.6",
     "webpack": "^2.2.1"
   },
-  "scripts": {
-    "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
-    "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
-    "lint": "eslint . .storybook",
-    "dev": "cross-env BABEL_ENV=default webpack --watch",
-    "test": "npm run lint && npm run test-unit",
-    "ci": "concurrently \"npm run build\" \"npm test\"",
-    "package-plugin": "./bin/build-plugin-zip.sh",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "test-unit": "jest",
-    "test-unit:coverage": "jest --coverage",
-    "test-unit:watch": "jest --watch"
-  },
   "jest": {
     "collectCoverageFrom": [
       "blocks/**/*.js",
@@ -143,5 +129,19 @@
       "\\.pegjs$": "<rootDir>/test/pegjs-transform.js"
     },
     "verbose": true
+  },
+  "scripts": {
+    "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
+    "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
+    "lint": "eslint . .storybook",
+    "dev": "cross-env BABEL_ENV=default webpack --watch",
+    "test": "npm run lint && npm run test-unit",
+    "ci": "concurrently \"npm run build\" \"npm test\"",
+    "package-plugin": "./bin/build-plugin-zip.sh",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "test-unit": "jest",
+    "test-unit:coverage": "jest --coverage",
+    "test-unit:watch": "jest --watch"
   }
 }
