@@ -53,6 +53,7 @@
     "babel-traverse": "^6.24.1",
     "chai": "^3.5.0",
     "concurrently": "^3.4.0",
+    "coveralls": "^2.13.1",
     "cross-env": "^3.2.4",
     "deep-freeze": "0.0.1",
     "dirty-chai": "^1.2.2",
