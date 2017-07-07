@@ -137,7 +137,7 @@
     "timers": "fake",
     "transform": {
       "^.+\\.jsx?$": "babel-jest",
-      "\\.pegjs$": "<rootDir>/test/pgejs-transform.js"
+      "\\.pegjs$": "<rootDir>/test/pegjs-transform.js"
     },
     "verbose": true
   }
