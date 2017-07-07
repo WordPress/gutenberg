@@ -119,7 +119,6 @@ registerBlockType( 'core/gallery', {
 						buttonProps={ uploadButtonProps }
 						onSelect={ setMediaUrl }
 						type="image"
-						autoOpen
 						multiple="true"
 					>
 						{ __( 'Insert from Media Library' ) }
