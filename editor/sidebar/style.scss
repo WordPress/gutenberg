@@ -1,16 +1,20 @@
 .editor-sidebar {
-	position: sticky;
+	position: fixed;
 	z-index: z-index( '.editor-sidebar' );
+	top: 0;
 	right: 0;
-	top: $admin-bar-height-big + $header-height;
 	bottom: 0;
 	width: $sidebar-width;
 	border-left: 1px solid $light-gray-500;
 	background: $light-gray-300;
 	color: $dark-gray-500;
+	height: 100vh;
+	overflow: hidden;
 
 	@include break-small() {
-		position: fixed;
+		top: $admin-bar-height-big + $header-height;
+		z-index: auto;
+		height: auto;
 		overflow: auto;
 	}
 
@@ -21,12 +25,38 @@
 	> .components-panel {
 		border-left: none;
 		border-right: none;
+		overflow: auto;
+		height: 100%;
+		padding-top: $sidebar-panel-header-height;
+
+		@include break-small() {
+			overflow: inherit;
+			height: auto;
+			padding-top: 0;
+		}
+
 		&:first-child {
 			margin-top: -1px;
 		}
 
 		&:last-child {
 			margin-bottom: -1px;
+		}
+	}
+
+	> .components-panel .components-panel__header {
+		position: fixed;
+		z-index: z-index( '.components-panel__header' );
+		top: 0;
+		left: 0;
+		right: 0;
+		height: $sidebar-panel-header-height;
+
+		@include break-small() {
+			position: inherit;
+			top: auto;
+			left: auto;
+			right: auto;
 		}
 	}
 
@@ -58,16 +88,6 @@
 
 /* Visual and Text editor both */
 .editor-layout.is-sidebar-opened .editor-layout__content {
-	margin-left: -200%;
-	float: left;
-	height: 0;
-
-	@include break-small() {
-		margin-left: auto;
-		float: none;
-		height: auto;
-	}
-
 	@include break-medium() {
 		margin-right: $sidebar-width;
 	}
