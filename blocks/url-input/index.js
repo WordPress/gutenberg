@@ -21,7 +21,7 @@ class UrlInput extends Component {
 	}
 
 	expand() {
-		this.setState( { expanded: true } );
+		this.setState( { expanded: ! this.state.expanded } );
 	}
 
 	render() {
@@ -41,6 +41,7 @@ class UrlInput extends Component {
 					<form
 						className="editable-format-toolbar__link-modal"
 						onSubmit={ ( event ) => event.preventDefault() }>
+						<IconButton className="components-url-input__back" icon="arrow-left-alt" type="button" onClick={ this.expand } />
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
