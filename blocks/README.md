@@ -49,6 +49,12 @@ editor-specific stylesheet if necessary.)
 The following sections will describe what you'll need to include in `block.js`
 to describe the behavior of your custom block.
 
+Note that all JavaScript code samples in this document are enclosed in a
+function that is evaulated immediately afterwards.  This recommended practice
+ensures that your variables declared with `var` will not pollute the global
+`window` object, which could cause plugins with WordPress core or with other
+plugins.
+
 ## Example
 
 Let's imagine you wanted to define a block to show a randomly generated image
@@ -104,60 +110,65 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-var el = wp.element.createElement,
-	query = wp.blocks.query;
+( function( blocks, element ) {
+	var el = element.createElement,
+		query = blocks.query;
 
-function RandomImage( props ) {
-	var src = 'http://lorempixel.com/400/200/' + props.category;
+	function RandomImage( props ) {
+		var src = 'http://lorempixel.com/400/200/' + props.category;
 
-	return el( 'img', {
-		src: src,
-		alt: props.category
-	} );
-}
-
-wp.blocks.registerBlockType( 'myplugin/random-image', {
-	title: 'Random Image',
-
-	icon: 'format-image',
-
-	category: 'media',
-
-	attributes: {
-		category: query.attr( 'img', 'alt' )
-	},
-
-	edit: function( props ) {
-		var category = props.attributes.category,
-			children;
-
-		function setCategory( event ) {
-			var selected = event.target.querySelector( 'option:checked' );
-			props.setAttributes( { category: selected.value } );
-			event.preventDefault();
-		}
-
-		children = [];
-		if ( category ) {
-			children.push( RandomImage( { category: category } ) );
-		}
-
-		children.push(
-			el( 'select', { value: category, onChange: setCategory },
-				el( 'option', null, '- Select -' ),
-				el( 'option', { value: 'sports' }, 'Sports' ),
-				el( 'option', { value: 'animals' }, 'Animals' ),
-				el( 'option', { value: 'nature' }, 'Nature' )
-			)
-		);
-
-		return el( 'form', { onSubmit: setCategory }, children );
-	},
-
-	save: function( props ) {
-		return RandomImage( { category: props.attributes.category } );
+		return el( 'img', {
+			src: src,
+			alt: props.category
+		} );
 	}
-} );
+
+	blocks.registerBlockType( 'myplugin/random-image', {
+		title: 'Random Image',
+
+		icon: 'format-image',
+
+		category: 'media',
+
+		attributes: {
+			category: query.attr( 'img', 'alt' )
+		},
+
+		edit: function( props ) {
+			var category = props.attributes.category,
+				children;
+
+			function setCategory( event ) {
+				var selected = event.target.querySelector( 'option:checked' );
+				props.setAttributes( { category: selected.value } );
+				event.preventDefault();
+			}
+
+			children = [];
+			if ( category ) {
+				children.push( RandomImage( { category: category } ) );
+			}
+
+			children.push(
+				el( 'select', { value: category, onChange: setCategory },
+					el( 'option', null, '- Select -' ),
+					el( 'option', { value: 'sports' }, 'Sports' ),
+					el( 'option', { value: 'animals' }, 'Animals' ),
+					el( 'option', { value: 'nature' }, 'Nature' )
+				)
+			);
+
+			return el( 'form', { onSubmit: setCategory }, children );
+		},
+
+		save: function( props ) {
+			return RandomImage( { category: props.attributes.category } );
+		}
+	} );
+} )(
+	window.wp.blocks,
+	window.wp.element
+);
 ```
 
 _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b96383e4b2e8a7c)_
@@ -260,30 +271,35 @@ meaning that focus is currently within the block.
 Example:
 
 ```js
-var el = wp.element.createElement,
-	BlockControls = wp.blocks.BlockControls,
-	AlignmentToolbar = wp.blocks.AlignmentToolbar;
+( function( blocks, element ) {
+	var el = element.createElement,
+		BlockControls = blocks.BlockControls,
+		AlignmentToolbar = blocks.AlignmentToolbar;
 
-function edit( props ) {
-	return [
-		// Controls: (only visible when focused)
-		props.focus && (
-			el( BlockControls, { key: 'controls' },
-				el( AlignmentToolbar, {
-					value: props.align,
-					onChange: function( nextAlign ) {
-						props.setAttributes( { align: nextAlign } )
-					}
-				} )
-			)
-		),
+	function edit( props ) {
+		return [
+			// Controls: (only visible when focused)
+			props.focus && (
+				el( BlockControls, { key: 'controls' },
+					el( AlignmentToolbar, {
+						value: props.align,
+						onChange: function( nextAlign ) {
+							props.setAttributes( { align: nextAlign } )
+						}
+					} )
+				)
+			),
 
-		// Block content: (with alignment as attribute)
-		el( 'p', { key: 'text', style: { textAlign: props.align } },
-			'Hello World!'
-		),
-	];
-}
+			// Block content: (with alignment as attribute)
+			el( 'p', { key: 'text', style: { textAlign: props.align } },
+				'Hello World!'
+			),
+		];
+	}
+} )(
+	window.wp.blocks,
+	window.wp.element
+);
 ```
 
 Note in this example that we render `AlignmentToolbar` as a child of the
@@ -331,17 +347,24 @@ The following properties (non-exhaustive list) are made available:
 Example:
 
 ```js
-var el = wp.element.createElement,
-	Editable = wp.blocks.Editable;
+( function( blocks, element ) {
+	var el = element.createElement,
+		Editable = blocks.Editable;
 
-function edit( props ) {
-	function onChange( value ) {
-		props.setAttributes( { text: value } );
+	function edit( props ) {
+		function onChange( value ) {
+			props.setAttributes( { text: value } );
+		}
+
+		return el( Editable, {
+			value: props.attributes.text,
+			onChange: onChange
+		} );
 	}
 
-	return el( Editable, {
-		value: props.attributes.text,
-		onChange: onChange
-	} );
-}
+	// blocks.registerBlockType( ..., { edit: edit, ... } );
+} )(
+	window.wp.blocks,
+	window.wp.element
+);
 ```
