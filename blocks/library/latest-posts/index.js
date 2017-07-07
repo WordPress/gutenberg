@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from 'element';
-import { Placeholder } from 'components';
+import { Placeholder, Spinner } from 'components';
 import { __ } from 'i18n';
 import moment from 'moment';
 
@@ -15,6 +15,7 @@ import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
 import TextControl from '../../inspector-controls/text-control';
 import ToggleControl from '../../inspector-controls/toggle-control';
+import BlockDescription from '../../block-description';
 
 const MIN_POSTS = 1;
 const MAX_POSTS = 100;
@@ -88,9 +89,10 @@ registerBlockType( 'core/latest-posts', {
 			if ( ! latestPosts.length ) {
 				return (
 					<Placeholder
-						icon="update"
-						label={ __( 'Loading latest posts, please wait' ) }
+						icon="admin-post"
+						label={ __( 'Latest Posts' ) }
 					>
+						<Spinner />
 					</Placeholder>
 				);
 			}
@@ -101,6 +103,10 @@ registerBlockType( 'core/latest-posts', {
 			return [
 				focus && (
 					<InspectorControls key="inspector">
+						<BlockDescription>
+							<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
+						</BlockDescription>
+						<h3>{ __( 'Latest Posts Settings' ) }</h3>
 						<ToggleControl
 							label={ __( 'Display post date' ) }
 							checked={ displayPostDate }
