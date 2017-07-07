@@ -17,8 +17,17 @@ $blocks-button__height: 46px;
 	vertical-align: top;
 	position: relative;
 
+	a {
+		color: $white;
+		text-decoration: none;
+	}
+
 	&:hover {
 		color: $white;
+	}
+
+	&.aligncenter {
+		display: inline-block;
 	}
 
 	.editable-format-toolbar__link-modal {
