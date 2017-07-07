@@ -23,7 +23,7 @@ in the Theme Handbook.
 
 At a minimum, you will need to enqueue scripts for your block as part of a
 `enqueue_block_editor_assets` action callback, with a dependency on the
-`wp-blocks` script handle:
+`wp-blocks` and `wp-element` script handles:
 
 ```php
 <?php
