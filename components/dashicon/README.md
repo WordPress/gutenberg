@@ -272,3 +272,6 @@ The following props are used to control the display of the component. Any additi
  - welcome-view-site
  - welcome-widgets-menus
  - welcome-write-blog
+ - wordpress-alt
+ - wordpress
+ - yes

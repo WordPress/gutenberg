@@ -294,7 +294,10 @@ storiesOf( 'Components', module )
 					'welcome-learn-more':'welcome-learn-more',
 					'welcome-view-site':'welcome-view-site',
 					'welcome-widgets-menus':'welcome-widgets-menus',
-					'welcome-write-blog':'welcome-write-blog'
+					'welcome-write-blog':'welcome-write-blog',
+					'wordpress-alt': 'wordpress-alt',
+					'wordpress': 'wordpress',
+					'yes': 'yes'
 				}, 'wordpress' ) }
 			/>
 		),
