@@ -103,6 +103,7 @@
       "<rootDir>/[^/]+/build/index.js",
       ".*/story/[^/]+.js"
     ],
+    "coverageDirectory": "coverage",
     "moduleNameMapper": {
       "\\.scss$": "<rootDir>/test/style-mock.js"
     },
