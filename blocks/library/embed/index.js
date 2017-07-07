@@ -19,7 +19,6 @@ import { registerBlockType, query } from '../../api';
 import Editable from '../../editable';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockDescription from '../../block-description';
 
 const { attr, children } = query;
 
