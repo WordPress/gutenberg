@@ -230,12 +230,6 @@ editor interface where blocks are implemented.
 - `save( { attributes: Object } ): WPElement | String` - Returns an element
   describing the markup of a block to be saved in the published content. This
   function is called before save and when switching to an editor's HTML view.
-- `encodeAttributes( attributes: Object ): Object` - Called when save markup is
-  generated, this function allows you to control which attributes are to be
-  encoded in the block comment metadata. By default, all attribute values not
-  defined in the block's `attributes` property are serialized to the comment
-  metadata. If defined, this function should return the subset of attributes to
-  encode, or `null` to bypass default behavior.
 
 ### `wp.blocks.getBlockType( name: string )`
 
@@ -319,18 +313,20 @@ behaves similarly to a
 except that `onChange` is triggered less frequently than would be expected from
 a traditional `input` field, usually when the user exits the field.
 
-The following props are made available:
+The following properties (non-exhaustive list) are made available:
 
-- `inline: boolean` - If true, only inline elements are allowed to be used in
-  inserted into the text, effectively disabling the behavior of the "Enter"
-  key.
-- `placeholder: string` - A text hint to be shown to the user when the field
-  value is empty, similar to the
-  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 - `value: string` - Markup value of the editable field. Only valid markup is
   allowed, as determined by `inline` value and available controls.
 - `onChange: Function` - Callback handler when the value of the field changes,
   passing the new value as its only argument.
+- `placeholder: string` - A text hint to be shown to the user when the field
+  value is empty, similar to the
+  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+- `multiline: String` - A tag name to use for the tag that should be inserted
+  when Enter is pressed.  For example: `li` in a list block, and `p` for a
+	block that can contain multiple paragraphs.  The default is that only inline
+	elements are allowed to be used in inserted into the text, effectively
+  disabling the behavior of the "Enter" key.
 
 Example:
 
