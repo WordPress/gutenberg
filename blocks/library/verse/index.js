@@ -12,10 +12,10 @@ import Editable from '../../editable';
 
 const { children } = query;
 
-registerBlockType( 'core/preformatted', {
-	title: __( 'Preformatted Text' ),
+registerBlockType( 'core/verse', {
+	title: __( 'Verse' ),
 
-	icon: 'text',
+	icon: 'edit',
 
 	category: 'formatting',
 
@@ -29,7 +29,7 @@ registerBlockType( 'core/preformatted', {
 				type: 'block',
 				blocks: [ 'core/text' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/preformatted', attributes ),
+					createBlock( 'core/verse', attributes ),
 			},
 		],
 		to: [
@@ -56,15 +56,13 @@ registerBlockType( 'core/preformatted', {
 				} }
 				focus={ focus }
 				onFocus={ setFocus }
-				placeholder={ __( 'Write preformatted text…' ) }
+				placeholder={ __( 'Write…' ) }
 				className={ className }
 			/>
 		);
 	},
 
-	save( { attributes } ) {
-		const { content } = attributes;
-
-		return <pre>{ content }</pre>;
+	save( { attributes, className } ) {
+		return <pre className={ className }>{ attributes.content }</pre>;
 	},
 } );
