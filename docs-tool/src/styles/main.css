@@ -1,0 +1,16 @@
+body {
+	margin: 0;
+}
+
+#secondary {
+	padding: 4rem 0 0;
+}
+
+code {
+	tab-size: 4;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background-color: #f7f7f7 !important;
+}
