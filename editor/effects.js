@@ -20,9 +20,28 @@ import {
 	getCurrentPostType,
 	getBlocks,
 	getPostEdits,
+	isCleanNewPost,
 } from './selectors';
 
+let originalDocumentTitle;
+
+function populateDocumentTitle( title, isCleanNew = false ) {
+	if ( ! title.trim() ) {
+		title = isCleanNew ? __( 'New post' ) : __( '(Untitled)' );
+	}
+	if ( ! originalDocumentTitle ) {
+		originalDocumentTitle = document.title;
+	}
+	document.title = title + ' | ' + originalDocumentTitle;
+}
+
 export default {
+	RESET_POST( action, store ) {
+		populateDocumentTitle( action.post.title ? action.post.title.raw : '', isCleanNewPost( store.getState() ) );
+	},
+	EDIT_POST_TITLE( action, store ) {
+		populateDocumentTitle( action.postTitle, isCleanNewPost( store.getState() ) );
+	},
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
