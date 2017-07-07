@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { render } from 'enzyme';
 
 /**
@@ -18,6 +17,6 @@ describe( 'withInstanceId', () => {
 		const dumb1 = render( <DumpComponent /> );
 		const dumb2 = render( <DumpComponent /> );
 		// Unrendered element.
-		expect( dumb1.text() ).to.not.equal( dumb2.text() );
+		expect( dumb1.text() ).not.toBe( dumb2.text() );
 	} );
 } );
