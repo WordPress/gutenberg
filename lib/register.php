@@ -63,6 +63,64 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
+ * Provide an edit link for posts and terms.
+ *
+ * @since 0.5.0
+ *
+ * @param WP_Admin_Bar $wp_admin_bar Admin bar.
+ */
+function gutenberg_add_admin_bar_edit_link( $wp_admin_bar ) {
+	$edit_node = $wp_admin_bar->get_node( 'edit' );
+	if ( ! $edit_node ) {
+		return;
+	}
+
+	$queried_object = get_queried_object();
+	if ( empty( $queried_object ) || empty( $queried_object->post_type ) || ! post_type_exists( $queried_object->post_type ) || ! gutenberg_can_edit_post( $queried_object->ID ) ) {
+		return;
+	}
+	$post = $queried_object;
+
+	if ( ! get_post_type_object( $post->post_type )->show_in_admin_bar ) {
+		return;
+	}
+
+	$classic_text = __( 'Classic Editor', 'gutenberg' );
+	remove_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10 );
+	$classic_url = get_edit_post_link( $post->ID, 'raw' );
+	add_filter( 'get_edit_post_link', 'gutenberg_filter_edit_post_link', 10, 3 );
+
+	if ( empty( $classic_url ) ) {
+		return;
+	}
+
+	$gutenberg_text = __( 'Edit in Gutenberg', 'gutenberg' );
+	$gutenberg_url = gutenberg_get_edit_post_url( $post->ID );
+
+	$is_gutenberg_default = gutenberg_post_has_blocks( $post->ID );
+
+	// Update title for edit link to indicate it will link to Gutenberg.
+	if ( $is_gutenberg_default ) {
+		$wp_admin_bar->add_node( array_merge(
+			(array) $edit_node,
+			array(
+				'title' => $gutenberg_text,
+			)
+		) );
+	}
+
+	// Add submenu item under link to go to Gutenberg editor or classic editor.
+	$wp_admin_bar->add_node( array(
+		'id' => 'edit_alt',
+		'parent' => 'edit',
+		'href' => $is_gutenberg_default ? $classic_url : $gutenberg_url,
+		'title' => $is_gutenberg_default ? $classic_text : $gutenberg_text,
+	) );
+
+}
+add_action( 'admin_bar_menu', 'gutenberg_add_admin_bar_edit_link', 81 );
+
+/**
  * Adds the filters to register additional links for the Gutenberg editor in
  * the post/page screens.
  *
