@@ -158,17 +158,17 @@ registerBlockType( 'core/image', {
 
 		// If there's no caption set only save the image element.
 		if ( ! needsWrapper && ( ! caption || ! caption.length ) ) {
+			const imageWithAlignment = <img src={ url } alt={ alt } className={ `align${ align }` } />;
 			return href
-				? <a href={ href }><img src={ url } alt={ alt } className={ `align${ align }` } /></a>
-				: <img src={ url } alt={ alt } className={ `align${ align }` } />;
+				? <a href={ href }>{ imageWithAlignment }</a>
+				: imageWithAlignment;
 		}
+
+		const image = <img src={ url } alt={ alt } />;
 
 		return (
 			<figure className={ `align${ align }` }>
-				{ href
-					? <a href={ href }><img src={ url } alt={ alt } /></a>
-					: <img src={ url } alt={ alt } />
-				}
+				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && !! caption.length && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);

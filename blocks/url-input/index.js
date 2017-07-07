@@ -46,12 +46,11 @@ class UrlInput extends Component {
 				{ expanded &&
 					<form
 						className="editable-format-toolbar__link-modal"
-						onSubmit={ ( event ) => this.submitLink( event ) }>
+						onSubmit={ this.submitLink }>
 						<IconButton className="components-url-input__back" icon="arrow-left-alt" onClick={ this.toggle } />
 						<input
 							className="editable-format-toolbar__link-input"
 							type="url"
-							required
 							value={ url }
 							onChange={ onChange }
 							placeholder={ __( 'Paste URL or type' ) }
