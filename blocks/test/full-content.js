@@ -88,10 +88,28 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
+	/* eslint-disable no-console */
 	beforeAll( () => {
-		// Registers all blocks
+		// Register all blocks.
 		require( 'blocks' );
+		// Ignore some specific warnings that would otherwise cause errors :(
+		// See `test/setup-globals.js` and #1769
+		console._errorThrows = console.error;
+		console.error = ( ...args ) => {
+			const message = args[ 0 ];
+			if ( /Whitespace [\w ]+ child of <(table|thead|tbody|tr)>/.test( message ) ) {
+				console._errorOriginal( message );
+				return;
+			}
+			console._errorThrows.apply( console, args );
+		};
 	} );
+
+	afterAll( () => {
+		console.error = console._errorThrows;
+		delete console._errorThrows;
+	} );
+	/* eslint-enable no-console */
 
 	fileBasenames.forEach( f => {
 		it( f, () => {
