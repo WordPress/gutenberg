@@ -78,7 +78,7 @@ TinyMCE is one of the best tools for enabling rich text on the web. In Gutenberg
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 The goal of Gutenberg is not to put anyone out of business. It is to evolve WordPress so there's more business to be had in the future.
 
-Aside from enabling a rich post and page building experience, a meta goal is to _move WordPress forward_ as a platform. Not only by modernizing the UI, but my modernizing the foundation also.
+Aside from enabling a rich post and page building experience, a meta goal is to _move WordPress forward_ as a platform. Not only by modernizing the UI, but by modernizing the foundation also.
 
 We realize it's a big change. We also think there will be many new opportunities for plugins. WordPress is likely to ship with a range of basic blocks, but there will be plenty of room for highly tailored premium plugins that augment existing blocks, or add new blocks to the mix.
 
