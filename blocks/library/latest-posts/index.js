@@ -145,7 +145,7 @@ registerBlockType( 'core/latest-posts', {
 				<ul className={ this.props.className } key="latest-posts">
 					{ latestPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link }>{ post.title.rendered }</a>
+							<a href={ post.link } target="_blank">{ post.title.rendered }</a>
 							{ displayPostDate && post.date_gmt &&
 								<span className={ `${ this.props.className }__post-date` }>
 									{ moment( post.date_gmt ).local().format( 'MMM DD h:mm A' ) }
