@@ -64,6 +64,7 @@ export const editor = combineUndoableReducers( {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'REQUEST_POST_UPDATE_SUCCESS':
+			case 'TRASH_POST_SUCCESS':
 				return false;
 
 			case 'UPDATE_BLOCK':
