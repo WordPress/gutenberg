@@ -13,8 +13,8 @@ $z-layers: (
 	'.editor-post-visibility__dialog': 30,
 	'.editor-post-schedule__dialog': 30,
 	'.editor-block-mover': 30,
-	'.components-notice-list': 9989,
-	'.components-popover': 9989,
+	'.components-notice-list': 9989, // Admin submenus (#adminmenu .wp-submenu) have z-index equal to 9999
+	'.components-popover': 9989, // Admin submenus (#adminmenu .wp-submenu) have z-index equal to 9999
 );
 
 @function z-index( $key ) {
