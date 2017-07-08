@@ -1,4 +1,5 @@
 import React from 'react';
+import { find } from 'lodash';
 import ReactMarkdown from 'react-markdown';
 
 const stories = [];
@@ -18,19 +19,31 @@ export function getStories() {
 	return stories;
 }
 
-export function getStoriesTree() {
-	const buildTreeNode = ( story ) => {
-		return  {
-			...story,
-			children: buildTreeChildren( story.id ),
-		};
-	}
+export function getStory( id ) {
+	return find( stories, ( story ) => story.id === id );
+}
 
-	const buildTreeChildren = ( parentId = '' ) => {
-		return stories
-			.filter( ( story ) => story.parent === parentId )
-			.map( buildTreeNode );
-	};
+export function getChildren( id ) {
+	return stories.filter( ( story ) => story.parent === id );
+}
 
-	return buildTreeChildren();
+export function getOrderedPageList( parentId = '' ) {
+	return getChildren( parentId ).reduce( ( memo, story ) => {
+		memo.push( story );
+		return memo.concat( getOrderedPageList( story.id ) );
+	}, [] );
+}
+
+export function getNextStory( id ) {
+	const orderedList = getOrderedPageList();
+	const index = orderedList.indexOf( getStory( id ) );
+
+	return orderedList[ index + 1 ];
+}
+
+export function getPreviousStory( id ) {
+	const orderedList = getOrderedPageList();
+	const index = orderedList.indexOf( getStory( id ) );
+
+	return orderedList[ index - 1 ];
 }

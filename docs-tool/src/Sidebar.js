@@ -1,21 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { getStoriesTree } from 'glutenberg';
+import { getStories, getChildren } from 'glutenberg';
 
-function MenuItem( { item } ) {
+function MenuItem( { item } ) {
+	const children = getChildren( item.id );
 	return (
 		<li>
-			{ ! item.children.length && <Link to={ item.path }>{ item.title }</Link> }
-			{ !! item.children.length && (
+			{ ! children.length && <Link to={ item.path }>{ item.title }</Link> }
+			{ !! children.length && (
 				<div className="expandable">
 					<span className="dashicons dashicons-arrow-down-alt2"></span>
 					<Link to={ item.path }>{ item.title }</Link>
 				</div>
 			) }
-			{ !! item.children.length && (
+			{ !! children.length && (
 				<ul>
-					{ item.children.map( ( story, index) => (
+					{ children.map( ( story, index ) => (
 						<MenuItem key={ index } item={ story } />
 					) ) }
 				</ul>
@@ -32,9 +33,12 @@ function Sidebar() {
 					<h2 className="widget-title">Documentation</h2>
 					<div className="menu-table-of-contents-container">
 						<ul>
-							{ getStoriesTree().map( ( story, index ) => (
-								<MenuItem key={ index } item={ story } />
-							) ) }
+							{ getStories()
+								.filter( ( story ) => ! story.parent )
+									.map( ( story, index ) => (
+										<MenuItem key={ index } item={ story } />
+									) )
+							}
 						</ul>
 					</div>
 				</aside>
