@@ -152,23 +152,13 @@ registerBlockType( 'core/image', {
 	},
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none', href } = attributes;
-		const needsWrapper = [ 'wide', 'full' ].indexOf( align ) !== -1;
-
-		// If there's no caption set only save the image element.
-		if ( ! needsWrapper && ( ! caption || ! caption.length ) ) {
-			const imageWithAlignment = <img src={ url } alt={ alt } className={ `align${ align }` } />;
-			return href
-				? <a href={ href }>{ imageWithAlignment }</a>
-				: imageWithAlignment;
-		}
-
+		const { url, alt, caption = [], align, href } = attributes;
 		const image = <img src={ url } alt={ alt } />;
 
 		return (
-			<figure className={ `align${ align }` }>
+			<figure className={ align && `align${ align }` }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && !! caption.length && <figcaption>{ caption }</figcaption> }
+				{ caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},
