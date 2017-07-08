@@ -28,7 +28,7 @@ function Sidebar() {
 	return (
 		<div id="secondary" className="widget-area">
 			<div className="secondary-content">
-				<aside id="handbook_pages-3" className="widget widget_wporg_handbook_pages">
+				<aside className="widget widget_wporg_handbook_pages">
 					<h2 className="widget-title">Documentation</h2>
 					<div className="menu-table-of-contents-container">
 						<ul>

@@ -29,18 +29,16 @@ class Tabs extends Component {
 
 		return (
 			<div>
-				<div>
-					{ tabs.map( ( tab, index ) => (
-						<button
-							key={ index }
-							onClick={ this.selectTab( index ) }
-							className={ index === this.state.activeTab ? 'is-active' : '' }
-						>
-							{ tab.name }
-						</button>
-					) ) }
-					{ activeTab && <div dangerouslySetInnerHTML={ { __html: activeTab.content } } /> }
-				</div>
+				{ tabs.map( ( tab, index ) => (
+					<button
+						key={ index }
+						onClick={ this.selectTab( index ) }
+						className={ index === this.state.activeTab ? 'is-active' : '' }
+					>
+						{ tab.name }
+					</button>
+				) ) }
+				{ activeTab && <div dangerouslySetInnerHTML={ { __html: activeTab.content } } /> }
 			</div>
 		);
 	}
@@ -82,12 +80,12 @@ class Page extends Component {
 
 				<div className="navigation">
 					{ !! previousStory && (
-						<p className="nav-older">
+						<p className="nav-older" rel="previous">
 							<Link to={ previousStory.path }>{ '←' } { previousStory.title }</Link>
 						</p>
 					) }
 					{ !! nextStory && (
-						<p className="nav-newer">
+						<p className="nav-newer" rel="next">
 							<Link to={ nextStory.path }>{ nextStory.title } { '→' }</Link>
 						</p>
 					) }
