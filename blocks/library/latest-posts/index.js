@@ -10,6 +10,7 @@ import moment from 'moment';
  * Internal dependencies
  */
 import './style.scss';
+import './block.scss';
 import { registerBlockType } from '../../api';
 import { getLatestPosts } from './data.js';
 import InspectorControls from '../../inspector-controls';
