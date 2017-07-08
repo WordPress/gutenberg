@@ -50,6 +50,10 @@ To run unit tests only, use `npm run test-unit` instead.
 
 Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
 
+### JavaScript Test Coverage
+
+JavaScript test coverage is available at [Coveralls](https://coveralls.io/github/WordPress/gutenberg). _Code coverage_ is a way of measuring the amount of code covered by the tests in the test suite of a project.
+
 ### PHP Testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. Before starting, you should install PHPUnit and have a copy of [WordPress Develop](https://github.com/WordPress/wordpress-develop) available and setup a [`wp-tests-config.php`](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/#setup) file. If the Gutenberg plugin is installed in the context of a WordPress Develop site, you can run `phpunit` directly from the command-line. Otherwise, you will need to specify the path to WordPress Develop's test directory as an environment variable:
