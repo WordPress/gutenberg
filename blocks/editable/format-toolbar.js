@@ -31,7 +31,7 @@ class FormatToolbar extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			linkValue: props.formats.link ? props.formats.link.value : '',
+			linkValue: props.formats.link,
 			isEditingLink: false,
 		};
 		this.addLink = this.addLink.bind( this );
@@ -64,15 +64,21 @@ class FormatToolbar extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		const newState = {
-			linkValue: nextProps.formats.link ? nextProps.formats.link.value : '',
+			linkValue: nextProps.formats.link,
 		};
+
 		if (
-			! this.props.formats.link ||
-			! nextProps.formats.link ||
-			this.props.formats.link.node !== nextProps.formats.link.node
+			nextProps.formats.link !== '#' &&
+			this.props.formats.link !== nextProps.formats.link
 		) {
 			newState.isEditingLink = false;
+
+			// Clean up link placeholders.
+			if ( ! nextProps.formats.link ) {
+				this.props.onChange( { link: undefined } );
+			}
 		}
+
 		this.setState( newState );
 	}
 
@@ -86,10 +92,8 @@ class FormatToolbar extends Component {
 
 	addLink() {
 		if ( ! this.props.formats.link ) {
-			this.props.onChange( { link: { value: '' } } );
-
-			// Debounce the call to avoid the reset in willReceiveProps
-			this.editTimeout = setTimeout( () => this.setState( { isEditingLink: true } ) );
+			this.props.onChange( { link: '#' } );
+			this.setState( { isEditingLink: true } );
 		}
 	}
 
@@ -106,7 +110,7 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.linkValue } } );
+		this.props.onChange( { link: this.state.linkValue } );
 		this.setState( {
 			isEditingLink: false,
 		} );
@@ -141,12 +145,14 @@ class FormatToolbar extends Component {
 			} );
 		}
 
+		const isEditingLink = this.state.isEditingLink || this.state.linkValue === '#';
+
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editable-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ !! formats.link && this.state.isEditingLink &&
+				{ !! formats.link && isEditingLink &&
 					<form
 						className="editable-format-toolbar__link-modal"
 						style={ linkStyle }
@@ -156,7 +162,7 @@ class FormatToolbar extends Component {
 							className="editable-format-toolbar__link-input"
 							type="url"
 							required
-							value={ this.state.linkValue }
+							value={ this.state.linkValue === '#' ? '' : this.state.linkValue }
 							onChange={ this.updateLinkValue }
 							placeholder={ __( 'Paste URL or type' ) }
 						/>
@@ -165,7 +171,7 @@ class FormatToolbar extends Component {
 					</form>
 				}
 
-				{ !! formats.link && ! this.state.isEditingLink &&
+				{ !! formats.link && ! isEditingLink &&
 					<div className="editable-format-toolbar__link-modal" style={ linkStyle }>
 						<a
 							className="editable-format-toolbar__link-value"

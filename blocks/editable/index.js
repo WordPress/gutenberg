@@ -353,16 +353,15 @@ export default class Editable extends Component {
 	}
 
 	onNodeChange( { element, parents } ) {
-		const formats = {};
-		const link = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
-		if ( link ) {
-			formats.link = { value: link.getAttribute( 'href' ) || '', link };
-		}
-		const activeFormats = this.editor.formatter.matchAll( [	'bold', 'italic', 'strikethrough' ] );
-		activeFormats.forEach( ( activeFormat ) => formats[ activeFormat ] = true );
-
 		const focusPosition = this.getRelativePosition( element );
 		const bookmark = this.editor.selection.getBookmark( 2, true );
+		const link = find( parents, ( node ) => node.nodeName === 'A' );
+		const formats = this.editor.formatter
+			.matchAll( [ 'bold', 'italic', 'strikethrough' ] )
+			.reduce( ( acc, format ) => ( { acc, [ format ]: true } ), {} );
+
+		formats.link = link ? link.getAttribute( 'href' ) || '' : '';
+
 		this.setState( { bookmark, formats, focusPosition } );
 	}
 
@@ -440,23 +439,29 @@ export default class Editable extends Component {
 		}
 
 		forEach( formats, ( formatValue, format ) => {
+			const isActive = this.isFormatActive( format );
+			const editor = this.editor;
+
 			if ( format === 'link' ) {
-				if ( formatValue !== undefined ) {
-					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
-					if ( ! anchor ) {
-						this.editor.formatter.remove( 'link' );
+				if ( ! formatValue ) {
+					if ( isActive ) {
+						editor.execCommand( 'Unlink' );
+					} else {
+						// Clean up link placeholders.
+						editor.$( 'a' ).each( function( i, element ) {
+							if ( element.getAttribute( 'href' ) === '#' ) {
+								editor.dom.remove( element, true );
+							}
+						} );
 					}
-					this.editor.formatter.apply( 'link', { href: formatValue.value }, anchor );
 				} else {
-					this.editor.execCommand( 'Unlink' );
+					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
+					this.editor.formatter.apply( 'link', { href: formatValue }, anchor );
 				}
-			} else {
-				const isActive = this.isFormatActive( format );
-				if ( isActive && ! formatValue ) {
-					this.editor.formatter.remove( format );
-				} else if ( ! isActive && formatValue ) {
-					this.editor.formatter.apply( format );
-				}
+			} else if ( isActive && ! formatValue ) {
+				this.editor.formatter.remove( format );
+			} else if ( ! isActive && formatValue ) {
+				this.editor.formatter.apply( format );
 			}
 		} );
 
