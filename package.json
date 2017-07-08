@@ -53,6 +53,7 @@
     "babel-traverse": "^6.24.1",
     "chai": "^3.5.0",
     "concurrently": "^3.4.0",
+    "coveralls": "^2.13.1",
     "cross-env": "^3.2.4",
     "deep-freeze": "0.0.1",
     "dirty-chai": "^1.2.2",
@@ -84,37 +85,26 @@
     "tinymce": "^4.5.6",
     "webpack": "^2.2.1"
   },
-  "scripts": {
-    "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
-    "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
-    "lint": "eslint . .storybook",
-    "dev": "cross-env BABEL_ENV=default webpack --watch",
-    "test": "npm run lint && npm run test-unit",
-    "ci": "concurrently \"npm run build\" \"npm test\"",
-    "package-plugin": "./bin/build-plugin-zip.sh",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "test-unit": "jest",
-    "test-unit:coverage": "jest --coverage",
-    "test-unit:watch": "jest --watch"
-  },
   "jest": {
     "collectCoverageFrom": [
-      "**/blocks/**/*.js",
-      "**/components/**/*.js",
-      "**/date/**/*.js",
-      "**/editor/**/*.js",
-      "**/element/**/*.js",
-      "**/i18n/**/*.js",
-      "**/utils/**/*.js"
+      "blocks/**/*.js",
+      "components/**/*.js",
+      "date/**/*.js",
+      "editor/**/*.js",
+      "element/**/*.js",
+      "i18n/**/*.js",
+      "utils/**/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/components/clipboard-button/index.js",
       "<rootDir>/components/notice/index.js",
       "<rootDir>/components/notice/list.js",
       "<rootDir>/components/form-toggle/index.js",
-      "<rootDir>/components/form-token-field/token.js"
+      "<rootDir>/components/form-token-field/token.js",
+      "<rootDir>/[^/]+/build/index.js",
+      ".*/story/[^/]+.js"
     ],
+    "coverageDirectory": "coverage",
     "moduleNameMapper": {
       "\\.scss$": "<rootDir>/test/style-mock.js"
     },
@@ -133,12 +123,28 @@
       "**/editor/**/test/*.js",
       "**/element/**/test/*.js",
       "**/i18n/**/test/*.js",
-      "**/utils/**/test/*.js" ],
+      "**/utils/**/test/*.js"
+    ],
     "timers": "fake",
     "transform": {
       "^.+\\.jsx?$": "babel-jest",
       "\\.pegjs$": "<rootDir>/test/pegjs-transform.js"
     },
     "verbose": true
+  },
+  "scripts": {
+    "build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
+    "gettext-strings": "cross-env BABEL_ENV=gettext webpack",
+    "lint": "eslint . .storybook",
+    "dev": "cross-env BABEL_ENV=default webpack --watch",
+    "test": "npm run lint && npm run test-unit",
+    "ci": "concurrently \"npm run build\" \"npm run lint\" \"npm run test-unit:coverage-ci\"",
+    "package-plugin": "./bin/build-plugin-zip.sh",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "test-unit": "jest",
+    "test-unit:coverage": "jest --coverage",
+    "test-unit:coverage-ci": "jest --coverage && coveralls < coverage/lcov.info",
+    "test-unit:watch": "jest --watch"
   }
 }

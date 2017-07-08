@@ -1,5 +1,6 @@
 # Gutenberg
-[![Build Status](https://travis-ci.org/WordPress/gutenberg.svg?branch=master)](https://travis-ci.org/WordPress/gutenberg)
+[![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
+[![Coverage](https://img.shields.io/coveralls/WordPress/gutenberg/master.svg)](https://coveralls.io/github/WordPress/gutenberg)
 
 Printing since 1440.
 
